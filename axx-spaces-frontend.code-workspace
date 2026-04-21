@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "../../../backend/axx-spaces-frontend"
+		},
+		{
+			"path": "../../../backend/axx-spaces-backend"
+		}
+	],
+	"settings": {}
+}
