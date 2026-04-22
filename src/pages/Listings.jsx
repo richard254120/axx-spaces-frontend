@@ -7,7 +7,6 @@ export default function Listings() {
   const [properties, setProperties] = useState([]);
   const location = useLocation();
 
-  // FETCH DATA (WITH SEARCH FILTERS FROM URL)
   useEffect(() => {
     fetchProperties();
   }, [location.search]);
@@ -23,7 +22,6 @@ export default function Listings() {
 
   return (
     <div style={{ padding: "20px" }}>
-
       <h2>🏠 Available Listings</h2>
 
       {/* 🌍 MAP VIEW */}
@@ -36,10 +34,8 @@ export default function Listings() {
         <div style={styles.grid}>
           {properties.map((p) => {
 
-            // ✅ FIXED IMAGE HANDLING (PRODUCTION SAFE)
-            const imageSrc = p.image
-              ? `https://axx-spaces-backend.onrender.com/uploads/${p.image}`
-              : null;
+            // ✅ CLOUDINARY IMAGE (FINAL FIX)
+            const imageSrc = p.image || null;
 
             return (
               <div key={p._id} style={styles.card}>
