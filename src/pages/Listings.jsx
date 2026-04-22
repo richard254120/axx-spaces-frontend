@@ -34,13 +34,13 @@ export default function Listings() {
         <div style={styles.grid}>
           {properties.map((p) => {
 
-            // ✅ CLOUDINARY IMAGE (FINAL FIX)
+            // ✅ CLOUDINARY IMAGE
             const imageSrc = p.image || null;
 
             return (
               <div key={p._id} style={styles.card}>
 
-                {/* IMAGE */}
+                {/* ✅ FIXED IMAGE DISPLAY */}
                 {imageSrc && (
                   <img
                     src={imageSrc}
