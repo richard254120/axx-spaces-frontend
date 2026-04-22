@@ -24,23 +24,23 @@ export default function Listings() {
     <div style={{ padding: "20px" }}>
       <h2>🏠 Available Listings</h2>
 
-      {/* 🌍 MAP VIEW */}
+      {/* MAP */}
       <MapView properties={properties} />
 
-      {/* LIST VIEW */}
+      {/* LIST */}
       {properties.length === 0 ? (
         <p>No properties found</p>
       ) : (
         <div style={styles.grid}>
           {properties.map((p) => {
 
-            // ✅ CLOUDINARY IMAGE
-            const imageSrc = p.image || null;
+            // ✅ FIX: correct image handling
+            const imageSrc = p.image;
 
             return (
               <div key={p._id} style={styles.card}>
 
-                {/* ✅ FIXED IMAGE DISPLAY */}
+                {/* IMAGE (FIXED BUG HERE) */}
                 {imageSrc && (
                   <img
                     src={imageSrc}
@@ -55,8 +55,7 @@ export default function Listings() {
                 <p>{p.type}</p>
                 <p>{p.bedrooms} Bedrooms</p>
 
-                {/* AMENITIES */}
-                {p.amenities && p.amenities.length > 0 && (
+                {p.amenities?.length > 0 && (
                   <p style={{ fontSize: "12px", color: "#aaa" }}>
                     🏡 {p.amenities.join(", ")}
                   </p>
@@ -67,7 +66,6 @@ export default function Listings() {
                 </p>
 
                 <strong>📞 {p.phone}</strong>
-
               </div>
             );
           })}
@@ -77,9 +75,6 @@ export default function Listings() {
   );
 }
 
-/* =========================
-   STYLES
-========================= */
 const styles = {
   grid: {
     display: "grid",
@@ -87,14 +82,12 @@ const styles = {
     gap: "15px",
     marginTop: "20px",
   },
-
   card: {
     background: "#111",
     padding: "15px",
     borderRadius: "10px",
     color: "white",
   },
-
   image: {
     width: "100%",
     height: "180px",
@@ -103,4 +96,3 @@ const styles = {
     marginBottom: "10px",
   },
 };
-
