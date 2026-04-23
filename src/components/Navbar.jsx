@@ -11,8 +11,8 @@ export default function Navbar() {
       <div>
         <Link style={styles.link} to="/">Home</Link>
         <Link style={styles.link} to="/listings">Listings</Link>
+          <Link style={styles.link} to="/upload">Upload</Link>
         <Link style={styles.link} to="/login">Login</Link>
-        <Link style={styles.link} to="/upload">Upload</Link>
 
         {/* 👇 Admin is hidden but not deleted */}
         {showAdmin && (
