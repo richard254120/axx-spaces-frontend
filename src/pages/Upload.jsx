@@ -114,7 +114,6 @@ export default function Upload() {
 
     formData.append("lat", form.lat || "");
     formData.append("lng", form.lng || "");
-
     formData.append("amenities", JSON.stringify(form.amenities || []));
 
     if (form.image) {
@@ -122,8 +121,12 @@ export default function Upload() {
     }
 
     try {
-      // ✅ FIXED: NO HEADERS
-      const res = await API.post("/properties", formData);
+      // ✅ FIXED REQUEST
+      const res = await API.post("/properties", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       console.log("SUCCESS:", res.data);
       alert("Property submitted ✔");
@@ -146,8 +149,9 @@ export default function Upload() {
       });
 
     } catch (err) {
-      console.log("SUBMISSION ERROR:", err?.response?.data || err.message);
-      alert("Submit failed ❌ Check backend or network");
+      console.log("FULL ERROR:", err);
+      console.log("BACKEND RESPONSE:", err?.response?.data);
+      alert(err?.response?.data?.error || "Submit failed ❌ Check backend or network");
     }
   };
 
