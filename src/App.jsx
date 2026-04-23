@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
@@ -18,6 +19,8 @@ function App() {
         <Route path="/upload" element={<Upload />} />
       
       </Routes>
+
+      <SpeedInsights />
     </>
   );
 }
