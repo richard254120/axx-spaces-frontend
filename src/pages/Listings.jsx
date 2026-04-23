@@ -33,14 +33,12 @@ export default function Listings() {
       ) : (
         <div style={styles.grid}>
           {properties.map((p) => {
-
-            // ✅ FIX: correct image handling
             const imageSrc = p.image;
 
             return (
               <div key={p._id} style={styles.card}>
 
-                {/* IMAGE (FIXED BUG HERE) */}
+                {/* ✅ FIXED IMAGE */}
                 {imageSrc && (
                   <img
                     src={imageSrc}
@@ -55,6 +53,7 @@ export default function Listings() {
                 <p>{p.type}</p>
                 <p>{p.bedrooms} Bedrooms</p>
 
+                {/* AMENITIES */}
                 {p.amenities?.length > 0 && (
                   <p style={{ fontSize: "12px", color: "#aaa" }}>
                     🏡 {p.amenities.join(", ")}
