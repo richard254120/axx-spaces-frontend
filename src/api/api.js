@@ -1,7 +1,9 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:1000/api",
+  baseURL:
+    import.meta.env.VITE_API_URL ||
+    "https://axx-spaces-backend-1.onrender.com/api",
 });
 
 export default API;
