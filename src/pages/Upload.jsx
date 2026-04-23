@@ -19,9 +19,6 @@ export default function Upload() {
     lng: "",
   });
 
-  /* =========================
-     COUNTIES
-  ========================= */
   const counties = [
     "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
     "Garissa","Wajir","Mandera","Marsabit",
@@ -35,9 +32,6 @@ export default function Upload() {
     "Nairobi City"
   ];
 
-  /* =========================
-     PROPERTY TYPES
-  ========================= */
   const propertyTypes = [
     "Bedsitter","Studio Apartment","1 Bedroom","2 Bedroom",
     "3 Bedroom","4+ Bedroom","Maisonette","Bungalow",
@@ -52,9 +46,6 @@ export default function Upload() {
     "WiFi","Borehole","Furnished"
   ];
 
-  /* =========================
-     GEOLOCATION
-  ========================= */
   const getMyLocation = () => {
     if (!navigator.geolocation) {
       alert("Geolocation not supported");
@@ -78,9 +69,6 @@ export default function Upload() {
     );
   };
 
-  /* =========================
-     HANDLERS
-  ========================= */
   const handleChange = (e) => {
     setForm((prev) => ({
       ...prev,
@@ -108,9 +96,6 @@ export default function Upload() {
     }));
   };
 
-  /* =========================
-     SUBMIT (FINAL FIXED)
-  ========================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -137,16 +122,12 @@ export default function Upload() {
     }
 
     try {
-      const res = await API.post("/properties", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      // ✅ FIXED: NO HEADERS
+      const res = await API.post("/properties", formData);
 
       console.log("SUCCESS:", res.data);
       alert("Property submitted ✔");
 
-      // RESET
       setForm({
         title: "",
         county: "",
@@ -170,9 +151,6 @@ export default function Upload() {
     }
   };
 
-  /* =========================
-     UI
-  ========================= */
   return (
     <div style={styles.container}>
       <h2>Upload Property</h2>
@@ -241,9 +219,6 @@ export default function Upload() {
   );
 }
 
-/* =========================
-   STYLES
-========================= */
 const styles = {
   container: {
     padding: "30px",
