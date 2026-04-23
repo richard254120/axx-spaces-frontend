@@ -41,14 +41,13 @@ export default function Login() {
       }
 
       // LOGIN MODE
-      const res = await API.post("/auth/login", {
-        email: form.email,
-        password: form.password
-      });
+    const res = await API.post("/auth/login", {
+  email,
+  password
+});
 
-      // SAVE TO LOCAL STORAGE
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+localStorage.setItem("token", res.data.token);
+localStorage.setItem("user", JSON.stringify(res.data.user));
 
       alert("Login successful ✔");
 
