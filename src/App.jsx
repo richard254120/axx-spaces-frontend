@@ -5,7 +5,6 @@ import Home from "./pages/Home";
 import Listings from "./pages/Listings";
 import Login from "./pages/Login";
 import Upload from "./pages/Upload";
-import AdminDashboard from "./pages/AdminDashboard";
 import "leaflet/dist/leaflet.css";
 function App() {
   return (
@@ -17,7 +16,7 @@ function App() {
         <Route path="/listings" element={<Listings />} />
         <Route path="/login" element={<Login />} />
         <Route path="/upload" element={<Upload />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+      
       </Routes>
     </>
   );
