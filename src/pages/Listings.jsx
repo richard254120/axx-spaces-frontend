@@ -38,7 +38,7 @@ export default function Listings() {
             return (
               <div key={p._id} style={styles.card}>
 
-                {/* ✅ FIXED IMAGE */}
+                {/* IMAGE */}
                 {imageSrc && (
                   <img
                     src={imageSrc}
@@ -49,7 +49,12 @@ export default function Listings() {
 
                 <h3>{p.title}</h3>
                 <p>{p.county} - {p.area}</p>
+
                 <p><b>Ksh {p.price}</b></p>
+
+                {/* ✅ FIXED: DEPOSIT DISPLAY */}
+                <p><b>Deposit:</b> Ksh {p.deposit}</p>
+
                 <p>{p.type}</p>
                 <p>{p.bedrooms} Bedrooms</p>
 
