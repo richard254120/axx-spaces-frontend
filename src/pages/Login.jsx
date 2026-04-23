@@ -1,65 +1,136 @@
 import { useState } from "react";
+import API from "../api/api";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
+    name: "",
     email: "",
-    password: "",
-    phone: "",
+    password: ""
   });
 
+  const [isRegister, setIsRegister] = useState(false);
+
+  // =========================
+  // HANDLE CHANGE
+  // =========================
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleLogin = (e) => {
+  // =========================
+  // SUBMIT
+  // =========================
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("LOGIN DATA:", form);
-    alert("Login sent (connect backend next)");
+
+    try {
+      // REGISTER MODE
+      if (isRegister) {
+        await API.post("/auth/register", {
+          name: form.name,
+          email: form.email,
+          password: form.password
+        });
+
+        alert("Account created successfully ✔");
+        setIsRegister(false);
+        return;
+      }
+
+      // LOGIN MODE
+      const res = await API.post("/auth/login", {
+        email: form.email,
+        password: form.password
+      });
+
+      // SAVE TO LOCAL STORAGE
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+
+      alert("Login successful ✔");
+
+      // redirect to home or listings
+      navigate("/");
+
+    } catch (err) {
+      console.log(err);
+      alert(err.response?.data?.message || "Error occurred");
+    }
   };
 
   return (
     <div style={styles.container}>
-      <h2>Landlord Login / Register</h2>
+      <h2>{isRegister ? "Create Account" : "Login"}</h2>
 
-      <form onSubmit={handleLogin} style={styles.form}>
+      <form onSubmit={handleSubmit} style={styles.form}>
+
+        {/* NAME ONLY FOR REGISTER */}
+        {isRegister && (
+          <input
+            name="name"
+            placeholder="Full Name"
+            onChange={handleChange}
+            style={styles.input}
+          />
+        )}
 
         <input
           name="email"
           placeholder="Email"
           onChange={handleChange}
-          required
+          style={styles.input}
         />
 
         <input
-          type="password"
           name="password"
+          type="password"
           placeholder="Password"
           onChange={handleChange}
-          required
+          style={styles.input}
         />
 
-        <input
-          name="phone"
-          placeholder="Phone Number (for SMS alerts)"
-          onChange={handleChange}
-          required
-        />
+        <button type="submit" style={styles.button}>
+          {isRegister ? "Register" : "Login"}
+        </button>
 
-        <button className="btn">Continue</button>
       </form>
+
+      <p
+        onClick={() => setIsRegister(!isRegister)}
+        style={{ cursor: "pointer", color: "blue" }}
+      >
+        {isRegister
+          ? "Already have an account? Login"
+          : "Don't have an account? Register"}
+      </p>
     </div>
   );
 }
 
 const styles = {
   container: {
-    padding: "30px",
-    maxWidth: "400px",
-    margin: "auto",
+    padding: "50px",
+    textAlign: "center"
   },
   form: {
     display: "flex",
     flexDirection: "column",
     gap: "10px",
+    maxWidth: "300px",
+    margin: "auto"
   },
+  input: {
+    padding: "10px",
+    borderRadius: "5px"
+  },
+  button: {
+    padding: "10px",
+    background: "#0a1f44",
+    color: "white",
+    border: "none",
+    borderRadius: "5px"
+  }
 };
