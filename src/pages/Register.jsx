@@ -3,14 +3,22 @@ import { AuthContext } from "../context/AuthContext.jsx";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../api/api";
 
-export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+export default function Register() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    phone: "",
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,12 +26,12 @@ export default function Login() {
     setError("");
 
     try {
-      const res = await API.post("/auth/login", { email, password });
+      const res = await API.post("/auth/register", formData);
       login(res.data.token, res.data.user);
-      alert("Login successful!");
+      alert("Registration successful! Welcome.");
       navigate("/dashboard");
     } catch (err) {
-      setError(err?.response?.data?.error || "Invalid email or password");
+      setError(err?.response?.data?.error || "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -31,34 +39,54 @@ export default function Login() {
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.heading}>Landlord Login</h2>
+      <h2 style={styles.heading}>Landlord Registration</h2>
       
       {error && <p style={styles.error}>{error}</p>}
 
       <form onSubmit={handleSubmit} style={styles.form}>
         <input
-          type="email"
-          placeholder="Email Address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          name="name"
+          type="text"
+          placeholder="Full Name"
+          value={formData.name}
+          onChange={handleChange}
           required
           style={styles.input}
         />
         <input
+          name="email"
+          type="email"
+          placeholder="Email Address"
+          value={formData.email}
+          onChange={handleChange}
+          required
+          style={styles.input}
+        />
+        <input
+          name="phone"
+          type="tel"
+          placeholder="Phone Number (07xxxxxxxx)"
+          value={formData.phone}
+          onChange={handleChange}
+          required
+          style={styles.input}
+        />
+        <input
+          name="password"
           type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Create Password"
+          value={formData.password}
+          onChange={handleChange}
           required
           style={styles.input}
         />
         <button type="submit" disabled={loading} style={styles.btn}>
-          {loading ? "Logging in..." : "Login"}
+          {loading ? "Creating Account..." : "Register"}
         </button>
       </form>
 
-      <p style={styles.registerLink}>
-        Don't have an account? <Link to="/register">Register here</Link>
+      <p style={styles.loginLink}>
+        Already have an account? <Link to="/login">Login here</Link>
       </p>
     </div>
   );
@@ -95,7 +123,7 @@ const styles = {
     cursor: "pointer",
     marginTop: "10px",
   },
-  registerLink: {
+  loginLink: {
     marginTop: "20px",
     color: "#aaa",
   },

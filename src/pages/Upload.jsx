@@ -1,7 +1,12 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../context/AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 
 export default function Upload() {
+  const { token } = useContext(AuthContext);
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
     title: "",
     county: "",
@@ -21,6 +26,15 @@ export default function Upload() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
+
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!token) {
+      alert("Please login to upload a property");
+      navigate("/login");
+    }
+  }, [token, navigate]);
 
   const counties = [
     "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
@@ -87,16 +101,17 @@ export default function Upload() {
   };
 
   const handleImage = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setForm((prev) => ({
-        ...prev,
-        image: e.target.files[0],
-      }));
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      setForm((prev) => ({ ...prev, image: file }));
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!token) return;
+
     setIsSubmitting(true);
     setSuccess(false);
 
@@ -122,24 +137,25 @@ export default function Upload() {
 
     try {
       const res = await API.post("/properties", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       console.log("SUCCESS:", res.data);
       setSuccess(true);
-      
-      // Reset form after successful submission
+
+      // Reset form
       setForm({
         title: "", county: "", area: "", price: "", deposit: "", type: "",
         bedrooms: "", bathrooms: "", amenities: [], description: "",
         phone: "", image: null, lat: "", lng: "",
       });
-
-      setTimeout(() => setSuccess(false), 5000);
+      setImagePreview(null);
 
     } catch (err) {
       console.error("FULL ERROR:", err);
-      console.error("BACKEND RESPONSE:", err?.response?.data);
       alert(err?.response?.data?.error || "Failed to submit property. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -153,9 +169,13 @@ export default function Upload() {
         <p style={styles.subtitle}>Fill in the details below. All fields marked * are required.</p>
       </div>
 
+      {/* ==================== IMPROVED SUCCESS MESSAGE ==================== */}
       {success && (
         <div style={styles.successMessage}>
-          ✅ Property submitted successfully! Awaiting admin approval.
+          <h3>✅ Property Submitted Successfully!</h3>
+          <p>Your property has been received and is now <strong>awaiting admin approval</strong>.</p>
+          <p>You can check the status anytime in <strong>My Properties</strong> page.</p>
+          <small>Once approved, it will appear in the public listings.</small>
         </div>
       )}
 
@@ -367,10 +387,23 @@ export default function Upload() {
             onChange={handleImage}
             style={styles.fileInput}
           />
-          {form.image && (
-            <p style={{ color: "#0a84ff", marginTop: "8px" }}>
-              Selected: {form.image.name}
-            </p>
+          {imagePreview && (
+            <div style={{ marginTop: "12px" }}>
+              <p style={{ color: "#0a84ff", marginBottom: "8px" }}>
+                Selected: {form.image?.name}
+              </p>
+              <img
+                src={imagePreview}
+                alt="Preview"
+                style={{
+                  maxWidth: "100%",
+                  maxHeight: "280px",
+                  borderRadius: "8px",
+                  border: "1px solid #333",
+                  objectFit: "cover",
+                }}
+              />
+            </div>
           )}
         </div>
 
@@ -418,11 +451,10 @@ const styles = {
   successMessage: {
     background: "#0a3d1f",
     color: "#4ade80",
-    padding: "14px 20px",
-    borderRadius: "8px",
-    marginBottom: "25px",
+    padding: "20px 25px",
+    borderRadius: "12px",
+    marginBottom: "30px",
     textAlign: "center",
-    fontWeight: "500",
     border: "1px solid #14532d",
   },
   form: {
