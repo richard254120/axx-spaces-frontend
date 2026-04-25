@@ -28,7 +28,7 @@ export default function Upload() {
   const [success, setSuccess] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
 
-  // Redirect if not logged in
+  // Redirect to login if not authenticated
   useEffect(() => {
     if (!token) {
       alert("Please login to upload a property");
@@ -82,10 +82,7 @@ export default function Upload() {
   };
 
   const handleChange = (e) => {
-    setForm((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleAmenity = (item) => {
@@ -101,7 +98,7 @@ export default function Upload() {
   };
 
   const handleImage = (e) => {
-    const file = e.target.files && e.target.files[0];
+    const file = e.target.files?.[0];
     if (file) {
       setForm((prev) => ({ ...prev, image: file }));
       setImagePreview(URL.createObjectURL(file));
@@ -131,22 +128,19 @@ export default function Upload() {
     formData.append("lng", form.lng || "");
     formData.append("amenities", JSON.stringify(form.amenities || []));
 
-    if (form.image) {
-      formData.append("image", form.image);
-    }
+    if (form.image) formData.append("image", form.image);
 
     try {
-      const res = await API.post("/properties", formData, {
+      await API.post("/properties", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
         },
       });
 
-      console.log("SUCCESS:", res.data);
       setSuccess(true);
 
-      // Reset form
+      // Reset form after successful submission
       setForm({
         title: "", county: "", area: "", price: "", deposit: "", type: "",
         bedrooms: "", bathrooms: "", amenities: [], description: "",
@@ -155,7 +149,7 @@ export default function Upload() {
       setImagePreview(null);
 
     } catch (err) {
-      console.error("FULL ERROR:", err);
+      console.error("Upload Error:", err);
       alert(err?.response?.data?.error || "Failed to submit property. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -169,13 +163,11 @@ export default function Upload() {
         <p style={styles.subtitle}>Fill in the details below. All fields marked * are required.</p>
       </div>
 
-      {/* ==================== IMPROVED SUCCESS MESSAGE ==================== */}
       {success && (
         <div style={styles.successMessage}>
           <h3>✅ Property Submitted Successfully!</h3>
           <p>Your property has been received and is now <strong>awaiting admin approval</strong>.</p>
-          <p>You can check the status anytime in <strong>My Properties</strong> page.</p>
-          <small>Once approved, it will appear in the public listings.</small>
+          <p>You can check the status anytime in <strong>My Properties</strong>.</p>
         </div>
       )}
 
@@ -185,112 +177,51 @@ export default function Upload() {
           <h3 style={styles.sectionTitle}>Basic Information</h3>
           
           <label style={styles.label}>Property Title *</label>
-          <input
-            name="title"
-            placeholder="e.g. Spacious 2 Bedroom Apartment in Kilimani"
-            value={form.title}
-            onChange={handleChange}
-            style={styles.input}
-            required
-          />
+          <input name="title" placeholder="e.g. Spacious 2 Bedroom Apartment in Kilimani" value={form.title} onChange={handleChange} style={styles.input} required />
 
           <div style={styles.row}>
             <div style={styles.col}>
               <label style={styles.label}>County *</label>
-              <select
-                name="county"
-                value={form.county}
-                onChange={handleChange}
-                style={styles.select}
-                required
-              >
+              <select name="county" value={form.county} onChange={handleChange} style={styles.select} required>
                 <option value="">Select County</option>
-                {counties.map((c, i) => (
-                  <option key={i} value={c}>{c}</option>
-                ))}
+                {counties.map((c, i) => <option key={i} value={c}>{c}</option>)}
               </select>
             </div>
-
             <div style={styles.col}>
               <label style={styles.label}>Area / Estate *</label>
-              <input
-                name="area"
-                placeholder="e.g. Kilimani, Westlands, Kitengela"
-                value={form.area}
-                onChange={handleChange}
-                style={styles.input}
-                required
-              />
+              <input name="area" placeholder="e.g. Kilimani, Westlands, Kitengela" value={form.area} onChange={handleChange} style={styles.input} required />
             </div>
           </div>
 
           <label style={styles.label}>Property Type *</label>
-          <select
-            name="type"
-            value={form.type}
-            onChange={handleChange}
-            style={styles.select}
-            required
-          >
+          <select name="type" value={form.type} onChange={handleChange} style={styles.select} required>
             <option value="">Select Property Type</option>
-            {propertyTypes.map((t, i) => (
-              <option key={i} value={t}>{t}</option>
-            ))}
+            {propertyTypes.map((t, i) => <option key={i} value={t}>{t}</option>)}
           </select>
         </div>
 
         {/* Pricing & Rooms */}
         <div style={styles.section}>
           <h3 style={styles.sectionTitle}>Pricing & Rooms</h3>
-          
           <div style={styles.row}>
             <div style={styles.col}>
               <label style={styles.label}>Rent per Month (KSh) *</label>
-              <input
-                name="price"
-                type="number"
-                placeholder="45000"
-                value={form.price}
-                onChange={handleChange}
-                style={styles.input}
-                required
-              />
+              <input name="price" type="number" placeholder="45000" value={form.price} onChange={handleChange} style={styles.input} required />
             </div>
             <div style={styles.col}>
               <label style={styles.label}>Deposit (KSh)</label>
-              <input
-                name="deposit"
-                type="number"
-                placeholder="45000"
-                value={form.deposit}
-                onChange={handleChange}
-                style={styles.input}
-              />
+              <input name="deposit" type="number" placeholder="45000" value={form.deposit} onChange={handleChange} style={styles.input} />
             </div>
           </div>
 
           <div style={styles.row}>
             <div style={styles.col}>
               <label style={styles.label}>Bedrooms</label>
-              <input
-                name="bedrooms"
-                type="number"
-                placeholder="2"
-                value={form.bedrooms}
-                onChange={handleChange}
-                style={styles.input}
-              />
+              <input name="bedrooms" type="number" placeholder="2" value={form.bedrooms} onChange={handleChange} style={styles.input} />
             </div>
             <div style={styles.col}>
               <label style={styles.label}>Bathrooms</label>
-              <input
-                name="bathrooms"
-                type="number"
-                placeholder="2"
-                value={form.bathrooms}
-                onChange={handleChange}
-                style={styles.input}
-              />
+              <input name="bathrooms" type="number" placeholder="2" value={form.bathrooms} onChange={handleChange} style={styles.input} />
             </div>
           </div>
         </div>
@@ -323,7 +254,6 @@ export default function Upload() {
         {/* Description & Contact */}
         <div style={styles.section}>
           <h3 style={styles.sectionTitle}>Description & Contact</h3>
-          
           <label style={styles.label}>Description</label>
           <textarea
             name="description"
@@ -349,7 +279,6 @@ export default function Upload() {
         {/* Location */}
         <div style={styles.section}>
           <h3 style={styles.sectionTitle}>Location</h3>
-          
           <button type="button" onClick={getMyLocation} style={styles.geoBtn}>
             📍 Get My Current Location
           </button>
@@ -357,23 +286,11 @@ export default function Upload() {
           <div style={styles.row}>
             <div style={styles.col}>
               <label style={styles.label}>Latitude</label>
-              <input
-                name="lat"
-                placeholder="e.g. -1.2921"
-                value={form.lat}
-                onChange={handleChange}
-                style={styles.input}
-              />
+              <input name="lat" placeholder="e.g. -1.2921" value={form.lat} onChange={handleChange} style={styles.input} />
             </div>
             <div style={styles.col}>
               <label style={styles.label}>Longitude</label>
-              <input
-                name="lng"
-                placeholder="e.g. 36.8219"
-                value={form.lng}
-                onChange={handleChange}
-                style={styles.input}
-              />
+              <input name="lng" placeholder="e.g. 36.8219" value={form.lng} onChange={handleChange} style={styles.input} />
             </div>
           </div>
         </div>
@@ -389,9 +306,7 @@ export default function Upload() {
           />
           {imagePreview && (
             <div style={{ marginTop: "12px" }}>
-              <p style={{ color: "#0a84ff", marginBottom: "8px" }}>
-                Selected: {form.image?.name}
-              </p>
+              <p style={{ color: "#0a84ff" }}>Selected: {form.image?.name}</p>
               <img
                 src={imagePreview}
                 alt="Preview"
@@ -409,10 +324,7 @@ export default function Upload() {
 
         <button
           type="submit"
-          style={{
-            ...styles.submitBtn,
-            opacity: isSubmitting ? 0.7 : 1,
-          }}
+          style={{ ...styles.submitBtn, opacity: isSubmitting ? 0.7 : 1 }}
           disabled={isSubmitting}
         >
           {isSubmitting ? "Submitting..." : "Submit Property for Approval"}
@@ -424,146 +336,23 @@ export default function Upload() {
 
 // ==================== STYLES ====================
 const styles = {
-  container: {
-    padding: "40px 20px",
-    maxWidth: "700px",
-    margin: "40px auto",
-    backgroundColor: "#0a0a0a",
-    borderRadius: "16px",
-    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.5)",
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-    color: "#eee",
-  },
-  header: {
-    textAlign: "center",
-    marginBottom: "30px",
-  },
-  title: {
-    fontSize: "28px",
-    fontWeight: "600",
-    margin: "0 0 8px 0",
-    color: "#fff",
-  },
-  subtitle: {
-    color: "#aaa",
-    fontSize: "15px",
-  },
-  successMessage: {
-    background: "#0a3d1f",
-    color: "#4ade80",
-    padding: "20px 25px",
-    borderRadius: "12px",
-    marginBottom: "30px",
-    textAlign: "center",
-    border: "1px solid #14532d",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "32px",
-  },
-  section: {
-    backgroundColor: "#111",
-    padding: "24px",
-    borderRadius: "12px",
-    border: "1px solid #222",
-  },
-  sectionTitle: {
-    margin: "0 0 18px 0",
-    color: "#0a84ff",
-    fontSize: "18px",
-    fontWeight: "600",
-  },
-  label: {
-    display: "block",
-    marginBottom: "6px",
-    fontSize: "14px",
-    color: "#ccc",
-    fontWeight: "500",
-  },
-  input: {
-    width: "100%",
-    padding: "12px 16px",
-    backgroundColor: "#1a1a1a",
-    border: "1px solid #333",
-    borderRadius: "8px",
-    color: "#fff",
-    fontSize: "15px",
-    outline: "none",
-  },
-  select: {
-    width: "100%",
-    padding: "12px 16px",
-    backgroundColor: "#1a1a1a",
-    border: "1px solid #333",
-    borderRadius: "8px",
-    color: "#fff",
-    fontSize: "15px",
-    cursor: "pointer",
-  },
-  textarea: {
-    width: "100%",
-    padding: "12px 16px",
-    backgroundColor: "#1a1a1a",
-    border: "1px solid #333",
-    borderRadius: "8px",
-    color: "#fff",
-    fontSize: "15px",
-    resize: "vertical",
-    minHeight: "110px",
-  },
-  row: {
-    display: "flex",
-    gap: "16px",
-  },
-  col: {
-    flex: 1,
-  },
-  amenitiesGrid: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "10px",
-  },
-  amenityLabel: {
-    padding: "10px 16px",
-    borderRadius: "8px",
-    cursor: "pointer",
-    userSelect: "none",
-    transition: "all 0.2s ease",
-    border: "1px solid #333",
-    fontSize: "14px",
-  },
-  geoBtn: {
-    padding: "12px 20px",
-    background: "linear-gradient(135deg, #0a84ff, #0066cc)",
-    color: "#fff",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer",
-    fontSize: "15px",
-    fontWeight: "500",
-    marginBottom: "12px",
-    transition: "transform 0.2s",
-  },
-  fileInput: {
-    width: "100%",
-    padding: "12px",
-    backgroundColor: "#1a1a1a",
-    border: "2px dashed #444",
-    borderRadius: "8px",
-    color: "#ccc",
-    cursor: "pointer",
-  },
-  submitBtn: {
-    padding: "16px",
-    background: "linear-gradient(135deg, #0a84ff, #0066cc)",
-    color: "#fff",
-    border: "none",
-    borderRadius: "10px",
-    fontSize: "17px",
-    fontWeight: "600",
-    cursor: "pointer",
-    marginTop: "10px",
-    transition: "all 0.3s ease",
-  },
+  container: { padding: "40px 20px", maxWidth: "700px", margin: "40px auto", backgroundColor: "#0a0a0a", borderRadius: "16px", boxShadow: "0 10px 30px rgba(0, 0, 0, 0.5)", fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif", color: "#eee" },
+  header: { textAlign: "center", marginBottom: "30px" },
+  title: { fontSize: "28px", fontWeight: "600", margin: "0 0 8px 0", color: "#fff" },
+  subtitle: { color: "#aaa", fontSize: "15px" },
+  successMessage: { background: "#0a3d1f", color: "#4ade80", padding: "20px 25px", borderRadius: "12px", marginBottom: "30px", textAlign: "center", border: "1px solid #14532d" },
+  form: { display: "flex", flexDirection: "column", gap: "32px" },
+  section: { backgroundColor: "#111", padding: "24px", borderRadius: "12px", border: "1px solid #222" },
+  sectionTitle: { margin: "0 0 18px 0", color: "#0a84ff", fontSize: "18px", fontWeight: "600" },
+  label: { display: "block", marginBottom: "6px", fontSize: "14px", color: "#ccc", fontWeight: "500" },
+  input: { width: "100%", padding: "12px 16px", backgroundColor: "#1a1a1a", border: "1px solid #333", borderRadius: "8px", color: "#fff", fontSize: "15px", outline: "none" },
+  select: { width: "100%", padding: "12px 16px", backgroundColor: "#1a1a1a", border: "1px solid #333", borderRadius: "8px", color: "#fff", fontSize: "15px", cursor: "pointer" },
+  textarea: { width: "100%", padding: "12px 16px", backgroundColor: "#1a1a1a", border: "1px solid #333", borderRadius: "8px", color: "#fff", fontSize: "15px", resize: "vertical", minHeight: "110px" },
+  row: { display: "flex", gap: "16px" },
+  col: { flex: 1 },
+  amenitiesGrid: { display: "flex", flexWrap: "wrap", gap: "10px" },
+  amenityLabel: { padding: "10px 16px", borderRadius: "8px", cursor: "pointer", userSelect: "none", transition: "all 0.2s ease", border: "1px solid #333", fontSize: "14px" },
+  geoBtn: { padding: "12px 20px", background: "linear-gradient(135deg, #0a84ff, #0066cc)", color: "#fff", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "15px", fontWeight: "500", marginBottom: "12px" },
+  fileInput: { width: "100%", padding: "12px", backgroundColor: "#1a1a1a", border: "2px dashed #444", borderRadius: "8px", color: "#ccc", cursor: "pointer" },
+  submitBtn: { padding: "16px", background: "linear-gradient(135deg, #0a84ff, #0066cc)", color: "#fff", border: "none", borderRadius: "10px", fontSize: "17px", fontWeight: "600", cursor: "pointer", marginTop: "10px" },
 };

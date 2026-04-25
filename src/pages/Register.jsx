@@ -10,6 +10,7 @@ export default function Register() {
     password: "",
     phone: "",
   });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -27,11 +28,12 @@ export default function Register() {
 
     try {
       const res = await API.post("/auth/register", formData);
+      
       login(res.data.token, res.data.user);
-      alert("Registration successful! Welcome.");
+      alert("Registration successful! Welcome to Axx Spaces.");
       navigate("/dashboard");
     } catch (err) {
-      setError(err?.response?.data?.error || "Registration failed");
+      setError(err?.response?.data?.error || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -81,7 +83,7 @@ export default function Register() {
           style={styles.input}
         />
         <button type="submit" disabled={loading} style={styles.btn}>
-          {loading ? "Creating Account..." : "Register"}
+          {loading ? "Creating Account..." : "Register as Landlord"}
         </button>
       </form>
 
