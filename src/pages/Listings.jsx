@@ -20,6 +20,24 @@ export default function Listings() {
     }
   };
 
+  /* =========================
+     WHATSAPP FUNCTION
+  ========================= */
+  const openWhatsApp = (phone, title) => {
+    if (!phone) {
+      alert("No phone number available");
+      return;
+    }
+
+    // Remove spaces and ensure format
+    const cleanPhone = phone.replace(/\s+/g, "");
+
+    const message = `Hello, I am interested in your property: ${title}`;
+    const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+
+    window.open(url, "_blank");
+  };
+
   return (
     <div style={{ padding: "20px" }}>
       <h2>🏠 Available Listings</h2>
@@ -51,8 +69,6 @@ export default function Listings() {
                 <p>{p.county} - {p.area}</p>
 
                 <p><b>Ksh {p.price}</b></p>
-
-                {/* ✅ FIXED: DEPOSIT DISPLAY */}
                 <p><b>Deposit:</b> Ksh {p.deposit}</p>
 
                 <p>{p.type}</p>
@@ -70,6 +86,17 @@ export default function Listings() {
                 </p>
 
                 <strong>📞 {p.phone}</strong>
+
+                {/* =========================
+                    WHATSAPP BUTTON
+                ========================= */}
+                <button
+                  onClick={() => openWhatsApp(p.phone, p.title)}
+                  style={styles.whatsappBtn}
+                >
+                  💬 Chat on WhatsApp
+                </button>
+
               </div>
             );
           })}
@@ -79,6 +106,9 @@ export default function Listings() {
   );
 }
 
+/* =========================
+   STYLES
+========================= */
 const styles = {
   grid: {
     display: "grid",
@@ -98,5 +128,18 @@ const styles = {
     objectFit: "cover",
     borderRadius: "8px",
     marginBottom: "10px",
+  },
+
+  /* NEW STYLE */
+  whatsappBtn: {
+    marginTop: "10px",
+    width: "100%",
+    padding: "10px",
+    background: "#25D366",
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontWeight: "bold",
   },
 };
