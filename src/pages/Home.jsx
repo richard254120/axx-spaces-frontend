@@ -393,11 +393,11 @@ export default function Home() {
             },
             {
               quote: "Listed my property on a Friday, had a tenant the following Monday. Axx Spaces is the real deal.",
-              name: "James K.", city: "Mombasa", avatar: "👨🏿",
+              name: "James Kimani.", city: "Mombasa",
             },
             {
               quote: "The direct contact feature saved me from paying commission to three different agents. 10/10.",
-              name: "Faith O.", city: "Kisumu", 
+              name: "Faith Okello.", city: "Kisumu", 
             },
           ].map((t) => (
             <div key={t.name} className="axx-testimonial">
