@@ -2,7 +2,7 @@ export default function PropertyCard({ property, isOwner = false, onDelete }) {
   const status = property.status || "pending";
   const isApproved = status === "approved";
 
-  // Get first image or show placeholder
+  // Get the first image from the images array (Cloudinary URL)
   const mainImage = property.images && property.images.length > 0 
     ? property.images[0] 
     : null;
@@ -16,7 +16,7 @@ export default function PropertyCard({ property, isOwner = false, onDelete }) {
           style={styles.image}
         />
       ) : (
-        <div style={styles.noImage}>No Image Available</div>
+        <div style={styles.noImage}>No Image</div>
       )}
 
       <h3 style={styles.title}>{property.title}</h3>
