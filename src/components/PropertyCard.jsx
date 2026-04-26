@@ -2,14 +2,21 @@ export default function PropertyCard({ property, isOwner = false, onDelete }) {
   const status = property.status || "pending";
   const isApproved = status === "approved";
 
+  // Get first image or show placeholder
+  const mainImage = property.images && property.images.length > 0 
+    ? property.images[0] 
+    : null;
+
   return (
     <div style={styles.card}>
-      {property.image && (
+      {mainImage ? (
         <img
-          src={property.image}
+          src={mainImage}
           alt={property.title}
           style={styles.image}
         />
+      ) : (
+        <div style={styles.noImage}>No Image Available</div>
       )}
 
       <h3 style={styles.title}>{property.title}</h3>
@@ -21,10 +28,15 @@ export default function PropertyCard({ property, isOwner = false, onDelete }) {
       <div style={{
         ...styles.statusBadge,
         backgroundColor: isApproved ? "#4ade80" : "#facc15",
-        color: isApproved ? "#000" : "#000"
       }}>
         {isApproved ? "✅ Approved" : "⏳ Pending Approval"}
       </div>
+
+      {property.images && property.images.length > 1 && (
+        <p style={styles.imageCount}>
+          +{property.images.length - 1} more photos
+        </p>
+      )}
 
       {isOwner && (
         <button
@@ -53,6 +65,18 @@ const styles = {
     borderRadius: "10px",
     marginBottom: "12px",
   },
+  noImage: {
+    width: "100%",
+    height: "200px",
+    background: "#1a1a1a",
+    borderRadius: "10px",
+    marginBottom: "12px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#666",
+    fontSize: "14px",
+  },
   title: {
     margin: "10px 0 6px 0",
     color: "#fff",
@@ -75,6 +99,11 @@ const styles = {
     fontSize: "14px",
     fontWeight: "bold",
     marginTop: "8px",
+  },
+  imageCount: {
+    color: "#0a84ff",
+    fontSize: "13px",
+    marginTop: "4px",
   },
   deleteBtn: {
     marginTop: "12px",
