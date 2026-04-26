@@ -4,12 +4,12 @@ import API from "../api/api";
 import MapView from "../components/MapView";
 
 /* ══════════════════════════════════════════════════════════════════
-   ✅ Property Detail Modal (Updated to support multiple images)
+   Property Detail Modal 
 ══════════════════════════════════════════════════════════════════ */
 function PropertyModal({ property: p, onClose, onWhatsApp, isFav, onToggleFav }) {
   if (!p) return null;
 
-  // Use first image from images array, fallback to old single image
+  // FIXED: Use first image from images array (Cloudinary)
   const mainImage = p.images && p.images.length > 0 ? p.images[0] : p.image;
 
   return (
@@ -89,7 +89,6 @@ function PropertyModal({ property: p, onClose, onWhatsApp, isFav, onToggleFav })
   );
 }
 
-/* ✅ Share helper */
 function shareProperty(p) {
   const text = `🏠 ${p.title} — Ksh ${Number(p.price).toLocaleString()}/mo\n📍 ${p.county}${p.area ? ", " + p.area : ""}\n\nFound on Axx Spaces`;
   if (navigator.share) {
@@ -101,9 +100,6 @@ function shareProperty(p) {
   }
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   MAIN Listings Component
-══════════════════════════════════════════════════════════════════ */
 export default function Listings() {
   const [properties, setProperties]     = useState([]);
   const [loading, setLoading]           = useState(true);
@@ -232,7 +228,7 @@ export default function Listings() {
       <div style={styles.searchBar}>
         <input
           className="lst-search-input"
-          placeholder="🔍 Search title, area, county, type…"
+          placeholder="🔍  Search title, area, county, type…"
           value={inlineFilters.search}
           onChange={(e) => setInlineFilters((f) => ({ ...f, search: e.target.value }))}
         />
@@ -262,6 +258,7 @@ export default function Listings() {
         <button
           className={`lst-fav-toggle${showFavsOnly ? " active" : ""}`}
           onClick={() => setShowFavsOnly((v) => !v)}
+          title="Show saved only"
         >
           {showFavsOnly ? "♥ Saved" : "♡ Saved"} ({favourites.length})
         </button>
@@ -280,8 +277,15 @@ export default function Listings() {
         <div style={styles.emptyState}>
           <div style={styles.emptyIcon}>🔍</div>
           <h3 style={styles.emptyTitle}>No properties found</h3>
-          <p style={styles.emptyText}>Try adjusting your filters</p>
-          <button className="lst-btn" onClick={() => navigate("/listings")}>
+          <p style={styles.emptyText}>Try adjusting your filters or browse all listings</p>
+          <button
+            className="lst-btn"
+            onClick={() => {
+              navigate("/listings");
+              setInlineFilters({ search: "", minPrice: "", maxPrice: "", sortBy: "newest" });
+              setShowFavsOnly(false);
+            }}
+          >
             View All Listings
           </button>
         </div>
@@ -290,7 +294,7 @@ export default function Listings() {
           {filtered.map((p, idx) => (
             <div key={p._id} className="lst-card" style={{ animationDelay: `${idx * 60}ms` }}>
 
-              {/* Updated Image Handling for Cloudinary array */}
+              {/* FIXED: Support for images array from Cloudinary */}
               {(p.images && p.images.length > 0) || p.image ? (
                 <div style={styles.imageWrap}>
                   <img
@@ -304,6 +308,7 @@ export default function Listings() {
                   <button
                     className="lst-heart-btn"
                     onClick={(e) => { e.stopPropagation(); toggleFavourite(p._id); }}
+                    title={favourites.includes(p._id) ? "Remove favourite" : "Save property"}
                   >
                     {favourites.includes(p._id) ? "♥" : "♡"}
                   </button>
@@ -333,7 +338,7 @@ export default function Listings() {
 
                 <div style={styles.metaRow}>
                   {p.bedrooms && <span className="lst-meta-pill">🛏 {p.bedrooms} Bed{p.bedrooms > 1 ? "s" : ""}</span>}
-                  {p.type && <span className="lst-meta-pill">{p.type}</span>}
+                  {p.type     && <span className="lst-meta-pill">{p.type}</span>}
                 </div>
 
                 {p.amenities?.length > 0 && (
@@ -399,11 +404,9 @@ export default function Listings() {
   );
 }
 
-/* Styles remain the same as you had */
-const styles = { /* ... your full styles object ... */ };
+/* All your original styles and css remain unchanged */
+const styles = { /* your full styles object */ };
 
-/* Modal styles remain the same */
-const modal = { /* ... your full modal styles ... */ };
+const modal = { /* your full modal styles */ };
 
-/* CSS classes remain the same */
-const css = ` /* ... your full css string ... */ `;
+const css = ` /* your full css string */ `;
