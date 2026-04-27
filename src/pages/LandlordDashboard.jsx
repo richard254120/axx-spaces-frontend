@@ -17,7 +17,6 @@ export default function LandlordDashboard() {
     setLoading(true);
     setError("");
     try {
-      // Get token from localStorage (adjust based on your auth setup)
       const token = localStorage.getItem("token");
       
       if (!token) {
@@ -220,7 +219,7 @@ export default function LandlordDashboard() {
                   )}
                 </div>
 
-                {/* Action buttons */}
+                {/* Action buttons - Delete added */}
                 <div style={styles.actionRow}>
                   <button
                     className="dashboard-view-btn"
@@ -232,7 +231,7 @@ export default function LandlordDashboard() {
                     className="dashboard-delete-btn"
                     onClick={() => handleDelete(property._id)}
                   >
-                    🗑 Delete
+                    🗑 Delete / Cancel
                   </button>
                 </div>
               </div>
@@ -253,7 +252,7 @@ export default function LandlordDashboard() {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   STYLES
+   STYLES (Unchanged)
 ══════════════════════════════════════════════════════════════════ */
 const styles = {
   root: {
