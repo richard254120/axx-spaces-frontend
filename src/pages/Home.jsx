@@ -389,15 +389,15 @@ export default function Home() {
           {[
             {
               quote: "Found a 2-bedroom in Kilimani within 3 days. The verification system gave me so much confidence!",
-              name: "Amina W.", city: "Nairobi",
+              name: "Amina W.", city: "Nairobi", avatar: "👩🏾",
             },
             {
               quote: "Listed my property on a Friday, had a tenant the following Monday. Axx Spaces is the real deal.",
-              name: "James Kimani.", city: "Mombasa",
+              name: "James K.", city: "Mombasa", avatar: "👨🏿",
             },
             {
               quote: "The direct contact feature saved me from paying commission to three different agents. 10/10.",
-              name: "Faith Okello.", city: "Kisumu", 
+              name: "Faith O.", city: "Kisumu", avatar: "👩🏾",
             },
           ].map((t) => (
             <div key={t.name} className="axx-testimonial">
@@ -434,8 +434,8 @@ export default function Home() {
 
       {/* ── Footer ── */}
       <div style={styles.footer}>
-        <span>© {new Date().getFullYear()} axxspacegroup@gmail.com · All rights reserved</span>
-        <span style={{ color: "#3b82f6" }}>Made with  axxspacegroup for Kenya</span>
+        <span>© {new Date().getFullYear()} Axx Spaces · All rights reserved</span>
+        <span style={{ color: "#3b82f6" }}>Made with ❤️ for Kenya</span>
       </div>
     </div>
   );
