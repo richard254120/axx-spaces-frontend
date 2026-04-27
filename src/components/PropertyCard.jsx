@@ -25,6 +25,7 @@ export default function PropertyCard({ property, isOwner = false, onDelete }) {
       </p>
       <h4 style={styles.price}>KSh {Number(property.price).toLocaleString()}</h4>
 
+      {/* Status Display */}
       <div style={{
         ...styles.statusBadge,
         backgroundColor: isApproved ? "#4ade80" : "#facc15",
@@ -38,6 +39,7 @@ export default function PropertyCard({ property, isOwner = false, onDelete }) {
         </p>
       )}
 
+      {/* Delete Button - Only show for owner */}
       {isOwner && (
         <button
           onClick={() => onDelete(property._id)}
