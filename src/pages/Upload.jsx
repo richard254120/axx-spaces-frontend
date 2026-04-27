@@ -1,7 +1,9 @@
 import { useState } from "react";
 import API from "../api/api";
+import { useNavigate } from "react-router-dom";
 
 export default function Upload() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     title: "",
     county: "",
@@ -14,7 +16,7 @@ export default function Upload() {
     amenities: [],
     description: "",
     phone: "",
-    image: null,
+    images: [], // Changed: array instead of single image
     lat: "",
     lng: "",
   });
@@ -22,8 +24,9 @@ export default function Upload() {
   // ✅ NEW — form state tracking
   const [submitting, setSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null); // "success" | "error" | null
-  const [previewImage, setPreviewImage] = useState(null); // ✅ NEW
-  const [completionPercent, setCompletionPercent] = useState(0); // ✅ NEW
+  const [previewImages, setPreviewImages] = useState([]); // ✅ Multiple previews
+  const [completionPercent, setCompletionPercent] = useState(0);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const counties = [
     "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
@@ -49,27 +52,25 @@ export default function Upload() {
 
   const amenitiesList = [
     "Water","Electricity","Parking","Security",
-    "WiFi","Borehole","Furnished"
+    "WiFi","Borehole","Furnished","AC","TV","Gym"
   ];
 
-  // ✅ NEW — Calculate form completion percentage
+  // ✅ Calculate form completion percentage
   const calcCompletion = () => {
     const fields = [
       form.title, form.county, form.area, form.price,
-      form.type, form.bedrooms, form.description, form.phone, form.image
+      form.type, form.bedrooms, form.description, form.phone, form.images.length > 0
     ];
     const filled = fields.filter(f => f && f.toString().trim()).length;
     return Math.round((filled / fields.length) * 100);
   };
 
-  // Update completion on form change
   const updateFormAndCompletion = (updates) => {
     const newForm = { ...form, ...updates };
     setForm(newForm);
-    // Calculate with updated form
     const fields = [
       newForm.title, newForm.county, newForm.area, newForm.price,
-      newForm.type, newForm.bedrooms, newForm.description, newForm.phone, newForm.image
+      newForm.type, newForm.bedrooms, newForm.description, newForm.phone, newForm.images.length > 0
     ];
     const filled = fields.filter(f => f && f.toString().trim()).length;
     setCompletionPercent(Math.round((filled / fields.length) * 100));
@@ -87,11 +88,11 @@ export default function Upload() {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         });
-        alert("Location detected ✔");
+        alert("✅ Location detected!");
       },
       (error) => {
         console.log("GEO ERROR:", error);
-        alert("Location permission denied ❌");
+        alert("❌ Location permission denied");
       }
     );
   };
@@ -107,81 +108,52 @@ export default function Upload() {
     updateFormAndCompletion({ amenities: updated });
   };
 
-  const handleImage = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // ✅ NEW — Image preview
+  // ✅ Handle multiple images
+  const handleImages = (e) => {
+    const files = Array.from(e.target.files || []);
+    
+    if (files.length > 5) {
+      setErrorMsg("⚠️ Maximum 5 images allowed");
+      return;
+    }
+
+    // Generate previews
+    const previews = [];
+    files.forEach(file => {
       const reader = new FileReader();
       reader.onload = (evt) => {
-        setPreviewImage(evt.target.result);
+        previews.push(evt.target.result);
+        if (previews.length === files.length) {
+          setPreviewImages(previews);
+        }
       };
       reader.readAsDataURL(file);
-      updateFormAndCompletion({ image: file });
-    }
+    });
+
+    updateFormAndCompletion({ images: files });
+    setErrorMsg("");
   };
 
-  // ✅ NEW — Reset form + preview
+  const removeImage = (idx) => {
+    const newImages = form.images.filter((_, i) => i !== idx);
+    const newPreviews = previewImages.filter((_, i) => i !== idx);
+    setForm({ ...form, images: newImages });
+    setPreviewImages(newPreviews);
+  };
+
   const resetForm = () => {
     setForm({
       title: "", county: "", area: "", price: "",
       deposit: "", type: "", bedrooms: "", bathrooms: "",
       amenities: [], description: "", phone: "",
-      image: null, lat: "", lng: "",
+      images: [], lat: "", lng: "",
     });
-    setPreviewImage(null);
+    setPreviewImages([]);
     setCompletionPercent(0);
     setSubmitStatus(null);
+    setErrorMsg("");
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setSubmitStatus(null);
-
-    const formData = new FormData();
-    formData.append("title", form.title);
-    formData.append("county", form.county);
-    formData.append("area", form.area);
-    formData.append("price", form.price);
-    formData.append("deposit", form.deposit);
-    formData.append("type", form.type);
-    formData.append("bedrooms", form.bedrooms);
-    formData.append("bathrooms", form.bathrooms);
-    formData.append("description", form.description);
-    formData.append("phone", form.phone);
-    formData.append("lat", form.lat || "");
-    formData.append("lng", form.lng || "");
-    formData.append("amenities", JSON.stringify(form.amenities || []));
-
-    if (form.image) {
-      formData.append("image", form.image);
-    }
-
-    try {
-      const res = await API.post("/properties", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      console.log("SUCCESS:", res.data);
-      setSubmitStatus("success");
-
-      // ✅ NEW — show success message before reset
-      setTimeout(() => {
-        resetForm();
-      }, 1500);
-
-    } catch (err) {
-      console.log("FULL ERROR:", err);
-      console.log("BACKEND RESPONSE:", err?.response?.data);
-      setSubmitStatus("error");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  // ✅ NEW — Suggested rental price based on type & bedrooms
   const suggestPrice = () => {
     const suggestions = {
       "Bedsitter": 8000,
@@ -196,6 +168,66 @@ export default function Upload() {
     alert(`💡 Suggested: Ksh ${suggested.toLocaleString()}`);
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setSubmitStatus(null);
+    setErrorMsg("");
+
+    try {
+      // ✅ Use FormData for multipart upload
+      const formData = new FormData();
+      
+      formData.append("title", form.title);
+      formData.append("county", form.county);
+      formData.append("area", form.area);
+      formData.append("price", form.price);
+      formData.append("deposit", form.deposit || "");
+      formData.append("type", form.type);
+      formData.append("bedrooms", form.bedrooms || "");
+      formData.append("bathrooms", form.bathrooms || "");
+      formData.append("description", form.description);
+      formData.append("phone", form.phone);
+      formData.append("lat", form.lat || "");
+      formData.append("lng", form.lng || "");
+      formData.append("amenities", JSON.stringify(form.amenities || []));
+
+      // ✅ Append all images
+      form.images.forEach((image, idx) => {
+        formData.append("images", image);
+      });
+
+      console.log("📤 Uploading with FormData:", {
+        title: form.title,
+        county: form.county,
+        imageCount: form.images.length,
+      });
+
+      // ✅ POST to /api/properties (without auth for now)
+      const res = await API.post("/properties", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("✅ SUCCESS:", res.data);
+      setSubmitStatus("success");
+
+      setTimeout(() => {
+        resetForm();
+        navigate("/listings"); // Redirect to listings after success
+      }, 2000);
+
+    } catch (err) {
+      console.error("❌ UPLOAD ERROR:", err);
+      const errorMessage = err.response?.data?.error || err.message || "Upload failed. Try again.";
+      setErrorMsg(errorMessage);
+      setSubmitStatus("error");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div style={styles.root}>
       <style>{css}</style>
@@ -206,7 +238,7 @@ export default function Upload() {
         <p style={styles.subtitle}>List your home and reach thousands of tenants</p>
       </div>
 
-      {/* ✅ NEW — Completion progress bar */}
+      {/* ✅ Completion progress bar */}
       <div style={styles.progressWrap}>
         <div style={styles.progressLabel}>
           Form Completion <span style={styles.progressPercent}>{completionPercent}%</span>
@@ -216,15 +248,20 @@ export default function Upload() {
         </div>
       </div>
 
-      {/* ✅ NEW — Success/Error messages */}
+      {/* ✅ Success/Error messages */}
       {submitStatus === "success" && (
         <div className="upload-success">
-          ✔ Property submitted successfully! Awaiting approval…
+          ✅ Property submitted successfully! Redirecting…
         </div>
       )}
       {submitStatus === "error" && (
         <div className="upload-error">
-          ❌ Upload failed. Check your network or try again.
+          ❌ {errorMsg || "Upload failed. Check your network."}
+        </div>
+      )}
+      {errorMsg && !submitStatus && (
+        <div className="upload-warning">
+          ⚠️ {errorMsg}
         </div>
       )}
 
@@ -298,7 +335,6 @@ export default function Upload() {
                 type="button"
                 className="upload-suggest-btn"
                 onClick={suggestPrice}
-                title="Get AI-suggested price for this property type"
               >
                 💡 Suggest
               </button>
@@ -392,7 +428,6 @@ export default function Upload() {
               name="lat"
               placeholder="Latitude (auto-filled)"
               value={form.lat}
-              onChange={handleChange}
               disabled
             />
             <input
@@ -400,42 +435,42 @@ export default function Upload() {
               name="lng"
               placeholder="Longitude (auto-filled)"
               value={form.lng}
-              onChange={handleChange}
               disabled
             />
           </div>
         </div>
 
-        {/* ✅ NEW — Image upload with preview */}
+        {/* ✅ Multiple images upload with preview */}
         <div style={styles.section}>
-          <h3 style={styles.sectionTitle}>Property Image</h3>
+          <h3 style={styles.sectionTitle}>Property Images (up to 5)</h3>
 
           <div style={styles.imageUploadBox}>
             <input
               type="file"
               accept="image/*"
-              onChange={handleImage}
+              multiple
+              onChange={handleImages}
               style={{ display: "none" }}
               id="image-input"
             />
             <label htmlFor="image-input" className="upload-file-label">
-              📸 Choose Image
+              📸 Choose Images ({form.images.length}/5)
             </label>
 
-            {previewImage && (
-              <div style={styles.previewWrap}>
-                <img src={previewImage} alt="preview" style={styles.previewImg} />
-                <button
-                  type="button"
-                  className="upload-remove-img"
-                  onClick={() => {
-                    setPreviewImage(null);
-                    updateFormAndCompletion({ image: null });
-                    document.getElementById("image-input").value = "";
-                  }}
-                >
-                  Remove
-                </button>
+            {previewImages.length > 0 && (
+              <div style={styles.previewGrid}>
+                {previewImages.map((preview, idx) => (
+                  <div key={idx} style={styles.previewItem}>
+                    <img src={preview} alt={`preview ${idx}`} style={styles.previewImg} />
+                    <button
+                      type="button"
+                      className="upload-remove-img"
+                      onClick={() => removeImage(idx)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -448,7 +483,7 @@ export default function Upload() {
             type="submit"
             disabled={submitting || completionPercent < 80}
           >
-            {submitting ? "⏳ Submitting…" : "✓ Submit for Approval"}
+            {submitting ? "⏳ Uploading…" : "✓ Submit for Approval"}
           </button>
 
           <button
@@ -461,7 +496,6 @@ export default function Upload() {
           </button>
         </div>
 
-        {/* ✅ NEW — Form hint ── */}
         {completionPercent < 80 && (
           <p style={styles.hint}>
             📌 Complete at least 80% of the form to submit ({completionPercent}%)
@@ -491,7 +525,6 @@ const styles = {
   title: { fontSize: "clamp(24px,4vw,36px)", fontWeight: 800, color: "#f1f5f9", margin: "0 0 6px", letterSpacing: "-0.5px" },
   subtitle: { color: "#64748b", fontSize: "14px", margin: 0 },
 
-  // ✅ NEW progress
   progressWrap: { marginBottom: "28px" },
   progressLabel: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px", fontSize: "13px", color: "#94a3b8" },
   progressPercent: { fontWeight: 700, color: "#60a5fa" },
@@ -516,10 +549,10 @@ const styles = {
 
   geoRow: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" },
 
-  // ✅ NEW image upload
   imageUploadBox: { display: "flex", flexDirection: "column", gap: "12px" },
-  previewWrap: { position: "relative", borderRadius: "12px", overflow: "hidden", border: "1px solid rgba(59,130,246,0.3)" },
-  previewImg: { width: "100%", height: "auto", maxHeight: "300px", objectFit: "cover", display: "block" },
+  previewGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: "12px" },
+  previewItem: { position: "relative", borderRadius: "12px", overflow: "hidden", border: "1px solid rgba(59,130,246,0.3)" },
+  previewImg: { width: "100%", height: "120px", objectFit: "cover", display: "block" },
 
   buttonRow: { display: "flex", gap: "10px" },
 
@@ -543,7 +576,6 @@ const css = `
   .upload-select { cursor: pointer; }
   .upload-select option { background: #0d1b2e; }
 
-  /* ✅ NEW amenity checkboxes */
   .upload-amenity {
     display: flex; align-items: center; gap: 6px;
     padding: 7px 12px; border-radius: 8px;
@@ -554,7 +586,6 @@ const css = `
   .upload-amenity:hover { background: rgba(255,255,255,0.06); }
   .upload-amenity input[type="checkbox"] { cursor: pointer; accent-color: #3b82f6; }
 
-  /* ✅ NEW suggest button */
   .upload-suggest-btn {
     padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(251,146,60,0.3);
     background: rgba(251,146,60,0.08); color: #fb923c; font-size: 12px;
@@ -563,7 +594,6 @@ const css = `
   }
   .upload-suggest-btn:hover { background: rgba(251,146,60,0.15); }
 
-  /* Geo button */
   .upload-geo-btn {
     width: 100%; padding: 11px; border-radius: 10px;
     border: 1px solid rgba(59,130,246,0.3); background: rgba(59,130,246,0.08);
@@ -572,7 +602,6 @@ const css = `
   }
   .upload-geo-btn:hover { background: rgba(59,130,246,0.15); }
 
-  /* ✅ NEW file upload */
   .upload-file-label {
     display: block; padding: 18px; text-align: center;
     border: 2px dashed rgba(59,130,246,0.3); border-radius: 12px;
@@ -583,15 +612,13 @@ const css = `
     border-color: rgba(59,130,246,0.6); background: rgba(59,130,246,0.08);
   }
 
-  /* ✅ NEW remove image */
   .upload-remove-img {
-    position: absolute; top: 8px; right: 8px;
-    padding: 6px 12px; border-radius: 6px; font-size: 12px;
+    position: absolute; top: 4px; right: 4px;
+    padding: 4px 8px; border-radius: 4px; font-size: 12px;
     border: none; background: rgba(239,68,68,0.8); color: white;
     cursor: pointer; font-family: inherit; font-weight: 600;
   }
 
-  /* Submit & Reset buttons */
   .upload-submit-btn {
     flex: 1; padding: 13px; border-radius: 10px; border: none;
     background: linear-gradient(135deg,#1d4ed8,#6d28d9); color: white;
@@ -610,7 +637,6 @@ const css = `
   .upload-reset-btn:hover:not(:disabled) { background: rgba(255,255,255,0.1); }
   .upload-reset-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  /* ✅ NEW status messages */
   .upload-success {
     padding: 12px 16px; border-radius: 10px;
     background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3);
@@ -623,6 +649,12 @@ const css = `
     background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3);
     color: #fca5a5; font-size: 13px; font-weight: 600; margin-bottom: 16px;
     animation: slideDown .3s ease;
+  }
+
+  .upload-warning {
+    padding: 12px 16px; border-radius: 10px;
+    background: rgba(251,146,60,0.12); border: 1px solid rgba(251,146,60,0.3);
+    color: #fed7aa; font-size: 13px; font-weight: 600; margin-bottom: 16px;
   }
 
   @keyframes slideDown {
