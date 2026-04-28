@@ -37,13 +37,11 @@ export default function Home() {
 
   const handleSearch = () => {
     const query = new URLSearchParams();
-
     if (searchData.location) query.append("county", searchData.location);
     if (searchData.area) query.append("area", searchData.area);
     if (searchData.price) query.append("price", searchData.price);
     if (searchData.type) query.append("type", searchData.type);
     if (searchData.bedrooms) query.append("bedrooms", searchData.bedrooms);
-
     navigate(`/listings?${query.toString()}`);
   };
 
@@ -51,7 +49,7 @@ export default function Home() {
     <div style={styles.root}>
       <style>{css}</style>
 
-      {/* ── HERO ── */}
+      {/* HERO SECTION */}
       <div style={styles.hero}>
         <img src={logo} alt="Axx Spaces Logo" style={styles.logo} />
 
@@ -63,14 +61,13 @@ export default function Home() {
           Trusted rental platform connecting landlords and tenants
         </p>
 
-        {/* Search Box */}
+        {/* Your Original Search Box */}
         <div style={styles.searchBox}>
           <select
             style={styles.input}
             value={searchData.location}
-            onChange={(e) =>
-              setSearchData({ ...searchData, location: e.target.value })
-            }
+            onChange={(e) => setSearchData({ ...searchData, location: e.target.value })}
+            className="search-input"
           >
             <option value="">📍 Select County</option>
             {counties.map((c, i) => (
@@ -82,26 +79,23 @@ export default function Home() {
             placeholder="🏘 Area (e.g Kilimani)"
             style={styles.input}
             value={searchData.area}
-            onChange={(e) =>
-              setSearchData({ ...searchData, area: e.target.value })
-            }
+            onChange={(e) => setSearchData({ ...searchData, area: e.target.value })}
+            className="search-input"
           />
 
           <input
             placeholder="💵 Max Price"
             style={styles.input}
             value={searchData.price}
-            onChange={(e) =>
-              setSearchData({ ...searchData, price: e.target.value })
-            }
+            onChange={(e) => setSearchData({ ...searchData, price: e.target.value })}
+            className="search-input"
           />
 
           <select
             style={styles.input}
             value={searchData.type}
-            onChange={(e) =>
-              setSearchData({ ...searchData, type: e.target.value })
-            }
+            onChange={(e) => setSearchData({ ...searchData, type: e.target.value })}
+            className="search-input"
           >
             <option value="">🏗 Property Type</option>
             {propertyTypes.map((t, i) => (
@@ -112,9 +106,8 @@ export default function Home() {
           <select
             style={styles.input}
             value={searchData.bedrooms}
-            onChange={(e) =>
-              setSearchData({ ...searchData, bedrooms: e.target.value })
-            }
+            onChange={(e) => setSearchData({ ...searchData, bedrooms: e.target.value })}
+            className="search-input"
           >
             <option value="">🛏 Bedrooms</option>
             <option value="1">1 Bedroom</option>
@@ -123,35 +116,31 @@ export default function Home() {
             <option value="4">4+ Bedrooms</option>
           </select>
 
-          <button className="home-btn" onClick={handleSearch}>
+          <button className="home-btn search-btn" onClick={handleSearch}>
             🔍 Search Homes
           </button>
         </div>
       </div>
 
-      {/* ── TRUST SECTION ── */}
+      {/* TRUST SECTION - Your Original */}
       <div style={styles.section}>
         <h2 style={styles.sectionTitle}>Why Renters Trust Axx Spaces</h2>
-
         <div style={styles.grid}>
           <div style={styles.card}>
             <div style={styles.icon}>🔐</div>
             <h3>Verified Listings</h3>
             <p>Every property is reviewed before approval</p>
           </div>
-
           <div style={styles.card}>
             <div style={styles.icon}>🧾</div>
             <h3>No Fake Ads</h3>
             <p>We filter scams and fake landlords</p>
           </div>
-
           <div style={styles.card}>
             <div style={styles.icon}>📞</div>
             <h3>Direct Contact</h3>
             <p>Talk directly to landlords</p>
           </div>
-
           <div style={styles.card}>
             <div style={styles.icon}>⚡</div>
             <h3>Fast Updates</h3>
@@ -160,11 +149,50 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ── LANDLORD CTA ── */}
+      {/* NEW: STATS SECTION */}
+      <div style={styles.statsSection}>
+        <div style={styles.statsGrid}>
+          <div style={styles.stat}>
+            <div style={styles.statNumber}>5,200+</div>
+            <div style={styles.statLabel}>Properties Listed</div>
+          </div>
+          <div style={styles.stat}>
+            <div style={styles.statNumber}>47</div>
+            <div style={styles.statLabel}>Counties Covered</div>
+          </div>
+          <div style={styles.stat}>
+            <div style={styles.statNumber}>98%</div>
+            <div style={styles.statLabel}>Satisfied Tenants</div>
+          </div>
+        </div>
+      </div>
+
+      {/* NEW: HOW IT WORKS */}
+      <div style={styles.section}>
+        <h2 style={styles.sectionTitle}>How Axx Spaces Works</h2>
+        <div style={styles.steps}>
+          <div style={styles.step}>
+            <div style={styles.stepNum}>1</div>
+            <h3>Browse & Search</h3>
+            <p>Find verified homes in your preferred county and area</p>
+          </div>
+          <div style={styles.step}>
+            <div style={styles.stepNum}>2</div>
+            <h3>Contact Directly</h3>
+            <p>Chat with landlords via WhatsApp or call</p>
+          </div>
+          <div style={styles.step}>
+            <div style={styles.stepNum}>3</div>
+            <h3>Move In</h3>
+            <p>Visit, pay deposit and secure your new home</p>
+          </div>
+        </div>
+      </div>
+
+      {/* LANDLORD CTA - Your Original */}
       <div style={styles.cta}>
         <h2>Are you a landlord?</h2>
         <p>Post your property and reach thousands of tenants</p>
-
         <button className="home-btn" onClick={() => navigate("/upload")}>
           📝 Upload Property
         </button>
@@ -173,9 +201,7 @@ export default function Home() {
   );
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   STYLES
-══════════════════════════════════════════════════════════════════ */
+/* Styles + Animations */
 const styles = {
   root: {
     fontFamily: "'DM Sans', 'Segoe UI', sans-serif",
@@ -237,7 +263,7 @@ const styles = {
     fontSize: "14px",
     outline: "none",
     fontFamily: "inherit",
-    transition: "border .2s",
+    transition: "all 0.3s ease",
   },
 
   section: {
@@ -268,11 +294,53 @@ const styles = {
     borderRadius: "14px",
     width: "220px",
     color: "white",
-    transition: "transform .2s, border-color .2s",
+    transition: "all 0.3s ease",
   },
 
   icon: {
     fontSize: "32px",
+    marginBottom: "12px",
+  },
+
+  statsSection: {
+    background: "#0a1729",
+    padding: "60px 20px",
+  },
+  statsGrid: {
+    display: "flex",
+    justifyContent: "center",
+    gap: "60px",
+    flexWrap: "wrap",
+  },
+  stat: {
+    textAlign: "center",
+  },
+  statNumber: {
+    fontSize: "42px",
+    fontWeight: "900",
+    color: "#60a5fa",
+  },
+  statLabel: {
+    color: "#94a3b8",
+    marginTop: "8px",
+  },
+
+  steps: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+    gap: "30px",
+    marginTop: "40px",
+  },
+  step: {
+    background: "rgba(255,255,255,0.03)",
+    padding: "32px 24px",
+    borderRadius: "16px",
+    textAlign: "center",
+  },
+  stepNum: {
+    fontSize: "48px",
+    fontWeight: "900",
+    color: "#60a5fa",
     marginBottom: "12px",
   },
 
@@ -288,7 +356,7 @@ const styles = {
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap');
 
-  .home-btn {
+  .home-btn, .search-btn {
     padding: 11px 28px;
     border-radius: 10px;
     border: none;
@@ -298,21 +366,35 @@ const css = `
     font-size: 14px;
     cursor: pointer;
     font-family: inherit;
-    transition: transform .15s, box-shadow .2s;
+    transition: all 0.3s ease;
     box-shadow: 0 4px 20px rgba(59,130,246,0.35);
   }
 
-  .home-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 28px rgba(59,130,246,0.45);
+  .home-btn:hover, .search-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 30px rgba(59,130,246,0.55);
   }
 
-  .home-btn:active {
-    transform: scale(0.97);
+  .search-input {
+    transition: all 0.3s ease;
   }
 
-  input:focus,
-  select:focus {
+  .search-input:focus {
+    border-color: rgba(59,130,246,0.6);
+    box-shadow: 0 0 0 4px rgba(59,130,246,0.25);
+    transform: scale(1.04);
+  }
+
+  .card {
+    transition: all 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(59,130,246,0.4);
+  }
+
+  input:focus, select:focus {
     border-color: rgba(59,130,246,0.5);
     box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
   }
