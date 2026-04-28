@@ -1,9 +1,20 @@
-import { useState } from "react";
-import API from "../api/api";
+import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import API from "../api/api";
 
 export default function Upload() {
   const navigate = useNavigate();
+  const { token } = useContext(AuthContext);
+
+  // ✅ NEW - Redirect if not logged in
+  useEffect(() => {
+    if (!token) {
+      alert("❌ Please login first to upload a property");
+      navigate("/login");
+    }
+  }, [token, navigate]);
+
   const [form, setForm] = useState({
     title: "",
     county: "",
@@ -16,15 +27,14 @@ export default function Upload() {
     amenities: [],
     description: "",
     phone: "",
-    images: [], // Changed: array instead of single image
+    images: [],
     lat: "",
     lng: "",
   });
 
-  // ✅ NEW — form state tracking
   const [submitting, setSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null); // "success" | "error" | null
-  const [previewImages, setPreviewImages] = useState([]); // ✅ Multiple previews
+  const [submitStatus, setSubmitStatus] = useState(null);
+  const [previewImages, setPreviewImages] = useState([]);
   const [completionPercent, setCompletionPercent] = useState(0);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -55,7 +65,6 @@ export default function Upload() {
     "WiFi","Borehole","Furnished","AC","TV","Gym"
   ];
 
-  // ✅ Calculate form completion percentage
   const calcCompletion = () => {
     const fields = [
       form.title, form.county, form.area, form.price,
@@ -108,7 +117,6 @@ export default function Upload() {
     updateFormAndCompletion({ amenities: updated });
   };
 
-  // ✅ Handle multiple images
   const handleImages = (e) => {
     const files = Array.from(e.target.files || []);
     
@@ -117,7 +125,6 @@ export default function Upload() {
       return;
     }
 
-    // Generate previews
     const previews = [];
     files.forEach(file => {
       const reader = new FileReader();
@@ -175,7 +182,6 @@ export default function Upload() {
     setErrorMsg("");
 
     try {
-      // ✅ Use FormData for multipart upload
       const formData = new FormData();
       
       formData.append("title", form.title);
@@ -192,7 +198,6 @@ export default function Upload() {
       formData.append("lng", form.lng || "");
       formData.append("amenities", JSON.stringify(form.amenities || []));
 
-      // ✅ Append all images
       form.images.forEach((image, idx) => {
         formData.append("images", image);
       });
@@ -203,10 +208,11 @@ export default function Upload() {
         imageCount: form.images.length,
       });
 
-      // ✅ POST to /api/properties (without auth for now)
+      // ✅ NEW - Send token in header for authentication
       const res = await API.post("/properties", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
+          "Authorization": `Bearer ${token}`,
         },
       });
 
@@ -215,7 +221,7 @@ export default function Upload() {
 
       setTimeout(() => {
         resetForm();
-        navigate("/listings"); // Redirect to listings after success
+        navigate("/dashboard"); // ✅ Redirect to dashboard after success
       }, 2000);
 
     } catch (err) {
@@ -228,17 +234,20 @@ export default function Upload() {
     }
   };
 
+  // ✅ Don't render if not logged in
+  if (!token) {
+    return null;
+  }
+
   return (
     <div style={styles.root}>
       <style>{css}</style>
 
-      {/* ── Page header ── */}
       <div style={styles.header}>
         <h1 style={styles.title}>📝 Upload Your Property</h1>
         <p style={styles.subtitle}>List your home and reach thousands of tenants</p>
       </div>
 
-      {/* ✅ Completion progress bar */}
       <div style={styles.progressWrap}>
         <div style={styles.progressLabel}>
           Form Completion <span style={styles.progressPercent}>{completionPercent}%</span>
@@ -248,10 +257,9 @@ export default function Upload() {
         </div>
       </div>
 
-      {/* ✅ Success/Error messages */}
       {submitStatus === "success" && (
         <div className="upload-success">
-          ✅ Property submitted successfully! Redirecting…
+          ✅ Property submitted successfully! Redirecting to dashboard…
         </div>
       )}
       {submitStatus === "error" && (
@@ -267,7 +275,6 @@ export default function Upload() {
 
       <form onSubmit={handleSubmit} style={styles.form}>
 
-        {/* ── Basic info section ── */}
         <div style={styles.section}>
           <h3 style={styles.sectionTitle}>Basic Information</h3>
 
@@ -316,7 +323,6 @@ export default function Upload() {
           </select>
         </div>
 
-        {/* ── Pricing section ── */}
         <div style={styles.section}>
           <h3 style={styles.sectionTitle}>Pricing</h3>
 
@@ -351,7 +357,6 @@ export default function Upload() {
           />
         </div>
 
-        {/* ── Details section ── */}
         <div style={styles.section}>
           <h3 style={styles.sectionTitle}>Details</h3>
 
@@ -384,7 +389,6 @@ export default function Upload() {
           />
         </div>
 
-        {/* ── Amenities ── */}
         <div style={styles.section}>
           <h3 style={styles.sectionTitle}>Amenities</h3>
           <div style={styles.amenitiesGrid}>
@@ -401,7 +405,6 @@ export default function Upload() {
           </div>
         </div>
 
-        {/* ── Contact & Location ── */}
         <div style={styles.section}>
           <h3 style={styles.sectionTitle}>Contact &amp; Location</h3>
 
@@ -440,7 +443,6 @@ export default function Upload() {
           </div>
         </div>
 
-        {/* ✅ Multiple images upload with preview */}
         <div style={styles.section}>
           <h3 style={styles.sectionTitle}>Property Images (up to 5)</h3>
 
@@ -476,7 +478,6 @@ export default function Upload() {
           </div>
         </div>
 
-        {/* ── Submit & Reset buttons ── */}
         <div style={styles.buttonRow}>
           <button
             className="upload-submit-btn"
@@ -507,9 +508,6 @@ export default function Upload() {
   );
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   STYLES
-══════════════════════════════════════════════════════════════════ */
 const styles = {
   root: {
     fontFamily: "'DM Sans', 'Segoe UI', sans-serif",
@@ -559,7 +557,6 @@ const styles = {
   hint: { fontSize: "12px", color: "#64748b", textAlign: "center", margin: 0 },
 };
 
-/* ── CSS classes ───────────────────────────────────────────────── */
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap');
 
