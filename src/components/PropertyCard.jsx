@@ -2,22 +2,23 @@ export default function PropertyCard({ property, isOwner = false, onDelete }) {
   const status = property.status || "pending";
   const isApproved = status === "approved";
 
-  // Get the first image from the images array (Cloudinary URL)
-  const mainImage = property.images && property.images.length > 0 
-    ? property.images[0] 
-    : null;
-
   return (
     <div style={styles.card}>
-      {mainImage ? (
-        <img
-          src={mainImage}
-          alt={property.title}
-          style={styles.image}
-        />
-      ) : (
-        <div style={styles.noImage}>No Image</div>
-      )}
+      {/* ✅ FIXED: Image Gallery - Shows ALL images! */}
+      <div style={styles.imageGallery}>
+        {property.images && property.images.length > 0 ? (
+          property.images.map((imageUrl, index) => (
+            <img
+              key={index}
+              src={imageUrl}
+              alt={`${property.title} - Photo ${index + 1}`}
+              style={styles.image}
+            />
+          ))
+        ) : (
+          <div style={styles.noImage}>No Image</div>
+        )}
+      </div>
 
       <h3 style={styles.title}>{property.title}</h3>
       <p style={styles.location}>
@@ -35,7 +36,7 @@ export default function PropertyCard({ property, isOwner = false, onDelete }) {
 
       {property.images && property.images.length > 1 && (
         <p style={styles.imageCount}>
-          +{property.images.length - 1} more photos
+          📸 {property.images.length} photos total
         </p>
       )}
 
@@ -60,18 +61,29 @@ const styles = {
     marginBottom: "20px",
     border: "1px solid #222",
   },
-  image: {
-    width: "100%",
-    height: "200px",
-    objectFit: "cover",
-    borderRadius: "10px",
+  
+  // ✅ NEW: Image Gallery Container
+  imageGallery: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+    gap: "8px",
     marginBottom: "12px",
   },
+  
+  image: {
+    width: "100%",
+    height: "120px",  // ✅ Reduced height for multiple images
+    objectFit: "cover",
+    borderRadius: "8px",
+    cursor: "pointer",
+    transition: "transform 0.2s",
+  },
+  
   noImage: {
     width: "100%",
-    height: "200px",
+    height: "120px",
     background: "#1a1a1a",
-    borderRadius: "10px",
+    borderRadius: "8px",
     marginBottom: "12px",
     display: "flex",
     alignItems: "center",
@@ -79,6 +91,7 @@ const styles = {
     color: "#666",
     fontSize: "14px",
   },
+  
   title: {
     margin: "10px 0 6px 0",
     color: "#fff",
