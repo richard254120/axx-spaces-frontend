@@ -22,7 +22,7 @@ export default function Navbar() {
         {token ? (
           <>
             <Link style={styles.link} to="/upload">Upload Property</Link>
-            <Link style={styles.link} to="/dashboard">My Properties</Link>
+            <Link style={styles.link} to="/dashboard">📊 My Properties</Link>
             <button onClick={handleLogout} style={styles.logoutBtn}>
               Logout
             </button>
