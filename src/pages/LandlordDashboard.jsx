@@ -11,7 +11,7 @@ export default function LandlordDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("pending");
   const [error, setError] = useState("");
-  const [selectedImageIndex, setSelectedImageIndex] = useState({});
+  const [selectedImageIndex, setSelectedImageIndex] = useState({}); // ✅ NEW - Track gallery position
 
   useEffect(() => {
     if (!token) {
@@ -55,7 +55,7 @@ export default function LandlordDashboard() {
     }
   };
 
-  // Get images for a property
+  // ✅ NEW - Get images for a property
   const getPropertyImages = (property) => {
     return property.images && property.images.length > 0 
       ? property.images 
@@ -64,7 +64,7 @@ export default function LandlordDashboard() {
         : [];
   };
 
-  // Navigate gallery
+  // ✅ NEW - Navigate gallery
   const nextImage = (propId, images) => {
     const current = selectedImageIndex[propId] || 0;
     setSelectedImageIndex({
@@ -73,6 +73,7 @@ export default function LandlordDashboard() {
     });
   };
 
+  // ✅ NEW - Previous image
   const prevImage = (propId, images) => {
     const current = selectedImageIndex[propId] || 0;
     setSelectedImageIndex({
@@ -138,6 +139,7 @@ export default function LandlordDashboard() {
       ) : (
         <div style={styles.grid}>
           {displayProps.map((property, idx) => {
+            // ✅ NEW - Get all images for this property
             const images = getPropertyImages(property);
             const currentImageIndex = selectedImageIndex[property._id] || 0;
             const currentImage = images[currentImageIndex];
@@ -148,7 +150,7 @@ export default function LandlordDashboard() {
                 className="dash-card"
                 style={{ animationDelay: `${idx * 60}ms` }}
               >
-                {/* Image section with arrows only - No thumbnails */}
+                {/* ✅ UPDATED Image section with gallery */}
                 {images.length > 0 ? (
                   <div style={styles.imageWrap}>
                     <img
@@ -160,6 +162,7 @@ export default function LandlordDashboard() {
                       {property.status === "pending" ? "⏳ Pending" : "✅ Approved"}
                     </span>
 
+                    {/* ✅ NEW - Gallery navigation controls */}
                     {images.length > 1 && (
                       <>
                         <div style={styles.galleryControls}>
@@ -179,6 +182,22 @@ export default function LandlordDashboard() {
                             ❯
                           </button>
                         </div>
+
+                        {/* ✅ NEW - Thumbnail gallery */}
+                        <div style={styles.thumbnails}>
+                          {images.map((img, i) => (
+                            <img
+                              key={i}
+                              src={img}
+                              alt={`thumb ${i}`}
+                              style={{
+                                ...styles.thumbnail,
+                                border: i === currentImageIndex ? "2px solid #60a5fa" : "1px solid #333"
+                              }}
+                              onClick={() => setSelectedImageIndex({ ...selectedImageIndex, [property._id]: i })}
+                            />
+                          ))}
+                        </div>
                       </>
                     )}
                   </div>
@@ -195,6 +214,7 @@ export default function LandlordDashboard() {
                     📍 {property.county}{property.area ? ` · ${property.area}` : ""}
                   </p>
 
+                  {/* Price */}
                   <div style={styles.priceBox}>
                     <div>
                       <div style={styles.label}>Monthly Rent</div>
@@ -210,6 +230,7 @@ export default function LandlordDashboard() {
                     </div>
                   </div>
 
+                  {/* Meta */}
                   <div style={styles.metaRow}>
                     {property.type && <span className="dash-meta-pill">{property.type}</span>}
                     {property.bedrooms && (
@@ -217,21 +238,25 @@ export default function LandlordDashboard() {
                     )}
                   </div>
 
+                  {/* Description */}
                   {property.description && (
                     <p style={styles.description}>{property.description}</p>
                   )}
 
+                  {/* Phone */}
                   <div style={styles.phoneRow}>
                     <span>📞</span>
                     <span style={styles.phone}>{property.phone}</span>
                   </div>
 
+                  {/* Amenities */}
                   {property.amenities?.length > 0 && (
                     <p style={styles.amenities}>
                       🏡 {property.amenities.join(", ")}
                     </p>
                   )}
 
+                  {/* Status Info */}
                   <div style={styles.statusInfo}>
                     {property.status === "pending" ? (
                       <p style={styles.pendingText}>
@@ -244,6 +269,7 @@ export default function LandlordDashboard() {
                     )}
                   </div>
 
+                  {/* Actions */}
                   <div style={styles.actionRow}>
                     <button
                       className="dash-delete-btn"
@@ -324,7 +350,7 @@ const styles = {
     padding: "5px 12px", borderRadius: "999px", border: "1px solid rgba(255,255,255,0.2)",
   },
 
-  // Gallery Controls (Arrows Only)
+  // ✅ NEW - Gallery styles
   galleryControls: {
     position: "absolute", bottom: "10px", left: "50%", transform: "translateX(-50%)",
     display: "flex", alignItems: "center", gap: "10px",
@@ -332,6 +358,17 @@ const styles = {
   },
 
   imageCounter: { color: "#fff", fontSize: "12px", fontWeight: 600 },
+
+  thumbnails: {
+    display: "flex", gap: "4px", padding: "6px",
+    background: "rgba(0,0,0,0.3)", borderRadius: "0 0 12px 12px",
+    overflowX: "auto",
+  },
+
+  thumbnail: {
+    width: "50px", height: "50px", objectFit: "cover",
+    borderRadius: "4px", cursor: "pointer", flexShrink: 0,
+  },
 
   cardBody: { padding: "16px" },
   cardTitle: { fontSize: "16px", fontWeight: 700, color: "#f1f5f9", margin: "0 0 4px" },
@@ -422,7 +459,7 @@ const css = `
   }
   .dash-btn:hover { transform: translateY(-2px); }
 
-  /* Gallery button styles */
+  /* ✅ NEW - Gallery button styles */
   .gallery-btn {
     background: rgba(255,255,255,0.1); border: none; color: white;
     padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: 600;
