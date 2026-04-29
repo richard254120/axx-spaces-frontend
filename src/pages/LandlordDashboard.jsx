@@ -11,6 +11,7 @@ export default function LandlordDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("pending");
   const [error, setError] = useState("");
+  const [selectedImageIndex, setSelectedImageIndex] = useState({}); // ✅ NEW - Track gallery position
 
   useEffect(() => {
     if (!token) {
@@ -52,6 +53,33 @@ export default function LandlordDashboard() {
     } catch (err) {
       alert("❌ Delete failed: " + (err.response?.data?.error || err.message));
     }
+  };
+
+  // ✅ NEW - Get images for a property
+  const getPropertyImages = (property) => {
+    return property.images && property.images.length > 0 
+      ? property.images 
+      : property.image 
+        ? [property.image]
+        : [];
+  };
+
+  // ✅ NEW - Navigate gallery
+  const nextImage = (propId, images) => {
+    const current = selectedImageIndex[propId] || 0;
+    setSelectedImageIndex({
+      ...selectedImageIndex,
+      [propId]: (current + 1) % images.length
+    });
+  };
+
+  // ✅ NEW - Previous image
+  const prevImage = (propId, images) => {
+    const current = selectedImageIndex[propId] || 0;
+    setSelectedImageIndex({
+      ...selectedImageIndex,
+      [propId]: current === 0 ? images.length - 1 : current - 1
+    });
   };
 
   const pendingProps = properties.filter(p => p.status === "pending");
@@ -110,104 +138,150 @@ export default function LandlordDashboard() {
         </div>
       ) : (
         <div style={styles.grid}>
-          {displayProps.map((property, idx) => (
-            <div
-              key={property._id}
-              className="dash-card"
-              style={{ animationDelay: `${idx * 60}ms` }}
-            >
-              {/* Image */}
-              {property.image || property.images?.[0] ? (
-                <div style={styles.imageWrap}>
-                  <img
-                    src={property.image || property.images[0]}
-                    alt={property.title}
-                    style={styles.image}
-                  />
-                  <span style={styles.statusBadge}>
-                    {property.status === "pending" ? "⏳ Pending" : "✅ Approved"}
-                  </span>
-                </div>
-              ) : (
-                <div style={styles.imagePlaceholder}>
-                  <span style={{ fontSize: 36 }}>🏠</span>
-                </div>
-              )}
+          {displayProps.map((property, idx) => {
+            // ✅ NEW - Get all images for this property
+            const images = getPropertyImages(property);
+            const currentImageIndex = selectedImageIndex[property._id] || 0;
+            const currentImage = images[currentImageIndex];
 
-              {/* Content */}
-              <div style={styles.cardBody}>
-                <h3 style={styles.cardTitle}>{property.title}</h3>
-                <p style={styles.location}>
-                  📍 {property.county}{property.area ? ` · ${property.area}` : ""}
-                </p>
+            return (
+              <div
+                key={property._id}
+                className="dash-card"
+                style={{ animationDelay: `${idx * 60}ms` }}
+              >
+                {/* ✅ UPDATED Image section with gallery */}
+                {images.length > 0 ? (
+                  <div style={styles.imageWrap}>
+                    <img
+                      src={currentImage}
+                      alt={property.title}
+                      style={styles.image}
+                    />
+                    <span style={styles.statusBadge}>
+                      {property.status === "pending" ? "⏳ Pending" : "✅ Approved"}
+                    </span>
 
-                {/* Price */}
-                <div style={styles.priceBox}>
-                  <div>
-                    <div style={styles.label}>Monthly Rent</div>
-                    <div style={styles.price}>
-                      Ksh {Number(property.price).toLocaleString()}
-                    </div>
+                    {/* ✅ NEW - Gallery navigation controls */}
+                    {images.length > 1 && (
+                      <>
+                        <div style={styles.galleryControls}>
+                          <button
+                            className="gallery-btn"
+                            onClick={() => prevImage(property._id, images)}
+                          >
+                            ❮
+                          </button>
+                          <span style={styles.imageCounter}>
+                            {currentImageIndex + 1} / {images.length}
+                          </span>
+                          <button
+                            className="gallery-btn"
+                            onClick={() => nextImage(property._id, images)}
+                          >
+                            ❯
+                          </button>
+                        </div>
+
+                        {/* ✅ NEW - Thumbnail gallery */}
+                        <div style={styles.thumbnails}>
+                          {images.map((img, i) => (
+                            <img
+                              key={i}
+                              src={img}
+                              alt={`thumb ${i}`}
+                              style={{
+                                ...styles.thumbnail,
+                                border: i === currentImageIndex ? "2px solid #60a5fa" : "1px solid #333"
+                              }}
+                              onClick={() => setSelectedImageIndex({ ...selectedImageIndex, [property._id]: i })}
+                            />
+                          ))}
+                        </div>
+                      </>
+                    )}
                   </div>
-                  <div style={{ textAlign: "right" }}>
-                    <div style={styles.label}>Deposit</div>
-                    <div style={styles.deposit}>
-                      Ksh {property.deposit ? Number(property.deposit).toLocaleString() : "N/A"}
-                    </div>
+                ) : (
+                  <div style={styles.imagePlaceholder}>
+                    <span style={{ fontSize: 36 }}>🏠</span>
                   </div>
-                </div>
-
-                {/* Meta */}
-                <div style={styles.metaRow}>
-                  {property.type && <span className="dash-meta-pill">{property.type}</span>}
-                  {property.bedrooms && (
-                    <span className="dash-meta-pill">🛏 {property.bedrooms} Bed{property.bedrooms > 1 ? "s" : ""}</span>
-                  )}
-                </div>
-
-                {/* Description */}
-                {property.description && (
-                  <p style={styles.description}>{property.description}</p>
                 )}
 
-                {/* Phone */}
-                <div style={styles.phoneRow}>
-                  <span>📞</span>
-                  <span style={styles.phone}>{property.phone}</span>
-                </div>
-
-                {/* Amenities */}
-                {property.amenities?.length > 0 && (
-                  <p style={styles.amenities}>
-                    🏡 {property.amenities.join(", ")}
+                {/* Content */}
+                <div style={styles.cardBody}>
+                  <h3 style={styles.cardTitle}>{property.title}</h3>
+                  <p style={styles.location}>
+                    📍 {property.county}{property.area ? ` · ${property.area}` : ""}
                   </p>
-                )}
 
-                {/* Status Info */}
-                <div style={styles.statusInfo}>
-                  {property.status === "pending" ? (
-                    <p style={styles.pendingText}>
-                      ⏳ Under review. We'll notify you once approved!
-                    </p>
-                  ) : (
-                    <p style={styles.approvedText}>
-                      ✅ Live on platform! Tenants can see it now.
+                  {/* Price */}
+                  <div style={styles.priceBox}>
+                    <div>
+                      <div style={styles.label}>Monthly Rent</div>
+                      <div style={styles.price}>
+                        Ksh {Number(property.price).toLocaleString()}
+                      </div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={styles.label}>Deposit</div>
+                      <div style={styles.deposit}>
+                        Ksh {property.deposit ? Number(property.deposit).toLocaleString() : "N/A"}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Meta */}
+                  <div style={styles.metaRow}>
+                    {property.type && <span className="dash-meta-pill">{property.type}</span>}
+                    {property.bedrooms && (
+                      <span className="dash-meta-pill">🛏 {property.bedrooms} Bed{property.bedrooms > 1 ? "s" : ""}</span>
+                    )}
+                  </div>
+
+                  {/* Description */}
+                  {property.description && (
+                    <p style={styles.description}>{property.description}</p>
+                  )}
+
+                  {/* Phone */}
+                  <div style={styles.phoneRow}>
+                    <span>📞</span>
+                    <span style={styles.phone}>{property.phone}</span>
+                  </div>
+
+                  {/* Amenities */}
+                  {property.amenities?.length > 0 && (
+                    <p style={styles.amenities}>
+                      🏡 {property.amenities.join(", ")}
                     </p>
                   )}
-                </div>
 
-                {/* Actions */}
-                <div style={styles.actionRow}>
-                  <button
-                    className="dash-delete-btn"
-                    onClick={() => handleDelete(property._id)}
-                  >
-                    🗑 Delete
-                  </button>
+                  {/* Status Info */}
+                  <div style={styles.statusInfo}>
+                    {property.status === "pending" ? (
+                      <p style={styles.pendingText}>
+                        ⏳ Under review. We'll notify you once approved!
+                      </p>
+                    ) : (
+                      <p style={styles.approvedText}>
+                        ✅ Live on platform! Tenants can see it now.
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Actions */}
+                  <div style={styles.actionRow}>
+                    <button
+                      className="dash-delete-btn"
+                      onClick={() => handleDelete(property._id)}
+                    >
+                      🗑 Delete
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -274,6 +348,26 @@ const styles = {
     background: "rgba(6,16,31,0.85)", backdropFilter: "blur(6px)",
     color: "#fff", fontSize: "12px", fontWeight: 600,
     padding: "5px 12px", borderRadius: "999px", border: "1px solid rgba(255,255,255,0.2)",
+  },
+
+  // ✅ NEW - Gallery styles
+  galleryControls: {
+    position: "absolute", bottom: "10px", left: "50%", transform: "translateX(-50%)",
+    display: "flex", alignItems: "center", gap: "10px",
+    background: "rgba(0,0,0,0.6)", padding: "6px 12px", borderRadius: "999px",
+  },
+
+  imageCounter: { color: "#fff", fontSize: "12px", fontWeight: 600 },
+
+  thumbnails: {
+    display: "flex", gap: "4px", padding: "6px",
+    background: "rgba(0,0,0,0.3)", borderRadius: "0 0 12px 12px",
+    overflowX: "auto",
+  },
+
+  thumbnail: {
+    width: "50px", height: "50px", objectFit: "cover",
+    borderRadius: "4px", cursor: "pointer", flexShrink: 0,
   },
 
   cardBody: { padding: "16px" },
@@ -364,6 +458,14 @@ const css = `
     box-shadow: 0 4px 20px rgba(59,130,246,0.35); transition: transform .15s;
   }
   .dash-btn:hover { transform: translateY(-2px); }
+
+  /* ✅ NEW - Gallery button styles */
+  .gallery-btn {
+    background: rgba(255,255,255,0.1); border: none; color: white;
+    padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: 600;
+    font-family: inherit; transition: background .2s;
+  }
+  .gallery-btn:hover { background: rgba(255,255,255,0.2); }
 
   .dash-spinner {
     width: 36px; height: 36px; border-radius: 50%;
