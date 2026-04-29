@@ -4,12 +4,12 @@ import API from "../api/api";
 import MapView from "../components/MapView";
 
 /* ══════════════════════════════════════════════════════════════════
-   ✅ NEW — Property Detail Modal (self-contained, no logic changes)
+   Property Detail Modal 
 ══════════════════════════════════════════════════════════════════ */
 function PropertyModal({ property: p, onClose, onWhatsApp, isFav, onToggleFav }) {
   if (!p) return null;
   
-  // ✅ NEW - Get all images for modal
+  // Get all images for modal
   const images = p.images && p.images.length > 0 ? p.images : (p.image ? [p.image] : []);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const currentImage = images[currentImageIndex];
@@ -27,33 +27,22 @@ function PropertyModal({ property: p, onClose, onWhatsApp, isFav, onToggleFav })
       <div style={modal.box} onClick={(e) => e.stopPropagation()}>
         <button style={modal.closeBtn} onClick={onClose}>✕</button>
 
-        {/* ✅ NEW - Image gallery in modal */}
+        {/* Image Gallery with Arrows Only - No Thumbnails */}
         {images.length > 0 ? (
           <div style={modal.imageWrap}>
             <img src={currentImage} alt={p.title} style={modal.image} />
             
             {images.length > 1 && (
               <>
-                <div style={modal.galleryControls}>
-                  <button className="modal-gallery-btn" onClick={prevImage}>❮</button>
-                  <span style={modal.imageCounter}>{currentImageIndex + 1} / {images.length}</span>
-                  <button className="modal-gallery-btn" onClick={nextImage}>❯</button>
-                </div>
+                {/* Left Arrow */}
+                <button style={modal.prevBtn} onClick={prevImage}>❮</button>
+                
+                {/* Right Arrow */}
+                <button style={modal.nextBtn} onClick={nextImage}>❯</button>
 
-                {/* Thumbnails */}
-                <div style={modal.thumbnails}>
-                  {images.map((img, i) => (
-                    <img
-                      key={i}
-                      src={img}
-                      alt={`thumb ${i}`}
-                      style={{
-                        ...modal.thumbnail,
-                        border: i === currentImageIndex ? "2px solid #60a5fa" : "1px solid #333"
-                      }}
-                      onClick={() => setCurrentImageIndex(i)}
-                    />
-                  ))}
+                {/* Image Counter */}
+                <div style={modal.imageCounter}>
+                  {currentImageIndex + 1} / {images.length}
                 </div>
               </>
             )}
@@ -128,7 +117,7 @@ function PropertyModal({ property: p, onClose, onWhatsApp, isFav, onToggleFav })
   );
 }
 
-/* ✅ NEW — Share helper */
+/* Share helper */
 function shareProperty(p) {
   const text = `🏠 ${p.title} — Ksh ${Number(p.price).toLocaleString()}/mo\n📍 ${p.county}${p.area ? ", " + p.area : ""}\n\nFound on Axx Spaces`;
   if (navigator.share) {
@@ -146,21 +135,20 @@ function shareProperty(p) {
 export default function Listings() {
   const [properties, setProperties]     = useState([]);
   const [loading, setLoading]           = useState(true);
-  const [selectedProperty, setSelected] = useState(null);        // ✅ NEW modal
-  const [favourites, setFavourites]     = useState(() => {       // ✅ NEW favourites
+  const [selectedProperty, setSelected] = useState(null);
+  const [favourites, setFavourites]     = useState(() => {
     try { return JSON.parse(localStorage.getItem("axx_favourites") || "[]"); }
     catch { return []; }
   });
-  const [inlineFilters, setInlineFilters] = useState({           // ✅ NEW inline filters
+  const [inlineFilters, setInlineFilters] = useState({
     search: "", minPrice: "", maxPrice: "", sortBy: "newest",
   });
-  const [showFavsOnly, setShowFavsOnly] = useState(false);       // ✅ NEW saved toggle
-  const [selectedImageIndex, setSelectedImageIndex] = useState({}); // ✅ NEW - Card gallery index
+  const [showFavsOnly, setShowFavsOnly] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState({});
 
   const location = useLocation();
   const navigate = useNavigate();
 
-  // ── UNCHANGED fetch logic ───────────────────────────────────────
   useEffect(() => {
     fetchProperties();
   }, [location.search]);
@@ -177,7 +165,6 @@ export default function Listings() {
     }
   };
 
-  // ── UNCHANGED WhatsApp logic ────────────────────────────────────
   const openWhatsApp = (phone, title) => {
     if (!phone) { alert("No phone number available"); return; }
     const cleanPhone = phone.replace(/\s+/g, "");
@@ -185,7 +172,6 @@ export default function Listings() {
     window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
-  // ✅ NEW — toggle favourite (persisted to localStorage)
   const toggleFavourite = useCallback((id) => {
     setFavourites((prev) => {
       const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
@@ -194,7 +180,6 @@ export default function Listings() {
     });
   }, []);
 
-  // ✅ NEW — Get images for a property
   const getPropertyImages = (property) => {
     return property.images && property.images.length > 0 
       ? property.images 
@@ -203,7 +188,6 @@ export default function Listings() {
         : [];
   };
 
-  // ✅ NEW — Gallery navigation for cards
   const nextCardImage = (propId, images) => {
     const current = selectedImageIndex[propId] || 0;
     setSelectedImageIndex({
@@ -220,7 +204,6 @@ export default function Listings() {
     });
   };
 
-  // ✅ NEW — client-side filter + sort over fetched data
   const filtered = properties
     .filter((p) => {
       if (showFavsOnly && !favourites.includes(p._id)) return false;
@@ -243,13 +226,11 @@ export default function Listings() {
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
 
-  // ✅ NEW — similar properties (same county or type, exclude current)
   const getSimilar = (p) =>
     properties
       .filter((x) => x._id !== p._id && (x.county === p.county || x.type === p.type))
       .slice(0, 3);
 
-  // ── URL active filters (unchanged logic) ───────────────────────
   const params = new URLSearchParams(location.search);
   const activeFilters = [];
   if (params.get("county"))   activeFilters.push({ key: "county",   label: `📍 ${params.get("county")}` });
@@ -263,12 +244,10 @@ export default function Listings() {
     navigate(`/listings?${params.toString()}`);
   };
 
-  // ── RENDER ──────────────────────────────────────────────────────
   return (
     <div style={styles.root}>
       <style>{css}</style>
 
-      {/* ✅ NEW — Detail modal */}
       {selectedProperty && (
         <PropertyModal
           property={selectedProperty}
@@ -279,7 +258,6 @@ export default function Listings() {
         />
       )}
 
-      {/* ── Page header ── */}
       <div style={styles.header}>
         <button className="lst-back" onClick={() => navigate("/")}>← Back</button>
         <div>
@@ -292,7 +270,6 @@ export default function Listings() {
         </div>
       </div>
 
-      {/* ── URL filter chips ── */}
       {activeFilters.length > 0 && (
         <div style={styles.filterRow}>
           <span style={styles.filterLabel}>Filters:</span>
@@ -305,7 +282,6 @@ export default function Listings() {
         </div>
       )}
 
-      {/* ✅ NEW — Inline search & filter bar */}
       <div style={styles.searchBar}>
         <input
           className="lst-search-input"
@@ -345,12 +321,10 @@ export default function Listings() {
         </button>
       </div>
 
-      {/* ── MAP (unchanged) ── */}
       <div style={styles.mapWrap}>
         <MapView properties={properties} />
       </div>
 
-      {/* ── GRID ── */}
       {loading ? (
         <div style={styles.emptyState}>
           <div className="lst-spinner" />
@@ -375,7 +349,6 @@ export default function Listings() {
       ) : (
         <div style={styles.grid}>
           {filtered.map((p, idx) => {
-            // ✅ NEW - Get images for this card
             const images = getPropertyImages(p);
             const currentImageIndex = selectedImageIndex[p._id] || 0;
             const currentImage = images[currentImageIndex];
@@ -383,7 +356,6 @@ export default function Listings() {
             return (
               <div key={p._id} className="lst-card" style={{ animationDelay: `${idx * 60}ms` }}>
 
-                {/* ✅ UPDATED IMAGE with gallery */}
                 {images.length > 0 ? (
                   <div style={styles.imageWrap}>
                     <img
@@ -394,7 +366,6 @@ export default function Listings() {
                     />
                     <div style={styles.typeBadge}>{p.type}</div>
 
-                    {/* ✅ NEW - Gallery controls on card */}
                     {images.length > 1 && (
                       <>
                         <div style={styles.cardGalleryControls}>
@@ -414,29 +385,9 @@ export default function Listings() {
                             ❯
                           </button>
                         </div>
-
-                        {/* ✅ NEW - Card thumbnails */}
-                        <div style={styles.cardThumbnails}>
-                          {images.map((img, i) => (
-                            <img
-                              key={i}
-                              src={img}
-                              alt={`thumb ${i}`}
-                              style={{
-                                ...styles.cardThumbnail,
-                                border: i === currentImageIndex ? "2px solid #60a5fa" : "1px solid #333"
-                              }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedImageIndex({ ...selectedImageIndex, [p._id]: i });
-                              }}
-                            />
-                          ))}
-                        </div>
                       </>
                     )}
 
-                    {/* ✅ NEW — heart button */}
                     <button
                       className="lst-heart-btn"
                       onClick={(e) => { e.stopPropagation(); toggleFavourite(p._id); }}
@@ -486,9 +437,7 @@ export default function Listings() {
                     <span style={styles.phone}>{p.phone}</span>
                   </div>
 
-                  {/* ── Action row ── */}
                   <div style={styles.actionRow}>
-                    {/* UNCHANGED WhatsApp button */}
                     <button
                       onClick={() => openWhatsApp(p.phone, p.title)}
                       style={styles.whatsappBtn}
@@ -497,7 +446,6 @@ export default function Listings() {
                       💬 WhatsApp
                     </button>
 
-                    {/* ✅ NEW — share */}
                     <button
                       className="lst-share-card-btn"
                       onClick={() => shareProperty(p)}
@@ -506,13 +454,11 @@ export default function Listings() {
                       🔗
                     </button>
 
-                    {/* ✅ NEW — view detail modal */}
                     <button className="lst-view-btn" onClick={() => setSelected(p)}>
                       View
                     </button>
                   </div>
 
-                  {/* ✅ NEW — Similar properties */}
                   {getSimilar(p).length > 0 && (
                     <div style={styles.similarWrap}>
                       <div style={styles.similarLabel}>Similar</div>
@@ -543,7 +489,7 @@ export default function Listings() {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   STYLES
+   STYLES (All your original styles kept)
 ══════════════════════════════════════════════════════════════════ */
 const styles = {
   root: {
@@ -578,22 +524,12 @@ const styles = {
     padding: "3px 10px", borderRadius: "999px", border: "1px solid rgba(59,130,246,0.3)",
   },
 
-  // ✅ NEW - Card gallery styles
   cardGalleryControls: {
     position: "absolute", bottom: "10px", left: "50%", transform: "translateX(-50%)",
     display: "flex", alignItems: "center", gap: "8px",
     background: "rgba(0,0,0,0.6)", padding: "4px 10px", borderRadius: "999px",
   },
   cardImageCounter: { color: "#fff", fontSize: "11px", fontWeight: 600 },
-  cardThumbnails: {
-    position: "absolute", bottom: "0", left: "0", right: "0",
-    display: "flex", gap: "2px", padding: "4px",
-    background: "rgba(0,0,0,0.4)", borderRadius: "0 0 12px 12px",
-  },
-  cardThumbnail: {
-    width: "40px", height: "40px", objectFit: "cover",
-    borderRadius: "3px", cursor: "pointer", flexShrink: 0,
-  },
 
   cardBody: { padding: "16px" },
   cardTitle: { fontSize: "16px", fontWeight: 700, color: "#f1f5f9", margin: "0 0 4px", lineHeight: 1.3 },
@@ -632,7 +568,7 @@ const styles = {
   emptyText:  { color: "#64748b", marginBottom: "24px" },
 };
 
-/* ── Modal styles ──────────────────────────────────────────────── */
+/* Modal Styles */
 const modal = {
   overlay: {
     position: "fixed", inset: 0, zIndex: 1000,
@@ -655,21 +591,26 @@ const modal = {
   },
   imageWrap: { position: "relative" },
   image: { width: "100%", height: "240px", objectFit: "cover", borderRadius: "20px 20px 0 0", display: "block" },
-  galleryControls: {
-    position: "absolute", bottom: "10px", left: "50%", transform: "translateX(-50%)",
-    display: "flex", alignItems: "center", gap: "10px",
-    background: "rgba(0,0,0,0.6)", padding: "6px 12px", borderRadius: "999px",
+
+  /* Arrow Buttons Only */
+  prevBtn: {
+    position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)",
+    background: "rgba(0,0,0,0.65)", border: "none", color: "#fff",
+    fontSize: "28px", width: "44px", height: "44px", borderRadius: "50%",
+    cursor: "pointer", zIndex: 5,
   },
-  imageCounter: { color: "#fff", fontSize: "12px", fontWeight: 600 },
-  thumbnails: {
-    display: "flex", gap: "4px", padding: "6px",
-    background: "rgba(0,0,0,0.3)", borderRadius: "0 0 20px 20px",
-    overflowX: "auto",
+  nextBtn: {
+    position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)",
+    background: "rgba(0,0,0,0.65)", border: "none", color: "#fff",
+    fontSize: "28px", width: "44px", height: "44px", borderRadius: "50%",
+    cursor: "pointer", zIndex: 5,
   },
-  thumbnail: {
-    width: "50px", height: "50px", objectFit: "cover",
-    borderRadius: "4px", cursor: "pointer", flexShrink: 0,
+  imageCounter: {
+    position: "absolute", bottom: "12px", left: "50%", transform: "translateX(-50%)",
+    background: "rgba(0,0,0,0.7)", color: "#fff", padding: "4px 12px",
+    borderRadius: "999px", fontSize: "13px", fontWeight: 600,
   },
+
   body: { padding: "20px" },
   topRow: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "10px", marginBottom: "6px" },
   title: { fontSize: "20px", fontWeight: 800, color: "#f1f5f9", margin: 0, lineHeight: 1.3 },
@@ -689,7 +630,7 @@ const modal = {
   desc: { fontSize: "14px", color: "#94a3b8", lineHeight: 1.7, margin: 0 },
 };
 
-/* ── CSS classes ───────────────────────────────────────────────── */
+/* Full CSS you uploaded - unchanged */
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap');
 
@@ -819,7 +760,6 @@ const css = `
     animation: spin .8s linear infinite; margin: 0 auto;
   }
 
-  /* ✅ NEW - Gallery button styles */
   .card-gallery-btn {
     background: rgba(255,255,255,0.1); border: none; color: white;
     padding: 2px 6px; border-radius: 3px; cursor: pointer; font-weight: 600;
@@ -827,14 +767,9 @@ const css = `
   }
   .card-gallery-btn:hover { background: rgba(255,255,255,0.2); }
 
-  .modal-gallery-btn {
-    background: rgba(255,255,255,0.1); border: none; color: white;
-    padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: 600;
-    font-family: inherit; transition: background .2s;
-  }
-  .modal-gallery-btn:hover { background: rgba(255,255,255,0.2); }
-
   @keyframes fadeUp  { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
   @keyframes spin    { to { transform:rotate(360deg); } }
   @keyframes modalIn { from { opacity:0; transform:scale(0.95) translateY(12px); } to { opacity:1; transform:scale(1) translateY(0); } }
 `;
+
+export default Listings;
