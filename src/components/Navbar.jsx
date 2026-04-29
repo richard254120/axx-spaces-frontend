@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import iconImage from "../assets/image.png";   // ← Your custom image
+import iconImage from "../assets/image.png";   // Your custom icon
 
 export default function Navbar() {
   const { token, logout } = useContext(AuthContext);
@@ -26,7 +26,7 @@ export default function Navbar() {
         {token ? (
           <>
             <Link style={styles.link} to="/upload">Upload Property</Link>
-            <Link style={styles.link} to="/dashboard">📊 My Properties</Link>
+            <Link style={styles.link} to="/dashboard">My Properties</Link>
             <button onClick={handleLogout} style={styles.logoutBtn}>
               Logout
             </button>
@@ -47,51 +47,93 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "15px 30px",
+    padding: "18px 40px",
     background: "#0a1f44",
     position: "sticky",
     top: 0,
     zIndex: 100,
-    borderBottom: "1px solid rgba(255,255,255,0.1)",
+    borderBottom: "1px solid rgba(255,255,255,0.08)",
   },
+
   logoContainer: {
     display: "flex",
     alignItems: "center",
-    gap: "10px",
+    gap: "12px",
   },
+
   icon: {
-    width: "32px",
-    height: "32px",
+    width: "34px",
+    height: "34px",
     objectFit: "contain",
-    borderRadius: "6px",
+    borderRadius: "8px",
   },
+
   logo: {
     margin: 0,
-    color: "white",
-    fontSize: "26px",
+    color: "#ffffff",
+    fontSize: "28px",
     fontWeight: 800,
-    letterSpacing: "-0.5px",
+    letterSpacing: "-0.8px",
   },
+
   links: {
     display: "flex",
     alignItems: "center",
-    gap: "20px",
+    gap: "28px",
   },
+
   link: {
-    color: "white",
+    color: "#ffffff",
     textDecoration: "none",
-    fontSize: "16px",
-    fontWeight: 500,
-    transition: "color 0.2s",
+    fontSize: "16.5px",
+    fontWeight: "700",           // Made bold as requested
+    transition: "all 0.3s ease",
+    position: "relative",
   },
+
+  // Hover effect with underline animation
+  linkHover: {
+    color: "#60a5fa",
+  },
+
   logoutBtn: {
     background: "transparent",
-    border: "1px solid #ff4d4d",
+    border: "2px solid #ff4d4d",
     color: "#ff4d4d",
     fontSize: "16px",
+    fontWeight: "700",
     cursor: "pointer",
-    padding: "8px 16px",
+    padding: "9px 20px",
     borderRadius: "8px",
-    fontWeight: 500,
+    transition: "all 0.3s ease",
   },
 };
+
+// Optional: Add this <style> block if you want even better hover effects
+const css = `
+  .nav-link:hover {
+    color: #60a5fa !important;
+    transform: translateY(-2px);
+  }
+  
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -4px;
+    left: 0;
+    background: #60a5fa;
+    transition: width 0.3s ease;
+  }
+  
+  .nav-link:hover::after {
+    width: 100%;
+  }
+  
+  .logoutBtn:hover {
+    background: #ff4d4d;
+    color: white;
+    transform: translateY(-2px);
+  }
+`;
