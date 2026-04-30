@@ -53,7 +53,7 @@ export default function Home() {
       {/* HERO SECTION */}
       <div style={styles.hero}>
         <div style={styles.logoContainer}>
-          
+          <img src={iconImage} alt="Axx Icon" style={styles.heroIcon} />
           <img src={logo} alt="Axx Spaces Logo" style={styles.logo} />
         </div>
 
@@ -201,6 +201,37 @@ export default function Home() {
           📝 Upload Your Property Now
         </button>
       </div>
+
+      {/* FOOTER */}
+      <footer style={styles.footer}>
+        <div style={styles.footerInner}>
+          <div style={styles.footerBrand}>
+            <img src={logo} alt="Axx Spaces" style={styles.footerLogo} />
+            <span style={styles.footerName}>Axx Spaces</span>
+          </div>
+
+          <div style={styles.footerLinks}>
+            <div style={styles.footerCol}>
+              <h4 style={styles.footerHeading}>Quick Links</h4>
+              <span style={styles.footerLink} onClick={() => navigate("/listings")}>Browse Listings</span>
+              <span style={styles.footerLink} onClick={() => navigate("/upload")}>List a Property</span>
+            </div>
+
+            <div style={styles.footerCol}>
+              <h4 style={styles.footerHeading}>Contact Us</h4>
+              <a href="mailto:axxspaces@gmail.com" style={styles.footerEmail}>
+                ✉️ axxspaces@gmail.com
+              </a>
+              <p style={styles.footerTagline}>We're available Mon – Sat, 8am – 6pm</p>
+            </div>
+          </div>
+        </div>
+
+        <div style={styles.footerBottom}>
+          <span>© {new Date().getFullYear()} Axx Spaces. All rights reserved.</span>
+          <span style={styles.footerMade}>Built for Kenya 🇰🇪</span>
+        </div>
+      </footer>
     </div>
   );
 }
@@ -407,6 +438,104 @@ const styles = {
     marginBottom: "16px",
   },
 
+  footer: {
+    background: "#03080f",
+    borderTop: "1px solid rgba(255,255,255,0.07)",
+    padding: "50px 20px 0",
+    color: "#94a3b8",
+  },
+
+  footerInner: {
+    maxWidth: "1100px",
+    margin: "0 auto",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    flexWrap: "wrap",
+    gap: "40px",
+    paddingBottom: "40px",
+    borderBottom: "1px solid rgba(255,255,255,0.06)",
+  },
+
+  footerBrand: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+  },
+
+  footerLogo: {
+    width: "48px",
+    height: "48px",
+    borderRadius: "12px",
+    objectFit: "contain",
+  },
+
+  footerName: {
+    fontSize: "22px",
+    fontWeight: "800",
+    color: "#f1f5f9",
+    letterSpacing: "-0.5px",
+  },
+
+  footerLinks: {
+    display: "flex",
+    gap: "60px",
+    flexWrap: "wrap",
+  },
+
+  footerCol: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+  },
+
+  footerHeading: {
+    color: "#f1f5f9",
+    fontSize: "15px",
+    fontWeight: "700",
+    marginBottom: "6px",
+    margin: "0 0 6px",
+  },
+
+  footerLink: {
+    fontSize: "14px",
+    color: "#64748b",
+    cursor: "pointer",
+    transition: "color 0.2s",
+  },
+
+  footerEmail: {
+    fontSize: "15px",
+    fontWeight: "600",
+    color: "#facc15",
+    textDecoration: "none",
+    transition: "color 0.2s",
+  },
+
+  footerTagline: {
+    fontSize: "13px",
+    color: "#475569",
+    margin: 0,
+  },
+
+  footerBottom: {
+    maxWidth: "1100px",
+    margin: "0 auto",
+    padding: "20px 0",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: "10px",
+    fontSize: "13px",
+    color: "#334155",
+  },
+
+  footerMade: {
+    fontSize: "13px",
+    color: "#334155",
+  },
+
   /* CTA — four-colour sweep ending dark */
   cta: {
     padding: "80px 20px",
@@ -516,5 +645,14 @@ const css = `
 
   .step:hover {
     transform: translateY(-6px);
+  }
+
+  footer a[href^="mailto"]:hover {
+    color: #fde047;
+    text-decoration: underline;
+  }
+
+  footer span[style*="cursor"]:hover {
+    color: #cbd5e1;
   }
 `;
