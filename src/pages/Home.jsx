@@ -53,7 +53,7 @@ export default function Home() {
       {/* HERO SECTION */}
       <div style={styles.hero}>
         <div style={styles.logoContainer}>
-          <img src={iconImage} alt="Axx Icon" style={styles.heroIcon} />
+         
           <img src={logo} alt="Axx Spaces Logo" style={styles.logo} />
         </div>
 
