@@ -8,10 +8,13 @@ export default function LandlordDashboard() {
   const { token, user } = useContext(AuthContext);
 
   const [properties, setProperties] = useState([]);
+  const [caretakers, setCaretakers] = useState([]); // ✅ NEW
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("pending");
   const [error, setError] = useState("");
-  const [selectedImageIndex, setSelectedImageIndex] = useState({}); // ✅ NEW - Track gallery position
+  const [selectedImageIndex, setSelectedImageIndex] = useState({});
+  const [showCaretakerModal, setShowCaretakerModal] = useState(false); // ✅ NEW
+  const [newCaretaker, setNewCaretaker] = useState({ name: '', email: '', phone: '' }); // ✅ NEW
 
   useEffect(() => {
     if (!token) {
@@ -19,6 +22,7 @@ export default function LandlordDashboard() {
       return;
     }
     fetchMyProperties();
+    fetchCaretakers(); // ✅ NEW
   }, [token, navigate]);
 
   const fetchMyProperties = async () => {
@@ -26,9 +30,7 @@ export default function LandlordDashboard() {
     setError("");
     try {
       const res = await API.get("/properties/my-properties", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       setProperties(res.data);
     } catch (err) {
@@ -39,23 +41,103 @@ export default function LandlordDashboard() {
     }
   };
 
+  // ✅ NEW - Fetch caretakers
+  const fetchCaretakers = async () => {
+    try {
+      const res = await API.get("/auth/my-caretakers", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCaretakers(res.data);
+    } catch (err) {
+      console.error("❌ Fetch caretakers error:", err);
+    }
+  };
+
+  // ✅ NEW - Add caretaker
+  const handleAddCaretaker = async () => {
+    if (!newCaretaker.name || !newCaretaker.email || !newCaretaker.phone) {
+      alert("❌ Please fill all fields");
+      return;
+    }
+
+    try {
+      await API.post("/auth/invite-caretaker", {
+        caretakerName: newCaretaker.name,
+        caretakerEmail: newCaretaker.email,
+        caretakerPhone: newCaretaker.phone,
+      }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      alert("✅ Caretaker invited successfully");
+      setNewCaretaker({ name: '', email: '', phone: '' });
+      setShowCaretakerModal(false);
+      fetchCaretakers();
+    } catch (err) {
+      alert("❌ Error: " + (err.response?.data?.error || err.message));
+    }
+  };
+
+  // ✅ NEW - Fire caretaker
+  const handleFireCaretaker = async (caretakerId) => {
+    if (!window.confirm("Are you sure? This caretaker will no longer be able to upload properties.")) return;
+
+    try {
+      await API.delete(`/auth/remove-caretaker/${caretakerId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      alert("✅ Caretaker removed");
+      fetchCaretakers();
+    } catch (err) {
+      alert("❌ Error: " + (err.response?.data?.error || err.message));
+    }
+  };
+
+  // ✅ NEW - Approve property
+  const handleApprovProperty = async (propertyId) => {
+    try {
+      await API.patch(`/properties/${propertyId}/landlord-approve`, 
+        { notes: "Approved by landlord" },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("✅ Property approved. Waiting for admin approval.");
+      fetchMyProperties();
+    } catch (err) {
+      alert("❌ Error: " + (err.response?.data?.error || err.message));
+    }
+  };
+
+  // ✅ NEW - Reject property
+  const handleRejectProperty = async (propertyId) => {
+    const notes = prompt("Why are you rejecting this property?");
+    if (!notes) return;
+
+    try {
+      await API.patch(`/properties/${propertyId}/landlord-reject`, 
+        { notes },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("✅ Property rejected");
+      fetchMyProperties();
+    } catch (err) {
+      alert("❌ Error: " + (err.response?.data?.error || err.message));
+    }
+  };
+
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this property?")) return;
+    if (!window.confirm("Delete this property?")) return;
 
     try {
       await API.delete(`/properties/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-      alert("✅ Property deleted successfully");
+      alert("✅ Property deleted");
       setProperties(properties.filter(p => p._id !== id));
     } catch (err) {
       alert("❌ Delete failed: " + (err.response?.data?.error || err.message));
     }
   };
 
-  // ✅ NEW - Get images for a property
   const getPropertyImages = (property) => {
     return property.images && property.images.length > 0 
       ? property.images 
@@ -64,7 +146,6 @@ export default function LandlordDashboard() {
         : [];
   };
 
-  // ✅ NEW - Navigate gallery
   const nextImage = (propId, images) => {
     const current = selectedImageIndex[propId] || 0;
     setSelectedImageIndex({
@@ -73,7 +154,6 @@ export default function LandlordDashboard() {
     });
   };
 
-  // ✅ NEW - Previous image
   const prevImage = (propId, images) => {
     const current = selectedImageIndex[propId] || 0;
     setSelectedImageIndex({
@@ -83,8 +163,16 @@ export default function LandlordDashboard() {
   };
 
   const pendingProps = properties.filter(p => p.status === "pending");
-  const approvedProps = properties.filter(p => p.status === "approved");
-  const displayProps = activeTab === "pending" ? pendingProps : approvedProps;
+  const landlordApprovedProps = properties.filter(p => p.status === "landlord_approved");
+  const approvedProps = properties.filter(p => p.status === "admin_approved");
+  const rejectedProps = properties.filter(p => p.status === "rejected");
+
+  let displayProps = [];
+  if (activeTab === "pending") displayProps = pendingProps;
+  else if (activeTab === "landlord_approved") displayProps = landlordApprovedProps;
+  else if (activeTab === "approved") displayProps = approvedProps;
+  else if (activeTab === "rejected") displayProps = rejectedProps;
+  else if (activeTab === "caretakers") displayProps = []; // Special tab
 
   return (
     <div style={styles.root}>
@@ -92,11 +180,10 @@ export default function LandlordDashboard() {
 
       {/* Header */}
       <div style={styles.header}>
-        <h1 style={styles.title}>📊 My Properties</h1>
-        <p style={styles.subtitle}>Manage your listings — view pending and approved properties</p>
+        <h1 style={styles.title}>📊 Landlord Dashboard</h1>
+        <p style={styles.subtitle}>Manage properties & caretakers</p>
       </div>
 
-      {/* Error */}
       {error && <div style={styles.errorBanner}>{error}</div>}
 
       {/* Tabs */}
@@ -108,190 +195,161 @@ export default function LandlordDashboard() {
           ⏳ Pending ({pendingProps.length})
         </button>
         <button
+          className={`dash-tab${activeTab === "landlord_approved" ? " active" : ""}`}
+          onClick={() => setActiveTab("landlord_approved")}
+        >
+          👤 Landlord Approved ({landlordApprovedProps.length})
+        </button>
+        <button
           className={`dash-tab${activeTab === "approved" ? " active" : ""}`}
           onClick={() => setActiveTab("approved")}
         >
-          ✅ Approved ({approvedProps.length})
+          ✅ Live ({approvedProps.length})
+        </button>
+        <button
+          className={`dash-tab${activeTab === "rejected" ? " active" : ""}`}
+          onClick={() => setActiveTab("rejected")}
+        >
+          ❌ Rejected ({rejectedProps.length})
+        </button>
+        <button
+          className={`dash-tab${activeTab === "caretakers" ? " active" : ""}`}
+          onClick={() => setActiveTab("caretakers")}
+        >
+          👥 Caretakers ({caretakers.length})
         </button>
       </div>
 
-      {/* Loading */}
-      {loading ? (
-        <div style={styles.loading}>
-          <div className="dash-spinner" />
-          <p>Loading your properties…</p>
-        </div>
-      ) : displayProps.length === 0 ? (
-        <div style={styles.emptyState}>
-          <div style={styles.emptyIcon}>{activeTab === "pending" ? "⏳" : "✅"}</div>
-          <h3 style={styles.emptyTitle}>
-            {activeTab === "pending" ? "No pending properties" : "No approved properties"}
-          </h3>
-          <p style={styles.emptyText}>
-            {activeTab === "pending"
-              ? "All your properties have been approved!"
-              : "You don't have any approved listings yet."}
-          </p>
-          <button className="dash-btn" onClick={() => navigate("/upload")}>
-            📝 Upload a Property
+      {/* CARETAKERS TAB */}
+      {activeTab === "caretakers" && (
+        <div style={styles.section}>
+          <h2 style={styles.sectionTitle}>Your Caretakers</h2>
+          <button className="dash-btn" onClick={() => setShowCaretakerModal(true)}>
+            ➕ Add Caretaker
           </button>
-        </div>
-      ) : (
-        <div style={styles.grid}>
-          {displayProps.map((property, idx) => {
-            // ✅ NEW - Get all images for this property
-            const images = getPropertyImages(property);
-            const currentImageIndex = selectedImageIndex[property._id] || 0;
-            const currentImage = images[currentImageIndex];
 
-            return (
-              <div
-                key={property._id}
-                className="dash-card"
-                style={{ animationDelay: `${idx * 60}ms` }}
-              >
-                {/* ✅ UPDATED Image section with gallery */}
-                {images.length > 0 ? (
-                  <div style={styles.imageWrap}>
-                    <img
-                      src={currentImage}
-                      alt={property.title}
-                      style={styles.image}
-                    />
-                    <span style={styles.statusBadge}>
-                      {property.status === "pending" ? "⏳ Pending" : "✅ Approved"}
-                    </span>
-
-                    {/* ✅ NEW - Gallery navigation controls */}
-                    {images.length > 1 && (
-                      <>
-                        <div style={styles.galleryControls}>
-                          <button
-                            className="gallery-btn"
-                            onClick={() => prevImage(property._id, images)}
-                          >
-                            ❮
-                          </button>
-                          <span style={styles.imageCounter}>
-                            {currentImageIndex + 1} / {images.length}
-                          </span>
-                          <button
-                            className="gallery-btn"
-                            onClick={() => nextImage(property._id, images)}
-                          >
-                            ❯
-                          </button>
-                        </div>
-
-                        {/* ✅ NEW - Thumbnail gallery */}
-                        <div style={styles.thumbnails}>
-                          {images.map((img, i) => (
-                            <img
-                              key={i}
-                              src={img}
-                              alt={`thumb ${i}`}
-                              style={{
-                                ...styles.thumbnail,
-                                border: i === currentImageIndex ? "2px solid #60a5fa" : "1px solid #333"
-                              }}
-                              onClick={() => setSelectedImageIndex({ ...selectedImageIndex, [property._id]: i })}
-                            />
-                          ))}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ) : (
-                  <div style={styles.imagePlaceholder}>
-                    <span style={{ fontSize: 36 }}>🏠</span>
-                  </div>
-                )}
-
-                {/* Content */}
-                <div style={styles.cardBody}>
-                  <h3 style={styles.cardTitle}>{property.title}</h3>
-                  <p style={styles.location}>
-                    📍 {property.county}{property.area ? ` · ${property.area}` : ""}
-                  </p>
-
-                  {/* Price */}
-                  <div style={styles.priceBox}>
-                    <div>
-                      <div style={styles.label}>Monthly Rent</div>
-                      <div style={styles.price}>
-                        Ksh {Number(property.price).toLocaleString()}
-                      </div>
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      <div style={styles.label}>Deposit</div>
-                      <div style={styles.deposit}>
-                        Ksh {property.deposit ? Number(property.deposit).toLocaleString() : "N/A"}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Meta */}
-                  <div style={styles.metaRow}>
-                    {property.type && <span className="dash-meta-pill">{property.type}</span>}
-                    {property.bedrooms && (
-                      <span className="dash-meta-pill">🛏 {property.bedrooms} Bed{property.bedrooms > 1 ? "s" : ""}</span>
-                    )}
-                  </div>
-
-                  {/* Description */}
-                  {property.description && (
-                    <p style={styles.description}>{property.description}</p>
-                  )}
-
-                  {/* Phone */}
-                  <div style={styles.phoneRow}>
-                    <span>📞</span>
-                    <span style={styles.phone}>{property.phone}</span>
-                  </div>
-
-                  {/* Amenities */}
-                  {property.amenities?.length > 0 && (
-                    <p style={styles.amenities}>
-                      🏡 {property.amenities.join(", ")}
-                    </p>
-                  )}
-
-                  {/* Status Info */}
-                  <div style={styles.statusInfo}>
-                    {property.status === "pending" ? (
-                      <p style={styles.pendingText}>
-                        ⏳ Under review. We'll notify you once approved!
-                      </p>
-                    ) : (
-                      <p style={styles.approvedText}>
-                        ✅ Live on platform! Tenants can see it now.
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Actions */}
-                  <div style={styles.actionRow}>
-                    <button
-                      className="dash-delete-btn"
-                      onClick={() => handleDelete(property._id)}
-                    >
-                      🗑 Delete
-                    </button>
-                  </div>
+          {showCaretakerModal && (
+            <div style={styles.modal}>
+              <div style={styles.modalBox}>
+                <h3>Add New Caretaker</h3>
+                <input
+                  placeholder="Name"
+                  value={newCaretaker.name}
+                  onChange={(e) => setNewCaretaker({...newCaretaker, name: e.target.value})}
+                  style={styles.modalInput}
+                />
+                <input
+                  placeholder="Email"
+                  value={newCaretaker.email}
+                  onChange={(e) => setNewCaretaker({...newCaretaker, email: e.target.value})}
+                  style={styles.modalInput}
+                />
+                <input
+                  placeholder="Phone"
+                  value={newCaretaker.phone}
+                  onChange={(e) => setNewCaretaker({...newCaretaker, phone: e.target.value})}
+                  style={styles.modalInput}
+                />
+                <div style={styles.modalActions}>
+                  <button className="dash-btn" onClick={handleAddCaretaker}>Invite</button>
+                  <button className="dash-btn-cancel" onClick={() => setShowCaretakerModal(false)}>Cancel</button>
                 </div>
               </div>
-            );
-          })}
+            </div>
+          )}
+
+          <div style={styles.caretakersList}>
+            {caretakers.length === 0 ? (
+              <p style={styles.emptyText}>No caretakers yet</p>
+            ) : (
+              caretakers.map(ct => (
+                <div key={ct._id} style={styles.caretakerCard}>
+                  <div>
+                    <h4>{ct.name}</h4>
+                    <p>{ct.email}</p>
+                    <p>{ct.phone}</p>
+                  </div>
+                  <button 
+                    className="dash-delete-btn"
+                    onClick={() => handleFireCaretaker(ct._id)}
+                  >
+                    🗑 Fire
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       )}
 
-      {/* CTA */}
-      <div style={styles.cta}>
-        <h2 style={styles.ctaTitle}>Upload another property?</h2>
-        <button className="dash-btn" onClick={() => navigate("/upload")}>
-          ➕ New Property
-        </button>
-      </div>
+      {/* PROPERTIES TABS */}
+      {activeTab !== "caretakers" && (
+        <>
+          {loading ? (
+            <div style={styles.loading}>
+              <div className="dash-spinner" />
+              <p>Loading…</p>
+            </div>
+          ) : displayProps.length === 0 ? (
+            <div style={styles.emptyState}>
+              <p style={styles.emptyText}>No properties in this category</p>
+            </div>
+          ) : (
+            <div style={styles.grid}>
+              {displayProps.map((property, idx) => {
+                const images = getPropertyImages(property);
+                const currentImageIndex = selectedImageIndex[property._id] || 0;
+                const currentImage = images[currentImageIndex];
+
+                return (
+                  <div key={property._id} className="dash-card" style={{ animationDelay: `${idx * 60}ms` }}>
+                    {images.length > 0 ? (
+                      <div style={styles.imageWrap}>
+                        <img src={currentImage} alt={property.title} style={styles.image} />
+                        <span style={styles.statusBadge}>
+                          {property.status === "pending" ? "⏳ Pending" : 
+                           property.status === "landlord_approved" ? "👤 Awaiting Admin" :
+                           property.status === "admin_approved" ? "✅ Live" :
+                           "❌ Rejected"}
+                        </span>
+
+                        {images.length > 1 && (
+                          <div style={styles.galleryControls}>
+                            <button className="gallery-btn" onClick={() => prevImage(property._id, images)}>❮</button>
+                            <span style={styles.imageCounter}>{currentImageIndex + 1} / {images.length}</span>
+                            <button className="gallery-btn" onClick={() => nextImage(property._id, images)}>❯</button>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div style={styles.imagePlaceholder}><span>🏠</span></div>
+                    )}
+
+                    <div style={styles.cardBody}>
+                      <h3 style={styles.cardTitle}>{property.title}</h3>
+                      <p style={styles.location}>📍 {property.county}</p>
+                      <p style={styles.price}>Ksh {Number(property.price).toLocaleString()}</p>
+                      
+                      {property.uploadedBy && (
+                        <p style={styles.uploadedBy}>Uploaded by: {property.uploadedBy.name}</p>
+                      )}
+
+                      {property.status === "pending" && (
+                        <div style={styles.actionRow}>
+                          <button className="dash-approve-btn" onClick={() => handleApprovProperty(property._id)}>✅ Approve</button>
+                          <button className="dash-reject-btn" onClick={() => handleRejectProperty(property._id)}>❌ Reject</button>
+                        </div>
+                      )}
+
+                      <button className="dash-delete-btn" onClick={() => handleDelete(property._id)}>🗑 Delete</button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
@@ -306,112 +364,39 @@ const styles = {
     maxWidth: "1200px",
     margin: "0 auto",
   },
-
   header: { textAlign: "center", marginBottom: "30px" },
   title: { fontSize: "clamp(24px,4vw,36px)", fontWeight: 800, color: "#f1f5f9", margin: "0 0 6px" },
   subtitle: { color: "#64748b", fontSize: "14px", margin: 0 },
-
   errorBanner: {
-    padding: "12px 16px",
-    borderRadius: "10px",
-    background: "rgba(239,68,68,0.12)",
-    border: "1px solid rgba(239,68,68,0.3)",
-    color: "#fca5a5",
-    marginBottom: "20px",
-    fontSize: "14px",
+    padding: "12px 16px", borderRadius: "10px",
+    background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)",
+    color: "#fca5a5", marginBottom: "20px", fontSize: "14px",
   },
-
-  tabBar: {
-    display: "flex",
-    gap: "10px",
-    marginBottom: "28px",
-    borderBottom: "1px solid rgba(255,255,255,0.07)",
-  },
-
+  tabBar: { display: "flex", gap: "10px", marginBottom: "28px", borderBottom: "1px solid rgba(255,255,255,0.07)", flexWrap: "wrap" },
   loading: { textAlign: "center", padding: "60px 20px" },
-
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-    gap: "20px",
-    marginBottom: "40px",
-  },
-
+  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "20px", marginBottom: "40px" },
   imageWrap: { position: "relative" },
   image: { width: "100%", height: "200px", objectFit: "cover", borderRadius: "12px 12px 0 0", display: "block" },
-  imagePlaceholder: {
-    width: "100%", height: "160px", background: "rgba(59,130,246,0.07)",
-    borderRadius: "12px 12px 0 0", display: "flex", alignItems: "center", justifyContent: "center",
-  },
-  statusBadge: {
-    position: "absolute", top: "10px", right: "10px",
-    background: "rgba(6,16,31,0.85)", backdropFilter: "blur(6px)",
-    color: "#fff", fontSize: "12px", fontWeight: 600,
-    padding: "5px 12px", borderRadius: "999px", border: "1px solid rgba(255,255,255,0.2)",
-  },
-
-  // ✅ NEW - Gallery styles
-  galleryControls: {
-    position: "absolute", bottom: "10px", left: "50%", transform: "translateX(-50%)",
-    display: "flex", alignItems: "center", gap: "10px",
-    background: "rgba(0,0,0,0.6)", padding: "6px 12px", borderRadius: "999px",
-  },
-
+  imagePlaceholder: { width: "100%", height: "160px", background: "rgba(59,130,246,0.07)", borderRadius: "12px 12px 0 0", display: "flex", alignItems: "center", justifyContent: "center" },
+  statusBadge: { position: "absolute", top: "10px", right: "10px", background: "rgba(6,16,31,0.85)", backdropFilter: "blur(6px)", color: "#fff", fontSize: "12px", fontWeight: 600, padding: "5px 12px", borderRadius: "999px" },
+  galleryControls: { position: "absolute", bottom: "10px", left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "center", gap: "10px", background: "rgba(0,0,0,0.6)", padding: "6px 12px", borderRadius: "999px" },
   imageCounter: { color: "#fff", fontSize: "12px", fontWeight: 600 },
-
-  thumbnails: {
-    display: "flex", gap: "4px", padding: "6px",
-    background: "rgba(0,0,0,0.3)", borderRadius: "0 0 12px 12px",
-    overflowX: "auto",
-  },
-
-  thumbnail: {
-    width: "50px", height: "50px", objectFit: "cover",
-    borderRadius: "4px", cursor: "pointer", flexShrink: 0,
-  },
-
   cardBody: { padding: "16px" },
   cardTitle: { fontSize: "16px", fontWeight: 700, color: "#f1f5f9", margin: "0 0 4px" },
-  location: { fontSize: "13px", color: "#60a5fa", margin: "0 0 12px" },
-
-  priceBox: {
-    display: "flex", justifyContent: "space-between",
-    background: "rgba(59,130,246,0.07)", borderRadius: "10px",
-    padding: "10px 14px", marginBottom: "12px",
-  },
-  label: { fontSize: "11px", color: "#64748b", marginBottom: "2px", textTransform: "uppercase" },
-  price: { fontSize: "16px", fontWeight: 800, color: "#60a5fa" },
-  deposit: { fontSize: "14px", fontWeight: 700, color: "#94a3b8" },
-
-  metaRow: { display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "10px" },
-
-  description: {
-    fontSize: "13px", color: "#94a3b8", lineHeight: 1.6, margin: "0 0 10px",
-    display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
-  },
-
-  phoneRow: { display: "flex", alignItems: "center", gap: "6px", marginBottom: "10px" },
-  phone: { fontSize: "14px", fontWeight: 600, color: "#e2e8f0" },
-
-  amenities: { fontSize: "12px", color: "#64748b", margin: "0 0 10px", lineHeight: 1.5 },
-
-  statusInfo: { background: "rgba(255,255,255,0.03)", borderRadius: "8px", padding: "10px 12px", marginBottom: "12px" },
-  pendingText: { margin: 0, fontSize: "12px", color: "#fbbf24" },
-  approvedText: { margin: 0, fontSize: "12px", color: "#86efac" },
-
-  actionRow: { display: "flex", gap: "8px" },
-
+  location: { fontSize: "13px", color: "#60a5fa", margin: "0 0 8px" },
+  price: { fontSize: "18px", fontWeight: 800, color: "#60a5fa", margin: "0 0 8px" },
+  uploadedBy: { fontSize: "12px", color: "#94a3b8", margin: "0 0 12px", fontStyle: "italic" },
+  actionRow: { display: "flex", gap: "8px", marginBottom: "8px" },
   emptyState: { textAlign: "center", padding: "60px 20px" },
-  emptyIcon: { fontSize: "52px", marginBottom: "12px" },
-  emptyTitle: { fontSize: "22px", fontWeight: 700, color: "#f1f5f9", margin: "0 0 8px" },
-  emptyText: { color: "#64748b", marginBottom: "24px" },
-
-  cta: {
-    textAlign: "center", padding: "40px",
-    background: "linear-gradient(160deg,#0c1d42,#060e1c)",
-    borderRadius: "16px", border: "1px solid rgba(59,130,246,0.15)",
-  },
-  ctaTitle: { fontSize: "24px", fontWeight: 800, color: "#f1f5f9", margin: "0 0 16px" },
+  emptyText: { color: "#64748b" },
+  section: { padding: "40px 20px", background: "rgba(255,255,255,0.03)", borderRadius: "16px", marginBottom: "20px" },
+  sectionTitle: { fontSize: "24px", fontWeight: 800, color: "#f1f5f9", margin: "0 0 20px" },
+  caretakersList: { display: "grid", gap: "12px" },
+  caretakerCard: { background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", padding: "16px", borderRadius: "12px", display: "flex", justifyContent: "space-between", alignItems: "center" },
+  modal: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 },
+  modalBox: { background: "#0d1b2e", padding: "32px", borderRadius: "16px", maxWidth: "400px", width: "90%" },
+  modalInput: { width: "100%", padding: "12px", marginBottom: "12px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.06)", color: "#e2e8f0" },
+  modalActions: { display: "flex", gap: "10px" },
 };
 
 const css = `
@@ -437,11 +422,12 @@ const css = `
     box-shadow: 0 12px 32px rgba(0,0,0,0.35);
   }
 
-  .dash-meta-pill {
-    display: inline-block; font-size: 11px; padding: 3px 10px;
-    border-radius: 999px; background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.08); color: #94a3b8;
+  .gallery-btn {
+    background: rgba(255,255,255,0.1); border: none; color: white;
+    padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: 600;
+    font-family: inherit; transition: background .2s;
   }
+  .gallery-btn:hover { background: rgba(255,255,255,0.2); }
 
   .dash-delete-btn {
     flex: 1; padding: 10px; border-radius: 10px; font-size: 13px;
@@ -451,6 +437,22 @@ const css = `
   }
   .dash-delete-btn:hover { background: rgba(239,68,68,0.18); }
 
+  .dash-approve-btn {
+    flex: 1; padding: 10px; border-radius: 10px; font-size: 13px;
+    border: 1px solid rgba(34,197,94,0.35); color: #86efac;
+    background: rgba(34,197,94,0.08); cursor: pointer; font-family: inherit;
+    font-weight: 600; transition: background .2s;
+  }
+  .dash-approve-btn:hover { background: rgba(34,197,94,0.18); }
+
+  .dash-reject-btn {
+    flex: 1; padding: 10px; border-radius: 10px; font-size: 13px;
+    border: 1px solid rgba(239,68,68,0.35); color: #fca5a5;
+    background: rgba(239,68,68,0.08); cursor: pointer; font-family: inherit;
+    font-weight: 600; transition: background .2s;
+  }
+  .dash-reject-btn:hover { background: rgba(239,68,68,0.18); }
+
   .dash-btn {
     padding: 12px 28px; border-radius: 10px; border: none;
     background: linear-gradient(135deg,#1d4ed8,#6d28d9); color: white;
@@ -459,13 +461,13 @@ const css = `
   }
   .dash-btn:hover { transform: translateY(-2px); }
 
-  /* ✅ NEW - Gallery button styles */
-  .gallery-btn {
-    background: rgba(255,255,255,0.1); border: none; color: white;
-    padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: 600;
-    font-family: inherit; transition: background .2s;
+  .dash-btn-cancel {
+    padding: 12px 28px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.05); color: #e2e8f0;
+    font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
+    transition: background .2s;
   }
-  .gallery-btn:hover { background: rgba(255,255,255,0.2); }
+  .dash-btn-cancel:hover { background: rgba(255,255,255,0.1); }
 
   .dash-spinner {
     width: 36px; height: 36px; border-radius: 50%;
