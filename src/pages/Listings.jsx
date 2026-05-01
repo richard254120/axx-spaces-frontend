@@ -8,57 +8,14 @@ import MapView from "../components/MapView";
 ══════════════════════════════════════════════════════════════════ */
 function PropertyModal({ property: p, onClose, onWhatsApp, isFav, onToggleFav }) {
   if (!p) return null;
-  
-  // ✅ NEW - Get all images for modal
-  const images = p.images && p.images.length > 0 ? p.images : (p.image ? [p.image] : []);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const currentImage = images[currentImageIndex];
-
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % images.length);
-  };
-
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-  };
-
   return (
     <div style={modal.overlay} onClick={onClose}>
       <div style={modal.box} onClick={(e) => e.stopPropagation()}>
         <button style={modal.closeBtn} onClick={onClose}>✕</button>
 
-        {/* ✅ NEW - Image gallery in modal */}
-        {images.length > 0 ? (
-          <div style={modal.imageWrap}>
-            <img src={currentImage} alt={p.title} style={modal.image} />
-            
-            {images.length > 1 && (
-              <>
-                <div style={modal.galleryControls}>
-                  <button className="modal-gallery-btn" onClick={prevImage}>❮</button>
-                  <span style={modal.imageCounter}>{currentImageIndex + 1} / {images.length}</span>
-                  <button className="modal-gallery-btn" onClick={nextImage}>❯</button>
-                </div>
-
-                {/* Thumbnails */}
-                <div style={modal.thumbnails}>
-                  {images.map((img, i) => (
-                    <img
-                      key={i}
-                      src={img}
-                      alt={`thumb ${i}`}
-                      style={{
-                        ...modal.thumbnail,
-                        border: i === currentImageIndex ? "2px solid #60a5fa" : "1px solid #333"
-                      }}
-                      onClick={() => setCurrentImageIndex(i)}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-        ) : null}
+        {p.image && (
+          <img src={p.image} alt={p.title} style={modal.image} />
+        )}
 
         <div style={modal.body}>
           <div style={modal.topRow}>
@@ -155,7 +112,6 @@ export default function Listings() {
     search: "", minPrice: "", maxPrice: "", sortBy: "newest",
   });
   const [showFavsOnly, setShowFavsOnly] = useState(false);       // ✅ NEW saved toggle
-  const [selectedImageIndex, setSelectedImageIndex] = useState({}); // ✅ NEW - Card gallery index
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -193,32 +149,6 @@ export default function Listings() {
       return next;
     });
   }, []);
-
-  // ✅ NEW — Get images for a property
-  const getPropertyImages = (property) => {
-    return property.images && property.images.length > 0 
-      ? property.images 
-      : property.image 
-        ? [property.image]
-        : [];
-  };
-
-  // ✅ NEW — Gallery navigation for cards
-  const nextCardImage = (propId, images) => {
-    const current = selectedImageIndex[propId] || 0;
-    setSelectedImageIndex({
-      ...selectedImageIndex,
-      [propId]: (current + 1) % images.length
-    });
-  };
-
-  const prevCardImage = (propId, images) => {
-    const current = selectedImageIndex[propId] || 0;
-    setSelectedImageIndex({
-      ...selectedImageIndex,
-      [propId]: current === 0 ? images.length - 1 : current - 1
-    });
-  };
 
   // ✅ NEW — client-side filter + sort over fetched data
   const filtered = properties
@@ -374,168 +304,119 @@ export default function Listings() {
         </div>
       ) : (
         <div style={styles.grid}>
-          {filtered.map((p, idx) => {
-            // ✅ NEW - Get images for this card
-            const images = getPropertyImages(p);
-            const currentImageIndex = selectedImageIndex[p._id] || 0;
-            const currentImage = images[currentImageIndex];
+          {filtered.map((p, idx) => (
+            <div key={p._id} className="lst-card" style={{ animationDelay: `${idx * 60}ms` }}>
 
-            return (
-              <div key={p._id} className="lst-card" style={{ animationDelay: `${idx * 60}ms` }}>
+              {/* IMAGE */}
+              {p.image ? (
+                <div style={styles.imageWrap}>
+                  <img
+                    src={p.image}
+                    alt={p.title}
+                    style={{ ...styles.image, cursor: "pointer" }}
+                    onClick={() => setSelected(p)}
+                  />
+                  <div style={styles.typeBadge}>{p.type}</div>
 
-                {/* ✅ UPDATED IMAGE with gallery */}
-                {images.length > 0 ? (
-                  <div style={styles.imageWrap}>
-                    <img
-                      src={currentImage}
-                      alt={p.title}
-                      style={{ ...styles.image, cursor: "pointer" }}
-                      onClick={() => setSelected(p)}
-                    />
-                    <div style={styles.typeBadge}>{p.type}</div>
+                  {/* ✅ NEW — heart button */}
+                  <button
+                    className="lst-heart-btn"
+                    onClick={(e) => { e.stopPropagation(); toggleFavourite(p._id); }}
+                    title={favourites.includes(p._id) ? "Remove favourite" : "Save property"}
+                  >
+                    {favourites.includes(p._id) ? "♥" : "♡"}
+                  </button>
+                </div>
+              ) : (
+                <div style={styles.imagePlaceholder} onClick={() => setSelected(p)}>
+                  <span style={{ fontSize: 36 }}>🏠</span>
+                </div>
+              )}
 
-                    {/* ✅ NEW - Gallery controls on card */}
-                    {images.length > 1 && (
-                      <>
-                        <div style={styles.cardGalleryControls}>
-                          <button
-                            className="card-gallery-btn"
-                            onClick={(e) => { e.stopPropagation(); prevCardImage(p._id, images); }}
-                          >
-                            ❮
-                          </button>
-                          <span style={styles.cardImageCounter}>
-                            {currentImageIndex + 1}/{images.length}
-                          </span>
-                          <button
-                            className="card-gallery-btn"
-                            onClick={(e) => { e.stopPropagation(); nextCardImage(p._id, images); }}
-                          >
-                            ❯
-                          </button>
-                        </div>
+              <div style={styles.cardBody}>
+                <h3 style={{ ...styles.cardTitle, cursor: "pointer" }} onClick={() => setSelected(p)}>
+                  {p.title}
+                </h3>
+                <p style={styles.cardLocation}>📍 {p.county}{p.area ? ` · ${p.area}` : ""}</p>
 
-                        {/* ✅ NEW - Card thumbnails */}
-                        <div style={styles.cardThumbnails}>
-                          {images.map((img, i) => (
-                            <img
-                              key={i}
-                              src={img}
-                              alt={`thumb ${i}`}
-                              style={{
-                                ...styles.cardThumbnail,
-                                border: i === currentImageIndex ? "2px solid #60a5fa" : "1px solid #333"
-                              }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedImageIndex({ ...selectedImageIndex, [p._id]: i });
-                              }}
-                            />
-                          ))}
-                        </div>
-                      </>
-                    )}
-
-                    {/* ✅ NEW — heart button */}
-                    <button
-                      className="lst-heart-btn"
-                      onClick={(e) => { e.stopPropagation(); toggleFavourite(p._id); }}
-                      title={favourites.includes(p._id) ? "Remove favourite" : "Save property"}
-                    >
-                      {favourites.includes(p._id) ? "♥" : "♡"}
-                    </button>
+                <div style={styles.priceRow}>
+                  <div>
+                    <div style={styles.priceLabel}>Monthly</div>
+                    <div style={styles.price}>Ksh {Number(p.price).toLocaleString()}</div>
                   </div>
-                ) : (
-                  <div style={styles.imagePlaceholder} onClick={() => setSelected(p)}>
-                    <span style={{ fontSize: 36 }}>🏠</span>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={styles.priceLabel}>Deposit</div>
+                    <div style={styles.deposit}>Ksh {Number(p.deposit).toLocaleString()}</div>
                   </div>
+                </div>
+
+                <div style={styles.metaRow}>
+                  {p.bedrooms && <span className="lst-meta-pill">🛏 {p.bedrooms} Bed{p.bedrooms > 1 ? "s" : ""}</span>}
+                  {p.type     && <span className="lst-meta-pill">{p.type}</span>}
+                </div>
+
+                {p.amenities?.length > 0 && (
+                  <p style={styles.amenities}>🏡 {p.amenities.join("  ·  ")}</p>
                 )}
 
-                <div style={styles.cardBody}>
-                  <h3 style={{ ...styles.cardTitle, cursor: "pointer" }} onClick={() => setSelected(p)}>
-                    {p.title}
-                  </h3>
-                  <p style={styles.cardLocation}>📍 {p.county}{p.area ? ` · ${p.area}` : ""}</p>
+                {p.description && (
+                  <p style={styles.description}>{p.description}</p>
+                )}
 
-                  <div style={styles.priceRow}>
-                    <div>
-                      <div style={styles.priceLabel}>Monthly</div>
-                      <div style={styles.price}>Ksh {Number(p.price).toLocaleString()}</div>
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      <div style={styles.priceLabel}>Deposit</div>
-                      <div style={styles.deposit}>Ksh {Number(p.deposit).toLocaleString()}</div>
-                    </div>
-                  </div>
-
-                  <div style={styles.metaRow}>
-                    {p.bedrooms && <span className="lst-meta-pill">🛏 {p.bedrooms} Bed{p.bedrooms > 1 ? "s" : ""}</span>}
-                    {p.type     && <span className="lst-meta-pill">{p.type}</span>}
-                  </div>
-
-                  {p.amenities?.length > 0 && (
-                    <p style={styles.amenities}>🏡 {p.amenities.join("  ·  ")}</p>
-                  )}
-
-                  {p.description && (
-                    <p style={styles.description}>{p.description}</p>
-                  )}
-
-                  <div style={styles.phoneRow}>
-                    <span style={styles.phoneIcon}>📞</span>
-                    <span style={styles.phone}>{p.phone}</span>
-                  </div>
-
-                  {/* ── Action row ── */}
-                  <div style={styles.actionRow}>
-                    {/* UNCHANGED WhatsApp button */}
-                    <button
-                      onClick={() => openWhatsApp(p.phone, p.title)}
-                      style={styles.whatsappBtn}
-                      className="lst-whatsapp"
-                    >
-                      💬 WhatsApp
-                    </button>
-
-                    {/* ✅ NEW — share */}
-                    <button
-                      className="lst-share-card-btn"
-                      onClick={() => shareProperty(p)}
-                      title="Share this property"
-                    >
-                      🔗
-                    </button>
-
-                    {/* ✅ NEW — view detail modal */}
-                    <button className="lst-view-btn" onClick={() => setSelected(p)}>
-                      View
-                    </button>
-                  </div>
-
-                  {/* ✅ NEW — Similar properties */}
-                  {getSimilar(p).length > 0 && (
-                    <div style={styles.similarWrap}>
-                      <div style={styles.similarLabel}>Similar</div>
-                      <div style={styles.similarRow}>
-                        {getSimilar(p).map((s) => (
-                          <button
-                            key={s._id}
-                            className="lst-similar-chip"
-                            onClick={() => setSelected(s)}
-                          >
-                            {s.title.length > 22 ? s.title.slice(0, 22) + "…" : s.title}
-                            <span style={{ color: "#60a5fa", marginLeft: 4 }}>
-                              Ksh {Number(s.price).toLocaleString()}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                <div style={styles.phoneRow}>
+                  <span style={styles.phoneIcon}>📞</span>
+                  <span style={styles.phone}>{p.phone}</span>
                 </div>
+
+                {/* ── Action row ── */}
+                <div style={styles.actionRow}>
+                  {/* UNCHANGED WhatsApp button */}
+                  <button
+                    onClick={() => openWhatsApp(p.phone, p.title)}
+                    style={styles.whatsappBtn}
+                    className="lst-whatsapp"
+                  >
+                    💬 WhatsApp
+                  </button>
+
+                  {/* ✅ NEW — share */}
+                  <button
+                    className="lst-share-card-btn"
+                    onClick={() => shareProperty(p)}
+                    title="Share this property"
+                  >
+                    🔗
+                  </button>
+
+                  {/* ✅ NEW — view detail modal */}
+                  <button className="lst-view-btn" onClick={() => setSelected(p)}>
+                    View
+                  </button>
+                </div>
+
+                {/* ✅ NEW — Similar properties */}
+                {getSimilar(p).length > 0 && (
+                  <div style={styles.similarWrap}>
+                    <div style={styles.similarLabel}>Similar</div>
+                    <div style={styles.similarRow}>
+                      {getSimilar(p).map((s) => (
+                        <button
+                          key={s._id}
+                          className="lst-similar-chip"
+                          onClick={() => setSelected(s)}
+                        >
+                          {s.title.length > 22 ? s.title.slice(0, 22) + "…" : s.title}
+                          <span style={{ color: "#60a5fa", marginLeft: 4 }}>
+                            Ksh {Number(s.price).toLocaleString()}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       )}
     </div>
@@ -577,24 +458,6 @@ const styles = {
     color: "#93c5fd", fontSize: "11px", fontWeight: 600,
     padding: "3px 10px", borderRadius: "999px", border: "1px solid rgba(59,130,246,0.3)",
   },
-
-  // ✅ NEW - Card gallery styles
-  cardGalleryControls: {
-    position: "absolute", bottom: "10px", left: "50%", transform: "translateX(-50%)",
-    display: "flex", alignItems: "center", gap: "8px",
-    background: "rgba(0,0,0,0.6)", padding: "4px 10px", borderRadius: "999px",
-  },
-  cardImageCounter: { color: "#fff", fontSize: "11px", fontWeight: 600 },
-  cardThumbnails: {
-    position: "absolute", bottom: "0", left: "0", right: "0",
-    display: "flex", gap: "2px", padding: "4px",
-    background: "rgba(0,0,0,0.4)", borderRadius: "0 0 12px 12px",
-  },
-  cardThumbnail: {
-    width: "40px", height: "40px", objectFit: "cover",
-    borderRadius: "3px", cursor: "pointer", flexShrink: 0,
-  },
-
   cardBody: { padding: "16px" },
   cardTitle: { fontSize: "16px", fontWeight: 700, color: "#f1f5f9", margin: "0 0 4px", lineHeight: 1.3 },
   cardLocation: { fontSize: "13px", color: "#60a5fa", margin: "0 0 14px" },
@@ -653,23 +516,7 @@ const modal = {
     width: "32px", height: "32px", cursor: "pointer",
     display: "flex", alignItems: "center", justifyContent: "center",
   },
-  imageWrap: { position: "relative" },
   image: { width: "100%", height: "240px", objectFit: "cover", borderRadius: "20px 20px 0 0", display: "block" },
-  galleryControls: {
-    position: "absolute", bottom: "10px", left: "50%", transform: "translateX(-50%)",
-    display: "flex", alignItems: "center", gap: "10px",
-    background: "rgba(0,0,0,0.6)", padding: "6px 12px", borderRadius: "999px",
-  },
-  imageCounter: { color: "#fff", fontSize: "12px", fontWeight: 600 },
-  thumbnails: {
-    display: "flex", gap: "4px", padding: "6px",
-    background: "rgba(0,0,0,0.3)", borderRadius: "0 0 20px 20px",
-    overflowX: "auto",
-  },
-  thumbnail: {
-    width: "50px", height: "50px", objectFit: "cover",
-    borderRadius: "4px", cursor: "pointer", flexShrink: 0,
-  },
   body: { padding: "20px" },
   topRow: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "10px", marginBottom: "6px" },
   title: { fontSize: "20px", fontWeight: 800, color: "#f1f5f9", margin: 0, lineHeight: 1.3 },
@@ -818,21 +665,6 @@ const css = `
     border: 3px solid rgba(59,130,246,0.15); border-top-color: #3b82f6;
     animation: spin .8s linear infinite; margin: 0 auto;
   }
-
-  /* ✅ NEW - Gallery button styles */
-  .card-gallery-btn {
-    background: rgba(255,255,255,0.1); border: none; color: white;
-    padding: 2px 6px; border-radius: 3px; cursor: pointer; font-weight: 600;
-    font-family: inherit; font-size: 11px; transition: background .2s;
-  }
-  .card-gallery-btn:hover { background: rgba(255,255,255,0.2); }
-
-  .modal-gallery-btn {
-    background: rgba(255,255,255,0.1); border: none; color: white;
-    padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: 600;
-    font-family: inherit; transition: background .2s;
-  }
-  .modal-gallery-btn:hover { background: rgba(255,255,255,0.2); }
 
   @keyframes fadeUp  { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
   @keyframes spin    { to { transform:rotate(360deg); } }
