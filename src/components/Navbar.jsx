@@ -1,194 +1,254 @@
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import iconImage from "../assets/image.png";
 
 export default function Navbar() {
-  const { token, logout, user } = useContext(AuthContext);
+  const { token, user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-  const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // ✅ Mobile menu state
 
   const handleLogout = () => {
     logout();
     navigate("/");
+    setMobileMenuOpen(false);
   };
 
-  // Check if current link is active
-  const isActive = (path) => location.pathname === path;
-
   return (
-    <div style={styles.nav}>
-      <div style={styles.logoContainer}>
-        <img src={iconImage} alt="Axx Spaces Icon" style={styles.icon} />
-        <h2 style={styles.logo}>Axx Spaces</h2>
-      </div>
+    <>
+      <style>{css}</style>
+      
+      <nav style={styles.navbar}>
+        <div style={styles.container}>
+          
+          {/* Logo */}
+          <Link to="/" style={styles.logo} onClick={() => setMobileMenuOpen(false)}>
+            🏠 Axx Spaces
+          </Link>
 
-      <div style={styles.links}>
-        <Link 
-          style={{ ...styles.link, ...(isActive('/') && styles.activeLink) }} 
-          to="/"
-        >
-          Home
-        </Link>
-        
-        <Link 
-          style={{ ...styles.link, ...(isActive('/listings') && styles.activeLink) }} 
-          to="/listings"
-        >
-          Listings
-        </Link>
+          {/* ✅ Mobile Menu Button */}
+          <button
+            style={styles.menuButton}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="mobile-menu-btn"
+          >
+            {mobileMenuOpen ? "✕" : "☰"}
+          </button>
 
-        {token ? (
-          <>
-            <Link 
-              style={{ ...styles.link, ...(isActive('/upload') && styles.activeLink) }} 
-              to="/upload"
-            >
-              + Upload Property
+          {/* ✅ Navigation Menu (Desktop + Mobile) */}
+          <div
+            style={{
+              ...styles.navLinks,
+              ...(mobileMenuOpen ? styles.navLinksOpen : {})
+            }}
+            className="nav-links"
+          >
+            {/* Always visible */}
+            <Link to="/" style={styles.link} onClick={() => setMobileMenuOpen(false)}>
+              🏠 Home
             </Link>
-            
-            <Link 
-              style={{ ...styles.link, ...(isActive('/dashboard') && styles.activeLink) }} 
-              to="/dashboard"
-            >
-              📊 My Properties
+            <Link to="/listings" style={styles.link} onClick={() => setMobileMenuOpen(false)}>
+              🔍 Listings
             </Link>
 
-            {user?.name && (
-              <span style={styles.userInfo}>
-                Hi, {user.name.split(" ")[0]}
-              </span>
+            {/* Only when logged in */}
+            {token ? (
+              <>
+                <Link to="/upload" style={styles.link} onClick={() => setMobileMenuOpen(false)}>
+                  ➕ Upload
+                </Link>
+                <Link to="/dashboard" style={styles.link} onClick={() => setMobileMenuOpen(false)}>
+                  📊 My Properties
+                </Link>
+                <button
+                  style={styles.logoutBtn}
+                  onClick={handleLogout}
+                  className="logout-btn"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                {/* Not logged in */}
+                <Link to="/login" style={styles.link} onClick={() => setMobileMenuOpen(false)}>
+                  Login
+                </Link>
+                <Link to="/register" style={styles.linkPrimary} onClick={() => setMobileMenuOpen(false)}>
+                  Register
+                </Link>
+              </>
             )}
-
-            <button onClick={handleLogout} style={styles.logoutBtn}>
-              Logout
-            </button>
-          </>
-        ) : (
-          <>
-            <Link 
-              style={{ ...styles.link, ...(isActive('/login') && styles.activeLink) }} 
-              to="/login"
-            >
-              Login
-            </Link>
-            <Link 
-              style={{ ...styles.link, ...(isActive('/register') && styles.activeLink) }} 
-              to="/register"
-            >
-              Register
-            </Link>
-          </>
-        )}
-      </div>
-    </div>
+          </div>
+        </div>
+      </nav>
+    </>
   );
 }
 
 const styles = {
-  nav: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "18px 40px",
-    background: "#0a1f44",
+  navbar: {
+    background: "#06101f",
+    borderBottom: "1px solid rgba(59,130,246,0.15)",
+    padding: "0",
     position: "sticky",
     top: 0,
     zIndex: 100,
-    borderBottom: "1px solid rgba(255,255,255,0.1)",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
+    backdropFilter: "blur(10px)",
   },
-
-  logoContainer: {
+  container: {
+    maxWidth: "1200px",
+    margin: "0 auto",
+    padding: "0 20px",
     display: "flex",
+    justifyContent: "space-between",
     alignItems: "center",
-    gap: "12px",
+    height: "70px",
   },
-
-  icon: {
-    width: "36px",
-    height: "36px",
-    objectFit: "contain",
-    borderRadius: "8px",
-  },
-
   logo: {
-    margin: 0,
-    color: "#ffffff",
-    fontSize: "28px",
+    fontSize: "22px",
     fontWeight: 800,
-    letterSpacing: "-0.5px",
-  },
-
-  links: {
-    display: "flex",
-    alignItems: "center",
-    gap: "26px",
-  },
-
-  link: {
-    color: "#e2e8f0",
+    color: "#3b82f6",
     textDecoration: "none",
-    fontSize: "16.5px",
-    fontWeight: "700",
-    transition: "all 0.3s ease",
-    position: "relative",
-    padding: "6px 0",
+    whiteSpace: "nowrap",
   },
-
-  activeLink: {
-    color: "#60a5fa",
-    position: "relative",
+  navLinks: {
+    display: "flex",
+    gap: "20px",
+    alignItems: "center",
   },
-
-  userInfo: {
-    color: "#94a3b8",
+  navLinksOpen: {
+    // ✅ Mobile styles (shown when menu is open)
+    position: "absolute",
+    top: "70px",
+    left: 0,
+    right: 0,
+    background: "#06101f",
+    border: "1px solid rgba(59,130,246,0.15)",
+    flexDirection: "column",
+    gap: "0",
+    alignItems: "stretch",
+    padding: "12px 0",
+  },
+  link: {
+    color: "#cbd5e1",
+    textDecoration: "none",
     fontSize: "15px",
-    fontWeight: "600",
-    padding: "6px 14px",
-    background: "rgba(255,255,255,0.08)",
-    borderRadius: "20px",
+    fontWeight: 600,
+    padding: "12px 20px",
+    transition: "all 0.2s",
+    display: "block",
   },
-
-  logoutBtn: {
-    background: "transparent",
-    border: "2px solid #ff4d4d",
-    color: "#ff4d4d",
-    fontSize: "16px",
-    fontWeight: "700",
-    cursor: "pointer",
-    padding: "9px 22px",
+  linkPrimary: {
+    color: "#3b82f6",
+    textDecoration: "none",
+    fontSize: "15px",
+    fontWeight: 700,
+    padding: "10px 20px",
+    background: "rgba(59,130,246,0.15)",
     borderRadius: "8px",
-    transition: "all 0.3s ease",
+    transition: "all 0.2s",
+    border: "1px solid rgba(59,130,246,0.3)",
+    display: "block",
+    textAlign: "center",
+  },
+  logoutBtn: {
+    background: "rgba(239,68,68,0.15)",
+    color: "#fca5a5",
+    border: "1px solid rgba(239,68,68,0.3)",
+    padding: "10px 20px",
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontSize: "15px",
+    fontWeight: 600,
+    fontFamily: "inherit",
+    transition: "all 0.2s",
+  },
+  menuButton: {
+    display: "none", // ✅ Hidden by default (desktop)
+    background: "none",
+    border: "none",
+    color: "#cbd5e1",
+    fontSize: "24px",
+    cursor: "pointer",
+    padding: "8px",
   },
 };
 
-// Optional enhanced hover effect using injected CSS
 const css = `
-  .nav-link:hover {
-    color: #60a5fa !important;
-    transform: translateY(-2px);
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
+  * {
+    font-family: 'DM Sans', sans-serif;
   }
-  
-  .nav-link::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 3px;
-    bottom: -2px;
-    left: 0;
-    background: linear-gradient(to right, #60a5fa, #3b82f6);
-    transition: width 0.3s ease;
+
+  /* Desktop - navbar links always visible */
+  @media (min-width: 768px) {
+    .nav-links {
+      display: flex !important;
+      gap: 20px;
+      position: static !important;
+      background: none !important;
+      border: none !important;
+      padding: 0 !important;
+      top: auto !important;
+      left: auto !important;
+      right: auto !important;
+      flex-direction: row !important;
+      align-items: center !important;
+    }
+
+    .mobile-menu-btn {
+      display: none !important;
+    }
   }
-  
-  .nav-link:hover::after,
-  .activeLink::after {
-    width: 100%;
+
+  /* Mobile - hamburger menu visible */
+  @media (max-width: 767px) {
+    .mobile-menu-btn {
+      display: block !important;
+    }
+
+    .nav-links {
+      display: none;
+      position: absolute;
+      top: 70px;
+      left: 0;
+      right: 0;
+      background: #06101f;
+      border: 1px solid rgba(59,130,246,0.15);
+      flex-direction: column;
+      gap: 0;
+      padding: 12px 0;
+      min-width: 100%;
+    }
+
+    .nav-links.open {
+      display: flex;
+    }
+
+    a {
+      padding: 14px 20px !important;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    a:last-child {
+      border-bottom: none;
+    }
   }
-  
-  .logoutBtn:hover {
-    background: #ff4d4d;
-    color: white;
-    transform: translateY(-2px);
+
+  a {
+    transition: all 0.2s;
+  }
+
+  a:hover {
+    color: #3b82f6;
+  }
+
+  .logout-btn:hover {
+    background: rgba(239,68,68,0.25) !important;
+  }
+
+  .mobile-menu-btn:hover {
+    color: #3b82f6;
   }
 `;
