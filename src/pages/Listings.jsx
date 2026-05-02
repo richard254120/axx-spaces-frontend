@@ -1,449 +1,470 @@
-import { useEffect, useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import API from "../api/api";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import iconImage from "../assets/image.png";
+import logo from "../assets/logo.jpeg";
 
-export default function Listings() {
-  const [searchParams] = useSearchParams();
+export default function Home() {
   const navigate = useNavigate();
-  
-  const [properties, setProperties] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedImageIndex, setSelectedImageIndex] = useState({});
-  const [selectedProperty, setSelectedProperty] = useState(null);
+  const [searchForm, setSearchForm] = useState({
+    county: "",
+    area: "",
+    type: "",
+    price: "",
+    bedrooms: "",
+  });
 
-  useEffect(() => {
-    fetchListings();
-  }, [searchParams]);
+  const counties = [
+    "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
+    "Garissa","Wajir","Mandera","Marsabit",
+    "Isiolo","Meru","Tharaka Nithi","Embu","Kitui",
+    "Machakos","Makueni","Nyandarua","Nyeri","Kirinyaga",
+    "Murang'a","Kiambu","Turkana","West Pokot","Samburu",
+    "Trans Nzoia","Uasin Gishu","Elgeyo Marakwet","Nandi","Baringo",
+    "Laikipia","Nakuru","Narok","Kajiado","Kericho","Bomet",
+    "Kakamega","Vihiga","Bungoma","Busia",
+    "Siaya","Kisumu","Homa Bay","Migori","Kisii","Nyamira",
+    "Nairobi City"
+  ];
 
-  const fetchListings = async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams();
-      if (searchParams.get("county")) params.append("county", searchParams.get("county"));
-      if (searchParams.get("area")) params.append("area", searchParams.get("area"));
-      if (searchParams.get("type")) params.append("type", searchParams.get("type"));
-      if (searchParams.get("price")) params.append("price", searchParams.get("price"));
-      if (searchParams.get("bedrooms")) params.append("bedrooms", searchParams.get("bedrooms"));
+  const types = [
+    "Bedsitter","Studio Apartment","1 Bedroom","2 Bedroom",
+    "3 Bedroom","4+ Bedroom","Maisonette","Bungalow",
+    "Townhouse","Apartment Block"
+  ];
 
-      const res = await API.get(`/properties/approved?${params.toString()}`);
-      setProperties(res.data);
-    } catch (err) {
-      console.error("❌ Fetch error:", err);
-    } finally {
-      setLoading(false);
-    }
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (searchForm.county) params.append("county", searchForm.county);
+    if (searchForm.area) params.append("area", searchForm.area);
+    if (searchForm.type) params.append("type", searchForm.type);
+    if (searchForm.price) params.append("price", searchForm.price);
+    if (searchForm.bedrooms) params.append("bedrooms", searchForm.bedrooms);
+    navigate(`/listings?${params.toString()}`);
   };
-
-  const getPropertyImages = (property) => {
-    if (!property) return [];
-    if (property.images && Array.isArray(property.images) && property.images.length > 0) {
-      return property.images;
-    }
-    if (property.image) return [property.image];
-    return [];
-  };
-
-  // ✅ Detailed WhatsApp Message
-  const getWhatsAppMessage = (property) => {
-    return encodeURIComponent(
-      `Hello,\n\n` +
-      `I'm interested in this property:\n\n` +
-      `🏠 *${property.title}*\n` +
-      `📍 Location: ${property.county}${property.area ? `, ${property.area}` : ''}\n` +
-      `💰 Monthly Rent: Ksh ${Number(property.price).toLocaleString()}\n` +
-      `${property.deposit ? `🔒 Deposit: Ksh ${Number(property.deposit).toLocaleString()}\n` : ''}` +
-      `${property.type ? `🏡 Type: ${property.type}\n` : ''}` +
-      `${property.bedrooms ? `🛏 Bedrooms: ${property.bedrooms}\n` : ''}` +
-      `${property.bathrooms ? `🚿 Bathrooms: ${property.bathrooms}\n` : ''}` +
-      `${property.description ? `\n📝 Description: ${property.description}\n` : ''}` +
-      `\nPlease let me know more details. Thank you!`
-    );
-  };
-
-  if (loading) {
-    return (
-      <div style={styles.loadingContainer}>
-        <div style={styles.spinner} />
-        <p>Loading properties...</p>
-      </div>
-    );
-  }
 
   return (
     <div style={styles.root}>
       <style>{css}</style>
 
-      {/* HEADER */}
-      <div style={styles.header}>
-        <h1 style={styles.title}>🏠 Available Listings</h1>
-        <p style={styles.count}>{properties.length} properties found</p>
-      </div>
+      {/* HERO SECTION */}
+      <section style={styles.hero}>
+        <div style={styles.heroContent}>
+          <div style={styles.logoContainer}>
+            <img src={iconImage} alt="Icon" style={styles.heroIcon} />
+            <img src={logo} alt="Logo" style={styles.heroLogo} />
+          </div>
+          
+          <h1 style={styles.heroTitle}>
+            Find Your Dream Home in Kenya
+          </h1>
+          <p style={styles.heroSubtitle}>
+            Discover verified rental properties across all 47 counties
+          </p>
 
-      {properties.length === 0 ? (
-        <div style={styles.emptyState}>
-          <div style={styles.emptyIcon}>🔍</div>
-          <h2>No properties found</h2>
-          <p>Try adjusting your filters or search criteria</p>
-          <button className="btn-primary" onClick={() => navigate("/listings")}>Clear Filters</button>
-        </div>
-      ) : (
-        <div style={styles.grid}>
-          {properties.map((property, idx) => {
-            const images = getPropertyImages(property);
-            const currentImageIndex = selectedImageIndex[property._id] || 0;
-            const currentImage = images.length > 0 ? images[currentImageIndex] : null;
-
-            return (
-              <div key={property._id} className="card" style={{ animationDelay: `${idx * 60}ms` }}>
-                {currentImage ? (
-                  <div style={styles.imageContainer} onClick={() => setSelectedProperty(property)}>
-                    <img src={currentImage} alt={property.title} style={styles.image} />
-                    
-                    {images.length > 1 && (
-                      <div style={styles.imageBadge}>
-                        {currentImageIndex + 1}/{images.length}
-                      </div>
-                    )}
-
-                    {images.length > 1 && (
-                      <div style={styles.arrowsContainer}>
-                        <button
-                          className="arrow-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const current = selectedImageIndex[property._id] || 0;
-                            setSelectedImageIndex({
-                              ...selectedImageIndex,
-                              [property._id]: current === 0 ? images.length - 1 : current - 1
-                            });
-                          }}
-                        >
-                          ❮
-                        </button>
-                        <button
-                          className="arrow-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const current = selectedImageIndex[property._id] || 0;
-                            setSelectedImageIndex({
-                              ...selectedImageIndex,
-                              [property._id]: (current + 1) % images.length
-                            });
-                          }}
-                        >
-                          ❯
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div style={styles.noImage}>📷 No Image</div>
-                )}
-
-                <div style={styles.cardBody}>
-                  <h3 style={styles.title}>{property.title}</h3>
-                  
-                  <p style={styles.location}>
-                    📍 {property.county}{property.area && ` · ${property.area}`}
-                  </p>
-
-                  <div style={styles.priceBox}>
-                    <div>
-                      <div style={styles.label}>Monthly Rent</div>
-                      <div style={styles.price}>Ksh {Number(property.price).toLocaleString()}</div>
-                    </div>
-                    {property.deposit && (
-                      <div>
-                        <div style={styles.label}>Deposit</div>
-                        <div style={styles.deposit}>Ksh {Number(property.deposit).toLocaleString()}</div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div style={styles.features}>
-                    {property.type && <span className="badge">{property.type}</span>}
-                    {property.bedrooms && <span className="badge">🛏 {property.bedrooms} Bed</span>}
-                    {property.bathrooms && <span className="badge">🚿 {property.bathrooms} Bath</span>}
-                  </div>
-
-                  {property.description && (
-                    <p style={styles.description}>{property.description}</p>
-                  )}
-
-                  {property.amenities && property.amenities.length > 0 && (
-                    <p style={styles.amenities}>✨ {property.amenities.join(", ")}</p>
-                  )}
-
-                  <div style={styles.contactBox}>
-                    <p style={styles.phone}>📞 {property.phone}</p>
-                  </div>
-
-                  {/* WhatsApp Button with Full Details */}
-                  <div style={styles.actions}>
-                    <a 
-                      href={`https://wa.me/${property.phone}?text=${getWhatsAppMessage(property)}`} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      style={styles.btnWhatsapp}
-                    >
-                      💬 WhatsApp Landlord
-                    </a>
-                    <button className="btn-secondary" onClick={() => setSelectedProperty(property)}>
-                      👁 View Details
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* MODAL */}
-      {selectedProperty && (
-        <div style={styles.modal} onClick={() => setSelectedProperty(null)}>
-          <div style={styles.modalBox} onClick={(e) => e.stopPropagation()}>
-            <button style={styles.closeBtn} onClick={() => setSelectedProperty(null)}>✕</button>
-            
-            {(() => {
-              const images = getPropertyImages(selectedProperty);
-              const currentIdx = selectedImageIndex[selectedProperty._id] || 0;
-              const currentImage = images.length > 0 ? images[currentIdx] : null;
-
-              return (
-                <>
-                  {currentImage && (
-                    <div style={styles.modalImageContainer}>
-                      <img src={currentImage} alt={selectedProperty.title} style={styles.modalImage} />
-                      
-                      {images.length > 1 && (
-                        <div style={styles.modalArrows}>
-                          <button className="arrow-btn" onClick={() => {
-                            const current = selectedImageIndex[selectedProperty._id] || 0;
-                            setSelectedImageIndex({
-                              ...selectedImageIndex,
-                              [selectedProperty._id]: current === 0 ? images.length - 1 : current - 1
-                            });
-                          }}>❮</button>
-                          <span style={styles.modalCounter}>{currentIdx + 1} / {images.length}</span>
-                          <button className="arrow-btn" onClick={() => {
-                            const current = selectedImageIndex[selectedProperty._id] || 0;
-                            setSelectedImageIndex({
-                              ...selectedImageIndex,
-                              [selectedProperty._id]: (current + 1) % images.length
-                            });
-                          }}>❯</button>
-                        </div>
-                      )}
-
-                      {images.length > 1 && (
-                        <div style={styles.thumbnailGallery}>
-                          {images.map((img, i) => (
-                            <img
-                              key={i}
-                              src={img}
-                              alt={`thumb ${i}`}
-                              style={{
-                                ...styles.thumbnail,
-                                border: i === currentIdx ? "2px solid #3b82f6" : "1px solid #333"
-                              }}
-                              onClick={() => setSelectedImageIndex({ ...selectedImageIndex, [selectedProperty._id]: i })}
-                            />
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </>
-              );
-            })()}
-
-            <div style={styles.modalBody}>
-              <h2 style={styles.modalTitle}>{selectedProperty.title}</h2>
-              <p style={styles.modalLocation}>📍 {selectedProperty.county}, {selectedProperty.area}</p>
-              
-              <div style={styles.priceBox}>
-                <div>
-                  <div style={styles.label}>Monthly Rent</div>
-                  <div style={styles.price}>Ksh {Number(selectedProperty.price).toLocaleString()}</div>
-                </div>
-                {selectedProperty.deposit && (
-                  <div>
-                    <div style={styles.label}>Deposit</div>
-                    <div style={styles.deposit}>Ksh {Number(selectedProperty.deposit).toLocaleString()}</div>
-                  </div>
-                )}
-              </div>
-
-              {selectedProperty.description && (
-                <p style={styles.fullDescription}>{selectedProperty.description}</p>
-              )}
-
-              {selectedProperty.amenities?.length > 0 && (
-                <p style={styles.amenities}>🏡 {selectedProperty.amenities.join(", ")}</p>
-              )}
-
-              {/* WhatsApp in Modal */}
-              <a 
-                href={`https://wa.me/${selectedProperty.phone}?text=${getWhatsAppMessage(selectedProperty)}`} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                style={styles.btnWhatsappLarge}
+          {/* SEARCH FORM */}
+          <form onSubmit={handleSearch} style={styles.searchForm}>
+            <div style={styles.searchGrid}>
+              <select
+                style={styles.searchInput}
+                value={searchForm.county}
+                onChange={(e) => setSearchForm({...searchForm, county: e.target.value})}
               >
-                💬 Contact Landlord on WhatsApp
-              </a>
+                <option value="">📍 County</option>
+                {counties.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+
+              <input
+                type="text"
+                placeholder="🏘 Area/Estate"
+                style={styles.searchInput}
+                value={searchForm.area}
+                onChange={(e) => setSearchForm({...searchForm, area: e.target.value})}
+              />
+
+              <select
+                style={styles.searchInput}
+                value={searchForm.type}
+                onChange={(e) => setSearchForm({...searchForm, type: e.target.value})}
+              >
+                <option value="">🏗 Property Type</option>
+                {types.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+
+              <input
+                type="number"
+                placeholder="💰 Max Price"
+                style={styles.searchInput}
+                value={searchForm.price}
+                onChange={(e) => setSearchForm({...searchForm, price: e.target.value})}
+              />
+
+              <input
+                type="number"
+                placeholder="🛏 Bedrooms"
+                style={styles.searchInput}
+                value={searchForm.bedrooms}
+                onChange={(e) => setSearchForm({...searchForm, bedrooms: e.target.value})}
+              />
+
+              <button type="submit" style={styles.searchBtn}>
+                🔍 Search
+              </button>
             </div>
+          </form>
+        </div>
+      </section>
+
+      {/* STATS SECTION */}
+      <section style={styles.stats}>
+        <div style={styles.statsContent}>
+          <div style={styles.statCard}>
+            <div style={{...styles.statNumber, color: "#fbbf24"}}>47</div>
+            <div style={styles.statLabel}>Counties</div>
+          </div>
+          <div style={styles.statCard}>
+            <div style={{...styles.statNumber, color: "#ef4444"}}>10K+</div>
+            <div style={styles.statLabel}>Verified Listings</div>
+          </div>
+          <div style={styles.statCard}>
+            <div style={{...styles.statNumber, color: "#22c55e"}}>5K+</div>
+            <div style={styles.statLabel}>Happy Tenants</div>
+          </div>
+          <div style={styles.statCard}>
+            <div style={{...styles.statNumber, color: "#1f2937"}}>24/7</div>
+            <div style={styles.statLabel}>Support</div>
           </div>
         </div>
-      )}
+      </section>
+
+      {/* FEATURES SECTION */}
+      <section style={styles.features}>
+        <h2 style={styles.sectionTitle}>Why Choose Axx Spaces?</h2>
+        
+        <div style={styles.featureGrid}>
+          <div style={{...styles.featureCard, borderTop: "4px solid #fbbf24"}}>
+            <div style={styles.featureIcon}>✓</div>
+            <h3 style={styles.featureTitle}>Verified Properties</h3>
+            <p style={styles.featureText}>All listings are manually verified to ensure accuracy and legitimacy</p>
+          </div>
+
+          <div style={{...styles.featureCard, borderTop: "4px solid #ef4444"}}>
+            <div style={styles.featureIcon}>💬</div>
+            <h3 style={styles.featureTitle}>Direct Contact</h3>
+            <p style={styles.featureText}>Chat with landlords via WhatsApp instantly</p>
+          </div>
+
+          <div style={{...styles.featureCard, borderTop: "4px solid #22c55e"}}>
+            <div style={styles.featureIcon}>🔒</div>
+            <h3 style={styles.featureTitle}>Safe & Secure</h3>
+            <p style={styles.featureText}>Your data is protected with industry-standard encryption</p>
+          </div>
+
+          <div style={{...styles.featureCard, borderTop: "4px solid #1f2937"}}>
+            <div style={styles.featureIcon}>📱</div>
+            <h3 style={styles.featureTitle}>Mobile Friendly</h3>
+            <p style={styles.featureText}>Search and find properties on the go</p>
+          </div>
+
+          <div style={{...styles.featureCard, borderTop: "4px solid #fbbf24"}}>
+            <div style={styles.featureIcon}>🗺</div>
+            <h3 style={styles.featureTitle}>Location Maps</h3>
+            <p style={styles.featureText}>View exact location of properties on interactive maps</p>
+          </div>
+
+          <div style={{...styles.featureCard, borderTop: "4px solid #ef4444"}}>
+            <div style={styles.featureIcon}>💰</div>
+            <h3 style={styles.featureTitle}>No Hidden Fees</h3>
+            <p style={styles.featureText}>Transparent pricing with no surprise charges</p>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA SECTION */}
+      <section style={styles.cta}>
+        <h2 style={styles.ctaTitle}>Ready to Find Your Home?</h2>
+        <p style={styles.ctaText}>Browse thousands of listings or list your property today</p>
+        <div style={styles.ctaButtons}>
+          <button 
+            style={styles.ctaBtnPrimary}
+            onClick={() => navigate("/listings")}
+          >
+            🔍 Browse Listings
+          </button>
+          <button 
+            style={styles.ctaBtnSecondary}
+            onClick={() => navigate("/register")}
+          >
+            📝 List Your Property
+          </button>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer style={styles.footer}>
+        <p style={styles.footerText}>© 2024 Axx Spaces. All rights reserved.</p>
+      </footer>
     </div>
   );
 }
 
-/* ====================== STYLES ====================== */
 const styles = {
   root: {
     fontFamily: "'DM Sans', sans-serif",
-    background: "#06101f",
-    color: "#e2e8f0",
+    background: "#f8f4f0",
+    color: "#1f2937",
     minHeight: "100vh",
-    padding: "40px 20px 60px",
+  },
+
+  hero: {
+    background: "linear-gradient(135deg, #ffffff 0%, #fef3e2 50%, #fef9e7 100%)",
+    padding: "60px 20px",
+    textAlign: "center",
+    borderBottom: "3px solid #fbbf24",
+  },
+
+  heroContent: {
+    maxWidth: "900px",
+    margin: "0 auto",
+  },
+
+  logoContainer: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "12px",
+    marginBottom: "20px",
+  },
+
+  heroIcon: {
+    height: "52px",
+    width: "auto",
+  },
+
+  heroLogo: {
+    height: "100px",
+    width: "auto",
+  },
+
+  heroTitle: {
+    fontSize: "clamp(32px, 6vw, 52px)",
+    fontWeight: 800,
+    color: "#1f2937",
+    margin: "0 0 12px",
+    letterSpacing: "-1px",
+  },
+
+  heroSubtitle: {
+    fontSize: "18px",
+    color: "#6b7280",
+    margin: "0 0 32px",
+    maxWidth: "600px",
+    marginLeft: "auto",
+    marginRight: "auto",
+  },
+
+  searchForm: {
+    marginTop: "40px",
+  },
+
+  searchGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+    gap: "12px",
+    maxWidth: "900px",
+    margin: "0 auto",
+  },
+
+  searchInput: {
+    padding: "12px 14px",
+    border: "2px solid #d1d5db",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontFamily: "inherit",
+    transition: "all 0.2s",
+    background: "white",
+  },
+
+  searchBtn: {
+    padding: "12px 24px",
+    background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "15px",
+    fontWeight: 700,
+    cursor: "pointer",
+    transition: "all 0.2s",
+    boxShadow: "0 4px 12px rgba(239, 68, 68, 0.3)",
+  },
+
+  stats: {
+    background: "#1f2937",
+    padding: "60px 20px",
+    color: "white",
+  },
+
+  statsContent: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+    gap: "24px",
+    maxWidth: "900px",
+    margin: "0 auto",
+  },
+
+  statCard: {
+    textAlign: "center",
+  },
+
+  statNumber: {
+    fontSize: "36px",
+    fontWeight: 800,
+    marginBottom: "8px",
+  },
+
+  statLabel: {
+    fontSize: "14px",
+    color: "#d1d5db",
+  },
+
+  features: {
+    padding: "80px 20px",
+    background: "white",
     maxWidth: "1200px",
     margin: "0 auto",
   },
-  header: { textAlign: "center", marginBottom: "40px" },
-  title: { fontSize: "clamp(24px,5vw,36px)", fontWeight: 800, color: "#f1f5f9", margin: "0 0 8px" },
-  count: { color: "#64748b", fontSize: "16px", margin: 0 },
-  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "24px", marginBottom: "60px" },
-  imageContainer: { position: "relative", cursor: "pointer", overflow: "hidden", borderRadius: "14px 14px 0 0" },
-  image: { width: "100%", height: "240px", objectFit: "cover", display: "block" },
-  noImage: { width: "100%", height: "160px", background: "rgba(59,130,246,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "48px" },
-  imageBadge: { position: "absolute", top: "12px", right: "12px", background: "rgba(0,0,0,0.7)", color: "#fff", padding: "4px 12px", borderRadius: "999px", fontSize: "12px", fontWeight: 600 },
-  arrowsContainer: { position: "absolute", bottom: "12px", left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "center", gap: "12px", background: "rgba(0,0,0,0.6)", padding: "8px 14px", borderRadius: "999px" },
-  cardBody: { padding: "20px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "0 0 14px 14px" },
-  location: { fontSize: "14px", color: "#60a5fa", margin: "0 0 16px" },
-  priceBox: { display: "flex", justifyContent: "space-between", background: "rgba(59,130,246,0.08)", padding: "14px", borderRadius: "10px", marginBottom: "14px" },
-  label: { fontSize: "12px", color: "#94a3b8", textTransform: "uppercase" },
-  price: { fontSize: "18px", fontWeight: 800, color: "#60a5fa" },
-  deposit: { fontSize: "16px", fontWeight: 700, color: "#94a3b8" },
-  features: { display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "14px" },
-  description: { fontSize: "14px", color: "#cbd5e1", lineHeight: 1.6, margin: "14px 0" },
-  amenities: { fontSize: "13px", color: "#94a3b8", margin: "14px 0" },
-  contactBox: { background: "rgba(255,255,255,0.04)", padding: "12px", borderRadius: "8px", marginBottom: "14px" },
-  phone: { margin: 0, fontSize: "14px", color: "#e2e8f0", fontWeight: 600, display: "flex", alignItems: "center", gap: "6px" },
-  actions: { display: "flex", gap: "10px" },
-  btnWhatsapp: { 
-    flex: 1, 
-    padding: "12px", 
-    background: "#25d366", 
-    color: "#fff", 
-    textDecoration: "none", 
-    borderRadius: "8px", 
-    textAlign: "center", 
-    fontSize: "14px", 
-    fontWeight: 700, 
-    transition: "all 0.2s" 
+
+  sectionTitle: {
+    fontSize: "36px",
+    fontWeight: 800,
+    color: "#1f2937",
+    textAlign: "center",
+    marginBottom: "60px",
   },
-  emptyState: { textAlign: "center", padding: "80px 20px" },
-  emptyIcon: { fontSize: "64px", marginBottom: "20px" },
-  loadingContainer: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh", gap: "20px" },
-  spinner: { width: "40px", height: "40px", border: "3px solid rgba(59,130,246,0.2)", borderTop: "3px solid #3b82f6", borderRadius: "50%", animation: "spin 0.8s linear infinite" },
-  modal: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.9)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "20px" },
-  modalBox: { background: "#0d1b2e", borderRadius: "20px", maxWidth: "700px", width: "100%", maxHeight: "90vh", overflow: "auto" },
-  closeBtn: { position: "absolute", top: "20px", right: "20px", background: "rgba(0,0,0,0.7)", color: "#fff", border: "none", width: "40px", height: "40px", borderRadius: "50%", fontSize: "20px", cursor: "pointer", zIndex: 1001 },
-  modalImageContainer: { position: "relative", width: "100%" },
-  modalImage: { width: "100%", height: "400px", objectFit: "cover" },
-  modalArrows: { position: "absolute", bottom: "20px", left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "center", gap: "16px", background: "rgba(0,0,0,0.7)", padding: "12px 20px", borderRadius: "999px" },
-  modalCounter: { color: "#fff", fontSize: "14px", fontWeight: 600, minWidth: "50px", textAlign: "center" },
-  thumbnailGallery: { display: "flex", gap: "6px", padding: "12px", background: "rgba(0,0,0,0.3)", overflowX: "auto" },
-  thumbnail: { width: "60px", height: "60px", objectFit: "cover", borderRadius: "6px", cursor: "pointer", flexShrink: 0 },
-  modalBody: { padding: "32px" },
-  modalTitle: { fontSize: "28px", fontWeight: 800, color: "#f1f5f9", margin: "0 0 12px" },
-  modalLocation: { fontSize: "16px", color: "#60a5fa", margin: "0 0 24px" },
-  fullDescription: { fontSize: "15px", color: "#cbd5e1", lineHeight: 1.8, margin: "24px 0" },
-  btnWhatsappLarge: { 
-    display: "block", 
-    padding: "16px 24px", 
-    background: "#25d366", 
-    color: "#fff", 
-    textDecoration: "none", 
-    borderRadius: "10px", 
-    textAlign: "center", 
-    fontSize: "16px", 
-    fontWeight: 700, 
-    marginTop: "24px", 
-    transition: "all 0.2s" 
+
+  featureGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+    gap: "28px",
+  },
+
+  featureCard: {
+    padding: "28px",
+    background: "#f9fafb",
+    borderRadius: "12px",
+    textAlign: "center",
+    transition: "all 0.2s",
+    border: "1px solid #e5e7eb",
+  },
+
+  featureIcon: {
+    fontSize: "36px",
+    marginBottom: "16px",
+  },
+
+  featureTitle: {
+    fontSize: "18px",
+    fontWeight: 700,
+    color: "#1f2937",
+    margin: "0 0 12px",
+  },
+
+  featureText: {
+    fontSize: "14px",
+    color: "#6b7280",
+    lineHeight: 1.6,
+    margin: 0,
+  },
+
+  cta: {
+    background: "linear-gradient(135deg, #fbbf24 0%, #fcd34d 100%)",
+    padding: "80px 20px",
+    textAlign: "center",
+    borderTop: "3px solid #f59e0b",
+  },
+
+  ctaTitle: {
+    fontSize: "36px",
+    fontWeight: 800,
+    color: "#1f2937",
+    margin: "0 0 12px",
+  },
+
+  ctaText: {
+    fontSize: "18px",
+    color: "#6b7280",
+    margin: "0 0 32px",
+  },
+
+  ctaButtons: {
+    display: "flex",
+    gap: "16px",
+    justifyContent: "center",
+    flexWrap: "wrap",
+  },
+
+  ctaBtnPrimary: {
+    padding: "14px 32px",
+    background: "#ef4444",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "16px",
+    fontWeight: 700,
+    cursor: "pointer",
+    transition: "all 0.2s",
+    boxShadow: "0 4px 12px rgba(239, 68, 68, 0.3)",
+  },
+
+  ctaBtnSecondary: {
+    padding: "14px 32px",
+    background: "white",
+    color: "#1f2937",
+    border: "2px solid #1f2937",
+    borderRadius: "8px",
+    fontSize: "16px",
+    fontWeight: 700,
+    cursor: "pointer",
+    transition: "all 0.2s",
+  },
+
+  footer: {
+    background: "#1f2937",
+    color: "#d1d5db",
+    padding: "20px",
+    textAlign: "center",
+    fontSize: "14px",
+  },
+
+  footerText: {
+    margin: 0,
   },
 };
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap');
 
-  .card {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 14px;
-    overflow: hidden;
-    transition: all .2s;
-    animation: fadeUp .4s ease both;
-  }
-  .card:hover {
-    transform: translateY(-6px);
-    border-color: rgba(59,130,246,0.35);
-    box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 18px;
+    padding-right: 32px;
   }
 
-  .arrow-btn {
-    background: rgba(255,255,255,0.1);
-    border: none;
-    color: white;
-    padding: 6px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background .2s;
-  }
-  .arrow-btn:hover {
-    background: rgba(255,255,255,0.2);
+  input:focus, select:focus {
+    outline: none;
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
   }
 
-  .badge {
-    display: inline-block;
-    background: rgba(59,130,246,0.15);
-    border: 1px solid rgba(59,130,246,0.3);
-    color: #60a5fa;
-    padding: 4px 12px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 600;
+  button:hover:not(:disabled) {
+    transform: translateY(-2px);
   }
 
-  .btn-primary {
-    padding: 12px 28px;
-    background: linear-gradient(135deg,#3b82f6,#6d28d9);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-weight: 700;
-    cursor: pointer;
-    font-family: inherit;
+  .featureCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   }
-
-  .btn-secondary {
-    padding: 12px 20px;
-    background: rgba(59,130,246,0.12);
-    border: 1px solid rgba(59,130,246,0.3);
-    color: #60a5fa;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    font-family: inherit;
-    transition: all .2s;
-  }
-  .btn-secondary:hover {
-    background: rgba(59,130,246,0.25);
-  }
-
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes spin { to { transform: rotate(360deg); } }
 `;
