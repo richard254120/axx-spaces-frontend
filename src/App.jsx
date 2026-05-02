@@ -27,6 +27,4 @@ function App() {
   );
 }
 
-exporY
-t default App;
- FKKK
+export default App;
