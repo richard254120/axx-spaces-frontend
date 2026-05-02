@@ -28,7 +28,6 @@ export default function Register() {
     setError("");
     setSuccess("");
 
-    // ✅ Validation
     if (!formData.name || !formData.email || !formData.password || !formData.phone) {
       setError("❌ Please fill all fields");
       setLoading(false);
@@ -48,12 +47,10 @@ export default function Register() {
       
       console.log("✅ Registration response:", res.data);
 
-      // ✅ Save token and user
       if (res.data.token && res.data.user) {
         login(res.data.token, res.data.user);
         setSuccess("✅ Registration successful!");
         
-        // ✅ Redirect to listings (not dashboard)
         setTimeout(() => {
           navigate("/listings");
         }, 1500);
