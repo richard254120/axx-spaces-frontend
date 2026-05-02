@@ -70,13 +70,13 @@ export default function Home() {
                 value={searchForm.county}
                 onChange={(e) => setSearchForm({...searchForm, county: e.target.value})}
               >
-                <option value="">📍 County</option>
+                <option value=""> County</option>
                 {counties.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
 
               <input
                 type="text"
-                placeholder="🏘 Area/Estate"
+                placeholder="Area/Estate"
                 style={styles.searchInput}
                 value={searchForm.area}
                 onChange={(e) => setSearchForm({...searchForm, area: e.target.value})}
@@ -87,13 +87,13 @@ export default function Home() {
                 value={searchForm.type}
                 onChange={(e) => setSearchForm({...searchForm, type: e.target.value})}
               >
-                <option value="">🏗 Property Type</option>
+                <option value="">Property Type</option>
                 {types.map(t => <option key={t} value={t}>{t}</option>)}
               </select>
 
               <input
                 type="number"
-                placeholder="💰 Max Price"
+                placeholder="Max Price"
                 style={styles.searchInput}
                 value={searchForm.price}
                 onChange={(e) => setSearchForm({...searchForm, price: e.target.value})}
