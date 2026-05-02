@@ -3,14 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 export default function Navbar() {
-  const { token, user, logout } = useContext(AuthContext);
+  const { token, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // ✅ Mobile menu state
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate("/");
-    setMobileMenuOpen(false);
+    setMenuOpen(false);
   };
 
   return (
@@ -21,42 +21,40 @@ export default function Navbar() {
         <div style={styles.container}>
           
           {/* Logo */}
-          <Link to="/" style={styles.logo} onClick={() => setMobileMenuOpen(false)}>
+          <Link to="/" style={styles.logo} onClick={() => setMenuOpen(false)}>
             🏠 Axx Spaces
           </Link>
 
-          {/* ✅ Mobile Menu Button */}
+          {/* Hamburger Button (Mobile Only) */}
           <button
-            style={styles.menuButton}
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="mobile-menu-btn"
+            style={styles.hamburger}
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="hamburger"
           >
-            {mobileMenuOpen ? "✕" : "☰"}
+            {menuOpen ? "✕" : "☰"}
           </button>
 
-          {/* ✅ Navigation Menu (Desktop + Mobile) */}
+          {/* Navigation Links */}
           <div
             style={{
               ...styles.navLinks,
-              ...(mobileMenuOpen ? styles.navLinksOpen : {})
+              ...(menuOpen && styles.navLinksActive)
             }}
-            className="nav-links"
+            className={menuOpen ? "nav-active" : ""}
           >
-            {/* Always visible */}
-            <Link to="/" style={styles.link} onClick={() => setMobileMenuOpen(false)}>
+            <Link to="/" style={styles.link} onClick={() => setMenuOpen(false)}>
               🏠 Home
             </Link>
-            <Link to="/listings" style={styles.link} onClick={() => setMobileMenuOpen(false)}>
+            <Link to="/listings" style={styles.link} onClick={() => setMenuOpen(false)}>
               🔍 Listings
             </Link>
 
-            {/* Only when logged in */}
             {token ? (
               <>
-                <Link to="/upload" style={styles.link} onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/upload" style={styles.link} onClick={() => setMenuOpen(false)}>
                   ➕ Upload
                 </Link>
-                <Link to="/dashboard" style={styles.link} onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/dashboard" style={styles.link} onClick={() => setMenuOpen(false)}>
                   📊 My Properties
                 </Link>
                 <button
@@ -64,16 +62,19 @@ export default function Navbar() {
                   onClick={handleLogout}
                   className="logout-btn"
                 >
-                  Logout
+                  🚪 Logout
                 </button>
               </>
             ) : (
               <>
-                {/* Not logged in */}
-                <Link to="/login" style={styles.link} onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/login" style={styles.link} onClick={() => setMenuOpen(false)}>
                   Login
                 </Link>
-                <Link to="/register" style={styles.linkPrimary} onClick={() => setMobileMenuOpen(false)}>
+                <Link 
+                  to="/register" 
+                  style={styles.registerBtn}
+                  onClick={() => setMenuOpen(false)}
+                >
                   Register
                 </Link>
               </>
@@ -93,7 +94,6 @@ const styles = {
     position: "sticky",
     top: 0,
     zIndex: 100,
-    backdropFilter: "blur(10px)",
   },
   container: {
     maxWidth: "1200px",
@@ -111,13 +111,21 @@ const styles = {
     textDecoration: "none",
     whiteSpace: "nowrap",
   },
+  hamburger: {
+    display: "none",
+    background: "none",
+    border: "none",
+    color: "#cbd5e1",
+    fontSize: "28px",
+    cursor: "pointer",
+    padding: "8px",
+  },
   navLinks: {
     display: "flex",
     gap: "20px",
     alignItems: "center",
   },
-  navLinksOpen: {
-    // ✅ Mobile styles (shown when menu is open)
+  navLinksActive: {
     position: "absolute",
     top: "70px",
     left: 0,
@@ -135,10 +143,10 @@ const styles = {
     fontSize: "15px",
     fontWeight: 600,
     padding: "12px 20px",
-    transition: "all 0.2s",
     display: "block",
+    transition: "all 0.2s",
   },
-  linkPrimary: {
+  registerBtn: {
     color: "#3b82f6",
     textDecoration: "none",
     fontSize: "15px",
@@ -146,10 +154,10 @@ const styles = {
     padding: "10px 20px",
     background: "rgba(59,130,246,0.15)",
     borderRadius: "8px",
-    transition: "all 0.2s",
     border: "1px solid rgba(59,130,246,0.3)",
     display: "block",
     textAlign: "center",
+    transition: "all 0.2s",
   },
   logoutBtn: {
     background: "rgba(239,68,68,0.15)",
@@ -162,49 +170,38 @@ const styles = {
     fontWeight: 600,
     fontFamily: "inherit",
     transition: "all 0.2s",
-  },
-  menuButton: {
-    display: "none", // ✅ Hidden by default (desktop)
-    background: "none",
-    border: "none",
-    color: "#cbd5e1",
-    fontSize: "24px",
-    cursor: "pointer",
-    padding: "8px",
+    margin: "8px 20px 0",
   },
 };
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
 
-  * {
-    font-family: 'DM Sans', sans-serif;
-  }
-
-  /* Desktop - navbar links always visible */
+  /* DESKTOP - All links visible */
   @media (min-width: 768px) {
+    .hamburger {
+      display: none !important;
+    }
+
     .nav-links {
       display: flex !important;
-      gap: 20px;
       position: static !important;
       background: none !important;
       border: none !important;
       padding: 0 !important;
-      top: auto !important;
-      left: auto !important;
-      right: auto !important;
+      gap: 20px;
       flex-direction: row !important;
-      align-items: center !important;
     }
 
-    .mobile-menu-btn {
-      display: none !important;
+    a {
+      padding: 12px 0 !important;
+      border: none !important;
     }
   }
 
-  /* Mobile - hamburger menu visible */
+  /* MOBILE - Hamburger menu */
   @media (max-width: 767px) {
-    .mobile-menu-btn {
+    .hamburger {
       display: block !important;
     }
 
@@ -220,15 +217,18 @@ const css = `
       gap: 0;
       padding: 12px 0;
       min-width: 100%;
+      width: 100vw;
+      margin-left: -20px;
     }
 
-    .nav-links.open {
-      display: flex;
+    .nav-active {
+      display: flex !important;
     }
 
     a {
       padding: 14px 20px !important;
       border-bottom: 1px solid rgba(255,255,255,0.05);
+      margin: 0 !important;
     }
 
     a:last-child {
@@ -248,7 +248,7 @@ const css = `
     background: rgba(239,68,68,0.25) !important;
   }
 
-  .mobile-menu-btn:hover {
+  .hamburger:hover {
     color: #3b82f6;
   }
 `;
