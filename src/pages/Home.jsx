@@ -1,17 +1,16 @@
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import iconImage from "../assets/image.png";
 import logo from "../assets/logo.jpeg";
-import iconImage from "../assets/image.png";   // ← Your custom icon
 
 export default function Home() {
   const navigate = useNavigate();
-
-  const [searchData, setSearchData] = useState({
-    location: "",
+  const [searchForm, setSearchForm] = useState({
+    county: "",
     area: "",
-    price: "",
     type: "",
-    bedrooms: ""
+    price: "",
+    bedrooms: "",
   });
 
   const counties = [
@@ -27,23 +26,21 @@ export default function Home() {
     "Nairobi City"
   ];
 
-  const propertyTypes = [
+  const types = [
     "Bedsitter","Studio Apartment","1 Bedroom","2 Bedroom",
     "3 Bedroom","4+ Bedroom","Maisonette","Bungalow",
-    "Townhouse","Apartment Block","Single Room","Shared Room",
-    "Hostel Room","Commercial Office","Shop / Retail Space",
-    "Warehouse","Plot / Land","Furnished Apartment",
-    "Unfurnished Apartment"
+    "Townhouse","Apartment Block"
   ];
 
-  const handleSearch = () => {
-    const query = new URLSearchParams();
-    if (searchData.location) query.append("county", searchData.location);
-    if (searchData.area) query.append("area", searchData.area);
-    if (searchData.price) query.append("price", searchData.price);
-    if (searchData.type) query.append("type", searchData.type);
-    if (searchData.bedrooms) query.append("bedrooms", searchData.bedrooms);
-    navigate(`/listings?${query.toString()}`);
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (searchForm.county) params.append("county", searchForm.county);
+    if (searchForm.area) params.append("area", searchForm.area);
+    if (searchForm.type) params.append("type", searchForm.type);
+    if (searchForm.price) params.append("price", searchForm.price);
+    if (searchForm.bedrooms) params.append("bedrooms", searchForm.bedrooms);
+    navigate(`/listings?${params.toString()}`);
   };
 
   return (
@@ -51,608 +48,423 @@ export default function Home() {
       <style>{css}</style>
 
       {/* HERO SECTION */}
-      <div style={styles.hero}>
-        <div style={styles.logoContainer}>
-         
-          <img src={logo} alt="Axx Spaces Logo" style={styles.logo} />
+      <section style={styles.hero}>
+        <div style={styles.heroContent}>
+          <div style={styles.logoContainer}>
+            <img src={iconImage} alt="Icon" style={styles.heroIcon} />
+            <img src={logo} alt="Logo" style={styles.heroLogo} />
+          </div>
+          
+          <h1 style={styles.heroTitle}>
+            Find Your Dream Home in Kenya
+          </h1>
+          <p style={styles.heroSubtitle}>
+            Discover verified rental properties across all 47 counties
+          </p>
+
+          {/* SEARCH FORM */}
+          <form onSubmit={handleSearch} style={styles.searchForm}>
+            <div style={styles.searchGrid}>
+              <select
+                style={styles.searchInput}
+                value={searchForm.county}
+                onChange={(e) => setSearchForm({...searchForm, county: e.target.value})}
+              >
+                <option value="">📍 County</option>
+                {counties.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+
+              <input
+                type="text"
+                placeholder="🏘 Area/Estate"
+                style={styles.searchInput}
+                value={searchForm.area}
+                onChange={(e) => setSearchForm({...searchForm, area: e.target.value})}
+              />
+
+              <select
+                style={styles.searchInput}
+                value={searchForm.type}
+                onChange={(e) => setSearchForm({...searchForm, type: e.target.value})}
+              >
+                <option value="">🏗 Property Type</option>
+                {types.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+
+              <input
+                type="number"
+                placeholder="💰 Max Price"
+                style={styles.searchInput}
+                value={searchForm.price}
+                onChange={(e) => setSearchForm({...searchForm, price: e.target.value})}
+              />
+
+              <input
+                type="number"
+                placeholder="🛏 Bedrooms"
+                style={styles.searchInput}
+                value={searchForm.bedrooms}
+                onChange={(e) => setSearchForm({...searchForm, bedrooms: e.target.value})}
+              />
+
+              <button type="submit" style={styles.searchBtn}>
+                🔍 Search
+              </button>
+            </div>
+          </form>
         </div>
-
-        <h1 style={styles.title}>
-          Find Affordable & Verified Homes in Kenya
-        </h1>
-
-        <p style={styles.subtitle}>
-          Trusted rental platform connecting landlords and tenants across all counties
-        </p>
-
-        {/* Search Box */}
-        <div style={styles.searchBox}>
-          <select
-            style={styles.input}
-            value={searchData.location}
-            onChange={(e) => setSearchData({ ...searchData, location: e.target.value })}
-            className="search-input"
-          >
-            <option value="">📍 Select County</option>
-            {counties.map((c, i) => (
-              <option key={i} value={c}>{c}</option>
-            ))}
-          </select>
-
-          <input
-            placeholder="🏘 Area (e.g Kilimani)"
-            style={styles.input}
-            value={searchData.area}
-            onChange={(e) => setSearchData({ ...searchData, area: e.target.value })}
-            className="search-input"
-          />
-
-          <input
-            placeholder="💵 Max Price"
-            style={styles.input}
-            value={searchData.price}
-            onChange={(e) => setSearchData({ ...searchData, price: e.target.value })}
-            className="search-input"
-          />
-
-          <select
-            style={styles.input}
-            value={searchData.type}
-            onChange={(e) => setSearchData({ ...searchData, type: e.target.value })}
-            className="search-input"
-          >
-            <option value="">🏗 Property Type</option>
-            {propertyTypes.map((t, i) => (
-              <option key={i} value={t}>{t}</option>
-            ))}
-          </select>
-
-          <select
-            style={styles.input}
-            value={searchData.bedrooms}
-            onChange={(e) => setSearchData({ ...searchData, bedrooms: e.target.value })}
-            className="search-input"
-          >
-            <option value="">🛏 Bedrooms</option>
-            <option value="1">1 Bedroom</option>
-            <option value="2">2 Bedrooms</option>
-            <option value="3">3 Bedrooms</option>
-            <option value="4">4+ Bedrooms</option>
-          </select>
-
-          <button className="home-btn search-btn" onClick={handleSearch}>
-            🔍 Search Homes
-          </button>
-        </div>
-      </div>
-
-      {/* TRUST SECTION */}
-      <div style={styles.section}>
-        <h2 style={styles.sectionTitle}>Why Renters Trust Axx Spaces</h2>
-        <div style={styles.grid}>
-          <div style={{ ...styles.card, ...styles.cardRed }}>
-            <div style={styles.icon}>🔐</div>
-            <h3>Verified Listings</h3>
-            <p>Every property is reviewed before approval</p>
-          </div>
-          <div style={{ ...styles.card, ...styles.cardBlue }}>
-            <div style={styles.icon}>🧾</div>
-            <h3>No Fake Ads</h3>
-            <p>We filter scams and fake landlords</p>
-          </div>
-          <div style={{ ...styles.card, ...styles.cardYellow }}>
-            <div style={styles.icon}>📞</div>
-            <h3>Direct Contact</h3>
-            <p>Talk directly to landlords</p>
-          </div>
-          <div style={{ ...styles.card, ...styles.cardGreen }}>
-            <div style={styles.icon}>⚡</div>
-            <h3>Fast Updates</h3>
-            <p>New listings appear instantly</p>
-          </div>
-        </div>
-      </div>
+      </section>
 
       {/* STATS SECTION */}
-      <div style={styles.statsSection}>
-        <div style={styles.statsGrid}>
-          <div style={styles.stat}>
-            <div style={{ ...styles.statNumber, color: "#f87171" }}>5,200+</div>
-            <div style={styles.statLabel}>Properties Listed</div>
+      <section style={styles.stats}>
+        <div style={styles.statsContent}>
+          <div style={styles.statCard}>
+            <div style={{...styles.statNumber, color: "#fbbf24"}}>47</div>
+            <div style={styles.statLabel}>Counties</div>
           </div>
-          <div style={styles.stat}>
-            <div style={{ ...styles.statNumber, color: "#facc15" }}>47</div>
-            <div style={styles.statLabel}>Counties Covered</div>
+          <div style={styles.statCard}>
+            <div style={{...styles.statNumber, color: "#ef4444"}}>10K+</div>
+            <div style={styles.statLabel}>Verified Listings</div>
           </div>
-          <div style={styles.stat}>
-            <div style={{ ...styles.statNumber, color: "#4ade80" }}>98%</div>
-            <div style={styles.statLabel}>Satisfied Tenants</div>
+          <div style={styles.statCard}>
+            <div style={{...styles.statNumber, color: "#22c55e"}}>5K+</div>
+            <div style={styles.statLabel}>Happy Tenants</div>
           </div>
-        </div>
-      </div>
-
-      {/* HOW IT WORKS */}
-      <div style={styles.section}>
-        <h2 style={styles.sectionTitle}>How Axx Spaces Works</h2>
-        <div style={styles.steps}>
-          <div style={{ ...styles.step, borderTop: "4px solid #ef4444" }}>
-            <div style={{ ...styles.stepNum, color: "#ef4444" }}>1</div>
-            <h3>Browse & Search</h3>
-            <p>Find verified homes in your preferred county and area</p>
-          </div>
-          <div style={{ ...styles.step, borderTop: "4px solid #3b82f6" }}>
-            <div style={{ ...styles.stepNum, color: "#3b82f6" }}>2</div>
-            <h3>Contact Directly</h3>
-            <p>Chat with landlords via WhatsApp or call</p>
-          </div>
-          <div style={{ ...styles.step, borderTop: "4px solid #22c55e" }}>
-            <div style={{ ...styles.stepNum, color: "#22c55e" }}>3</div>
-            <h3>Move In</h3>
-            <p>Visit, pay deposit and secure your new home</p>
+          <div style={styles.statCard}>
+            <div style={{...styles.statNumber, color: "#1f2937"}}>24/7</div>
+            <div style={styles.statLabel}>Support</div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* LANDLORD CTA */}
-      <div style={styles.cta}>
-        <h2>Are you a landlord?</h2>
-        <p>List your property and reach thousands of serious tenants</p>
-        <button className="home-btn" onClick={() => navigate("/upload")}>
-          📝 Upload Your Property Now
-        </button>
-      </div>
+      {/* FEATURES SECTION */}
+      <section style={styles.features}>
+        <h2 style={styles.sectionTitle}>Why Choose Axx Spaces?</h2>
+        
+        <div style={styles.featureGrid}>
+          <div style={{...styles.featureCard, borderTop: "4px solid #fbbf24"}}>
+            <div style={styles.featureIcon}>✓</div>
+            <h3 style={styles.featureTitle}>Verified Properties</h3>
+            <p style={styles.featureText}>All listings are manually verified to ensure accuracy and legitimacy</p>
+          </div>
+
+          <div style={{...styles.featureCard, borderTop: "4px solid #ef4444"}}>
+            <div style={styles.featureIcon}>💬</div>
+            <h3 style={styles.featureTitle}>Direct Contact</h3>
+            <p style={styles.featureText}>Chat with landlords via WhatsApp instantly</p>
+          </div>
+
+          <div style={{...styles.featureCard, borderTop: "4px solid #22c55e"}}>
+            <div style={styles.featureIcon}>🔒</div>
+            <h3 style={styles.featureTitle}>Safe & Secure</h3>
+            <p style={styles.featureText}>Your data is protected with industry-standard encryption</p>
+          </div>
+
+          <div style={{...styles.featureCard, borderTop: "4px solid #1f2937"}}>
+            <div style={styles.featureIcon}>📱</div>
+            <h3 style={styles.featureTitle}>Mobile Friendly</h3>
+            <p style={styles.featureText}>Search and find properties on the go</p>
+          </div>
+
+          <div style={{...styles.featureCard, borderTop: "4px solid #fbbf24"}}>
+            <div style={styles.featureIcon}>🗺</div>
+            <h3 style={styles.featureTitle}>Location Maps</h3>
+            <p style={styles.featureText}>View exact location of properties on interactive maps</p>
+          </div>
+
+          <div style={{...styles.featureCard, borderTop: "4px solid #ef4444"}}>
+            <div style={styles.featureIcon}>💰</div>
+            <h3 style={styles.featureTitle}>No Hidden Fees</h3>
+            <p style={styles.featureText}>Transparent pricing with no surprise charges</p>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA SECTION */}
+      <section style={styles.cta}>
+        <h2 style={styles.ctaTitle}>Ready to Find Your Home?</h2>
+        <p style={styles.ctaText}>Browse thousands of listings or list your property today</p>
+        <div style={styles.ctaButtons}>
+          <button 
+            style={styles.ctaBtnPrimary}
+            onClick={() => navigate("/listings")}
+          >
+            🔍 Browse Listings
+          </button>
+          <button 
+            style={styles.ctaBtnSecondary}
+            onClick={() => navigate("/register")}
+          >
+            📝 List Your Property
+          </button>
+        </div>
+      </section>
 
       {/* FOOTER */}
       <footer style={styles.footer}>
-        <div style={styles.footerInner}>
-          <div style={styles.footerBrand}>
-            <img src={logo} alt="Axx Spaces" style={styles.footerLogo} />
-            <span style={styles.footerName}>Axx Spaces</span>
-          </div>
-
-          <div style={styles.footerLinks}>
-            <div style={styles.footerCol}>
-              <h4 style={styles.footerHeading}>Quick Links</h4>
-              <span style={styles.footerLink} onClick={() => navigate("/listings")}>Browse Listings</span>
-              <span style={styles.footerLink} onClick={() => navigate("/upload")}>List a Property</span>
-            </div>
-
-            <div style={styles.footerCol}>
-              <h4 style={styles.footerHeading}>Contact Us</h4>
-              <a href="mailto:axxspaces@gmail.com" style={styles.footerEmail}>
-                ✉️ axxspaces@gmail.com
-              </a>
-              <p style={styles.footerTagline}>We're available Mon – Sat, 8am – 6pm</p>
-            </div>
-          </div>
-        </div>
-
-        <div style={styles.footerBottom}>
-          <span>© {new Date().getFullYear()} Axx Spaces. All rights reserved.</span>
-          <span style={styles.footerMade}>Built for Kenya 🇰🇪</span>
-        </div>
+        <p style={styles.footerText}>© 2024 Axx Spaces. All rights reserved.</p>
       </footer>
     </div>
   );
 }
 
-/* ==================== STYLES ==================== */
 const styles = {
   root: {
-    fontFamily: "'DM Sans', 'Segoe UI', sans-serif",
-    background: "#06101f",
-    color: "#e2e8f0",
+    fontFamily: "'DM Sans', sans-serif",
+    background: "#f8f4f0",
+    color: "#1f2937",
     minHeight: "100vh",
   },
 
-  /* HERO — sweeping diagonal: deep navy → red → blue → green → yellow → dark */
   hero: {
-    padding: "80px 20px 100px",
+    background: "linear-gradient(135deg, #ffffff 0%, #fef3e2 50%, #fef9e7 100%)",
+    padding: "60px 20px",
     textAlign: "center",
-    background: `
-      linear-gradient(135deg,
-        #0a0e27 0%,
-        #3b0a0a 12%,
-        #7f1d1d 22%,
-        #1e3a8a 36%,
-        #0f2f6f 48%,
-        #14532d 62%,
-        #065f46 72%,
-        #78350f 84%,
-        #0a0e27 100%
-      )
-    `,
-    minHeight: "75vh",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-    overflow: "hidden",
+    borderBottom: "3px solid #fbbf24",
+  },
+
+  heroContent: {
+    maxWidth: "900px",
+    margin: "0 auto",
   },
 
   logoContainer: {
     display: "flex",
     alignItems: "center",
-    gap: "16px",
+    justifyContent: "center",
+    gap: "12px",
     marginBottom: "20px",
   },
 
-  logo: {
-    width: "100px",
-    height: "100px",
-    objectFit: "contain",
-    borderRadius: "20px",
-    boxShadow: "0 0 40px rgba(239,68,68,0.4)",
-  },
-
   heroIcon: {
-    width: "52px",
     height: "52px",
-    objectFit: "contain",
+    width: "auto",
   },
 
-  title: {
+  heroLogo: {
+    height: "100px",
+    width: "auto",
+  },
+
+  heroTitle: {
     fontSize: "clamp(32px, 6vw, 52px)",
     fontWeight: 800,
-    color: "white",
-    margin: "0 0 16px",
-    lineHeight: 1.2,
+    color: "#1f2937",
+    margin: "0 0 12px",
+    letterSpacing: "-1px",
   },
 
-  subtitle: {
-    color: "#94a3b8",
-    marginBottom: "40px",
+  heroSubtitle: {
     fontSize: "18px",
+    color: "#6b7280",
+    margin: "0 0 32px",
     maxWidth: "600px",
+    marginLeft: "auto",
+    marginRight: "auto",
   },
 
-  searchBox: {
-    display: "flex",
-    justifyContent: "center",
+  searchForm: {
+    marginTop: "40px",
+  },
+
+  searchGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
     gap: "12px",
-    flexWrap: "wrap",
-    maxWidth: "950px",
-  },
-
-  input: {
-    padding: "14px 16px",
-    borderRadius: "12px",
-    border: "1px solid rgba(255,255,255,0.12)",
-    background: "rgba(255,255,255,0.06)",
-    color: "#e2e8f0",
-    width: "170px",
-    fontSize: "15px",
-    outline: "none",
-    transition: "all 0.3s ease",
-    fontFamily: "inherit",
-  },
-
-  section: {
-    padding: "70px 20px",
-    textAlign: "center",
-    maxWidth: "1100px",
+    maxWidth: "900px",
     margin: "0 auto",
   },
 
-  sectionTitle: {
-    fontSize: "clamp(26px, 4vw, 38px)",
-    fontWeight: 800,
-    color: "#f1f5f9",
-    marginBottom: "50px",
+  searchInput: {
+    padding: "12px 14px",
+    border: "2px solid #d1d5db",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontFamily: "inherit",
+    transition: "all 0.2s",
+    background: "white",
   },
 
-  grid: {
-    display: "flex",
-    justifyContent: "center",
+  searchBtn: {
+    padding: "12px 24px",
+    background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "15px",
+    fontWeight: 700,
+    cursor: "pointer",
+    transition: "all 0.2s",
+    boxShadow: "0 4px 12px rgba(239, 68, 68, 0.3)",
+  },
+
+  stats: {
+    background: "#1f2937",
+    padding: "60px 20px",
+    color: "white",
+  },
+
+  statsContent: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
     gap: "24px",
-    flexWrap: "wrap",
+    maxWidth: "900px",
+    margin: "0 auto",
   },
 
-  card: {
-    padding: "28px 20px",
-    borderRadius: "16px",
-    width: "240px",
-    transition: "all 0.4s ease",
-  },
-
-  /* Each trust card gets its own vivid color band */
-  cardRed: {
-    background: "rgba(239,68,68,0.12)",
-    border: "1px solid rgba(239,68,68,0.35)",
-  },
-  cardBlue: {
-    background: "rgba(59,130,246,0.12)",
-    border: "1px solid rgba(59,130,246,0.35)",
-  },
-  cardYellow: {
-    background: "rgba(250,204,21,0.10)",
-    border: "1px solid rgba(250,204,21,0.35)",
-  },
-  cardGreen: {
-    background: "rgba(34,197,94,0.10)",
-    border: "1px solid rgba(34,197,94,0.35)",
-  },
-
-  icon: {
-    fontSize: "38px",
-    marginBottom: "16px",
-  },
-
-  /* STATS — four-colour diagonal sweep */
-  statsSection: {
-    background: `
-      linear-gradient(160deg,
-        #1a0808 0%,
-        #7f1d1d 15%,
-        #1e3a8a 35%,
-        #0f2f6f 50%,
-        #14532d 68%,
-        #78350f 83%,
-        #1a0808 100%
-      )
-    `,
-    padding: "80px 20px",
-  },
-
-  statsGrid: {
-    display: "flex",
-    justifyContent: "center",
-    gap: "80px",
-    flexWrap: "wrap",
-  },
-
-  stat: {
+  statCard: {
     textAlign: "center",
   },
 
   statNumber: {
-    fontSize: "48px",
-    fontWeight: "900",
+    fontSize: "36px",
+    fontWeight: 800,
     marginBottom: "8px",
   },
 
   statLabel: {
-    color: "#cbd5e1",
-    fontSize: "15px",
+    fontSize: "14px",
+    color: "#d1d5db",
   },
 
-  steps: {
+  features: {
+    padding: "80px 20px",
+    background: "white",
+    maxWidth: "1200px",
+    margin: "0 auto",
+  },
+
+  sectionTitle: {
+    fontSize: "36px",
+    fontWeight: 800,
+    color: "#1f2937",
+    textAlign: "center",
+    marginBottom: "60px",
+  },
+
+  featureGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-    gap: "30px",
+    gap: "28px",
   },
 
-  step: {
-    background: "rgba(255,255,255,0.03)",
-    padding: "40px 24px",
-    borderRadius: "16px",
+  featureCard: {
+    padding: "28px",
+    background: "#f9fafb",
+    borderRadius: "12px",
     textAlign: "center",
-    transition: "transform 0.3s ease",
-    border: "1px solid rgba(255,255,255,0.06)",
+    transition: "all 0.2s",
+    border: "1px solid #e5e7eb",
   },
 
-  stepNum: {
-    fontSize: "52px",
-    fontWeight: "900",
+  featureIcon: {
+    fontSize: "36px",
     marginBottom: "16px",
   },
 
-  footer: {
-    background: "#03080f",
-    borderTop: "1px solid rgba(255,255,255,0.07)",
-    padding: "50px 20px 0",
-    color: "#94a3b8",
+  featureTitle: {
+    fontSize: "18px",
+    fontWeight: 700,
+    color: "#1f2937",
+    margin: "0 0 12px",
   },
 
-  footerInner: {
-    maxWidth: "1100px",
-    margin: "0 auto",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    flexWrap: "wrap",
-    gap: "40px",
-    paddingBottom: "40px",
-    borderBottom: "1px solid rgba(255,255,255,0.06)",
-  },
-
-  footerBrand: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-  },
-
-  footerLogo: {
-    width: "48px",
-    height: "48px",
-    borderRadius: "12px",
-    objectFit: "contain",
-  },
-
-  footerName: {
-    fontSize: "22px",
-    fontWeight: "800",
-    color: "#f1f5f9",
-    letterSpacing: "-0.5px",
-  },
-
-  footerLinks: {
-    display: "flex",
-    gap: "60px",
-    flexWrap: "wrap",
-  },
-
-  footerCol: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "10px",
-  },
-
-  footerHeading: {
-    color: "#f1f5f9",
-    fontSize: "15px",
-    fontWeight: "700",
-    marginBottom: "6px",
-    margin: "0 0 6px",
-  },
-
-  footerLink: {
+  featureText: {
     fontSize: "14px",
-    color: "#64748b",
-    cursor: "pointer",
-    transition: "color 0.2s",
-  },
-
-  footerEmail: {
-    fontSize: "15px",
-    fontWeight: "600",
-    color: "#facc15",
-    textDecoration: "none",
-    transition: "color 0.2s",
-  },
-
-  footerTagline: {
-    fontSize: "13px",
-    color: "#475569",
+    color: "#6b7280",
+    lineHeight: 1.6,
     margin: 0,
   },
 
-  footerBottom: {
-    maxWidth: "1100px",
-    margin: "0 auto",
-    padding: "20px 0",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    flexWrap: "wrap",
-    gap: "10px",
-    fontSize: "13px",
-    color: "#334155",
-  },
-
-  footerMade: {
-    fontSize: "13px",
-    color: "#334155",
-  },
-
-  /* CTA — four-colour sweep ending dark */
   cta: {
+    background: "linear-gradient(135deg, #fbbf24 0%, #fcd34d 100%)",
     padding: "80px 20px",
     textAlign: "center",
-    background: `
-      linear-gradient(160deg,
-        #3b0a0a 0%,
-        #7f1d1d 15%,
-        #1e3a8a 32%,
-        #14532d 52%,
-        #78350f 70%,
-        #facc15 80%,
-        #78350f 90%,
-        #0a0e27 100%
-      )
-    `,
-    borderTop: "1px solid rgba(239,68,68,0.2)",
+    borderTop: "3px solid #f59e0b",
+  },
+
+  ctaTitle: {
+    fontSize: "36px",
+    fontWeight: 800,
+    color: "#1f2937",
+    margin: "0 0 12px",
+  },
+
+  ctaText: {
+    fontSize: "18px",
+    color: "#6b7280",
+    margin: "0 0 32px",
+  },
+
+  ctaButtons: {
+    display: "flex",
+    gap: "16px",
+    justifyContent: "center",
+    flexWrap: "wrap",
+  },
+
+  ctaBtnPrimary: {
+    padding: "14px 32px",
+    background: "#ef4444",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "16px",
+    fontWeight: 700,
+    cursor: "pointer",
+    transition: "all 0.2s",
+    boxShadow: "0 4px 12px rgba(239, 68, 68, 0.3)",
+  },
+
+  ctaBtnSecondary: {
+    padding: "14px 32px",
+    background: "white",
+    color: "#1f2937",
+    border: "2px solid #1f2937",
+    borderRadius: "8px",
+    fontSize: "16px",
+    fontWeight: 700,
+    cursor: "pointer",
+    transition: "all 0.2s",
+  },
+
+  footer: {
+    background: "#1f2937",
+    color: "#d1d5db",
+    padding: "20px",
+    textAlign: "center",
+    fontSize: "14px",
+  },
+
+  footerText: {
+    margin: 0,
   },
 };
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap');
 
-  /* Search button: red → yellow gradient */
-  .search-btn {
-    padding: 14px 32px;
-    border-radius: 12px;
-    border: none;
-    background: linear-gradient(135deg, #dc2626, #f59e0b);
-    color: white;
-    font-weight: 700;
-    font-size: 16px;
-    cursor: pointer;
-    font-family: inherit;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(220,38,38,0.45);
-  }
-
-  .search-btn:hover {
-    transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 12px 35px rgba(245,158,11,0.6);
-  }
-
-  /* CTA button: green → blue gradient */
-  .home-btn:not(.search-btn) {
-    padding: 14px 32px;
-    border-radius: 12px;
-    border: none;
-    background: linear-gradient(135deg, #16a34a, #2563eb);
-    color: white;
-    font-weight: 700;
-    font-size: 16px;
-    cursor: pointer;
-    font-family: inherit;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(22,163,74,0.45);
-  }
-
-  .home-btn:not(.search-btn):hover {
-    transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 12px 35px rgba(37,99,235,0.6);
-  }
-
-  .search-input {
-    transition: all 0.3s ease;
-  }
-
-  .search-input:focus {
-    border-color: #facc15;
-    box-shadow: 0 0 0 4px rgba(250,204,21,0.2);
-    transform: scale(1.03);
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 18px;
+    padding-right: 32px;
   }
 
   input:focus, select:focus {
-    border-color: #facc15;
-    box-shadow: 0 0 0 3px rgba(250,204,21,0.15);
+    outline: none;
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
   }
 
-  select option {
-    background: #0d1b2e;
+  button:hover:not(:disabled) {
+    transform: translateY(-2px);
   }
 
-  /* Card hover — glow matches card border colour */
-  div[style*="rgba(239,68,68"]:hover {
-    transform: translateY(-10px);
-    border-color: rgba(239,68,68,0.7) !important;
-    box-shadow: 0 8px 30px rgba(239,68,68,0.25);
-  }
-
-  div[style*="rgba(59,130,246"]:hover {
-    transform: translateY(-10px);
-    border-color: rgba(59,130,246,0.7) !important;
-    box-shadow: 0 8px 30px rgba(59,130,246,0.25);
-  }
-
-  div[style*="rgba(250,204,21"]:hover {
-    transform: translateY(-10px);
-    border-color: rgba(250,204,21,0.7) !important;
-    box-shadow: 0 8px 30px rgba(250,204,21,0.2);
-  }
-
-  div[style*="rgba(34,197,94"]:hover {
-    transform: translateY(-10px);
-    border-color: rgba(34,197,94,0.7) !important;
-    box-shadow: 0 8px 30px rgba(34,197,94,0.2);
-  }
-
-  .step:hover {
-    transform: translateY(-6px);
-  }
-
-  footer a[href^="mailto"]:hover {
-    color: #fde047;
-    text-decoration: underline;
-  }
-
-  footer span[style*="cursor"]:hover {
-    color: #cbd5e1;
+  .featureCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   }
 `;
