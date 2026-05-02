@@ -180,7 +180,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA SECTION */}
+      {/* CTA SECTION - UPDATED */}
       <section style={styles.cta}>
         <h2 style={styles.ctaTitle}>Ready to Find Your Home?</h2>
         <p style={styles.ctaText}>Browse thousands of listings or list your property today</p>
@@ -191,9 +191,10 @@ export default function Home() {
           >
             🔍 Browse Listings
           </button>
+          
           <button 
             style={styles.ctaBtnSecondary}
-            onClick={() => navigate("/register")}
+            onClick={() => navigate("/login")}   {/* Changed to Login */}
           >
             📝 List Your Property
           </button>
@@ -208,6 +209,7 @@ export default function Home() {
   );
 }
 
+/* ==================== STYLES (Unchanged) ==================== */
 const styles = {
   root: {
     fontFamily: "'DM Sans', sans-serif",
