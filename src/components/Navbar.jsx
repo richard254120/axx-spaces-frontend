@@ -32,6 +32,11 @@ export default function Navbar() {
             <Link to="/listings" style={styles.link}>
               🔍 Listings
             </Link>
+            {token && (
+              <Link to="/upload" style={styles.link}>
+                ➕ Upload
+              </Link>
+            )}
             {!token ? (
               <Link to="/login" style={styles.link}>
                 Login   
@@ -53,13 +58,6 @@ export default function Navbar() {
             <div style={styles.mobileMenu}>
               {token ? (
                 <>
-                  <Link 
-                    to="/upload" 
-                    style={styles.mobileLink}
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    Upload Property
-                  </Link>
                   <Link 
                     to="/dashboard" 
                     style={styles.mobileLink}
