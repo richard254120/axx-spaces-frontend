@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import logo from "../assets/image.png"; // ✅ IMPORT LOGO
 
 export default function Navbar() {
   const { token, logout } = useContext(AuthContext);
@@ -22,7 +23,8 @@ export default function Navbar() {
           
           {/* Logo */}
           <Link to="/" style={styles.logo} onClick={() => setMenuOpen(false)}>
-            🏠 Axx Spaces
+            <img src={logo} alt="Axx Spaces Logo" style={styles.logoImg} />
+            <span>Axx Spaces</span>
           </Link>
 
           {/* Desktop Navigation (Always Visible) */}
@@ -32,7 +34,7 @@ export default function Navbar() {
             </Link>
             {!token ? (
               <Link to="/login" style={styles.link}>
-                Login
+                Login   
               </Link>
             ) : null}
           </div>
@@ -46,7 +48,7 @@ export default function Navbar() {
             {menuOpen ? "✕" : "☰"}
           </button>
 
-          {/* Mobile Menu (Hamburger Dropdown) */}
+          {/* Mobile Menu */}
           {menuOpen && (
             <div style={styles.mobileMenu}>
               {token ? (
@@ -56,7 +58,7 @@ export default function Navbar() {
                     style={styles.mobileLink}
                     onClick={() => setMenuOpen(false)}
                   >
-                    ➕ Upload Property
+                    Upload Property
                   </Link>
                   <Link 
                     to="/dashboard" 
@@ -69,7 +71,7 @@ export default function Navbar() {
                     style={styles.logoutBtn}
                     onClick={handleLogout}
                   >
-                    🚪 Logout
+                     Logout
                   </button>
                 </>
               ) : (
@@ -111,11 +113,18 @@ const styles = {
     position: "relative",
   },
   logo: {
+    display: "flex",               // ✅ align image + text
+    alignItems: "center",
+    gap: "10px",
     fontSize: "22px",
     fontWeight: 800,
     color: "#3b82f6",
     textDecoration: "none",
     whiteSpace: "nowrap",
+  },
+  logoImg: {
+    height: "40px",               // ✅ control logo size
+    width: "auto",
   },
   desktopNav: {
     display: "flex",
@@ -180,14 +189,12 @@ const styles = {
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
 
-  /* DESKTOP */
   @media (min-width: 768px) {
     .hamburger {
       display: none !important;
     }
   }
 
-  /* MOBILE */
   @media (max-width: 767px) {
     .hamburger {
       display: block !important;
