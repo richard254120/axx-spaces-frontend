@@ -13,6 +13,7 @@ export default function Register() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -25,15 +26,44 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess("");
+
+    // ✅ Validation
+    if (!formData.name || !formData.email || !formData.password || !formData.phone) {
+      setError("❌ Please fill all fields");
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError("❌ Password must be at least 6 characters");
+      setLoading(false);
+      return;
+    }
 
     try {
+      console.log("📝 Registering user...", formData);
+      
       const res = await API.post("/auth/register", formData);
       
-      login(res.data.token, res.data.user);
-      alert("Registration successful! Welcome to Axx Spaces.");
-      navigate("/dashboard");
+      console.log("✅ Registration response:", res.data);
+
+      // ✅ Save token and user
+      if (res.data.token && res.data.user) {
+        login(res.data.token, res.data.user);
+        setSuccess("✅ Registration successful!");
+        
+        // ✅ Redirect to listings (not dashboard)
+        setTimeout(() => {
+          navigate("/listings");
+        }, 1500);
+      } else {
+        setError("❌ Invalid response from server");
+      }
     } catch (err) {
-      setError(err?.response?.data?.error || "Registration failed. Please try again.");
+      console.error("❌ Registration error:", err);
+      const errorMsg = err?.response?.data?.error || err?.message || "Registration failed";
+      setError("❌ " + errorMsg);
     } finally {
       setLoading(false);
     }
@@ -41,92 +71,219 @@ export default function Register() {
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.heading}>Landlord Registration</h2>
-      
-      {error && <p style={styles.error}>{error}</p>}
+      <style>{css}</style>
 
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <input
-          name="name"
-          type="text"
-          placeholder="Full Name"
-          value={formData.name}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        />
-        <input
-          name="email"
-          type="email"
-          placeholder="Email Address"
-          value={formData.email}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        />
-        <input
-          name="phone"
-          type="tel"
-          placeholder="Phone Number (07xxxxxxxx)"
-          value={formData.phone}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        />
-        <input
-          name="password"
-          type="password"
-          placeholder="Create Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        />
-        <button type="submit" disabled={loading} style={styles.btn}>
-          {loading ? "Creating Account..." : "Register as Landlord"}
-        </button>
-      </form>
+      <div style={styles.box}>
+        <h1 style={styles.heading}>🏠 Create Account</h1>
+        <p style={styles.subtitle}>Join Axx Spaces as a Landlord</p>
 
-      <p style={styles.loginLink}>
-        Already have an account? <Link to="/login">Login here</Link>
-      </p>
+        {error && <div style={styles.errorBox}>{error}</div>}
+        {success && <div style={styles.successBox}>{success}</div>}
+
+        <form onSubmit={handleSubmit} style={styles.form}>
+          <div style={styles.fieldGroup}>
+            <label style={styles.label}>Full Name</label>
+            <input
+              name="name"
+              type="text"
+              placeholder="John Doe"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              style={styles.input}
+            />
+          </div>
+
+          <div style={styles.fieldGroup}>
+            <label style={styles.label}>Email Address</label>
+            <input
+              name="email"
+              type="email"
+              placeholder="you@example.com"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              style={styles.input}
+            />
+          </div>
+
+          <div style={styles.fieldGroup}>
+            <label style={styles.label}>Phone Number</label>
+            <input
+              name="phone"
+              type="tel"
+              placeholder="254712345678"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+              style={styles.input}
+            />
+          </div>
+
+          <div style={styles.fieldGroup}>
+            <label style={styles.label}>Password</label>
+            <input
+              name="password"
+              type="password"
+              placeholder="••••••••"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              style={styles.input}
+            />
+          </div>
+
+          <button 
+            type="submit" 
+            disabled={loading} 
+            style={{
+              ...styles.btn,
+              opacity: loading ? 0.6 : 1,
+              cursor: loading ? "not-allowed" : "pointer"
+            }}
+          >
+            {loading ? "⏳ Creating Account..." : "✅ Register as Landlord"}
+          </button>
+        </form>
+
+        <p style={styles.divider}>or</p>
+
+        <p style={styles.loginLink}>
+          Already have an account? <Link to="/login" style={styles.link}>Login here</Link>
+        </p>
+      </div>
     </div>
   );
 }
 
 const styles = {
   container: {
-    maxWidth: "420px",
-    margin: "80px auto",
-    padding: "40px 30px",
-    background: "#111",
-    borderRadius: "16px",
+    minHeight: "100vh",
+    background: "linear-gradient(135deg, #06101f 0%, #0a1428 100%)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "20px",
+    fontFamily: "'DM Sans', sans-serif",
+  },
+  box: {
+    background: "rgba(10, 20, 40, 0.9)",
+    border: "1px solid rgba(59, 130, 246, 0.2)",
+    backdropFilter: "blur(10px)",
+    borderRadius: "20px",
+    padding: "50px 40px",
+    maxWidth: "450px",
+    width: "100%",
+    boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
+  },
+  heading: {
+    color: "#f1f5f9",
+    fontSize: "28px",
+    fontWeight: 800,
+    margin: "0 0 8px",
     textAlign: "center",
   },
-  heading: { color: "#fff", marginBottom: "20px" },
-  error: { color: "#ff4d4d", marginBottom: "15px" },
-  form: { display: "flex", flexDirection: "column", gap: "15px" },
+  subtitle: {
+    color: "#94a3b8",
+    fontSize: "14px",
+    textAlign: "center",
+    margin: "0 0 32px",
+  },
+  errorBox: {
+    background: "rgba(239, 68, 68, 0.15)",
+    border: "1px solid rgba(239, 68, 68, 0.5)",
+    color: "#fca5a5",
+    padding: "12px 16px",
+    borderRadius: "10px",
+    marginBottom: "20px",
+    fontSize: "14px",
+    fontWeight: 500,
+  },
+  successBox: {
+    background: "rgba(34, 197, 94, 0.15)",
+    border: "1px solid rgba(34, 197, 94, 0.5)",
+    color: "#86efac",
+    padding: "12px 16px",
+    borderRadius: "10px",
+    marginBottom: "20px",
+    fontSize: "14px",
+    fontWeight: 500,
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "20px",
+    marginBottom: "24px",
+  },
+  fieldGroup: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+  },
+  label: {
+    color: "#cbd5e1",
+    fontSize: "13px",
+    fontWeight: 600,
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
+  },
   input: {
-    padding: "14px",
-    background: "#1a1a1a",
-    border: "1px solid #333",
-    borderRadius: "8px",
-    color: "#fff",
-    fontSize: "16px",
+    padding: "14px 16px",
+    background: "rgba(30, 41, 59, 0.8)",
+    border: "1px solid rgba(148, 163, 184, 0.2)",
+    borderRadius: "10px",
+    color: "#f1f5f9",
+    fontSize: "15px",
+    fontFamily: "inherit",
+    transition: "all 0.2s",
+    outline: "none",
   },
   btn: {
-    padding: "14px",
-    background: "#0a84ff",
+    padding: "14px 24px",
+    background: "linear-gradient(135deg, #3b82f6 0%, #6d28d9 100%)",
     color: "#fff",
     border: "none",
-    borderRadius: "8px",
-    fontSize: "17px",
-    fontWeight: "600",
+    borderRadius: "10px",
+    fontSize: "15px",
+    fontWeight: 700,
     cursor: "pointer",
-    marginTop: "10px",
+    marginTop: "8px",
+    transition: "all 0.3s",
+    boxShadow: "0 8px 24px rgba(59, 130, 246, 0.4)",
+  },
+  divider: {
+    textAlign: "center",
+    color: "#64748b",
+    margin: "24px 0",
+    fontSize: "13px",
   },
   loginLink: {
-    marginTop: "20px",
-    color: "#aaa",
+    textAlign: "center",
+    color: "#94a3b8",
+    fontSize: "14px",
+    margin: 0,
+  },
+  link: {
+    color: "#3b82f6",
+    textDecoration: "none",
+    fontWeight: 600,
+    transition: "color 0.2s",
   },
 };
+
+const css = `
+  input:focus {
+    border-color: rgba(59, 130, 246, 0.8) !important;
+    background: rgba(30, 41, 59, 1) !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(59, 130, 246, 0.5);
+  }
+
+  a {
+    cursor: pointer;
+  }
+`;
