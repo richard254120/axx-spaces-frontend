@@ -393,7 +393,7 @@ const styles = {
   },
 
   cta: {
-    background: "linear-gradient(135deg, #fbbf24 0%, #fcd34d 100%)",
+    background: "linear-gradient(135deg, #2427fb 0%, #4d9ffc 100%)",
     padding: "80px 20px",
     textAlign: "center",
     borderTop: "3px solid #f59e0b",
