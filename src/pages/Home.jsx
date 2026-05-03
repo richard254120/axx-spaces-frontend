@@ -191,7 +191,7 @@ export default function Home() {
 
       {/* CTA SECTION */}
       <section style={styles.cta}>
-        <h2 style={styles.ctaTitle}>Ready to Find Your Home?</h2>
+        <h2 style={styles.ctaTitle}>Ready to Find Your Home/Are you a landlord?</h2>
         <p style={styles.ctaText}>Browse thousands of listings or list your property today</p>
         <div style={styles.ctaButtons}>
           <button 
