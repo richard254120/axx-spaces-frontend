@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import iconImage from "../assets/image.png";
+import { AuthContext } from "../context/AuthContext";
 import logo from "../assets/logo.jpeg";
 
 export default function Home() {
   const navigate = useNavigate();
+  const { token } = useContext(AuthContext);
+  
   const [searchForm, setSearchForm] = useState({
     county: "",
     area: "",
@@ -43,6 +45,14 @@ export default function Home() {
     navigate(`/listings?${params.toString()}`);
   };
 
+  const handleListProperty = () => {
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+    navigate("/upload");
+  };
+
   return (
     <div style={styles.root}>
       <style>{css}</style>
@@ -51,7 +61,6 @@ export default function Home() {
       <section style={styles.hero}>
         <div style={styles.heroContent}>
           <div style={styles.logoContainer}>
-            <img src={iconImage} alt="Icon" style={styles.heroIcon} />
             <img src={logo} alt="Logo" style={styles.heroLogo} />
           </div>
           
@@ -70,13 +79,13 @@ export default function Home() {
                 value={searchForm.county}
                 onChange={(e) => setSearchForm({...searchForm, county: e.target.value})}
               >
-                <option value=""> County</option>
+                <option value="">📍 County</option>
                 {counties.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
 
               <input
                 type="text"
-                placeholder="Area/Estate"
+                placeholder="🏘 Area/Estate"
                 style={styles.searchInput}
                 value={searchForm.area}
                 onChange={(e) => setSearchForm({...searchForm, area: e.target.value})}
@@ -87,13 +96,13 @@ export default function Home() {
                 value={searchForm.type}
                 onChange={(e) => setSearchForm({...searchForm, type: e.target.value})}
               >
-                <option value="">Property Type</option>
+                <option value="">🏗 Property Type</option>
                 {types.map(t => <option key={t} value={t}>{t}</option>)}
               </select>
 
               <input
                 type="number"
-                placeholder="Max Price"
+                placeholder="💰 Max Price"
                 style={styles.searchInput}
                 value={searchForm.price}
                 onChange={(e) => setSearchForm({...searchForm, price: e.target.value})}
@@ -180,7 +189,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA SECTION - UPDATED */}
+      {/* CTA SECTION */}
       <section style={styles.cta}>
         <h2 style={styles.ctaTitle}>Ready to Find Your Home?</h2>
         <p style={styles.ctaText}>Browse thousands of listings or list your property today</p>
@@ -193,12 +202,23 @@ export default function Home() {
           </button>
           
           <button 
-            style={styles.ctaBtnSecondary}
-            onClick={() => navigate("/login")}   {/* Changed to Login */}
+            style={{
+              ...styles.ctaBtnSecondary,
+              background: token ? "#22c55e" : "white",
+              color: token ? "white" : "#1f2937",
+              border: token ? "none" : "2px solid #1f2937"
+            }}
+            onClick={handleListProperty}
+            title={token ? "Upload your property" : "Login to list your property"}
           >
-            📝 List Your Property
+            {token ? "📝 Upload Your Property" : "🔐 Login to List Property"}
           </button>
         </div>
+        {!token && (
+          <p style={styles.loginHint}>
+            💡 Create an account to start listing properties
+          </p>
+        )}
       </section>
 
       {/* FOOTER */}
@@ -209,7 +229,6 @@ export default function Home() {
   );
 }
 
-/* ==================== STYLES (Unchanged) ==================== */
 const styles = {
   root: {
     fontFamily: "'DM Sans', sans-serif",
@@ -236,11 +255,6 @@ const styles = {
     justifyContent: "center",
     gap: "12px",
     marginBottom: "20px",
-  },
-
-  heroIcon: {
-    height: "52px",
-    width: "auto",
   },
 
   heroLogo: {
@@ -420,14 +434,18 @@ const styles = {
 
   ctaBtnSecondary: {
     padding: "14px 32px",
-    background: "white",
-    color: "#1f2937",
-    border: "2px solid #1f2937",
     borderRadius: "8px",
     fontSize: "16px",
     fontWeight: 700,
     cursor: "pointer",
     transition: "all 0.2s",
+  },
+
+  loginHint: {
+    fontSize: "14px",
+    color: "#6b7280",
+    marginTop: "16px",
+    fontStyle: "italic",
   },
 
   footer: {
