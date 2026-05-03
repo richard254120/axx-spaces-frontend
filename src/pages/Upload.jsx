@@ -29,6 +29,13 @@ export default function Upload() {
     images: [],
     lat: "",
     lng: "",
+    size: "",
+    floor: "",
+    yearBuilt: "",
+    furnishing: "",
+    parking: "",
+    petPolicy: "",
+    utilitiesIncluded: "",
   });
 
   const [submitting, setSubmitting] = useState(false);
@@ -56,13 +63,27 @@ export default function Upload() {
 
   const amenitiesList = ["Water","Electricity","Parking","Security","WiFi","Borehole","Furnished","AC","TV","Gym"];
 
-  // ✅ Format Phone with Kenyan Country Code
   const formatPhoneForSubmit = (phone) => {
     if (!phone) return "";
     let num = phone.toString().trim().replace(/\s+/g, "");
     if (num.startsWith("0")) num = num.substring(1);
     if (!num.startsWith("254")) num = "254" + num;
     return num;
+  };
+
+  const allowedFields = [
+    "title", "county", "area", "price", "deposit", "type",
+    "bedrooms", "bathrooms", "description", "phone", "amenities",
+    "lat", "lng", "size", "floor", "yearBuilt", "furnishing",
+    "parking", "petPolicy", "utilitiesIncluded"
+  ];
+
+  const sanitizeForm = (data) => {
+    const clean = {};
+    allowedFields.forEach(key => {
+      if (data[key] !== undefined) clean[key] = data[key];
+    });
+    return clean;
   };
 
   const calcCompletion = () => {
@@ -120,7 +141,12 @@ export default function Upload() {
   };
 
   const resetForm = () => {
-    setForm({ title: "", county: "", area: "", price: "", deposit: "", type: "", bedrooms: "", bathrooms: "", amenities: [], description: "", phone: "", images: [], lat: "", lng: "" });
+    setForm({
+      title: "", county: "", area: "", price: "", deposit: "", type: "",
+      bedrooms: "", bathrooms: "", amenities: [], description: "",
+      phone: "", images: [], lat: "", lng: "", size: "", floor: "",
+      yearBuilt: "", furnishing: "", parking: "", petPolicy: "", utilitiesIncluded: ""
+    });
     setPreviewImages([]);
     setCompletionPercent(0);
     setSubmitStatus(null);
@@ -141,19 +167,17 @@ export default function Upload() {
 
     try {
       const formData = new FormData();
-      formData.append("title", form.title);
-      formData.append("county", form.county);
-      formData.append("area", form.area);
-      formData.append("price", form.price);
-      formData.append("deposit", form.deposit || "");
-      formData.append("type", form.type);
-      formData.append("bedrooms", form.bedrooms || "");
-      formData.append("bathrooms", form.bathrooms || "");
-      formData.append("description", form.description);
-      formData.append("phone", formatPhoneForSubmit(form.phone)); // ✅ Country code added
-      formData.append("lat", form.lat || "");
-      formData.append("lng", form.lng || "");
-      formData.append("amenities", JSON.stringify(form.amenities || []));
+      const sanitized = sanitizeForm(form);
+
+      Object.keys(sanitized).forEach(key => {
+        if (key === "amenities") {
+          formData.append(key, JSON.stringify(sanitized[key]));
+        } else if (key === "phone") {
+          formData.append(key, formatPhoneForSubmit(sanitized[key]));
+        } else if (key !== "images") {
+          formData.append(key, sanitized[key]);
+        }
+      });
 
       form.images.forEach(img => formData.append("images", img));
 
@@ -165,7 +189,10 @@ export default function Upload() {
       });
 
       setSubmitStatus("success");
-      setTimeout(() => { resetForm(); navigate("/dashboard"); }, 2000);
+      setTimeout(() => {
+        resetForm();
+        navigate("/dashboard");
+      }, 2000);
 
     } catch (err) {
       setErrorMsg(err.response?.data?.error || err.message || "Upload failed");
@@ -199,7 +226,6 @@ export default function Upload() {
       {submitStatus === "error" && <div className="upload-error">❌ {errorMsg}</div>}
 
       <form onSubmit={handleSubmit} style={styles.form}>
-        {/* Basic Information */}
         <div style={styles.section}>
           <h3 style={styles.sectionTitle}>Basic Information</h3>
           <input className="upload-input" name="title" placeholder="Property Title" value={form.title} onChange={handleChange} required />
@@ -214,7 +240,6 @@ export default function Upload() {
           </select>
         </div>
 
-        {/* Pricing */}
         <div style={styles.section}>
           <h3 style={styles.sectionTitle}>Pricing</h3>
           <div style={styles.priceRow}>
@@ -224,8 +249,31 @@ export default function Upload() {
           <input className="upload-input" name="deposit" type="number" placeholder="Deposit (optional)" value={form.deposit} onChange={handleChange} />
         </div>
 
-        {/* Details & Amenities & Contact sections remain the same */}
-        {/* ... (I kept them short for space - they are unchanged from your code) ... */}
+        <div style={styles.section}>
+          <h3 style={styles.sectionTitle}>Additional Property Details</h3>
+          <input className="upload-input" name="size" placeholder="Size (e.g. 1200 sq ft)" value={form.size} onChange={handleChange} />
+          <input className="upload-input" name="floor" placeholder="Floor (e.g. Ground Floor)" value={form.floor} onChange={handleChange} />
+          <input className="upload-input" name="yearBuilt" placeholder="Year Built" value={form.yearBuilt} onChange={handleChange} />
+          <select className="upload-select" name="furnishing" value={form.furnishing} onChange={handleChange}>
+            <option value="">Furnishing Status</option>
+            <option value="Furnished">Furnished</option>
+            <option value="Semi-Furnished">Semi-Furnished</option>
+            <option value="Unfurnished">Unfurnished</option>
+          </select>
+          <select className="upload-select" name="parking" value={form.parking} onChange={handleChange}>
+            <option value="">Parking</option>
+            <option value="Yes">Yes</option>
+            <option value="Covered">Covered Parking</option>
+            <option value="Open">Open Parking</option>
+            <option value="No">No Parking</option>
+          </select>
+          <select className="upload-select" name="petPolicy" value={form.petPolicy} onChange={handleChange}>
+            <option value="">Pet Policy</option>
+            <option value="Allowed">Pets Allowed</option>
+            <option value="Not Allowed">No Pets Allowed</option>
+          </select>
+          <input className="upload-input" name="utilitiesIncluded" placeholder="Utilities Included (e.g. Water, Electricity)" value={form.utilitiesIncluded} onChange={handleChange} />
+        </div>
 
         <div style={styles.section}>
           <h3 style={styles.sectionTitle}>Contact &amp; Location</h3>
@@ -237,7 +285,6 @@ export default function Upload() {
           </div>
         </div>
 
-        {/* Images Section */}
         <div style={styles.section}>
           <h3 style={styles.sectionTitle}>Property Images (max 5)</h3>
           <div style={styles.imageUploadBox}>
@@ -281,7 +328,6 @@ const styles = {
   section: { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "20px" },
   sectionTitle: { fontSize: "14px", fontWeight: 700, color: "#f1f5f9", marginBottom: "14px", textTransform: "uppercase" },
   priceRow: { display: "flex", gap: "10px", alignItems: "flex-end" },
-  detailRow: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" },
   geoRow: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" },
   imageUploadBox: { display: "flex", flexDirection: "column", gap: "12px" },
   previewGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: "12px" },
@@ -294,14 +340,38 @@ const styles = {
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap');
 
-  .upload-input, .upload-select, .upload-textarea {
-    width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
-    background: rgba(255,255,255,0.04); color: #e2e8f0; font-size: 14px;
+  .upload-input, .upload-select {
+    width: 100%; padding: 12px; border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    color: #e2e8f0; font-size: 14px;
   }
   .upload-input:focus, .upload-select:focus { border-color: #3b82f6; }
 
-  .upload-suggest-btn, .upload-geo-btn, .upload-file-label, .upload-submit-btn, .upload-reset-btn {
-    font-family: inherit; cursor: pointer;
+  .upload-file-label {
+    display: block; padding: 18px; text-align: center;
+    border: 2px dashed rgba(59,130,246,0.3); border-radius: 12px;
+    cursor: pointer; color: #60a5fa; font-weight: 600;
   }
-  /* Add the rest of your original CSS here if needed */
+
+  .upload-remove-img {
+    position: absolute; top: 6px; right: 6px;
+    background: rgba(239,68,68,0.9); color: white;
+    border: none; border-radius: 4px; padding: 2px 6px;
+    cursor: pointer; font-size: 12px;
+  }
+
+  .upload-submit-btn {
+    flex: 1; padding: 14px; border: none; border-radius: 10px;
+    background: linear-gradient(135deg, #1d4ed8, #6d28d9);
+    color: white; font-weight: 700; cursor: pointer;
+  }
+  .upload-reset-btn {
+    flex: 1; padding: 14px; border: 1px solid rgba(255,255,255,0.2);
+    background: transparent; color: #e2e8f0; border-radius: 10px;
+    cursor: pointer;
+  }
+
+  .upload-success { padding: 12px; background: rgba(34,197,94,0.15); color: #86efac; border-radius: 10px; margin-bottom: 16px; }
+  .upload-error { padding: 12px; background: rgba(239,68,68,0.15); color: #fca5a5; border-radius: 10px; margin-bottom: 16px; }
 `;
