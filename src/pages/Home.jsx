@@ -408,7 +408,7 @@ const styles = {
 
   ctaText: {
     fontSize: "18px",
-    color: "#6b7280",
+    color: "#806c6b",
     margin: "0 0 32px",
   },
 
