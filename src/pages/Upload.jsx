@@ -41,8 +41,8 @@ export default function Upload() {
     description: "",
     phone: "",
     images: [],
-    lat: "",
-    lng: "",
+    lat: "", // Latitude
+    lng: "", // Longitude
     size: "",
     floor: "",
     yearBuilt: "",
@@ -66,17 +66,17 @@ export default function Upload() {
     }
   }, [token, navigate]);
 
-  // FIXED: Completion Logic moved to useEffect to prevent the 67% sync error
+  // Completion Logic
   useEffect(() => {
     const coreFields = [
       form.title, form.county, form.area, form.price, 
-      form.type, form.bedrooms, form.description, form.phone
+      form.type, form.bedrooms, form.description, form.phone,
+      form.lat, form.lng // Added coordinates to core logic
     ];
     const filledCore = coreFields.filter(f => f && f.toString().trim() !== "").length;
     const hasImages = form.images.length > 0 ? 1 : 0;
     
-    // Total 9 points. (8 text fields + 1 image set)
-    const totalPoints = 9; 
+    const totalPoints = 11; // 10 text fields + 1 image set
     const percent = Math.round(((filledCore + hasImages) / totalPoints) * 100);
     setCompletionPercent(percent);
   }, [form]);
@@ -112,10 +112,23 @@ export default function Upload() {
   };
 
   const getMyLocation = () => {
-    if (!navigator.geolocation) return alert("Geolocation not supported");
+    if (!navigator.geolocation) return alert("Geolocation not supported by your browser");
+    
+    alert("Fetching your coordinates... Please allow location access.");
+    
     navigator.geolocation.getCurrentPosition(
-      (pos) => setForm(prev => ({ ...prev, lat: pos.coords.latitude, lng: pos.coords.longitude })),
-      () => alert("❌ Location permission denied")
+      (pos) => {
+        setForm(prev => ({ 
+          ...prev, 
+          lat: pos.coords.latitude.toFixed(6), 
+          lng: pos.coords.longitude.toFixed(6) 
+        }));
+      },
+      (err) => {
+        console.error(err);
+        alert("❌ Location permission denied or unavailable.");
+      },
+      { enableHighAccuracy: true }
     );
   };
 
@@ -132,12 +145,10 @@ export default function Upload() {
     try {
       const formData = new FormData();
       
-      // Formatting phone
       let cleanPhone = form.phone.trim().replace(/\s+/g, "");
       if (cleanPhone.startsWith("0")) cleanPhone = "254" + cleanPhone.substring(1);
       if (!cleanPhone.startsWith("254")) cleanPhone = "254" + cleanPhone;
 
-      // Append all fields
       Object.keys(form).forEach(key => {
         if (key === "images") {
           form.images.forEach(img => formData.append("images", img));
@@ -157,7 +168,7 @@ export default function Upload() {
       setSubmitStatus("success");
       setTimeout(() => navigate("/dashboard"), 2000);
     } catch (err) {
-      setErrorMsg(err.response?.data?.error || "Upload failed. Please check your connection.");
+      setErrorMsg(err.response?.data?.error || "Upload failed. Check your coordinates and connection.");
       setSubmitStatus("error");
     } finally {
       setSubmitting(false);
@@ -209,17 +220,25 @@ export default function Upload() {
           </div>
         </div>
 
-        {/* Section 2: Pricing */}
+        {/* Section 2: Rent & Location */}
         <div style={styles.section}>
-          <h3 style={styles.sectionTitle}>Rent & Deposit</h3>
+          <h3 style={styles.sectionTitle}>Rent & Coordinates</h3>
           <div style={styles.priceRow}>
-            <input className="upload-input" name="price" type="number" placeholder="Rent per month (Ksh)" value={form.price} onChange={handleChange} required />
+            <input className="upload-input" name="price" type="number" placeholder="Rent (Ksh)" value={form.price} onChange={handleChange} required />
             <button type="button" className="upload-suggest-btn" onClick={suggestPrice}>💡 Suggest</button>
           </div>
-          <input className="upload-input" name="deposit" type="number" placeholder="Security Deposit (Ksh)" value={form.deposit} onChange={handleChange} />
+          
+          <div style={styles.locationHeader}>
+            <span style={{fontSize: '11px', color: '#94a3b8'}}>GPS Coordinates (Required)</span>
+            <button type="button" className="geo-auto-btn" onClick={getMyLocation}>📍 Auto-detect</button>
+          </div>
+          <div style={styles.geoRow}>
+            <input className="upload-input" name="lat" placeholder="Latitude" value={form.lat} onChange={handleChange} required />
+            <input className="upload-input" name="lng" placeholder="Longitude" value={form.lng} onChange={handleChange} required />
+          </div>
         </div>
 
-        {/* Section 3: Details */}
+        {/* Section 3: Amenities */}
         <div style={styles.section}>
           <h3 style={styles.sectionTitle}>Amenities & Description</h3>
           <div style={styles.amenityGrid}>
@@ -237,15 +256,15 @@ export default function Upload() {
           <textarea 
             className="upload-input" 
             name="description" 
-            placeholder="Tell us more about the house..." 
-            style={{ minHeight: "100px", marginTop: "15px" }}
+            placeholder="Property Description..." 
+            style={{ minHeight: "80px", marginTop: "15px" }}
             value={form.description} 
             onChange={handleChange} 
             required 
           />
         </div>
 
-        {/* Section 4: Contact & Images */}
+        {/* Section 4: Contact & Photos */}
         <div style={styles.section}>
           <h3 style={styles.sectionTitle}>Contact & Photos</h3>
           <input className="upload-input" name="phone" placeholder="Phone Number (07...)" value={form.phone} onChange={handleChange} required />
@@ -292,7 +311,8 @@ const styles = {
   section: { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "16px", padding: "20px" },
   sectionTitle: { fontSize: "12px", letterSpacing: "1px", fontWeight: 700, color: "#94a3b8", marginBottom: "15px", textTransform: "uppercase" },
   geoRow: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "10px" },
-  priceRow: { display: "flex", gap: "10px", marginBottom: "10px" },
+  priceRow: { display: "flex", gap: "10px", marginBottom: "15px" },
+  locationHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' },
   amenityGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))", gap: "8px" },
   imageUploadBox: { marginTop: "15px" },
   previewGrid: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px", marginTop: "10px" },
@@ -305,13 +325,17 @@ const css = `
   .upload-input, .upload-select {
     width: 100%; padding: 12px; border-radius: 10px;
     border: 1px solid rgba(255,255,255,0.1); background: #0f172a;
-    color: white; outline: none; margin-bottom: 10px;
+    color: white; outline: none; margin-bottom: 10px; font-size: 14px;
   }
   .amenity-btn {
     padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
     background: transparent; color: #94a3b8; font-size: 11px; cursor: pointer;
   }
   .amenity-btn.active { background: #3b82f6; color: white; border-color: #3b82f6; }
+  .geo-auto-btn {
+    background: #1e293b; color: #60a5fa; border: 1px solid #3b82f6;
+    padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer;
+  }
   .upload-file-label {
     display: block; padding: 20px; border: 2px dashed #334155;
     text-align: center; border-radius: 12px; color: #3b82f6; cursor: pointer;
@@ -323,7 +347,7 @@ const css = `
   .upload-submit-btn:disabled { background: #1e293b; color: #475569; cursor: not-allowed; }
   .upload-suggest-btn {
     padding: 0 15px; height: 45px; border-radius: 10px; border: none;
-    background: #1e293b; color: #fbbf24; cursor: pointer;
+    background: #1e293b; color: #fbbf24; cursor: pointer; font-size: 13px;
   }
   .upload-remove-img {
     position: absolute; top: 4px; right: 4px; background: rgba(239, 68, 68, 0.8);
