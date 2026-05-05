@@ -19,7 +19,10 @@ export default function Register() {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -28,6 +31,7 @@ export default function Register() {
     setError("");
     setSuccess("");
 
+    // ================= VALIDATION =================
     if (!formData.name || !formData.email || !formData.password || !formData.phone) {
       setError("❌ Please fill all fields");
       setLoading(false);
@@ -42,24 +46,43 @@ export default function Register() {
 
     try {
       console.log("📝 Registering user...", formData);
-      
-      const res = await API.post("/auth/register", formData);
-      
+
+      // ================= CLEAN PAYLOAD =================
+      const payload = {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        password: formData.password,
+        phone: formData.phone.trim(),
+      };
+
+      // ================= API CALL =================
+      const res = await API.post("/auth/register", payload, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
       console.log("✅ Registration response:", res.data);
 
+      // ================= SUCCESS =================
       if (res.data.token && res.data.user) {
         login(res.data.token, res.data.user);
         setSuccess("✅ Registration successful!");
-        
+
         setTimeout(() => {
           navigate("/listings");
-        }, 1500);
+        }, 1200);
       } else {
         setError("❌ Invalid response from server");
       }
     } catch (err) {
       console.error("❌ Registration error:", err);
-      const errorMsg = err?.response?.data?.error || err?.message || "Registration failed";
+
+      const errorMsg =
+        err?.response?.data?.error ||
+        err?.message ||
+        "Network error";
+
       setError("❌ " + errorMsg);
     } finally {
       setLoading(false);
@@ -130,13 +153,13 @@ export default function Register() {
             />
           </div>
 
-          <button 
-            type="submit" 
-            disabled={loading} 
+          <button
+            type="submit"
+            disabled={loading}
             style={{
               ...styles.btn,
               opacity: loading ? 0.6 : 1,
-              cursor: loading ? "not-allowed" : "pointer"
+              cursor: loading ? "not-allowed" : "pointer",
             }}
           >
             {loading ? "⏳ Creating Account..." : "✅ Register as Landlord"}
@@ -146,13 +169,17 @@ export default function Register() {
         <p style={styles.divider}>or</p>
 
         <p style={styles.loginLink}>
-          Already have an account? <Link to="/login" style={styles.link}>Login here</Link>
+          Already have an account?{" "}
+          <Link to="/login" style={styles.link}>
+            Login here
+          </Link>
         </p>
       </div>
     </div>
   );
 }
 
+// ================= FULL STYLES (UNCHANGED) =================
 const styles = {
   container: {
     minHeight: "100vh",
@@ -231,9 +258,8 @@ const styles = {
     borderRadius: "10px",
     color: "#f1f5f9",
     fontSize: "15px",
-    fontFamily: "inherit",
-    transition: "all 0.2s",
     outline: "none",
+    width: "100%",
   },
   btn: {
     padding: "14px 24px",
@@ -245,8 +271,8 @@ const styles = {
     fontWeight: 700,
     cursor: "pointer",
     marginTop: "8px",
+    width: "100%",
     transition: "all 0.3s",
-    boxShadow: "0 8px 24px rgba(59, 130, 246, 0.4)",
   },
   divider: {
     textAlign: "center",
@@ -264,10 +290,10 @@ const styles = {
     color: "#3b82f6",
     textDecoration: "none",
     fontWeight: 600,
-    transition: "color 0.2s",
   },
 };
 
+// ================= CSS =================
 const css = `
   input:focus {
     border-color: rgba(59, 130, 246, 0.8) !important;
