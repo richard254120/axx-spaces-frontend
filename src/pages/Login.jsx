@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import logo from "../assets/logo.jpeg";
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = "http://localhost:1000";
 
 export default function Login() {
   const navigate = useNavigate();
