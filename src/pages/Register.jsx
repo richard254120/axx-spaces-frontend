@@ -3,17 +3,19 @@ import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import logo from "../assets/logo.jpeg";
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = "http://localhost:1000";   // ← Fixed Port
 
 export default function Register() {
   const navigate = useNavigate();
-  const { setToken } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);   // Use login instead of setToken
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     phone: "",
   });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -31,7 +33,6 @@ export default function Register() {
     setError("");
     setSuccess("");
 
-    // Validation
     if (!formData.name || !formData.email || !formData.password || !formData.phone) {
       setError("❌ All fields are required");
       return;
@@ -45,8 +46,8 @@ export default function Register() {
     setLoading(true);
 
     try {
-      console.log("📝 Registering with:", formData);
-      
+      console.log("📝 Sending registration to:", `${API_BASE}/api/auth/register`);
+
       const response = await fetch(`${API_BASE}/api/auth/register`, {
         method: "POST",
         headers: {
@@ -56,22 +57,24 @@ export default function Register() {
       });
 
       const data = await response.json();
-      console.log("📥 Response:", data);
+      console.log("📥 Server Response:", data);
 
       if (!response.ok) {
         throw new Error(data.error || "Registration failed");
       }
 
-      setSuccess("✅ Registration successful! Redirecting...");
-      setToken(data.token);
-      localStorage.setItem("token", data.token);
+      setSuccess("✅ Registration successful! Logging you in...");
+
+      // Login the user automatically
+      login(data.token, data.user || { email: formData.email, name: formData.name });
 
       setTimeout(() => {
-        navigate("/listings");
-      }, 2000);
+        navigate("/dashboard");
+      }, 1500);
+
     } catch (err) {
-      console.error("❌ Error:", err);
-      setError(err.message || "❌ Registration failed");
+      console.error("❌ Registration Error:", err);
+      setError(err.message || "❌ Failed to connect to server. Is backend running?");
     } finally {
       setLoading(false);
     }
@@ -82,21 +85,18 @@ export default function Register() {
       <style>{css}</style>
 
       <div style={styles.container}>
-        {/* Logo Section */}
         <div style={styles.logoSection}>
           <img src={logo} alt="Axx Spaces" style={styles.logo} />
         </div>
 
-        {/* Form Container */}
         <div style={styles.formBox}>
-          <h1 style={styles.title}>📝 Create Your Account</h1>
-          <p style={styles.subtitle}>Join Kenya's fastest-growing rental platform</p>
+          <h1 style={styles.title}>📝 Create Landlord Account</h1>
+          <p style={styles.subtitle}>Join Kenya's trusted rental platform</p>
 
           {error && <div style={styles.error}>{error}</div>}
           {success && <div style={styles.success}>{success}</div>}
 
           <form onSubmit={handleSubmit} style={styles.form}>
-            {/* Full Name */}
             <div style={styles.formGroup}>
               <label style={styles.label}>Full Name</label>
               <input
@@ -110,7 +110,6 @@ export default function Register() {
               />
             </div>
 
-            {/* Email */}
             <div style={styles.formGroup}>
               <label style={styles.label}>Email Address</label>
               <input
@@ -124,7 +123,6 @@ export default function Register() {
               />
             </div>
 
-            {/* Phone */}
             <div style={styles.formGroup}>
               <label style={styles.label}>Phone Number</label>
               <input
@@ -138,13 +136,12 @@ export default function Register() {
               />
             </div>
 
-            {/* Password */}
             <div style={styles.formGroup}>
               <label style={styles.label}>Password</label>
               <input
                 type="password"
                 name="password"
-                placeholder="Min 6 characters"
+                placeholder="Minimum 6 characters"
                 value={formData.password}
                 onChange={handleChange}
                 style={styles.input}
@@ -152,7 +149,6 @@ export default function Register() {
               />
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
@@ -162,14 +158,12 @@ export default function Register() {
                 cursor: loading ? "not-allowed" : "pointer",
               }}
             >
-              {loading ? "⏳ Creating Account..." : "🚀 Register"}
+              {loading ? "⏳ Creating Account..." : "🚀 Register Now"}
             </button>
           </form>
 
-          {/* Divider */}
           <div style={styles.divider}></div>
 
-          {/* Login Link */}
           <p style={styles.footer}>
             Already have an account?{" "}
             <Link to="/login" style={styles.link}>
@@ -182,6 +176,7 @@ export default function Register() {
   );
 }
 
+/* ==================== STYLES ===================
 const styles = {
   root: {
     fontFamily: "'DM Sans', sans-serif",
