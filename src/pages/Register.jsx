@@ -1,312 +1,348 @@
 import { useState, useContext } from "react";
-import { AuthContext } from "../context/AuthContext.jsx";
 import { useNavigate, Link } from "react-router-dom";
-import API from "../api/api";
+import { AuthContext } from "../context/AuthContext";
+import logo from "../assets/logo.jpeg";
+
+const API_BASE = "http://localhost:5000";
 
 export default function Register() {
+  const navigate = useNavigate();
+  const { setToken } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     phone: "",
   });
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const { login } = useContext(AuthContext);
-  const navigate = useNavigate();
-
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
     setSuccess("");
 
-    // ================= VALIDATION =================
+    // Validation
     if (!formData.name || !formData.email || !formData.password || !formData.phone) {
-      setError("❌ Please fill all fields");
-      setLoading(false);
+      setError("❌ All fields are required");
       return;
     }
 
     if (formData.password.length < 6) {
       setError("❌ Password must be at least 6 characters");
-      setLoading(false);
       return;
     }
 
+    setLoading(true);
+
     try {
-      console.log("📝 Registering user...", formData);
-
-      // ================= CLEAN PAYLOAD =================
-      const payload = {
-        name: formData.name.trim(),
-        email: formData.email.trim(),
-        password: formData.password,
-        phone: formData.phone.trim(),
-      };
-
-      // ================= API CALL =================
-      const res = await API.post("/auth/register", payload, {
+      console.log("📝 Registering with:", formData);
+      
+      const response = await fetch(`${API_BASE}/api/auth/register`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify(formData),
       });
 
-      console.log("✅ Registration response:", res.data);
+      const data = await response.json();
+      console.log("📥 Response:", data);
 
-      // ================= SUCCESS =================
-      if (res.data.token && res.data.user) {
-        login(res.data.token, res.data.user);
-        setSuccess("✅ Registration successful!");
-
-        setTimeout(() => {
-          navigate("/listings");
-        }, 1200);
-      } else {
-        setError("❌ Invalid response from server");
+      if (!response.ok) {
+        throw new Error(data.error || "Registration failed");
       }
+
+      setSuccess("✅ Registration successful! Redirecting...");
+      setToken(data.token);
+      localStorage.setItem("token", data.token);
+
+      setTimeout(() => {
+        navigate("/listings");
+      }, 2000);
     } catch (err) {
-      console.error("❌ Registration error:", err);
-
-      const errorMsg =
-        err?.response?.data?.error ||
-        err?.message ||
-        "Network error";
-
-      setError("❌ " + errorMsg);
+      console.error("❌ Error:", err);
+      setError(err.message || "❌ Registration failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={styles.container}>
+    <div style={styles.root}>
       <style>{css}</style>
 
-      <div style={styles.box}>
-        <h1 style={styles.heading}>🏠 Create Account</h1>
-        <p style={styles.subtitle}>Join Axx Spaces as a Landlord</p>
+      <div style={styles.container}>
+        {/* Logo Section */}
+        <div style={styles.logoSection}>
+          <img src={logo} alt="Axx Spaces" style={styles.logo} />
+        </div>
 
-        {error && <div style={styles.errorBox}>{error}</div>}
-        {success && <div style={styles.successBox}>{success}</div>}
+        {/* Form Container */}
+        <div style={styles.formBox}>
+          <h1 style={styles.title}>📝 Create Your Account</h1>
+          <p style={styles.subtitle}>Join Kenya's fastest-growing rental platform</p>
 
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={styles.fieldGroup}>
-            <label style={styles.label}>Full Name</label>
-            <input
-              name="name"
-              type="text"
-              placeholder="John Doe"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              style={styles.input}
-            />
-          </div>
+          {error && <div style={styles.error}>{error}</div>}
+          {success && <div style={styles.success}>{success}</div>}
 
-          <div style={styles.fieldGroup}>
-            <label style={styles.label}>Email Address</label>
-            <input
-              name="email"
-              type="email"
-              placeholder="you@example.com"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              style={styles.input}
-            />
-          </div>
+          <form onSubmit={handleSubmit} style={styles.form}>
+            {/* Full Name */}
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Full Name</label>
+              <input
+                type="text"
+                name="name"
+                placeholder="e.g., John Doe"
+                value={formData.name}
+                onChange={handleChange}
+                style={styles.input}
+                required
+              />
+            </div>
 
-          <div style={styles.fieldGroup}>
-            <label style={styles.label}>Phone Number</label>
-            <input
-              name="phone"
-              type="tel"
-              placeholder="254712345678"
-              value={formData.phone}
-              onChange={handleChange}
-              required
-              style={styles.input}
-            />
-          </div>
+            {/* Email */}
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Email Address</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="e.g., john@example.com"
+                value={formData.email}
+                onChange={handleChange}
+                style={styles.input}
+                required
+              />
+            </div>
 
-          <div style={styles.fieldGroup}>
-            <label style={styles.label}>Password</label>
-            <input
-              name="password"
-              type="password"
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              style={styles.input}
-            />
-          </div>
+            {/* Phone */}
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Phone Number</label>
+              <input
+                type="tel"
+                name="phone"
+                placeholder="e.g., 254712345678"
+                value={formData.phone}
+                onChange={handleChange}
+                style={styles.input}
+                required
+              />
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              ...styles.btn,
-              opacity: loading ? 0.6 : 1,
-              cursor: loading ? "not-allowed" : "pointer",
-            }}
-          >
-            {loading ? "⏳ Creating Account..." : "✅ Register as Landlord"}
-          </button>
-        </form>
+            {/* Password */}
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Password</label>
+              <input
+                type="password"
+                name="password"
+                placeholder="Min 6 characters"
+                value={formData.password}
+                onChange={handleChange}
+                style={styles.input}
+                required
+              />
+            </div>
 
-        <p style={styles.divider}>or</p>
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                ...styles.submitBtn,
+                opacity: loading ? 0.7 : 1,
+                cursor: loading ? "not-allowed" : "pointer",
+              }}
+            >
+              {loading ? "⏳ Creating Account..." : "🚀 Register"}
+            </button>
+          </form>
 
-        <p style={styles.loginLink}>
-          Already have an account?{" "}
-          <Link to="/login" style={styles.link}>
-            Login here
-          </Link>
-        </p>
+          {/* Divider */}
+          <div style={styles.divider}></div>
+
+          {/* Login Link */}
+          <p style={styles.footer}>
+            Already have an account?{" "}
+            <Link to="/login" style={styles.link}>
+              Login here
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
 }
 
-// ================= FULL STYLES (UNCHANGED) =================
 const styles = {
-  container: {
+  root: {
+    fontFamily: "'DM Sans', sans-serif",
+    background: "linear-gradient(135deg, #ffffff 0%, #fef3e2 50%, #fef9e7 100%)",
     minHeight: "100vh",
-    background: "linear-gradient(135deg, #06101f 0%, #0a1428 100%)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     padding: "20px",
-    fontFamily: "'DM Sans', sans-serif",
   },
-  box: {
-    background: "rgba(10, 20, 40, 0.9)",
-    border: "1px solid rgba(59, 130, 246, 0.2)",
-    backdropFilter: "blur(10px)",
-    borderRadius: "20px",
-    padding: "50px 40px",
-    maxWidth: "450px",
+
+  container: {
     width: "100%",
-    boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
+    maxWidth: "500px",
   },
-  heading: {
-    color: "#f1f5f9",
+
+  logoSection: {
+    textAlign: "center",
+    marginBottom: "40px",
+  },
+
+  logo: {
+    height: "80px",
+    width: "auto",
+  },
+
+  formBox: {
+    background: "white",
+    border: "2px solid #fbbf24",
+    borderRadius: "16px",
+    padding: "40px 32px",
+    boxShadow: "0 10px 40px rgba(0, 0, 0, 0.08)",
+  },
+
+  title: {
     fontSize: "28px",
     fontWeight: 800,
+    color: "#1f2937",
     margin: "0 0 8px",
     textAlign: "center",
   },
+
   subtitle: {
-    color: "#94a3b8",
     fontSize: "14px",
+    color: "#6b7280",
+    margin: "0 0 24px",
     textAlign: "center",
-    margin: "0 0 32px",
   },
-  errorBox: {
-    background: "rgba(239, 68, 68, 0.15)",
-    border: "1px solid rgba(239, 68, 68, 0.5)",
-    color: "#fca5a5",
+
+  error: {
+    background: "#fee2e2",
+    border: "1px solid #fca5a5",
+    color: "#991b1b",
     padding: "12px 16px",
-    borderRadius: "10px",
+    borderRadius: "8px",
     marginBottom: "20px",
     fontSize: "14px",
     fontWeight: 500,
   },
-  successBox: {
-    background: "rgba(34, 197, 94, 0.15)",
-    border: "1px solid rgba(34, 197, 94, 0.5)",
-    color: "#86efac",
+
+  success: {
+    background: "#dcfce7",
+    border: "1px solid #86efac",
+    color: "#166534",
     padding: "12px 16px",
-    borderRadius: "10px",
+    borderRadius: "8px",
     marginBottom: "20px",
     fontSize: "14px",
     fontWeight: 500,
   },
+
   form: {
     display: "flex",
     flexDirection: "column",
     gap: "20px",
-    marginBottom: "24px",
   },
-  fieldGroup: {
+
+  formGroup: {
     display: "flex",
     flexDirection: "column",
-    gap: "8px",
+    gap: "6px",
   },
+
   label: {
-    color: "#cbd5e1",
     fontSize: "13px",
-    fontWeight: 600,
+    fontWeight: 700,
+    color: "#374151",
     textTransform: "uppercase",
     letterSpacing: "0.5px",
   },
+
   input: {
-    padding: "14px 16px",
-    background: "rgba(30, 41, 59, 0.8)",
-    border: "1px solid rgba(148, 163, 184, 0.2)",
-    borderRadius: "10px",
-    color: "#f1f5f9",
+    padding: "12px 14px",
+    border: "2px solid #d1d5db",
+    borderRadius: "8px",
     fontSize: "15px",
-    outline: "none",
-    width: "100%",
+    fontFamily: "inherit",
+    transition: "all 0.2s",
+    background: "#f9fafb",
   },
-  btn: {
-    padding: "14px 24px",
-    background: "linear-gradient(135deg, #3b82f6 0%, #6d28d9 100%)",
-    color: "#fff",
+
+  submitBtn: {
+    padding: "13px 24px",
+    background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+    color: "white",
     border: "none",
-    borderRadius: "10px",
+    borderRadius: "8px",
     fontSize: "15px",
     fontWeight: 700,
     cursor: "pointer",
+    transition: "all 0.2s",
+    boxShadow: "0 4px 12px rgba(239, 68, 68, 0.3)",
     marginTop: "8px",
-    width: "100%",
-    transition: "all 0.3s",
   },
+
   divider: {
-    textAlign: "center",
-    color: "#64748b",
-    margin: "24px 0",
-    fontSize: "13px",
+    height: "1px",
+    background: "#e5e7eb",
+    margin: "20px 0",
   },
-  loginLink: {
+
+  footer: {
     textAlign: "center",
-    color: "#94a3b8",
+    color: "#6b7280",
     fontSize: "14px",
     margin: 0,
   },
+
   link: {
-    color: "#3b82f6",
+    color: "#ef4444",
     textDecoration: "none",
-    fontWeight: 600,
+    fontWeight: 700,
   },
 };
 
-// ================= CSS =================
 const css = `
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap');
+
   input:focus {
-    border-color: rgba(59, 130, 246, 0.8) !important;
-    background: rgba(30, 41, 59, 1) !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: none;
+    border-color: #ef4444 !important;
+    background: white !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
   }
 
   button:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(59, 130, 246, 0.5);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4) !important;
   }
 
-  a {
-    cursor: pointer;
+  button:active {
+    transform: translateY(0);
+  }
+
+  a:hover {
+    opacity: 0.8;
+  }
+
+  @media (max-width: 600px) {
+    [style*="padding: 40px 32px"] {
+      padding: 32px 24px !important;
+    }
   }
 `;
