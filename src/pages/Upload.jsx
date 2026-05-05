@@ -1,358 +1,683 @@
-import React, { useState, useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import API from "../api/api";
+import { useNavigate } from "react-router-dom";
+
+const AMENITIES_LIST = [
+  "WiFi",
+  "Parking",
+  "AC/Cooler",
+  "Water Tank",
+  "Generator",
+  "Security Fence",
+  "Balcony",
+  "TV",
+  "Refrigerator",
+  "Cooking Stove",
+  "Bed",
+  "Sofa",
+  "Dining Table",
+  "Shower",
+  "Kitchen Cabinet",
+  "Wardrobes",
+  "Ceiling Fans",
+  "Lights",
+  "24/7 Security",
+  "Swimming Pool",
+  "Gym",
+  "Garden",
+  "Workspace",
+  "Pet Friendly",
+];
 
 export default function Upload() {
-  const navigate = useNavigate();
   const { token } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  // Constants
-  const counties = [
-    "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
-    "Garissa","Wajir","Mandera","Marsabit","Isiolo","Meru","Tharaka Nithi",
-    "Embu","Kitui","Machakos","Makueni","Nyandarua","Nyeri","Kirinyaga",
-    "Murang'a","Kiambu","Turkana","West Pokot","Samburu","Trans Nzoia",
-    "Uasin Gishu","Elgeyo Marakwet","Nandi","Baringo","Laikipia","Nakuru",
-    "Narok","Kajiado","Kericho","Bomet","Kakamega","Vihiga","Bungoma",
-    "Busia","Siaya","Kisumu","Homa Bay","Migori","Kisii","Nyamira","Nairobi City"
-  ];
-
-  const propertyTypes = [
-    "Bedsitter","Studio Apartment","1 Bedroom","2 Bedroom","3 Bedroom",
-    "4+ Bedroom","Maisonette","Bungalow","Townhouse","Apartment Block",
-    "Single Room","Shared Room","Hostel Room","Commercial Office",
-    "Shop / Retail Space","Warehouse","Plot / Land"
-  ];
-
-  const amenitiesList = ["Water","Electricity","Parking","Security","WiFi","Borehole","Furnished","AC","TV","Gym"];
-
-  // State
-  const [form, setForm] = useState({
+  const [formData, setFormData] = useState({
     title: "",
-    county: "",
-    area: "",
+    description: "",
+    location: "",
     price: "",
-    deposit: "",
-    type: "",
     bedrooms: "",
     bathrooms: "",
     amenities: [],
-    description: "",
-    phone: "",
-    images: [],
-    lat: "", // Latitude
-    lng: "", // Longitude
-    size: "",
-    floor: "",
-    yearBuilt: "",
-    furnishing: "",
-    parking: "",
-    petPolicy: "",
-    utilitiesIncluded: "",
+    totalUnits: 1,
   });
 
-  const [submitting, setSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null);
-  const [previewImages, setPreviewImages] = useState([]);
-  const [completionPercent, setCompletionPercent] = useState(0);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [images, setImages] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  // Auth Guard
-  useEffect(() => {
-    if (!token) {
-      alert("❌ Please login first to upload a property");
-      navigate("/login");
-    }
-  }, [token, navigate]);
-
-  // Completion Logic
-  useEffect(() => {
-    const coreFields = [
-      form.title, form.county, form.area, form.price, 
-      form.type, form.bedrooms, form.description, form.phone,
-      form.lat, form.lng // Added coordinates to core logic
-    ];
-    const filledCore = coreFields.filter(f => f && f.toString().trim() !== "").length;
-    const hasImages = form.images.length > 0 ? 1 : 0;
-    
-    const totalPoints = 11; // 10 text fields + 1 image set
-    const percent = Math.round(((filledCore + hasImages) / totalPoints) * 100);
-    setCompletionPercent(percent);
-  }, [form]);
-
-  // Handlers
+  // Handle text inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleAmenity = (item) => {
-    setForm(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      amenities: prev.amenities.includes(item)
-        ? prev.amenities.filter(a => a !== item)
-        : [...prev.amenities, item]
+      [name]: name === "price" || name === "bedrooms" || name === "bathrooms" || name === "totalUnits" 
+        ? parseInt(value) || "" 
+        : value,
     }));
   };
 
-  const handleImages = (e) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length + form.images.length > 5) return setErrorMsg("⚠️ Maximum 5 images allowed");
-
-    const newPreviews = files.map(file => URL.createObjectURL(file));
-    setPreviewImages(prev => [...prev, ...newPreviews]);
-    setForm(prev => ({ ...prev, images: [...prev.images, ...files] }));
-    setErrorMsg("");
+  // Handle amenities selection
+  const handleAmenityToggle = (amenity) => {
+    setFormData((prev) => ({
+      ...prev,
+      amenities: prev.amenities.includes(amenity)
+        ? prev.amenities.filter((a) => a !== amenity)
+        : [...prev.amenities, amenity],
+    }));
   };
 
-  const removeImage = (idx) => {
-    setForm(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== idx) }));
-    setPreviewImages(prev => prev.filter((_, i) => i !== idx));
+  // Handle image selection
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+
+    if (files.length + images.length > 10) {
+      setError("⚠️ Maximum 10 images allowed");
+      return;
+    }
+
+    const newImages = [...images, ...files];
+    setImages(newImages);
+
+    // Create previews
+    const newPreviews = files.map((file) => URL.createObjectURL(file));
+    setImagePreviews((prev) => [...prev, ...newPreviews]);
   };
 
-  const getMyLocation = () => {
-    if (!navigator.geolocation) return alert("Geolocation not supported by your browser");
-    
-    alert("Fetching your coordinates... Please allow location access.");
-    
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setForm(prev => ({ 
-          ...prev, 
-          lat: pos.coords.latitude.toFixed(6), 
-          lng: pos.coords.longitude.toFixed(6) 
-        }));
-      },
-      (err) => {
-        console.error(err);
-        alert("❌ Location permission denied or unavailable.");
-      },
-      { enableHighAccuracy: true }
-    );
+  // Remove image
+  const removeImage = (index) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const suggestPrice = () => {
-    const suggestions = { "Bedsitter": 8000, "Studio Apartment": 12000, "1 Bedroom": 18000, "2 Bedroom": 28000 };
-    setForm(prev => ({ ...prev, price: suggestions[prev.type] || 15000 }));
-  };
-
+  // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
-    setErrorMsg("");
+    setError("");
+    setSuccess("");
+
+    // Validation
+    if (
+      !formData.title ||
+      !formData.description ||
+      !formData.location ||
+      !formData.price ||
+      !formData.bedrooms ||
+      !formData.bathrooms
+    ) {
+      setError("❌ Please fill all required fields");
+      return;
+    }
+
+    if (images.length === 0) {
+      setError("❌ Please upload at least one image");
+      return;
+    }
+
+    if (formData.amenities.length === 0) {
+      setError("⚠️ Please select at least one amenity");
+      return;
+    }
+
+    setLoading(true);
 
     try {
-      const formData = new FormData();
-      
-      let cleanPhone = form.phone.trim().replace(/\s+/g, "");
-      if (cleanPhone.startsWith("0")) cleanPhone = "254" + cleanPhone.substring(1);
-      if (!cleanPhone.startsWith("254")) cleanPhone = "254" + cleanPhone;
+      const formDataToSend = new FormData();
 
-      Object.keys(form).forEach(key => {
-        if (key === "images") {
-          form.images.forEach(img => formData.append("images", img));
-        } else if (key === "amenities") {
-          formData.append(key, JSON.stringify(form[key]));
-        } else if (key === "phone") {
-          formData.append(key, cleanPhone);
-        } else {
-          formData.append(key, form[key]);
-        }
+      // Add text fields
+      formDataToSend.append("title", formData.title);
+      formDataToSend.append("description", formData.description);
+      formDataToSend.append("location", formData.location);
+      formDataToSend.append("price", formData.price);
+      formDataToSend.append("bedrooms", formData.bedrooms);
+      formDataToSend.append("bathrooms", formData.bathrooms);
+      formDataToSend.append("totalUnits", formData.totalUnits);
+      formDataToSend.append("amenities", JSON.stringify(formData.amenities));
+
+      // Add images
+      images.forEach((image) => {
+        formDataToSend.append("images", image);
       });
 
-      await API.post("/properties", formData, {
-        headers: { "Content-Type": "multipart/form-data", "Authorization": `Bearer ${token}` }
+      const response = await fetch("/api/properties/create", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formDataToSend,
       });
 
-      setSubmitStatus("success");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to upload property");
+      }
+
+      const data = await response.json();
+      setSuccess("✅ Property uploaded successfully! Redirecting...");
+
+      // Reset form
+      setFormData({
+        title: "",
+        description: "",
+        location: "",
+        price: "",
+        bedrooms: "",
+        bathrooms: "",
+        amenities: [],
+        totalUnits: 1,
+      });
+      setImages([]);
+      setImagePreviews([]);
+
+      // Redirect
       setTimeout(() => navigate("/dashboard"), 2000);
     } catch (err) {
-      setErrorMsg(err.response?.data?.error || "Upload failed. Check your coordinates and connection.");
-      setSubmitStatus("error");
+      setError(err.message || "Error uploading property");
     } finally {
-      setSubmitting(false);
+      setLoading(false);
     }
   };
 
-  if (!token) return null;
-
-  return (
-    <div style={styles.root}>
-      <style>{css}</style>
-
-      <div style={styles.header}>
-        <h1 style={styles.title}>📝 List Property</h1>
-        <p style={styles.subtitle}>Fill in details to attract tenants</p>
-      </div>
-
-      <div style={styles.progressWrap}>
-        <div style={styles.progressLabel}>
-          Form Completion <span style={styles.progressPercent}>{completionPercent}%</span>
-        </div>
-        <div style={styles.progressBar}>
-          <div style={{ ...styles.progressFill, width: `${completionPercent}%` }} />
-        </div>
-      </div>
-
-      {submitStatus === "success" && <div className="upload-success">✅ Upload Successful! Redirecting...</div>}
-      {errorMsg && <div className="upload-error">❌ {errorMsg}</div>}
-
-      <form onSubmit={handleSubmit} style={styles.form}>
-        {/* Section 1: Basics */}
-        <div style={styles.section}>
-          <h3 style={styles.sectionTitle}>Basic Information</h3>
-          <input className="upload-input" name="title" placeholder="Title (e.g. Modern 2BR in Kilimani)" value={form.title} onChange={handleChange} required />
-          <div style={styles.geoRow}>
-            <select className="upload-select" name="county" value={form.county} onChange={handleChange} required>
-              <option value="">Select County</option>
-              {counties.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-            <input className="upload-input" name="area" placeholder="Area / Estate" value={form.area} onChange={handleChange} required />
-          </div>
-          <select className="upload-select" name="type" value={form.type} onChange={handleChange} required>
-            <option value="">Property Type</option>
-            {propertyTypes.map(t => <option key={t} value={t}>{t}</option>)}
-          </select>
-          <div style={styles.geoRow}>
-            <input className="upload-input" name="bedrooms" type="number" placeholder="Bedrooms" value={form.bedrooms} onChange={handleChange} required />
-            <input className="upload-input" name="bathrooms" type="number" placeholder="Bathrooms" value={form.bathrooms} onChange={handleChange} />
-          </div>
-        </div>
-
-        {/* Section 2: Rent & Location */}
-        <div style={styles.section}>
-          <h3 style={styles.sectionTitle}>Rent & Coordinates</h3>
-          <div style={styles.priceRow}>
-            <input className="upload-input" name="price" type="number" placeholder="Rent (Ksh)" value={form.price} onChange={handleChange} required />
-            <button type="button" className="upload-suggest-btn" onClick={suggestPrice}>💡 Suggest</button>
-          </div>
-          
-          <div style={styles.locationHeader}>
-            <span style={{fontSize: '11px', color: '#94a3b8'}}>GPS Coordinates (Required)</span>
-            <button type="button" className="geo-auto-btn" onClick={getMyLocation}>📍 Auto-detect</button>
-          </div>
-          <div style={styles.geoRow}>
-            <input className="upload-input" name="lat" placeholder="Latitude" value={form.lat} onChange={handleChange} required />
-            <input className="upload-input" name="lng" placeholder="Longitude" value={form.lng} onChange={handleChange} required />
-          </div>
-        </div>
-
-        {/* Section 3: Amenities */}
-        <div style={styles.section}>
-          <h3 style={styles.sectionTitle}>Amenities & Description</h3>
-          <div style={styles.amenityGrid}>
-            {amenitiesList.map(item => (
-              <button 
-                key={item} 
-                type="button" 
-                onClick={() => handleAmenity(item)}
-                className={`amenity-btn ${form.amenities.includes(item) ? 'active' : ''}`}
-              >
-                {item}
-              </button>
-            ))}
-          </div>
-          <textarea 
-            className="upload-input" 
-            name="description" 
-            placeholder="Property Description..." 
-            style={{ minHeight: "80px", marginTop: "15px" }}
-            value={form.description} 
-            onChange={handleChange} 
-            required 
-          />
-        </div>
-
-        {/* Section 4: Contact & Photos */}
-        <div style={styles.section}>
-          <h3 style={styles.sectionTitle}>Contact & Photos</h3>
-          <input className="upload-input" name="phone" placeholder="Phone Number (07...)" value={form.phone} onChange={handleChange} required />
-          
-          <div style={styles.imageUploadBox}>
-            <input type="file" accept="image/*" multiple id="image-input" style={{display:"none"}} onChange={handleImages} />
-            <label htmlFor="image-input" className="upload-file-label">📸 Add Photos ({form.images.length}/5)</label>
-            <div style={styles.previewGrid}>
-              {previewImages.map((src, i) => (
-                <div key={i} style={styles.previewItem}>
-                  <img src={src} alt="" style={styles.previewImg} />
-                  <button type="button" className="upload-remove-img" onClick={() => removeImage(i)}>✕</button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Submit */}
-        <div style={styles.buttonRow}>
-          <button 
-            className="upload-submit-btn" 
-            type="submit" 
-            disabled={submitting || completionPercent < 70}
+  if (!token) {
+    return (
+      <div style={styles.container}>
+        <style>{cssStyles}</style>
+        <div style={styles.unauth}>
+          <p>🔐 Please login to upload a property</p>
+          <button
+            onClick={() => navigate("/login")}
+            style={styles.loginBtn}
           >
-            {submitting ? "⏳ Uploading..." : `Submit (${completionPercent}%)`}
+            Go to Login
           </button>
         </div>
-      </form>
+      </div>
+    );
+  }
+
+  return (
+    <div style={styles.container}>
+      <style>{cssStyles}</style>
+
+      <div style={styles.formBox}>
+        <h1 style={styles.heading}>📝 Upload Your Property</h1>
+        <p style={styles.subtitle}>List your rental property on Axx Spaces</p>
+
+        {error && <div style={styles.errorBox}>{error}</div>}
+        {success && <div style={styles.successBox}>{success}</div>}
+
+        <form onSubmit={handleSubmit} style={styles.form}>
+          {/* Title */}
+          <div style={styles.formGroup}>
+            <label style={styles.label}>
+              Property Title <span style={styles.required}>*</span>
+            </label>
+            <input
+              type="text"
+              name="title"
+              placeholder="e.g., Modern 2BR Apartment with balcony"
+              value={formData.title}
+              onChange={handleChange}
+              style={styles.input}
+              required
+            />
+          </div>
+
+          {/* Location */}
+          <div style={styles.formGroup}>
+            <label style={styles.label}>
+              Location <span style={styles.required}>*</span>
+            </label>
+            <input
+              type="text"
+              name="location"
+              placeholder="e.g., Nairobi, Westlands"
+              value={formData.location}
+              onChange={handleChange}
+              style={styles.input}
+              required
+            />
+          </div>
+
+          {/* Description */}
+          <div style={styles.formGroup}>
+            <label style={styles.label}>
+              Description <span style={styles.required}>*</span>
+            </label>
+            <textarea
+              name="description"
+              placeholder="Describe your property in detail (min 50 characters)"
+              value={formData.description}
+              onChange={handleChange}
+              style={styles.textarea}
+              rows="5"
+              minLength="50"
+              required
+            />
+            <p style={styles.charCount}>
+              {formData.description.length} characters
+            </p>
+          </div>
+
+          {/* Price */}
+          <div style={styles.formRow}>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>
+                Monthly Price (KES) <span style={styles.required}>*</span>
+              </label>
+              <input
+                type="number"
+                name="price"
+                placeholder="e.g., 45000"
+                value={formData.price}
+                onChange={handleChange}
+                style={styles.input}
+                required
+              />
+            </div>
+
+            {/* Total Units */}
+            <div style={styles.formGroup}>
+              <label style={styles.label}>
+                Total Units <span style={styles.required}>*</span>
+              </label>
+              <input
+                type="number"
+                name="totalUnits"
+                placeholder="e.g., 1"
+                value={formData.totalUnits}
+                onChange={handleChange}
+                style={styles.input}
+                min="1"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Bedrooms & Bathrooms */}
+          <div style={styles.formRow}>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>
+                Bedrooms <span style={styles.required}>*</span>
+              </label>
+              <input
+                type="number"
+                name="bedrooms"
+                placeholder="e.g., 2"
+                value={formData.bedrooms}
+                onChange={handleChange}
+                style={styles.input}
+                required
+              />
+            </div>
+
+            <div style={styles.formGroup}>
+              <label style={styles.label}>
+                Bathrooms <span style={styles.required}>*</span>
+              </label>
+              <input
+                type="number"
+                name="bathrooms"
+                placeholder="e.g., 1"
+                value={formData.bathrooms}
+                onChange={handleChange}
+                style={styles.input}
+                required
+              />
+            </div>
+          </div>
+
+          {/* Images */}
+          <div style={styles.formGroup}>
+            <label style={styles.label}>
+              Upload Images (Max 10) <span style={styles.required}>*</span>
+            </label>
+            <div style={styles.imageUploadBox}>
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleImageChange}
+                style={styles.fileInput}
+                id="imageInput"
+              />
+              <label htmlFor="imageInput" style={styles.fileLabel}>
+                <div style={styles.uploadIcon}>📷</div>
+                <p>Click to select or drag images here</p>
+                <p style={styles.uploadSubtext}>
+                  {images.length}/10 images selected
+                </p>
+              </label>
+            </div>
+
+            {/* Image Previews */}
+            {imagePreviews.length > 0 && (
+              <div style={styles.previewContainer}>
+                {imagePreviews.map((preview, index) => (
+                  <div key={index} style={styles.previewBox}>
+                    <img src={preview} alt={`Preview ${index + 1}`} style={styles.previewImg} />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      style={styles.removeBtn}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Amenities */}
+          <div style={styles.formGroup}>
+            <label style={styles.label}>
+              Amenities (Select at least 1) <span style={styles.required}>*</span>
+            </label>
+            <div style={styles.amenitiesGrid}>
+              {AMENITIES_LIST.map((amenity) => (
+                <button
+                  key={amenity}
+                  type="button"
+                  onClick={() => handleAmenityToggle(amenity)}
+                  style={{
+                    ...styles.amenityBtn,
+                    ...(formData.amenities.includes(amenity)
+                      ? styles.amenityBtnSelected
+                      : styles.amenityBtnUnselected),
+                  }}
+                >
+                  {formData.amenities.includes(amenity) ? "✓ " : ""}
+                  {amenity}
+                </button>
+              ))}
+            </div>
+            <p style={styles.selectedCount}>
+              {formData.amenities.length} amenities selected
+            </p>
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              ...styles.submitBtn,
+              opacity: loading ? 0.6 : 1,
+              cursor: loading ? "not-allowed" : "pointer",
+            }}
+          >
+            {loading ? "⏳ Uploading Property..." : "🚀 Upload Property"}
+          </button>
+        </form>
+
+        <p style={styles.disclaimer}>
+          ℹ️ Your property will be reviewed by our admin team before appearing on listings.
+        </p>
+      </div>
     </div>
   );
 }
 
 const styles = {
-  root: { fontFamily: "'DM Sans', sans-serif", background: "#06101f", color: "#e2e8f0", minHeight: "100vh", padding: "40px 20px", maxWidth: "600px", margin: "0 auto" },
-  header: { textAlign: "center", marginBottom: "30px" },
-  title: { fontSize: "28px", fontWeight: 800, color: "#f1f5f9" },
-  subtitle: { color: "#64748b", fontSize: "14px" },
-  progressWrap: { marginBottom: "28px" },
-  progressLabel: { display: "flex", justifyContent: "space-between", fontSize: "13px", marginBottom: "8px" },
-  progressBar: { height: "6px", background: "rgba(255,255,255,0.08)", borderRadius: "99px" },
-  progressFill: { height: "100%", background: "#3b82f6", borderRadius: "99px", transition: "width 0.4s ease" },
-  form: { display: "flex", flexDirection: "column", gap: "20px" },
-  section: { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "16px", padding: "20px" },
-  sectionTitle: { fontSize: "12px", letterSpacing: "1px", fontWeight: 700, color: "#94a3b8", marginBottom: "15px", textTransform: "uppercase" },
-  geoRow: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "10px" },
-  priceRow: { display: "flex", gap: "10px", marginBottom: "15px" },
-  locationHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' },
-  amenityGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))", gap: "8px" },
-  imageUploadBox: { marginTop: "15px" },
-  previewGrid: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px", marginTop: "10px" },
-  previewItem: { position: "relative", height: "80px", borderRadius: "8px", overflow: "hidden" },
-  previewImg: { width: "100%", height: "100%", objectFit: "cover" },
-  buttonRow: { marginTop: "10px" }
+  container: {
+    minHeight: "100vh",
+    background: "linear-gradient(135deg, #06101f 0%, #0a1428 100%)",
+    padding: "40px 20px",
+    fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont",
+  },
+  formBox: {
+    maxWidth: "700px",
+    margin: "0 auto",
+    background: "rgba(10, 20, 40, 0.9)",
+    border: "1px solid rgba(59, 130, 246, 0.2)",
+    backdropFilter: "blur(10px)",
+    borderRadius: "20px",
+    padding: "50px 40px",
+    boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
+  },
+  heading: {
+    color: "#f1f5f9",
+    fontSize: "28px",
+    fontWeight: 800,
+    margin: "0 0 8px",
+    textAlign: "center",
+  },
+  subtitle: {
+    color: "#94a3b8",
+    fontSize: "14px",
+    textAlign: "center",
+    margin: "0 0 32px",
+  },
+  errorBox: {
+    background: "rgba(239, 68, 68, 0.15)",
+    border: "1px solid rgba(239, 68, 68, 0.5)",
+    color: "#fca5a5",
+    padding: "12px 16px",
+    borderRadius: "10px",
+    marginBottom: "20px",
+    fontSize: "14px",
+    fontWeight: 500,
+  },
+  successBox: {
+    background: "rgba(34, 197, 94, 0.15)",
+    border: "1px solid rgba(34, 197, 94, 0.5)",
+    color: "#86efac",
+    padding: "12px 16px",
+    borderRadius: "10px",
+    marginBottom: "20px",
+    fontSize: "14px",
+    fontWeight: 500,
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "24px",
+  },
+  formGroup: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+  },
+  formRow: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "16px",
+  },
+  label: {
+    color: "#cbd5e1",
+    fontSize: "13px",
+    fontWeight: 600,
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
+  },
+  required: {
+    color: "#ef4444",
+    fontWeight: 700,
+  },
+  input: {
+    padding: "14px 16px",
+    background: "rgba(30, 41, 59, 0.8)",
+    border: "1px solid rgba(148, 163, 184, 0.2)",
+    borderRadius: "10px",
+    color: "#f1f5f9",
+    fontSize: "15px",
+    fontFamily: "inherit",
+    transition: "all 0.2s",
+    outline: "none",
+  },
+  textarea: {
+    padding: "14px 16px",
+    background: "rgba(30, 41, 59, 0.8)",
+    border: "1px solid rgba(148, 163, 184, 0.2)",
+    borderRadius: "10px",
+    color: "#f1f5f9",
+    fontSize: "15px",
+    fontFamily: "inherit",
+    transition: "all 0.2s",
+    outline: "none",
+    resize: "vertical",
+  },
+  charCount: {
+    color: "#64748b",
+    fontSize: "12px",
+    margin: "4px 0 0 0",
+  },
+  imageUploadBox: {
+    position: "relative",
+    border: "2px dashed rgba(59, 130, 246, 0.5)",
+    borderRadius: "10px",
+    padding: "40px 20px",
+    textAlign: "center",
+    background: "rgba(59, 130, 246, 0.05)",
+    transition: "all 0.3s ease",
+    cursor: "pointer",
+  },
+  fileInput: {
+    display: "none",
+  },
+  fileLabel: {
+    cursor: "pointer",
+    display: "block",
+  },
+  uploadIcon: {
+    fontSize: "48px",
+    marginBottom: "12px",
+  },
+  uploadSubtext: {
+    color: "#94a3b8",
+    fontSize: "12px",
+    margin: "8px 0 0 0",
+  },
+  previewContainer: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))",
+    gap: "12px",
+    marginTop: "16px",
+  },
+  previewBox: {
+    position: "relative",
+    width: "100%",
+    aspectRatio: "1",
+    borderRadius: "8px",
+    overflow: "hidden",
+    background: "#1e293b",
+  },
+  previewImg: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+  },
+  removeBtn: {
+    position: "absolute",
+    top: "4px",
+    right: "4px",
+    background: "rgba(239, 68, 68, 0.9)",
+    border: "none",
+    color: "white",
+    width: "24px",
+    height: "24px",
+    borderRadius: "50%",
+    cursor: "pointer",
+    fontSize: "12px",
+    fontWeight: 700,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  amenitiesGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
+    gap: "8px",
+  },
+  amenityBtn: {
+    padding: "10px 12px",
+    border: "1px solid rgba(148, 163, 184, 0.2)",
+    borderRadius: "8px",
+    fontSize: "13px",
+    fontWeight: 600,
+    cursor: "pointer",
+    transition: "all 0.2s ease",
+    textAlign: "center",
+  },
+  amenityBtnUnselected: {
+    background: "rgba(30, 41, 59, 0.8)",
+    color: "#cbd5e1",
+  },
+  amenityBtnSelected: {
+    background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
+    color: "white",
+    border: "1px solid #3b82f6",
+  },
+  selectedCount: {
+    color: "#94a3b8",
+    fontSize: "12px",
+    margin: "8px 0 0 0",
+  },
+  submitBtn: {
+    padding: "14px 24px",
+    background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
+    color: "#fff",
+    border: "none",
+    borderRadius: "10px",
+    fontSize: "15px",
+    fontWeight: 700,
+    cursor: "pointer",
+    marginTop: "16px",
+    transition: "all 0.3s",
+    boxShadow: "0 8px 24px rgba(34, 197, 94, 0.4)",
+  },
+  disclaimer: {
+    textAlign: "center",
+    color: "#64748b",
+    fontSize: "12px",
+    marginTop: "20px",
+    margin: "20px 0 0 0",
+  },
+  unauth: {
+    textAlign: "center",
+    color: "#94a3b8",
+    padding: "60px 20px",
+    background: "rgba(30, 41, 59, 0.5)",
+    borderRadius: "12px",
+    border: "2px dashed #475569",
+  },
+  loginBtn: {
+    marginTop: "20px",
+    padding: "12px 24px",
+    background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "1rem",
+    fontWeight: 600,
+    cursor: "pointer",
+  },
 };
 
-const css = `
-  .upload-input, .upload-select {
-    width: 100%; padding: 12px; border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.1); background: #0f172a;
-    color: white; outline: none; margin-bottom: 10px; font-size: 14px;
+const cssStyles = `
+  input:focus,
+  textarea:focus {
+    border-color: rgba(59, 130, 246, 0.8) !important;
+    background: rgba(30, 41, 59, 1) !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
-  .amenity-btn {
-    padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
-    background: transparent; color: #94a3b8; font-size: 11px; cursor: pointer;
+
+  button:hover:not(:disabled) {
+    transform: translateY(-2px);
   }
-  .amenity-btn.active { background: #3b82f6; color: white; border-color: #3b82f6; }
-  .geo-auto-btn {
-    background: #1e293b; color: #60a5fa; border: 1px solid #3b82f6;
-    padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer;
+
+  [style*="gridTemplateColumns: 1fr 1fr"] {
+    width: 100%;
   }
-  .upload-file-label {
-    display: block; padding: 20px; border: 2px dashed #334155;
-    text-align: center; border-radius: 12px; color: #3b82f6; cursor: pointer;
+
+  @media (max-width: 600px) {
+    [style*="gridTemplateColumns: 1fr 1fr"] {
+      grid-template-columns: 1fr !important;
+    }
   }
-  .upload-submit-btn {
-    width: 100%; padding: 16px; border-radius: 12px; border: none;
-    background: #3b82f6; color: white; font-weight: 700; cursor: pointer;
-  }
-  .upload-submit-btn:disabled { background: #1e293b; color: #475569; cursor: not-allowed; }
-  .upload-suggest-btn {
-    padding: 0 15px; height: 45px; border-radius: 10px; border: none;
-    background: #1e293b; color: #fbbf24; cursor: pointer; font-size: 13px;
-  }
-  .upload-remove-img {
-    position: absolute; top: 4px; right: 4px; background: rgba(239, 68, 68, 0.8);
-    color: white; border: none; border-radius: 4px; cursor: pointer;
-  }
-  .upload-success { background: rgba(34,197,94,0.1); color: #4ade80; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
-  .upload-error { background: rgba(239,68,68,0.1); color: #f87171; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
 `;

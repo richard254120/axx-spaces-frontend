@@ -1,456 +1,616 @@
-import { useState, useEffect, useContext, useCallback } from "react";
+import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function LandlordDashboard() {
-  const { token, logout } = useContext(AuthContext);
-  
+  const { token } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("active");
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [actionLoading, setActionLoading] = useState(null);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  // Fetch properties
-  const fetchProperties = useCallback(async () => {
+  // Fetch properties based on active tab
+  useEffect(() => {
     if (!token) {
-      setError("Please log in to view your properties");
+      navigate("/login");
       return;
     }
 
-    setLoading(true);
-    setError("");
+    const fetchProperties = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const endpoint =
+          activeTab === "active"
+            ? "/api/properties/my-properties/active"
+            : "/api/properties/my-properties/booked";
 
-    try {
-      const endpoint = activeTab === "active"
-        ? "/api/properties/my-properties/active"
-        : "/api/properties/my-properties/booked";
+        const response = await fetch(endpoint, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-      const response = await fetch(endpoint, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+        if (!response.ok) {
+          throw new Error("Failed to fetch properties");
+        }
 
-      if (response.status === 401) {
-        logout?.();
-        throw new Error("Session expired. Please login again.");
+        const data = await response.json();
+        setProperties(data);
+      } catch (err) {
+        setError(err.message || "Error fetching properties");
+      } finally {
+        setLoading(false);
       }
+    };
 
-      if (!response.ok) throw new Error("Failed to fetch properties");
-
-      const data = await response.json();
-      setProperties(data || []);
-    } catch (err) {
-      setError(err.message || "Error fetching properties");
-    } finally {
-      setLoading(false);
-    }
-  }, [activeTab, token, logout]);
-
-  useEffect(() => {
     fetchProperties();
-  }, [fetchProperties]);
+  }, [activeTab, token, navigate]);
 
-  // Handle actions (mark booked, unmark, delete)
-  const handleAction = async (propertyId, url, method, successText) => {
-    setActionLoading(propertyId);
-
+  // Mark property as booked
+  const handleMarkBooked = async (propertyId) => {
     try {
-      const response = await fetch(url, {
-        method,
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (response.status === 401) {
-        logout?.();
-        throw new Error("Session expired.");
-      }
+      const response = await fetch(
+        `/api/properties/${propertyId}/mark-booked`,
+        {
+          method: "PUT",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || "Action failed");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to mark as booked");
       }
 
-      setSuccessMessage(successText);
+      setProperties(properties.filter((p) => p._id !== propertyId));
+      setSuccessMessage("✅ Property marked as booked!");
       setTimeout(() => setSuccessMessage(""), 3000);
-
-      fetchProperties(); // Refresh list
     } catch (err) {
       setError(err.message);
       setTimeout(() => setError(""), 3000);
-    } finally {
-      setActionLoading(null);
     }
   };
 
-  const handleMarkBooked = (id) => 
-    handleAction(id, `/api/properties/${id}/mark-booked`, "PUT", "✅ Property marked as booked!");
+  // Unmark property as booked
+  const handleUnmarkBooked = async (propertyId) => {
+    try {
+      const response = await fetch(
+        `/api/properties/${propertyId}/unmark-booked`,
+        {
+          method: "PUT",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-  const handleUnmarkBooked = (id) => 
-    handleAction(id, `/api/properties/${id}/unmark-booked`, "PUT", "✅ Booked status removed!");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to unmark as booked");
+      }
 
-  const handleDelete = (id) => {
-    if (!window.confirm("Are you sure you want to delete this property?")) return;
-    handleAction(id, `/api/properties/${id}`, "DELETE", "✅ Property deleted successfully!");
+      setProperties(properties.filter((p) => p._id !== propertyId));
+      setSuccessMessage("✅ Booked status removed!");
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (err) {
+      setError(err.message);
+      setTimeout(() => setError(""), 3000);
+    }
+  };
+
+  // Delete property
+  const handleDelete = async (propertyId) => {
+    if (!window.confirm("🗑️ Delete this property permanently?")) return;
+
+    try {
+      const response = await fetch(`/api/properties/${propertyId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to delete property");
+      }
+
+      setProperties(properties.filter((p) => p._id !== propertyId));
+      setSuccessMessage("✅ Property deleted successfully!");
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (err) {
+      setError(err.message);
+      setTimeout(() => setError(""), 3000);
+    }
   };
 
   return (
-    <>
-      <style>{`
-        .landlord-container {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 20px;
-          background: linear-gradient(135deg, #06101f 0%, #0f1729 100%);
-          min-height: 100vh;
-        }
+    <div style={styles.container}>
+      <style>{cssStyles}</style>
 
-        .header {
-          text-align: center;
-          margin-bottom: 40px;
-          color: #f1f5f9;
-        }
+      {/* Header */}
+      <div style={styles.header}>
+        <h1 style={styles.title}>🏠 My Properties</h1>
+        <p style={styles.subtitle}>Manage your rental listings</p>
+      </div>
 
-        .header h1 {
-          font-size: 2.5rem;
-          margin: 0;
-          color: #fbbf24;
-          font-weight: 700;
-        }
+      {/* Messages */}
+      {successMessage && (
+        <div style={styles.successMsg}>{successMessage}</div>
+      )}
+      {error && <div style={styles.errorMsg}>{error}</div>}
 
-        .header p {
-          font-size: 1rem;
-          color: #94a3b8;
-          margin-top: 8px;
-        }
+      {/* Tabs */}
+      <div style={styles.tabsContainer}>
+        <button
+          style={{
+            ...styles.tabBtn,
+            ...(activeTab === "active"
+              ? styles.tabBtnActive
+              : styles.tabBtnInactive),
+          }}
+          onClick={() => setActiveTab("active")}
+        >
+          📋 Active Properties ({properties.length})
+        </button>
+        <button
+          style={{
+            ...styles.tabBtn,
+            ...(activeTab === "booked"
+              ? styles.tabBtnActive
+              : styles.tabBtnInactive),
+          }}
+          onClick={() => setActiveTab("booked")}
+        >
+          ✅ Booked Properties ({properties.length})
+        </button>
+      </div>
 
-        .success, .error {
-          padding: 12px 16px;
-          border-radius: 8px;
-          margin-bottom: 20px;
-          text-align: center;
-          font-weight: 500;
-          animation: slideDown 0.3s ease;
-        }
+      {/* Loading */}
+      {loading && <p style={styles.loading}>⏳ Loading properties...</p>}
 
-        .success { background: #10b981; color: white; }
-        .error { background: #ef4444; color: white; }
-
-        @keyframes slideDown {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        .tabs {
-          display: flex;
-          gap: 16px;
-          margin-bottom: 32px;
-          border-bottom: 2px solid #1e293b;
-          justify-content: center;
-          flex-wrap: wrap;
-        }
-
-        .tabBtn {
-          background: transparent;
-          border: none;
-          color: #94a3b8;
-          padding: 12px 24px;
-          font-size: 1rem;
-          cursor: pointer;
-          font-weight: 600;
-          border-bottom: 3px solid transparent;
-        }
-
-        .tabBtn:hover { color: #fbbf24; }
-        .tabBtn.active { color: #fbbf24; border-bottom-color: #fbbf24; }
-
-        .loading, .empty {
-          text-align: center;
-          color: #94a3b8;
-          font-size: 1.1rem;
-          padding: 60px 20px;
-        }
-
-        .empty {
-          background: rgba(30, 41, 59, 0.5);
-          border-radius: 12px;
-          border: 2px dashed #475569;
-        }
-
-        .grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-          gap: 24px;
-        }
-
-        .card {
-          background: linear-gradient(135deg, #1e293b 0%, #0f1729 100%);
-          border: 1px solid #334155;
-          border-radius: 12px;
-          overflow: hidden;
-          transition: all 0.3s ease;
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .card:hover {
-          border-color: #fbbf24;
-          box-shadow: 0 8px 24px rgba(251, 191, 36, 0.1);
-          transform: translateY(-4px);
-        }
-
-        .imageContainer {
-          position: relative;
-          width: 100%;
-          height: 200px;
-          overflow: hidden;
-          background: #0f1729;
-        }
-
-        .image {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          transition: transform 0.3s ease;
-        }
-
-        .card:hover .image {
-          transform: scale(1.05);
-        }
-
-        .noImage {
-          width: 100%;
-          height: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: #334155;
-          color: #94a3b8;
-          font-weight: 600;
-        }
-
-        .statusBadge {
-          position: absolute;
-          top: 12px;
-          right: 12px;
-        }
-
-        .statusBadge span {
-          display: inline-block;
-          padding: 6px 12px;
-          border-radius: 20px;
-          font-size: 0.85rem;
-          font-weight: 600;
-        }
-
-        .approved { background: #10b981; color: white; }
-        .pending { background: #f59e0b; color: white; }
-        .rejected { background: #ef4444; color: white; }
-
-        .bookedBadge {
-          position: absolute;
-          bottom: 12px;
-          left: 12px;
-          background: rgba(59, 130, 246, 0.9);
-          color: white;
-          padding: 8px 12px;
-          border-radius: 6px;
-          font-size: 0.85rem;
-          font-weight: 600;
-        }
-
-        .details {
-          padding: 20px;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .details h2 {
-          color: #f1f5f9;
-          font-size: 1.3rem;
-          margin: 0 0 8px 0;
-        }
-
-        .location {
-          color: #94a3b8;
-          margin: 0 0 12px 0;
-          font-size: 0.95rem;
-        }
-
-        .specs {
-          display: flex;
-          gap: 12px;
-          margin: 12px 0;
-          color: #cbd5e1;
-          font-size: 0.9rem;
-        }
-
-        .price {
-          color: #fbbf24;
-          font-size: 1.2rem;
-          font-weight: 700;
-          margin: 12px 0;
-        }
-
-        .description {
-          color: #cbd5e1;
-          font-size: 0.9rem;
-          margin: 12px 0;
-          line-height: 1.5;
-        }
-
-        .unitsInfo {
-          display: flex;
-          gap: 8px;
-          padding: 12px;
-          background: rgba(59, 130, 246, 0.1);
-          border-radius: 8px;
-          margin: 12px 0;
-          font-size: 0.85rem;
-          color: #cbd5e1;
-        }
-
-        .unitsInfo span { flex: 1; text-align: center; }
-
-        .actions {
-          display: flex;
-          gap: 8px;
-          margin-top: auto;
-        }
-
-        .bookedBtn, .unbookBtn, .deleteBtn {
-          flex: 1;
-          padding: 10px 12px;
-          border: none;
-          border-radius: 6px;
-          font-weight: 600;
-          cursor: pointer;
-          font-size: 0.9rem;
-        }
-
-        .bookedBtn { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; }
-        .unbookBtn { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; }
-        .deleteBtn { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; }
-
-        .bookedBtn:hover:not(:disabled),
-        .unbookBtn:hover:not(:disabled),
-        .deleteBtn:hover:not(:disabled) {
-          transform: translateY(-2px);
-        }
-
-        .bookedBtn:disabled,
-        .unbookBtn:disabled,
-        .deleteBtn:disabled {
-          opacity: 0.7;
-          cursor: not-allowed;
-        }
-
-        @media (max-width: 768px) {
-          .landlord-container { padding: 12px; }
-          .header h1 { font-size: 1.8rem; }
-          .grid { grid-template-columns: 1fr; }
-          .actions { flex-direction: column; }
-        }
-      `}</style>
-
-      <div className="landlord-container">
-        <div className="header">
-          <h1>🏠 My Properties</h1>
-          <p>Manage your rental listings</p>
+      {/* No Properties */}
+      {!loading && properties.length === 0 && (
+        <div style={styles.empty}>
+          <p style={styles.emptyText}>
+            {activeTab === "active"
+              ? "📝 No active properties yet. Upload one to get started! 🚀"
+              : "📌 No booked properties yet."}
+          </p>
+          {activeTab === "active" && (
+            <button
+              onClick={() => navigate("/upload")}
+              style={styles.uploadBtn}
+            >
+              ➕ Upload New Property
+            </button>
+          )}
         </div>
+      )}
 
-        {successMessage && <div className="success">{successMessage}</div>}
-        {error && <div className="error">{error}</div>}
+      {/* Properties Grid */}
+      {!loading && properties.length > 0 && (
+        <div style={styles.grid}>
+          {properties.map((property) => (
+            <div key={property._id} style={styles.card}>
+              {/* Image */}
+              <div style={styles.imageContainer}>
+                {property.images && property.images.length > 0 ? (
+                  <img
+                    src={property.images[0]}
+                    alt={property.title}
+                    style={styles.image}
+                  />
+                ) : (
+                  <div style={styles.noImage}>📷 No Image</div>
+                )}
 
-        <div className="tabs">
-          <button className={`tabBtn ${activeTab === "active" ? "active" : ""}`} onClick={() => setActiveTab("active")}>
-            📋 Active Properties
-          </button>
-          <button className={`tabBtn ${activeTab === "booked" ? "active" : ""}`} onClick={() => setActiveTab("booked")}>
-            ✅ Booked Properties
-          </button>
-        </div>
-
-        {loading ? (
-          <p className="loading">Loading properties...</p>
-        ) : properties.length === 0 ? (
-          <div className="empty">
-            <p>
-              {activeTab === "active"
-                ? "No active properties yet. Upload one to get started! 🚀"
-                : "No booked properties yet. 📌"}
-            </p>
-          </div>
-        ) : (
-          <div className="grid">
-            {properties.map((property) => (
-              <div key={property._id} className="card">
-                <div className="imageContainer">
-                  {property.images?.[0] ? (
-                    <img src={property.images[0]} alt={property.title} className="image" />
-                  ) : (
-                    <div className="noImage">No Image</div>
-                  )}
-
-                  <div className="statusBadge">
-                    {property.status === "approved" && <span className="approved">✅ Approved</span>}
-                    {property.status === "pending" && <span className="pending">⏳ Pending</span>}
-                    {property.status === "rejected" && <span className="rejected">❌ Rejected</span>}
-                  </div>
-
-                  {property.bookedUnits > 0 && (
-                    <div className="bookedBadge">
-                      {property.bookedUnits} of {property.totalUnits} Booked
-                    </div>
-                  )}
+                {/* Status Badge */}
+                <div
+                  style={{
+                    ...styles.badge,
+                    ...(property.status === "approved"
+                      ? styles.badgeApproved
+                      : property.status === "pending"
+                      ? styles.badgePending
+                      : styles.badgeRejected),
+                  }}
+                >
+                  {property.status === "approved" && "✅ Approved"}
+                  {property.status === "pending" && "⏳ Pending"}
+                  {property.status === "rejected" && "❌ Rejected"}
                 </div>
 
-                <div className="details">
-                  <h2>{property.title}</h2>
-                  <p className="location">📍 {property.location || property.county || property.area}</p>
-
-                  <div className="specs">
-                    <span>🛏️ {property.bedrooms || 0} Beds</span>
-                    <span>🚿 {property.bathrooms || 0} Baths</span>
+                {/* Booked Badge */}
+                {property.bookedUnits > 0 && (
+                  <div style={styles.bookedBadge}>
+                    {property.bookedUnits} of {property.totalUnits} Booked
                   </div>
+                )}
+              </div>
 
-                  <p className="price">
-                    💰 KES {Number(property.price || 0).toLocaleString()} / month
-                  </p>
+              {/* Details */}
+              <div style={styles.content}>
+                <h2 style={styles.title2}>{property.title}</h2>
+                <p style={styles.location}>📍 {property.location}</p>
 
-                  <p className="description">
-                    {property.description ? property.description.substring(0, 100) + "..." : "No description available"}
-                  </p>
+                <div style={styles.specs}>
+                  <span style={styles.spec}>🛏️ {property.bedrooms} Beds</span>
+                  <span style={styles.spec}>🚿 {property.bathrooms} Baths</span>
+                </div>
 
-                  <div className="unitsInfo">
-                    <span>Total: {property.totalUnits || 0}</span>
-                    <span>Booked: {property.bookedUnits || 0}</span>
-                    <span>Available: {property.availableUnits || property.totalUnits - property.bookedUnits || 0}</span>
+                <p style={styles.price}>
+                  💰 KES {property.price?.toLocaleString()} / month
+                </p>
+
+                <p style={styles.description}>
+                  {property.description?.substring(0, 100)}...
+                </p>
+
+                {/* Unit Info */}
+                <div style={styles.unitsInfo}>
+                  <span style={styles.unitItem}>Total: {property.totalUnits}</span>
+                  <span style={styles.unitItem}>Booked: {property.bookedUnits}</span>
+                  <span style={styles.unitItem}>
+                    Available: {property.availableUnits}
+                  </span>
+                </div>
+
+                {/* Amenities */}
+                {property.amenities && property.amenities.length > 0 && (
+                  <div style={styles.amenitiesBox}>
+                    <p style={styles.amenitiesTitle}>✨ Amenities:</p>
+                    <div style={styles.amenitiesList}>
+                      {property.amenities.slice(0, 3).map((amenity, idx) => (
+                        <span key={idx} style={styles.amenityTag}>
+                          {amenity}
+                        </span>
+                      ))}
+                      {property.amenities.length > 3 && (
+                        <span style={styles.amenityTag}>
+                          +{property.amenities.length - 3} more
+                        </span>
+                      )}
+                    </div>
                   </div>
+                )}
 
-                  <div className="actions">
-                    {activeTab === "active" ? (
-                      <>
-                        <button className="bookedBtn" onClick={() => handleMarkBooked(property._id)} disabled={actionLoading === property._id}>
-                          {actionLoading === property._id ? "Processing..." : "✅ Mark Booked"}
-                        </button>
-                        <button className="deleteBtn" onClick={() => handleDelete(property._id)} disabled={actionLoading === property._id}>
-                          🗑️ Delete
-                        </button>
-                      </>
-                    ) : (
-                      <button className="unbookBtn" onClick={() => handleUnmarkBooked(property._id)} disabled={actionLoading === property._id}>
-                        {actionLoading === property._id ? "Processing..." : "🔄 Unmark Booked"}
+                {/* Actions */}
+                <div style={styles.actions}>
+                  {activeTab === "active" ? (
+                    <>
+                      <button
+                        style={styles.bookedBtn}
+                        onClick={() => handleMarkBooked(property._id)}
+                      >
+                        ✅ Mark Booked
                       </button>
-                    )}
-                  </div>
+                      <button
+                        style={styles.deleteBtn}
+                        onClick={() => handleDelete(property._id)}
+                      >
+                        🗑️ Delete
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      style={styles.unbookBtn}
+                      onClick={() => handleUnmarkBooked(property._id)}
+                    >
+                      🔄 Unmark Booked
+                    </button>
+                  )}
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
+
+const styles = {
+  container: {
+    maxWidth: "1200px",
+    margin: "0 auto",
+    padding: "20px",
+    background: "linear-gradient(135deg, #06101f 0%, #0f1729 100%)",
+    minHeight: "100vh",
+    fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI'",
+  },
+  header: {
+    textAlign: "center",
+    marginBottom: "40px",
+    color: "#f1f5f9",
+  },
+  title: {
+    fontSize: "2.5rem",
+    margin: 0,
+    color: "#fbbf24",
+    fontWeight: 700,
+  },
+  subtitle: {
+    fontSize: "1rem",
+    color: "#94a3b8",
+    marginTop: "8px",
+  },
+  successMsg: {
+    background: "#10b981",
+    color: "white",
+    padding: "12px 16px",
+    borderRadius: "8px",
+    marginBottom: "20px",
+    textAlign: "center",
+    fontWeight: 500,
+  },
+  errorMsg: {
+    background: "#ef4444",
+    color: "white",
+    padding: "12px 16px",
+    borderRadius: "8px",
+    marginBottom: "20px",
+    textAlign: "center",
+    fontWeight: 500,
+  },
+  tabsContainer: {
+    display: "flex",
+    gap: "16px",
+    marginBottom: "32px",
+    borderBottom: "2px solid #1e293b",
+    justifyContent: "center",
+    flexWrap: "wrap",
+  },
+  tabBtn: {
+    background: "transparent",
+    border: "none",
+    padding: "12px 24px",
+    fontSize: "1rem",
+    fontWeight: 600,
+    cursor: "pointer",
+    transition: "all 0.3s ease",
+    borderBottom: "3px solid transparent",
+    marginBottom: "-2px",
+  },
+  tabBtnActive: {
+    color: "#fbbf24",
+    borderBottomColor: "#fbbf24",
+  },
+  tabBtnInactive: {
+    color: "#94a3b8",
+  },
+  loading: {
+    textAlign: "center",
+    color: "#94a3b8",
+    fontSize: "1.1rem",
+    padding: "40px 20px",
+  },
+  empty: {
+    textAlign: "center",
+    color: "#94a3b8",
+    padding: "60px 20px",
+    background: "rgba(30, 41, 59, 0.5)",
+    borderRadius: "12px",
+    border: "2px dashed #475569",
+  },
+  emptyText: {
+    fontSize: "1.1rem",
+    margin: 0,
+  },
+  uploadBtn: {
+    marginTop: "20px",
+    padding: "12px 24px",
+    background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "1rem",
+    fontWeight: 600,
+    cursor: "pointer",
+  },
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+    gap: "24px",
+  },
+  card: {
+    background: "linear-gradient(135deg, #1e293b 0%, #0f1729 100%)",
+    border: "1px solid #334155",
+    borderRadius: "12px",
+    overflow: "hidden",
+    transition: "all 0.3s ease",
+    display: "flex",
+    flexDirection: "column",
+    height: "100%",
+  },
+  imageContainer: {
+    position: "relative",
+    width: "100%",
+    height: "200px",
+    overflow: "hidden",
+    background: "#0f1729",
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    transition: "transform 0.3s ease",
+  },
+  noImage: {
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    background: "#334155",
+    color: "#94a3b8",
+    fontWeight: 600,
+  },
+  badge: {
+    position: "absolute",
+    top: "12px",
+    right: "12px",
+    padding: "6px 12px",
+    borderRadius: "20px",
+    fontSize: "0.85rem",
+    fontWeight: 600,
+    color: "white",
+  },
+  badgeApproved: {
+    background: "#10b981",
+  },
+  badgePending: {
+    background: "#f59e0b",
+  },
+  badgeRejected: {
+    background: "#ef4444",
+  },
+  bookedBadge: {
+    position: "absolute",
+    bottom: "12px",
+    left: "12px",
+    background: "rgba(59, 130, 246, 0.9)",
+    color: "white",
+    padding: "8px 12px",
+    borderRadius: "6px",
+    fontSize: "0.85rem",
+    fontWeight: 600,
+  },
+  content: {
+    padding: "20px",
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+  },
+  title2: {
+    color: "#f1f5f9",
+    fontSize: "1.3rem",
+    margin: "0 0 8px 0",
+    wordBreak: "break-word",
+  },
+  location: {
+    color: "#94a3b8",
+    margin: "0 0 12px 0",
+    fontSize: "0.95rem",
+  },
+  specs: {
+    display: "flex",
+    gap: "12px",
+    margin: "12px 0",
+  },
+  spec: {
+    color: "#cbd5e1",
+    fontSize: "0.9rem",
+  },
+  price: {
+    color: "#fbbf24",
+    fontSize: "1.2rem",
+    fontWeight: 700,
+    margin: "12px 0",
+  },
+  description: {
+    color: "#cbd5e1",
+    fontSize: "0.9rem",
+    margin: "12px 0",
+    lineHeight: "1.5",
+  },
+  unitsInfo: {
+    display: "flex",
+    gap: "8px",
+    padding: "12px",
+    background: "rgba(59, 130, 246, 0.1)",
+    borderRadius: "8px",
+    margin: "12px 0",
+    fontSize: "0.85rem",
+    color: "#cbd5e1",
+  },
+  unitItem: {
+    flex: 1,
+    textAlign: "center",
+  },
+  amenitiesBox: {
+    background: "rgba(139, 92, 246, 0.1)",
+    padding: "12px",
+    borderRadius: "8px",
+    margin: "12px 0",
+    border: "1px solid rgba(139, 92, 246, 0.3)",
+  },
+  amenitiesTitle: {
+    color: "#8b5cf6",
+    fontSize: "0.85rem",
+    fontWeight: 600,
+    margin: "0 0 8px 0",
+  },
+  amenitiesList: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "6px",
+  },
+  amenityTag: {
+    background: "rgba(139, 92, 246, 0.2)",
+    color: "#cbd5e1",
+    padding: "4px 8px",
+    borderRadius: "4px",
+    fontSize: "0.75rem",
+    fontWeight: 500,
+  },
+  actions: {
+    display: "flex",
+    gap: "8px",
+    marginTop: "auto",
+  },
+  bookedBtn: {
+    flex: 1,
+    padding: "10px 12px",
+    background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    fontWeight: 600,
+    cursor: "pointer",
+    fontSize: "0.9rem",
+    transition: "all 0.3s ease",
+  },
+  unbookBtn: {
+    flex: 1,
+    padding: "10px 12px",
+    background: "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)",
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    fontWeight: 600,
+    cursor: "pointer",
+    fontSize: "0.9rem",
+    transition: "all 0.3s ease",
+  },
+  deleteBtn: {
+    flex: 1,
+    padding: "10px 12px",
+    background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    fontWeight: 600,
+    cursor: "pointer",
+    fontSize: "0.9rem",
+    transition: "all 0.3s ease",
+  },
+};
+
+const cssStyles = `
+  * {
+    box-sizing: border-box;
+  }
+
+  button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+
+  button:active {
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    [style*="gridTemplateColumns"] {
+      grid-template-columns: 1fr !important;
+    }
+  }
+`;
