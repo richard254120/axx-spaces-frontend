@@ -3,20 +3,19 @@ import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import logo from "../assets/logo.jpeg";
 
-// Use environment variable with fallback
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
-
-console.log("🌐 API Base URL:", API_BASE);
+const API_BASE = "http://localhost:1000";
 
 export default function Register() {
   const navigate = useNavigate();
-  const { setToken } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     phone: "",
   });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -34,7 +33,6 @@ export default function Register() {
     setError("");
     setSuccess("");
 
-    // Validation
     if (!formData.name || !formData.email || !formData.password || !formData.phone) {
       setError("❌ All fields are required");
       return;
@@ -48,12 +46,7 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const registerUrl = `${API_BASE}/auth/register`;
-      console.log("📝 Register attempt");
-      console.log("🌐 Sending to:", registerUrl);
-      console.log("📦 Payload:", formData);
-      
-      const response = await fetch(registerUrl, {
+      const response = await fetch(`${API_BASE}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -61,25 +54,24 @@ export default function Register() {
         body: JSON.stringify(formData),
       });
 
-      console.log("📥 Response status:", response.status);
-
       const data = await response.json();
-      console.log("📥 Response data:", data);
 
       if (!response.ok) {
         throw new Error(data.error || "Registration failed");
       }
 
-      setSuccess("✅ Registration successful! Redirecting...");
-      setToken(data.token);
+      setSuccess("✅ Registration successful! Logging you in...");
+
+      login(data.token, data.user);
       localStorage.setItem("token", data.token);
 
       setTimeout(() => {
-        navigate("/listings");
-      }, 2000);
+        navigate("/dashboard");
+      }, 1800);
+
     } catch (err) {
-      console.error("❌ Registration error:", err);
-      setError(err.message || "❌ Registration failed. Please try again.");
+      console.error("❌ Registration Error:", err);
+      setError(err.message || "❌ Failed to connect to server. Make sure backend is running on port 1000");
     } finally {
       setLoading(false);
     }
@@ -190,6 +182,7 @@ export default function Register() {
   );
 }
 
+/* ==================== YOUR ORIGINAL STYLES (KEPT 100%) ==================== */
 const styles = {
   root: {
     fontFamily: "'DM Sans', sans-serif",
@@ -354,3 +347,5 @@ const css = `
     }
   }
 `;
+
+export default Register;
