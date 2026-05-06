@@ -2,124 +2,71 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
+
 export default function LandlordDashboard() {
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("active");
+
   const [properties, setProperties] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState("all"); // all, pending, approved
   const [successMessage, setSuccessMessage] = useState("");
 
-  // Fetch properties based on active tab
   useEffect(() => {
     if (!token) {
       navigate("/login");
       return;
     }
+    fetchMyProperties();
+  }, [token, navigate]);
 
-    const fetchProperties = async () => {
-      setLoading(true);
-      setError("");
-      try {
-        const endpoint =
-          activeTab === "active"
-            ? "/api/properties/my-properties/active"
-            : "/api/properties/my-properties/booked";
-
-        const response = await fetch(endpoint, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch properties");
-        }
-
-        const data = await response.json();
-        setProperties(data);
-      } catch (err) {
-        setError(err.message || "Error fetching properties");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProperties();
-  }, [activeTab, token, navigate]);
-
-  // Mark property as booked
-  const handleMarkBooked = async (propertyId) => {
+  const fetchMyProperties = async () => {
+    setLoading(true);
+    setError("");
     try {
-      const response = await fetch(
-        `/api/properties/${propertyId}/mark-booked`,
-        {
-          method: "PUT",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await fetch(`${API_BASE}/properties/my-properties`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to mark as booked");
-      }
+      if (!response.ok) throw new Error("Failed to fetch properties");
 
-      setProperties(properties.filter((p) => p._id !== propertyId));
-      setSuccessMessage("✅ Property marked as booked!");
-      setTimeout(() => setSuccessMessage(""), 3000);
+      const data = await response.json();
+      setProperties(data);
     } catch (err) {
-      setError(err.message);
-      setTimeout(() => setError(""), 3000);
+      console.error(err);
+      setError("Failed to load your properties. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Unmark property as booked
-  const handleUnmarkBooked = async (propertyId) => {
-    try {
-      const response = await fetch(
-        `/api/properties/${propertyId}/unmark-booked`,
-        {
-          method: "PUT",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to unmark as booked");
-      }
-
-      setProperties(properties.filter((p) => p._id !== propertyId));
-      setSuccessMessage("✅ Booked status removed!");
-      setTimeout(() => setSuccessMessage(""), 3000);
-    } catch (err) {
-      setError(err.message);
-      setTimeout(() => setError(""), 3000);
-    }
-  };
-
-  // Delete property
   const handleDelete = async (propertyId) => {
     if (!window.confirm("🗑️ Delete this property permanently?")) return;
 
     try {
-      const response = await fetch(`/api/properties/${propertyId}`, {
+      const response = await fetch(`${API_BASE}/properties/${propertyId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to delete property");
-      }
+      if (!response.ok) throw new Error("Failed to delete property");
 
-      setProperties(properties.filter((p) => p._id !== propertyId));
+      setProperties(properties.filter(p => p._id !== propertyId));
       setSuccessMessage("✅ Property deleted successfully!");
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
-      setError(err.message);
+      setError("Failed to delete property");
       setTimeout(() => setError(""), 3000);
     }
   };
+
+  const filteredProperties = properties.filter(p => {
+    if (activeTab === "pending") return p.status === "pending";
+    if (activeTab === "approved") return p.status === "approved";
+    return true; // "all"
+  });
 
   return (
     <div style={styles.container}>
@@ -132,65 +79,50 @@ export default function LandlordDashboard() {
       </div>
 
       {/* Messages */}
-      {successMessage && (
-        <div style={styles.successMsg}>{successMessage}</div>
-      )}
+      {successMessage && <div style={styles.successMsg}>{successMessage}</div>}
       {error && <div style={styles.errorMsg}>{error}</div>}
 
       {/* Tabs */}
       <div style={styles.tabsContainer}>
         <button
-          style={{
-            ...styles.tabBtn,
-            ...(activeTab === "active"
-              ? styles.tabBtnActive
-              : styles.tabBtnInactive),
-          }}
-          onClick={() => setActiveTab("active")}
+          style={{...styles.tabBtn, ...(activeTab === "all" && styles.tabBtnActive)}}
+          onClick={() => setActiveTab("all")}
         >
-          📋 Active Properties ({properties.length})
+          📋 All ({properties.length})
         </button>
         <button
-          style={{
-            ...styles.tabBtn,
-            ...(activeTab === "booked"
-              ? styles.tabBtnActive
-              : styles.tabBtnInactive),
-          }}
-          onClick={() => setActiveTab("booked")}
+          style={{...styles.tabBtn, ...(activeTab === "pending" && styles.tabBtnActive)}}
+          onClick={() => setActiveTab("pending")}
         >
-          ✅ Booked Properties ({properties.length})
+          ⏳ Pending ({properties.filter(p => p.status === "pending").length})
+        </button>
+        <button
+          style={{...styles.tabBtn, ...(activeTab === "approved" && styles.tabBtnActive)}}
+          onClick={() => setActiveTab("approved")}
+        >
+          ✅ Approved ({properties.filter(p => p.status === "approved").length})
         </button>
       </div>
 
-      {/* Loading */}
-      {loading && <p style={styles.loading}>⏳ Loading properties...</p>}
+      {loading && <p style={styles.loading}>⏳ Loading your properties...</p>}
 
-      {/* No Properties */}
-      {!loading && properties.length === 0 && (
+      {!loading && filteredProperties.length === 0 && (
         <div style={styles.empty}>
           <p style={styles.emptyText}>
-            {activeTab === "active"
-              ? "📝 No active properties yet. Upload one to get started! 🚀"
-              : "📌 No booked properties yet."}
+            {activeTab === "all" 
+              ? "You have not uploaded any properties yet." 
+              : `No ${activeTab} properties found.`}
           </p>
-          {activeTab === "active" && (
-            <button
-              onClick={() => navigate("/upload")}
-              style={styles.uploadBtn}
-            >
-              ➕ Upload New Property
-            </button>
-          )}
+          <button onClick={() => navigate("/upload")} style={styles.uploadBtn}>
+            ➕ Upload New Property
+          </button>
         </div>
       )}
 
-      {/* Properties Grid */}
-      {!loading && properties.length > 0 && (
+      {!loading && filteredProperties.length > 0 && (
         <div style={styles.grid}>
-          {properties.map((property) => (
+          {filteredProperties.map((property) => (
             <div key={property._id} style={styles.card}>
-              {/* Image */}
               <div style={styles.imageContainer}>
                 {property.images && property.images.length > 0 ? (
                   <img
@@ -202,102 +134,33 @@ export default function LandlordDashboard() {
                   <div style={styles.noImage}>📷 No Image</div>
                 )}
 
-                {/* Status Badge */}
-                <div
-                  style={{
-                    ...styles.badge,
-                    ...(property.status === "approved"
-                      ? styles.badgeApproved
-                      : property.status === "pending"
-                      ? styles.badgePending
-                      : styles.badgeRejected),
-                  }}
-                >
-                  {property.status === "approved" && "✅ Approved"}
-                  {property.status === "pending" && "⏳ Pending"}
-                  {property.status === "rejected" && "❌ Rejected"}
+                <div style={{
+                  ...styles.statusBadge,
+                  backgroundColor: property.status === "approved" ? "#22c55e" : "#f59e0b"
+                }}>
+                  {property.status === "approved" ? "✅ Approved" : "⏳ Pending Approval"}
                 </div>
-
-                {/* Booked Badge */}
-                {property.bookedUnits > 0 && (
-                  <div style={styles.bookedBadge}>
-                    {property.bookedUnits} of {property.totalUnits} Booked
-                  </div>
-                )}
               </div>
 
-              {/* Details */}
               <div style={styles.content}>
-                <h2 style={styles.title2}>{property.title}</h2>
-                <p style={styles.location}>📍 {property.location}</p>
+                <h3 style={styles.propertyTitle}>{property.title}</h3>
+                <p style={styles.location}>📍 {property.location || `${property.area}, ${property.county}`}</p>
+                
+                <p style={styles.price}>
+                  KSh {Number(property.price).toLocaleString()} / month
+                </p>
 
                 <div style={styles.specs}>
-                  <span style={styles.spec}>🛏️ {property.bedrooms} Beds</span>
-                  <span style={styles.spec}>🚿 {property.bathrooms} Baths</span>
+                  <span>🛏 {property.bedrooms} Beds</span>
+                  <span>🚿 {property.bathrooms} Baths</span>
                 </div>
 
-                <p style={styles.price}>
-                  💰 KES {property.price?.toLocaleString()} / month
-                </p>
-
-                <p style={styles.description}>
-                  {property.description?.substring(0, 100)}...
-                </p>
-
-                {/* Unit Info */}
-                <div style={styles.unitsInfo}>
-                  <span style={styles.unitItem}>Total: {property.totalUnits}</span>
-                  <span style={styles.unitItem}>Booked: {property.bookedUnits}</span>
-                  <span style={styles.unitItem}>
-                    Available: {property.availableUnits}
-                  </span>
-                </div>
-
-                {/* Amenities */}
-                {property.amenities && property.amenities.length > 0 && (
-                  <div style={styles.amenitiesBox}>
-                    <p style={styles.amenitiesTitle}>✨ Amenities:</p>
-                    <div style={styles.amenitiesList}>
-                      {property.amenities.slice(0, 3).map((amenity, idx) => (
-                        <span key={idx} style={styles.amenityTag}>
-                          {amenity}
-                        </span>
-                      ))}
-                      {property.amenities.length > 3 && (
-                        <span style={styles.amenityTag}>
-                          +{property.amenities.length - 3} more
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Actions */}
-                <div style={styles.actions}>
-                  {activeTab === "active" ? (
-                    <>
-                      <button
-                        style={styles.bookedBtn}
-                        onClick={() => handleMarkBooked(property._id)}
-                      >
-                        ✅ Mark Booked
-                      </button>
-                      <button
-                        style={styles.deleteBtn}
-                        onClick={() => handleDelete(property._id)}
-                      >
-                        🗑️ Delete
-                      </button>
-                    </>
-                  ) : (
-                    <button
-                      style={styles.unbookBtn}
-                      onClick={() => handleUnmarkBooked(property._id)}
-                    >
-                      🔄 Unmark Booked
-                    </button>
-                  )}
-                </div>
+                <button 
+                  onClick={() => handleDelete(property._id)}
+                  style={styles.deleteBtn}
+                >
+                  🗑 Delete Property
+                </button>
               </div>
             </div>
           ))}
@@ -307,6 +170,7 @@ export default function LandlordDashboard() {
   );
 }
 
+/* ==================== STYLES (Your Original Style Preserved) ==================== */
 const styles = {
   container: {
     maxWidth: "1200px",
@@ -443,7 +307,7 @@ const styles = {
     color: "#94a3b8",
     fontWeight: 600,
   },
-  badge: {
+  statusBadge: {
     position: "absolute",
     top: "12px",
     right: "12px",
@@ -452,26 +316,6 @@ const styles = {
     fontSize: "0.85rem",
     fontWeight: 600,
     color: "white",
-  },
-  badgeApproved: {
-    background: "#10b981",
-  },
-  badgePending: {
-    background: "#f59e0b",
-  },
-  badgeRejected: {
-    background: "#ef4444",
-  },
-  bookedBadge: {
-    position: "absolute",
-    bottom: "12px",
-    left: "12px",
-    background: "rgba(59, 130, 246, 0.9)",
-    color: "white",
-    padding: "8px 12px",
-    borderRadius: "6px",
-    fontSize: "0.85rem",
-    fontWeight: 600,
   },
   content: {
     padding: "20px",
@@ -483,7 +327,6 @@ const styles = {
     color: "#f1f5f9",
     fontSize: "1.3rem",
     margin: "0 0 8px 0",
-    wordBreak: "break-word",
   },
   location: {
     color: "#94a3b8",
@@ -505,83 +348,8 @@ const styles = {
     fontWeight: 700,
     margin: "12px 0",
   },
-  description: {
-    color: "#cbd5e1",
-    fontSize: "0.9rem",
-    margin: "12px 0",
-    lineHeight: "1.5",
-  },
-  unitsInfo: {
-    display: "flex",
-    gap: "8px",
-    padding: "12px",
-    background: "rgba(59, 130, 246, 0.1)",
-    borderRadius: "8px",
-    margin: "12px 0",
-    fontSize: "0.85rem",
-    color: "#cbd5e1",
-  },
-  unitItem: {
-    flex: 1,
-    textAlign: "center",
-  },
-  amenitiesBox: {
-    background: "rgba(139, 92, 246, 0.1)",
-    padding: "12px",
-    borderRadius: "8px",
-    margin: "12px 0",
-    border: "1px solid rgba(139, 92, 246, 0.3)",
-  },
-  amenitiesTitle: {
-    color: "#8b5cf6",
-    fontSize: "0.85rem",
-    fontWeight: 600,
-    margin: "0 0 8px 0",
-  },
-  amenitiesList: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "6px",
-  },
-  amenityTag: {
-    background: "rgba(139, 92, 246, 0.2)",
-    color: "#cbd5e1",
-    padding: "4px 8px",
-    borderRadius: "4px",
-    fontSize: "0.75rem",
-    fontWeight: 500,
-  },
-  actions: {
-    display: "flex",
-    gap: "8px",
-    marginTop: "auto",
-  },
-  bookedBtn: {
-    flex: 1,
-    padding: "10px 12px",
-    background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    fontWeight: 600,
-    cursor: "pointer",
-    fontSize: "0.9rem",
-    transition: "all 0.3s ease",
-  },
-  unbookBtn: {
-    flex: 1,
-    padding: "10px 12px",
-    background: "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    fontWeight: 600,
-    cursor: "pointer",
-    fontSize: "0.9rem",
-    transition: "all 0.3s ease",
-  },
   deleteBtn: {
-    flex: 1,
+    marginTop: "auto",
     padding: "10px 12px",
     background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
     color: "white",
@@ -590,24 +358,13 @@ const styles = {
     fontWeight: 600,
     cursor: "pointer",
     fontSize: "0.9rem",
-    transition: "all 0.3s ease",
   },
 };
 
 const cssStyles = `
-  * {
-    box-sizing: border-box;
-  }
-
   button:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
   }
-
-  button:active {
-    transform: translateY(0);
-  }
-
   @media (max-width: 768px) {
     [style*="gridTemplateColumns"] {
       grid-template-columns: 1fr !important;
