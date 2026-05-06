@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
+// Ensure this matches your local or production environment
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
 
 const AMENITIES_LIST = [
@@ -43,7 +44,7 @@ export default function Upload() {
       ...prev,
       [name]: type === "checkbox" ? checked : 
                (["price","deposit","bedrooms","bathrooms","totalUnits"].includes(name)) 
-               ? parseInt(value) || "" 
+               ? (value === "" ? "" : parseInt(value)) 
                : value,
     }));
   };
@@ -59,15 +60,12 @@ export default function Upload() {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-
     if (files.length + images.length > 10) {
       setError("⚠️ Maximum 10 images allowed");
       return;
     }
-
     const newImages = [...images, ...files];
     setImages(newImages);
-
     const newPreviews = files.map((file) => URL.createObjectURL(file));
     setImagePreviews((prev) => [...prev, ...newPreviews]);
   };
@@ -82,6 +80,7 @@ export default function Upload() {
     setError("");
     setSuccess("");
 
+    // Validation
     if (!formData.title || !formData.description || !formData.location || 
         !formData.price || !formData.bedrooms || !formData.bathrooms) {
       setError("❌ Please fill all required fields");
@@ -96,30 +95,39 @@ export default function Upload() {
     setLoading(true);
 
     try {
-      const formDataToSend = new FormData();
+      const data = new FormData();
 
+      // Append all text/number fields
       Object.keys(formData).forEach(key => {
         if (key === "amenities") {
-          formDataToSend.append("amenities", JSON.stringify(formData.amenities));
+          // Backend expects a stringified array if sent via FormData
+          data.append("amenities", JSON.stringify(formData.amenities));
         } else {
-          formDataToSend.append(key, formData[key]);
+          data.append(key, formData[key]);
         }
       });
 
-      images.forEach((image) => formDataToSend.append("images", image));
-
-      const response = await fetch(`${API_BASE}/properties`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formDataToSend,
+      // Append images with key 'images' to match your Multer config
+      images.forEach((image) => {
+        data.append("images", image);
       });
 
+      const response = await fetch(`${API_BASE}/properties/create`, {
+        method: "POST",
+        headers: { 
+          // Do NOT set Content-Type header manually when using FormData
+          Authorization: `Bearer ${token}` 
+        },
+        body: data,
+      });
+
+      const result = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to upload property");
+        throw new Error(result.error || "Failed to upload property");
       }
 
-      setSuccess("✅ Property uploaded successfully! It is now pending admin approval.");
+      setSuccess("✅ Property uploaded! Status: Pending Admin Approval.");
 
       // Reset form
       setFormData({
@@ -130,7 +138,7 @@ export default function Upload() {
       setImages([]);
       setImagePreviews([]);
 
-      setTimeout(() => navigate("/dashboard"), 2200);
+      setTimeout(() => navigate("/dashboard"), 2500);
     } catch (err) {
       setError(err.message || "Error uploading property");
     } finally {
@@ -155,7 +163,6 @@ export default function Upload() {
   return (
     <div style={styles.container}>
       <style>{cssStyles}</style>
-
       <div style={styles.formBox}>
         <h1 style={styles.heading}>📝 Upload Your Property</h1>
         <p style={styles.subtitle}>List your rental property on Axx Spaces</p>
@@ -219,7 +226,6 @@ export default function Upload() {
             </div>
           </div>
 
-          {/* Images */}
           <div style={styles.formGroup}>
             <label style={styles.label}>Upload Images (Max 10) <span style={styles.required}>*</span></label>
             <div style={styles.imageUploadBox}>
@@ -243,7 +249,6 @@ export default function Upload() {
             )}
           </div>
 
-          {/* Amenities */}
           <div style={styles.formGroup}>
             <label style={styles.label}>Amenities (Select at least 1) <span style={styles.required}>*</span></label>
             <div style={styles.amenitiesGrid}>
@@ -276,36 +281,22 @@ export default function Upload() {
   );
 }
 
-/* ==================== YOUR ORIGINAL STYLES (FULLY KEPT) ==================== */
+/* ==================== STYLES ==================== */
 const styles = {
-  container: {
-    minHeight: "100vh",
-    background: "linear-gradient(135deg, #06101f 0%, #0a1428 100%)",
-    padding: "40px 20px",
-    fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont",
-  },
-  formBox: {
-    maxWidth: "700px",
-    margin: "0 auto",
-    background: "rgba(10, 20, 40, 0.9)",
-    border: "1px solid rgba(59, 130, 246, 0.2)",
-    backdropFilter: "blur(10px)",
-    borderRadius: "20px",
-    padding: "50px 40px",
-    boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
-  },
+  container: { minHeight: "100vh", background: "linear-gradient(135deg, #06101f 0%, #0a1428 100%)", padding: "40px 20px", fontFamily: "'DM Sans', sans-serif" },
+  formBox: { maxWidth: "700px", margin: "0 auto", background: "rgba(10, 20, 40, 0.9)", border: "1px solid rgba(59, 130, 246, 0.2)", backdropFilter: "blur(10px)", borderRadius: "20px", padding: "50px 40px", boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)" },
   heading: { color: "#f1f5f9", fontSize: "28px", fontWeight: 800, margin: "0 0 8px", textAlign: "center" },
   subtitle: { color: "#94a3b8", fontSize: "14px", textAlign: "center", margin: "0 0 32px" },
-  errorBox: { background: "rgba(239, 68, 68, 0.15)", border: "1px solid rgba(239, 68, 68, 0.5)", color: "#fca5a5", padding: "12px 16px", borderRadius: "10px", marginBottom: "20px", fontSize: "14px", fontWeight: 500 },
-  successBox: { background: "rgba(34, 197, 94, 0.15)", border: "1px solid rgba(34, 197, 94, 0.5)", color: "#86efac", padding: "12px 16px", borderRadius: "10px", marginBottom: "20px", fontSize: "14px", fontWeight: 500 },
+  errorBox: { background: "rgba(239, 68, 68, 0.15)", border: "1px solid rgba(239, 68, 68, 0.5)", color: "#fca5a5", padding: "12px 16px", borderRadius: "10px", marginBottom: "20px", fontSize: "14px" },
+  successBox: { background: "rgba(34, 197, 94, 0.15)", border: "1px solid rgba(34, 197, 94, 0.5)", color: "#86efac", padding: "12px 16px", borderRadius: "10px", marginBottom: "20px", fontSize: "14px" },
   form: { display: "flex", flexDirection: "column", gap: "24px" },
   formGroup: { display: "flex", flexDirection: "column", gap: "8px" },
   formRow: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" },
   label: { color: "#cbd5e1", fontSize: "13px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" },
   required: { color: "#ef4444", fontWeight: 700 },
-  input: { padding: "14px 16px", background: "rgba(30, 41, 59, 0.8)", border: "1px solid rgba(148, 163, 184, 0.2)", borderRadius: "10px", color: "#f1f5f9", fontSize: "15px", fontFamily: "inherit", transition: "all 0.2s", outline: "none" },
-  textarea: { padding: "14px 16px", background: "rgba(30, 41, 59, 0.8)", border: "1px solid rgba(148, 163, 184, 0.2)", borderRadius: "10px", color: "#f1f5f9", fontSize: "15px", fontFamily: "inherit", transition: "all 0.2s", outline: "none", resize: "vertical" },
-  imageUploadBox: { position: "relative", border: "2px dashed rgba(59, 130, 246, 0.5)", borderRadius: "10px", padding: "40px 20px", textAlign: "center", background: "rgba(59, 130, 246, 0.05)", transition: "all 0.3s ease", cursor: "pointer" },
+  input: { padding: "14px 16px", background: "rgba(30, 41, 59, 0.8)", border: "1px solid rgba(148, 163, 184, 0.2)", borderRadius: "10px", color: "#f1f5f9", fontSize: "15px", outline: "none" },
+  textarea: { padding: "14px 16px", background: "rgba(30, 41, 59, 0.8)", border: "1px solid rgba(148, 163, 184, 0.2)", borderRadius: "10px", color: "#f1f5f9", fontSize: "15px", outline: "none", resize: "vertical" },
+  imageUploadBox: { position: "relative", border: "2px dashed rgba(59, 130, 246, 0.5)", borderRadius: "10px", padding: "40px 20px", textAlign: "center", background: "rgba(59, 130, 246, 0.05)", cursor: "pointer" },
   fileInput: { display: "none" },
   fileLabel: { cursor: "pointer", display: "block" },
   uploadIcon: { fontSize: "48px", marginBottom: "12px" },
@@ -313,29 +304,18 @@ const styles = {
   previewContainer: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))", gap: "12px", marginTop: "16px" },
   previewBox: { position: "relative", width: "100%", aspectRatio: "1", borderRadius: "8px", overflow: "hidden", background: "#1e293b" },
   previewImg: { width: "100%", height: "100%", objectFit: "cover" },
-  removeBtn: { position: "absolute", top: "4px", right: "4px", background: "rgba(239, 68, 68, 0.9)", border: "none", color: "white", width: "24px", height: "24px", borderRadius: "50%", cursor: "pointer", fontSize: "12px", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" },
+  removeBtn: { position: "absolute", top: "4px", right: "4px", background: "rgba(239, 68, 68, 0.9)", border: "none", color: "white", width: "24px", height: "24px", borderRadius: "50%", cursor: "pointer" },
   amenitiesGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", gap: "8px" },
-  amenityBtn: { padding: "10px 12px", border: "1px solid rgba(148, 163, 184, 0.2)", borderRadius: "8px", fontSize: "13px", fontWeight: 600, cursor: "pointer", transition: "all 0.2s ease", textAlign: "center" },
+  amenityBtn: { padding: "10px 12px", border: "1px solid rgba(148, 163, 184, 0.2)", borderRadius: "8px", fontSize: "13px", fontWeight: 600, cursor: "pointer" },
   amenityBtnUnselected: { background: "rgba(30, 41, 59, 0.8)", color: "#cbd5e1" },
   amenityBtnSelected: { background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)", color: "white", border: "1px solid #3b82f6" },
-  submitBtn: { padding: "14px 24px", background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "#fff", border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 700, cursor: "pointer", marginTop: "16px", transition: "all 0.3s", boxShadow: "0 8px 24px rgba(34, 197, 94, 0.4)" },
+  submitBtn: { padding: "14px 24px", background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "#fff", border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 700, cursor: "pointer", marginTop: "16px", boxShadow: "0 8px 24px rgba(34, 197, 94, 0.4)" },
   disclaimer: { textAlign: "center", color: "#64748b", fontSize: "12px", marginTop: "20px" },
   unauth: { textAlign: "center", color: "#94a3b8", padding: "60px 20px", background: "rgba(30, 41, 59, 0.5)", borderRadius: "12px", border: "2px dashed #475569" },
-  loginBtn: { marginTop: "20px", padding: "12px 24px", background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)", color: "white", border: "none", borderRadius: "8px", fontSize: "1rem", fontWeight: 600, cursor: "pointer" },
+  loginBtn: { marginTop: "20px", padding: "12px 24px", background: "#3b82f6", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer" },
 };
 
 const cssStyles = `
-  input:focus, textarea:focus {
-    border-color: rgba(59, 130, 246, 0.8) !important;
-    background: rgba(30, 41, 59, 1) !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-  button:hover:not(:disabled) {
-    transform: translateY(-2px);
-  }
-  @media (max-width: 600px) {
-    [style*="gridTemplateColumns: 1fr 1fr"] {
-      grid-template-columns: 1fr !important;
-    }
-  }
+  input:focus, textarea:focus { border-color: #3b82f6 !important; background: rgba(30, 41, 59, 1) !important; }
+  button:hover:not(:disabled) { transform: translateY(-2px); transition: 0.2s; }
 `;
