@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import logo from "../assets/logo.jpeg";
 
-const API_BASE = "http://localhost:1000";
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -38,8 +38,9 @@ export default function Login() {
 
     try {
       console.log("🔐 Logging in with:", formData.email);
+      console.log("🌐 API URL:", `${API_BASE}/auth/login`);
 
-      const response = await fetch(`${API_BASE}/api/auth/login`, {
+      const response = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -63,7 +64,7 @@ export default function Login() {
       }, 2000);
     } catch (err) {
       console.error("❌ Error:", err);
-      setError(err.message || "❌ Login failed");
+      setError(err.message || "❌ Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
