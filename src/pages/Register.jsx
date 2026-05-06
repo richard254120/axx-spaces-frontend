@@ -10,7 +10,7 @@ console.log("🌐 API Base URL:", API_BASE);
 
 export default function Register() {
   const navigate = useNavigate();
-  const { setToken } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);   // ← Changed from setToken to login
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -70,12 +70,15 @@ export default function Register() {
         throw new Error(data.error || "Registration failed");
       }
 
-      setSuccess("✅ Registration successful! Redirecting...");
-      setToken(data.token);
+      setSuccess("✅ Registration successful! Redirecting to Dashboard...");
+
+      // ✅ FIXED: Use login from AuthContext instead of setToken
+      login(data.token, data.user || { name: formData.name, email: formData.email });
+
       localStorage.setItem("token", data.token);
 
       setTimeout(() => {
-        navigate("/listings");
+        navigate("/dashboard");   // ← Changed to dashboard as requested
       }, 2000);
     } catch (err) {
       console.error("❌ Registration error:", err);
