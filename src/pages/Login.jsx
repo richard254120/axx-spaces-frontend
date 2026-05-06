@@ -3,11 +3,14 @@ import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import logo from "../assets/logo.jpeg";
 
+// Use environment variable with fallback
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
+
+console.log("🌐 API Base URL:", API_BASE);
 
 export default function Login() {
   const navigate = useNavigate();
-  const { setToken } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);   // ← Changed from setToken to login
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -55,13 +58,17 @@ export default function Login() {
         throw new Error(data.error || "Login failed");
       }
 
-      setSuccess("✅ Login successful! Redirecting...");
-      setToken(data.token);
+      setSuccess("✅ Login successful! Redirecting to Dashboard...");
+
+      // ✅ FIXED: Use login() instead of setToken
+      login(data.token, data.user);
+
       localStorage.setItem("token", data.token);
 
       setTimeout(() => {
-        navigate("/listings");
-      }, 2000);
+        navigate("/dashboard");   // ← Changed to Landlord Dashboard
+      }, 1500);
+
     } catch (err) {
       console.error("❌ Error:", err);
       setError(err.message || "❌ Login failed. Please try again.");
@@ -73,21 +80,17 @@ export default function Login() {
   return (
     <div style={styles.root}>
       <style>{css}</style>
-
       <div style={styles.container}>
         {/* Logo Section */}
         <div style={styles.logoSection}>
           <img src={logo} alt="Axx Spaces" style={styles.logo} />
         </div>
-
         {/* Form Container */}
         <div style={styles.formBox}>
           <h1 style={styles.title}>🔐 Welcome Back</h1>
           <p style={styles.subtitle}>Login to your Axx Spaces account</p>
-
           {error && <div style={styles.error}>{error}</div>}
           {success && <div style={styles.success}>{success}</div>}
-
           <form onSubmit={handleSubmit} style={styles.form}>
             {/* Email */}
             <div style={styles.formGroup}>
@@ -102,7 +105,6 @@ export default function Login() {
                 required
               />
             </div>
-
             {/* Password */}
             <div style={styles.formGroup}>
               <label style={styles.label}>Password</label>
@@ -116,7 +118,6 @@ export default function Login() {
                 required
               />
             </div>
-
             {/* Submit Button */}
             <button
               type="submit"
@@ -130,19 +131,15 @@ export default function Login() {
               {loading ? "⏳ Logging in..." : "🚀 Login"}
             </button>
           </form>
-
           {/* Divider */}
           <div style={styles.divider}></div>
-
           {/* Links */}
           <div style={styles.linksContainer}>
             <Link to="/forgot-password" style={styles.link}>
               🔐 Forgot Password?
             </Link>
           </div>
-
           <div style={styles.divider}></div>
-
           {/* Register Link */}
           <p style={styles.footer}>
             Don't have an account?{" "}
@@ -166,22 +163,18 @@ const styles = {
     justifyContent: "center",
     padding: "20px",
   },
-
   container: {
     width: "100%",
     maxWidth: "500px",
   },
-
   logoSection: {
     textAlign: "center",
     marginBottom: "40px",
   },
-
   logo: {
     height: "80px",
     width: "auto",
   },
-
   formBox: {
     background: "white",
     border: "2px solid #fbbf24",
@@ -189,7 +182,6 @@ const styles = {
     padding: "40px 32px",
     boxShadow: "0 10px 40px rgba(0, 0, 0, 0.08)",
   },
-
   title: {
     fontSize: "28px",
     fontWeight: 800,
@@ -197,14 +189,12 @@ const styles = {
     margin: "0 0 8px",
     textAlign: "center",
   },
-
   subtitle: {
     fontSize: "14px",
     color: "#6b7280",
     margin: "0 0 24px",
     textAlign: "center",
   },
-
   error: {
     background: "#fee2e2",
     border: "1px solid #fca5a5",
@@ -215,7 +205,6 @@ const styles = {
     fontSize: "14px",
     fontWeight: 500,
   },
-
   success: {
     background: "#dcfce7",
     border: "1px solid #86efac",
@@ -226,19 +215,16 @@ const styles = {
     fontSize: "14px",
     fontWeight: 500,
   },
-
   form: {
     display: "flex",
     flexDirection: "column",
     gap: "20px",
   },
-
   formGroup: {
     display: "flex",
     flexDirection: "column",
     gap: "6px",
   },
-
   label: {
     fontSize: "13px",
     fontWeight: 700,
@@ -246,7 +232,6 @@ const styles = {
     textTransform: "uppercase",
     letterSpacing: "0.5px",
   },
-
   input: {
     padding: "12px 14px",
     border: "2px solid #d1d5db",
@@ -256,7 +241,6 @@ const styles = {
     transition: "all 0.2s",
     background: "#f9fafb",
   },
-
   submitBtn: {
     padding: "13px 24px",
     background: "linear-gradient(135deg, #2427fb 0%, #4d9ffc 100%)",
@@ -270,25 +254,21 @@ const styles = {
     boxShadow: "0 4px 12px rgba(36, 39, 251, 0.3)",
     marginTop: "8px",
   },
-
   divider: {
     height: "1px",
     background: "#e5e7eb",
     margin: "20px 0",
   },
-
   linksContainer: {
     textAlign: "center",
     margin: "16px 0",
   },
-
   footer: {
     textAlign: "center",
     color: "#6b7280",
     fontSize: "14px",
     margin: 0,
   },
-
   link: {
     color: "#2427fb",
     textDecoration: "none",
@@ -305,20 +285,16 @@ const css = `
     background: white !important;
     box-shadow: 0 0 0 3px rgba(36, 39, 251, 0.1);
   }
-
   button:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(36, 39, 251, 0.4) !important;
   }
-
   button:active {
     transform: translateY(0);
   }
-
   a:hover {
     opacity: 0.8;
   }
-
   @media (max-width: 600px) {
     [style*="padding: 40px 32px"] {
       padding: 32px 24px !important;
