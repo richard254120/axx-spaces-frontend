@@ -8,7 +8,6 @@ export default function Listings() {
   const [filteredProperties, setFilteredProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState("all");
   const [filters, setFilters] = useState({
     location: "",
     minPrice: 0,
@@ -27,6 +26,7 @@ export default function Listings() {
         if (!response.ok) throw new Error("Failed to fetch properties");
         const data = await response.json();
        
+        // ✅ PERFECT UNIT CALCULATION
         const processedProperties = data.map(prop => ({
           ...prop,
           availableUnits: Math.max(0, (prop.totalUnits || 1) - (prop.bookedUnits || 0))
@@ -46,11 +46,6 @@ export default function Listings() {
 
   useEffect(() => {
     let filtered = properties;
-
-    if (activeTab === "book") {
-      filtered = filtered.filter((p) => p.availableUnits > 0);
-    }
-
     if (filters.location) {
       filtered = filtered.filter((p) =>
         (p.location + " " + (p.county || "")).toLowerCase().includes(filters.location.toLowerCase())
@@ -68,9 +63,8 @@ export default function Listings() {
     filtered = filtered.filter(
       (p) => p.price >= filters.minPrice && p.price <= filters.maxPrice
     );
-
     setFilteredProperties(filtered);
-  }, [filters, properties, activeTab]);
+  }, [filters, properties]);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -101,18 +95,16 @@ export default function Listings() {
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
-  // ✅ NEW: Dedicated Booking Message
+  // ✅ NEW: Book button function
   const handleBookNow = (property) => {
     const phoneNumber = property.owner?.phone?.replace(/\D/g, "") || property.phone?.replace(/\D/g, "");
-    const message = `Hello,\n\n` +
-      `I want to BOOK this property:\n\n` +
-      `🏠 ${property.title}\n` +
-      `📍 ${property.county} - ${property.location}\n` +
-      `💰 KES ${property.price?.toLocaleString()}/month\n` +
-      `🛏 ${property.bedrooms} Bedrooms | 🚿 ${property.bathrooms} Bathrooms\n` +
-      `📊 Available Units: ${property.availableUnits}\n\n` +
-      `I am seriously interested and ready to proceed with booking. Please confirm availability and next steps.\nThank you!`;
-
+    const message = `Hello,\n\nI want to BOOK this property right now:\n\n` +
+                    `🏠 ${property.title}\n` +
+                    `📍 ${property.county} - ${property.location}\n` +
+                    `💰 KES ${property.price?.toLocaleString()}/month\n` +
+                    `🛏 ${property.bedrooms} Bedrooms | 🚿 ${property.bathrooms} Bathrooms\n` +
+                    `📊 Available: ${property.availableUnits} units\n\n` +
+                    `Please confirm availability and let me know the next steps for booking. Thank you!`;
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
@@ -137,22 +129,6 @@ export default function Listings() {
       </div>
 
       {error && <div style={styles.error}>{error}</div>}
-
-      {/* Tabs */}
-      <div style={styles.tabsContainer}>
-        <button 
-          style={{...styles.tabBtn, ...(activeTab === "all" && styles.tabBtnActive)}} 
-          onClick={() => setActiveTab("all")}
-        >
-          📋 All
-        </button>
-        <button 
-          style={{...styles.tabBtn, ...(activeTab === "book" && styles.tabBtnActive)}} 
-          onClick={() => setActiveTab("book")}
-        >
-          🚀 Book Property
-        </button>
-      </div>
 
       {/* Filters - unchanged */}
       <div style={styles.filters}>
@@ -201,7 +177,6 @@ export default function Listings() {
         <div style={styles.grid}>
           {filteredProperties.map((property) => (
             <div key={property._id} style={styles.card}>
-              {/* ... your card code unchanged ... */}
               <div style={styles.imageContainer} onClick={() => openModal(property)}>
                 {property.images?.length > 0 ? (
                   <img src={property.images[0]} alt={property.title} style={styles.image} />
@@ -211,14 +186,38 @@ export default function Listings() {
                 <div style={{ ...styles.availabilityBadge, ...(property.availableUnits > 0 ? styles.availableBadge : styles.unavailableBadge) }}>
                   {property.availableUnits > 0 ? <>✅ {property.availableUnits} Available</> : <>❌ Fully Booked</>}
                 </div>
+                {property.images?.length > 1 && (
+                  <div style={styles.imageCount}>📷 {property.images.length}</div>
+                )}
               </div>
-
               <div style={styles.content}>
                 <h2 style={styles.title}>{property.title}</h2>
-                <p style={styles.location}>📍 {property.county} • {property.location}</p>
-
-                {/* ... rest of card unchanged ... */}
-
+               
+                <p style={styles.location}>
+                  📍 {property.county} • {property.location}
+                </p>
+                <div style={styles.specs}>
+                  <span style={styles.spec}>🛏️ {property.bedrooms} Bed</span>
+                  <span style={styles.spec}>🚿 {property.bathrooms} Bath</span>
+                  <span style={styles.spec}>{property.furnished ? "🪑 Furnished" : "📦 Unfurnished"}</span>
+                </div>
+                <div style={styles.price}>💰 KES {property.price?.toLocaleString()}/month</div>
+                <p style={styles.description}>{property.description?.substring(0, 80)}...</p>
+                <div style={styles.unitInfo}>
+                  <div><span style={styles.unitLabel}>Total Units</span><span style={styles.unitValue}>{property.totalUnits || 1}</span></div>
+                  <div><span style={styles.unitLabel}>Booked</span><span style={styles.unitValue}>{property.bookedUnits || 0}</span></div>
+                  <div><span style={styles.unitLabel}>Available</span><strong style={styles.unitValueBold}>{property.availableUnits}</strong></div>
+                </div>
+                {property.amenities?.length > 0 && (
+                  <div style={styles.amenitiesPreview}>
+                    {property.amenities.slice(0, 2).map((amenity, idx) => (
+                      <span key={idx} style={styles.amenityChip}>✓ {amenity}</span>
+                    ))}
+                    {property.amenities.length > 2 && (
+                      <span style={styles.amenityChip}>+{property.amenities.length - 2} more</span>
+                    )}
+                  </div>
+                )}
                 <button
                   style={{ ...styles.contactBtn, ...(property.availableUnits === 0 ? styles.contactBtnDisabled : {}) }}
                   onClick={() => handleContactLandlord(property)}
@@ -235,7 +234,7 @@ export default function Listings() {
         </div>
       )}
 
-      {/* ==================== MODAL WITH NEW "BOOK" BUTTON ==================== */}
+      {/* Modal - Updated with new Book button */}
       {selectedProperty && (
         <div style={styles.modal} onClick={closeModal}>
           <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
@@ -347,19 +346,18 @@ export default function Listings() {
                 <p style={styles.landlordDetail}><strong>Phone:</strong> {selectedProperty.owner?.phone}</p>
               </div>
 
-              {/* ✅ THREE BUTTONS IN MODAL */}
+              {/* ✅ THREE BUTTONS: Contact, Call, and Book */}
               <div style={styles.contactButtonsContainer}>
                 <button
-                  style={styles.whatsappBtn}
+                  style={{ ...styles.whatsappBtn, ...(selectedProperty.availableUnits === 0 ? styles.contactBtnDisabled : {}) }}
                   onClick={() => handleContactLandlord(selectedProperty)}
+                  disabled={selectedProperty.availableUnits === 0}
                 >
                   💬 Contact via WhatsApp
                 </button>
-
                 <button style={styles.callBtn} onClick={() => window.open(`tel:${selectedProperty.owner?.phone}`)}>
                   📞 Call Landlord
                 </button>
-
                 {/* ✅ NEW BOOK BUTTON */}
                 <button
                   style={styles.bookBtn}
@@ -376,7 +374,7 @@ export default function Listings() {
   );
 }
 
-/* ==================== STYLES (All your original styles + new Book button) ==================== */
+/* ==================== ALL YOUR ORIGINAL STYLES + NEW BOOK BUTTON STYLE ==================== */
 const styles = {
   container: { maxWidth: "1200px", margin: "0 auto", padding: "20px", background: "linear-gradient(135deg, #06101f 0%, #0f1729 100%)", minHeight: "100vh", fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont" },
   header: { textAlign: "center", marginBottom: "40px", color: "#f1f5f9" },
@@ -464,7 +462,7 @@ const styles = {
   landlordInfo: { margin: "20px 0", padding: "16px", background: "rgba(139, 92, 246, 0.1)", borderRadius: "8px" },
   landlordHead: { margin: "0 0 12px 0", color: "#8b5cf6" },
   landlordDetail: { color: "#cbd5e1", margin: "8px 0" },
-  contactButtonsContainer: { display: "flex", gap: "12px", marginTop: "20px", flexWrap: "wrap" },
+  contactButtonsContainer: { display: "flex", gap: "12px", marginTop: "20px" },
   whatsappBtn: { flex: 1, padding: "12px 16px", background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.95rem" },
   callBtn: { flex: 1, padding: "12px 16px", background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.95rem" },
 };
