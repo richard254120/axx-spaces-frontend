@@ -41,28 +41,7 @@ export default function LandlordDashboard() {
     }
   };
 
-  const handleDelete = async (propertyId) => {
-    if (!window.confirm("🗑️ Delete this property permanently?")) return;
-    try {
-      const response = await fetch(`${API_BASE}/properties/${propertyId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.error || "Failed to delete property");
-      }
-
-      setProperties(properties.filter((p) => p._id !== propertyId));
-      setSuccessMessage("✅ Property deleted successfully!");
-      setTimeout(() => setSuccessMessage(""), 3000);
-    } catch (err) {
-      setError(err.message || "Failed to delete property");
-      setTimeout(() => setError(""), 3000);
-    }
-  };
-
+  // ✅ Update booked units
   const updateBookedUnits = async (propertyId, change) => {
     try {
       const response = await fetch(`${API_BASE}/properties/${propertyId}/book`, {
@@ -112,7 +91,7 @@ export default function LandlordDashboard() {
     <div style={styles.container}>
       <style>{cssStyles}</style>
 
-      {/* ==================== LANDLORD PROFILE SECTION ==================== */}
+      {/* ==================== LANDLORD PROFILE ==================== */}
       <div style={styles.profileCard}>
         <div style={styles.profileHeader}>
           <div style={styles.avatar}>👤</div>
@@ -253,7 +232,7 @@ export default function LandlordDashboard() {
                         Mark 1 Unit Available
                       </button>
                     </div>
-          
+                  )}
                 </div>
               </div>
             );
@@ -320,7 +299,6 @@ const styles = {
   bookingControls: { display: "flex", gap: "8px", margin: "12px 0" },
   bookedBtn: { flex: 1, padding: "9px 12px", background: "linear-gradient(135deg, #f59e0b, #d97706)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.85rem" },
   availableBtn: { flex: 1, padding: "9px 12px", background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.85rem" },
-  deleteBtn: { width: "100%", padding: "10px", background: "#ef4444", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: 600, marginTop: "8px" }
 };
 
 const cssStyles = `
