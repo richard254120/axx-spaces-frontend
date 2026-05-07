@@ -259,7 +259,7 @@ export default function LandlordDashboard() {
                     style={styles.deleteBtn}
                     onClick={() => handleDelete(property._id)}
                   >
-                    🗑 Delete Property
+                    
                   </button>
                 </div>
               </div>
