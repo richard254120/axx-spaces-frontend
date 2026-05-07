@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-// ✅ Use API_BASE like every other file
+// ✅ FIX: Use API_BASE like every other file
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
 
 // Helper function to format Kenyan phone numbers (+254)
@@ -34,12 +34,12 @@ export default function Listings() {
         const response = await fetch(`${API_BASE}/properties`);
         if (!response.ok) throw new Error("Failed to fetch properties");
         const data = await response.json();
-       
+      
         const processedProperties = data.map(prop => ({
           ...prop,
           availableUnits: Math.max(0, (prop.totalUnits || 1) - (prop.bookedUnits || 0))
         }));
-       
+      
         const availableProperties = processedProperties.filter((prop) => prop.availableUnits > 0);
         setProperties(processedProperties);
         setFilteredProperties(availableProperties);
@@ -86,10 +86,7 @@ export default function Listings() {
     setSelectedProperty(property);
     setCurrentImageIndex(0);
   };
-  const closeModal = () => { 
-    setSelectedProperty(null); 
-    setCurrentImageIndex(0); 
-  };
+  const closeModal = () => { setSelectedProperty(null); setCurrentImageIndex(0); };
   const nextImage = () => {
     if (selectedProperty?.images?.length > 0)
       setCurrentImageIndex((prev) => (prev + 1) % selectedProperty.images.length);
@@ -100,16 +97,14 @@ export default function Listings() {
   };
 
   const handleContactLandlord = (property) => {
-    let phone = property.owner?.phone || property.phone || "";
-    const formattedPhone = formatKenyaPhone(phone);
+    const phoneNumber = formatKenyaPhone(property.owner?.phone || property.phone || "");
     const landlordName = property.owner?.name || "Landlord";
     const message = `Hi ${landlordName}, I'm interested in your property "${property.title}" located in ${property.location}. Can you provide more details?`;
-    window.open(`https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`, "_blank");
+    window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
   const handleBookNow = (property) => {
-    let phone = property.owner?.phone || property.phone || "";
-    const formattedPhone = formatKenyaPhone(phone);
+    const phoneNumber = formatKenyaPhone(property.owner?.phone || property.phone || "");
     const message = `Hello,\n\nI want to BOOK this property right now:\n\n` +
                     `🏠 ${property.title}\n` +
                     `📍 ${property.county} - ${property.location}\n` +
@@ -117,13 +112,12 @@ export default function Listings() {
                     `🛏 ${property.bedrooms} Bedrooms | 🚿 ${property.bathrooms} Bathrooms\n` +
                     `📊 Available: ${property.availableUnits} units\n\n` +
                     `Please confirm availability and let me know the next steps for booking. Thank you!`;
-    window.open(`https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`, "_blank");
+    window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
-  // ✅ NEW: SMS Booking
+  // ✅ NEW: SMS Booking Option
   const handleSendSMS = (property) => {
-    let phone = property.owner?.phone || property.phone || "";
-    const formattedPhone = formatKenyaPhone(phone);
+    const phoneNumber = formatKenyaPhone(property.owner?.phone || property.phone || "");
     const message = `Hello, I want to BOOK this property:\n` +
                     `${property.title}\n` +
                     `${property.county} - ${property.location}\n` +
@@ -131,7 +125,7 @@ export default function Listings() {
                     `${property.bedrooms} Bed | ${property.bathrooms} Bath\n` +
                     `Available: ${property.availableUnits} units\n\n` +
                     `Please reply with availability and booking details. Thank you!`;
-    window.open(`sms:${formattedPhone}?body=${encodeURIComponent(message)}`, "_blank");
+    window.open(`sms:${phoneNumber}?body=${encodeURIComponent(message)}`, "_blank");
   };
 
   const leaseLabel = { monthly: "Monthly", "6months": "6 Months", yearly: "Yearly" };
@@ -198,36 +192,68 @@ export default function Listings() {
         </div>
       )}
 
-      <div style={styles.grid}>
-        {filteredProperties.map((property) => (
-          <div key={property._id} style={styles.card}>
-            <div style={styles.imageContainer} onClick={() => openModal(property)}>
-              {property.images?.length > 0 ? (
-                <img src={property.images[0]} alt={property.title} style={styles.image} />
-              ) : (
-                <div style={styles.noImage}>📷 No Image</div>
-              )}
-              <div style={{ ...styles.availabilityBadge, ...(property.availableUnits > 0 ? styles.availableBadge : styles.unavailableBadge) }}>
-                {property.availableUnits > 0 ? <>✅ {property.availableUnits} Available</> : <>❌ Fully Booked</>}
+      {filteredProperties.length > 0 && (
+        <div style={styles.grid}>
+          {filteredProperties.map((property) => (
+            <div key={property._id} style={styles.card}>
+              <div style={styles.imageContainer} onClick={() => openModal(property)}>
+                {property.images?.length > 0 ? (
+                  <img src={property.images[0]} alt={property.title} style={styles.image} />
+                ) : (
+                  <div style={styles.noImage}>📷 No Image</div>
+                )}
+                <div style={{ ...styles.availabilityBadge, ...(property.availableUnits > 0 ? styles.availableBadge : styles.unavailableBadge) }}>
+                  {property.availableUnits > 0 ? <>✅ {property.availableUnits} Available</> : <>❌ Fully Booked</>}
+                </div>
+                {property.images?.length > 1 && (
+                  <div style={styles.imageCount}>📷 {property.images.length}</div>
+                )}
+              </div>
+              <div style={styles.content}>
+                <h2 style={styles.title}>{property.title}</h2>
+              
+                <p style={styles.location}>
+                  📍 {property.county} • {property.location}
+                </p>
+                <div style={styles.specs}>
+                  <span style={styles.spec}>🛏️ {property.bedrooms} Bed</span>
+                  <span style={styles.spec}>🚿 {property.bathrooms} Bath</span>
+                  <span style={styles.spec}>{property.furnished ? "🪑 Furnished" : "📦 Unfurnished"}</span>
+                </div>
+                <div style={styles.price}>💰 KES {property.price?.toLocaleString()}/month</div>
+                <p style={styles.description}>{property.description?.substring(0, 80)}...</p>
+                <div style={styles.unitInfo}>
+                  <div><span style={styles.unitLabel}>Total Units</span><span style={styles.unitValue}>{property.totalUnits || 1}</span></div>
+                  <div><span style={styles.unitLabel}>Booked</span><span style={styles.unitValue}>{property.bookedUnits || 0}</span></div>
+                  <div><span style={styles.unitLabel}>Available</span><strong style={styles.unitValueBold}>{property.availableUnits}</strong></div>
+                </div>
+                {property.amenities?.length > 0 && (
+                  <div style={styles.amenitiesPreview}>
+                    {property.amenities.slice(0, 2).map((amenity, idx) => (
+                      <span key={idx} style={styles.amenityChip}>✓ {amenity}</span>
+                    ))}
+                    {property.amenities.length > 2 && (
+                      <span style={styles.amenityChip}>+{property.amenities.length - 2} more</span>
+                    )}
+                  </div>
+                )}
+                <button
+                  style={{ ...styles.contactBtn, ...(property.availableUnits === 0 ? styles.contactBtnDisabled : {}) }}
+                  onClick={() => handleContactLandlord(property)}
+                  disabled={property.availableUnits === 0}
+                >
+                  💬 Contact via WhatsApp
+                </button>
+                <button style={styles.viewBtn} onClick={() => openModal(property)}>
+                  👁️ View Details
+                </button>
               </div>
             </div>
-            <div style={styles.content}>
-              <h2 style={styles.title}>{property.title}</h2>
-              <p style={styles.location}>📍 {property.county} • {property.location}</p>
-              <div style={styles.specs}>
-                <span style={styles.spec}>🛏️ {property.bedrooms} Bed</span>
-                <span style={styles.spec}>🚿 {property.bathrooms} Bath</span>
-                <span style={styles.spec}>{property.furnished ? "🪑 Furnished" : "📦 Unfurnished"}</span>
-              </div>
-              <div style={styles.price}>💰 KES {property.price?.toLocaleString()}/month</div>
-              <p style={styles.description}>{property.description?.substring(0, 80)}...</p>
-              <button style={styles.viewBtn} onClick={() => openModal(property)}>👁️ View Details</button>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
-      {/* ====================== MODAL ====================== */}
+      {/* Modal */}
       {selectedProperty && (
         <div style={styles.modal} onClick={closeModal}>
           <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
@@ -235,21 +261,40 @@ export default function Listings() {
 
             <div style={styles.modalImage}>
               {selectedProperty.images?.length > 0 ? (
-                <img src={selectedProperty.images[currentImageIndex]} alt={selectedProperty.title} style={styles.modalImg} />
+                <>
+                  <img src={selectedProperty.images[currentImageIndex]} alt={`${selectedProperty.title} ${currentImageIndex + 1}`} style={styles.modalImg} />
+                  {selectedProperty.images.length > 1 && (
+                    <>
+                      <button style={styles.prevBtn} onClick={prevImage}>❮</button>
+                      <button style={styles.nextBtn} onClick={nextImage}>❯</button>
+                      <div style={styles.imageCounter}>{currentImageIndex + 1} / {selectedProperty.images.length}</div>
+                    </>
+                  )}
+                </>
               ) : (
                 <div style={styles.noImage}>📷 No Images Available</div>
               )}
-              {selectedProperty.images?.length > 1 && (
-                <>
-                  <button style={styles.prevBtn} onClick={prevImage}>❮</button>
-                  <button style={styles.nextBtn} onClick={nextImage}>❯</button>
-                </>
-              )}
             </div>
+
+            {selectedProperty.images?.length > 1 && (
+              <div style={styles.thumbnails}>
+                {selectedProperty.images.map((img, idx) => (
+                  <img
+                    key={idx}
+                    src={img}
+                    alt={`Thumbnail ${idx + 1}`}
+                    style={{ ...styles.thumbnail, ...(idx === currentImageIndex ? styles.activeThumbnail : {}) }}
+                    onClick={() => setCurrentImageIndex(idx)}
+                  />
+                ))}
+              </div>
+            )}
 
             <div style={styles.modalDetails}>
               <h2 style={styles.modalTitle}>{selectedProperty.title}</h2>
-              <p style={styles.modalLocation}>📍 {selectedProperty.county} • {selectedProperty.location}</p>
+              <p style={styles.modalLocation}>
+                📍 {selectedProperty.county} • {selectedProperty.location}
+              </p>
 
               <div style={styles.specs}>
                 <span style={styles.spec}>🛏️ {selectedProperty.bedrooms} Bedrooms</span>
@@ -257,30 +302,92 @@ export default function Listings() {
                 <span style={styles.spec}>{selectedProperty.furnished ? "🪑 Furnished" : "📦 Unfurnished"}</span>
               </div>
 
-              <div style={styles.price}>💰 KES {selectedProperty.price?.toLocaleString()}/month</div>
+              <div style={styles.pricingRow}>
+                <div style={styles.pricingBox}>
+                  <span style={styles.pricingLabel}>Monthly Rent</span>
+                  <span style={styles.pricingValue}>KES {selectedProperty.price?.toLocaleString()}</span>
+                </div>
+                {selectedProperty.deposit > 0 && (
+                  <div style={styles.pricingBox}>
+                    <span style={styles.pricingLabel}>Deposit</span>
+                    <span style={styles.pricingValue}>KES {selectedProperty.deposit?.toLocaleString()}</span>
+                  </div>
+                )}
+                {selectedProperty.leaseType && (
+                  <div style={styles.pricingBox}>
+                    <span style={styles.pricingLabel}>Lease</span>
+                    <span style={styles.pricingValue}>{leaseLabel[selectedProperty.leaseType] || selectedProperty.leaseType}</span>
+                  </div>
+                )}
+              </div>
 
               <p style={styles.fullDescription}>{selectedProperty.description}</p>
 
-              {/* Landlord Contact - Hidden as requested */}
+              {selectedProperty.rules && (
+                <div style={styles.rulesBox}>
+                  <h3 style={styles.rulesHead}>📋 House Rules</h3>
+                  <p style={styles.rulesText}>{selectedProperty.rules}</p>
+                </div>
+              )}
+
+              {selectedProperty.amenities?.length > 0 && (
+                <div style={styles.amenitiesSection}>
+                  <h3 style={styles.amenitiesHead}>✨ Amenities</h3>
+                  <div style={styles.amenitiesGrid}>
+                    {selectedProperty.amenities.map((amenity, idx) => (
+                      <span key={idx} style={styles.amenityChip}>✓ {amenity}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div style={styles.unitInfoModal}>
+                <h3 style={styles.unitHeading}>📊 Availability</h3>
+                <div style={styles.unitGrid}>
+                  <div style={styles.unitBox}>
+                    <p style={styles.unitBoxLabel}>Total Units</p>
+                    <p style={styles.unitBoxNumber}>{selectedProperty.totalUnits || 1}</p>
+                  </div>
+                  <div style={styles.unitBox}>
+                    <p style={styles.unitBoxLabel}>Booked</p>
+                    <p style={styles.unitBoxNumber}>{selectedProperty.bookedUnits || 0}</p>
+                  </div>
+                  <div style={styles.unitBox}>
+                    <p style={styles.unitBoxLabel}>Available</p>
+                    <p style={styles.unitBoxNumber}>{selectedProperty.availableUnits}</p>
+                  </div>
+                </div>
+              </div>
+
               <div style={styles.landlordInfo}>
                 <h3 style={styles.landlordHead}>👤 Landlord Contact</h3>
                 <p style={styles.landlordDetail}><strong>Name:</strong> </p>
                 <p style={styles.landlordDetail}><strong>Phone:</strong> </p>
               </div>
 
-              {/* 4 Action Buttons */}
+              {/* Four Buttons: WhatsApp, Call, SMS, Book */}
               <div style={styles.contactButtonsContainer}>
-                <button style={styles.whatsappBtn} onClick={() => handleContactLandlord(selectedProperty)}>
+                <button
+                  style={{ ...styles.whatsappBtn, ...(selectedProperty.availableUnits === 0 ? styles.contactBtnDisabled : {}) }}
+                  onClick={() => handleContactLandlord(selectedProperty)}
+                  disabled={selectedProperty.availableUnits === 0}
+                >
                   💬 WhatsApp
                 </button>
                 <button style={styles.callBtn} onClick={() => window.open(`tel:${selectedProperty.owner?.phone || selectedProperty.phone}`)}>
-                  📞 Call
+                  📞 Call Landlord
                 </button>
-                <button style={styles.smsBtn} onClick={() => handleSendSMS(selectedProperty)}>
+                <button
+                  style={styles.smsBtn}
+                  onClick={() => handleSendSMS(selectedProperty)}
+                >
                   📱 Send SMS
                 </button>
-                <button style={styles.bookBtn} onClick={() => handleBookNow(selectedProperty)}>
-                  🚀 Book Now
+                <button
+                  style={styles.bookBtn}
+                  onClick={() => handleBookNow(selectedProperty)}
+                >
+                  🚀 Book This Property
                 </button>
               </div>
             </div>
@@ -291,59 +398,100 @@ export default function Listings() {
   );
 }
 
-/* ====================== FULL STYLES ====================== */
+/* ==================== ALL YOUR ORIGINAL STYLES PRESERVED + NEW SMS BUTTON ==================== */
 const styles = {
-  container: { maxWidth: "1200px", margin: "0 auto", padding: "20px", background: "linear-gradient(135deg, #06101f 0%, #0f1729 100%)", minHeight: "100vh", fontFamily: "'DM Sans', system-ui" },
+  container: { maxWidth: "1200px", margin: "0 auto", padding: "20px", background: "linear-gradient(135deg, #06101f 0%, #0f1729 100%)", minHeight: "100vh", fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont" },
   header: { textAlign: "center", marginBottom: "40px", color: "#f1f5f9" },
   heading: { fontSize: "2.5rem", margin: 0, color: "#fbbf24", fontWeight: 700 },
-  tagline: { fontSize: "1.1rem", color: "#94a3b8", marginTop: "8px" },
-  filters: { display: "flex", gap: "12px", marginBottom: "32px", flexWrap: "wrap" },
-  filterInput: { padding: "12px", border: "1px solid #334155", borderRadius: "8px", background: "#1e293b", color: "#f1f5f9", flex: 1, minWidth: "160px" },
-  filterSelect: { padding: "12px", border: "1px solid #334155", borderRadius: "8px", background: "#1e293b", color: "#f1f5f9" },
+  tagline: { fontSize: "1rem", color: "#94a3b8", marginTop: "8px" },
+  error: { background: "rgba(239, 68, 68, 0.15)", border: "1px solid rgba(239, 68, 68, 0.4)", color: "#fca5a5", padding: "12px 16px", borderRadius: "8px", marginBottom: "20px", textAlign: "center", fontWeight: 500 },
+  loading: { textAlign: "center", color: "#94a3b8", fontSize: "1.1rem", padding: "60px 20px" },
+  filters: { display: "flex", gap: "12px", marginBottom: "32px", flexWrap: "wrap", alignItems: "center" },
+  filterInput: { padding: "10px 14px", border: "1px solid #334155", borderRadius: "6px", background: "#1e293b", color: "#f1f5f9", fontSize: "0.95rem", minWidth: "150px" },
+  filterSelect: { padding: "10px 14px", border: "1px solid #334155", borderRadius: "6px", background: "#1e293b", color: "#f1f5f9", fontSize: "0.95rem", minWidth: "140px" },
   priceRange: { display: "flex", gap: "8px", alignItems: "center" },
-  priceSeparator: { color: "#94a3b8" },
-  resultsCount: { color: "#94a3b8", marginBottom: "20px" },
-  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "24px" },
-  card: { background: "#1e293b", borderRadius: "12px", overflow: "hidden", border: "1px solid #334155" },
-  imageContainer: { position: "relative", height: "200px", cursor: "pointer" },
-  image: { width: "100%", height: "100%", objectFit: "cover" },
-  noImage: { width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#334155", color: "#94a3b8" },
-  availabilityBadge: { position: "absolute", top: "12px", left: "12px", padding: "6px 12px", borderRadius: "20px", fontSize: "0.85rem", fontWeight: 600 },
+  priceSeparator: { color: "#94a3b8", fontWeight: 600 },
+  resultsCount: { color: "#94a3b8", marginBottom: "20px", fontSize: "0.95rem" },
+  noResults: { textAlign: "center", color: "#94a3b8", padding: "60px 20px", background: "rgba(30, 41, 59, 0.5)", borderRadius: "12px", border: "2px dashed #475569" },
+  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "24px" },
+  card: { background: "linear-gradient(135deg, #1e293b 0%, #0f1729 100%)", border: "1px solid #334155", borderRadius: "12px", overflow: "hidden", transition: "all 0.3s ease", display: "flex", flexDirection: "column", height: "100%" },
+  imageContainer: { position: "relative", width: "100%", height: "200px", overflow: "hidden", background: "#0f1729", cursor: "pointer" },
+  image: { width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.3s ease" },
+  noImage: { width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#334155", color: "#94a3b8", fontWeight: 600 },
+  availabilityBadge: { position: "absolute", top: "12px", left: "12px", padding: "8px 14px", borderRadius: "20px", fontSize: "0.85rem", fontWeight: 600 },
   availableBadge: { background: "#10b981", color: "white" },
   unavailableBadge: { background: "#ef4444", color: "white" },
-  content: { padding: "20px" },
-  title: { color: "#f1f5f9", fontSize: "1.25rem", margin: "0 0 8px 0" },
-  location: { color: "#94a3b8", margin: "0 0 12px 0" },
-  specs: { display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "12px" },
-  spec: { color: "#cbd5e1", fontSize: "0.9rem" },
-  price: { color: "#fbbf24", fontSize: "1.25rem", fontWeight: 700, margin: "8px 0" },
-  description: { color: "#cbd5e1", fontSize: "0.9rem", lineHeight: "1.5" },
-  viewBtn: { padding: "12px", background: "#3b82f6", color: "white", border: "none", borderRadius: "8px", width: "100%", marginTop: "12px", cursor: "pointer", fontWeight: 600 },
-
-  modal: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.85)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "20px" },
-  modalContent: { background: "#1e293b", borderRadius: "12px", maxWidth: "620px", width: "100%", maxHeight: "90vh", overflowY: "auto", border: "1px solid #475569" },
-  closeBtn: { position: "absolute", top: "16px", right: "16px", background: "rgba(0,0,0,0.7)", color: "white", border: "none", width: "40px", height: "40px", borderRadius: "50%", fontSize: "1.4rem", cursor: "pointer", zIndex: 10 },
-  modalImage: { position: "relative", height: "320px", background: "#0f1729" },
+  imageCount: { position: "absolute", bottom: "12px", right: "12px", background: "rgba(0,0,0,0.6)", color: "white", padding: "6px 12px", borderRadius: "6px", fontSize: "0.85rem", fontWeight: 600 },
+  content: { padding: "20px", flex: 1, display: "flex", flexDirection: "column" },
+  title: { color: "#f1f5f9", fontSize: "1.2rem", margin: "0 0 8px 0", wordBreak: "break-word" },
+  location: { color: "#94a3b8", margin: "0 0 12px 0", fontSize: "0.9rem" },
+  specs: { display: "flex", gap: "10px", margin: "12px 0", flexWrap: "wrap" },
+  spec: { color: "#cbd5e1", fontSize: "0.85rem" },
+  price: { color: "#fbbf24", fontSize: "1.1rem", fontWeight: 700, margin: "8px 0" },
+  description: { color: "#cbd5e1", fontSize: "0.85rem", margin: "8px 0", lineHeight: "1.4" },
+  unitInfo: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", padding: "12px", background: "rgba(59, 130, 246, 0.1)", borderRadius: "6px", margin: "12px 0", fontSize: "0.8rem", color: "#cbd5e1" },
+  unitLabel: { color: "#94a3b8", display: "block", fontSize: "0.75rem", marginBottom: "2px" },
+  unitValue: { display: "block", fontWeight: 600 },
+  unitValueBold: { display: "block", color: "#22c55e", fontWeight: 700, fontSize: "1rem" },
+  amenitiesPreview: { display: "flex", flexWrap: "wrap", gap: "6px", margin: "8px 0" },
+  amenityChip: { background: "rgba(139, 92, 246, 0.2)", color: "#cbd5e1", padding: "4px 8px", borderRadius: "4px", fontSize: "0.75rem", fontWeight: 500 },
+  contactBtn: { padding: "10px 12px", background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.9rem", marginTop: "8px", transition: "all 0.3s ease" },
+  contactBtnDisabled: { opacity: 0.5, cursor: "not-allowed" },
+  viewBtn: { padding: "10px 12px", background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.9rem", marginTop: "6px", transition: "all 0.3s ease" },
+  modal: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000, padding: "20px" },
+  modalContent: { background: "linear-gradient(135deg, #1e293b 0%, #0f1729 100%)", borderRadius: "12px", maxWidth: "600px", width: "100%", maxHeight: "90vh", overflowY: "auto", border: "1px solid #334155", position: "relative" },
+  closeBtn: { position: "absolute", top: "12px", right: "12px", background: "rgba(0,0,0,0.6)", border: "none", color: "white", width: "32px", height: "32px", borderRadius: "50%", cursor: "pointer", fontSize: "1.2rem", zIndex: 1001 },
+  modalImage: { position: "relative", width: "100%", height: "300px", overflow: "hidden", background: "#0f1729" },
   modalImg: { width: "100%", height: "100%", objectFit: "cover" },
-  prevBtn: { position: "absolute", top: "50%", left: "16px", transform: "translateY(-50%)", background: "rgba(0,0,0,0.6)", color: "white", border: "none", width: "44px", height: "44px", borderRadius: "50%", cursor: "pointer", fontSize: "1.5rem" },
-  nextBtn: { position: "absolute", top: "50%", right: "16px", transform: "translateY(-50%)", background: "rgba(0,0,0,0.6)", color: "white", border: "none", width: "44px", height: "44px", borderRadius: "50%", cursor: "pointer", fontSize: "1.5rem" },
-  modalDetails: { padding: "24px" },
-  modalTitle: { color: "#fbbf24", fontSize: "1.6rem", margin: "0 0 8px 0" },
+  imageCounter: { position: "absolute", bottom: "12px", left: "50%", transform: "translateX(-50%)", background: "rgba(0,0,0,0.6)", color: "white", padding: "4px 12px", borderRadius: "12px", fontSize: "0.85rem", fontWeight: 600 },
+  prevBtn: { position: "absolute", top: "50%", left: "12px", transform: "translateY(-50%)", background: "rgba(0,0,0,0.6)", border: "none", color: "white", width: "40px", height: "40px", borderRadius: "50%", cursor: "pointer", fontSize: "1.2rem" },
+  nextBtn: { position: "absolute", top: "50%", right: "12px", transform: "translateY(-50%)", background: "rgba(0,0,0,0.6)", border: "none", color: "white", width: "40px", height: "40px", borderRadius: "50%", cursor: "pointer", fontSize: "1.2rem" },
+  thumbnails: { display: "flex", gap: "8px", padding: "12px", overflowX: "auto", background: "#0f1729" },
+  thumbnail: { width: "60px", height: "60px", objectFit: "cover", borderRadius: "6px", cursor: "pointer", opacity: 0.6, border: "2px solid transparent", flexShrink: 0 },
+  activeThumbnail: { opacity: 1, borderColor: "#fbbf24" },
+  modalDetails: { padding: "24px", color: "#f1f5f9" },
+  modalTitle: { fontSize: "1.5rem", margin: "0 0 8px 0", color: "#fbbf24" },
   modalLocation: { color: "#94a3b8", marginBottom: "16px" },
-  fullDescription: { color: "#cbd5e1", lineHeight: "1.7", margin: "20px 0" },
+  pricingRow: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))", gap: "12px", margin: "16px 0" },
+  pricingBox: { background: "rgba(251, 191, 36, 0.1)", border: "1px solid rgba(251, 191, 36, 0.2)", borderRadius: "8px", padding: "12px", textAlign: "center" },
+  pricingLabel: { display: "block", color: "#94a3b8", fontSize: "0.75rem", marginBottom: "4px" },
+  pricingValue: { display: "block", color: "#fbbf24", fontWeight: 700, fontSize: "1rem" },
+  fullDescription: { color: "#cbd5e1", lineHeight: "1.6", margin: "16px 0" },
+  rulesBox: { margin: "16px 0", padding: "16px", background: "rgba(148, 163, 184, 0.08)", borderRadius: "8px", borderLeft: "3px solid #475569" },
+  rulesHead: { margin: "0 0 8px 0", color: "#94a3b8", fontSize: "1rem" },
+  rulesText: { color: "#cbd5e1", fontSize: "0.9rem", lineHeight: "1.6", margin: 0 },
+  amenitiesSection: { margin: "20px 0", padding: "16px", background: "rgba(59, 130, 246, 0.1)", borderRadius: "8px" },
+  amenitiesHead: { margin: "0 0 12px 0", color: "#fbbf24" },
+  amenitiesGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: "8px" },
+  unitInfoModal: { margin: "20px 0", padding: "16px", background: "rgba(34, 197, 94, 0.1)", borderRadius: "8px" },
+  unitHeading: { margin: "0 0 12px 0", color: "#10b981" },
+  unitGrid: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" },
+  unitBox: { textAlign: "center", padding: "12px", background: "rgba(255,255,255,0.05)", borderRadius: "6px" },
+  unitBoxLabel: { margin: 0, color: "#94a3b8", fontSize: "0.85rem" },
+  unitBoxNumber: { margin: "4px 0 0 0", color: "#22c55e", fontSize: "1.5rem", fontWeight: 700 },
   landlordInfo: { margin: "20px 0", padding: "16px", background: "rgba(139, 92, 246, 0.1)", borderRadius: "8px" },
-  landlordHead: { margin: "0 0 10px 0", color: "#8b5cf6" },
-  landlordDetail: { color: "#cbd5e1", margin: "6px 0" },
-  contactButtonsContainer: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px", marginTop: "24px" },
-  whatsappBtn: { padding: "14px", background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer" },
-  callBtn: { padding: "14px", background: "linear-gradient(135deg, #3b82f6, #2563eb)", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer" },
-  smsBtn: { padding: "14px", background: "linear-gradient(135deg, #f59e0b, #d97706)", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer" },
-  bookBtn: { padding: "14px", background: "linear-gradient(135deg, #eab308, #ca8a04)", color: "white", border: "none", borderRadius: "8px", fontWeight: 700, cursor: "pointer" },
+  landlordHead: { margin: "0 0 12px 0", color: "#8b5cf6" },
+  landlordDetail: { color: "#cbd5e1", margin: "8px 0" },
+  contactButtonsContainer: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px", marginTop: "20px" },
+  whatsappBtn: { padding: "14px 16px", background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", fontSize: "0.95rem" },
+  callBtn: { padding: "14px 16px", background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", fontSize: "0.95rem" },
+  smsBtn: { padding: "14px 16px", background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", fontSize: "0.95rem" },
+  bookBtn: {
+    padding: "14px 16px",
+    background: "linear-gradient(135deg, #eab308, #ca8a04)",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    fontWeight: 700,
+    cursor: "pointer",
+    fontSize: "0.95rem"
+  },
 };
 
 const cssStyles = `
   * { box-sizing: border-box; }
-  button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.3); }
+  button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+  input:focus, select:focus { outline: none; border-color: #fbbf24 !important; box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1) !important; }
   @media (max-width: 768px) {
     [style*="gridTemplateColumns"] { grid-template-columns: 1fr !important; }
   }
