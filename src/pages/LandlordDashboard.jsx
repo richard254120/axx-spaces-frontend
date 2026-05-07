@@ -253,14 +253,7 @@ export default function LandlordDashboard() {
                         Mark 1 Unit Available
                       </button>
                     </div>
-                  )}
-
-                  <button 
-                    style={styles.deleteBtn}
-                    onClick={() => handleDelete(property._id)}
-                  >
-                    
-                  </button>
+          
                 </div>
               </div>
             );
