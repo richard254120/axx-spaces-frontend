@@ -26,7 +26,6 @@ export default function Listings() {
         if (!response.ok) throw new Error("Failed to fetch properties");
         const data = await response.json();
        
-        // ✅ PERFECT UNIT CALCULATION
         const processedProperties = data.map(prop => ({
           ...prop,
           availableUnits: Math.max(0, (prop.totalUnits || 1) - (prop.bookedUnits || 0))
@@ -95,7 +94,6 @@ export default function Listings() {
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
-  // ✅ NEW: Book button function
   const handleBookNow = (property) => {
     const phoneNumber = property.owner?.phone?.replace(/\D/g, "") || property.phone?.replace(/\D/g, "");
     const message = `Hello,\n\nI want to BOOK this property right now:\n\n` +
@@ -234,7 +232,7 @@ export default function Listings() {
         </div>
       )}
 
-      {/* Modal - Updated with new Book button */}
+      {/* Modal - Updated Landlord Contact Section */}
       {selectedProperty && (
         <div style={styles.modal} onClick={closeModal}>
           <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
@@ -340,13 +338,14 @@ export default function Listings() {
                 </div>
               </div>
 
+              {/* ✅ LANDLORD CONTACT - NAME & PHONE HIDDEN AS REQUESTED */}
               <div style={styles.landlordInfo}>
                 <h3 style={styles.landlordHead}>👤 Landlord Contact</h3>
-                <p style={styles.landlordDetail}><strong>Name:</strong> {selectedProperty.owner?.name}</p>
-                <p style={styles.landlordDetail}><strong>Phone:</strong> {selectedProperty.owner?.phone}</p>
+                <p style={styles.landlordDetail}><strong>Name:</strong> </p>
+                <p style={styles.landlordDetail}><strong>Phone:</strong> </p>
               </div>
 
-              {/* ✅ THREE BUTTONS: Contact, Call, and Book */}
+              {/* Three Buttons */}
               <div style={styles.contactButtonsContainer}>
                 <button
                   style={{ ...styles.whatsappBtn, ...(selectedProperty.availableUnits === 0 ? styles.contactBtnDisabled : {}) }}
@@ -358,7 +357,6 @@ export default function Listings() {
                 <button style={styles.callBtn} onClick={() => window.open(`tel:${selectedProperty.owner?.phone}`)}>
                   📞 Call Landlord
                 </button>
-                {/* ✅ NEW BOOK BUTTON */}
                 <button
                   style={styles.bookBtn}
                   onClick={() => handleBookNow(selectedProperty)}
@@ -374,7 +372,7 @@ export default function Listings() {
   );
 }
 
-/* ==================== ALL YOUR ORIGINAL STYLES + NEW BOOK BUTTON STYLE ==================== */
+/* ==================== ALL YOUR ORIGINAL STYLES PRESERVED ==================== */
 const styles = {
   container: { maxWidth: "1200px", margin: "0 auto", padding: "20px", background: "linear-gradient(135deg, #06101f 0%, #0f1729 100%)", minHeight: "100vh", fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont" },
   header: { textAlign: "center", marginBottom: "40px", color: "#f1f5f9" },
@@ -414,20 +412,6 @@ const styles = {
   contactBtn: { padding: "10px 12px", background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.9rem", marginTop: "8px", transition: "all 0.3s ease" },
   contactBtnDisabled: { opacity: 0.5, cursor: "not-allowed" },
   viewBtn: { padding: "10px 12px", background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.9rem", marginTop: "6px", transition: "all 0.3s ease" },
-
-  // ✅ NEW BOOK BUTTON STYLE
-  bookBtn: { 
-    flex: 1, 
-    padding: "14px 16px", 
-    background: "linear-gradient(135deg, #eab308, #ca8a04)", 
-    color: "white", 
-    border: "none", 
-    borderRadius: "6px", 
-    fontWeight: 700, 
-    cursor: "pointer", 
-    fontSize: "0.95rem" 
-  },
-
   modal: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000, padding: "20px" },
   modalContent: { background: "linear-gradient(135deg, #1e293b 0%, #0f1729 100%)", borderRadius: "12px", maxWidth: "600px", width: "100%", maxHeight: "90vh", overflowY: "auto", border: "1px solid #334155", position: "relative" },
   closeBtn: { position: "absolute", top: "12px", right: "12px", background: "rgba(0,0,0,0.6)", border: "none", color: "white", width: "32px", height: "32px", borderRadius: "50%", cursor: "pointer", fontSize: "1.2rem", zIndex: 1001 },
@@ -465,6 +449,17 @@ const styles = {
   contactButtonsContainer: { display: "flex", gap: "12px", marginTop: "20px" },
   whatsappBtn: { flex: 1, padding: "12px 16px", background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.95rem" },
   callBtn: { flex: 1, padding: "12px 16px", background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.95rem" },
+  bookBtn: { 
+    flex: 1, 
+    padding: "14px 16px", 
+    background: "linear-gradient(135deg, #eab308, #ca8a04)", 
+    color: "white", 
+    border: "none", 
+    borderRadius: "6px", 
+    fontWeight: 700, 
+    cursor: "pointer", 
+    fontSize: "0.95rem" 
+  },
 };
 
 const cssStyles = `
