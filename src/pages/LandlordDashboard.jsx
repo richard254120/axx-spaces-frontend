@@ -11,14 +11,11 @@ export default function LandlordDashboard() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState("all"); // all, pending, approved
+  const [activeTab, setActiveTab] = useState("all");
   const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
-    if (!token) {
-      navigate("/login");
-      return;
-    }
+    if (!token) { navigate("/login"); return; }
     fetchMyProperties();
   }, [token, navigate]);
 
@@ -26,12 +23,12 @@ export default function LandlordDashboard() {
     setLoading(true);
     setError("");
     try {
-      const response = await fetch(`${API_BASE}/properties/my-properties`, {
+      // ✅ FIX 2: Correct endpoint is /my-properties/all, not /my-properties
+      const response = await fetch(`${API_BASE}/properties/my-properties/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!response.ok) throw new Error("Failed to fetch properties");
-
       const data = await response.json();
       setProperties(data);
     } catch (err) {
@@ -44,64 +41,76 @@ export default function LandlordDashboard() {
 
   const handleDelete = async (propertyId) => {
     if (!window.confirm("🗑️ Delete this property permanently?")) return;
-
     try {
       const response = await fetch(`${API_BASE}/properties/${propertyId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!response.ok) throw new Error("Failed to delete property");
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || "Failed to delete property");
+      }
 
-      setProperties(properties.filter(p => p._id !== propertyId));
+      setProperties(properties.filter((p) => p._id !== propertyId));
       setSuccessMessage("✅ Property deleted successfully!");
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
-      setError("Failed to delete property");
+      setError(err.message || "Failed to delete property");
       setTimeout(() => setError(""), 3000);
     }
   };
 
-  const filteredProperties = properties.filter(p => {
-    if (activeTab === "pending") return p.status === "pending";
-    if (activeTab === "approved") return p.status === "approved";
-    return true; // "all"
+  const counts = {
+    all: properties.length,
+    pending: properties.filter((p) => p.status === "pending").length,
+    approved: properties.filter((p) => p.status === "approved").length,
+    rejected: properties.filter((p) => p.status === "rejected").length,
+  };
+
+  const filteredProperties = properties.filter((p) => {
+    if (activeTab === "all") return true;
+    return p.status === activeTab;
   });
+
+  // ✅ Status badge config (covers all 3 statuses from the schema enum)
+  const statusConfig = {
+    approved: { bg: "#22c55e", label: "✅ Approved" },
+    pending:  { bg: "#f59e0b", label: "⏳ Pending Approval" },
+    rejected: { bg: "#ef4444", label: "❌ Rejected" },
+  };
 
   return (
     <div style={styles.container}>
       <style>{cssStyles}</style>
 
-      {/* Header */}
       <div style={styles.header}>
         <h1 style={styles.title}>🏠 My Properties</h1>
         <p style={styles.subtitle}>Manage your rental listings</p>
+        <button onClick={() => navigate("/upload")} style={styles.uploadBtnTop}>
+          ➕ Upload New Property
+        </button>
       </div>
 
-      {/* Messages */}
       {successMessage && <div style={styles.successMsg}>{successMessage}</div>}
       {error && <div style={styles.errorMsg}>{error}</div>}
 
-      {/* Tabs */}
+      {/* Tabs — now includes Rejected */}
       <div style={styles.tabsContainer}>
-        <button
-          style={{...styles.tabBtn, ...(activeTab === "all" && styles.tabBtnActive)}}
-          onClick={() => setActiveTab("all")}
-        >
-          📋 All ({properties.length})
-        </button>
-        <button
-          style={{...styles.tabBtn, ...(activeTab === "pending" && styles.tabBtnActive)}}
-          onClick={() => setActiveTab("pending")}
-        >
-          ⏳ Pending ({properties.filter(p => p.status === "pending").length})
-        </button>
-        <button
-          style={{...styles.tabBtn, ...(activeTab === "approved" && styles.tabBtnActive)}}
-          onClick={() => setActiveTab("approved")}
-        >
-          ✅ Approved ({properties.filter(p => p.status === "approved").length})
-        </button>
+        {[
+          { key: "all",      label: "📋 All",       count: counts.all },
+          { key: "pending",  label: "⏳ Pending",    count: counts.pending },
+          { key: "approved", label: "✅ Approved",   count: counts.approved },
+          { key: "rejected", label: "❌ Rejected",   count: counts.rejected },
+        ].map(({ key, label, count }) => (
+          <button
+            key={key}
+            style={{ ...styles.tabBtn, ...(activeTab === key && styles.tabBtnActive) }}
+            onClick={() => setActiveTab(key)}
+          >
+            {label} ({count})
+          </button>
+        ))}
       </div>
 
       {loading && <p style={styles.loading}>⏳ Loading your properties...</p>}
@@ -109,265 +118,117 @@ export default function LandlordDashboard() {
       {!loading && filteredProperties.length === 0 && (
         <div style={styles.empty}>
           <p style={styles.emptyText}>
-            {activeTab === "all" 
-              ? "You have not uploaded any properties yet." 
+            {activeTab === "all"
+              ? "You have not uploaded any properties yet."
               : `No ${activeTab} properties found.`}
           </p>
-          <button onClick={() => navigate("/upload")} style={styles.uploadBtn}>
-            ➕ Upload New Property
-          </button>
+          {activeTab === "all" && (
+            <button onClick={() => navigate("/upload")} style={styles.uploadBtn}>
+              ➕ Upload New Property
+            </button>
+          )}
+          {activeTab === "rejected" && (
+            <p style={{ color: "#94a3b8", fontSize: "0.9rem", marginTop: "12px" }}>
+              Rejected properties can be deleted and re-submitted after fixing any issues.
+            </p>
+          )}
         </div>
       )}
 
       {!loading && filteredProperties.length > 0 && (
         <div style={styles.grid}>
-          {filteredProperties.map((property) => (
-            <div key={property._id} style={styles.card}>
-              <div style={styles.imageContainer}>
-                {property.images && property.images.length > 0 ? (
-                  <img
-                    src={property.images[0]}
-                    alt={property.title}
-                    style={styles.image}
-                  />
-                ) : (
-                  <div style={styles.noImage}>📷 No Image</div>
-                )}
+          {filteredProperties.map((property) => {
+            const status = statusConfig[property.status] || statusConfig.pending;
+            const availableUnits = property.totalUnits - property.bookedUnits;
 
-                <div style={{
-                  ...styles.statusBadge,
-                  backgroundColor: property.status === "approved" ? "#22c55e" : "#f59e0b"
-                }}>
-                  {property.status === "approved" ? "✅ Approved" : "⏳ Pending Approval"}
-                </div>
-              </div>
-
-              <div style={styles.content}>
-                <h3 style={styles.propertyTitle}>{property.title}</h3>
-                <p style={styles.location}>📍 {property.location || `${property.area}, ${property.county}`}</p>
-                
-                <p style={styles.price}>
-                  KSh {Number(property.price).toLocaleString()} / month
-                </p>
-
-                <div style={styles.specs}>
-                  <span>🛏 {property.bedrooms} Beds</span>
-                  <span>🚿 {property.bathrooms} Baths</span>
+            return (
+              <div key={property._id} style={styles.card}>
+                <div style={styles.imageContainer}>
+                  {property.images && property.images.length > 0 ? (
+                    <img src={property.images[0]} alt={property.title} style={styles.image} />
+                  ) : (
+                    <div style={styles.noImage}>📷 No Image</div>
+                  )}
+                  <div style={{ ...styles.statusBadge, backgroundColor: status.bg }}>
+                    {status.label}
+                  </div>
                 </div>
 
-                <button 
-                  onClick={() => handleDelete(property._id)}
-                  style={styles.deleteBtn}
-                >
-                  🗑 Delete Property
-                </button>
+                <div style={styles.content}>
+                  <h3 style={styles.propertyTitle}>{property.title}</h3>
+                  <p style={styles.location}>📍 {property.location}</p>
+                  <p style={styles.price}>KSh {Number(property.price).toLocaleString()} / month</p>
+
+                  <div style={styles.specs}>
+                    <span>🛏 {property.bedrooms} Beds</span>
+                    <span>🚿 {property.bathrooms} Baths</span>
+                    <span>🏢 {availableUnits}/{property.totalUnits} units free</span>
+                  </div>
+
+                  {/* ✅ Show rejection note if rejected */}
+                  {property.status === "rejected" && (
+                    <div style={styles.rejectedNote}>
+                      ⚠️ This listing was rejected. Delete it and re-submit after making changes.
+                    </div>
+                  )}
+
+                  {/* ✅ Show pending info */}
+                  {property.status === "pending" && (
+                    <div style={styles.pendingNote}>
+                      🕐 Under review by admin. Usually takes 24–48 hours.
+                    </div>
+                  )}
+
+                  <div style={styles.cardActions}>
+                    <button onClick={() => handleDelete(property._id)} style={styles.deleteBtn}>
+                      🗑 Delete
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
   );
 }
 
-/* ==================== STYLES (Your Original Style Preserved) ==================== */
 const styles = {
-  container: {
-    maxWidth: "1200px",
-    margin: "0 auto",
-    padding: "20px",
-    background: "linear-gradient(135deg, #06101f 0%, #0f1729 100%)",
-    minHeight: "100vh",
-    fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI'",
-  },
-  header: {
-    textAlign: "center",
-    marginBottom: "40px",
-    color: "#f1f5f9",
-  },
-  title: {
-    fontSize: "2.5rem",
-    margin: 0,
-    color: "#fbbf24",
-    fontWeight: 700,
-  },
-  subtitle: {
-    fontSize: "1rem",
-    color: "#94a3b8",
-    marginTop: "8px",
-  },
-  successMsg: {
-    background: "#10b981",
-    color: "white",
-    padding: "12px 16px",
-    borderRadius: "8px",
-    marginBottom: "20px",
-    textAlign: "center",
-    fontWeight: 500,
-  },
-  errorMsg: {
-    background: "#ef4444",
-    color: "white",
-    padding: "12px 16px",
-    borderRadius: "8px",
-    marginBottom: "20px",
-    textAlign: "center",
-    fontWeight: 500,
-  },
-  tabsContainer: {
-    display: "flex",
-    gap: "16px",
-    marginBottom: "32px",
-    borderBottom: "2px solid #1e293b",
-    justifyContent: "center",
-    flexWrap: "wrap",
-  },
-  tabBtn: {
-    background: "transparent",
-    border: "none",
-    padding: "12px 24px",
-    fontSize: "1rem",
-    fontWeight: 600,
-    cursor: "pointer",
-    transition: "all 0.3s ease",
-    borderBottom: "3px solid transparent",
-    marginBottom: "-2px",
-  },
-  tabBtnActive: {
-    color: "#fbbf24",
-    borderBottomColor: "#fbbf24",
-  },
-  tabBtnInactive: {
-    color: "#94a3b8",
-  },
-  loading: {
-    textAlign: "center",
-    color: "#94a3b8",
-    fontSize: "1.1rem",
-    padding: "40px 20px",
-  },
-  empty: {
-    textAlign: "center",
-    color: "#94a3b8",
-    padding: "60px 20px",
-    background: "rgba(30, 41, 59, 0.5)",
-    borderRadius: "12px",
-    border: "2px dashed #475569",
-  },
-  emptyText: {
-    fontSize: "1.1rem",
-    margin: 0,
-  },
-  uploadBtn: {
-    marginTop: "20px",
-    padding: "12px 24px",
-    background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    fontSize: "1rem",
-    fontWeight: 600,
-    cursor: "pointer",
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-    gap: "24px",
-  },
-  card: {
-    background: "linear-gradient(135deg, #1e293b 0%, #0f1729 100%)",
-    border: "1px solid #334155",
-    borderRadius: "12px",
-    overflow: "hidden",
-    transition: "all 0.3s ease",
-    display: "flex",
-    flexDirection: "column",
-    height: "100%",
-  },
-  imageContainer: {
-    position: "relative",
-    width: "100%",
-    height: "200px",
-    overflow: "hidden",
-    background: "#0f1729",
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-    transition: "transform 0.3s ease",
-  },
-  noImage: {
-    width: "100%",
-    height: "100%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    background: "#334155",
-    color: "#94a3b8",
-    fontWeight: 600,
-  },
-  statusBadge: {
-    position: "absolute",
-    top: "12px",
-    right: "12px",
-    padding: "6px 12px",
-    borderRadius: "20px",
-    fontSize: "0.85rem",
-    fontWeight: 600,
-    color: "white",
-  },
-  content: {
-    padding: "20px",
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
-  },
-  title2: {
-    color: "#f1f5f9",
-    fontSize: "1.3rem",
-    margin: "0 0 8px 0",
-  },
-  location: {
-    color: "#94a3b8",
-    margin: "0 0 12px 0",
-    fontSize: "0.95rem",
-  },
-  specs: {
-    display: "flex",
-    gap: "12px",
-    margin: "12px 0",
-  },
-  spec: {
-    color: "#cbd5e1",
-    fontSize: "0.9rem",
-  },
-  price: {
-    color: "#fbbf24",
-    fontSize: "1.2rem",
-    fontWeight: 700,
-    margin: "12px 0",
-  },
-  deleteBtn: {
-    marginTop: "auto",
-    padding: "10px 12px",
-    background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    fontWeight: 600,
-    cursor: "pointer",
-    fontSize: "0.9rem",
-  },
+  container: { maxWidth: "1200px", margin: "0 auto", padding: "20px", background: "linear-gradient(135deg, #06101f 0%, #0f1729 100%)", minHeight: "100vh", fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI'" },
+  header: { textAlign: "center", marginBottom: "40px", color: "#f1f5f9" },
+  title: { fontSize: "2.5rem", margin: 0, color: "#fbbf24", fontWeight: 700 },
+  subtitle: { fontSize: "1rem", color: "#94a3b8", marginTop: "8px" },
+  uploadBtnTop: { marginTop: "16px", padding: "10px 24px", background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)", color: "white", border: "none", borderRadius: "8px", fontSize: "0.95rem", fontWeight: 600, cursor: "pointer" },
+  successMsg: { background: "rgba(16, 185, 129, 0.15)", border: "1px solid rgba(16, 185, 129, 0.4)", color: "#6ee7b7", padding: "12px 16px", borderRadius: "8px", marginBottom: "20px", textAlign: "center", fontWeight: 500 },
+  errorMsg: { background: "rgba(239, 68, 68, 0.15)", border: "1px solid rgba(239, 68, 68, 0.4)", color: "#fca5a5", padding: "12px 16px", borderRadius: "8px", marginBottom: "20px", textAlign: "center", fontWeight: 500 },
+  tabsContainer: { display: "flex", gap: "8px", marginBottom: "32px", borderBottom: "2px solid #1e293b", justifyContent: "center", flexWrap: "wrap" },
+  tabBtn: { background: "transparent", border: "none", padding: "12px 20px", fontSize: "0.95rem", fontWeight: 600, cursor: "pointer", transition: "all 0.3s ease", borderBottom: "3px solid transparent", marginBottom: "-2px", color: "#94a3b8" },
+  tabBtnActive: { color: "#fbbf24", borderBottomColor: "#fbbf24" },
+  loading: { textAlign: "center", color: "#94a3b8", fontSize: "1.1rem", padding: "40px 20px" },
+  empty: { textAlign: "center", color: "#94a3b8", padding: "60px 20px", background: "rgba(30, 41, 59, 0.5)", borderRadius: "12px", border: "2px dashed #475569" },
+  emptyText: { fontSize: "1.1rem", margin: 0 },
+  uploadBtn: { marginTop: "20px", padding: "12px 24px", background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "white", border: "none", borderRadius: "8px", fontSize: "1rem", fontWeight: 600, cursor: "pointer" },
+  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "24px" },
+  card: { background: "linear-gradient(135deg, #1e293b 0%, #0f1729 100%)", border: "1px solid #334155", borderRadius: "12px", overflow: "hidden", transition: "all 0.3s ease", display: "flex", flexDirection: "column" },
+  imageContainer: { position: "relative", width: "100%", height: "200px", overflow: "hidden", background: "#0f1729" },
+  image: { width: "100%", height: "100%", objectFit: "cover" },
+  noImage: { width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#334155", color: "#94a3b8", fontWeight: 600 },
+  statusBadge: { position: "absolute", top: "12px", right: "12px", padding: "6px 12px", borderRadius: "20px", fontSize: "0.8rem", fontWeight: 600, color: "white" },
+  content: { padding: "20px", flex: 1, display: "flex", flexDirection: "column", gap: "8px" },
+  propertyTitle: { color: "#f1f5f9", fontSize: "1.1rem", margin: 0, fontWeight: 700 },
+  location: { color: "#94a3b8", margin: 0, fontSize: "0.9rem" },
+  price: { color: "#fbbf24", fontSize: "1.15rem", fontWeight: 700, margin: 0 },
+  specs: { display: "flex", gap: "10px", flexWrap: "wrap", fontSize: "0.85rem", color: "#cbd5e1" },
+  rejectedNote: { background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.3)", color: "#fca5a5", padding: "10px 12px", borderRadius: "8px", fontSize: "0.85rem" },
+  pendingNote: { background: "rgba(245, 158, 11, 0.1)", border: "1px solid rgba(245, 158, 11, 0.3)", color: "#fcd34d", padding: "10px 12px", borderRadius: "8px", fontSize: "0.85rem" },
+  cardActions: { marginTop: "auto", paddingTop: "12px", display: "flex", gap: "8px" },
+  deleteBtn: { flex: 1, padding: "10px 12px", background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.9rem" },
 };
 
 const cssStyles = `
-  button:hover:not(:disabled) {
-    transform: translateY(-2px);
-  }
+  button:hover:not(:disabled) { transform: translateY(-2px); }
   @media (max-width: 768px) {
-    [style*="gridTemplateColumns"] {
-      grid-template-columns: 1fr !important;
-    }
+    [style*="gridTemplateColumns"] { grid-template-columns: 1fr !important; }
   }
 `;
