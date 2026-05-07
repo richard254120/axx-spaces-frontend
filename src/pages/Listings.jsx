@@ -27,8 +27,15 @@ export default function Listings() {
         const response = await fetch(`${API_BASE}/properties`);
         if (!response.ok) throw new Error("Failed to fetch properties");
         const data = await response.json();
-        const availableProperties = data.filter((prop) => prop.availableUnits > 0);
-        setProperties(availableProperties);
+        
+        // ✅ PERFECT UNIT CALCULATION — Always compute reliably from backend data
+        const processedProperties = data.map(prop => ({
+          ...prop,
+          availableUnits: Math.max(0, (prop.totalUnits || 1) - (prop.bookedUnits || 0))
+        }));
+        
+        const availableProperties = processedProperties.filter((prop) => prop.availableUnits > 0);
+        setProperties(processedProperties);           // Keep all for filtering
         setFilteredProperties(availableProperties);
       } catch (err) {
         setError(err.message);
@@ -193,8 +200,8 @@ export default function Listings() {
                 <p style={styles.description}>{property.description?.substring(0, 80)}...</p>
 
                 <div style={styles.unitInfo}>
-                  <div><span style={styles.unitLabel}>Total Units</span><span style={styles.unitValue}>{property.totalUnits}</span></div>
-                  <div><span style={styles.unitLabel}>Booked</span><span style={styles.unitValue}>{property.bookedUnits}</span></div>
+                  <div><span style={styles.unitLabel}>Total Units</span><span style={styles.unitValue}>{property.totalUnits || 1}</span></div>
+                  <div><span style={styles.unitLabel}>Booked</span><span style={styles.unitValue}>{property.bookedUnits || 0}</span></div>
                   <div><span style={styles.unitLabel}>Available</span><strong style={styles.unitValueBold}>{property.availableUnits}</strong></div>
                 </div>
 
@@ -318,11 +325,11 @@ export default function Listings() {
                 <div style={styles.unitGrid}>
                   <div style={styles.unitBox}>
                     <p style={styles.unitBoxLabel}>Total Units</p>
-                    <p style={styles.unitBoxNumber}>{selectedProperty.totalUnits}</p>
+                    <p style={styles.unitBoxNumber}>{selectedProperty.totalUnits || 1}</p>
                   </div>
                   <div style={styles.unitBox}>
                     <p style={styles.unitBoxLabel}>Booked</p>
-                    <p style={styles.unitBoxNumber}>{selectedProperty.bookedUnits}</p>
+                    <p style={styles.unitBoxNumber}>{selectedProperty.bookedUnits || 0}</p>
                   </div>
                   <div style={styles.unitBox}>
                     <p style={styles.unitBoxLabel}>Available</p>

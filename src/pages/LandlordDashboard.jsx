@@ -23,7 +23,6 @@ export default function LandlordDashboard() {
     setLoading(true);
     setError("");
     try {
-      // ✅ FIX 2: Correct endpoint is /my-properties/all, not /my-properties
       const response = await fetch(`${API_BASE}/properties/my-properties/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -61,6 +60,33 @@ export default function LandlordDashboard() {
     }
   };
 
+  // ✅ NEW: Update booked units using the backend endpoint
+  const updateBookedUnits = async (propertyId, change) => {
+    try {
+      const response = await fetch(`${API_BASE}/properties/${propertyId}/book`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ change }), // +1 or -1
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || "Failed to update units");
+      }
+
+      // Refresh properties
+      fetchMyProperties();
+      setSuccessMessage(change > 0 ? "✅ 1 Unit marked as Booked" : "✅ 1 Unit marked as Available");
+      setTimeout(() => setSuccessMessage(""), 2500);
+    } catch (err) {
+      setError(err.message || "Failed to update booking status");
+      setTimeout(() => setError(""), 3000);
+    }
+  };
+
   const counts = {
     all: properties.length,
     pending: properties.filter((p) => p.status === "pending").length,
@@ -73,7 +99,6 @@ export default function LandlordDashboard() {
     return p.status === activeTab;
   });
 
-  // ✅ Status badge config (covers all 3 statuses from the schema enum)
   const statusConfig = {
     approved: { bg: "#22c55e", label: "✅ Approved" },
     pending:  { bg: "#f59e0b", label: "⏳ Pending Approval" },
@@ -139,7 +164,9 @@ export default function LandlordDashboard() {
         <div style={styles.grid}>
           {filteredProperties.map((property) => {
             const status = statusConfig[property.status] || statusConfig.pending;
-            const availableUnits = property.totalUnits - property.bookedUnits;
+            const total = property.totalUnits || 1;
+            const booked = property.bookedUnits || 0;
+            const available = Math.max(0, total - booked);
 
             return (
               <div key={property._id} style={styles.card}>
@@ -162,7 +189,7 @@ export default function LandlordDashboard() {
                   <div style={styles.specs}>
                     <span>🛏 {property.bedrooms} Beds</span>
                     <span>🚿 {property.bathrooms} Baths</span>
-                    <span>🏢 {availableUnits}/{property.totalUnits} units free</span>
+                    <span>🏢 {available}/{total} units free</span>
                   </div>
 
                   {/* ✅ Show rejection note if rejected */}
@@ -176,6 +203,26 @@ export default function LandlordDashboard() {
                   {property.status === "pending" && (
                     <div style={styles.pendingNote}>
                       🕐 Under review by admin. Usually takes 24–48 hours.
+                    </div>
+                  )}
+
+                  {/* ✅ Booking Controls - Only for Approved Properties */}
+                  {property.status === "approved" && (
+                    <div style={styles.bookingControls}>
+                      <button 
+                        onClick={() => updateBookedUnits(property._id, 1)}
+                        disabled={available <= 0}
+                        style={styles.bookedBtn}
+                      >
+                        Mark 1 Unit Booked
+                      </button>
+                      <button 
+                        onClick={() => updateBookedUnits(property._id, -1)}
+                        disabled={booked <= 0}
+                        style={styles.availableBtn}
+                      >
+                        Mark 1 Unit Available
+                      </button>
                     </div>
                   )}
 
@@ -224,6 +271,11 @@ const styles = {
   pendingNote: { background: "rgba(245, 158, 11, 0.1)", border: "1px solid rgba(245, 158, 11, 0.3)", color: "#fcd34d", padding: "10px 12px", borderRadius: "8px", fontSize: "0.85rem" },
   cardActions: { marginTop: "auto", paddingTop: "12px", display: "flex", gap: "8px" },
   deleteBtn: { flex: 1, padding: "10px 12px", background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.9rem" },
+
+  // ✅ NEW STYLES FOR BOOKING CONTROLS
+  bookingControls: { display: "flex", gap: "8px", margin: "12px 0" },
+  bookedBtn: { flex: 1, padding: "9px 12px", background: "linear-gradient(135deg, #f59e0b, #d97706)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.85rem" },
+  availableBtn: { flex: 1, padding: "9px 12px", background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.85rem" },
 };
 
 const cssStyles = `
