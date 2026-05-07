@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 
-// ✅ FIX: Use API_BASE like every other file — the old hardcoded "/api/properties"
-// was hitting the wrong URL and returning nothing
+// ✅ FIX: Use API_BASE like every other file
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
 
 export default function Listings() {
@@ -23,19 +22,18 @@ export default function Listings() {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        // ✅ FIX: Was "/api/properties" — now uses API_BASE so it hits the right server
         const response = await fetch(`${API_BASE}/properties`);
         if (!response.ok) throw new Error("Failed to fetch properties");
         const data = await response.json();
         
-        // ✅ PERFECT UNIT CALCULATION — Always compute reliably from backend data
+        // ✅ PERFECT UNIT CALCULATION
         const processedProperties = data.map(prop => ({
           ...prop,
           availableUnits: Math.max(0, (prop.totalUnits || 1) - (prop.bookedUnits || 0))
         }));
         
         const availableProperties = processedProperties.filter((prop) => prop.availableUnits > 0);
-        setProperties(processedProperties);           // Keep all for filtering
+        setProperties(processedProperties);
         setFilteredProperties(availableProperties);
       } catch (err) {
         setError(err.message);
@@ -52,7 +50,7 @@ export default function Listings() {
 
     if (filters.location) {
       filtered = filtered.filter((p) =>
-        p.location?.toLowerCase().includes(filters.location.toLowerCase())
+        (p.location + " " + (p.county || "")).toLowerCase().includes(filters.location.toLowerCase())
       );
     }
     if (filters.bedrooms) {
@@ -127,7 +125,7 @@ export default function Listings() {
         <input
           type="text"
           name="location"
-          placeholder="📍 Filter by location..."
+          placeholder="📍 Filter by location or county..."
           value={filters.location}
           onChange={handleFilterChange}
           style={styles.filterInput}
@@ -145,7 +143,6 @@ export default function Listings() {
           <option value="2">2 Bathrooms</option>
           <option value="3">3+ Bathrooms</option>
         </select>
-        {/* ✅ Furnished filter — works now that the field is saved */}
         <select name="furnished" value={filters.furnished} onChange={handleFilterChange} style={styles.filterSelect}>
           <option value="">Furnished or not</option>
           <option value="true">Furnished</option>
@@ -186,12 +183,15 @@ export default function Listings() {
 
               <div style={styles.content}>
                 <h2 style={styles.title}>{property.title}</h2>
-                <p style={styles.location}>📍 {property.location}</p>
+                
+                {/* ✅ COUNTY + LOCATION DISPLAYED */}
+                <p style={styles.location}>
+                  📍 {property.county} • {property.location}
+                </p>
 
                 <div style={styles.specs}>
                   <span style={styles.spec}>🛏️ {property.bedrooms} Bed</span>
                   <span style={styles.spec}>🚿 {property.bathrooms} Bath</span>
-                  {/* ✅ Show furnished status on card */}
                   <span style={styles.spec}>{property.furnished ? "🪑 Furnished" : "📦 Unfurnished"}</span>
                 </div>
 
@@ -271,7 +271,10 @@ export default function Listings() {
 
             <div style={styles.modalDetails}>
               <h2 style={styles.modalTitle}>{selectedProperty.title}</h2>
-              <p style={styles.modalLocation}>📍 {selectedProperty.location}</p>
+              {/* ✅ COUNTY SHOWN IN MODAL TOO */}
+              <p style={styles.modalLocation}>
+                📍 {selectedProperty.county} • {selectedProperty.location}
+              </p>
 
               <div style={styles.specs}>
                 <span style={styles.spec}>🛏️ {selectedProperty.bedrooms} Bedrooms</span>
@@ -279,7 +282,6 @@ export default function Listings() {
                 <span style={styles.spec}>{selectedProperty.furnished ? "🪑 Furnished" : "📦 Unfurnished"}</span>
               </div>
 
-              {/* ✅ Show deposit and lease type in modal — these are now saved to DB */}
               <div style={styles.pricingRow}>
                 <div style={styles.pricingBox}>
                   <span style={styles.pricingLabel}>Monthly Rent</span>
@@ -311,7 +313,6 @@ export default function Listings() {
               {selectedProperty.amenities?.length > 0 && (
                 <div style={styles.amenitiesSection}>
                   <h3 style={styles.amenitiesHead}>✨ Amenities</h3>
-                  {/* ✅ Grid layout for amenities — much cleaner than a bullet list */}
                   <div style={styles.amenitiesGrid}>
                     {selectedProperty.amenities.map((amenity, idx) => (
                       <span key={idx} style={styles.amenityChip}>✓ {amenity}</span>
@@ -364,6 +365,7 @@ export default function Listings() {
   );
 }
 
+/* ==================== ALL YOUR ORIGINAL STYLES + CSS PRESERVED ==================== */
 const styles = {
   container: { maxWidth: "1200px", margin: "0 auto", padding: "20px", background: "linear-gradient(135deg, #06101f 0%, #0f1729 100%)", minHeight: "100vh", fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont" },
   header: { textAlign: "center", marginBottom: "40px", color: "#f1f5f9" },
