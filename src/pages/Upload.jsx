@@ -11,6 +11,25 @@ const AMENITIES_LIST = [
   "24/7 Security","Swimming Pool","Gym","Garden","Workspace","Pet Friendly",
 ];
 
+const PROPERTY_TYPES = [
+  "Bedsitter","Studio Apartment","1 Bedroom","2 Bedroom","3 Bedroom",
+  "4+ Bedroom","Maisonette","Bungalow","Townhouse","Apartment Block",
+  "Single Room","Shared Room","Hostel Room","Commercial Office",
+  "Shop / Retail Space","Warehouse","Plot / Land","Furnished Apartment",
+  "Unfurnished Apartment","Penthouse","Duplex"
+];
+
+const COUNTIES = [
+  "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
+  "Garissa","Wajir","Mandera","Marsabit","Isiolo","Meru","Tharaka Nithi",
+  "Embu","Kitui","Machakos","Makueni","Nyandarua","Nyeri","Kirinyaga",
+  "Murang’a","Kiambu","Turkana","West Pokot","Samburu","Trans Nzoia",
+  "Uasin Gishu","Elgeyo Marakwet","Nandi","Baringo","Laikipia","Nakuru",
+  "Narok","Kajiado","Kericho","Bomet","Kakamega","Vihiga","Bungoma",
+  "Busia","Siaya","Kisumu","Homa Bay","Migori","Kisii","Nyamira",
+  "Nairobi City"
+];
+
 export default function Upload() {
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -29,6 +48,12 @@ export default function Upload() {
     leaseType: "monthly",
     availableFrom: "",
     rules: "",
+    propertyType: "",
+    county: "",
+    lat: "",
+    lng: "",
+    bookedUnits: 0,
+    initiallyBooked: false,
   });
 
   const [images, setImages] = useState([]);
@@ -40,13 +65,13 @@ export default function Upload() {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
-    if (name === "furnished") {
-      setFormData((prev) => ({ ...prev, furnished: value === "true" }));
+    if (name === "furnished" || name === "initiallyBooked") {
+      setFormData((prev) => ({ ...prev, [name]: checked }));
       return;
     }
 
     const floatFields = ["price", "deposit"];
-    const intFields = ["bedrooms", "bathrooms", "totalUnits"];
+    const intFields = ["bedrooms", "bathrooms", "totalUnits", "bookedUnits"];
 
     setFormData((prev) => ({
       ...prev,
@@ -85,13 +110,31 @@ export default function Upload() {
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setError("❌ Geolocation is not supported by your browser");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setFormData((prev) => ({
+          ...prev,
+          lat: position.coords.latitude.toFixed(6),
+          lng: position.coords.longitude.toFixed(6),
+        }));
+      },
+      () => setError("❌ Unable to get location. Please enter manually.")
+    );
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
     if (!formData.title || !formData.description || !formData.location ||
-        !formData.price || !formData.bedrooms || !formData.bathrooms) {
+        !formData.price || !formData.bedrooms || !formData.bathrooms ||
+        !formData.propertyType || !formData.county) {
       setError("❌ Please fill all required fields");
       return;
     }
@@ -103,6 +146,10 @@ export default function Upload() {
       setError("❌ Please select at least one amenity");
       return;
     }
+    if (formData.bookedUnits > formData.totalUnits) {
+      setError("❌ Booked units cannot be more than total units");
+      return;
+    }
 
     setLoading(true);
 
@@ -112,8 +159,8 @@ export default function Upload() {
       Object.keys(formData).forEach((key) => {
         if (key === "amenities") {
           formDataToSend.append("amenities", JSON.stringify(formData.amenities));
-        } else if (key === "furnished") {
-          formDataToSend.append("furnished", String(formData.furnished));
+        } else if (key === "furnished" || key === "initiallyBooked") {
+          formDataToSend.append(key, String(formData[key]));
         } else {
           formDataToSend.append(key, formData[key]);
         }
@@ -121,13 +168,9 @@ export default function Upload() {
 
       images.forEach((image) => formDataToSend.append("images", image));
 
-      // ✅ FIX 1: Correct endpoint is /properties/create, not /properties
       const response = await fetch(`${API_BASE}/properties/create`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          // ✅ No Content-Type — browser sets multipart/form-data boundary automatically
-        },
+        headers: { Authorization: `Bearer ${token}` },
         body: formDataToSend,
       });
 
@@ -139,17 +182,20 @@ export default function Upload() {
       const result = await response.json();
       console.log("Upload success:", result);
 
-      setSuccess("✅ Property submitted! Pending admin approval. Track its status in your dashboard.");
+      setSuccess("✅ Property submitted successfully! Pending admin approval. You can mark units as booked/unbooked from your dashboard.");
 
+      // Reset form
       setFormData({
         title: "", description: "", location: "", price: "", deposit: "",
         bedrooms: "", bathrooms: "", amenities: [], totalUnits: 1,
         furnished: false, leaseType: "monthly", availableFrom: "", rules: "",
+        propertyType: "", county: "", lat: "", lng: "",
+        bookedUnits: 0, initiallyBooked: false,
       });
       setImages([]);
       setImagePreviews([]);
 
-      setTimeout(() => navigate("/dashboard"), 2500);
+      setTimeout(() => navigate("/dashboard"), 2800);
     } catch (err) {
       console.error("Upload error:", err);
       setError(err.message || "Error uploading property. Please try again.");
@@ -186,14 +232,59 @@ export default function Upload() {
             <input type="text" name="title" placeholder="e.g., Modern 2BR Apartment with balcony" value={formData.title} onChange={handleChange} style={styles.input} required />
           </div>
 
+          <div style={styles.formRow}>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Property Type <span style={styles.required}>*</span></label>
+              <select name="propertyType" value={formData.propertyType} onChange={handleChange} style={styles.input} required>
+                <option value="">Select Property Type</option>
+                {PROPERTY_TYPES.map(type => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>County <span style={styles.required}>*</span></label>
+              <select name="county" value={formData.county} onChange={handleChange} style={styles.input} required>
+                <option value="">Select County</option>
+                {COUNTIES.map(county => (
+                  <option key={county} value={county}>{county}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           <div style={styles.formGroup}>
             <label style={styles.label}>Location <span style={styles.required}>*</span></label>
             <input type="text" name="location" placeholder="e.g., Nairobi, Westlands" value={formData.location} onChange={handleChange} style={styles.input} required />
           </div>
 
+          {/* GPS Location */}
+          <div style={styles.formRow}>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Latitude</label>
+              <input type="number" name="lat" step="0.000001" placeholder="e.g., -1.2921" value={formData.lat} onChange={handleChange} style={styles.input} />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Longitude</label>
+              <input type="number" name="lng" step="0.000001" placeholder="e.g., 36.8219" value={formData.lng} onChange={handleChange} style={styles.input} />
+            </div>
+          </div>
+          <button type="button" onClick={getCurrentLocation} style={styles.geoBtn}>
+            📍 Get Current Location
+          </button>
+
+          {/* ✅ Description - NO CHARACTER LIMIT */}
           <div style={styles.formGroup}>
             <label style={styles.label}>Description <span style={styles.required}>*</span></label>
-            <textarea name="description" placeholder="Describe your property in detail (min 50 characters)" value={formData.description} onChange={handleChange} style={styles.textarea} rows="5" required />
+            <textarea 
+              name="description" 
+              placeholder="Describe your property in detail..." 
+              value={formData.description} 
+              onChange={handleChange} 
+              style={styles.textarea} 
+              rows="6" 
+              required 
+            />
           </div>
 
           <div style={styles.formRow}>
@@ -242,9 +333,27 @@ export default function Upload() {
               <input type="number" name="totalUnits" placeholder="1" value={formData.totalUnits} onChange={handleChange} style={styles.input} min="1" />
             </div>
             <div style={styles.formGroup}>
-              <label style={styles.label}>Available From</label>
-              <input type="date" name="availableFrom" value={formData.availableFrom} onChange={handleChange} style={styles.input} />
+              <label style={styles.label}>Initial Booked Units</label>
+              <input type="number" name="bookedUnits" placeholder="0" value={formData.bookedUnits} onChange={handleChange} style={styles.input} min="0" />
             </div>
+          </div>
+
+          <div style={styles.formGroup}>
+            <label style={styles.label}>
+              <input 
+                type="checkbox" 
+                name="initiallyBooked" 
+                checked={formData.initiallyBooked} 
+                onChange={handleChange} 
+                style={{ marginRight: "8px" }}
+              />
+              Mark this property as partially booked on upload
+            </label>
+          </div>
+
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Available From</label>
+            <input type="date" name="availableFrom" value={formData.availableFrom} onChange={handleChange} style={styles.input} />
           </div>
 
           <div style={styles.formGroup}>
@@ -299,10 +408,7 @@ export default function Upload() {
         </form>
 
         <p style={styles.disclaimer}>
-          ℹ️ Your property will be reviewed by our admin team before appearing on listings.{" "}
-          <span style={{ color: "#60a5fa", cursor: "pointer" }} onClick={() => navigate("/dashboard")}>
-            Track status in dashboard →
-          </span>
+          ℹ️ Your property will be reviewed by our admin team. After approval, you can mark units as booked/unbooked from your dashboard.
         </p>
       </div>
     </div>
@@ -340,6 +446,7 @@ const styles = {
   disclaimer: { textAlign: "center", color: "#64748b", fontSize: "12px", marginTop: "20px" },
   unauth: { textAlign: "center", color: "#94a3b8", padding: "60px 20px", background: "rgba(30, 41, 59, 0.5)", borderRadius: "12px", border: "2px dashed #475569" },
   loginBtn: { marginTop: "20px", padding: "12px 24px", background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)", color: "white", border: "none", borderRadius: "8px", fontSize: "1rem", fontWeight: 600, cursor: "pointer" },
+  geoBtn: { padding: "10px 16px", background: "linear-gradient(135deg, #0a84ff, #0066cc)", color: "#fff", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "14px", marginTop: "8px" },
 };
 
 const cssStyles = `
