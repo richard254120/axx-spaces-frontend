@@ -92,10 +92,12 @@ export default function LandlordDashboard() {
     pending: properties.filter((p) => p.status === "pending").length,
     approved: properties.filter((p) => p.status === "approved").length,
     rejected: properties.filter((p) => p.status === "rejected").length,
+    booked: properties.filter((p) => (p.bookedUnits || 0) > 0).length,
   };
 
   const filteredProperties = properties.filter((p) => {
     if (activeTab === "all") return true;
+    if (activeTab === "booked") return (p.bookedUnits || 0) > 0;
     return p.status === activeTab;
   });
 
@@ -120,12 +122,13 @@ export default function LandlordDashboard() {
       {successMessage && <div style={styles.successMsg}>{successMessage}</div>}
       {error && <div style={styles.errorMsg}>{error}</div>}
 
-      {/* Tabs — now includes Rejected */}
+      {/* Tabs — Added Booked Tab */}
       <div style={styles.tabsContainer}>
         {[
           { key: "all",      label: "📋 All",       count: counts.all },
           { key: "pending",  label: "⏳ Pending",    count: counts.pending },
           { key: "approved", label: "✅ Approved",   count: counts.approved },
+          { key: "booked",   label: "📌 Booked",     count: counts.booked },
           { key: "rejected", label: "❌ Rejected",   count: counts.rejected },
         ].map(({ key, label, count }) => (
           <button
@@ -192,14 +195,12 @@ export default function LandlordDashboard() {
                     <span>🏢 {available}/{total} units free</span>
                   </div>
 
-                  {/* ✅ Show rejection note if rejected */}
                   {property.status === "rejected" && (
                     <div style={styles.rejectedNote}>
                       ⚠️ This listing was rejected. Delete it and re-submit after making changes.
                     </div>
                   )}
 
-                  {/* ✅ Show pending info */}
                   {property.status === "pending" && (
                     <div style={styles.pendingNote}>
                       🕐 Under review by admin. Usually takes 24–48 hours.
@@ -227,9 +228,7 @@ export default function LandlordDashboard() {
                   )}
 
                   <div style={styles.cardActions}>
-                    <button onClick={() => handleDelete(property._id)} style={styles.deleteBtn}>
-                      🗑 Delete
-                    </button>
+                    {/* Delete button removed for landlords as requested */}
                   </div>
                 </div>
               </div>
