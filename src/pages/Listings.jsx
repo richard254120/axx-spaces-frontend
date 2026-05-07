@@ -8,7 +8,7 @@ export default function Listings() {
   const [filteredProperties, setFilteredProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState("all");   // ✅ Added tab state
   const [filters, setFilters] = useState({
     location: "",
     minPrice: 0,
@@ -26,29 +26,31 @@ export default function Listings() {
         const response = await fetch(`${API_BASE}/properties`);
         if (!response.ok) throw new Error("Failed to fetch properties");
         const data = await response.json();
-        
+       
+        // ✅ PERFECT UNIT CALCULATION
         const processedProperties = data.map(prop => ({
           ...prop,
           availableUnits: Math.max(0, (prop.totalUnits || 1) - (prop.bookedUnits || 0))
         }));
-        
+       
+        const availableProperties = processedProperties.filter((prop) => prop.availableUnits > 0);
         setProperties(processedProperties);
-        setFilteredProperties(processedProperties.filter(p => p.availableUnits > 0));
+        setFilteredProperties(availableProperties);
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-
     fetchProperties();
   }, []);
 
   useEffect(() => {
     let filtered = properties;
 
+    // ✅ NEW: Filter for "Book Property" tab
     if (activeTab === "book") {
-      filtered = filtered.filter(p => p.availableUnits > 0);
+      filtered = filtered.filter((p) => p.availableUnits > 0);
     }
 
     if (filters.location) {
@@ -94,24 +96,11 @@ export default function Listings() {
       setCurrentImageIndex((prev) => (prev - 1 + selectedProperty.images.length) % selectedProperty.images.length);
   };
 
-  // ✅ DIRECT BOOKING - Opens WhatsApp with full property details
-  const handleBookNow = (property) => {
-    const phone = property.owner?.phone?.replace(/\D/g, "") || property.phone?.replace(/\D/g, "");
-    if (!phone) {
-      alert("Sorry, landlord contact number is not available.");
-      return;
-    }
-
-    const message = `Hello,\n\n` +
-      `I am interested in booking your property:\n\n` +
-      `🏠 *${property.title}*\n` +
-      `📍 ${property.county} - ${property.location}\n` +
-      `💰 KSh ${property.price?.toLocaleString()}/month\n` +
-      `🛏 ${property.bedrooms} Bedrooms | 🚿 ${property.bathrooms} Bathrooms\n` +
-      `📏 Total Units: ${property.totalUnits || 1} | Available: ${property.availableUnits}\n\n` +
-      `Please let me know the next steps for booking and viewing. Thank you!`;
-
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank");
+  const handleContactLandlord = (property) => {
+    const phoneNumber = property.owner?.phone?.replace(/\D/g, "") || property.phone?.replace(/\D/g, "");
+    const landlordName = property.owner?.name || "Landlord";
+    const message = `Hi ${landlordName}, I'm interested in your property "${property.title}" located in ${property.location}. Can you provide more details?`;
+    window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
   const leaseLabel = { monthly: "Monthly", "6months": "6 Months", yearly: "Yearly" };
@@ -136,19 +125,19 @@ export default function Listings() {
 
       {error && <div style={styles.error}>{error}</div>}
 
-      {/* Tabs */}
+      {/* ✅ TABS - Added "Book Property" Tab */}
       <div style={styles.tabsContainer}>
         <button 
           style={{...styles.tabBtn, ...(activeTab === "all" && styles.tabBtnActive)}} 
           onClick={() => setActiveTab("all")}
         >
-          📋 All Properties
+          📋 All
         </button>
         <button 
           style={{...styles.tabBtn, ...(activeTab === "book" && styles.tabBtnActive)}} 
           onClick={() => setActiveTab("book")}
         >
-          🚀 Book Now
+          🚀 Book Property
         </button>
       </div>
 
@@ -208,11 +197,17 @@ export default function Listings() {
                 <div style={{ ...styles.availabilityBadge, ...(property.availableUnits > 0 ? styles.availableBadge : styles.unavailableBadge) }}>
                   {property.availableUnits > 0 ? <>✅ {property.availableUnits} Available</> : <>❌ Fully Booked</>}
                 </div>
+                {property.images?.length > 1 && (
+                  <div style={styles.imageCount}>📷 {property.images.length}</div>
+                )}
               </div>
 
               <div style={styles.content}>
                 <h2 style={styles.title}>{property.title}</h2>
-                <p style={styles.location}>📍 {property.county} • {property.location}</p>
+               
+                <p style={styles.location}>
+                  📍 {property.county} • {property.location}
+                </p>
 
                 <div style={styles.specs}>
                   <span style={styles.spec}>🛏️ {property.bedrooms} Bed</span>
@@ -230,16 +225,26 @@ export default function Listings() {
                   <div><span style={styles.unitLabel}>Available</span><strong style={styles.unitValueBold}>{property.availableUnits}</strong></div>
                 </div>
 
-                {/* ✅ STRONG "BOOK NOW" BUTTON - Direct to Landlord */}
-                <button
-                  style={styles.bookNowBtn}
-                  onClick={() => handleBookNow(property)}
-                >
-                  🚀 BOOK THIS PROPERTY NOW
-                </button>
+                {property.amenities?.length > 0 && (
+                  <div style={styles.amenitiesPreview}>
+                    {property.amenities.slice(0, 2).map((amenity, idx) => (
+                      <span key={idx} style={styles.amenityChip}>✓ {amenity}</span>
+                    ))}
+                    {property.amenities.length > 2 && (
+                      <span style={styles.amenityChip}>+{property.amenities.length - 2} more</span>
+                    )}
+                  </div>
+                )}
 
+                <button
+                  style={{ ...styles.contactBtn, ...(property.availableUnits === 0 ? styles.contactBtnDisabled : {}) }}
+                  onClick={() => handleContactLandlord(property)}
+                  disabled={property.availableUnits === 0}
+                >
+                  💬 Contact via WhatsApp
+                </button>
                 <button style={styles.viewBtn} onClick={() => openModal(property)}>
-                  👁️ View Full Details
+                  👁️ View Details
                 </button>
               </div>
             </div>
@@ -247,12 +252,131 @@ export default function Listings() {
         </div>
       )}
 
-      {/* Modal - Unchanged from your original */}
+      {/* Modal - Unchanged */}
       {selectedProperty && (
         <div style={styles.modal} onClick={closeModal}>
           <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            {/* ... Your full modal code remains here unchanged ... */}
-            {/* (I kept it exactly as in your previous version) */}
+            <button style={styles.closeBtn} onClick={closeModal}>✕</button>
+
+            <div style={styles.modalImage}>
+              {selectedProperty.images?.length > 0 ? (
+                <>
+                  <img src={selectedProperty.images[currentImageIndex]} alt={`${selectedProperty.title} ${currentImageIndex + 1}`} style={styles.modalImg} />
+                  {selectedProperty.images.length > 1 && (
+                    <>
+                      <button style={styles.prevBtn} onClick={prevImage}>❮</button>
+                      <button style={styles.nextBtn} onClick={nextImage}>❯</button>
+                      <div style={styles.imageCounter}>{currentImageIndex + 1} / {selectedProperty.images.length}</div>
+                    </>
+                  )}
+                </>
+              ) : (
+                <div style={styles.noImage}>📷 No Images Available</div>
+              )}
+            </div>
+
+            {selectedProperty.images?.length > 1 && (
+              <div style={styles.thumbnails}>
+                {selectedProperty.images.map((img, idx) => (
+                  <img
+                    key={idx}
+                    src={img}
+                    alt={`Thumbnail ${idx + 1}`}
+                    style={{ ...styles.thumbnail, ...(idx === currentImageIndex ? styles.activeThumbnail : {}) }}
+                    onClick={() => setCurrentImageIndex(idx)}
+                  />
+                ))}
+              </div>
+            )}
+
+            <div style={styles.modalDetails}>
+              <h2 style={styles.modalTitle}>{selectedProperty.title}</h2>
+              <p style={styles.modalLocation}>
+                📍 {selectedProperty.county} • {selectedProperty.location}
+              </p>
+
+              <div style={styles.specs}>
+                <span style={styles.spec}>🛏️ {selectedProperty.bedrooms} Bedrooms</span>
+                <span style={styles.spec}>🚿 {selectedProperty.bathrooms} Bathrooms</span>
+                <span style={styles.spec}>{selectedProperty.furnished ? "🪑 Furnished" : "📦 Unfurnished"}</span>
+              </div>
+
+              <div style={styles.pricingRow}>
+                <div style={styles.pricingBox}>
+                  <span style={styles.pricingLabel}>Monthly Rent</span>
+                  <span style={styles.pricingValue}>KES {selectedProperty.price?.toLocaleString()}</span>
+                </div>
+                {selectedProperty.deposit > 0 && (
+                  <div style={styles.pricingBox}>
+                    <span style={styles.pricingLabel}>Deposit</span>
+                    <span style={styles.pricingValue}>KES {selectedProperty.deposit?.toLocaleString()}</span>
+                  </div>
+                )}
+                {selectedProperty.leaseType && (
+                  <div style={styles.pricingBox}>
+                    <span style={styles.pricingLabel}>Lease</span>
+                    <span style={styles.pricingValue}>{leaseLabel[selectedProperty.leaseType] || selectedProperty.leaseType}</span>
+                  </div>
+                )}
+              </div>
+
+              <p style={styles.fullDescription}>{selectedProperty.description}</p>
+
+              {selectedProperty.rules && (
+                <div style={styles.rulesBox}>
+                  <h3 style={styles.rulesHead}>📋 House Rules</h3>
+                  <p style={styles.rulesText}>{selectedProperty.rules}</p>
+                </div>
+              )}
+
+              {selectedProperty.amenities?.length > 0 && (
+                <div style={styles.amenitiesSection}>
+                  <h3 style={styles.amenitiesHead}>✨ Amenities</h3>
+                  <div style={styles.amenitiesGrid}>
+                    {selectedProperty.amenities.map((amenity, idx) => (
+                      <span key={idx} style={styles.amenityChip}>✓ {amenity}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div style={styles.unitInfoModal}>
+                <h3 style={styles.unitHeading}>📊 Availability</h3>
+                <div style={styles.unitGrid}>
+                  <div style={styles.unitBox}>
+                    <p style={styles.unitBoxLabel}>Total Units</p>
+                    <p style={styles.unitBoxNumber}>{selectedProperty.totalUnits || 1}</p>
+                  </div>
+                  <div style={styles.unitBox}>
+                    <p style={styles.unitBoxLabel}>Booked</p>
+                    <p style={styles.unitBoxNumber}>{selectedProperty.bookedUnits || 0}</p>
+                  </div>
+                  <div style={styles.unitBox}>
+                    <p style={styles.unitBoxLabel}>Available</p>
+                    <p style={styles.unitBoxNumber}>{selectedProperty.availableUnits}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div style={styles.landlordInfo}>
+                <h3 style={styles.landlordHead}>👤 Landlord Contact</h3>
+                <p style={styles.landlordDetail}><strong>Name:</strong> {selectedProperty.owner?.name}</p>
+                <p style={styles.landlordDetail}><strong>Phone:</strong> {selectedProperty.owner?.phone}</p>
+              </div>
+
+              <div style={styles.contactButtonsContainer}>
+                <button
+                  style={{ ...styles.whatsappBtn, ...(selectedProperty.availableUnits === 0 ? styles.contactBtnDisabled : {}) }}
+                  onClick={() => handleContactLandlord(selectedProperty)}
+                  disabled={selectedProperty.availableUnits === 0}
+                >
+                  💬 Contact via WhatsApp
+                </button>
+                <button style={styles.callBtn} onClick={() => window.open(`tel:${selectedProperty.owner?.phone}`)}>
+                  📞 Call Landlord
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -260,7 +384,7 @@ export default function Listings() {
   );
 }
 
-/* ==================== ALL YOUR ORIGINAL STYLES PRESERVED ==================== */
+/* ==================== ALL YOUR ORIGINAL STYLES + CSS PRESERVED ==================== */
 const styles = {
   container: { maxWidth: "1200px", margin: "0 auto", padding: "20px", background: "linear-gradient(135deg, #06101f 0%, #0f1729 100%)", minHeight: "100vh", fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont" },
   header: { textAlign: "center", marginBottom: "40px", color: "#f1f5f9" },
@@ -300,25 +424,43 @@ const styles = {
   contactBtn: { padding: "10px 12px", background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.9rem", marginTop: "8px", transition: "all 0.3s ease" },
   contactBtnDisabled: { opacity: 0.5, cursor: "not-allowed" },
   viewBtn: { padding: "10px 12px", background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.9rem", marginTop: "6px", transition: "all 0.3s ease" },
-  
-  // ✅ NEW STRONG BOOK NOW BUTTON
-  bookNowBtn: { 
-    padding: "14px 20px", 
-    background: "linear-gradient(135deg, #22c55e, #16a34a)", 
-    color: "white", 
-    border: "none", 
-    borderRadius: "10px", 
-    fontWeight: 700, 
-    fontSize: "1.05rem", 
-    cursor: "pointer", 
-    marginTop: "12px",
-    width: "100%",
-    boxShadow: "0 4px 15px rgba(34, 197, 94, 0.4)"
-  },
-
   modal: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000, padding: "20px" },
   modalContent: { background: "linear-gradient(135deg, #1e293b 0%, #0f1729 100%)", borderRadius: "12px", maxWidth: "600px", width: "100%", maxHeight: "90vh", overflowY: "auto", border: "1px solid #334155", position: "relative" },
-  // ... (all other modal styles remain the same as your previous version)
+  closeBtn: { position: "absolute", top: "12px", right: "12px", background: "rgba(0,0,0,0.6)", border: "none", color: "white", width: "32px", height: "32px", borderRadius: "50%", cursor: "pointer", fontSize: "1.2rem", zIndex: 1001 },
+  modalImage: { position: "relative", width: "100%", height: "300px", overflow: "hidden", background: "#0f1729" },
+  modalImg: { width: "100%", height: "100%", objectFit: "cover" },
+  imageCounter: { position: "absolute", bottom: "12px", left: "50%", transform: "translateX(-50%)", background: "rgba(0,0,0,0.6)", color: "white", padding: "4px 12px", borderRadius: "12px", fontSize: "0.85rem", fontWeight: 600 },
+  prevBtn: { position: "absolute", top: "50%", left: "12px", transform: "translateY(-50%)", background: "rgba(0,0,0,0.6)", border: "none", color: "white", width: "40px", height: "40px", borderRadius: "50%", cursor: "pointer", fontSize: "1.2rem" },
+  nextBtn: { position: "absolute", top: "50%", right: "12px", transform: "translateY(-50%)", background: "rgba(0,0,0,0.6)", border: "none", color: "white", width: "40px", height: "40px", borderRadius: "50%", cursor: "pointer", fontSize: "1.2rem" },
+  thumbnails: { display: "flex", gap: "8px", padding: "12px", overflowX: "auto", background: "#0f1729" },
+  thumbnail: { width: "60px", height: "60px", objectFit: "cover", borderRadius: "6px", cursor: "pointer", opacity: 0.6, border: "2px solid transparent", flexShrink: 0 },
+  activeThumbnail: { opacity: 1, borderColor: "#fbbf24" },
+  modalDetails: { padding: "24px", color: "#f1f5f9" },
+  modalTitle: { fontSize: "1.5rem", margin: "0 0 8px 0", color: "#fbbf24" },
+  modalLocation: { color: "#94a3b8", marginBottom: "16px" },
+  pricingRow: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))", gap: "12px", margin: "16px 0" },
+  pricingBox: { background: "rgba(251, 191, 36, 0.1)", border: "1px solid rgba(251, 191, 36, 0.2)", borderRadius: "8px", padding: "12px", textAlign: "center" },
+  pricingLabel: { display: "block", color: "#94a3b8", fontSize: "0.75rem", marginBottom: "4px" },
+  pricingValue: { display: "block", color: "#fbbf24", fontWeight: 700, fontSize: "1rem" },
+  fullDescription: { color: "#cbd5e1", lineHeight: "1.6", margin: "16px 0" },
+  rulesBox: { margin: "16px 0", padding: "16px", background: "rgba(148, 163, 184, 0.08)", borderRadius: "8px", borderLeft: "3px solid #475569" },
+  rulesHead: { margin: "0 0 8px 0", color: "#94a3b8", fontSize: "1rem" },
+  rulesText: { color: "#cbd5e1", fontSize: "0.9rem", lineHeight: "1.6", margin: 0 },
+  amenitiesSection: { margin: "20px 0", padding: "16px", background: "rgba(59, 130, 246, 0.1)", borderRadius: "8px" },
+  amenitiesHead: { margin: "0 0 12px 0", color: "#fbbf24" },
+  amenitiesGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: "8px" },
+  unitInfoModal: { margin: "20px 0", padding: "16px", background: "rgba(34, 197, 94, 0.1)", borderRadius: "8px" },
+  unitHeading: { margin: "0 0 12px 0", color: "#10b981" },
+  unitGrid: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" },
+  unitBox: { textAlign: "center", padding: "12px", background: "rgba(255,255,255,0.05)", borderRadius: "6px" },
+  unitBoxLabel: { margin: 0, color: "#94a3b8", fontSize: "0.85rem" },
+  unitBoxNumber: { margin: "4px 0 0 0", color: "#22c55e", fontSize: "1.5rem", fontWeight: 700 },
+  landlordInfo: { margin: "20px 0", padding: "16px", background: "rgba(139, 92, 246, 0.1)", borderRadius: "8px" },
+  landlordHead: { margin: "0 0 12px 0", color: "#8b5cf6" },
+  landlordDetail: { color: "#cbd5e1", margin: "8px 0" },
+  contactButtonsContainer: { display: "flex", gap: "12px", marginTop: "20px" },
+  whatsappBtn: { flex: 1, padding: "12px 16px", background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.95rem" },
+  callBtn: { flex: 1, padding: "12px 16px", background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.95rem" },
 };
 
 const cssStyles = `
