@@ -1,4 +1,4 @@
-```javascriptreact
+
 import { useState, useEffect } from "react";
 
 // ✅ FIX: Use API_BASE like every other file
