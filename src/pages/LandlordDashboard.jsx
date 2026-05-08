@@ -42,9 +42,31 @@ export default function LandlordDashboard() {
   };
 
   const updateBookedUnits = async (propertyId, change) => {
-    // ... your existing function (unchanged) ...
+    try {
+      const response = await fetch(`${API_BASE}/properties/${propertyId}/book`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ change }),
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || "Failed to update units");
+      }
+
+      fetchMyProperties();
+      setSuccessMessage(change > 0 ? "✅ 1 Unit marked as Booked" : "✅ 1 Unit marked as Available");
+      setTimeout(() => setSuccessMessage(""), 2500);
+    } catch (err) {
+      setError(err.message || "Failed to update booking status");
+      setTimeout(() => setError(""), 3000);
+    }
   };
 
+  // ✅ NEW - Boost Property (Monetization)
   const handleBoost = (propertyId) => {
     navigate(`/premium-plans?propertyId=${propertyId}`);
   };
@@ -73,19 +95,38 @@ export default function LandlordDashboard() {
     <div style={styles.container}>
       <style>{cssStyles}</style>
 
-      {/* ==================== WALLET BALANCE ==================== */}
-      <div style={styles.walletBar}>
-        <div style={styles.walletText}>
-          💰 Wallet Balance: <strong>KSh {(user?.walletBalance || 0).toLocaleString()}</strong>
-        </div>
-        <button onClick={() => navigate("/premium-plans")} style={styles.topUpBtn}>
-          Top Up Wallet
-        </button>
-      </div>
-
-      {/* Profile Card - Your Original */}
+      {/* ==================== YOUR ORIGINAL PROFILE CARD ==================== */}
       <div style={styles.profileCard}>
-        {/* ... your existing profile card code ... */}
+        <div style={styles.profileHeader}>
+          <div style={styles.avatar}>👤</div>
+          <div style={styles.profileInfo}>
+            <h2 style={styles.profileName}>{user?.name || "My Account"}</h2>
+            <p style={styles.profileEmail}>{user?.email}</p>
+            <p style={styles.profilePhone}>{user?.phone || "No phone number added"}</p>
+          </div>
+          <button style={styles.logoutBtn} onClick={logout}>
+            Logout
+          </button>
+        </div>
+
+        <div style={styles.statsGrid}>
+          <div style={styles.statBox}>
+            <div style={styles.statNumber}>{counts.all}</div>
+            <div style={styles.statLabel}>Total Properties</div>
+          </div>
+          <div style={styles.statBox}>
+            <div style={styles.statNumber}>{counts.approved}</div>
+            <div style={styles.statLabel}>Approved</div>
+          </div>
+          <div style={styles.statBox}>
+            <div style={styles.statNumber}>{counts.pending}</div>
+            <div style={styles.statLabel}>Pending</div>
+          </div>
+          <div style={styles.statBox}>
+            <div style={styles.statNumber}>{counts.booked}</div>
+            <div style={styles.statLabel}>Booked Properties</div>
+          </div>
+        </div>
       </div>
 
       {/* Header */}
@@ -100,123 +141,180 @@ export default function LandlordDashboard() {
       {successMessage && <div style={styles.successMsg}>{successMessage}</div>}
       {error && <div style={styles.errorMsg}>{error}</div>}
 
-      {/* Tabs - Your Original */}
+      {/* Tabs */}
       <div style={styles.tabsContainer}>
-        {/* ... your existing tabs ... */}
+        {[
+          { key: "all",      label: "📋 All",       count: counts.all },
+          { key: "pending",  label: "⏳ Pending",   count: counts.pending },
+          { key: "approved", label: "✅ Approved",  count: counts.approved },
+          { key: "booked",   label: "📌 Booked",    count: counts.booked },
+          { key: "rejected", label: "❌ Rejected",  count: counts.rejected },
+        ].map(({ key, label, count }) => (
+          <button
+            key={key}
+            style={{ ...styles.tabBtn, ...(activeTab === key && styles.tabBtnActive) }}
+            onClick={() => setActiveTab(key)}
+          >
+            {label} ({count})
+          </button>
+        ))}
       </div>
 
-      {/* Properties Grid */}
+      {loading && <p style={styles.loading}>⏳ Loading your properties...</p>}
+
+      {!loading && filteredProperties.length === 0 && (
+        <div style={styles.empty}>
+          <p style={styles.emptyText}>
+            {activeTab === "all" ? "You have not uploaded any properties yet." : `No ${activeTab} properties found.`}
+          </p>
+          {activeTab === "all" && (
+            <button onClick={() => navigate("/upload")} style={styles.uploadBtn}>
+              ➕ Upload New Property
+            </button>
+          )}
+        </div>
+      )}
+
       {!loading && filteredProperties.length > 0 && (
         <div style={styles.grid}>
           {filteredProperties.map((property) => {
             const status = statusConfig[property.status] || statusConfig.pending;
-            const isBoosted = property.isFeatured && new Date(property.promotionEndDate) > new Date();
+            const total = property.totalUnits || 1;
+            const booked = property.bookedUnits || 0;
+            const available = Math.max(0, total - booked);
 
             return (
               <div key={property._id} style={styles.card}>
                 <div style={styles.imageContainer}>
-                  {property.images?.[0] ? (
+                  {property.images && property.images.length > 0 ? (
                     <img src={property.images[0]} alt={property.title} style={styles.image} />
                   ) : (
                     <div style={styles.noImage}>📷 No Image</div>
                   )}
-
                   <div style={{ ...styles.statusBadge, backgroundColor: status.bg }}>
                     {status.label}
                   </div>
-
-                  {isBoosted && (
-                    <div style={styles.boostedBadge}>⭐ BOOSTED</div>
-                  )}
                 </div>
 
                 <div style={styles.content}>
-                  <h3 style={styles.propertyTitle}>
-                    {property.title} {isBoosted && "⭐"}
-                  </h3>
+                  <h3 style={styles.propertyTitle}>{property.title}</h3>
                   <p style={styles.location}>📍 {property.county} • {property.location}</p>
                   <p style={styles.price}>KSh {Number(property.price).toLocaleString()} / month</p>
 
                   <div style={styles.specs}>
                     <span>🛏 {property.bedrooms} Beds</span>
                     <span>🚿 {property.bathrooms} Baths</span>
+                    <span>🏢 {available}/{total} units free</span>
                   </div>
 
+                  {/* ✅ Boost Button - Only for Approved Properties */}
                   {property.status === "approved" && (
                     <button 
                       onClick={() => handleBoost(property._id)}
                       style={styles.boostBtn}
                     >
-                      ⭐ Boost This Listing
+                      ⭐ Boost This Listing (Monetize)
                     </button>
                   )}
 
-                  {/* Your existing booking buttons remain here */}
+                  {property.status === "rejected" && (
+                    <div style={styles.rejectedNote}>
+                      ⚠️ This listing was rejected. Delete it and re-submit after fixing any issues.
+                    </div>
+                  )}
+
+                  {property.status === "pending" && (
+                    <div style={styles.pendingNote}>
+                      🕐 Under review by admin. Usually takes 24–48 hours.
+                    </div>
+                  )}
+
+                  {property.status === "approved" && (
+                    <div style={styles.bookingControls}>
+                      <button 
+                        onClick={() => updateBookedUnits(property._id, 1)}
+                        disabled={available <= 0}
+                        style={styles.bookedBtn}
+                      >
+                        Mark 1 Unit Booked
+                      </button>
+                      <button 
+                        onClick={() => updateBookedUnits(property._id, -1)}
+                        disabled={booked <= 0}
+                        style={styles.availableBtn}
+                      >
+                        Mark 1 Unit Available
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             );
           })}
         </div>
       )}
-
-      {/* ==================== BOOST HISTORY ==================== */}
-      <div style={styles.historySection}>
-        <h2>💳 Recent Boost History</h2>
-        {user?.paymentHistory?.length > 0 ? (
-          <div style={styles.historyList}>
-            {user.paymentHistory.slice(0, 5).map((payment, index) => (
-              <div key={index} style={styles.historyItem}>
-                <span>⭐ {payment.plan?.toUpperCase()} Plan</span>
-                <span>KSh {payment.amount}</span>
-                <span style={{ color: payment.status === "success" ? "#22c55e" : "#f59e0b" }}>
-                  {payment.status}
-                </span>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p>No boost history yet.</p>
-        )}
-      </div>
     </div>
   );
 }
 
-/* ====================== STYLES ====================== */
+/* ====================== ALL YOUR ORIGINAL STYLES + BOOST BUTTON ====================== */
 const styles = {
-  // ... Keep all your original styles here ...
+  container: { maxWidth: "1200px", margin: "0 auto", padding: "20px", background: "linear-gradient(135deg, #06101f 0%, #0f1729 100%)", minHeight: "100vh", fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI'" },
 
-  walletBar: {
-    background: "#1e293b",
-    padding: "14px 20px",
-    borderRadius: "12px",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "25px",
+  profileCard: {
+    background: "linear-gradient(135deg, #1e2937, #0f172a)",
+    borderRadius: "16px",
+    padding: "24px",
+    marginBottom: "32px",
     border: "1px solid #334155"
   },
-  walletText: { fontSize: "1.1rem", fontWeight: "600" },
-  topUpBtn: {
-    padding: "8px 18px",
-    background: "#eab308",
-    color: "#000",
-    border: "none",
-    borderRadius: "8px",
-    fontWeight: "600",
-    cursor: "pointer"
-  },
-  boostedBadge: {
-    position: "absolute",
-    top: "12px",
-    left: "12px",
-    background: "#eab308",
-    color: "#000",
-    padding: "4px 10px",
-    borderRadius: "20px",
-    fontSize: "0.8rem",
-    fontWeight: "700"
-  },
+  profileHeader: { display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" },
+  avatar: { fontSize: "52px", width: "80px", height: "80px", background: "#334155", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" },
+  profileInfo: { flex: 1 },
+  profileName: { margin: 0, fontSize: "1.6rem", color: "#60a5fa" },
+  profileEmail: { margin: "4px 0", color: "#94a3b8" },
+  profilePhone: { color: "#94a3b8" },
+  logoutBtn: { padding: "10px 20px", background: "#ef4444", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: 600 },
+
+  statsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "16px", marginTop: "24px" },
+  statBox: { background: "rgba(59, 130, 246, 0.1)", padding: "16px", borderRadius: "10px", textAlign: "center", border: "1px solid rgba(59, 130, 246, 0.2)" },
+  statNumber: { fontSize: "1.8rem", fontWeight: 700, color: "#60a5fa" },
+  statLabel: { color: "#94a3b8", fontSize: "0.9rem", marginTop: "4px" },
+
+  header: { textAlign: "center", marginBottom: "30px", color: "#f1f5f9" },
+  title: { fontSize: "2.5rem", margin: 0, color: "#fbbf24", fontWeight: 700 },
+  subtitle: { fontSize: "1rem", color: "#94a3b8", marginTop: "8px" },
+  uploadBtnTop: { marginTop: "16px", padding: "10px 24px", background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)", color: "white", border: "none", borderRadius: "8px", fontSize: "0.95rem", fontWeight: 600, cursor: "pointer" },
+
+  successMsg: { background: "rgba(16, 185, 129, 0.15)", border: "1px solid rgba(16, 185, 129, 0.4)", color: "#6ee7b7", padding: "12px 16px", borderRadius: "8px", marginBottom: "20px", textAlign: "center" },
+  errorMsg: { background: "rgba(239, 68, 68, 0.15)", border: "1px solid rgba(239, 68, 68, 0.4)", color: "#fca5a5", padding: "12px 16px", borderRadius: "8px", marginBottom: "20px", textAlign: "center" },
+
+  tabsContainer: { display: "flex", gap: "8px", marginBottom: "32px", borderBottom: "2px solid #1e293b", justifyContent: "center", flexWrap: "wrap" },
+  tabBtn: { background: "transparent", border: "none", padding: "12px 20px", fontSize: "0.95rem", fontWeight: 600, cursor: "pointer", transition: "all 0.3s ease", borderBottom: "3px solid transparent", marginBottom: "-2px", color: "#94a3b8" },
+  tabBtnActive: { color: "#fbbf24", borderBottomColor: "#fbbf24" },
+
+  loading: { textAlign: "center", color: "#94a3b8", fontSize: "1.1rem", padding: "40px 20px" },
+  empty: { textAlign: "center", color: "#94a3b8", padding: "60px 20px", background: "rgba(30, 41, 59, 0.5)", borderRadius: "12px", border: "2px dashed #475569" },
+  emptyText: { fontSize: "1.1rem", margin: 0 },
+
+  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "24px" },
+  card: { background: "linear-gradient(135deg, #1e293b 0%, #0f1729 100%)", border: "1px solid #334155", borderRadius: "12px", overflow: "hidden", transition: "all 0.3s ease", display: "flex", flexDirection: "column" },
+  imageContainer: { position: "relative", width: "100%", height: "200px", overflow: "hidden", background: "#0f1729" },
+  image: { width: "100%", height: "100%", objectFit: "cover" },
+  noImage: { width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#334155", color: "#94a3b8", fontWeight: 600 },
+  statusBadge: { position: "absolute", top: "12px", right: "12px", padding: "6px 12px", borderRadius: "20px", fontSize: "0.8rem", fontWeight: 600, color: "white" },
+  content: { padding: "20px", flex: 1, display: "flex", flexDirection: "column", gap: "8px" },
+  propertyTitle: { color: "#f1f5f9", fontSize: "1.1rem", margin: 0, fontWeight: 700 },
+  location: { color: "#94a3b8", margin: 0, fontSize: "0.9rem" },
+  price: { color: "#fbbf24", fontSize: "1.15rem", fontWeight: 700, margin: 0 },
+  specs: { display: "flex", gap: "10px", flexWrap: "wrap", fontSize: "0.85rem", color: "#cbd5e1" },
+  rejectedNote: { background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.3)", color: "#fca5a5", padding: "10px 12px", borderRadius: "8px", fontSize: "0.85rem" },
+  pendingNote: { background: "rgba(245, 158, 11, 0.1)", border: "1px solid rgba(245, 158, 11, 0.3)", color: "#fcd34d", padding: "10px 12px", borderRadius: "8px", fontSize: "0.85rem" },
+  bookingControls: { display: "flex", gap: "8px", margin: "12px 0" },
+  bookedBtn: { flex: 1, padding: "9px 12px", background: "linear-gradient(135deg, #f59e0b, #d97706)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.85rem" },
+  availableBtn: { flex: 1, padding: "9px 12px", background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.85rem" },
+
+  // ✅ NEW BOOST BUTTON STYLE
   boostBtn: {
     marginTop: "12px",
     width: "100%",
@@ -226,24 +324,11 @@ const styles = {
     border: "none",
     borderRadius: "8px",
     fontWeight: "700",
-    cursor: "pointer"
-  },
-  historySection: {
-    marginTop: "50px",
-    background: "#1e293b",
-    padding: "25px",
-    borderRadius: "12px",
-    border: "1px solid #334155"
-  },
-  historyList: { display: "flex", flexDirection: "column", gap: "10px" },
-  historyItem: {
-    display: "flex",
-    justifyContent: "space-between",
-    background: "#0f1729",
-    padding: "12px",
-    borderRadius: "8px"
+    fontSize: "1rem",
+    cursor: "pointer",
   }
 };
+
 const cssStyles = `
   button:hover:not(:disabled) { transform: translateY(-2px); }
   .card:hover { transform: translateY(-6px); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
