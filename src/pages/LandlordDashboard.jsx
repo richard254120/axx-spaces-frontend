@@ -219,7 +219,7 @@ export default function LandlordDashboard() {
                       onClick={() => handleBoost(property._id)}
                       style={styles.boostBtn}
                     >
-                      ⭐ Boost This Listing
+                      ⭐ Boost your property
                     </button>
                   )}
 
