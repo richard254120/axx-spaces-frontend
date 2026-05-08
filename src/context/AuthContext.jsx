@@ -19,6 +19,26 @@ export function AuthProvider({ children }) {
     }
   }, [token]);
 
+  // Add this useEffect after the first one
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (token && (!user || !user.name)) {
+        try {
+          const res = await fetch(`${API_BASE}/auth/me`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          const data = await res.json();
+          // You may need to update context here if possible
+          setUser(data); 
+          console.log("User data:", data);
+        } catch (err) {
+          console.error("Failed to fetch user profile");
+        }
+      }
+    };
+    fetchUserProfile();
+  }, [token, user]);
+
   const login = (newToken, userData) => {
     setToken(newToken);
     setUser(userData);

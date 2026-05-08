@@ -96,18 +96,24 @@ export default function LandlordDashboard() {
       <style>{cssStyles}</style>
 
       {/* ==================== YOUR ORIGINAL PROFILE CARD ==================== */}
-      <div style={styles.profileCard}>
-        <div style={styles.profileHeader}>
-          <div style={styles.avatar}>👤</div>
-          <div style={styles.profileInfo}>
-            <h2 style={styles.profileName}>{user?.name || "My Account"}</h2>
-            <p style={styles.profileEmail}>{user?.email}</p>
-            <p style={styles.profilePhone}>{user?.phone || "No phone number added"}</p>
-          </div>
-          <button style={styles.logoutBtn} onClick={logout}>
-            Logout
-          </button>
-        </div>
+     <div style={styles.profileCard}>
+  <div style={styles.profileHeader}>
+    <div style={styles.avatar}>👤</div>
+    <div style={styles.profileInfo}>
+      <h2 style={styles.profileName}>
+        {user?.name || "Landlord"}
+      </h2>
+      <p style={styles.profileEmail}>
+        {user?.email || "No email loaded"}
+      </p>
+      <p style={styles.profilePhone}>
+        {user?.phone || "No phone added"}
+      </p>
+    </div>
+    <button style={styles.logoutBtn} onClick={logout}>
+      Logout
+    </button>
+  </div>
 
         <div style={styles.statsGrid}>
           <div style={styles.statBox}>
