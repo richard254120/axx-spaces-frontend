@@ -7,7 +7,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";     // ← Added
 import Upload from "./pages/Upload";
 import LandlordDashboard from "./pages/LandlordDashboard";
-
+import PremiumPlans from "./pages/PremiumPlans";
+import Checkout from "./pages/Checkout";
 import "leaflet/dist/leaflet.css";
 
 function App() {
@@ -22,6 +23,10 @@ function App() {
         <Route path="/register" element={<Register />} />   {/* ← This was missing */}
         <Route path="/upload" element={<Upload />} />
         <Route path="/dashboard" element={<LandlordDashboard />} />
+        <Route path="/premium-plans" element={<PremiumPlans />} />
+        <Route path="/checkout" element={<Checkout />} />
+      
+  
       </Routes>
     </>
   );
