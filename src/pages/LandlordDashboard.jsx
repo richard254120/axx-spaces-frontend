@@ -175,7 +175,7 @@ export default function LandlordDashboard() {
           </p>
           {activeTab === "all" && (
             <button onClick={() => navigate("/upload")} style={styles.uploadBtn}>
-              ➕ Upload New Property
+               Upload New Property
             </button>
           )}
         </div>
@@ -219,7 +219,7 @@ export default function LandlordDashboard() {
                       onClick={() => handleBoost(property._id)}
                       style={styles.boostBtn}
                     >
-                      ⭐ Boost This Listing (Monetize)
+                      ⭐ Boost This Listing
                     </button>
                   )}
 
