@@ -1,8 +1,8 @@
-
-import { useState, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import logo from "../assets/logo.jpeg";
+import API from "../api/api";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -15,6 +15,10 @@ export default function Home() {
     price: "",
     bedrooms: "",
   });
+
+  // ✅ Featured (Boosted) Properties
+  const [featuredProperties, setFeaturedProperties] = useState([]);
+  const [loadingFeatured, setLoadingFeatured] = useState(true);
 
   const counties = [
     "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
@@ -34,6 +38,21 @@ export default function Home() {
     "3 Bedroom","4+ Bedroom","Maisonette","Bungalow",
     "Townhouse","Apartment Block"
   ];
+
+  // Fetch Featured Properties
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        const res = await API.get("/payment/featured");
+        setFeaturedProperties(res.data || []);
+      } catch (err) {
+        console.error("Failed to load featured properties");
+      } finally {
+        setLoadingFeatured(false);
+      }
+    };
+    fetchFeatured();
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -125,6 +144,48 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ==================== FEATURED LISTINGS SECTION ==================== */}
+      <section style={styles.featuredSection}>
+        <h2 style={styles.sectionTitle}>⭐ Featured Premium Listings</h2>
+        <p style={styles.sectionSubtitle}>Boosted properties get maximum visibility and priority</p>
+
+        {loadingFeatured ? (
+          <p style={{ textAlign: "center", color: "#666" }}>Loading featured properties...</p>
+        ) : featuredProperties.length > 0 ? (
+          <div style={styles.featuredGrid}>
+            {featuredProperties.map((property) => (
+              <div key={property._id} style={styles.featuredCard}>
+                <img 
+                  src={property.images?.[0] || ""} 
+                  alt={property.title} 
+                  style={styles.featuredImage} 
+                />
+                <div style={styles.featuredInfo}>
+                  <div style={styles.boostedTag}>⭐ BOOSTED</div>
+                  <h3 style={styles.featuredTitle}>{property.title}</h3>
+                  <p style={styles.featuredLocation}>
+                    📍 {property.area}, {property.county}
+                  </p>
+                  <p style={styles.featuredPrice}>
+                    KSh {Number(property.price).toLocaleString()} / month
+                  </p>
+                  <button 
+                    onClick={() => navigate(`/listings?highlight=${property._id}`)}
+                    style={styles.viewBtn}
+                  >
+                    View Property
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p style={{ textAlign: "center", color: "#666" }}>
+            No featured listings at the moment. Boost your property to appear here!
+          </p>
+        )}
+      </section>
+
       {/* STATS SECTION */}
       <section style={styles.stats}>
         <div style={styles.statsContent}>
@@ -192,7 +253,7 @@ export default function Home() {
 
       {/* CTA SECTION */}
       <section style={styles.cta}>
-        <h2 style={styles.ctaTitle}>Ready to Find Your Home/Are you a landlord?</h2>
+        <h2 style={styles.ctaTitle}>Ready to Find Your Home / Are you a landlord?</h2>
         <p style={styles.ctaText}>Browse thousands of listings or list your property today</p>
         <div style={styles.ctaButtons}>
           <button 
@@ -210,7 +271,6 @@ export default function Home() {
               border: token ? "none" : "2px solid #1f2937"
             }}
             onClick={handleListProperty}
-            title={token ? "Upload your property" : "Login to list your property"}
           >
             {token ? "📝 Upload Your Property" : "🔐 Login to List Property"}
           </button>
@@ -230,6 +290,7 @@ export default function Home() {
   );
 }
 
+/* ====================== FULL STYLES ====================== */
 const styles = {
   root: {
     fontFamily: "'DM Sans', sans-serif",
@@ -315,12 +376,88 @@ const styles = {
     boxShadow: "0 4px 12px rgba(239, 68, 68, 0.3)",
   },
 
+  // ==================== FEATURED SECTION ====================
+  featuredSection: { 
+    padding: "70px 20px", 
+    background: "#1f2937", 
+    color: "white" 
+  },
+  sectionTitle: { 
+    fontSize: "36px", 
+    fontWeight: 800, 
+    textAlign: "center", 
+    marginBottom: "12px", 
+    color: "#fbbf24" 
+  },
+  sectionSubtitle: { 
+    textAlign: "center", 
+    color: "#94a3b8", 
+    marginBottom: "50px", 
+    fontSize: "18px" 
+  },
+  featuredGrid: { 
+    display: "grid", 
+    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", 
+    gap: "25px", 
+    maxWidth: "1200px", 
+    margin: "0 auto" 
+  },
+  featuredCard: { 
+    background: "#111827", 
+    borderRadius: "12px", 
+    overflow: "hidden", 
+    border: "1px solid #334155" 
+  },
+  featuredImage: { 
+    width: "100%", 
+    height: "200px", 
+    objectFit: "cover" 
+  },
+  featuredInfo: { 
+    padding: "18px" 
+  },
+  boostedTag: { 
+    background: "#eab308", 
+    color: "#000", 
+    padding: "4px 12px", 
+    borderRadius: "20px", 
+    display: "inline-block", 
+    fontSize: "0.85rem", 
+    fontWeight: "700", 
+    marginBottom: "10px" 
+  },
+  featuredTitle: { 
+    fontSize: "1.2rem", 
+    fontWeight: 700, 
+    margin: "0 0 8px 0" 
+  },
+  featuredLocation: { 
+    color: "#94a3b8", 
+    margin: "6px 0" 
+  },
+  featuredPrice: { 
+    color: "#22c55e", 
+    fontSize: "1.25rem", 
+    fontWeight: 700 
+  },
+  viewBtn: { 
+    marginTop: "12px", 
+    width: "100%", 
+    padding: "12px", 
+    background: "#3b82f6", 
+    color: "white", 
+    border: "none", 
+    borderRadius: "8px", 
+    cursor: "pointer", 
+    fontWeight: 600 
+  },
+
+  // STATS
   stats: {
     background: "#1f2937",
     padding: "60px 20px",
     color: "white",
   },
-
   statsContent: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
@@ -328,43 +465,22 @@ const styles = {
     maxWidth: "900px",
     margin: "0 auto",
   },
+  statCard: { textAlign: "center" },
+  statNumber: { fontSize: "36px", fontWeight: 800, marginBottom: "8px" },
+  statLabel: { fontSize: "14px", color: "#d1d5db" },
 
-  statCard: {
-    textAlign: "center",
-  },
-
-  statNumber: {
-    fontSize: "36px",
-    fontWeight: 800,
-    marginBottom: "8px",
-  },
-
-  statLabel: {
-    fontSize: "14px",
-    color: "#d1d5db",
-  },
-
+  // FEATURES
   features: {
     padding: "80px 20px",
     background: "white",
     maxWidth: "1200px",
     margin: "0 auto",
   },
-
-  sectionTitle: {
-    fontSize: "36px",
-    fontWeight: 800,
-    color: "#1f2937",
-    textAlign: "center",
-    marginBottom: "60px",
-  },
-
   featureGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
     gap: "28px",
   },
-
   featureCard: {
     padding: "28px",
     background: "#f9fafb",
@@ -373,53 +489,20 @@ const styles = {
     transition: "all 0.2s",
     border: "1px solid #e5e7eb",
   },
+  featureIcon: { fontSize: "36px", marginBottom: "16px" },
+  featureTitle: { fontSize: "18px", fontWeight: 700, color: "#1f2937", margin: "0 0 12px" },
+  featureText: { fontSize: "14px", color: "#6b7280", lineHeight: 1.6, margin: 0 },
 
-  featureIcon: {
-    fontSize: "36px",
-    marginBottom: "16px",
-  },
-
-  featureTitle: {
-    fontSize: "18px",
-    fontWeight: 700,
-    color: "#1f2937",
-    margin: "0 0 12px",
-  },
-
-  featureText: {
-    fontSize: "14px",
-    color: "#6b7280",
-    lineHeight: 1.6,
-    margin: 0,
-  },
-
+  // CTA
   cta: {
     background: "linear-gradient(135deg, #2427fb 0%, #4d9ffc 100%)",
     padding: "80px 20px",
     textAlign: "center",
     borderTop: "3px solid #f59e0b",
   },
-
-  ctaTitle: {
-    fontSize: "36px",
-    fontWeight: 800,
-    color: "#1f2937",
-    margin: "0 0 12px",
-  },
-
-  ctaText: {
-    fontSize: "18px",
-    color: "#806c6b",
-    margin: "0 0 32px",
-  },
-
-  ctaButtons: {
-    display: "flex",
-    gap: "16px",
-    justifyContent: "center",
-    flexWrap: "wrap",
-  },
-
+  ctaTitle: { fontSize: "36px", fontWeight: 800, color: "#1f2937", margin: "0 0 12px" },
+  ctaText: { fontSize: "18px", color: "#806c6b", margin: "0 0 32px" },
+  ctaButtons: { display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap" },
   ctaBtnPrimary: {
     padding: "14px 32px",
     background: "#ef4444",
@@ -432,7 +515,6 @@ const styles = {
     transition: "all 0.2s",
     boxShadow: "0 4px 12px rgba(239, 68, 68, 0.3)",
   },
-
   ctaBtnSecondary: {
     padding: "14px 32px",
     borderRadius: "8px",
@@ -441,7 +523,6 @@ const styles = {
     cursor: "pointer",
     transition: "all 0.2s",
   },
-
   loginHint: {
     fontSize: "14px",
     color: "#6b7280",
@@ -449,6 +530,7 @@ const styles = {
     fontStyle: "italic",
   },
 
+  // FOOTER
   footer: {
     background: "#1f2937",
     color: "#d1d5db",
@@ -456,10 +538,7 @@ const styles = {
     textAlign: "center",
     fontSize: "14px",
   },
-
-  footerText: {
-    margin: 0,
-  },
+  footerText: { margin: 0 },
 };
 
 const css = `
