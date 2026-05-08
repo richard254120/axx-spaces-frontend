@@ -41,7 +41,6 @@ export default function LandlordDashboard() {
     }
   };
 
-  // ✅ Update booked units
   const updateBookedUnits = async (propertyId, change) => {
     try {
       const response = await fetch(`${API_BASE}/properties/${propertyId}/book`, {
@@ -65,6 +64,11 @@ export default function LandlordDashboard() {
       setError(err.message || "Failed to update booking status");
       setTimeout(() => setError(""), 3000);
     }
+  };
+
+  // ✅ NEW - Boost Property (Monetization)
+  const handleBoost = (propertyId) => {
+    navigate(`/premium-plans?propertyId=${propertyId}`);
   };
 
   const counts = {
@@ -91,7 +95,7 @@ export default function LandlordDashboard() {
     <div style={styles.container}>
       <style>{cssStyles}</style>
 
-      {/* ==================== LANDLORD PROFILE ==================== */}
+      {/* ==================== YOUR ORIGINAL PROFILE CARD ==================== */}
       <div style={styles.profileCard}>
         <div style={styles.profileHeader}>
           <div style={styles.avatar}>👤</div>
@@ -203,6 +207,16 @@ export default function LandlordDashboard() {
                     <span>🏢 {available}/{total} units free</span>
                   </div>
 
+                  {/* ✅ Boost Button - Only for Approved Properties */}
+                  {property.status === "approved" && (
+                    <button 
+                      onClick={() => handleBoost(property._id)}
+                      style={styles.boostBtn}
+                    >
+                      ⭐ Boost This Listing (Monetize)
+                    </button>
+                  )}
+
                   {property.status === "rejected" && (
                     <div style={styles.rejectedNote}>
                       ⚠️ This listing was rejected. Delete it and re-submit after fixing any issues.
@@ -243,7 +257,7 @@ export default function LandlordDashboard() {
   );
 }
 
-/* ====================== STYLES ====================== */
+/* ====================== ALL YOUR ORIGINAL STYLES + BOOST BUTTON ====================== */
 const styles = {
   container: { maxWidth: "1200px", margin: "0 auto", padding: "20px", background: "linear-gradient(135deg, #06101f 0%, #0f1729 100%)", minHeight: "100vh", fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI'" },
 
@@ -299,6 +313,20 @@ const styles = {
   bookingControls: { display: "flex", gap: "8px", margin: "12px 0" },
   bookedBtn: { flex: 1, padding: "9px 12px", background: "linear-gradient(135deg, #f59e0b, #d97706)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.85rem" },
   availableBtn: { flex: 1, padding: "9px 12px", background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.85rem" },
+
+  // ✅ NEW BOOST BUTTON STYLE
+  boostBtn: {
+    marginTop: "12px",
+    width: "100%",
+    padding: "12px",
+    background: "linear-gradient(135deg, #eab308, #ca8a04)",
+    color: "#000",
+    border: "none",
+    borderRadius: "8px",
+    fontWeight: "700",
+    fontSize: "1rem",
+    cursor: "pointer",
+  }
 };
 
 const cssStyles = `
