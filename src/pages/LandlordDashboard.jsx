@@ -134,7 +134,7 @@ export default function LandlordDashboard() {
         <h1 style={styles.title}>🏠 My Properties</h1>
         <p style={styles.subtitle}>Manage your rental listings</p>
         <button onClick={() => navigate("/upload")} style={styles.uploadBtnTop}>
-          ➕ Upload New Property
+           Upload New Property
         </button>
       </div>
 
@@ -169,7 +169,7 @@ export default function LandlordDashboard() {
           </p>
           {activeTab === "all" && (
             <button onClick={() => navigate("/upload")} style={styles.uploadBtn}>
-              ➕ Upload New Property
+               Upload New Property
             </button>
           )}
         </div>
@@ -213,13 +213,13 @@ export default function LandlordDashboard() {
                       onClick={() => handleBoost(property._id)}
                       style={styles.boostBtn}
                     >
-                      ⭐ Boost This Listing (Monetize)
+                      ⭐ Boost This Property
                     </button>
                   )}
 
                   {property.status === "rejected" && (
                     <div style={styles.rejectedNote}>
-                      ⚠️ This listing was rejected. Delete it and re-submit after fixing any issues.
+                      ⚠️ This property was rejected. Delete it and re-submit after fixing any issues.
                     </div>
                   )}
 
