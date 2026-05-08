@@ -1,3 +1,4 @@
+```javascriptreact
 import { useState, useEffect } from "react";
 
 // ✅ FIX: Use API_BASE like every other file
@@ -24,7 +25,6 @@ export default function Listings() {
     bedrooms: "",
     bathrooms: "",
     furnished: "",
-    showOnlyFeatured: false,        // ← Added
   });
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -55,14 +55,6 @@ export default function Listings() {
 
   useEffect(() => {
     let filtered = properties;
-
-    // Added: Featured filter
-    if (filters.showOnlyFeatured) {
-      filtered = filtered.filter((p) => 
-        p.isFeatured && p.promotionEndDate && new Date(p.promotionEndDate) > new Date()
-      );
-    }
-
     if (filters.location) {
       filtered = filtered.filter((p) =>
         (p.location + " " + (p.county || "")).toLowerCase().includes(filters.location.toLowerCase())
@@ -80,16 +72,6 @@ export default function Listings() {
     filtered = filtered.filter(
       (p) => p.price >= filters.minPrice && p.price <= filters.maxPrice
     );
-
-    // Added: Boosted properties show first
-    filtered.sort((a, b) => {
-      const aBoosted = a.isFeatured && new Date(a.promotionEndDate || 0) > new Date();
-      const bBoosted = b.isFeatured && new Date(b.promotionEndDate || 0) > new Date();
-      if (aBoosted && !bBoosted) return -1;
-      if (!aBoosted && bBoosted) return 1;
-      return 0;
-    });
-
     setFilteredProperties(filtered);
   }, [filters, properties]);
 
@@ -134,6 +116,7 @@ export default function Listings() {
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
+  // ✅ NEW: SMS Booking Option
   const handleSendSMS = (property) => {
     const phoneNumber = formatKenyaPhone(property.owner?.phone || property.phone || "");
     const message = `Hello, I want to BOOK this property:\n` +
@@ -147,11 +130,6 @@ export default function Listings() {
   };
 
   const leaseLabel = { monthly: "Monthly", "6months": "6 Months", yearly: "Yearly" };
-
-  // Helper to check if boosted
-  const isBoosted = (property) => {
-    return property.isFeatured && property.promotionEndDate && new Date(property.promotionEndDate) > new Date();
-  };
 
   if (loading) {
     return (
@@ -174,17 +152,6 @@ export default function Listings() {
       {error && <div style={styles.error}>{error}</div>}
 
       <div style={styles.filters}>
-        {/* Added: Featured Toggle */}
-        <label style={styles.featuredToggle}>
-          <input
-            type="checkbox"
-            name="showOnlyFeatured"
-            checked={filters.showOnlyFeatured}
-            onChange={handleFilterChange}
-          />
-          🔥 Show Only Boosted Properties
-        </label>
-
         <input
           type="text"
           name="location"
@@ -228,70 +195,66 @@ export default function Listings() {
 
       {filteredProperties.length > 0 && (
         <div style={styles.grid}>
-          {filteredProperties.map((property) => {
-            const boosted = isBoosted(property);
-            return (
-              <div key={property._id} style={styles.card}>
-                <div style={styles.imageContainer} onClick={() => openModal(property)}>
-                  {property.images?.length > 0 ? (
-                    <img src={property.images[0]} alt={property.title} style={styles.image} />
-                  ) : (
-                    <div style={styles.noImage}>📷 No Image</div>
-                  )}
-                  <div style={{ ...styles.availabilityBadge, ...(property.availableUnits > 0 ? styles.availableBadge : styles.unavailableBadge) }}>
-                    {property.availableUnits > 0 ? <>✅ {property.availableUnits} Available</> : <>❌ Fully Booked</>}
-                  </div>
-                  {boosted && <div style={styles.boostedBadge}>⭐ BOOSTED</div>}
-                  {property.images?.length > 1 && (
-                    <div style={styles.imageCount}>📷 {property.images.length}</div>
-                  )}
+          {filteredProperties.map((property) => (
+            <div key={property._id} style={styles.card}>
+              <div style={styles.imageContainer} onClick={() => openModal(property)}>
+                {property.images?.length > 0 ? (
+                  <img src={property.images[0]} alt={property.title} style={styles.image} />
+                ) : (
+                  <div style={styles.noImage}>📷 No Image</div>
+                )}
+                <div style={{ ...styles.availabilityBadge, ...(property.availableUnits > 0 ? styles.availableBadge : styles.unavailableBadge) }}>
+                  {property.availableUnits > 0 ? <>✅ {property.availableUnits} Available</> : <>❌ Fully Booked</>}
                 </div>
-                <div style={styles.content}>
-                  <h2 style={styles.title}>{property.title} {boosted && "⭐"}</h2>
-                
-                  <p style={styles.location}>
-                    📍 {property.county} • {property.location}
-                  </p>
-                  <div style={styles.specs}>
-                    <span style={styles.spec}>🛏️ {property.bedrooms} Bed</span>
-                    <span style={styles.spec}>🚿 {property.bathrooms} Bath</span>
-                    <span style={styles.spec}>{property.furnished ? "🪑 Furnished" : "📦 Unfurnished"}</span>
-                  </div>
-                  <div style={styles.price}>💰 KES {property.price?.toLocaleString()}/month</div>
-                  <p style={styles.description}>{property.description?.substring(0, 80)}...</p>
-                  <div style={styles.unitInfo}>
-                    <div><span style={styles.unitLabel}>Total Units</span><span style={styles.unitValue}>{property.totalUnits || 1}</span></div>
-                    <div><span style={styles.unitLabel}>Booked</span><span style={styles.unitValue}>{property.bookedUnits || 0}</span></div>
-                    <div><span style={styles.unitLabel}>Available</span><strong style={styles.unitValueBold}>{property.availableUnits}</strong></div>
-                  </div>
-                  {property.amenities?.length > 0 && (
-                    <div style={styles.amenitiesPreview}>
-                      {property.amenities.slice(0, 2).map((amenity, idx) => (
-                        <span key={idx} style={styles.amenityChip}>✓ {amenity}</span>
-                      ))}
-                      {property.amenities.length > 2 && (
-                        <span style={styles.amenityChip}>+{property.amenities.length - 2} more</span>
-                      )}
-                    </div>
-                  )}
-                  <button
-                    style={{ ...styles.contactBtn, ...(property.availableUnits === 0 ? styles.contactBtnDisabled : {}) }}
-                    onClick={() => handleContactLandlord(property)}
-                    disabled={property.availableUnits === 0}
-                  >
-                    💬 Contact via WhatsApp
-                  </button>
-                  <button style={styles.viewBtn} onClick={() => openModal(property)}>
-                    👁️ View Details
-                  </button>
-                </div>
+                {property.images?.length > 1 && (
+                  <div style={styles.imageCount}>📷 {property.images.length}</div>
+                )}
               </div>
-            );
-          })}
+              <div style={styles.content}>
+                <h2 style={styles.title}>{property.title}</h2>
+              
+                <p style={styles.location}>
+                  📍 {property.county} • {property.location}
+                </p>
+                <div style={styles.specs}>
+                  <span style={styles.spec}>🛏️ {property.bedrooms} Bed</span>
+                  <span style={styles.spec}>🚿 {property.bathrooms} Bath</span>
+                  <span style={styles.spec}>{property.furnished ? "🪑 Furnished" : "📦 Unfurnished"}</span>
+                </div>
+                <div style={styles.price}>💰 KES {property.price?.toLocaleString()}/month</div>
+                <p style={styles.description}>{property.description?.substring(0, 80)}...</p>
+                <div style={styles.unitInfo}>
+                  <div><span style={styles.unitLabel}>Total Units</span><span style={styles.unitValue}>{property.totalUnits || 1}</span></div>
+                  <div><span style={styles.unitLabel}>Booked</span><span style={styles.unitValue}>{property.bookedUnits || 0}</span></div>
+                  <div><span style={styles.unitLabel}>Available</span><strong style={styles.unitValueBold}>{property.availableUnits}</strong></div>
+                </div>
+                {property.amenities?.length > 0 && (
+                  <div style={styles.amenitiesPreview}>
+                    {property.amenities.slice(0, 2).map((amenity, idx) => (
+                      <span key={idx} style={styles.amenityChip}>✓ {amenity}</span>
+                    ))}
+                    {property.amenities.length > 2 && (
+                      <span style={styles.amenityChip}>+{property.amenities.length - 2} more</span>
+                    )}
+                  </div>
+                )}
+                <button
+                  style={{ ...styles.contactBtn, ...(property.availableUnits === 0 ? styles.contactBtnDisabled : {}) }}
+                  onClick={() => handleContactLandlord(property)}
+                  disabled={property.availableUnits === 0}
+                >
+                  💬 Contact via WhatsApp
+                </button>
+                <button style={styles.viewBtn} onClick={() => openModal(property)}>
+                  👁️ View Details
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
-      {/* Modal - Completely Unchanged */}
+      {/* Modal */}
       {selectedProperty && (
         <div style={styles.modal} onClick={closeModal}>
           <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
@@ -403,6 +366,7 @@ export default function Listings() {
                 <p style={styles.landlordDetail}><strong>Phone:</strong> </p>
               </div>
 
+              {/* Four Buttons: WhatsApp, Call, SMS, Book */}
               <div style={styles.contactButtonsContainer}>
                 <button
                   style={{ ...styles.whatsappBtn, ...(selectedProperty.availableUnits === 0 ? styles.contactBtnDisabled : {}) }}
@@ -435,9 +399,8 @@ export default function Listings() {
   );
 }
 
-/* ==================== ALL YOUR ORIGINAL STYLES + Small Additions ==================== */
+/* ==================== ALL YOUR ORIGINAL STYLES PRESERVED + NEW SMS BUTTON ==================== */
 const styles = {
-  // ... All your original styles (exactly as you posted)
   container: { maxWidth: "1200px", margin: "0 auto", padding: "20px", background: "linear-gradient(135deg, #06101f 0%, #0f1729 100%)", minHeight: "100vh", fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont" },
   header: { textAlign: "center", marginBottom: "40px", color: "#f1f5f9" },
   heading: { fontSize: "2.5rem", margin: 0, color: "#fbbf24", fontWeight: 700 },
@@ -524,29 +487,6 @@ const styles = {
     cursor: "pointer",
     fontSize: "0.95rem"
   },
-
-  // Added Styles Only
-  featuredToggle: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-    color: "#fbbf24",
-    fontWeight: "600",
-    cursor: "pointer",
-    marginRight: "10px"
-  },
-  boostedBadge: {
-    position: "absolute",
-    top: "12px",
-    right: "12px",
-    background: "#eab308",
-    color: "#000",
-    padding: "4px 10px",
-    borderRadius: "20px",
-    fontSize: "0.8rem",
-    fontWeight: "700",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-  },
 };
 
 const cssStyles = `
@@ -556,4 +496,4 @@ const cssStyles = `
   @media (max-width: 768px) {
     [style*="gridTemplateColumns"] { grid-template-columns: 1fr !important; }
   }
-`;
+`;   
