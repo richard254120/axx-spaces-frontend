@@ -1,7 +1,9 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import logo from "../assets/logo.jpeg";
+
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -15,16 +17,17 @@ export default function Home() {
     bedrooms: "",
   });
 
+  const [featuredProperties, setFeaturedProperties] = useState([]);
+  const [loadingFeatured, setLoadingFeatured] = useState(true);
+
   const counties = [
     "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
-    "Garissa","Wajir","Mandera","Marsabit",
-    "Isiolo","Meru","Tharaka Nithi","Embu","Kitui",
-    "Machakos","Makueni","Nyandarua","Nyeri","Kirinyaga",
-    "Murang'a","Kiambu","Turkana","West Pokot","Samburu",
-    "Trans Nzoia","Uasin Gishu","Elgeyo Marakwet","Nandi","Baringo",
-    "Laikipia","Nakuru","Narok","Kajiado","Kericho","Bomet",
-    "Kakamega","Vihiga","Bungoma","Busia",
-    "Siaya","Kisumu","Homa Bay","Migori","Kisii","Nyamira",
+    "Garissa","Wajir","Mandera","Marsabit","Isiolo","Meru","Tharaka Nithi",
+    "Embu","Kitui","Machakos","Makueni","Nyandarua","Nyeri","Kirinyaga",
+    "Murang'a","Kiambu","Turkana","West Pokot","Samburu","Trans Nzoia",
+    "Uasin Gishu","Elgeyo Marakwet","Nandi","Baringo","Laikipia","Nakuru",
+    "Narok","Kajiado","Kericho","Bomet","Kakamega","Vihiga","Bungoma",
+    "Busia","Siaya","Kisumu","Homa Bay","Migori","Kisii","Nyamira",
     "Nairobi City"
   ];
 
@@ -34,6 +37,25 @@ export default function Home() {
     "Townhouse","Apartment Block"
   ];
 
+  // Fetch Featured / Boosted Properties
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/payment/featured`);
+        if (res.ok) {
+          const data = await res.json();
+          setFeaturedProperties(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch featured properties:", err);
+      } finally {
+        setLoadingFeatured(false);
+      }
+    };
+
+    fetchFeatured();
+  }, []);
+
   const handleSearch = (e) => {
     e.preventDefault();
     const params = new URLSearchParams();
@@ -42,6 +64,7 @@ export default function Home() {
     if (searchForm.type) params.append("type", searchForm.type);
     if (searchForm.price) params.append("price", searchForm.price);
     if (searchForm.bedrooms) params.append("bedrooms", searchForm.bedrooms);
+    
     navigate(`/listings?${params.toString()}`);
   };
 
@@ -51,6 +74,10 @@ export default function Home() {
       return;
     }
     navigate("/upload");
+  };
+
+  const viewProperty = (id) => {
+    navigate(`/property/${id}`);
   };
 
   return (
@@ -146,6 +173,73 @@ export default function Home() {
         </div>
       </section>
 
+      {/* FEATURED / BOOSTED LISTINGS */}
+      <section style={styles.featuredSection}>
+        <div style={styles.sectionHeader}>
+          <h2 style={styles.sectionTitle}>🔥 Featured & Boosted Properties</h2>
+          <p style={styles.sectionSubtitle}>
+            Premium listings with active boosts — get more visibility
+          </p>
+        </div>
+
+        {loadingFeatured ? (
+          <p style={{ textAlign: "center", padding: "60px", fontSize: "18px" }}>
+            Loading premium listings...
+          </p>
+        ) : featuredProperties.length > 0 ? (
+          <div style={styles.featuredGrid}>
+            {featuredProperties.slice(0, 8).map((property) => (
+              <div 
+                key={property._id} 
+                style={styles.featuredCard}
+                onClick={() => viewProperty(property._id)}
+              >
+                <div style={styles.imageContainer}>
+                  {property.images?.[0] ? (
+                    <img 
+                      src={property.images[0]} 
+                      alt={property.title} 
+                      style={styles.featuredImage} 
+                    />
+                  ) : (
+                    <div style={styles.noImage}>📷 No Image</div>
+                  )}
+                  <div style={styles.boostedBadge}>⭐ BOOSTED</div>
+                </div>
+
+                <div style={styles.featuredContent}>
+                  <h3 style={styles.featuredTitle}>{property.title}</h3>
+                  <p style={styles.location}>
+                    📍 {property.county} • {property.location}
+                  </p>
+                  <p style={styles.price}>
+                    KSh {Number(property.price).toLocaleString()} / month
+                  </p>
+
+                  <div style={styles.specs}>
+                    <span>🛏 {property.bedrooms || "—"}</span>
+                    <span>🚿 {property.bathrooms || "—"}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p style={{ textAlign: "center", padding: "60px", color: "#666" }}>
+            No boosted properties available at the moment.
+          </p>
+        )}
+
+        <div style={{ textAlign: "center", marginTop: "50px" }}>
+          <button 
+            onClick={() => navigate("/listings")}
+            style={styles.viewAllBtn}
+          >
+            View All Listings →
+          </button>
+        </div>
+      </section>
+
       {/* FEATURES SECTION */}
       <section style={styles.features}>
         <h2 style={styles.sectionTitle}>Why Choose Axx Spaces?</h2>
@@ -191,7 +285,7 @@ export default function Home() {
 
       {/* CTA SECTION */}
       <section style={styles.cta}>
-        <h2 style={styles.ctaTitle}>Ready to Find Your Home/Are you a landlord?</h2>
+        <h2 style={styles.ctaTitle}>Ready to Find Your Home / Are you a landlord?</h2>
         <p style={styles.ctaText}>Browse thousands of listings or list your property today</p>
         <div style={styles.ctaButtons}>
           <button 
@@ -209,7 +303,6 @@ export default function Home() {
               border: token ? "none" : "2px solid #1f2937"
             }}
             onClick={handleListProperty}
-            title={token ? "Upload your property" : "Login to list your property"}
           >
             {token ? "📝 Upload Your Property" : "🔐 Login to List Property"}
           </button>
@@ -343,19 +436,131 @@ const styles = {
     color: "#d1d5db",
   },
 
-  features: {
+  /* Featured Section Styles */
+  featuredSection: {
     padding: "80px 20px",
-    background: "white",
-    maxWidth: "1200px",
+    background: "#f8f4f0",
+    maxWidth: "1400px",
     margin: "0 auto",
+  },
+
+  sectionHeader: {
+    textAlign: "center",
+    marginBottom: "50px",
   },
 
   sectionTitle: {
     fontSize: "36px",
     fontWeight: 800,
     color: "#1f2937",
-    textAlign: "center",
-    marginBottom: "60px",
+    marginBottom: "12px",
+  },
+
+  sectionSubtitle: {
+    fontSize: "18px",
+    color: "#6b7280",
+  },
+
+  featuredGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+    gap: "24px",
+    maxWidth: "1200px",
+    margin: "0 auto",
+  },
+
+  featuredCard: {
+    background: "white",
+    borderRadius: "12px",
+    overflow: "hidden",
+    boxShadow: "0 4px 15px rgba(0,0,0,0.08)",
+    cursor: "pointer",
+    transition: "all 0.3s",
+  },
+
+  imageContainer: {
+    position: "relative",
+    height: "200px",
+  },
+
+  featuredImage: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+  },
+
+  noImage: {
+    width: "100%",
+    height: "100%",
+    background: "#e5e7eb",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "40px",
+    color: "#9ca3af",
+  },
+
+  boostedBadge: {
+    position: "absolute",
+    top: "12px",
+    right: "12px",
+    background: "#eab308",
+    color: "#000",
+    padding: "4px 12px",
+    borderRadius: "20px",
+    fontSize: "0.85rem",
+    fontWeight: "700",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+  },
+
+  featuredContent: {
+    padding: "16px",
+  },
+
+  featuredTitle: {
+    fontSize: "1.1rem",
+    fontWeight: "700",
+    margin: "0 0 8px 0",
+    color: "#1f2937",
+  },
+
+  location: {
+    color: "#6b7280",
+    fontSize: "0.95rem",
+    margin: "4px 0",
+  },
+
+  price: {
+    fontSize: "1.25rem",
+    fontWeight: "700",
+    color: "#ef4444",
+    margin: "8px 0",
+  },
+
+  specs: {
+    display: "flex",
+    gap: "16px",
+    fontSize: "0.95rem",
+    color: "#4b5563",
+    marginTop: "8px",
+  },
+
+  viewAllBtn: {
+    padding: "14px 36px",
+    background: "#1f2937",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "16px",
+    fontWeight: "600",
+    cursor: "pointer",
+  },
+
+  features: {
+    padding: "80px 20px",
+    background: "white",
+    maxWidth: "1200px",
+    margin: "0 auto",
   },
 
   featureGrid: {
