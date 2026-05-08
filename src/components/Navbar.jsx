@@ -30,11 +30,11 @@ export default function Navbar() {
           {/* Desktop Navigation (Always Visible) */}
           <div style={styles.desktopNav}>
             <Link to="/listings" style={styles.link}>
-              🔍 Listings
+              Listings
             </Link>
             {token && (
               <Link to="/upload" style={styles.link}>
-                ➕ Upload
+                Upload
               </Link>
             )}
             {!token ? (
