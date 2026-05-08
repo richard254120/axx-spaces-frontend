@@ -496,4 +496,4 @@ const cssStyles = `
   @media (max-width: 768px) {
     [style*="gridTemplateColumns"] { grid-template-columns: 1fr !important; }
   }
-`;   
+`;  
