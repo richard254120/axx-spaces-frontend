@@ -34,12 +34,12 @@ export default function Listings() {
         const response = await fetch(`${API_BASE}/properties`);
         if (!response.ok) throw new Error("Failed to fetch properties");
         const data = await response.json();
-      
+     
         const processedProperties = data.map(prop => ({
           ...prop,
           availableUnits: Math.max(0, (prop.totalUnits || 1) - (prop.bookedUnits || 0))
         }));
-      
+     
         const availableProperties = processedProperties.filter((prop) => prop.availableUnits > 0);
         setProperties(processedProperties);
         setFilteredProperties(availableProperties);
@@ -115,6 +115,7 @@ export default function Listings() {
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
+  // ✅ NEW: SMS Booking Option
   const handleSendSMS = (property) => {
     const phoneNumber = formatKenyaPhone(property.owner?.phone || property.phone || "");
     const message = `Hello, I want to BOOK this property:\n` +
@@ -134,9 +135,9 @@ export default function Listings() {
                     `📍 ${property.county} - ${property.location}\n` +
                     `💰 KES ${property.price?.toLocaleString()}/month\n` +
                     `🛏 ${property.bedrooms} Bedrooms | 🚿 ${property.bathrooms} Bathrooms\n\n` +
-                    `Please quote me for moving services. Thank you!`;
+                    `Please quote me your moving rates. Thank you!`;
     window.open(`https://wa.me/254712345678?text=${encodeURIComponent(message)}`, "_blank"); 
-    // Replace 254712345678 with your movers contact number later
+    // Replace 254712345678 with your actual movers number later
   };
 
   const leaseLabel = { monthly: "Monthly", "6months": "6 Months", yearly: "Yearly" };
@@ -222,7 +223,7 @@ export default function Listings() {
               </div>
               <div style={styles.content}>
                 <h2 style={styles.title}>{property.title}</h2>
-              
+             
                 <p style={styles.location}>
                   📍 {property.county} • {property.location}
                 </p>
@@ -255,6 +256,15 @@ export default function Listings() {
                 >
                   💬 Contact via WhatsApp
                 </button>
+
+                {/* ✅ NEW MOVERS BUTTON ADDED HERE */}
+                <button 
+                  onClick={() => handleNeedMovers(property)}
+                  style={styles.moversBtn}
+                >
+                  🚚 Need Professional Movers?
+                </button>
+
                 <button style={styles.viewBtn} onClick={() => openModal(property)}>
                   👁️ View Details
                 </button>
@@ -324,9 +334,57 @@ export default function Listings() {
                     <span style={styles.pricingValue}>KES {selectedProperty.deposit?.toLocaleString()}</span>
                   </div>
                 )}
+                {selectedProperty.leaseType && (
+                  <div style={styles.pricingBox}>
+                    <span style={styles.pricingLabel}>Lease</span>
+                    <span style={styles.pricingValue}>{leaseLabel[selectedProperty.leaseType] || selectedProperty.leaseType}</span>
+                  </div>
+                )}
               </div>
 
               <p style={styles.fullDescription}>{selectedProperty.description}</p>
+
+              {selectedProperty.rules && (
+                <div style={styles.rulesBox}>
+                  <h3 style={styles.rulesHead}>📋 House Rules</h3>
+                  <p style={styles.rulesText}>{selectedProperty.rules}</p>
+                </div>
+              )}
+
+              {selectedProperty.amenities?.length > 0 && (
+                <div style={styles.amenitiesSection}>
+                  <h3 style={styles.amenitiesHead}>✨ Amenities</h3>
+                  <div style={styles.amenitiesGrid}>
+                    {selectedProperty.amenities.map((amenity, idx) => (
+                      <span key={idx} style={styles.amenityChip}>✓ {amenity}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div style={styles.unitInfoModal}>
+                <h3 style={styles.unitHeading}>📊 Availability</h3>
+                <div style={styles.unitGrid}>
+                  <div style={styles.unitBox}>
+                    <p style={styles.unitBoxLabel}>Total Units</p>
+                    <p style={styles.unitBoxNumber}>{selectedProperty.totalUnits || 1}</p>
+                  </div>
+                  <div style={styles.unitBox}>
+                    <p style={styles.unitBoxLabel}>Booked</p>
+                    <p style={styles.unitBoxNumber}>{selectedProperty.bookedUnits || 0}</p>
+                  </div>
+                  <div style={styles.unitBox}>
+                    <p style={styles.unitBoxLabel}>Available</p>
+                    <p style={styles.unitBoxNumber}>{selectedProperty.availableUnits}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div style={styles.landlordInfo}>
+                <h3 style={styles.landlordHead}>👤 Landlord Contact</h3>
+                <p style={styles.landlordDetail}><strong>Name:</strong> </p>
+                <p style={styles.landlordDetail}><strong>Phone:</strong> </p>
+              </div>
 
               {/* ✅ NEW MOVERS BUTTON */}
               <button 
@@ -336,7 +394,7 @@ export default function Listings() {
                 🚚 Need Professional Movers?
               </button>
 
-              {/* Your existing contact buttons remain unchanged */}
+              {/* Four Buttons: WhatsApp, Call, SMS, Book */}
               <div style={styles.contactButtonsContainer}>
                 <button
                   style={{ ...styles.whatsappBtn, ...(selectedProperty.availableUnits === 0 ? styles.contactBtnDisabled : {}) }}
@@ -468,7 +526,7 @@ const styles = {
     borderRadius: "8px",
     fontWeight: 700,
     cursor: "pointer",
-    margin: "16px 0 10px 0",
+    margin: "12px 0",
     fontSize: "1rem"
   }
 };
