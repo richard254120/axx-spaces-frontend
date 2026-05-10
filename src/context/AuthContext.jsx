@@ -2,80 +2,34 @@ import { createContext, useState, useEffect } from "react";
 
 export const AuthContext = createContext();
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
-
-export function AuthProvider({ children }) {
-  const [token, setToken] = useState(() => {
-    return localStorage.getItem("token") || null;
-  });
-
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
 
-  // Load token from localStorage
   useEffect(() => {
-    if (token) {
-      localStorage.setItem("token", token);
-    } else {
-      localStorage.removeItem("token");
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
     }
-  }, [token]);
-
-  // Fetch user profile when token exists
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (!token) {
-        setUser(null);
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const res = await fetch(`${API_BASE}/auth/me`, {
-          headers: { 
-            Authorization: `Bearer ${token}` 
-          },
-        });
-
-        if (res.ok) {
-          const userData = await res.json();
-          setUser(userData);
-        } else {
-          console.warn("Failed to fetch user profile");
-          setUser(null);
-        }
-      } catch (err) {
-        console.error("Error fetching user profile:", err);
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserProfile();
-  }, [token]);
+  }, []);
 
   const login = (newToken, userData) => {
     setToken(newToken);
     setUser(userData);
     localStorage.setItem("token", newToken);
+    localStorage.setItem("user", JSON.stringify(userData)); // ✅ Crucial for roles
   };
 
   const logout = () => {
     setToken(null);
     setUser(null);
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      token, 
-      user, 
-      login, 
-      logout,
-      loading 
-    }}>
+    <AuthContext.Provider value={{ user, token, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
-}
+};

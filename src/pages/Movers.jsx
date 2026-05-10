@@ -84,30 +84,28 @@ export default function Movers() {
       setLoading(false); 
     }
   };
-
-  const onLogin = async (e) => {
+const onLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // ✅ FIXED: Using the standard /auth/login endpoint
       const res = await API.post("/auth/login", loginData);
       
-      // Check if user is a mover
       if (res.data.user.role !== "mover") {
         alert("❌ This portal is for Mover accounts only.");
         return;
       }
 
-      login(res.data.token, res.data.user);
+      // ✅ Ensure this passes BOTH token and the user object
+      login(res.data.token, res.data.user); 
+      
+      // Navigate specifically to mover dashboard
       navigate("/mover-dashboard");
     } catch (err) {
-      const errorMsg = err.response?.data?.message || "Invalid credentials.";
-      alert(`❌ ${errorMsg}`);
+      alert("❌ Invalid credentials.");
     } finally { 
       setLoading(false); 
     }
   };
-
   return (
     <div style={styles.container}>
       <div style={styles.header}>
