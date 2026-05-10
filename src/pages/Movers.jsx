@@ -19,7 +19,10 @@ export default function Movers() {
     phone: "",
     county: "",
     company: "",
-    services: "",
+    experience: "",
+    vehicleType: "",
+    services: [], // Array for checkboxes
+    about: "",
   });
 
   const counties = [
@@ -33,6 +36,14 @@ export default function Movers() {
     "Wajir", "West Pokot"
   ];
 
+  const availableServices = [
+    "Household Moving", "Office Relocation", "Packing & Unpacking",
+    "Furniture Assembly", "Storage Solutions", "Local Moving",
+    "Inter-County Moving", "Fragile Item Handling"
+  ];
+
+  const vehicleOptions = ["Small Van", "Pickup Truck", "3-Ton Truck", "5-Ton Truck", "10-Ton+ Lorry", "Motorbike/Courier"];
+
   // 3. FETCH APPROVED MOVERS BY COUNTY
   useEffect(() => {
     if (!selectedCounty || activeTab !== "search") return;
@@ -40,7 +51,6 @@ export default function Movers() {
     const fetchMovers = async () => {
       setLoading(true);
       try {
-        // Backend should only return movers where isApproved: true
         const res = await API.get(`/movers?county=${selectedCounty}`);
         setMovers(res.data || []);
       } catch (err) {
@@ -54,18 +64,31 @@ export default function Movers() {
     fetchMovers();
   }, [selectedCounty, activeTab]);
 
-  // 4. HANDLE REGISTRATION SUBMIT
+  // 4. HANDLE CHECKBOX CHANGE
+  const handleServiceChange = (service) => {
+    setFormData(prev => ({
+      ...prev,
+      services: prev.services.includes(service)
+        ? prev.services.filter(s => s !== service)
+        : [...prev.services, service]
+    }));
+  };
+
+  // 5. HANDLE REGISTRATION SUBMIT
   const handleRegister = async (e) => {
     e.preventDefault();
+    if (formData.services.length === 0) {
+      alert("Please select at least one service.");
+      return;
+    }
     setLoading(true);
     try {
-      // Sends details to backend with default isApproved: false
       await API.post("/movers/register", formData);
-      alert("✅ Details Submitted! Please wait for Admin approval before you appear in searches.");
-      setFormData({ name: "", phone: "", county: "", company: "", services: "" });
+      alert("✅ Application Submitted! Admin will review your profile. You'll appear in searches once approved.");
+      setFormData({ name: "", phone: "", county: "", company: "", experience: "", vehicleType: "", services: [], about: "" });
       setActiveTab("search");
     } catch (err) {
-      alert("❌ Error submitting details. Please try again.");
+      alert("❌ Submission failed. Check your connection.");
     } finally {
       setLoading(false);
     }
@@ -80,10 +103,9 @@ export default function Movers() {
     <div style={styles.container}>
       <div style={styles.header}>
         <h1 style={styles.title}>🚚 Movers Hub</h1>
-        <p style={styles.subtitle}>Professional relocation services at your fingertips</p>
+        <p style={styles.subtitle}>Kenya's Trusted Relocation Network</p>
       </div>
 
-      {/* TAB NAVIGATION */}
       <div style={styles.tabBar}>
         <button 
           style={activeTab === "search" ? styles.activeTab : styles.tab} 
@@ -99,138 +121,145 @@ export default function Movers() {
         </button>
       </div>
 
-      <hr style={styles.divider} />
-
-      {/* SEARCH TAB CONTENT */}
-      {activeTab === "search" && (
-        <div style={styles.contentFade}>
-          <div style={styles.filterSection}>
+      {activeTab === "search" ? (
+        <div style={styles.searchSection}>
+          <div style={styles.filterBox}>
             <select 
               value={selectedCounty} 
               onChange={(e) => setSelectedCounty(e.target.value)}
               style={styles.select}
             >
-              <option value="">-- Select County to Search --</option>
+              <option value="">-- Choose County --</option>
               {counties.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
 
-          {loading && <p style={styles.centerText}>Searching for verified movers...</p>}
-
-          {!loading && selectedCounty && movers.length > 0 && (
+          {loading ? (
+            <div style={styles.loader}>Scanning for verified movers...</div>
+          ) : selectedCounty ? (
             <div style={styles.grid}>
-              {movers.map((mover) => (
+              {movers.length > 0 ? movers.map((mover) => (
                 <div key={mover._id} style={styles.card}>
-                  <h3 style={styles.moverName}>{mover.name}</h3>
-                  <p style={styles.badge}>✅ Verified</p>
-                  <p style={styles.detail}>📍 {mover.county}</p>
-                  {mover.company && <p style={styles.detail}>🏢 {mover.company}</p>}
-                  <p style={styles.servicesText}>{mover.services}</p>
+                  <div style={styles.cardHeader}>
+                    <h3 style={styles.moverName}>{mover.name}</h3>
+                    <span style={styles.verifyBadge}>Verified</span>
+                  </div>
+                  <p style={styles.detail}><b>Experience:</b> {mover.experience} Years</p>
+                  <p style={styles.detail}><b>Vehicle:</b> {mover.vehicleType}</p>
+                  <div style={styles.serviceTags}>
+                    {mover.services.map(s => <span key={s} style={styles.tag}>{s}</span>)}
+                  </div>
                   <button onClick={() => handleContact(mover)} style={styles.whatsappBtn}>
-                    Chat on WhatsApp
+                    Book Mover
                   </button>
                 </div>
-              ))}
+              )) : <p style={styles.emptyText}>No approved movers found in {selectedCounty} yet.</p>}
             </div>
-          )}
-
-          {!loading && selectedCounty && movers.length === 0 && (
-            <p style={styles.centerText}>No approved movers found in {selectedCounty} yet.</p>
-          )}
+          ) : <p style={styles.emptyText}>Select a county to see available professionals.</p>}
         </div>
-      )}
+      ) : (
+        <div style={styles.formContainer}>
+          <form style={styles.form} onSubmit={handleRegister}>
+            <h2 style={styles.formTitle}>Professional Onboarding</h2>
+            
+            <div style={styles.formGrid}>
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>Full Name / Brand Name</label>
+                <input required style={styles.input} value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+              </div>
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>WhatsApp Phone</label>
+                <input required type="tel" placeholder="07..." style={styles.input} value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
+              </div>
+            </div>
 
-      {/* REGISTER TAB CONTENT */}
-      {activeTab === "register" && (
-        <div style={styles.authCard}>
-          <h2 style={styles.formTitle}>Mover Application</h2>
-          <p style={styles.formNote}>Fill in your details. Admin will verify and post them publicly.</p>
-          
-          <form onSubmit={handleRegister}>
-            <input 
-              placeholder="Full Name / Business Name" 
-              style={styles.input} 
-              required 
-              value={formData.name}
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
-            />
-            <input 
-              placeholder="WhatsApp Phone Number (e.g. 0712...)" 
-              style={styles.input} 
-              required 
-              value={formData.phone}
-              onChange={(e) => setFormData({...formData, phone: e.target.value})}
-            />
-            <select 
-              style={styles.input} 
-              required 
-              value={formData.county}
-              onChange={(e) => setFormData({...formData, county: e.target.value})}
-            >
-              <option value="">Select Primary County</option>
-              {counties.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-            <input 
-              placeholder="Company Name (Optional)" 
-              style={styles.input} 
-              value={formData.company}
-              onChange={(e) => setFormData({...formData, company: e.target.value})}
-            />
-            <textarea 
-              placeholder="List your services (e.g. House moving, Office relocations, Packing...)" 
-              style={{...styles.input, height: "100px", resize: "none"}} 
-              required 
-              value={formData.services}
-              onChange={(e) => setFormData({...formData, services: e.target.value})}
-            />
-            <button type="submit" style={styles.submitBtn} disabled={loading}>
-              {loading ? "Submitting..." : "Submit for Approval"}
+            <div style={styles.formGrid}>
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>Primary County</label>
+                <select required style={styles.input} value={formData.county} onChange={e => setFormData({...formData, county: e.target.value})}>
+                   <option value="">Select County</option>
+                   {counties.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>Experience (Years)</label>
+                <input type="number" style={styles.input} value={formData.experience} onChange={e => setFormData({...formData, experience: e.target.value})} />
+              </div>
+            </div>
+
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>Vehicle Type</label>
+              <select style={styles.input} value={formData.vehicleType} onChange={e => setFormData({...formData, vehicleType: e.target.value})}>
+                <option value="">Select Primary Vehicle</option>
+                {vehicleOptions.map(v => <option key={v} value={v}>{v}</option>)}
+              </select>
+            </div>
+
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>Services Offered (Tick all that apply)</label>
+              <div style={styles.checkboxGrid}>
+                {availableServices.map(service => (
+                  <label key={service} style={styles.checkboxLabel}>
+                    <input 
+                      type="checkbox" 
+                      checked={formData.services.includes(service)}
+                      onChange={() => handleServiceChange(service)}
+                    /> {service}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>Brief Bio / About Services</label>
+              <textarea style={styles.textarea} placeholder="Tell customers why they should pick you..." value={formData.about} onChange={e => setFormData({...formData, about: e.target.value})} />
+            </div>
+
+            <button type="submit" disabled={loading} style={styles.submitBtn}>
+              {loading ? "Processing..." : "Submit Application"}
             </button>
           </form>
         </div>
       )}
-
-      <button onClick={() => navigate("/dashboard")} style={styles.backBtn}>
-        ← Back to Dashboard
-      </button>
     </div>
   );
 }
 
 const styles = {
-  container: {
-    background: "linear-gradient(135deg, #06101f 0%, #0f1729 100%)",
-    minHeight: "100vh",
-    padding: "120px 20px 60px",
-    color: "#f1f5f9",
-    fontFamily: "'DM Sans', sans-serif"
-  },
+  container: { background: "#06101f", minHeight: "100vh", padding: "100px 20px 50px", color: "#f1f5f9", fontFamily: "'DM Sans', sans-serif" },
   header: { textAlign: "center", marginBottom: "40px" },
-  title: { fontSize: "2.5rem", color: "#fbbf24", marginBottom: "10px" },
-  subtitle: { color: "#94a3b8", fontSize: "1.1rem" },
+  title: { fontSize: "2.8rem", color: "#fbbf24", margin: 0 },
+  subtitle: { color: "#94a3b8", marginTop: "10px" },
+  tabBar: { display: "flex", justifyContent: "center", gap: "15px", marginBottom: "40px" },
+  tab: { padding: "12px 25px", background: "#1e293b", border: "1px solid #334155", color: "#94a3b8", borderRadius: "30px", cursor: "pointer", transition: "0.3s" },
+  activeTab: { padding: "12px 25px", background: "#fbbf24", border: "1px solid #fbbf24", color: "#000", borderRadius: "30px", cursor: "pointer", fontWeight: "bold" },
   
-  tabBar: { display: "flex", justifyContent: "center", gap: "15px", marginBottom: "20px" },
-  tab: { padding: "12px 24px", background: "rgba(30, 41, 59, 0.5)", border: "1px solid #334155", color: "#94a3b8", borderRadius: "8px", cursor: "pointer", fontWeight: "600" },
-  activeTab: { padding: "12px 24px", background: "#fbbf24", border: "1px solid #fbbf24", color: "#000", borderRadius: "8px", cursor: "pointer", fontWeight: "700" },
-  divider: { border: "0", height: "1px", background: "rgba(51, 65, 85, 0.5)", marginBottom: "40px", maxWidth: "800px", margin: "0 auto 40px" },
+  // Search Styles
+  filterBox: { maxWidth: "400px", margin: "0 auto 40px" },
+  select: { width: "100%", padding: "15px", borderRadius: "12px", background: "#1e293b", color: "#fff", border: "2px solid #334155" },
+  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "25px", maxWidth: "1200px", margin: "0 auto" },
+  card: { background: "#111827", padding: "25px", borderRadius: "20px", border: "1px solid #1f2937", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)" },
+  cardHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" },
+  moverName: { color: "#fbbf24", margin: 0, fontSize: "1.3rem" },
+  verifyBadge: { background: "rgba(34, 197, 94, 0.2)", color: "#22c55e", padding: "4px 10px", borderRadius: "20px", fontSize: "0.75rem", fontWeight: "bold" },
+  detail: { fontSize: "0.9rem", color: "#cbd5e1", margin: "5px 0" },
+  serviceTags: { display: "flex", flexWrap: "wrap", gap: "8px", margin: "15px 0" },
+  tag: { background: "#1f2937", padding: "5px 10px", borderRadius: "5px", fontSize: "0.8rem", color: "#94a3b8" },
+  whatsappBtn: { width: "100%", padding: "12px", background: "#22c55e", color: "#fff", border: "none", borderRadius: "10px", fontWeight: "bold", cursor: "pointer" },
 
-  filterSection: { maxWidth: "500px", margin: "0 auto 40px" },
-  select: { width: "100%", padding: "15px", borderRadius: "10px", background: "#1e293b", color: "#fff", border: "1px solid #475569", fontSize: "1rem" },
-
-  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "25px", maxWidth: "1200px", margin: "0 auto" },
-  card: { background: "#1e293b", padding: "25px", borderRadius: "15px", border: "1px solid #334155", position: "relative" },
-  moverName: { fontSize: "1.4rem", color: "#60a5fa", marginBottom: "5px" },
-  badge: { color: "#22c55e", fontSize: "0.8rem", fontWeight: "bold", marginBottom: "15px" },
-  detail: { color: "#cbd5e1", margin: "5px 0", fontSize: "0.95rem" },
-  servicesText: { color: "#94a3b8", fontSize: "0.9rem", margin: "15px 0", fontStyle: "italic", lineHeight: "1.5" },
-  whatsappBtn: { width: "100%", padding: "12px", background: "#22c55e", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "bold", cursor: "pointer", marginTop: "10px" },
-
-  authCard: { maxWidth: "500px", margin: "0 auto", background: "#1e293b", padding: "40px", borderRadius: "20px", border: "1px solid #334155" },
-  formTitle: { textAlign: "center", color: "#fbbf24", marginBottom: "10px" },
-  formNote: { textAlign: "center", color: "#94a3b8", fontSize: "0.9rem", marginBottom: "30px" },
-  input: { width: "100%", padding: "12px", marginBottom: "15px", borderRadius: "8px", border: "1px solid #334155", background: "#0f172a", color: "#fff", boxSizing: "border-box" },
-  submitBtn: { width: "100%", padding: "14px", background: "#fbbf24", color: "#000", border: "none", borderRadius: "8px", fontWeight: "bold", cursor: "pointer", fontSize: "1rem" },
-
-  centerText: { textAlign: "center", color: "#94a3b8", padding: "40px" },
-  backBtn: { display: "block", margin: "40px auto 0", padding: "10px 20px", background: "transparent", color: "#94a3b8", border: "1px solid #334155", borderRadius: "8px", cursor: "pointer" }
+  // Form Styles
+  formContainer: { maxWidth: "700px", margin: "0 auto" },
+  form: { background: "#1e293b", padding: "40px", borderRadius: "24px", border: "1px solid #334155" },
+  formTitle: { textAlign: "center", color: "#fbbf24", marginBottom: "30px" },
+  formGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" },
+  inputGroup: { display: "flex", flexDirection: "column", gap: "8px", marginBottom: "20px" },
+  label: { fontSize: "0.9rem", color: "#94a3b8", fontWeight: "600" },
+  input: { padding: "12px", borderRadius: "8px", background: "#0f172a", border: "1px solid #334155", color: "#fff" },
+  textarea: { padding: "12px", borderRadius: "8px", background: "#0f172a", border: "1px solid #334155", color: "#fff", height: "100px", resize: "none" },
+  checkboxGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", background: "#0f172a", padding: "15px", borderRadius: "8px" },
+  checkboxLabel: { fontSize: "0.85rem", color: "#cbd5e1", display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" },
+  submitBtn: { width: "100%", padding: "15px", background: "#fbbf24", color: "#000", border: "none", borderRadius: "10px", fontWeight: "900", cursor: "pointer", marginTop: "10px" },
+  
+  emptyText: { textAlign: "center", color: "#64748b", marginTop: "50px" },
+  loader: { textAlign: "center", color: "#fbbf24", fontSize: "1.1rem" }
 };
