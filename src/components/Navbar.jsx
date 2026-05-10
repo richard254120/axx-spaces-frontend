@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import logo from "../assets/image.png"; // ✅ IMPORT LOGO
+import logo from "../assets/image.png";
 
 export default function Navbar() {
   const { token, logout } = useContext(AuthContext);
@@ -27,10 +27,13 @@ export default function Navbar() {
             <span>Axx Spaces</span>
           </Link>
 
-          {/* Desktop Navigation (Always Visible) */}
+          {/* Desktop Navigation */}
           <div style={styles.desktopNav}>
             <Link to="/listings" style={styles.link}>
               Listings
+            </Link>
+            <Link to="/movers" style={styles.link}>
+              🚚 Movers
             </Link>
             {token && (
               <Link to="/upload" style={styles.link}>
@@ -56,6 +59,14 @@ export default function Navbar() {
           {/* Mobile Menu */}
           {menuOpen && (
             <div style={styles.mobileMenu}>
+              <Link 
+                to="/movers" 
+                style={styles.mobileLink}
+                onClick={() => setMenuOpen(false)}
+              >
+                🚚 Movers
+              </Link>
+
               {token ? (
                 <>
                   <Link 
@@ -111,7 +122,7 @@ const styles = {
     position: "relative",
   },
   logo: {
-    display: "flex",               // ✅ align image + text
+    display: "flex",
     alignItems: "center",
     gap: "10px",
     fontSize: "22px",
@@ -121,7 +132,7 @@ const styles = {
     whiteSpace: "nowrap",
   },
   logoImg: {
-    height: "40px",               // ✅ control logo size
+    height: "40px",
     width: "auto",
   },
   desktopNav: {
