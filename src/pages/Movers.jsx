@@ -5,6 +5,9 @@ import API from "../api/api";
 export default function Movers() {
   const navigate = useNavigate();
 
+  // New state for tabs: 'search' | 'login' | 'register'
+  const [activeTab, setActiveTab] = useState("search");
+  
   const [selectedCounty, setSelectedCounty] = useState("");
   const [movers, setMovers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -20,9 +23,8 @@ export default function Movers() {
     "Wajir", "West Pokot"
   ];
 
-  // Fetch movers when county is selected
   useEffect(() => {
-    if (!selectedCounty) {
+    if (!selectedCounty || activeTab !== "search") {
       setMovers([]);
       return;
     }
@@ -41,7 +43,7 @@ export default function Movers() {
     };
 
     fetchMovers();
-  }, [selectedCounty]);
+  }, [selectedCounty, activeTab]);
 
   const handleContact = (mover) => {
     const message = `Hello ${mover.name}, I need moving services in ${selectedCounty}. Please contact me.`;
@@ -50,61 +52,99 @@ export default function Movers() {
 
   return (
     <div style={styles.container}>
+      {/* Header Section */}
       <div style={styles.header}>
-        <h1 style={styles.title}>🚚 Find Professional Movers</h1>
-        <p style={styles.subtitle}>Select your county to see available movers</p>
+        <h1 style={styles.title}>🚚 Movers Hub</h1>
+        <p style={styles.subtitle}>Find a service or manage your mover profile</p>
       </div>
 
-      <div style={styles.filterSection}>
-        <select 
-          value={selectedCounty} 
-          onChange={(e) => setSelectedCounty(e.target.value)}
-          style={styles.select}
-        >
-          <option value="">-- Select County --</option>
-          {counties.map((county) => (
-            <option key={county} value={county}>{county}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Register as Mover Button */}
-      <div style={styles.registerSection}>
+      {/* Tab Navigation */}
+      <div style={styles.tabContainer}>
         <button 
-          onClick={() => navigate("/mover-register")}
-          style={styles.registerBtn}
+          style={activeTab === "search" ? styles.activeTab : styles.tab} 
+          onClick={() => setActiveTab("search")}
         >
-          🚚 Register as a Professional Mover
+          Find Movers
+        </button>
+        <button 
+          style={activeTab === "login" ? styles.activeTab : styles.tab} 
+          onClick={() => setActiveTab("login")}
+        >
+          Mover Login
+        </button>
+        <button 
+          style={activeTab === "register" ? styles.activeTab : styles.tab} 
+          onClick={() => setActiveTab("register")}
+        >
+          Register as Mover
         </button>
       </div>
 
-      {loading && <p style={styles.loading}>Loading movers in {selectedCounty}...</p>}
+      <hr style={styles.divider} />
 
-      {!loading && selectedCounty && movers.length > 0 && (
-        <div style={styles.moversGrid}>
-          {movers.map((mover) => (
-            <div key={mover._id} style={styles.moverCard}>
-              <h3 style={styles.moverName}>{mover.name}</h3>
-              <p style={styles.moverDetail}>📍 {mover.county}</p>
-              <p style={styles.moverDetail}>📞 {mover.phone}</p>
-              {mover.company && <p style={styles.moverDetail}>🏢 {mover.company}</p>}
-              {mover.services && <p style={styles.services}>{mover.services}</p>}
+      {/* Tab Content: FIND MOVERS */}
+      {activeTab === "search" && (
+        <>
+          <div style={styles.filterSection}>
+            <select 
+              value={selectedCounty} 
+              onChange={(e) => setSelectedCounty(e.target.value)}
+              style={styles.select}
+            >
+              <option value="">-- Select County --</option>
+              {counties.map((county) => (
+                <option key={county} value={county}>{county}</option>
+              ))}
+            </select>
+          </div>
 
-              <button 
-                onClick={() => handleContact(mover)}
-                style={styles.contactBtn}
-              >
-                Contact via WhatsApp
-              </button>
+          {loading && <p style={styles.loading}>Loading movers in {selectedCounty}...</p>}
+
+          {!loading && selectedCounty && movers.length > 0 && (
+            <div style={styles.moversGrid}>
+              {movers.map((mover) => (
+                <div key={mover._id} style={styles.moverCard}>
+                  <h3 style={styles.moverName}>{mover.name}</h3>
+                  <p style={styles.moverDetail}>📍 {mover.county}</p>
+                  <p style={styles.moverDetail}>📞 {mover.phone}</p>
+                  {mover.company && <p style={styles.moverDetail}>🏢 {mover.company}</p>}
+                  {mover.services && <p style={styles.services}>{mover.services}</p>}
+                  <button onClick={() => handleContact(mover)} style={styles.contactBtn}>
+                    Contact via WhatsApp
+                  </button>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
+
+          {!loading && selectedCounty && movers.length === 0 && (
+            <p style={styles.noResults}>No registered movers found in {selectedCounty} yet.</p>
+          )}
+        </>
+      )}
+
+      {/* Tab Content: LOGIN (Simplified UI) */}
+      {activeTab === "login" && (
+        <div style={styles.authContainer}>
+          <h2>Welcome Back</h2>
+          <input type="email" placeholder="Email Address" style={styles.input} />
+          <input type="password" placeholder="Password" style={styles.input} />
+          <button style={styles.contactBtn}>Login to Profile</button>
         </div>
       )}
 
-      {!loading && selectedCounty && movers.length === 0 && (
-        <p style={styles.noResults}>
-          No registered movers found in {selectedCounty} yet.
-        </p>
+      {/* Tab Content: REGISTER (Simplified UI) */}
+      {activeTab === "register" && (
+        <div style={styles.authContainer}>
+          <h2>Join the Network</h2>
+          <input type="text" placeholder="Full Name / Company" style={styles.input} />
+          <input type="text" placeholder="Phone Number" style={styles.input} />
+          <select style={styles.input}>
+            <option>Select Primary County</option>
+            {counties.map(c => <option key={c}>{c}</option>)}
+          </select>
+          <button style={styles.contactBtn}>Create Mover Account</button>
+        </div>
       )}
 
       <button onClick={() => navigate("/dashboard")} style={styles.backBtn}>
@@ -122,9 +162,36 @@ const styles = {
     padding: "40px 20px",
     fontFamily: "'DM Sans', sans-serif"
   },
-  header: { textAlign: "center", marginBottom: "40px" },
+  header: { textAlign: "center", marginBottom: "30px" },
   title: { fontSize: "2.8rem", color: "#fbbf24", marginBottom: "8px" },
   subtitle: { color: "#94a3b8", fontSize: "1.2rem" },
+  
+  // Tab Styles
+  tabContainer: {
+    display: "flex",
+    justifyContent: "center",
+    gap: "10px",
+    marginBottom: "20px"
+  },
+  tab: {
+    padding: "10px 20px",
+    background: "transparent",
+    color: "#94a3b8",
+    border: "1px solid #334155",
+    borderRadius: "8px",
+    cursor: "pointer",
+    transition: "0.3s"
+  },
+  activeTab: {
+    padding: "10px 20px",
+    background: "#fbbf24",
+    color: "#000",
+    border: "1px solid #fbbf24",
+    borderRadius: "8px",
+    fontWeight: "bold",
+    cursor: "pointer"
+  },
+  divider: { border: "0", height: "1px", background: "#334155", marginBottom: "30px" },
 
   filterSection: { maxWidth: "500px", margin: "0 auto 30px" },
   select: {
@@ -137,16 +204,23 @@ const styles = {
     color: "white"
   },
 
-  registerSection: { textAlign: "center", marginBottom: "40px" },
-  registerBtn: {
-    padding: "14px 32px",
-    background: "linear-gradient(135deg, #eab308, #ca8a04)",
-    color: "#000",
-    border: "none",
-    borderRadius: "10px",
-    fontSize: "1.1rem",
-    fontWeight: "700",
-    cursor: "pointer"
+  // Auth Section Styles
+  authContainer: {
+    maxWidth: "400px",
+    margin: "0 auto",
+    background: "#1e293b",
+    padding: "30px",
+    borderRadius: "15px",
+    textAlign: "center"
+  },
+  input: {
+    width: "100%",
+    padding: "12px",
+    margin: "10px 0",
+    borderRadius: "8px",
+    border: "1px solid #475569",
+    background: "#0f172a",
+    color: "white"
   },
 
   moversGrid: {
