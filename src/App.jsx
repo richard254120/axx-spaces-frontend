@@ -10,6 +10,7 @@ import Upload from "./pages/Upload";
 import LandlordDashboard from "./pages/LandlordDashboard";
 import PremiumPlans from "./pages/PremiumPlans";
 import Checkout from "./pages/Checkout";
+import Movers from "./pages/Movers";          // ← NEW
 
 import "leaflet/dist/leaflet.css";
 
@@ -27,6 +28,7 @@ function App() {
         <Route path="/dashboard" element={<LandlordDashboard />} />
         <Route path="/premium-plans" element={<PremiumPlans />} />
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/movers" element={<Movers />} />           {/* ← NEW */}
       </Routes>
     </AuthProvider>
   );
