@@ -1,201 +1,96 @@
 import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import logo from "../assets/image.png";
+import logo from "../assets/logo.jpeg";
 
 export default function Navbar() {
-  const { token, logout } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
-    navigate("/");
-    setMenuOpen(false);
+    navigate("/login");
   };
 
   return (
-    <>
+    <nav style={styles.nav}>
       <style>{css}</style>
-      
-      <nav style={styles.navbar}>
-        <div style={styles.container}>
+      <div style={styles.navContainer}>
+        {/* Logo */}
+        <Link to="/" style={styles.logoContainer}>
+          <img src={logo} alt="Axx Spaces" style={styles.logoImg} />
+          <span style={styles.logoText}>AXX SPACES</span>
+        </Link>
+
+        {/* Mobile Toggle */}
+        <button style={styles.menuBtn} onClick={() => setIsOpen(!isOpen)}>
+          {isOpen ? "✕" : "☰"}
+        </button>
+
+        {/* Links Section */}
+        <div style={{ ...styles.navLinks, display: isOpen ? "flex" : "" }} className={isOpen ? "open" : ""}>
           
-          {/* Logo & Title */}
-          <Link to="/" style={styles.logo} onClick={() => setMenuOpen(false)}>
-            <img src={logo} alt="Axx Spaces Logo" style={styles.logoImg} />
-            <span>Axx Spaces</span>
-          </Link>
+          {/* 1. PUBLIC LINKS */}
+          {!user && (
+            <>
+              <Link to="/properties" style={styles.link}>Properties</Link>
+              <Link to="/movers" style={styles.link}>Join as Mover</Link>
+              <Link to="/login" style={styles.loginBtn}>Login</Link>
+            </>
+          )}
 
-          {/* Navigation Links - Now BELOW the heading/logo */}
-          <div style={styles.desktopNav}>
-            <Link to="/listings" style={styles.link}>Listings</Link>
-            <Link to="/movers" style={styles.link}>🚚 Movers</Link>
-            
-            {token && (
-              <Link to="/upload" style={styles.link}>Upload Property</Link>
-            )}
+          {/* 2. LANDLORD ONLY LINKS */}
+          {user && user.role === "landlord" && (
+            <>
+              <Link to="/dashboard" style={styles.link}>My Listings</Link>
+              <Link to="/add-property" style={styles.link}>➕ Upload Property</Link>
+              <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
+            </>
+          )}
 
-            {!token ? (
-              <>
-                <Link to="/login" style={styles.link}>Login</Link>
-                <Link to="/register" style={styles.link}>Register</Link>
-              </>
-            ) : (
-              <Link to="/dashboard" style={styles.link}>📊 Dashboard</Link>
-            )}
-          </div>
-
-          {/* Hamburger Button */}
-          <button
-            style={styles.hamburger}
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="hamburger"
-          >
-            {menuOpen ? "✕" : "☰"}
-          </button>
-
-          {/* Mobile Menu */}
-          {menuOpen && (
-            <div style={styles.mobileMenu}>
-              <Link to="/listings" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>
-                Listings
-              </Link>
-              <Link to="/movers" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>
-                🚚 Movers
-              </Link>
-              
-              {token ? (
-                <>
-                  <Link to="/upload" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>
-                    Upload Property
-                  </Link>
-                  <Link to="/dashboard" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>
-                    📊 My Dashboard
-                  </Link>
-                  <button style={styles.logoutBtn} onClick={handleLogout}>
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link to="/login" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>
-                    Login
-                  </Link>
-                  <Link to="/register" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>
-                    Register
-                  </Link>
-                </>
-              )}
-            </div>
+          {/* 3. MOVER ONLY LINKS */}
+          {user && user.role === "mover" && (
+            <>
+              <Link to="/mover-dashboard" style={styles.link}>My Dashboard</Link>
+              <Link to="/mover-dashboard" style={styles.link}>Available Jobs</Link>
+              <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
+            </>
           )}
         </div>
-      </nav>
-    </>
+      </div>
+    </nav>
   );
 }
 
 const styles = {
-  navbar: {
-    background: "#06101f",
-    borderBottom: "1px solid rgba(59,130,246,0.15)",
-    padding: "15px 0",
-    position: "sticky",
-    top: 0,
-    zIndex: 100,
-  },
-  container: {
-    maxWidth: "1200px",
-    margin: "0 auto",
-    padding: "0 20px",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: "12px",
-  },
-  logo: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-    fontSize: "24px",
-    fontWeight: 800,
-    color: "#3b82f6",
-    textDecoration: "none",
-  },
-  logoImg: {
-    height: "45px",
-    width: "auto",
-  },
-  // Links now below logo
-  desktopNav: {
-    display: "flex",
-    gap: "22px",
-    alignItems: "center",
-    flexWrap: "wrap",
-    justifyContent: "center",
-  },
-  link: {
-    color: "#cbd5e1",
-    textDecoration: "none",
-    fontSize: "15.5px",
-    fontWeight: 600,
-    transition: "all 0.2s",
-  },
-  hamburger: {
-    display: "none",
-    background: "none",
-    border: "none",
-    color: "#cbd5e1",
-    fontSize: "28px",
-    cursor: "pointer",
-    padding: "8px",
-  },
-  mobileMenu: {
-    position: "absolute",
-    top: "100%",
-    left: 0,
-    right: 0,
-    background: "#06101f",
-    borderTop: "1px solid rgba(59,130,246,0.15)",
-    padding: "15px 0",
-    boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
-    zIndex: 1000,
-  },
-  mobileLink: {
-    display: "block",
-    color: "#cbd5e1",
-    textDecoration: "none",
-    fontSize: "15px",
-    fontWeight: 600,
-    padding: "14px 25px",
-    borderBottom: "1px solid rgba(255,255,255,0.05)",
-  },
-  logoutBtn: {
-    width: "100%",
-    background: "rgba(239,68,68,0.15)",
-    color: "#fca5a5",
-    border: "none",
-    padding: "14px 25px",
-    textAlign: "left",
-    fontSize: "15px",
-    fontWeight: 600,
-    cursor: "pointer",
-  },
+  nav: { background: "#ffffff", borderBottom: "2px solid #f3f4f6", padding: "10px 0", position: "sticky", top: 0, zIndex: 1000 },
+  navContainer: { maxWidth: "1200px", margin: "0 auto", padding: "0 20px", display: "flex", justifyContent: "space-between", alignItems: "center" },
+  logoContainer: { display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" },
+  logoImg: { height: "40px", borderRadius: "5px" },
+  logoText: { fontWeight: "900", color: "#1f2937", fontSize: "18px", letterSpacing: "1px" },
+  menuBtn: { display: "none", fontSize: "24px", background: "none", border: "none", cursor: "pointer", color: "#1f2937" },
+  navLinks: { display: "flex", alignItems: "center", gap: "25px" },
+  link: { textDecoration: "none", color: "#4b5563", fontWeight: "600", fontSize: "14px", transition: "0.2s" },
+  loginBtn: { background: "#ef4444", color: "white", padding: "8px 20px", borderRadius: "6px", textDecoration: "none", fontWeight: "700" },
+  logoutBtn: { background: "#f3f4f6", border: "none", padding: "8px 15px", borderRadius: "6px", cursor: "pointer", fontWeight: "600", color: "#ef4444" },
 };
 
 const css = `
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
-
-  @media (min-width: 768px) {
-    .hamburger { display: none !important; }
-  }
-
-  @media (max-width: 767px) {
-    .hamburger { display: block !important; }
-    .desktopNav { display: none !important; }
-  }
-
-  a:hover, .link:hover {
-    color: #60a5fa !important;
+  @media (max-width: 768px) {
+    button[style*="menuBtn"] { display: block !important; }
+    div[style*="navLinks"] {
+      display: none;
+      flex-direction: column;
+      position: absolute;
+      top: 60px;
+      left: 0;
+      width: 100%;
+      background: white;
+      padding: 20px;
+      border-bottom: 2px solid #f3f4f6;
+      gap: 15px;
+    }
+    div[style*="navLinks"].open { display: flex !important; }
   }
 `;
