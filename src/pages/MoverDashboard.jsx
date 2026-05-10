@@ -1,107 +1,110 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
-
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function MoverDashboard() {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-  
-  const [stats, setStats] = useState({
-    pendingRequests: 0,
-    completedMoves: 0,
-    totalEarnings: 0
-  });
+  const [activeTab, setActiveTab] = useState("overview");
 
-  // Example of fetching mover-specific data
   useEffect(() => {
-    if (!user || user.role !== "mover") {
-      navigate("/login");
-      return;
-    }
-    // You would fetch real stats from your backend here
+    // SECURITY: strictly block non-movers
+    if (!user) navigate("/login");
+    if (user && user.role !== "mover") navigate("/dashboard");
   }, [user, navigate]);
 
   return (
-    <div style={styles.dashboard}>
-      <style>{css}</style>
+    <div style={styles.container}>
+      <style>{mobileCss}</style>
       
-      {/* Sidebar / Header */}
-      <nav style={styles.sidebar}>
-        <div style={styles.profileSection}>
-          <div style={styles.avatar}>🚚</div>
-          <h3 style={styles.userName}>{user?.name || "Mover Partner"}</h3>
-          <span style={styles.badge}>Verified Mover</span>
-        </div>
-        
-        <ul style={styles.navLinks}>
-          <li style={styles.activeLink}>📊 Overview</li>
-          <li>📦 Move Requests</li>
-          <li>🛠 Manage Services</li>
-          <li>⚙️ Settings</li>
-        </ul>
+      {/* Top Header */}
+      <header style={styles.topBar}>
+        <span style={styles.logoText}>Axx Mover</span>
+        <button onClick={logout} style={styles.logoutIcon}>🚪</button>
+      </header>
 
-        <button onClick={logout} style={styles.logoutBtn}>🚪 Logout</button>
-      </nav>
+      {/* Main Content Area */}
+      <main style={styles.content}>
+        {activeTab === "overview" && (
+          <section>
+            <div style={styles.welcomeCard}>
+              <h2>Hello, {user?.name.split(" ")[0]}!</h2>
+              <p>Your account is **{user?.status || "Active"}**</p>
+            </div>
 
-      {/* Main Content */}
-      <main style={styles.main}>
-        <header style={styles.header}>
-          <h1>Mover Dashboard</h1>
-          <p>Welcome back! You have <strong>{stats.pendingRequests}</strong> new move requests today.</p>
-        </header>
+            <div style={styles.statsRow}>
+              <div style={styles.miniCard}><h4>0</h4><p>Jobs</p></div>
+              <div style={styles.miniCard}><h4>KES 0</h4><p>Earned</p></div>
+            </div>
 
-        {/* Stats Grid */}
-        <div style={styles.statsGrid}>
-          <div style={styles.statCard}>
-            <h4>Pending</h4>
-            <p style={styles.statValue}>{stats.pendingRequests}</p>
-          </div>
-          <div style={styles.statCard}>
-            <h4>Completed</h4>
-            <p style={styles.statValue}>{stats.completedMoves}</p>
-          </div>
-          <div style={styles.statCard}>
-            <h4>Total Revenue</h4>
-            <p style={{...styles.statValue, color: "#10b981"}}>KES 0</p>
-          </div>
-        </div>
+            <h3 style={styles.sectionTitle}>Recent Move Requests</h3>
+            <div style={styles.emptyBox}>
+              <p>No requests yet. Stay tuned!</p>
+            </div>
+          </section>
+        )}
 
-        {/* Recent Activity Section */}
-        <section style={styles.section}>
-          <h3>Recent Requests</h3>
-          <div style={styles.emptyState}>
-            <p>No active requests found. Make sure your profile is updated to attract clients!</p>
-            <button style={styles.actionBtn}>Update Portfolio</button>
-          </div>
-        </section>
+        {activeTab === "profile" && (
+          <section style={styles.profilePage}>
+            <div style={styles.avatarLarge}>🚚</div>
+            <h3>{user?.name}</h3>
+            <p style={styles.userEmail}>{user?.email}</p>
+            <hr style={styles.divider} />
+            <div style={styles.infoRow}><strong>Phone:</strong> {user?.phone}</div>
+            <div style={styles.infoRow}><strong>County:</strong> {user?.county || "Not Set"}</div>
+            <button style={styles.editBtn}>Edit Profile</button>
+          </section>
+        )}
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <nav style={styles.bottomNav}>
+        <button 
+          style={activeTab === "overview" ? styles.navBtnActive : styles.navBtn} 
+          onClick={() => setActiveTab("overview")}
+        >
+          📊 <span>Home</span>
+        </button>
+        <button 
+          style={activeTab === "jobs" ? styles.navBtnActive : styles.navBtn} 
+          onClick={() => setActiveTab("jobs")}
+        >
+          📦 <span>Jobs</span>
+        </button>
+        <button 
+          style={activeTab === "profile" ? styles.navBtnActive : styles.navBtn} 
+          onClick={() => setActiveTab("profile")}
+        >
+          👤 <span>Profile</span>
+        </button>
+      </nav>
     </div>
   );
 }
 
 const styles = {
-  dashboard: { display: "flex", minHeight: "100vh", background: "#f9fafb", fontFamily: "'DM Sans', sans-serif" },
-  sidebar: { width: "260px", background: "#1f2937", color: "white", padding: "30px 20px", display: "flex", flexDirection: "column" },
-  profileSection: { textAlign: "center", marginBottom: "40px" },
-  avatar: { fontSize: "40px", marginBottom: "10px" },
-  userName: { margin: "0", fontSize: "18px" },
-  badge: { fontSize: "12px", color: "#fbbf24", fontWeight: "bold" },
-  navLinks: { listStyle: "none", padding: "0", flex: 1 },
-  activeLink: { background: "#374151", padding: "12px", borderRadius: "8px", marginBottom: "10px", color: "#fbbf24" },
-  logoutBtn: { background: "transparent", border: "1px solid #ef4444", color: "#ef4444", padding: "10px", borderRadius: "8px", cursor: "pointer", fontWeight: "bold" },
-  main: { flex: 1, padding: "40px" },
-  header: { marginBottom: "30px" },
-  statsGrid: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px", marginBottom: "40px" },
-  statCard: { background: "white", padding: "20px", borderRadius: "12px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)", border: "1px solid #e5e7eb" },
-  statValue: { fontSize: "28px", fontWeight: "800", margin: "10px 0 0" },
-  section: { background: "white", padding: "30px", borderRadius: "12px", border: "1px solid #e5e7eb" },
-  emptyState: { textAlign: "center", color: "#6b7280", padding: "40px 0" },
-  actionBtn: { marginTop: "15px", padding: "10px 20px", background: "#2427fb", color: "white", border: "none", borderRadius: "6px", cursor: "pointer" }
+  container: { background: "#f4f7f6", minHeight: "100vh", paddingBottom: "80px", fontFamily: "'DM Sans', sans-serif" },
+  topBar: { background: "#1f2937", color: "white", padding: "15px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 100 },
+  logoText: { fontWeight: "800", fontSize: "18px", color: "#fbbf24" },
+  logoutIcon: { background: "none", border: "none", fontSize: "20px", cursor: "pointer" },
+  content: { padding: "20px" },
+  welcomeCard: { background: "linear-gradient(135deg, #ef4444, #b91c1c)", color: "white", padding: "25px", borderRadius: "15px", marginBottom: "20px", boxShadow: "0 4px 15px rgba(239, 68, 68, 0.2)" },
+  statsRow: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px", marginBottom: "25px" },
+  miniCard: { background: "white", padding: "15px", borderRadius: "12px", textAlign: "center", border: "1px solid #e5e7eb" },
+  sectionTitle: { fontSize: "16px", fontWeight: "700", color: "#374151", marginBottom: "10px" },
+  emptyBox: { background: "white", padding: "40px 20px", textAlign: "center", borderRadius: "12px", color: "#9ca3af", border: "1px dashed #d1d5db" },
+  bottomNav: { position: "fixed", bottom: 0, width: "100%", background: "white", display: "flex", justifyContent: "space-around", padding: "10px 0", borderTop: "1px solid #e5e7eb", boxShadow: "0 -2px 10px rgba(0,0,0,0.05)" },
+  navBtn: { border: "none", background: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", color: "#9ca3af", fontSize: "12px" },
+  navBtnActive: { border: "none", background: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", color: "#ef4444", fontSize: "12px", fontWeight: "bold" },
+  profilePage: { textAlign: "center", background: "white", padding: "30px 20px", borderRadius: "15px" },
+  avatarLarge: { fontSize: "60px", marginBottom: "10px" },
+  userEmail: { color: "#6b7280", marginBottom: "20px" },
+  divider: { margin: "20px 0", border: "0.5px solid #f3f4f6" },
+  infoRow: { textAlign: "left", padding: "10px 0", fontSize: "14px", borderBottom: "1px solid #f9fafb" },
+  editBtn: { marginTop: "20px", width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: "#1f2937", color: "white", fontWeight: "bold" }
 };
 
-const css = `
-  li { padding: 12px; cursor: pointer; transition: 0.2s; color: #9ca3af; }
-  li:hover { color: white; }
+const mobileCss = `
+  body { margin: 0; padding: 0; }
+  h2, h3, h4 { margin: 0; }
 `;
