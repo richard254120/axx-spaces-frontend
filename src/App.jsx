@@ -1,5 +1,4 @@
 import { Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
 
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
@@ -8,16 +7,17 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Upload from "./pages/Upload";
 import LandlordDashboard from "./pages/LandlordDashboard";
+import MoverDashboard from "./pages/MoverDashboard"; // ✅ ADD THIS
+
+// Premium pages
 import PremiumPlans from "./pages/PremiumPlans";
 import Checkout from "./pages/Checkout";
-import Movers from "./pages/Movers";
-import MoverRegister from "./pages/MoverRegister";   // ← New
 
 import "leaflet/dist/leaflet.css";
 
 function App() {
   return (
-    <AuthProvider>
+    <>
       <Navbar />
 
       <Routes>
@@ -26,13 +26,18 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/upload" element={<Upload />} />
+        
+        {/* LANDLORD ROUTES */}
         <Route path="/dashboard" element={<LandlordDashboard />} />
+        
+        {/* MOVER ROUTES */}
+        <Route path="/mover-dashboard" element={<MoverDashboard />} /> {/* ✅ ADD THIS */}
+        
+        {/* PREMIUM ROUTES */}
         <Route path="/premium-plans" element={<PremiumPlans />} />
         <Route path="/checkout" element={<Checkout />} />
-        <Route path="/movers" element={<Movers />} />
-        <Route path="/mover-register" element={<MoverRegister />} />
       </Routes>
-    </AuthProvider>
+    </>
   );
 }
 

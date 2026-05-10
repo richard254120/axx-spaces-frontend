@@ -9,14 +9,13 @@ export default function Register() {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
 
-  const [activeTab, setActiveTab] = useState("landlord"); // landlord or mover
+  const [activeTab, setActiveTab] = useState("landlord");
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     phone: "",
-    // Mover extra fields
     county: "",
     services: [],
     experienceYears: "",
@@ -84,7 +83,7 @@ export default function Register() {
         email: formData.email,
         password: formData.password,
         phone: formData.phone,
-        role: activeTab,   // "landlord" or "mover"
+        role: activeTab,
         ...(activeTab === "mover" && {
           county: formData.county,
           services: formData.services,
@@ -104,15 +103,16 @@ export default function Register() {
 
       if (!response.ok) throw new Error(data.error || "Registration failed");
 
-      setSuccess("✅ Registration successful! Logging you in...");
+      setSuccess(`✅ Registration successful! Logging you in...`);
 
       login(data.token, data.user);
 
       setTimeout(() => {
-        if (data.user?.role === "mover") {
-          navigate("/movers");
+        // ✅ REDIRECT BASED ON ROLE
+        if (activeTab === "mover" || data.user?.role === "mover") {
+          navigate("/mover-dashboard");  // ✅ MOVER GOES TO MOVER DASHBOARD
         } else {
-          navigate("/dashboard");
+          navigate("/dashboard");  // ✅ LANDLORD GOES TO LANDLORD DASHBOARD
         }
       }, 1500);
 
@@ -136,7 +136,6 @@ export default function Register() {
           <h1 style={styles.title}>📝 Create Your Account</h1>
           <p style={styles.subtitle}>Join Kenya's fastest-growing rental platform</p>
 
-          {/* TABS */}
           <div style={styles.tabs}>
             <button
               style={{ ...styles.tabBtn, ...(activeTab === "landlord" && styles.tabBtnActive) }}
@@ -156,7 +155,6 @@ export default function Register() {
           {success && <div style={styles.success}>{success}</div>}
 
           <form onSubmit={handleSubmit} style={styles.form}>
-            {/* ==================== YOUR ORIGINAL LANDLORD FORM (UNTOUCHED) ==================== */}
             <div style={styles.formGroup}>
               <label style={styles.label}>Full Name</label>
               <input type="text" name="name" placeholder="e.g., John Doe" value={formData.name} onChange={handleChange} style={styles.input} required />
@@ -177,7 +175,6 @@ export default function Register() {
               <input type="password" name="password" placeholder="Min 6 characters" value={formData.password} onChange={handleChange} style={styles.input} required />
             </div>
 
-            {/* ==================== MOVER ONLY FIELDS ==================== */}
             {activeTab === "mover" && (
               <>
                 <div style={styles.formGroup}>
@@ -255,7 +252,6 @@ export default function Register() {
   );
 }
 
-/* ====================== STYLES ====================== */
 const styles = {
   root: { fontFamily: "'DM Sans', sans-serif", background: "linear-gradient(135deg, #ffffff 0%, #fef3e2 50%, #fef9e7 100%)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" },
   container: { width: "100%", maxWidth: "520px" },
