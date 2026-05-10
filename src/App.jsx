@@ -11,7 +11,7 @@ import LandlordDashboard from "./pages/LandlordDashboard";
 import PremiumPlans from "./pages/PremiumPlans";
 import Checkout from "./pages/Checkout";
 import Movers from "./pages/Movers";
-import MoverRegister from "./pages/MoverRegister";   // ← NEW
+import MoverRegister from "./pages/MoverRegister";   // ← New
 
 import "leaflet/dist/leaflet.css";
 
@@ -30,7 +30,7 @@ function App() {
         <Route path="/premium-plans" element={<PremiumPlans />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/movers" element={<Movers />} />
-        <Route path="/mover-register" element={<MoverRegister />} />   {/* ← NEW */}
+        <Route path="/mover-register" element={<MoverRegister />} />
       </Routes>
     </AuthProvider>
   );
