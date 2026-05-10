@@ -9,7 +9,7 @@ export default function Login() {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
 
-  const [activeTab, setActiveTab] = useState("landlord"); // landlord or mover
+  const [activeTab, setActiveTab] = useState("landlord");
 
   const [formData, setFormData] = useState({
     email: "",
@@ -56,12 +56,14 @@ export default function Login() {
 
       login(data.token, data.user);
 
-      // Redirect based on role
-      if (data.user?.role === "mover") {
-        navigate("/movers");
-      } else {
-        navigate("/dashboard");   // Your original landlord redirect
-      }
+      // ✅ REDIRECT BASED ON ROLE
+      setTimeout(() => {
+        if (data.user?.role === "mover") {
+          navigate("/mover-dashboard");  // ✅ MOVER GOES HERE
+        } else {
+          navigate("/dashboard");  // ✅ LANDLORD GOES HERE
+        }
+      }, 1500);
 
     } catch (err) {
       setError(err.message || "❌ Login failed. Please try again.");
@@ -83,7 +85,6 @@ export default function Login() {
           <h1 style={styles.title}>🔐 Welcome Back</h1>
           <p style={styles.subtitle}>Login to your Axx Spaces account</p>
 
-          {/* TABS - Added on top, your original form remains below */}
           <div style={styles.tabs}>
             <button
               style={{ ...styles.tabBtn, ...(activeTab === "landlord" && styles.tabBtnActive) }}
@@ -102,7 +103,6 @@ export default function Login() {
           {error && <div style={styles.error}>{error}</div>}
           {success && <div style={styles.success}>{success}</div>}
 
-          {/* YOUR ORIGINAL FORM - UNCHANGED */}
           <form onSubmit={handleSubmit} style={styles.form}>
             <div style={styles.formGroup}>
               <label style={styles.label}>Email Address</label>
@@ -157,7 +157,6 @@ export default function Login() {
   );
 }
 
-/* ====================== YOUR ORIGINAL STYLES + NEW TABS ====================== */
 const styles = {
   root: {
     fontFamily: "'DM Sans', sans-serif",
@@ -201,7 +200,6 @@ const styles = {
     textAlign: "center",
   },
 
-  // ✅ NEW TABS STYLES
   tabs: {
     display: "flex",
     background: "#f3f4f6",
