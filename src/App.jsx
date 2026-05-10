@@ -7,7 +7,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Upload from "./pages/Upload";
 import LandlordDashboard from "./pages/LandlordDashboard";
-import MoverDashboard from "./pages/MoverDashboard"; // ✅ ADD THIS
+import MoverDashboard from "./pages/MoverDashboard"; 
+import Movers from "./pages/Movers"; // ✅ ADD THIS IMPORT
 
 // Premium pages
 import PremiumPlans from "./pages/PremiumPlans";
@@ -23,6 +24,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/listings" element={<Listings />} />
+        <Route path="/movers" element={<Movers />} /> {/* ✅ ADD THIS ROUTE */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/upload" element={<Upload />} />
@@ -31,7 +33,7 @@ function App() {
         <Route path="/dashboard" element={<LandlordDashboard />} />
         
         {/* MOVER ROUTES */}
-        <Route path="/mover-dashboard" element={<MoverDashboard />} /> {/* ✅ ADD THIS */}
+        <Route path="/mover-dashboard" element={<MoverDashboard />} /> 
         
         {/* PREMIUM ROUTES */}
         <Route path="/premium-plans" element={<PremiumPlans />} />

@@ -159,7 +159,7 @@ const styles = {
     background: "linear-gradient(135deg, #06101f 0%, #0f1729 100%)",
     minHeight: "100vh",
     color: "#f1f5f9",
-    padding: "40px 20px",
+    padding: "120px 20px 40px", // Increase the top padding (first value) to clear the navbar
     fontFamily: "'DM Sans', sans-serif"
   },
   header: { textAlign: "center", marginBottom: "30px" },
