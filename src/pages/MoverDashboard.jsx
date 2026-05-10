@@ -14,6 +14,7 @@ export default function MoverDashboard() {
   const [error, setError] = useState("");
   const [jobs, setJobs] = useState([]);
   const [editingProfile, setEditingProfile] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false); // ✅ MOBILE TOGGLE
   const [profileData, setProfileData] = useState({
     county: "",
     services: [],
@@ -28,7 +29,6 @@ export default function MoverDashboard() {
       return;
     }
 
-    // Fetch mover profile data
     fetchMoverData();
   }, [token, navigate]);
 
@@ -51,7 +51,6 @@ export default function MoverDashboard() {
         description: data.description || "",
       });
 
-      // Mock jobs data - in production, fetch from backend
       setJobs([
         {
           id: 1,
@@ -181,8 +180,16 @@ export default function MoverDashboard() {
     <div style={styles.root}>
       <style>{cssStyles}</style>
 
-      {/* SIDEBAR */}
-      <div style={styles.sidebar}>
+      {/* ✅ MOBILE OVERLAY - CLOSES SIDEBAR WHEN CLICKING OUTSIDE */}
+      {sidebarOpen && (
+        <div
+          style={styles.mobileOverlay}
+          onClick={() => setSidebarOpen(false)}
+        ></div>
+      )}
+
+      {/* ✅ SIDEBAR - RESPONSIVE */}
+      <div style={{ ...styles.sidebar, ...(sidebarOpen ? styles.sidebarOpen : styles.sidebarClosed) }}>
         <div style={styles.logo}>🚚 Axx Movers</div>
 
         <div style={styles.profileCard}>
@@ -197,11 +204,11 @@ export default function MoverDashboard() {
 
         <nav style={styles.nav}>
           {[
-            { id: "overview", label: "📊 Overview", icon: "📊" },
-            { id: "jobs", label: "📋 My Jobs", icon: "📋" },
-            { id: "profile", label: "👤 Profile", icon: "👤" },
-            { id: "earnings", label: "💰 Earnings", icon: "💰" },
-            { id: "settings", label: "⚙️ Settings", icon: "⚙️" },
+            { id: "overview", label: "📊 Overview" },
+            { id: "jobs", label: "📋 My Jobs" },
+            { id: "profile", label: "👤 Profile" },
+            { id: "earnings", label: "💰 Earnings" },
+            { id: "settings", label: "⚙️ Settings" },
           ].map((item) => (
             <button
               key={item.id}
@@ -209,7 +216,10 @@ export default function MoverDashboard() {
                 ...styles.navItem,
                 ...(activeTab === item.id && styles.navItemActive),
               }}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => {
+                setActiveTab(item.id);
+                setSidebarOpen(false); // ✅ CLOSE SIDEBAR ON MOBILE
+              }}
             >
               {item.label}
             </button>
@@ -221,9 +231,26 @@ export default function MoverDashboard() {
         </button>
       </div>
 
-      {/* MAIN CONTENT */}
+      {/* ✅ MAIN CONTENT */}
       <div style={styles.mainContent}>
-        {/* HEADER */}
+        {/* ✅ MOBILE HEADER WITH TOGGLE */}
+        <div style={styles.mobileHeader}>
+          <button
+            style={styles.hamburger}
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            ☰
+          </button>
+          <h1 style={styles.mobileTitle}>
+            {activeTab === "overview" && "📊 Overview"}
+            {activeTab === "jobs" && "📋 Jobs"}
+            {activeTab === "profile" && "👤 Profile"}
+            {activeTab === "earnings" && "💰 Earnings"}
+            {activeTab === "settings" && "⚙️ Settings"}
+          </h1>
+        </div>
+
+        {/* DESKTOP HEADER */}
         <div style={styles.header}>
           <h1 style={styles.headerTitle}>
             {activeTab === "overview" && "📊 Dashboard Overview"}
@@ -304,25 +331,6 @@ export default function MoverDashboard() {
         {/* JOBS TAB */}
         {activeTab === "jobs" && (
           <div style={styles.content}>
-            <div style={styles.filterTabs}>
-              {["all", "pending", "in-progress", "completed"].map((filter) => (
-                <button
-                  key={filter}
-                  style={{
-                    ...styles.filterBtn,
-                    background:
-                      filter === "all" ? "#ef4444" : "transparent",
-                    color: filter === "all" ? "white" : "#6b7280",
-                  }}
-                >
-                  {filter === "all" && "All Jobs"}
-                  {filter === "pending" && "⏳ Pending"}
-                  {filter === "in-progress" && "🔄 In Progress"}
-                  {filter === "completed" && "✅ Completed"}
-                </button>
-              ))}
-            </div>
-
             <div style={styles.jobsList}>
               {jobs.map((job) => (
                 <div key={job.id} style={styles.jobCard}>
@@ -535,7 +543,6 @@ export default function MoverDashboard() {
                 <h2 style={styles.sectionTitle}>🔒 Account Security</h2>
                 <button style={styles.settingBtn}>🔑 Change Password</button>
                 <button style={styles.settingBtn}>🔐 Two-Factor Authentication</button>
-                <button style={styles.settingBtn}>📧 Update Email</button>
               </div>
 
               <div style={styles.settingsCard}>
@@ -548,15 +555,6 @@ export default function MoverDashboard() {
                   <span>SMS Notifications</span>
                   <input type="checkbox" defaultChecked />
                 </div>
-                <div style={styles.settingOption}>
-                  <span>Push Notifications</span>
-                  <input type="checkbox" />
-                </div>
-              </div>
-
-              <div style={styles.settingsCard}>
-                <h2 style={styles.sectionTitle}>⚠️ Danger Zone</h2>
-                <button style={styles.deleteBtn}>🗑️ Delete Account</button>
               </div>
             </div>
           </div>
@@ -572,6 +570,19 @@ const styles = {
     minHeight: "100vh",
     background: "#f3f4f6",
     fontFamily: "'DM Sans', sans-serif",
+    position: "relative",
+  },
+
+  // ✅ MOBILE OVERLAY
+  mobileOverlay: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: "rgba(0, 0, 0, 0.5)",
+    zIndex: 99,
+    display: "none",
   },
 
   sidebar: {
@@ -580,6 +591,22 @@ const styles = {
     color: "#f1f5f9",
     padding: "24px",
     overflowY: "auto",
+    transition: "all 0.3s ease",
+    position: "relative",
+  },
+
+  // ✅ SIDEBAR MOBILE STYLES
+  sidebarOpen: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    height: "100vh",
+    width: "250px",
+    zIndex: 100,
+  },
+
+  sidebarClosed: {
+    display: "none",
   },
 
   logo: {
@@ -684,6 +711,29 @@ const styles = {
     overflowY: "auto",
   },
 
+  // ✅ MOBILE HEADER
+  mobileHeader: {
+    display: "none",
+    alignItems: "center",
+    gap: "12px",
+    marginBottom: "20px",
+  },
+
+  hamburger: {
+    background: "none",
+    border: "none",
+    fontSize: "28px",
+    cursor: "pointer",
+    color: "#1f2937",
+  },
+
+  mobileTitle: {
+    margin: 0,
+    fontSize: "20px",
+    fontWeight: 700,
+    color: "#1f2937",
+  },
+
   header: {
     marginBottom: "32px",
   },
@@ -770,6 +820,8 @@ const styles = {
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: "16px",
+    flexWrap: "wrap",
+    gap: "12px",
   },
 
   jobTitle: {
@@ -810,26 +862,12 @@ const styles = {
     fontSize: "14px",
     fontWeight: 600,
     transition: "all 0.2s",
-  },
-
-  filterTabs: {
-    display: "flex",
-    gap: "12px",
-    marginBottom: "20px",
-  },
-
-  filterBtn: {
-    padding: "10px 16px",
-    border: "1px solid #e5e7eb",
-    borderRadius: "6px",
-    cursor: "pointer",
-    fontSize: "14px",
-    fontWeight: 600,
-    transition: "all 0.2s",
+    width: "100%",
   },
 
   profileContainer: {
     maxWidth: "600px",
+    margin: "0 auto",
   },
 
   profileInfoCard: {
@@ -844,6 +882,8 @@ const styles = {
     justifyContent: "space-between",
     padding: "12px 0",
     borderBottom: "1px solid #e5e7eb",
+    flexWrap: "wrap",
+    gap: "12px",
   },
 
   infoLabel: {
@@ -883,6 +923,7 @@ const styles = {
     cursor: "pointer",
     fontWeight: 600,
     transition: "all 0.2s",
+    width: "100%",
   },
 
   formGroup: {
@@ -905,6 +946,7 @@ const styles = {
     borderRadius: "6px",
     fontSize: "14px",
     fontFamily: "inherit",
+    boxSizing: "border-box",
   },
 
   textarea: {
@@ -915,6 +957,7 @@ const styles = {
     fontSize: "14px",
     fontFamily: "inherit",
     resize: "vertical",
+    boxSizing: "border-box",
   },
 
   servicesGrid: {
@@ -960,6 +1003,7 @@ const styles = {
 
   earningsContainer: {
     maxWidth: "800px",
+    margin: "0 auto",
   },
 
   earningsCard: {
@@ -994,6 +1038,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: "0",
+    overflowX: "auto",
   },
 
   breakdownHeader: {
@@ -1018,6 +1063,7 @@ const styles = {
 
   settingsContainer: {
     maxWidth: "600px",
+    margin: "0 auto",
   },
 
   settingsCard: {
@@ -1049,19 +1095,6 @@ const styles = {
     padding: "12px 0",
     borderBottom: "1px solid #e5e7eb",
   },
-
-  deleteBtn: {
-    display: "block",
-    width: "100%",
-    padding: "12px 16px",
-    background: "#ef4444",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer",
-    fontWeight: 600,
-    transition: "all 0.2s",
-  },
 };
 
 const cssStyles = `
@@ -1079,8 +1112,55 @@ const cssStyles = `
     accentColor: #3b82f6;
   }
 
+  /* ✅ MOBILE RESPONSIVE */
   @media (max-width: 768px) {
-    [style*="gridTemplateColumns"] {
+    [style*="display: flex"][style*="width: 280px"] {
+      display: none !important;
+    }
+
+    [style*="flex: 1"][style*="padding: 32px"] {
+      padding: 16px !important;
+    }
+
+    [style*="fontSize: 28px"][style*="fontWeight: 800"] {
+      font-size: 20px !important;
+    }
+
+    [style*="gridTemplateColumns: repeat"] {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* ✅ SHOW MOBILE HEADER */
+    [style*="display: none"][style*="alignItems: center"][style*="gap: 12px"] {
+      display: flex !important;
+    }
+
+    /* ✅ SHOW MOBILE OVERLAY */
+    [style*="display: none"][style*="position: fixed"][style*="background: rgba(0, 0, 0, 0.5)"] {
+      display: block !important;
+    }
+
+    /* ✅ SHOW SIDEBAR WHEN OPEN */
+    [style*="position: relative"][style*="width: 280px"][style*="background: linear-gradient"] {
+      position: fixed !important;
+      width: 250px !important;
+      height: 100vh !important;
+      top: 0 !important;
+      left: 0 !important;
+      z-index: 100 !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    [style*="fontSize: 40px"] {
+      font-size: 28px !important;
+    }
+
+    [style*="padding: 32px"] {
+      padding: 12px !important;
+    }
+
+    [style*="display: grid"][style*="gridTemplateColumns: 1fr 150px 120px"] {
       grid-template-columns: 1fr !important;
     }
   }
