@@ -37,7 +37,7 @@ export default function Register() {
   const counties = [
     "Nairobi City","Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
     "Garissa","Wajir","Mandera","Marsabit","Isiolo","Meru","Tharaka Nithi","Embu",
-    "Kitui","Machakos","Makueni","Nyandarua","Nyeri","Kirinyaga","Murang’a","Kiambu",
+    "Kitui","Machakos","Makueni","Nyandarua","Nyeri","Kirinyaga","Murang'a","Kiambu",
     "Turkana","West Pokot","Samburu","Trans Nzoia","Uasin Gishu","Elgeyo Marakwet",
     "Nandi","Baringo","Laikipia","Nakuru","Narok","Kajiado","Kericho","Bomet",
     "Kakamega","Vihiga","Bungoma","Busia","Siaya","Kisumu","Homa Bay","Migori",
@@ -197,8 +197,9 @@ export default function Register() {
                           type="checkbox"
                           checked={formData.services.includes(service)}
                           onChange={() => handleServiceToggle(service)}
+                          style={styles.checkbox}
                         />
-                        {service}
+                        <span style={styles.checkboxText}>{service}</span>
                       </label>
                     ))}
                   </div>
@@ -275,8 +276,10 @@ const styles = {
   textarea: { padding: "12px 14px", border: "2px solid #d1d5db", borderRadius: "8px", fontSize: "15px", minHeight: "90px", resize: "vertical" },
   row: { display: "flex", gap: "16px" },
   col: { flex: 1 },
-  amenitiesGrid: { display: "flex", flexWrap: "wrap", gap: "10px" },
-  checkboxLabel: { display: "flex", alignItems: "center", gap: "6px", fontSize: "14px", cursor: "pointer" },
+  amenitiesGrid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px", marginTop: "10px" },
+  checkboxLabel: { display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", cursor: "pointer", padding: "8px 12px", borderRadius: "6px", border: "1px solid #e5e7eb", transition: "all 0.2s", background: "#f9fafb" },
+  checkbox: { width: "18px", height: "18px", cursor: "pointer", accentColor: "#ef4444" },
+  checkboxText: { fontSize: "14px", color: "#374151", fontWeight: 500 },
   submitBtn: { padding: "13px 24px", background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)", color: "white", border: "none", borderRadius: "8px", fontSize: "15px", fontWeight: 700, cursor: "pointer", transition: "all 0.2s", boxShadow: "0 4px 12px rgba(239, 68, 68, 0.3)", marginTop: "8px" },
   divider: { height: "1px", background: "#e5e7eb", margin: "20px 0" },
   footer: { textAlign: "center", color: "#6b7280", fontSize: "14px", margin: 0 },
@@ -294,5 +297,9 @@ const css = `
   button:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4) !important;
+  }
+  label[style*="checkboxLabel"]:hover {
+    background: #f3f4f6 !important;
+    border-color: #ef4444 !important;
   }
 `;
