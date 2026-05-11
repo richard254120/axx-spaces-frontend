@@ -14,19 +14,62 @@ export default function Navbar() {
     setMenuOpen(false);
   };
 
+  // ✅ MOVER NAVBAR - Only shows mover-specific content
+  if (user?.role === "mover") {
+    return (
+      <nav style={styles.moverNavbar}>
+        <style>{css}</style>
+
+        {/* TOP SECTION - LOGO + HAMBURGER */}
+        <div style={styles.topSection}>
+          <Link to="/mover-dashboard" style={styles.logoContainer}>
+            <img src={logo} alt="Axx Spaces" style={styles.logo} />
+            <span style={styles.brandName}>🚚 Axx Movers</span>
+          </Link>
+
+          <button
+            style={styles.hamburger}
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            {menuOpen ? "✕" : "☰"}
+          </button>
+        </div>
+
+        {/* BOTTOM SECTION - MOVER ONLY LINKS */}
+        <div style={{ ...styles.navLinksContainer, ...(menuOpen && styles.navLinksContainerOpen) }}>
+          {/* MOVER DASHBOARD LINK */}
+          <Link 
+            to="/mover-dashboard" 
+            style={styles.navLink} 
+            onClick={() => setMenuOpen(false)}
+          >
+            📊 Dashboard
+          </Link>
+
+          {/* USER INFO & LOGOUT */}
+          <div style={styles.userSection}>
+            <span style={styles.userName}>👤 {user?.name}</span>
+            <button style={styles.logoutBtn} onClick={handleLogout}>
+              🚪 Logout
+            </button>
+          </div>
+        </div>
+      </nav>
+    );
+  }
+
+  // ✅ REGULAR NAVBAR - For landlords and unauthenticated users
   return (
     <nav style={styles.navbar}>
       <style>{css}</style>
 
       {/* TOP SECTION - LOGO + HAMBURGER */}
       <div style={styles.topSection}>
-        {/* LOGO */}
         <Link to="/" style={styles.logoContainer}>
           <img src={logo} alt="Axx Spaces" style={styles.logo} />
           <span style={styles.brandName}>Axx Spaces</span>
         </Link>
 
-        {/* HAMBURGER MENU - MOBILE */}
         <button
           style={styles.hamburger}
           onClick={() => setMenuOpen(!menuOpen)}
@@ -45,7 +88,7 @@ export default function Navbar() {
           📋 Listings
         </Link>
         
-        {/* ✅ MOVERS LINK */}
+        {/* MOVERS LINK */}
         <Link to="/movers" style={styles.navLink} onClick={() => setMenuOpen(false)}>
           🚚 Movers
         </Link>
@@ -85,6 +128,19 @@ export default function Navbar() {
 }
 
 const styles = {
+  // ✅ MOVER NAVBAR STYLES
+  moverNavbar: {
+    background: "linear-gradient(135deg, #1e293b 0%, #0f1729 100%)",
+    color: "#f1f5f9",
+    boxShadow: "0 2px 12px rgba(0, 0, 0, 0.15)",
+    fontFamily: "'DM Sans', sans-serif",
+    position: "sticky",
+    top: 0,
+    zIndex: 50,
+    padding: "16px 24px",
+  },
+
+  // REGULAR NAVBAR STYLES
   navbar: {
     background: "linear-gradient(135deg, #1e293b 0%, #0f1729 100%)",
     color: "#f1f5f9",
