@@ -151,12 +151,6 @@ export default function Upload() {
       return;
     }
 
-    if (!token) {
-      setError("Please login again");
-      navigate("/login");
-      return;
-    }
-
     setLoading(true);
 
     try {
@@ -176,11 +170,10 @@ export default function Upload() {
 
       images.forEach((image) => formDataToSend.append("images", image));
 
-      const response = await fetch(`${API_BASE}/properties`, {   // ← Updated to /properties
+      // ✅ FIXED: Using correct endpoint that matches your backend
+      const response = await fetch(`${API_BASE}/properties`, {
         method: "POST",
-        headers: { 
-          Authorization: `Bearer ${token}` 
-        },
+        headers: { Authorization: `Bearer ${token}` },
         body: formDataToSend,
       });
 
