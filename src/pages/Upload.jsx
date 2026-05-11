@@ -170,7 +170,7 @@ export default function Upload() {
 
       images.forEach((image) => formDataToSend.append("images", image));
 
-      // ✅ FIXED ENDPOINT - Using /properties to match your backend route
+      // ✅ FIXED: Correct endpoint matching your backend
       const response = await fetch(`${API_BASE}/properties`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
@@ -261,7 +261,6 @@ export default function Upload() {
             <input type="text" name="location" placeholder="e.g., Nairobi, Westlands" value={formData.location} onChange={handleChange} style={styles.input} required />
           </div>
 
-          {/* GPS Location */}
           <div style={styles.formRow}>
             <div style={styles.formGroup}>
               <label style={styles.label}>Latitude</label>
@@ -276,7 +275,6 @@ export default function Upload() {
             📍 Get Current Location
           </button>
 
-          {/* ✅ Description - NO CHARACTER LIMIT */}
           <div style={styles.formGroup}>
             <label style={styles.label}>Description <span style={styles.required}>*</span></label>
             <textarea 
