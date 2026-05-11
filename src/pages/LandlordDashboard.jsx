@@ -15,12 +15,20 @@ export default function LandlordDashboard() {
   const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
+    // 🛡️ SECURITY FIREWALL: Check if logged in and if user is a Landlord
     if (!token) { 
       navigate("/login"); 
       return; 
     }
+    
+    if (user && user.role !== "landlord") {
+      // Redirect Movers or others to their correct dashboard
+      navigate(user.role === "mover" ? "/mover-dashboard" : "/");
+      return;
+    }
+
     fetchMyProperties();
-  }, [token, navigate]);
+  }, [token, user, navigate]);
 
   const fetchMyProperties = async () => {
     setLoading(true);
@@ -66,7 +74,6 @@ export default function LandlordDashboard() {
     }
   };
 
-  // ✅ NEW - Boost Property (Monetization)
   const handleBoost = (propertyId) => {
     navigate(`/premium-plans?propertyId=${propertyId}`);
   };
@@ -95,25 +102,17 @@ export default function LandlordDashboard() {
     <div style={styles.container}>
       <style>{cssStyles}</style>
 
-      {/* ==================== YOUR ORIGINAL PROFILE CARD ==================== */}
-     <div style={styles.profileCard}>
-  <div style={styles.profileHeader}>
-    <div style={styles.avatar}>👤</div>
-    <div style={styles.profileInfo}>
-      <h2 style={styles.profileName}>
-        {user?.name || "Landlord"}
-      </h2>
-      <p style={styles.profileEmail}>
-        {user?.email || "No email loaded"}
-      </p>
-      <p style={styles.profilePhone}>
-        {user?.phone || "No phone added"}
-      </p>
-    </div>
-    <button style={styles.logoutBtn} onClick={logout}>
-      Logout
-    </button>
-  </div>
+      {/* Profile Card */}
+      <div style={styles.profileCard}>
+        <div style={styles.profileHeader}>
+          <div style={styles.avatar}>👤</div>
+          <div style={styles.profileInfo}>
+            <h2 style={styles.profileName}>{user?.name || "Landlord"}</h2>
+            <p style={styles.profileEmail}>{user?.email || "No email loaded"}</p>
+            <p style={styles.profilePhone}>{user?.phone || "No phone added"}</p>
+          </div>
+          <button style={styles.logoutBtn} onClick={logout}>Logout</button>
+        </div>
 
         <div style={styles.statsGrid}>
           <div style={styles.statBox}>
@@ -130,15 +129,13 @@ export default function LandlordDashboard() {
           </div>
           <div style={styles.statBox}>
             <div style={styles.statNumber}>{counts.booked}</div>
-            <div style={styles.statLabel}>Booked Properties</div>
+            <div style={styles.statLabel}>Booked Units</div>
           </div>
         </div>
       </div>
 
-      {/* Header */}
       <div style={styles.header}>
         <h1 style={styles.title}>🏠 My Properties</h1>
-        <p style={styles.subtitle}>Manage your rental listings</p>
         <button onClick={() => navigate("/upload")} style={styles.uploadBtnTop}>
           ➕ Upload New Property
         </button>
@@ -147,7 +144,6 @@ export default function LandlordDashboard() {
       {successMessage && <div style={styles.successMsg}>{successMessage}</div>}
       {error && <div style={styles.errorMsg}>{error}</div>}
 
-      {/* Tabs */}
       <div style={styles.tabsContainer}>
         {[
           { key: "all",      label: "📋 All",       count: counts.all },
@@ -170,13 +166,9 @@ export default function LandlordDashboard() {
 
       {!loading && filteredProperties.length === 0 && (
         <div style={styles.empty}>
-          <p style={styles.emptyText}>
-            {activeTab === "all" ? "You have not uploaded any properties yet." : `No ${activeTab} properties found.`}
-          </p>
+          <p style={styles.emptyText}>No {activeTab === "all" ? "" : activeTab} properties found.</p>
           {activeTab === "all" && (
-            <button onClick={() => navigate("/upload")} style={styles.uploadBtn}>
-               Upload New Property
-            </button>
+            <button onClick={() => navigate("/upload")} style={styles.uploadBtnTop}>Upload Now</button>
           )}
         </div>
       )}
@@ -192,7 +184,7 @@ export default function LandlordDashboard() {
             return (
               <div key={property._id} style={styles.card}>
                 <div style={styles.imageContainer}>
-                  {property.images && property.images.length > 0 ? (
+                  {property.images?.[0] ? (
                     <img src={property.images[0]} alt={property.title} style={styles.image} />
                   ) : (
                     <div style={styles.noImage}>📷 No Image</div>
@@ -205,53 +197,23 @@ export default function LandlordDashboard() {
                 <div style={styles.content}>
                   <h3 style={styles.propertyTitle}>{property.title}</h3>
                   <p style={styles.location}>📍 {property.county} • {property.location}</p>
-                  <p style={styles.price}>KSh {Number(property.price).toLocaleString()} / month</p>
+                  <p style={styles.price}>KSh {Number(property.price).toLocaleString()}</p>
 
                   <div style={styles.specs}>
                     <span>🛏 {property.bedrooms} Beds</span>
-                    <span>🚿 {property.bathrooms} Baths</span>
                     <span>🏢 {available}/{total} units free</span>
                   </div>
 
-                  {/* ✅ Boost Button - Only for Approved Properties */}
                   {property.status === "approved" && (
-                    <button 
-                      onClick={() => handleBoost(property._id)}
-                      style={styles.boostBtn}
-                    >
-                      ⭐ Boost your property
-                    </button>
-                  )}
-
-                  {property.status === "rejected" && (
-                    <div style={styles.rejectedNote}>
-                      ⚠️ This listing was rejected. Delete it and re-submit after fixing any issues.
-                    </div>
-                  )}
-
-                  {property.status === "pending" && (
-                    <div style={styles.pendingNote}>
-                      🕐 Under review by admin. Usually takes 24–48 hours.
-                    </div>
-                  )}
-
-                  {property.status === "approved" && (
-                    <div style={styles.bookingControls}>
-                      <button 
-                        onClick={() => updateBookedUnits(property._id, 1)}
-                        disabled={available <= 0}
-                        style={styles.bookedBtn}
-                      >
-                        Mark 1 Unit Booked
+                    <>
+                      <button onClick={() => handleBoost(property._id)} style={styles.boostBtn}>
+                        ⭐ Boost Property
                       </button>
-                      <button 
-                        onClick={() => updateBookedUnits(property._id, -1)}
-                        disabled={booked <= 0}
-                        style={styles.availableBtn}
-                      >
-                        Mark 1 Unit Available
-                      </button>
-                    </div>
+                      <div style={styles.bookingControls}>
+                        <button onClick={() => updateBookedUnits(property._id, 1)} disabled={available <= 0} style={styles.bookedBtn}>Book Unit</button>
+                        <button onClick={() => updateBookedUnits(property._id, -1)} disabled={booked <= 0} style={styles.availableBtn}>Free Unit</button>
+                      </div>
+                    </>
                   )}
                 </div>
               </div>
@@ -263,82 +225,50 @@ export default function LandlordDashboard() {
   );
 }
 
-/* ====================== ALL YOUR ORIGINAL STYLES + BOOST BUTTON ====================== */
 const styles = {
-  container: { maxWidth: "1200px", margin: "0 auto", padding: "20px", background: "linear-gradient(135deg, #06101f 0%, #0f1729 100%)", minHeight: "100vh", fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI'" },
-
-  profileCard: {
-    background: "linear-gradient(135deg, #1e2937, #0f172a)",
-    borderRadius: "16px",
-    padding: "24px",
-    marginBottom: "32px",
-    border: "1px solid #334155"
-  },
+  container: { maxWidth: "1200px", margin: "0 auto", padding: "20px", background: "#06101f", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif" },
+  profileCard: { background: "#1e2937", borderRadius: "16px", padding: "24px", marginBottom: "32px", border: "1px solid #334155" },
   profileHeader: { display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" },
-  avatar: { fontSize: "52px", width: "80px", height: "80px", background: "#334155", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" },
+  avatar: { fontSize: "40px", width: "60px", height: "60px", background: "#334155", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" },
   profileInfo: { flex: 1 },
-  profileName: { margin: 0, fontSize: "1.6rem", color: "#60a5fa" },
-  profileEmail: { margin: "4px 0", color: "#94a3b8" },
-  profilePhone: { color: "#94a3b8" },
-  logoutBtn: { padding: "10px 20px", background: "#ef4444", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: 600 },
-
-  statsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "16px", marginTop: "24px" },
-  statBox: { background: "rgba(59, 130, 246, 0.1)", padding: "16px", borderRadius: "10px", textAlign: "center", border: "1px solid rgba(59, 130, 246, 0.2)" },
-  statNumber: { fontSize: "1.8rem", fontWeight: 700, color: "#60a5fa" },
-  statLabel: { color: "#94a3b8", fontSize: "0.9rem", marginTop: "4px" },
-
-  header: { textAlign: "center", marginBottom: "30px", color: "#f1f5f9" },
-  title: { fontSize: "2.5rem", margin: 0, color: "#fbbf24", fontWeight: 700 },
-  subtitle: { fontSize: "1rem", color: "#94a3b8", marginTop: "8px" },
-  uploadBtnTop: { marginTop: "16px", padding: "10px 24px", background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)", color: "white", border: "none", borderRadius: "8px", fontSize: "0.95rem", fontWeight: 600, cursor: "pointer" },
-
-  successMsg: { background: "rgba(16, 185, 129, 0.15)", border: "1px solid rgba(16, 185, 129, 0.4)", color: "#6ee7b7", padding: "12px 16px", borderRadius: "8px", marginBottom: "20px", textAlign: "center" },
-  errorMsg: { background: "rgba(239, 68, 68, 0.15)", border: "1px solid rgba(239, 68, 68, 0.4)", color: "#fca5a5", padding: "12px 16px", borderRadius: "8px", marginBottom: "20px", textAlign: "center" },
-
-  tabsContainer: { display: "flex", gap: "8px", marginBottom: "32px", borderBottom: "2px solid #1e293b", justifyContent: "center", flexWrap: "wrap" },
-  tabBtn: { background: "transparent", border: "none", padding: "12px 20px", fontSize: "0.95rem", fontWeight: 600, cursor: "pointer", transition: "all 0.3s ease", borderBottom: "3px solid transparent", marginBottom: "-2px", color: "#94a3b8" },
-  tabBtnActive: { color: "#fbbf24", borderBottomColor: "#fbbf24" },
-
-  loading: { textAlign: "center", color: "#94a3b8", fontSize: "1.1rem", padding: "40px 20px" },
-  empty: { textAlign: "center", color: "#94a3b8", padding: "60px 20px", background: "rgba(30, 41, 59, 0.5)", borderRadius: "12px", border: "2px dashed #475569" },
-  emptyText: { fontSize: "1.1rem", margin: 0 },
-
-  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "24px" },
-  card: { background: "linear-gradient(135deg, #1e293b 0%, #0f1729 100%)", border: "1px solid #334155", borderRadius: "12px", overflow: "hidden", transition: "all 0.3s ease", display: "flex", flexDirection: "column" },
-  imageContainer: { position: "relative", width: "100%", height: "200px", overflow: "hidden", background: "#0f1729" },
+  profileName: { margin: 0, fontSize: "1.4rem", color: "#60a5fa" },
+  profileEmail: { margin: "2px 0", color: "#94a3b8", fontSize: "0.9rem" },
+  profilePhone: { color: "#94a3b8", fontSize: "0.9rem" },
+  logoutBtn: { padding: "8px 16px", background: "#ef4444", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: 600 },
+  statsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "12px", marginTop: "20px" },
+  statBox: { background: "rgba(59, 130, 246, 0.1)", padding: "12px", borderRadius: "10px", textAlign: "center", border: "1px solid rgba(59, 130, 246, 0.2)" },
+  statNumber: { fontSize: "1.5rem", fontWeight: 700, color: "#60a5fa" },
+  statLabel: { color: "#94a3b8", fontSize: "0.8rem" },
+  header: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "15px" },
+  title: { color: "#fbbf24", fontSize: "1.8rem", margin: 0 },
+  uploadBtnTop: { padding: "12px 20px", background: "#3b82f6", color: "white", border: "none", borderRadius: "8px", fontWeight: 700, cursor: "pointer" },
+  successMsg: { background: "#065f46", color: "#a7f3d0", padding: "10px", borderRadius: "8px", marginBottom: "15px", textAlign: "center" },
+  errorMsg: { background: "#991b1b", color: "#fecaca", padding: "10px", borderRadius: "8px", marginBottom: "15px", textAlign: "center" },
+  tabsContainer: { display: "flex", gap: "10px", marginBottom: "25px", overflowX: "auto", paddingBottom: "10px" },
+  tabBtn: { background: "transparent", border: "none", color: "#94a3b8", padding: "10px 15px", cursor: "pointer", borderBottom: "2px solid transparent" },
+  tabBtnActive: { color: "#fbbf24", borderBottom: "2px solid #fbbf24" },
+  loading: { textAlign: "center", color: "#94a3b8" },
+  empty: { textAlign: "center", color: "#94a3b8", padding: "50px", border: "1px dashed #334155", borderRadius: "12px" },
+  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "20px" },
+  card: { background: "#0f172a", borderRadius: "12px", border: "1px solid #1e293b", overflow: "hidden" },
+  imageContainer: { height: "180px", position: "relative" },
   image: { width: "100%", height: "100%", objectFit: "cover" },
-  noImage: { width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#334155", color: "#94a3b8", fontWeight: 600 },
-  statusBadge: { position: "absolute", top: "12px", right: "12px", padding: "6px 12px", borderRadius: "20px", fontSize: "0.8rem", fontWeight: 600, color: "white" },
-  content: { padding: "20px", flex: 1, display: "flex", flexDirection: "column", gap: "8px" },
-  propertyTitle: { color: "#f1f5f9", fontSize: "1.1rem", margin: 0, fontWeight: 700 },
-  location: { color: "#94a3b8", margin: 0, fontSize: "0.9rem" },
-  price: { color: "#fbbf24", fontSize: "1.15rem", fontWeight: 700, margin: 0 },
-  specs: { display: "flex", gap: "10px", flexWrap: "wrap", fontSize: "0.85rem", color: "#cbd5e1" },
-  rejectedNote: { background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.3)", color: "#fca5a5", padding: "10px 12px", borderRadius: "8px", fontSize: "0.85rem" },
-  pendingNote: { background: "rgba(245, 158, 11, 0.1)", border: "1px solid rgba(245, 158, 11, 0.3)", color: "#fcd34d", padding: "10px 12px", borderRadius: "8px", fontSize: "0.85rem" },
-  bookingControls: { display: "flex", gap: "8px", margin: "12px 0" },
-  bookedBtn: { flex: 1, padding: "9px 12px", background: "linear-gradient(135deg, #f59e0b, #d97706)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.85rem" },
-  availableBtn: { flex: 1, padding: "9px 12px", background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.85rem" },
-
-  // ✅ NEW BOOST BUTTON STYLE
-  boostBtn: {
-    marginTop: "12px",
-    width: "100%",
-    padding: "12px",
-    background: "linear-gradient(135deg, #eab308, #ca8a04)",
-    color: "#000",
-    border: "none",
-    borderRadius: "8px",
-    fontWeight: "700",
-    fontSize: "1rem",
-    cursor: "pointer",
-  }
+  noImage: { background: "#1e293b", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" },
+  statusBadge: { position: "absolute", top: "10px", right: "10px", padding: "4px 10px", borderRadius: "12px", fontSize: "0.75rem", color: "white" },
+  content: { padding: "15px" },
+  propertyTitle: { color: "#f1f5f9", margin: "0 0 5px", fontSize: "1rem" },
+  location: { color: "#94a3b8", fontSize: "0.85rem", margin: "0 0 10px" },
+  price: { color: "#fbbf24", fontSize: "1.1rem", fontWeight: 700, margin: "0 0 10px" },
+  specs: { display: "flex", gap: "10px", fontSize: "0.8rem", color: "#cbd5e1", marginBottom: "15px" },
+  boostBtn: { width: "100%", padding: "10px", background: "#eab308", color: "#000", border: "none", borderRadius: "6px", fontWeight: 700, cursor: "pointer", marginBottom: "10px" },
+  bookingControls: { display: "flex", gap: "10px" },
+  bookedBtn: { flex: 1, padding: "8px", background: "#f59e0b", color: "white", border: "none", borderRadius: "6px", fontSize: "0.8rem" },
+  availableBtn: { flex: 1, padding: "8px", background: "#22c55e", color: "white", border: "none", borderRadius: "6px", fontSize: "0.8rem" },
 };
 
 const cssStyles = `
-  button:hover:not(:disabled) { transform: translateY(-2px); }
-  .card:hover { transform: translateY(-6px); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
-  @media (max-width: 768px) {
-    [style*="gridTemplateColumns"] { grid-template-columns: 1fr !important; }
+  button:hover { opacity: 0.9; transform: translateY(-1px); }
+  @media (max-width: 600px) {
+    [style*="header"] { flex-direction: column; text-align: center; }
   }
 `;

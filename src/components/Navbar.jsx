@@ -17,43 +17,46 @@ export default function Navbar() {
     <nav style={styles.nav}>
       <style>{css}</style>
       <div style={styles.navContainer}>
-        {/* Logo */}
-        <Link to="/" style={styles.logoContainer}>
+        
+        {/* Logo and Branding */}
+        <Link to="/" style={styles.logoContainer} onClick={() => setIsOpen(false)}>
           <img src={logo} alt="Axx Spaces" style={styles.logoImg} />
           <span style={styles.logoText}>AXX SPACES</span>
         </Link>
 
-        {/* Mobile Toggle */}
+        {/* Mobile Hamburger Button */}
         <button style={styles.menuBtn} onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? "✕" : "☰"}
         </button>
 
-        {/* Links Section */}
-        <div style={{ ...styles.navLinks, display: isOpen ? "flex" : "" }} className={isOpen ? "open" : ""}>
+        {/* Links Navigation */}
+        <div className={`nav-links ${isOpen ? "open" : ""}`} style={styles.navLinks}>
           
-          {/* 1. PUBLIC LINKS */}
+          {/* 1. ALWAYS VISIBLE PUBLIC LINKS */}
+          <Link to="/properties" style={styles.link} onClick={() => setIsOpen(false)}>Listings</Link>
+          <Link to="/movers" style={styles.link} onClick={() => setIsOpen(false)}>🚚 Movers</Link>
+
+          {/* 2. LOGGED OUT ONLY: Show Login/Register */}
           {!user && (
             <>
-              <Link to="/properties" style={styles.link}>Properties</Link>
-              <Link to="/movers" style={styles.link}>Join as Mover</Link>
-              <Link to="/login" style={styles.loginBtn}>Login</Link>
+              <Link to="/login" style={styles.link} onClick={() => setIsOpen(false)}>Login</Link>
+              <Link to="/register" style={styles.registerBtn} onClick={() => setIsOpen(false)}>Register</Link>
             </>
           )}
 
-          {/* 2. LANDLORD ONLY LINKS */}
+          {/* 3. LANDLORD LOGGED IN: Show Upload & Dashboard */}
           {user && user.role === "landlord" && (
             <>
-              <Link to="/dashboard" style={styles.link}>My Listings</Link>
-              <Link to="/add-property" style={styles.link}>➕ Upload Property</Link>
+              <Link to="/dashboard" style={styles.link} onClick={() => setIsOpen(false)}>My Dashboard</Link>
+              <Link to="/upload" style={styles.link} onClick={() => setIsOpen(false)}>➕ Upload</Link>
               <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
             </>
           )}
 
-          {/* 3. MOVER ONLY LINKS */}
+          {/* 4. MOVER LOGGED IN: Show Mover Dashboard */}
           {user && user.role === "mover" && (
             <>
-              <Link to="/mover-dashboard" style={styles.link}>My Dashboard</Link>
-              <Link to="/mover-dashboard" style={styles.link}>Available Jobs</Link>
+              <Link to="/mover-dashboard" style={styles.link} onClick={() => setIsOpen(false)}>Mover Dashboard</Link>
               <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
             </>
           )}
@@ -64,33 +67,33 @@ export default function Navbar() {
 }
 
 const styles = {
-  nav: { background: "#ffffff", borderBottom: "2px solid #f3f4f6", padding: "10px 0", position: "sticky", top: 0, zIndex: 1000 },
+  nav: { background: "#ffffff", borderBottom: "1px solid #e5e7eb", padding: "12px 0", position: "sticky", top: 0, zIndex: 1000 },
   navContainer: { maxWidth: "1200px", margin: "0 auto", padding: "0 20px", display: "flex", justifyContent: "space-between", alignItems: "center" },
   logoContainer: { display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" },
-  logoImg: { height: "40px", borderRadius: "5px" },
-  logoText: { fontWeight: "900", color: "#1f2937", fontSize: "18px", letterSpacing: "1px" },
-  menuBtn: { display: "none", fontSize: "24px", background: "none", border: "none", cursor: "pointer", color: "#1f2937" },
-  navLinks: { display: "flex", alignItems: "center", gap: "25px" },
-  link: { textDecoration: "none", color: "#4b5563", fontWeight: "600", fontSize: "14px", transition: "0.2s" },
-  loginBtn: { background: "#ef4444", color: "white", padding: "8px 20px", borderRadius: "6px", textDecoration: "none", fontWeight: "700" },
-  logoutBtn: { background: "#f3f4f6", border: "none", padding: "8px 15px", borderRadius: "6px", cursor: "pointer", fontWeight: "600", color: "#ef4444" },
+  logoImg: { height: "40px", width: "auto", borderRadius: "4px" },
+  logoText: { fontWeight: "800", color: "#111827", fontSize: "18px" },
+  menuBtn: { display: "none", fontSize: "24px", background: "none", border: "none", cursor: "pointer" },
+  navLinks: { display: "flex", alignItems: "center", gap: "20px" },
+  link: { textDecoration: "none", color: "#4b5563", fontWeight: "600", fontSize: "15px" },
+  registerBtn: { background: "#ef4444", color: "white", padding: "8px 16px", borderRadius: "6px", textDecoration: "none", fontWeight: "700" },
+  logoutBtn: { background: "#f3f4f6", color: "#ef4444", border: "none", padding: "8px 16px", borderRadius: "6px", fontWeight: "700", cursor: "pointer" },
 };
 
 const css = `
   @media (max-width: 768px) {
     button[style*="menuBtn"] { display: block !important; }
-    div[style*="navLinks"] {
-      display: none;
+    .nav-links {
+      display: none !important;
       flex-direction: column;
       position: absolute;
-      top: 60px;
+      top: 64px;
       left: 0;
       width: 100%;
       background: white;
       padding: 20px;
-      border-bottom: 2px solid #f3f4f6;
-      gap: 15px;
+      border-bottom: 1px solid #e5e7eb;
+      gap: 15px !important;
     }
-    div[style*="navLinks"].open { display: flex !important; }
+    .nav-links.open { display: flex !important; }
   }
 `;
