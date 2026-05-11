@@ -43,14 +43,14 @@ export default function Navbar() {
             style={styles.navLink} 
             onClick={() => setMenuOpen(false)}
           >
-            📊 Dashboard
+             Dashboard
           </Link>
 
           {/* USER INFO & LOGOUT */}
           <div style={styles.userSection}>
             <span style={styles.userName}>👤 {user?.name}</span>
             <button style={styles.logoutBtn} onClick={handleLogout}>
-              🚪 Logout
+              Logout
             </button>
           </div>
         </div>
@@ -82,10 +82,10 @@ export default function Navbar() {
       <div style={{ ...styles.navLinksContainer, ...(menuOpen && styles.navLinksContainerOpen) }}>
         {/* PUBLIC LINKS */}
         <Link to="/" style={styles.navLink} onClick={() => setMenuOpen(false)}>
-          🏠 Home
+          Home
         </Link>
         <Link to="/listings" style={styles.navLink} onClick={() => setMenuOpen(false)}>
-          📋 Listings
+          Listings
         </Link>
         
         {/* MOVERS LINK */}
@@ -97,7 +97,7 @@ export default function Navbar() {
         {token && user ? (
           <>
             <Link to="/upload" style={styles.navLink} onClick={() => setMenuOpen(false)}>
-              ➕ Upload
+              Upload
             </Link>
             <Link to="/dashboard" style={styles.navLink} onClick={() => setMenuOpen(false)}>
               📊 Dashboard
@@ -107,7 +107,7 @@ export default function Navbar() {
             <div style={styles.userSection}>
               <span style={styles.userName}>👤 {user.name}</span>
               <button style={styles.logoutBtn} onClick={handleLogout}>
-                🚪 Logout
+                Logout
               </button>
             </div>
           </>
@@ -115,10 +115,10 @@ export default function Navbar() {
           /* UNAUTHENTICATED LINKS */
           <>
             <Link to="/login" style={styles.loginLink} onClick={() => setMenuOpen(false)}>
-              🔐 Login
+              Login
             </Link>
             <Link to="/register" style={styles.registerLink} onClick={() => setMenuOpen(false)}>
-              📝 Register
+              Register
             </Link>
           </>
         )}
