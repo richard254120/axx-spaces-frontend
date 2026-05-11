@@ -41,34 +41,6 @@ export default function Home() {
     "💰 Zero Hidden Fees — Ever",
     "🎉 Over 5,000 Happy Tenants and Counting!",
   ];
-
-  const testimonials = [
-    {
-      name: "Amina Wanjiru",
-      location: "Nairobi",
-      text: "Found my dream apartment in Westlands within 2 days. The WhatsApp contact feature saved me so much time — no agents, no hassle!",
-      rating: 5,
-      avatar: "AW",
-      color: "#3b82f6",
-    },
-    {
-      name: "Brian Otieno",
-      location: "Kisumu",
-      text: "As a landlord, boosting my property got me 3 serious tenants in one week. Axx Spaces is genuinely the best platform in Kenya.",
-      rating: 5,
-      avatar: "BO",
-      color: "#22c55e",
-    },
-    {
-      name: "Fatuma Hassan",
-      location: "Mombasa",
-      text: "The verified listings gave me confidence. I knew exactly what I was getting before I even visited. Professional and trustworthy.",
-      rating: 5,
-      avatar: "FH",
-      color: "#f59e0b",
-    },
-  ];
-
   const howItWorks = [
     { step: "01", icon: "🔍", title: "Search", desc: "Filter by county and property type to find your match instantly." },
     { step: "02", icon: "🏠", title: "Explore", desc: "Browse photos, maps, and full details of verified listings." },
@@ -365,34 +337,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── LANDLORD BANNER ── */}
-      <section style={styles.landlordBanner}>
-        <div style={styles.landlordContent}>
-          <div style={styles.landlordLeft}>
-            <span style={styles.landlordBadge}>FOR LANDLORDS</span>
-            <h2 style={styles.landlordTitle}>List Your Property,<br />Reach 50,000+ Tenants</h2>
-            <p style={styles.landlordDesc}>
-              Free listing. Paid boosting for priority placement. No commissions.
-            </p>
-            <div style={styles.landlordPerks}>
-              {[
-                "✅ Free to list",
-                "📊 Track views & enquiries",
-                "🚀 Boost for KSh 500/week",
-                "💬 Instant tenant contact",
-              ].map((p) => (
-                <span key={p} style={styles.perkItem}>{p}</span>
-              ))}
-            </div>
-          </div>
-          <div style={styles.landlordRight}>
-            <button style={styles.landlordBtn} onClick={handleListProperty}>
-              {token ? "📝 Upload Your Property" : "🔐 Get Started Free"}
-            </button>
-            {!token && <p style={styles.landlordHint}>No credit card required</p>}
-          </div>
-        </div>
-      </section>
+    
 
       {/* ── WHY AXX SPACES ── */}
       <section style={styles.featuresSection}>
