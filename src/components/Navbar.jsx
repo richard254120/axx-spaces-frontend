@@ -41,6 +41,11 @@ export default function Navbar() {
         <Link to="/listings" style={styles.navLink} onClick={() => setMenuOpen(false)}>
           📋 Listings
         </Link>
+        
+        {/* ✅ NEW MOVERS LINK */}
+        <Link to="/movers" style={styles.navLink} onClick={() => setMenuOpen(false)}>
+          🚚 Movers
+        </Link>
 
         {/* AUTHENTICATED LANDLORD LINKS */}
         {token && user ? (
