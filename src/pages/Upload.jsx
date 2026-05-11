@@ -23,7 +23,7 @@ const COUNTIES = [
   "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
   "Garissa","Wajir","Mandera","Marsabit","Isiolo","Meru","Tharaka Nithi",
   "Embu","Kitui","Machakos","Makueni","Nyandarua","Nyeri","Kirinyaga",
-  "Murang’a","Kiambu","Turkana","West Pokot","Samburu","Trans Nzoia",
+  "Murang'a","Kiambu","Turkana","West Pokot","Samburu","Trans Nzoia",
   "Uasin Gishu","Elgeyo Marakwet","Nandi","Baringo","Laikipia","Nakuru",
   "Narok","Kajiado","Kericho","Bomet","Kakamega","Vihiga","Bungoma",
   "Busia","Siaya","Kisumu","Homa Bay","Migori","Kisii","Nyamira",
@@ -61,6 +61,7 @@ export default function Upload() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [activeSection, setActiveSection] = useState("basic");
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -97,7 +98,7 @@ export default function Upload() {
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     if (files.length + images.length > 10) {
-      setError("⚠️ Maximum 10 images allowed");
+      setError("Maximum 10 images allowed");
       return;
     }
     setImages((prev) => [...prev, ...files]);
@@ -112,7 +113,7 @@ export default function Upload() {
 
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
-      setError("❌ Geolocation is not supported by your browser");
+      setError("Geolocation not supported");
       return;
     }
     navigator.geolocation.getCurrentPosition(
@@ -123,7 +124,7 @@ export default function Upload() {
           lng: position.coords.longitude.toFixed(6),
         }));
       },
-      () => setError("❌ Unable to get location. Please enter manually.")
+      () => setError("Unable to get location. Enter manually.")
     );
   };
 
@@ -135,19 +136,19 @@ export default function Upload() {
     if (!formData.title || !formData.description || !formData.location ||
         !formData.price || !formData.bedrooms || !formData.bathrooms ||
         !formData.propertyType || !formData.county) {
-      setError("❌ Please fill all required fields");
+      setError("Fill all required fields");
       return;
     }
     if (images.length === 0) {
-      setError("❌ Please upload at least one image");
+      setError("Upload at least one image");
       return;
     }
     if (formData.amenities.length === 0) {
-      setError("❌ Please select at least one amenity");
+      setError("Select at least one amenity");
       return;
     }
     if (formData.bookedUnits > formData.totalUnits) {
-      setError("❌ Booked units cannot be more than total units");
+      setError("Booked units cannot exceed total units");
       return;
     }
 
@@ -170,7 +171,6 @@ export default function Upload() {
 
       images.forEach((image) => formDataToSend.append("images", image));
 
-      // ✅ FIXED: Correct endpoint
       const response = await fetch(`${API_BASE}/properties`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
@@ -179,15 +179,10 @@ export default function Upload() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || errorData.error || `Server error: ${response.status}`);
+        throw new Error(errorData.message || errorData.error || "Upload failed");
       }
 
-      const result = await response.json();
-      console.log("Upload success:", result);
-
-      setSuccess("✅ Property submitted successfully! Pending admin approval. You can mark units as booked/unbooked from your dashboard.");
-
-      // Reset form
+      setSuccess("Property submitted! Pending admin approval.");
       setFormData({
         title: "", description: "", location: "", price: "", deposit: "",
         bedrooms: "", bathrooms: "", amenities: [], totalUnits: 1,
@@ -200,8 +195,7 @@ export default function Upload() {
 
       setTimeout(() => navigate("/dashboard"), 2800);
     } catch (err) {
-      console.error("Upload error:", err);
-      setError(err.message || "Error uploading property. Please try again.");
+      setError(err.message || "Error uploading property");
     } finally {
       setLoading(false);
     }
@@ -212,7 +206,7 @@ export default function Upload() {
       <div style={styles.container}>
         <style>{cssStyles}</style>
         <div style={styles.unauth}>
-          <p>🔐 Please login to upload a property</p>
+          <p>Login to upload a property</p>
           <button onClick={() => navigate("/login")} style={styles.loginBtn}>Go to Login</button>
         </div>
       </div>
@@ -222,31 +216,54 @@ export default function Upload() {
   return (
     <div style={styles.container}>
       <style>{cssStyles}</style>
-      <div style={styles.formBox}>
-        <h1 style={styles.heading}>📝 Upload Your Property</h1>
-        <p style={styles.subtitle}>List your rental property on Axx Spaces</p>
+      
+      <div style={styles.header}>
+        <h1 style={styles.heading}>Upload Property</h1>
+        <button style={styles.backBtn} onClick={() => navigate("/dashboard")}>←</button>
+      </div>
 
-        {error && <div style={styles.errorBox}>{error}</div>}
-        {success && <div style={styles.successBox}>{success}</div>}
+      {error && <div style={styles.errorBox}>{error}</div>}
+      {success && <div style={styles.successBox}>{success}</div>}
 
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Property Title <span style={styles.required}>*</span></label>
-            <input type="text" name="title" placeholder="e.g., Modern 2BR Apartment with balcony" value={formData.title} onChange={handleChange} style={styles.input} required />
-          </div>
+      {/* SECTION TABS */}
+      <div style={styles.sectionTabs}>
+        {["basic", "details", "images", "amenities"].map((section) => (
+          <button
+            key={section}
+            style={{...styles.sectionTab, ...(activeSection === section && styles.sectionTabActive)}}
+            onClick={() => setActiveSection(section)}
+          >
+            {section === "basic" && "📋"}
+            {section === "details" && "🏠"}
+            {section === "images" && "📷"}
+            {section === "amenities" && "✨"}
+          </button>
+        ))}
+      </div>
 
-          <div style={styles.formRow}>
+      <form onSubmit={handleSubmit} style={styles.form}>
+        {/* BASIC INFO */}
+        {activeSection === "basic" && (
+          <div style={styles.section}>
+            <h2 style={styles.sectionTitle}>Basic Info</h2>
+
             <div style={styles.formGroup}>
-              <label style={styles.label}>Property Type <span style={styles.required}>*</span></label>
+              <label style={styles.label}>Title *</label>
+              <input type="text" name="title" placeholder="Modern 2BR Apartment" value={formData.title} onChange={handleChange} style={styles.input} required />
+            </div>
+
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Property Type *</label>
               <select name="propertyType" value={formData.propertyType} onChange={handleChange} style={styles.input} required>
-                <option value="">Select Property Type</option>
+                <option value="">Select Type</option>
                 {PROPERTY_TYPES.map(type => (
                   <option key={type} value={type}>{type}</option>
                 ))}
               </select>
             </div>
+
             <div style={styles.formGroup}>
-              <label style={styles.label}>County <span style={styles.required}>*</span></label>
+              <label style={styles.label}>County *</label>
               <select name="county" value={formData.county} onChange={handleChange} style={styles.input} required>
                 <option value="">Select County</option>
                 {COUNTIES.map(county => (
@@ -254,210 +271,464 @@ export default function Upload() {
                 ))}
               </select>
             </div>
-          </div>
 
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Location <span style={styles.required}>*</span></label>
-            <input type="text" name="location" placeholder="e.g., Nairobi, Westlands" value={formData.location} onChange={handleChange} style={styles.input} required />
-          </div>
-
-          <div style={styles.formRow}>
             <div style={styles.formGroup}>
-              <label style={styles.label}>Latitude</label>
-              <input type="number" name="lat" step="0.000001" placeholder="e.g., -1.2921" value={formData.lat} onChange={handleChange} style={styles.input} />
+              <label style={styles.label}>Location *</label>
+              <input type="text" name="location" placeholder="e.g., Westlands" value={formData.location} onChange={handleChange} style={styles.input} required />
             </div>
+
+            <button type="button" onClick={() => setActiveSection("details")} style={styles.nextBtn}>
+              Next →
+            </button>
+          </div>
+        )}
+
+        {/* DETAILS */}
+        {activeSection === "details" && (
+          <div style={styles.section}>
+            <h2 style={styles.sectionTitle}>Details</h2>
+
             <div style={styles.formGroup}>
-              <label style={styles.label}>Longitude</label>
-              <input type="number" name="lng" step="0.000001" placeholder="e.g., 36.8219" value={formData.lng} onChange={handleChange} style={styles.input} />
+              <label style={styles.label}>Description *</label>
+              <textarea name="description" placeholder="Describe your property..." value={formData.description} onChange={handleChange} style={styles.textarea} rows="4" required />
+            </div>
+
+            <div style={styles.twoCol}>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Price (KES) *</label>
+                <input type="number" name="price" placeholder="50000" value={formData.price} onChange={handleChange} style={styles.input} required />
+              </div>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Deposit (KES)</label>
+                <input type="number" name="deposit" placeholder="50000" value={formData.deposit} onChange={handleChange} style={styles.input} />
+              </div>
+            </div>
+
+            <div style={styles.twoCol}>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Bedrooms *</label>
+                <input type="number" name="bedrooms" placeholder="2" value={formData.bedrooms} onChange={handleChange} style={styles.input} required />
+              </div>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Bathrooms *</label>
+                <input type="number" name="bathrooms" placeholder="1" value={formData.bathrooms} onChange={handleChange} style={styles.input} required />
+              </div>
+            </div>
+
+            <div style={styles.twoCol}>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Furnished</label>
+                <select name="furnished" value={String(formData.furnished)} onChange={handleChange} style={styles.input}>
+                  <option value="false">Unfurnished</option>
+                  <option value="true">Furnished</option>
+                </select>
+              </div>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Lease Type</label>
+                <select name="leaseType" value={formData.leaseType} onChange={handleChange} style={styles.input}>
+                  <option value="monthly">Monthly</option>
+                  <option value="6months">6 Months</option>
+                  <option value="yearly">Yearly</option>
+                </select>
+              </div>
+            </div>
+
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Available From</label>
+              <input type="date" name="availableFrom" value={formData.availableFrom} onChange={handleChange} style={styles.input} />
+            </div>
+
+            <div style={styles.formGroup}>
+              <label style={styles.label}>House Rules</label>
+              <textarea name="rules" placeholder="e.g., No pets..." value={formData.rules} onChange={handleChange} style={styles.textarea} rows="3" />
+            </div>
+
+            <div style={styles.navBtns}>
+              <button type="button" onClick={() => setActiveSection("basic")} style={styles.prevBtn}>← Back</button>
+              <button type="button" onClick={() => setActiveSection("images")} style={styles.nextBtn}>Next →</button>
             </div>
           </div>
-          <button type="button" onClick={getCurrentLocation} style={styles.geoBtn}>
-            📍 Get Current Location
-          </button>
+        )}
 
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Description <span style={styles.required}>*</span></label>
-            <textarea 
-              name="description" 
-              placeholder="Describe your property in detail..." 
-              value={formData.description} 
-              onChange={handleChange} 
-              style={styles.textarea} 
-              rows="6" 
-              required 
-            />
-          </div>
+        {/* IMAGES */}
+        {activeSection === "images" && (
+          <div style={styles.section}>
+            <h2 style={styles.sectionTitle}>Images</h2>
 
-          <div style={styles.formRow}>
             <div style={styles.formGroup}>
-              <label style={styles.label}>Monthly Price (KES) <span style={styles.required}>*</span></label>
-              <input type="number" name="price" placeholder="45000" value={formData.price} onChange={handleChange} style={styles.input} min="0" required />
-            </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Deposit (KES)</label>
-              <input type="number" name="deposit" placeholder="45000" value={formData.deposit} onChange={handleChange} style={styles.input} min="0" />
-            </div>
-          </div>
+              <label style={styles.label}>Upload Images ({images.length}/10) *</label>
+              <div style={styles.imageUploadBox}>
+                <input type="file" multiple accept="image/*" onChange={handleImageChange} style={styles.fileInput} id="imageInput" />
+                <label htmlFor="imageInput" style={styles.fileLabel}>
+                  <div style={styles.uploadIcon}>📷</div>
+                  <p>Tap to select images</p>
+                </label>
+              </div>
 
-          <div style={styles.formRow}>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Bedrooms <span style={styles.required}>*</span></label>
-              <input type="number" name="bedrooms" placeholder="2" value={formData.bedrooms} onChange={handleChange} style={styles.input} min="0" required />
+              {imagePreviews.length > 0 && (
+                <div style={styles.previewContainer}>
+                  {imagePreviews.map((preview, index) => (
+                    <div key={index} style={styles.previewBox}>
+                      <img src={preview} alt={`Preview ${index + 1}`} style={styles.previewImg} />
+                      <button type="button" onClick={() => removeImage(index)} style={styles.removeBtn}>✕</button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Bathrooms <span style={styles.required}>*</span></label>
-              <input type="number" name="bathrooms" placeholder="1" value={formData.bathrooms} onChange={handleChange} style={styles.input} min="0" required />
+
+            <div style={styles.navBtns}>
+              <button type="button" onClick={() => setActiveSection("details")} style={styles.prevBtn}>← Back</button>
+              <button type="button" onClick={() => setActiveSection("amenities")} style={styles.nextBtn}>Next →</button>
             </div>
           </div>
+        )}
 
-          <div style={styles.formRow}>
+        {/* AMENITIES */}
+        {activeSection === "amenities" && (
+          <div style={styles.section}>
+            <h2 style={styles.sectionTitle}>Amenities</h2>
+
             <div style={styles.formGroup}>
-              <label style={styles.label}>Furnished</label>
-              <select name="furnished" value={String(formData.furnished)} onChange={handleChange} style={styles.input}>
-                <option value="false">Unfurnished</option>
-                <option value="true">Fully Furnished</option>
-              </select>
-            </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Lease Type</label>
-              <select name="leaseType" value={formData.leaseType} onChange={handleChange} style={styles.input}>
-                <option value="monthly">Monthly</option>
-                <option value="6months">6 Months</option>
-                <option value="yearly">Yearly</option>
-              </select>
-            </div>
-          </div>
-
-          <div style={styles.formRow}>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Total Units</label>
-              <input type="number" name="totalUnits" placeholder="1" value={formData.totalUnits} onChange={handleChange} style={styles.input} min="1" />
-            </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Initial Booked Units</label>
-              <input type="number" name="bookedUnits" placeholder="0" value={formData.bookedUnits} onChange={handleChange} style={styles.input} min="0" />
-            </div>
-          </div>
-
-          <div style={styles.formGroup}>
-            <label style={styles.label}>
-              <input 
-                type="checkbox" 
-                name="initiallyBooked" 
-                checked={formData.initiallyBooked} 
-                onChange={handleChange} 
-                style={{ marginRight: "8px" }}
-              />
-              Mark this property as partially booked on upload
-            </label>
-          </div>
-
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Available From</label>
-            <input type="date" name="availableFrom" value={formData.availableFrom} onChange={handleChange} style={styles.input} />
-          </div>
-
-          <div style={styles.formGroup}>
-            <label style={styles.label}>House Rules</label>
-            <textarea name="rules" placeholder="e.g., No pets, No smoking indoors..." value={formData.rules} onChange={handleChange} style={styles.textarea} rows="3" />
-          </div>
-
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Upload Images (Max 10) <span style={styles.required}>*</span></label>
-            <div style={styles.imageUploadBox}>
-              <input type="file" multiple accept="image/*" onChange={handleImageChange} style={styles.fileInput} id="imageInput" />
-              <label htmlFor="imageInput" style={styles.fileLabel}>
-                <div style={styles.uploadIcon}>📷</div>
-                <p>Click to select or drag images here</p>
-                <p style={styles.uploadSubtext}>{images.length}/10 images selected</p>
-              </label>
-            </div>
-            {imagePreviews.length > 0 && (
-              <div style={styles.previewContainer}>
-                {imagePreviews.map((preview, index) => (
-                  <div key={index} style={styles.previewBox}>
-                    <img src={preview} alt={`Preview ${index + 1}`} style={styles.previewImg} />
-                    <button type="button" onClick={() => removeImage(index)} style={styles.removeBtn}>✕</button>
-                  </div>
+              <label style={styles.label}>Select Amenities * ({formData.amenities.length})</label>
+              <div style={styles.amenitiesGrid}>
+                {AMENITIES_LIST.map((amenity) => (
+                  <button
+                    key={amenity}
+                    type="button"
+                    onClick={() => handleAmenityToggle(amenity)}
+                    style={{
+                      ...styles.amenityBtn,
+                      ...(formData.amenities.includes(amenity) ? styles.amenityBtnSelected : styles.amenityBtnUnselected),
+                    }}
+                  >
+                    {formData.amenities.includes(amenity) ? "✓" : "○"} {amenity}
+                  </button>
                 ))}
               </div>
-            )}
-          </div>
-
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Amenities <span style={styles.required}>*</span></label>
-            <div style={styles.amenitiesGrid}>
-              {AMENITIES_LIST.map((amenity) => (
-                <button
-                  key={amenity}
-                  type="button"
-                  onClick={() => handleAmenityToggle(amenity)}
-                  style={{
-                    ...styles.amenityBtn,
-                    ...(formData.amenities.includes(amenity) ? styles.amenityBtnSelected : styles.amenityBtnUnselected),
-                  }}
-                >
-                  {formData.amenities.includes(amenity) ? "✓ " : ""}{amenity}
-                </button>
-              ))}
             </div>
+
+            <div style={styles.navBtns}>
+              <button type="button" onClick={() => setActiveSection("images")} style={styles.prevBtn}>← Back</button>
+            </div>
+
+            <button type="submit" disabled={loading} style={{...styles.submitBtn, opacity: loading ? 0.7 : 1}}>
+              {loading ? "Uploading..." : "Upload Property"}
+            </button>
           </div>
-
-          <button type="submit" disabled={loading} style={{ ...styles.submitBtn, opacity: loading ? 0.7 : 1, cursor: loading ? "not-allowed" : "pointer" }}>
-            {loading ? "⏳ Uploading Property..." : "🚀 Upload Property"}
-          </button>
-        </form>
-
-        <p style={styles.disclaimer}>
-          ℹ️ Your property will be reviewed by our admin team. After approval, you can mark units as booked/unbooked from your dashboard.
-        </p>
-      </div>
+        )}
+      </form>
     </div>
   );
 }
 
 const styles = {
-  container: { minHeight: "100vh", background: "linear-gradient(135deg, #06101f 0%, #0a1428 100%)", padding: "40px 20px", fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont" },
-  formBox: { maxWidth: "700px", margin: "0 auto", background: "rgba(10, 20, 40, 0.9)", border: "1px solid rgba(59, 130, 246, 0.2)", backdropFilter: "blur(10px)", borderRadius: "20px", padding: "50px 40px", boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)" },
-  heading: { color: "#f1f5f9", fontSize: "28px", fontWeight: 800, margin: "0 0 8px", textAlign: "center" },
-  subtitle: { color: "#94a3b8", fontSize: "14px", textAlign: "center", margin: "0 0 32px" },
-  errorBox: { background: "rgba(239, 68, 68, 0.15)", border: "1px solid rgba(239, 68, 68, 0.5)", color: "#fca5a5", padding: "12px 16px", borderRadius: "10px", marginBottom: "20px", fontSize: "14px", fontWeight: 500 },
-  successBox: { background: "rgba(34, 197, 94, 0.15)", border: "1px solid rgba(34, 197, 94, 0.5)", color: "#86efac", padding: "12px 16px", borderRadius: "10px", marginBottom: "20px", fontSize: "14px", fontWeight: 500 },
-  form: { display: "flex", flexDirection: "column", gap: "24px" },
-  formGroup: { display: "flex", flexDirection: "column", gap: "8px" },
-  formRow: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" },
-  label: { color: "#cbd5e1", fontSize: "13px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" },
-  required: { color: "#ef4444", fontWeight: 700 },
-  input: { padding: "14px 16px", background: "rgba(30, 41, 59, 0.8)", border: "1px solid rgba(148, 163, 184, 0.2)", borderRadius: "10px", color: "#f1f5f9", fontSize: "15px", fontFamily: "inherit", transition: "all 0.2s", outline: "none" },
-  textarea: { padding: "14px 16px", background: "rgba(30, 41, 59, 0.8)", border: "1px solid rgba(148, 163, 184, 0.2)", borderRadius: "10px", color: "#f1f5f9", fontSize: "15px", fontFamily: "inherit", transition: "all 0.2s", outline: "none", resize: "vertical" },
-  imageUploadBox: { position: "relative", border: "2px dashed rgba(59, 130, 246, 0.5)", borderRadius: "10px", padding: "40px 20px", textAlign: "center", background: "rgba(59, 130, 246, 0.05)", transition: "all 0.3s ease", cursor: "pointer" },
-  fileInput: { display: "none" },
-  fileLabel: { cursor: "pointer", display: "block", color: "#94a3b8" },
-  uploadIcon: { fontSize: "48px", marginBottom: "12px" },
-  uploadSubtext: { color: "#94a3b8", fontSize: "12px", margin: "8px 0 0 0" },
-  previewContainer: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))", gap: "12px", marginTop: "16px" },
-  previewBox: { position: "relative", width: "100%", aspectRatio: "1", borderRadius: "8px", overflow: "hidden", background: "#1e293b" },
-  previewImg: { width: "100%", height: "100%", objectFit: "cover" },
-  removeBtn: { position: "absolute", top: "4px", right: "4px", background: "rgba(239, 68, 68, 0.9)", border: "none", color: "white", width: "24px", height: "24px", borderRadius: "50%", cursor: "pointer", fontSize: "12px", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" },
-  amenitiesGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", gap: "8px" },
-  amenityBtn: { padding: "10px 12px", border: "1px solid rgba(148, 163, 184, 0.2)", borderRadius: "8px", fontSize: "13px", fontWeight: 600, cursor: "pointer", transition: "all 0.2s ease", textAlign: "center" },
-  amenityBtnUnselected: { background: "rgba(30, 41, 59, 0.8)", color: "#cbd5e1" },
-  amenityBtnSelected: { background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)", color: "white", border: "1px solid #3b82f6" },
-  submitBtn: { padding: "14px 24px", background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "#fff", border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 700, marginTop: "16px", transition: "all 0.3s", boxShadow: "0 8px 24px rgba(34, 197, 94, 0.4)" },
-  disclaimer: { textAlign: "center", color: "#64748b", fontSize: "12px", marginTop: "20px" },
-  unauth: { textAlign: "center", color: "#94a3b8", padding: "60px 20px", background: "rgba(30, 41, 59, 0.5)", borderRadius: "12px", border: "2px dashed #475569" },
-  loginBtn: { marginTop: "20px", padding: "12px 24px", background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)", color: "white", border: "none", borderRadius: "8px", fontSize: "1rem", fontWeight: 600, cursor: "pointer" },
-  geoBtn: { padding: "10px 16px", background: "linear-gradient(135deg, #0a84ff, #0066cc)", color: "#fff", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "14px", marginTop: "8px" },
+  container: {
+    background: "#06101f",
+    minHeight: "100vh",
+    fontFamily: "'DM Sans', sans-serif",
+    color: "#f1f5f9",
+    padding: "0",
+  },
+
+  header: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "16px",
+    borderBottom: "1px solid #1e293b",
+    background: "#0f1729",
+  },
+
+  heading: {
+    margin: 0,
+    fontSize: "20px",
+    fontWeight: 800,
+    color: "#fbbf24",
+  },
+
+  backBtn: {
+    background: "#1e293b",
+    border: "none",
+    color: "#fbbf24",
+    fontSize: "20px",
+    padding: "8px 12px",
+    borderRadius: "6px",
+    cursor: "pointer",
+  },
+
+  sectionTabs: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr 1fr 1fr",
+    gap: "0",
+    padding: "12px",
+    background: "#1e293b",
+  },
+
+  sectionTab: {
+    background: "#0f1729",
+    border: "none",
+    color: "#94a3b8",
+    padding: "12px 8px",
+    fontSize: "20px",
+    cursor: "pointer",
+    transition: "all 0.2s",
+  },
+
+  sectionTabActive: {
+    background: "#fbbf24",
+    color: "#0f1729",
+  },
+
+  form: {
+    padding: "16px",
+  },
+
+  section: {
+    animation: "fadeIn 0.3s ease",
+  },
+
+  sectionTitle: {
+    margin: "0 0 16px",
+    fontSize: "18px",
+    fontWeight: 700,
+    color: "#fbbf24",
+  },
+
+  formGroup: {
+    marginBottom: "16px",
+  },
+
+  label: {
+    display: "block",
+    fontSize: "12px",
+    fontWeight: 700,
+    color: "#cbd5e1",
+    marginBottom: "6px",
+    textTransform: "uppercase",
+  },
+
+  input: {
+    width: "100%",
+    padding: "12px",
+    background: "#1e293b",
+    border: "1px solid #334155",
+    borderRadius: "8px",
+    color: "#f1f5f9",
+    fontSize: "14px",
+    fontFamily: "inherit",
+    boxSizing: "border-box",
+  },
+
+  textarea: {
+    width: "100%",
+    padding: "12px",
+    background: "#1e293b",
+    border: "1px solid #334155",
+    borderRadius: "8px",
+    color: "#f1f5f9",
+    fontSize: "14px",
+    fontFamily: "inherit",
+    boxSizing: "border-box",
+    resize: "vertical",
+  },
+
+  twoCol: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "12px",
+  },
+
+  imageUploadBox: {
+    border: "2px dashed #334155",
+    borderRadius: "8px",
+    padding: "24px 12px",
+    textAlign: "center",
+    background: "#1e293b",
+    cursor: "pointer",
+  },
+
+  fileInput: {
+    display: "none",
+  },
+
+  fileLabel: {
+    cursor: "pointer",
+    display: "block",
+    color: "#94a3b8",
+  },
+
+  uploadIcon: {
+    fontSize: "32px",
+    marginBottom: "8px",
+  },
+
+  previewContainer: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(70px, 1fr))",
+    gap: "10px",
+    marginTop: "12px",
+  },
+
+  previewBox: {
+    position: "relative",
+    aspectRatio: "1",
+    borderRadius: "8px",
+    overflow: "hidden",
+    background: "#334155",
+  },
+
+  previewImg: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+  },
+
+  removeBtn: {
+    position: "absolute",
+    top: "2px",
+    right: "2px",
+    background: "#ef4444",
+    border: "none",
+    color: "white",
+    width: "20px",
+    height: "20px",
+    borderRadius: "50%",
+    cursor: "pointer",
+    fontSize: "10px",
+  },
+
+  amenitiesGrid: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "8px",
+  },
+
+  amenityBtn: {
+    padding: "10px 8px",
+    border: "1px solid #334155",
+    borderRadius: "6px",
+    fontSize: "12px",
+    fontWeight: 600,
+    cursor: "pointer",
+    transition: "all 0.2s",
+    background: "#1e293b",
+    color: "#cbd5e1",
+  },
+
+  amenityBtnSelected: {
+    background: "#3b82f6",
+    color: "white",
+    border: "1px solid #3b82f6",
+  },
+
+  amenityBtnUnselected: {
+    background: "#1e293b",
+    color: "#cbd5e1",
+  },
+
+  navBtns: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "10px",
+    marginTop: "20px",
+  },
+
+  prevBtn: {
+    padding: "12px",
+    background: "#334155",
+    color: "#f1f5f9",
+    border: "none",
+    borderRadius: "8px",
+    fontWeight: 700,
+    cursor: "pointer",
+    fontSize: "14px",
+  },
+
+  nextBtn: {
+    padding: "12px",
+    background: "#3b82f6",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    fontWeight: 700,
+    cursor: "pointer",
+    fontSize: "14px",
+  },
+
+  submitBtn: {
+    width: "100%",
+    padding: "14px",
+    background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "15px",
+    fontWeight: 700,
+    cursor: "pointer",
+    marginTop: "16px",
+  },
+
+  errorBox: {
+    background: "rgba(239, 68, 68, 0.2)",
+    border: "1px solid #ef4444",
+    color: "#fca5a5",
+    padding: "12px 16px",
+    margin: "16px",
+    borderRadius: "8px",
+    fontSize: "13px",
+  },
+
+  successBox: {
+    background: "rgba(34, 197, 94, 0.2)",
+    border: "1px solid #22c55e",
+    color: "#86efac",
+    padding: "12px 16px",
+    margin: "16px",
+    borderRadius: "8px",
+    fontSize: "13px",
+  },
+
+  unauth: {
+    textAlign: "center",
+    padding: "60px 20px",
+    color: "#94a3b8",
+  },
+
+  loginBtn: {
+    marginTop: "20px",
+    padding: "12px 24px",
+    background: "#3b82f6",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontWeight: 700,
+  },
 };
 
 const cssStyles = `
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
   input:focus, textarea:focus, select:focus {
-    border-color: rgba(59, 130, 246, 0.8) !important;
-    background: rgba(30, 41, 59, 1) !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: #3b82f6 !important;
+    background: #334155 !important;
+    outline: none;
   }
-  button:hover:not(:disabled) { transform: translateY(-2px); }
-  @media (max-width: 600px) {
-    [style*="gridTemplateColumns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
+
+  button:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @media (max-width: 480px) {
+    [style*="padding: 16px"] {
+      padding: 12px !important;
+    }
   }
 `;
