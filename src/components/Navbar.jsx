@@ -23,7 +23,7 @@ export default function Navbar() {
         {/* TOP SECTION - LOGO + TITLE + HAMBURGER */}
         <div style={styles.topSection}>
           <Link to="/mover-dashboard" style={styles.logoContainer}>
-            <img src={logo} alt="Axx Spaces" style={styles.image} />
+            <img src={image} alt="Axx Spaces" style={styles.image} />
             <div style={styles.titleSection}>
               <span style={styles.brandName}>Axx Movers</span>
             </div>
