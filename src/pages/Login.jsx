@@ -47,23 +47,29 @@ export default function Login() {
         throw new Error(data.error || "Login failed");
       }
 
-      // 1. Log the user in (Save token/data to Context)
+      // 1. Save data to AuthContext
       login(data.token, data.user);
 
-      // 2. Redirect logic based on role
+      // 2. Normalize role for comparison (prevents "Landlord" vs "landlord" issues)
+      const userRole = data.user?.role?.toLowerCase().trim();
+      console.log("Logged in user role:", userRole); // Debugging
+
       setSuccess("✅ Login successful! Redirecting...");
 
+      // 3. Perform Redirect
       setTimeout(() => {
-        if (data.user?.role === "landlord") {
-          navigate("/dashboard"); // Redirect Landlord to their dashboard
-        } else if (data.user?.role === "mover") {
-          navigate("/mover-dashboard"); // Redirect Mover to their dashboard
+        if (userRole === "landlord") {
+          navigate("/dashboard"); 
+        } else if (userRole === "mover") {
+          navigate("/mover-dashboard");
         } else {
-          navigate("/"); // Default fallback
+          console.warn("Unexpected role, going home:", userRole);
+          navigate("/"); 
         }
-      }, 1500);
+      }, 1000);
 
     } catch (err) {
+      console.error("Login Error:", err);
       setError(err.message || "❌ Login failed. Please try again.");
     } finally {
       setLoading(false);
@@ -74,7 +80,6 @@ export default function Login() {
     <div style={styles.root}>
       <style>{css}</style>
       <div style={styles.container}>
-        
         <div style={styles.logoSection}>
           <img src={logo} alt="Axx Spaces" style={styles.logo} />
         </div>
@@ -141,26 +146,13 @@ export default function Login() {
   );
 }
 
+// ... styles and css variables stay exactly as you had them
 const styles = {
-  root: {
-    fontFamily: "'DM Sans', sans-serif",
-    background: "linear-gradient(135deg, #ffffff 0%, #fef3e2 50%, #fef9e7 100%)",
-    minHeight: "100vh",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "20px",
-  },
+  root: { fontFamily: "'DM Sans', sans-serif", background: "linear-gradient(135deg, #ffffff 0%, #fef3e2 50%, #fef9e7 100%)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" },
   container: { width: "100%", maxWidth: "450px" },
   logoSection: { textAlign: "center", marginBottom: "30px" },
   logo: { height: "70px", width: "auto" },
-  formBox: {
-    background: "white",
-    border: "2px solid #fbbf24",
-    borderRadius: "16px",
-    padding: "40px 32px",
-    boxShadow: "0 10px 40px rgba(0, 0, 0, 0.08)",
-  },
+  formBox: { background: "white", border: "2px solid #fbbf24", borderRadius: "16px", padding: "40px 32px", boxShadow: "0 10px 40px rgba(0, 0, 0, 0.08)" },
   title: { fontSize: "26px", fontWeight: 800, color: "#1f2937", margin: "0 0 8px", textAlign: "center" },
   subtitle: { fontSize: "14px", color: "#6b7280", margin: "0 0 30px", textAlign: "center" },
   error: { background: "#fee2e2", color: "#991b1b", padding: "12px", borderRadius: "8px", marginBottom: "20px", fontSize: "14px", textAlign: "center" },
