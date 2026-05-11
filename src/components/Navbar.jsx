@@ -20,11 +20,13 @@ export default function Navbar() {
       <nav style={styles.moverNavbar}>
         <style>{css}</style>
 
-        {/* TOP SECTION - LOGO + HAMBURGER */}
+        {/* TOP SECTION - LOGO + TITLE + HAMBURGER */}
         <div style={styles.topSection}>
           <Link to="/mover-dashboard" style={styles.logoContainer}>
             <img src={logo} alt="Axx Spaces" style={styles.logo} />
-            <span style={styles.brandName}>🚚 Axx Movers</span>
+            <div style={styles.titleSection}>
+              <span style={styles.brandName}>Axx Movers</span>
+            </div>
           </Link>
 
           <button
@@ -43,12 +45,12 @@ export default function Navbar() {
             style={styles.navLink} 
             onClick={() => setMenuOpen(false)}
           >
-             Dashboard
+            Dashboard
           </Link>
 
           {/* USER INFO & LOGOUT */}
           <div style={styles.userSection}>
-            <span style={styles.userName}>👤 {user?.name}</span>
+            <span style={styles.userName}>{user?.name}</span>
             <button style={styles.logoutBtn} onClick={handleLogout}>
               Logout
             </button>
@@ -63,11 +65,13 @@ export default function Navbar() {
     <nav style={styles.navbar}>
       <style>{css}</style>
 
-      {/* TOP SECTION - LOGO + HAMBURGER */}
+      {/* TOP SECTION - LOGO + TITLE + HAMBURGER */}
       <div style={styles.topSection}>
         <Link to="/" style={styles.logoContainer}>
           <img src={logo} alt="Axx Spaces" style={styles.logo} />
-          <span style={styles.brandName}>Axx Spaces</span>
+          <div style={styles.titleSection}>
+            <span style={styles.brandName}>Axx Spaces</span>
+          </div>
         </Link>
 
         <button
@@ -90,7 +94,7 @@ export default function Navbar() {
         
         {/* MOVERS LINK */}
         <Link to="/movers" style={styles.navLink} onClick={() => setMenuOpen(false)}>
-          🚚 Movers
+          Movers
         </Link>
 
         {/* AUTHENTICATED LANDLORD LINKS */}
@@ -100,12 +104,12 @@ export default function Navbar() {
               Upload
             </Link>
             <Link to="/dashboard" style={styles.navLink} onClick={() => setMenuOpen(false)}>
-              📊 Dashboard
+              Dashboard
             </Link>
 
             {/* USER INFO */}
             <div style={styles.userSection}>
-              <span style={styles.userName}>👤 {user.name}</span>
+              <span style={styles.userName}>{user.name}</span>
               <button style={styles.logoutBtn} onClick={handleLogout}>
                 Logout
               </button>
@@ -162,14 +166,21 @@ const styles = {
   logoContainer: {
     display: "flex",
     alignItems: "center",
-    gap: "8px",
+    gap: "12px",
     textDecoration: "none",
     cursor: "pointer",
   },
 
   logo: {
-    height: "36px",
+    height: "40px",
     width: "auto",
+  },
+
+  // ✅ TITLE SECTION
+  titleSection: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "2px",
   },
 
   brandName: {
@@ -203,12 +214,12 @@ const styles = {
     display: "flex",
   },
 
-  // ✅ BOLD LINKS
+  // ✅ BOLD LINKS - NO EMOJIS
   navLink: {
     color: "#cbd5e1",
     textDecoration: "none",
     fontSize: "13px",
-    fontWeight: 700,  // ✅ INCREASED from 600 to 700 (BOLDER)
+    fontWeight: 700,
     transition: "all 0.2s",
     cursor: "pointer",
     padding: "6px 10px",
@@ -227,7 +238,7 @@ const styles = {
 
   userName: {
     fontSize: "13px",
-    fontWeight: 700,  // ✅ INCREASED from 600 to 700 (BOLDER)
+    fontWeight: 700,
     color: "#fbbf24",
   },
 
@@ -239,7 +250,7 @@ const styles = {
     borderRadius: "6px",
     cursor: "pointer",
     fontSize: "12px",
-    fontWeight: 700,  // ✅ INCREASED from 600 to 700 (BOLDER)
+    fontWeight: 700,
     transition: "all 0.2s",
   },
 
@@ -247,7 +258,7 @@ const styles = {
     color: "#cbd5e1",
     textDecoration: "none",
     fontSize: "13px",
-    fontWeight: 700,  // ✅ INCREASED from 600 to 700 (BOLDER)
+    fontWeight: 700,
     padding: "6px 10px",
     borderRadius: "6px",
     transition: "all 0.2s",
@@ -263,7 +274,7 @@ const styles = {
     borderRadius: "6px",
     textDecoration: "none",
     fontSize: "12px",
-    fontWeight: 700,  // ✅ ALREADY BOLD
+    fontWeight: 700,
     cursor: "pointer",
     transition: "all 0.2s",
     whiteSpace: "nowrap",
@@ -296,7 +307,7 @@ const css = `
     /* Show mobile menu */
     [style*="display: flex"][style*="gap: 8px"][style*="flexWrap"] {
       position: fixed !important;
-      top: 64px !important;
+      top: 76px !important;
       left: 0 !important;
       right: 0 !important;
       flex-direction: column !important;
@@ -369,7 +380,7 @@ const css = `
     }
 
     /* Smaller logo */
-    img[style*="height: 36px"] {
+    img[style*="height: 40px"] {
       height: 32px !important;
       width: auto !important;
     }
