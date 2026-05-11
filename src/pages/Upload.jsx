@@ -70,9 +70,18 @@ export default function Upload() {
       return;
     }
 
+    const floatFields = ["price", "deposit"];
+    const intFields = ["bedrooms", "bathrooms", "totalUnits", "bookedUnits"];
+
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: type === "checkbox"
+        ? checked
+        : floatFields.includes(name)
+          ? parseFloat(value) || ""
+          : intFields.includes(name)
+            ? parseInt(value) || ""
+            : value,
     }));
   };
 
@@ -114,7 +123,7 @@ export default function Upload() {
           lng: position.coords.longitude.toFixed(6),
         }));
       },
-      () => setError("❌ Unable to get location.")
+      () => setError("❌ Unable to get location. Please enter manually.")
     );
   };
 
@@ -123,14 +132,28 @@ export default function Upload() {
     setError("");
     setSuccess("");
 
-    if (!token) {
-      setError("Please login again");
-      navigate("/login");
+    if (!formData.title || !formData.description || !formData.location ||
+        !formData.price || !formData.bedrooms || !formData.bathrooms ||
+        !formData.propertyType || !formData.county) {
+      setError("❌ Please fill all required fields");
+      return;
+    }
+    if (images.length === 0) {
+      setError("❌ Please upload at least one image");
+      return;
+    }
+    if (formData.amenities.length === 0) {
+      setError("❌ Please select at least one amenity");
+      return;
+    }
+    if (formData.bookedUnits > formData.totalUnits) {
+      setError("❌ Booked units cannot be more than total units");
       return;
     }
 
-    if (images.length === 0) {
-      setError("❌ Please upload at least one image");
+    if (!token) {
+      setError("Please login again");
+      navigate("/login");
       return;
     }
 
@@ -143,6 +166,8 @@ export default function Upload() {
         if (formData[key] !== undefined && formData[key] !== null) {
           if (key === "amenities") {
             formDataToSend.append("amenities", JSON.stringify(formData.amenities));
+          } else if (key === "furnished" || key === "initiallyBooked") {
+            formDataToSend.append(key, String(formData[key]));
           } else {
             formDataToSend.append(key, formData[key]);
           }
@@ -151,21 +176,23 @@ export default function Upload() {
 
       images.forEach((image) => formDataToSend.append("images", image));
 
-      const response = await fetch(`${API_BASE}/properties`, {   // ← Fixed endpoint
+      const response = await fetch(`${API_BASE}/properties`, {   // ← Updated to /properties
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
+        headers: { 
+          Authorization: `Bearer ${token}` 
         },
         body: formDataToSend,
       });
 
-      const result = await response.json();
-
       if (!response.ok) {
-        throw new Error(result.error || result.message || "Upload failed");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || errorData.error || `Server error: ${response.status}`);
       }
 
-      setSuccess("✅ Property submitted successfully! Pending admin approval.");
+      const result = await response.json();
+      console.log("Upload success:", result);
+
+      setSuccess("✅ Property submitted successfully! Pending admin approval. You can mark units as booked/unbooked from your dashboard.");
 
       // Reset form
       setFormData({
@@ -178,11 +205,10 @@ export default function Upload() {
       setImages([]);
       setImagePreviews([]);
 
-      setTimeout(() => navigate("/dashboard"), 2500);
-
+      setTimeout(() => navigate("/dashboard"), 2800);
     } catch (err) {
       console.error("Upload error:", err);
-      setError(err.message || "Failed to submit property. Please try again.");
+      setError(err.message || "Error uploading property. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -211,7 +237,6 @@ export default function Upload() {
         {success && <div style={styles.successBox}>{success}</div>}
 
         <form onSubmit={handleSubmit} style={styles.form}>
-          {/* ... ALL YOUR EXISTING FORM FIELDS REMAIN UNCHANGED ... */}
           <div style={styles.formGroup}>
             <label style={styles.label}>Property Title <span style={styles.required}>*</span></label>
             <input type="text" name="title" placeholder="e.g., Modern 2BR Apartment with balcony" value={formData.title} onChange={handleChange} style={styles.input} required />
@@ -238,7 +263,113 @@ export default function Upload() {
             </div>
           </div>
 
-          {/* ... (All other fields remain the same as you provided) ... */}
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Location <span style={styles.required}>*</span></label>
+            <input type="text" name="location" placeholder="e.g., Nairobi, Westlands" value={formData.location} onChange={handleChange} style={styles.input} required />
+          </div>
+
+          {/* GPS Location */}
+          <div style={styles.formRow}>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Latitude</label>
+              <input type="number" name="lat" step="0.000001" placeholder="e.g., -1.2921" value={formData.lat} onChange={handleChange} style={styles.input} />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Longitude</label>
+              <input type="number" name="lng" step="0.000001" placeholder="e.g., 36.8219" value={formData.lng} onChange={handleChange} style={styles.input} />
+            </div>
+          </div>
+          <button type="button" onClick={getCurrentLocation} style={styles.geoBtn}>
+            📍 Get Current Location
+          </button>
+
+          {/* ✅ Description - NO CHARACTER LIMIT */}
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Description <span style={styles.required}>*</span></label>
+            <textarea 
+              name="description" 
+              placeholder="Describe your property in detail..." 
+              value={formData.description} 
+              onChange={handleChange} 
+              style={styles.textarea} 
+              rows="6" 
+              required 
+            />
+          </div>
+
+          <div style={styles.formRow}>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Monthly Price (KES) <span style={styles.required}>*</span></label>
+              <input type="number" name="price" placeholder="45000" value={formData.price} onChange={handleChange} style={styles.input} min="0" required />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Deposit (KES)</label>
+              <input type="number" name="deposit" placeholder="45000" value={formData.deposit} onChange={handleChange} style={styles.input} min="0" />
+            </div>
+          </div>
+
+          <div style={styles.formRow}>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Bedrooms <span style={styles.required}>*</span></label>
+              <input type="number" name="bedrooms" placeholder="2" value={formData.bedrooms} onChange={handleChange} style={styles.input} min="0" required />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Bathrooms <span style={styles.required}>*</span></label>
+              <input type="number" name="bathrooms" placeholder="1" value={formData.bathrooms} onChange={handleChange} style={styles.input} min="0" required />
+            </div>
+          </div>
+
+          <div style={styles.formRow}>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Furnished</label>
+              <select name="furnished" value={String(formData.furnished)} onChange={handleChange} style={styles.input}>
+                <option value="false">Unfurnished</option>
+                <option value="true">Fully Furnished</option>
+              </select>
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Lease Type</label>
+              <select name="leaseType" value={formData.leaseType} onChange={handleChange} style={styles.input}>
+                <option value="monthly">Monthly</option>
+                <option value="6months">6 Months</option>
+                <option value="yearly">Yearly</option>
+              </select>
+            </div>
+          </div>
+
+          <div style={styles.formRow}>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Total Units</label>
+              <input type="number" name="totalUnits" placeholder="1" value={formData.totalUnits} onChange={handleChange} style={styles.input} min="1" />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Initial Booked Units</label>
+              <input type="number" name="bookedUnits" placeholder="0" value={formData.bookedUnits} onChange={handleChange} style={styles.input} min="0" />
+            </div>
+          </div>
+
+          <div style={styles.formGroup}>
+            <label style={styles.label}>
+              <input 
+                type="checkbox" 
+                name="initiallyBooked" 
+                checked={formData.initiallyBooked} 
+                onChange={handleChange} 
+                style={{ marginRight: "8px" }}
+              />
+              Mark this property as partially booked on upload
+            </label>
+          </div>
+
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Available From</label>
+            <input type="date" name="availableFrom" value={formData.availableFrom} onChange={handleChange} style={styles.input} />
+          </div>
+
+          <div style={styles.formGroup}>
+            <label style={styles.label}>House Rules</label>
+            <textarea name="rules" placeholder="e.g., No pets, No smoking indoors..." value={formData.rules} onChange={handleChange} style={styles.textarea} rows="3" />
+          </div>
 
           <div style={styles.formGroup}>
             <label style={styles.label}>Upload Images (Max 10) <span style={styles.required}>*</span></label>
@@ -287,14 +418,13 @@ export default function Upload() {
         </form>
 
         <p style={styles.disclaimer}>
-          ℹ️ Your property will be reviewed by our admin team. After approval, you can manage it from your dashboard.
+          ℹ️ Your property will be reviewed by our admin team. After approval, you can mark units as booked/unbooked from your dashboard.
         </p>
       </div>
     </div>
   );
 }
 
-/* ====================== YOUR EXISTING STYLES ====================== */
 const styles = {
   container: { minHeight: "100vh", background: "linear-gradient(135deg, #06101f 0%, #0a1428 100%)", padding: "40px 20px", fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont" },
   formBox: { maxWidth: "700px", margin: "0 auto", background: "rgba(10, 20, 40, 0.9)", border: "1px solid rgba(59, 130, 246, 0.2)", backdropFilter: "blur(10px)", borderRadius: "20px", padding: "50px 40px", boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)" },
