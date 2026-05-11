@@ -18,22 +18,25 @@ export default function Navbar() {
     <nav style={styles.navbar}>
       <style>{css}</style>
 
-      {/* LOGO */}
-      <Link to="/" style={styles.logoContainer}>
-        <img src={logo} alt="Axx Spaces" style={styles.logo} />
-        <span style={styles.brandName}>Axx Spaces</span>
-      </Link>
+      {/* TOP SECTION - LOGO + HAMBURGER */}
+      <div style={styles.topSection}>
+        {/* LOGO */}
+        <Link to="/" style={styles.logoContainer}>
+          <img src={logo} alt="Axx Spaces" style={styles.logo} />
+          <span style={styles.brandName}>Axx Spaces</span>
+        </Link>
 
-      {/* HAMBURGER MENU - MOBILE */}
-      <button
-        style={styles.hamburger}
-        onClick={() => setMenuOpen(!menuOpen)}
-      >
-        {menuOpen ? "✕" : "☰"}
-      </button>
+        {/* HAMBURGER MENU - MOBILE */}
+        <button
+          style={styles.hamburger}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          {menuOpen ? "✕" : "☰"}
+        </button>
+      </div>
 
-      {/* NAVIGATION LINKS */}
-      <div style={{ ...styles.navLinks, ...(menuOpen && styles.navLinksOpen) }}>
+      {/* BOTTOM SECTION - NAVIGATION LINKS IN A ROW */}
+      <div style={{ ...styles.navLinksContainer, ...(menuOpen && styles.navLinksContainerOpen) }}>
         {/* PUBLIC LINKS */}
         <Link to="/" style={styles.navLink} onClick={() => setMenuOpen(false)}>
           🏠 Home
@@ -42,7 +45,7 @@ export default function Navbar() {
           📋 Listings
         </Link>
         
-        {/* ✅ NEW MOVERS LINK */}
+        {/* ✅ MOVERS LINK */}
         <Link to="/movers" style={styles.navLink} onClick={() => setMenuOpen(false)}>
           🚚 Movers
         </Link>
@@ -83,10 +86,6 @@ export default function Navbar() {
 
 const styles = {
   navbar: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "16px 24px",
     background: "linear-gradient(135deg, #1e293b 0%, #0f1729 100%)",
     color: "#f1f5f9",
     boxShadow: "0 2px 12px rgba(0, 0, 0, 0.15)",
@@ -94,6 +93,14 @@ const styles = {
     position: "sticky",
     top: 0,
     zIndex: 50,
+    padding: "16px 24px",
+  },
+
+  topSection: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: "16px",
   },
 
   logoContainer: {
@@ -126,16 +133,17 @@ const styles = {
     padding: "8px",
   },
 
-  navLinks: {
+  navLinksContainer: {
     display: "flex",
     alignItems: "center",
-    gap: "24px",
+    gap: "12px",
+    flexWrap: "wrap",
     listStyle: "none",
     margin: 0,
     padding: 0,
   },
 
-  navLinksOpen: {
+  navLinksContainerOpen: {
     display: "flex",
   },
 
@@ -148,14 +156,16 @@ const styles = {
     cursor: "pointer",
     padding: "8px 12px",
     borderRadius: "6px",
+    whiteSpace: "nowrap",
   },
 
   userSection: {
     display: "flex",
     alignItems: "center",
-    gap: "16px",
+    gap: "12px",
     borderLeft: "1px solid #334155",
-    paddingLeft: "24px",
+    paddingLeft: "12px",
+    marginLeft: "12px",
   },
 
   userName: {
@@ -165,13 +175,13 @@ const styles = {
   },
 
   logoutBtn: {
-    padding: "8px 16px",
+    padding: "6px 12px",
     background: "rgba(239, 68, 68, 0.2)",
     color: "#fca5a5",
     border: "1px solid rgba(239, 68, 68, 0.3)",
     borderRadius: "6px",
     cursor: "pointer",
-    fontSize: "14px",
+    fontSize: "13px",
     fontWeight: 600,
     transition: "all 0.2s",
   },
@@ -185,19 +195,21 @@ const styles = {
     borderRadius: "6px",
     transition: "all 0.2s",
     cursor: "pointer",
+    whiteSpace: "nowrap",
   },
 
   registerLink: {
-    padding: "8px 16px",
+    padding: "6px 12px",
     background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
     color: "#0f1729",
     border: "none",
     borderRadius: "6px",
     textDecoration: "none",
-    fontSize: "14px",
+    fontSize: "13px",
     fontWeight: 700,
     cursor: "pointer",
     transition: "all 0.2s",
+    whiteSpace: "nowrap",
   },
 };
 
@@ -224,37 +236,41 @@ const css = `
       display: block !important;
     }
 
-    [style*="display: flex"][style*="gap: 24px"] {
+    [style*="display: flex"][style*="gap: 12px"][style*="flexWrap"] {
       position: fixed !important;
-      top: 60px !important;
+      top: 76px !important;
       left: 0 !important;
       right: 0 !important;
       flex-direction: column !important;
       background: linear-gradient(135deg, #1e293b 0%, #0f1729 100%) !important;
       padding: 16px !important;
-      gap: 12px !important;
+      gap: 8px !important;
       max-height: 0 !important;
       overflow: hidden !important;
       transition: max-height 0.3s ease !important;
+      align-items: flex-start !important;
     }
 
-    [style*="display: flex"][style*="gap: 24px"][style*="display: flex"] {
+    [style*="display: flex"][style*="gap: 12px"][style*="flexWrap"][style*="display: flex"] {
       max-height: 500px !important;
     }
 
-    [style*="display: flex"][style*="gap: 24px"] a {
+    [style*="display: flex"][style*="gap: 12px"][style*="flexWrap"] a {
       padding: 12px 16px !important;
-      width: 100% !important;
+      width: calc(100% - 32px) !important;
       text-align: left !important;
     }
 
-    [style*="display: flex"][style*="gap: 24px"] [style*="borderLeft"] {
+    [style*="display: flex"][style*="gap: 12px"][style*="flexWrap"] [style*="borderLeft"] {
       border-left: none !important;
       border-top: 1px solid #334155 !important;
       padding-left: 0 !important;
       padding-top: 12px !important;
+      margin-left: 0 !important;
+      margin-top: 8px !important;
       flex-direction: column !important;
-      gap: 12px !important;
+      gap: 8px !important;
+      width: 100% !important;
     }
   }
 
@@ -265,6 +281,10 @@ const css = `
 
     [style*="padding: 16px 24px"] {
       padding: 12px 16px !important;
+    }
+
+    [style*="display: flex"][style*="gap: 12px"][style*="flexWrap"] a {
+      font-size: 13px !important;
     }
   }
 `;
