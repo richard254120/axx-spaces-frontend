@@ -170,7 +170,7 @@ export default function Upload() {
 
       images.forEach((image) => formDataToSend.append("images", image));
 
-      // ✅ FIXED: Correct endpoint matching your backend
+      // ✅ FIXED: Correct endpoint
       const response = await fetch(`${API_BASE}/properties`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
