@@ -19,10 +19,7 @@ export default function Login() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -50,17 +47,20 @@ export default function Login() {
         throw new Error(data.error || "Login failed");
       }
 
-      // Security Check: If a mover tries to use the Landlord login page
-      if (data.user?.role === "mover") {
-        throw new Error("This login is for Landlords. Please use the Mover Portal.");
-      }
-
-      setSuccess("✅ Login successful! Redirecting to Dashboard...");
-
+      // 1. Log the user in (Save token/data to Context)
       login(data.token, data.user);
 
+      // 2. Redirect logic based on role
+      setSuccess("✅ Login successful! Redirecting...");
+
       setTimeout(() => {
-        navigate("/dashboard");
+        if (data.user?.role === "landlord") {
+          navigate("/dashboard"); // Redirect Landlord to their dashboard
+        } else if (data.user?.role === "mover") {
+          navigate("/mover-dashboard"); // Redirect Mover to their dashboard
+        } else {
+          navigate("/"); // Default fallback
+        }
       }, 1500);
 
     } catch (err) {
@@ -130,11 +130,9 @@ export default function Login() {
 
           <p style={styles.footer}>
             Need to register a property?{" "}
-            <Link to="/register" style={styles.link}>
-              Create Account
-            </Link>
+            <Link to="/register" style={styles.link}>Create Account</Link>
           </p>
-          <p style={styles.footer} style={{marginTop: "10px", fontSize: "12px"}}>
+          <p style={{...styles.footer, marginTop: "10px", fontSize: "12px"}}>
             Are you a mover? <Link to="/movers" style={styles.link}>Go to Mover Portal</Link>
           </p>
         </div>
