@@ -18,25 +18,25 @@ export default function Navbar() {
       <style>{css}</style>
       <div style={styles.navContainer}>
         
-        {/* Logo and Branding */}
+        {/* --- LOGO --- */}
         <Link to="/" style={styles.logoContainer} onClick={() => setIsOpen(false)}>
           <img src={logo} alt="Axx Spaces" style={styles.logoImg} />
           <span style={styles.logoText}>AXX SPACES</span>
         </Link>
 
-        {/* Mobile Hamburger Button */}
+        {/* --- MOBILE HAMBURGER --- */}
         <button style={styles.menuBtn} onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? "✕" : "☰"}
         </button>
 
-        {/* Links Navigation */}
+        {/* --- NAVIGATION LINKS --- */}
         <div className={`nav-links ${isOpen ? "open" : ""}`} style={styles.navLinks}>
           
-          {/* 1. ALWAYS VISIBLE PUBLIC LINKS */}
+          {/* ALWAYS VISIBLE LINKS */}
           <Link to="/properties" style={styles.link} onClick={() => setIsOpen(false)}>Listings</Link>
           <Link to="/movers" style={styles.link} onClick={() => setIsOpen(false)}>🚚 Movers</Link>
 
-          {/* 2. LOGGED OUT ONLY: Show Login/Register */}
+          {/* 1. GUEST LINKS (Shown when not logged in) */}
           {!user && (
             <>
               <Link to="/login" style={styles.link} onClick={() => setIsOpen(false)}>Login</Link>
@@ -44,16 +44,16 @@ export default function Navbar() {
             </>
           )}
 
-          {/* 3. LANDLORD LOGGED IN: Show Upload & Dashboard */}
+          {/* 2. LANDLORD ONLY LINKS (Shown when logged in as landlord) */}
           {user && user.role === "landlord" && (
             <>
               <Link to="/dashboard" style={styles.link} onClick={() => setIsOpen(false)}>My Dashboard</Link>
-              <Link to="/upload" style={styles.link} onClick={() => setIsOpen(false)}>➕ Upload</Link>
+              <Link to="/upload" style={styles.link} onClick={() => setIsOpen(false)}>➕ Upload Property</Link>
               <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
             </>
           )}
 
-          {/* 4. MOVER LOGGED IN: Show Mover Dashboard */}
+          {/* 3. MOVER ONLY LINKS (Shown when logged in as mover) */}
           {user && user.role === "mover" && (
             <>
               <Link to="/mover-dashboard" style={styles.link} onClick={() => setIsOpen(false)}>Mover Dashboard</Link>
@@ -67,32 +67,96 @@ export default function Navbar() {
 }
 
 const styles = {
-  nav: { background: "#ffffff", borderBottom: "1px solid #e5e7eb", padding: "12px 0", position: "sticky", top: 0, zIndex: 1000 },
-  navContainer: { maxWidth: "1200px", margin: "0 auto", padding: "0 20px", display: "flex", justifyContent: "space-between", alignItems: "center" },
-  logoContainer: { display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" },
-  logoImg: { height: "40px", width: "auto", borderRadius: "4px" },
-  logoText: { fontWeight: "800", color: "#111827", fontSize: "18px" },
-  menuBtn: { display: "none", fontSize: "24px", background: "none", border: "none", cursor: "pointer" },
-  navLinks: { display: "flex", alignItems: "center", gap: "20px" },
-  link: { textDecoration: "none", color: "#4b5563", fontWeight: "600", fontSize: "15px" },
-  registerBtn: { background: "#ef4444", color: "white", padding: "8px 16px", borderRadius: "6px", textDecoration: "none", fontWeight: "700" },
-  logoutBtn: { background: "#f3f4f6", color: "#ef4444", border: "none", padding: "8px 16px", borderRadius: "6px", fontWeight: "700", cursor: "pointer" },
+  nav: { 
+    background: "#ffffff", 
+    borderBottom: "1px solid #e5e7eb", 
+    padding: "12px 0", 
+    position: "sticky", 
+    top: 0, 
+    zIndex: 1000 
+  },
+  navContainer: { 
+    maxWidth: "1200px", 
+    margin: "0 auto", 
+    padding: "0 200px", 
+    display: "flex", 
+    justifyContent: "space-between", 
+    alignItems: "center" 
+  },
+  logoContainer: { 
+    display: "flex", 
+    alignItems: "center", 
+    gap: "10px", 
+    textDecoration: "none" 
+  },
+  logoImg: { 
+    height: "45px", 
+    width: "auto", 
+    borderRadius: "4px" 
+  },
+  logoText: { 
+    fontWeight: "800", 
+    color: "#111827", 
+    fontSize: "20px",
+    letterSpacing: "-0.5px"
+  },
+  menuBtn: { 
+    display: "none", 
+    fontSize: "28px", 
+    background: "none", 
+    border: "none", 
+    cursor: "pointer",
+    color: "#111827"
+  },
+  navLinks: { 
+    display: "flex", 
+    alignItems: "center", 
+    gap: "24px" 
+  },
+  link: { 
+    textDecoration: "none", 
+    color: "#4b5563", 
+    fontWeight: "600", 
+    fontSize: "15px",
+    transition: "color 0.2s"
+  },
+  registerBtn: { 
+    background: "#ef4444", 
+    color: "white", 
+    padding: "10px 20px", 
+    borderRadius: "8px", 
+    textDecoration: "none", 
+    fontWeight: "700",
+    boxShadow: "0 2px 4px rgba(239, 68, 68, 0.2)"
+  },
+  logoutBtn: { 
+    background: "#fee2e2", 
+    color: "#ef4444", 
+    border: "none", 
+    padding: "8px 16px", 
+    borderRadius: "8px", 
+    fontWeight: "700", 
+    cursor: "pointer" 
+  },
 };
 
 const css = `
-  @media (max-width: 768px) {
+  .link:hover { color: #ef4444 !important; }
+  
+  @media (max-width: 992px) {
     button[style*="menuBtn"] { display: block !important; }
     .nav-links {
       display: none !important;
       flex-direction: column;
       position: absolute;
-      top: 64px;
+      top: 70px;
       left: 0;
       width: 100%;
       background: white;
-      padding: 20px;
-      border-bottom: 1px solid #e5e7eb;
-      gap: 15px !important;
+      padding: 30px 20px;
+      border-bottom: 2px solid #f3f4f6;
+      gap: 20px !important;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     }
     .nav-links.open { display: flex !important; }
   }
