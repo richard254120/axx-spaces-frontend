@@ -11,7 +11,6 @@ export default function Home() {
   const [searchForm, setSearchForm] = useState({ county: "", type: "" });
   const [featuredProperties, setFeaturedProperties] = useState([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
 
   const counties = [
     "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
@@ -35,19 +34,6 @@ export default function Home() {
     "🚀 Boost Your Property", "🔒 Safe & Secure",
   ];
 
-  const howItWorks = [
-    { step: "01", icon: "🔍", title: "Search", desc: "Filter by county and property type to find your match instantly." },
-    { step: "02", icon: "🏠", title: "Explore", desc: "Browse photos, maps, and full details of verified listings." },
-    { step: "03", icon: "💬", title: "Connect", desc: "Contact the landlord directly on WhatsApp — zero middlemen." },
-    { step: "04", icon: "🎉", title: "Move In", desc: "Agree terms, sign, and move into your new home stress-free." },
-  ];
-
-  const testimonials = [
-    { name: "Sarah W.", location: "Nairobi", text: "Found my perfect 2-bedroom apartment in 2 days. The WhatsApp connection was super fast!", rating: 5, color: "#fbbf24", avatar: "SW" },
-    { name: "James K.", location: "Mombasa", text: "As a landlord, boosting my property increased inquiries by 300%. Highly recommended!", rating: 5, color: "#22c55e", avatar: "JK" },
-    { name: "Aisha M.", location: "Kisumu", text: "Very professional platform. Got a nice house near the lake with honest landlord.", rating: 4, color: "#3b82f6", avatar: "AM" },
-  ];
-
   // Fetch Featured Properties
   useEffect(() => {
     const fetchFeatured = async () => {
@@ -61,14 +47,6 @@ export default function Home() {
       }
     };
     fetchFeatured();
-  }, []);
-
-  // Testimonial Auto-rotate
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 4500);
-    return () => clearInterval(timer);
   }, []);
 
   const handleSearch = (e) => {
@@ -97,7 +75,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Minimized Hero - So Featured shows faster */}
+      {/* Shortened Hero */}
       <section style={styles.hero}>
         <div style={styles.heroContent}>
           <div style={styles.logoContainer}>
@@ -105,7 +83,9 @@ export default function Home() {
           </div>
 
           <h1 style={styles.heroTitle}>Find Your Dream Home in Kenya</h1>
-          <p style={styles.heroSubtitle}>Verified rentals across all 47 counties. No agents. No hidden fees.</p>
+          <p style={styles.heroSubtitle}>
+            Verified rentals • Direct landlord chat • No agents
+          </p>
 
           <form onSubmit={handleSearch} style={styles.searchCard}>
             <div style={styles.searchRow}>
@@ -133,11 +113,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Listings - Now appears immediately after hero */}
+      {/* Featured Listings - Appears Immediately */}
       <section style={styles.featuredSection}>
         <div style={styles.sectionHeader}>
           <h2 style={styles.sectionTitle}>⭐ Featured Premium Listings</h2>
-          <p style={styles.sectionSubtitle}>Boosted & handpicked properties</p>
+          <p style={styles.sectionSubtitle}>Handpicked & boosted properties</p>
         </div>
 
         {loadingFeatured ? (
@@ -146,7 +126,11 @@ export default function Home() {
           <div style={styles.featuredGrid}>
             {featuredProperties.slice(0, 6).map((property) => (
               <div key={property._id} style={styles.featuredCard}>
-                <img src={property.images?.[0] || ""} alt={property.title} style={styles.featuredImage} />
+                <img
+                  src={property.images?.[0] || ""}
+                  alt={property.title}
+                  style={styles.featuredImage}
+                />
                 <div style={styles.featuredInfo}>
                   <h3 style={styles.featuredTitle}>{property.title}</h3>
                   <p style={styles.featuredLocation}>📍 {property.county}</p>
@@ -154,39 +138,33 @@ export default function Home() {
                     KSh {Number(property.price).toLocaleString()} 
                     <span style={styles.perMonth}> / month</span>
                   </p>
-                  <button onClick={() => navigate(`/listings?highlight=${property._id}`)} style={styles.viewBtn}>
+                  <button
+                    onClick={() => navigate(`/listings?highlight=${property._id}`)}
+                    style={styles.viewBtn}
+                  >
                     View Property →
                   </button>
                 </div>
               </div>
             ))}
           </div>
-        ) : null}
-      </section>
+        ) : (
+          <div style={styles.noFeatured}>
+            <p>No featured listings at the moment</p>
+          </div>
+        )}
 
-      {/* How It Works */}
-      <section style={styles.howSection}>
-        <div style={styles.sectionHeader}>
-          <h2 style={{ ...styles.sectionTitle, color: "#1f2937" }}>How It Works</h2>
-          <p style={{ ...styles.sectionSubtitle, color: "#6b7280" }}>From search to move-in in 4 simple steps</p>
-        </div>
-        <div style={styles.howGrid}>
-          {howItWorks.map((step, i) => (
-            <div key={step.step} style={styles.howCard}>
-              <div style={styles.howStep}>{step.step}</div>
-              <div style={styles.howIcon}>{step.icon}</div>
-              <h3 style={styles.howTitle}>{step.title}</h3>
-              <p style={styles.howDesc}>{step.desc}</p>
-            </div>
-          ))}
+        <div style={{ textAlign: "center", marginTop: "40px" }}>
+          <button onClick={() => navigate("/listings")} style={styles.viewAllBtn}>
+            View All Listings →
+          </button>
         </div>
       </section>
 
-      {/* Final CTA */}
+      {/* Simple CTA */}
       <section style={styles.cta}>
         <div style={styles.ctaInner}>
-          <h2 style={styles.ctaTitle}>Start Your Search Today</h2>
-          <p style={styles.ctaText}>Join thousands of Kenyans who found their perfect home on Axx Spaces</p>
+          <h2 style={styles.ctaTitle}>Ready to Find Your Home?</h2>
           <div style={styles.ctaButtons}>
             <button style={styles.ctaBtnPrimary} onClick={() => navigate("/listings")}>
               🔍 Browse All Listings
@@ -201,10 +179,8 @@ export default function Home() {
       {/* Footer */}
       <footer style={styles.footer}>
         <div style={styles.footerInner}>
-          <div style={styles.footerBrand}>
-            <strong style={{ color: "#fbbf24", fontSize: "18px" }}>Axx Spaces</strong>
-            <p style={styles.footerTagline}>Kenya's most trusted rental platform</p>
-          </div>
+          <strong style={{ color: "#fbbf24" }}>Axx Spaces</strong>
+          <p style={styles.footerTagline}>Kenya's Most Trusted Rental Platform</p>
           <p style={styles.footerCopy}>© 2026 Axx Spaces. All rights reserved.</p>
         </div>
       </footer>
@@ -217,7 +193,7 @@ const styles = {
   root: { fontFamily: "'DM Sans', sans-serif", background: "#f8f4f0", color: "#1f2937", minHeight: "100vh" },
 
   marqueeWrapper: { overflow: "hidden", background: "#fbbf24", padding: "9px 0", borderBottom: "2px solid #f59e0b" },
-  marqueePill: { display: "inline-flex", alignItems: "center", gap: "10px", background: "white", borderRadius: "20px", padding: "4px 16px", margin: "0 8px", fontSize: "13px", fontWeight: 600, whiteSpace: "nowrap" },
+  marqueePill: { display: "inline-flex", alignItems: "center", gap: "8px", background: "white", borderRadius: "20px", padding: "4px 14px", margin: "0 6px", fontSize: "13px", fontWeight: 600, whiteSpace: "nowrap" },
 
   hero: { background: "linear-gradient(150deg, #ffffff 0%, #fef3e2 100%)", padding: "40px 20px 50px", textAlign: "center" },
   heroContent: { maxWidth: "820px", margin: "0 auto" },
@@ -245,25 +221,18 @@ const styles = {
   perMonth: { fontSize: "13px", color: "#4ade80" },
   viewBtn: { marginTop: "12px", width: "100%", padding: "10px", background: "#3b82f6", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: 600 },
 
-  howSection: { padding: "70px 20px", background: "white" },
-  howGrid: { display: "flex", justifyContent: "center", gap: "24px", flexWrap: "wrap" },
-  howCard: { flex: "1", minWidth: "220px", textAlign: "center", padding: "28px 16px" },
-  howStep: { fontSize: "11px", fontWeight: 800, color: "#ef4444", marginBottom: "10px" },
-  howIcon: { fontSize: "36px", marginBottom: "12px" },
-  howTitle: { fontSize: "17px", fontWeight: 700, margin: "0 0 8px" },
-  howDesc: { fontSize: "13px", color: "#6b7280", lineHeight: 1.6 },
+  loadingWrap: { textAlign: "center", padding: "60px 20px", color: "#94a3b8" },
 
-  cta: { background: "linear-gradient(135deg, #2427fb 0%, #4d9ffc 100%)", padding: "76px 20px", textAlign: "center" },
+  cta: { background: "linear-gradient(135deg, #2427fb 0%, #4d9ffc 100%)", padding: "70px 20px", textAlign: "center" },
   ctaInner: { maxWidth: "640px", margin: "0 auto" },
-  ctaTitle: { fontSize: "34px", fontWeight: 800, color: "white", margin: "0 0 12px" },
-  ctaText: { fontSize: "17px", color: "rgba(255,255,255,0.8)", margin: "0 0 32px" },
+  ctaTitle: { fontSize: "32px", fontWeight: 800, color: "white", margin: "0 0 12px" },
   ctaButtons: { display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" },
   ctaBtnPrimary: { padding: "14px 32px", background: "#ef4444", color: "white", border: "none", borderRadius: "10px", fontWeight: 700, cursor: "pointer" },
   ctaBtnSecondary: { padding: "14px 32px", borderRadius: "10px", fontWeight: 700, cursor: "pointer", background: "white", color: "#1f2937" },
 
   footer: { background: "#1f2937", color: "#d1d5db", padding: "36px 20px 20px", textAlign: "center" },
   footerInner: { maxWidth: "960px", margin: "0 auto" },
-  footerBrand: { marginBottom: "18px" },
+  footerBrand: { marginBottom: "10px" },
   footerTagline: { fontSize: "13px", color: "#6b7280" },
   footerCopy: { fontSize: "12px", color: "#4b5563", margin: 0 },
 };
