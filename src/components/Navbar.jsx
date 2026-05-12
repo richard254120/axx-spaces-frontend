@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import logo from "../assets/image.png";
+import logo from "../assets/image.png"; // ✅ one import, used everywhere
 
 export default function Navbar() {
   const { token, user, logout } = useContext(AuthContext);
@@ -23,7 +23,7 @@ export default function Navbar() {
         {/* TOP SECTION - LOGO + TITLE + HAMBURGER */}
         <div style={styles.topSection}>
           <Link to="/mover-dashboard" style={styles.logoContainer}>
-            <img src={image} alt="Axx Spaces" style={styles.image} />
+            <img src={logo} alt="Axx Spaces" style={styles.logo} /> {/* ✅ FIXED: was "image" */}
             <div style={styles.titleSection}>
               <span style={styles.brandName}>Axx Movers</span>
             </div>
@@ -39,16 +39,14 @@ export default function Navbar() {
 
         {/* BOTTOM SECTION - MOVER ONLY LINKS */}
         <div style={{ ...styles.navLinksContainer, ...(menuOpen && styles.navLinksContainerOpen) }}>
-          {/* MOVER DASHBOARD LINK */}
-          <Link 
-            to="/mover-dashboard" 
-            style={styles.navLink} 
+          <Link
+            to="/mover-dashboard"
+            style={styles.navLink}
             onClick={() => setMenuOpen(false)}
           >
             Dashboard
           </Link>
 
-          {/* USER INFO & LOGOUT */}
           <div style={styles.userSection}>
             <span style={styles.userName}>{user?.name}</span>
             <button style={styles.logoutBtn} onClick={handleLogout}>
@@ -84,20 +82,16 @@ export default function Navbar() {
 
       {/* BOTTOM SECTION - NAVIGATION LINKS IN A ROW */}
       <div style={{ ...styles.navLinksContainer, ...(menuOpen && styles.navLinksContainerOpen) }}>
-        {/* PUBLIC LINKS */}
         <Link to="/" style={styles.navLink} onClick={() => setMenuOpen(false)}>
           Home
         </Link>
         <Link to="/listings" style={styles.navLink} onClick={() => setMenuOpen(false)}>
           Listings
         </Link>
-        
-        {/* MOVERS LINK */}
         <Link to="/movers" style={styles.navLink} onClick={() => setMenuOpen(false)}>
           Movers
         </Link>
 
-        {/* AUTHENTICATED LANDLORD LINKS */}
         {token && user ? (
           <>
             <Link to="/upload" style={styles.navLink} onClick={() => setMenuOpen(false)}>
@@ -106,8 +100,6 @@ export default function Navbar() {
             <Link to="/dashboard" style={styles.navLink} onClick={() => setMenuOpen(false)}>
               Dashboard
             </Link>
-
-            {/* USER INFO */}
             <div style={styles.userSection}>
               <span style={styles.userName}>{user.name}</span>
               <button style={styles.logoutBtn} onClick={handleLogout}>
@@ -116,7 +108,6 @@ export default function Navbar() {
             </div>
           </>
         ) : (
-          /* UNAUTHENTICATED LINKS */
           <>
             <Link to="/login" style={styles.loginLink} onClick={() => setMenuOpen(false)}>
               Login
@@ -132,7 +123,6 @@ export default function Navbar() {
 }
 
 const styles = {
-  // ✅ MOVER NAVBAR STYLES
   moverNavbar: {
     background: "linear-gradient(135deg, #1e293b 0%, #0f1729 100%)",
     color: "#f1f5f9",
@@ -144,7 +134,6 @@ const styles = {
     padding: "12px 16px",
   },
 
-  // REGULAR NAVBAR STYLES
   navbar: {
     background: "linear-gradient(135deg, #1e293b 0%, #0f1729 100%)",
     color: "#f1f5f9",
@@ -176,7 +165,6 @@ const styles = {
     width: "auto",
   },
 
-  // ✅ TITLE SECTION
   titleSection: {
     display: "flex",
     flexDirection: "column",
@@ -214,7 +202,6 @@ const styles = {
     display: "flex",
   },
 
-  // ✅ BOLD LINKS - NO EMOJIS
   navLink: {
     color: "#cbd5e1",
     textDecoration: "none",
@@ -298,13 +285,11 @@ const css = `
     background: rgba(239, 68, 68, 0.3) !important;
   }
 
-  /* ✅ MOBILE RESPONSIVE - OPTIMIZED FOR PHONE */
   @media (max-width: 768px) {
     [style*="display: none"][style*="background: none"][style*="border: none"] {
       display: block !important;
     }
 
-    /* Show mobile menu */
     [style*="display: flex"][style*="gap: 8px"][style*="flexWrap"] {
       position: fixed !important;
       top: 76px !important;
@@ -321,12 +306,10 @@ const css = `
       z-index: 99 !important;
     }
 
-    /* Open menu */
     [style*="display: flex"][style*="gap: 8px"][style*="flexWrap"][style*="display: flex"] {
       max-height: 600px !important;
     }
 
-    /* Mobile links - full width */
     [style*="display: flex"][style*="gap: 8px"][style*="flexWrap"] a {
       padding: 14px 16px !important;
       width: 100% !important;
@@ -336,7 +319,6 @@ const css = `
       border-radius: 0 !important;
     }
 
-    /* User section mobile */
     [style*="display: flex"][style*="gap: 8px"][style*="flexWrap"] [style*="borderLeft"] {
       border-left: none !important;
       border-top: 1px solid #334155 !important;
@@ -351,7 +333,6 @@ const css = `
       align-items: flex-start !important;
     }
 
-    /* Mobile logout button */
     [style*="display: flex"][style*="gap: 8px"][style*="flexWrap"] button[style*="background: rgba(239"] {
       width: 100% !important;
       padding: 10px 12px !important;
@@ -359,7 +340,6 @@ const css = `
   }
 
   @media (max-width: 480px) {
-    /* Smaller logo on very small screens */
     [style*="fontSize: 16px"][style*="fontWeight: 800"] {
       font-size: 14px !important;
     }
@@ -368,18 +348,15 @@ const css = `
       padding: 10px 12px !important;
     }
 
-    /* Adjust navbar padding */
     nav[style*="padding: 12px 16px"] {
       padding: 10px 12px !important;
     }
 
-    /* Mobile links smaller text */
     [style*="display: flex"][style*="gap: 8px"][style*="flexWrap"] a {
       font-size: 13px !important;
       padding: 12px 14px !important;
     }
 
-    /* Smaller logo */
     img[style*="height: 40px"] {
       height: 32px !important;
       width: auto !important;
