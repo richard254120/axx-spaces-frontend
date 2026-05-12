@@ -386,14 +386,7 @@ export default function Listings() {
                 <p style={styles.landlordDetail}><strong>Phone:</strong> </p>
               </div>
 
-              {/* ✅ NEW MOVERS BUTTON */}
-              <button 
-                onClick={() => handleNeedMovers(selectedProperty)}
-                style={styles.moversBtn}
-              >
-                🚚 Need Professional Movers?
-              </button>
-
+             
               {/* Four Buttons: WhatsApp, Call, SMS, Book */}
               <div style={styles.contactButtonsContainer}>
                 <button
