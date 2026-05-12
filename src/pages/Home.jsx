@@ -11,7 +11,6 @@ export default function Home() {
   const [searchForm, setSearchForm] = useState({ county: "", type: "" });
   const [featuredProperties, setFeaturedProperties] = useState([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
 
   const counties = [
     "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
@@ -42,40 +41,6 @@ export default function Home() {
     "🎉 Over 5,000 Happy Tenants and Counting!",
   ];
 
-  const testimonials = [
-    {
-      name: "Amina Wanjiru",
-      location: "Nairobi",
-      text: "Found my dream apartment in Westlands within 2 days. The WhatsApp contact feature saved me so much time — no agents, no hassle!",
-      rating: 5,
-      avatar: "AW",
-      color: "#3b82f6",
-    },
-    {
-      name: "Brian Otieno",
-      location: "Kisumu",
-      text: "As a landlord, boosting my property got me 3 serious tenants in one week. Axx Spaces is genuinely the best platform in Kenya.",
-      rating: 5,
-      avatar: "BO",
-      color: "#22c55e",
-    },
-    {
-      name: "Fatuma Hassan",
-      location: "Mombasa",
-      text: "The verified listings gave me confidence. I knew exactly what I was getting before I even visited. Professional and trustworthy.",
-      rating: 5,
-      avatar: "FH",
-      color: "#f59e0b",
-    },
-  ];
-
-  const howItWorks = [
-    { step: "01", icon: "🔍", title: "Search", desc: "Filter by county and property type to find your match instantly." },
-    { step: "02", icon: "🏠", title: "Explore", desc: "Browse photos, maps, and full details of verified listings." },
-    { step: "03", icon: "💬", title: "Connect", desc: "Contact the landlord directly on WhatsApp — zero middlemen." },
-    { step: "04", icon: "🎉", title: "Move In", desc: "Agree terms, sign, and move into your new home stress-free." },
-  ];
-
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
@@ -88,13 +53,6 @@ export default function Home() {
       }
     };
     fetchFeatured();
-  }, []);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 4500);
-    return () => clearInterval(timer);
   }, []);
 
   const handleSearch = (e) => {
@@ -254,144 +212,6 @@ export default function Home() {
             </button>
           </div>
         )}
-      </section>
-
-      {/* ── HOW IT WORKS ── */}
-      <section style={styles.howSection}>
-        <div style={styles.sectionHeader}>
-          <h2 style={{ ...styles.sectionTitle, color: "#1f2937" }}>How It Works</h2>
-          <p style={{ ...styles.sectionSubtitle, color: "#6b7280" }}>
-            From search to move-in in 4 simple steps
-          </p>
-        </div>
-        <div style={styles.howGrid}>
-          {howItWorks.map((step, i) => (
-            <div key={step.step} style={styles.howCard} className="how-card">
-              <div style={styles.howStep}>{step.step}</div>
-              <div style={styles.howIcon}>{step.icon}</div>
-              <h3 style={styles.howTitle}>{step.title}</h3>
-              <p style={styles.howDesc}>{step.desc}</p>
-              {i < howItWorks.length - 1 && (
-                <div style={styles.howArrow} className="how-arrow">›</div>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── TRUST INDICATORS ── */}
-      <section style={styles.trustSection}>
-        <div style={styles.trustGrid}>
-          {[
-            { icon: "🛡", title: "100% Verified Listings", desc: "Every property is manually reviewed before going live" },
-            { icon: "⚡", title: "Instant WhatsApp Connect", desc: "Reach landlords directly — no brokers, no delays" },
-            { icon: "📸", title: "Real Photos Only", desc: "Authentic images from actual property walkthroughs" },
-            { icon: "🗺", title: "GPS-Pinned Locations", desc: "Know exactly where you're going before you visit" },
-            { icon: "💳", title: "Secure Payments", desc: "Boosting handled via encrypted M-Pesa gateway" },
-            { icon: "🤝", title: "Landlord Vetted", desc: "All hosts pass our verification before listing" },
-          ].map((t) => (
-            <div key={t.title} style={styles.trustCard} className="trust-card">
-              <div style={styles.trustIcon}>{t.icon}</div>
-              <div>
-                <h4 style={styles.trustTitle}>{t.title}</h4>
-                <p style={styles.trustDesc}>{t.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── STATS STRIP ── */}
-      <section style={styles.statsStrip}>
-        {[
-          { val: "47", label: "Counties Covered", color: "#fbbf24" },
-          { val: "10,000+", label: "Verified Listings", color: "#ef4444" },
-          { val: "5,000+", label: "Happy Tenants", color: "#22c55e" },
-          { val: "24/7", label: "Customer Support", color: "#60a5fa" },
-        ].map((s) => (
-          <div key={s.label} style={styles.statItem}>
-            <div style={{ ...styles.statNum, color: s.color }}>{s.val}</div>
-            <div style={styles.statLbl}>{s.label}</div>
-          </div>
-        ))}
-      </section>
-
-      {/* ── TESTIMONIALS ── */}
-      <section style={styles.testimonialsSection}>
-        <div style={styles.sectionHeader}>
-          <h2 style={{ ...styles.sectionTitle, color: "#1f2937" }}>What Our Users Say</h2>
-          <p style={{ ...styles.sectionSubtitle, color: "#6b7280" }}>
-            Real stories from tenants and landlords across Kenya
-          </p>
-        </div>
-
-        <div style={styles.testimonialsWrap}>
-          {testimonials.map((t, i) => (
-            <div
-              key={i}
-              style={{
-                ...styles.testimonialCard,
-                opacity: activeTestimonial === i ? 1 : 0.35,
-                transform: activeTestimonial === i ? "scale(1)" : "scale(0.96)",
-                border: activeTestimonial === i ? `2px solid ${t.color}` : "2px solid #e5e7eb",
-              }}
-              onClick={() => setActiveTestimonial(i)}
-            >
-              <div style={styles.stars}>{"★".repeat(t.rating)}</div>
-              <p style={styles.testimonialText}>"{t.text}"</p>
-              <div style={styles.testimonialAuthor}>
-                <div style={{ ...styles.avatarCircle, background: t.color }}>{t.avatar}</div>
-                <div>
-                  <p style={styles.authorName}>{t.name}</p>
-                  <p style={styles.authorLocation}>📍 {t.location}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div style={styles.testimonialDots}>
-          {testimonials.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setActiveTestimonial(i)}
-              style={{
-                ...styles.dot,
-                background: activeTestimonial === i ? "#fbbf24" : "#d1d5db",
-                width: activeTestimonial === i ? "24px" : "8px",
-              }}
-            />
-          ))}
-        </div>
-      </section>
-
-      {/* ── LANDLORD BANNER ── */}
-      <section style={styles.landlordBanner}>
-        <div style={styles.landlordContent}>
-          <div style={styles.landlordLeft}>
-            <span style={styles.landlordBadge}>FOR LANDLORDS</span>
-            <h2 style={styles.landlordTitle}>List Your Property,<br />Reach 50,000+ Tenants</h2>
-            <p style={styles.landlordDesc}>
-              Free listing. Paid boosting for priority placement. No commissions.
-            </p>
-            <div style={styles.landlordPerks}>
-              {[
-                "✅ Free to list",
-                "📊 Track views & enquiries",
-                "🚀 Boost for KSh 500/week",
-                "💬 Instant tenant contact",
-              ].map((p) => (
-                <span key={p} style={styles.perkItem}>{p}</span>
-              ))}
-            </div>
-          </div>
-          <div style={styles.landlordRight}>
-            <button style={styles.landlordBtn} onClick={handleListProperty}>
-              {token ? "📝 Upload Your Property" : "🔐 Get Started Free"}
-            </button>
-            {!token && <p style={styles.landlordHint}>No credit card required</p>}
-          </div>
-        </div>
       </section>
 
       {/* ── WHY AXX SPACES ── */}
@@ -685,113 +505,6 @@ const styles = {
     fontWeight: 700, fontSize: "15px", cursor: "pointer",
   },
 
-  /* How It Works */
-  howSection: { padding: "70px 20px", background: "white" },
-  howGrid: {
-    display: "flex", justifyContent: "center", gap: "0",
-    maxWidth: "1000px", margin: "0 auto",
-    flexWrap: "wrap", position: "relative",
-  },
-  howCard: {
-    flex: "1", minWidth: "180px", maxWidth: "220px",
-    textAlign: "center", padding: "28px 16px", position: "relative",
-  },
-  howStep: { fontSize: "11px", fontWeight: 800, color: "#ef4444", letterSpacing: "0.1em", marginBottom: "10px" },
-  howIcon: { fontSize: "36px", marginBottom: "12px" },
-  howTitle: { fontSize: "17px", fontWeight: 700, color: "#1f2937", margin: "0 0 8px" },
-  howDesc: { fontSize: "13px", color: "#6b7280", lineHeight: 1.6, margin: 0 },
-  howArrow: {
-    position: "absolute", right: "-12px", top: "50%",
-    transform: "translateY(-60%)", fontSize: "28px",
-    color: "#d1d5db", fontWeight: 300, zIndex: 1,
-  },
-
-  /* Trust */
-  trustSection: { background: "#f8f4f0", padding: "60px 20px" },
-  trustGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-    gap: "16px", maxWidth: "1100px", margin: "0 auto",
-  },
-  trustCard: {
-    background: "white", borderRadius: "12px", padding: "20px 22px",
-    display: "flex", gap: "16px", alignItems: "flex-start",
-    border: "1px solid #e5e7eb", transition: "transform 0.2s, box-shadow 0.2s",
-  },
-  trustIcon: { fontSize: "28px", flexShrink: 0, marginTop: "2px" },
-  trustTitle: { fontSize: "15px", fontWeight: 700, color: "#1f2937", margin: "0 0 4px" },
-  trustDesc: { fontSize: "13px", color: "#6b7280", margin: 0, lineHeight: 1.5 },
-
-  /* Stats Strip */
-  statsStrip: {
-    background: "#111827", padding: "44px 20px",
-    display: "flex", justifyContent: "center",
-    gap: "48px", flexWrap: "wrap", color: "white",
-  },
-  statItem: { textAlign: "center" },
-  statNum: { fontSize: "32px", fontWeight: 800, marginBottom: "4px" },
-  statLbl: { fontSize: "13px", color: "#9ca3af" },
-
-  /* Testimonials */
-  testimonialsSection: { padding: "70px 20px", background: "white" },
-  testimonialsWrap: {
-    display: "flex", gap: "20px", maxWidth: "1100px",
-    margin: "0 auto 24px", flexWrap: "wrap", justifyContent: "center",
-  },
-  testimonialCard: {
-    background: "#f9fafb", borderRadius: "14px", padding: "26px",
-    maxWidth: "310px", flex: "1", minWidth: "240px",
-    cursor: "pointer", transition: "all 0.4s ease",
-    border: "2px solid #e5e7eb",
-  },
-  stars: { color: "#fbbf24", fontSize: "18px", marginBottom: "12px", letterSpacing: "2px" },
-  testimonialText: { fontSize: "14px", color: "#374151", lineHeight: 1.7, margin: "0 0 20px", fontStyle: "italic" },
-  testimonialAuthor: { display: "flex", alignItems: "center", gap: "12px" },
-  avatarCircle: {
-    width: "42px", height: "42px", borderRadius: "50%",
-    display: "flex", alignItems: "center", justifyContent: "center",
-    color: "white", fontWeight: 700, fontSize: "14px", flexShrink: 0,
-  },
-  authorName: { fontSize: "14px", fontWeight: 700, color: "#1f2937", margin: 0 },
-  authorLocation: { fontSize: "12px", color: "#9ca3af", margin: 0 },
-  testimonialDots: { display: "flex", justifyContent: "center", gap: "8px", alignItems: "center" },
-  dot: { height: "8px", borderRadius: "4px", border: "none", cursor: "pointer", transition: "all 0.3s ease", padding: 0 },
-
-  /* Landlord Banner */
-  landlordBanner: {
-    background: "linear-gradient(135deg, #1f2937 0%, #111827 100%)",
-    padding: "60px 20px",
-    borderTop: "3px solid #fbbf24",
-    borderBottom: "3px solid #fbbf24",
-  },
-  landlordContent: {
-    maxWidth: "960px", margin: "0 auto",
-    display: "flex", alignItems: "center",
-    justifyContent: "space-between", gap: "40px", flexWrap: "wrap",
-  },
-  landlordLeft: { flex: 1, minWidth: "260px" },
-  landlordBadge: {
-    background: "#fbbf24", color: "#000",
-    padding: "4px 14px", borderRadius: "20px",
-    fontSize: "11px", fontWeight: 800,
-    letterSpacing: "0.08em", display: "inline-block", marginBottom: "16px",
-  },
-  landlordTitle: {
-    fontSize: "clamp(22px, 4vw, 32px)", fontWeight: 800,
-    color: "white", margin: "0 0 12px", lineHeight: 1.2,
-  },
-  landlordDesc: { fontSize: "15px", color: "#94a3b8", margin: "0 0 20px" },
-  landlordPerks: { display: "flex", flexDirection: "column", gap: "6px" },
-  perkItem: { fontSize: "14px", color: "#d1fae5", fontWeight: 500 },
-  landlordRight: { display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" },
-  landlordBtn: {
-    padding: "16px 36px", background: "#fbbf24", color: "#000",
-    border: "none", borderRadius: "12px", fontSize: "16px",
-    fontWeight: 800, cursor: "pointer", transition: "all 0.2s",
-    boxShadow: "0 6px 20px rgba(251,191,36,0.35)", whiteSpace: "nowrap",
-  },
-  landlordHint: { fontSize: "12px", color: "#6b7280", margin: 0 },
-
   /* Features */
   featuresSection: { padding: "72px 20px", background: "#f8f4f0", maxWidth: "1200px", margin: "0 auto" },
   featureGrid: {
@@ -904,13 +617,7 @@ const css = `
     box-shadow: 0 8px 24px rgba(0,0,0,0.08);
   }
 
-  .trust-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.07);
-  }
-
   @media (max-width: 620px) {
     .search-row { grid-template-columns: 1fr !important; }
-    .how-arrow { display: none !important; }
   }
 `;
