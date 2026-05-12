@@ -627,4 +627,4 @@ const css = `
   @media (max-width: 620px) {
     .search-row { grid-template-columns: 1fr !important; }
   }
-`;
+`;  nnnn
