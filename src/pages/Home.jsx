@@ -11,6 +11,7 @@ export default function Home() {
   const [searchForm, setSearchForm] = useState({ county: "", type: "" });
   const [featuredProperties, setFeaturedProperties] = useState([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
+  const [fetchError, setFetchError] = useState(false); // ✅ NEW: track error state
 
   const counties = [
     "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
@@ -44,10 +45,23 @@ export default function Home() {
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
-        const res = await API.get("/payment/featured");
-        setFeaturedProperties(res.data || []);
+        setFetchError(false);
+        const res = await API.get("/payment/featured", { timeout: 15000 }); // ✅ 15s timeout for Render cold starts
+
+        // ✅ FIXED: safely ensure we always set an array, never an object/null
+        const data = res?.data;
+        if (Array.isArray(data)) {
+          setFeaturedProperties(data);
+        } else if (data && Array.isArray(data.properties)) {
+          // handle e.g. { properties: [...] } response shape
+          setFeaturedProperties(data.properties);
+        } else {
+          setFeaturedProperties([]);
+        }
       } catch (err) {
-        console.error("Failed to load featured properties");
+        console.error("Failed to load featured properties:", err?.message || err);
+        setFetchError(true);      // ✅ flag the error
+        setFeaturedProperties([]); // ✅ always reset to safe empty array
       } finally {
         setLoadingFeatured(false);
       }
@@ -160,16 +174,28 @@ export default function Home() {
             <div className="spinner"></div>
             <p style={styles.loadingText}>Loading featured properties...</p>
           </div>
+        ) : fetchError ? (
+          // ✅ NEW: friendly error state instead of crashing
+          <div style={styles.noFeatured}>
+            <div style={styles.noFeaturedIcon}>⚠️</div>
+            <p style={styles.noFeaturedText}>Could not load featured listings</p>
+            <p style={styles.noFeaturedSub}>Our server may be waking up — please refresh in a moment.</p>
+            <button onClick={() => window.location.reload()} style={styles.boostBtn}>
+              🔄 Retry
+            </button>
+          </div>
         ) : featuredProperties.length > 0 ? (
           <>
             <div style={styles.featuredGrid}>
-              {featuredProperties.map((property) => (
+              {/* ✅ FIXED: extra safety guard on .map() */}
+              {(Array.isArray(featuredProperties) ? featuredProperties : []).map((property) => (
                 <div key={property._id} style={styles.featuredCard} className="featured-card">
                   <div style={styles.featuredImageWrapper}>
                     <img
                       src={property.images?.[0] || ""}
-                      alt={property.title}
+                      alt={property.title || "Property"}
                       style={styles.featuredImage}
+                      onError={(e) => { e.target.style.display = "none"; }} // ✅ hide broken images
                     />
                     <div style={styles.boostedBadge}>⭐ BOOSTED</div>
                     <div style={styles.featuredType}>{property.type || "Rental"}</div>
