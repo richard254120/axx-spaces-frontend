@@ -115,7 +115,7 @@ export default function Listings() {
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
-  // ✅ NEW: SMS Booking Option
+  // ✅ SMS Booking Option
   const handleSendSMS = (property) => {
     const phoneNumber = formatKenyaPhone(property.owner?.phone || property.phone || "");
     const message = `Hello, I want to BOOK this property:\n` +
@@ -126,18 +126,6 @@ export default function Listings() {
                     `Available: ${property.availableUnits} units\n\n` +
                     `Please reply with availability and booking details. Thank you!`;
     window.open(`sms:${phoneNumber}?body=${encodeURIComponent(message)}`, "_blank");
-  };
-
-  // ✅ NEW: Need Movers Function
-  const handleNeedMovers = (property) => {
-    const message = `Hello,\nI need professional movers for this property I saw on Axx Spaces:\n\n` +
-                    `🏠 ${property.title}\n` +
-                    `📍 ${property.county} - ${property.location}\n` +
-                    `💰 KES ${property.price?.toLocaleString()}/month\n` +
-                    `🛏 ${property.bedrooms} Bedrooms | 🚿 ${property.bathrooms} Bathrooms\n\n` +
-                    `Please quote me your moving rates. Thank you!`;
-    window.open(`https://wa.me/254712345678?text=${encodeURIComponent(message)}`, "_blank"); 
-    // Replace 254712345678 with your actual movers number later
   };
 
   const leaseLabel = { monthly: "Monthly", "6months": "6 Months", yearly: "Yearly" };
@@ -257,14 +245,6 @@ export default function Listings() {
                   💬 Contact via WhatsApp
                 </button>
 
-                {/* ✅ NEW MOVERS BUTTON ADDED HERE */}
-                <button 
-                  onClick={() => handleNeedMovers(property)}
-                  style={styles.moversBtn}
-                >
-                  🚚 Need Professional Movers?
-                </button>
-
                 <button style={styles.viewBtn} onClick={() => openModal(property)}>
                   👁️ View Details
                 </button>
@@ -274,7 +254,7 @@ export default function Listings() {
         </div>
       )}
 
-      {/* Modal - Your Original + NEW MOVERS BUTTON */}
+      {/* Modal */}
       {selectedProperty && (
         <div style={styles.modal} onClick={closeModal}>
           <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
@@ -386,7 +366,6 @@ export default function Listings() {
                 <p style={styles.landlordDetail}><strong>Phone:</strong> </p>
               </div>
 
-             
               {/* Four Buttons: WhatsApp, Call, SMS, Book */}
               <div style={styles.contactButtonsContainer}>
                 <button
@@ -420,7 +399,7 @@ export default function Listings() {
   );
 }
 
-/* ==================== ALL YOUR ORIGINAL STYLES + NEW MOVERS BUTTON ==================== */
+/* ==================== STYLES ==================== */
 const styles = {
   container: { maxWidth: "1200px", margin: "0 auto", padding: "20px", background: "linear-gradient(135deg, #06101f 0%, #0f1729 100%)", minHeight: "100vh", fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont" },
   header: { textAlign: "center", marginBottom: "40px", color: "#f1f5f9" },
@@ -508,20 +487,6 @@ const styles = {
     cursor: "pointer",
     fontSize: "0.95rem"
   },
-
-  // ✅ NEW MOVERS BUTTON STYLE
-  moversBtn: {
-    width: "100%",
-    padding: "14px",
-    background: "linear-gradient(135deg, #f59e0b, #d97706)",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    fontWeight: 700,
-    cursor: "pointer",
-    margin: "12px 0",
-    fontSize: "1rem"
-  }
 };
 
 const cssStyles = `
