@@ -126,7 +126,7 @@ export default function Home() {
               </button>
             </div>
             <p style={styles.searchHint}>
-              🔥 <strong>2,340</strong> new listings added this week
+              🔥 <strong>40</strong> new listings added this week
             </p>
           </form>
 
@@ -330,9 +330,11 @@ const styles = {
   /* Hero */
   hero: {
     background: "linear-gradient(150deg, #ffffff 0%, #fef3e2 55%, #fff7ed 100%)",
-    padding: "40px 20px 44px",
+    padding: "40px 16px 44px",
     textAlign: "center",
     borderBottom: "3px solid #fbbf24",
+    width: "100%",
+    boxSizing: "border-box",
   },
   heroContent: { maxWidth: "820px", margin: "0 auto" },
   logoContainer: { display: "flex", justifyContent: "center", marginBottom: "16px" },
@@ -376,12 +378,14 @@ const styles = {
   searchCard: {
     background: "white",
     borderRadius: "16px",
-    padding: "24px 28px 18px",
+    padding: "20px 16px 16px",
     boxShadow: "0 8px 40px rgba(0,0,0,0.10)",
     maxWidth: "680px",
+    width: "100%",
     margin: "0 auto 30px",
     textAlign: "left",
     border: "1px solid #f3f4f6",
+    boxSizing: "border-box",
   },
   searchLabel: {
     fontSize: "13px",
@@ -393,7 +397,7 @@ const styles = {
   },
   searchRow: {
     display: "grid",
-    gridTemplateColumns: "1fr 1fr auto",
+    gridTemplateColumns: "1fr 1fr",
     gap: "10px",
     alignItems: "center",
   },
@@ -406,9 +410,11 @@ const styles = {
     background: "#f9fafb",
     color: "#1f2937",
     transition: "all 0.2s",
+    width: "100%",
+    boxSizing: "border-box",
   },
   searchBtn: {
-    padding: "12px 22px",
+    padding: "13px 22px",
     background: "#ef4444",
     color: "white",
     border: "none",
@@ -416,9 +422,10 @@ const styles = {
     fontSize: "15px",
     fontWeight: 700,
     cursor: "pointer",
-    whiteSpace: "nowrap",
     transition: "all 0.2s",
     boxShadow: "0 4px 14px rgba(239,68,68,0.35)",
+    width: "100%",
+    gridColumn: "1 / -1",
   },
   searchHint: {
     fontSize: "12px",
