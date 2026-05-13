@@ -7,8 +7,9 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Upload from "./pages/Upload";
 import LandlordDashboard from "./pages/LandlordDashboard";
-import MoverDashboard from "./pages/MoverDashboard"; 
-import Movers from "./pages/Movers"; // ✅ ADD THIS IMPORT
+import MoverDashboard from "./pages/MoverDashboard";
+import Movers from "./pages/Movers";
+import ResetPassword from "./pages/ResetPassword"; // ✅ ADDED
 
 // Premium pages
 import PremiumPlans from "./pages/PremiumPlans";
@@ -24,20 +25,23 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/listings" element={<Listings />} />
-        <Route path="/movers" element={<Movers />} /> {/* ✅ ADD THIS ROUTE */}
+        <Route path="/movers" element={<Movers />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/upload" element={<Upload />} />
-        
+
         {/* LANDLORD ROUTES */}
         <Route path="/dashboard" element={<LandlordDashboard />} />
-        
+
         {/* MOVER ROUTES */}
-        <Route path="/mover-dashboard" element={<MoverDashboard />} /> 
-        
+        <Route path="/mover-dashboard" element={<MoverDashboard />} />
+
         {/* PREMIUM ROUTES */}
         <Route path="/premium-plans" element={<PremiumPlans />} />
         <Route path="/checkout" element={<Checkout />} />
+
+        {/* PASSWORD RESET ROUTE ✅ */}
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
     </>
   );

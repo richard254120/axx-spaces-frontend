@@ -9,13 +9,16 @@ export default function Login() {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // ✅ Forgot password state
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotMsg, setForgotMsg] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,32 +50,53 @@ export default function Login() {
         throw new Error(data.error || "Login failed");
       }
 
-      // 1. Save data to AuthContext
       login(data.token, data.user);
 
-      // 2. Normalize role for comparison (prevents "Landlord" vs "landlord" issues)
       const userRole = data.user?.role?.toLowerCase().trim();
-      console.log("Logged in user role:", userRole); // Debugging
-
       setSuccess("✅ Login successful! Redirecting...");
 
-      // 3. Perform Redirect
       setTimeout(() => {
         if (userRole === "landlord") {
-          navigate("/dashboard"); 
+          navigate("/dashboard");
         } else if (userRole === "mover") {
           navigate("/mover-dashboard");
         } else {
-          console.warn("Unexpected role, going home:", userRole);
-          navigate("/"); 
+          navigate("/");
         }
       }, 1000);
 
     } catch (err) {
-      console.error("Login Error:", err);
       setError(err.message || "❌ Login failed. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // ✅ Handle forgot password
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setForgotMsg("");
+
+    if (!forgotEmail) {
+      setForgotMsg("❌ Please enter your email address.");
+      return;
+    }
+
+    setForgotLoading(true);
+
+    try {
+      const response = await fetch(`${API_BASE}/auth/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail }),
+      });
+
+      const data = await response.json();
+      setForgotMsg(data.message || "✅ Reset link sent! Check your inbox.");
+    } catch (err) {
+      setForgotMsg("❌ Failed to send reset email. Try again.");
+    } finally {
+      setForgotLoading(false);
     }
   };
 
@@ -85,68 +109,130 @@ export default function Login() {
         </div>
 
         <div style={styles.formBox}>
-          <h1 style={styles.title}>🏠 Landlord Portal</h1>
-          <p style={styles.subtitle}>Manage your properties and tenants</p>
 
-          {error && <div style={styles.error}>{error}</div>}
-          {success && <div style={styles.success}>{success}</div>}
+          {/* ✅ FORGOT PASSWORD FORM */}
+          {showForgot ? (
+            <>
+              <h1 style={styles.title}>🔐 Reset Password</h1>
+              <p style={styles.subtitle}>Enter your email to receive a reset link</p>
 
-          <form onSubmit={handleSubmit} style={styles.form}>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Email Address</label>
-              <input
-                type="email"
-                name="email"
-                placeholder="e.g., landlord@example.com"
-                value={formData.email}
-                onChange={handleChange}
-                style={styles.input}
-                required
-              />
-            </div>
+              {forgotMsg && (
+                <div style={forgotMsg.includes("❌") ? styles.error : styles.success}>
+                  {forgotMsg}
+                </div>
+              )}
 
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Password</label>
-              <input
-                type="password"
-                name="password"
-                placeholder="Enter your password"
-                value={formData.password}
-                onChange={handleChange}
-                style={styles.input}
-                required
-              />
-            </div>
+              <form onSubmit={handleForgotPassword} style={styles.form}>
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>Email Address</label>
+                  <input
+                    type="email"
+                    placeholder="Enter your registered email"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    style={styles.input}
+                    required
+                  />
+                </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                ...styles.submitBtn,
-                opacity: loading ? 0.7 : 1,
-                cursor: loading ? "not-allowed" : "pointer",
-              }}
-            >
-              {loading ? "⏳ Verifying..." : "🚀 Login to Dashboard"}
-            </button>
-          </form>
+                <button
+                  type="submit"
+                  disabled={forgotLoading}
+                  style={{
+                    ...styles.submitBtn,
+                    opacity: forgotLoading ? 0.7 : 1,
+                    cursor: forgotLoading ? "not-allowed" : "pointer",
+                  }}
+                >
+                  {forgotLoading ? "⏳ Sending..." : "📧 Send Reset Link"}
+                </button>
+              </form>
 
-          <div style={styles.divider}></div>
+              <div style={styles.divider}></div>
 
-          <p style={styles.footer}>
-            Need to register a property?{" "}
-            <Link to="/register" style={styles.link}>Create Account</Link>
-          </p>
-          <p style={{...styles.footer, marginTop: "10px", fontSize: "12px"}}>
-            Are you a mover? <Link to="/movers" style={styles.link}>Go to Mover Portal</Link>
-          </p>
+              <p style={styles.footer}>
+                <span
+                  onClick={() => { setShowForgot(false); setForgotMsg(""); }}
+                  style={styles.link}
+                >
+                  ← Back to Login
+                </span>
+              </p>
+            </>
+          ) : (
+            <>
+              {/* ✅ LOGIN FORM */}
+              <h1 style={styles.title}>🏠 Landlord Portal</h1>
+              <p style={styles.subtitle}>Manage your properties and tenants</p>
+
+              {error && <div style={styles.error}>{error}</div>}
+              {success && <div style={styles.success}>{success}</div>}
+
+              <form onSubmit={handleSubmit} style={styles.form}>
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>Email Address</label>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="e.g., landlord@example.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                    style={styles.input}
+                    required
+                  />
+                </div>
+
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>Password</label>
+                  <input
+                    type="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    style={styles.input}
+                    required
+                  />
+                  {/* ✅ FORGOT PASSWORD LINK */}
+                  <span
+                    onClick={() => { setShowForgot(true); setError(""); }}
+                    style={styles.forgotLink}
+                  >
+                    Forgot password?
+                  </span>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  style={{
+                    ...styles.submitBtn,
+                    opacity: loading ? 0.7 : 1,
+                    cursor: loading ? "not-allowed" : "pointer",
+                  }}
+                >
+                  {loading ? "⏳ Verifying..." : "🚀 Login to Dashboard"}
+                </button>
+              </form>
+
+              <div style={styles.divider}></div>
+
+              <p style={styles.footer}>
+                Need to register a property?{" "}
+                <Link to="/register" style={styles.link}>Create Account</Link>
+              </p>
+              <p style={{ ...styles.footer, marginTop: "10px", fontSize: "12px" }}>
+                Are you a mover?{" "}
+                <Link to="/movers" style={styles.link}>Go to Mover Portal</Link>
+              </p>
+            </>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-// ... styles and css variables stay exactly as you had them
 const styles = {
   root: { fontFamily: "'DM Sans', sans-serif", background: "linear-gradient(135deg, #ffffff 0%, #fef3e2 50%, #fef9e7 100%)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" },
   container: { width: "100%", maxWidth: "450px" },
@@ -164,7 +250,8 @@ const styles = {
   submitBtn: { padding: "14px", background: "linear-gradient(135deg, #2427fb 0%, #4d9ffc 100%)", color: "white", border: "none", borderRadius: "8px", fontWeight: 700, fontSize: "16px" },
   divider: { height: "1px", background: "#e5e7eb", margin: "25px 0" },
   footer: { textAlign: "center", color: "#6b7280", fontSize: "14px" },
-  link: { color: "#2427fb", textDecoration: "none", fontWeight: 700 },
+  link: { color: "#2427fb", textDecoration: "none", fontWeight: 700, cursor: "pointer" },
+  forgotLink: { fontSize: "12px", color: "#2427fb", cursor: "pointer", textAlign: "right", fontWeight: 600, marginTop: "2px" },
 };
 
 const css = `
