@@ -91,7 +91,7 @@ export default function Navbar() {
         <Link to="/movers" style={styles.navLink} onClick={() => setMenuOpen(false)}>
           Movers
         </Link>
-
+          
         {token && user ? (
           <>
             <Link to="/upload" style={styles.navLink} onClick={() => setMenuOpen(false)}>
@@ -114,6 +114,9 @@ export default function Navbar() {
             </Link>
             <Link to="/register" style={styles.registerLink} onClick={() => setMenuOpen(false)}>
               Register
+            </Link>
+            <Link to="/about" style={styles.navLink} onClick={() => setMenuOpen(false)}>
+            About
             </Link>
           </>
         )}

@@ -10,7 +10,7 @@ import LandlordDashboard from "./pages/LandlordDashboard";
 import MoverDashboard from "./pages/MoverDashboard";
 import Movers from "./pages/Movers";
 import ResetPassword from "./pages/ResetPassword"; // ✅ ADDED
-
+import AboutUs from "./pages/AboutUs";
 // Premium pages
 import PremiumPlans from "./pages/PremiumPlans";
 import Checkout from "./pages/Checkout";
@@ -23,13 +23,14 @@ function App() {
       <Navbar />
 
       <Routes>
+      
         <Route path="/" element={<Home />} />
         <Route path="/listings" element={<Listings />} />
         <Route path="/movers" element={<Movers />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/upload" element={<Upload />} />
-
+        <Route path="/about" element={<AboutUs />} />
         {/* LANDLORD ROUTES */}
         <Route path="/dashboard" element={<LandlordDashboard />} />
 
