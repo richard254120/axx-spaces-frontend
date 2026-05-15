@@ -1,7 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import logo from "../assets/logo.jpeg";
 import API from "../api/api";
 
 export default function Home() {
@@ -11,6 +10,7 @@ export default function Home() {
   const [searchForm, setSearchForm] = useState({ county: "", type: "" });
   const [featuredProperties, setFeaturedProperties] = useState([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
 
   const counties = [
     "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
@@ -44,10 +44,20 @@ export default function Home() {
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
-        const res = await API.get("/payment/featured");
-        setFeaturedProperties(res.data || []);
+        setFetchError(false);
+        const res = await API.get("/payment/featured", { timeout: 15000 });
+        const data = res?.data;
+        if (Array.isArray(data)) {
+          setFeaturedProperties(data);
+        } else if (data && Array.isArray(data.properties)) {
+          setFeaturedProperties(data.properties);
+        } else {
+          setFeaturedProperties([]);
+        }
       } catch (err) {
-        console.error("Failed to load featured properties");
+        console.error("Failed to load featured properties:", err?.message || err);
+        setFetchError(true);
+        setFeaturedProperties([]);
       } finally {
         setLoadingFeatured(false);
       }
@@ -72,23 +82,9 @@ export default function Home() {
     <div style={styles.root}>
       <style>{css}</style>
 
-      {/* ── MARQUEE ── */}
-      <div style={styles.marqueeWrapper}>
-        <div className="marquee-track">
-          {[...marqueeItems, ...marqueeItems].map((item, idx) => (
-            <span key={idx} style={styles.marqueePill}>
-              {item}<span style={styles.marqueeSep}>·</span>
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* ── HERO ── */}
+      {/* ── HERO — at very top, no logo ── */}
       <section style={styles.hero}>
         <div style={styles.heroContent}>
-          <div style={styles.logoContainer}>
-            <img src={logo} alt="Axx Spaces" style={styles.heroLogo} />
-          </div>
 
           <div style={styles.trustBadge}>
             <span style={styles.trustDot}></span>
@@ -146,7 +142,18 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── FEATURED LISTINGS ── */}
+      {/* ── MARQUEE ── */}
+      <div style={styles.marqueeWrapper}>
+        <div className="marquee-track">
+          {[...marqueeItems, ...marqueeItems].map((item, idx) => (
+            <span key={idx} style={styles.marqueePill}>
+              {item}<span style={styles.marqueeSep}>·</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* ── FEATURED LISTINGS — scrolling marquee cards ── */}
       <section style={styles.featuredSection}>
         <div style={styles.sectionHeader}>
           <h2 style={styles.sectionTitle}>⭐ Featured Premium Listings</h2>
@@ -160,41 +167,54 @@ export default function Home() {
             <div className="spinner"></div>
             <p style={styles.loadingText}>Loading featured properties...</p>
           </div>
+        ) : fetchError ? (
+          <div style={styles.noFeatured}>
+            <div style={styles.noFeaturedIcon}>⚠️</div>
+            <p style={styles.noFeaturedText}>Could not load featured listings</p>
+            <p style={styles.noFeaturedSub}>Our server may be waking up — please refresh in a moment.</p>
+            <button onClick={() => window.location.reload()} style={styles.boostBtn}>
+              🔄 Retry
+            </button>
+          </div>
         ) : featuredProperties.length > 0 ? (
           <>
-            <div style={styles.featuredGrid}>
-              {featuredProperties.map((property) => (
-                <div key={property._id} style={styles.featuredCard} className="featured-card">
-                  <div style={styles.featuredImageWrapper}>
-                    <img
-                      src={property.images?.[0] || ""}
-                      alt={property.title}
-                      style={styles.featuredImage}
-                    />
-                    <div style={styles.boostedBadge}>⭐ BOOSTED</div>
-                    <div style={styles.featuredType}>{property.type || "Rental"}</div>
-                  </div>
-                  <div style={styles.featuredInfo}>
-                    <h3 style={styles.featuredTitle}>{property.title}</h3>
-                    <p style={styles.featuredLocation}>📍 {property.area}, {property.county}</p>
-                    <div style={styles.featuredMeta}>
-                      {property.bedrooms && <span style={styles.metaTag}>🛏 {property.bedrooms} Bed</span>}
-                      {property.bathrooms && <span style={styles.metaTag}>🚿 {property.bathrooms} Bath</span>}
+            {/* ✅ Marquee-style scrolling cards */}
+            <div style={styles.marqueeCardsWrapper}>
+              <div className="cards-marquee-track">
+                {[...featuredProperties, ...featuredProperties].map((property, idx) => (
+                  <div key={`${property._id}-${idx}`} style={styles.featuredCard} className="featured-card">
+                    <div style={styles.featuredImageWrapper}>
+                      <img
+                        src={property.images?.[0] || ""}
+                        alt={property.title || "Property"}
+                        style={styles.featuredImage}
+                        onError={(e) => { e.target.style.display = "none"; }}
+                      />
+                      <div style={styles.boostedBadge}>⭐ BOOSTED</div>
+                      <div style={styles.featuredType}>{property.type || "Rental"}</div>
                     </div>
-                    <p style={styles.featuredPrice}>
-                      KSh {Number(property.price).toLocaleString()}
-                      <span style={styles.perMonth}> / month</span>
-                    </p>
-                    <button
-                      onClick={() => navigate(`/listings?highlight=${property._id}`)}
-                      style={styles.viewBtn}
-                      className="view-btn"
-                    >
-                      View Property →
-                    </button>
+                    <div style={styles.featuredInfo}>
+                      <h3 style={styles.featuredTitle}>{property.title}</h3>
+                      <p style={styles.featuredLocation}>📍 {property.area}, {property.county}</p>
+                      <div style={styles.featuredMeta}>
+                        {property.bedrooms && <span style={styles.metaTag}>🛏 {property.bedrooms} Bed</span>}
+                        {property.bathrooms && <span style={styles.metaTag}>🚿 {property.bathrooms} Bath</span>}
+                      </div>
+                      <p style={styles.featuredPrice}>
+                        KSh {Number(property.price).toLocaleString()}
+                        <span style={styles.perMonth}> / month</span>
+                      </p>
+                      <button
+                        onClick={() => navigate(`/listings?highlight=${property._id}`)}
+                        style={styles.viewBtn}
+                        className="view-btn"
+                      >
+                        View Property →
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
             <div style={{ textAlign: "center", marginTop: "32px" }}>
               <button onClick={() => navigate("/listings")} style={styles.viewAllBtn}>
@@ -299,58 +319,28 @@ const styles = {
     minHeight: "100vh",
   },
 
-  /* Marquee */
-  marqueeWrapper: {
-    overflow: "hidden",
-    background: "#fbbf24",
-    padding: "9px 0",
-    borderBottom: "2px solid #f59e0b",
-  },
-  marqueePill: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "10px",
-    background: "white",
-    borderRadius: "20px",
-    padding: "4px 16px",
-    margin: "0 8px",
-    fontSize: "13px",
-    fontWeight: 600,
-    color: "#1f2937",
-    whiteSpace: "nowrap",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
-  },
-  marqueeSep: {
-    color: "#d97706",
-    fontWeight: 700,
-    fontSize: "16px",
-    marginLeft: "8px",
-  },
-
-  /* Hero */
+  /* Hero — no logo, at very top */
   hero: {
-    background: "linear-gradient(150deg, #ffffff 0%, #fef3e2 55%, #fff7ed 100%)",
-    padding: "40px 16px 44px",
+    background: "linear-gradient(150deg, #1f2937 0%, #111827 60%, #0f172a 100%)",
+    padding: "60px 16px 52px",
     textAlign: "center",
     borderBottom: "3px solid #fbbf24",
     width: "100%",
     boxSizing: "border-box",
   },
   heroContent: { maxWidth: "820px", margin: "0 auto" },
-  logoContainer: { display: "flex", justifyContent: "center", marginBottom: "16px" },
-  heroLogo: { height: "80px", width: "auto" },
   trustBadge: {
     display: "inline-flex",
     alignItems: "center",
     gap: "8px",
-    background: "#dcfce7",
-    color: "#15803d",
+    background: "rgba(34,197,94,0.15)",
+    color: "#4ade80",
     padding: "5px 16px",
     borderRadius: "20px",
     fontSize: "13px",
     fontWeight: 600,
     marginBottom: "18px",
-    border: "1px solid #bbf7d0",
+    border: "1px solid rgba(34,197,94,0.3)",
   },
   trustDot: {
     width: "8px",
@@ -361,16 +351,16 @@ const styles = {
     animation: "pulse 1.8s infinite",
   },
   heroTitle: {
-    fontSize: "clamp(30px, 5.5vw, 52px)",
+    fontSize: "clamp(32px, 6vw, 58px)",
     fontWeight: 800,
-    color: "#1f2937",
-    margin: "0 0 12px",
+    color: "#ffffff",
+    margin: "0 0 14px",
     letterSpacing: "-1.5px",
     lineHeight: 1.15,
   },
   heroSubtitle: {
     fontSize: "16px",
-    color: "#6b7280",
+    color: "#94a3b8",
     margin: "0 auto 30px",
     maxWidth: "480px",
     lineHeight: 1.6,
@@ -379,7 +369,7 @@ const styles = {
     background: "white",
     borderRadius: "16px",
     padding: "20px 16px 16px",
-    boxShadow: "0 8px 40px rgba(0,0,0,0.10)",
+    boxShadow: "0 8px 40px rgba(0,0,0,0.30)",
     maxWidth: "680px",
     width: "100%",
     margin: "0 auto 30px",
@@ -441,32 +431,64 @@ const styles = {
     marginTop: "4px",
   },
   heroStat: { display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" },
-  heroStatVal: { fontSize: "20px", fontWeight: 800, color: "#1f2937" },
-  heroStatLabel: { fontSize: "11px", color: "#9ca3af", fontWeight: 500 },
+  heroStatVal: { fontSize: "20px", fontWeight: 800, color: "#fbbf24" },
+  heroStatLabel: { fontSize: "11px", color: "#64748b", fontWeight: 500 },
 
-  /* Featured */
-  featuredSection: { padding: "60px 20px", background: "#1f2937", color: "white" },
-  sectionHeader: { textAlign: "center", marginBottom: "44px" },
+  /* Marquee */
+  marqueeWrapper: {
+    overflow: "hidden",
+    background: "#fbbf24",
+    padding: "9px 0",
+    borderBottom: "2px solid #f59e0b",
+  },
+  marqueePill: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "10px",
+    background: "white",
+    borderRadius: "20px",
+    padding: "4px 16px",
+    margin: "0 8px",
+    fontSize: "13px",
+    fontWeight: 600,
+    color: "#1f2937",
+    whiteSpace: "nowrap",
+    boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+  },
+  marqueeSep: {
+    color: "#d97706",
+    fontWeight: 700,
+    fontSize: "16px",
+    marginLeft: "8px",
+  },
+
+  /* Featured — marquee scrolling cards */
+  featuredSection: { padding: "60px 0 60px", background: "#1f2937", color: "white", overflow: "hidden" },
+  sectionHeader: { textAlign: "center", marginBottom: "44px", padding: "0 20px" },
   sectionTitle: { fontSize: "30px", fontWeight: 800, color: "#fbbf24", margin: "0 0 10px" },
   sectionSubtitle: { color: "#94a3b8", fontSize: "16px", margin: 0 },
   loadingWrap: { display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", padding: "40px 0" },
   loadingText: { color: "#94a3b8", fontSize: "15px" },
-  featuredGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(270px, 1fr))",
-    gap: "22px",
-    maxWidth: "1200px",
-    margin: "0 auto",
+
+  /* ✅ Marquee cards container */
+  marqueeCardsWrapper: {
+    overflow: "hidden",
+    width: "100%",
   },
+
   featuredCard: {
     background: "#111827",
     borderRadius: "14px",
     overflow: "hidden",
     border: "1px solid #334155",
     transition: "transform 0.25s, box-shadow 0.25s",
+    minWidth: "280px",
+    maxWidth: "280px",
+    flexShrink: 0,
+    margin: "0 12px",
   },
   featuredImageWrapper: { position: "relative" },
-  featuredImage: { width: "100%", height: "195px", objectFit: "cover", display: "block" },
+  featuredImage: { width: "100%", height: "180px", objectFit: "cover", display: "block" },
   boostedBadge: {
     position: "absolute", top: "12px", left: "12px",
     background: "#eab308", color: "#000",
@@ -480,21 +502,21 @@ const styles = {
     fontSize: "11px", fontWeight: 600,
   },
   featuredInfo: { padding: "16px 18px 20px" },
-  featuredTitle: { fontSize: "16px", fontWeight: 700, margin: "0 0 6px", color: "white" },
-  featuredLocation: { color: "#94a3b8", margin: "0 0 8px", fontSize: "13px" },
+  featuredTitle: { fontSize: "15px", fontWeight: 700, margin: "0 0 6px", color: "white" },
+  featuredLocation: { color: "#94a3b8", margin: "0 0 8px", fontSize: "12px" },
   featuredMeta: { display: "flex", gap: "8px", marginBottom: "8px", flexWrap: "wrap" },
   metaTag: {
     background: "#1e3a5f", color: "#93c5fd",
     padding: "3px 10px", borderRadius: "6px",
-    fontSize: "12px", fontWeight: 500,
+    fontSize: "11px", fontWeight: 500,
   },
-  featuredPrice: { color: "#22c55e", fontSize: "18px", fontWeight: 800, margin: "8px 0 0" },
-  perMonth: { fontSize: "13px", color: "#4ade80", fontWeight: 400 },
+  featuredPrice: { color: "#22c55e", fontSize: "17px", fontWeight: 800, margin: "8px 0 0" },
+  perMonth: { fontSize: "12px", color: "#4ade80", fontWeight: 400 },
   viewBtn: {
     marginTop: "14px", width: "100%", padding: "11px",
     background: "#3b82f6", color: "white", border: "none",
     borderRadius: "8px", cursor: "pointer", fontWeight: 700,
-    fontSize: "14px", transition: "background 0.2s",
+    fontSize: "13px", transition: "background 0.2s",
   },
   viewAllBtn: {
     padding: "13px 36px", background: "transparent",
@@ -570,6 +592,12 @@ const css = `
     0%   { transform: translateX(0); }
     100% { transform: translateX(-50%); }
   }
+
+  @keyframes cardsMarquee {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
   @keyframes pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
     50%       { opacity: 0.5; transform: scale(1.3); }
@@ -585,6 +613,16 @@ const css = `
     animation: marquee 34s linear infinite;
   }
   .marquee-track:hover { animation-play-state: paused; }
+
+  /* ✅ Cards marquee track */
+  .cards-marquee-track {
+    display: flex;
+    align-items: stretch;
+    width: max-content;
+    animation: cardsMarquee 30s linear infinite;
+    padding: 10px 0 20px;
+  }
+  .cards-marquee-track:hover { animation-play-state: paused; }
 
   .spinner {
     width: 32px; height: 32px;
@@ -627,4 +665,4 @@ const css = `
   @media (max-width: 620px) {
     .search-row { grid-template-columns: 1fr !important; }
   }
-`;  
+`;
