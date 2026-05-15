@@ -82,7 +82,18 @@ export default function Home() {
     <div style={styles.root}>
       <style>{css}</style>
 
-      {/* ── HERO — at very top, no logo ── */}
+      {/* ── MARQUEE at top ── */}
+      <div style={styles.marqueeWrapper}>
+        <div className="marquee-track">
+          {[...marqueeItems, ...marqueeItems].map((item, idx) => (
+            <span key={idx} style={styles.marqueePill}>
+              {item}<span style={styles.marqueeSep}>·</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* ── HERO — original background, no logo ── */}
       <section style={styles.hero}>
         <div style={styles.heroContent}>
 
@@ -126,12 +137,12 @@ export default function Home() {
             </p>
           </form>
 
+          {/* ✅ Removed User Rating, Active Listings now 280 */}
           <div style={styles.heroStats}>
             {[
-              { val: "10K+", label: "Active Listings" },
+              { val: "280", label: "Active Listings" },
               { val: "47", label: "Counties" },
               { val: "5K+", label: "Happy Tenants" },
-              { val: "4.9★", label: "User Rating" },
             ].map((s) => (
               <div key={s.label} style={styles.heroStat}>
                 <span style={styles.heroStatVal}>{s.val}</span>
@@ -142,18 +153,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── MARQUEE ── */}
-      <div style={styles.marqueeWrapper}>
-        <div className="marquee-track">
-          {[...marqueeItems, ...marqueeItems].map((item, idx) => (
-            <span key={idx} style={styles.marqueePill}>
-              {item}<span style={styles.marqueeSep}>·</span>
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* ── FEATURED LISTINGS — scrolling marquee cards ── */}
+      {/* ── FEATURED LISTINGS — directly below hero, marquee scrolling cards ── */}
       <section style={styles.featuredSection}>
         <div style={styles.sectionHeader}>
           <h2 style={styles.sectionTitle}>⭐ Featured Premium Listings</h2>
@@ -178,7 +178,7 @@ export default function Home() {
           </div>
         ) : featuredProperties.length > 0 ? (
           <>
-            {/* ✅ Marquee-style scrolling cards */}
+            {/* ✅ Marquee scrolling cards */}
             <div style={styles.marqueeCardsWrapper}>
               <div className="cards-marquee-track">
                 {[...featuredProperties, ...featuredProperties].map((property, idx) => (
@@ -319,10 +319,38 @@ const styles = {
     minHeight: "100vh",
   },
 
-  /* Hero — no logo, at very top */
+  /* Marquee — back at top */
+  marqueeWrapper: {
+    overflow: "hidden",
+    background: "#fbbf24",
+    padding: "9px 0",
+    borderBottom: "2px solid #f59e0b",
+  },
+  marqueePill: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "10px",
+    background: "white",
+    borderRadius: "20px",
+    padding: "4px 16px",
+    margin: "0 8px",
+    fontSize: "13px",
+    fontWeight: 600,
+    color: "#1f2937",
+    whiteSpace: "nowrap",
+    boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+  },
+  marqueeSep: {
+    color: "#d97706",
+    fontWeight: 700,
+    fontSize: "16px",
+    marginLeft: "8px",
+  },
+
+  /* Hero — original background, no logo */
   hero: {
-    background: "linear-gradient(150deg, #1f2937 0%, #111827 60%, #0f172a 100%)",
-    padding: "60px 16px 52px",
+    background: "linear-gradient(150deg, #ffffff 0%, #fef3e2 55%, #fff7ed 100%)",
+    padding: "40px 16px 44px",
     textAlign: "center",
     borderBottom: "3px solid #fbbf24",
     width: "100%",
@@ -333,14 +361,14 @@ const styles = {
     display: "inline-flex",
     alignItems: "center",
     gap: "8px",
-    background: "rgba(34,197,94,0.15)",
-    color: "#4ade80",
+    background: "#dcfce7",
+    color: "#15803d",
     padding: "5px 16px",
     borderRadius: "20px",
     fontSize: "13px",
     fontWeight: 600,
     marginBottom: "18px",
-    border: "1px solid rgba(34,197,94,0.3)",
+    border: "1px solid #bbf7d0",
   },
   trustDot: {
     width: "8px",
@@ -351,16 +379,16 @@ const styles = {
     animation: "pulse 1.8s infinite",
   },
   heroTitle: {
-    fontSize: "clamp(32px, 6vw, 58px)",
+    fontSize: "clamp(30px, 5.5vw, 52px)",
     fontWeight: 800,
-    color: "#ffffff",
-    margin: "0 0 14px",
+    color: "#1f2937",
+    margin: "0 0 12px",
     letterSpacing: "-1.5px",
     lineHeight: 1.15,
   },
   heroSubtitle: {
     fontSize: "16px",
-    color: "#94a3b8",
+    color: "#6b7280",
     margin: "0 auto 30px",
     maxWidth: "480px",
     lineHeight: 1.6,
@@ -369,7 +397,7 @@ const styles = {
     background: "white",
     borderRadius: "16px",
     padding: "20px 16px 16px",
-    boxShadow: "0 8px 40px rgba(0,0,0,0.30)",
+    boxShadow: "0 8px 40px rgba(0,0,0,0.10)",
     maxWidth: "680px",
     width: "100%",
     margin: "0 auto 30px",
@@ -431,38 +459,10 @@ const styles = {
     marginTop: "4px",
   },
   heroStat: { display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" },
-  heroStatVal: { fontSize: "20px", fontWeight: 800, color: "#fbbf24" },
-  heroStatLabel: { fontSize: "11px", color: "#64748b", fontWeight: 500 },
+  heroStatVal: { fontSize: "20px", fontWeight: 800, color: "#1f2937" },
+  heroStatLabel: { fontSize: "11px", color: "#9ca3af", fontWeight: 500 },
 
-  /* Marquee */
-  marqueeWrapper: {
-    overflow: "hidden",
-    background: "#fbbf24",
-    padding: "9px 0",
-    borderBottom: "2px solid #f59e0b",
-  },
-  marqueePill: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "10px",
-    background: "white",
-    borderRadius: "20px",
-    padding: "4px 16px",
-    margin: "0 8px",
-    fontSize: "13px",
-    fontWeight: 600,
-    color: "#1f2937",
-    whiteSpace: "nowrap",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
-  },
-  marqueeSep: {
-    color: "#d97706",
-    fontWeight: 700,
-    fontSize: "16px",
-    marginLeft: "8px",
-  },
-
-  /* Featured — marquee scrolling cards */
+  /* Featured — directly below hero */
   featuredSection: { padding: "60px 0 60px", background: "#1f2937", color: "white", overflow: "hidden" },
   sectionHeader: { textAlign: "center", marginBottom: "44px", padding: "0 20px" },
   sectionTitle: { fontSize: "30px", fontWeight: 800, color: "#fbbf24", margin: "0 0 10px" },
@@ -470,12 +470,10 @@ const styles = {
   loadingWrap: { display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", padding: "40px 0" },
   loadingText: { color: "#94a3b8", fontSize: "15px" },
 
-  /* ✅ Marquee cards container */
   marqueeCardsWrapper: {
     overflow: "hidden",
     width: "100%",
   },
-
   featuredCard: {
     background: "#111827",
     borderRadius: "14px",
@@ -592,12 +590,10 @@ const css = `
     0%   { transform: translateX(0); }
     100% { transform: translateX(-50%); }
   }
-
   @keyframes cardsMarquee {
     0%   { transform: translateX(0); }
     100% { transform: translateX(-50%); }
   }
-
   @keyframes pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
     50%       { opacity: 0.5; transform: scale(1.3); }
@@ -614,7 +610,6 @@ const css = `
   }
   .marquee-track:hover { animation-play-state: paused; }
 
-  /* ✅ Cards marquee track */
   .cards-marquee-track {
     display: flex;
     align-items: stretch;
