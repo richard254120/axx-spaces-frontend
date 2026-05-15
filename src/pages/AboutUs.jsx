@@ -5,22 +5,22 @@ export default function AboutUs() {
 
   const team = [
     {
-      name: "Richard Oguda",
+      name: "Kenfred",
       role: "Co-Founder & CEO",
       emoji: "👨‍💼",
       bio: "Passionate about solving Kenya's housing challenges through technology. Richard leads product vision and strategy at Axx Spaces.",
     },
     {
-      name: "Lucy Lee",
+      name: "Lucie",
       role: "Co-Founder & Operations",
       emoji: "👩‍💼",
-      bio: "Lucy oversees landlord relations and ensures every listing on Axx Spaces meets our quality and verification standards.",
+      bio: "Lucie oversees landlord relations and ensures every listing on Axx Spaces meets our quality and verification standards.",
     },
     {
-      name: "Ken Fred",
+      name: "Richard",
       role: "Co-Founder & Technology",
       emoji: "👨‍💻",
-      bio: "Ken drives the technical infrastructure that powers Axx Spaces, ensuring a seamless experience for landlords and tenants alike.",
+      bio: "drives the technical infrastructure that powers Axx Spaces, ensuring a seamless experience for landlords and tenants alike.",
     },
   ];
 
