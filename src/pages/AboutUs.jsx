@@ -8,7 +8,7 @@ export default function AboutUs() {
       name: "Kenfred",
       role: "Co-Founder & CEO",
       emoji: "👨‍💼",
-      bio: "Passionate about solving Kenya's housing challenges through technology. Richard leads product vision and strategy at Axx Spaces.",
+      bio: "Passionate about solving Kenya's housing challenges through technology. Kenfred leads product vision and strategy at Axx Spaces.",
     },
     {
       name: "Lucie",
