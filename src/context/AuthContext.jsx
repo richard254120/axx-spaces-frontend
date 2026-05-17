@@ -5,19 +5,21 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
-  const [loading, setLoading] = useState(true); // ✅ Guard against blank flash
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Read localStorage only after mount — safe in all browsers + Vercel
     try {
       const savedToken = localStorage.getItem("token");
       const savedUser = localStorage.getItem("user");
+
       if (savedToken) setToken(savedToken);
       if (savedUser) setUser(JSON.parse(savedUser));
     } catch (err) {
       console.error("Auth restore error:", err);
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
     } finally {
-      setLoading(false); // ✅ Now safe to render the app
+      setLoading(false);
     }
   }, []);
 
@@ -33,10 +35,18 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    
+    // Optional: Redirect to home after logout
+    window.location.href = "/";
   };
 
-  // ✅ Hold rendering until localStorage is read
-  // Prevents blank screen / dark flash on Vercel
+  // Optional: Make it harder for console attackers
+  useEffect(() => {
+    if (token) {
+      // You can add more protection logic here later
+    }
+  }, [token]);
+
   if (loading) {
     return (
       <div style={{
@@ -47,8 +57,6 @@ export const AuthProvider = ({ children }) => {
         justifyContent: "center",
         color: "#fbbf24",
         fontSize: "18px",
-        fontFamily: "'DM Sans', sans-serif",
-        letterSpacing: "0.02em",
       }}>
         ✨ Loading Axx Spaces...
       </div>
@@ -56,7 +64,13 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      token, 
+      login, 
+      logout,
+      isAuthenticated: !!token 
+    }}>
       {children}
     </AuthContext.Provider>
   );

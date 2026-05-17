@@ -1,7 +1,13 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
+import { useContext } from "react";
+
+import { AuthContext } from "./context/AuthContext";
+
+// Protection Hook
+import { useDevToolsProtection } from "./hooks/useDevToolsProtection";
 
 import Navbar from "./components/Navbar";
-import FloatingWhatsApp from "./components/FloatingWhatsApp"; // ✅ Floating WhatsApp button
+import FloatingWhatsApp from "./components/FloatingWhatsApp";
 
 import Home from "./pages/Home";
 import Listings from "./pages/Listings";
@@ -20,7 +26,28 @@ import Checkout from "./pages/Checkout";
 
 import "leaflet/dist/leaflet.css";
 
+// Protected Route Component
+const ProtectedRoute = ({ children, allowedRoles = [] }) => {
+  const { token, user } = useContext(AuthContext);
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // If specific roles are required
+  if (allowedRoles.length > 0 && user?.role && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
 function App() {
+  const navigate = useNavigate();
+  
+  // Enable Console / DevTools Protection
+  useDevToolsProtection();
+
   return (
     <>
       <Navbar />
@@ -31,23 +58,41 @@ function App() {
         <Route path="/movers" element={<Movers />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/upload" element={<Upload />} />
         <Route path="/about" element={<AboutUs />} />
-
-        {/* LANDLORD ROUTES */}
-        <Route path="/dashboard" element={<LandlordDashboard />} />
-
-        {/* MOVER ROUTES */}
-        <Route path="/mover-dashboard" element={<MoverDashboard />} />
-
-        {/* PREMIUM ROUTES */}
-        <Route path="/premium-plans" element={<PremiumPlans />} />
-        <Route path="/checkout" element={<Checkout />} />
-
-        {/* PASSWORD RESET ROUTE */}
         <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-        {/* 404 CATCH-ALL */}
+        {/* Protected Routes */}
+        <Route path="/upload" element={
+          <ProtectedRoute>
+            <Upload />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/dashboard" element={
+          <ProtectedRoute allowedRoles={['landlord']}>
+            <LandlordDashboard />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/mover-dashboard" element={
+          <ProtectedRoute allowedRoles={['mover']}>
+            <MoverDashboard />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/premium-plans" element={
+          <ProtectedRoute>
+            <PremiumPlans />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/checkout" element={
+          <ProtectedRoute>
+            <Checkout />
+          </ProtectedRoute>
+        } />
+
+        {/* 404 Page */}
         <Route path="*" element={
           <div style={{
             minHeight: "80vh",
@@ -62,24 +107,28 @@ function App() {
             <div style={{ fontSize: "64px", marginBottom: "16px" }}>🏚️</div>
             <h2 style={{ color: "#fbbf24", margin: "0 0 8px" }}>Page Not Found</h2>
             <p style={{ margin: "0 0 24px" }}>This page doesn't exist on Axx Spaces.</p>
-            <a href="/" style={{
-              padding: "12px 28px",
-              background: "#3b82f6",
-              color: "white",
-              borderRadius: "8px",
-              textDecoration: "none",
-              fontWeight: 700,
-            }}>
+            
+            <button 
+              onClick={() => navigate("/")}
+              style={{
+                padding: "12px 28px",
+                background: "#3b82f6",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                fontWeight: 700,
+                cursor: "pointer"
+              }}
+            >
               Go Home
-            </a>
+            </button>
           </div>
         } />
       </Routes>
 
-      {/* ✅ Floating WhatsApp — visible on every page */}
       <FloatingWhatsApp />
     </>
   );
 }
 
-export default App;// force rebuild Sun May 17 10:54:56 AM EAT 2026
+export default App;
