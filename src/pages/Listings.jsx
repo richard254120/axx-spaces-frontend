@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import ReviewsSection from "../components/ReviewsSection";
 import RecentlyViewed, { trackView } from "../components/RecentlyViewed";
 import ShareProperty from "../components/ShareProperty";
+import MapView from "../components/MapView";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
 
@@ -18,6 +19,7 @@ export default function Listings() {
   const [filteredProperties, setFilteredProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showMap, setShowMap] = useState(false);
   const [filters, setFilters] = useState({
     location: "",
     minPrice: 0,
@@ -35,12 +37,10 @@ export default function Listings() {
         const response = await fetch(`${API_BASE}/properties`);
         if (!response.ok) throw new Error("Failed to fetch properties");
         const data = await response.json();
-
         const processedProperties = data.map(prop => ({
           ...prop,
           availableUnits: Math.max(0, (prop.totalUnits || 1) - (prop.bookedUnits || 0))
         }));
-
         const availableProperties = processedProperties.filter((prop) => prop.availableUnits > 0);
         setProperties(processedProperties);
         setFilteredProperties(availableProperties);
@@ -54,24 +54,16 @@ export default function Listings() {
   }, []);
 
   useEffect(() => {
-    let filtered = properties.filter(p => p.availableUnits > 0); // ✅ always exclude fully booked
+    let filtered = properties.filter(p => p.availableUnits > 0);
     if (filters.location) {
       filtered = filtered.filter((p) =>
         (p.location + " " + (p.county || "")).toLowerCase().includes(filters.location.toLowerCase())
       );
     }
-    if (filters.bedrooms) {
-      filtered = filtered.filter((p) => p.bedrooms === parseInt(filters.bedrooms));
-    }
-    if (filters.bathrooms) {
-      filtered = filtered.filter((p) => p.bathrooms === parseInt(filters.bathrooms));
-    }
-    if (filters.furnished !== "") {
-      filtered = filtered.filter((p) => p.furnished === (filters.furnished === "true"));
-    }
-    filtered = filtered.filter(
-      (p) => p.price >= filters.minPrice && p.price <= filters.maxPrice
-    );
+    if (filters.bedrooms) filtered = filtered.filter((p) => p.bedrooms === parseInt(filters.bedrooms));
+    if (filters.bathrooms) filtered = filtered.filter((p) => p.bathrooms === parseInt(filters.bathrooms));
+    if (filters.furnished !== "") filtered = filtered.filter((p) => p.furnished === (filters.furnished === "true"));
+    filtered = filtered.filter((p) => p.price >= filters.minPrice && p.price <= filters.maxPrice);
     setFilteredProperties(filtered);
   }, [filters, properties]);
 
@@ -83,7 +75,6 @@ export default function Listings() {
     }));
   };
 
-  // ✅ Now also tracks recently viewed
   const openModal = (property) => {
     setSelectedProperty(property);
     setCurrentImageIndex(0);
@@ -111,24 +102,20 @@ export default function Listings() {
   const handleBookNow = (property) => {
     const phoneNumber = formatKenyaPhone(property.owner?.phone || property.phone || "");
     const message = `Hello,\n\nI want to BOOK this property right now:\n\n` +
-                    `🏠 ${property.title}\n` +
-                    `📍 ${property.county} - ${property.location}\n` +
-                    `💰 KES ${property.price?.toLocaleString()}/month\n` +
-                    `🛏 ${property.bedrooms} Bedrooms | 🚿 ${property.bathrooms} Bathrooms\n` +
-                    `📊 Available: ${property.availableUnits} units\n\n` +
-                    `Please confirm availability and let me know the next steps for booking. Thank you!`;
+      `🏠 ${property.title}\n📍 ${property.county} - ${property.location}\n` +
+      `💰 KES ${property.price?.toLocaleString()}/month\n` +
+      `🛏 ${property.bedrooms} Bedrooms | 🚿 ${property.bathrooms} Bathrooms\n` +
+      `📊 Available: ${property.availableUnits} units\n\n` +
+      `Please confirm availability and let me know the next steps for booking. Thank you!`;
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
   const handleSendSMS = (property) => {
     const phoneNumber = formatKenyaPhone(property.owner?.phone || property.phone || "");
-    const message = `Hello, I want to BOOK this property:\n` +
-                    `${property.title}\n` +
-                    `${property.county} - ${property.location}\n` +
-                    `KES ${property.price?.toLocaleString()}/month\n` +
-                    `${property.bedrooms} Bed | ${property.bathrooms} Bath\n` +
-                    `Available: ${property.availableUnits} units\n\n` +
-                    `Please reply with availability and booking details. Thank you!`;
+    const message = `Hello, I want to BOOK this property:\n${property.title}\n` +
+      `${property.county} - ${property.location}\nKES ${property.price?.toLocaleString()}/month\n` +
+      `${property.bedrooms} Bed | ${property.bathrooms} Bath\nAvailable: ${property.availableUnits} units\n\n` +
+      `Please reply with availability and booking details. Thank you!`;
     window.open(`sms:${phoneNumber}?body=${encodeURIComponent(message)}`, "_blank");
   };
 
@@ -154,16 +141,9 @@ export default function Listings() {
 
       {error && <div style={styles.error}>{error}</div>}
 
-      {/* FILTERS — unchanged */}
       <div style={styles.filters}>
-        <input
-          type="text"
-          name="location"
-          placeholder="📍 Filter by location or county..."
-          value={filters.location}
-          onChange={handleFilterChange}
-          style={styles.filterInput}
-        />
+        <input type="text" name="location" placeholder="📍 Filter by location or county..."
+          value={filters.location} onChange={handleFilterChange} style={styles.filterInput} />
         <select name="bedrooms" value={filters.bedrooms} onChange={handleFilterChange} style={styles.filterSelect}>
           <option value="">All Bedrooms</option>
           <option value="1">1 Bedroom</option>
@@ -189,11 +169,18 @@ export default function Listings() {
         </div>
       </div>
 
-      <div style={styles.resultsCount}>
-        Found {filteredProperties.length} {filteredProperties.length === 1 ? "property" : "properties"}
+      <div style={styles.resultsRow}>
+        <span style={styles.resultsCount}>
+          Found {filteredProperties.length} {filteredProperties.length === 1 ? "property" : "properties"}
+        </span>
+        <button style={styles.mapToggleBtn} onClick={() => setShowMap((v) => !v)}>
+          {showMap ? "🗒️ Hide Map" : "🗺️ Show Map"}
+        </button>
       </div>
 
-      {/* ✅ RECENTLY VIEWED — appears above the grid */}
+      {/* MAP — toggled */}
+      {showMap && <MapView properties={filteredProperties} />}
+
       <RecentlyViewed onSelect={openModal} />
 
       {filteredProperties.length === 0 && (
@@ -260,7 +247,6 @@ export default function Listings() {
         </div>
       )}
 
-      {/* ─── MODAL ─── */}
       {selectedProperty && (
         <div style={styles.modal} onClick={closeModal}>
           <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
@@ -269,11 +255,8 @@ export default function Listings() {
             <div style={styles.modalImage}>
               {selectedProperty.images?.length > 0 ? (
                 <>
-                  <img
-                    src={selectedProperty.images[currentImageIndex]}
-                    alt={`${selectedProperty.title} ${currentImageIndex + 1}`}
-                    style={styles.modalImg}
-                  />
+                  <img src={selectedProperty.images[currentImageIndex]}
+                    alt={`${selectedProperty.title} ${currentImageIndex + 1}`} style={styles.modalImg} />
                   {selectedProperty.images.length > 1 && (
                     <>
                       <button style={styles.prevBtn} onClick={prevImage}>❮</button>
@@ -290,22 +273,16 @@ export default function Listings() {
             {selectedProperty.images?.length > 1 && (
               <div style={styles.thumbnails}>
                 {selectedProperty.images.map((img, idx) => (
-                  <img
-                    key={idx}
-                    src={img}
-                    alt={`Thumbnail ${idx + 1}`}
+                  <img key={idx} src={img} alt={`Thumbnail ${idx + 1}`}
                     style={{ ...styles.thumbnail, ...(idx === currentImageIndex ? styles.activeThumbnail : {}) }}
-                    onClick={() => setCurrentImageIndex(idx)}
-                  />
+                    onClick={() => setCurrentImageIndex(idx)} />
                 ))}
               </div>
             )}
 
             <div style={styles.modalDetails}>
               <h2 style={styles.modalTitle}>{selectedProperty.title}</h2>
-              <p style={styles.modalLocation}>
-                📍 {selectedProperty.county} • {selectedProperty.location}
-              </p>
+              <p style={styles.modalLocation}>📍 {selectedProperty.county} • {selectedProperty.location}</p>
 
               <div style={styles.specs}>
                 <span style={styles.spec}>🛏️ {selectedProperty.bedrooms} Bedrooms</span>
@@ -355,58 +332,33 @@ export default function Listings() {
               <div style={styles.unitInfoModal}>
                 <h3 style={styles.unitHeading}>📊 Availability</h3>
                 <div style={styles.unitGrid}>
-                  <div style={styles.unitBox}>
-                    <p style={styles.unitBoxLabel}>Total Units</p>
-                    <p style={styles.unitBoxNumber}>{selectedProperty.totalUnits || 1}</p>
-                  </div>
-                  <div style={styles.unitBox}>
-                    <p style={styles.unitBoxLabel}>Booked</p>
-                    <p style={styles.unitBoxNumber}>{selectedProperty.bookedUnits || 0}</p>
-                  </div>
-                  <div style={styles.unitBox}>
-                    <p style={styles.unitBoxLabel}>Available</p>
-                    <p style={styles.unitBoxNumber}>{selectedProperty.availableUnits}</p>
-                  </div>
+                  <div style={styles.unitBox}><p style={styles.unitBoxLabel}>Total Units</p><p style={styles.unitBoxNumber}>{selectedProperty.totalUnits || 1}</p></div>
+                  <div style={styles.unitBox}><p style={styles.unitBoxLabel}>Booked</p><p style={styles.unitBoxNumber}>{selectedProperty.bookedUnits || 0}</p></div>
+                  <div style={styles.unitBox}><p style={styles.unitBoxLabel}>Available</p><p style={styles.unitBoxNumber}>{selectedProperty.availableUnits}</p></div>
                 </div>
               </div>
 
-              {/* ✅ LANDLORD CONTACT — now shows real data */}
               <div style={styles.landlordInfo}>
                 <h3 style={styles.landlordHead}>👤 Landlord Contact</h3>
-                <p style={styles.landlordDetail}>
-                  <strong>Name:</strong> {selectedProperty.owner?.name || "—"}
-                </p>
-                <p style={styles.landlordDetail}>
-                  <strong>Phone:</strong> {selectedProperty.owner?.phone || selectedProperty.phone || "—"}
-                </p>
+                <p style={styles.landlordDetail}><strong>Name:</strong> {selectedProperty.owner?.name || "—"}</p>
+                <p style={styles.landlordDetail}><strong>Phone:</strong> {selectedProperty.owner?.phone || selectedProperty.phone || "—"}</p>
               </div>
 
-              {/* ✅ SHARE PROPERTY */}
               <ShareProperty property={selectedProperty} />
 
-              {/* Four Buttons: WhatsApp, Call, SMS, Book */}
               <div style={styles.contactButtonsContainer}>
-                <button
-                  style={{ ...styles.whatsappBtn, ...(selectedProperty.availableUnits === 0 ? styles.contactBtnDisabled : {}) }}
-                  onClick={() => handleContactLandlord(selectedProperty)}
-                  disabled={selectedProperty.availableUnits === 0}
-                >
+                <button style={{ ...styles.whatsappBtn, ...(selectedProperty.availableUnits === 0 ? styles.contactBtnDisabled : {}) }}
+                  onClick={() => handleContactLandlord(selectedProperty)} disabled={selectedProperty.availableUnits === 0}>
                   💬 WhatsApp
                 </button>
                 <button style={styles.callBtn} onClick={() => window.open(`tel:${selectedProperty.owner?.phone || selectedProperty.phone}`)}>
                   📞 Call Landlord
                 </button>
-                <button style={styles.smsBtn} onClick={() => handleSendSMS(selectedProperty)}>
-                  📱 Send SMS
-                </button>
-                <button style={styles.bookBtn} onClick={() => handleBookNow(selectedProperty)}>
-                  🚀 Book This Property
-                </button>
+                <button style={styles.smsBtn} onClick={() => handleSendSMS(selectedProperty)}>📱 Send SMS</button>
+                <button style={styles.bookBtn} onClick={() => handleBookNow(selectedProperty)}>🚀 Book This Property</button>
               </div>
 
-              {/* ✅ REVIEWS & RATINGS */}
               <ReviewsSection propertyId={selectedProperty._id} />
-
             </div>
           </div>
         </div>
@@ -415,7 +367,6 @@ export default function Listings() {
   );
 }
 
-/* ==================== STYLES — all original + no changes ==================== */
 const styles = {
   container: { maxWidth: "1200px", margin: "0 auto", padding: "20px", background: "linear-gradient(135deg, #06101f 0%, #0f1729 100%)", minHeight: "100vh", fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont" },
   header: { textAlign: "center", marginBottom: "40px", color: "#f1f5f9" },
@@ -423,12 +374,14 @@ const styles = {
   tagline: { fontSize: "1rem", color: "#94a3b8", marginTop: "8px" },
   error: { background: "rgba(239, 68, 68, 0.15)", border: "1px solid rgba(239, 68, 68, 0.4)", color: "#fca5a5", padding: "12px 16px", borderRadius: "8px", marginBottom: "20px", textAlign: "center", fontWeight: 500 },
   loading: { textAlign: "center", color: "#94a3b8", fontSize: "1.1rem", padding: "60px 20px" },
-  filters: { display: "flex", gap: "12px", marginBottom: "32px", flexWrap: "wrap", alignItems: "center" },
+  filters: { display: "flex", gap: "12px", marginBottom: "20px", flexWrap: "wrap", alignItems: "center" },
   filterInput: { padding: "10px 14px", border: "1px solid #334155", borderRadius: "6px", background: "#1e293b", color: "#f1f5f9", fontSize: "0.95rem", minWidth: "150px" },
   filterSelect: { padding: "10px 14px", border: "1px solid #334155", borderRadius: "6px", background: "#1e293b", color: "#f1f5f9", fontSize: "0.95rem", minWidth: "140px" },
   priceRange: { display: "flex", gap: "8px", alignItems: "center" },
   priceSeparator: { color: "#94a3b8", fontWeight: 600 },
-  resultsCount: { color: "#94a3b8", marginBottom: "20px", fontSize: "0.95rem" },
+  resultsRow: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px", flexWrap: "wrap", gap: "10px" },
+  resultsCount: { color: "#94a3b8", fontSize: "0.95rem" },
+  mapToggleBtn: { padding: "8px 18px", background: "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.9rem", transition: "all 0.3s ease" },
   noResults: { textAlign: "center", color: "#94a3b8", padding: "60px 20px", background: "rgba(30, 41, 59, 0.5)", borderRadius: "12px", border: "2px dashed #475569" },
   grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "24px" },
   card: { background: "linear-gradient(135deg, #1e293b 0%, #0f1729 100%)", border: "1px solid #334155", borderRadius: "12px", overflow: "hidden", transition: "all 0.3s ease", display: "flex", flexDirection: "column", height: "100%" },
