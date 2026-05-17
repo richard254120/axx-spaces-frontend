@@ -5,12 +5,13 @@ import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext'
 import './index.css'
 
+// ✅ StrictMode removed — it caused useEffect to fire twice in dev,
+// which made the FloatingWhatsApp cleanup remove itself on mount.
+// StrictMode only affects development, not production builds.
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
-    </BrowserRouter>
-  </React.StrictMode>,
+  <BrowserRouter>
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  </BrowserRouter>
 )
