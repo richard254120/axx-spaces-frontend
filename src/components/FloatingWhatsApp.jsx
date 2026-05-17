@@ -79,7 +79,7 @@ export default function FloatingWhatsApp() {
     // LABEL
     const label = document.createElement("div");
     label.id = "wa-float-label";
-    label.textContent = "💬 Chat with us";
+    label.textContent = "Chat with us";
 
     // BUTTON — use <a> tag for maximum compatibility
     const btn = document.createElement("a");
