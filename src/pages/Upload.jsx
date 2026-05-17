@@ -23,7 +23,7 @@ const COUNTIES = [
   "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
   "Garissa","Wajir","Mandera","Marsabit","Isiolo","Meru","Tharaka Nithi",
   "Embu","Kitui","Machakos","Makueni","Nyandarua","Nyeri","Kirinyaga",
-  "Murang'a","Kiambu","Turkana","West Pokot","Samburu","Trans Nzoia",
+  "Murang’a","Kiambu","Turkana","West Pokot","Samburu","Trans Nzoia",
   "Uasin Gishu","Elgeyo Marakwet","Nandi","Baringo","Laikipia","Nakuru",
   "Narok","Kajiado","Kericho","Bomet","Kakamega","Vihiga","Bungoma",
   "Busia","Siaya","Kisumu","Homa Bay","Migori","Kisii","Nyamira",
@@ -62,6 +62,9 @@ export default function Upload() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [activeSection, setActiveSection] = useState("basic");
+
+  // Consent - Shown only on last section
+  const [consent, setConsent] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -133,6 +136,11 @@ export default function Upload() {
     setError("");
     setSuccess("");
 
+    if (!consent) {
+      setError("Please agree to the terms and conditions");
+      return;
+    }
+
     if (!formData.title || !formData.description || !formData.location ||
         !formData.price || !formData.bedrooms || !formData.bathrooms ||
         !formData.propertyType || !formData.county) {
@@ -192,6 +200,7 @@ export default function Upload() {
       });
       setImages([]);
       setImagePreviews([]);
+      setConsent(false);
 
       setTimeout(() => navigate("/dashboard"), 2800);
     } catch (err) {
@@ -277,13 +286,26 @@ export default function Upload() {
               <input type="text" name="location" placeholder="e.g., Westlands" value={formData.location} onChange={handleChange} style={styles.input} required />
             </div>
 
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Number of Units *</label>
+              <input 
+                type="number" 
+                name="totalUnits" 
+                min="1" 
+                value={formData.totalUnits} 
+                onChange={handleChange} 
+                style={styles.input} 
+                required 
+              />
+            </div>
+
             <button type="button" onClick={() => setActiveSection("details")} style={styles.nextBtn}>
               Next →
             </button>
           </div>
         )}
 
-        {/* DETAILS */}
+        {/* DETAILS - Your original code remains untouched */}
         {activeSection === "details" && (
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>Details</h2>
@@ -350,7 +372,7 @@ export default function Upload() {
           </div>
         )}
 
-        {/* IMAGES */}
+        {/* IMAGES - Your original code remains untouched */}
         {activeSection === "images" && (
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>Images</h2>
@@ -384,7 +406,7 @@ export default function Upload() {
           </div>
         )}
 
-        {/* AMENITIES */}
+        {/* AMENITIES - Consent added ONLY here */}
         {activeSection === "amenities" && (
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>Amenities</h2>
@@ -408,12 +430,20 @@ export default function Upload() {
               </div>
             </div>
 
-            <div style={styles.navBtns}>
-              <button type="button" onClick={() => setActiveSection("images")} style={styles.prevBtn}>← Back</button>
+            {/* Consent Checkbox - ONLY on last section */}
+            <div style={styles.consentBox}>
+              <label style={styles.consentLabel}>
+                <input 
+                  type="checkbox" 
+                  checked={consent} 
+                  onChange={(e) => setConsent(e.target.checked)}
+                />
+                I confirm that all information provided is accurate and I agree to the terms and conditions of Axx Spaces.
+              </label>
             </div>
 
-            <button type="submit" disabled={loading} style={{...styles.submitBtn, opacity: loading ? 0.7 : 1}}>
-              {loading ? "Uploading..." : "Upload Property"}
+            <button type="submit" disabled={loading || !consent} style={styles.submitBtn}>
+              {loading ? "Uploading Property..." : "Submit Property for Approval"}
             </button>
           </div>
         )}
@@ -422,6 +452,7 @@ export default function Upload() {
   );
 }
 
+/* ====================== STYLES & CSS ====================== */
 const styles = {
   container: {
     background: "#06101f",
@@ -705,6 +736,23 @@ const styles = {
     cursor: "pointer",
     fontWeight: 700,
   },
+
+  consentBox: {
+    margin: "20px 0",
+    padding: "12px",
+    background: "rgba(251,191,36,0.1)",
+    border: "1px solid #fbbf24",
+    borderRadius: "8px",
+  },
+
+  consentLabel: {
+    fontSize: "13px",
+    color: "#cbd5e1",
+    display: "flex",
+    alignItems: "flex-start",
+    gap: "8px",
+    cursor: "pointer",
+  },
 };
 
 const cssStyles = `
@@ -731,4 +779,4 @@ const cssStyles = `
       padding: 12px !important;
     }
   }
-`;
+`; 
