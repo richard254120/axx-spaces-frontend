@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
+import ReviewsSection from "../components/ReviewsSection";
+import RecentlyViewed, { trackView } from "../components/RecentlyViewed";
+import ShareProperty from "../components/ShareProperty";
 
-// ✅ FIX: Use API_BASE like every other file
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
 
-// Helper function to format Kenyan phone numbers (+254)
 const formatKenyaPhone = (phone) => {
   if (!phone) return "";
   let cleaned = phone.toString().replace(/\D/g, "");
@@ -34,12 +35,12 @@ export default function Listings() {
         const response = await fetch(`${API_BASE}/properties`);
         if (!response.ok) throw new Error("Failed to fetch properties");
         const data = await response.json();
-     
+
         const processedProperties = data.map(prop => ({
           ...prop,
           availableUnits: Math.max(0, (prop.totalUnits || 1) - (prop.bookedUnits || 0))
         }));
-     
+
         const availableProperties = processedProperties.filter((prop) => prop.availableUnits > 0);
         setProperties(processedProperties);
         setFilteredProperties(availableProperties);
@@ -53,7 +54,7 @@ export default function Listings() {
   }, []);
 
   useEffect(() => {
-    let filtered = properties;
+    let filtered = properties.filter(p => p.availableUnits > 0); // ✅ always exclude fully booked
     if (filters.location) {
       filtered = filtered.filter((p) =>
         (p.location + " " + (p.county || "")).toLowerCase().includes(filters.location.toLowerCase())
@@ -82,11 +83,15 @@ export default function Listings() {
     }));
   };
 
+  // ✅ Now also tracks recently viewed
   const openModal = (property) => {
     setSelectedProperty(property);
     setCurrentImageIndex(0);
+    trackView(property);
   };
+
   const closeModal = () => { setSelectedProperty(null); setCurrentImageIndex(0); };
+
   const nextImage = () => {
     if (selectedProperty?.images?.length > 0)
       setCurrentImageIndex((prev) => (prev + 1) % selectedProperty.images.length);
@@ -115,7 +120,6 @@ export default function Listings() {
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
-  // ✅ SMS Booking Option
   const handleSendSMS = (property) => {
     const phoneNumber = formatKenyaPhone(property.owner?.phone || property.phone || "");
     const message = `Hello, I want to BOOK this property:\n` +
@@ -150,6 +154,7 @@ export default function Listings() {
 
       {error && <div style={styles.error}>{error}</div>}
 
+      {/* FILTERS — unchanged */}
       <div style={styles.filters}>
         <input
           type="text"
@@ -184,7 +189,12 @@ export default function Listings() {
         </div>
       </div>
 
-      <div style={styles.resultsCount}>Found {filteredProperties.length} {filteredProperties.length === 1 ? "property" : "properties"}</div>
+      <div style={styles.resultsCount}>
+        Found {filteredProperties.length} {filteredProperties.length === 1 ? "property" : "properties"}
+      </div>
+
+      {/* ✅ RECENTLY VIEWED — appears above the grid */}
+      <RecentlyViewed onSelect={openModal} />
 
       {filteredProperties.length === 0 && (
         <div style={styles.noResults}>
@@ -211,10 +221,7 @@ export default function Listings() {
               </div>
               <div style={styles.content}>
                 <h2 style={styles.title}>{property.title}</h2>
-             
-                <p style={styles.location}>
-                  📍 {property.county} • {property.location}
-                </p>
+                <p style={styles.location}>📍 {property.county} • {property.location}</p>
                 <div style={styles.specs}>
                   <span style={styles.spec}>🛏️ {property.bedrooms} Bed</span>
                   <span style={styles.spec}>🚿 {property.bathrooms} Bath</span>
@@ -244,7 +251,6 @@ export default function Listings() {
                 >
                   💬 Contact via WhatsApp
                 </button>
-
                 <button style={styles.viewBtn} onClick={() => openModal(property)}>
                   👁️ View Details
                 </button>
@@ -254,7 +260,7 @@ export default function Listings() {
         </div>
       )}
 
-      {/* Modal */}
+      {/* ─── MODAL ─── */}
       {selectedProperty && (
         <div style={styles.modal} onClick={closeModal}>
           <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
@@ -263,7 +269,11 @@ export default function Listings() {
             <div style={styles.modalImage}>
               {selectedProperty.images?.length > 0 ? (
                 <>
-                  <img src={selectedProperty.images[currentImageIndex]} alt={`${selectedProperty.title} ${currentImageIndex + 1}`} style={styles.modalImg} />
+                  <img
+                    src={selectedProperty.images[currentImageIndex]}
+                    alt={`${selectedProperty.title} ${currentImageIndex + 1}`}
+                    style={styles.modalImg}
+                  />
                   {selectedProperty.images.length > 1 && (
                     <>
                       <button style={styles.prevBtn} onClick={prevImage}>❮</button>
@@ -360,11 +370,19 @@ export default function Listings() {
                 </div>
               </div>
 
+              {/* ✅ LANDLORD CONTACT — now shows real data */}
               <div style={styles.landlordInfo}>
                 <h3 style={styles.landlordHead}>👤 Landlord Contact</h3>
-                <p style={styles.landlordDetail}><strong>Name:</strong> </p>
-                <p style={styles.landlordDetail}><strong>Phone:</strong> </p>
+                <p style={styles.landlordDetail}>
+                  <strong>Name:</strong> {selectedProperty.owner?.name || "—"}
+                </p>
+                <p style={styles.landlordDetail}>
+                  <strong>Phone:</strong> {selectedProperty.owner?.phone || selectedProperty.phone || "—"}
+                </p>
               </div>
+
+              {/* ✅ SHARE PROPERTY */}
+              <ShareProperty property={selectedProperty} />
 
               {/* Four Buttons: WhatsApp, Call, SMS, Book */}
               <div style={styles.contactButtonsContainer}>
@@ -378,19 +396,17 @@ export default function Listings() {
                 <button style={styles.callBtn} onClick={() => window.open(`tel:${selectedProperty.owner?.phone || selectedProperty.phone}`)}>
                   📞 Call Landlord
                 </button>
-                <button
-                  style={styles.smsBtn}
-                  onClick={() => handleSendSMS(selectedProperty)}
-                >
+                <button style={styles.smsBtn} onClick={() => handleSendSMS(selectedProperty)}>
                   📱 Send SMS
                 </button>
-                <button
-                  style={styles.bookBtn}
-                  onClick={() => handleBookNow(selectedProperty)}
-                >
+                <button style={styles.bookBtn} onClick={() => handleBookNow(selectedProperty)}>
                   🚀 Book This Property
                 </button>
               </div>
+
+              {/* ✅ REVIEWS & RATINGS */}
+              <ReviewsSection propertyId={selectedProperty._id} />
+
             </div>
           </div>
         </div>
@@ -399,7 +415,7 @@ export default function Listings() {
   );
 }
 
-/* ==================== STYLES ==================== */
+/* ==================== STYLES — all original + no changes ==================== */
 const styles = {
   container: { maxWidth: "1200px", margin: "0 auto", padding: "20px", background: "linear-gradient(135deg, #06101f 0%, #0f1729 100%)", minHeight: "100vh", fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont" },
   header: { textAlign: "center", marginBottom: "40px", color: "#f1f5f9" },
@@ -477,22 +493,14 @@ const styles = {
   whatsappBtn: { padding: "14px 16px", background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", fontSize: "0.95rem" },
   callBtn: { padding: "14px 16px", background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", fontSize: "0.95rem" },
   smsBtn: { padding: "14px 16px", background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", fontSize: "0.95rem" },
-  bookBtn: {
-    padding: "14px 16px",
-    background: "linear-gradient(135deg, #eab308, #ca8a04)",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    fontWeight: 700,
-    cursor: "pointer",
-    fontSize: "0.95rem"
-  },
+  bookBtn: { padding: "14px 16px", background: "linear-gradient(135deg, #eab308, #ca8a04)", color: "white", border: "none", borderRadius: "8px", fontWeight: 700, cursor: "pointer", fontSize: "0.95rem" },
 };
 
 const cssStyles = `
   * { box-sizing: border-box; }
   button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
   input:focus, select:focus { outline: none; border-color: #fbbf24 !important; box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1) !important; }
+  textarea:focus { outline: none; border-color: #fbbf24 !important; box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1) !important; }
   @media (max-width: 768px) {
     [style*="gridTemplateColumns"] { grid-template-columns: 1fr !important; }
   }
