@@ -168,7 +168,7 @@ export default function Materials() {
           <p style={styles.heroSubtitle}>Connect directly with local verified sellers. Save costs on construction materials, overstock furniture, tools, and heavy appliances.</p>
         </div>
         <button onClick={handleSell} style={styles.heroUploadBtn}>
-          <span style={{ fontSize: "1.2rem", marginRight: "6px" }}>💵</span> Start Earning Now
+          <span style={{ fontSize: "1.2rem", marginRight: "6px" }}>💵</span> Sell a Material
         </button>
       </div>
 
