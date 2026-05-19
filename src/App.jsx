@@ -25,7 +25,7 @@ import PremiumPlans from "./pages/PremiumPlans";
 import Checkout from "./pages/Checkout";
 
 import "leaflet/dist/leaflet.css";
-
+import Materials from "./pages/Materials";
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const { token, user } = useContext(AuthContext);
@@ -60,7 +60,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-
+        <Route path="/materials" element={<Materials />} />
         {/* Protected Routes */}
         <Route path="/upload" element={
           <ProtectedRoute>

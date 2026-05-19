@@ -32,13 +32,13 @@ export default function Home() {
     "👋 Welcome to Axx Spaces!",
     "🏠 Kenya's #1 Rental Platform",
     "✅ Verified Listings in All 47 Counties",
-    "💬 Connect Directly with Landlords via WhatsApp",
+    "💬 Connect Directly with Landlords via WhatsApp and call",
     "🚀 Boost Your Property for Maximum Visibility",
     "🔒 Safe, Secure & 100% Transparent",
     "📱 Search on Any Device, Anytime",
     "🗺 Interactive Maps for Every Listing",
     "💰 Zero Hidden Fees — Ever",
-    "🎉 Over 5,000 Happy Tenants and Counting!",
+    "🎉 Over 500 Happy Tenants and Counting!",
   ];
 
   useEffect(() => {
@@ -133,16 +133,16 @@ export default function Home() {
               </button>
             </div>
             <p style={styles.searchHint}>
-              🔥 <strong>2,340</strong> new listings added this week
+              🔥 <strong>40</strong> new listings added this week
             </p>
           </form>
 
-          {/* ✅ Removed User Rating, Active Listings now 280 */}
+          {/* Removed User Rating, Active Listings now 280 */}
           <div style={styles.heroStats}>
             {[
               { val: "280", label: "Active Listings" },
               { val: "47", label: "Counties" },
-              { val: "5K+", label: "Happy Tenants" },
+              { val: "500+", label: "Happy Tenants" },
             ].map((s) => (
               <div key={s.label} style={styles.heroStat}>
                 <span style={styles.heroStatVal}>{s.val}</span>
@@ -171,7 +171,7 @@ export default function Home() {
           <div style={styles.noFeatured}>
             <div style={styles.noFeaturedIcon}>⚠️</div>
             <p style={styles.noFeaturedText}>Could not load featured listings</p>
-            <p style={styles.noFeaturedSub}>Our server may be waking up — please refresh in a moment.</p>
+            <p style={styles.noFeaturedSub}> please refresh in a moment.</p>
             <button onClick={() => window.location.reload()} style={styles.boostBtn}>
               🔄 Retry
             </button>
@@ -303,7 +303,7 @@ export default function Home() {
               <span key={l} style={styles.footerLink}>{l}</span>
             ))}
           </div>
-          <p style={styles.footerCopy}>© 2024 Axx Spaces. All rights reserved.</p>
+          <p style={styles.footerCopy}>© 2026 Axx Spaces. All rights reserved.</p>
         </div>
       </footer>
     </div>
