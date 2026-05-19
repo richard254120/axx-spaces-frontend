@@ -29,7 +29,7 @@ export default function SellerDashboard() {
   const [token, setToken] = useState(null);
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState("listings"); // "listings" | "upload"
+  const [view, setView] = useState("listings");
   const [submitLoading, setSubmitLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -65,23 +65,28 @@ export default function SellerDashboard() {
         .filter(m => m.status === "sold")
         .reduce((sum, item) => sum + ((item.price || 0) * (item.quantity || 1)), 0);
 
-      const live = materials.filter(m => m.status === "active").length;
-      const pending = materials.filter(m => m.status === "pending" || !m.status).length;
+      // Backwards-compatible check for active items
+      const live = materials.filter(m => m.status === "active" || m.isVerified === true).length;
+      const pending = materials.filter(m => m.status === "pending" || (!m.status && !m.isVerified)).length;
       const views = materials.reduce((sum, item) => sum + (item.views || 0), 0);
 
       setStats({ totalEarnings: earnings, liveItems: live, pendingReview: pending, totalViews: views });
+    } else {
+      setStats({ totalEarnings: 0, liveItems: 0, pendingReview: 0, totalViews: 0 });
     }
   }, [materials]);
 
   const fetchMyMaterials = async (tkn) => {
     try {
-      const res = await fetch(`${API_BASE}/materials/seller/my-materials`, {
+      setLoading(true);
+      // Added a timestamp parameter to completely bypass browser caching issues
+      const res = await fetch(`${API_BASE}/materials/seller/my-materials?_cb=${Date.now()}`, {
         headers: { Authorization: `Bearer ${tkn}` },
       });
       const data = await res.json();
       setMaterials(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching materials:", err);
     } finally {
       setLoading(false);
     }
@@ -171,9 +176,16 @@ export default function SellerDashboard() {
 
   // Filter application pipeline
   const filteredMaterials = materials.filter((m) => {
-    const matchesSearch = m.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          m.category.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === "all" ? true : (m.status || "pending") === statusFilter;
+    const matchesSearch = (m.title || "").toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          (m.category || "").toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Fallback normalization: If backend sets isVerified to true, count it as active
+    let effectiveStatus = m.status || "pending";
+    if (m.isVerified && effectiveStatus === "pending") {
+      effectiveStatus = "active";
+    }
+
+    const matchesStatus = statusFilter === "all" ? true : effectiveStatus === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -197,7 +209,7 @@ export default function SellerDashboard() {
         </div>
       </div>
 
-      {/* NEW PERFORMANCE ANALYTICS SECTION */}
+      {/* PERFORMANCE ANALYTICS SECTION */}
       <div style={s.statsGrid}>
         <div style={s.statCard}>
           <span style={s.statIcon}>💰</span>
@@ -265,8 +277,8 @@ export default function SellerDashboard() {
               <option value="sold">Sold</option>
               <option value="archived">Rejected</option>
             </select>
-            <button style={s.refreshBtn} onClick={() => { setLoading(true); fetchMyMaterials(token); }}>
-              🔄 Refresh
+            <button style={s.refreshBtn} onClick={() => fetchMyMaterials(token)}>
+              🔄 Refresh Status
             </button>
           </div>
         )}
@@ -287,8 +299,15 @@ export default function SellerDashboard() {
           ) : (
             <div style={s.grid}>
               {filteredMaterials.map((m) => {
-                const st = STATUS_COLORS[m.status] || STATUS_COLORS.pending;
-                const isLowStock = m.quantity <= 2 && m.status === "active";
+                // Determine layout badge dynamically based on true status or verification status
+                let calculatedStatus = m.status || "pending";
+                if (m.isVerified && calculatedStatus === "pending") {
+                  calculatedStatus = "active";
+                }
+                
+                const st = STATUS_COLORS[calculatedStatus] || STATUS_COLORS.pending;
+                const isLowStock = m.quantity <= 2 && calculatedStatus === "active";
+
                 return (
                   <div key={m._id} style={s.card}>
                     <div style={s.cardImg}>
@@ -311,7 +330,7 @@ export default function SellerDashboard() {
                       <p style={s.cardPrice}>KES {m.price?.toLocaleString()}</p>
                       <p style={s.cardMeta}>Qty: {m.quantity} • 👁️ {m.views || 0} views</p>
                       <div style={s.cardBtns}>
-                        {m.status !== "sold" && m.status !== "archived" && (
+                        {calculatedStatus !== "sold" && calculatedStatus !== "archived" && (
                           <button style={s.soldBtn} onClick={() => handleMarkSold(m._id)}>
                             Mark Sold
                           </button>
@@ -426,7 +445,6 @@ const s = {
   uploadBtn: { padding: "10px 20px", background: "linear-gradient(135deg, #fbbf24, #f59e0b)", color: "#0f1729", border: "none", borderRadius: "8px", fontWeight: 700, cursor: "pointer", fontSize: "0.95rem" },
   logoutBtn: { padding: "10px 16px", background: "rgba(239,68,68,0.2)", color: "#fca5a5", border: "1px solid rgba(239,68,68,0.3)", borderRadius: "8px", cursor: "pointer", fontWeight: 600 },
   
-  // Analytics Cards Layout
   statsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "16px", marginBottom: "24px" },
   statCard: { display: "flex", alignItems: "center", gap: "16px", padding: "20px", background: "linear-gradient(135deg, #1e293b, #0f1729)", border: "1px solid #334155", borderRadius: "12px" },
   statIcon: { fontSize: "1.75rem", padding: "10px", background: "rgba(251,191,36,0.1)", borderRadius: "10px", color: "#fbbf24" },
