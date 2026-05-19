@@ -50,10 +50,24 @@ export default function Materials() {
       if (filters.minPrice) query.append("minPrice", filters.minPrice);
       if (filters.maxPrice) query.append("maxPrice", filters.maxPrice);
       if (filters.county) query.append("county", filters.county);
+      
+      // Force cache-busting so updates appear immediately after admin changes
+      query.append("_cb", Date.now());
 
       const res = await fetch(`${API_BASE}/materials?${query}`);
       const data = await res.json();
-      setMaterials(Array.isArray(data) ? data : []);
+      
+      // Clean and normalize incoming array items to guarantee visibility state matches
+      if (Array.isArray(data)) {
+        const approvedItems = data.filter(item => {
+          // Fallback fallback: client-side filter double-check for security
+          return item.isVerified === true || item.status === "active";
+        });
+        setMaterials(approvedItems);
+      } else {
+        setMaterials([]);
+      }
+      
       setError("");
     } catch (err) {
       setError("Failed to load materials");
