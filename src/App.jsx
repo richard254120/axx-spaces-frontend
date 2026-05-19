@@ -19,7 +19,8 @@ import MoverDashboard from "./pages/MoverDashboard";
 import Movers from "./pages/Movers";
 import ResetPassword from "./pages/ResetPassword";
 import AboutUs from "./pages/AboutUs";
-
+import SellerLogin from "./pages/SellerLogin";
+import SellerDashboard from "./pages/SellerDashboard";
 // Premium pages
 import PremiumPlans from "./pages/PremiumPlans";
 import Checkout from "./pages/Checkout";
@@ -60,6 +61,9 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/seller-login" element={<SellerLogin />} />
+        <Route path="/seller-dashboard" element={<SellerDashboard />} />
+
         <Route path="/materials" element={<Materials />} />
         {/* Protected Routes */}
         <Route path="/upload" element={
