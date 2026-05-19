@@ -36,6 +36,11 @@ export default function SellerDashboard() {
   const [images, setImages] = useState([]);
   const [previews, setPreviews] = useState([]);
 
+  // Analytics & Filtering States
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [stats, setStats] = useState({ totalEarnings: 0, liveItems: 0, pendingReview: 0, totalViews: 0 });
+
   const [form, setForm] = useState({
     title: "", description: "", category: "", condition: "Good",
     price: "", quantity: "", location: "", county: "", subcategory: "",
@@ -52,6 +57,21 @@ export default function SellerDashboard() {
     setSeller(JSON.parse(storedUser));
     fetchMyMaterials(storedToken);
   }, []);
+
+  // Compute stats dynamically from listing data
+  useEffect(() => {
+    if (materials.length > 0) {
+      const earnings = materials
+        .filter(m => m.status === "sold")
+        .reduce((sum, item) => sum + ((item.price || 0) * (item.quantity || 1)), 0);
+
+      const live = materials.filter(m => m.status === "active").length;
+      const pending = materials.filter(m => m.status === "pending" || !m.status).length;
+      const views = materials.reduce((sum, item) => sum + (item.views || 0), 0);
+
+      setStats({ totalEarnings: earnings, liveItems: live, pendingReview: pending, totalViews: views });
+    }
+  }, [materials]);
 
   const fetchMyMaterials = async (tkn) => {
     try {
@@ -119,7 +139,7 @@ export default function SellerDashboard() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this material?")) return;
+    if (!window.confirm("Delete this material permanently?")) return;
     try {
       await fetch(`${API_BASE}/materials/${id}`, {
         method: "DELETE",
@@ -149,6 +169,14 @@ export default function SellerDashboard() {
     navigate("/seller-login");
   };
 
+  // Filter application pipeline
+  const filteredMaterials = materials.filter((m) => {
+    const matchesSearch = m.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          m.category.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === "all" ? true : (m.status || "pending") === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
   if (!seller) return null;
 
   return (
@@ -159,7 +187,7 @@ export default function SellerDashboard() {
       <div style={s.topBar}>
         <div>
           <h1 style={s.topTitle}>🛒 Seller Dashboard</h1>
-          <p style={s.topSub}>Welcome, {seller.name}</p>
+          <p style={s.topSub}>Welcome back, <strong style={{ color: "#fbbf24" }}>{seller.name}</strong></p>
         </div>
         <div style={s.topBtns}>
           <button style={s.uploadBtn} onClick={() => { setView("upload"); setError(""); setSuccess(""); }}>
@@ -169,42 +197,98 @@ export default function SellerDashboard() {
         </div>
       </div>
 
+      {/* NEW PERFORMANCE ANALYTICS SECTION */}
+      <div style={s.statsGrid}>
+        <div style={s.statCard}>
+          <span style={s.statIcon}>💰</span>
+          <div>
+            <div style={s.statLabel}>Revenue (Sold Items)</div>
+            <div style={s.statVal}>KES {stats.totalEarnings.toLocaleString()}</div>
+          </div>
+        </div>
+        <div style={s.statCard}>
+          <span style={s.statIcon}>🌐</span>
+          <div>
+            <div style={s.statLabel}>Live Listings</div>
+            <div style={s.statVal}>{stats.liveItems}</div>
+          </div>
+        </div>
+        <div style={s.statCard}>
+          <span style={s.statIcon}>⏳</span>
+          <div>
+            <div style={s.statLabel}>Awaiting Review</div>
+            <div style={s.statVal}>{stats.pendingReview}</div>
+          </div>
+        </div>
+        <div style={s.statCard}>
+          <span style={s.statIcon}>👁️</span>
+          <div>
+            <div style={s.statLabel}>Product Impressions</div>
+            <div style={s.statVal}>{stats.totalViews.toLocaleString()}</div>
+          </div>
+        </div>
+      </div>
+
       {/* APPROVAL NOTICE */}
       <div style={s.noticeBox}>
         📋 All uploaded materials go through admin review before appearing on the marketplace. You can track status below.
       </div>
 
-      {/* TABS */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px", flexWrap: "wrap", gap: "10px" }}>
-  <div style={s.tabs}>
-    <button style={{ ...s.tab, ...(view === "listings" ? s.activeTab : {}) }} onClick={() => setView("listings")}>
-      My Listings ({materials.length})
-    </button>
-    <button style={{ ...s.tab, ...(view === "upload" ? s.activeTab : {}) }} onClick={() => { setView("upload"); setError(""); setSuccess(""); }}>
-      + New Listing
-    </button>
-  </div>
-  <button
-    style={{ padding: "8px 16px", background: "rgba(59,130,246,0.15)", color: "#93c5fd", border: "1px solid rgba(59,130,246,0.3)", borderRadius: "6px", cursor: "pointer", fontWeight: 600, fontSize: "0.85rem" }}
-    onClick={() => { setLoading(true); fetchMyMaterials(token); }}
-  >
-    🔄 Refresh Status
-  </button>
-</div>
+      {/* TABS & SEARCH CONTROLS */}
+      <div style={s.controlsRow}>
+        <div style={s.tabs}>
+          <button style={{ ...s.tab, ...(view === "listings" ? s.activeTab : {}) }} onClick={() => setView("listings")}>
+            My Listings ({materials.length})
+          </button>
+          <button style={{ ...s.tab, ...(view === "upload" ? s.activeTab : {}) }} onClick={() => { setView("upload"); setError(""); setSuccess(""); }}>
+            + New Listing
+          </button>
+        </div>
+
+        {view === "listings" && (
+          <div style={s.filterGroup}>
+            <input 
+              type="text" 
+              placeholder="Search by title..." 
+              value={searchQuery} 
+              onChange={(e) => setSearchQuery(e.target.value)} 
+              style={s.searchBar}
+            />
+            <select 
+              value={statusFilter} 
+              onChange={(e) => setStatusFilter(e.target.value)} 
+              style={s.statusDropdown}
+            >
+              <option value="all">All Statuses</option>
+              <option value="active">Live</option>
+              <option value="pending">Pending</option>
+              <option value="sold">Sold</option>
+              <option value="archived">Rejected</option>
+            </select>
+            <button style={s.refreshBtn} onClick={() => { setLoading(true); fetchMyMaterials(token); }}>
+              🔄 Refresh
+            </button>
+          </div>
+        )}
+      </div>
+
       {/* ─── LISTINGS VIEW ─── */}
       {view === "listings" && (
         <div>
           {loading ? (
             <p style={s.muted}>Loading your listings...</p>
-          ) : materials.length === 0 ? (
+          ) : filteredMaterials.length === 0 ? (
             <div style={s.empty}>
-              <p>You have no listings yet.</p>
-              <button style={s.uploadBtn} onClick={() => setView("upload")}>Upload your first material</button>
+              <p>No listings match your selection.</p>
+              {materials.length === 0 && (
+                <button style={s.uploadBtn} onClick={() => setView("upload")}>Upload your first material</button>
+              )}
             </div>
           ) : (
             <div style={s.grid}>
-              {materials.map((m) => {
+              {filteredMaterials.map((m) => {
                 const st = STATUS_COLORS[m.status] || STATUS_COLORS.pending;
+                const isLowStock = m.quantity <= 2 && m.status === "active";
                 return (
                   <div key={m._id} style={s.card}>
                     <div style={s.cardImg}>
@@ -216,6 +300,9 @@ export default function SellerDashboard() {
                       <span style={{ ...s.statusBadge, background: st.bg, color: st.color }}>
                         {st.label}
                       </span>
+                      {isLowStock && (
+                        <span style={s.stockWarning}>⚠️ Low Stock</span>
+                      )}
                     </div>
                     <div style={s.cardBody}>
                       <h3 style={s.cardTitle}>{m.title}</h3>
@@ -224,7 +311,7 @@ export default function SellerDashboard() {
                       <p style={s.cardPrice}>KES {m.price?.toLocaleString()}</p>
                       <p style={s.cardMeta}>Qty: {m.quantity} • 👁️ {m.views || 0} views</p>
                       <div style={s.cardBtns}>
-                        {m.status === "active" && (
+                        {m.status !== "sold" && m.status !== "archived" && (
                           <button style={s.soldBtn} onClick={() => handleMarkSold(m._id)}>
                             Mark Sold
                           </button>
@@ -279,13 +366,13 @@ export default function SellerDashboard() {
             </div>
 
             <div>
-              <label style={s.label}>Quantity *</label>
+              <label style={s.label}>Quantity Available *</label>
               <input name="quantity" type="number" value={form.quantity} onChange={handleChange}
                 placeholder="e.g. 10" style={s.input} />
             </div>
 
             <div>
-              <label style={s.label}>Location *</label>
+              <label style={s.label}>Specific Neighborhood/Location *</label>
               <input name="location" value={form.location} onChange={handleChange}
                 placeholder="e.g. Westlands" style={s.input} />
             </div>
@@ -299,9 +386,9 @@ export default function SellerDashboard() {
             </div>
 
             <div style={s.fieldFull}>
-              <label style={s.label}>Description *</label>
+              <label style={s.label}>Detailed Description *</label>
               <textarea name="description" value={form.description} onChange={handleChange}
-                placeholder="Describe the material, its condition, dimensions, etc."
+                placeholder="Describe the material, its dimensions, why you are selling, etc."
                 rows={4} style={{ ...s.input, resize: "vertical" }} />
             </div>
 
@@ -331,25 +418,40 @@ export default function SellerDashboard() {
 }
 
 const s = {
-  page: { maxWidth: "1100px", margin: "0 auto", padding: "20px", background: "linear-gradient(135deg, #06101f 0%, #0f1729 100%)", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif", color: "#f1f5f9" },
-  topBar: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px", flexWrap: "wrap", gap: "12px" },
-  topTitle: { margin: 0, color: "#fbbf24", fontSize: "1.8rem", fontWeight: 800 },
-  topSub: { color: "#94a3b8", margin: "4px 0 0 0", fontSize: "0.95rem" },
-  topBtns: { display: "flex", gap: "10px", alignItems: "center" },
+  page: { maxWidth: "1200px", margin: "0 auto", padding: "24px", background: "linear-gradient(135deg, #06101f 0%, #0f1729 100%)", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif", color: "#f1f5f9" },
+  topBar: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "24px", flexWrap: "wrap", gap: "12px" },
+  topTitle: { margin: 0, color: "#fbbf24", fontSize: "2rem", fontWeight: 800 },
+  topSub: { color: "#94a3b8", margin: "4px 0 0 0", fontSize: "1rem" },
+  topBtns: { display: "flex", gap: "12px", alignItems: "center" },
   uploadBtn: { padding: "10px 20px", background: "linear-gradient(135deg, #fbbf24, #f59e0b)", color: "#0f1729", border: "none", borderRadius: "8px", fontWeight: 700, cursor: "pointer", fontSize: "0.95rem" },
   logoutBtn: { padding: "10px 16px", background: "rgba(239,68,68,0.2)", color: "#fca5a5", border: "1px solid rgba(239,68,68,0.3)", borderRadius: "8px", cursor: "pointer", fontWeight: 600 },
-  noticeBox: { background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)", borderRadius: "8px", padding: "12px 16px", marginBottom: "20px", color: "#93c5fd", fontSize: "0.88rem" },
-  tabs: { display: "flex", gap: "4px", background: "#0f1729", borderRadius: "8px", padding: "4px", marginBottom: "24px", width: "fit-content" },
+  
+  // Analytics Cards Layout
+  statsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "16px", marginBottom: "24px" },
+  statCard: { display: "flex", alignItems: "center", gap: "16px", padding: "20px", background: "linear-gradient(135deg, #1e293b, #0f1729)", border: "1px solid #334155", borderRadius: "12px" },
+  statIcon: { fontSize: "1.75rem", padding: "10px", background: "rgba(251,191,36,0.1)", borderRadius: "10px", color: "#fbbf24" },
+  statLabel: { color: "#94a3b8", fontSize: "0.82rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" },
+  statVal: { color: "#f1f5f9", fontSize: "1.35rem", fontWeight: 800, marginTop: "2px" },
+
+  noticeBox: { background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)", borderRadius: "8px", padding: "12px 16px", marginBottom: "24px", color: "#93c5fd", fontSize: "0.88rem" },
+  controlsRow: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px", flexWrap: "wrap", gap: "16px" },
+  filterGroup: { display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" },
+  searchBar: { padding: "8px 14px", background: "#0f1729", border: "1px solid #334155", borderRadius: "8px", color: "#f1f5f9", fontSize: "0.88rem", width: "200px" },
+  statusDropdown: { padding: "8px 12px", background: "#0f1729", border: "1px solid #334155", borderRadius: "8px", color: "#f1f5f9", fontSize: "0.88rem", cursor: "pointer" },
+  refreshBtn: { padding: "8px 14px", background: "rgba(59,130,246,0.15)", color: "#93c5fd", border: "1px solid rgba(59,130,246,0.3)", borderRadius: "8px", cursor: "pointer", fontWeight: 600, fontSize: "0.85rem" },
+
+  tabs: { display: "flex", gap: "4px", background: "#0f1729", borderRadius: "8px", padding: "4px", width: "fit-content" },
   tab: { padding: "9px 20px", background: "transparent", border: "none", color: "#94a3b8", borderRadius: "6px", cursor: "pointer", fontWeight: 600, fontSize: "0.9rem" },
   activeTab: { background: "#334155", color: "#fbbf24" },
   muted: { color: "#94a3b8", textAlign: "center", padding: "40px" },
-  empty: { textAlign: "center", color: "#94a3b8", padding: "60px 20px", background: "rgba(30,41,59,0.5)", borderRadius: "12px", border: "2px dashed #475569" },
+  empty: { width: "100%", textAlign: "center", color: "#94a3b8", padding: "60px 20px", background: "rgba(30,41,59,0.5)", borderRadius: "12px", border: "2px dashed #475569" },
   grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "20px" },
   card: { background: "linear-gradient(135deg, #1e293b, #0f1729)", border: "1px solid #334155", borderRadius: "12px", overflow: "hidden" },
   cardImg: { position: "relative", height: "180px", background: "#0f1729" },
   img: { width: "100%", height: "100%", objectFit: "cover" },
   noImg: { width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569", fontWeight: 600 },
   statusBadge: { position: "absolute", top: "10px", left: "10px", padding: "5px 12px", borderRadius: "20px", fontSize: "0.78rem", fontWeight: 700 },
+  stockWarning: { position: "absolute", top: "10px", right: "10px", padding: "5px 10px", background: "rgba(239,68,68,0.85)", color: "#fff", borderRadius: "6px", fontSize: "0.72rem", fontWeight: 800 },
   cardBody: { padding: "16px" },
   cardTitle: { margin: "0 0 6px 0", color: "#f1f5f9", fontSize: "1rem", fontWeight: 700 },
   cardMeta: { margin: "3px 0", color: "#94a3b8", fontSize: "0.82rem" },
@@ -377,8 +479,9 @@ const css = `
   * { box-sizing: border-box; }
   input:focus, select:focus, textarea:focus { outline: none; border-color: #fbbf24 !important; box-shadow: 0 0 0 3px rgba(251,191,36,0.1) !important; }
   button:hover:not(:disabled) { transform: translateY(-1px); opacity: 0.92; }
-  @media (max-width: 600px) {
+  @media (max-width: 768px) {
     [style*="gridTemplateColumns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
-    [style*="gridTemplateColumns: repeat(auto-fill, minmax(260px"] { grid-template-columns: 1fr !important; }
+    [style*="display: flex"][style*="gap: 8px"] { width: 100%; justify-content: space-between; }
+    input[style*="width: 200px"] { width: 100% !important; }
   }
 `;
