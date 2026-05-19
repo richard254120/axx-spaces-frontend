@@ -175,15 +175,22 @@ export default function SellerDashboard() {
       </div>
 
       {/* TABS */}
-      <div style={s.tabs}>
-        <button style={{ ...s.tab, ...(view === "listings" ? s.activeTab : {}) }} onClick={() => setView("listings")}>
-          My Listings ({materials.length})
-        </button>
-        <button style={{ ...s.tab, ...(view === "upload" ? s.activeTab : {}) }} onClick={() => { setView("upload"); setError(""); setSuccess(""); }}>
-          + New Listing
-        </button>
-      </div>
-
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px", flexWrap: "wrap", gap: "10px" }}>
+  <div style={s.tabs}>
+    <button style={{ ...s.tab, ...(view === "listings" ? s.activeTab : {}) }} onClick={() => setView("listings")}>
+      My Listings ({materials.length})
+    </button>
+    <button style={{ ...s.tab, ...(view === "upload" ? s.activeTab : {}) }} onClick={() => { setView("upload"); setError(""); setSuccess(""); }}>
+      + New Listing
+    </button>
+  </div>
+  <button
+    style={{ padding: "8px 16px", background: "rgba(59,130,246,0.15)", color: "#93c5fd", border: "1px solid rgba(59,130,246,0.3)", borderRadius: "6px", cursor: "pointer", fontWeight: 600, fontSize: "0.85rem" }}
+    onClick={() => { setLoading(true); fetchMyMaterials(token); }}
+  >
+    🔄 Refresh Status
+  </button>
+</div>
       {/* ─── LISTINGS VIEW ─── */}
       {view === "listings" && (
         <div>
