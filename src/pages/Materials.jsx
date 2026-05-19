@@ -57,12 +57,9 @@ export default function Materials() {
       const res = await fetch(`${API_BASE}/materials?${query}`);
       const data = await res.json();
       
-      // Clean and normalize incoming array items to guarantee visibility state matches
       if (Array.isArray(data)) {
-        const approvedItems = data.filter(item => {
-          // Fallback fallback: client-side filter double-check for security
-          return item.isVerified === true || item.status === "active";
-        });
+        // ✅ Updates logic to match your precise "approved" string status
+        const approvedItems = data.filter(item => item.status === "approved");
         setMaterials(approvedItems);
       } else {
         setMaterials([]);
