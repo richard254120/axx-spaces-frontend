@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
@@ -21,7 +21,7 @@ const CONDITIONS = ["Like New","Good","Fair","Poor"];
 
 export default function Materials() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,6 +29,7 @@ export default function Materials() {
   const [selected, setSelected] = useState(null);
   const [currentImage, setCurrentImage] = useState(0);
 
+  // Core filter parameters synced cleanly on setup
   const [filters, setFilters] = useState({
     search: searchParams.get("search") || "",
     category: searchParams.get("category") || "",
@@ -38,7 +39,31 @@ export default function Materials() {
     county: searchParams.get("county") || "",
   });
 
-  useEffect(() => { fetchMaterials(); }, [filters]);
+  // Local state purely for text-box input tracking to handle debounce delay cleanly
+  const [searchInput, setSearchInput] = useState(filters.search);
+  const debounceTimer = useRef(null);
+
+  // FEATURE: Auto-synchronize parameters to browser query strings without full redraws
+  useEffect(() => {
+    const params = {};
+    Object.entries(filters).forEach(([key, val]) => {
+      if (val) params[key] = val;
+    });
+    setSearchParams(params, { replace: true });
+    fetchMaterials();
+  }, [filters]);
+
+  // FEATURE: Handle debounced search keystrokes to minimize rapid-fire API hits
+  useEffect(() => {
+    if (searchInput === filters.search) return;
+    
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      setFilters((prev) => ({ ...prev, search: searchInput }));
+    }, 400);
+
+    return () => { if (debounceTimer.current) clearTimeout(debounceTimer.current); };
+  }, [searchInput]);
 
   const fetchMaterials = async () => {
     setLoading(true);
@@ -51,14 +76,12 @@ export default function Materials() {
       if (filters.maxPrice) query.append("maxPrice", filters.maxPrice);
       if (filters.county) query.append("county", filters.county);
       
-      // Force cache-busting so updates appear immediately after admin changes
       query.append("_cb", Date.now());
 
       const res = await fetch(`${API_BASE}/materials?${query}`);
       const data = await res.json();
       
       if (Array.isArray(data)) {
-        // ✅ Updates logic to match your precise "approved" string status
         const approvedItems = data.filter(item => item.status === "approved");
         setMaterials(approvedItems);
       } else {
@@ -74,10 +97,23 @@ export default function Materials() {
   };
 
   const handleFilterChange = (e) => {
-    setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ Goes to seller login, NOT landlord login
+  // FEATURE: Fast reset handler back to empty states
+  const handleResetFilters = () => {
+    setSearchInput("");
+    setFilters({
+      search: "",
+      category: "",
+      condition: "",
+      minPrice: "",
+      maxPrice: "",
+      county: "",
+    });
+  };
+
   const handleSell = () => navigate("/seller-login");
 
   const formatPhone = (phone) => {
@@ -99,6 +135,9 @@ export default function Materials() {
   const openModal = (item) => { setSelected(item); setCurrentImage(0); };
   const closeModal = () => { setSelected(null); setCurrentImage(0); };
 
+  // Detect if any visual filters are modifying current outputs
+  const hasActiveFilters = Object.values(filters).some(val => val !== "");
+
   return (
     <div style={styles.container}>
       <style>{css}</style>
@@ -116,8 +155,14 @@ export default function Materials() {
 
       {/* FILTERS */}
       <div style={styles.filterSection}>
-        <input type="text" name="search" placeholder="🔍 Search materials..."
-          value={filters.search} onChange={handleFilterChange} style={{ ...styles.filterSelect, gridColumn: "span 2" }} />
+        <input 
+          type="text" 
+          name="search" 
+          placeholder="🔍 Search materials..."
+          value={searchInput} 
+          onChange={(e) => setSearchInput(e.target.value)} 
+          style={{ ...styles.filterSelect, gridColumn: "span 2" }} 
+        />
         <select name="category" value={filters.category} onChange={handleFilterChange} style={styles.filterSelect}>
           <option value="">All Categories</option>
           {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -136,8 +181,15 @@ export default function Materials() {
           value={filters.maxPrice} onChange={handleFilterChange} style={styles.filterSelect} />
       </div>
 
-      <div style={styles.resultsCount}>
-        Found {materials.length} {materials.length === 1 ? "item" : "items"}
+      <div style={styles.resultsRow}>
+        <div style={styles.resultsCount}>
+          Found {materials.length} {materials.length === 1 ? "item" : "items"}
+        </div>
+        {hasActiveFilters && (
+          <button onClick={handleResetFilters} style={styles.resetBtn}>
+            🔄 Reset Filters
+          </button>
+        )}
       </div>
 
       {error && <div style={styles.error}>{error}</div>}
@@ -147,12 +199,15 @@ export default function Materials() {
       ) : materials.length === 0 ? (
         <div style={styles.empty}>
           <p>No materials found. Try different filters.</p>
-          <button onClick={handleSell} style={styles.uploadBtn}>Be the first to sell here!</button>
+          <div style={{ display: "flex", gap: "12px", justifyContent: "center", marginTop: "14px" }}>
+            {hasActiveFilters && <button onClick={handleResetFilters} style={styles.resetBtnSecondary}>Clear Criteria</button>}
+            <button onClick={handleSell} style={styles.uploadBtn}>Be the first to sell here!</button>
+          </div>
         </div>
       ) : (
         <div style={styles.grid}>
           {materials.map((m) => (
-            <div key={m._id} style={styles.card} onClick={() => openModal(m)}>
+            <div key={m._id} className="material-card" style={styles.card} onClick={() => openModal(m)}>
               <div style={styles.imageContainer}>
                 <img src={m.images?.[0] || "/placeholder.jpg"} alt={m.title} style={styles.image} />
                 <span style={styles.conditionBadge}>{m.condition}</span>
@@ -167,8 +222,8 @@ export default function Materials() {
                 <p style={styles.price}>KES {Number(m.price).toLocaleString()}</p>
                 <p style={styles.quantity}>Qty: {m.quantity}</p>
                 <div style={styles.stats}>
-                  <span>👁️ {m.views || 0}</span>
-                  <span>💬 {m.inquiries || 0}</span>
+                  <span>👁️ {m.views || 0} views</span>
+                  <span>💬 {m.inquiries || 0} inquiries</span>
                 </div>
                 <button style={styles.viewBtn} onClick={(e) => { e.stopPropagation(); openModal(m); }}>
                   View Details
@@ -255,15 +310,18 @@ const styles = {
   header: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "30px", paddingBottom: "20px", borderBottom: "1px solid #334155", flexWrap: "wrap", gap: "12px" },
   title: { margin: 0, fontSize: "2rem", fontWeight: 800, color: "#fbbf24" },
   subtitle: { color: "#94a3b8", margin: "6px 0 0 0", fontSize: "0.95rem" },
-  uploadBtn: { padding: "12px 24px", background: "linear-gradient(135deg, #fbbf24, #f59e0b)", color: "#0f1729", border: "none", borderRadius: "8px", fontSize: "0.95rem", fontWeight: 700, cursor: "pointer" },
+  uploadBtn: { padding: "12px 24px", background: "linear-gradient(135deg, #fbbf24, #f59e0b)", color: "#0f1729", border: "none", borderRadius: "8px", fontSize: "0.95rem", fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center" },
   filterSection: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "12px", marginBottom: "24px" },
   filterSelect: { padding: "11px 14px", background: "#1e293b", border: "1px solid #334155", borderRadius: "8px", color: "#f1f5f9", fontSize: "0.92rem" },
-  resultsCount: { color: "#94a3b8", marginBottom: "20px", fontSize: "0.95rem" },
+  resultsRow: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" },
+  resultsCount: { color: "#94a3b8", fontSize: "0.95rem" },
+  resetBtn: { background: "none", border: "none", color: "#fbbf24", cursor: "pointer", fontSize: "0.9rem", fontWeight: 600, padding: "4px 8px" },
+  resetBtnSecondary: { background: "#1e293b", border: "1px solid #334155", borderRadius: "8px", color: "#f1f5f9", padding: "12px 20px", cursor: "pointer", fontWeight: 600 },
   error: { background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.4)", color: "#fca5a5", padding: "12px 16px", borderRadius: "8px", marginBottom: "20px" },
   loading: { textAlign: "center", color: "#94a3b8", padding: "60px" },
   empty: { textAlign: "center", color: "#94a3b8", padding: "60px 20px", background: "rgba(30,41,59,0.5)", borderRadius: "12px", border: "2px dashed #475569" },
   grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "20px" },
-  card: { background: "linear-gradient(135deg, #1e293b, #0f1729)", border: "1px solid #334155", borderRadius: "12px", overflow: "hidden", cursor: "pointer", transition: "all 0.3s" },
+  card: { background: "linear-gradient(135deg, #1e293b, #0f1729)", border: "1px solid #334155", borderRadius: "12px", overflow: "hidden", cursor: "pointer" },
   imageContainer: { position: "relative", height: "170px", overflow: "hidden", background: "#0f1729" },
   image: { width: "100%", height: "100%", objectFit: "cover" },
   conditionBadge: { position: "absolute", top: "10px", right: "10px", background: "#3b82f6", color: "white", padding: "4px 10px", borderRadius: "12px", fontSize: "0.75rem", fontWeight: 700 },
@@ -275,7 +333,7 @@ const styles = {
   price: { margin: "6px 0 3px 0", fontSize: "1.1rem", fontWeight: 700, color: "#fbbf24" },
   quantity: { margin: "0 0 6px 0", fontSize: "0.82rem", color: "#94a3b8" },
   stats: { display: "flex", gap: "10px", fontSize: "0.78rem", color: "#cbd5e1", marginBottom: "10px" },
-  viewBtn: { width: "100%", padding: "9px", background: "linear-gradient(135deg, #3b82f6, #2563eb)", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.88rem", fontWeight: 600 },
+  viewBtn: { width: "100%", padding: "9px", background: "linear-gradient(135deg, #3b82f6, #2563eb)", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.88rem", fontWeight: 600, transition: "transform 0.2s, box-shadow 0.2s" },
   modal: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.75)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000, padding: "20px" },
   modalBox: { background: "linear-gradient(135deg, #1e293b, #0f1729)", borderRadius: "12px", maxWidth: "580px", width: "100%", maxHeight: "90vh", overflowY: "auto", border: "1px solid #334155", position: "relative" },
   closeBtn: { position: "absolute", top: "12px", right: "12px", background: "rgba(0,0,0,0.6)", border: "none", color: "white", width: "32px", height: "32px", borderRadius: "50%", cursor: "pointer", fontSize: "1.2rem", zIndex: 1001 },
@@ -310,6 +368,8 @@ const css = `
   * { box-sizing: border-box; }
   button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
   input:focus, select:focus { outline: none; border-color: #fbbf24 !important; box-shadow: 0 0 0 3px rgba(251,191,36,0.1) !important; }
+  .material-card { transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease; }
+  .material-card:hover { transform: translateY(-4px) scale(1.01); border-color: #fbbf24 !important; box-shadow: 0 12px 24px rgba(251,191,38,0.15); }
   @media (max-width: 768px) {
     [style*="gridTemplateColumns: repeat(auto-fill, minmax(240px"] { grid-template-columns: 1fr !important; }
   }
