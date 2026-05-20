@@ -93,7 +93,7 @@ export default function Navbar() {
         </Link>
         {/* ✅ ADDED MATERIALS LINK HERE */}
         <Link to="/materials" style={styles.navLink} onClick={() => setMenuOpen(false)}>
-          Materials
+          merchants
         </Link>
           
         {token && user ? (
