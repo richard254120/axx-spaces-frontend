@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
+import bgVideo from "../assets/AXX Homepage Video.mp4";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ export default function Home() {
   const [featuredProperties, setFeaturedProperties] = useState([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
   const [fetchError, setFetchError] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const counties = [
     "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
@@ -93,8 +95,25 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ── HERO — original background, no logo ── */}
+      {/* ── HERO WITH BACKGROUND VIDEO ── */}
       <section style={styles.hero}>
+        {/* BACKGROUND VIDEO */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          style={styles.bgVideo}
+          className="hero-video"
+        >
+          <source src={bgVideo} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+
+        {/* LIGHTER OVERLAY — video is deeply visible */}
+        <div style={styles.videoOverlay}></div>
+
+        {/* CONTENT ABOVE VIDEO */}
         <div style={styles.heroContent}>
 
           <div style={styles.trustBadge}>
@@ -107,9 +126,38 @@ export default function Home() {
             Verified rentals across all 47 counties. No agents. No hidden fees.
           </p>
 
-          <form onSubmit={handleSearch} style={styles.searchCard}>
-            <p style={styles.searchLabel}>Where are you looking?</p>
-            <div style={styles.searchRow}>
+          {/* ── SEARCH PROPERTY LABEL ── */}
+          <p style={styles.searchPropertyLabel}>Search Property</p>
+
+          {/* ── HAMBURGER SEARCH TRIGGER ── */}
+          <div style={styles.hamburgerWrapper}>
+            <button
+              type="button"
+              style={styles.hamburgerBtn}
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Open property search"
+              className="hamburger-btn"
+            >
+              <span style={{
+                ...styles.hamburgerLine,
+                transform: menuOpen ? "rotate(45deg) translate(4px, 4px)" : "none",
+              }}></span>
+              <span style={{
+                ...styles.hamburgerLine,
+                opacity: menuOpen ? 0 : 1,
+                transform: menuOpen ? "scaleX(0)" : "none",
+              }}></span>
+              <span style={{
+                ...styles.hamburgerLine,
+                transform: menuOpen ? "rotate(-45deg) translate(4px, -4px)" : "none",
+              }}></span>
+            </button>
+            <span style={styles.hamburgerLabel}>Search Properties</span>
+          </div>
+
+          {/* Dropdown search panel */}
+          {menuOpen && (
+            <form onSubmit={(e) => { handleSearch(e); setMenuOpen(false); }} style={styles.searchDropdown} className="hamburger-menu">
               <select
                 style={styles.searchInput}
                 value={searchForm.county}
@@ -131,13 +179,9 @@ export default function Home() {
               <button type="submit" style={styles.searchBtn}>
                 🔍 Search Now
               </button>
-            </div>
-            <p style={styles.searchHint}>
-              🔥 <strong>40</strong> new listings added this week
-            </p>
-          </form>
+            </form>
+          )}
 
-          {/* Removed User Rating, Active Listings now 280 */}
           <div style={styles.heroStats}>
             {[
               { val: "280", label: "Active Listings" },
@@ -153,7 +197,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── FEATURED LISTINGS — directly below hero, marquee scrolling cards ── */}
+      {/* ── FEATURED LISTINGS ── */}
       <section style={styles.featuredSection}>
         <div style={styles.sectionHeader}>
           <h2 style={styles.sectionTitle}>⭐ Featured Premium Listings</h2>
@@ -171,14 +215,13 @@ export default function Home() {
           <div style={styles.noFeatured}>
             <div style={styles.noFeaturedIcon}>⚠️</div>
             <p style={styles.noFeaturedText}>Could not load featured listings</p>
-            <p style={styles.noFeaturedSub}> please refresh in a moment.</p>
+            <p style={styles.noFeaturedSub}>Please refresh in a moment.</p>
             <button onClick={() => window.location.reload()} style={styles.boostBtn}>
               🔄 Retry
             </button>
           </div>
         ) : featuredProperties.length > 0 ? (
           <>
-            {/* ✅ Marquee scrolling cards */}
             <div style={styles.marqueeCardsWrapper}>
               <div className="cards-marquee-track">
                 {[...featuredProperties, ...featuredProperties].map((property, idx) => (
@@ -319,7 +362,7 @@ const styles = {
     minHeight: "100vh",
   },
 
-  /* Marquee — back at top */
+  /* ── Marquee ── */
   marqueeWrapper: {
     overflow: "hidden",
     background: "#fbbf24",
@@ -347,16 +390,55 @@ const styles = {
     marginLeft: "8px",
   },
 
-  /* Hero — original background, no logo */
+  /* ── Hero ── */
   hero: {
-    background: "linear-gradient(150deg, #ffffff 0%, #fef3e2 55%, #fff7ed 100%)",
+    position: "relative",
     padding: "40px 16px 44px",
     textAlign: "center",
     borderBottom: "3px solid #fbbf24",
     width: "100%",
     boxSizing: "border-box",
+    overflow: "hidden",
+    minHeight: "100vh",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  heroContent: { maxWidth: "820px", margin: "0 auto" },
+
+  /* Video fully fills hero — centered, no gaps */
+  bgVideo: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    width: "100%",
+    height: "100%",
+    minWidth: "100%",
+    minHeight: "100%",
+    transform: "translate(-50%, -50%)",
+    objectFit: "cover",
+    objectPosition: "center center",
+    zIndex: 0,
+    display: "block",
+  },
+
+  /* ✅ LIGHTER overlay — video is now deeply visible */
+  videoOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    background: "linear-gradient(160deg, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.28) 100%)",
+    zIndex: 1,
+  },
+
+  heroContent: {
+    maxWidth: "820px",
+    margin: "0 auto",
+    position: "relative",
+    zIndex: 2,
+  },
+
   trustBadge: {
     display: "inline-flex",
     alignItems: "center",
@@ -381,43 +463,94 @@ const styles = {
   heroTitle: {
     fontSize: "clamp(30px, 5.5vw, 52px)",
     fontWeight: 800,
-    color: "#1f2937",
+    color: "white",
     margin: "0 0 12px",
     letterSpacing: "-1.5px",
     lineHeight: 1.15,
+    textShadow: "0 2px 16px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4)",
   },
   heroSubtitle: {
     fontSize: "16px",
-    color: "#6b7280",
+    color: "#f3f4f6",
     margin: "0 auto 30px",
     maxWidth: "480px",
     lineHeight: 1.6,
+    textShadow: "0 1px 8px rgba(0,0,0,0.5)",
   },
-  searchCard: {
-    background: "white",
-    borderRadius: "16px",
-    padding: "20px 16px 16px",
-    boxShadow: "0 8px 40px rgba(0,0,0,0.10)",
-    maxWidth: "680px",
-    width: "100%",
-    margin: "0 auto 30px",
-    textAlign: "left",
-    border: "1px solid #f3f4f6",
-    boxSizing: "border-box",
-  },
-  searchLabel: {
+
+  searchPropertyLabel: {
     fontSize: "13px",
     fontWeight: 700,
-    color: "#374151",
+    color: "rgba(255,255,255,0.75)",
     textTransform: "uppercase",
-    letterSpacing: "0.06em",
-    margin: "0 0 12px",
+    letterSpacing: "0.12em",
+    margin: "0 0 8px",
+    textShadow: "0 1px 4px rgba(0,0,0,0.4)",
   },
-  searchRow: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "10px",
+
+  /* ── Hamburger search trigger ── */
+  hamburgerWrapper: {
+    display: "inline-flex",
     alignItems: "center",
+    gap: "12px",
+    background: "rgba(255,255,255,0.15)",
+    border: "1.5px solid rgba(255,255,255,0.35)",
+    borderRadius: "50px",
+    padding: "8px 20px 8px 8px",
+    margin: "0 auto 16px",
+    cursor: "pointer",
+    backdropFilter: "blur(8px)",
+  },
+
+  hamburgerLabel: {
+    color: "white",
+    fontWeight: 700,
+    fontSize: "15px",
+    letterSpacing: "0.02em",
+    textShadow: "0 1px 4px rgba(0,0,0,0.4)",
+  },
+
+  /* ✅ Hamburger button */
+  hamburgerBtn: {
+    background: "#1f2937",
+    border: "none",
+    borderRadius: "50%",
+    width: "42px",
+    height: "42px",
+    cursor: "pointer",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "5px",
+    flexShrink: 0,
+    transition: "background 0.2s",
+    padding: 0,
+  },
+  hamburgerLine: {
+    display: "block",
+    width: "20px",
+    height: "2.5px",
+    background: "#fbbf24",
+    borderRadius: "2px",
+    transition: "transform 0.25s ease, opacity 0.2s ease",
+  },
+
+  /* ✅ Search dropdown panel */
+  searchDropdown: {
+    background: "rgba(255,255,255,0.97)",
+    borderRadius: "16px",
+    padding: "16px",
+    boxShadow: "0 8px 40px rgba(0,0,0,0.28)",
+    maxWidth: "400px",
+    width: "100%",
+    margin: "0 auto 30px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+    boxSizing: "border-box",
+    backdropFilter: "blur(8px)",
+    border: "1px solid rgba(255,255,255,0.8)",
   },
   searchInput: {
     padding: "12px 14px",
@@ -443,14 +576,9 @@ const styles = {
     transition: "all 0.2s",
     boxShadow: "0 4px 14px rgba(239,68,68,0.35)",
     width: "100%",
-    gridColumn: "1 / -1",
   },
-  searchHint: {
-    fontSize: "12px",
-    color: "#9ca3af",
-    margin: "12px 0 0",
-    textAlign: "center",
-  },
+
+  /* ── Hero Stats ── */
   heroStats: {
     display: "flex",
     justifyContent: "center",
@@ -459,10 +587,20 @@ const styles = {
     marginTop: "4px",
   },
   heroStat: { display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" },
-  heroStatVal: { fontSize: "20px", fontWeight: 800, color: "#1f2937" },
-  heroStatLabel: { fontSize: "11px", color: "#9ca3af", fontWeight: 500 },
+  heroStatVal: {
+    fontSize: "20px",
+    fontWeight: 800,
+    color: "white",
+    textShadow: "0 2px 10px rgba(0,0,0,0.5)",
+  },
+  heroStatLabel: {
+    fontSize: "11px",
+    color: "rgba(255, 255, 255, 0.9)",
+    fontWeight: 500,
+    textShadow: "0 1px 4px rgba(0,0,0,0.4)",
+  },
 
-  /* Featured — directly below hero */
+  /* ── Featured ── */
   featuredSection: { padding: "60px 0 60px", background: "#1f2937", color: "white", overflow: "hidden" },
   sectionHeader: { textAlign: "center", marginBottom: "44px", padding: "0 20px" },
   sectionTitle: { fontSize: "30px", fontWeight: 800, color: "#fbbf24", margin: "0 0 10px" },
@@ -532,7 +670,7 @@ const styles = {
     fontWeight: 700, fontSize: "15px", cursor: "pointer",
   },
 
-  /* Features */
+  /* ── Features ── */
   featuresSection: { padding: "72px 20px", background: "#f8f4f0", maxWidth: "1200px", margin: "0 auto" },
   featureGrid: {
     display: "grid",
@@ -547,7 +685,7 @@ const styles = {
   featureTitle: { fontSize: "16px", fontWeight: 700, color: "#1f2937", margin: "0 0 10px" },
   featureText: { fontSize: "13px", color: "#6b7280", lineHeight: 1.6, margin: 0 },
 
-  /* CTA */
+  /* ── CTA ── */
   cta: {
     background: "linear-gradient(135deg, #2427fb 0%, #4d9ffc 100%)",
     padding: "76px 20px", textAlign: "center",
@@ -569,7 +707,7 @@ const styles = {
   },
   loginHint: { fontSize: "13px", color: "rgba(255,255,255,0.65)", marginTop: "16px", fontStyle: "italic" },
 
-  /* Footer */
+  /* ── Footer ── */
   footer: { background: "#1f2937", color: "#d1d5db", padding: "36px 20px 20px" },
   footerInner: { maxWidth: "960px", margin: "0 auto", textAlign: "center" },
   footerBrand: { marginBottom: "18px" },
@@ -601,6 +739,10 @@ const css = `
   @keyframes spin {
     to { transform: rotate(360deg); }
   }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
   .marquee-track {
     display: flex;
@@ -625,6 +767,19 @@ const css = `
     border-top-color: #fbbf24;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
+  }
+
+  .hamburger-menu {
+    animation: slideDown 0.2s ease;
+  }
+
+  .menu-item:hover {
+    background: #f3f4f6 !important;
+  }
+
+  .hamburger-btn:hover {
+    background: #374151 !important;
+    transform: scale(1.05);
   }
 
   select {
