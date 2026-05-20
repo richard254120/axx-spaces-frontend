@@ -390,45 +390,43 @@ const styles = {
     marginLeft: "8px",
   },
 
-  /* ── Hero ── */
+  /* ── Hero — fills viewport on all screen sizes including phones ── */
   hero: {
     position: "relative",
-    padding: "40px 16px 44px",
+    padding: "80px 16px 60px",
     textAlign: "center",
     borderBottom: "3px solid #fbbf24",
     width: "100%",
     boxSizing: "border-box",
     overflow: "hidden",
-    minHeight: "100vh",
+    minHeight: "100dvh",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
   },
 
-  /* Video fully fills hero — centered, no gaps */
+  /* Video locked to exact hero bounds — fills perfectly on mobile & desktop */
   bgVideo: {
     position: "absolute",
-    top: "50%",
-    left: "50%",
+    top: 0,
+    left: 0,
     width: "100%",
     height: "100%",
-    minWidth: "100%",
-    minHeight: "100%",
-    transform: "translate(-50%, -50%)",
     objectFit: "cover",
     objectPosition: "center center",
     zIndex: 0,
     display: "block",
+    pointerEvents: "none",
   },
 
-  /* ✅ LIGHTER overlay — video is now deeply visible */
+  /* Dim overlay — video is visible but all text reads clearly on phones */
   videoOverlay: {
     position: "absolute",
     top: 0,
     left: 0,
     width: "100%",
     height: "100%",
-    background: "linear-gradient(160deg, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.28) 100%)",
+    background: "linear-gradient(180deg, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.52) 50%, rgba(0,0,0,0.65) 100%)",
     zIndex: 1,
   },
 
