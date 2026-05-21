@@ -83,19 +83,19 @@ export default function About() {
   ];
 
   const values = [
-    { icon: "💡", title: "Innovation", text: "Building modern solutions for everyday problems." },
-    { icon: "🌍", title: "Accessibility", text: "Making services and opportunities easier to reach for everyone." },
-    { icon: "🔍", title: "Transparency", text: "Encouraging accurate listings, honest reviews, and responsible engagement." },
-    { icon: "🤝", title: "Community Growth", text: "Supporting landlords, tenants, merchants, movers, and entrepreneurs together." },
+    { icon: "", title: "Innovation", text: "Building modern solutions for everyday problems." },
+    { icon: "", title: "Accessibility", text: "Making services and opportunities easier to reach for everyone." },
+    { icon: "", title: "Transparency", text: "Encouraging accurate listings, honest reviews, and responsible engagement." },
+    { icon: "", title: "Community Growth", text: "Supporting landlords, tenants, merchants, movers, and entrepreneurs together." },
   ];
 
   const trustElements = [
-    { icon: "✅", title: "Verified Listings", desc: "Every property is manually reviewed & verified before publication." },
-    { icon: "⭐", title: "Reviews & Ratings", desc: "Tenants rate landlords. Landlords track feedback. Transparency builds trust." },
-    { icon: "👁️", title: "Physical Verification", desc: "We encourage in-person visits before any payments are made." },
-    { icon: "📞", title: "24/7 Support", desc: "Got an issue? Contact us via WhatsApp, email, or phone. We're here to help." },
-    { icon: "🔐", title: "Data Privacy", desc: "Your personal data is encrypted and never shared without consent." },
-    { icon: "🚨", title: "Report Fake Listings", desc: "Spot a scam? Report it immediately. We remove fake listings within 24 hours." },
+    { icon: "", title: "Verified Listings", desc: "Every property is manually reviewed & verified before publication." },
+    { icon: "", title: "Reviews & Ratings", desc: "Tenants rate landlords. Landlords track feedback. Transparency builds trust." },
+    { icon: "", title: "Physical Verification", desc: "We encourage in-person visits before any payments are made." },
+    { icon: "", title: "24/7 Support", desc: "Got an issue? Contact us via WhatsApp, email, or phone. We're here to help." },
+    { icon: "", title: "Data Privacy", desc: "Your personal data is encrypted and never shared without consent." },
+    { icon: "", title: "Report Fake Listings", desc: "Spot a scam? Report it immediately. We remove fake listings within 24 hours." },
   ];
 
   return (
@@ -210,10 +210,10 @@ export default function About() {
 
           <div style={styles.statsGrid}>
             {[
-              { val: "280+", label: "Active Listings", icon: "🏠" },
-              { val: "47", label: "Counties Covered", icon: "🗺️" },
-              { val: "500+", label: "Happy Tenants", icon: "😊" },
-              { val: "150+", label: "Landlords Onboarded", icon: "👨‍💼" },
+              { val: "280+", label: "Active Listings", icon: "" },
+              { val: "47", label: "Counties Covered", icon: "" },
+              { val: "500+", label: "Happy Tenants", icon: "" },
+              { val: "150+", label: "Landlords Onboarded", icon: "" },
             ].map((s) => (
               <div key={s.label} style={styles.statCard} className="stat-card">
                 <div style={styles.statIcon}>{s.icon}</div>
@@ -314,7 +314,7 @@ export default function About() {
 
           <div style={styles.ctaButtons}>
             <button style={styles.ctaBtnPrimary} onClick={() => navigate("/listings")}>
-              🔍 Browse Listings
+              Browse Listings
             </button>
             <button
               style={{
@@ -324,19 +324,19 @@ export default function About() {
               }}
               onClick={() => token ? navigate("/upload") : navigate("/login")}
             >
-              📝 List Your Property
+              List Your Property
             </button>
             <button
               style={{ ...styles.ctaBtnSecondary, background: "#3b82f6", color: "white" }}
               onClick={() => navigate("/materials")}
             >
-              🛒 Buy Materials
+               Buy Materials
             </button>
             <button
               style={{ ...styles.ctaBtnSecondary, background: "#6366f1", color: "white" }}
               onClick={() => window.open("mailto:partners@axxspaces.com")}
             >
-              🤝 Become a Partner
+              Become a Partner
             </button>
           </div>
         </div>
@@ -357,9 +357,9 @@ export default function About() {
           </div>
           <div style={styles.footerSection}>
             <h4 style={styles.footerTitle}>Support</h4>
-            <p style={styles.footerLink}>📧 support@axxspaces.com</p>
-            <p style={styles.footerLink}>📱 +254 700 000 000</p>
-            <p style={styles.footerLink}>💬 WhatsApp Support</p>
+            <p style={styles.footerLink}> axxspaces@gmail.com</p>
+            <p style={styles.footerLink}> +254 796740883</p>
+            <p style={styles.footerLink}> WhatsApp Support</p>
           </div>
         </div>
         <div style={styles.footerBottom}>
