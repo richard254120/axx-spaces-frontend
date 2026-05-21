@@ -1,7 +1,10 @@
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
-export default function AboutUs() {
+export default function About() {
   const navigate = useNavigate();
+  const { token } = useContext(AuthContext);
 
   const team = [
     {
@@ -20,7 +23,7 @@ export default function AboutUs() {
       name: "Richard",
       role: "Co-Founder & Technology",
       emoji: "👨‍💻",
-      bio: "drives the technical infrastructure that powers Axx Spaces, ensuring a seamless experience for landlords and tenants alike.",
+      bio: "Drives the technical infrastructure that powers Axx Spaces, ensuring a seamless experience for landlords and tenants alike.",
     },
   ];
 
@@ -36,6 +39,39 @@ export default function AboutUs() {
     { icon: "✅", title: "Verification", text: "Every listing is manually reviewed before going live. We don't publish what we can't stand behind." },
     { icon: "🤝", title: "Community", text: "Built for Kenyans, by Kenyans. We understand the local market because we live it every day." },
     { icon: "🚀", title: "Innovation", text: "From GPS-mapped listings to integrated movers, we keep pushing to make your experience better." },
+  ];
+
+  const trustElements = [
+    {
+      icon: "🔍",
+      title: "Verified Listings",
+      desc: "Every property is manually reviewed & verified before publication",
+    },
+    {
+      icon: "⭐",
+      title: "Reviews & Ratings",
+      desc: "Tenants rate landlords. Landlords track feedback. Transparency builds trust.",
+    },
+    {
+      icon: "👁️",
+      title: "Physical Verification",
+      desc: "We encourage in-person visits before any payments are made.",
+    },
+    {
+      icon: "📞",
+      title: "24/7 Support",
+      desc: "Got an issue? Contact us via WhatsApp, email, or phone. We're here to help.",
+    },
+    {
+      icon: "🔐",
+      title: "Data Privacy",
+      desc: "Your personal data is encrypted and never shared without consent.",
+    },
+    {
+      icon: "🚨",
+      title: "Report Fake Listings",
+      desc: "Spot a scam? Report it immediately. We remove fake listings within 24 hours.",
+    },
   ];
 
   return (
@@ -54,7 +90,7 @@ export default function AboutUs() {
         </div>
       </section>
 
-      {/* ── MISSION ── */}
+      {/* ── MISSION & VISION ── */}
       <section style={styles.missionSection}>
         <div style={styles.missionInner}>
           <div style={styles.missionCard}>
@@ -70,14 +106,13 @@ export default function AboutUs() {
             <h2 style={styles.missionTitle}>Our Vision</h2>
             <p style={styles.missionText}>
               A Kenya where every person — regardless of county or budget — can find a safe, verified, 
-              affordable home with a single search. Where landlords and tenants communicate directly, 
-              honestly, and efficiently.
+              affordable home with a single search. Where landlords and tenants communicate directly, honestly, and efficiently.
             </p>
           </div>
         </div>
       </section>
 
-      {/* ── STORY ── */}
+      {/* ── HOW IT STARTED ── */}
       <section style={styles.storySection}>
         <div style={styles.storyInner}>
           <h2 style={styles.sectionTitle}>How It All Started</h2>
@@ -141,6 +176,47 @@ export default function AboutUs() {
         </div>
       </section>
 
+      {/* ── STATISTICS ── */}
+      <section style={styles.statsSection}>
+        <div style={styles.statsInner}>
+          <h2 style={{ ...styles.sectionTitle, color: "#fbbf24" }}>By The Numbers</h2>
+          <p style={{ ...styles.sectionSubtitle, color: "#94a3b8" }}>Our impact across Kenya</p>
+
+          <div style={styles.statsGrid}>
+            {[
+              { val: "280+", label: "Active Listings", icon: "🏠" },
+              { val: "47", label: "Counties Covered", icon: "🗺️" },
+              { val: "500+", label: "Happy Tenants", icon: "😊" },
+              { val: "150+", label: "Landlords Onboarded", icon: "👨‍💼" },
+            ].map((s) => (
+              <div key={s.label} style={styles.statCard}>
+                <div style={styles.statIcon}>{s.icon}</div>
+                <div style={styles.statNumber}>{s.val}</div>
+                <div style={styles.statLabel}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── TRUST & SAFETY ── */}
+      <section style={styles.trustSection}>
+        <div style={styles.trustInner}>
+          <h2 style={styles.sectionTitle}>Trust & Safety</h2>
+          <p style={styles.sectionSubtitle}>We take your safety seriously. Here's how we protect you.</p>
+
+          <div style={styles.trustGrid}>
+            {trustElements.map((trust) => (
+              <div key={trust.title} style={styles.trustCard}>
+                <div style={styles.trustIcon}>{trust.icon}</div>
+                <h3 style={styles.trustTitle}>{trust.title}</h3>
+                <p style={styles.trustDesc}>{trust.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── TEAM ── */}
       <section style={styles.teamSection}>
         <div style={styles.teamInner}>
@@ -160,36 +236,39 @@ export default function AboutUs() {
         </div>
       </section>
 
-      {/* ── STATS ── */}
-      <section style={styles.statsSection}>
-        <div style={styles.statsGrid}>
-          {[
-            { val: "280+", label: "Active Listings" },
-            { val: "47", label: "Counties Covered" },
-            { val: "5,000+", label: "Happy Tenants" },
-            { val: "0", label: "Hidden Fees" },
-          ].map((s) => (
-            <div key={s.label} style={styles.statItem}>
-              <span style={styles.statVal}>{s.val}</span>
-              <span style={styles.statLabel}>{s.label}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── CTA ── */}
+      {/* ── CALL TO ACTION ── */}
       <section style={styles.cta}>
         <div style={styles.ctaInner}>
           <h2 style={styles.ctaTitle}>Ready to Find Your Home?</h2>
           <p style={styles.ctaText}>
-            Join thousands of Kenyans who found their perfect home on Axx Spaces — for free.
+            Join thousands of Kenyans who found their perfect home on Axx Spaces — for free, with zero hidden fees.
           </p>
+
           <div style={styles.ctaButtons}>
             <button style={styles.ctaBtnPrimary} onClick={() => navigate("/listings")}>
               🔍 Browse Listings
             </button>
-            <button style={styles.ctaBtnSecondary} onClick={() => navigate("/register")}>
+            <button
+              style={{
+                ...styles.ctaBtnSecondary,
+                background: token ? "#22c55e" : "white",
+                color: token ? "white" : "#1f2937",
+              }}
+              onClick={() => token ? navigate("/upload") : navigate("/login")}
+            >
               📝 List Your Property
+            </button>
+            <button
+              style={{ ...styles.ctaBtnSecondary, background: "#3b82f6", color: "white" }}
+              onClick={() => navigate("/materials")}
+            >
+              🛒 Buy Materials
+            </button>
+            <button
+              style={{ ...styles.ctaBtnSecondary, background: "#6366f1", color: "white" }}
+              onClick={() => window.open("mailto:partners@axxspaces.com")}
+            >
+              🤝 Become Partner
             </button>
           </div>
         </div>
@@ -198,9 +277,25 @@ export default function AboutUs() {
       {/* ── FOOTER ── */}
       <footer style={styles.footer}>
         <div style={styles.footerInner}>
-          <strong style={{ color: "#fbbf24", fontSize: "18px" }}>Axx Spaces</strong>
-          <p style={styles.footerTagline}>Kenya's most trusted rental platform</p>
-          <p style={styles.footerCopy}>© 2024 Axx Spaces. All rights reserved.</p>
+          <div style={styles.footerSection}>
+            <strong style={{ color: "#fbbf24", fontSize: "18px" }}>Axx Spaces</strong>
+            <p style={styles.footerTagline}>Kenya's most trusted rental platform</p>
+          </div>
+          <div style={styles.footerSection}>
+            <h4 style={styles.footerTitle}>Quick Links</h4>
+            <p style={styles.footerLink} onClick={() => navigate("/listings")}>Browse Listings</p>
+            <p style={styles.footerLink} onClick={() => navigate("/")}>Home</p>
+            <p style={styles.footerLink} onClick={() => navigate("/materials")}>Materials Marketplace</p>
+          </div>
+          <div style={styles.footerSection}>
+            <h4 style={styles.footerTitle}>Support</h4>
+            <p style={styles.footerLink}>📧 support@axxspaces.com</p>
+            <p style={styles.footerLink}>📱 +254 700 000 000</p>
+            <p style={styles.footerLink}>💬 WhatsApp Support</p>
+          </div>
+        </div>
+        <div style={styles.footerBottom}>
+          <p style={styles.footerCopy}>© 2026 Axx Spaces. All rights reserved. Built for Kenya, by Kenyans.</p>
         </div>
       </footer>
     </div>
@@ -208,60 +303,132 @@ export default function AboutUs() {
 }
 
 const styles = {
-  root: { fontFamily: "'DM Sans', sans-serif", background: "#f8f4f0", color: "#1f2937", minHeight: "100vh" },
+  root: {
+    fontFamily: "'DM Sans', sans-serif",
+    background: "#f8f4f0",
+    color: "#1f2937",
+    minHeight: "100vh",
+  },
 
-  /* Hero */
+  /* ── HERO ── */
   hero: {
     background: "linear-gradient(150deg, #ffffff 0%, #fef3e2 55%, #fff7ed 100%)",
     padding: "80px 20px 60px",
     textAlign: "center",
     borderBottom: "3px solid #fbbf24",
   },
-  heroContent: { maxWidth: "720px", margin: "0 auto" },
+  heroContent: {
+    maxWidth: "720px",
+    margin: "0 auto",
+  },
   badge: {
     display: "inline-block",
-    background: "#dcfce7", color: "#15803d",
-    padding: "5px 16px", borderRadius: "20px",
-    fontSize: "13px", fontWeight: 600,
-    marginBottom: "20px", border: "1px solid #bbf7d0",
+    background: "#dcfce7",
+    color: "#15803d",
+    padding: "5px 16px",
+    borderRadius: "20px",
+    fontSize: "13px",
+    fontWeight: 600,
+    marginBottom: "20px",
+    border: "1px solid #bbf7d0",
   },
   heroTitle: {
     fontSize: "clamp(32px, 6vw, 54px)",
-    fontWeight: 800, color: "#1f2937",
-    margin: "0 0 16px", letterSpacing: "-1.5px", lineHeight: 1.15,
+    fontWeight: 800,
+    color: "#1f2937",
+    margin: "0 0 16px",
+    letterSpacing: "-1.5px",
+    lineHeight: 1.15,
   },
   heroSubtitle: {
-    fontSize: "17px", color: "#6b7280",
-    margin: "0 auto", maxWidth: "560px", lineHeight: 1.7,
+    fontSize: "17px",
+    color: "#6b7280",
+    margin: "0 auto",
+    maxWidth: "560px",
+    lineHeight: 1.7,
   },
 
-  /* Mission */
-  missionSection: { padding: "72px 20px", background: "#f8f4f0" },
+  /* ── MISSION ── */
+  missionSection: {
+    padding: "72px 20px",
+    background: "#f8f4f0",
+  },
   missionInner: {
-    maxWidth: "900px", margin: "0 auto",
-    display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px",
+    maxWidth: "900px",
+    margin: "0 auto",
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "24px",
   },
   missionCard: {
-    background: "white", padding: "32px", borderRadius: "16px",
-    border: "1px solid #e5e7eb", textAlign: "center",
+    background: "white",
+    padding: "32px",
+    borderRadius: "16px",
+    border: "1px solid #e5e7eb",
+    textAlign: "center",
     boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+    transition: "all 0.3s",
   },
-  missionIcon: { fontSize: "40px", marginBottom: "16px" },
-  missionTitle: { fontSize: "20px", fontWeight: 800, color: "#1f2937", margin: "0 0 12px" },
-  missionText: { fontSize: "15px", color: "#6b7280", lineHeight: 1.7, margin: 0 },
+  missionIcon: {
+    fontSize: "40px",
+    marginBottom: "16px",
+  },
+  missionTitle: {
+    fontSize: "20px",
+    fontWeight: 800,
+    color: "#1f2937",
+    margin: "0 0 12px",
+  },
+  missionText: {
+    fontSize: "15px",
+    color: "#6b7280",
+    lineHeight: 1.7,
+    margin: 0,
+  },
 
-  /* Story */
-  storySection: { padding: "72px 20px", background: "white" },
-  storyInner: { maxWidth: "760px", margin: "0 auto" },
-  sectionTitle: { fontSize: "28px", fontWeight: 800, color: "#1f2937", margin: "0 0 10px", textAlign: "center" },
-  sectionSubtitle: { fontSize: "15px", color: "#6b7280", textAlign: "center", margin: "0 0 44px" },
-  storyText: { fontSize: "16px", color: "#4b5563", lineHeight: 1.85 },
-  "storyText p": { marginBottom: "20px" },
+  /* ── STORY ── */
+  storySection: {
+    padding: "72px 20px",
+    background: "white",
+  },
+  storyInner: {
+    maxWidth: "760px",
+    margin: "0 auto",
+  },
+  sectionTitle: {
+    fontSize: "28px",
+    fontWeight: 800,
+    color: "#1f2937",
+    margin: "0 0 10px",
+    textAlign: "center",
+  },
+  sectionSubtitle: {
+    fontSize: "15px",
+    color: "#6b7280",
+    textAlign: "center",
+    margin: "0 0 44px",
+  },
+  storyText: {
+    fontSize: "16px",
+    color: "#4b5563",
+    lineHeight: 1.85,
+  },
 
-  /* Milestones */
-  milestonesSection: { padding: "72px 20px", background: "#1f2937" },
-  milestonesInner: { maxWidth: "760px", margin: "0 auto" },
-  timeline: { marginTop: "44px", display: "flex", flexDirection: "column", gap: "0" },
+  /* ── MILESTONES ── */
+  milestonesSection: {
+    padding: "72px 20px",
+    background: "#1f2937",
+  },
+  milestonesInner: {
+    maxWidth: "760px",
+    margin: "0 auto",
+  },
+  timeline: {
+    marginTop: "44px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0",
+  },
   timelineItem: {
     display: "grid",
     gridTemplateColumns: "80px 24px 1fr",
@@ -271,110 +438,322 @@ const styles = {
     position: "relative",
   },
   timelineYear: {
-    fontSize: "18px", fontWeight: 800, color: "#fbbf24",
-    textAlign: "right", paddingTop: "2px",
+    fontSize: "18px",
+    fontWeight: 800,
+    color: "#fbbf24",
+    textAlign: "right",
+    paddingTop: "2px",
   },
   timelineDot: {
-    width: "14px", height: "14px",
-    borderRadius: "50%", background: "#fbbf24",
+    width: "14px",
+    height: "14px",
+    borderRadius: "50%",
+    background: "#fbbf24",
     border: "3px solid #1f2937",
     boxShadow: "0 0 0 3px #fbbf24",
-    marginTop: "4px", flexShrink: 0,
+    marginTop: "4px",
+    flexShrink: 0,
   },
-  timelineText: { fontSize: "15px", color: "#cbd5e1", lineHeight: 1.7 },
+  timelineText: {
+    fontSize: "15px",
+    color: "#cbd5e1",
+    lineHeight: 1.7,
+  },
 
-  /* Values */
-  valuesSection: { padding: "72px 20px", background: "#f8f4f0", maxWidth: "1100px", margin: "0 auto" },
+  /* ── VALUES ── */
+  valuesSection: {
+    padding: "72px 20px",
+    background: "#f8f4f0",
+    maxWidth: "1100px",
+    margin: "0 auto",
+  },
   valuesGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-    gap: "22px", marginTop: "8px",
+    gap: "22px",
+    marginTop: "8px",
   },
   valueCard: {
-    background: "white", padding: "28px", borderRadius: "14px",
-    textAlign: "center", border: "1px solid #e5e7eb",
-    transition: "all 0.22s", boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
+    background: "white",
+    padding: "28px",
+    borderRadius: "14px",
+    textAlign: "center",
+    border: "1px solid #e5e7eb",
+    transition: "all 0.22s",
+    boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
   },
-  valueIcon: { fontSize: "36px", marginBottom: "14px" },
-  valueTitle: { fontSize: "17px", fontWeight: 700, color: "#1f2937", margin: "0 0 10px" },
-  valueText: { fontSize: "13px", color: "#6b7280", lineHeight: 1.6, margin: 0 },
+  valueIcon: {
+    fontSize: "36px",
+    marginBottom: "14px",
+  },
+  valueTitle: {
+    fontSize: "17px",
+    fontWeight: 700,
+    color: "#1f2937",
+    margin: "0 0 10px",
+  },
+  valueText: {
+    fontSize: "13px",
+    color: "#6b7280",
+    lineHeight: 1.6,
+    margin: 0,
+  },
 
-  /* Team */
-  teamSection: { padding: "72px 20px", background: "#1f2937" },
-  teamInner: { maxWidth: "900px", margin: "0 auto" },
+  /* ── STATISTICS ── */
+  statsSection: {
+    background: "#1f2937",
+    color: "white",
+    padding: "60px 20px",
+  },
+  statsInner: {
+    maxWidth: "1200px",
+    margin: "0 auto",
+  },
+  statsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+    gap: "20px",
+    marginTop: "40px",
+  },
+  statCard: {
+    background: "#111827",
+    padding: "30px 20px",
+    borderRadius: "12px",
+    textAlign: "center",
+    border: "1px solid #334155",
+    transition: "all 0.3s",
+  },
+  statIcon: {
+    fontSize: "40px",
+    marginBottom: "12px",
+  },
+  statNumber: {
+    fontSize: "32px",
+    fontWeight: 800,
+    color: "#fbbf24",
+    margin: "8px 0",
+  },
+  statLabel: {
+    fontSize: "14px",
+    color: "#9ca3af",
+    fontWeight: 600,
+  },
+
+  /* ── TRUST & SAFETY ── */
+  trustSection: {
+    background: "#f3f4f6",
+    padding: "60px 20px",
+  },
+  trustInner: {
+    maxWidth: "1200px",
+    margin: "0 auto",
+  },
+  trustGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+    gap: "24px",
+    marginTop: "40px",
+  },
+  trustCard: {
+    background: "white",
+    padding: "28px 24px",
+    borderRadius: "12px",
+    border: "2px solid #e5e7eb",
+    transition: "all 0.3s",
+  },
+  trustIcon: {
+    fontSize: "32px",
+    marginBottom: "12px",
+  },
+  trustTitle: {
+    fontSize: "16px",
+    fontWeight: 700,
+    color: "#1f2937",
+    margin: "0 0 8px",
+  },
+  trustDesc: {
+    fontSize: "13px",
+    color: "#6b7280",
+    lineHeight: 1.6,
+    margin: 0,
+  },
+
+  /* ── TEAM ── */
+  teamSection: {
+    padding: "72px 20px",
+    background: "#1f2937",
+  },
+  teamInner: {
+    maxWidth: "900px",
+    margin: "0 auto",
+  },
   teamGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-    gap: "24px", marginTop: "44px",
+    gap: "24px",
+    marginTop: "44px",
   },
   teamCard: {
-    background: "#111827", padding: "32px 24px",
-    borderRadius: "16px", textAlign: "center",
-    border: "1px solid #334155", transition: "all 0.25s",
+    background: "#111827",
+    padding: "32px 24px",
+    borderRadius: "16px",
+    textAlign: "center",
+    border: "1px solid #334155",
+    transition: "all 0.25s",
   },
-  teamEmoji: { fontSize: "52px", marginBottom: "16px" },
-  teamName: { fontSize: "18px", fontWeight: 800, color: "white", margin: "0 0 6px" },
-  teamRole: { fontSize: "13px", color: "#fbbf24", fontWeight: 600, margin: "0 0 14px" },
-  teamBio: { fontSize: "13px", color: "#94a3b8", lineHeight: 1.7, margin: 0 },
+  teamEmoji: {
+    fontSize: "52px",
+    marginBottom: "16px",
+  },
+  teamName: {
+    fontSize: "18px",
+    fontWeight: 800,
+    color: "white",
+    margin: "0 0 6px",
+  },
+  teamRole: {
+    fontSize: "13px",
+    color: "#fbbf24",
+    fontWeight: 600,
+    margin: "0 0 14px",
+  },
+  teamBio: {
+    fontSize: "13px",
+    color: "#94a3b8",
+    lineHeight: 1.7,
+    margin: 0,
+  },
 
-  /* Stats */
-  statsSection: {
-    background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
-    padding: "52px 20px",
-  },
-  statsGrid: {
-    display: "flex", justifyContent: "center",
-    gap: "48px", flexWrap: "wrap",
-    maxWidth: "900px", margin: "0 auto",
-  },
-  statItem: { display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" },
-  statVal: { fontSize: "36px", fontWeight: 800, color: "#1f2937" },
-  statLabel: { fontSize: "13px", color: "#78350f", fontWeight: 600 },
-
-  /* CTA */
+  /* ── CTA ── */
   cta: {
     background: "linear-gradient(135deg, #2427fb 0%, #4d9ffc 100%)",
-    padding: "76px 20px", textAlign: "center",
+    padding: "76px 20px",
+    textAlign: "center",
   },
-  ctaInner: { maxWidth: "600px", margin: "0 auto" },
-  ctaTitle: { fontSize: "32px", fontWeight: 800, color: "white", margin: "0 0 12px" },
-  ctaText: { fontSize: "16px", color: "rgba(255,255,255,0.8)", margin: "0 0 32px" },
-  ctaButtons: { display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" },
+  ctaInner: {
+    maxWidth: "900px",
+    margin: "0 auto",
+  },
+  ctaTitle: {
+    fontSize: "32px",
+    fontWeight: 800,
+    color: "white",
+    margin: "0 0 12px",
+  },
+  ctaText: {
+    fontSize: "16px",
+    color: "rgba(255,255,255,0.8)",
+    margin: "0 0 32px",
+  },
+  ctaButtons: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+    gap: "16px",
+    maxWidth: "800px",
+    margin: "0 auto",
+  },
   ctaBtnPrimary: {
-    padding: "14px 32px", background: "#ef4444", color: "white",
-    border: "none", borderRadius: "10px", fontSize: "16px",
-    fontWeight: 700, cursor: "pointer",
+    padding: "14px 24px",
+    background: "#ef4444",
+    color: "white",
+    border: "none",
+    borderRadius: "10px",
+    fontSize: "14px",
+    fontWeight: 700,
+    cursor: "pointer",
+    transition: "all 0.3s",
   },
   ctaBtnSecondary: {
-    padding: "14px 32px", background: "white", color: "#1f2937",
-    border: "none", borderRadius: "10px", fontSize: "16px",
-    fontWeight: 700, cursor: "pointer",
+    padding: "14px 24px",
+    border: "none",
+    borderRadius: "10px",
+    fontSize: "14px",
+    fontWeight: 700,
+    cursor: "pointer",
+    transition: "all 0.3s",
   },
 
-  /* Footer */
-  footer: { background: "#1f2937", color: "#d1d5db", padding: "36px 20px 20px", textAlign: "center" },
-  footerInner: { maxWidth: "960px", margin: "0 auto" },
-  footerTagline: { fontSize: "13px", color: "#6b7280", margin: "6px 0 4px" },
-  footerCopy: { fontSize: "12px", color: "#4b5563", margin: 0 },
+  /* ── FOOTER ── */
+  footer: {
+    background: "#1f2937",
+    color: "#d1d5db",
+    padding: "40px 20px 20px",
+  },
+  footerInner: {
+    maxWidth: "1200px",
+    margin: "0 auto",
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+    gap: "30px",
+    marginBottom: "30px",
+  },
+  footerSection: {
+    fontSize: "13px",
+  },
+  footerTitle: {
+    color: "#fbbf24",
+    fontSize: "14px",
+    fontWeight: 700,
+    margin: "0 0 12px",
+  },
+  footerTagline: {
+    fontSize: "13px",
+    color: "#6b7280",
+    margin: "6px 0 4px",
+  },
+  footerLink: {
+    margin: "6px 0",
+    cursor: "pointer",
+    transition: "color 0.2s",
+    color: "#9ca3af",
+  },
+  footerBottom: {
+    textAlign: "center",
+    paddingTop: "20px",
+    borderTop: "1px solid #374151",
+  },
+  footerCopy: {
+    fontSize: "12px",
+    color: "#6b7280",
+    margin: 0,
+  },
 };
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
 
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  p { margin-bottom: 20px; }
+
+  p:last-child { margin-bottom: 0; }
+
   .value-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
     border-color: #fbbf24 !important;
   }
 
   .team-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.3) !important;
     border-color: #fbbf24 !important;
   }
 
-  @media (max-width: 640px) {
+  button:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+  }
+
+  [style*="cursor: pointer"]:hover {
+    color: #fbbf24 !important;
+  }
+
+  @media (max-width: 768px) {
     [style*="gridTemplateColumns: 1fr 1fr"] {
+      grid-template-columns: 1fr !important;
+    }
+    [style*="gridTemplateColumns: repeat"] {
       grid-template-columns: 1fr !important;
     }
   }
