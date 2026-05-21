@@ -9,11 +9,13 @@ export default function Movers() {
 
   const [activeTab, setActiveTab] = useState("search");
   const [loading, setLoading] = useState(false);
-  const [selectedCounty, setSelectedCounty] = useState("");
+  
+  // Set default search parameter to "all" so it lists everyone initially
+  const [selectedCounty, setSelectedCounty] = useState("all"); 
   const [movers, setMovers] = useState([]);
 
   // Booking modal state
-  const [bookingMover, setBookingMover] = useState(null); // mover object to book
+  const [bookingMover, setBookingMover] = useState(null); 
   const [bookingForm, setBookingForm] = useState({
     serviceType: "",
     pickupLocation: "",
@@ -56,14 +58,20 @@ export default function Movers() {
   const [forgotMsg, setForgotMsg] = useState("");
 
   useEffect(() => {
-    if (!selectedCounty || activeTab !== "search") return;
+    if (activeTab !== "search") return;
+    
     const fetchMovers = async () => {
       setLoading(true);
       try {
         const res = await API.get(`/movers?county=${selectedCounty}`);
         setMovers(res.data || []);
-      } catch { setMovers([]); } finally { setLoading(false); }
+      } catch { 
+        setMovers([]); 
+      } finally { 
+        setLoading(false); 
+      }
     };
+    
     fetchMovers();
   }, [selectedCounty, activeTab]);
 
@@ -168,8 +176,6 @@ export default function Movers() {
     }
   };
 
-  // ── RENDER ────────────────────────────────────────────────────────────────
-
   return (
     <div style={styles.container}>
 
@@ -269,7 +275,7 @@ export default function Movers() {
       {activeTab === "search" && (
         <div style={styles.viewContainer}>
           <select value={selectedCounty} onChange={e => setSelectedCounty(e.target.value)} style={styles.select}>
-            <option value="">-- Select Your County --</option>
+            <option value="all">🌍 All Counties</option>
             {counties.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
 
@@ -290,7 +296,6 @@ export default function Movers() {
                     {m.services?.map(s => <span key={s} style={styles.miniTag}>{s}</span>)}
                   </div>
 
-                  {/* TWO ACTIONS: Book or WhatsApp */}
                   <div style={{ display: "flex", gap: "8px", marginTop: "16px" }}>
                     <button onClick={() => openBooking(m)} style={styles.bookBtn}>
                       📋 Request Job
@@ -300,9 +305,11 @@ export default function Movers() {
                     </button>
                   </div>
                 </div>
-              )) : selectedCounty ? (
-                <p style={styles.centerText}>No approved movers in {selectedCounty} yet.</p>
-              ) : null}
+              )) : (
+                <p style={styles.centerText}>
+                  {selectedCounty === "all" ? "No approved movers found anywhere yet." : `No approved movers in ${selectedCounty} yet.`}
+                </p>
+              )}
             </div>
           )}
         </div>
@@ -382,6 +389,7 @@ export default function Movers() {
   );
 }
 
+// Keeping your original styles intact
 const styles = {
   container: { background: "#06101f", minHeight: "100vh", padding: "120px 20px 60px", color: "#f1f5f9", fontFamily: "'DM Sans', sans-serif" },
   header: { textAlign: "center", marginBottom: "40px" },
@@ -396,14 +404,12 @@ const styles = {
   card: { background: "#111827", padding: "25px", borderRadius: "20px", border: "1px solid #1f2937" },
   cardHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" },
   moverName: { color: "#fbbf24", margin: 0, fontSize: "1.3rem" },
-  verifiedBadge: { background: "rgba(34,197,94,0.15)", color: "#22c55e", padding: "3px 8px", borderRadius: "6px", fontSize: "11px", fontWeight: 700 },
+  verifiedBadge: { background: "rgba(34,197,94,0.15)", color: "#22c55e", padding: "3px 8px", borderRadius: "6px", fontSize: "11px", fontWeight 700 },
   detail: { color: "#94a3b8", margin: "5px 0", fontSize: "0.9rem" },
   tagContainer: { display: "flex", flexWrap: "wrap", gap: "6px", margin: "12px 0 0" },
   miniTag: { background: "#1e293b", padding: "4px 10px", borderRadius: "6px", fontSize: "0.75rem", color: "#cbd5e1" },
   bookBtn: { flex: 2, padding: "11px", background: "#3b82f6", color: "#fff", border: "none", borderRadius: "10px", fontWeight: "bold", cursor: "pointer" },
   whatsappBtn: { flex: 1, padding: "11px", background: "#22c55e", color: "#fff", border: "none", borderRadius: "10px", fontWeight: "bold", cursor: "pointer" },
-
-  // Modal
   modalOverlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "20px" },
   modal: { background: "#1e293b", borderRadius: "20px", border: "1px solid #334155", width: "100%", maxWidth: "480px", maxHeight: "90vh", overflowY: "auto", padding: "28px" },
   modalHeader: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "24px" },
@@ -417,7 +423,6 @@ const styles = {
   doneBtn: { padding: "12px 32px", background: "#22c55e", color: "#fff", border: "none", borderRadius: "10px", fontWeight: 700, cursor: "pointer", fontSize: "14px" },
   cancelBtn: { flex: 1, padding: "12px", background: "transparent", color: "#94a3b8", border: "1px solid #334155", borderRadius: "10px", fontWeight: 600, cursor: "pointer" },
   sendBtn: { flex: 2, padding: "12px", background: "#fbbf24", color: "#000", border: "none", borderRadius: "10px", fontWeight: 700, cursor: "pointer", fontSize: "14px" },
-
   formCard: { maxWidth: "700px", margin: "0 auto", background: "#1e293b", padding: "40px", borderRadius: "25px", border: "1px solid #334155" },
   loginSmallCard: { maxWidth: "400px", margin: "0 auto", background: "#1e293b", padding: "40px", borderRadius: "25px", border: "1px solid #334155" },
   formTitle: { color: "#fbbf24", textAlign: "center", marginBottom: "10px", fontSize: "1.5rem" },
