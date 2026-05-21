@@ -206,8 +206,8 @@ export default function MoverDashboard() {
           <span style={styles.logoText}>🚚 AXX Movers Dashboard</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <button onClick={fetchAll} style={styles.refreshBtn} title="Refresh Data">🔄</button>
-          <button onClick={handleLogout} style={styles.logoutIcon} title="Logout">🚪</button>
+          <button onClick={fetchAll} style={styles.refreshBtn} title="Refresh Data">refresh</button>
+          <button onClick={handleLogout} style={styles.logoutIcon} title="Logout">logout</button>
         </div>
       </header>
 
@@ -372,7 +372,7 @@ export default function MoverDashboard() {
 
                   {profileData.bio && (
                     <div style={{ ...styles.infoRow, flexDirection: "column", gap: "6px" }}>
-                      <span style={styles.infoLabel}>📝 Bio</span>
+                      <span style={styles.infoLabel}> Bio</span>
                       <span style={{ ...styles.infoValue, fontSize: "13px", lineHeight: 1.5 }}>
                         {profileData.bio}
                       </span>
@@ -381,12 +381,12 @@ export default function MoverDashboard() {
                 </div>
 
                 <button style={styles.editBtn} onClick={() => setEditingProfile(true)}>
-                  ✏️ Edit Profile
+                   Edit Profile
                 </button>
               </div>
             ) : (
               <div style={styles.profilePage}>
-                <h3 style={{ ...styles.profileName, marginBottom: "20px" }}>✏️ Edit Profile</h3>
+                <h3 style={{ ...styles.profileName, marginBottom: "20px" }}>Edit Profile</h3>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px", textAlign: "left" }}>
                   <label style={styles.formLabel}>📞 Phone Number</label>
@@ -397,7 +397,7 @@ export default function MoverDashboard() {
                     placeholder="e.g. 0712345678"
                   />
 
-                  <label style={styles.formLabel}>📍 County</label>
+                  <label style={styles.formLabel}> County</label>
                   <input
                     style={styles.formInput}
                     value={profileData.county}
@@ -426,7 +426,7 @@ export default function MoverDashboard() {
                     placeholder="e.g. 3"
                   />
 
-                  <label style={styles.formLabel}>📝 Bio</label>
+                  <label style={styles.formLabel}>Bio</label>
                   <textarea
                     style={{ ...styles.formInput, minHeight: "80px", resize: "vertical" }}
                     value={profileData.bio}
@@ -469,7 +469,7 @@ export default function MoverDashboard() {
                     onClick={handleSaveProfile}
                     disabled={profileSaving}
                   >
-                    {profileSaving ? "Saving..." : "💾 Save Profile"}
+                    {profileSaving ? "Saving..." : "Save Profile"}
                   </button>
                 </div>
               </div>
@@ -509,7 +509,7 @@ function JobList({ jobs, actionLoading, onAccept, onComplete, getStatusColor, ge
   if (!jobs || jobs.length === 0) {
     return (
       <div style={styles.emptyBox}>
-        <p>📭 No jobs found.</p>
+        <p>No jobs found.</p>
       </div>
     );
   }
