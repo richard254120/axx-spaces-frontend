@@ -126,8 +126,7 @@ export default function Movers() {
 
   const openBooking = (mover) => {
     if (!user || !token) {
-      alert("Please log in or register to book a mover.");
-      navigate("/login");
+      alert("Please log in or register as a customer to book a mover directly.");
       return;
     }
     setBookingMover(mover);
@@ -163,12 +162,12 @@ export default function Movers() {
         scheduledDate: bookingForm.scheduledDate,
         notes: bookingForm.notes,
         customerPhone: bookingForm.phone,
-        customerName: user?.name,
+        customerName: user?.name || "Valued Client",
         county: bookingMover.county,
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setBookingSuccess(`✅ Request sent to ${bookingMover.name}! They will contact you at ${bookingForm.phone}.`);
+      setBookingSuccess(`✅ Request sent to ${bookingMover.name}! They will view these specifications on their dashboard.`);
     } catch (err) {
       setBookingError(err.response?.data?.message || "Failed to send request. Try again.");
     } finally {
@@ -179,14 +178,14 @@ export default function Movers() {
   return (
     <div style={styles.container}>
 
-      {/* ── BOOKING MODAL ── */}
+      {/* ── BOOKING SPECS MODAL ── */}
       {bookingMover && (
         <div style={styles.modalOverlay} onClick={(e) => e.target === e.currentTarget && closeBooking()}>
           <div style={styles.modal}>
             <div style={styles.modalHeader}>
               <div>
                 <h3 style={styles.modalTitle}>📦 Book {bookingMover.name}</h3>
-                <p style={styles.modalSub}>📍 {bookingMover.county} • 🚛 {bookingMover.vehicleType}</p>
+                <p style={styles.modalSub}>📍 {bookingMover.county} • Complete Move Specifications</p>
               </div>
               <button onClick={closeBooking} style={styles.closeBtn}>✕</button>
             </div>
@@ -194,18 +193,15 @@ export default function Movers() {
             {bookingSuccess ? (
               <div style={styles.bookingSuccessBox}>
                 <div style={{ fontSize: "48px", marginBottom: "12px" }}>🎉</div>
-                <p style={{ fontWeight: 700, fontSize: "16px", margin: "0 0 8px" }}>Request Sent!</p>
-                <p style={{ color: "#6b7280", fontSize: "13px", margin: "0 0 20px" }}>{bookingSuccess}</p>
-                <p style={{ color: "#6b7280", fontSize: "12px", margin: "0 0 20px" }}>
-                  The mover will review and accept your job on their dashboard. You'll be contacted directly.
-                </p>
-                <button style={styles.doneBtn} onClick={closeBooking}>Done</button>
+                <p style={{ fontWeight: 700, fontSize: "16px", margin: "0 0 8px" }}>Specs Saved!</p>
+                <p style={{ color: "#a3b8cc", fontSize: "13px", margin: "0 0 20px" }}>{bookingSuccess}</p>
+                <button style={styles.doneBtn} onClick={closeBooking}>Close Panel</button>
               </div>
             ) : (
               <form onSubmit={handleBookingSubmit}>
                 {bookingError && <div style={styles.errorBox}>{bookingError}</div>}
 
-                <label style={styles.fieldLabel}>Service Type *</label>
+                <label style={styles.fieldLabel}>Service Requirement *</label>
                 <select style={styles.fieldInput}
                   value={bookingForm.serviceType}
                   onChange={e => setBookingForm(p => ({ ...p, serviceType: e.target.value }))}>
@@ -215,42 +211,42 @@ export default function Movers() {
                   ))}
                 </select>
 
-                <label style={styles.fieldLabel}>Your Phone Number *</label>
-                <input style={styles.fieldInput} placeholder="e.g. 0712 345 678"
+                <label style={styles.fieldLabel}>Your Active Callback Number *</label>
+                <input style={styles.fieldInput} placeholder="e.g. 0712345678"
                   value={bookingForm.phone}
                   onChange={e => setBookingForm(p => ({ ...p, phone: e.target.value }))} />
 
-                <label style={styles.fieldLabel}>Pickup Location *</label>
-                <input style={styles.fieldInput} placeholder="e.g. Westlands, Nairobi"
+                <label style={styles.fieldLabel}>Exact Pickup Point/Estate/Floor *</label>
+                <input style={styles.fieldInput} placeholder="e.g. Kilimani, Wood Avenue, Block B, 4th Floor"
                   value={bookingForm.pickupLocation}
                   onChange={e => setBookingForm(p => ({ ...p, pickupLocation: e.target.value }))} />
 
-                <label style={styles.fieldLabel}>Drop-off Location *</label>
-                <input style={styles.fieldInput} placeholder="e.g. Kiambu Town"
+                <label style={styles.fieldLabel}>Exact Destination Point/Estate/Floor *</label>
+                <input style={styles.fieldInput} placeholder="e.g. Syokimau, Community Road, House 4"
                   value={bookingForm.dropoffLocation}
                   onChange={e => setBookingForm(p => ({ ...p, dropoffLocation: e.target.value }))} />
 
-                <label style={styles.fieldLabel}>Preferred Date *</label>
+                <label style={styles.fieldLabel}>Moving Date *</label>
                 <input style={styles.fieldInput} type="date"
                   min={new Date().toISOString().split("T")[0]}
                   value={bookingForm.scheduledDate}
                   onChange={e => setBookingForm(p => ({ ...p, scheduledDate: e.target.value }))} />
 
-                <label style={styles.fieldLabel}>Additional Notes</label>
-                <textarea style={{ ...styles.fieldInput, minHeight: "80px", resize: "vertical" }}
-                  placeholder="e.g. 2-bedroom house, 3rd floor, need packing..."
+                <label style={styles.fieldLabel}>Mover Instructions & Special Details</label>
+                <textarea style={{ ...styles.fieldInput, minHeight: "90px", resize: "vertical" }}
+                  placeholder="State items to carry, fragile items, or layout complications here so the mover knows exactly what to expect..."
                   value={bookingForm.notes}
                   onChange={e => setBookingForm(p => ({ ...p, notes: e.target.value }))} />
 
                 <div style={styles.modalNote}>
                   <span>ℹ️</span>
-                  <span>The mover will review your request and contact you to confirm pricing and details.</span>
+                  <span>Submitting writes these logistics directly onto the mover's pipeline tracker database.</span>
                 </div>
 
-                <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+                <div style={{ display: "flex", gap: "10px", marginTop: "24px" }}>
                   <button type="button" onClick={closeBooking} style={styles.cancelBtn}>Cancel</button>
                   <button type="submit" disabled={bookingLoading} style={styles.sendBtn}>
-                    {bookingLoading ? "⏳ Sending..." : "📤 Send Request"}
+                    {bookingLoading ? "⏳ Saving Specs..." : "📤 Submit to Dashboard"}
                   </button>
                 </div>
               </form>
@@ -290,18 +286,22 @@ export default function Movers() {
                     <span style={styles.verifiedBadge}>✅ Verified</span>
                   </div>
                   <p style={styles.detail}>📍 {m.county} • ⭐ {m.experience || m.experienceYears} yrs exp</p>
-                  <p style={styles.detail}>🚛 {m.vehicleType}</p>
+                  <p style={styles.detail}>CC: +{m.phone}</p>
                   {m.bio && <p style={{ ...styles.detail, fontStyle: "italic", marginTop: "8px" }}>"{m.bio}"</p>}
                   <div style={styles.tagContainer}>
                     {m.services?.map(s => <span key={s} style={styles.miniTag}>{s}</span>)}
                   </div>
 
-                  <div style={{ display: "flex", gap: "8px", marginTop: "16px" }}>
+                  {/* 3-Action Interactive Communication Hub */}
+                  <div style={styles.actionCluster}>
                     <button onClick={() => openBooking(m)} style={styles.bookBtn}>
                       📋 Request Job
                     </button>
+                    <button onClick={() => window.open(`tel:${m.phone}`)} style={styles.callBtn}>
+                      📞 Call
+                    </button>
                     <button onClick={() => window.open(`https://wa.me/${m.phone}`, "_blank")} style={styles.whatsappBtn}>
-                      💬 WhatsApp
+                      💬 WA
                     </button>
                   </div>
                 </div>
@@ -389,7 +389,6 @@ export default function Movers() {
   );
 }
 
-// Keeping your original styles intact
 const styles = {
   container: { background: "#06101f", minHeight: "100vh", padding: "120px 20px 60px", color: "#f1f5f9", fontFamily: "'DM Sans', sans-serif" },
   header: { textAlign: "center", marginBottom: "40px" },
@@ -400,29 +399,34 @@ const styles = {
   activeTab: { padding: "10px 20px", background: "#fbbf24", color: "#000", border: "none", borderRadius: "20px", fontWeight: "bold" },
   viewContainer: { maxWidth: "1200px", margin: "0 auto" },
   select: { display: "block", width: "100%", maxWidth: "400px", margin: "0 auto 40px", padding: "15px", background: "#1e293b", color: "#fff", border: "1px solid #334155", borderRadius: "12px", cursor: "pointer" },
-  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "25px" },
-  card: { background: "#111827", padding: "25px", borderRadius: "20px", border: "1px solid #1f2937" },
+  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "25px" },
+  card: { background: "#111827", padding: "25px", borderRadius: "20px", border: "1px solid #1f2937", display: "flex", flexDirection: "column", justifyContent: "between" },
   cardHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" },
   moverName: { color: "#fbbf24", margin: 0, fontSize: "1.3rem" },
-  verifiedBadge: { background: "rgba(34,197,94,0.15)", color: "#22c55e", padding: "3px 8px", borderRadius: "6px", fontSize: "11px", fontWeight 700 },
+  verifiedBadge: { background: "rgba(34,197,94,0.15)", color: "#22c55e", padding: "3px 8px", borderRadius: "6px", fontSize: "11px", fontWeight: 700 },
   detail: { color: "#94a3b8", margin: "5px 0", fontSize: "0.9rem" },
-  tagContainer: { display: "flex", flexWrap: "wrap", gap: "6px", margin: "12px 0 0" },
+  tagContainer: { display: "flex", flexWrap: "wrap", gap: "6px", margin: "12px 0 16px" },
   miniTag: { background: "#1e293b", padding: "4px 10px", borderRadius: "6px", fontSize: "0.75rem", color: "#cbd5e1" },
+  
+  // Action clusters layouts
+  actionCluster: { display: "flex", gap: "8px", marginTop: "auto", paddingTop: "10px" },
   bookBtn: { flex: 2, padding: "11px", background: "#3b82f6", color: "#fff", border: "none", borderRadius: "10px", fontWeight: "bold", cursor: "pointer" },
+  callBtn: { flex: 1, padding: "11px", background: "#fbbf24", color: "#000", border: "none", borderRadius: "10px", fontWeight: "bold", cursor: "pointer", textAlign: "center" },
   whatsappBtn: { flex: 1, padding: "11px", background: "#22c55e", color: "#fff", border: "none", borderRadius: "10px", fontWeight: "bold", cursor: "pointer" },
-  modalOverlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "20px" },
-  modal: { background: "#1e293b", borderRadius: "20px", border: "1px solid #334155", width: "100%", maxWidth: "480px", maxHeight: "90vh", overflowY: "auto", padding: "28px" },
+  
+  modalOverlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "20px" },
+  modal: { background: "#111827", borderRadius: "24px", border: "1px solid #334155", width: "100%", maxWidth: "520px", maxHeight: "90vh", overflowY: "auto", padding: "32px" },
   modalHeader: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "24px" },
-  modalTitle: { color: "#fbbf24", margin: "0 0 4px", fontSize: "1.2rem" },
+  modalTitle: { color: "#fbbf24", margin: "0 0 4px", fontSize: "1.4rem" },
   modalSub: { color: "#94a3b8", margin: 0, fontSize: "13px" },
   closeBtn: { background: "none", border: "none", color: "#94a3b8", fontSize: "20px", cursor: "pointer", padding: "0 0 0 12px" },
-  fieldLabel: { display: "block", fontSize: "12px", fontWeight: 700, color: "#94a3b8", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.5px" },
-  fieldInput: { width: "100%", padding: "11px 12px", background: "#0f172a", border: "1px solid #334155", borderRadius: "8px", color: "#fff", boxSizing: "border-box", marginBottom: "16px", fontFamily: "inherit", fontSize: "14px" },
-  modalNote: { display: "flex", gap: "8px", background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.3)", borderRadius: "8px", padding: "12px", fontSize: "12px", color: "#93c5fd" },
-  bookingSuccessBox: { textAlign: "center", padding: "20px 0" },
-  doneBtn: { padding: "12px 32px", background: "#22c55e", color: "#fff", border: "none", borderRadius: "10px", fontWeight: 700, cursor: "pointer", fontSize: "14px" },
+  fieldLabel: { display: "block", fontSize: "11px", fontWeight: 700, color: "#94a3b8", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.5px" },
+  fieldInput: { width: "100%", padding: "12px 14px", background: "#06101f", border: "1px solid #334155", borderRadius: "10px", color: "#fff", boxSizing: "border-box", marginBottom: "18px", fontFamily: "inherit", fontSize: "14px" },
+  modalNote: { display: "flex", gap: "8px", background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.2)", borderRadius: "8px", padding: "12px", fontSize: "12px", color: "#fde047" },
+  bookingSuccessBox: { textAlign: "center", padding: "30px 10px" },
+  doneBtn: { padding: "12px 32px", background: "#3b82f6", color: "#fff", border: "none", borderRadius: "10px", fontWeight: 700, cursor: "pointer", fontSize: "14px" },
   cancelBtn: { flex: 1, padding: "12px", background: "transparent", color: "#94a3b8", border: "1px solid #334155", borderRadius: "10px", fontWeight: 600, cursor: "pointer" },
-  sendBtn: { flex: 2, padding: "12px", background: "#fbbf24", color: "#000", border: "none", borderRadius: "10px", fontWeight: 700, cursor: "pointer", fontSize: "14px" },
+  sendBtn: { flex: 2, padding: "12px", background: "#22c55e", color: "#fff", border: "none", borderRadius: "10px", fontWeight: 700, cursor: "pointer", fontSize: "14px" },
   formCard: { maxWidth: "700px", margin: "0 auto", background: "#1e293b", padding: "40px", borderRadius: "25px", border: "1px solid #334155" },
   loginSmallCard: { maxWidth: "400px", margin: "0 auto", background: "#1e293b", padding: "40px", borderRadius: "25px", border: "1px solid #334155" },
   formTitle: { color: "#fbbf24", textAlign: "center", marginBottom: "10px", fontSize: "1.5rem" },
