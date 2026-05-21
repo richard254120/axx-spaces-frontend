@@ -5,48 +5,56 @@ import API from "../api/api";
 
 export default function Movers() {
   const navigate = useNavigate();
-  const { login, user } = useContext(AuthContext);
+  const { login, user, token } = useContext(AuthContext);
 
-  // 1. NAVIGATION & UI STATE
-  const [activeTab, setActiveTab] = useState("search"); 
+  const [activeTab, setActiveTab] = useState("search");
   const [loading, setLoading] = useState(false);
   const [selectedCounty, setSelectedCounty] = useState("");
   const [movers, setMovers] = useState([]);
 
+  // Booking modal state
+  const [bookingMover, setBookingMover] = useState(null); // mover object to book
+  const [bookingForm, setBookingForm] = useState({
+    serviceType: "",
+    pickupLocation: "",
+    dropoffLocation: "",
+    scheduledDate: "",
+    notes: "",
+    phone: "",
+  });
+  const [bookingLoading, setBookingLoading] = useState(false);
+  const [bookingSuccess, setBookingSuccess] = useState("");
+  const [bookingError, setBookingError] = useState("");
+
   const counties = [
-    "Baringo", "Bomet", "Bungoma", "Busia", "Elgeyo Marakwet", "Embu", "Garissa",
-    "Homa Bay", "Isiolo", "Kajiado", "Kakamega", "Kericho", "Kiambu", "Kilifi",
-    "Kirinyaga", "Kisii", "Kisumu", "Kitui", "Kwale", "Laikipia", "Lamu",
-    "Machakos", "Makueni", "Mandera", "Marsabit", "Meru", "Migori", "Mombasa",
-    "Murang'a", "Nairobi City", "Nakuru", "Nandi", "Narok", "Nyamira",
-    "Nyandarua", "Nyeri", "Samburu", "Siaya", "Taita Taveta", "Tana River",
-    "Tharaka Nithi", "Trans Nzoia", "Turkana", "Uasin Gishu", "Vihiga",
-    "Wajir", "West Pokot"
+    "Baringo","Bomet","Bungoma","Busia","Elgeyo Marakwet","Embu","Garissa",
+    "Homa Bay","Isiolo","Kajiado","Kakamega","Kericho","Kiambu","Kilifi",
+    "Kirinyaga","Kisii","Kisumu","Kitui","Kwale","Laikipia","Lamu",
+    "Machakos","Makueni","Mandera","Marsabit","Meru","Migori","Mombasa",
+    "Murang'a","Nairobi City","Nakuru","Nandi","Narok","Nyamira",
+    "Nyandarua","Nyeri","Samburu","Siaya","Taita Taveta","Tana River",
+    "Tharaka Nithi","Trans Nzoia","Turkana","Uasin Gishu","Vihiga",
+    "Wajir","West Pokot"
   ];
 
   const availableServices = [
-    "Household Moving", "Office Relocation", "Packing & Unpacking",
-    "Furniture Assembly", "Storage Solutions", "Inter-County Moving",
-    "Fragile Item Handling", "Piano/Heavy Lift"
+    "Household Moving","Office Relocation","Packing & Unpacking",
+    "Furniture Assembly","Storage Solutions","Inter-County Moving",
+    "Fragile Item Handling","Piano/Heavy Lift"
   ];
 
-  // 2. FORM STATES
   const [registerData, setRegisterData] = useState({
-    name: "", email: "", password: "", phone: "", county: "", 
+    name: "", email: "", password: "", phone: "", county: "",
     experience: "", vehicleType: "Pickup", services: []
   });
-
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [loginError, setLoginError] = useState("");
   const [loginSuccess, setLoginSuccess] = useState("");
-
-  // ✅ FORGOT PASSWORD STATE
   const [showForgot, setShowForgot] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotMsg, setForgotMsg] = useState("");
 
-  // 3. SEARCH LOGIC
   useEffect(() => {
     if (!selectedCounty || activeTab !== "search") return;
     const fetchMovers = async () => {
@@ -54,16 +62,11 @@ export default function Movers() {
       try {
         const res = await API.get(`/movers?county=${selectedCounty}`);
         setMovers(res.data || []);
-      } catch (err) { 
-        setMovers([]); 
-      } finally { 
-        setLoading(false); 
-      }
+      } catch { setMovers([]); } finally { setLoading(false); }
     };
     fetchMovers();
   }, [selectedCounty, activeTab]);
 
-  // 4. HANDLERS
   const handleServiceToggle = (service) => {
     setRegisterData(prev => ({
       ...prev,
@@ -77,100 +80,195 @@ export default function Movers() {
     e.preventDefault();
     setLoading(true);
     try {
-      await API.post("/auth/register", { 
-        ...registerData, 
-        role: "mover" 
-      });
+      await API.post("/auth/register", { ...registerData, role: "mover" });
       alert("✅ Application Submitted! Once Admin approves your business, you can log in.");
       setActiveTab("login");
     } catch (err) {
-      const errorMsg = err.response?.data?.message || "Registration failed. Check your details.";
-      alert(`❌ ${errorMsg}`);
-    } finally { 
-      setLoading(false); 
-    }
+      alert(`❌ ${err.response?.data?.message || "Registration failed."}`);
+    } finally { setLoading(false); }
   };
 
   const onLogin = async (e) => {
     e.preventDefault();
-    setLoginError("");
-    setLoginSuccess("");
-    setLoading(true);
+    setLoginError(""); setLoginSuccess(""); setLoading(true);
     try {
       const res = await API.post("/auth/login", loginData);
-      
       if (res.data.user.role !== "mover") {
-        setLoginError("❌ This portal is for Mover accounts only.");
-        return;
+        setLoginError("❌ This portal is for Mover accounts only."); return;
       }
-
-      login(res.data.token, res.data.user); 
+      login(res.data.token, res.data.user);
       setLoginSuccess("✅ Login successful! Redirecting...");
       setTimeout(() => navigate("/mover-dashboard"), 1000);
-    } catch (err) {
-      setLoginError("❌ Invalid credentials. Please try again.");
-    } finally { 
-      setLoading(false); 
-    }
+    } catch { setLoginError("❌ Invalid credentials. Please try again.");
+    } finally { setLoading(false); }
   };
 
-  // ✅ FORGOT PASSWORD HANDLER
   const handleForgotPassword = async (e) => {
     e.preventDefault();
-    setForgotMsg("");
-
-    if (!forgotEmail) {
-      setForgotMsg("❌ Please enter your email address.");
-      return;
-    }
-
+    if (!forgotEmail) { setForgotMsg("❌ Please enter your email."); return; }
     setForgotLoading(true);
     try {
       const res = await API.post("/auth/forgot-password", { email: forgotEmail });
-      setForgotMsg(res.data?.message || "✅ Reset link sent! Check your inbox.");
+      setForgotMsg(res.data?.message || "✅ Reset link sent!");
+    } catch { setForgotMsg("❌ Failed to send reset email.");
+    } finally { setForgotLoading(false); }
+  };
+
+  // ── BOOKING HANDLERS ──────────────────────────────────────────────────────
+
+  const openBooking = (mover) => {
+    if (!user || !token) {
+      alert("Please log in or register to book a mover.");
+      navigate("/login");
+      return;
+    }
+    setBookingMover(mover);
+    setBookingForm({
+      serviceType: mover.services?.[0] || "",
+      pickupLocation: "", dropoffLocation: "",
+      scheduledDate: "", notes: "", phone: user?.phone || "",
+    });
+    setBookingSuccess(""); setBookingError("");
+  };
+
+  const closeBooking = () => {
+    setBookingMover(null);
+    setBookingSuccess(""); setBookingError("");
+  };
+
+  const handleBookingSubmit = async (e) => {
+    e.preventDefault();
+    if (!bookingForm.serviceType || !bookingForm.pickupLocation ||
+        !bookingForm.dropoffLocation || !bookingForm.scheduledDate || !bookingForm.phone) {
+      setBookingError("Please fill in all required fields.");
+      return;
+    }
+    setBookingLoading(true);
+    setBookingError("");
+    try {
+      await API.post("/jobs", {
+        moverId: bookingMover._id,
+        moverName: bookingMover.name,
+        serviceType: bookingForm.serviceType,
+        pickupLocation: bookingForm.pickupLocation,
+        dropoffLocation: bookingForm.dropoffLocation,
+        scheduledDate: bookingForm.scheduledDate,
+        notes: bookingForm.notes,
+        customerPhone: bookingForm.phone,
+        customerName: user?.name,
+        county: bookingMover.county,
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setBookingSuccess(`✅ Request sent to ${bookingMover.name}! They will contact you at ${bookingForm.phone}.`);
     } catch (err) {
-      setForgotMsg("❌ Failed to send reset email. Try again.");
+      setBookingError(err.response?.data?.message || "Failed to send request. Try again.");
     } finally {
-      setForgotLoading(false);
+      setBookingLoading(false);
     }
   };
 
+  // ── RENDER ────────────────────────────────────────────────────────────────
+
   return (
     <div style={styles.container}>
+
+      {/* ── BOOKING MODAL ── */}
+      {bookingMover && (
+        <div style={styles.modalOverlay} onClick={(e) => e.target === e.currentTarget && closeBooking()}>
+          <div style={styles.modal}>
+            <div style={styles.modalHeader}>
+              <div>
+                <h3 style={styles.modalTitle}>📦 Book {bookingMover.name}</h3>
+                <p style={styles.modalSub}>📍 {bookingMover.county} • 🚛 {bookingMover.vehicleType}</p>
+              </div>
+              <button onClick={closeBooking} style={styles.closeBtn}>✕</button>
+            </div>
+
+            {bookingSuccess ? (
+              <div style={styles.bookingSuccessBox}>
+                <div style={{ fontSize: "48px", marginBottom: "12px" }}>🎉</div>
+                <p style={{ fontWeight: 700, fontSize: "16px", margin: "0 0 8px" }}>Request Sent!</p>
+                <p style={{ color: "#6b7280", fontSize: "13px", margin: "0 0 20px" }}>{bookingSuccess}</p>
+                <p style={{ color: "#6b7280", fontSize: "12px", margin: "0 0 20px" }}>
+                  The mover will review and accept your job on their dashboard. You'll be contacted directly.
+                </p>
+                <button style={styles.doneBtn} onClick={closeBooking}>Done</button>
+              </div>
+            ) : (
+              <form onSubmit={handleBookingSubmit}>
+                {bookingError && <div style={styles.errorBox}>{bookingError}</div>}
+
+                <label style={styles.fieldLabel}>Service Type *</label>
+                <select style={styles.fieldInput}
+                  value={bookingForm.serviceType}
+                  onChange={e => setBookingForm(p => ({ ...p, serviceType: e.target.value }))}>
+                  <option value="">Select service</option>
+                  {(bookingMover.services || availableServices).map(s => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+
+                <label style={styles.fieldLabel}>Your Phone Number *</label>
+                <input style={styles.fieldInput} placeholder="e.g. 0712 345 678"
+                  value={bookingForm.phone}
+                  onChange={e => setBookingForm(p => ({ ...p, phone: e.target.value }))} />
+
+                <label style={styles.fieldLabel}>Pickup Location *</label>
+                <input style={styles.fieldInput} placeholder="e.g. Westlands, Nairobi"
+                  value={bookingForm.pickupLocation}
+                  onChange={e => setBookingForm(p => ({ ...p, pickupLocation: e.target.value }))} />
+
+                <label style={styles.fieldLabel}>Drop-off Location *</label>
+                <input style={styles.fieldInput} placeholder="e.g. Kiambu Town"
+                  value={bookingForm.dropoffLocation}
+                  onChange={e => setBookingForm(p => ({ ...p, dropoffLocation: e.target.value }))} />
+
+                <label style={styles.fieldLabel}>Preferred Date *</label>
+                <input style={styles.fieldInput} type="date"
+                  min={new Date().toISOString().split("T")[0]}
+                  value={bookingForm.scheduledDate}
+                  onChange={e => setBookingForm(p => ({ ...p, scheduledDate: e.target.value }))} />
+
+                <label style={styles.fieldLabel}>Additional Notes</label>
+                <textarea style={{ ...styles.fieldInput, minHeight: "80px", resize: "vertical" }}
+                  placeholder="e.g. 2-bedroom house, 3rd floor, need packing..."
+                  value={bookingForm.notes}
+                  onChange={e => setBookingForm(p => ({ ...p, notes: e.target.value }))} />
+
+                <div style={styles.modalNote}>
+                  <span>ℹ️</span>
+                  <span>The mover will review your request and contact you to confirm pricing and details.</span>
+                </div>
+
+                <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+                  <button type="button" onClick={closeBooking} style={styles.cancelBtn}>Cancel</button>
+                  <button type="submit" disabled={bookingLoading} style={styles.sendBtn}>
+                    {bookingLoading ? "⏳ Sending..." : "📤 Send Request"}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── HEADER ── */}
       <div style={styles.header}>
         <h1 style={styles.title}>🚚 Axx Movers</h1>
         <p style={styles.subtitle}>Kenya's Verified Relocation Network</p>
       </div>
 
       <div style={styles.tabBar}>
-        <button 
-          style={activeTab === "search" ? styles.activeTab : styles.tab} 
-          onClick={() => setActiveTab("search")}
-        >
-          🔍 Find Mover
-        </button>
-        <button 
-          style={activeTab === "register" ? styles.activeTab : styles.tab} 
-          onClick={() => setActiveTab("register")}
-        >
-          📝 Join Us
-        </button>
-        <button 
-          style={activeTab === "login" ? styles.activeTab : styles.tab} 
-          onClick={() => { setActiveTab("login"); setShowForgot(false); setForgotMsg(""); }}
-        >
-          🔑 Mover Login
-        </button>
+        <button style={activeTab === "search" ? styles.activeTab : styles.tab} onClick={() => setActiveTab("search")}>🔍 Find Mover</button>
+        <button style={activeTab === "register" ? styles.activeTab : styles.tab} onClick={() => setActiveTab("register")}>📝 Join Us</button>
+        <button style={activeTab === "login" ? styles.activeTab : styles.tab} onClick={() => { setActiveTab("login"); setShowForgot(false); setForgotMsg(""); }}>🔑 Mover Login</button>
       </div>
 
-      {/* ─── SEARCH TAB ─── */}
+      {/* ── SEARCH TAB ── */}
       {activeTab === "search" && (
         <div style={styles.viewContainer}>
-          <select 
-            value={selectedCounty} 
-            onChange={(e) => setSelectedCounty(e.target.value)} 
-            style={styles.select}
-          >
+          <select value={selectedCounty} onChange={e => setSelectedCounty(e.target.value)} style={styles.select}>
             <option value="">-- Select Your County --</option>
             {counties.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
@@ -179,26 +277,30 @@ export default function Movers() {
             <p style={styles.centerText}>Searching database...</p>
           ) : (
             <div style={styles.grid}>
-              {movers.length > 0 ? (
-                movers.map(m => (
-                  <div key={m._id} style={styles.card}>
-                    <div style={styles.cardHeader}>
-                      <h3 style={styles.moverName}>{m.name}</h3>
-                    </div>
-                    <p style={styles.detail}>📍 {m.county} • ⭐ {m.experience || m.experienceYears} yrs exp</p>
-                    <p style={styles.detail}>🚛 {m.vehicleType}</p>
-                    <div style={styles.tagContainer}>
-                      {m.services && m.services.map(s => <span key={s} style={styles.miniTag}>{s}</span>)}
-                    </div>
-                    <button 
-                      onClick={() => window.open(`https://wa.me/${m.phone}`, "_blank")} 
-                      style={styles.whatsappBtn}
-                    >
-                      💬 Contact on WhatsApp
+              {movers.length > 0 ? movers.map(m => (
+                <div key={m._id} style={styles.card}>
+                  <div style={styles.cardHeader}>
+                    <h3 style={styles.moverName}>{m.name}</h3>
+                    <span style={styles.verifiedBadge}>✅ Verified</span>
+                  </div>
+                  <p style={styles.detail}>📍 {m.county} • ⭐ {m.experience || m.experienceYears} yrs exp</p>
+                  <p style={styles.detail}>🚛 {m.vehicleType}</p>
+                  {m.bio && <p style={{ ...styles.detail, fontStyle: "italic", marginTop: "8px" }}>"{m.bio}"</p>}
+                  <div style={styles.tagContainer}>
+                    {m.services?.map(s => <span key={s} style={styles.miniTag}>{s}</span>)}
+                  </div>
+
+                  {/* TWO ACTIONS: Book or WhatsApp */}
+                  <div style={{ display: "flex", gap: "8px", marginTop: "16px" }}>
+                    <button onClick={() => openBooking(m)} style={styles.bookBtn}>
+                      📋 Request Job
+                    </button>
+                    <button onClick={() => window.open(`https://wa.me/${m.phone}`, "_blank")} style={styles.whatsappBtn}>
+                      💬 WhatsApp
                     </button>
                   </div>
-                ))
-              ) : selectedCounty ? (
+                </div>
+              )) : selectedCounty ? (
                 <p style={styles.centerText}>No approved movers in {selectedCounty} yet.</p>
               ) : null}
             </div>
@@ -206,187 +308,72 @@ export default function Movers() {
         </div>
       )}
 
-      {/* ─── REGISTER TAB ─── */}
+      {/* ── REGISTER TAB ── */}
       {activeTab === "register" && (
         <div style={styles.formCard}>
           <form onSubmit={onRegister}>
             <h2 style={styles.formTitle}>🚚 Mover Registration</h2>
             <p style={styles.formSubtitle}>Join our network of verified movers</p>
-            
             <div style={styles.formGrid}>
-              <input 
-                required 
-                placeholder="Business/Full Name" 
-                style={styles.input} 
-                value={registerData.name} 
-                onChange={e => setRegisterData({...registerData, name: e.target.value})} 
-              />
-              <input 
-                required 
-                type="email" 
-                placeholder="Email Address" 
-                style={styles.input} 
-                value={registerData.email} 
-                onChange={e => setRegisterData({...registerData, email: e.target.value})} 
-              />
+              <input required placeholder="Business/Full Name" style={styles.input} value={registerData.name} onChange={e => setRegisterData({...registerData, name: e.target.value})} />
+              <input required type="email" placeholder="Email Address" style={styles.input} value={registerData.email} onChange={e => setRegisterData({...registerData, email: e.target.value})} />
             </div>
-
             <div style={styles.formGrid}>
-              <input 
-                required 
-                type="password" 
-                placeholder="Create Password" 
-                style={styles.input} 
-                value={registerData.password} 
-                onChange={e => setRegisterData({...registerData, password: e.target.value})} 
-              />
-              <input 
-                required 
-                placeholder="WhatsApp Phone (254712345678)" 
-                style={styles.input} 
-                value={registerData.phone} 
-                onChange={e => setRegisterData({...registerData, phone: e.target.value})} 
-              />
+              <input required type="password" placeholder="Create Password" style={styles.input} value={registerData.password} onChange={e => setRegisterData({...registerData, password: e.target.value})} />
+              <input required placeholder="WhatsApp Phone (254712345678)" style={styles.input} value={registerData.phone} onChange={e => setRegisterData({...registerData, phone: e.target.value})} />
             </div>
-
             <div style={styles.formGrid}>
-              <select 
-                required 
-                style={styles.input} 
-                value={registerData.county} 
-                onChange={e => setRegisterData({...registerData, county: e.target.value})}
-              >
+              <select required style={styles.input} value={registerData.county} onChange={e => setRegisterData({...registerData, county: e.target.value})}>
                 <option value="">Select County</option>
                 {counties.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
-              <input 
-                type="number" 
-                placeholder="Experience (Years)" 
-                style={styles.input} 
-                value={registerData.experience} 
-                onChange={e => setRegisterData({...registerData, experience: e.target.value})} 
-              />
+              <input type="number" placeholder="Experience (Years)" style={styles.input} value={registerData.experience} onChange={e => setRegisterData({...registerData, experience: e.target.value})} />
             </div>
-
             <div style={styles.inputGroup}>
               <label style={styles.label}>🚚 Services Provided:</label>
               <div style={styles.checkGrid}>
                 {availableServices.map(s => (
                   <label key={s} style={styles.checkItem}>
-                    <input 
-                      type="checkbox" 
-                      checked={registerData.services.includes(s)} 
-                      onChange={() => handleServiceToggle(s)} 
-                    /> 
-                    {s}
+                    <input type="checkbox" checked={registerData.services.includes(s)} onChange={() => handleServiceToggle(s)} /> {s}
                   </label>
                 ))}
               </div>
             </div>
-
-            <button 
-              type="submit" 
-              disabled={loading} 
-              style={styles.submitBtn}
-            >
-              {loading ? "⏳ Processing..." : "📤 Submit Application"}
-            </button>
-
-            <p style={styles.switchText} onClick={() => setActiveTab("login")}>
-              Already registered? Login here
-            </p>
+            <button type="submit" disabled={loading} style={styles.submitBtn}>{loading ? "⏳ Processing..." : "📤 Submit Application"}</button>
+            <p style={styles.switchText} onClick={() => setActiveTab("login")}>Already registered? Login here</p>
           </form>
         </div>
       )}
 
-      {/* ─── LOGIN TAB ─── */}
+      {/* ── LOGIN TAB ── */}
       {activeTab === "login" && (
         <div style={styles.loginSmallCard}>
-
-          {/* ✅ FORGOT PASSWORD VIEW */}
           {showForgot ? (
             <form onSubmit={handleForgotPassword}>
               <h2 style={styles.formTitle}>🔐 Reset Password</h2>
               <p style={styles.formSubtitle}>Enter your email to receive a reset link</p>
-
-              {forgotMsg && (
-                <div style={forgotMsg.includes("❌") ? styles.errorBox : styles.successBox}>
-                  {forgotMsg}
-                </div>
-              )}
-
-              <input 
-                required
-                type="email"
-                placeholder="Enter your registered email"
-                style={styles.input}
-                value={forgotEmail}
-                onChange={(e) => setForgotEmail(e.target.value)}
-              />
-
-              <button 
-                type="submit" 
-                disabled={forgotLoading} 
-                style={{ ...styles.submitBtn, opacity: forgotLoading ? 0.7 : 1, cursor: forgotLoading ? "not-allowed" : "pointer" }}
-              >
+              {forgotMsg && <div style={forgotMsg.includes("❌") ? styles.errorBox : styles.successBox}>{forgotMsg}</div>}
+              <input required type="email" placeholder="Enter your registered email" style={styles.input} value={forgotEmail} onChange={e => setForgotEmail(e.target.value)} />
+              <button type="submit" disabled={forgotLoading} style={{ ...styles.submitBtn, opacity: forgotLoading ? 0.7 : 1 }}>
                 {forgotLoading ? "⏳ Sending..." : "📧 Send Reset Link"}
               </button>
-
-              <p 
-                style={styles.switchText} 
-                onClick={() => { setShowForgot(false); setForgotMsg(""); setForgotEmail(""); }}
-              >
-                ← Back to Login
-              </p>
+              <p style={styles.switchText} onClick={() => { setShowForgot(false); setForgotMsg(""); setForgotEmail(""); }}>← Back to Login</p>
             </form>
-
           ) : (
-            /* ✅ NORMAL LOGIN VIEW */
             <form onSubmit={onLogin}>
               <h2 style={styles.formTitle}>🔐 Mover Login</h2>
               <p style={styles.formSubtitle}>Access your dashboard</p>
-
               {loginError && <div style={styles.errorBox}>{loginError}</div>}
               {loginSuccess && <div style={styles.successBox}>{loginSuccess}</div>}
-              
-              <input 
-                required 
-                type="email" 
-                placeholder="Email" 
-                style={styles.input} 
-                value={loginData.email} 
-                onChange={e => setLoginData({...loginData, email: e.target.value})} 
-              />
-
-              {/* Password field + forgot password link */}
-              <div style={{ position: "relative", marginBottom: "0" }}>
-                <input 
-                  required 
-                  type="password" 
-                  placeholder="Password" 
-                  style={{ ...styles.input, marginBottom: "6px" }} 
-                  value={loginData.password} 
-                  onChange={e => setLoginData({...loginData, password: e.target.value})} 
-                />
-                <span 
-                  style={styles.forgotLink}
-                  onClick={() => { setShowForgot(true); setLoginError(""); setLoginSuccess(""); }}
-                >
-                  Forgot password?
-                </span>
+              <input required type="email" placeholder="Email" style={styles.input} value={loginData.email} onChange={e => setLoginData({...loginData, email: e.target.value})} />
+              <div style={{ position: "relative" }}>
+                <input required type="password" placeholder="Password" style={{ ...styles.input, marginBottom: "6px" }} value={loginData.password} onChange={e => setLoginData({...loginData, password: e.target.value})} />
+                <span style={styles.forgotLink} onClick={() => { setShowForgot(true); setLoginError(""); }}>Forgot password?</span>
               </div>
-              
-              <button 
-                type="submit" 
-                disabled={loading} 
-                style={{ ...styles.submitBtn, marginTop: "20px", opacity: loading ? 0.7 : 1, cursor: loading ? "not-allowed" : "pointer" }}
-              >
+              <button type="submit" disabled={loading} style={{ ...styles.submitBtn, marginTop: "20px", opacity: loading ? 0.7 : 1 }}>
                 {loading ? "⏳ Verifying..." : "🚀 Access Dashboard"}
               </button>
-
-              <p style={styles.switchText} onClick={() => setActiveTab("register")}>
-                New here? Register your business
-              </p>
+              <p style={styles.switchText} onClick={() => setActiveTab("register")}>New here? Register your business</p>
             </form>
           )}
         </div>
@@ -401,19 +388,35 @@ const styles = {
   title: { fontSize: "2.5rem", color: "#fbbf24", margin: 0 },
   subtitle: { color: "#94a3b8", marginTop: "10px" },
   tabBar: { display: "flex", justifyContent: "center", gap: "10px", marginBottom: "40px", flexWrap: "wrap" },
-  tab: { padding: "10px 20px", background: "#1e293b", color: "#94a3b8", border: "1px solid #334155", borderRadius: "20px", cursor: "pointer", transition: "0.3s" },
+  tab: { padding: "10px 20px", background: "#1e293b", color: "#94a3b8", border: "1px solid #334155", borderRadius: "20px", cursor: "pointer" },
   activeTab: { padding: "10px 20px", background: "#fbbf24", color: "#000", border: "none", borderRadius: "20px", fontWeight: "bold" },
-  
   viewContainer: { maxWidth: "1200px", margin: "0 auto" },
   select: { display: "block", width: "100%", maxWidth: "400px", margin: "0 auto 40px", padding: "15px", background: "#1e293b", color: "#fff", border: "1px solid #334155", borderRadius: "12px", cursor: "pointer" },
   grid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "25px" },
   card: { background: "#111827", padding: "25px", borderRadius: "20px", border: "1px solid #1f2937" },
   cardHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" },
   moverName: { color: "#fbbf24", margin: 0, fontSize: "1.3rem" },
+  verifiedBadge: { background: "rgba(34,197,94,0.15)", color: "#22c55e", padding: "3px 8px", borderRadius: "6px", fontSize: "11px", fontWeight: 700 },
   detail: { color: "#94a3b8", margin: "5px 0", fontSize: "0.9rem" },
-  tagContainer: { display: "flex", flexWrap: "wrap", gap: "6px", margin: "15px 0" },
+  tagContainer: { display: "flex", flexWrap: "wrap", gap: "6px", margin: "12px 0 0" },
   miniTag: { background: "#1e293b", padding: "4px 10px", borderRadius: "6px", fontSize: "0.75rem", color: "#cbd5e1" },
-  whatsappBtn: { width: "100%", padding: "12px", background: "#22c55e", color: "#fff", border: "none", borderRadius: "10px", fontWeight: "bold", cursor: "pointer", transition: "0.3s" },
+  bookBtn: { flex: 2, padding: "11px", background: "#3b82f6", color: "#fff", border: "none", borderRadius: "10px", fontWeight: "bold", cursor: "pointer" },
+  whatsappBtn: { flex: 1, padding: "11px", background: "#22c55e", color: "#fff", border: "none", borderRadius: "10px", fontWeight: "bold", cursor: "pointer" },
+
+  // Modal
+  modalOverlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "20px" },
+  modal: { background: "#1e293b", borderRadius: "20px", border: "1px solid #334155", width: "100%", maxWidth: "480px", maxHeight: "90vh", overflowY: "auto", padding: "28px" },
+  modalHeader: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "24px" },
+  modalTitle: { color: "#fbbf24", margin: "0 0 4px", fontSize: "1.2rem" },
+  modalSub: { color: "#94a3b8", margin: 0, fontSize: "13px" },
+  closeBtn: { background: "none", border: "none", color: "#94a3b8", fontSize: "20px", cursor: "pointer", padding: "0 0 0 12px" },
+  fieldLabel: { display: "block", fontSize: "12px", fontWeight: 700, color: "#94a3b8", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.5px" },
+  fieldInput: { width: "100%", padding: "11px 12px", background: "#0f172a", border: "1px solid #334155", borderRadius: "8px", color: "#fff", boxSizing: "border-box", marginBottom: "16px", fontFamily: "inherit", fontSize: "14px" },
+  modalNote: { display: "flex", gap: "8px", background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.3)", borderRadius: "8px", padding: "12px", fontSize: "12px", color: "#93c5fd" },
+  bookingSuccessBox: { textAlign: "center", padding: "20px 0" },
+  doneBtn: { padding: "12px 32px", background: "#22c55e", color: "#fff", border: "none", borderRadius: "10px", fontWeight: 700, cursor: "pointer", fontSize: "14px" },
+  cancelBtn: { flex: 1, padding: "12px", background: "transparent", color: "#94a3b8", border: "1px solid #334155", borderRadius: "10px", fontWeight: 600, cursor: "pointer" },
+  sendBtn: { flex: 2, padding: "12px", background: "#fbbf24", color: "#000", border: "none", borderRadius: "10px", fontWeight: 700, cursor: "pointer", fontSize: "14px" },
 
   formCard: { maxWidth: "700px", margin: "0 auto", background: "#1e293b", padding: "40px", borderRadius: "25px", border: "1px solid #334155" },
   loginSmallCard: { maxWidth: "400px", margin: "0 auto", background: "#1e293b", padding: "40px", borderRadius: "25px", border: "1px solid #334155" },
@@ -425,11 +428,9 @@ const styles = {
   inputGroup: { marginBottom: "20px" },
   checkGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", background: "#0f172a", padding: "15px", borderRadius: "10px" },
   checkItem: { fontSize: "0.8rem", color: "#cbd5e1", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" },
-  submitBtn: { width: "100%", padding: "14px", background: "#fbbf24", color: "#000", border: "none", borderRadius: "10px", fontWeight: "bold", cursor: "pointer", fontSize: "1rem", transition: "0.3s" },
+  submitBtn: { width: "100%", padding: "14px", background: "#fbbf24", color: "#000", border: "none", borderRadius: "10px", fontWeight: "bold", cursor: "pointer", fontSize: "1rem" },
   switchText: { textAlign: "center", color: "#3b82f6", marginTop: "20px", cursor: "pointer", fontSize: "0.9rem" },
   centerText: { textAlign: "center", color: "#94a3b8", marginTop: "40px" },
-
-  // ✅ NEW: Forgot password styles
   forgotLink: { display: "block", textAlign: "right", fontSize: "12px", color: "#fbbf24", cursor: "pointer", fontWeight: 600, marginBottom: "5px" },
   errorBox: { background: "#3b0a0a", color: "#fca5a5", padding: "12px", borderRadius: "8px", marginBottom: "20px", fontSize: "14px", textAlign: "center" },
   successBox: { background: "#052e16", color: "#86efac", padding: "12px", borderRadius: "8px", marginBottom: "20px", fontSize: "14px", textAlign: "center" },
