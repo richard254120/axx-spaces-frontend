@@ -2,6 +2,13 @@ import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
+// Import team images from src/assets
+import kenfredImg from "../assets/kenfred.jpg";
+import lucieImg from "../assets/lucie.jpg";
+import richardImg from "../assets/richard.jpg";
+import ianImg from "../assets/ian.jpg";
+import brianImg from "../assets/brian.jpg";
+
 export default function About() {
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
@@ -10,68 +17,85 @@ export default function About() {
     {
       name: "Kenfred",
       role: "Co-Founder & CEO",
-      emoji: "👨‍💼",
+      image: kenfredImg,
+      color: "#fbbf24",
       bio: "Passionate about solving Kenya's housing challenges through technology. Kenfred leads product vision and strategy at Axx Spaces.",
     },
     {
       name: "Lucie",
       role: "Co-Founder & Operations",
-      emoji: "👩‍💼",
+      image: lucieImg,
+      color: "#22c55e",
       bio: "Lucie oversees landlord relations and ensures every listing on Axx Spaces meets our quality and verification standards.",
     },
     {
       name: "Richard",
-      role: "Co-Founder & Technology",
-      emoji: "👨‍💻",
+      role: "Technical Lead",
+      image: richardImg,
+      color: "#3b82f6",
       bio: "Drives the technical infrastructure that powers Axx Spaces, ensuring a seamless experience for landlords and tenants alike.",
+    },
+    {
+      name: "Ian",
+      role: "Chief Financial Officer",
+      image: ianImg,
+      color: "#8b5cf6",
+      bio: "Stewards the financial health and strategic direction of Axx Spaces.",
+    },
+    {
+      name: "Brian",
+      role: "UI/UX Designer",
+      image: brianImg,
+      color: "#ec4899",
+      bio: "Creates intuitive and engaging user experiences for Axx Spaces.",
     },
   ];
 
-  const milestones = [
-    { year: "2023", text: "Axx Spaces was founded in Nairobi with a simple mission — make renting in Kenya fair, transparent, and stress-free." },
-    { year: "2024", text: "Launched in all 47 counties, onboarded over 200 landlords and connected thousands of tenants to verified homes." },
-    { year: "2025", text: "Introduced Axx Movers — Kenya's first integrated moving network — allowing tenants to move seamlessly after finding a home." },
-    { year: "2026", text: "Serving 280+ active listings across Kenya with zero hidden fees and direct landlord communication." },
+  const whatWeDo = [
+    {
+      icon: "🏠",
+      title: "Rental Space",
+      color: "#fbbf24",
+      desc: "We help users discover available rental houses and business spaces — compare pricing and locations, connect directly with landlords and caretakers, and access property information more conveniently.",
+      items: null,
+    },
+    {
+      icon: "🏢",
+      title: "Business Space",
+      color: "#22c55e",
+      desc: "We help entrepreneurs and businesses find spaces that match their operational needs and budgets.",
+      items: ["Shops", "Offices", "Commercial spaces", "Small business locations"],
+    },
+    {
+      icon: "🚚",
+      title: "Movers & Relocation",
+      color: "#3b82f6",
+      desc: "Moving can be stressful and expensive. Axxspace connects users with movers and relocation service providers to make transitions easier and more organized.",
+      items: null,
+    },
+    {
+      icon: "🛍️",
+      title: "Second-Hand Marketplace",
+      color: "#a855f7",
+      desc: "A platform where second-hand merchants showcase products to buyers looking for affordable and accessible options.",
+      items: ["Sustainability", "Affordable living", "Small-scale traders and local businesses"],
+    },
   ];
 
   const values = [
-    { icon: "🔍", title: "Transparency", text: "No hidden fees, no middlemen. Every price you see is what you pay." },
-    { icon: "✅", title: "Verification", text: "Every listing is manually reviewed before going live. We don't publish what we can't stand behind." },
-    { icon: "🤝", title: "Community", text: "Built for Kenyans, by Kenyans. We understand the local market because we live it every day." },
-    { icon: "🚀", title: "Innovation", text: "From GPS-mapped listings to integrated movers, we keep pushing to make your experience better." },
+    { icon: "💡", title: "Innovation", text: "Building modern solutions for everyday problems." },
+    { icon: "🌍", title: "Accessibility", text: "Making services and opportunities easier to reach for everyone." },
+    { icon: "🔍", title: "Transparency", text: "Encouraging accurate listings, honest reviews, and responsible engagement." },
+    { icon: "🤝", title: "Community Growth", text: "Supporting landlords, tenants, merchants, movers, and entrepreneurs together." },
   ];
 
   const trustElements = [
-    {
-      icon: "🔍",
-      title: "Verified Listings",
-      desc: "Every property is manually reviewed & verified before publication",
-    },
-    {
-      icon: "⭐",
-      title: "Reviews & Ratings",
-      desc: "Tenants rate landlords. Landlords track feedback. Transparency builds trust.",
-    },
-    {
-      icon: "👁️",
-      title: "Physical Verification",
-      desc: "We encourage in-person visits before any payments are made.",
-    },
-    {
-      icon: "📞",
-      title: "24/7 Support",
-      desc: "Got an issue? Contact us via WhatsApp, email, or phone. We're here to help.",
-    },
-    {
-      icon: "🔐",
-      title: "Data Privacy",
-      desc: "Your personal data is encrypted and never shared without consent.",
-    },
-    {
-      icon: "🚨",
-      title: "Report Fake Listings",
-      desc: "Spot a scam? Report it immediately. We remove fake listings within 24 hours.",
-    },
+    { icon: "✅", title: "Verified Listings", desc: "Every property is manually reviewed & verified before publication." },
+    { icon: "⭐", title: "Reviews & Ratings", desc: "Tenants rate landlords. Landlords track feedback. Transparency builds trust." },
+    { icon: "👁️", title: "Physical Verification", desc: "We encourage in-person visits before any payments are made." },
+    { icon: "📞", title: "24/7 Support", desc: "Got an issue? Contact us via WhatsApp, email, or phone. We're here to help." },
+    { icon: "🔐", title: "Data Privacy", desc: "Your personal data is encrypted and never shared without consent." },
+    { icon: "🚨", title: "Report Fake Listings", desc: "Spot a scam? Report it immediately. We remove fake listings within 24 hours." },
   ];
 
   return (
@@ -81,11 +105,28 @@ export default function About() {
       {/* ── HERO ── */}
       <section style={styles.hero}>
         <div style={styles.heroContent}>
-          <div style={styles.badge}>🏠 Our Story</div>
-          <h1 style={styles.heroTitle}>Built for Kenyans,<br />by Kenyans</h1>
+          <div style={styles.badge}>🌍 About Axxspace</div>
+          <h1 style={styles.heroTitle}>Spaces. Services.<br />Solutions. All in One.</h1>
           <p style={styles.heroSubtitle}>
-            We started Axx Spaces because we experienced firsthand how frustrating it was to find a decent, 
-            honest rental in Kenya. No more middlemen. No more hidden fees. No more wasted weekends.
+            A digital ecosystem connecting tenants, landlords, business owners, movers, and
+            second-hand merchants through technology — built by young innovators in Kenya.
+          </p>
+        </div>
+      </section>
+
+      {/* ── WHO WE ARE ── */}
+      <section style={styles.whoSection}>
+        <div style={styles.whoInner}>
+          <div style={styles.whoLabel}>Who We Are</div>
+          <h2 style={styles.whoTitle}>More Than a Platform</h2>
+          <p style={styles.whoText}>
+            Axxspace is a digital platform designed to simplify how people find spaces, services, and essential
+            moving solutions in one place. What started as a house-hunting solution has expanded into a broader
+            ecosystem connecting tenants, landlords, business owners, movers, and second-hand merchants through technology.
+          </p>
+          <p style={styles.whoText}>
+            Founded by young innovators and university students in Kenya, Axxspace was created to solve everyday
+            challenges people face when relocating, starting businesses, or searching for affordable products and spaces.
           </p>
         </div>
       </section>
@@ -97,63 +138,45 @@ export default function About() {
             <div style={styles.missionIcon}>🎯</div>
             <h2 style={styles.missionTitle}>Our Mission</h2>
             <p style={styles.missionText}>
-              To make finding and renting a home in Kenya as simple, transparent, and stress-free as possible — 
-              connecting landlords directly with tenants across all 47 counties, with zero hidden fees and full trust.
+              To simplify access to spaces, relocation services, and affordable marketplaces through technology.
             </p>
           </div>
           <div style={styles.missionCard}>
-            <div style={styles.missionIcon}>👁️</div>
+            <div style={styles.missionIcon}>🌍</div>
             <h2 style={styles.missionTitle}>Our Vision</h2>
             <p style={styles.missionText}>
-              A Kenya where every person — regardless of county or budget — can find a safe, verified, 
-              affordable home with a single search. Where landlords and tenants communicate directly, honestly, and efficiently.
+              To become Africa's leading digital platform for spaces, moving services, and community-driven commerce.
             </p>
           </div>
         </div>
       </section>
 
-      {/* ── HOW IT STARTED ── */}
-      <section style={styles.storySection}>
-        <div style={styles.storyInner}>
-          <h2 style={styles.sectionTitle}>How It All Started</h2>
-          <p style={styles.sectionSubtitle}>From a frustrating experience to Kenya's most trusted rental platform</p>
+      {/* ── WHAT WE DO ── */}
+      <section style={styles.whatSection}>
+        <div style={styles.whatInner}>
+          <div style={styles.sectionLabelDark}>What We Do</div>
+          <h2 style={{ ...styles.sectionTitle, color: "#fbbf24" }}>Our Services</h2>
+          <p style={{ ...styles.sectionSubtitle, color: "#94a3b8" }}>
+            Everything you need — spaces, movers, and a marketplace — in one connected platform
+          </p>
 
-          <div style={styles.storyText}>
-            <p>
-              In 2023, our co-founders were searching for rental properties in Nairobi. What they encountered 
-              was a maze of unverified listings, agents demanding commissions, properties that looked nothing 
-              like their photos, and landlords who were impossible to reach directly.
-            </p>
-            <p>
-              Frustrated but determined, they built Axx Spaces — a platform where landlords list directly, 
-              tenants search freely, and every property is verified before it goes live. No agents. 
-              No commissions. No surprises.
-            </p>
-            <p>
-              What started as a solution to a personal problem quickly became a movement. Within months, 
-              hundreds of landlords across Kenya joined the platform, and thousands of tenants found their 
-              perfect home without paying a single shilling to an agent.
-            </p>
-            <p>
-              Today, Axx Spaces operates in all 47 counties with 280+ active listings, an integrated moving 
-              network through Axx Movers, and a growing community of Kenyans who believe renting should be fair.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ── MILESTONES ── */}
-      <section style={styles.milestonesSection}>
-        <div style={styles.milestonesInner}>
-          <h2 style={{ ...styles.sectionTitle, color: "#fbbf24" }}>Our Journey</h2>
-          <p style={{ ...styles.sectionSubtitle, color: "#94a3b8" }}>Key moments that shaped who we are</p>
-
-          <div style={styles.timeline}>
-            {milestones.map((m, idx) => (
-              <div key={idx} style={styles.timelineItem}>
-                <div style={styles.timelineYear}>{m.year}</div>
-                <div style={styles.timelineDot}></div>
-                <div style={styles.timelineText}>{m.text}</div>
+          <div style={styles.whatGrid}>
+            {whatWeDo.map((item) => (
+              <div key={item.title} style={styles.whatCard} className="what-card">
+                <div style={{ ...styles.whatIconWrap, background: item.color + "18", border: `1.5px solid ${item.color}40` }}>
+                  <span style={styles.whatIcon}>{item.icon}</span>
+                </div>
+                <h3 style={{ ...styles.whatTitle, color: item.color }}>{item.title}</h3>
+                <p style={styles.whatDesc}>{item.desc}</p>
+                {item.items && (
+                  <ul style={styles.whatList}>
+                    {item.items.map((i) => (
+                      <li key={i} style={styles.whatListItem}>
+                        <span style={{ color: item.color, marginRight: "8px" }}>→</span>{i}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             ))}
           </div>
@@ -162,17 +185,20 @@ export default function About() {
 
       {/* ── VALUES ── */}
       <section style={styles.valuesSection}>
-        <h2 style={styles.sectionTitle}>What We Stand For</h2>
-        <p style={styles.sectionSubtitle}>The principles that guide everything we do</p>
+        <div style={styles.valuesInner}>
+          <div style={styles.sectionLabel}>Our Core Values</div>
+          <h2 style={styles.sectionTitle}>What We Stand For</h2>
+          <p style={styles.sectionSubtitle}>The principles that guide everything we do</p>
 
-        <div style={styles.valuesGrid}>
-          {values.map((v) => (
-            <div key={v.title} style={styles.valueCard} className="value-card">
-              <div style={styles.valueIcon}>{v.icon}</div>
-              <h3 style={styles.valueTitle}>{v.title}</h3>
-              <p style={styles.valueText}>{v.text}</p>
-            </div>
-          ))}
+          <div style={styles.valuesGrid}>
+            {values.map((v) => (
+              <div key={v.title} style={styles.valueCard} className="value-card">
+                <div style={styles.valueIcon}>{v.icon}</div>
+                <h3 style={styles.valueTitle}>{v.title}</h3>
+                <p style={styles.valueText}>{v.text}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -189,7 +215,7 @@ export default function About() {
               { val: "500+", label: "Happy Tenants", icon: "😊" },
               { val: "150+", label: "Landlords Onboarded", icon: "👨‍💼" },
             ].map((s) => (
-              <div key={s.label} style={styles.statCard}>
+              <div key={s.label} style={styles.statCard} className="stat-card">
                 <div style={styles.statIcon}>{s.icon}</div>
                 <div style={styles.statNumber}>{s.val}</div>
                 <div style={styles.statLabel}>{s.label}</div>
@@ -202,12 +228,13 @@ export default function About() {
       {/* ── TRUST & SAFETY ── */}
       <section style={styles.trustSection}>
         <div style={styles.trustInner}>
+          <div style={styles.sectionLabel}>Safety First</div>
           <h2 style={styles.sectionTitle}>Trust & Safety</h2>
           <p style={styles.sectionSubtitle}>We take your safety seriously. Here's how we protect you.</p>
 
           <div style={styles.trustGrid}>
             {trustElements.map((trust) => (
-              <div key={trust.title} style={styles.trustCard}>
+              <div key={trust.title} style={styles.trustCard} className="trust-card">
                 <div style={styles.trustIcon}>{trust.icon}</div>
                 <h3 style={styles.trustTitle}>{trust.title}</h3>
                 <p style={styles.trustDesc}>{trust.desc}</p>
@@ -217,20 +244,61 @@ export default function About() {
         </div>
       </section>
 
-      {/* ── TEAM ── */}
+      {/* ── TEAM ── (Improved Images) */}
       <section style={styles.teamSection}>
         <div style={styles.teamInner}>
+          <div style={styles.sectionLabelDark}>The People</div>
           <h2 style={{ ...styles.sectionTitle, color: "#fbbf24" }}>Meet the Team</h2>
-          <p style={{ ...styles.sectionSubtitle, color: "#94a3b8" }}>The people behind Axx Spaces</p>
+          <p style={{ ...styles.sectionSubtitle, color: "#94a3b8" }}>The young innovators behind Axx Spaces</p>
 
           <div style={styles.teamGrid}>
             {team.map((member) => (
               <div key={member.name} style={styles.teamCard} className="team-card">
-                <div style={styles.teamEmoji}>{member.emoji}</div>
+                <img
+                  src={member.image}
+                  alt={member.name}
+                  style={styles.teamImage}
+                />
                 <h3 style={styles.teamName}>{member.name}</h3>
-                <p style={styles.teamRole}>{member.role}</p>
+                <p style={{ ...styles.teamRole, color: member.color }}>{member.role}</p>
                 <p style={styles.teamBio}>{member.bio}</p>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── IMPORTANT NOTICE ── */}
+      <section style={styles.noticeSection}>
+        <div style={styles.noticeInner}>
+          <div style={styles.noticeCard}>
+            <div style={styles.noticeIcon}>⚠️</div>
+            <div>
+              <h3 style={styles.noticeTitle}>Important Notice</h3>
+              <p style={styles.noticeText}>
+                Axxspace acts as a digital connection platform between users, landlords, businesses, movers, and merchants.
+                Information displayed on the platform is provided by the respective owners or service providers.
+                Users are encouraged to verify products, services, pricing, and property details independently before
+                making payments or final decisions. Availability of spaces or products may change without prior notice.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── BUILDING THE FUTURE ── */}
+      <section style={styles.futureSection}>
+        <div style={styles.futureInner}>
+          <div style={styles.futureLabel}>What's Next</div>
+          <h2 style={{ ...styles.sectionTitle, color: "#fbbf24" }}>Building the Future</h2>
+          <p style={styles.futureText}>
+            Axxspace is more than a platform. It is a growing ecosystem built around convenience, opportunity, and innovation.
+            From finding a home, relocating, starting a business, or purchasing affordable second-hand products — we aim to
+            make the process smarter, faster, and more connected for everyone.
+          </p>
+          <div style={styles.futurePillars}>
+            {["Convenience", "Opportunity", "Innovation"].map((p) => (
+              <div key={p} style={styles.futurePillar}>{p}</div>
             ))}
           </div>
         </div>
@@ -239,7 +307,7 @@ export default function About() {
       {/* ── CALL TO ACTION ── */}
       <section style={styles.cta}>
         <div style={styles.ctaInner}>
-          <h2 style={styles.ctaTitle}>Ready to Find Your Home?</h2>
+          <h2 style={styles.ctaTitle}>Ready to Find Your Space?</h2>
           <p style={styles.ctaText}>
             Join thousands of Kenyans who found their perfect home on Axx Spaces — for free, with zero hidden fees.
           </p>
@@ -268,7 +336,7 @@ export default function About() {
               style={{ ...styles.ctaBtnSecondary, background: "#6366f1", color: "white" }}
               onClick={() => window.open("mailto:partners@axxspaces.com")}
             >
-              🤝 Become Partner
+              🤝 Become a Partner
             </button>
           </div>
         </div>
@@ -310,17 +378,14 @@ const styles = {
     minHeight: "100vh",
   },
 
-  /* ── HERO ── */
+  /* HERO */
   hero: {
     background: "linear-gradient(150deg, #ffffff 0%, #fef3e2 55%, #fff7ed 100%)",
     padding: "80px 20px 60px",
     textAlign: "center",
     borderBottom: "3px solid #fbbf24",
   },
-  heroContent: {
-    maxWidth: "720px",
-    margin: "0 auto",
-  },
+  heroContent: { maxWidth: "720px", margin: "0 auto" },
   badge: {
     display: "inline-block",
     background: "#dcfce7",
@@ -348,245 +413,73 @@ const styles = {
     lineHeight: 1.7,
   },
 
-  /* ── MISSION ── */
-  missionSection: {
-    padding: "72px 20px",
-    background: "#f8f4f0",
-  },
-  missionInner: {
-    maxWidth: "900px",
-    margin: "0 auto",
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "24px",
-  },
-  missionCard: {
-    background: "white",
-    padding: "32px",
-    borderRadius: "16px",
-    border: "1px solid #e5e7eb",
-    textAlign: "center",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
-    transition: "all 0.3s",
-  },
-  missionIcon: {
-    fontSize: "40px",
-    marginBottom: "16px",
-  },
-  missionTitle: {
-    fontSize: "20px",
-    fontWeight: 800,
-    color: "#1f2937",
-    margin: "0 0 12px",
-  },
-  missionText: {
-    fontSize: "15px",
-    color: "#6b7280",
-    lineHeight: 1.7,
-    margin: 0,
-  },
-
-  /* ── STORY ── */
-  storySection: {
-    padding: "72px 20px",
-    background: "white",
-  },
-  storyInner: {
-    maxWidth: "760px",
-    margin: "0 auto",
-  },
-  sectionTitle: {
-    fontSize: "28px",
-    fontWeight: 800,
-    color: "#1f2937",
-    margin: "0 0 10px",
-    textAlign: "center",
-  },
-  sectionSubtitle: {
-    fontSize: "15px",
-    color: "#6b7280",
-    textAlign: "center",
-    margin: "0 0 44px",
-  },
-  storyText: {
-    fontSize: "16px",
-    color: "#4b5563",
-    lineHeight: 1.85,
-  },
-
-  /* ── MILESTONES ── */
-  milestonesSection: {
-    padding: "72px 20px",
-    background: "#1f2937",
-  },
-  milestonesInner: {
-    maxWidth: "760px",
-    margin: "0 auto",
-  },
-  timeline: {
-    marginTop: "44px",
-    display: "flex",
-    flexDirection: "column",
-    gap: "0",
-  },
-  timelineItem: {
-    display: "grid",
-    gridTemplateColumns: "80px 24px 1fr",
-    gap: "16px",
-    alignItems: "flex-start",
-    paddingBottom: "36px",
-    position: "relative",
-  },
-  timelineYear: {
-    fontSize: "18px",
-    fontWeight: 800,
-    color: "#fbbf24",
-    textAlign: "right",
-    paddingTop: "2px",
-  },
-  timelineDot: {
-    width: "14px",
-    height: "14px",
-    borderRadius: "50%",
-    background: "#fbbf24",
-    border: "3px solid #1f2937",
-    boxShadow: "0 0 0 3px #fbbf24",
-    marginTop: "4px",
-    flexShrink: 0,
-  },
-  timelineText: {
-    fontSize: "15px",
-    color: "#cbd5e1",
-    lineHeight: 1.7,
-  },
-
-  /* ── VALUES ── */
-  valuesSection: {
-    padding: "72px 20px",
-    background: "#f8f4f0",
-    maxWidth: "1100px",
-    margin: "0 auto",
-  },
-  valuesGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-    gap: "22px",
-    marginTop: "8px",
-  },
-  valueCard: {
-    background: "white",
-    padding: "28px",
-    borderRadius: "14px",
-    textAlign: "center",
-    border: "1px solid #e5e7eb",
-    transition: "all 0.22s",
-    boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
-  },
-  valueIcon: {
-    fontSize: "36px",
+  whoSection: { padding: "72px 20px", background: "white" },
+  whoInner: { maxWidth: "760px", margin: "0 auto" },
+  whoLabel: {
+    display: "inline-block",
+    background: "#fef9c3",
+    color: "#854d0e",
+    padding: "4px 14px",
+    borderRadius: "20px",
+    fontSize: "12px",
+    fontWeight: 700,
     marginBottom: "14px",
+    textTransform: "uppercase",
+    letterSpacing: "0.08em",
+    border: "1px solid #fde68a",
   },
-  valueTitle: {
-    fontSize: "17px",
-    fontWeight: 700,
-    color: "#1f2937",
-    margin: "0 0 10px",
-  },
-  valueText: {
-    fontSize: "13px",
-    color: "#6b7280",
-    lineHeight: 1.6,
-    margin: 0,
-  },
+  whoTitle: { fontSize: "28px", fontWeight: 800, color: "#1f2937", margin: "0 0 20px" },
+  whoText: { fontSize: "16px", color: "#4b5563", lineHeight: 1.85, marginBottom: "16px" },
 
-  /* ── STATISTICS ── */
-  statsSection: {
-    background: "#1f2937",
-    color: "white",
-    padding: "60px 20px",
-  },
-  statsInner: {
-    maxWidth: "1200px",
-    margin: "0 auto",
-  },
-  statsGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-    gap: "20px",
-    marginTop: "40px",
-  },
-  statCard: {
-    background: "#111827",
-    padding: "30px 20px",
-    borderRadius: "12px",
-    textAlign: "center",
-    border: "1px solid #334155",
-    transition: "all 0.3s",
-  },
-  statIcon: {
-    fontSize: "40px",
-    marginBottom: "12px",
-  },
-  statNumber: {
-    fontSize: "32px",
-    fontWeight: 800,
-    color: "#fbbf24",
-    margin: "8px 0",
-  },
-  statLabel: {
-    fontSize: "14px",
-    color: "#9ca3af",
-    fontWeight: 600,
-  },
+  missionSection: { padding: "60px 20px", background: "#f8f4f0" },
+  missionInner: { maxWidth: "900px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" },
+  missionCard: { background: "white", padding: "32px", borderRadius: "16px", border: "1px solid #e5e7eb", textAlign: "center", boxShadow: "0 4px 20px rgba(0,0,0,0.06)" },
+  missionIcon: { fontSize: "40px", marginBottom: "16px" },
+  missionTitle: { fontSize: "20px", fontWeight: 800, color: "#1f2937", margin: "0 0 12px" },
+  missionText: { fontSize: "15px", color: "#6b7280", lineHeight: 1.7, margin: 0 },
 
-  /* ── TRUST & SAFETY ── */
-  trustSection: {
-    background: "#f3f4f6",
-    padding: "60px 20px",
-  },
-  trustInner: {
-    maxWidth: "1200px",
-    margin: "0 auto",
-  },
-  trustGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-    gap: "24px",
-    marginTop: "40px",
-  },
-  trustCard: {
-    background: "white",
-    padding: "28px 24px",
-    borderRadius: "12px",
-    border: "2px solid #e5e7eb",
-    transition: "all 0.3s",
-  },
-  trustIcon: {
-    fontSize: "32px",
-    marginBottom: "12px",
-  },
-  trustTitle: {
-    fontSize: "16px",
-    fontWeight: 700,
-    color: "#1f2937",
-    margin: "0 0 8px",
-  },
-  trustDesc: {
-    fontSize: "13px",
-    color: "#6b7280",
-    lineHeight: 1.6,
-    margin: 0,
-  },
+  whatSection: { padding: "72px 20px", background: "#1f2937" },
+  whatInner: { maxWidth: "1100px", margin: "0 auto" },
+  sectionLabelDark: { display: "inline-block", background: "#fbbf2420", color: "#fbbf24", padding: "4px 14px", borderRadius: "20px", fontSize: "12px", fontWeight: 700, marginBottom: "14px", textTransform: "uppercase", letterSpacing: "0.08em", border: "1px solid #fbbf2440" },
+  whatGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "22px", marginTop: "8px" },
+  whatCard: { background: "#111827", padding: "28px", borderRadius: "16px", border: "1px solid #334155", transition: "all 0.25s" },
+  whatIconWrap: { display: "inline-flex", alignItems: "center", justifyContent: "center", width: "52px", height: "52px", borderRadius: "12px", marginBottom: "16px" },
+  whatIcon: { fontSize: "26px" },
+  whatTitle: { fontSize: "17px", fontWeight: 800, margin: "0 0 10px" },
+  whatDesc: { fontSize: "13px", color: "#94a3b8", lineHeight: 1.7, margin: "0 0 12px" },
+  whatList: { paddingLeft: "0", listStyle: "none", margin: 0 },
+  whatListItem: { fontSize: "13px", color: "#cbd5e1", padding: "4px 0", display: "flex", alignItems: "center" },
 
-  /* ── TEAM ── */
-  teamSection: {
-    padding: "72px 20px",
-    background: "#1f2937",
-  },
-  teamInner: {
-    maxWidth: "900px",
-    margin: "0 auto",
-  },
+  valuesSection: { padding: "72px 20px", background: "#f8f4f0" },
+  valuesInner: { maxWidth: "1100px", margin: "0 auto" },
+  sectionLabel: { display: "inline-block", background: "#fef9c3", color: "#854d0e", padding: "4px 14px", borderRadius: "20px", fontSize: "12px", fontWeight: 700, marginBottom: "14px", textTransform: "uppercase", letterSpacing: "0.08em", border: "1px solid #fde68a" },
+  sectionTitle: { fontSize: "28px", fontWeight: 800, color: "#1f2937", margin: "0 0 10px", textAlign: "center" },
+  sectionSubtitle: { fontSize: "15px", color: "#6b7280", textAlign: "center", margin: "0 0 44px" },
+  valuesGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "22px" },
+  valueCard: { background: "white", padding: "28px", borderRadius: "14px", textAlign: "center", border: "1px solid #e5e7eb", transition: "all 0.22s", boxShadow: "0 2px 12px rgba(0,0,0,0.04)" },
+  valueIcon: { fontSize: "36px", marginBottom: "14px" },
+  valueTitle: { fontSize: "17px", fontWeight: 700, color: "#1f2937", margin: "0 0 10px" },
+  valueText: { fontSize: "13px", color: "#6b7280", lineHeight: 1.6, margin: 0 },
+
+  statsSection: { background: "#1f2937", color: "white", padding: "60px 20px" },
+  statsInner: { maxWidth: "1200px", margin: "0 auto" },
+  statsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "20px", marginTop: "40px" },
+  statCard: { background: "#111827", padding: "30px 20px", borderRadius: "12px", textAlign: "center", border: "1px solid #334155", transition: "all 0.3s" },
+  statIcon: { fontSize: "40px", marginBottom: "12px" },
+  statNumber: { fontSize: "32px", fontWeight: 800, color: "#fbbf24", margin: "8px 0" },
+  statLabel: { fontSize: "14px", color: "#9ca3af", fontWeight: 600 },
+
+  trustSection: { background: "#f3f4f6", padding: "60px 20px" },
+  trustInner: { maxWidth: "1200px", margin: "0 auto" },
+  trustGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "24px", marginTop: "40px" },
+  trustCard: { background: "white", padding: "28px 24px", borderRadius: "12px", border: "2px solid #e5e7eb", transition: "all 0.3s" },
+  trustIcon: { fontSize: "32px", marginBottom: "12px" },
+  trustTitle: { fontSize: "16px", fontWeight: 700, color: "#1f2937", margin: "0 0 8px" },
+  trustDesc: { fontSize: "13px", color: "#6b7280", lineHeight: 1.6, margin: 0 },
+
+  /* TEAM - Optimized for visibility */
+  teamSection: { padding: "72px 20px", background: "#1f2937" },
+  teamInner: { maxWidth: "900px", margin: "0 auto" },
   teamGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
@@ -601,50 +494,76 @@ const styles = {
     border: "1px solid #334155",
     transition: "all 0.25s",
   },
-  teamEmoji: {
-    fontSize: "52px",
-    marginBottom: "16px",
+  teamImage: {
+    width: "110px",
+    height: "110px",
+    borderRadius: "50%",
+    objectFit: "cover",
+    margin: "0 auto 18px",
+    border: "4px solid #fbbf24",
+    boxShadow: "0 6px 16px rgba(251, 191, 36, 0.4)",
   },
-  teamName: {
-    fontSize: "18px",
-    fontWeight: 800,
-    color: "white",
-    margin: "0 0 6px",
+  teamName: { fontSize: "18px", fontWeight: 800, color: "white", margin: "0 0 6px" },
+  teamRole: { fontSize: "13px", fontWeight: 600, margin: "0 0 14px" },
+  teamBio: { fontSize: "13px", color: "#94a3b8", lineHeight: 1.7, margin: 0 },
+
+  noticeSection: {
+    background: "#fffbeb",
+    padding: "40px 20px",
+    borderTop: "1px solid #fde68a",
+    borderBottom: "1px solid #fde68a",
   },
-  teamRole: {
-    fontSize: "13px",
+  noticeInner: { maxWidth: "900px", margin: "0 auto" },
+  noticeCard: {
+    display: "flex",
+    alignItems: "flex-start",
+    gap: "18px",
+    background: "white",
+    border: "1.5px solid #fbbf24",
+    borderRadius: "14px",
+    padding: "28px 24px",
+    boxShadow: "0 2px 12px rgba(251,191,36,0.08)",
+  },
+  noticeIcon: { fontSize: "28px", flexShrink: 0, marginTop: "2px" },
+  noticeTitle: { fontSize: "16px", fontWeight: 800, color: "#92400e", margin: "0 0 10px" },
+  noticeText: { fontSize: "14px", color: "#78350f", lineHeight: 1.75, margin: 0 },
+
+  futureSection: { background: "#1f2937", padding: "72px 20px", textAlign: "center" },
+  futureInner: { maxWidth: "700px", margin: "0 auto" },
+  futureLabel: {
+    display: "inline-block",
+    background: "#fbbf2420",
     color: "#fbbf24",
-    fontWeight: 600,
-    margin: "0 0 14px",
+    padding: "4px 14px",
+    borderRadius: "20px",
+    fontSize: "12px",
+    fontWeight: 700,
+    marginBottom: "14px",
+    textTransform: "uppercase",
+    letterSpacing: "0.08em",
+    border: "1px solid #fbbf2440",
   },
-  teamBio: {
-    fontSize: "13px",
-    color: "#94a3b8",
-    lineHeight: 1.7,
-    margin: 0,
+  futureText: { fontSize: "16px", color: "#94a3b8", lineHeight: 1.85, margin: "0 0 32px" },
+  futurePillars: { display: "flex", justifyContent: "center", gap: "14px", flexWrap: "wrap" },
+  futurePillar: {
+    background: "#111827",
+    border: "1.5px solid #fbbf24",
+    color: "#fbbf24",
+    padding: "10px 24px",
+    borderRadius: "30px",
+    fontSize: "14px",
+    fontWeight: 700,
+    letterSpacing: "0.04em",
   },
 
-  /* ── CTA ── */
   cta: {
     background: "linear-gradient(135deg, #2427fb 0%, #4d9ffc 100%)",
     padding: "76px 20px",
     textAlign: "center",
   },
-  ctaInner: {
-    maxWidth: "900px",
-    margin: "0 auto",
-  },
-  ctaTitle: {
-    fontSize: "32px",
-    fontWeight: 800,
-    color: "white",
-    margin: "0 0 12px",
-  },
-  ctaText: {
-    fontSize: "16px",
-    color: "rgba(255,255,255,0.8)",
-    margin: "0 0 32px",
-  },
+  ctaInner: { maxWidth: "900px", margin: "0 auto" },
+  ctaTitle: { fontSize: "32px", fontWeight: 800, color: "white", margin: "0 0 12px" },
+  ctaText: { fontSize: "16px", color: "rgba(255,255,255,0.8)", margin: "0 0 32px" },
   ctaButtons: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
@@ -673,12 +592,7 @@ const styles = {
     transition: "all 0.3s",
   },
 
-  /* ── FOOTER ── */
-  footer: {
-    background: "#1f2937",
-    color: "#d1d5db",
-    padding: "40px 20px 20px",
-  },
+  footer: { background: "#1f2937", color: "#d1d5db", padding: "40px 20px 20px" },
   footerInner: {
     maxWidth: "1200px",
     margin: "0 auto",
@@ -687,36 +601,12 @@ const styles = {
     gap: "30px",
     marginBottom: "30px",
   },
-  footerSection: {
-    fontSize: "13px",
-  },
-  footerTitle: {
-    color: "#fbbf24",
-    fontSize: "14px",
-    fontWeight: 700,
-    margin: "0 0 12px",
-  },
-  footerTagline: {
-    fontSize: "13px",
-    color: "#6b7280",
-    margin: "6px 0 4px",
-  },
-  footerLink: {
-    margin: "6px 0",
-    cursor: "pointer",
-    transition: "color 0.2s",
-    color: "#9ca3af",
-  },
-  footerBottom: {
-    textAlign: "center",
-    paddingTop: "20px",
-    borderTop: "1px solid #374151",
-  },
-  footerCopy: {
-    fontSize: "12px",
-    color: "#6b7280",
-    margin: 0,
-  },
+  footerSection: { fontSize: "13px" },
+  footerTitle: { color: "#fbbf24", fontSize: "14px", fontWeight: 700, margin: "0 0 12px" },
+  footerTagline: { fontSize: "13px", color: "#6b7280", margin: "6px 0 4px" },
+  footerLink: { margin: "6px 0", cursor: "pointer", transition: "color 0.2s", color: "#9ca3af" },
+  footerBottom: { textAlign: "center", paddingTop: "20px", borderTop: "1px solid #374151" },
+  footerCopy: { fontSize: "12px", color: "#6b7280", margin: 0 },
 };
 
 const css = `
@@ -724,9 +614,14 @@ const css = `
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  p { margin-bottom: 20px; }
-
+  p { margin-bottom: 16px; }
   p:last-child { margin-bottom: 0; }
+
+  .what-card:hover {
+    transform: translateY(-4px);
+    border-color: #fbbf24 !important;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.25) !important;
+  }
 
   .value-card:hover {
     transform: translateY(-4px);
