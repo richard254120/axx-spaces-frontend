@@ -1,9 +1,7 @@
+// App.jsx
 import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import { useContext } from "react";
-
 import { AuthContext } from "./context/AuthContext";
-
-// Protection Hook
 import { useDevToolsProtection } from "./hooks/useDevToolsProtection";
 
 import Navbar from "./components/Navbar";
@@ -21,21 +19,37 @@ import ResetPassword from "./pages/ResetPassword";
 import AboutUs from "./pages/AboutUs";
 import SellerLogin from "./pages/SellerLogin";
 import SellerDashboard from "./pages/SellerDashboard";
-// Premium pages
 import PremiumPlans from "./pages/PremiumPlans";
 import Checkout from "./pages/Checkout";
+import Materials from "./pages/Materials";
 
 import "leaflet/dist/leaflet.css";
-import Materials from "./pages/Materials";
-// Protected Route Component
+
+// ─── Layouts ────────────────────────────────────────────────────────────────
+
+// Public pages get the Navbar + WhatsApp button
+function PublicLayout({ children }) {
+  return (
+    <>
+      <Navbar />
+      {children}
+      <FloatingWhatsApp />
+    </>
+  );
+}
+
+// Dashboard pages get NO Navbar and NO WhatsApp button
+function DashboardLayout({ children }) {
+  return <>{children}</>;
+}
+
+// ─── Route guard ────────────────────────────────────────────────────────────
+
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const { token, user } = useContext(AuthContext);
 
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
+  if (!token) return <Navigate to="/login" replace />;
 
-  // If specific roles are required
   if (allowedRoles.length > 0 && user?.role && !allowedRoles.includes(user.role)) {
     return <Navigate to="/" replace />;
   }
@@ -43,95 +57,106 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   return children;
 };
 
+// ─── App ────────────────────────────────────────────────────────────────────
+
 function App() {
   const navigate = useNavigate();
-  
-  // Enable Console / DevTools Protection
   useDevToolsProtection();
 
   return (
-    <>
-      <Navbar />
+    <Routes>
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/listings" element={<Listings />} />
-        <Route path="/movers" element={<Movers />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/about" element={<AboutUs />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
-        <Route path="/seller-login" element={<SellerLogin />} />
-        <Route path="/seller-dashboard" element={<SellerDashboard />} />
+      {/* ── PUBLIC ROUTES (have Navbar) ── */}
+      <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
+      <Route path="/listings" element={<PublicLayout><Listings /></PublicLayout>} />
+      <Route path="/movers" element={<PublicLayout><Movers /></PublicLayout>} />
+      <Route path="/login" element={<PublicLayout><Login /></PublicLayout>} />
+      <Route path="/register" element={<PublicLayout><Register /></PublicLayout>} />
+      <Route path="/about" element={<PublicLayout><AboutUs /></PublicLayout>} />
+      <Route path="/reset-password/:token" element={<PublicLayout><ResetPassword /></PublicLayout>} />
+      <Route path="/seller-login" element={<PublicLayout><SellerLogin /></PublicLayout>} />
+      <Route path="/materials" element={<PublicLayout><Materials /></PublicLayout>} />
 
-        <Route path="/materials" element={<Materials />} />
-        {/* Protected Routes */}
-        <Route path="/upload" element={
-          <ProtectedRoute>
-            <Upload />
-          </ProtectedRoute>
-        } />
+      {/* ── DASHBOARD ROUTES (no Navbar) ── */}
+      <Route
+        path="/seller-dashboard"
+        element={<DashboardLayout><SellerDashboard /></DashboardLayout>}
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <DashboardLayout>
+            <ProtectedRoute allowedRoles={["landlord"]}>
+              <LandlordDashboard />
+            </ProtectedRoute>
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/mover-dashboard"
+        element={
+          <DashboardLayout>
+            <ProtectedRoute allowedRoles={["mover"]}>
+              <MoverDashboard />
+            </ProtectedRoute>
+          </DashboardLayout>
+        }
+      />
 
-        <Route path="/dashboard" element={
-          <ProtectedRoute allowedRoles={['landlord']}>
-            <LandlordDashboard />
-          </ProtectedRoute>
-        } />
+      {/* ── PROTECTED PUBLIC ROUTES (have Navbar) ── */}
+      <Route
+        path="/upload"
+        element={
+          <PublicLayout>
+            <ProtectedRoute><Upload /></ProtectedRoute>
+          </PublicLayout>
+        }
+      />
+      <Route
+        path="/premium-plans"
+        element={
+          <PublicLayout>
+            <ProtectedRoute><PremiumPlans /></ProtectedRoute>
+          </PublicLayout>
+        }
+      />
+      <Route
+        path="/checkout"
+        element={
+          <PublicLayout>
+            <ProtectedRoute><Checkout /></ProtectedRoute>
+          </PublicLayout>
+        }
+      />
 
-        <Route path="/mover-dashboard" element={
-          <ProtectedRoute allowedRoles={['mover']}>
-            <MoverDashboard />
-          </ProtectedRoute>
-        } />
-
-        <Route path="/premium-plans" element={
-          <ProtectedRoute>
-            <PremiumPlans />
-          </ProtectedRoute>
-        } />
-
-        <Route path="/checkout" element={
-          <ProtectedRoute>
-            <Checkout />
-          </ProtectedRoute>
-        } />
-
-        {/* 404 Page */}
-        <Route path="*" element={
-          <div style={{
-            minHeight: "80vh",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "#0f1729",
-            color: "#94a3b8",
-            fontFamily: "'DM Sans', sans-serif",
-          }}>
-            <div style={{ fontSize: "64px", marginBottom: "16px" }}>🏚️</div>
-            <h2 style={{ color: "#fbbf24", margin: "0 0 8px" }}>Page Not Found</h2>
-            <p style={{ margin: "0 0 24px" }}>This page doesn't exist on Axx Spaces.</p>
-            
-            <button 
-              onClick={() => navigate("/")}
-              style={{
-                padding: "12px 28px",
-                background: "#3b82f6",
-                color: "white",
-                border: "none",
-                borderRadius: "8px",
-                fontWeight: 700,
-                cursor: "pointer"
-              }}
-            >
-              Go Home
-            </button>
-          </div>
-        } />
-      </Routes>
-
-      <FloatingWhatsApp />
-    </>
+      {/* ── 404 ── */}
+      <Route
+        path="*"
+        element={
+          <PublicLayout>
+            <div style={{
+              minHeight: "80vh", display: "flex", flexDirection: "column",
+              alignItems: "center", justifyContent: "center",
+              background: "#0f1729", color: "#94a3b8",
+              fontFamily: "'DM Sans', sans-serif",
+            }}>
+              <div style={{ fontSize: "64px", marginBottom: "16px" }}>🏚️</div>
+              <h2 style={{ color: "#fbbf24", margin: "0 0 8px" }}>Page Not Found</h2>
+              <p style={{ margin: "0 0 24px" }}>This page doesn't exist on Axx Spaces.</p>
+              <button
+                onClick={() => navigate("/")}
+                style={{
+                  padding: "12px 28px", background: "#3b82f6", color: "white",
+                  border: "none", borderRadius: "8px", fontWeight: 700, cursor: "pointer",
+                }}
+              >
+                Go Home
+              </button>
+            </div>
+          </PublicLayout>
+        }
+      />
+    </Routes>
   );
 }
 
