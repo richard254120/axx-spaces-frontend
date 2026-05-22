@@ -23,7 +23,7 @@ const COUNTIES = [
   "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
   "Garissa","Wajir","Mandera","Marsabit","Isiolo","Meru","Tharaka Nithi",
   "Embu","Kitui","Machakos","Makueni","Nyandarua","Nyeri","Kirinyaga",
-  "Murang’a","Kiambu","Turkana","West Pokot","Samburu","Trans Nzoia",
+  "Murang'a","Kiambu","Turkana","West Pokot","Samburu","Trans Nzoia",
   "Uasin Gishu","Elgeyo Marakwet","Nandi","Baringo","Laikipia","Nakuru",
   "Narok","Kajiado","Kericho","Bomet","Kakamega","Vihiga","Bungoma",
   "Busia","Siaya","Kisumu","Homa Bay","Migori","Kisii","Nyamira",
@@ -59,11 +59,10 @@ export default function Upload() {
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [locLoading, setLocLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [activeSection, setActiveSection] = useState("basic");
-
-  // Consent - Shown only on last section
   const [consent, setConsent] = useState(false);
 
   const handleChange = (e) => {
@@ -74,7 +73,7 @@ export default function Upload() {
       return;
     }
 
-    const floatFields = ["price", "deposit"];
+    const floatFields = ["price", "deposit", "lat", "lng"];
     const intFields = ["bedrooms", "bathrooms", "totalUnits", "bookedUnits"];
 
     setFormData((prev) => ({
@@ -82,7 +81,7 @@ export default function Upload() {
       [name]: type === "checkbox"
         ? checked
         : floatFields.includes(name)
-          ? parseFloat(value) || ""
+          ? value  // keep as string so user can type freely
           : intFields.includes(name)
             ? parseInt(value) || ""
             : value,
@@ -116,9 +115,11 @@ export default function Upload() {
 
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
-      setError("Geolocation not supported");
+      setError("Geolocation not supported by your browser");
       return;
     }
+    setLocLoading(true);
+    setError("");
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setFormData((prev) => ({
@@ -126,8 +127,12 @@ export default function Upload() {
           lat: position.coords.latitude.toFixed(6),
           lng: position.coords.longitude.toFixed(6),
         }));
+        setLocLoading(false);
       },
-      () => setError("Unable to get location. Enter manually.")
+      () => {
+        setError("Unable to get location. Please enter coordinates manually.");
+        setLocLoading(false);
+      }
     );
   };
 
@@ -225,7 +230,7 @@ export default function Upload() {
   return (
     <div style={styles.container}>
       <style>{cssStyles}</style>
-      
+
       <div style={styles.header}>
         <h1 style={styles.heading}>Upload Property</h1>
         <button style={styles.backBtn} onClick={() => navigate("/dashboard")}>←</button>
@@ -251,7 +256,8 @@ export default function Upload() {
       </div>
 
       <form onSubmit={handleSubmit} style={styles.form}>
-        {/* BASIC INFO */}
+
+        {/* ── BASIC INFO ── */}
         {activeSection === "basic" && (
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>Basic Info</h2>
@@ -288,15 +294,73 @@ export default function Upload() {
 
             <div style={styles.formGroup}>
               <label style={styles.label}>Number of Units *</label>
-              <input 
-                type="number" 
-                name="totalUnits" 
-                min="1" 
-                value={formData.totalUnits} 
-                onChange={handleChange} 
-                style={styles.input} 
-                required 
-              />
+              <input type="number" name="totalUnits" min="1" value={formData.totalUnits} onChange={handleChange} style={styles.input} required />
+            </div>
+
+            {/* ── GPS COORDINATES ── */}
+            <div style={styles.gpsCard}>
+              <div style={styles.gpsHeader}>
+                <span style={styles.gpsTitle}>📍 GPS Coordinates</span>
+                <span style={styles.gpsBadge}>Recommended</span>
+              </div>
+              <p style={styles.gpsHint}>
+                Adding coordinates pins your property on the map, making it easier for tenants to find.
+              </p>
+
+              <button
+                type="button"
+                onClick={getCurrentLocation}
+                disabled={locLoading}
+                style={styles.gpsBtn}
+              >
+                {locLoading ? "📡 Detecting..." : "📍 Use My Current Location"}
+              </button>
+
+              {(formData.lat || formData.lng) && (
+                <div style={styles.coordsDisplay}>
+                  ✅ {formData.lat}, {formData.lng}
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, lat: "", lng: "" }))}
+                    style={styles.clearCoordsBtn}
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+
+              <p style={styles.gpsOrDivider}>— or enter manually —</p>
+
+              <div style={styles.twoCol}>
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>Latitude</label>
+                  <input
+                    type="number"
+                    name="lat"
+                    step="any"
+                    placeholder="-1.292066"
+                    value={formData.lat}
+                    onChange={handleChange}
+                    style={styles.input}
+                  />
+                </div>
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>Longitude</label>
+                  <input
+                    type="number"
+                    name="lng"
+                    step="any"
+                    placeholder="36.821945"
+                    value={formData.lng}
+                    onChange={handleChange}
+                    style={styles.input}
+                  />
+                </div>
+              </div>
+
+              <p style={styles.gpsTip}>
+                💡 Not sure? Open Google Maps, long-press your property location, and copy the coordinates shown.
+              </p>
             </div>
 
             <button type="button" onClick={() => setActiveSection("details")} style={styles.nextBtn}>
@@ -305,7 +369,7 @@ export default function Upload() {
           </div>
         )}
 
-        {/* DETAILS - Your original code remains untouched */}
+        {/* ── DETAILS ── */}
         {activeSection === "details" && (
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>Details</h2>
@@ -372,7 +436,7 @@ export default function Upload() {
           </div>
         )}
 
-        {/* IMAGES - Your original code remains untouched */}
+        {/* ── IMAGES ── */}
         {activeSection === "images" && (
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>Images</h2>
@@ -406,7 +470,7 @@ export default function Upload() {
           </div>
         )}
 
-        {/* AMENITIES - Consent added ONLY here */}
+        {/* ── AMENITIES ── */}
         {activeSection === "amenities" && (
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>Amenities</h2>
@@ -430,19 +494,22 @@ export default function Upload() {
               </div>
             </div>
 
-            {/* Consent Checkbox - ONLY on last section */}
             <div style={styles.consentBox}>
               <label style={styles.consentLabel}>
-                <input 
-                  type="checkbox" 
-                  checked={consent} 
+                <input
+                  type="checkbox"
+                  checked={consent}
                   onChange={(e) => setConsent(e.target.checked)}
                 />
                 I confirm that all information provided is accurate and I agree to the terms and conditions of Axx Spaces.
               </label>
             </div>
 
-            <button type="submit" disabled={loading || !consent} style={styles.submitBtn}>
+            <button type="submit" disabled={loading || !consent} style={{
+              ...styles.submitBtn,
+              opacity: (!consent || loading) ? 0.5 : 1,
+              cursor: (!consent || loading) ? "not-allowed" : "pointer",
+            }}>
               {loading ? "Uploading Property..." : "Submit Property for Approval"}
             </button>
           </div>
@@ -452,7 +519,6 @@ export default function Upload() {
   );
 }
 
-/* ====================== STYLES & CSS ====================== */
 const styles = {
   container: {
     background: "#06101f",
@@ -461,7 +527,6 @@ const styles = {
     color: "#f1f5f9",
     padding: "0",
   },
-
   header: {
     display: "flex",
     justifyContent: "space-between",
@@ -470,14 +535,12 @@ const styles = {
     borderBottom: "1px solid #1e293b",
     background: "#0f1729",
   },
-
   heading: {
     margin: 0,
     fontSize: "20px",
     fontWeight: 800,
     color: "#fbbf24",
   },
-
   backBtn: {
     background: "#1e293b",
     border: "none",
@@ -487,7 +550,6 @@ const styles = {
     borderRadius: "6px",
     cursor: "pointer",
   },
-
   sectionTabs: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr 1fr 1fr",
@@ -495,7 +557,6 @@ const styles = {
     padding: "12px",
     background: "#1e293b",
   },
-
   sectionTab: {
     background: "#0f1729",
     border: "none",
@@ -505,31 +566,19 @@ const styles = {
     cursor: "pointer",
     transition: "all 0.2s",
   },
-
   sectionTabActive: {
     background: "#fbbf24",
     color: "#0f1729",
   },
-
-  form: {
-    padding: "16px",
-  },
-
-  section: {
-    animation: "fadeIn 0.3s ease",
-  },
-
+  form: { padding: "16px" },
+  section: { animation: "fadeIn 0.3s ease" },
   sectionTitle: {
     margin: "0 0 16px",
     fontSize: "18px",
     fontWeight: 700,
     color: "#fbbf24",
   },
-
-  formGroup: {
-    marginBottom: "16px",
-  },
-
+  formGroup: { marginBottom: "16px" },
   label: {
     display: "block",
     fontSize: "12px",
@@ -538,7 +587,6 @@ const styles = {
     marginBottom: "6px",
     textTransform: "uppercase",
   },
-
   input: {
     width: "100%",
     padding: "12px",
@@ -550,7 +598,6 @@ const styles = {
     fontFamily: "inherit",
     boxSizing: "border-box",
   },
-
   textarea: {
     width: "100%",
     padding: "12px",
@@ -563,11 +610,91 @@ const styles = {
     boxSizing: "border-box",
     resize: "vertical",
   },
-
   twoCol: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
     gap: "12px",
+  },
+
+  // ── GPS CARD ──
+  gpsCard: {
+    background: "rgba(251,191,36,0.05)",
+    border: "1px solid rgba(251,191,36,0.25)",
+    borderRadius: "12px",
+    padding: "16px",
+    marginBottom: "20px",
+  },
+  gpsHeader: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: "6px",
+  },
+  gpsTitle: {
+    fontSize: "14px",
+    fontWeight: 700,
+    color: "#fbbf24",
+  },
+  gpsBadge: {
+    fontSize: "10px",
+    fontWeight: 700,
+    background: "rgba(251,191,36,0.15)",
+    color: "#fbbf24",
+    padding: "2px 8px",
+    borderRadius: "20px",
+    letterSpacing: "0.5px",
+  },
+  gpsHint: {
+    fontSize: "12px",
+    color: "#94a3b8",
+    marginBottom: "12px",
+    lineHeight: 1.5,
+  },
+  gpsBtn: {
+    width: "100%",
+    padding: "11px",
+    background: "#fbbf24",
+    color: "#0f1729",
+    border: "none",
+    borderRadius: "8px",
+    fontWeight: 700,
+    fontSize: "13px",
+    cursor: "pointer",
+    fontFamily: "inherit",
+    marginBottom: "10px",
+  },
+  coordsDisplay: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    background: "rgba(34,197,94,0.1)",
+    border: "1px solid rgba(34,197,94,0.3)",
+    borderRadius: "8px",
+    padding: "8px 12px",
+    fontSize: "13px",
+    color: "#86efac",
+    fontWeight: 600,
+    marginBottom: "10px",
+  },
+  clearCoordsBtn: {
+    background: "none",
+    border: "none",
+    color: "#86efac",
+    cursor: "pointer",
+    fontSize: "14px",
+    padding: "0 4px",
+  },
+  gpsOrDivider: {
+    textAlign: "center",
+    fontSize: "11px",
+    color: "#475569",
+    margin: "8px 0",
+  },
+  gpsTip: {
+    fontSize: "11px",
+    color: "#475569",
+    marginTop: "8px",
+    lineHeight: 1.5,
   },
 
   imageUploadBox: {
@@ -578,29 +705,19 @@ const styles = {
     background: "#1e293b",
     cursor: "pointer",
   },
-
-  fileInput: {
-    display: "none",
-  },
-
+  fileInput: { display: "none" },
   fileLabel: {
     cursor: "pointer",
     display: "block",
     color: "#94a3b8",
   },
-
-  uploadIcon: {
-    fontSize: "32px",
-    marginBottom: "8px",
-  },
-
+  uploadIcon: { fontSize: "32px", marginBottom: "8px" },
   previewContainer: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fill, minmax(70px, 1fr))",
     gap: "10px",
     marginTop: "12px",
   },
-
   previewBox: {
     position: "relative",
     aspectRatio: "1",
@@ -608,13 +725,7 @@ const styles = {
     overflow: "hidden",
     background: "#334155",
   },
-
-  previewImg: {
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-  },
-
+  previewImg: { width: "100%", height: "100%", objectFit: "cover" },
   removeBtn: {
     position: "absolute",
     top: "2px",
@@ -628,13 +739,11 @@ const styles = {
     cursor: "pointer",
     fontSize: "10px",
   },
-
   amenitiesGrid: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
     gap: "8px",
   },
-
   amenityBtn: {
     padding: "10px 8px",
     border: "1px solid #334155",
@@ -645,26 +754,23 @@ const styles = {
     transition: "all 0.2s",
     background: "#1e293b",
     color: "#cbd5e1",
+    fontFamily: "inherit",
   },
-
   amenityBtnSelected: {
     background: "#3b82f6",
     color: "white",
     border: "1px solid #3b82f6",
   },
-
   amenityBtnUnselected: {
     background: "#1e293b",
     color: "#cbd5e1",
   },
-
   navBtns: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
     gap: "10px",
     marginTop: "20px",
   },
-
   prevBtn: {
     padding: "12px",
     background: "#334155",
@@ -674,8 +780,8 @@ const styles = {
     fontWeight: 700,
     cursor: "pointer",
     fontSize: "14px",
+    fontFamily: "inherit",
   },
-
   nextBtn: {
     padding: "12px",
     background: "#3b82f6",
@@ -685,8 +791,8 @@ const styles = {
     fontWeight: 700,
     cursor: "pointer",
     fontSize: "14px",
+    fontFamily: "inherit",
   },
-
   submitBtn: {
     width: "100%",
     padding: "14px",
@@ -698,8 +804,8 @@ const styles = {
     fontWeight: 700,
     cursor: "pointer",
     marginTop: "16px",
+    fontFamily: "inherit",
   },
-
   errorBox: {
     background: "rgba(239, 68, 68, 0.2)",
     border: "1px solid #ef4444",
@@ -709,7 +815,6 @@ const styles = {
     borderRadius: "8px",
     fontSize: "13px",
   },
-
   successBox: {
     background: "rgba(34, 197, 94, 0.2)",
     border: "1px solid #22c55e",
@@ -719,13 +824,11 @@ const styles = {
     borderRadius: "8px",
     fontSize: "13px",
   },
-
   unauth: {
     textAlign: "center",
     padding: "60px 20px",
     color: "#94a3b8",
   },
-
   loginBtn: {
     marginTop: "20px",
     padding: "12px 24px",
@@ -735,8 +838,8 @@ const styles = {
     borderRadius: "8px",
     cursor: "pointer",
     fontWeight: 700,
+    fontFamily: "inherit",
   },
-
   consentBox: {
     margin: "20px 0",
     padding: "12px",
@@ -744,7 +847,6 @@ const styles = {
     border: "1px solid #fbbf24",
     borderRadius: "8px",
   },
-
   consentLabel: {
     fontSize: "13px",
     color: "#cbd5e1",
@@ -779,4 +881,4 @@ const cssStyles = `
       padding: 12px !important;
     }
   }
-`; 
+`;
