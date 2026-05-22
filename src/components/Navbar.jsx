@@ -61,11 +61,23 @@ export default function Navbar() {
           <Link to="/materials" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>🛍️</span> Merchants
           </Link>
-          <Link to="/about" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>ℹ️</span> About
-          </Link>
+        <Link to="/about" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+  <span style={styles.dropdownIcon}>ℹ️</span> About
+</Link>
 
-          {token && user ? (
+<div style={styles.dropdownDivider} />
+<div style={styles.dropdownHeader}>Help & Legal</div>
+<Link to="/faq" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+  <span style={styles.dropdownIcon}>❓</span> FAQ
+</Link>
+<Link to="/contact" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+  <span style={styles.dropdownIcon}>📞</span> Contact & Support
+</Link>
+<Link to="/terms" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+  <span style={styles.dropdownIcon}>📄</span> Terms & Privacy
+</Link>
+
+{token && user ? (
             <>
               <div style={styles.dropdownDivider} />
               {/* ACCOUNT SECTION */}

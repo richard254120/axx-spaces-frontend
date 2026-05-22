@@ -22,7 +22,9 @@ import SellerDashboard from "./pages/SellerDashboard";
 import PremiumPlans from "./pages/PremiumPlans";
 import Checkout from "./pages/Checkout";
 import Materials from "./pages/Materials";
-
+import FAQ from "./pages/FAQ";
+import Contact from "./pages/Contact";
+import TermsAndPrivacy from "./pages/TermsAndPrivacy";
 import "leaflet/dist/leaflet.css";
 
 // ─── Layouts ────────────────────────────────────────────────────────────────
@@ -76,7 +78,9 @@ function App() {
       <Route path="/reset-password/:token" element={<PublicLayout><ResetPassword /></PublicLayout>} />
       <Route path="/seller-login" element={<PublicLayout><SellerLogin /></PublicLayout>} />
       <Route path="/materials" element={<PublicLayout><Materials /></PublicLayout>} />
-
+<Route path="/faq" element={<FAQ />} />
+<Route path="/contact" element={<Contact />} />
+<Route path="/terms" element={<TermsAndPrivacy />} />
       {/* ── DASHBOARD ROUTES (no Navbar) ── */}
       <Route
         path="/seller-dashboard"
