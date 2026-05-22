@@ -8,8 +8,9 @@ import lucieImg from "../assets/lucie.jpg";
 import richardImg from "../assets/richard.jpg";
 import ianImg from "../assets/ian.jpg";
 import brianImg from "../assets/brian.jpg";
+import clareImg from "../assets/clare.jpg";
 
-export default function About() {
+export default function AboutPage() {
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
 
@@ -48,6 +49,13 @@ export default function About() {
       image: brianImg,
       color: "#ec4899",
       bio: "Creates intuitive and engaging user experiences for Axx Spaces.",
+    },
+    {
+      name: "Clare",
+      role: "Communication lead",
+      image: clareImg,
+      color: "#3b82f6",
+      bio: "Drives our communication strategies and ensures consistent messaging across all channels.",
     },
   ];
 
@@ -244,7 +252,7 @@ export default function About() {
         </div>
       </section>
 
-      {/* ── TEAM ── (Improved Images) */}
+      {/* ── TEAM ── */}
       <section style={styles.teamSection}>
         <div style={styles.teamInner}>
           <div style={styles.sectionLabelDark}>The People</div>
@@ -477,7 +485,6 @@ const styles = {
   trustTitle: { fontSize: "16px", fontWeight: 700, color: "#1f2937", margin: "0 0 8px" },
   trustDesc: { fontSize: "13px", color: "#6b7280", lineHeight: 1.6, margin: 0 },
 
-  /* TEAM - Optimized for visibility */
   teamSection: { padding: "72px 20px", background: "#1f2937" },
   teamInner: { maxWidth: "900px", margin: "0 auto" },
   teamGrid: {
@@ -500,6 +507,7 @@ const styles = {
     borderRadius: "50%",
     objectFit: "cover",
     margin: "0 auto 18px",
+    display: "block",
     border: "4px solid #fbbf24",
     boxShadow: "0 6px 16px rgba(251, 191, 36, 0.4)",
   },
