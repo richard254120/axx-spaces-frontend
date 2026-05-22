@@ -18,9 +18,9 @@ export default function Contact() {
   };
 
   const channels = [
-    { icon: "📧", label: "Email", value: "support@axxspaces.com", href: "mailto:support@axxspaces.com" },
+    { icon: "📧", label: "Email", value: "saxxspaces@gmail.com", href: "mailto:axxspaces@gmail.com" },
     { icon: "💬", label: "Live Chat", value: "Available Mon–Sun, 8am–6pm", href: null },
-    { icon: "📱", label: "WhatsApp", value: "+254 700 000 000", href: "https://wa.me/254796740883" },
+    { icon: "📱", label: "WhatsApp", value: "+254 796740883", href: "https://wa.me/254796740883" },
   ];
 
   return (
