@@ -22,18 +22,40 @@ export default function ProviderDashboard() {
   const [tab, setTab] = useState(0);
   const [replyText, setReplyText] = useState("");
   const [replyingTo, setReplyingTo] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const totalRevenue = bookings.filter((b) => b.paid).reduce((sum, b) => sum + b.total, 0);
   const confirmed = bookings.filter((b) => b.status === "confirmed").length;
   const pending = bookings.filter((b) => b.status === "pending").length;
   const avgRating = (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1);
 
+  const handleTabChange = (i) => {
+    setTab(i);
+    setSidebarOpen(false);
+  };
+
   return (
     <div style={s.root}>
       <style>{css}</style>
 
+      {/* MOBILE TOP BAR */}
+      <div style={s.mobileTopBar} className="mobile-topbar">
+        <button style={s.hamburger} onClick={() => setSidebarOpen(!sidebarOpen)} aria-label="Menu">
+          <span style={{ ...s.hamburgerLine, transform: sidebarOpen ? "rotate(45deg) translate(5px,5px)" : "none" }} />
+          <span style={{ ...s.hamburgerLine, opacity: sidebarOpen ? 0 : 1 }} />
+          <span style={{ ...s.hamburgerLine, transform: sidebarOpen ? "rotate(-45deg) translate(5px,-5px)" : "none" }} />
+        </button>
+        <div style={s.mobileLogoText}>🏨 Serena Beach Resort</div>
+        <div style={s.statusDot}>🟢</div>
+      </div>
+
+      {/* OVERLAY */}
+      {sidebarOpen && (
+        <div style={s.overlay} onClick={() => setSidebarOpen(false)} />
+      )}
+
       {/* SIDEBAR */}
-      <aside style={s.sidebar}>
+      <aside style={{ ...s.sidebar, transform: sidebarOpen ? "translateX(0)" : undefined }} className="sidebar">
         <div style={s.sidebarLogo}>
           <div style={s.logoIcon}>🏨</div>
           <div>
@@ -47,7 +69,7 @@ export default function ProviderDashboard() {
             <button
               key={t}
               style={{ ...s.navItem, ...(tab === i ? s.navActive : {}) }}
-              onClick={() => setTab(i)}
+              onClick={() => handleTabChange(i)}
             >
               {["📊", "📅", "⭐", "⚙️", "📈"][i]} {t}
             </button>
@@ -72,19 +94,19 @@ export default function ProviderDashboard() {
             <p style={s.pageSub}>Mombasa, Coast · Listed since January 2026</p>
           </div>
           <div style={s.topBarRight}>
-            <div style={s.statusBadge}>🟢 Listing Active</div>
+            <div style={s.statusBadge}>🟢 Active</div>
           </div>
         </div>
 
-        {/* OVERVIEW */}
+        {/* ── OVERVIEW ── */}
         {tab === 0 && (
           <div>
             <div style={s.statsGrid}>
               {[
                 { label: "Total Revenue", val: `KSh ${totalRevenue.toLocaleString()}`, icon: "💰", color: "#22c55e", sub: "Paid bookings" },
-                { label: "Confirmed Bookings", val: confirmed, icon: "✅", color: "#3b82f6", sub: "This month" },
-                { label: "Pending Approval", val: pending, icon: "⏳", color: "#f59e0b", sub: "Needs action" },
-                { label: "Average Rating", val: `⭐ ${avgRating}`, icon: "🌟", color: "#a855f7", sub: `${reviews.length} reviews` },
+                { label: "Confirmed", val: confirmed, icon: "✅", color: "#3b82f6", sub: "This month" },
+                { label: "Pending", val: pending, icon: "⏳", color: "#f59e0b", sub: "Needs action" },
+                { label: "Avg Rating", val: `⭐ ${avgRating}`, icon: "🌟", color: "#a855f7", sub: `${reviews.length} reviews` },
               ].map((stat) => (
                 <div key={stat.label} style={s.statCard}>
                   <div style={s.statIcon}>{stat.icon}</div>
@@ -102,7 +124,7 @@ export default function ProviderDashboard() {
                   <div key={b.id} style={s.miniBooking}>
                     <div style={s.miniBookingLeft}>
                       <div style={s.miniGuest}>{b.guest}</div>
-                      <div style={s.miniDates}>📅 {b.checkin} → {b.checkout} · {b.nights} nights</div>
+                      <div style={s.miniDates}>📅 {b.checkin} → {b.checkout} · {b.nights}n</div>
                       <div style={s.miniRoom}>{b.room}</div>
                     </div>
                     <div style={s.miniTotal}>KSh {b.total.toLocaleString()}</div>
@@ -117,7 +139,7 @@ export default function ProviderDashboard() {
                     { label: "Update Pricing", icon: "💵", action: () => setTab(3) },
                     { label: "View Bookings", icon: "📅", action: () => setTab(1) },
                     { label: "Reply to Reviews", icon: "⭐", action: () => setTab(2) },
-                    { label: "Edit Property Info", icon: "✏️", action: () => setTab(3) },
+                    { label: "Edit Property", icon: "✏️", action: () => setTab(3) },
                   ].map((a) => (
                     <button key={a.label} style={s.quickAction} onClick={a.action}>
                       <span style={s.quickIcon}>{a.icon}</span>
@@ -130,7 +152,7 @@ export default function ProviderDashboard() {
           </div>
         )}
 
-        {/* BOOKINGS */}
+        {/* ── BOOKINGS ── */}
         {tab === 1 && (
           <div style={s.card}>
             <div style={s.tableHeader}>
@@ -141,7 +163,33 @@ export default function ProviderDashboard() {
                 ))}
               </div>
             </div>
-            <div style={s.tableWrap}>
+            {/* Mobile booking cards */}
+            <div className="bookings-mobile">
+              {bookings.map((b) => (
+                <div key={b.id} style={s.bookingMobileCard}>
+                  <div style={s.bookingMobileHeader}>
+                    <span style={s.bookingId}>{b.id}</span>
+                    <span style={{ ...s.statusBadgeTbl, background: { confirmed: "#dbeafe", pending: "#fef9c3", cancelled: "#fee2e2" }[b.status], color: { confirmed: "#1d4ed8", pending: "#92400e", cancelled: "#dc2626" }[b.status] }}>
+                      {b.status.charAt(0).toUpperCase() + b.status.slice(1)}
+                    </span>
+                  </div>
+                  <div style={s.bookingMobileGuest}>{b.guest}</div>
+                  <div style={s.bookingMobileRoom}>{b.room}</div>
+                  <div style={s.bookingMobileDates}>📅 {b.checkin} → {b.checkout} · {b.nights} night{b.nights > 1 ? "s" : ""}</div>
+                  <div style={s.bookingMobileFooter}>
+                    <strong style={{ color: "#22c55e" }}>KSh {b.total.toLocaleString()}</strong>
+                    <span style={{ ...s.payBadge, background: b.paid ? "#dcfce7" : "#fee2e2", color: b.paid ? "#16a34a" : "#dc2626" }}>
+                      {b.paid ? "✅ Paid" : "⏳ Pending"}
+                    </span>
+                    {b.status === "pending" && (
+                      <button style={s.acceptBtn}>Accept</button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Desktop table */}
+            <div style={s.tableWrap} className="bookings-desktop">
               <table style={s.table}>
                 <thead>
                   <tr style={s.thead}>
@@ -174,7 +222,9 @@ export default function ProviderDashboard() {
                         </span>
                       </td>
                       <td style={s.td}>
-                        {b.status === "pending" && <button style={s.acceptBtn}>Accept</button>}
+                        {b.status === "pending" && (
+                          <button style={s.acceptBtn}>Accept</button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -184,14 +234,14 @@ export default function ProviderDashboard() {
           </div>
         )}
 
-        {/* REVIEWS */}
+        {/* ── REVIEWS ── */}
         {tab === 2 && (
           <div style={s.card}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", flexWrap: "wrap", gap: "10px" }}>
               <h2 style={s.cardTitle}>Guest Reviews</h2>
               <div style={s.ratingOverall}>
-                <span style={{ fontSize: "32px", fontWeight: 800, color: "#fbbf24" }}>{avgRating}</span>
-                <span style={{ fontSize: "14px", color: "#6b7280", marginLeft: "8px" }}>avg · {reviews.length} reviews</span>
+                <span style={{ fontSize: "28px", fontWeight: 800, color: "#fbbf24" }}>{avgRating}</span>
+                <span style={{ fontSize: "13px", color: "#6b7280", marginLeft: "8px" }}>{reviews.length} reviews</span>
               </div>
             </div>
             {reviews.map((r, i) => (
@@ -223,7 +273,7 @@ export default function ProviderDashboard() {
           </div>
         )}
 
-        {/* SETTINGS */}
+        {/* ── SETTINGS ── */}
         {tab === 3 && (
           <div style={s.card}>
             <h2 style={s.cardTitle}>Property Settings</h2>
@@ -248,14 +298,14 @@ export default function ProviderDashboard() {
               <button style={s.saveBtn}>💾 Save Changes</button>
               <div style={s.dangerZone}>
                 <div style={s.dangerTitle}>Danger Zone</div>
-                <button style={s.pauseBtn}>⏸️ Pause Listing</button>
-                <button style={s.deleteBtn}>🗑️ Delete Listing</button>
+                <button style={s.pauseBtn}>⏸️ Pause</button>
+                <button style={s.deleteBtn}>🗑️ Delete</button>
               </div>
             </div>
           </div>
         )}
 
-        {/* ANALYTICS */}
+        {/* ── ANALYTICS ── */}
         {tab === 4 && (
           <div>
             <div style={s.analyticsGrid}>
@@ -263,7 +313,7 @@ export default function ProviderDashboard() {
                 { label: "Profile Views", val: "1,247", change: "+18%", color: "#3b82f6" },
                 { label: "Booking Requests", val: "43", change: "+12%", color: "#22c55e" },
                 { label: "Conversion Rate", val: "11.6%", change: "+2.1%", color: "#fbbf24" },
-                { label: "Revenue (Month)", val: "KSh 233,000", change: "+31%", color: "#a855f7" },
+                { label: "Revenue (Month)", val: "KSh 233K", change: "+31%", color: "#a855f7" },
               ].map((a) => (
                 <div key={a.label} style={s.analyticsCard}>
                   <div style={s.analyticsVal}>{a.val}</div>
@@ -280,7 +330,7 @@ export default function ProviderDashboard() {
                   { month: "Apr", val: 7 }, { month: "May", val: 6 }, { month: "Jun", val: 9 },
                 ].map((d) => (
                   <div key={d.month} style={s.barCol}>
-                    <div style={{ ...s.bar, height: `${d.val * 20}px` }} />
+                    <div style={{ ...s.bar, height: `${d.val * 18}px` }} />
                     <div style={s.barLabel}>{d.month}</div>
                     <div style={s.barVal}>{d.val}</div>
                   </div>
@@ -295,111 +345,159 @@ export default function ProviderDashboard() {
 }
 
 const s = {
-  root: { fontFamily: "'DM Sans', sans-serif", display: "flex", minHeight: "100vh", background: "#f8f4f0", flexDirection: "column" },
+  root: { fontFamily: "'DM Sans', sans-serif", display: "flex", minHeight: "100vh", background: "#f8f4f0" },
 
-  sidebar: { width: "100%", background: "#1f2937", display: "flex", flexDirection: "column", padding: "20px 16px", flexShrink: 0 },
+  // Mobile top bar
+  mobileTopBar: { display: "none", position: "fixed", top: 0, left: 0, right: 0, zIndex: 200, background: "#1f2937", padding: "12px 16px", alignItems: "center", justifyContent: "space-between", height: "56px" },
+  hamburger: { background: "transparent", border: "none", cursor: "pointer", padding: "4px", display: "flex", flexDirection: "column", gap: "5px", width: "28px" },
+  hamburgerLine: { display: "block", width: "22px", height: "2px", background: "white", borderRadius: "2px", transition: "all 0.3s ease", transformOrigin: "center" },
+  mobileLogoText: { fontSize: "14px", fontWeight: 800, color: "white" },
+  statusDot: { fontSize: "16px" },
+
+  overlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 150 },
+
+  sidebar: { width: "240px", background: "#1f2937", display: "flex", flexDirection: "column", padding: "24px 16px", flexShrink: 0, position: "relative", zIndex: 160 },
   sidebarLogo: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "32px" },
   logoIcon: { fontSize: "28px" },
   logoName: { fontSize: "13px", fontWeight: 800, color: "white", lineHeight: 1.2 },
   logoSub: { fontSize: "11px", color: "#6b7280" },
 
   nav: { flex: 1, display: "flex", flexDirection: "column", gap: "4px" },
-  navItem: { background: "transparent", border: "none", color: "#9ca3af", padding: "12px 14px", borderRadius: "8px", fontSize: "13px", fontWeight: 600, cursor: "pointer", textAlign: "left" },
+  navItem: { background: "transparent", border: "none", color: "#9ca3af", padding: "10px 12px", borderRadius: "8px", fontSize: "13px", fontWeight: 600, cursor: "pointer", textAlign: "left", fontFamily: "inherit", transition: "all 0.15s" },
   navActive: { background: "#fbbf2420", color: "#fbbf24" },
 
   sidebarFooter: { display: "flex", flexDirection: "column", gap: "8px", marginTop: "24px" },
-  viewListingBtn: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "8px", padding: "12px", fontSize: "13px", fontWeight: 700, cursor: "pointer" },
-  logoutBtn: { background: "transparent", border: "1px solid #374151", color: "#9ca3af", borderRadius: "8px", padding: "12px", fontSize: "13px", cursor: "pointer" },
+  viewListingBtn: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "8px", padding: "10px", fontSize: "12px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" },
+  logoutBtn: { background: "transparent", border: "1px solid #374151", color: "#9ca3af", borderRadius: "8px", padding: "10px", fontSize: "12px", cursor: "pointer", fontFamily: "inherit" },
 
-  main: { flex: 1, padding: "20px", overflow: "auto" },
+  main: { flex: 1, padding: "28px", overflow: "auto" },
   topBar: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "28px", flexWrap: "wrap", gap: "12px" },
-  pageTitle: { fontSize: "24px", fontWeight: 800, color: "#1f2937", margin: "0 0 4px" },
-  pageSub: { fontSize: "13px", color: "#6b7280" },
+  pageTitle: { fontSize: "22px", fontWeight: 800, color: "#1f2937", margin: "0 0 4px" },
+  pageSub: { fontSize: "12px", color: "#6b7280" },
   topBarRight: { display: "flex", gap: "10px", alignItems: "center" },
-  statusBadge: { background: "#dcfce7", color: "#16a34a", padding: "6px 14px", borderRadius: "20px", fontSize: "12px", fontWeight: 700 },
+  statusBadge: { background: "#dcfce7", color: "#16a34a", padding: "6px 12px", borderRadius: "20px", fontSize: "11px", fontWeight: 700 },
 
-  statsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "16px", marginBottom: "24px" },
-  statCard: { background: "white", borderRadius: "14px", padding: "20px", border: "1px solid #e5e7eb", textAlign: "center" },
-  statIcon: { fontSize: "28px", marginBottom: "8px" },
-  statVal: { fontSize: "24px", fontWeight: 800, marginBottom: "4px" },
-  statLabel: { fontSize: "13px", color: "#1f2937", fontWeight: 600, marginBottom: "2px" },
+  statsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: "12px", marginBottom: "20px" },
+  statCard: { background: "white", borderRadius: "14px", padding: "16px", border: "1px solid #e5e7eb", textAlign: "center" },
+  statIcon: { fontSize: "24px", marginBottom: "6px" },
+  statVal: { fontSize: "20px", fontWeight: 800, marginBottom: "4px" },
+  statLabel: { fontSize: "12px", color: "#1f2937", fontWeight: 600, marginBottom: "2px" },
   statSub: { fontSize: "11px", color: "#9ca3af" },
 
-  twoCol: { display: "grid", gridTemplateColumns: "1fr", gap: "20px" },
-  card: { background: "white", borderRadius: "14px", padding: "24px", border: "1px solid #e5e7eb", marginBottom: "20px" },
-  cardTitle: { fontSize: "16px", fontWeight: 800, color: "#1f2937", marginBottom: "18px" },
+  twoCol: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" },
+  card: { background: "white", borderRadius: "14px", padding: "20px", border: "1px solid #e5e7eb", marginBottom: "16px" },
+  cardTitle: { fontSize: "15px", fontWeight: 800, color: "#1f2937", marginBottom: "16px" },
 
-  miniBooking: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "12px 0", borderBottom: "1px solid #f3f4f6" },
+  miniBooking: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "10px 0", borderBottom: "1px solid #f3f4f6" },
   miniBookingLeft: {},
-  miniGuest: { fontSize: "14px", fontWeight: 700, color: "#1f2937" },
-  miniDates: { fontSize: "12px", color: "#6b7280", margin: "2px 0" },
-  miniRoom: { fontSize: "12px", color: "#9ca3af" },
-  miniTotal: { fontSize: "14px", fontWeight: 800, color: "#22c55e" },
+  miniGuest: { fontSize: "13px", fontWeight: 700, color: "#1f2937" },
+  miniDates: { fontSize: "11px", color: "#6b7280", margin: "2px 0" },
+  miniRoom: { fontSize: "11px", color: "#9ca3af" },
+  miniTotal: { fontSize: "13px", fontWeight: 800, color: "#22c55e", flexShrink: 0 },
 
-  quickActions: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" },
-  quickAction: { background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "16px 12px", cursor: "pointer", fontFamily: "inherit" },
-  quickIcon: { display: "block", fontSize: "24px", marginBottom: "6px" },
-  quickLabel: { fontSize: "12px", fontWeight: 700, color: "#4b5563" },
+  quickActions: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" },
+  quickAction: { background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "12px 8px", cursor: "pointer", fontFamily: "inherit", textAlign: "center" },
+  quickIcon: { display: "block", fontSize: "20px", marginBottom: "4px" },
+  quickLabel: { fontSize: "11px", fontWeight: 700, color: "#4b5563" },
 
-  tableHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px", flexWrap: "wrap", gap: "10px" },
-  tableFilters: { display: "flex", gap: "6px", flexWrap: "wrap" },
-  filterChip: { border: "1px solid #e5e7eb", background: "white", borderRadius: "20px", padding: "5px 12px", fontSize: "12px", cursor: "pointer" },
+  tableHeader: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "16px", flexWrap: "wrap", gap: "10px" },
+  tableFilters: { display: "flex", flexWrap: "wrap", gap: "6px" },
+  filterChip: { border: "1px solid #e5e7eb", background: "white", borderRadius: "20px", padding: "4px 10px", fontSize: "11px", cursor: "pointer", fontFamily: "inherit", color: "#6b7280" },
+
+  // Mobile booking cards
+  bookingMobileCard: { border: "1px solid #e5e7eb", borderRadius: "10px", padding: "14px", marginBottom: "10px" },
+  bookingMobileHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" },
+  bookingMobileGuest: { fontSize: "14px", fontWeight: 700, color: "#1f2937", marginBottom: "2px" },
+  bookingMobileRoom: { fontSize: "12px", color: "#6b7280", marginBottom: "4px" },
+  bookingMobileDates: { fontSize: "12px", color: "#9ca3af", marginBottom: "10px" },
+  bookingMobileFooter: { display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" },
+
   tableWrap: { overflowX: "auto" },
-  table: { width: "100%", borderCollapse: "collapse" },
+  table: { width: "100%", borderCollapse: "collapse", minWidth: "600px" },
   thead: { background: "#f9fafb" },
-  th: { padding: "10px 12px", fontSize: "11px", fontWeight: 700, color: "#6b7280", textAlign: "left" },
+  th: { padding: "10px 12px", fontSize: "11px", fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.06em", textAlign: "left", borderBottom: "1px solid #e5e7eb" },
   tr: { borderBottom: "1px solid #f3f4f6" },
-  td: { padding: "12px", fontSize: "13px", color: "#1f2937" },
-  bookingId: { background: "#f3f4f6", borderRadius: "4px", padding: "2px 6px", fontSize: "11px", fontFamily: "monospace" },
+  td: { padding: "12px", fontSize: "13px", color: "#1f2937", verticalAlign: "middle" },
+  bookingId: { background: "#f3f4f6", borderRadius: "4px", padding: "2px 6px", fontSize: "11px", fontFamily: "monospace", color: "#6b7280" },
   payBadge: { padding: "3px 8px", borderRadius: "20px", fontSize: "11px", fontWeight: 700 },
   statusBadgeTbl: { padding: "3px 8px", borderRadius: "20px", fontSize: "11px", fontWeight: 700 },
-  acceptBtn: { background: "#22c55e", color: "white", border: "none", borderRadius: "6px", padding: "5px 10px", fontSize: "11px", fontWeight: 700, cursor: "pointer" },
+  acceptBtn: { background: "#22c55e", color: "white", border: "none", borderRadius: "6px", padding: "5px 10px", fontSize: "11px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" },
 
   ratingOverall: { display: "flex", alignItems: "center" },
-  reviewCard: { border: "1px solid #f3f4f6", borderRadius: "12px", padding: "18px", marginBottom: "14px" },
-  reviewTop: { display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" },
-  reviewAvatar: { width: "36px", height: "36px", borderRadius: "50%", background: "#fbbf24", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: "14px" },
-  reviewName: { fontSize: "14px", fontWeight: 700, color: "#1f2937" },
+  reviewCard: { border: "1px solid #f3f4f6", borderRadius: "12px", padding: "16px", marginBottom: "12px" },
+  reviewTop: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" },
+  reviewAvatar: { width: "34px", height: "34px", borderRadius: "50%", background: "#fbbf24", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: "13px", flexShrink: 0 },
+  reviewName: { fontSize: "13px", fontWeight: 700, color: "#1f2937" },
   reviewMeta: { fontSize: "12px", color: "#9ca3af" },
-  repliedBadge: { background: "#dcfce7", color: "#16a34a", fontSize: "11px", fontWeight: 700, padding: "3px 8px", borderRadius: "20px" },
-  reviewComment: { fontSize: "13px", color: "#4b5563", lineHeight: 1.65, margin: "0 0 12px" },
-  replyBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "7px 14px", fontSize: "12px", color: "#6b7280", cursor: "pointer" },
-  replyBox: { background: "#f9fafb", borderRadius: "10px", padding: "14px" },
-  replyInput: { width: "100%", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "10px 12px", fontSize: "13px", marginBottom: "10px", height: "80px", resize: "vertical" },
-  sendReplyBtn: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "8px", padding: "8px 16px", fontSize: "13px", fontWeight: 700, cursor: "pointer" },
-  cancelReplyBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "8px 16px", fontSize: "13px", color: "#6b7280", cursor: "pointer" },
+  repliedBadge: { background: "#dcfce7", color: "#16a34a", fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "20px", flexShrink: 0 },
+  reviewComment: { fontSize: "13px", color: "#4b5563", lineHeight: 1.65, margin: "0 0 10px" },
+  replyBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "7px 14px", fontSize: "12px", color: "#6b7280", cursor: "pointer", fontFamily: "inherit" },
+  replyBox: { background: "#f9fafb", borderRadius: "10px", padding: "12px" },
+  replyInput: { width: "100%", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "10px 12px", fontSize: "13px", fontFamily: "inherit", marginBottom: "10px", height: "80px", resize: "vertical", boxSizing: "border-box" },
+  sendReplyBtn: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "8px", padding: "8px 16px", fontSize: "13px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" },
+  cancelReplyBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "8px 16px", fontSize: "13px", color: "#6b7280", cursor: "pointer", fontFamily: "inherit" },
 
-  settingsGrid: { display: "grid", gridTemplateColumns: "1fr", gap: "16px", marginBottom: "24px" },
+  settingsGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "20px" },
   settingField: { display: "flex", flexDirection: "column", gap: "6px" },
   settingLabel: { fontSize: "11px", fontWeight: 700, color: "#374151", textTransform: "uppercase", letterSpacing: "0.06em" },
-  settingInput: { border: "1px solid #e5e7eb", borderRadius: "8px", padding: "10px 12px", fontSize: "14px", outline: "none" },
-  settingActions: { display: "flex", flexDirection: "column", gap: "12px", paddingTop: "20px", borderTop: "1px solid #f3f4f6" },
-  saveBtn: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "10px", padding: "12px 24px", fontWeight: 800, fontSize: "14px", cursor: "pointer" },
-  dangerZone: { display: "flex", flexDirection: "column", gap: "8px" },
-  dangerTitle: { fontSize: "12px", color: "#dc2626", fontWeight: 700 },
-  pauseBtn: { background: "#fef9c3", color: "#92400e", border: "1px solid #fde68a", borderRadius: "8px", padding: "8px 14px", fontSize: "12px", fontWeight: 700, cursor: "pointer" },
-  deleteBtn: { background: "#fee2e2", color: "#dc2626", border: "1px solid #fecaca", borderRadius: "8px", padding: "8px 14px", fontSize: "12px", fontWeight: 700, cursor: "pointer" },
+  settingInput: { border: "1px solid #e5e7eb", borderRadius: "8px", padding: "10px 12px", fontSize: "13px", fontFamily: "inherit", outline: "none" },
+  settingActions: { display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "16px", borderTop: "1px solid #f3f4f6", flexWrap: "wrap", gap: "12px" },
+  saveBtn: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "10px", padding: "10px 20px", fontWeight: 800, fontSize: "13px", cursor: "pointer", fontFamily: "inherit" },
+  dangerZone: { display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" },
+  dangerTitle: { fontSize: "11px", color: "#dc2626", fontWeight: 700 },
+  pauseBtn: { background: "#fef9c3", color: "#92400e", border: "1px solid #fde68a", borderRadius: "8px", padding: "7px 12px", fontSize: "11px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" },
+  deleteBtn: { background: "#fee2e2", color: "#dc2626", border: "1px solid #fecaca", borderRadius: "8px", padding: "7px 12px", fontSize: "11px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" },
 
-  analyticsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "16px", marginBottom: "20px" },
-  analyticsCard: { background: "white", borderRadius: "14px", padding: "20px", border: "1px solid #e5e7eb" },
-  analyticsVal: { fontSize: "22px", fontWeight: 800, color: "#1f2937", marginBottom: "4px" },
-  analyticsLabel: { fontSize: "13px", color: "#6b7280", marginBottom: "6px" },
-  analyticsChange: { fontSize: "12px", fontWeight: 700 },
+  analyticsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: "12px", marginBottom: "16px" },
+  analyticsCard: { background: "white", borderRadius: "14px", padding: "16px", border: "1px solid #e5e7eb" },
+  analyticsVal: { fontSize: "20px", fontWeight: 800, color: "#1f2937", marginBottom: "4px" },
+  analyticsLabel: { fontSize: "12px", color: "#6b7280", marginBottom: "4px" },
+  analyticsChange: { fontSize: "11px", fontWeight: 700 },
 
-  barChart: { display: "flex", alignItems: "flex-end", gap: "12px", height: "200px", padding: "20px 0 0", overflowX: "auto" },
-  barCol: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", gap: "6px" },
-  bar: { width: "100%", background: "linear-gradient(180deg, #fbbf24, #f59e0b)", borderRadius: "6px 6px 0 0" },
-  barLabel: { fontSize: "12px", color: "#6b7280", fontWeight: 600 },
-  barVal: { fontSize: "11px", color: "#9ca3af" },
+  barChart: { display: "flex", alignItems: "flex-end", gap: "10px", height: "160px", padding: "16px 0 0" },
+  barCol: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", gap: "4px" },
+  bar: { width: "100%", background: "linear-gradient(180deg, #fbbf24, #f59e0b)", borderRadius: "4px 4px 0 0", transition: "height 0.3s", minHeight: "4px" },
+  barLabel: { fontSize: "11px", color: "#6b7280", fontWeight: 600 },
+  barVal: { fontSize: "10px", color: "#9ca3af" },
 };
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
   .table-row:hover { background: #f9fafb; }
+  input:focus, select:focus, textarea:focus { border-color: #fbbf24 !important; outline: none; }
+
+  @media (max-width: 768px) {
+    .mobile-topbar { display: flex !important; }
+    .sidebar {
+      position: fixed !important;
+      top: 0; left: 0; bottom: 0;
+      width: 260px !important;
+      z-index: 160;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+    .bookings-mobile { display: block !important; }
+    .bookings-desktop { display: none !important; }
+  }
   @media (min-width: 769px) {
-    [style*="flexDirection: column"][style*="minHeight: 100vh"] { flex-direction: row !important; }
-    [style*="width: 100%"][style*="background: #1f2937"] { width: 260px !important; }
-    [style*="gridTemplateColumns: 1fr"] { grid-template-columns: 1fr 1fr !important; }
+    .mobile-topbar { display: none !important; }
+    .sidebar { transform: translateX(0) !important; }
+    .bookings-mobile { display: none !important; }
+    .bookings-desktop { display: block !important; }
+  }
+  @media (max-width: 768px) {
+    [style*="flex: 1"][style*="padding: 28px"] {
+      padding: 16px !important;
+      padding-top: 72px !important;
+    }
+    [style*="gridTemplateColumns: 1fr 1fr"] {
+      grid-template-columns: 1fr !important;
+    }
+  }
+  @media (max-width: 480px) {
+    [style*="gridTemplateColumns: repeat(auto-fill, minmax(150px"] {
+      grid-template-columns: 1fr 1fr !important;
+    }
   }
 `;

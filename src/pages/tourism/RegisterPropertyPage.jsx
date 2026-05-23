@@ -49,19 +49,19 @@ export default function RegisterPropertyPage() {
   if (submitted) {
     return (
       <div style={{ fontFamily: "'DM Sans', sans-serif", minHeight: "100vh", background: "#f8f4f0", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
-        <div style={{ background: "white", borderRadius: "20px", padding: "48px", textAlign: "center", maxWidth: "520px", border: "1px solid #e5e7eb", boxShadow: "0 20px 60px rgba(0,0,0,0.08)" }}>
-          <div style={{ fontSize: "64px", marginBottom: "20px" }}>🎉</div>
-          <h2 style={{ fontSize: "26px", fontWeight: 800, color: "#1f2937", marginBottom: "12px" }}>Property Submitted!</h2>
-          <p style={{ color: "#6b7280", lineHeight: 1.7, marginBottom: "24px" }}>
+        <div style={{ background: "white", borderRadius: "20px", padding: "32px 24px", textAlign: "center", maxWidth: "520px", width: "100%", border: "1px solid #e5e7eb", boxShadow: "0 20px 60px rgba(0,0,0,0.08)" }}>
+          <div style={{ fontSize: "56px", marginBottom: "16px" }}>🎉</div>
+          <h2 style={{ fontSize: "22px", fontWeight: 800, color: "#1f2937", marginBottom: "10px" }}>Property Submitted!</h2>
+          <p style={{ color: "#6b7280", lineHeight: 1.7, marginBottom: "20px", fontSize: "14px" }}>
             <strong>{form.name}</strong> has been submitted for review. Our team will verify your listing within 24 hours and contact you at <strong>{form.email}</strong>.
           </p>
-          <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "12px", padding: "16px", marginBottom: "28px", textAlign: "left" }}>
+          <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "12px", padding: "16px", marginBottom: "24px", textAlign: "left" }}>
             <div style={{ fontSize: "13px", color: "#166534", fontWeight: 700, marginBottom: "8px" }}>What Happens Next?</div>
             {["Our team reviews your submission (24hrs)", "We verify property details & contact you", "Your listing goes live on Axx Spaces", "Start receiving booking requests"].map((s, i) => (
               <div key={s} style={{ fontSize: "13px", color: "#15803d", padding: "4px 0" }}>{i + 1}. {s}</div>
             ))}
           </div>
-          <button style={{ background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "10px", padding: "14px 32px", fontWeight: 800, fontSize: "15px", cursor: "pointer", fontFamily: "inherit" }} onClick={() => navigate("/tourism")}>
+          <button style={{ background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "10px", padding: "14px 32px", fontWeight: 800, fontSize: "15px", cursor: "pointer", fontFamily: "inherit", width: "100%" }} onClick={() => navigate("/tourism")}>
             Browse Tourism →
           </button>
         </div>
@@ -78,9 +78,9 @@ export default function RegisterPropertyPage() {
         <button style={s.backBtn} onClick={() => navigate("/tourism")}>← Back</button>
         <div style={s.headerCenter}>
           <h1 style={s.headerTitle}>List Your Property</h1>
-          <p style={s.headerSub}>Join Kenya's #1 tourism marketplace — free to list</p>
+          <p style={s.headerSub}>Kenya's #1 tourism marketplace</p>
         </div>
-        <div style={s.stepCount}>Step {step + 1} of {steps.length}</div>
+        <div style={s.stepCount}>Step {step + 1}/{steps.length}</div>
       </div>
 
       {/* PROGRESS */}
@@ -88,9 +88,19 @@ export default function RegisterPropertyPage() {
         <div style={{ ...s.progressFill, width: `${((step + 1) / steps.length) * 100}%` }} />
       </div>
 
+      {/* STEP PILLS (mobile horizontal scroll) */}
+      <div style={s.stepPills}>
+        {steps.map((st, i) => (
+          <div key={st} style={{ ...s.stepPill, ...(i === step ? s.stepPillActive : {}), ...(i < step ? s.stepPillDone : {}) }}>
+            <span style={s.stepPillNum}>{i < step ? "✓" : i + 1}</span>
+            <span style={s.stepPillLabel}>{st}</span>
+          </div>
+        ))}
+      </div>
+
       <div style={s.layout}>
-        {/* STEP NAV */}
-        <aside style={s.stepNav}>
+        {/* STEP NAV — desktop only */}
+        <aside style={s.stepNav} className="step-nav-desktop">
           {steps.map((st, i) => (
             <div key={st} style={{ ...s.stepItem, ...(i === step ? s.stepActive : {}), ...(i < step ? s.stepDone : {}) }}>
               <div style={{ ...s.stepDot, ...(i === step ? { background: "#fbbf24", color: "#1f2937" } : i < step ? { background: "#22c55e", color: "white" } : {}) }}>
@@ -105,7 +115,6 @@ export default function RegisterPropertyPage() {
         <main style={s.formBody}>
           <div style={s.formCard}>
 
-            {/* STEP 0 — BASIC INFO */}
             {step === 0 && (
               <div>
                 <h2 style={s.formTitle}>Basic Information</h2>
@@ -123,12 +132,11 @@ export default function RegisterPropertyPage() {
                 </div>
                 <div style={s.field}>
                   <label style={s.label}>Description *</label>
-                  <textarea style={{ ...s.input, height: "140px", resize: "vertical" }} placeholder="Describe your property..." value={form.description} onChange={(e) => update("description", e.target.value)} />
+                  <textarea style={{ ...s.input, height: "120px", resize: "vertical" }} placeholder="Describe your property, what makes it special, nearby attractions..." value={form.description} onChange={(e) => update("description", e.target.value)} />
                 </div>
               </div>
             )}
 
-            {/* STEP 1 — LOCATION */}
             {step === 1 && (
               <div>
                 <h2 style={s.formTitle}>Location Details</h2>
@@ -143,7 +151,7 @@ export default function RegisterPropertyPage() {
                   </div>
                   <div style={s.field}>
                     <label style={s.label}>Town / Area *</label>
-                    <input style={s.input} placeholder="e.g. Diani, Westlands, Nyali" value={form.town} onChange={(e) => update("town", e.target.value)} />
+                    <input style={s.input} placeholder="e.g. Diani, Westlands" value={form.town} onChange={(e) => update("town", e.target.value)} />
                   </div>
                 </div>
                 <div style={s.field}>
@@ -157,7 +165,6 @@ export default function RegisterPropertyPage() {
               </div>
             )}
 
-            {/* STEP 2 — AMENITIES */}
             {step === 2 && (
               <div>
                 <h2 style={s.formTitle}>Amenities & Features</h2>
@@ -173,17 +180,20 @@ export default function RegisterPropertyPage() {
                     </button>
                   ))}
                 </div>
+                <div style={s.field}>
+                  <label style={s.label}>Additional Amenities (comma separated)</label>
+                  <input style={s.input} placeholder="e.g. Helicopter pad, Private beach" />
+                </div>
               </div>
             )}
 
-            {/* STEP 3 — PRICING */}
             {step === 3 && (
               <div>
                 <h2 style={s.formTitle}>Pricing & Room Types</h2>
                 <p style={s.formSub}>Set your rates (KSh per night)</p>
                 <div style={s.twoCol}>
                   <div style={s.field}>
-                    <label style={s.label}>Base Price per Night (KSh) *</label>
+                    <label style={s.label}>Base Price (KSh) *</label>
                     <input style={s.input} type="number" placeholder="e.g. 8500" value={form.basePrice} onChange={(e) => update("basePrice", e.target.value)} />
                   </div>
                   <div style={s.field}>
@@ -195,20 +205,37 @@ export default function RegisterPropertyPage() {
                   <label style={s.label}>Peak Season Price (KSh)</label>
                   <input style={s.input} type="number" placeholder="e.g. 18000" value={form.seasonalPrice} onChange={(e) => update("seasonalPrice", e.target.value)} />
                 </div>
-
                 <div style={s.sectionBreak}>Room Types</div>
                 {form.roomTypes.map((r, i) => (
                   <div key={i} style={s.roomRow}>
-                    <input style={{ ...s.input, flex: 2 }} placeholder="Room type name" value={r.name} onChange={(e) => updateRoom(i, "name", e.target.value)} />
-                    <input style={{ ...s.input, flex: 1 }} type="number" placeholder="Price (KSh)" value={r.price} onChange={(e) => updateRoom(i, "price", e.target.value)} />
-                    <input style={{ ...s.input, flex: 1 }} type="number" placeholder="Max guests" value={r.guests} onChange={(e) => updateRoom(i, "guests", e.target.value)} />
+                    <input style={{ ...s.input, flex: 2, minWidth: 0 }} placeholder="Room type name" value={r.name} onChange={(e) => updateRoom(i, "name", e.target.value)} />
+                    <input style={{ ...s.input, flex: 1, minWidth: 0 }} type="number" placeholder="Price" value={r.price} onChange={(e) => updateRoom(i, "price", e.target.value)} />
+                    <input style={{ ...s.input, flex: 1, minWidth: 0 }} type="number" placeholder="Guests" value={r.guests} onChange={(e) => updateRoom(i, "guests", e.target.value)} />
                   </div>
                 ))}
                 <button style={s.addRoomBtn} onClick={addRoomType}>+ Add Room Type</button>
+                <div style={s.twoCol}>
+                  <div style={s.field}>
+                    <label style={s.label}>Check-in Time</label>
+                    <input style={s.input} type="time" value={form.checkIn} onChange={(e) => update("checkIn", e.target.value)} />
+                  </div>
+                  <div style={s.field}>
+                    <label style={s.label}>Check-out Time</label>
+                    <input style={s.input} type="time" value={form.checkOut} onChange={(e) => update("checkOut", e.target.value)} />
+                  </div>
+                </div>
+                <div style={s.field}>
+                  <label style={s.label}>Free Cancellation Window</label>
+                  <select style={s.input} value={form.cancellation} onChange={(e) => update("cancellation", e.target.value)}>
+                    <option value="24">24 hours before check-in</option>
+                    <option value="48">48 hours before check-in</option>
+                    <option value="72">72 hours before check-in</option>
+                    <option value="0">Non-refundable</option>
+                  </select>
+                </div>
               </div>
             )}
 
-            {/* STEP 4 — CONTACT */}
             {step === 4 && (
               <div>
                 <h2 style={s.formTitle}>Contact Information</h2>
@@ -234,7 +261,6 @@ export default function RegisterPropertyPage() {
               </div>
             )}
 
-            {/* STEP 5 — REVIEW */}
             {step === 5 && (
               <div>
                 <h2 style={s.formTitle}>Review & Submit</h2>
@@ -250,12 +276,14 @@ export default function RegisterPropertyPage() {
                 <div style={s.commissionBox}>
                   <div style={s.commissionTitle}>📊 Commission Structure</div>
                   <p style={s.commissionText}>
-                    Axx Spaces charges a <strong>10–15% commission</strong> per confirmed booking.
+                    Axx Spaces charges a <strong>10–15% commission</strong> per confirmed booking. Paid directly via M-Pesa.
                   </p>
                 </div>
                 <label style={s.checkboxRow}>
-                  <input type="checkbox" checked={form.agreeTerms} onChange={(e) => update("agreeTerms", e.target.checked)} style={{ marginRight: "10px" }} />
-                  I agree to the Axx Spaces Terms & Conditions
+                  <input type="checkbox" checked={form.agreeTerms} onChange={(e) => update("agreeTerms", e.target.checked)} style={{ marginRight: "10px", flexShrink: 0 }} />
+                  <span style={{ fontSize: "14px", color: "#4b5563" }}>
+                    I agree to the Axx Spaces <span style={{ color: "#fbbf24", cursor: "pointer" }}>Terms & Conditions</span> and confirm all information is accurate.
+                  </span>
                 </label>
               </div>
             )}
@@ -266,12 +294,18 @@ export default function RegisterPropertyPage() {
                 <button style={s.prevBtn} onClick={() => setStep((s) => s - 1)}>← Previous</button>
               )}
               {step < steps.length - 1 ? (
-                <button style={{ ...s.nextBtn, opacity: canNext() ? 1 : 0.5 }} onClick={() => canNext() && setStep((s) => s + 1)}>
+                <button
+                  style={{ ...s.nextBtn, opacity: canNext() ? 1 : 0.5 }}
+                  onClick={() => { if (canNext()) setStep((s) => s + 1); }}
+                >
                   Next Step →
                 </button>
               ) : (
-                <button style={{ ...s.nextBtn, opacity: form.agreeTerms ? 1 : 0.5 }} onClick={handleSubmit}>
-                  Submit Property 🚀
+                <button
+                  style={{ ...s.nextBtn, opacity: form.agreeTerms ? 1 : 0.5 }}
+                  onClick={handleSubmit}
+                >
+                  Submit 🚀
                 </button>
               )}
             </div>
@@ -284,60 +318,79 @@ export default function RegisterPropertyPage() {
 
 const s = {
   root: { fontFamily: "'DM Sans', sans-serif", background: "#f8f4f0", minHeight: "100vh" },
-  header: { background: "white", borderBottom: "1px solid #e5e7eb", padding: "16px 20px", display: "flex", flexDirection: "column", gap: "12px" },
-  backBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "8px 16px", fontSize: "13px", cursor: "pointer" },
-  headerCenter: { textAlign: "center" },
-  headerTitle: { fontSize: "20px", fontWeight: 800, color: "#1f2937" },
-  headerSub: { fontSize: "13px", color: "#6b7280" },
-  stepCount: { fontSize: "13px", color: "#9ca3af", fontWeight: 600, textAlign: "center" },
+  header: { background: "white", borderBottom: "1px solid #e5e7eb", padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10 },
+  backBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "7px 12px", fontSize: "12px", cursor: "pointer", fontFamily: "inherit", color: "#4b5563", flexShrink: 0 },
+  headerCenter: { textAlign: "center", flex: 1, padding: "0 8px" },
+  headerTitle: { fontSize: "16px", fontWeight: 800, color: "#1f2937", margin: 0 },
+  headerSub: { fontSize: "11px", color: "#6b7280" },
+  stepCount: { fontSize: "12px", color: "#9ca3af", fontWeight: 600, flexShrink: 0 },
 
   progressBar: { height: "4px", background: "#e5e7eb" },
   progressFill: { height: "100%", background: "#fbbf24", transition: "width 0.4s ease" },
 
-  layout: { padding: "20px", display: "flex", flexDirection: "column", gap: "24px" },
-  stepNav: { display: "flex", overflowX: "auto", gap: "12px", padding: "8px 0" },
-  stepItem: { display: "flex", alignItems: "center", gap: "10px", padding: "10px 12px", borderRadius: "10px", minWidth: "150px", flexShrink: 0 },
-  stepDot: { width: "28px", height: "28px", borderRadius: "50%", background: "#e5e7eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 700 },
+  // Mobile step pills
+  stepPills: { display: "flex", gap: "8px", padding: "12px 16px", overflowX: "auto", background: "white", borderBottom: "1px solid #e5e7eb" },
+  stepPill: { display: "flex", alignItems: "center", gap: "6px", padding: "6px 12px", borderRadius: "20px", background: "#f3f4f6", flexShrink: 0, opacity: 0.6 },
+  stepPillActive: { background: "#fef9c3", opacity: 1, border: "1px solid #fbbf24" },
+  stepPillDone: { background: "#f0fdf4", opacity: 1, border: "1px solid #bbf7d0" },
+  stepPillNum: { width: "20px", height: "20px", borderRadius: "50%", background: "#e5e7eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 700, color: "#6b7280", flexShrink: 0 },
+  stepPillLabel: { fontSize: "12px", fontWeight: 600, color: "#4b5563", whiteSpace: "nowrap" },
+
+  layout: { maxWidth: "1000px", margin: "0 auto", padding: "20px 16px", display: "grid", gridTemplateColumns: "200px 1fr", gap: "24px", alignItems: "start" },
+
+  stepNav: { position: "sticky", top: "120px" },
+  stepItem: { display: "flex", alignItems: "center", gap: "10px", padding: "10px 12px", borderRadius: "10px", marginBottom: "4px" },
+  stepActive: { background: "#fef9c3" },
+  stepDone: { opacity: 0.7 },
+  stepDot: { width: "28px", height: "28px", borderRadius: "50%", background: "#e5e7eb", color: "#9ca3af", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 700, flexShrink: 0 },
   stepLabel: { fontSize: "13px", fontWeight: 600, color: "#4b5563" },
 
   formBody: {},
-  formCard: { background: "white", borderRadius: "16px", padding: "24px", border: "1px solid #e5e7eb" },
-  formTitle: { fontSize: "22px", fontWeight: 800, color: "#1f2937", marginBottom: "6px" },
-  formSub: { fontSize: "14px", color: "#6b7280", marginBottom: "28px" },
+  formCard: { background: "white", borderRadius: "16px", padding: "24px 20px", border: "1px solid #e5e7eb" },
+  formTitle: { fontSize: "20px", fontWeight: 800, color: "#1f2937", marginBottom: "4px" },
+  formSub: { fontSize: "13px", color: "#6b7280", marginBottom: "24px" },
 
-  field: { marginBottom: "18px" },
-  label: { display: "block", fontSize: "12px", fontWeight: 700, color: "#374151", marginBottom: "6px" },
-  input: { width: "100%", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "12px 14px", fontSize: "14px", outline: "none" },
-  twoCol: { display: "grid", gridTemplateColumns: "1fr", gap: "16px" },
+  field: { marginBottom: "16px" },
+  label: { display: "block", fontSize: "11px", fontWeight: 700, color: "#374151", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "6px" },
+  input: { width: "100%", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "11px 14px", fontSize: "14px", fontFamily: "inherit", color: "#1f2937", outline: "none", boxSizing: "border-box" },
+  twoCol: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" },
 
-  amenitiesGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "10px", marginBottom: "24px" },
-  amenityBtn: { border: "1px solid #e5e7eb", background: "white", borderRadius: "8px", padding: "10px 12px", fontSize: "13px", cursor: "pointer" },
-  amenityActive: { background: "#fef9c3", borderColor: "#fbbf24", fontWeight: 700 },
+  amenitiesGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "8px", marginBottom: "20px" },
+  amenityBtn: { border: "1px solid #e5e7eb", background: "white", borderRadius: "8px", padding: "9px 10px", fontSize: "12px", cursor: "pointer", fontFamily: "inherit", color: "#4b5563", textAlign: "left" },
+  amenityActive: { background: "#fef9c3", borderColor: "#fbbf24", color: "#92400e", fontWeight: 700 },
 
-  sectionBreak: { fontSize: "13px", fontWeight: 700, color: "#6b7280", margin: "20px 0 10px" },
-  roomRow: { display: "flex", flexDirection: "column", gap: "10px", marginBottom: "12px" },
-  addRoomBtn: { background: "transparent", border: "1px dashed #fbbf24", color: "#fbbf24", borderRadius: "8px", padding: "12px", fontWeight: 700, width: "100%" },
+  sectionBreak: { fontSize: "12px", fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid #f3f4f6", paddingBottom: "8px", marginBottom: "12px", marginTop: "8px" },
+  roomRow: { display: "flex", gap: "8px", marginBottom: "8px" },
+  addRoomBtn: { background: "transparent", border: "1px dashed #fbbf24", color: "#fbbf24", borderRadius: "8px", padding: "9px 14px", fontSize: "12px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit", marginBottom: "20px", width: "100%" },
 
-  reviewGrid: { display: "grid", gridTemplateColumns: "1fr", gap: "12px", marginBottom: "24px" },
-  reviewItem: { background: "#f9fafb", borderRadius: "10px", padding: "14px" },
-  reviewKey: { fontSize: "11px", fontWeight: 700, color: "#9ca3af" },
-  reviewVal: { fontSize: "14px", color: "#1f2937", fontWeight: 600 },
+  reviewGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "20px" },
+  reviewItem: { background: "#f9fafb", borderRadius: "10px", padding: "12px" },
+  reviewKey: { fontSize: "10px", fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "4px" },
+  reviewVal: { fontSize: "13px", color: "#1f2937", fontWeight: 600, wordBreak: "break-word" },
+  commissionBox: { background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "12px", padding: "14px", marginBottom: "16px" },
+  commissionTitle: { fontSize: "13px", fontWeight: 800, color: "#92400e", marginBottom: "6px" },
+  commissionText: { fontSize: "12px", color: "#78350f", lineHeight: 1.65, margin: 0 },
+  checkboxRow: { display: "flex", alignItems: "flex-start", cursor: "pointer" },
 
-  commissionBox: { background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "12px", padding: "16px", marginBottom: "20px" },
-  commissionTitle: { fontSize: "14px", fontWeight: 800, color: "#92400e" },
-  commissionText: { fontSize: "13px", color: "#78350f" },
-  checkboxRow: { display: "flex", alignItems: "flex-start", cursor: "pointer", fontSize: "14px" },
-
-  navBtns: { display: "flex", flexDirection: "column", gap: "12px", marginTop: "32px" },
-  prevBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "14px", fontWeight: 700 },
-  nextBtn: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "10px", padding: "14px", fontWeight: 800 },
+  navBtns: { display: "flex", justifyContent: "space-between", marginTop: "28px", paddingTop: "20px", borderTop: "1px solid #f3f4f6", gap: "12px" },
+  prevBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "12px 20px", fontSize: "14px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit", color: "#4b5563" },
+  nextBtn: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginLeft: "auto" },
 };
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  @media (min-width: 769px) {
-    [style*="flexDirection: column"] { flex-direction: row !important; }
-    [style*="gridTemplateColumns: 1fr"] { grid-template-columns: 1fr 1fr !important; }
+  input:focus, select:focus, textarea:focus { border-color: #fbbf24 !important; box-shadow: 0 0 0 3px rgba(251,191,36,0.1); }
+  .step-nav-desktop { display: block; }
+
+  @media (max-width: 700px) {
+    .step-nav-desktop { display: none !important; }
+    [style*="gridTemplateColumns: 200px"] { grid-template-columns: 1fr !important; padding: 12px !important; }
+    [style*="gridTemplateColumns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
+    [style*="padding: 24px 20px"] { padding: 16px !important; }
   }
+  @media (max-width: 400px) {
+    [style*="gridTemplateColumns: repeat(auto-fill, minmax(140px"] { grid-template-columns: 1fr 1fr !important; }
+  }
+  .step-pills-scroll::-webkit-scrollbar { display: none; }
 `;
