@@ -36,11 +36,10 @@ const properties = {
   },
 };
 
-// Fallback for other IDs
 const defaultProperty = {
   id: 2, name: "Fairmont Mount Kenya Safari Club", location: "Nanyuki, Laikipia", county: "Laikipia",
   category: "Mountain Lodge", price: 28000, rating: 4.9, reviews: 198, color: "#22c55e", tag: "Luxury",
-  description: "Perched on the equator at the foot of Mount Kenya, the Fairmont Mount Kenya Safari Club offers an incomparable safari and mountain lodge experience. This historic property, once frequented by celebrities and dignitaries, combines colonial elegance with modern luxury amid 100 acres of manicured grounds.",
+  description: "Perched on the equator at the foot of Mount Kenya, the Fairmont Mount Kenya Safari Club offers an incomparable safari and mountain lodge experience.",
   amenities: ["🦁 Game Drives", "🏊 Heated Pool", "🍽️ Fine Dining", "🐴 Horse Riding", "📶 Free WiFi", "🚗 Airport Transfer", "🎾 Tennis", "🧘 Yoga", "🔭 Star Gazing", "🛎️ Butler Service", "🌿 Nature Walks", "📸 Photography Tours"],
   policies: { checkin: "3:00 PM", checkout: "12:00 PM", cancellation: "Free cancellation up to 72 hours before check-in", payment: "M-Pesa, Visa, Mastercard, Bank Transfer" },
   roomTypes: [
@@ -49,8 +48,8 @@ const defaultProperty = {
     { name: "Club Cottage", price: 68000, guests: 4, desc: "2 bedrooms, private veranda, butler" },
   ],
   reviewList: [
-    { name: "Peter N.", rating: 5, date: "April 2026", comment: "The most magical safari experience I've ever had. Waking up to Mount Kenya views is priceless." },
-    { name: "Grace A.", rating: 5, date: "March 2026", comment: "Exceptional service and stunning location. Worth every penny for a truly special occasion." },
+    { name: "Peter N.", rating: 5, date: "April 2026", comment: "The most magical safari experience I've ever had." },
+    { name: "Grace A.", rating: 5, date: "March 2026", comment: "Exceptional service and stunning location." },
   ],
   manager: { name: "Carol Wanjiku", phone: "+254 722 987 654", email: "reservations@fairmont-mkenya.co.ke", whatsapp: "+254 722 987 654" },
 };
@@ -88,7 +87,6 @@ export default function TourismDetailPage() {
           <h2 style={{ fontSize: "24px", fontWeight: 800, color: "#1f2937", marginBottom: "12px" }}>Booking Confirmed!</h2>
           <p style={{ color: "#6b7280", lineHeight: 1.7, marginBottom: "24px" }}>
             Your booking at <strong>{property.name}</strong> has been confirmed.
-            A confirmation will be sent to your email and WhatsApp.
           </p>
           <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "12px", padding: "16px", marginBottom: "24px", textAlign: "left" }}>
             <div style={{ fontSize: "13px", color: "#166534", fontWeight: 700, marginBottom: "8px" }}>Booking Summary</div>
@@ -109,25 +107,20 @@ export default function TourismDetailPage() {
     <div style={s.root}>
       <style>{css}</style>
 
-      {/* BACK */}
       <div style={s.topBar}>
-        <button style={s.backBtn} onClick={() => navigate("/tourism/listings")}>← Back to Listings</button>
+        <button style={s.backBtn} onClick={() => navigate("/tourism")}>← Back to Listings</button>
         <div style={s.breadcrumb}>Tourism / {property.category} / {property.name}</div>
       </div>
 
       <div style={s.layout}>
-        {/* LEFT COLUMN */}
         <div style={s.leftCol}>
-
-          {/* HERO IMAGE */}
           <div style={{ ...s.heroImg, background: `linear-gradient(135deg, ${property.color}25, ${property.color}10)`, border: `1px solid ${property.color}30` }}>
             <span style={{ fontSize: "100px" }}>
-              {{ "Beach Resort": "🏖️", "Mountain Lodge": "⛰️", "Hotel": "🏨", "Adventure Tour": "🗻", "Camping Grounds": "🏕️" }[property.category] || "🏨"}
+              {{ "Beach Resort": "🏖️", "Mountain Lodge": "⛰️", "Hotel": "🏨" }[property.category] || "🏨"}
             </span>
             {property.tag && <div style={{ ...s.heroTag, background: property.color }}>{property.tag}</div>}
           </div>
 
-          {/* INFO */}
           <div style={s.infoCard}>
             <div style={s.catBadge}>{property.category}</div>
             <h1 style={s.propName}>{property.name}</h1>
@@ -138,7 +131,6 @@ export default function TourismDetailPage() {
             <p style={s.description}>{property.description}</p>
           </div>
 
-          {/* AMENITIES */}
           <div style={s.card}>
             <h2 style={s.cardTitle}>Amenities & Features</h2>
             <div style={s.amenitiesGrid}>
@@ -148,7 +140,6 @@ export default function TourismDetailPage() {
             </div>
           </div>
 
-          {/* ROOM TYPES */}
           <div style={s.card}>
             <h2 style={s.cardTitle}>Room Types</h2>
             <div style={s.roomsGrid}>
@@ -157,7 +148,6 @@ export default function TourismDetailPage() {
                   key={r.name}
                   style={{ ...s.roomCard, ...(selectedRoom === i ? { borderColor: property.color, background: property.color + "08" } : {}) }}
                   onClick={() => setSelectedRoom(i)}
-                  className="room-card"
                 >
                   <div style={s.roomHeader}>
                     <h3 style={s.roomName}>{r.name}</h3>
@@ -165,13 +155,11 @@ export default function TourismDetailPage() {
                   </div>
                   <div style={s.roomDesc}>{r.desc}</div>
                   <div style={s.roomGuests}>👥 Up to {r.guests} guests</div>
-                  {selectedRoom === i && <div style={{ ...s.selectedBadge, background: property.color }}>✓ Selected</div>}
                 </div>
               ))}
             </div>
           </div>
 
-          {/* POLICIES */}
           <div style={s.card}>
             <h2 style={s.cardTitle}>Policies</h2>
             <div style={s.policiesGrid}>
@@ -182,7 +170,6 @@ export default function TourismDetailPage() {
             </div>
           </div>
 
-          {/* REVIEWS */}
           <div style={s.card}>
             <h2 style={s.cardTitle}>Guest Reviews</h2>
             <div style={s.ratingRow}>
@@ -209,7 +196,6 @@ export default function TourismDetailPage() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN — BOOKING */}
         <aside style={s.bookingCol}>
           <div style={s.bookingCard}>
             <div style={s.bookingHeader}>
@@ -235,14 +221,6 @@ export default function TourismDetailPage() {
                 <label style={s.fieldLabel}>Guests</label>
                 <input type="number" min={1} max={property.roomTypes[selectedRoom].guests} style={s.guestInput} value={guests} onChange={(e) => setGuests(e.target.value)} />
               </div>
-              <div style={s.fieldGroup}>
-                <label style={s.fieldLabel}>Room Type</label>
-                <select style={s.roomSelect} value={selectedRoom} onChange={(e) => setSelectedRoom(Number(e.target.value))}>
-                  {property.roomTypes.map((r, i) => (
-                    <option key={r.name} value={i}>{r.name} — KSh {r.price.toLocaleString()}/night</option>
-                  ))}
-                </select>
-              </div>
             </div>
 
             {checkin && checkout && (
@@ -259,7 +237,6 @@ export default function TourismDetailPage() {
             <div style={s.bookNote}>You won't be charged yet · Free cancellation</div>
           </div>
 
-          {/* CONTACT MANAGER */}
           <div style={s.contactCard}>
             <h3 style={s.contactTitle}>Contact Property Manager</h3>
             <div style={s.contactName}>👤 {property.manager.name}</div>
@@ -277,92 +254,88 @@ export default function TourismDetailPage() {
 
 const s = {
   root: { fontFamily: "'DM Sans', sans-serif", background: "#f8f4f0", minHeight: "100vh" },
-  topBar: { background: "white", borderBottom: "1px solid #e5e7eb", padding: "14px 24px", display: "flex", alignItems: "center", gap: "16px" },
-  backBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "8px 16px", fontSize: "13px", cursor: "pointer", fontFamily: "inherit", color: "#4b5563" },
+  topBar: { background: "white", borderBottom: "1px solid #e5e7eb", padding: "14px 20px", display: "flex", flexDirection: "column", gap: "10px" },
+  backBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "8px 16px", fontSize: "13px", cursor: "pointer" },
   breadcrumb: { fontSize: "13px", color: "#9ca3af" },
 
-  layout: { maxWidth: "1300px", margin: "0 auto", padding: "24px 20px", display: "grid", gridTemplateColumns: "1fr 380px", gap: "28px", alignItems: "start" },
+  layout: { padding: "16px 20px", display: "flex", flexDirection: "column", gap: "28px" },
   leftCol: { display: "flex", flexDirection: "column", gap: "20px" },
 
-  heroImg: { height: "320px", borderRadius: "16px", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" },
+  heroImg: { height: "280px", borderRadius: "16px", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" },
   heroTag: { position: "absolute", top: "16px", left: "16px", color: "white", fontSize: "12px", fontWeight: 700, padding: "5px 12px", borderRadius: "20px" },
 
   infoCard: { background: "white", borderRadius: "14px", padding: "24px", border: "1px solid #e5e7eb" },
-  catBadge: { display: "inline-block", background: "#f3f4f6", color: "#6b7280", fontSize: "11px", fontWeight: 700, padding: "3px 10px", borderRadius: "20px", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" },
-  propName: { fontSize: "26px", fontWeight: 800, color: "#1f2937", margin: "0 0 10px", lineHeight: 1.2 },
-  propMeta: { display: "flex", gap: "20px", flexWrap: "wrap", marginBottom: "16px", fontSize: "14px", color: "#6b7280" },
+  catBadge: { display: "inline-block", background: "#f3f4f6", color: "#6b7280", fontSize: "11px", fontWeight: 700, padding: "3px 10px", borderRadius: "20px" },
+  propName: { fontSize: "26px", fontWeight: 800, color: "#1f2937", margin: "0 0 10px" },
+  propMeta: { display: "flex", flexDirection: "column", gap: "6px", marginBottom: "16px", fontSize: "14px", color: "#6b7280" },
   ratingBadge: { fontWeight: 700 },
-  description: { fontSize: "15px", color: "#4b5563", lineHeight: 1.75, margin: 0 },
+  description: { fontSize: "15px", color: "#4b5563", lineHeight: 1.75 },
 
   card: { background: "white", borderRadius: "14px", padding: "24px", border: "1px solid #e5e7eb" },
   cardTitle: { fontSize: "18px", fontWeight: 800, color: "#1f2937", marginBottom: "18px" },
 
-  amenitiesGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "10px" },
+  amenitiesGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: "10px" },
   amenityItem: { fontSize: "13px", color: "#4b5563", padding: "8px 12px", background: "#f9fafb", borderRadius: "8px", border: "1px solid #e5e7eb" },
 
   roomsGrid: { display: "flex", flexDirection: "column", gap: "12px" },
-  roomCard: { border: "2px solid #e5e7eb", borderRadius: "12px", padding: "16px", cursor: "pointer", transition: "all 0.2s", position: "relative" },
-  roomHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" },
-  roomName: { fontSize: "15px", fontWeight: 700, color: "#1f2937", margin: 0 },
+  roomCard: { border: "2px solid #e5e7eb", borderRadius: "12px", padding: "16px", cursor: "pointer" },
+  roomHeader: { display: "flex", justifyContent: "space-between", alignItems: "center" },
+  roomName: { fontSize: "15px", fontWeight: 700 },
   roomPrice: { fontSize: "17px", fontWeight: 800 },
-  roomPer: { fontSize: "12px", color: "#9ca3af", fontWeight: 400 },
-  roomDesc: { fontSize: "13px", color: "#6b7280", marginBottom: "6px" },
+  roomPer: { fontSize: "12px", color: "#9ca3af" },
+  roomDesc: { fontSize: "13px", color: "#6b7280" },
   roomGuests: { fontSize: "12px", color: "#9ca3af" },
-  selectedBadge: { position: "absolute", top: "12px", right: "12px", color: "white", fontSize: "11px", fontWeight: 700, padding: "3px 8px", borderRadius: "20px" },
 
-  policiesGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" },
+  policiesGrid: { display: "grid", gridTemplateColumns: "1fr", gap: "12px" },
   policyItem: { background: "#f9fafb", borderRadius: "10px", padding: "14px" },
-  policyLabel: { fontSize: "11px", fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "4px" },
+  policyLabel: { fontSize: "11px", fontWeight: 700, color: "#9ca3af" },
   policyVal: { fontSize: "13px", color: "#1f2937", fontWeight: 600 },
 
   ratingRow: { display: "flex", alignItems: "center", gap: "16px", marginBottom: "20px" },
-  bigRating: { fontSize: "48px", fontWeight: 800, lineHeight: 1 },
-  stars: { fontSize: "20px", marginBottom: "4px" },
+  bigRating: { fontSize: "48px", fontWeight: 800 },
+  stars: { fontSize: "20px" },
   reviewCount: { fontSize: "13px", color: "#6b7280" },
   reviewsList: { display: "flex", flexDirection: "column", gap: "16px" },
   reviewCard: { border: "1px solid #f3f4f6", borderRadius: "10px", padding: "16px" },
-  reviewHeader: { display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" },
-  reviewAvatar: { width: "36px", height: "36px", borderRadius: "50%", background: "#fbbf24", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: "15px", flexShrink: 0 },
-  reviewName: { fontSize: "14px", fontWeight: 700, color: "#1f2937" },
+  reviewHeader: { display: "flex", alignItems: "center", gap: "12px" },
+  reviewAvatar: { width: "36px", height: "36px", borderRadius: "50%", background: "#fbbf24", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800 },
+  reviewName: { fontSize: "14px", fontWeight: 700 },
   reviewDate: { fontSize: "12px", color: "#9ca3af" },
-  reviewComment: { fontSize: "13px", color: "#4b5563", lineHeight: 1.65, margin: 0 },
+  reviewComment: { fontSize: "13px", color: "#4b5563", lineHeight: 1.65 },
 
-  bookingCol: { position: "sticky", top: "24px", display: "flex", flexDirection: "column", gap: "16px" },
+  bookingCol: { position: "sticky", top: "20px" },
   bookingCard: { background: "white", borderRadius: "16px", padding: "24px", border: "1px solid #e5e7eb", boxShadow: "0 8px 32px rgba(0,0,0,0.08)" },
-  bookingHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" },
+  bookingHeader: { display: "flex", justifyContent: "space-between", marginBottom: "20px" },
   bookingPrice: { fontSize: "26px", fontWeight: 800 },
   bookingPer: { fontSize: "14px", color: "#9ca3af" },
-  bookingRating: { fontSize: "14px", color: "#fbbf24", fontWeight: 700 },
+  bookingRating: { fontSize: "14px", color: "#fbbf24" },
 
-  bookingForm: { display: "flex", flexDirection: "column", gap: "12px", marginBottom: "16px" },
+  bookingForm: { display: "flex", flexDirection: "column", gap: "12px" },
   dateRow: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" },
   dateField: { display: "flex", flexDirection: "column", gap: "4px" },
-  fieldLabel: { fontSize: "11px", fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.06em" },
-  dateInput: { border: "1px solid #e5e7eb", borderRadius: "8px", padding: "10px 12px", fontSize: "13px", fontFamily: "inherit", outline: "none" },
+  fieldLabel: { fontSize: "11px", fontWeight: 700, color: "#6b7280" },
+  dateInput: { border: "1px solid #e5e7eb", borderRadius: "8px", padding: "10px", fontSize: "13px" },
   fieldGroup: { display: "flex", flexDirection: "column", gap: "4px" },
-  guestInput: { border: "1px solid #e5e7eb", borderRadius: "8px", padding: "10px 12px", fontSize: "13px", fontFamily: "inherit", outline: "none" },
-  roomSelect: { border: "1px solid #e5e7eb", borderRadius: "8px", padding: "10px 12px", fontSize: "13px", fontFamily: "inherit", outline: "none" },
+  guestInput: { border: "1px solid #e5e7eb", borderRadius: "8px", padding: "10px", fontSize: "13px" },
 
   priceBreakdown: { background: "#f9fafb", borderRadius: "10px", padding: "14px", marginBottom: "16px" },
-  priceRow: { display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#6b7280", padding: "4px 0" },
-  priceTotal: { borderTop: "1px solid #e5e7eb", marginTop: "8px", paddingTop: "12px", fontWeight: 800, color: "#1f2937", fontSize: "15px" },
+  priceRow: { display: "flex", justifyContent: "space-between", fontSize: "13px", padding: "4px 0" },
+  priceTotal: { borderTop: "1px solid #e5e7eb", marginTop: "8px", paddingTop: "12px", fontWeight: 800 },
 
-  bookNowBtn: { width: "100%", color: "white", border: "none", borderRadius: "10px", padding: "16px", fontSize: "16px", fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginBottom: "10px" },
+  bookNowBtn: { width: "100%", color: "white", border: "none", borderRadius: "10px", padding: "16px", fontSize: "16px", fontWeight: 800, cursor: "pointer" },
   bookNote: { textAlign: "center", fontSize: "12px", color: "#9ca3af" },
 
   contactCard: { background: "white", borderRadius: "14px", padding: "20px", border: "1px solid #e5e7eb" },
-  contactTitle: { fontSize: "15px", fontWeight: 800, color: "#1f2937", marginBottom: "10px" },
+  contactTitle: { fontSize: "15px", fontWeight: 800, marginBottom: "10px" },
   contactName: { fontSize: "13px", color: "#6b7280", marginBottom: "14px" },
   contactBtns: { display: "flex", gap: "8px" },
-  contactBtn: { flex: 1, background: "#1f2937", color: "white", border: "none", borderRadius: "8px", padding: "10px 6px", fontSize: "12px", fontWeight: 700, cursor: "pointer", textAlign: "center", textDecoration: "none", display: "block" },
+  contactBtn: { flex: 1, background: "#1f2937", color: "white", border: "none", borderRadius: "8px", padding: "10px", fontSize: "12px", fontWeight: 700, textAlign: "center", textDecoration: "none" },
 };
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  .room-card:hover { border-color: #fbbf24 !important; }
-  @media (max-width: 900px) {
-    [style*="gridTemplateColumns: 1fr 380px"] { grid-template-columns: 1fr !important; }
-    [style*="gridTemplateColumns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
+  @media (min-width: 900px) {
+    [style*="flexDirection: column"][style*="gap: 28px"] { flex-direction: row !important; }
   }
 `;

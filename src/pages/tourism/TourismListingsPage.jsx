@@ -66,7 +66,7 @@ export default function TourismListingsPage() {
       </div>
 
       <div style={s.body}>
-        {/* SIDEBAR */}
+        {/* SIDEBAR FILTERS */}
         <aside style={s.sidebar}>
           <h3 style={s.filterTitle}>Filters</h3>
 
@@ -87,7 +87,10 @@ export default function TourismListingsPage() {
             <div style={s.filterLabel}>Max Price per Night</div>
             <div style={s.priceDisplay}>KSh {maxPrice.toLocaleString()}</div>
             <input
-              type="range" min={1000} max={50000} step={500}
+              type="range" 
+              min={1000} 
+              max={50000} 
+              step={500}
               value={maxPrice}
               onChange={(e) => setMaxPrice(Number(e.target.value))}
               style={s.slider}
@@ -119,7 +122,12 @@ export default function TourismListingsPage() {
             </select>
           </div>
 
-          <button style={s.clearBtn} onClick={() => { setCategory("All"); setMaxPrice(50000); setMinRating(0); setSearch(""); }}>
+          <button style={s.clearBtn} onClick={() => { 
+            setCategory("All"); 
+            setMaxPrice(50000); 
+            setMinRating(0); 
+            setSearch(""); 
+          }}>
             Clear All Filters
           </button>
         </aside>
@@ -161,7 +169,10 @@ export default function TourismListingsPage() {
                       </div>
                       <div style={s.cardRating}>⭐ {p.rating} <span style={{ color: "#9ca3af" }}>({p.reviews})</span></div>
                     </div>
-                    <button style={{ ...s.viewBtn, background: p.color }} onClick={(e) => { e.stopPropagation(); navigate(`/tourism/${p.id}`); }}>
+                    <button style={{ ...s.viewBtn, background: p.color }} onClick={(e) => { 
+                      e.stopPropagation(); 
+                      navigate(`/tourism/${p.id}`); 
+                    }}>
                       View & Book →
                     </button>
                   </div>
@@ -178,28 +189,28 @@ export default function TourismListingsPage() {
 const s = {
   root: { fontFamily: "'DM Sans', sans-serif", background: "#f8f4f0", minHeight: "100vh" },
   header: { background: "white", borderBottom: "1px solid #e5e7eb", padding: "20px", position: "sticky", top: 0, zIndex: 10 },
-  headerInner: { maxWidth: "1400px", margin: "0 auto", display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" },
+  headerInner: { maxWidth: "1400px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "16px" },
   headerTitle: { fontSize: "22px", fontWeight: 800, color: "#1f2937", margin: 0 },
   headerSub: { fontSize: "13px", color: "#6b7280", margin: "2px 0 0" },
-  searchBar: { flex: 1, minWidth: "200px", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "10px 16px", fontSize: "14px", fontFamily: "inherit", outline: "none" },
-  listBtn: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "10px", padding: "10px 20px", fontWeight: 700, fontSize: "14px", cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" },
+  searchBar: { flex: 1, minWidth: "200px", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "12px 16px", fontSize: "14px", fontFamily: "inherit", outline: "none" },
+  listBtn: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "10px", padding: "12px 20px", fontWeight: 700, fontSize: "14px", cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" },
 
-  body: { maxWidth: "1400px", margin: "0 auto", padding: "24px 20px", display: "grid", gridTemplateColumns: "280px 1fr", gap: "24px", alignItems: "start" },
-  sidebar: { background: "white", borderRadius: "14px", padding: "24px", border: "1px solid #e5e7eb", position: "sticky", top: "100px" },
+  body: { maxWidth: "1400px", margin: "0 auto", padding: "20px", display: "flex", flexDirection: "column", gap: "24px" },
+  sidebar: { background: "white", borderRadius: "14px", padding: "24px", border: "1px solid #e5e7eb", position: "sticky", top: "20px" },
   filterTitle: { fontSize: "16px", fontWeight: 800, color: "#1f2937", marginBottom: "20px" },
   filterGroup: { marginBottom: "24px" },
   filterLabel: { fontSize: "11px", fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" },
-  filterChip: { display: "block", width: "100%", textAlign: "left", background: "transparent", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "8px 12px", fontSize: "13px", cursor: "pointer", marginBottom: "6px", fontFamily: "inherit", color: "#4b5563", transition: "all 0.15s" },
+  filterChip: { display: "block", width: "100%", textAlign: "left", background: "transparent", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "10px 12px", fontSize: "13px", cursor: "pointer", marginBottom: "6px", fontFamily: "inherit", color: "#4b5563" },
   filterChipActive: { background: "#fef9c3", borderColor: "#fbbf24", color: "#92400e", fontWeight: 700 },
   priceDisplay: { fontSize: "20px", fontWeight: 800, color: "#1f2937", marginBottom: "10px" },
   slider: { width: "100%", accentColor: "#fbbf24", marginBottom: "6px" },
   priceRange: { display: "flex", justifyContent: "space-between", fontSize: "11px", color: "#9ca3af" },
-  select: { width: "100%", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "8px 12px", fontSize: "13px", fontFamily: "inherit", color: "#1f2937", outline: "none" },
-  clearBtn: { width: "100%", background: "transparent", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "10px", fontSize: "13px", color: "#6b7280", cursor: "pointer", fontFamily: "inherit" },
+  select: { width: "100%", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "10px 12px", fontSize: "13px", fontFamily: "inherit", color: "#1f2937", outline: "none" },
+  clearBtn: { width: "100%", background: "transparent", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "12px", fontSize: "13px", color: "#6b7280", cursor: "pointer", fontFamily: "inherit" },
 
   main: {},
   empty: { textAlign: "center", padding: "80px 20px" },
-  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "20px" },
+  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "20px" },
   card: { background: "white", borderRadius: "14px", overflow: "hidden", border: "1px solid #e5e7eb", cursor: "pointer", transition: "all 0.22s" },
   cardImg: { height: "160px", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" },
   cardTag: { position: "absolute", top: "10px", left: "10px", color: "white", fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "20px" },
@@ -213,14 +224,16 @@ const s = {
   cardPrice: { fontSize: "17px", fontWeight: 800 },
   cardPer: { fontSize: "12px", color: "#9ca3af" },
   cardRating: { fontSize: "13px", color: "#fbbf24", fontWeight: 700 },
-  viewBtn: { width: "100%", border: "none", color: "white", padding: "10px", borderRadius: "8px", fontWeight: 700, fontSize: "13px", cursor: "pointer", fontFamily: "inherit" },
+  viewBtn: { width: "100%", border: "none", color: "white", padding: "12px", borderRadius: "8px", fontWeight: 700, fontSize: "13px", cursor: "pointer", fontFamily: "inherit" },
 };
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
   .prop-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.1) !important; border-color: #fbbf24 !important; }
-  @media (max-width: 900px) {
-    [style*="gridTemplateColumns: 280px"] { grid-template-columns: 1fr !important; }
+  
+  @media (min-width: 768px) {
+    [style*="flexDirection: column"] { flex-direction: row !important; }
+    [style*="gridTemplateColumns: repeat(auto-fill, minmax(260px, 1fr))"] { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important; }
   }
 `;

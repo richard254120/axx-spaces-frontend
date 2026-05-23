@@ -76,7 +76,7 @@ export default function ProviderDashboard() {
           </div>
         </div>
 
-        {/* ── OVERVIEW ── */}
+        {/* OVERVIEW */}
         {tab === 0 && (
           <div>
             <div style={s.statsGrid}>
@@ -96,7 +96,6 @@ export default function ProviderDashboard() {
             </div>
 
             <div style={s.twoCol}>
-              {/* UPCOMING BOOKINGS */}
               <div style={s.card}>
                 <h2 style={s.cardTitle}>Upcoming Bookings</h2>
                 {bookings.filter((b) => b.status === "confirmed").slice(0, 3).map((b) => (
@@ -111,7 +110,6 @@ export default function ProviderDashboard() {
                 ))}
               </div>
 
-              {/* QUICK ACTIONS */}
               <div style={s.card}>
                 <h2 style={s.cardTitle}>Quick Actions</h2>
                 <div style={s.quickActions}>
@@ -132,7 +130,7 @@ export default function ProviderDashboard() {
           </div>
         )}
 
-        {/* ── BOOKINGS ── */}
+        {/* BOOKINGS */}
         {tab === 1 && (
           <div style={s.card}>
             <div style={s.tableHeader}>
@@ -176,9 +174,7 @@ export default function ProviderDashboard() {
                         </span>
                       </td>
                       <td style={s.td}>
-                        {b.status === "pending" && (
-                          <button style={s.acceptBtn}>Accept</button>
-                        )}
+                        {b.status === "pending" && <button style={s.acceptBtn}>Accept</button>}
                       </td>
                     </tr>
                   ))}
@@ -188,7 +184,7 @@ export default function ProviderDashboard() {
           </div>
         )}
 
-        {/* ── REVIEWS ── */}
+        {/* REVIEWS */}
         {tab === 2 && (
           <div style={s.card}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
@@ -227,7 +223,7 @@ export default function ProviderDashboard() {
           </div>
         )}
 
-        {/* ── SETTINGS ── */}
+        {/* SETTINGS */}
         {tab === 3 && (
           <div style={s.card}>
             <h2 style={s.cardTitle}>Property Settings</h2>
@@ -259,7 +255,7 @@ export default function ProviderDashboard() {
           </div>
         )}
 
-        {/* ── ANALYTICS ── */}
+        {/* ANALYTICS */}
         {tab === 4 && (
           <div>
             <div style={s.analyticsGrid}>
@@ -299,37 +295,37 @@ export default function ProviderDashboard() {
 }
 
 const s = {
-  root: { fontFamily: "'DM Sans', sans-serif", display: "flex", minHeight: "100vh", background: "#f8f4f0" },
+  root: { fontFamily: "'DM Sans', sans-serif", display: "flex", minHeight: "100vh", background: "#f8f4f0", flexDirection: "column" },
 
-  sidebar: { width: "240px", background: "#1f2937", display: "flex", flexDirection: "column", padding: "24px 16px", flexShrink: 0 },
+  sidebar: { width: "100%", background: "#1f2937", display: "flex", flexDirection: "column", padding: "20px 16px", flexShrink: 0 },
   sidebarLogo: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "32px" },
   logoIcon: { fontSize: "28px" },
   logoName: { fontSize: "13px", fontWeight: 800, color: "white", lineHeight: 1.2 },
   logoSub: { fontSize: "11px", color: "#6b7280" },
 
   nav: { flex: 1, display: "flex", flexDirection: "column", gap: "4px" },
-  navItem: { background: "transparent", border: "none", color: "#9ca3af", padding: "10px 12px", borderRadius: "8px", fontSize: "13px", fontWeight: 600, cursor: "pointer", textAlign: "left", fontFamily: "inherit", transition: "all 0.15s" },
+  navItem: { background: "transparent", border: "none", color: "#9ca3af", padding: "12px 14px", borderRadius: "8px", fontSize: "13px", fontWeight: 600, cursor: "pointer", textAlign: "left" },
   navActive: { background: "#fbbf2420", color: "#fbbf24" },
 
   sidebarFooter: { display: "flex", flexDirection: "column", gap: "8px", marginTop: "24px" },
-  viewListingBtn: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "8px", padding: "10px", fontSize: "12px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" },
-  logoutBtn: { background: "transparent", border: "1px solid #374151", color: "#9ca3af", borderRadius: "8px", padding: "10px", fontSize: "12px", cursor: "pointer", fontFamily: "inherit" },
+  viewListingBtn: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "8px", padding: "12px", fontSize: "13px", fontWeight: 700, cursor: "pointer" },
+  logoutBtn: { background: "transparent", border: "1px solid #374151", color: "#9ca3af", borderRadius: "8px", padding: "12px", fontSize: "13px", cursor: "pointer" },
 
-  main: { flex: 1, padding: "28px", overflow: "auto" },
-  topBar: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "28px" },
+  main: { flex: 1, padding: "20px", overflow: "auto" },
+  topBar: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "28px", flexWrap: "wrap", gap: "12px" },
   pageTitle: { fontSize: "24px", fontWeight: 800, color: "#1f2937", margin: "0 0 4px" },
   pageSub: { fontSize: "13px", color: "#6b7280" },
   topBarRight: { display: "flex", gap: "10px", alignItems: "center" },
   statusBadge: { background: "#dcfce7", color: "#16a34a", padding: "6px 14px", borderRadius: "20px", fontSize: "12px", fontWeight: 700 },
 
-  statsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "16px", marginBottom: "24px" },
+  statsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "16px", marginBottom: "24px" },
   statCard: { background: "white", borderRadius: "14px", padding: "20px", border: "1px solid #e5e7eb", textAlign: "center" },
   statIcon: { fontSize: "28px", marginBottom: "8px" },
   statVal: { fontSize: "24px", fontWeight: 800, marginBottom: "4px" },
   statLabel: { fontSize: "13px", color: "#1f2937", fontWeight: 600, marginBottom: "2px" },
   statSub: { fontSize: "11px", color: "#9ca3af" },
 
-  twoCol: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" },
+  twoCol: { display: "grid", gridTemplateColumns: "1fr", gap: "20px" },
   card: { background: "white", borderRadius: "14px", padding: "24px", border: "1px solid #e5e7eb", marginBottom: "20px" },
   cardTitle: { fontSize: "16px", fontWeight: 800, color: "#1f2937", marginBottom: "18px" },
 
@@ -341,58 +337,58 @@ const s = {
   miniTotal: { fontSize: "14px", fontWeight: 800, color: "#22c55e" },
 
   quickActions: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" },
-  quickAction: { background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "16px 12px", cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s", textAlign: "center" },
+  quickAction: { background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "16px 12px", cursor: "pointer", fontFamily: "inherit" },
   quickIcon: { display: "block", fontSize: "24px", marginBottom: "6px" },
   quickLabel: { fontSize: "12px", fontWeight: 700, color: "#4b5563" },
 
-  tableHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" },
-  tableFilters: { display: "flex", gap: "6px" },
-  filterChip: { border: "1px solid #e5e7eb", background: "white", borderRadius: "20px", padding: "5px 12px", fontSize: "12px", cursor: "pointer", fontFamily: "inherit", color: "#6b7280" },
+  tableHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px", flexWrap: "wrap", gap: "10px" },
+  tableFilters: { display: "flex", gap: "6px", flexWrap: "wrap" },
+  filterChip: { border: "1px solid #e5e7eb", background: "white", borderRadius: "20px", padding: "5px 12px", fontSize: "12px", cursor: "pointer" },
   tableWrap: { overflowX: "auto" },
   table: { width: "100%", borderCollapse: "collapse" },
   thead: { background: "#f9fafb" },
-  th: { padding: "10px 12px", fontSize: "11px", fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.06em", textAlign: "left", borderBottom: "1px solid #e5e7eb" },
+  th: { padding: "10px 12px", fontSize: "11px", fontWeight: 700, color: "#6b7280", textAlign: "left" },
   tr: { borderBottom: "1px solid #f3f4f6" },
-  td: { padding: "12px", fontSize: "13px", color: "#1f2937", verticalAlign: "middle" },
-  bookingId: { background: "#f3f4f6", borderRadius: "4px", padding: "2px 6px", fontSize: "11px", fontFamily: "monospace", color: "#6b7280" },
+  td: { padding: "12px", fontSize: "13px", color: "#1f2937" },
+  bookingId: { background: "#f3f4f6", borderRadius: "4px", padding: "2px 6px", fontSize: "11px", fontFamily: "monospace" },
   payBadge: { padding: "3px 8px", borderRadius: "20px", fontSize: "11px", fontWeight: 700 },
   statusBadgeTbl: { padding: "3px 8px", borderRadius: "20px", fontSize: "11px", fontWeight: 700 },
-  acceptBtn: { background: "#22c55e", color: "white", border: "none", borderRadius: "6px", padding: "5px 10px", fontSize: "11px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" },
+  acceptBtn: { background: "#22c55e", color: "white", border: "none", borderRadius: "6px", padding: "5px 10px", fontSize: "11px", fontWeight: 700, cursor: "pointer" },
 
   ratingOverall: { display: "flex", alignItems: "center" },
   reviewCard: { border: "1px solid #f3f4f6", borderRadius: "12px", padding: "18px", marginBottom: "14px" },
   reviewTop: { display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" },
-  reviewAvatar: { width: "36px", height: "36px", borderRadius: "50%", background: "#fbbf24", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: "14px", flexShrink: 0 },
+  reviewAvatar: { width: "36px", height: "36px", borderRadius: "50%", background: "#fbbf24", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: "14px" },
   reviewName: { fontSize: "14px", fontWeight: 700, color: "#1f2937" },
   reviewMeta: { fontSize: "12px", color: "#9ca3af" },
   repliedBadge: { background: "#dcfce7", color: "#16a34a", fontSize: "11px", fontWeight: 700, padding: "3px 8px", borderRadius: "20px" },
   reviewComment: { fontSize: "13px", color: "#4b5563", lineHeight: 1.65, margin: "0 0 12px" },
-  replyBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "7px 14px", fontSize: "12px", color: "#6b7280", cursor: "pointer", fontFamily: "inherit" },
+  replyBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "7px 14px", fontSize: "12px", color: "#6b7280", cursor: "pointer" },
   replyBox: { background: "#f9fafb", borderRadius: "10px", padding: "14px" },
-  replyInput: { width: "100%", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "10px 12px", fontSize: "13px", fontFamily: "inherit", marginBottom: "10px", height: "80px", resize: "vertical" },
-  sendReplyBtn: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "8px", padding: "8px 16px", fontSize: "13px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" },
-  cancelReplyBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "8px 16px", fontSize: "13px", color: "#6b7280", cursor: "pointer", fontFamily: "inherit" },
+  replyInput: { width: "100%", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "10px 12px", fontSize: "13px", marginBottom: "10px", height: "80px", resize: "vertical" },
+  sendReplyBtn: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "8px", padding: "8px 16px", fontSize: "13px", fontWeight: 700, cursor: "pointer" },
+  cancelReplyBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "8px 16px", fontSize: "13px", color: "#6b7280", cursor: "pointer" },
 
-  settingsGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "24px" },
+  settingsGrid: { display: "grid", gridTemplateColumns: "1fr", gap: "16px", marginBottom: "24px" },
   settingField: { display: "flex", flexDirection: "column", gap: "6px" },
   settingLabel: { fontSize: "11px", fontWeight: 700, color: "#374151", textTransform: "uppercase", letterSpacing: "0.06em" },
-  settingInput: { border: "1px solid #e5e7eb", borderRadius: "8px", padding: "10px 12px", fontSize: "14px", fontFamily: "inherit", outline: "none" },
-  settingActions: { display: "flex", justifyContent: "space-between", alignItems: "flex-end", paddingTop: "20px", borderTop: "1px solid #f3f4f6" },
-  saveBtn: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "10px", padding: "12px 24px", fontWeight: 800, fontSize: "14px", cursor: "pointer", fontFamily: "inherit" },
-  dangerZone: { display: "flex", alignItems: "center", gap: "10px" },
+  settingInput: { border: "1px solid #e5e7eb", borderRadius: "8px", padding: "10px 12px", fontSize: "14px", outline: "none" },
+  settingActions: { display: "flex", flexDirection: "column", gap: "12px", paddingTop: "20px", borderTop: "1px solid #f3f4f6" },
+  saveBtn: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "10px", padding: "12px 24px", fontWeight: 800, fontSize: "14px", cursor: "pointer" },
+  dangerZone: { display: "flex", flexDirection: "column", gap: "8px" },
   dangerTitle: { fontSize: "12px", color: "#dc2626", fontWeight: 700 },
-  pauseBtn: { background: "#fef9c3", color: "#92400e", border: "1px solid #fde68a", borderRadius: "8px", padding: "8px 14px", fontSize: "12px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" },
-  deleteBtn: { background: "#fee2e2", color: "#dc2626", border: "1px solid #fecaca", borderRadius: "8px", padding: "8px 14px", fontSize: "12px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" },
+  pauseBtn: { background: "#fef9c3", color: "#92400e", border: "1px solid #fde68a", borderRadius: "8px", padding: "8px 14px", fontSize: "12px", fontWeight: 700, cursor: "pointer" },
+  deleteBtn: { background: "#fee2e2", color: "#dc2626", border: "1px solid #fecaca", borderRadius: "8px", padding: "8px 14px", fontSize: "12px", fontWeight: 700, cursor: "pointer" },
 
-  analyticsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "16px", marginBottom: "20px" },
+  analyticsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "16px", marginBottom: "20px" },
   analyticsCard: { background: "white", borderRadius: "14px", padding: "20px", border: "1px solid #e5e7eb" },
   analyticsVal: { fontSize: "22px", fontWeight: 800, color: "#1f2937", marginBottom: "4px" },
   analyticsLabel: { fontSize: "13px", color: "#6b7280", marginBottom: "6px" },
   analyticsChange: { fontSize: "12px", fontWeight: 700 },
 
-  barChart: { display: "flex", alignItems: "flex-end", gap: "16px", height: "200px", padding: "20px 0 0" },
+  barChart: { display: "flex", alignItems: "flex-end", gap: "12px", height: "200px", padding: "20px 0 0", overflowX: "auto" },
   barCol: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", gap: "6px" },
-  bar: { width: "100%", background: "linear-gradient(180deg, #fbbf24, #f59e0b)", borderRadius: "6px 6px 0 0", transition: "height 0.3s" },
+  bar: { width: "100%", background: "linear-gradient(180deg, #fbbf24, #f59e0b)", borderRadius: "6px 6px 0 0" },
   barLabel: { fontSize: "12px", color: "#6b7280", fontWeight: 600 },
   barVal: { fontSize: "11px", color: "#9ca3af" },
 };
@@ -401,17 +397,9 @@ const css = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
   .table-row:hover { background: #f9fafb; }
-  [style*="background: transparent"][style*="border: none"]:hover { background: #f3f4f6 !important; }
-  input:focus, select:focus, textarea:focus { border-color: #fbbf24 !important; outline: none; }
-  @media (max-width: 768px) {
-    [style*="display: flex"][style*="minHeight: 100vh"] { flex-direction: column; }
-    [style*="width: 240px"] { width: 100% !important; }
+  @media (min-width: 769px) {
+    [style*="flexDirection: column"][style*="minHeight: 100vh"] { flex-direction: row !important; }
+    [style*="width: 100%"][style*="background: #1f2937"] { width: 260px !important; }
+    [style*="gridTemplateColumns: 1fr"] { grid-template-columns: 1fr 1fr !important; }
   }
 `;
-
-
-
-
-
-
-

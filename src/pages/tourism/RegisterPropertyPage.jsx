@@ -123,7 +123,7 @@ export default function RegisterPropertyPage() {
                 </div>
                 <div style={s.field}>
                   <label style={s.label}>Description *</label>
-                  <textarea style={{ ...s.input, height: "140px", resize: "vertical" }} placeholder="Describe your property, what makes it special, nearby attractions..." value={form.description} onChange={(e) => update("description", e.target.value)} />
+                  <textarea style={{ ...s.input, height: "140px", resize: "vertical" }} placeholder="Describe your property..." value={form.description} onChange={(e) => update("description", e.target.value)} />
                 </div>
               </div>
             )}
@@ -173,10 +173,6 @@ export default function RegisterPropertyPage() {
                     </button>
                   ))}
                 </div>
-                <div style={s.field}>
-                  <label style={s.label}>Additional Amenities (comma separated)</label>
-                  <input style={s.input} placeholder="e.g. Helicopter pad, Private beach, Rooftop terrace" />
-                </div>
               </div>
             )}
 
@@ -209,26 +205,6 @@ export default function RegisterPropertyPage() {
                   </div>
                 ))}
                 <button style={s.addRoomBtn} onClick={addRoomType}>+ Add Room Type</button>
-
-                <div style={s.twoCol}>
-                  <div style={s.field}>
-                    <label style={s.label}>Check-in Time</label>
-                    <input style={s.input} type="time" value={form.checkIn} onChange={(e) => update("checkIn", e.target.value)} />
-                  </div>
-                  <div style={s.field}>
-                    <label style={s.label}>Check-out Time</label>
-                    <input style={s.input} type="time" value={form.checkOut} onChange={(e) => update("checkOut", e.target.value)} />
-                  </div>
-                </div>
-                <div style={s.field}>
-                  <label style={s.label}>Free Cancellation Window (hours before check-in)</label>
-                  <select style={s.input} value={form.cancellation} onChange={(e) => update("cancellation", e.target.value)}>
-                    <option value="24">24 hours</option>
-                    <option value="48">48 hours</option>
-                    <option value="72">72 hours</option>
-                    <option value="0">Non-refundable</option>
-                  </select>
-                </div>
               </div>
             )}
 
@@ -275,15 +251,11 @@ export default function RegisterPropertyPage() {
                   <div style={s.commissionTitle}>📊 Commission Structure</div>
                   <p style={s.commissionText}>
                     Axx Spaces charges a <strong>10–15% commission</strong> per confirmed booking.
-                    Example: A booking at KSh 50,000 earns Axx Spaces KSh 5,000–7,500.
-                    You keep the rest and are paid directly via M-Pesa.
                   </p>
                 </div>
                 <label style={s.checkboxRow}>
                   <input type="checkbox" checked={form.agreeTerms} onChange={(e) => update("agreeTerms", e.target.checked)} style={{ marginRight: "10px" }} />
-                  <span style={{ fontSize: "14px", color: "#4b5563" }}>
-                    I agree to the Axx Spaces <span style={{ color: "#fbbf24", cursor: "pointer" }}>Terms & Conditions</span> and confirm that all information provided is accurate.
-                  </span>
+                  I agree to the Axx Spaces Terms & Conditions
                 </label>
               </div>
             )}
@@ -294,17 +266,11 @@ export default function RegisterPropertyPage() {
                 <button style={s.prevBtn} onClick={() => setStep((s) => s - 1)}>← Previous</button>
               )}
               {step < steps.length - 1 ? (
-                <button
-                  style={{ ...s.nextBtn, opacity: canNext() ? 1 : 0.5 }}
-                  onClick={() => { if (canNext()) setStep((s) => s + 1); }}
-                >
+                <button style={{ ...s.nextBtn, opacity: canNext() ? 1 : 0.5 }} onClick={() => canNext() && setStep((s) => s + 1)}>
                   Next Step →
                 </button>
               ) : (
-                <button
-                  style={{ ...s.nextBtn, opacity: form.agreeTerms ? 1 : 0.5 }}
-                  onClick={handleSubmit}
-                >
+                <button style={{ ...s.nextBtn, opacity: form.agreeTerms ? 1 : 0.5 }} onClick={handleSubmit}>
                   Submit Property 🚀
                 </button>
               )}
@@ -318,63 +284,60 @@ export default function RegisterPropertyPage() {
 
 const s = {
   root: { fontFamily: "'DM Sans', sans-serif", background: "#f8f4f0", minHeight: "100vh" },
-  header: { background: "white", borderBottom: "1px solid #e5e7eb", padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" },
-  backBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "8px 16px", fontSize: "13px", cursor: "pointer", fontFamily: "inherit", color: "#4b5563" },
+  header: { background: "white", borderBottom: "1px solid #e5e7eb", padding: "16px 20px", display: "flex", flexDirection: "column", gap: "12px" },
+  backBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "8px 16px", fontSize: "13px", cursor: "pointer" },
   headerCenter: { textAlign: "center" },
-  headerTitle: { fontSize: "18px", fontWeight: 800, color: "#1f2937", margin: 0 },
-  headerSub: { fontSize: "12px", color: "#6b7280" },
-  stepCount: { fontSize: "13px", color: "#9ca3af", fontWeight: 600 },
+  headerTitle: { fontSize: "20px", fontWeight: 800, color: "#1f2937" },
+  headerSub: { fontSize: "13px", color: "#6b7280" },
+  stepCount: { fontSize: "13px", color: "#9ca3af", fontWeight: 600, textAlign: "center" },
 
   progressBar: { height: "4px", background: "#e5e7eb" },
   progressFill: { height: "100%", background: "#fbbf24", transition: "width 0.4s ease" },
 
-  layout: { maxWidth: "1000px", margin: "0 auto", padding: "32px 20px", display: "grid", gridTemplateColumns: "200px 1fr", gap: "28px", alignItems: "start" },
-
-  stepNav: { position: "sticky", top: "24px" },
-  stepItem: { display: "flex", alignItems: "center", gap: "10px", padding: "10px 12px", borderRadius: "10px", marginBottom: "4px" },
-  stepActive: { background: "#fef9c3" },
-  stepDone: { opacity: 0.7 },
-  stepDot: { width: "28px", height: "28px", borderRadius: "50%", background: "#e5e7eb", color: "#9ca3af", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 700, flexShrink: 0 },
+  layout: { padding: "20px", display: "flex", flexDirection: "column", gap: "24px" },
+  stepNav: { display: "flex", overflowX: "auto", gap: "12px", padding: "8px 0" },
+  stepItem: { display: "flex", alignItems: "center", gap: "10px", padding: "10px 12px", borderRadius: "10px", minWidth: "150px", flexShrink: 0 },
+  stepDot: { width: "28px", height: "28px", borderRadius: "50%", background: "#e5e7eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 700 },
   stepLabel: { fontSize: "13px", fontWeight: 600, color: "#4b5563" },
 
   formBody: {},
-  formCard: { background: "white", borderRadius: "16px", padding: "32px", border: "1px solid #e5e7eb" },
+  formCard: { background: "white", borderRadius: "16px", padding: "24px", border: "1px solid #e5e7eb" },
   formTitle: { fontSize: "22px", fontWeight: 800, color: "#1f2937", marginBottom: "6px" },
   formSub: { fontSize: "14px", color: "#6b7280", marginBottom: "28px" },
 
   field: { marginBottom: "18px" },
-  label: { display: "block", fontSize: "12px", fontWeight: 700, color: "#374151", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "6px" },
-  input: { width: "100%", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "12px 14px", fontSize: "14px", fontFamily: "inherit", color: "#1f2937", outline: "none", transition: "border-color 0.15s" },
-  twoCol: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" },
+  label: { display: "block", fontSize: "12px", fontWeight: 700, color: "#374151", marginBottom: "6px" },
+  input: { width: "100%", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "12px 14px", fontSize: "14px", outline: "none" },
+  twoCol: { display: "grid", gridTemplateColumns: "1fr", gap: "16px" },
 
-  amenitiesGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: "10px", marginBottom: "24px" },
-  amenityBtn: { border: "1px solid #e5e7eb", background: "white", borderRadius: "8px", padding: "10px 12px", fontSize: "13px", cursor: "pointer", fontFamily: "inherit", color: "#4b5563", transition: "all 0.15s", textAlign: "left" },
-  amenityActive: { background: "#fef9c3", borderColor: "#fbbf24", color: "#92400e", fontWeight: 700 },
+  amenitiesGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "10px", marginBottom: "24px" },
+  amenityBtn: { border: "1px solid #e5e7eb", background: "white", borderRadius: "8px", padding: "10px 12px", fontSize: "13px", cursor: "pointer" },
+  amenityActive: { background: "#fef9c3", borderColor: "#fbbf24", fontWeight: 700 },
 
-  sectionBreak: { fontSize: "13px", fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid #f3f4f6", paddingBottom: "8px", marginBottom: "14px", marginTop: "8px" },
-  roomRow: { display: "flex", gap: "10px", marginBottom: "10px" },
-  addRoomBtn: { background: "transparent", border: "1px dashed #fbbf24", color: "#fbbf24", borderRadius: "8px", padding: "10px 16px", fontSize: "13px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit", marginBottom: "24px" },
+  sectionBreak: { fontSize: "13px", fontWeight: 700, color: "#6b7280", margin: "20px 0 10px" },
+  roomRow: { display: "flex", flexDirection: "column", gap: "10px", marginBottom: "12px" },
+  addRoomBtn: { background: "transparent", border: "1px dashed #fbbf24", color: "#fbbf24", borderRadius: "8px", padding: "12px", fontWeight: 700, width: "100%" },
 
-  reviewGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "24px" },
+  reviewGrid: { display: "grid", gridTemplateColumns: "1fr", gap: "12px", marginBottom: "24px" },
   reviewItem: { background: "#f9fafb", borderRadius: "10px", padding: "14px" },
-  reviewKey: { fontSize: "11px", fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "4px" },
+  reviewKey: { fontSize: "11px", fontWeight: 700, color: "#9ca3af" },
   reviewVal: { fontSize: "14px", color: "#1f2937", fontWeight: 600 },
-  commissionBox: { background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "12px", padding: "16px", marginBottom: "20px" },
-  commissionTitle: { fontSize: "14px", fontWeight: 800, color: "#92400e", marginBottom: "8px" },
-  commissionText: { fontSize: "13px", color: "#78350f", lineHeight: 1.65, margin: 0 },
-  checkboxRow: { display: "flex", alignItems: "flex-start", cursor: "pointer" },
 
-  navBtns: { display: "flex", justifyContent: "space-between", marginTop: "32px", paddingTop: "24px", borderTop: "1px solid #f3f4f6" },
-  prevBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit", color: "#4b5563" },
-  nextBtn: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "10px", padding: "12px 28px", fontSize: "14px", fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginLeft: "auto" },
+  commissionBox: { background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "12px", padding: "16px", marginBottom: "20px" },
+  commissionTitle: { fontSize: "14px", fontWeight: 800, color: "#92400e" },
+  commissionText: { fontSize: "13px", color: "#78350f" },
+  checkboxRow: { display: "flex", alignItems: "flex-start", cursor: "pointer", fontSize: "14px" },
+
+  navBtns: { display: "flex", flexDirection: "column", gap: "12px", marginTop: "32px" },
+  prevBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "14px", fontWeight: 700 },
+  nextBtn: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "10px", padding: "14px", fontWeight: 800 },
 };
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  input:focus, select:focus, textarea:focus { border-color: #fbbf24 !important; box-shadow: 0 0 0 3px rgba(251,191,36,0.1); }
-  @media (max-width: 700px) {
-    [style*="gridTemplateColumns: 200px"] { grid-template-columns: 1fr !important; }
-    [style*="gridTemplateColumns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
+  @media (min-width: 769px) {
+    [style*="flexDirection: column"] { flex-direction: row !important; }
+    [style*="gridTemplateColumns: 1fr"] { grid-template-columns: 1fr 1fr !important; }
   }
 `;
