@@ -199,7 +199,7 @@ export default function Navbar() {
           Home
         </Link>
         <Link to="/listings" style={styles.navLink} onClick={() => setMenuOpen(false)}>
-          Listings
+          Rentals
         </Link>
         <Link to="/movers" style={styles.navLink} onClick={() => setMenuOpen(false)}>
           Movers
