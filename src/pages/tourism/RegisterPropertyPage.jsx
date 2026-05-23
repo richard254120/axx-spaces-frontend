@@ -1,396 +1,462 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const categories = ["Hotel", "Beach Resort", "Mountain Lodge", "Theme Park", "Camping Grounds", "Restaurant", "Entertainment Venue", "Spa & Wellness Center", "Adventure Tours", "Water Sports Operator"];
-const counties = ["Nairobi", "Mombasa", "Kisumu", "Nakuru", "Eldoret", "Thika", "Malindi", "Kitale", "Garissa", "Nyeri", "Laikipia", "Kajiado", "Narok", "Kwale", "Kilifi", "Taita-Taveta", "Lamu", "Tana River"];
-const amenitiesList = ["Swimming Pool", "WiFi", "Restaurant", "Spa", "Gym", "Parking", "Bar", "Conference Room", "Game Drives", "Beach Access", "Kids Club", "Airport Transfer", "Room Service", "Laundry", "Water Sports"];
+const categories = [
+  { icon: "🏨", label: "Hotels", count: "48 listed" },
+  { icon: "🏖️", label: "Beach Resorts", count: "12 listed" },
+  { icon: "⛰️", label: "Mountain Lodges", count: "19 listed" },
+  { icon: "🎪", label: "Theme Parks", count: "7 listed" },
+  { icon: "🏕️", label: "Camping Grounds", count: "23 listed" },
+  { icon: "🍽️", label: "Restaurants", count: "61 listed" },
+  { icon: "🎭", label: "Entertainment", count: "15 listed" },
+  { icon: "🏊", label: "Spas & Wellness", count: "31 listed" },
+  { icon: "🗻", label: "Adventure Tours", count: "27 listed" },
+  { icon: "🚣", label: "Water Sports", count: "9 listed" },
+];
 
-const steps = ["Basic Info", "Location", "Amenities", "Pricing", "Contact", "Review"];
+const featured = [
+  {
+    id: 1,
+    name: "Serena Beach Resort",
+    location: "Mombasa, Coast",
+    category: "Beach Resort",
+    price: 12500,
+    rating: 4.8,
+    reviews: 312,
+    color: "#0ea5e9",
+    tag: "Top Rated",
+  },
+  {
+    id: 2,
+    name: "Fairmont Mount Kenya Safari Club",
+    location: "Nanyuki, Laikipia",
+    category: "Mountain Lodge",
+    price: 28000,
+    rating: 4.9,
+    reviews: 198,
+    color: "#22c55e",
+    tag: "Luxury Pick",
+  },
+  {
+    id: 3,
+    name: "Nairobi Serena Hotel",
+    location: "Nairobi CBD",
+    category: "Hotel",
+    price: 9500,
+    rating: 4.7,
+    reviews: 541,
+    color: "#f59e0b",
+    tag: "Most Booked",
+  },
+  {
+    id: 4,
+    name: "Ol Pejeta Bush Camp",
+    location: "Laikipia, Rift Valley",
+    category: "Adventure Tour",
+    price: 18000,
+    rating: 4.9,
+    reviews: 87,
+    color: "#a855f7",
+    tag: "Hidden Gem",
+  },
+];
 
-export default function RegisterPropertyPage() {
+export default function TourismPage() {
   const navigate = useNavigate();
-  const [step, setStep] = useState(0);
-  const [submitted, setSubmitted] = useState(false);
-
-  const [form, setForm] = useState({
-    name: "", category: "", description: "",
-    county: "", town: "", address: "", mapLink: "",
-    amenities: [],
-    basePrice: "", weekendPrice: "", seasonalPrice: "",
-    roomTypes: [{ name: "", price: "", guests: "" }],
-    checkIn: "14:00", checkOut: "11:00", cancellation: "48",
-    managerName: "", phone: "", email: "", whatsapp: "",
-    agreeTerms: false,
-  });
-
-  const update = (field, value) => setForm((f) => ({ ...f, [field]: value }));
-  const toggleAmenity = (a) => {
-    setForm((f) => ({
-      ...f,
-      amenities: f.amenities.includes(a) ? f.amenities.filter((x) => x !== a) : [...f.amenities, a],
-    }));
-  };
-  const addRoomType = () => setForm((f) => ({ ...f, roomTypes: [...f.roomTypes, { name: "", price: "", guests: "" }] }));
-  const updateRoom = (i, field, val) => setForm((f) => {
-    const rt = [...f.roomTypes]; rt[i] = { ...rt[i], [field]: val }; return { ...f, roomTypes: rt };
-  });
-
-  const canNext = () => {
-    if (step === 0) return form.name && form.category && form.description;
-    if (step === 1) return form.county && form.town;
-    if (step === 2) return form.amenities.length > 0;
-    if (step === 3) return form.basePrice;
-    if (step === 4) return form.managerName && form.phone && form.email;
-    return true;
-  };
-
-  const handleSubmit = () => { if (form.agreeTerms) setSubmitted(true); };
-
-  if (submitted) {
-    return (
-      <div style={{ fontFamily: "'DM Sans', sans-serif", minHeight: "100vh", background: "#f8f4f0", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
-        <div style={{ background: "white", borderRadius: "20px", padding: "32px 24px", textAlign: "center", maxWidth: "520px", width: "100%", border: "1px solid #e5e7eb", boxShadow: "0 20px 60px rgba(0,0,0,0.08)" }}>
-          <div style={{ fontSize: "56px", marginBottom: "16px" }}>🎉</div>
-          <h2 style={{ fontSize: "22px", fontWeight: 800, color: "#1f2937", marginBottom: "10px" }}>Property Submitted!</h2>
-          <p style={{ color: "#6b7280", lineHeight: 1.7, marginBottom: "20px", fontSize: "14px" }}>
-            <strong>{form.name}</strong> has been submitted for review. Our team will verify your listing within 24 hours and contact you at <strong>{form.email}</strong>.
-          </p>
-          <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "12px", padding: "16px", marginBottom: "24px", textAlign: "left" }}>
-            <div style={{ fontSize: "13px", color: "#166534", fontWeight: 700, marginBottom: "8px" }}>What Happens Next?</div>
-            {["Our team reviews your submission (24hrs)", "We verify property details & contact you", "Your listing goes live on Axx Spaces", "Start receiving booking requests"].map((s, i) => (
-              <div key={s} style={{ fontSize: "13px", color: "#15803d", padding: "4px 0" }}>{i + 1}. {s}</div>
-            ))}
-          </div>
-          <button style={{ background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "10px", padding: "14px 32px", fontWeight: 800, fontSize: "15px", cursor: "pointer", fontFamily: "inherit", width: "100%" }} onClick={() => navigate("/tourism")}>
-            Browse Tourism →
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const [search, setSearch] = useState("");
+  const [checkin, setCheckin] = useState("");
+  const [checkout, setCheckout] = useState("");
+  const [guests, setGuests] = useState(1);
 
   return (
     <div style={s.root}>
       <style>{css}</style>
 
-      {/* HEADER */}
-      <div style={s.header}>
-        <button style={s.backBtn} onClick={() => navigate("/tourism")}>← Back</button>
-        <div style={s.headerCenter}>
-          <h1 style={s.headerTitle}>List Your Property</h1>
-          <p style={s.headerSub}>Kenya's #1 tourism marketplace</p>
+      {/* ── HERO ── */}
+      <section style={s.hero}>
+        <div style={s.heroOverlay} />
+        <div style={s.heroContent}>
+          <div style={s.heroBadge}>🌍 Explore Kenya</div>
+          <h1 style={s.heroTitle}>
+            Discover Hotels,<br />Resorts & Adventures
+          </h1>
+          <p style={s.heroSub}>
+            Kenya's top hospitality & recreation destinations — all in one place.
+          </p>
+
+          {/* SEARCH BOX */}
+          <div className="search-box">
+            <div className="search-field">
+              <span style={s.searchLabel}>Where</span>
+              <input
+                style={s.searchInput}
+                placeholder="Destination or property name"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            <div className="search-divider" />
+            <div className="search-field">
+              <span style={s.searchLabel}>Check-in</span>
+              <input
+                style={s.searchInput}
+                type="date"
+                value={checkin}
+                onChange={(e) => setCheckin(e.target.value)}
+              />
+            </div>
+            <div className="search-divider" />
+            <div className="search-field">
+              <span style={s.searchLabel}>Check-out</span>
+              <input
+                style={s.searchInput}
+                type="date"
+                value={checkout}
+                onChange={(e) => setCheckout(e.target.value)}
+              />
+            </div>
+            <div className="search-divider" />
+            <div className="search-field">
+              <span style={s.searchLabel}>Guests</span>
+              <input
+                style={s.searchInput}
+                type="number"
+                min={1}
+                value={guests}
+                onChange={(e) => setGuests(e.target.value)}
+              />
+            </div>
+            <button
+              style={s.searchBtn}
+              onClick={() => navigate("/tourism/listings")}
+            >
+              🔍 Search
+            </button>
+          </div>
         </div>
-        <div style={s.stepCount}>Step {step + 1}/{steps.length}</div>
-      </div>
+      </section>
 
-      {/* PROGRESS */}
-      <div style={s.progressBar}>
-        <div style={{ ...s.progressFill, width: `${((step + 1) / steps.length) * 100}%` }} />
-      </div>
-
-      {/* STEP PILLS (mobile horizontal scroll) */}
-      <div style={s.stepPills}>
-        {steps.map((st, i) => (
-          <div key={st} style={{ ...s.stepPill, ...(i === step ? s.stepPillActive : {}), ...(i < step ? s.stepPillDone : {}) }}>
-            <span style={s.stepPillNum}>{i < step ? "✓" : i + 1}</span>
-            <span style={s.stepPillLabel}>{st}</span>
+      {/* ── CATEGORIES ── */}
+      <section style={s.section}>
+        <div style={s.inner}>
+          <div style={s.sectionLabel}>Browse By Type</div>
+          <h2 style={s.sectionTitle}>What Are You Looking For?</h2>
+          <div className="cat-grid">
+            {categories.map((c) => (
+              <div
+                key={c.label}
+                style={s.catCard}
+                className="cat-card"
+                onClick={() => navigate(`/tourism/listings?category=${c.label}`)}
+              >
+                <div style={s.catIcon}>{c.icon}</div>
+                <div style={s.catLabel}>{c.label}</div>
+                <div style={s.catCount}>{c.count}</div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      </section>
 
-      <div style={s.layout}>
-        {/* STEP NAV — desktop only */}
-        <aside style={s.stepNav} className="step-nav-desktop">
-          {steps.map((st, i) => (
-            <div key={st} style={{ ...s.stepItem, ...(i === step ? s.stepActive : {}), ...(i < step ? s.stepDone : {}) }}>
-              <div style={{ ...s.stepDot, ...(i === step ? { background: "#fbbf24", color: "#1f2937" } : i < step ? { background: "#22c55e", color: "white" } : {}) }}>
-                {i < step ? "✓" : i + 1}
-              </div>
-              <span style={s.stepLabel}>{st}</span>
-            </div>
-          ))}
-        </aside>
-
-        {/* FORM BODY */}
-        <main style={s.formBody}>
-          <div style={s.formCard}>
-
-            {step === 0 && (
-              <div>
-                <h2 style={s.formTitle}>Basic Information</h2>
-                <p style={s.formSub}>Tell us about your property</p>
-                <div style={s.field}>
-                  <label style={s.label}>Property Name *</label>
-                  <input style={s.input} placeholder="e.g. Sunrise Beach Hotel" value={form.name} onChange={(e) => update("name", e.target.value)} />
-                </div>
-                <div style={s.field}>
-                  <label style={s.label}>Category *</label>
-                  <select style={s.input} value={form.category} onChange={(e) => update("category", e.target.value)}>
-                    <option value="">Select category...</option>
-                    {categories.map((c) => <option key={c}>{c}</option>)}
-                  </select>
-                </div>
-                <div style={s.field}>
-                  <label style={s.label}>Description *</label>
-                  <textarea style={{ ...s.input, height: "120px", resize: "vertical" }} placeholder="Describe your property, what makes it special, nearby attractions..." value={form.description} onChange={(e) => update("description", e.target.value)} />
-                </div>
-              </div>
-            )}
-
-            {step === 1 && (
-              <div>
-                <h2 style={s.formTitle}>Location Details</h2>
-                <p style={s.formSub}>Help guests find you</p>
-                <div style={s.twoCol}>
-                  <div style={s.field}>
-                    <label style={s.label}>County *</label>
-                    <select style={s.input} value={form.county} onChange={(e) => update("county", e.target.value)}>
-                      <option value="">Select county...</option>
-                      {counties.map((c) => <option key={c}>{c}</option>)}
-                    </select>
-                  </div>
-                  <div style={s.field}>
-                    <label style={s.label}>Town / Area *</label>
-                    <input style={s.input} placeholder="e.g. Diani, Westlands" value={form.town} onChange={(e) => update("town", e.target.value)} />
-                  </div>
-                </div>
-                <div style={s.field}>
-                  <label style={s.label}>Physical Address</label>
-                  <input style={s.input} placeholder="Street address or landmark" value={form.address} onChange={(e) => update("address", e.target.value)} />
-                </div>
-                <div style={s.field}>
-                  <label style={s.label}>Google Maps Link (optional)</label>
-                  <input style={s.input} placeholder="https://maps.google.com/..." value={form.mapLink} onChange={(e) => update("mapLink", e.target.value)} />
-                </div>
-              </div>
-            )}
-
-            {step === 2 && (
-              <div>
-                <h2 style={s.formTitle}>Amenities & Features</h2>
-                <p style={s.formSub}>Select everything your property offers</p>
-                <div style={s.amenitiesGrid}>
-                  {amenitiesList.map((a) => (
-                    <button
-                      key={a}
-                      style={{ ...s.amenityBtn, ...(form.amenities.includes(a) ? s.amenityActive : {}) }}
-                      onClick={() => toggleAmenity(a)}
-                    >
-                      {form.amenities.includes(a) ? "✓ " : ""}{a}
-                    </button>
-                  ))}
-                </div>
-                <div style={s.field}>
-                  <label style={s.label}>Additional Amenities (comma separated)</label>
-                  <input style={s.input} placeholder="e.g. Helicopter pad, Private beach" />
-                </div>
-              </div>
-            )}
-
-            {step === 3 && (
-              <div>
-                <h2 style={s.formTitle}>Pricing & Room Types</h2>
-                <p style={s.formSub}>Set your rates (KSh per night)</p>
-                <div style={s.twoCol}>
-                  <div style={s.field}>
-                    <label style={s.label}>Base Price (KSh) *</label>
-                    <input style={s.input} type="number" placeholder="e.g. 8500" value={form.basePrice} onChange={(e) => update("basePrice", e.target.value)} />
-                  </div>
-                  <div style={s.field}>
-                    <label style={s.label}>Weekend Price (KSh)</label>
-                    <input style={s.input} type="number" placeholder="e.g. 12000" value={form.weekendPrice} onChange={(e) => update("weekendPrice", e.target.value)} />
-                  </div>
-                </div>
-                <div style={s.field}>
-                  <label style={s.label}>Peak Season Price (KSh)</label>
-                  <input style={s.input} type="number" placeholder="e.g. 18000" value={form.seasonalPrice} onChange={(e) => update("seasonalPrice", e.target.value)} />
-                </div>
-                <div style={s.sectionBreak}>Room Types</div>
-                {form.roomTypes.map((r, i) => (
-                  <div key={i} style={s.roomRow}>
-                    <input style={{ ...s.input, flex: 2, minWidth: 0 }} placeholder="Room type name" value={r.name} onChange={(e) => updateRoom(i, "name", e.target.value)} />
-                    <input style={{ ...s.input, flex: 1, minWidth: 0 }} type="number" placeholder="Price" value={r.price} onChange={(e) => updateRoom(i, "price", e.target.value)} />
-                    <input style={{ ...s.input, flex: 1, minWidth: 0 }} type="number" placeholder="Guests" value={r.guests} onChange={(e) => updateRoom(i, "guests", e.target.value)} />
-                  </div>
-                ))}
-                <button style={s.addRoomBtn} onClick={addRoomType}>+ Add Room Type</button>
-                <div style={s.twoCol}>
-                  <div style={s.field}>
-                    <label style={s.label}>Check-in Time</label>
-                    <input style={s.input} type="time" value={form.checkIn} onChange={(e) => update("checkIn", e.target.value)} />
-                  </div>
-                  <div style={s.field}>
-                    <label style={s.label}>Check-out Time</label>
-                    <input style={s.input} type="time" value={form.checkOut} onChange={(e) => update("checkOut", e.target.value)} />
-                  </div>
-                </div>
-                <div style={s.field}>
-                  <label style={s.label}>Free Cancellation Window</label>
-                  <select style={s.input} value={form.cancellation} onChange={(e) => update("cancellation", e.target.value)}>
-                    <option value="24">24 hours before check-in</option>
-                    <option value="48">48 hours before check-in</option>
-                    <option value="72">72 hours before check-in</option>
-                    <option value="0">Non-refundable</option>
-                  </select>
-                </div>
-              </div>
-            )}
-
-            {step === 4 && (
-              <div>
-                <h2 style={s.formTitle}>Contact Information</h2>
-                <p style={s.formSub}>How guests and our team will reach you</p>
-                <div style={s.field}>
-                  <label style={s.label}>Manager / Contact Name *</label>
-                  <input style={s.input} placeholder="Full name" value={form.managerName} onChange={(e) => update("managerName", e.target.value)} />
-                </div>
-                <div style={s.twoCol}>
-                  <div style={s.field}>
-                    <label style={s.label}>Phone Number *</label>
-                    <input style={s.input} placeholder="+254 7XX XXX XXX" value={form.phone} onChange={(e) => update("phone", e.target.value)} />
-                  </div>
-                  <div style={s.field}>
-                    <label style={s.label}>WhatsApp Number</label>
-                    <input style={s.input} placeholder="+254 7XX XXX XXX" value={form.whatsapp} onChange={(e) => update("whatsapp", e.target.value)} />
-                  </div>
-                </div>
-                <div style={s.field}>
-                  <label style={s.label}>Email Address *</label>
-                  <input style={s.input} type="email" placeholder="reservations@yourproperty.co.ke" value={form.email} onChange={(e) => update("email", e.target.value)} />
-                </div>
-              </div>
-            )}
-
-            {step === 5 && (
-              <div>
-                <h2 style={s.formTitle}>Review & Submit</h2>
-                <p style={s.formSub}>Check your details before submitting</p>
-                <div style={s.reviewGrid}>
-                  <div style={s.reviewItem}><div style={s.reviewKey}>Property Name</div><div style={s.reviewVal}>{form.name || "—"}</div></div>
-                  <div style={s.reviewItem}><div style={s.reviewKey}>Category</div><div style={s.reviewVal}>{form.category || "—"}</div></div>
-                  <div style={s.reviewItem}><div style={s.reviewKey}>Location</div><div style={s.reviewVal}>{form.town ? `${form.town}, ${form.county}` : "—"}</div></div>
-                  <div style={s.reviewItem}><div style={s.reviewKey}>Base Price</div><div style={s.reviewVal}>{form.basePrice ? `KSh ${Number(form.basePrice).toLocaleString()}/night` : "—"}</div></div>
-                  <div style={s.reviewItem}><div style={s.reviewKey}>Amenities</div><div style={s.reviewVal}>{form.amenities.length > 0 ? form.amenities.join(", ") : "—"}</div></div>
-                  <div style={s.reviewItem}><div style={s.reviewKey}>Contact</div><div style={s.reviewVal}>{form.managerName} · {form.phone}</div></div>
-                </div>
-                <div style={s.commissionBox}>
-                  <div style={s.commissionTitle}>📊 Commission Structure</div>
-                  <p style={s.commissionText}>
-                    Axx Spaces charges a <strong>10–15% commission</strong> per confirmed booking. Paid directly via M-Pesa.
-                  </p>
-                </div>
-                <label style={s.checkboxRow}>
-                  <input type="checkbox" checked={form.agreeTerms} onChange={(e) => update("agreeTerms", e.target.checked)} style={{ marginRight: "10px", flexShrink: 0 }} />
-                  <span style={{ fontSize: "14px", color: "#4b5563" }}>
-                    I agree to the Axx Spaces <span style={{ color: "#fbbf24", cursor: "pointer" }}>Terms & Conditions</span> and confirm all information is accurate.
+      {/* ── FEATURED ── */}
+      <section style={{ ...s.section, background: "#1f2937" }}>
+        <div style={s.inner}>
+          <div style={{ ...s.sectionLabel, background: "#fbbf2420", color: "#fbbf24", border: "1px solid #fbbf2440" }}>
+            Featured Experiences
+          </div>
+          <h2 style={{ ...s.sectionTitle, color: "#fbbf24" }}>Top Picks in Kenya</h2>
+          <p style={{ ...s.sectionSub, color: "#94a3b8" }}>Handpicked destinations loved by travellers</p>
+          <div className="feat-grid">
+            {featured.map((f) => (
+              <div
+                key={f.id}
+                style={s.featCard}
+                className="feat-card"
+                onClick={() => navigate(`/tourism/${f.id}`)}
+              >
+                <div style={{ ...s.featImg, background: `linear-gradient(135deg, ${f.color}30, ${f.color}10)`, border: `1px solid ${f.color}40` }}>
+                  <span style={{ fontSize: "52px" }}>
+                    {f.category === "Beach Resort" ? "🏖️"
+                      : f.category === "Mountain Lodge" ? "⛰️"
+                      : f.category === "Hotel" ? "🏨"
+                      : "🗻"}
                   </span>
-                </label>
+                  <div style={{ ...s.featTag, background: f.color }}>{f.tag}</div>
+                </div>
+                <div style={s.featBody}>
+                  <div style={s.featCat}>{f.category}</div>
+                  <h3 style={s.featName}>{f.name}</h3>
+                  <div style={s.featLocation}>📍 {f.location}</div>
+                  <div style={s.featBottom}>
+                    <div style={s.featPrice}>
+                      <span style={{ color: f.color, fontWeight: 800, fontSize: "18px" }}>
+                        KSh {f.price.toLocaleString()}
+                      </span>
+                      <span style={{ color: "#6b7280", fontSize: "12px" }}>/night</span>
+                    </div>
+                    <div style={s.featRating}>
+                      ⭐ {f.rating} <span style={{ color: "#6b7280" }}>({f.reviews})</span>
+                    </div>
+                  </div>
+                  <button
+                    style={{ ...s.bookBtn, background: f.color }}
+                    onClick={(e) => { e.stopPropagation(); navigate(`/tourism/${f.id}`); }}
+                  >
+                    View & Book →
+                  </button>
+                </div>
               </div>
-            )}
+            ))}
+          </div>
+          <div style={{ textAlign: "center", marginTop: "40px" }}>
+            <button style={s.viewAllBtn} onClick={() => navigate("/tourism/listings")}>
+              View All Properties →
+            </button>
+          </div>
+        </div>
+      </section>
 
-            {/* NAV BUTTONS */}
-            <div style={s.navBtns}>
-              {step > 0 && (
-                <button style={s.prevBtn} onClick={() => setStep((s) => s - 1)}>← Previous</button>
-              )}
-              {step < steps.length - 1 ? (
-                <button
-                  style={{ ...s.nextBtn, opacity: canNext() ? 1 : 0.5 }}
-                  onClick={() => { if (canNext()) setStep((s) => s + 1); }}
-                >
-                  Next Step →
-                </button>
-              ) : (
-                <button
-                  style={{ ...s.nextBtn, opacity: form.agreeTerms ? 1 : 0.5 }}
-                  onClick={handleSubmit}
-                >
-                  Submit 🚀
-                </button>
-              )}
+      {/* ── HOW IT WORKS ── */}
+      <section style={s.section}>
+        <div style={s.inner}>
+          <div style={s.sectionLabel}>Simple Process</div>
+          <h2 style={s.sectionTitle}>How It Works</h2>
+          <div className="how-grid">
+            {[
+              { step: "01", icon: "🔍", title: "Search & Discover", desc: "Browse hundreds of verified hotels, resorts, and recreation sites across Kenya." },
+              { step: "02", icon: "📅", title: "Check Availability", desc: "Pick your dates, number of guests, and view real-time pricing and availability." },
+              { step: "03", icon: "💳", title: "Book & Pay", desc: "Confirm your booking and pay securely via M-Pesa or card — instantly." },
+              { step: "04", icon: "🎉", title: "Enjoy Your Stay", desc: "Arrive and enjoy! Leave a review to help other travellers discover the best spots." },
+            ].map((h) => (
+              <div key={h.step} style={s.howCard} className="how-card">
+                <div style={s.howStep}>{h.step}</div>
+                <div style={s.howIcon}>{h.icon}</div>
+                <h3 style={s.howTitle}>{h.title}</h3>
+                <p style={s.howDesc}>{h.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── LIST YOUR PROPERTY CTA ── */}
+      <section style={s.listCta}>
+        <div className="cta-inner">
+          <div style={s.listCtaLeft}>
+            <h2 style={s.listCtaTitle}>Own a Hotel, Resort or Recreation Site?</h2>
+            <p style={s.listCtaSub}>
+              Join Kenya's fastest-growing hospitality marketplace. List your property and start receiving
+              bookings from thousands of travellers — for free.
+            </p>
+            <ul style={s.listCtaPoints}>
+              {["Free to list your property", "Receive direct bookings", "Manage availability easily", "Get paid via M-Pesa"].map((p) => (
+                <li key={p} style={s.listCtaPoint}>✅ {p}</li>
+              ))}
+            </ul>
+            <button style={s.listCtaBtn} onClick={() => navigate("/tourism/register-property")}>
+              List Your Property Free →
+            </button>
+          </div>
+          <div style={s.listCtaRight}>
+            <div className="stats-grid">
+              {[
+                { val: "280+", label: "Properties Listed" },
+                { val: "47", label: "Counties Covered" },
+                { val: "10-15%", label: "Commission Rate" },
+                { val: "24hr", label: "Go-Live Time" },
+              ].map((stat) => (
+                <div key={stat.label} style={s.listCtaStat}>
+                  <div style={s.listCtaStatVal}>{stat.val}</div>
+                  <div style={s.listCtaStatLabel}>{stat.label}</div>
+                </div>
+              ))}
             </div>
           </div>
-        </main>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }
 
 const s = {
-  root: { fontFamily: "'DM Sans', sans-serif", background: "#f8f4f0", minHeight: "100vh" },
-  header: { background: "white", borderBottom: "1px solid #e5e7eb", padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10 },
-  backBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "7px 12px", fontSize: "12px", cursor: "pointer", fontFamily: "inherit", color: "#4b5563", flexShrink: 0 },
-  headerCenter: { textAlign: "center", flex: 1, padding: "0 8px" },
-  headerTitle: { fontSize: "16px", fontWeight: 800, color: "#1f2937", margin: 0 },
-  headerSub: { fontSize: "11px", color: "#6b7280" },
-  stepCount: { fontSize: "12px", color: "#9ca3af", fontWeight: 600, flexShrink: 0 },
+  root: { fontFamily: "'DM Sans', sans-serif", background: "#f8f4f0", color: "#1f2937", minHeight: "100vh", overflowX: "hidden" },
 
-  progressBar: { height: "4px", background: "#e5e7eb" },
-  progressFill: { height: "100%", background: "#fbbf24", transition: "width 0.4s ease" },
+  hero: { position: "relative", background: "linear-gradient(150deg, #0f172a 0%, #1e3a5f 50%, #0f4c75 100%)", padding: "80px 16px 60px", textAlign: "center", overflow: "hidden" },
+  heroOverlay: { position: "absolute", inset: 0, background: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")", zIndex: 0 },
+  heroContent: { position: "relative", zIndex: 1, maxWidth: "800px", margin: "0 auto" },
+  heroBadge: { display: "inline-block", background: "rgba(251,191,36,0.15)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.4)", padding: "6px 18px", borderRadius: "20px", fontSize: "13px", fontWeight: 700, marginBottom: "20px" },
+  heroTitle: { fontSize: "clamp(26px, 6vw, 58px)", fontWeight: 800, color: "white", margin: "0 0 16px", lineHeight: 1.15, letterSpacing: "-1px" },
+  heroSub: { fontSize: "15px", color: "rgba(255,255,255,0.7)", marginBottom: "32px" },
 
-  // Mobile step pills
-  stepPills: { display: "flex", gap: "8px", padding: "12px 16px", overflowX: "auto", background: "white", borderBottom: "1px solid #e5e7eb" },
-  stepPill: { display: "flex", alignItems: "center", gap: "6px", padding: "6px 12px", borderRadius: "20px", background: "#f3f4f6", flexShrink: 0, opacity: 0.6 },
-  stepPillActive: { background: "#fef9c3", opacity: 1, border: "1px solid #fbbf24" },
-  stepPillDone: { background: "#f0fdf4", opacity: 1, border: "1px solid #bbf7d0" },
-  stepPillNum: { width: "20px", height: "20px", borderRadius: "50%", background: "#e5e7eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 700, color: "#6b7280", flexShrink: 0 },
-  stepPillLabel: { fontSize: "12px", fontWeight: 600, color: "#4b5563", whiteSpace: "nowrap" },
+  searchLabel: { fontSize: "10px", fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "4px" },
+  searchInput: { border: "none", outline: "none", fontSize: "14px", color: "#1f2937", background: "transparent", fontFamily: "inherit", width: "100%" },
+  searchBtn: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "12px", padding: "14px 24px", fontWeight: 800, fontSize: "14px", cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", flexShrink: 0 },
 
-  layout: { maxWidth: "1000px", margin: "0 auto", padding: "20px 16px", display: "grid", gridTemplateColumns: "200px 1fr", gap: "24px", alignItems: "start" },
+  section: { padding: "60px 16px", background: "#f8f4f0" },
+  inner: { maxWidth: "1200px", margin: "0 auto" },
+  sectionLabel: { display: "inline-block", background: "#fef9c3", color: "#854d0e", padding: "4px 14px", borderRadius: "20px", fontSize: "12px", fontWeight: 700, marginBottom: "14px", textTransform: "uppercase", letterSpacing: "0.08em", border: "1px solid #fde68a" },
+  sectionTitle: { fontSize: "clamp(20px, 4vw, 28px)", fontWeight: 800, color: "#1f2937", margin: "0 0 10px" },
+  sectionSub: { fontSize: "15px", color: "#6b7280", margin: "0 0 40px" },
 
-  stepNav: { position: "sticky", top: "120px" },
-  stepItem: { display: "flex", alignItems: "center", gap: "10px", padding: "10px 12px", borderRadius: "10px", marginBottom: "4px" },
-  stepActive: { background: "#fef9c3" },
-  stepDone: { opacity: 0.7 },
-  stepDot: { width: "28px", height: "28px", borderRadius: "50%", background: "#e5e7eb", color: "#9ca3af", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 700, flexShrink: 0 },
-  stepLabel: { fontSize: "13px", fontWeight: 600, color: "#4b5563" },
+  catCard: { background: "white", borderRadius: "14px", padding: "20px 12px", textAlign: "center", border: "1px solid #e5e7eb", cursor: "pointer", transition: "all 0.22s", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" },
+  catIcon: { fontSize: "32px", marginBottom: "10px" },
+  catLabel: { fontSize: "13px", fontWeight: 700, color: "#1f2937", marginBottom: "4px" },
+  catCount: { fontSize: "11px", color: "#6b7280" },
 
-  formBody: {},
-  formCard: { background: "white", borderRadius: "16px", padding: "24px 20px", border: "1px solid #e5e7eb" },
-  formTitle: { fontSize: "20px", fontWeight: 800, color: "#1f2937", marginBottom: "4px" },
-  formSub: { fontSize: "13px", color: "#6b7280", marginBottom: "24px" },
+  featCard: { background: "#111827", borderRadius: "16px", overflow: "hidden", border: "1px solid #334155", cursor: "pointer", transition: "all 0.25s" },
+  featImg: { height: "160px", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" },
+  featTag: { position: "absolute", top: "12px", left: "12px", color: "white", fontSize: "11px", fontWeight: 700, padding: "4px 10px", borderRadius: "20px" },
+  featBody: { padding: "18px" },
+  featCat: { fontSize: "11px", color: "#6b7280", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.08em", marginBottom: "6px" },
+  featName: { fontSize: "15px", fontWeight: 800, color: "white", margin: "0 0 6px", lineHeight: 1.3 },
+  featLocation: { fontSize: "13px", color: "#94a3b8", marginBottom: "14px" },
+  featBottom: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px", flexWrap: "wrap", gap: "6px" },
+  featPrice: { display: "flex", alignItems: "baseline", gap: "4px" },
+  featRating: { fontSize: "13px", color: "#fbbf24", fontWeight: 700 },
+  bookBtn: { width: "100%", border: "none", color: "white", padding: "10px", borderRadius: "8px", fontWeight: 700, fontSize: "13px", cursor: "pointer", fontFamily: "inherit" },
 
-  field: { marginBottom: "16px" },
-  label: { display: "block", fontSize: "11px", fontWeight: 700, color: "#374151", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "6px" },
-  input: { width: "100%", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "11px 14px", fontSize: "14px", fontFamily: "inherit", color: "#1f2937", outline: "none", boxSizing: "border-box" },
-  twoCol: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" },
+  viewAllBtn: { background: "transparent", border: "2px solid #fbbf24", color: "#fbbf24", padding: "14px 36px", borderRadius: "10px", fontSize: "15px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" },
 
-  amenitiesGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "8px", marginBottom: "20px" },
-  amenityBtn: { border: "1px solid #e5e7eb", background: "white", borderRadius: "8px", padding: "9px 10px", fontSize: "12px", cursor: "pointer", fontFamily: "inherit", color: "#4b5563", textAlign: "left" },
-  amenityActive: { background: "#fef9c3", borderColor: "#fbbf24", color: "#92400e", fontWeight: 700 },
+  howCard: { background: "white", borderRadius: "14px", padding: "28px 20px", border: "1px solid #e5e7eb", textAlign: "center", transition: "all 0.22s" },
+  howStep: { fontSize: "40px", fontWeight: 800, color: "#fbbf2430", lineHeight: 1, marginBottom: "12px" },
+  howIcon: { fontSize: "32px", marginBottom: "14px" },
+  howTitle: { fontSize: "15px", fontWeight: 800, color: "#1f2937", margin: "0 0 10px" },
+  howDesc: { fontSize: "13px", color: "#6b7280", lineHeight: 1.65, margin: 0 },
 
-  sectionBreak: { fontSize: "12px", fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid #f3f4f6", paddingBottom: "8px", marginBottom: "12px", marginTop: "8px" },
-  roomRow: { display: "flex", gap: "8px", marginBottom: "8px" },
-  addRoomBtn: { background: "transparent", border: "1px dashed #fbbf24", color: "#fbbf24", borderRadius: "8px", padding: "9px 14px", fontSize: "12px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit", marginBottom: "20px", width: "100%" },
-
-  reviewGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "20px" },
-  reviewItem: { background: "#f9fafb", borderRadius: "10px", padding: "12px" },
-  reviewKey: { fontSize: "10px", fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "4px" },
-  reviewVal: { fontSize: "13px", color: "#1f2937", fontWeight: 600, wordBreak: "break-word" },
-  commissionBox: { background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "12px", padding: "14px", marginBottom: "16px" },
-  commissionTitle: { fontSize: "13px", fontWeight: 800, color: "#92400e", marginBottom: "6px" },
-  commissionText: { fontSize: "12px", color: "#78350f", lineHeight: 1.65, margin: 0 },
-  checkboxRow: { display: "flex", alignItems: "flex-start", cursor: "pointer" },
-
-  navBtns: { display: "flex", justifyContent: "space-between", marginTop: "28px", paddingTop: "20px", borderTop: "1px solid #f3f4f6", gap: "12px" },
-  prevBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "12px 20px", fontSize: "14px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit", color: "#4b5563" },
-  nextBtn: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginLeft: "auto" },
+  listCta: { background: "linear-gradient(135deg, #1f2937 0%, #111827 100%)", padding: "60px 16px", borderTop: "3px solid #fbbf24" },
+  listCtaLeft: {},
+  listCtaTitle: { fontSize: "clamp(22px, 4vw, 32px)", fontWeight: 800, color: "white", margin: "0 0 16px", lineHeight: 1.2 },
+  listCtaSub: { fontSize: "15px", color: "#94a3b8", lineHeight: 1.7, marginBottom: "24px" },
+  listCtaPoints: { listStyle: "none", padding: 0, margin: "0 0 28px" },
+  listCtaPoint: { fontSize: "14px", color: "#d1d5db", padding: "6px 0" },
+  listCtaBtn: { background: "#fbbf24", color: "#1f2937", border: "none", padding: "14px 28px", borderRadius: "10px", fontSize: "15px", fontWeight: 800, cursor: "pointer", fontFamily: "inherit", width: "100%", maxWidth: "320px" },
+  listCtaRight: {},
+  listCtaStat: { background: "#1f2937", border: "1px solid #334155", borderRadius: "12px", padding: "20px 12px", textAlign: "center" },
+  listCtaStatVal: { fontSize: "26px", fontWeight: 800, color: "#fbbf24", marginBottom: "6px" },
+  listCtaStatLabel: { fontSize: "11px", color: "#6b7280", fontWeight: 600 },
 };
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  input:focus, select:focus, textarea:focus { border-color: #fbbf24 !important; box-shadow: 0 0 0 3px rgba(251,191,36,0.1); }
-  .step-nav-desktop { display: block; }
 
-  @media (max-width: 700px) {
-    .step-nav-desktop { display: none !important; }
-    [style*="gridTemplateColumns: 200px"] { grid-template-columns: 1fr !important; padding: 12px !important; }
-    [style*="gridTemplateColumns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
-    [style*="padding: 24px 20px"] { padding: 16px !important; }
+  /* ── Search box ── */
+  .search-box {
+    background: white;
+    border-radius: 16px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    max-width: 900px;
+    margin: 0 auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    flex-wrap: wrap;
+    gap: 0;
   }
-  @media (max-width: 400px) {
-    [style*="gridTemplateColumns: repeat(auto-fill, minmax(140px"] { grid-template-columns: 1fr 1fr !important; }
+  .search-field {
+    flex: 1;
+    min-width: 140px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
   }
-  .step-pills-scroll::-webkit-scrollbar { display: none; }
+  .search-divider {
+    width: 1px;
+    height: 40px;
+    background: #e5e7eb;
+    flex-shrink: 0;
+  }
+
+  /* ── Grids ── */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 14px;
+    margin-top: 28px;
+  }
+  .feat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+    margin-top: 28px;
+  }
+  .how-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 20px;
+    margin-top: 36px;
+  }
+  .cta-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 52px;
+    align-items: center;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* ── Hover effects ── */
+  .cat-card:hover  { transform: translateY(-4px); border-color: #fbbf24 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.1) !important; }
+  .feat-card:hover { transform: translateY(-4px); border-color: #fbbf24 !important; box-shadow: 0 16px 40px rgba(0,0,0,0.3) !important; }
+  .how-card:hover  { transform: translateY(-4px); border-color: #fbbf24 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important; }
+
+  /* ── Tablet ── */
+  @media (max-width: 768px) {
+    .cta-inner {
+      grid-template-columns: 1fr !important;
+      gap: 36px !important;
+    }
+    .feat-grid {
+      grid-template-columns: 1fr 1fr !important;
+    }
+    .search-box {
+      flex-direction: column;
+      align-items: stretch;
+      padding: 12px;
+      gap: 4px;
+    }
+    .search-field {
+      min-width: unset;
+      width: 100%;
+      border-bottom: 1px solid #f3f4f6;
+      padding: 10px 8px;
+    }
+    .search-divider {
+      display: none;
+    }
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 480px) {
+    .cat-grid {
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 10px !important;
+    }
+    .feat-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .how-grid {
+      grid-template-columns: 1fr 1fr !important;
+    }
+    .stats-grid {
+      grid-template-columns: 1fr 1fr !important;
+    }
+    .search-box {
+      border-radius: 12px;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .cat-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+    .how-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
 `;
