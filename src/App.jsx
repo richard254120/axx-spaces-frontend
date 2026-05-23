@@ -25,6 +25,14 @@ import Materials from "./pages/Materials";
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
 import TermsAndPrivacy from "./pages/TermsAndPrivacy";
+
+// ─── Tourism Pages ───────────────────────────────────────────────────────────
+import TourismPage from "./pages/tourism/TourismPage";
+import TourismListingsPage from "./pages/tourism/TourismListingsPage";
+import TourismDetailPage from "./pages/tourism/TourismDetailPage";
+import RegisterPropertyPage from "./pages/tourism/RegisterPropertyPage";
+import ProviderDashboard from "./pages/tourism/ProviderDashboard";
+
 import "leaflet/dist/leaflet.css";
 
 // ─── Layouts ────────────────────────────────────────────────────────────────
@@ -78,9 +86,27 @@ function App() {
       <Route path="/reset-password/:token" element={<PublicLayout><ResetPassword /></PublicLayout>} />
       <Route path="/seller-login" element={<PublicLayout><SellerLogin /></PublicLayout>} />
       <Route path="/materials" element={<PublicLayout><Materials /></PublicLayout>} />
-<Route path="/faq" element={<FAQ />} />
-<Route path="/contact" element={<Contact />} />
-<Route path="/terms" element={<TermsAndPrivacy />} />
+      <Route path="/faq" element={<FAQ />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/terms" element={<TermsAndPrivacy />} />
+
+      {/* ── TOURISM ROUTES (have Navbar) ── */}
+      {/* IMPORTANT: specific /tourism/* paths must come before /tourism/:id */}
+      <Route path="/tourism" element={<PublicLayout><TourismPage /></PublicLayout>} />
+      <Route path="/tourism/listings" element={<PublicLayout><TourismListingsPage /></PublicLayout>} />
+      <Route path="/tourism/register-property" element={<PublicLayout><RegisterPropertyPage /></PublicLayout>} />
+      <Route
+        path="/tourism/dashboard"
+        element={
+          <DashboardLayout>
+            <ProtectedRoute>
+              <ProviderDashboard />
+            </ProtectedRoute>
+          </DashboardLayout>
+        }
+      />
+      <Route path="/tourism/:id" element={<PublicLayout><TourismDetailPage /></PublicLayout>} />
+
       {/* ── DASHBOARD ROUTES (no Navbar) ── */}
       <Route
         path="/seller-dashboard"

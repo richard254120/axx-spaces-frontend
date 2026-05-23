@@ -61,23 +61,26 @@ export default function Navbar() {
           <Link to="/materials" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>🛍️</span> Merchants
           </Link>
-        <Link to="/about" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-  <span style={styles.dropdownIcon}>ℹ️</span> About
-</Link>
+          <Link to="/tourism" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+            <span style={styles.dropdownIcon}>🏨</span> Tourism
+          </Link>
+          <Link to="/about" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+            <span style={styles.dropdownIcon}>ℹ️</span> About
+          </Link>
 
-<div style={styles.dropdownDivider} />
-<div style={styles.dropdownHeader}>Help & Legal</div>
-<Link to="/faq" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-  <span style={styles.dropdownIcon}>❓</span> FAQ
-</Link>
-<Link to="/contact" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-  <span style={styles.dropdownIcon}>📞</span> Contact & Support
-</Link>
-<Link to="/terms" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-  <span style={styles.dropdownIcon}>📄</span> Terms & Privacy
-</Link>
+          <div style={styles.dropdownDivider} />
+          <div style={styles.dropdownHeader}>Help & Legal</div>
+          <Link to="/faq" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+            <span style={styles.dropdownIcon}>❓</span> FAQ
+          </Link>
+          <Link to="/contact" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+            <span style={styles.dropdownIcon}>📞</span> Contact & Support
+          </Link>
+          <Link to="/terms" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+            <span style={styles.dropdownIcon}>📄</span> Terms & Privacy
+          </Link>
 
-{token && user ? (
+          {token && user ? (
             <>
               <div style={styles.dropdownDivider} />
               {/* ACCOUNT SECTION */}
@@ -203,6 +206,9 @@ export default function Navbar() {
         </Link>
         <Link to="/materials" style={styles.navLink} onClick={() => setMenuOpen(false)}>
           Merchants
+        </Link>
+        <Link to="/tourism" style={styles.navLink} onClick={() => setMenuOpen(false)}>
+          Tourism
         </Link>
 
         {token && user ? (
@@ -348,7 +354,6 @@ const styles = {
     display: "flex",
   },
 
-  // ✅ navLink style — Register now uses this too
   navLink: {
     color: "#cbd5e1",
     textDecoration: "none",
@@ -547,8 +552,6 @@ const styles = {
     fontWeight: 700,
     transition: "all 0.2s",
   },
-
-  // ─── REMOVED: registerLink (was yellow, now handled above) ───────────────
 };
 
 const css = `
