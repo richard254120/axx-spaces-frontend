@@ -227,27 +227,7 @@ export default function Navbar() {
               >
                 <span style={styles.dropdownIcon}>🏢</span> All Listings
               </Link>
-              <Link
-                to="/listings?type=apartment"
-                style={styles.rentalsDropdownItem}
-                onClick={() => { setAccountOpen(false); setMenuOpen(false); }}
-              >
-                <span style={styles.dropdownIcon}>🏠</span> Apartments
-              </Link>
-              <Link
-                to="/listings?type=house"
-                style={styles.rentalsDropdownItem}
-                onClick={() => { setAccountOpen(false); setMenuOpen(false); }}
-              >
-                <span style={styles.dropdownIcon}>🏡</span> Houses
-              </Link>
-              <Link
-                to="/listings?type=commercial"
-                style={styles.rentalsDropdownItem}
-                onClick={() => { setAccountOpen(false); setMenuOpen(false); }}
-              >
-                <span style={styles.dropdownIcon}>🏬</span> Commercial
-              </Link>
+              
 
               {/* Account section — only shown when not logged in */}
               {!(token && user) && (
