@@ -110,12 +110,11 @@ export default function Home() {
           Your browser does not support the video tag.
         </video>
 
-        {/* LIGHTER OVERLAY — video is deeply visible */}
+        {/* DARK OVERLAY — video visible, text clear */}
         <div style={styles.videoOverlay}></div>
 
         {/* CONTENT ABOVE VIDEO */}
         <div style={styles.heroContent}>
-
           <div style={styles.trustBadge}>
             <span style={styles.trustDot}></span>
             Kenya's Most Trusted Rental Platform
@@ -280,17 +279,17 @@ export default function Home() {
       {/* ── WHY AXX SPACES ── */}
       <section style={styles.featuresSection}>
         <div style={styles.sectionHeader}>
-          <h2 style={{ ...styles.sectionTitle, color: "#1f2937" }}>Why Axx Spaces?</h2>
+          <h2 style={{ ...styles.sectionTitle, color: "#0B2140" }}>Why Axx Spaces?</h2>
           <p style={{ ...styles.sectionSubtitle, color: "#6b7280" }}>Built for Kenyans, by Kenyans</p>
         </div>
         <div style={styles.featureGrid}>
           {[
-            { icon: "✓", title: "Verified Properties", text: "Every listing is manually reviewed before going live on our platform", color: "#fbbf24" },
-            { icon: "💬", title: "Direct WhatsApp", text: "Skip the middleman. Chat directly with landlords in seconds", color: "#ef4444" },
+            { icon: "✓", title: "Verified Properties", text: "Every listing is manually reviewed before going live on our platform", color: "#E31B1B" },
+            { icon: "💬", title: "Direct WhatsApp", text: "Skip the middleman. Chat directly with landlords in seconds", color: "#E31B1B" },
             { icon: "🔒", title: "Safe & Secure", text: "Industry-standard encryption protects all your personal data", color: "#22c55e" },
-            { icon: "📱", title: "Mobile Optimized", text: "Fully responsive — find your home on any phone or tablet", color: "#3b82f6" },
-            { icon: "🗺", title: "GPS Maps", text: "Interactive maps with exact coordinates for every property", color: "#fbbf24" },
-            { icon: "💰", title: "No Hidden Fees", text: "What you see is what you pay. Transparent pricing always", color: "#ef4444" },
+            { icon: "📱", title: "Mobile Optimized", text: "Fully responsive — find your home on any phone or tablet", color: "#0B2140" },
+            { icon: "🗺", title: "GPS Maps", text: "Interactive maps with exact coordinates for every property", color: "#E31B1B" },
+            { icon: "💰", title: "No Hidden Fees", text: "What you see is what you pay. Transparent pricing always", color: "#0B2140" },
           ].map((f) => (
             <div
               key={f.title}
@@ -319,9 +318,9 @@ export default function Home() {
             <button
               style={{
                 ...styles.ctaBtnSecondary,
-                background: token ? "#22c55e" : "white",
-                color: token ? "white" : "#1f2937",
-                border: token ? "none" : "2px solid #1f2937",
+                background: token ? "#E31B1B" : "white",
+                color: token ? "white" : "#0B2140",
+                border: token ? "none" : "2px solid #0B2140",
               }}
               onClick={handleListProperty}
             >
@@ -338,7 +337,7 @@ export default function Home() {
       <footer style={styles.footer}>
         <div style={styles.footerInner}>
           <div style={styles.footerBrand}>
-            <strong style={{ color: "#fbbf24", fontSize: "18px" }}>Axx Spaces</strong>
+            <strong style={{ color: "#E31B1B", fontSize: "18px" }}>Axx Spaces</strong>
             <p style={styles.footerTagline}>Kenya's most trusted rental platform</p>
           </div>
           <div style={styles.footerLinks}>
@@ -353,21 +352,21 @@ export default function Home() {
   );
 }
 
-/* ═══════════════════════════════ STYLES ═══════════════════════════════ */
+/* ═══════════════════════════════ UNIFIED COLOR SYSTEM ═══════════════════════════════ */
 const styles = {
   root: {
     fontFamily: "'DM Sans', sans-serif",
-    background: "#f8f4f0",
-    color: "#1f2937",
+    background: "#FFFFFF",
+    color: "#0B2140",
     minHeight: "100vh",
   },
 
   /* ── Marquee ── */
   marqueeWrapper: {
     overflow: "hidden",
-    background: "#fbbf24",
+    background: "linear-gradient(90deg, #E31B1B 0%, #D91414 50%, #E31B1B 100%)",
     padding: "9px 0",
-    borderBottom: "2px solid #f59e0b",
+    borderBottom: "2px solid #C01010",
   },
   marqueePill: {
     display: "inline-flex",
@@ -379,23 +378,23 @@ const styles = {
     margin: "0 8px",
     fontSize: "13px",
     fontWeight: 600,
-    color: "#1f2937",
+    color: "#0B2140",
     whiteSpace: "nowrap",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+    boxShadow: "0 2px 8px rgba(227, 27, 27, 0.15)",
   },
   marqueeSep: {
-    color: "#d97706",
+    color: "#C01010",
     fontWeight: 700,
     fontSize: "16px",
     marginLeft: "8px",
   },
 
-  /* ── Hero — fills viewport on all screen sizes including phones ── */
+  /* ── Hero ── */
   hero: {
     position: "relative",
     padding: "80px 16px 60px",
     textAlign: "center",
-    borderBottom: "3px solid #fbbf24",
+    borderBottom: "3px solid #E31B1B",
     width: "100%",
     boxSizing: "border-box",
     overflow: "hidden",
@@ -405,7 +404,6 @@ const styles = {
     justifyContent: "center",
   },
 
-  /* Video locked to exact hero bounds — fills perfectly on mobile & desktop */
   bgVideo: {
     position: "absolute",
     top: 0,
@@ -419,14 +417,13 @@ const styles = {
     pointerEvents: "none",
   },
 
-  /* Dim overlay — video is visible but all text reads clearly on phones */
   videoOverlay: {
     position: "absolute",
     top: 0,
     left: 0,
     width: "100%",
     height: "100%",
-    background: "linear-gradient(180deg, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.52) 50%, rgba(0,0,0,0.65) 100%)",
+    background: "linear-gradient(180deg, rgba(11, 33, 64, 0.70) 0%, rgba(11, 33, 64, 0.60) 50%, rgba(11, 33, 64, 0.75) 100%)",
     zIndex: 1,
   },
 
@@ -441,20 +438,21 @@ const styles = {
     display: "inline-flex",
     alignItems: "center",
     gap: "8px",
-    background: "#dcfce7",
-    color: "#15803d",
-    padding: "5px 16px",
+    background: "rgba(255, 255, 255, 0.95)",
+    color: "#0B2140",
+    padding: "8px 18px",
     borderRadius: "20px",
     fontSize: "13px",
-    fontWeight: 600,
+    fontWeight: 700,
     marginBottom: "18px",
-    border: "1px solid #bbf7d0",
+    border: "1px solid rgba(227, 27, 27, 0.3)",
+    boxShadow: "0 4px 16px rgba(227, 27, 27, 0.2)",
   },
   trustDot: {
     width: "8px",
     height: "8px",
     borderRadius: "50%",
-    background: "#22c55e",
+    background: "#E31B1B",
     display: "inline-block",
     animation: "pulse 1.8s infinite",
   },
@@ -465,7 +463,7 @@ const styles = {
     margin: "0 0 12px",
     letterSpacing: "-1.5px",
     lineHeight: 1.15,
-    textShadow: "0 2px 16px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4)",
+    textShadow: "0 2px 16px rgba(11, 33, 64, 0.8), 0 1px 4px rgba(11, 33, 64, 0.6)",
   },
   heroSubtitle: {
     fontSize: "16px",
@@ -473,17 +471,17 @@ const styles = {
     margin: "0 auto 30px",
     maxWidth: "480px",
     lineHeight: 1.6,
-    textShadow: "0 1px 8px rgba(0,0,0,0.5)",
+    textShadow: "0 1px 8px rgba(11, 33, 64, 0.6)",
   },
 
   searchPropertyLabel: {
     fontSize: "13px",
     fontWeight: 700,
-    color: "rgba(255,255,255,0.75)",
+    color: "rgba(255,255,255,0.9)",
     textTransform: "uppercase",
     letterSpacing: "0.12em",
     margin: "0 0 8px",
-    textShadow: "0 1px 4px rgba(0,0,0,0.4)",
+    textShadow: "0 1px 4px rgba(11, 33, 64, 0.5)",
   },
 
   /* ── Hamburger search trigger ── */
@@ -505,12 +503,11 @@ const styles = {
     fontWeight: 700,
     fontSize: "15px",
     letterSpacing: "0.02em",
-    textShadow: "0 1px 4px rgba(0,0,0,0.4)",
+    textShadow: "0 1px 4px rgba(11, 33, 64, 0.5)",
   },
 
-  /* ✅ Hamburger button */
   hamburgerBtn: {
-    background: "#1f2937",
+    background: "#0B2140",
     border: "none",
     borderRadius: "50%",
     width: "42px",
@@ -529,17 +526,16 @@ const styles = {
     display: "block",
     width: "20px",
     height: "2.5px",
-    background: "#fbbf24",
+    background: "#E31B1B",
     borderRadius: "2px",
     transition: "transform 0.25s ease, opacity 0.2s ease",
   },
 
-  /* ✅ Search dropdown panel */
   searchDropdown: {
-    background: "rgba(255,255,255,0.97)",
+    background: "rgba(255,255,255,0.98)",
     borderRadius: "16px",
     padding: "16px",
-    boxShadow: "0 8px 40px rgba(0,0,0,0.28)",
+    boxShadow: "0 12px 40px rgba(227, 27, 27, 0.25)",
     maxWidth: "400px",
     width: "100%",
     margin: "0 auto 30px",
@@ -548,7 +544,7 @@ const styles = {
     gap: "10px",
     boxSizing: "border-box",
     backdropFilter: "blur(8px)",
-    border: "1px solid rgba(255,255,255,0.8)",
+    border: "1px solid rgba(227, 27, 27, 0.1)",
   },
   searchInput: {
     padding: "12px 14px",
@@ -557,14 +553,14 @@ const styles = {
     fontSize: "14px",
     fontFamily: "inherit",
     background: "#f9fafb",
-    color: "#1f2937",
+    color: "#0B2140",
     transition: "all 0.2s",
     width: "100%",
     boxSizing: "border-box",
   },
   searchBtn: {
     padding: "13px 22px",
-    background: "#ef4444",
+    background: "linear-gradient(135deg, #E31B1B 0%, #C01010 100%)",
     color: "white",
     border: "none",
     borderRadius: "10px",
@@ -572,7 +568,7 @@ const styles = {
     fontWeight: 700,
     cursor: "pointer",
     transition: "all 0.2s",
-    boxShadow: "0 4px 14px rgba(239,68,68,0.35)",
+    boxShadow: "0 4px 14px rgba(227, 27, 27, 0.35)",
     width: "100%",
   },
 
@@ -589,133 +585,139 @@ const styles = {
     fontSize: "20px",
     fontWeight: 800,
     color: "white",
-    textShadow: "0 2px 10px rgba(0,0,0,0.5)",
+    textShadow: "0 2px 10px rgba(11, 33, 64, 0.6)",
   },
   heroStatLabel: {
     fontSize: "11px",
-    color: "rgba(255, 255, 255, 0.9)",
+    color: "rgba(255, 255, 255, 0.95)",
     fontWeight: 500,
-    textShadow: "0 1px 4px rgba(0,0,0,0.4)",
+    textShadow: "0 1px 4px rgba(11, 33, 64, 0.5)",
   },
 
   /* ── Featured ── */
-  featuredSection: { padding: "60px 0 60px", background: "#1f2937", color: "white", overflow: "hidden" },
+  featuredSection: {
+    padding: "60px 0 60px",
+    background: "linear-gradient(180deg, #FFFFFF 0%, #F8F9FA 100%)",
+    color: "#0B2140",
+    overflow: "hidden",
+  },
   sectionHeader: { textAlign: "center", marginBottom: "44px", padding: "0 20px" },
-  sectionTitle: { fontSize: "30px", fontWeight: 800, color: "#fbbf24", margin: "0 0 10px" },
-  sectionSubtitle: { color: "#94a3b8", fontSize: "16px", margin: 0 },
+  sectionTitle: { fontSize: "30px", fontWeight: 800, color: "#E31B1B", margin: "0 0 10px" },
+  sectionSubtitle: { color: "#6b7280", fontSize: "16px", margin: 0 },
   loadingWrap: { display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", padding: "40px 0" },
-  loadingText: { color: "#94a3b8", fontSize: "15px" },
+  loadingText: { color: "#6b7280", fontSize: "15px" },
 
   marqueeCardsWrapper: {
     overflow: "hidden",
     width: "100%",
   },
   featuredCard: {
-    background: "#111827",
+    background: "white",
     borderRadius: "14px",
     overflow: "hidden",
-    border: "1px solid #334155",
+    border: "1px solid #e5e7eb",
     transition: "transform 0.25s, box-shadow 0.25s",
     minWidth: "280px",
     maxWidth: "280px",
     flexShrink: 0,
     margin: "0 12px",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
   },
   featuredImageWrapper: { position: "relative" },
   featuredImage: { width: "100%", height: "180px", objectFit: "cover", display: "block" },
   boostedBadge: {
     position: "absolute", top: "12px", left: "12px",
-    background: "#eab308", color: "#000",
+    background: "#E31B1B", color: "white",
     padding: "4px 12px", borderRadius: "20px",
     fontSize: "11px", fontWeight: 700,
   },
   featuredType: {
     position: "absolute", top: "12px", right: "12px",
-    background: "rgba(0,0,0,0.65)", color: "white",
+    background: "rgba(11, 33, 64, 0.85)", color: "white",
     padding: "4px 10px", borderRadius: "6px",
     fontSize: "11px", fontWeight: 600,
   },
   featuredInfo: { padding: "16px 18px 20px" },
-  featuredTitle: { fontSize: "15px", fontWeight: 700, margin: "0 0 6px", color: "white" },
-  featuredLocation: { color: "#94a3b8", margin: "0 0 8px", fontSize: "12px" },
+  featuredTitle: { fontSize: "15px", fontWeight: 700, margin: "0 0 6px", color: "#0B2140" },
+  featuredLocation: { color: "#6b7280", margin: "0 0 8px", fontSize: "12px" },
   featuredMeta: { display: "flex", gap: "8px", marginBottom: "8px", flexWrap: "wrap" },
   metaTag: {
-    background: "#1e3a5f", color: "#93c5fd",
+    background: "rgba(227, 27, 27, 0.1)", color: "#E31B1B",
     padding: "3px 10px", borderRadius: "6px",
     fontSize: "11px", fontWeight: 500,
   },
-  featuredPrice: { color: "#22c55e", fontSize: "17px", fontWeight: 800, margin: "8px 0 0" },
-  perMonth: { fontSize: "12px", color: "#4ade80", fontWeight: 400 },
+  featuredPrice: { color: "#E31B1B", fontSize: "17px", fontWeight: 800, margin: "8px 0 0" },
+  perMonth: { fontSize: "12px", color: "#C01010", fontWeight: 400 },
   viewBtn: {
     marginTop: "14px", width: "100%", padding: "11px",
-    background: "#3b82f6", color: "white", border: "none",
+    background: "linear-gradient(135deg, #0B2140 0%, #152B4A 100%)", color: "white", border: "none",
     borderRadius: "8px", cursor: "pointer", fontWeight: 700,
     fontSize: "13px", transition: "background 0.2s",
   },
   viewAllBtn: {
     padding: "13px 36px", background: "transparent",
-    color: "#fbbf24", border: "2px solid #fbbf24",
+    color: "#E31B1B", border: "2px solid #E31B1B",
     borderRadius: "10px", fontSize: "15px", fontWeight: 700,
     cursor: "pointer", transition: "all 0.2s",
   },
   noFeatured: { textAlign: "center", padding: "40px 20px" },
   noFeaturedIcon: { fontSize: "52px", marginBottom: "12px" },
-  noFeaturedText: { color: "#e5e7eb", fontSize: "18px", fontWeight: 700, margin: "0 0 6px" },
-  noFeaturedSub: { color: "#94a3b8", fontSize: "14px", margin: "0 0 20px" },
+  noFeaturedText: { color: "#0B2140", fontSize: "18px", fontWeight: 700, margin: "0 0 6px" },
+  noFeaturedSub: { color: "#6b7280", fontSize: "14px", margin: "0 0 20px" },
   boostBtn: {
-    padding: "12px 28px", background: "#fbbf24",
-    color: "#000", border: "none", borderRadius: "8px",
+    padding: "12px 28px", background: "linear-gradient(135deg, #E31B1B 0%, #C01010 100%)",
+    color: "white", border: "none", borderRadius: "8px",
     fontWeight: 700, fontSize: "15px", cursor: "pointer",
   },
 
   /* ── Features ── */
-  featuresSection: { padding: "72px 20px", background: "#f8f4f0", maxWidth: "1200px", margin: "0 auto" },
+  featuresSection: { padding: "72px 20px", background: "#FFFFFF", maxWidth: "1200px", margin: "0 auto" },
   featureGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
     gap: "22px", marginTop: "8px",
   },
   featureCard: {
-    padding: "26px", background: "white", borderRadius: "12px",
+    padding: "26px", background: "#F8F9FA", borderRadius: "12px",
     textAlign: "center", border: "1px solid #e5e7eb", transition: "all 0.22s",
   },
   featureIcon: { fontSize: "34px", marginBottom: "14px" },
-  featureTitle: { fontSize: "16px", fontWeight: 700, color: "#1f2937", margin: "0 0 10px" },
+  featureTitle: { fontSize: "16px", fontWeight: 700, color: "#0B2140", margin: "0 0 10px" },
   featureText: { fontSize: "13px", color: "#6b7280", lineHeight: 1.6, margin: 0 },
 
   /* ── CTA ── */
   cta: {
-    background: "linear-gradient(135deg, #2427fb 0%, #4d9ffc 100%)",
+    background: "linear-gradient(135deg, #0B2140 0%, #1a3a52 100%)",
     padding: "76px 20px", textAlign: "center",
-    borderTop: "3px solid #f59e0b",
+    borderTop: "3px solid #E31B1B",
   },
   ctaInner: { maxWidth: "640px", margin: "0 auto" },
   ctaTitle: { fontSize: "34px", fontWeight: 800, color: "white", margin: "0 0 12px" },
-  ctaText: { fontSize: "17px", color: "rgba(255,255,255,0.8)", margin: "0 0 32px" },
+  ctaText: { fontSize: "17px", color: "rgba(255,255,255,0.9)", margin: "0 0 32px" },
   ctaButtons: { display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" },
   ctaBtnPrimary: {
-    padding: "14px 32px", background: "#ef4444", color: "white",
+    padding: "14px 32px", background: "linear-gradient(135deg, #E31B1B 0%, #C01010 100%)", color: "white",
     border: "none", borderRadius: "10px", fontSize: "16px",
     fontWeight: 700, cursor: "pointer", transition: "all 0.2s",
-    boxShadow: "0 4px 14px rgba(239,68,68,0.4)",
+    boxShadow: "0 4px 14px rgba(227, 27, 27, 0.4)",
   },
   ctaBtnSecondary: {
     padding: "14px 32px", borderRadius: "10px",
     fontSize: "16px", fontWeight: 700, cursor: "pointer", transition: "all 0.2s",
   },
-  loginHint: { fontSize: "13px", color: "rgba(255,255,255,0.65)", marginTop: "16px", fontStyle: "italic" },
+  loginHint: { fontSize: "13px", color: "rgba(255,255,255,0.75)", marginTop: "16px", fontStyle: "italic" },
 
   /* ── Footer ── */
-  footer: { background: "#1f2937", color: "#d1d5db", padding: "36px 20px 20px" },
+  footer: { background: "#0B2140", color: "#cbd5e1", padding: "36px 20px 20px" },
   footerInner: { maxWidth: "960px", margin: "0 auto", textAlign: "center" },
   footerBrand: { marginBottom: "18px" },
-  footerTagline: { fontSize: "13px", color: "#6b7280", margin: "4px 0 0" },
+  footerTagline: { fontSize: "13px", color: "#94a3b8", margin: "4px 0 0" },
   footerLinks: {
     display: "flex", justifyContent: "center",
     gap: "24px", flexWrap: "wrap", marginBottom: "20px",
   },
-  footerLink: { fontSize: "13px", color: "#9ca3af", cursor: "pointer", transition: "color 0.2s" },
-  footerCopy: { fontSize: "12px", color: "#4b5563", margin: 0 },
+  footerLink: { fontSize: "13px", color: "#94a3b8", cursor: "pointer", transition: "color 0.2s" },
+  footerCopy: { fontSize: "12px", color: "#475569", margin: 0 },
 };
 
 /* ════════════════════════ INJECTED CSS ════════════════════════ */
@@ -761,8 +763,8 @@ const css = `
 
   .spinner {
     width: 32px; height: 32px;
-    border: 3px solid #334155;
-    border-top-color: #fbbf24;
+    border: 3px solid #e5e7eb;
+    border-top-color: #E31B1B;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
@@ -771,12 +773,8 @@ const css = `
     animation: slideDown 0.2s ease;
   }
 
-  .menu-item:hover {
-    background: #f3f4f6 !important;
-  }
-
   .hamburger-btn:hover {
-    background: #374151 !important;
+    background: #152B4A !important;
     transform: scale(1.05);
   }
 
@@ -792,22 +790,23 @@ const css = `
 
   input:focus, select:focus {
     outline: none;
-    border-color: #ef4444 !important;
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+    border-color: #E31B1B !important;
+    box-shadow: 0 0 0 3px rgba(227, 27, 27, 0.12);
   }
 
   button:hover:not(:disabled) { transform: translateY(-2px); opacity: 0.93; }
 
   .featured-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+    box-shadow: 0 12px 32px rgba(227, 27, 27, 0.15);
   }
 
-  .view-btn:hover { background: #2563eb !important; }
+  .view-btn:hover { background: linear-gradient(135deg, #152B4A 0%, #1a3a52 100%) !important; }
 
   .feature-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    box-shadow: 0 8px 24px rgba(227, 27, 27, 0.08);
+    background: white;
   }
 
   @media (max-width: 620px) {

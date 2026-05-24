@@ -198,63 +198,63 @@ export default function Navbar() {
         <Link to="/" style={styles.navLink} onClick={() => setMenuOpen(false)}>
           Home
         </Link>
-        <Link to="/listings" style={styles.navLink} onClick={() => setMenuOpen(false)}>
-          Rentals
-        </Link>
-        <Link to="/movers" style={styles.navLink} onClick={() => setMenuOpen(false)}>
-          Movers
-        </Link>
-        <Link to="/materials" style={styles.navLink} onClick={() => setMenuOpen(false)}>
-          Merchants
-        </Link>
-        <Link to="/tourism" style={styles.navLink} onClick={() => setMenuOpen(false)}>
-          Tourism
-        </Link>
+        {/* ─── RENTALS DROPDOWN ─── */}
+        <div style={styles.accountWrapper} ref={accountRef}>
+          <button
+            style={{
+              ...styles.navLink,
+              background: accountOpen ? "rgba(251,191,36,0.12)" : "transparent",
+              color: accountOpen ? "#fbbf24" : "#cbd5e1",
+              border: "none",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "5px",
+            }}
+            onClick={() => setAccountOpen(!accountOpen)}
+          >
+            Rentals <span style={{ fontSize: "10px", opacity: 0.7 }}>{accountOpen ? "▲" : "▼"}</span>
+          </button>
 
-        {token && user ? (
-          <>
-            <Link to="/upload" style={styles.navLink} onClick={() => setMenuOpen(false)}>
-              Upload
-            </Link>
-            <Link to="/dashboard" style={styles.navLink} onClick={() => setMenuOpen(false)}>
-              Dashboard
-            </Link>
-            <div style={styles.userSection}>
-              <span style={styles.userName}>{user.name}</span>
-              <button style={styles.logoutBtn} onClick={handleLogout}>
-                Logout
-              </button>
-            </div>
-          </>
-        ) : (
-          <>
-            <Link to="/about" style={styles.navLink} onClick={() => setMenuOpen(false)}>
-              About
-            </Link>
-
-            {/* ─── SINGLE ACCOUNT TAB ─── */}
-            <div style={styles.accountWrapper} ref={accountRef}>
-              <button
-                style={{
-                  ...styles.navLink,
-                  background: accountOpen ? "rgba(251,191,36,0.12)" : "transparent",
-                  color: accountOpen ? "#fbbf24" : "#cbd5e1",
-                  border: "none",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "5px",
-                }}
-                onClick={() => setAccountOpen(!accountOpen)}
+          {accountOpen && (
+            <div style={styles.accountDropdown}>
+              {/* Listings links */}
+              <div style={styles.rentalsDropdownHeader}>Browse</div>
+              <Link
+                to="/listings"
+                style={styles.rentalsDropdownItem}
+                onClick={() => { setAccountOpen(false); setMenuOpen(false); }}
               >
-                Account <span style={{ fontSize: "10px", opacity: 0.7 }}>{accountOpen ? "▲" : "▼"}</span>
-              </button>
+                <span style={styles.dropdownIcon}>🏢</span> All Listings
+              </Link>
+              <Link
+                to="/listings?type=apartment"
+                style={styles.rentalsDropdownItem}
+                onClick={() => { setAccountOpen(false); setMenuOpen(false); }}
+              >
+                <span style={styles.dropdownIcon}>🏠</span> Apartments
+              </Link>
+              <Link
+                to="/listings?type=house"
+                style={styles.rentalsDropdownItem}
+                onClick={() => { setAccountOpen(false); setMenuOpen(false); }}
+              >
+                <span style={styles.dropdownIcon}>🏡</span> Houses
+              </Link>
+              <Link
+                to="/listings?type=commercial"
+                style={styles.rentalsDropdownItem}
+                onClick={() => { setAccountOpen(false); setMenuOpen(false); }}
+              >
+                <span style={styles.dropdownIcon}>🏬</span> Commercial
+              </Link>
 
-              {accountOpen && (
-                <div style={styles.accountDropdown}>
-                  <div style={styles.accountDropdownTitle}>Welcome back</div>
+              {/* Account section — only shown when not logged in */}
+              {!(token && user) && (
+                <>
+                  <div style={styles.rentalsDropdownDivider} />
+                  <div style={styles.rentalsDropdownHeader}>Account</div>
                   <p style={styles.accountDropdownSubtitle}>Sign in or create an account</p>
-
                   <Link
                     to="/login"
                     style={styles.accountBtn}
@@ -269,8 +269,38 @@ export default function Navbar() {
                   >
                     Register
                   </Link>
-                </div>
+                </>
               )}
+            </div>
+          )}
+        </div>
+
+        <Link to="/movers" style={styles.navLink} onClick={() => setMenuOpen(false)}>
+          Movers
+        </Link>
+        <Link to="/materials" style={styles.navLink} onClick={() => setMenuOpen(false)}>
+          Merchants
+        </Link>
+        <Link to="/tourism" style={styles.navLink} onClick={() => setMenuOpen(false)}>
+          Tourism
+        </Link>
+        <Link to="/about" style={styles.navLink} onClick={() => setMenuOpen(false)}>
+          About
+        </Link>
+
+        {token && user && (
+          <>
+            <Link to="/upload" style={styles.navLink} onClick={() => setMenuOpen(false)}>
+              Upload
+            </Link>
+            <Link to="/dashboard" style={styles.navLink} onClick={() => setMenuOpen(false)}>
+              Dashboard
+            </Link>
+            <div style={styles.userSection}>
+              <span style={styles.userName}>{user.name}</span>
+              <button style={styles.logoutBtn} onClick={handleLogout}>
+                Logout
+              </button>
             </div>
           </>
         )}
@@ -506,6 +536,36 @@ const styles = {
     minWidth: "220px",
     zIndex: 300,
     boxShadow: "0 12px 32px rgba(0,0,0,0.5)",
+  },
+
+  // ─── RENTALS DROPDOWN STYLES ─────────────────────────────────────────────
+
+  rentalsDropdownHeader: {
+    padding: "8px 14px 4px",
+    fontSize: "10px",
+    fontWeight: 700,
+    color: "#64748b",
+    textTransform: "uppercase",
+    letterSpacing: "1px",
+  },
+
+  rentalsDropdownItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    padding: "9px 14px",
+    color: "#cbd5e1",
+    fontSize: "13px",
+    fontWeight: 600,
+    textDecoration: "none",
+    borderRadius: "8px",
+    transition: "background 0.15s",
+  },
+
+  rentalsDropdownDivider: {
+    height: "1px",
+    background: "#334155",
+    margin: "8px 0 4px",
   },
 
   accountDropdownTitle: {
