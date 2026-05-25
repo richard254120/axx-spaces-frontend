@@ -97,6 +97,31 @@ export async function fetchMyTourismListings(token) {
   return json.data || [];
 }
 
+export async function fetchOwnerProfile(token) {
+  const json = await request("/tourism/owner/profile", {
+    headers: { ...authHeaders(token) },
+  });
+  return json.data;
+}
+
+export async function fetchOwnerListing(token, listingId) {
+  const json = await request(`/tourism/owner/listings/${listingId}`, {
+    headers: { ...authHeaders(token) },
+  });
+  return json.data;
+}
+
+export async function updateOwnerListing(token, listingId, formData) {
+  const res = await fetch(`${API_BASE}/tourism/owner/listings/${listingId}`, {
+    method: "PATCH",
+    headers: { ...authHeaders(token) },
+    body: formData,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "Failed to update property");
+  return data;
+}
+
 export async function submitTourismReview(id, { name, rating, comment }) {
   return request(`/tourism/${id}/reviews`, {
     method: "POST",

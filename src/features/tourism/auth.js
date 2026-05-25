@@ -16,7 +16,16 @@ export function getTourismUser() {
 
 export function setTourismSession(token, user) {
   if (token) localStorage.setItem(TOKEN_KEY, token);
-  if (user) localStorage.setItem(USER_KEY, JSON.stringify(user));
+  if (user) {
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+    localStorage.setItem("user", JSON.stringify({
+      _id: user.id || user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role || "landlord",
+    }));
+  }
 }
 
 export function clearTourismSession() {
