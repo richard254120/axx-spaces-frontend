@@ -30,10 +30,6 @@ export default function MoverDashboard() {
     county: "", services: [], vehicleType: "", experienceYears: "",
     phone: "", bio: "",
   });
-  const [subscriptionInfo, setSubscriptionInfo] = useState(null);
-  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
-  const [subscriptionLoading, setSubscriptionLoading] = useState(false);
-  const [boostLoading, setBoostLoading] = useState(false);
 
   const pendingJobsCount = jobs.filter(j => j.status === "pending").length;
 
@@ -47,7 +43,7 @@ export default function MoverDashboard() {
     setLoading(true);
     setError("");
     try {
-      await Promise.all([fetchJobs(), fetchProfile(), fetchSubscription()]);
+      await Promise.all([fetchJobs(), fetchProfile()]);
     } catch (err) {
       setError("Failed to load dashboard data.");
     } finally {
@@ -80,20 +76,6 @@ export default function MoverDashboard() {
       phone: data.phone || user?.phone || "",
       bio: data.bio || "",
     });
-  };
-
-  const fetchSubscription = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/payment/subscription`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setSubscriptionInfo(data);
-      }
-    } catch (err) {
-      console.error("Failed to fetch subscription info:", err);
-    }
   };
 
   const computeStats = (jobList) => {
@@ -203,57 +185,6 @@ export default function MoverDashboard() {
   }[status] || status);
 
   const handleLogout = () => { logout(); navigate("/"); };
-
-  const handleSubscribe = async (subscriptionType) => {
-    setSubscriptionLoading(true);
-    try {
-      const res = await fetch(`${API_BASE}/payment/subscribe`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          subscriptionType,
-          phone: user?.phone || profileData.phone,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Subscription failed");
-      showSuccess("M-Pesa prompt sent! Check your phone.");
-      setShowSubscriptionModal(false);
-      setTimeout(() => fetchSubscription(), 5000);
-    } catch (err) {
-      showError(err.message || "Subscription failed. Try again.");
-    } finally {
-      setSubscriptionLoading(false);
-    }
-  };
-
-  const handleBoostProfile = async (plan) => {
-    setBoostLoading(true);
-    try {
-      const res = await fetch(`${API_BASE}/payment/boost-mover`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          plan,
-          phone: user?.phone || profileData.phone,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Boost failed");
-      showSuccess("M-Pesa prompt sent! Check your phone.");
-      setTimeout(() => fetchSubscription(), 5000);
-    } catch (err) {
-      showError(err.message || "Boost failed. Try again.");
-    } finally {
-      setBoostLoading(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -418,126 +349,6 @@ export default function MoverDashboard() {
             />
           </section>
         )}
-
-        {/* ── SUBSCRIPTION TAB ── */}
-        {activeTab === "subscription" && (
-          <section>
-            <h2 style={styles.sectionTitle}>💎 Subscription & Boosts</h2>
-            
-            {/* Current Subscription Status */}
-            <div style={styles.subscriptionCard}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-                <div>
-                  <p style={{ fontSize: "12px", color: "#6b7280", fontWeight: 700, textTransform: "uppercase", margin: "0 0 4px" }}>
-                    Current Plan
-                  </p>
-                  <h3 style={{ fontSize: "20px", fontWeight: 800, color: "#1f2937", margin: 0 }}>
-                    {subscriptionInfo?.subscriptionTier || "Free"}
-                  </h3>
-                </div>
-                {subscriptionInfo?.isActive && (
-                  <div style={styles.activeBadge}>
-                    Active ({subscriptionInfo.daysRemaining} days left)
-                  </div>
-                )}
-              </div>
-              {!subscriptionInfo?.isActive && (
-                <button
-                  onClick={() => setShowSubscriptionModal(true)}
-                  style={styles.upgradeBtn}
-                >
-                  Upgrade Now
-                </button>
-              )}
-            </div>
-
-            {/* Subscription Plans */}
-            <h3 style={styles.sectionTitle}>📦 Subscription Plans</h3>
-            <div style={styles.plansGrid}>
-              {[
-                {
-                  name: "Basic",
-                  price: "KES 500",
-                  duration: "30 days",
-                  features: ["Priority in search results", "Basic analytics", "Email support"],
-                  color: "#3b82f6",
-                  type: "basic",
-                },
-                {
-                  name: "Premium",
-                  price: "KES 1,200",
-                  duration: "90 days",
-                  features: ["Top placement in search", "Advanced analytics", "Priority support", "Featured badge"],
-                  color: "#f59e0b",
-                  type: "premium",
-                },
-              ].map((plan) => (
-                <div key={plan.name} style={styles.planCard}>
-                  <div style={{ background: plan.color, color: "white", padding: "16px", borderRadius: "12px 12px 0 0" }}>
-                    <h3 style={{ fontSize: "18px", fontWeight: 800, margin: 0 }}>{plan.name}</h3>
-                    <p style={{ fontSize: "24px", fontWeight: 700, margin: "4px 0 0" }}>{plan.price}</p>
-                    <p style={{ fontSize: "12px", opacity: 0.9, margin: 0 }}>{plan.duration}</p>
-                  </div>
-                  <div style={{ padding: "16px" }}>
-                    <ul style={{ margin: 0, paddingLeft: "20px", color: "#4b5563" }}>
-                      {plan.features.map((feature, idx) => (
-                        <li key={idx} style={{ marginBottom: "8px", fontSize: "13px" }}>{feature}</li>
-                      ))}
-                    </ul>
-                    <button
-                      onClick={() => handleSubscribe(plan.type)}
-                      disabled={subscriptionLoading}
-                      style={{
-                        ...styles.planBtn,
-                        background: plan.color,
-                      }}
-                    >
-                      {subscriptionLoading ? "Processing..." : "Subscribe"}
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Profile Boost Options */}
-            <h3 style={styles.sectionTitle}>🚀 Boost Your Profile</h3>
-            <div style={styles.boostGrid}>
-              {[
-                {
-                  name: "7-Day Boost",
-                  price: "KES 300",
-                  description: "Get featured for 7 days",
-                  plan: "boost-7days",
-                },
-                {
-                  name: "30-Day Boost",
-                  price: "KES 700",
-                  description: "Get featured for 30 days",
-                  plan: "boost-30days",
-                },
-              ].map((boost) => (
-                <div key={boost.name} style={styles.boostCard}>
-                  <h4 style={{ fontSize: "16px", fontWeight: 700, color: "#1f2937", margin: "0 0 4px" }}>
-                    {boost.name}
-                  </h4>
-                  <p style={{ fontSize: "20px", fontWeight: 800, color: "#22c55e", margin: "0 0 8px" }}>
-                    {boost.price}
-                  </p>
-                  <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 12px" }}>
-                    {boost.description}
-                  </p>
-                  <button
-                    onClick={() => handleBoostProfile(boost.plan)}
-                    disabled={boostLoading}
-                    style={styles.boostBtn}
-                  >
-                    {boostLoading ? "Processing..." : "Boost Now"}
-                  </button>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
       </main>
 
       {/* BOTTOM NAV */}
@@ -546,7 +357,6 @@ export default function MoverDashboard() {
           { tab: "overview", icon: "📊", label: "Overview", badge: 0 },
           { tab: "jobs",     icon: "📦", label: "Jobs",     badge: pendingJobsCount },
           { tab: "earnings", icon: "💰", label: "Earnings", badge: 0 },
-          { tab: "subscription", icon: "💎", label: "Upgrade", badge: 0 },
           { tab: "profile",  icon: "👤", label: "Profile",  badge: 0 },
         ].map(({ tab, icon, label, badge }) => (
           <button
@@ -885,46 +695,6 @@ const styles = {
     borderRadius: "10px", padding: "1px 6px",
     fontSize: "10px", fontWeight: 700,
     minWidth: "12px", textAlign: "center",
-  },
-  subscriptionCard: {
-    background: "white", padding: "20px", borderRadius: "12px",
-    border: "1px solid #e5e7eb", marginBottom: "24px",
-  },
-  activeBadge: {
-    background: "#22c55e", color: "white",
-    padding: "6px 12px", borderRadius: "8px",
-    fontSize: "12px", fontWeight: 700,
-  },
-  upgradeBtn: {
-    padding: "10px 20px", background: "#3b82f6",
-    color: "white", border: "none", borderRadius: "8px",
-    fontWeight: 700, cursor: "pointer", fontSize: "14px",
-  },
-  plansGrid: {
-    display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px",
-    marginBottom: "24px",
-  },
-  planCard: {
-    background: "white", borderRadius: "12px",
-    border: "1px solid #e5e7eb", overflow: "hidden",
-  },
-  planBtn: {
-    width: "100%", padding: "10px", color: "white",
-    border: "none", borderRadius: "8px",
-    fontWeight: 700, cursor: "pointer", fontSize: "13px",
-    marginTop: "12px",
-  },
-  boostGrid: {
-    display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px",
-  },
-  boostCard: {
-    background: "white", padding: "16px", borderRadius: "12px",
-    border: "1px solid #e5e7eb", textAlign: "center",
-  },
-  boostBtn: {
-    width: "100%", padding: "10px", background: "#22c55e",
-    color: "white", border: "none", borderRadius: "8px",
-    fontWeight: 700, cursor: "pointer", fontSize: "13px",
   },
 };
 

@@ -25,13 +25,11 @@ import Materials from "./pages/Materials";
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
 import TermsAndPrivacy from "./pages/TermsAndPrivacy";
-import Reviews from "./pages/Reviews";
 
 // ─── Tourism Pages ───────────────────────────────────────────────────────────
 import TourismPage from "./pages/tourism/TourismPage";
 import TourismListingsPage from "./pages/tourism/TourismListingsPage";
 import TourismDetailPage from "./pages/tourism/TourismDetailPage";
-import TourismLogin from "./pages/tourism/TourismLogin";
 import RegisterPropertyPage from "./pages/tourism/RegisterPropertyPage";
 import ProviderDashboard from "./pages/tourism/ProviderDashboard";
 import EditPropertyPage from "./pages/tourism/EditPropertyPage";
@@ -92,19 +90,17 @@ function App() {
       <Route path="/faq" element={<PublicLayout><FAQ /></PublicLayout>} />
       <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
       <Route path="/terms" element={<PublicLayout><TermsAndPrivacy /></PublicLayout>} />
-      <Route path="/reviews" element={<PublicLayout><Reviews /></PublicLayout>} />
 
       {/* ── TOURISM ROUTES (have Navbar) ── */}
       {/* IMPORTANT: specific /tourism/* paths must come before /tourism/:id */}
       <Route path="/tourism" element={<PublicLayout><TourismPage /></PublicLayout>} />
       <Route path="/tourism/listings" element={<PublicLayout><TourismListingsPage /></PublicLayout>} />
-      <Route path="/tourism/login" element={<PublicLayout><TourismLogin /></PublicLayout>} />
       <Route path="/tourism/register-property" element={<PublicLayout><RegisterPropertyPage /></PublicLayout>} />
       <Route
         path="/tourism/dashboard"
         element={
           <DashboardLayout>
-            <ProtectedRoute allowedRoles={["tourism_provider"]}>
+            <ProtectedRoute>
               <ProviderDashboard />
             </ProtectedRoute>
           </DashboardLayout>
@@ -114,7 +110,7 @@ function App() {
         path="/tourism/dashboard/property/:id"
         element={
           <DashboardLayout>
-            <ProtectedRoute allowedRoles={["tourism_provider"]}>
+            <ProtectedRoute>
               <EditPropertyPage />
             </ProtectedRoute>
           </DashboardLayout>
@@ -187,7 +183,7 @@ function App() {
             }}>
               <div style={{ fontSize: "64px", marginBottom: "16px" }}>🏚️</div>
               <h2 style={{ color: "#fbbf24", margin: "0 0 8px" }}>Page Not Found</h2>
-              <p style={{ margin: "0 0 24px" }}>This page doesn't exist on Axxspace.</p>
+              <p style={{ margin: "0 0 24px" }}>This page doesn't exist on Axx Spaces.</p>
               <button
                 onClick={() => navigate("/")}
                 style={{

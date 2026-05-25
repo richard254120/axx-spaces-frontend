@@ -39,9 +39,6 @@ export default function SellerDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [stats, setStats] = useState({ totalEarnings: 0, liveItems: 0, pendingReview: 0, totalViews: 0 });
-  const [subscriptionInfo, setSubscriptionInfo] = useState(null);
-  const [subscriptionLoading, setSubscriptionLoading] = useState(false);
-  const [boostLoading, setBoostLoading] = useState(false);
 
   const [form, setForm] = useState({
     title: "", description: "", category: "", condition: "Good",
@@ -58,7 +55,6 @@ export default function SellerDashboard() {
     setToken(storedToken);
     setSeller(JSON.parse(storedUser));
     fetchMyMaterials(storedToken);
-    fetchSubscription(storedToken);
   }, []);
 
   useEffect(() => {
@@ -89,20 +85,6 @@ export default function SellerDashboard() {
       console.error(err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchSubscription = async (tkn) => {
-    try {
-      const res = await fetch(`${API_BASE}/payment/subscription`, {
-        headers: { Authorization: `Bearer ${tkn}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setSubscriptionInfo(data);
-      }
-    } catch (err) {
-      console.error("Failed to fetch subscription info:", err);
     }
   };
 
@@ -156,57 +138,6 @@ export default function SellerDashboard() {
     fetchMyMaterials(token);
   };
 
-  const handleSubscribe = async (subscriptionType) => {
-    setSubscriptionLoading(true);
-    try {
-      const res = await fetch(`${API_BASE}/payment/subscribe`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          subscriptionType,
-          phone: seller?.phone,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Subscription failed");
-      setSuccess("M-Pesa prompt sent! Check your phone.");
-      setTimeout(() => { setSuccess(""); fetchSubscription(token); }, 5000);
-    } catch (err) {
-      setError(err.message || "Subscription failed. Try again.");
-    } finally {
-      setSubscriptionLoading(false);
-    }
-  };
-
-  const handleBoostMaterial = async (materialId, plan) => {
-    setBoostLoading(true);
-    try {
-      const res = await fetch(`${API_BASE}/payment/boost-material`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          materialId,
-          plan,
-          phone: seller?.phone,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Boost failed");
-      setSuccess("M-Pesa prompt sent! Check your phone.");
-      setTimeout(() => { setSuccess(""); fetchMyMaterials(token); }, 5000);
-    } catch (err) {
-      setError(err.message || "Boost failed. Try again.");
-    } finally {
-      setBoostLoading(false);
-    }
-  };
-
   const filteredMaterials = materials.filter((m) => {
     const matchesSearch = (m.title || "").toLowerCase().includes(searchQuery.toLowerCase());
     let currentStatus = m.status || "pending";
@@ -242,7 +173,6 @@ export default function SellerDashboard() {
       <div style={s.controlsRow}>
         <div style={s.tabs}>
           <button style={{ ...s.tab, ...(view === "listings" ? s.activeTab : {}) }} onClick={() => setView("listings")}>My Stock</button>
-          <button style={{ ...s.tab, ...(view === "subscription" ? s.activeTab : {}) }} onClick={() => setView("subscription")}>💎 Upgrade</button>
           <button style={{ ...s.tab, ...(view === "profile" ? s.activeTab : {}) }} onClick={() => setView("profile")}>👤 Profile</button>
         </div>
         {view === "listings" && (
@@ -266,113 +196,6 @@ export default function SellerDashboard() {
           accentColor="#fbbf24"
           onUpdated={(u) => u && setSeller(u)}
         />
-      ) : view === "subscription" ? (
-        <div style={{ maxWidth: "900px" }}>
-          <h2 style={{ color: "#fbbf24", marginBottom: "24px" }}>💎 Subscription & Boosts</h2>
-          
-          {/* Current Subscription Status */}
-          <div style={s.subscriptionCard}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-              <div>
-                <p style={{ fontSize: "12px", color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", margin: "0 0 4px" }}>
-                  Current Plan
-                </p>
-                <h3 style={{ fontSize: "20px", fontWeight: 800, color: "#f8fafc", margin: 0 }}>
-                  {subscriptionInfo?.subscriptionTier || "Free"}
-                </h3>
-              </div>
-              {subscriptionInfo?.isActive && (
-                <div style={s.activeBadge}>
-                  Active ({subscriptionInfo.daysRemaining} days left)
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Subscription Plans */}
-          <h3 style={{ color: "#f8fafc", marginBottom: "16px", fontSize: "16px", fontWeight: 700 }}>📦 Subscription Plans</h3>
-          <div style={s.plansGrid}>
-            {[
-              {
-                name: "Basic",
-                price: "KES 500",
-                duration: "30 days",
-                features: ["Priority in search results", "Basic analytics", "Email support"],
-                color: "#3b82f6",
-                type: "basic",
-              },
-              {
-                name: "Premium",
-                price: "KES 1,200",
-                duration: "90 days",
-                features: ["Top placement in search", "Advanced analytics", "Priority support", "Featured badge"],
-                color: "#f59e0b",
-                type: "premium",
-              },
-            ].map((plan) => (
-              <div key={plan.name} style={s.planCard}>
-                <div style={{ background: plan.color, color: "white", padding: "16px", borderRadius: "12px 12px 0 0" }}>
-                  <h3 style={{ fontSize: "18px", fontWeight: 800, margin: 0 }}>{plan.name}</h3>
-                  <p style={{ fontSize: "24px", fontWeight: 700, margin: "4px 0 0" }}>{plan.price}</p>
-                  <p style={{ fontSize: "12px", opacity: 0.9, margin: 0 }}>{plan.duration}</p>
-                </div>
-                <div style={{ padding: "16px" }}>
-                  <ul style={{ margin: 0, paddingLeft: "20px", color: "#cbd5e1" }}>
-                    {plan.features.map((feature, idx) => (
-                      <li key={idx} style={{ marginBottom: "8px", fontSize: "13px" }}>{feature}</li>
-                    ))}
-                  </ul>
-                  <button
-                    onClick={() => handleSubscribe(plan.type)}
-                    disabled={subscriptionLoading}
-                    style={{
-                      ...s.planBtn,
-                      background: plan.color,
-                    }}
-                  >
-                    {subscriptionLoading ? "Processing..." : "Subscribe"}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Boost Options for Materials */}
-          <h3 style={{ color: "#f8fafc", marginBottom: "16px", marginTop: "32px", fontSize: "16px", fontWeight: 700 }}>🚀 Boost Your Listings</h3>
-          <p style={{ color: "#94a3b8", marginBottom: "16px", fontSize: "13px" }}>Boost your active materials to get more visibility</p>
-          <div style={s.grid}>
-            {materials.filter(m => m.status === "active" || (m.isVerified && m.status === "pending")).slice(0, 6).map((m) => (
-              <div key={m._id} style={s.card}>
-                <div style={s.cardImg}>
-                  {m.images?.[0] ? <img src={m.images[0]} alt="" style={s.img} /> : <div style={s.noImg}>📷 No Image</div>}
-                  {m.isFeatured && <span style={{ ...s.statusBadge, background: "rgba(251,191,36,0.2)", color: "#fbbf24" }}>⭐ Featured</span>}
-                </div>
-                <div style={s.cardBody}>
-                  <h3 style={s.cardTitle}>{m.title}</h3>
-                  <p style={s.cardPrice}>KES {m.price?.toLocaleString()}</p>
-                  {!m.isFeatured && (
-                    <div style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
-                      <button
-                        onClick={() => handleBoostMaterial(m._id, "boost-7days")}
-                        disabled={boostLoading}
-                        style={{ ...s.boostBtn, flex: 1, fontSize: "11px", padding: "6px" }}
-                      >
-                        7-Day (KES 200)
-                      </button>
-                      <button
-                        onClick={() => handleBoostMaterial(m._id, "boost-30days")}
-                        disabled={boostLoading}
-                        style={{ ...s.boostBtn, flex: 1, fontSize: "11px", padding: "6px", background: "#f59e0b" }}
-                      >
-                        30-Day (KES 500)
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
       ) : view === "listings" ? (
         <div style={s.grid}>
           {filteredMaterials.map((m) => {
@@ -461,13 +284,7 @@ const s = {
   input: { width: "100%", padding: "10px", background: "#0f172a", border: "1px solid #334155", borderRadius: "6px", color: "#fff" },
   submitBtn: { padding: "10px 24px", background: "#fbbf24", color: "#0f172a", border: "none", borderRadius: "6px", fontWeight: "bold", cursor: "pointer" },
   errorMsg: { background: "rgba(239,68,68,0.2)", padding: "10px", borderRadius: "6px", color: "#f87171", marginBottom: "16px" },
-  successMsg: { background: "rgba(34,197,94,0.2)", padding: "10px", borderRadius: "6px", color: "#4ade80", marginBottom: "16px" },
-  subscriptionCard: { background: "#1e293b", padding: "20px", borderRadius: "12px", border: "1px solid #334155", marginBottom: "24px" },
-  activeBadge: { background: "#22c55e", color: "white", padding: "6px 12px", borderRadius: "8px", fontSize: "12px", fontWeight: 700 },
-  plansGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "24px" },
-  planCard: { background: "#1e293b", borderRadius: "12px", border: "1px solid #334155", overflow: "hidden" },
-  planBtn: { width: "100%", padding: "10px", color: "white", border: "none", borderRadius: "8px", fontWeight: 700, cursor: "pointer", fontSize: "13px", marginTop: "12px" },
-  boostBtn: { padding: "6px 12px", background: "#22c55e", color: "white", border: "none", borderRadius: "6px", fontWeight: 700, cursor: "pointer", fontSize: "12px" }
+  successMsg: { background: "rgba(34,197,94,0.2)", padding: "10px", borderRadius: "6px", color: "#4ade80", marginBottom: "16px" }
 };
 
 const css = `

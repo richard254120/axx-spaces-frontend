@@ -55,6 +55,15 @@ export default function RegisterPropertyPage() {
     setSubmitError("");
     try {
       const result = await registerTourismProperty(form);
+      if (result.token) {
+        setTourismSession(result.token, result.user);
+        authLogin(result.token, {
+          _id: result.user?.id,
+          name: result.user?.name,
+          email: result.user?.email,
+          role: "landlord",
+        });
+      }
       setSubmitted(true);
     } catch (err) {
       setSubmitError(err.message || "Submission failed. Please try again.");
@@ -83,13 +92,9 @@ export default function RegisterPropertyPage() {
               <div style={{ fontSize: "12px", color: "#15803d" }}>Guests will be redirected to: {form.bookingUrl}</div>
             </div>
           )}
-          <div style={{ background: "#fef3c7", border: "1px solid #fcd34d", borderRadius: "12px", padding: "16px", marginBottom: "20px", textAlign: "left" }}>
-            <div style={{ fontSize: "13px", fontWeight: 800, color: "#92400e", marginBottom: "8px" }}>⏳ Account Pending Approval</div>
-            <div style={{ fontSize: "12px", color: "#78350f" }}>Your account requires admin approval before you can access the dashboard. Approval typically takes less than 5 hours. You will receive an email once approved.</div>
-          </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            <button style={{ background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "10px", padding: "14px", fontWeight: 800, fontSize: "15px", cursor: "pointer", fontFamily: "inherit" }} onClick={() => navigate("/tourism/login")}>
-              Login to Dashboard →
+            <button style={{ background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "10px", padding: "14px", fontWeight: 800, fontSize: "15px", cursor: "pointer", fontFamily: "inherit" }} onClick={() => navigate("/tourism/dashboard")}>
+              Go to Dashboard →
             </button>
             <button style={{ background: "transparent", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "14px", fontWeight: 700, fontSize: "14px", cursor: "pointer", fontFamily: "inherit", color: "#4b5563" }} onClick={() => navigate("/tourism")}>
               Browse Tourism
