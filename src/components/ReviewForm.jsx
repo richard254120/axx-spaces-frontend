@@ -127,7 +127,7 @@ const styles = {
     borderRadius: "8px",
     padding: "12px 24px",
     fontSize: "15px",
-    fontWeight: 700",
+    fontWeight: 700,
     cursor: "pointer",
     textDecoration: "none",
     display: "inline-block",

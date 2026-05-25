@@ -46,7 +46,7 @@ export default function MoverRegister() {
     <div style={styles.container}>
       <div style={styles.card}>
         <h1 style={styles.title}>🚚 Register as a Professional Mover</h1>
-        <p style={styles.subtitle}>Join Axx Spaces Movers Network</p>
+        <p style={styles.subtitle}>Join Axxspace Movers Network</p>
 
         <form onSubmit={handleSubmit}>
           <input 

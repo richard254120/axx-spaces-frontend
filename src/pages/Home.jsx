@@ -33,7 +33,7 @@ export default function Home() {
   ];
 
   const marqueeItems = [
-    "👋 Welcome to Axx Spaces!",
+    "👋 Welcome to Axxspace!",
     "🏠 Rentals Across All 47 Counties",
     "🚛 Trusted Moving Services",
     "🛍️ Building Materials & Merchants",
@@ -285,7 +285,7 @@ export default function Home() {
       <section style={styles.categoriesSection}>
         <div style={styles.sectionHeader}>
           <h2 style={styles.sectionTitle}>Everything on One Platform</h2>
-          <p style={styles.sectionSubtitle}>From finding a home to settling in — Axx Spaces has you covered</p>
+          <p style={styles.sectionSubtitle}>From finding a home to settling in — Axxspace has you covered</p>
         </div>
         <div style={styles.categoriesGrid}>
           {platformCategories.map((cat) => (
@@ -468,7 +468,7 @@ export default function Home() {
             { step: "01", icon: "🔍", title: "Search & Discover", text: "Browse verified listings across Rentals, Movers, Merchants, and Tourism — all in one place." },
             { step: "02", icon: "💬", title: "Connect Directly", text: "Chat with landlords, movers, merchants, or hotels via WhatsApp or call — no middlemen." },
             { step: "03", icon: "✅", title: "Book & Confirm", text: "Schedule viewings, get quotes, place orders, or book stays — with full transparency." },
-            { step: "04", icon: "🏠", title: "Move In & Thrive", text: "Find your home, move your stuff, furnish it, and explore Kenya — all through Axx Spaces." },
+            { step: "04", icon: "🏠", title: "Move In & Thrive", text: "Find your home, move your stuff, furnish it, and explore Kenya — all through Axxspace." },
           ].map((s, idx) => (
             <div key={s.step} style={styles.stepCard} className="step-card">
               <div style={styles.stepNumber}>{s.step}</div>
@@ -490,9 +490,9 @@ export default function Home() {
         <div style={styles.testimonialsGrid}>
           {[
             { name: "Sarah Wanjiku", role: "Tenant · Nairobi", rating: 5, text: "Found my dream apartment in 2 days! The WhatsApp feature made connecting with the landlord so easy. No agents, no hidden fees.", avatar: "", tag: "Rentals" },
-            { name: "David Mwangi", role: "Customer · Mombasa", rating: 5, text: "Booked movers through Axx Spaces for my relocation to Nairobi. Professional team, transparent pricing, everything arrived safely.", avatar: "", tag: "Movers" },
+            { name: "David Mwangi", role: "Customer · Mombasa", rating: 5, text: "Booked movers through Axxspace for my relocation to Nairobi. Professional team, transparent pricing, everything arrived safely.", avatar: "", tag: "Movers" },
             { name: "Grace Omondi", role: "Developer · Kisumu", rating: 5, text: "The merchant listings saved me thousands on my construction project. Found roofing materials at 20% below market prices.", avatar: "", tag: "Merchants" },
-            { name: "James Kariuki", role: "Tourist · Nairobi", rating: 5, text: "Planned a full safari weekend through Axx Spaces Tourism. Best lodge, easy booking, and zero commission. Absolutely loved it!", avatar: "", tag: "Tourism" },
+            { name: "James Kariuki", role: "Tourist · Nairobi", rating: 5, text: "Planned a full safari weekend through Axxspace Tourism. Best lodge, easy booking, and zero commission. Absolutely loved it!", avatar: "", tag: "Tourism" },
           ].map((t) => (
             <div key={t.name} style={styles.testimonialCard} className="testimonial-card">
               <div style={styles.testimonialTop}>
@@ -510,10 +510,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── WHY AXX SPACES ── */}
+      {/* ── WHY AXXSPACE ── */}
       <section style={styles.featuresSection}>
         <div style={styles.sectionHeader}>
-          <h2 style={{ ...styles.sectionTitle, color: "#0B2140" }}>Why Axx Spaces?</h2>
+          <h2 style={{ ...styles.sectionTitle, color: "#0B2140" }}>Why Axxspace?</h2>
           <p style={{ ...styles.sectionSubtitle, color: "#6b7280" }}>Built for Kenyans, by Kenyans — serving every need</p>
         </div>
         <div style={styles.featureGrid}>
@@ -541,7 +541,7 @@ export default function Home() {
         <div style={styles.ctaInner}>
           <h2 style={styles.ctaTitle}>Start Your Journey Today</h2>
           <p style={styles.ctaText}>
-            Join thousands of Kenyans who find homes, move smarter, build better, and explore more — all through Axx Spaces.
+            Join thousands of Kenyans who find homes, move smarter, build better, and explore more — all through Axxspace.
           </p>
           <div style={styles.ctaButtons}>
             <button style={styles.ctaBtnPrimary} onClick={() => navigate("/listings")}>🏢 Browse Rentals</button>
@@ -569,7 +569,7 @@ export default function Home() {
       <footer style={styles.footer}>
         <div style={styles.footerInner}>
           <div style={styles.footerBrand}>
-            <strong style={{ color: "#E31B1B", fontSize: "18px" }}>Axx Spaces</strong>
+            <strong style={{ color: "#E31B1B", fontSize: "18px" }}>Axxspace</strong>
             <p style={styles.footerTagline}>Kenya's most trusted property & services platform</p>
           </div>
           <div style={styles.footerColumns}>
@@ -592,7 +592,7 @@ export default function Home() {
               ))}
             </div>
           </div>
-          <p style={styles.footerCopy}>© 2026 Axx Spaces. All rights reserved.</p>
+          <p style={styles.footerCopy}>© 2026 Axxspace. All rights reserved.</p>
         </div>
       </footer>
     </div>

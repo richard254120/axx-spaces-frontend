@@ -48,7 +48,7 @@ export default function AdminDashboard() {
       
       <div style={styles.header}>
         <h1 style={styles.title}>🛡️ Admin Review Panel</h1>
-        <p style={styles.subtitle}>Manage pending submissions for Axx Spaces</p>
+        <p style={styles.subtitle}>Manage pending submissions for Axxspace</p>
       </div>
 
       {loading ? (

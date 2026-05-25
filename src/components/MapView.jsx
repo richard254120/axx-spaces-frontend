@@ -1,5 +1,5 @@
 /**
- * MapView.jsx — AXX Spaces
+ * MapView.jsx — Axxspace
  *
  * Receives already-filtered properties from Listings.jsx as a prop.
  * No internal fetching. Matches the navy/amber theme.

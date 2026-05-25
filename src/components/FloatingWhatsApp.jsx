@@ -5,7 +5,7 @@ import { useEffect } from "react";
 export default function FloatingWhatsApp() {
   useEffect(() => {
     const phone = "254796740883";
-    const message = "Hello Axx Spaces! 👋 I need help finding a property.";
+    const message = "Hello Axxspace! 👋 I need help finding a property.";
     const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 
     // Always clean up first to handle StrictMode double-fire

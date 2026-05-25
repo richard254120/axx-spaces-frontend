@@ -21,35 +21,35 @@ export default function AboutPage() {
       role: "Co-Founder & CEO",
       image: kenfredImg,
       color: "#fbbf24",
-      bio: "Passionate about solving Kenya's housing challenges through technology. Kenfred leads product vision and strategy at Axx Spaces.",
+      bio: "Passionate about solving Kenya's housing challenges through technology. Kenfred leads product vision and strategy at Axxspace.",
     },
     {
       name: "Lucie",
       role: "Co-Founder & Operations",
       image: lucieImg,
       color: "#22c55e",
-      bio: "Lucie oversees landlord relations and ensures every listing on Axx Spaces meets our quality and verification standards.",
+      bio: "Lucie oversees landlord relations and ensures every listing on Axxspace meets our quality and verification standards.",
     },
     {
       name: "Richard",
       role: "Technical Lead",
       image: richardImg,
       color: "#3b82f6",
-      bio: "Drives the technical infrastructure that powers Axx Spaces, ensuring a seamless experience for landlords and tenants alike.",
+      bio: "Drives the technical infrastructure that powers Axxspace, ensuring a seamless experience for landlords and tenants alike.",
     },
     {
       name: "Ian",
       role: "Chief Financial Officer",
       image: ianImg,
       color: "#8b5cf6",
-      bio: "Stewards the financial health and strategic direction of Axx Spaces.",
+      bio: "Stewards the financial health and strategic direction of Axxspace.",
     },
     {
       name: "Brian",
       role: "UI/UX Designer",
       image: brianImg,
       color: "#ec4899",
-      bio: "Creates intuitive and engaging user experiences for Axx Spaces.",
+      bio: "Creates intuitive and engaging user experiences for Axxspace.",
     },
     {
       name: "Clare",
@@ -265,7 +265,7 @@ export default function AboutPage() {
         <div style={styles.teamInner}>
           <div style={styles.sectionLabelDark}>The People</div>
           <h2 style={{ ...styles.sectionTitle, color: "#fbbf24" }}>Meet the Team</h2>
-          <p style={{ ...styles.sectionSubtitle, color: "#94a3b8" }}>The young innovators behind Axx Spaces</p>
+          <p style={{ ...styles.sectionSubtitle, color: "#94a3b8" }}>The young innovators behind Axxspace</p>
 
           <div style={styles.teamGrid}>
             {team.map((member) => (
@@ -325,7 +325,7 @@ export default function AboutPage() {
         <div style={styles.ctaInner}>
           <h2 style={styles.ctaTitle}>Ready to Find Your Space?</h2>
           <p style={styles.ctaText}>
-            Join thousands of Kenyans who found their perfect home on Axx Spaces — for free, with zero hidden fees.
+            Join thousands of Kenyans who found their perfect home on Axxspace — for free, with zero hidden fees.
           </p>
 
           <div style={styles.ctaButtons}>
@@ -372,7 +372,7 @@ export default function AboutPage() {
       <footer style={styles.footer}>
         <div style={styles.footerInner}>
           <div style={styles.footerSection}>
-            <strong style={{ color: "#fbbf24", fontSize: "18px" }}>Axx Spaces</strong>
+            <strong style={{ color: "#fbbf24", fontSize: "18px" }}>Axxspace</strong>
             <p style={styles.footerTagline}>Kenya's most trusted rental platform</p>
           </div>
           <div style={styles.footerSection}>
@@ -390,7 +390,7 @@ export default function AboutPage() {
           </div>
         </div>
         <div style={styles.footerBottom}>
-          <p style={styles.footerCopy}>© 2026 Axx Spaces. All rights reserved. Built for Kenya, by Kenyans.</p>
+          <p style={styles.footerCopy}>© 2026 Axxspace. All rights reserved. Built for Kenya, by Kenyans.</p>
         </div>
       </footer>
     </div>

@@ -4,16 +4,16 @@ const TABS = ["Terms of Service", "Privacy Policy"];
 
 const terms = `
 ## 1. Acceptance of Terms
-By accessing or using Axx Spaces ("the Platform"), you agree to be bound by these Terms of Service. If you do not agree, please do not use the Platform.
+By accessing or using Axxspace ("the Platform"), you agree to be bound by these Terms of Service. If you do not agree, please do not use the Platform.
 
 ## 2. Description of Service
-Axx Spaces is an online marketplace that connects landlords, tenants, movers, and merchants. We provide tools to list properties, discover rental accommodation, book moving services, and source packing materials. Axx Spaces does not own any properties and is not a party to any rental or service agreement between users.
+Axxspace is an online marketplace that connects landlords, tenants, movers, and merchants. We provide tools to list properties, discover rental accommodation, book moving services, and source packing materials. Axxspace does not own any properties and is not a party to any rental or service agreement between users.
 
 ## 3. User Accounts
 You must register an account to access certain features. You are responsible for keeping your credentials secure and for all activity that occurs under your account. You must provide accurate information and keep it up to date.
 
 ## 4. Listings & Content
-Landlords are solely responsible for the accuracy of their listings. Axx Spaces reserves the right to remove listings that are fraudulent, misleading, or in violation of these terms. By uploading content (photos, descriptions) you grant Axx Spaces a non-exclusive licence to display it on the Platform.
+Landlords are solely responsible for the accuracy of their listings. Axxspace reserves the right to remove listings that are fraudulent, misleading, or in violation of these terms. By uploading content (photos, descriptions) you grant Axxspace a non-exclusive licence to display it on the Platform.
 
 ## 5. Prohibited Conduct
 You may not:
@@ -23,10 +23,10 @@ You may not:
 - Attempt to scrape, reverse-engineer, or disrupt the Platform.
 
 ## 6. Payments & Transactions
-Axx Spaces does not process payments between users. All financial arrangements are made directly between landlords, tenants, movers, and merchants. Axx Spaces is not responsible for any payment disputes.
+Axxspace does not process payments between users. All financial arrangements are made directly between landlords, tenants, movers, and merchants. Axxspace is not responsible for any payment disputes.
 
 ## 7. Limitation of Liability
-To the maximum extent permitted by law, Axx Spaces shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Platform, including but not limited to disputes between users, property damage, or loss of data.
+To the maximum extent permitted by law, Axxspace shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Platform, including but not limited to disputes between users, property damage, or loss of data.
 
 ## 8. Termination
 We reserve the right to suspend or terminate your account at our discretion if you violate these terms.
@@ -56,7 +56,7 @@ We use your information to:
 We do not sell your personal data. We may share your information with:
 - **Other users**: Your name and listing details are visible to platform users as intended.
 - **Service providers**: Third-party services we use to operate the Platform (hosting, analytics, email delivery). These providers are bound by data processing agreements.
-- **Legal requirements**: When required by law or to protect the rights and safety of Axx Spaces and its users.
+- **Legal requirements**: When required by law or to protect the rights and safety of Axxspace and its users.
 
 ## 4. Data Storage & Security
 Your data is stored on secure servers. We use industry-standard measures (encryption in transit via HTTPS, access controls) to protect your information. No system is 100% secure; please use a strong, unique password.
@@ -77,7 +77,7 @@ To exercise any of these rights, contact us at privacy@axxspace.com.
 We retain your data for as long as your account is active, or as long as necessary to provide services and comply with legal obligations. Deleted accounts are purged within 90 days.
 
 ## 8. Children's Privacy
-Axx Spaces is not intended for users under the age of 18. We do not knowingly collect personal data from minors.
+Axxspace is not intended for users under the age of 18. We do not knowingly collect personal data from minors.
 
 ## 9. Changes to This Policy
 We may update this Privacy Policy from time to time. We will notify you by email or an in-app notice if the changes are material.
@@ -123,7 +123,7 @@ export default function TermsAndPrivacy() {
         <p style={styles.eyebrow}>Legal</p>
         <h1 style={styles.heroTitle}>Terms & Privacy</h1>
         <p style={styles.heroSub}>
-          Please read these documents carefully. They govern your use of Axx Spaces.
+          Please read these documents carefully. They govern your use of Axxspace.
         </p>
       </div>
 

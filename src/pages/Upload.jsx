@@ -501,7 +501,7 @@ export default function Upload() {
                   checked={consent}
                   onChange={(e) => setConsent(e.target.checked)}
                 />
-                I confirm that all information provided is accurate and I agree to the terms and conditions of Axx Spaces.
+                I confirm that all information provided is accurate and I agree to the terms and conditions of Axxspace.
               </label>
             </div>
 

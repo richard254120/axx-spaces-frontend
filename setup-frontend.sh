@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 Setting up Axx Spaces Frontend..."
+echo "🚀 Setting up Axxspace Frontend..."
 
 # Create folders
 mkdir -p src/pages src/components src/api src/layouts
@@ -53,7 +53,7 @@ cat > src/pages/Home.jsx <<EOL
 export default function Home() {
   return (
     <div style={{ padding: "20px" }}>
-      <h1>Axx Spaces 🏠</h1>
+      <h1>Axxspace 🏠</h1>
       <p>Find rental spaces in Kenya</p>
       <input placeholder="Search location..." />
     </div>

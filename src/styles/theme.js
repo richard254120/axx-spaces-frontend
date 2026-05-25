@@ -1,4 +1,4 @@
-// Unified Design System for Axx Spaces
+// Unified Design System for Axxspace
 // Consistent colors, spacing, and styles across all pages
 
 export const COLORS = {

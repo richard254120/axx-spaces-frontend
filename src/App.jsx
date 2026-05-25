@@ -185,7 +185,7 @@ function App() {
             }}>
               <div style={{ fontSize: "64px", marginBottom: "16px" }}>🏚️</div>
               <h2 style={{ color: "#fbbf24", margin: "0 0 8px" }}>Page Not Found</h2>
-              <p style={{ margin: "0 0 24px" }}>This page doesn't exist on Axx Spaces.</p>
+              <p style={{ margin: "0 0 24px" }}>This page doesn't exist on Axxspace.</p>
               <button
                 onClick={() => navigate("/")}
                 style={{

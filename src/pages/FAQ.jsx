@@ -5,7 +5,7 @@ const faqs = [
     category: "Listings",
     items: [
       {
-        q: "How do I list my property on Axx Spaces?",
+        q: "How do I list my property on Axxspace?",
         a: "Create an account, go to your Dashboard and click 'Upload Property'. Fill in the details — title, description, photos, price, and location — then submit for review. Your listing goes live within 24 hours.",
       },
       {
@@ -30,7 +30,7 @@ const faqs = [
         a: "Browse the Movers page, select a mover that fits your needs, and send them a booking request with your date, pickup, and drop-off location. They'll confirm within a few hours.",
       },
       {
-        q: "Are the movers on Axx Spaces verified?",
+        q: "Are the movers on Axxspace verified?",
         a: "All movers go through a basic verification process before being listed. Verified movers display a badge on their profile. We recommend reading reviews before booking.",
       },
       {
@@ -51,8 +51,8 @@ const faqs = [
         a: "Click 'Login', then 'Forgot password'. Enter your email and we'll send you a reset link within a few minutes.",
       },
       {
-        q: "Does Axx Spaces handle payments between landlords and tenants?",
-        a: "Not currently. Axx Spaces is a discovery and communication platform. Payment arrangements are made directly between the parties. We recommend using traceable payment methods.",
+        q: "Does Axxspace handle payments between landlords and tenants?",
+        a: "Not currently. Axxspace is a discovery and communication platform. Payment arrangements are made directly between the parties. We recommend using traceable payment methods.",
       },
     ],
   },

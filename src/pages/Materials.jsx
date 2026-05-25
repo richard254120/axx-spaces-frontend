@@ -146,7 +146,7 @@ export default function Marketplace() {
 
   const handleWhatsApp = (item) => {
     const phone = formatPhone(item.sellerPhone);
-    const msg = `Hi ${item.sellerName}, I'm interested in your listing "${item.title}" on Axx Spaces for KES ${item.price?.toLocaleString()}. Is it still available?`;
+    const msg = `Hi ${item.sellerName}, I'm interested in your listing "${item.title}" on Axxspace for KES ${item.price?.toLocaleString()}. Is it still available?`;
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
   };
 

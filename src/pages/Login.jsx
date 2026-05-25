@@ -106,7 +106,7 @@ export default function Login() {
       <style>{css}</style>
       <div style={styles.container}>
         <div style={styles.logoSection}>
-          <img src={logo} alt="Axx Spaces" style={styles.logo} />
+          <img src={logo} alt="Axxspace" style={styles.logo} />
         </div>
 
         <div style={styles.formBox}>

@@ -12,7 +12,7 @@ export default function ShareProperty({ property }) {
   const shareUrl = `${window.location.origin}/listings?highlight=${property._id}`;
 
   const shareText =
-    `🏠 Check out this property on Axx Spaces!\n\n` +
+    `🏠 Check out this property on Axxspace!\n\n` +
     `*${property.title}*\n` +
     `📍 ${property.county} - ${property.location}\n` +
     `💰 KES ${property.price?.toLocaleString()}/month\n` +
@@ -49,7 +49,7 @@ export default function ShareProperty({ property }) {
     if (navigator.share) {
       navigator.share({
         title: property.title,
-        text: `Check out this property on Axx Spaces — ${property.title} in ${property.county}`,
+        text: `Check out this property on Axxspace — ${property.title} in ${property.county}`,
         url: shareUrl,
       });
     } else {

@@ -2,8 +2,13 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #0a0a0a;
+  background: #0f1729 !important;
   color: white;
+}
+
+html, body, #root {
+  background: #0f1729 !important;
+  min-height: 100vh;
 }
 
 input, textarea {
@@ -28,7 +33,7 @@ button {
 
 /* ====================== LEAFLET OVERRIDES ======================
    Forces Leaflet's popups, controls, and tiles to match
-   the dark #0a0a0a / #b30000 theme used across AXX Spaces.
+   the dark #0a0a0a / #b30000 theme used across Axxspace.
    Import leaflet/dist/leaflet.css BEFORE this file.
    ============================================================= */
 
