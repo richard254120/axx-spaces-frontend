@@ -13,6 +13,7 @@ export default function Home() {
   const [loadingFeatured, setLoadingFeatured] = useState(true);
   const [fetchError, setFetchError] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [animatedStats, setAnimatedStats] = useState({ listings: 0, counties: 0, tenants: 0 });
 
   const counties = [
     "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
@@ -65,6 +66,34 @@ export default function Home() {
       }
     };
     fetchFeatured();
+  }, []);
+
+  // Animated stats counter
+  useEffect(() => {
+    const targetStats = { listings: 280, counties: 47, tenants: 500 };
+    const duration = 2000;
+    const steps = 60;
+    const interval = duration / steps;
+
+    let currentStep = 0;
+    const timer = setInterval(() => {
+      currentStep++;
+      const progress = currentStep / steps;
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+
+      setAnimatedStats({
+        listings: Math.floor(targetStats.listings * easeOut),
+        counties: Math.floor(targetStats.counties * easeOut),
+        tenants: Math.floor(targetStats.tenants * easeOut),
+      });
+
+      if (currentStep >= steps) {
+        clearInterval(timer);
+        setAnimatedStats(targetStats);
+      }
+    }, interval);
+
+    return () => clearInterval(timer);
   }, []);
 
   const handleSearch = (e) => {
@@ -183,9 +212,9 @@ export default function Home() {
 
           <div style={styles.heroStats}>
             {[
-              { val: "280", label: "Active Listings" },
-              { val: "47", label: "Counties" },
-              { val: "500+", label: "Happy Tenants" },
+              { val: animatedStats.listings, label: "Active Listings" },
+              { val: animatedStats.counties, label: "Counties" },
+              { val: animatedStats.tenants + "+", label: "Happy Tenants" },
             ].map((s) => (
               <div key={s.label} style={styles.heroStat}>
                 <span style={styles.heroStatVal}>{s.val}</span>
@@ -274,6 +303,74 @@ export default function Home() {
             </button>
           </div>
         )}
+      </section>
+
+      {/* ── HOW IT WORKS ── */}
+      <section style={styles.howItWorksSection}>
+        <div style={styles.sectionHeader}>
+          <h2 style={styles.sectionTitle}>How It Works</h2>
+          <p style={styles.sectionSubtitle}>Find your perfect home in 3 simple steps</p>
+        </div>
+        <div style={styles.stepsGrid}>
+          {[
+            { step: "01", icon: "🔍", title: "Search Properties", text: "Browse verified listings across all 47 counties with advanced filters" },
+            { step: "02", icon: "💬", title: "Connect Directly", text: "Chat with landlords via WhatsApp or call — no middlemen involved" },
+            { step: "03", icon: "🏠", title: "Move In", text: "Schedule viewings, sign agreements, and move into your new home" },
+          ].map((s, idx) => (
+            <div key={s.step} style={styles.stepCard} className="step-card">
+              <div style={styles.stepNumber}>{s.step}</div>
+              <div style={styles.stepIcon}>{s.icon}</div>
+              <h3 style={styles.stepTitle}>{s.title}</h3>
+              <p style={styles.stepText}>{s.text}</p>
+              {idx < 2 && <div style={styles.stepConnector}></div>}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── TESTIMONIALS ── */}
+      <section style={styles.testimonialsSection}>
+        <div style={styles.sectionHeader}>
+          <h2 style={styles.sectionTitle}>What Our Users Say</h2>
+          <p style={styles.sectionSubtitle}>Real stories from happy tenants and landlords</p>
+        </div>
+        <div style={styles.testimonialsGrid}>
+          {[
+            {
+              name: "Sarah Wanjiku",
+              role: "Tenant, Nairobi",
+              rating: 5,
+              text: "Found my dream apartment in just 2 days! The WhatsApp feature made connecting with the landlord so easy. No agents, no hidden fees.",
+              avatar: "👩"
+            },
+            {
+              name: "John Kamau",
+              role: "Landlord, Kiambu",
+              rating: 5,
+              text: "I've listed 5 properties on Axx Spaces and all were rented within weeks. The verification process gives tenants confidence.",
+              avatar: "👨"
+            },
+            {
+              name: "Grace Omondi",
+              role: "Tenant, Mombasa",
+              rating: 5,
+              text: "The GPS maps feature saved me so much time. I could see exact locations before scheduling viewings. Highly recommended!",
+              avatar: "👩"
+            },
+          ].map((t) => (
+            <div key={t.name} style={styles.testimonialCard} className="testimonial-card">
+              <div style={styles.testimonialAvatar}>{t.avatar}</div>
+              <div style={styles.testimonialRating}>
+                {"⭐".repeat(t.rating)}
+              </div>
+              <p style={styles.testimonialText}>"{t.text}"</p>
+              <div style={styles.testimonialAuthor}>
+                <strong style={styles.testimonialName}>{t.name}</strong>
+                <span style={styles.testimonialRole}>{t.role}</span>
+              </div>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* ── WHY AXX SPACES ── */}
@@ -670,6 +767,78 @@ const styles = {
     fontWeight: 700, fontSize: "15px", cursor: "pointer",
   },
 
+  /* ── How It Works ── */
+  howItWorksSection: { padding: "80px 20px", background: "linear-gradient(180deg, #F8F9FA 0%, #FFFFFF 100%)", maxWidth: "1200px", margin: "0 auto" },
+  stepsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+    gap: "40px",
+    marginTop: "40px",
+    position: "relative",
+  },
+  stepCard: {
+    position: "relative",
+    padding: "32px 24px",
+    background: "white",
+    borderRadius: "16px",
+    border: "1px solid #e5e7eb",
+    textAlign: "center",
+    transition: "all 0.3s",
+  },
+  stepNumber: {
+    position: "absolute",
+    top: "-16px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    background: "linear-gradient(135deg, #E31B1B 0%, #C01010 100%)",
+    color: "white",
+    width: "40px",
+    height: "40px",
+    borderRadius: "50%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "14px",
+    fontWeight: 800,
+    boxShadow: "0 4px 12px rgba(227, 27, 27, 0.3)",
+  },
+  stepIcon: { fontSize: "48px", marginBottom: "16px" },
+  stepTitle: { fontSize: "18px", fontWeight: 700, color: "#0B2140", margin: "0 0 12px" },
+  stepText: { fontSize: "14px", color: "#6b7280", lineHeight: 1.6, margin: 0 },
+  stepConnector: {
+    position: "absolute",
+    top: "50%",
+    right: "-20px",
+    width: "40px",
+    height: "2px",
+    background: "#E31B1B",
+    opacity: 0.3,
+  },
+
+  /* ── Testimonials ── */
+  testimonialsSection: { padding: "80px 20px", background: "#0B2140", color: "white" },
+  testimonialsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+    gap: "28px",
+    marginTop: "40px",
+    maxWidth: "1200px",
+    margin: "40px auto 0",
+  },
+  testimonialCard: {
+    background: "rgba(255, 255, 255, 0.05)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    borderRadius: "16px",
+    padding: "28px",
+    transition: "all 0.3s",
+  },
+  testimonialAvatar: { fontSize: "48px", marginBottom: "12px" },
+  testimonialRating: { fontSize: "16px", marginBottom: "12px" },
+  testimonialText: { fontSize: "15px", lineHeight: 1.7, color: "rgba(255, 255, 255, 0.9)", margin: "0 0 16px", fontStyle: "italic" },
+  testimonialAuthor: { display: "flex", flexDirection: "column", gap: "2px" },
+  testimonialName: { fontSize: "15px", color: "#fbbf24" },
+  testimonialRole: { fontSize: "13px", color: "rgba(255, 255, 255, 0.6)" },
+
   /* ── Features ── */
   featuresSection: { padding: "72px 20px", background: "#FFFFFF", maxWidth: "1200px", margin: "0 auto" },
   featureGrid: {
@@ -809,7 +978,20 @@ const css = `
     background: white;
   }
 
+  .step-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 32px rgba(227, 27, 27, 0.15);
+    border-color: #E31B1B;
+  }
+
+  .testimonial-card:hover {
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(251, 191, 36, 0.3);
+  }
+
   @media (max-width: 620px) {
     .search-row { grid-template-columns: 1fr !important; }
+    .stepConnector { display: none !important; }
   }
 `;
