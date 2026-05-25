@@ -1,6 +1,11 @@
+/**
+ * Tourism API — all backend calls in one place.
+ * Set VITE_API_URL in .env (e.g. http://localhost:1000/api)
+ */
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
 
-async function parseJson(res) {
+async function request(path, options = {}) {
+  const res = await fetch(`${API_BASE}${path}`, options);
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     throw new Error(data.error || data.message || `Request failed (${res.status})`);
@@ -8,31 +13,33 @@ async function parseJson(res) {
   return data;
 }
 
+function authHeaders(token) {
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+// ─── Browse ───────────────────────────────────────────────────────────
+
 export async function fetchTourismListings(params = {}) {
   const qs = new URLSearchParams();
   Object.entries(params).forEach(([k, v]) => {
     if (v !== undefined && v !== null && v !== "") qs.set(k, v);
   });
-  const res = await fetch(`${API_BASE}/tourism?${qs}`);
-  const json = await parseJson(res);
+  const json = await request(`/tourism?${qs}`);
   return json.data || [];
 }
 
 export async function fetchFeaturedTourism(limit = 6) {
-  const res = await fetch(`${API_BASE}/tourism/featured?limit=${limit}`);
-  const json = await parseJson(res);
+  const json = await request(`/tourism/featured?limit=${limit}`);
   return json.data || [];
 }
 
 export async function fetchTourismStats() {
-  const res = await fetch(`${API_BASE}/tourism/stats`);
-  const json = await parseJson(res);
+  const json = await request("/tourism/stats");
   return json.data;
 }
 
 export async function fetchTourismById(id) {
-  const res = await fetch(`${API_BASE}/tourism/${id}`);
-  const json = await parseJson(res);
+  const json = await request(`/tourism/${id}`);
   return json.data;
 }
 
@@ -40,17 +47,21 @@ export async function recordTourismView(id) {
   await fetch(`${API_BASE}/tourism/${id}/view`, { method: "PATCH" }).catch(() => {});
 }
 
-export async function submitTourismReview(id, { name, rating, comment }) {
-  const res = await fetch(`${API_BASE}/tourism/${id}/reviews`, {
+// ─── Auth (uses main auth routes) ─────────────────────────────────────
+
+export async function tourismLogin(email, password) {
+  const json = await request("/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, rating, comment }),
+    body: JSON.stringify({ email, password }),
   });
-  return parseJson(res);
+  return json;
 }
 
+// ─── Provider ─────────────────────────────────────────────────────────
+
 export async function registerTourismProperty(form) {
-  const res = await fetch(`${API_BASE}/tourism/register`, {
+  return request("/tourism/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -75,19 +86,21 @@ export async function registerTourismProperty(form) {
       checkOut: form.checkOut,
       cancellation: form.cancellation,
       bookingUrl: form.bookingUrl,
-      managerName: form.managerName,
-      phone: form.phone,
-      email: form.email,
-      whatsapp: form.whatsapp,
     }),
   });
-  return parseJson(res);
 }
 
 export async function fetchMyTourismListings(token) {
-  const res = await fetch(`${API_BASE}/tourism/my`, {
-    headers: { Authorization: `Bearer ${token}` },
+  const json = await request("/tourism/my", {
+    headers: { ...authHeaders(token) },
   });
-  const json = await parseJson(res);
   return json.data || [];
+}
+
+export async function submitTourismReview(id, { name, rating, comment }) {
+  return request(`/tourism/${id}/reviews`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, rating, comment }),
+  });
 }

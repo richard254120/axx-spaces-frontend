@@ -1,6 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchFeaturedTourism, fetchTourismStats } from "../../api/tourism";
+import { tourismLogin } from "../../api/tourism";
+import {
+  useTourismHome,
+  ADVERTISING_PACKAGES,
+  DEFAULT_CATEGORIES,
+  setTourismSession,
+  getDisplayName,
+  isTourismLoggedIn,
+  getTourismUser,
+} from "../../features/tourism";
 
 const featuredProperties = [
   {
@@ -41,50 +50,12 @@ const featuredProperties = [
   },
 ];
 
-const packages = [
-  {
-    name: "Starter",
-    duration: "1 Month",
-    price: 2500,
-    color: "#6b7280",
-    features: ["1 property listing", "Basic analytics", "Email support", "Standard placement"],
-    popular: false,
-  },
-  {
-    name: "Growth",
-    duration: "3 Months",
-    price: 6000,
-    color: "#0ea5e9",
-    features: ["Up to 3 listings", "Full analytics dashboard", "Priority support", "Featured placement", "Social media shoutout"],
-    popular: true,
-  },
-  {
-    name: "Premium",
-    duration: "6 Months",
-    price: 10000,
-    color: "#fbbf24",
-    features: ["Unlimited listings", "Advanced analytics & reports", "Dedicated account manager", "Homepage featured slot", "Monthly performance review", "Social media campaign"],
-    popular: false,
-  },
-];
+const packages = ADVERTISING_PACKAGES.map((p) => ({
+  ...p,
+  features: p.desc.split(",").map((x) => x.trim()),
+}));
 
-const stats = [
-  { val: "200+", label: "Properties Listed" },
-  { val: "47", label: "Counties Covered" },
-  { val: "18K+", label: "Monthly Visitors" },
-  { val: "4.8★", label: "Avg. Rating" },
-];
-
-const categories = [
-  { name: "Beach Resorts", emoji: "🏖️", count: 34 },
-  { name: "Safari Camps", emoji: "🦁", count: 28 },
-  { name: "Mountain Lodges", emoji: "⛰️", count: 19 },
-  { name: "City Hotels", emoji: "🏨", count: 41 },
-  { name: "Camping", emoji: "🏕️", count: 22 },
-  { name: "Adventure", emoji: "🗻", count: 16 },
-  { name: "Spa & Wellness", emoji: "💆", count: 12 },
-  { name: "Water Sports", emoji: "🚣", count: 9 },
-];
+const categories = DEFAULT_CATEGORIES;
 
 export default function TourismPage() {
   const navigate = useNavigate();
@@ -92,35 +63,29 @@ export default function TourismPage() {
   const [authTab, setAuthTab] = useState("login");
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [regForm, setRegForm] = useState({ name: "", email: "", phone: "", password: "", businessName: "" });
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [userName, setUserName] = useState("");
+  const [loggedIn, setLoggedIn] = useState(isTourismLoggedIn());
+  const [userName, setUserName] = useState(getDisplayName(getTourismUser()));
+  const [authError, setAuthError] = useState("");
+  const [authLoading, setAuthLoading] = useState(false);
   const [selectedPkg, setSelectedPkg] = useState(null);
   const [search, setSearch] = useState("");
-  const [featuredList, setFeaturedList] = useState(featuredProperties);
-  const [heroStats, setHeroStats] = useState(stats);
+  const { featured: featuredList, stats: heroStats } = useTourismHome();
 
-  useEffect(() => {
-    fetchFeaturedTourism(6)
-      .then((data) => { if (data.length) setFeaturedList(data); })
-      .catch(() => {});
-    fetchTourismStats()
-      .then((data) => {
-        if (!data) return;
-        setHeroStats([
-          { val: `${data.propertiesListed || 0}+`, label: "Properties Listed" },
-          { val: String(data.countiesCovered || 0), label: "Counties Covered" },
-          { val: data.monthlyVisitors || "18K+", label: "Monthly Visitors" },
-          { val: data.avgRating || "4.8★", label: "Avg. Rating" },
-        ]);
-      })
-      .catch(() => {});
-  }, []);
-
-  const handleLogin = () => {
-    if (loginForm.email && loginForm.password) {
+  const handleLogin = async () => {
+    if (!loginForm.email || !loginForm.password) return;
+    setAuthLoading(true);
+    setAuthError("");
+    try {
+      const res = await tourismLogin(loginForm.email, loginForm.password);
+      const user = res.user || { name: res.name, email: loginForm.email };
+      setTourismSession(res.token, user);
       setLoggedIn(true);
-      setUserName(loginForm.email.split("@")[0]);
+      setUserName(getDisplayName(user));
       setAuthModal(null);
+    } catch (err) {
+      setAuthError(err.message);
+    } finally {
+      setAuthLoading(false);
     }
   };
 
@@ -416,7 +381,10 @@ export default function TourismPage() {
                   <label style={s.label}>Password</label>
                   <input style={s.input} type="password" placeholder="••••••••" value={loginForm.password} onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })} />
                 </div>
-                <button style={s.authBtn} onClick={handleLogin}>Sign In →</button>
+                {authError && <p style={{ color: "#dc2626", fontSize: "13px", marginBottom: "10px" }}>{authError}</p>}
+                <button style={s.authBtn} onClick={handleLogin} disabled={authLoading}>
+                  {authLoading ? "Signing in…" : "Sign In →"}
+                </button>
                 <p style={s.authSwitch}>No account? <span style={{ color: "#fbbf24", cursor: "pointer", fontWeight: 700 }} onClick={() => setAuthTab("register")}>Register free</span></p>
               </div>
             ) : (

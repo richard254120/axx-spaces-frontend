@@ -1,19 +1,22 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { registerTourismProperty } from "../../api/tourism";
+import {
+  ADVERTISING_PACKAGES,
+  PROPERTY_CATEGORIES,
+  KENYA_COUNTIES,
+  AMENITIES_LIST,
+  REGISTER_STEPS,
+  INITIAL_REGISTER_FORM,
+  setTourismSession,
+  ErrorAlert,
+} from "../../features/tourism";
 
-const categories = ["Hotel", "Beach Resort", "Mountain Lodge", "Safari Camp", "Camping Grounds", "Boutique Hotel", "Restaurant", "Eco Lodge", "Spa & Wellness Centre", "Adventure Tours", "Water Sports Operator", "Theme Park"];
-const counties = ["Nairobi", "Mombasa", "Kisumu", "Nakuru", "Eldoret", "Laikipia", "Kajiado", "Narok", "Kwale", "Kilifi", "Taita-Taveta", "Lamu", "Nyeri", "Samburu", "Isiolo", "Machakos", "Makueni", "Kitui", "Embu", "Tana River", "Malindi", "Marsabit"];
-const amenitiesList = ["Swimming Pool", "WiFi", "Restaurant", "Spa", "Gym", "Parking", "Bar", "Conference Room", "Game Drives", "Beach Access", "Kids Club", "Airport Transfer", "Room Service", "Laundry", "Water Sports", "Horse Riding", "Helicopter Pad", "Tennis Court", "Stargazing Deck", "Nature Trails"];
-
-const steps = ["Account", "Property", "Location", "Amenities", "Pricing & Booking", "Review"];
-const stepIcons = ["👤", "🏷️", "📍", "✨", "💰", "✅"];
-
-const packages = [
-  { name: "Starter", duration: "1 Month", price: 2500, color: "#6b7280", desc: "1 listing, basic analytics, email support" },
-  { name: "Growth", duration: "3 Months", price: 6000, color: "#0ea5e9", desc: "Up to 3 listings, full analytics, priority support, featured placement", popular: true },
-  { name: "Premium", duration: "6 Months", price: 10000, color: "#fbbf24", desc: "Unlimited listings, homepage slot, dedicated account manager, social media campaign" },
-];
+const categories = PROPERTY_CATEGORIES;
+const counties = KENYA_COUNTIES;
+const amenitiesList = AMENITIES_LIST;
+const steps = REGISTER_STEPS;
+const packages = ADVERTISING_PACKAGES;
 
 export default function RegisterPropertyPage() {
   const navigate = useNavigate();
@@ -22,24 +25,7 @@ export default function RegisterPropertyPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
-  const [form, setForm] = useState({
-    // Account
-    ownerName: "", ownerEmail: "", ownerPhone: "", password: "", selectedPackage: "",
-    // Property
-    name: "", category: "", description: "",
-    // Location
-    county: "", town: "", address: "", mapLink: "",
-    // Amenities
-    amenities: [],
-    // Pricing & Booking
-    basePrice: "", weekendPrice: "", peakPrice: "",
-    roomTypes: [{ name: "", price: "", guests: "" }],
-    checkIn: "14:00", checkOut: "11:00", cancellation: "48",
-    bookingUrl: "", // Owner's own booking site (the key new field)
-    // Contact
-    managerName: "", phone: "", email: "", whatsapp: "",
-    agreeTerms: false,
-  });
+  const [form, setForm] = useState({ ...INITIAL_REGISTER_FORM });
 
   const update = (field, value) => setForm((f) => ({ ...f, [field]: value }));
   const toggleAmenity = (a) => setForm((f) => ({
@@ -67,10 +53,7 @@ export default function RegisterPropertyPage() {
     setSubmitError("");
     try {
       const result = await registerTourismProperty(form);
-      if (result.token) {
-        localStorage.setItem("token", result.token);
-        localStorage.setItem("tourismUser", JSON.stringify(result.user));
-      }
+      if (result.token) setTourismSession(result.token, result.user);
       setSubmitted(true);
     } catch (err) {
       setSubmitError(err.message || "Submission failed. Please try again.");
@@ -413,11 +396,7 @@ export default function RegisterPropertyPage() {
                 </button>
               ) : (
                 <>
-                  {submitError && (
-                    <div style={{ fontSize: "13px", color: "#dc2626", background: "#fee2e2", padding: "10px 12px", borderRadius: "8px", marginBottom: "12px", flex: "1 1 100%" }}>
-                      {submitError}
-                    </div>
-                  )}
+                  {submitError && <div style={{ flex: "1 1 100%", marginBottom: "8px" }}><ErrorAlert message={submitError} /></div>}
                   <button style={{ ...s.nextBtn, opacity: form.agreeTerms && !submitting ? 1 : 0.5 }} onClick={handleSubmit} disabled={submitting}>
                     {submitting ? "Submitting…" : "Submit Property 🚀"}
                   </button>

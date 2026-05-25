@@ -1,6 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchTourismById, recordTourismView } from "../../api/tourism";
+import {
+  useTourismProperty,
+  TourismNav,
+  LoadingBlock,
+  ErrorAlert,
+  TOURISM_FONT_CSS,
+  tourismTheme,
+} from "../../features/tourism";
 
 const properties = {
   1: {
@@ -65,39 +72,32 @@ const defaultProperty = properties[2];
 export default function TourismDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [property, setProperty] = useState(properties[id] || defaultProperty);
-  const [loading, setLoading] = useState(true);
+  const { property, roomTypes, loading, error } = useTourismProperty(id);
 
   const [selectedRoom, setSelectedRoom] = useState(0);
   const [bookingOpen, setBookingOpen] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      if (!id || /^\d+$/.test(id)) {
-        setProperty(properties[id] || defaultProperty);
-        setLoading(false);
-        return;
-      }
-      setLoading(true);
-      try {
-        const data = await fetchTourismById(id);
-        if (!cancelled) {
-          setProperty(data);
-          recordTourismView(id);
-        }
-      } catch {
-        if (!cancelled) setProperty(properties[id] || defaultProperty);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [id]);
+  if (loading) {
+    return (
+      <div style={{ fontFamily: "'DM Sans', sans-serif", background: tourismTheme.bg, minHeight: "100vh" }}>
+        <style>{TOURISM_FONT_CSS}</style>
+        <TourismNav />
+        <LoadingBlock message="Loading property details…" />
+      </div>
+    );
+  }
 
-  const roomTypes = property.roomTypes?.length
-    ? property.roomTypes
-    : [{ name: "Standard Room", price: property.price, guests: 2, desc: "" }];
+  if (!property) {
+    return (
+      <div style={{ fontFamily: "'DM Sans', sans-serif", background: tourismTheme.bg, minHeight: "100vh", padding: "40px 20px" }}>
+        <TourismNav />
+        <ErrorAlert message={error || "Property not found"} />
+        <button type="button" onClick={() => navigate("/tourism/listings")} style={{ marginTop: "16px", padding: "12px 20px", borderRadius: "10px", border: "none", background: "#fbbf24", fontWeight: 800, cursor: "pointer" }}>
+          Back to listings
+        </button>
+      </div>
+    );
+  }
 
   const roomPrice = roomTypes[selectedRoom]?.price ?? property.price;
 
@@ -150,7 +150,13 @@ export default function TourismDetailPage() {
 
   return (
     <div style={s.root}>
-      <style>{css}</style>
+      <style>{TOURISM_FONT_CSS}{css}</style>
+      <TourismNav />
+      {error && (
+        <div style={{ maxWidth: "1100px", margin: "12px auto", padding: "0 16px" }}>
+          <ErrorAlert message={`Showing cached preview: ${error}`} />
+        </div>
+      )}
 
       {/* TOP BAR */}
       <div style={s.topBar}>
