@@ -1,11 +1,12 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { UserProfileEditor } from "../features/profile";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
 
 export default function LandlordDashboard() {
-  const { token, user, logout } = useContext(AuthContext);
+  const { token, user, logout, login } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [properties, setProperties] = useState([]);
@@ -167,6 +168,12 @@ export default function LandlordDashboard() {
 
       {/* TABS */}
       <div style={styles.tabsScroll}>
+        <button
+          style={{ ...styles.tabBtn, ...(activeTab === "profile" && styles.tabBtnActive) }}
+          onClick={() => setActiveTab("profile")}
+        >
+          Profile
+        </button>
         {["all", "pending", "approved", "booked", "rejected"].map((tab) => (
           <button
             key={tab}
@@ -180,17 +187,21 @@ export default function LandlordDashboard() {
         ))}
       </div>
 
+      {activeTab === "profile" ? (
+        <UserProfileEditor token={token} user={user} accentColor="#60a5fa" onUpdated={(u) => { if (u) login(token, u); }} />
+      ) : null}
+
       {/* PROPERTIES LIST */}
-      {loading ? (
+      {activeTab !== "profile" && loading ? (
         <p style={styles.loading}>⏳ Loading properties...</p>
-      ) : filteredProperties.length === 0 ? (
+      ) : activeTab !== "profile" && filteredProperties.length === 0 ? (
         <div style={styles.empty}>
           <p>No {activeTab === "all" ? "" : activeTab} properties yet.</p>
           <button onClick={() => navigate("/upload")} style={styles.uploadBtn}>
             Start Listing
           </button>
         </div>
-      ) : (
+      ) : activeTab !== "profile" ? (
         <div style={styles.propertiesList}>
           {filteredProperties.map((property) => {
             const status = statusConfig[property.status] || statusConfig.pending;
@@ -304,7 +315,7 @@ export default function LandlordDashboard() {
             );
           })}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useContext, useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import { ProfileAvatar } from "../features/profile";
 import logo from "../assets/image.png";
 
 export default function Navbar() {
@@ -160,9 +161,10 @@ export default function Navbar() {
             Dashboard
           </Link>
           <div style={styles.userSection}>
+            <ProfileAvatar user={user} size={32} />
             <span style={styles.userName}>{user?.name}</span>
-            <button style={styles.logoutBtn} onClick={handleLogout}>
-              Logout
+            <button style={styles.logoutBtn} onClick={handleLogout} title="Log out" aria-label="Log out">
+              🚪
             </button>
           </div>
         </div>
@@ -277,9 +279,10 @@ export default function Navbar() {
               Dashboard
             </Link>
             <div style={styles.userSection}>
+              <ProfileAvatar user={user} size={32} />
               <span style={styles.userName}>{user.name}</span>
-              <button style={styles.logoutBtn} onClick={handleLogout}>
-                Logout
+              <button style={styles.logoutBtn} onClick={handleLogout} title="Log out" aria-label="Log out">
+                🚪
               </button>
             </div>
           </>

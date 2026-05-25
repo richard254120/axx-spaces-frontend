@@ -30,6 +30,14 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("user", JSON.stringify(userData));
   };
 
+  const updateUser = (partial) => {
+    setUser((prev) => {
+      const next = { ...prev, ...partial };
+      localStorage.setItem("user", JSON.stringify(next));
+      return next;
+    });
+  };
+
   const logout = (redirectTo = "/") => {
     setToken(null);
     setUser(null);
@@ -67,6 +75,7 @@ export const AuthProvider = ({ children }) => {
       token, 
       login, 
       logout,
+      updateUser,
       isAuthenticated: !!token 
     }}>
       {children}

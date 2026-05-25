@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { UserProfileEditor, ProfileAvatar } from "../features/profile";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
 
@@ -152,7 +153,10 @@ export default function SellerDashboard() {
       <div style={s.topBar}>
         <div>
           <h1 style={s.topTitle}>🛒 Seller Dashboard</h1>
-          <p style={s.topSub}>Vendor profile: <strong style={{ color: "#fbbf24" }}>{seller.name}</strong></p>
+          <p style={{ ...s.topSub, display: "flex", alignItems: "center", gap: "10px" }}>
+            <ProfileAvatar user={seller} size={36} />
+            <span>Vendor: <strong style={{ color: "#fbbf24" }}>{seller.name}</strong></span>
+          </p>
         </div>
         <button style={s.uploadBtn} onClick={() => setView(view === "listings" ? "upload" : "listings")}>
           {view === "listings" ? "+ Upload Material" : "View Inventory"}
@@ -169,6 +173,7 @@ export default function SellerDashboard() {
       <div style={s.controlsRow}>
         <div style={s.tabs}>
           <button style={{ ...s.tab, ...(view === "listings" ? s.activeTab : {}) }} onClick={() => setView("listings")}>My Stock</button>
+          <button style={{ ...s.tab, ...(view === "profile" ? s.activeTab : {}) }} onClick={() => setView("profile")}>👤 Profile</button>
         </div>
         {view === "listings" && (
           <div style={s.filterGroup}>
@@ -184,7 +189,14 @@ export default function SellerDashboard() {
         )}
       </div>
 
-      {view === "listings" ? (
+      {view === "profile" ? (
+        <UserProfileEditor
+          token={token}
+          user={seller}
+          accentColor="#fbbf24"
+          onUpdated={(u) => u && setSeller(u)}
+        />
+      ) : view === "listings" ? (
         <div style={s.grid}>
           {filteredMaterials.map((m) => {
             const currentStatus = m.isVerified && m.status === "pending" ? "active" : (m.status || "pending");

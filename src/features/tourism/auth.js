@@ -24,6 +24,7 @@ export function setTourismSession(token, user) {
       email: user.email,
       phone: user.phone,
       role: user.role || "landlord",
+      profileImage: user.profileImage || "",
     }));
   }
 }

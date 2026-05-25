@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { UserProfileEditor } from "../features/profile";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
 
@@ -339,141 +340,13 @@ export default function MoverDashboard() {
         {/* ── PROFILE TAB ── */}
         {activeTab === "profile" && (
           <section>
-            {!editingProfile ? (
-              <div style={styles.profilePage}>
-                <div style={styles.avatarLarge}>🏢</div>
-                <h3 style={styles.profileName}>{user?.name}</h3>
-                <p style={styles.userEmail}>{user?.email}</p>
-
-                <div style={styles.profileInfo}>
-                  {[
-                    { label: "📞 Phone",       value: profileData.phone || "Not set" },
-                    { label: "📍 County",      value: profileData.county || "Not set" },
-                    { label: "🚗 Vehicle",     value: profileData.vehicleType || "Not set" },
-                    { label: "⭐ Experience",  value: `${profileData.experienceYears || 0} Years` },
-                  ].map(row => (
-                    <div key={row.label} style={styles.infoRow}>
-                      <span style={styles.infoLabel}>{row.label}</span>
-                      <span style={styles.infoValue}>{row.value}</span>
-                    </div>
-                  ))}
-
-                  <div style={styles.infoRow}>
-                    <span style={styles.infoLabel}>✅ Services</span>
-                    <div style={styles.servicesDisplay}>
-                      {profileData.services?.length > 0
-                        ? profileData.services.map(s => (
-                            <span key={s} style={styles.serviceBadge}>{s}</span>
-                          ))
-                        : <span style={styles.infoValue}>None set</span>
-                      }
-                    </div>
-                  </div>
-
-                  {profileData.bio && (
-                    <div style={{ ...styles.infoRow, flexDirection: "column", gap: "6px" }}>
-                      <span style={styles.infoLabel}> Bio</span>
-                      <span style={{ ...styles.infoValue, fontSize: "13px", lineHeight: 1.5 }}>
-                        {profileData.bio}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                <button style={styles.editBtn} onClick={() => setEditingProfile(true)}>
-                   Edit Profile
-                </button>
-              </div>
-            ) : (
-              <div style={styles.profilePage}>
-                <h3 style={{ ...styles.profileName, marginBottom: "20px" }}>Edit Profile</h3>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: "12px", textAlign: "left" }}>
-                  <label style={styles.formLabel}>📞 Phone Number</label>
-                  <input
-                    style={styles.formInput}
-                    value={profileData.phone}
-                    onChange={e => setProfileData(p => ({ ...p, phone: e.target.value }))}
-                    placeholder="e.g. 0712345678"
-                  />
-
-                  <label style={styles.formLabel}> County</label>
-                  <input
-                    style={styles.formInput}
-                    value={profileData.county}
-                    onChange={e => setProfileData(p => ({ ...p, county: e.target.value }))}
-                    placeholder="e.g. Nairobi"
-                  />
-
-                  <label style={styles.formLabel}>🚗 Vehicle Type</label>
-                  <select
-                    style={styles.formInput}
-                    value={profileData.vehicleType}
-                    onChange={e => setProfileData(p => ({ ...p, vehicleType: e.target.value }))}
-                  >
-                    <option value="">Select vehicle...</option>
-                    {VEHICLE_TYPES.map(v => <option key={v} value={v}>{v}</option>)}
-                  </select>
-
-                  <label style={styles.formLabel}>⭐ Years of Experience</label>
-                  <input
-                    style={styles.formInput}
-                    type="number"
-                    min="0"
-                    max="50"
-                    value={profileData.experienceYears}
-                    onChange={e => setProfileData(p => ({ ...p, experienceYears: e.target.value }))}
-                    placeholder="e.g. 3"
-                  />
-
-                  <label style={styles.formLabel}>Bio</label>
-                  <textarea
-                    style={{ ...styles.formInput, minHeight: "80px", resize: "vertical" }}
-                    value={profileData.bio}
-                    onChange={e => setProfileData(p => ({ ...p, bio: e.target.value }))}
-                    placeholder="Describe your services, equipment, and experience..."
-                  />
-
-                  <label style={styles.formLabel}>✅ Services Offered</label>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                    {SERVICE_OPTIONS.map(s => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => toggleService(s)}
-                        style={{
-                          padding: "6px 12px", borderRadius: "20px", fontSize: "12px",
-                          fontWeight: 600, cursor: "pointer", border: "2px solid",
-                          borderColor: profileData.services.includes(s) ? "#3b82f6" : "#d1d5db",
-                          background: profileData.services.includes(s) ? "#dbeafe" : "white",
-                          color: profileData.services.includes(s) ? "#1d4ed8" : "#6b7280",
-                        }}
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div style={{ display: "flex", gap: "10px", marginTop: "24px" }}>
-                  <button
-                    type="button"
-                    style={styles.cancelBtn}
-                    onClick={() => setEditingProfile(false)}
-                  >
-                    ← Cancel
-                  </button>
-                  <button
-                    type="button"
-                    style={{ ...styles.editBtn, margin: 0, flex: 1 }}
-                    onClick={handleSaveProfile}
-                    disabled={profileSaving}
-                  >
-                    {profileSaving ? "Saving..." : "Save Profile"}
-                  </button>
-                </div>
-              </div>
-            )}
+            <UserProfileEditor
+              token={token}
+              user={user}
+              showMoverFields
+              accentColor="#3b82f6"
+              onUpdated={() => fetchProfile()}
+            />
           </section>
         )}
       </main>

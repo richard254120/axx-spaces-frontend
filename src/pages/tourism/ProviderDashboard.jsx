@@ -1,7 +1,8 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import { tourismLogin, updateOwnerProfile } from "../../api/tourism";
+import { tourismLogin } from "../../api/tourism";
+import { UserProfileEditor, ProfileAvatar } from "../../features/profile";
 import {
   useOwnerProfile,
   StatusBadge,
@@ -20,12 +21,6 @@ export default function ProviderDashboard() {
   const { user: authUser, token, login: authLogin, logout: authLogout } = useContext(AuthContext);
   const { profile, loading, error, reload } = useOwnerProfile();
 
-  const [editingProfile, setEditingProfile] = useState(false);
-  const [profileForm, setProfileForm] = useState({ name: "", phone: "" });
-  const [profileSaving, setProfileSaving] = useState(false);
-  const [profileMsg, setProfileMsg] = useState("");
-  const [profileErr, setProfileErr] = useState("");
-
   const [showLogin, setShowLogin] = useState(false);
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [loginLoading, setLoginLoading] = useState(false);
@@ -35,44 +30,6 @@ export default function ProviderDashboard() {
   const user = profile?.user;
   const stats = profile?.stats;
   const listings = profile?.listings || [];
-
-  const openEditProfile = () => {
-    if (!user) return;
-    setProfileForm({ name: user.name || "", phone: user.phone || "" });
-    setEditingProfile(true);
-    setProfileMsg("");
-    setProfileErr("");
-  };
-
-  const handleSaveProfile = async (e) => {
-    e.preventDefault();
-    const t = token || getTourismToken();
-    if (!t) return;
-    setProfileSaving(true);
-    setProfileErr("");
-    setProfileMsg("");
-    try {
-      const res = await updateOwnerProfile(t, profileForm);
-      const updated = res.data?.user;
-      if (updated) {
-        setTourismSession(t, updated);
-        authLogin(t, {
-          _id: updated.id || updated._id,
-          name: updated.name,
-          email: updated.email,
-          phone: updated.phone,
-          role: updated.role || "landlord",
-        });
-      }
-      setProfileMsg(res.message || "Profile updated");
-      setEditingProfile(false);
-      reload();
-    } catch (err) {
-      setProfileErr(err.message);
-    } finally {
-      setProfileSaving(false);
-    }
-  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -97,7 +54,7 @@ export default function ProviderDashboard() {
   };
 
   const displayName = getDisplayName(user || authUser);
-  const initial = (displayName || "O").charAt(0).toUpperCase();
+  const avatarUser = user || authUser;
 
   return (
     <div style={{ fontFamily: "'DM Sans', sans-serif", display: "flex", minHeight: "100vh", background: tourismTheme.bg }}>
@@ -110,7 +67,7 @@ export default function ProviderDashboard() {
             {loggedIn ? (
               <>
                 <button type="button" style={iconBtn} title={`Signed in as ${displayName}`} aria-label="Account">
-                  <span style={avatar}>{initial}</span>
+                  <ProfileAvatar user={avatarUser} size={28} style={{ border: "none" }} />
                 </button>
                 <button type="button" style={iconBtn} onClick={handleLogout} title="Log out" aria-label="Log out">
                   🚪
@@ -126,7 +83,7 @@ export default function ProviderDashboard() {
 
         {loggedIn && (
           <div style={sidebarUser}>
-            <span style={avatarLg}>{initial}</span>
+            <ProfileAvatar user={avatarUser} size={40} />
             <div>
               <div style={{ fontWeight: 700, fontSize: "14px" }}>{displayName}</div>
               <div style={{ fontSize: "11px", color: "#9ca3af" }}>{user?.email || authUser?.email}</div>
@@ -182,72 +139,12 @@ export default function ProviderDashboard() {
           <LoadingBlock message="Loading your profile…" />
         ) : user ? (
           <>
-            <section style={profileCard}>
-              <div style={profileCardHead}>
-                <h2 style={sectionHead}>Your profile</h2>
-                {!editingProfile && (
-                  <button type="button" style={editProfileBtn} onClick={openEditProfile}>
-                    ✏️ Update profile
-                  </button>
-                )}
-              </div>
-
-              {profileMsg && (
-                <div style={successBanner}>{profileMsg}</div>
-              )}
-              {profileErr && <div style={{ marginBottom: "12px" }}><ErrorAlert message={profileErr} /></div>}
-
-              {editingProfile ? (
-                <form onSubmit={handleSaveProfile}>
-                  <div style={formGrid}>
-                    <label style={fieldWrap}>
-                      <span style={fieldLabel}>Full name *</span>
-                      <input
-                        style={fieldInput}
-                        value={profileForm.name}
-                        onChange={(e) => setProfileForm((f) => ({ ...f, name: e.target.value }))}
-                        required
-                      />
-                    </label>
-                    <label style={fieldWrap}>
-                      <span style={fieldLabel}>Phone / WhatsApp *</span>
-                      <input
-                        style={fieldInput}
-                        value={profileForm.phone}
-                        onChange={(e) => setProfileForm((f) => ({ ...f, phone: e.target.value }))}
-                        placeholder="+254 7XX XXX XXX"
-                        required
-                      />
-                    </label>
-                    <label style={fieldWrap}>
-                      <span style={fieldLabel}>Email</span>
-                      <input style={{ ...fieldInput, background: "#f9fafb", color: "#6b7280" }} value={user.email} disabled />
-                      <span style={fieldHint}>Email cannot be changed here. Contact support if needed.</span>
-                    </label>
-                  </div>
-                  <div style={{ display: "flex", gap: "10px", marginTop: "16px", flexWrap: "wrap" }}>
-                    <button type="submit" style={primaryBtn} disabled={profileSaving}>
-                      {profileSaving ? "Saving…" : "Save profile"}
-                    </button>
-                    <button type="button" style={secondaryBtn} onClick={() => setEditingProfile(false)}>
-                      Cancel
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <div style={profileGrid}>
-                  <div><span style={label}>Name</span><div style={value}>{user.name}</div></div>
-                  <div><span style={label}>Email</span><div style={value}>{user.email}</div></div>
-                  <div><span style={label}>Phone</span><div style={value}>{user.phone || "—"}</div></div>
-                  <div>
-                    <span style={label}>Member since</span>
-                    <div style={value}>
-                      {user.memberSince ? new Date(user.memberSince).toLocaleDateString("en-KE", { month: "long", year: "numeric" }) : "—"}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </section>
+            <UserProfileEditor
+              token={token || getTourismToken()}
+              user={user}
+              accentColor="#fbbf24"
+              onUpdated={() => reload()}
+            />
 
             <div style={statsGrid}>
               {[
@@ -384,8 +281,6 @@ const sidebarTop = { display: "flex", alignItems: "flex-start", justifyContent: 
 const logoBtn = { background: "none", border: "none", color: "white", fontSize: "17px", fontWeight: 800, cursor: "pointer", fontFamily: "inherit", textAlign: "left", flex: 1 };
 const authRow = { display: "flex", gap: "6px", flexShrink: 0 };
 const iconBtn = { background: "#374151", border: "none", borderRadius: "10px", width: "40px", height: "40px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px" };
-const avatar = { width: "28px", height: "28px", borderRadius: "50%", background: "#fbbf24", color: "#1f2937", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: "14px" };
-const avatarLg = { width: "40px", height: "40px", borderRadius: "50%", background: "#fbbf24", color: "#1f2937", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: "16px", flexShrink: 0 };
 const sidebarUser = { display: "flex", alignItems: "center", gap: "12px", padding: "12px", background: "#374151", borderRadius: "12px", marginBottom: "8px" };
 const navItem = { padding: "12px 14px", borderRadius: "10px", background: "transparent", border: "none", color: "#9ca3af", textAlign: "left", cursor: "pointer", fontFamily: "inherit", fontSize: "14px" };
 const sidebarFooter = { marginTop: "auto", paddingTop: "20px" };
@@ -393,19 +288,7 @@ const logoutLink = { width: "100%", padding: "12px 14px", borderRadius: "10px", 
 const loginLink = { width: "100%", padding: "12px 14px", borderRadius: "10px", background: "#fbbf24", border: "none", color: "#1f2937", textAlign: "left", cursor: "pointer", fontFamily: "inherit", fontSize: "14px", fontWeight: 700, display: "flex", alignItems: "center", gap: "8px" };
 const mainHeader = { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px", marginBottom: "24px", flexWrap: "wrap" };
 const headerLogout = { background: "white", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "10px 16px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit", fontSize: "13px" };
-const profileCard = { background: "white", padding: "22px", borderRadius: "14px", border: "1px solid #e5e7eb", marginBottom: "20px" };
-const profileCardHead = { display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", marginBottom: "14px" };
 const sectionHead = { fontSize: "16px", fontWeight: 800, margin: 0, color: "#1f2937" };
-const editProfileBtn = { background: "#fef9c3", border: "1px solid #fbbf24", color: "#92400e", borderRadius: "10px", padding: "8px 14px", fontWeight: 700, fontSize: "13px", cursor: "pointer", fontFamily: "inherit" };
-const successBanner = { background: "#f0fdf4", border: "1px solid #bbf7d0", color: "#166534", padding: "10px 14px", borderRadius: "8px", fontSize: "13px", marginBottom: "14px" };
-const profileGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px" };
-const formGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "14px" };
-const label = { fontSize: "10px", fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.06em" };
-const value = { fontSize: "15px", fontWeight: 600, color: "#1f2937", marginTop: "4px" };
-const fieldWrap = { display: "flex", flexDirection: "column" };
-const fieldLabel = { fontSize: "11px", fontWeight: 700, color: "#374151", marginBottom: "6px", textTransform: "uppercase" };
-const fieldInput = { border: "1px solid #e5e7eb", borderRadius: "10px", padding: "12px", fontSize: "14px", fontFamily: "inherit" };
-const fieldHint = { fontSize: "11px", color: "#9ca3af", marginTop: "4px" };
 const statsGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "12px" };
 const statCard = { background: "white", padding: "18px", borderRadius: "14px", border: "1px solid #e5e7eb" };
 const listRow = { background: "white", padding: "16px", borderRadius: "14px", border: "1px solid #e5e7eb", display: "flex", gap: "16px", alignItems: "flex-start", flexWrap: "wrap" };
