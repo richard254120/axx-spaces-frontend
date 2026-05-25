@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { COLORS, buttonStyles, pageStyles } from "../styles/theme";
 
 // Import team images from src/assets
 import kenfredImg from "../assets/kenfred.jpg";
@@ -380,53 +381,50 @@ export default function AboutPage() {
 
 const styles = {
   root: {
-    fontFamily: "'DM Sans', sans-serif",
-    background: "#f8f4f0",
-    color: "#1f2937",
-    minHeight: "100vh",
+    ...pageStyles.dark,
   },
 
   /* HERO */
   hero: {
-    background: "linear-gradient(150deg, #ffffff 0%, #fef3e2 55%, #fff7ed 100%)",
+    background: `linear-gradient(150deg, ${COLORS.bgLight} 0%, ${COLORS.bgDark} 55%, ${COLORS.bgDarker} 100%)`,
     padding: "80px 20px 60px",
     textAlign: "center",
-    borderBottom: "3px solid #fbbf24",
+    borderBottom: `3px solid ${COLORS.primary}`,
   },
   heroContent: { maxWidth: "720px", margin: "0 auto" },
   badge: {
     display: "inline-block",
-    background: "#dcfce7",
-    color: "#15803d",
+    background: "rgba(34, 197, 94, 0.15)",
+    color: "#86efac",
     padding: "5px 16px",
     borderRadius: "20px",
     fontSize: "13px",
     fontWeight: 600,
     marginBottom: "20px",
-    border: "1px solid #bbf7d0",
+    border: "1px solid rgba(34, 197, 94, 0.3)",
   },
   heroTitle: {
     fontSize: "clamp(32px, 6vw, 54px)",
     fontWeight: 800,
-    color: "#1f2937",
+    color: COLORS.textLight,
     margin: "0 0 16px",
     letterSpacing: "-1.5px",
     lineHeight: 1.15,
   },
   heroSubtitle: {
     fontSize: "17px",
-    color: "#6b7280",
+    color: COLORS.textMutedLight,
     margin: "0 auto",
     maxWidth: "560px",
     lineHeight: 1.7,
   },
 
-  whoSection: { padding: "72px 20px", background: "white" },
+  whoSection: { padding: "72px 20px", background: COLORS.bgLight },
   whoInner: { maxWidth: "760px", margin: "0 auto" },
   whoLabel: {
     display: "inline-block",
-    background: "#fef9c3",
-    color: "#854d0e",
+    background: "rgba(251, 191, 36, 0.15)",
+    color: COLORS.accent,
     padding: "4px 14px",
     borderRadius: "20px",
     fontSize: "12px",
@@ -434,58 +432,58 @@ const styles = {
     marginBottom: "14px",
     textTransform: "uppercase",
     letterSpacing: "0.08em",
-    border: "1px solid #fde68a",
+    border: "1px solid rgba(251, 191, 36, 0.3)",
   },
-  whoTitle: { fontSize: "28px", fontWeight: 800, color: "#1f2937", margin: "0 0 20px" },
-  whoText: { fontSize: "16px", color: "#4b5563", lineHeight: 1.85, marginBottom: "16px" },
+  whoTitle: { fontSize: "28px", fontWeight: 800, color: COLORS.textLight, margin: "0 0 20px" },
+  whoText: { fontSize: "16px", color: COLORS.textMutedLight, lineHeight: 1.85, marginBottom: "16px" },
 
-  missionSection: { padding: "60px 20px", background: "#f8f4f0" },
+  missionSection: { padding: "60px 20px", background: COLORS.bgDark },
   missionInner: { maxWidth: "900px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" },
-  missionCard: { background: "white", padding: "32px", borderRadius: "16px", border: "1px solid #e5e7eb", textAlign: "center", boxShadow: "0 4px 20px rgba(0,0,0,0.06)" },
+  missionCard: { background: COLORS.bgLight, padding: "32px", borderRadius: "16px", border: `1px solid ${COLORS.border}`, textAlign: "center", boxShadow: "0 4px 20px rgba(0,0,0,0.3)" },
   missionIcon: { fontSize: "40px", marginBottom: "16px" },
-  missionTitle: { fontSize: "20px", fontWeight: 800, color: "#1f2937", margin: "0 0 12px" },
-  missionText: { fontSize: "15px", color: "#6b7280", lineHeight: 1.7, margin: 0 },
+  missionTitle: { fontSize: "20px", fontWeight: 800, color: COLORS.textLight, margin: "0 0 12px" },
+  missionText: { fontSize: "15px", color: COLORS.textMutedLight, lineHeight: 1.7, margin: 0 },
 
-  whatSection: { padding: "72px 20px", background: "#1f2937" },
+  whatSection: { padding: "72px 20px", background: COLORS.bgDarker },
   whatInner: { maxWidth: "1100px", margin: "0 auto" },
-  sectionLabelDark: { display: "inline-block", background: "#fbbf2420", color: "#fbbf24", padding: "4px 14px", borderRadius: "20px", fontSize: "12px", fontWeight: 700, marginBottom: "14px", textTransform: "uppercase", letterSpacing: "0.08em", border: "1px solid #fbbf2440" },
+  sectionLabelDark: { display: "inline-block", background: "rgba(251, 191, 36, 0.15)", color: COLORS.accent, padding: "4px 14px", borderRadius: "20px", fontSize: "12px", fontWeight: 700, marginBottom: "14px", textTransform: "uppercase", letterSpacing: "0.08em", border: "1px solid rgba(251, 191, 36, 0.3)" },
   whatGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "22px", marginTop: "8px" },
-  whatCard: { background: "#111827", padding: "28px", borderRadius: "16px", border: "1px solid #334155", transition: "all 0.25s" },
+  whatCard: { background: COLORS.bgDark, padding: "28px", borderRadius: "16px", border: `1px solid ${COLORS.border}`, transition: "all 0.25s" },
   whatIconWrap: { display: "inline-flex", alignItems: "center", justifyContent: "center", width: "52px", height: "52px", borderRadius: "12px", marginBottom: "16px" },
   whatIcon: { fontSize: "26px" },
   whatTitle: { fontSize: "17px", fontWeight: 800, margin: "0 0 10px" },
-  whatDesc: { fontSize: "13px", color: "#94a3b8", lineHeight: 1.7, margin: "0 0 12px" },
+  whatDesc: { fontSize: "13px", color: COLORS.textMutedLight, lineHeight: 1.7, margin: "0 0 12px" },
   whatList: { paddingLeft: "0", listStyle: "none", margin: 0 },
-  whatListItem: { fontSize: "13px", color: "#cbd5e1", padding: "4px 0", display: "flex", alignItems: "center" },
+  whatListItem: { fontSize: "13px", color: COLORS.textLight, padding: "4px 0", display: "flex", alignItems: "center" },
 
-  valuesSection: { padding: "72px 20px", background: "#f8f4f0" },
+  valuesSection: { padding: "72px 20px", background: COLORS.bgDark },
   valuesInner: { maxWidth: "1100px", margin: "0 auto" },
-  sectionLabel: { display: "inline-block", background: "#fef9c3", color: "#854d0e", padding: "4px 14px", borderRadius: "20px", fontSize: "12px", fontWeight: 700, marginBottom: "14px", textTransform: "uppercase", letterSpacing: "0.08em", border: "1px solid #fde68a" },
-  sectionTitle: { fontSize: "28px", fontWeight: 800, color: "#1f2937", margin: "0 0 10px", textAlign: "center" },
-  sectionSubtitle: { fontSize: "15px", color: "#6b7280", textAlign: "center", margin: "0 0 44px" },
+  sectionLabel: { display: "inline-block", background: "rgba(251, 191, 36, 0.15)", color: COLORS.accent, padding: "4px 14px", borderRadius: "20px", fontSize: "12px", fontWeight: 700, marginBottom: "14px", textTransform: "uppercase", letterSpacing: "0.08em", border: "1px solid rgba(251, 191, 36, 0.3)" },
+  sectionTitle: { fontSize: "28px", fontWeight: 800, color: COLORS.textLight, margin: "0 0 10px", textAlign: "center" },
+  sectionSubtitle: { fontSize: "15px", color: COLORS.textMutedLight, textAlign: "center", margin: "0 0 44px" },
   valuesGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "22px" },
-  valueCard: { background: "white", padding: "28px", borderRadius: "14px", textAlign: "center", border: "1px solid #e5e7eb", transition: "all 0.22s", boxShadow: "0 2px 12px rgba(0,0,0,0.04)" },
+  valueCard: { background: COLORS.bgLight, padding: "28px", borderRadius: "14px", textAlign: "center", border: `1px solid ${COLORS.border}`, transition: "all 0.22s", boxShadow: "0 2px 12px rgba(0,0,0,0.2)" },
   valueIcon: { fontSize: "36px", marginBottom: "14px" },
-  valueTitle: { fontSize: "17px", fontWeight: 700, color: "#1f2937", margin: "0 0 10px" },
-  valueText: { fontSize: "13px", color: "#6b7280", lineHeight: 1.6, margin: 0 },
+  valueTitle: { fontSize: "17px", fontWeight: 700, color: COLORS.textLight, margin: "0 0 10px" },
+  valueText: { fontSize: "13px", color: COLORS.textMutedLight, lineHeight: 1.6, margin: 0 },
 
-  statsSection: { background: "#1f2937", color: "white", padding: "60px 20px" },
+  statsSection: { background: COLORS.bgDarker, color: "white", padding: "60px 20px" },
   statsInner: { maxWidth: "1200px", margin: "0 auto" },
   statsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "20px", marginTop: "40px" },
-  statCard: { background: "#111827", padding: "30px 20px", borderRadius: "12px", textAlign: "center", border: "1px solid #334155", transition: "all 0.3s" },
+  statCard: { background: COLORS.bgDark, padding: "30px 20px", borderRadius: "12px", textAlign: "center", border: `1px solid ${COLORS.border}`, transition: "all 0.3s" },
   statIcon: { fontSize: "40px", marginBottom: "12px" },
-  statNumber: { fontSize: "32px", fontWeight: 800, color: "#fbbf24", margin: "8px 0" },
-  statLabel: { fontSize: "14px", color: "#9ca3af", fontWeight: 600 },
+  statNumber: { fontSize: "32px", fontWeight: 800, color: COLORS.accent, margin: "8px 0" },
+  statLabel: { fontSize: "14px", color: COLORS.textMutedLight, fontWeight: 600 },
 
-  trustSection: { background: "#f3f4f6", padding: "60px 20px" },
+  trustSection: { background: COLORS.bgDark, padding: "60px 20px" },
   trustInner: { maxWidth: "1200px", margin: "0 auto" },
   trustGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "24px", marginTop: "40px" },
-  trustCard: { background: "white", padding: "28px 24px", borderRadius: "12px", border: "2px solid #e5e7eb", transition: "all 0.3s" },
+  trustCard: { background: COLORS.bgLight, padding: "28px 24px", borderRadius: "12px", border: `2px solid ${COLORS.border}`, transition: "all 0.3s" },
   trustIcon: { fontSize: "32px", marginBottom: "12px" },
-  trustTitle: { fontSize: "16px", fontWeight: 700, color: "#1f2937", margin: "0 0 8px" },
-  trustDesc: { fontSize: "13px", color: "#6b7280", lineHeight: 1.6, margin: 0 },
+  trustTitle: { fontSize: "16px", fontWeight: 700, color: COLORS.textLight, margin: "0 0 8px" },
+  trustDesc: { fontSize: "13px", color: COLORS.textMutedLight, lineHeight: 1.6, margin: 0 },
 
-  teamSection: { padding: "72px 20px", background: "#1f2937" },
+  teamSection: { padding: "72px 20px", background: COLORS.bgDarker },
   teamInner: { maxWidth: "900px", margin: "0 auto" },
   teamGrid: {
     display: "grid",
@@ -494,11 +492,11 @@ const styles = {
     marginTop: "44px",
   },
   teamCard: {
-    background: "#111827",
+    background: COLORS.bgDark,
     padding: "32px 24px",
     borderRadius: "16px",
     textAlign: "center",
-    border: "1px solid #334155",
+    border: `1px solid ${COLORS.border}`,
     transition: "all 0.25s",
   },
   teamImage: {
@@ -508,40 +506,40 @@ const styles = {
     objectFit: "cover",
     margin: "0 auto 18px",
     display: "block",
-    border: "4px solid #fbbf24",
-    boxShadow: "0 6px 16px rgba(251, 191, 36, 0.4)",
+    border: `4px solid ${COLORS.accent}`,
+    boxShadow: `0 6px 16px rgba(251, 191, 36, 0.4)`,
   },
   teamName: { fontSize: "18px", fontWeight: 800, color: "white", margin: "0 0 6px" },
   teamRole: { fontSize: "13px", fontWeight: 600, margin: "0 0 14px" },
-  teamBio: { fontSize: "13px", color: "#94a3b8", lineHeight: 1.7, margin: 0 },
+  teamBio: { fontSize: "13px", color: COLORS.textMutedLight, lineHeight: 1.7, margin: 0 },
 
   noticeSection: {
-    background: "#fffbeb",
+    background: "rgba(251, 191, 36, 0.08)",
     padding: "40px 20px",
-    borderTop: "1px solid #fde68a",
-    borderBottom: "1px solid #fde68a",
+    borderTop: `1px solid rgba(251, 191, 36, 0.2)`,
+    borderBottom: `1px solid rgba(251, 191, 36, 0.2)`,
   },
   noticeInner: { maxWidth: "900px", margin: "0 auto" },
   noticeCard: {
     display: "flex",
     alignItems: "flex-start",
     gap: "18px",
-    background: "white",
-    border: "1.5px solid #fbbf24",
+    background: COLORS.bgLight,
+    border: `1.5px solid ${COLORS.accent}`,
     borderRadius: "14px",
     padding: "28px 24px",
-    boxShadow: "0 2px 12px rgba(251,191,36,0.08)",
+    boxShadow: "0 2px 12px rgba(251,191,36,0.15)",
   },
   noticeIcon: { fontSize: "28px", flexShrink: 0, marginTop: "2px" },
-  noticeTitle: { fontSize: "16px", fontWeight: 800, color: "#92400e", margin: "0 0 10px" },
-  noticeText: { fontSize: "14px", color: "#78350f", lineHeight: 1.75, margin: 0 },
+  noticeTitle: { fontSize: "16px", fontWeight: 800, color: COLORS.accent, margin: "0 0 10px" },
+  noticeText: { fontSize: "14px", color: COLORS.textMutedLight, lineHeight: 1.75, margin: 0 },
 
-  futureSection: { background: "#1f2937", padding: "72px 20px", textAlign: "center" },
+  futureSection: { background: COLORS.bgDarker, padding: "72px 20px", textAlign: "center" },
   futureInner: { maxWidth: "700px", margin: "0 auto" },
   futureLabel: {
     display: "inline-block",
-    background: "#fbbf2420",
-    color: "#fbbf24",
+    background: "rgba(251, 191, 36, 0.15)",
+    color: COLORS.accent,
     padding: "4px 14px",
     borderRadius: "20px",
     fontSize: "12px",
@@ -549,14 +547,14 @@ const styles = {
     marginBottom: "14px",
     textTransform: "uppercase",
     letterSpacing: "0.08em",
-    border: "1px solid #fbbf2440",
+    border: "1px solid rgba(251, 191, 36, 0.3)",
   },
-  futureText: { fontSize: "16px", color: "#94a3b8", lineHeight: 1.85, margin: "0 0 32px" },
+  futureText: { fontSize: "16px", color: COLORS.textMutedLight, lineHeight: 1.85, margin: "0 0 32px" },
   futurePillars: { display: "flex", justifyContent: "center", gap: "14px", flexWrap: "wrap" },
   futurePillar: {
-    background: "#111827",
-    border: "1.5px solid #fbbf24",
-    color: "#fbbf24",
+    background: COLORS.bgDark,
+    border: `1.5px solid ${COLORS.accent}`,
+    color: COLORS.accent,
     padding: "10px 24px",
     borderRadius: "30px",
     fontSize: "14px",
@@ -565,7 +563,7 @@ const styles = {
   },
 
   cta: {
-    background: "linear-gradient(135deg, #2427fb 0%, #4d9ffc 100%)",
+    background: `linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.primaryDark} 100%)`,
     padding: "76px 20px",
     textAlign: "center",
   },
@@ -580,15 +578,7 @@ const styles = {
     margin: "0 auto",
   },
   ctaBtnPrimary: {
-    padding: "14px 24px",
-    background: "#ef4444",
-    color: "white",
-    border: "none",
-    borderRadius: "10px",
-    fontSize: "14px",
-    fontWeight: 700,
-    cursor: "pointer",
-    transition: "all 0.3s",
+    ...buttonStyles.secondary,
   },
   ctaBtnSecondary: {
     padding: "14px 24px",
@@ -598,9 +588,11 @@ const styles = {
     fontWeight: 700,
     cursor: "pointer",
     transition: "all 0.3s",
+    background: "white",
+    color: COLORS.bgDarker,
   },
 
-  footer: { background: "#1f2937", color: "#d1d5db", padding: "40px 20px 20px" },
+  footer: { background: COLORS.bgDarker, color: "#d1d5db", padding: "40px 20px 20px" },
   footerInner: {
     maxWidth: "1200px",
     margin: "0 auto",
@@ -610,11 +602,11 @@ const styles = {
     marginBottom: "30px",
   },
   footerSection: { fontSize: "13px" },
-  footerTitle: { color: "#fbbf24", fontSize: "14px", fontWeight: 700, margin: "0 0 12px" },
-  footerTagline: { fontSize: "13px", color: "#6b7280", margin: "6px 0 4px" },
+  footerTitle: { color: COLORS.accent, fontSize: "14px", fontWeight: 700, margin: "0 0 12px" },
+  footerTagline: { fontSize: "13px", color: COLORS.textMutedLight, margin: "6px 0 4px" },
   footerLink: { margin: "6px 0", cursor: "pointer", transition: "color 0.2s", color: "#9ca3af" },
-  footerBottom: { textAlign: "center", paddingTop: "20px", borderTop: "1px solid #374151" },
-  footerCopy: { fontSize: "12px", color: "#6b7280", margin: 0 },
+  footerBottom: { textAlign: "center", paddingTop: "20px", borderTop: `1px solid ${COLORS.border}` },
+  footerCopy: { fontSize: "12px", color: COLORS.textMutedLight, margin: 0 },
 };
 
 const css = `
@@ -627,20 +619,20 @@ const css = `
 
   .what-card:hover {
     transform: translateY(-4px);
-    border-color: #fbbf24 !important;
-    box-shadow: 0 12px 32px rgba(0,0,0,0.25) !important;
+    border-color: ${COLORS.accent} !important;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4) !important;
   }
 
   .value-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
-    border-color: #fbbf24 !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important;
+    border-color: ${COLORS.accent} !important;
   }
 
   .team-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 16px 40px rgba(0,0,0,0.3) !important;
-    border-color: #fbbf24 !important;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.4) !important;
+    border-color: ${COLORS.accent} !important;
   }
 
   button:hover {
@@ -649,7 +641,7 @@ const css = `
   }
 
   [style*="cursor: pointer"]:hover {
-    color: #fbbf24 !important;
+    color: ${COLORS.accent} !important;
   }
 
   @media (max-width: 768px) {

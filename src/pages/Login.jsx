@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import logo from "../assets/logo.jpeg";
+import { COLORS, buttonStyles, inputStyles, pageStyles } from "../styles/theme";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
 
@@ -234,27 +235,54 @@ export default function Login() {
 }
 
 const styles = {
-  root: { fontFamily: "'DM Sans', sans-serif", background: "linear-gradient(135deg, #ffffff 0%, #fef3e2 50%, #fef9e7 100%)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" },
+  root: {
+    ...pageStyles.dark,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "20px",
+  },
   container: { width: "100%", maxWidth: "450px" },
   logoSection: { textAlign: "center", marginBottom: "30px" },
   logo: { height: "70px", width: "auto" },
-  formBox: { background: "white", border: "2px solid #fbbf24", borderRadius: "16px", padding: "40px 32px", boxShadow: "0 10px 40px rgba(0, 0, 0, 0.08)" },
-  title: { fontSize: "26px", fontWeight: 800, color: "#1f2937", margin: "0 0 8px", textAlign: "center" },
-  subtitle: { fontSize: "14px", color: "#6b7280", margin: "0 0 30px", textAlign: "center" },
-  error: { background: "#fee2e2", color: "#991b1b", padding: "12px", borderRadius: "8px", marginBottom: "20px", fontSize: "14px", textAlign: "center" },
-  success: { background: "#dcfce7", color: "#166534", padding: "12px", borderRadius: "8px", marginBottom: "20px", fontSize: "14px", textAlign: "center" },
+  formBox: {
+    background: COLORS.bgLight,
+    border: `1px solid ${COLORS.border}`,
+    borderRadius: "16px",
+    padding: "40px 32px",
+    boxShadow: "0 10px 40px rgba(0, 0, 0, 0.3)",
+  },
+  title: { fontSize: "26px", fontWeight: 800, color: COLORS.textLight, margin: "0 0 8px", textAlign: "center" },
+  subtitle: { fontSize: "14px", color: COLORS.textMutedLight, margin: "0 0 30px", textAlign: "center" },
+  error: { background: "rgba(239, 68, 68, 0.15)", color: "#fca5a5", padding: "12px", borderRadius: "8px", marginBottom: "20px", fontSize: "14px", textAlign: "center", border: "1px solid rgba(239, 68, 68, 0.3)" },
+  success: { background: "rgba(34, 197, 94, 0.15)", color: "#86efac", padding: "12px", borderRadius: "8px", marginBottom: "20px", fontSize: "14px", textAlign: "center", border: "1px solid rgba(34, 197, 94, 0.3)" },
   form: { display: "flex", flexDirection: "column", gap: "20px" },
   formGroup: { display: "flex", flexDirection: "column", gap: "6px" },
-  label: { fontSize: "12px", fontWeight: 700, color: "#374151", textTransform: "uppercase" },
-  input: { padding: "12px", border: "2px solid #d1d5db", borderRadius: "8px", fontSize: "15px", background: "#f9fafb" },
-  submitBtn: { padding: "14px", background: "linear-gradient(135deg, #2427fb 0%, #4d9ffc 100%)", color: "white", border: "none", borderRadius: "8px", fontWeight: 700, fontSize: "16px" },
-  divider: { height: "1px", background: "#e5e7eb", margin: "25px 0" },
-  footer: { textAlign: "center", color: "#6b7280", fontSize: "14px" },
-  link: { color: "#2427fb", textDecoration: "none", fontWeight: 700, cursor: "pointer" },
-  forgotLink: { fontSize: "12px", color: "#2427fb", cursor: "pointer", textAlign: "right", fontWeight: 600, marginTop: "2px" },
+  label: { fontSize: "12px", fontWeight: 700, color: COLORS.textMutedLight, textTransform: "uppercase", letterSpacing: "0.5px" },
+  input: inputStyles.dark,
+  submitBtn: buttonStyles.primary,
+  divider: { height: "1px", background: COLORS.border, margin: "25px 0" },
+  footer: { textAlign: "center", color: COLORS.textMutedLight, fontSize: "14px" },
+  link: { color: COLORS.accent, textDecoration: "none", fontWeight: 700, cursor: "pointer" },
+  forgotLink: { fontSize: "12px", color: COLORS.accent, cursor: "pointer", textAlign: "right", fontWeight: 600, marginTop: "2px" },
 };
 
 const css = `
-  input:focus { outline: none; border-color: #2427fb !important; background: white !important; }
-  button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(36, 39, 251, 0.3); }
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+  
+  input:focus { 
+    outline: none; 
+    border-color: ${COLORS.accent} !important; 
+    background: rgba(15,23,41,0.9) !important;
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.12);
+  }
+  
+  button:hover:not(:disabled) { 
+    transform: translateY(-2px); 
+    opacity: 0.9;
+  }
+  
+  a[style*="color: #fbbf24"]:hover {
+    opacity: 0.8;
+  }
 `;

@@ -87,9 +87,9 @@ function App() {
       <Route path="/reset-password/:token" element={<PublicLayout><ResetPassword /></PublicLayout>} />
       <Route path="/seller-login" element={<PublicLayout><SellerLogin /></PublicLayout>} />
       <Route path="/materials" element={<PublicLayout><Materials /></PublicLayout>} />
-      <Route path="/faq" element={<FAQ />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/terms" element={<TermsAndPrivacy />} />
+      <Route path="/faq" element={<PublicLayout><FAQ /></PublicLayout>} />
+      <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
+      <Route path="/terms" element={<PublicLayout><TermsAndPrivacy /></PublicLayout>} />
 
       {/* ── TOURISM ROUTES (have Navbar) ── */}
       {/* IMPORTANT: specific /tourism/* paths must come before /tourism/:id */}

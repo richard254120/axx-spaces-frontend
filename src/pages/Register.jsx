@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import logo from "../assets/logo.jpeg";
+import { COLORS, buttonStyles, inputStyles, pageStyles } from "../styles/theme";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
 
@@ -184,123 +185,104 @@ export default function Register() {
 }
 
 const styles = {
-  root: { 
-    fontFamily: "'DM Sans', sans-serif", 
-    background: "linear-gradient(135deg, #ffffff 0%, #fef3e2 50%, #fef9e7 100%)", 
-    minHeight: "100vh", 
-    display: "flex", 
-    alignItems: "center", 
-    justifyContent: "center", 
-    padding: "20px" 
+  root: {
+    ...pageStyles.dark,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "20px",
   },
-  container: { 
-    width: "100%", 
-    maxWidth: "450px" 
+  container: {
+    width: "100%",
+    maxWidth: "450px",
   },
-  logoSection: { 
-    textAlign: "center", 
-    marginBottom: "30px" 
+  logoSection: {
+    textAlign: "center",
+    marginBottom: "30px",
   },
-  logo: { 
-    height: "70px", 
-    width: "auto" 
+  logo: {
+    height: "70px",
+    width: "auto",
   },
-  formBox: { 
-    background: "white", 
-    border: "2px solid #fbbf24", 
-    borderRadius: "16px", 
-    padding: "40px 32px", 
-    boxShadow: "0 10px 40px rgba(0, 0, 0, 0.08)" 
+  formBox: {
+    background: COLORS.bgLight,
+    border: `1px solid ${COLORS.border}`,
+    borderRadius: "16px",
+    padding: "40px 32px",
+    boxShadow: "0 10px 40px rgba(0, 0, 0, 0.3)",
   },
-  title: { 
-    fontSize: "26px", 
-    fontWeight: 800, 
-    color: "#1f2937", 
-    margin: "0 0 8px", 
-    textAlign: "center" 
+  title: {
+    fontSize: "26px",
+    fontWeight: 800,
+    color: COLORS.textLight,
+    margin: "0 0 8px",
+    textAlign: "center",
   },
-  subtitle: { 
-    fontSize: "14px", 
-    color: "#6b7280", 
-    margin: "0 0 30px", 
-    textAlign: "center" 
+  subtitle: {
+    fontSize: "14px",
+    color: COLORS.textMutedLight,
+    margin: "0 0 30px",
+    textAlign: "center",
   },
-  error: { 
-    background: "#fee2e2", 
-    border: "1px solid #fca5a5", 
-    color: "#991b1b", 
-    padding: "12px 16px", 
-    borderRadius: "8px", 
-    marginBottom: "20px", 
-    fontSize: "14px", 
-    fontWeight: 500 
+  error: {
+    background: "rgba(239, 68, 68, 0.15)",
+    border: "1px solid rgba(239, 68, 68, 0.3)",
+    color: "#fca5a5",
+    padding: "12px 16px",
+    borderRadius: "8px",
+    marginBottom: "20px",
+    fontSize: "14px",
+    fontWeight: 500,
   },
-  success: { 
-    background: "#dcfce7", 
-    border: "1px solid #86efac", 
-    color: "#166534", 
-    padding: "12px 16px", 
-    borderRadius: "8px", 
-    marginBottom: "20px", 
-    fontSize: "14px", 
-    fontWeight: 500 
+  success: {
+    background: "rgba(34, 197, 94, 0.15)",
+    border: "1px solid rgba(34, 197, 94, 0.3)",
+    color: "#86efac",
+    padding: "12px 16px",
+    borderRadius: "8px",
+    marginBottom: "20px",
+    fontSize: "14px",
+    fontWeight: 500,
   },
-  form: { 
-    display: "flex", 
-    flexDirection: "column", 
-    gap: "20px" 
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "20px",
   },
-  formGroup: { 
-    display: "flex", 
-    flexDirection: "column", 
-    gap: "6px" 
+  formGroup: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "6px",
   },
-  label: { 
-    fontSize: "13px", 
-    fontWeight: 700, 
-    color: "#374151", 
-    textTransform: "uppercase", 
-    letterSpacing: "0.5px" 
+  label: {
+    fontSize: "13px",
+    fontWeight: 700,
+    color: COLORS.textMutedLight,
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
   },
-  input: { 
-    padding: "12px 14px", 
-    border: "2px solid #d1d5db", 
-    borderRadius: "8px", 
-    fontSize: "15px", 
-    background: "#f9fafb",
-    fontFamily: "inherit",
+  input: inputStyles.dark,
+  submitBtn: buttonStyles.primary,
+  divider: {
+    height: "1px",
+    background: COLORS.border,
+    margin: "20px 0",
   },
-  submitBtn: { 
-    padding: "14px", 
-    background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)", 
-    color: "#0f1729", 
-    border: "none", 
-    borderRadius: "8px", 
-    fontSize: "15px", 
-    fontWeight: 700, 
-    cursor: "pointer", 
-    boxShadow: "0 4px 12px rgba(251, 191, 36, 0.3)" 
-  },
-  divider: { 
-    height: "1px", 
-    background: "#e5e7eb", 
-    margin: "20px 0" 
-  },
-  footer: { 
-    textAlign: "center", 
-    color: "#6b7280", 
-    fontSize: "14px" 
+  footer: {
+    textAlign: "center",
+    color: COLORS.textMutedLight,
+    fontSize: "14px",
   },
   footerSmall: {
     textAlign: "center",
-    color: "#6b7280",
+    color: COLORS.textMutedLight,
     fontSize: "12px",
-    marginTop: "10px"
+    marginTop: "10px",
   },
-  link: { 
-    color: "#fbbf24", 
-    textDecoration: "none", 
-    fontWeight: 700 
+  link: {
+    color: COLORS.accent,
+    textDecoration: "none",
+    fontWeight: 700,
   },
 };
 
@@ -309,13 +291,17 @@ const css = `
 
   input:focus {
     outline: none;
-    border-color: #fbbf24 !important;
-    background: white !important;
-    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
+    border-color: ${COLORS.accent} !important;
+    background: rgba(15,23,41,0.9) !important;
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.12);
   }
   
   button:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(251, 191, 36, 0.4) !important;
+    opacity: 0.9;
+  }
+  
+  a[style*="color: #fbbf24"]:hover {
+    opacity: 0.8;
   }
 `;
