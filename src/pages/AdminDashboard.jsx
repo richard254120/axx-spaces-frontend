@@ -10,6 +10,14 @@ export default function AdminDashboard() {
   const [pendingProviders, setPendingProviders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("properties");
+  const [mpesaConfig, setMpesaConfig] = useState({
+    mpesa_shortcode: "",
+    mpesa_passkey: "",
+    mpesa_consumer_key: "",
+    mpesa_consumer_secret: "",
+  });
+  const [configSaving, setConfigSaving] = useState(false);
+  const [configMessage, setConfigMessage] = useState("");
 
   useEffect(() => {
     // Security check: ensure only admins can stay on this page
@@ -19,7 +27,42 @@ export default function AdminDashboard() {
     }
     loadPending();
     loadPendingProviders();
+    loadMpesaConfig();
   }, []);
+
+  const loadMpesaConfig = async () => {
+    try {
+      const res = await API.get("/config");
+      setMpesaConfig({
+        mpesa_shortcode: res.data.mpesa_shortcode || "",
+        mpesa_passkey: res.data.mpesa_passkey || "",
+        mpesa_consumer_key: res.data.mpesa_consumer_key || "",
+        mpesa_consumer_secret: res.data.mpesa_consumer_secret || "",
+      });
+    } catch (err) {
+      console.error("Failed to load M-Pesa config:", err);
+    }
+  };
+
+  const handleSaveMpesaConfig = async () => {
+    setConfigSaving(true);
+    try {
+      // Save each config value
+      await Promise.all([
+        API.post("/config", { key: "mpesa_shortcode", value: mpesaConfig.mpesa_shortcode, description: "M-Pesa Paybill/Shortcode" }),
+        API.post("/config", { key: "mpesa_passkey", value: mpesaConfig.mpesa_passkey, description: "M-Pesa Passkey" }),
+        API.post("/config", { key: "mpesa_consumer_key", value: mpesaConfig.mpesa_consumer_key, description: "M-Pesa Consumer Key" }),
+        API.post("/config", { key: "mpesa_consumer_secret", value: mpesaConfig.mpesa_consumer_secret, description: "M-Pesa Consumer Secret" }),
+      ]);
+      setConfigMessage("✅ M-Pesa configuration saved successfully!");
+      setTimeout(() => setConfigMessage(""), 3000);
+    } catch (err) {
+      setConfigMessage("❌ Failed to save configuration. Please try again.");
+      setTimeout(() => setConfigMessage(""), 3000);
+    } finally {
+      setConfigSaving(false);
+    }
+  };
 
   const loadPending = async () => {
     try {
@@ -87,6 +130,12 @@ export default function AdminDashboard() {
         >
           🏨 Tourism Providers ({pendingProviders.length})
         </button>
+        <button
+          style={{ ...styles.tab, ...(activeTab === "payment" ? styles.tabActive : {}) }}
+          onClick={() => setActiveTab("payment")}
+        >
+          💳 Payment Settings
+        </button>
       </div>
 
       {loading ? (
@@ -139,7 +188,7 @@ export default function AdminDashboard() {
             </table>
           </div>
         )
-      ) : (
+      ) : activeTab === "providers" ? (
         // Tourism Providers Tab
         pendingProviders.length === 0 ? (
           <div style={styles.emptyCard}>
@@ -188,7 +237,92 @@ export default function AdminDashboard() {
             </table>
           </div>
         )
-      )}
+      ) : activeTab === "payment" ? (
+        // Payment Settings Tab
+        <div style={styles.configContainer}>
+          <h2 style={styles.configTitle}>💳 M-Pesa Payment Configuration</h2>
+          <p style={styles.configSubtitle}>Configure your M-Pesa credentials to enable payments for subscriptions, boosts, and property promotions.</p>
+          
+          {configMessage && (
+            <div style={{
+              ...styles.configMessage,
+              background: configMessage.startsWith("✅") ? "rgba(34, 197, 94, 0.1)" : "rgba(239, 68, 68, 0.1)",
+              color: configMessage.startsWith("✅") ? "#22c55e" : "#ef4444",
+              borderColor: configMessage.startsWith("✅") ? "#22c55e" : "#ef4444",
+            }}>
+              {configMessage}
+            </div>
+          )}
+
+          <div style={styles.configForm}>
+            <div style={styles.configField}>
+              <label style={styles.configLabel}>Paybill/Shortcode Number</label>
+              <input
+                type="text"
+                value={mpesaConfig.mpesa_shortcode}
+                onChange={(e) => setMpesaConfig({ ...mpesaConfig, mpesa_shortcode: e.target.value })}
+                placeholder="e.g., 174379"
+                style={styles.configInput}
+              />
+              <p style={styles.configHint}>Your M-Pesa Paybill or Buy Goods Till Number</p>
+            </div>
+
+            <div style={styles.configField}>
+              <label style={styles.configLabel}>Passkey</label>
+              <input
+                type="password"
+                value={mpesaConfig.mpesa_passkey}
+                onChange={(e) => setMpesaConfig({ ...mpesaConfig, mpesa_passkey: e.target.value })}
+                placeholder="Enter your M-Pesa Passkey"
+                style={styles.configInput}
+              />
+              <p style={styles.configHint}>The passkey from your M-Pesa dashboard</p>
+            </div>
+
+            <div style={styles.configField}>
+              <label style={styles.configLabel}>Consumer Key</label>
+              <input
+                type="text"
+                value={mpesaConfig.mpesa_consumer_key}
+                onChange={(e) => setMpesaConfig({ ...mpesaConfig, mpesa_consumer_key: e.target.value })}
+                placeholder="Enter Consumer Key"
+                style={styles.configInput}
+              />
+              <p style={styles.configHint}>API Consumer Key from Safaricom Developer Portal</p>
+            </div>
+
+            <div style={styles.configField}>
+              <label style={styles.configLabel}>Consumer Secret</label>
+              <input
+                type="password"
+                value={mpesaConfig.mpesa_consumer_secret}
+                onChange={(e) => setMpesaConfig({ ...mpesaConfig, mpesa_consumer_secret: e.target.value })}
+                placeholder="Enter Consumer Secret"
+                style={styles.configInput}
+              />
+              <p style={styles.configHint}>API Consumer Secret from Safaricom Developer Portal</p>
+            </div>
+
+            <button
+              onClick={handleSaveMpesaConfig}
+              disabled={configSaving}
+              style={styles.saveConfigBtn}
+            >
+              {configSaving ? "Saving..." : "💾 Save Configuration"}
+            </button>
+          </div>
+
+          <div style={styles.configInfo}>
+            <h3 style={styles.configInfoTitle}>📋 Configuration Notes</h3>
+            <ul style={styles.configInfoList}>
+              <li>These credentials are required for M-Pesa STK Push payments</li>
+              <li>Get your credentials from the <a href="https://developer.safaricom.co.ke/" target="_blank" style={styles.configLink}>Safaricom Developer Portal</a></li>
+              <li>For production, use your live credentials instead of sandbox credentials</li>
+              <li>Changes take effect immediately for all new payment requests</li>
+            </ul>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -256,7 +390,59 @@ const styles = {
     color: "#1f2937",
     borderColor: "#fbbf24",
   },
-  roleBadge: { background: "rgba(251, 191, 36, 0.1)", color: "#fbbf24", padding: "6px 12px", borderRadius: "6px", fontWeight: 700 }
+  roleBadge: { background: "rgba(251, 191, 36, 0.1)", color: "#fbbf24", padding: "6px 12px", borderRadius: "6px", fontWeight: 700 },
+  configContainer: {
+    background: "rgba(15, 23, 42, 0.8)",
+    borderRadius: "16px",
+    padding: "40px",
+    border: "1px solid rgba(255,255,255,0.05)",
+    maxWidth: "700px",
+    margin: "0 auto",
+  },
+  configTitle: { fontSize: "24px", fontWeight: 800, color: "#fbbf24", marginBottom: "8px" },
+  configSubtitle: { color: "#94a3b8", fontSize: "14px", marginBottom: "24px" },
+  configForm: { display: "flex", flexDirection: "column", gap: "20px", marginBottom: "32px" },
+  configField: { display: "flex", flexDirection: "column", gap: "6px" },
+  configLabel: { fontSize: "13px", fontWeight: 700, color: "#f1f5f9", textTransform: "uppercase", letterSpacing: "0.5px" },
+  configInput: {
+    padding: "12px 16px",
+    borderRadius: "8px",
+    border: "1px solid rgba(255,255,255,0.1)",
+    background: "rgba(30, 41, 59, 0.6)",
+    color: "#f1f5f9",
+    fontSize: "14px",
+    outline: "none",
+    transition: "0.2s",
+  },
+  configHint: { fontSize: "12px", color: "#64748b", margin: 0 },
+  saveConfigBtn: {
+    padding: "14px 24px",
+    background: "#fbbf24",
+    color: "#1f2937",
+    border: "none",
+    borderRadius: "8px",
+    fontWeight: 700,
+    fontSize: "14px",
+    cursor: "pointer",
+    transition: "0.2s",
+  },
+  configMessage: {
+    padding: "12px 16px",
+    borderRadius: "8px",
+    border: "1px solid",
+    fontSize: "13px",
+    fontWeight: 600,
+    marginBottom: "20px",
+  },
+  configInfo: {
+    background: "rgba(30, 41, 59, 0.4)",
+    padding: "20px",
+    borderRadius: "12px",
+    border: "1px dashed rgba(251, 191, 36, 0.3)",
+  },
+  configInfoTitle: { fontSize: "14px", fontWeight: 700, color: "#fbbf24", marginBottom: "12px" },
+  configInfoList: { margin: 0, paddingLeft: "20px", color: "#94a3b8", fontSize: "13px", lineHeight: "1.8" },
+  configLink: { color: "#3b82f6", textDecoration: "none" },
 };
 
 const cssStyles = `
