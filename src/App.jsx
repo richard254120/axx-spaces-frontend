@@ -26,7 +26,6 @@ import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
 import TermsAndPrivacy from "./pages/TermsAndPrivacy";
 
-// ─── Tourism Pages ───────────────────────────────────────────────────────────
 import TourismPage from "./pages/tourism/TourismPage";
 import TourismListingsPage from "./pages/tourism/TourismListingsPage";
 import TourismDetailPage from "./pages/tourism/TourismDetailPage";
@@ -36,9 +35,6 @@ import EditPropertyPage from "./pages/tourism/EditPropertyPage";
 
 import "leaflet/dist/leaflet.css";
 
-// ─── Layouts ────────────────────────────────────────────────────────────────
-
-// Public pages get the Navbar + WhatsApp button
 function PublicLayout({ children }) {
   return (
     <>
@@ -49,26 +45,29 @@ function PublicLayout({ children }) {
   );
 }
 
-// Dashboard pages get NO Navbar and NO WhatsApp button
 function DashboardLayout({ children }) {
   return <>{children}</>;
 }
 
-// ─── Route guard ────────────────────────────────────────────────────────────
-
-const ProtectedRoute = ({ children, allowedRoles = [] }) => {
+// ─── Route guard ─────────────────────────────────────────────────────────────
+//  allowedRoles – only these roles may enter; others go to their own dashboard
+//  redirectTo   – where unauthenticated users are sent (per-section login page)
+const ProtectedRoute = ({ children, allowedRoles = [], redirectTo = "/login" }) => {
   const { token, user } = useContext(AuthContext);
 
-  if (!token) return <Navigate to="/login" replace />;
+  // Not logged in → send to the correct login page for this section
+  if (!token) return <Navigate to={redirectTo} replace />;
 
+  // Logged in but wrong role → bounce to their own dashboard
   if (allowedRoles.length > 0 && user?.role && !allowedRoles.includes(user.role)) {
+    if (user.role === "mover")     return <Navigate to="/mover-dashboard" replace />;
+    if (user.role === "landlord")  return <Navigate to="/dashboard" replace />;
+    if (user.role === "provider")  return <Navigate to="/tourism/dashboard" replace />;
     return <Navigate to="/" replace />;
   }
 
   return children;
 };
-
-// ─── App ────────────────────────────────────────────────────────────────────
 
 function App() {
   const navigate = useNavigate();
@@ -77,7 +76,7 @@ function App() {
   return (
     <Routes>
 
-      {/* ── PUBLIC ROUTES (have Navbar) ── */}
+      {/* ── PUBLIC ROUTES ── */}
       <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
       <Route path="/listings" element={<PublicLayout><Listings /></PublicLayout>} />
       <Route path="/movers" element={<PublicLayout><Movers /></PublicLayout>} />
@@ -91,16 +90,17 @@ function App() {
       <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
       <Route path="/terms" element={<PublicLayout><TermsAndPrivacy /></PublicLayout>} />
 
-      {/* ── TOURISM ROUTES (have Navbar) ── */}
-      {/* IMPORTANT: specific /tourism/* paths must come before /tourism/:id */}
+      {/* ── TOURISM ROUTES ── */}
       <Route path="/tourism" element={<PublicLayout><TourismPage /></PublicLayout>} />
       <Route path="/tourism/listings" element={<PublicLayout><TourismListingsPage /></PublicLayout>} />
       <Route path="/tourism/register-property" element={<PublicLayout><RegisterPropertyPage /></PublicLayout>} />
+
+      {/* Provider dashboard — "provider" role only; logged-out → /tourism */}
       <Route
         path="/tourism/dashboard"
         element={
           <DashboardLayout>
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["provider"]} redirectTo="/tourism">
               <ProviderDashboard />
             </ProtectedRoute>
           </DashboardLayout>
@@ -110,7 +110,7 @@ function App() {
         path="/tourism/dashboard/property/:id"
         element={
           <DashboardLayout>
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["provider"]} redirectTo="/tourism">
               <EditPropertyPage />
             </ProtectedRoute>
           </DashboardLayout>
@@ -123,52 +123,35 @@ function App() {
         path="/seller-dashboard"
         element={<DashboardLayout><SellerDashboard /></DashboardLayout>}
       />
+
+      {/* Landlord dashboard — "landlord" role only; logged-out → /login */}
       <Route
         path="/dashboard"
         element={
           <DashboardLayout>
-            <ProtectedRoute allowedRoles={["landlord"]}>
+            <ProtectedRoute allowedRoles={["landlord"]} redirectTo="/login">
               <LandlordDashboard />
             </ProtectedRoute>
           </DashboardLayout>
         }
       />
+
+      {/* Mover dashboard — "mover" role only; logged-out → /movers */}
       <Route
         path="/mover-dashboard"
         element={
           <DashboardLayout>
-            <ProtectedRoute allowedRoles={["mover"]}>
+            <ProtectedRoute allowedRoles={["mover"]} redirectTo="/movers">
               <MoverDashboard />
             </ProtectedRoute>
           </DashboardLayout>
         }
       />
 
-      {/* ── PROTECTED PUBLIC ROUTES (have Navbar) ── */}
-      <Route
-        path="/upload"
-        element={
-          <PublicLayout>
-            <ProtectedRoute><Upload /></ProtectedRoute>
-          </PublicLayout>
-        }
-      />
-      <Route
-        path="/premium-plans"
-        element={
-          <PublicLayout>
-            <ProtectedRoute><PremiumPlans /></ProtectedRoute>
-          </PublicLayout>
-        }
-      />
-      <Route
-        path="/checkout"
-        element={
-          <PublicLayout>
-            <ProtectedRoute><Checkout /></ProtectedRoute>
-          </PublicLayout>
-        }
-      />
+      {/* ── PROTECTED PUBLIC ROUTES ── */}
+      <Route path="/upload" element={<PublicLayout><ProtectedRoute><Upload /></ProtectedRoute></PublicLayout>} />
+      <Route path="/premium-plans" element={<PublicLayout><ProtectedRoute><PremiumPlans /></ProtectedRoute></PublicLayout>} />
+      <Route path="/checkout" element={<PublicLayout><ProtectedRoute><Checkout /></ProtectedRoute></PublicLayout>} />
 
       {/* ── 404 ── */}
       <Route
