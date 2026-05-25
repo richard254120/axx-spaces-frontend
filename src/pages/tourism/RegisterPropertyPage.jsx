@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
 import { registerTourismProperty } from "../../api/tourism";
 import {
   ADVERTISING_PACKAGES,
@@ -20,6 +21,7 @@ const packages = ADVERTISING_PACKAGES;
 
 export default function RegisterPropertyPage() {
   const navigate = useNavigate();
+  const { login: authLogin } = useContext(AuthContext);
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -53,7 +55,15 @@ export default function RegisterPropertyPage() {
     setSubmitError("");
     try {
       const result = await registerTourismProperty(form);
-      if (result.token) setTourismSession(result.token, result.user);
+      if (result.token) {
+        setTourismSession(result.token, result.user);
+        authLogin(result.token, {
+          _id: result.user?.id,
+          name: result.user?.name,
+          email: result.user?.email,
+          role: "landlord",
+        });
+      }
       setSubmitted(true);
     } catch (err) {
       setSubmitError(err.message || "Submission failed. Please try again.");

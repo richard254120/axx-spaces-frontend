@@ -169,14 +169,29 @@ export default function TourismDetailPage() {
         {/* ── LEFT ── */}
         <div style={s.leftCol}>
 
-          {/* HERO */}
-          <div style={{ ...s.heroImg, background: `linear-gradient(135deg, ${property.color}30, ${property.color}10)`, border: `1px solid ${property.color}25` }}>
-            <span style={{ fontSize: "88px" }}>{property.emoji}</span>
-            {property.tag && <div style={{ ...s.heroTag, background: property.color }}>{property.tag}</div>}
-            {property.bookingUrl && (
-              <div style={s.bookingUrlBadge}>🔗 Official Booking Available</div>
-            )}
-          </div>
+          {/* HERO / MEDIA */}
+          {(property.images?.length > 0 || property.videos?.length > 0) ? (
+            <div style={{ marginBottom: "16px" }}>
+              {property.images?.length > 0 && (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "10px", marginBottom: property.videos?.length ? "12px" : 0 }}>
+                  {property.images.map((url) => (
+                    <img key={url} src={url} alt={property.name} style={{ width: "100%", height: "200px", objectFit: "cover", borderRadius: "12px", border: `1px solid ${property.color}25` }} />
+                  ))}
+                </div>
+              )}
+              {property.videos?.map((url) => (
+                <video key={url} src={url} controls style={{ width: "100%", maxHeight: "360px", borderRadius: "12px", marginBottom: "8px" }} />
+              ))}
+            </div>
+          ) : (
+            <div style={{ ...s.heroImg, background: `linear-gradient(135deg, ${property.color}30, ${property.color}10)`, border: `1px solid ${property.color}25` }}>
+              <span style={{ fontSize: "88px" }}>{property.emoji}</span>
+              {property.tag && <div style={{ ...s.heroTag, background: property.color }}>{property.tag}</div>}
+              {property.bookingUrl && (
+                <div style={s.bookingUrlBadge}>🔗 Official Booking Available</div>
+              )}
+            </div>
+          )}
 
           {/* INFO */}
           <div style={s.card}>

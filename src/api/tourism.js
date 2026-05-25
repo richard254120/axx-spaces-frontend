@@ -104,6 +104,15 @@ export async function fetchOwnerProfile(token) {
   return json.data;
 }
 
+export async function updateOwnerProfile(token, { name, phone }) {
+  const json = await request("/tourism/owner/profile", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...authHeaders(token) },
+    body: JSON.stringify({ name, phone }),
+  });
+  return json;
+}
+
 export async function fetchOwnerListing(token, listingId) {
   const json = await request(`/tourism/owner/listings/${listingId}`, {
     headers: { ...authHeaders(token) },

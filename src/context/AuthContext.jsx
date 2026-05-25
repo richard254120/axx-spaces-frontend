@@ -30,14 +30,12 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("user", JSON.stringify(userData));
   };
 
-  const logout = () => {
+  const logout = (redirectTo = "/") => {
     setToken(null);
     setUser(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    
-    // Optional: Redirect to home after logout
-    window.location.href = "/";
+    window.location.href = redirectTo;
   };
 
   // Optional: Make it harder for console attackers

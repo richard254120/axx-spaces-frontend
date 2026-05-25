@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
 import { tourismLogin } from "../../api/tourism";
 import {
   useTourismHome,
@@ -59,6 +60,7 @@ const categories = DEFAULT_CATEGORIES;
 
 export default function TourismPage() {
   const navigate = useNavigate();
+  const { login: authLogin } = useContext(AuthContext);
   const [authModal, setAuthModal] = useState(null); // "login" | "register" | "packages"
   const [authTab, setAuthTab] = useState("login");
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
@@ -79,6 +81,7 @@ export default function TourismPage() {
       const res = await tourismLogin(loginForm.email, loginForm.password);
       const user = res.user || { name: res.name, email: loginForm.email };
       setTourismSession(res.token, user);
+      authLogin(res.token, res.user);
       setLoggedIn(true);
       setUserName(getDisplayName(user));
       setAuthModal(null);

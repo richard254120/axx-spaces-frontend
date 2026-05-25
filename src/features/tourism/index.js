@@ -6,6 +6,7 @@ export { useTourismListings } from "./hooks/useTourismListings";
 export { useTourismProperty } from "./hooks/useTourismProperty";
 export { useTourismHome } from "./hooks/useTourismHome";
 export { useProviderListings } from "./hooks/useProviderListings";
+export { useOwnerProfile } from "./hooks/useOwnerProfile";
 export { default as TourismNav } from "./components/TourismNav";
 export { default as PropertyCard } from "./components/PropertyCard";
 export { default as ListingFilters } from "./components/ListingFilters";

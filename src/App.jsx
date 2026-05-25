@@ -32,6 +32,7 @@ import TourismListingsPage from "./pages/tourism/TourismListingsPage";
 import TourismDetailPage from "./pages/tourism/TourismDetailPage";
 import RegisterPropertyPage from "./pages/tourism/RegisterPropertyPage";
 import ProviderDashboard from "./pages/tourism/ProviderDashboard";
+import EditPropertyPage from "./pages/tourism/EditPropertyPage";
 
 import "leaflet/dist/leaflet.css";
 
@@ -101,6 +102,16 @@ function App() {
           <DashboardLayout>
             <ProtectedRoute>
               <ProviderDashboard />
+            </ProtectedRoute>
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/tourism/dashboard/property/:id"
+        element={
+          <DashboardLayout>
+            <ProtectedRoute>
+              <EditPropertyPage />
             </ProtectedRoute>
           </DashboardLayout>
         }

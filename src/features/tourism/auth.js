@@ -31,6 +31,7 @@ export function setTourismSession(token, user) {
 export function clearTourismSession() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
+  localStorage.removeItem("user");
 }
 
 export function isTourismLoggedIn() {
