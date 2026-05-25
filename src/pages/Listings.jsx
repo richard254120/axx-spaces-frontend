@@ -56,7 +56,7 @@ export default function Listings() {
   }, []);
 
   useEffect(() => {
-    let filtered = properties.filter(p => p.availableUnits > 0); // ✅ always exclude fully booked
+    let filtered = properties.filter(p => p.availableUnits > 0);
     if (filters.location) {
       filtered = filtered.filter((p) =>
         (p.location + " " + (p.county || "")).toLowerCase().includes(filters.location.toLowerCase())
@@ -85,7 +85,6 @@ export default function Listings() {
     }));
   };
 
-  // ✅ Now also tracks recently viewed
   const openModal = (property) => {
     setSelectedProperty(property);
     setCurrentImageIndex(0);
@@ -140,7 +139,10 @@ export default function Listings() {
     return (
       <div style={styles.container}>
         <style>{cssStyles}</style>
-        <p style={styles.loading}>⏳ Loading properties...</p>
+        <div style={styles.loadingState}>
+          <div style={styles.spinner}></div>
+          <p style={styles.loadingText}>Loading amazing properties...</p>
+        </div>
       </div>
     );
   }
@@ -149,162 +151,204 @@ export default function Listings() {
     <div style={styles.container}>
       <style>{cssStyles}</style>
 
-      <div style={styles.header}>
-        <h1 style={styles.heading}>🏢 Available Properties</h1>
-        <p style={styles.tagline}>Find your perfect rental home in Kenya</p>
+      {/* HEADER */}
+      <div style={styles.heroHeader}>
+        <div style={styles.headerContent}>
+          <h1 style={styles.mainTitle}>Find Your Perfect Home</h1>
+          <p style={styles.subtitle}>Discover {filteredProperties.length} available properties across Kenya</p>
+        </div>
       </div>
 
       {error && <div style={styles.error}>{error}</div>}
 
-      {/* FILTERS — unchanged */}
-      <div style={styles.filters}>
-        <input
-          type="text"
-          name="location"
-          placeholder="📍 Filter by location or county..."
-          value={filters.location}
-          onChange={handleFilterChange}
-          style={styles.filterInput}
-        />
-        <select name="bedrooms" value={filters.bedrooms} onChange={handleFilterChange} style={styles.filterSelect}>
-          <option value="">All Bedrooms</option>
-          <option value="1">1 Bedroom</option>
-          <option value="2">2 Bedrooms</option>
-          <option value="3">3 Bedrooms</option>
-          <option value="4">4+ Bedrooms</option>
-        </select>
-        <select name="bathrooms" value={filters.bathrooms} onChange={handleFilterChange} style={styles.filterSelect}>
-          <option value="">All Bathrooms</option>
-          <option value="1">1 Bathroom</option>
-          <option value="2">2 Bathrooms</option>
-          <option value="3">3+ Bathrooms</option>
-        </select>
-        <select name="furnished" value={filters.furnished} onChange={handleFilterChange} style={styles.filterSelect}>
-          <option value="">Furnished or not</option>
-          <option value="true">Furnished</option>
-          <option value="false">Unfurnished</option>
-        </select>
-        <div style={styles.priceRange}>
-          <input type="number" name="minPrice" placeholder="Min Price" value={filters.minPrice} onChange={handleFilterChange} style={styles.filterInput} />
-          <span style={styles.priceSeparator}>-</span>
-          <input type="number" name="maxPrice" placeholder="Max Price" value={filters.maxPrice} onChange={handleFilterChange} style={styles.filterInput} />
+      {/* FILTERS */}
+      <div style={styles.filterSection}>
+        <div style={styles.filterWrapper}>
+          <div style={styles.filterGrid}>
+            <input
+              type="text"
+              name="location"
+              placeholder="📍 Search by location or county..."
+              value={filters.location}
+              onChange={handleFilterChange}
+              style={styles.filterInput}
+            />
+            <select name="bedrooms" value={filters.bedrooms} onChange={handleFilterChange} style={styles.filterSelect}>
+              <option value="">All Bedrooms</option>
+              <option value="1">1 Bedroom</option>
+              <option value="2">2 Bedrooms</option>
+              <option value="3">3 Bedrooms</option>
+              <option value="4">4+ Bedrooms</option>
+            </select>
+            <select name="bathrooms" value={filters.bathrooms} onChange={handleFilterChange} style={styles.filterSelect}>
+              <option value="">All Bathrooms</option>
+              <option value="1">1 Bathroom</option>
+              <option value="2">2 Bathrooms</option>
+              <option value="3">3+ Bathrooms</option>
+            </select>
+            <select name="furnished" value={filters.furnished} onChange={handleFilterChange} style={styles.filterSelect}>
+              <option value="">Any Condition</option>
+              <option value="true">Furnished</option>
+              <option value="false">Unfurnished</option>
+            </select>
+          </div>
+          <div style={styles.priceFilterWrapper}>
+            <input type="number" name="minPrice" placeholder="Min" value={filters.minPrice} onChange={handleFilterChange} style={styles.priceInput} />
+            <span style={styles.priceSeparator}>—</span>
+            <input type="number" name="maxPrice" placeholder="Max" value={filters.maxPrice} onChange={handleFilterChange} style={styles.priceInput} />
+            <button style={styles.mapToggleBtn} onClick={() => setShowMap((v) => !v)}>
+              {showMap ? "🗒️ List" : "🗺️ Map"}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* ✅ RESULTS COUNT + MAP TOGGLE */}
-      <div style={styles.resultsRow}>
+      {/* RESULTS INFO */}
+      <div style={styles.resultsInfo}>
         <span style={styles.resultsCount}>
-          Found {filteredProperties.length} {filteredProperties.length === 1 ? "property" : "properties"}
+          {filteredProperties.length} {filteredProperties.length === 1 ? "property" : "properties"} found
         </span>
-        <button style={styles.mapToggleBtn} onClick={() => setShowMap((v) => !v)}>
-          {showMap ? "🗒️ Hide Map" : "🗺️ Show Map"}
-        </button>
       </div>
 
-      {/* ✅ MAP VIEW — toggled */}
+      {/* MAP VIEW */}
       {showMap && <MapView properties={filteredProperties} />}
 
-      {/* ✅ RECENTLY VIEWED — appears above the grid */}
+      {/* RECENTLY VIEWED */}
       <RecentlyViewed onSelect={openModal} />
 
+      {/* NO RESULTS */}
       {filteredProperties.length === 0 && (
-        <div style={styles.noResults}>
-          <p>No properties match your filters. Try adjusting your search! 🔍</p>
+        <div style={styles.emptyState}>
+          <div style={styles.emptyIcon}>🔍</div>
+          <h3 style={styles.emptyTitle}>No Properties Found</h3>
+          <p style={styles.emptyText}>Try adjusting your filters to see more listings</p>
         </div>
       )}
 
+      {/* LISTINGS GRID */}
       {filteredProperties.length > 0 && (
-        <div style={styles.grid}>
+        <div style={styles.listingsGrid}>
           {filteredProperties.map((property) => (
-            <div key={property._id} style={styles.card}>
-              <div style={styles.imageContainer} onClick={() => openModal(property)}>
+            <div key={property._id} style={styles.propertyCard} className="property-card">
+              
+              {/* IMAGE SECTION */}
+              <div style={styles.cardImageWrapper} onClick={() => openModal(property)}>
                 {property.images?.length > 0 ? (
-                  <img src={property.images[0]} alt={property.title} style={styles.image} />
+                  <img src={property.images[0]} alt={property.title} style={styles.cardImage} />
                 ) : (
-                  <div style={styles.noImage}>📷 No Image</div>
+                  <div style={styles.noImage}>📷</div>
                 )}
-                <div style={{ ...styles.availabilityBadge, ...(property.availableUnits > 0 ? styles.availableBadge : styles.unavailableBadge) }}>
-                  {property.availableUnits > 0 ? <>✅ {property.availableUnits} Available</> : <>❌ Fully Booked</>}
+                
+                {/* BADGES */}
+                <div style={styles.badgesContainer}>
+                  <span style={property.availableUnits > 0 ? styles.badgeAvailable : styles.badgeUnavailable}>
+                    {property.availableUnits > 0 ? `✓ ${property.availableUnits} Available` : "✕ Fully Booked"}
+                  </span>
+                  {property.images?.length > 1 && (
+                    <span style={styles.badgeImage}>📷 {property.images.length}</span>
+                  )}
                 </div>
-                {property.images?.length > 1 && (
-                  <div style={styles.imageCount}>📷 {property.images.length}</div>
-                )}
+
+                {/* HOVER OVERLAY */}
+                <div style={styles.cardOverlay}>
+                  <button style={styles.viewDetailsBtn}>View Details</button>
+                </div>
               </div>
-              <div style={styles.content}>
-                <h2 style={styles.title}>{property.title}</h2>
-                <p style={styles.location}> {property.county} • {property.location}</p>
-                <div style={styles.specs}>
-                  <span style={styles.spec}> {property.bedrooms} Bed</span>
-                  <span style={styles.spec}> {property.bathrooms} Bath</span>
-                  <span style={styles.spec}>{property.furnished ? "🪑 Furnished" : "📦 Unfurnished"}</span>
+
+              {/* CONTENT SECTION */}
+              <div style={styles.cardContent}>
+                <div style={styles.titleArea}>
+                  <h3 style={styles.propertyTitle}>{property.title}</h3>
+                  <div style={styles.priceTag}>KES {property.price?.toLocaleString()}</div>
                 </div>
-                <div style={styles.price}>💰 KES {property.price?.toLocaleString()}/month</div>
-                <p style={styles.description}>{property.description?.substring(0, 80)}...</p>
-                <div style={styles.unitInfo}>
-                  <div><span style={styles.unitLabel}>Total Units</span><span style={styles.unitValue}>{property.totalUnits || 1}</span></div>
-                  <div><span style={styles.unitLabel}>Booked</span><span style={styles.unitValue}>{property.bookedUnits || 0}</span></div>
-                  <div><span style={styles.unitLabel}>Available</span><strong style={styles.unitValueBold}>{property.availableUnits}</strong></div>
+
+                <div style={styles.locationBar}>
+                  <span style={styles.location}>📍 {property.location}</span>
+                  <span style={styles.county}>{property.county}</span>
                 </div>
+
+                {/* SPECS ROW */}
+                <div style={styles.specsRow}>
+                  <div style={styles.spec}>
+                    <span style={styles.specIcon}>🛏️</span>
+                    <span>{property.bedrooms}</span>
+                  </div>
+                  <div style={styles.spec}>
+                    <span style={styles.specIcon}>🚿</span>
+                    <span>{property.bathrooms}</span>
+                  </div>
+                  <div style={styles.spec}>
+                    <span style={styles.specIcon}>{property.furnished ? "✓" : "📦"}</span>
+                    <span>{property.furnished ? "Furnished" : "Unfurnished"}</span>
+                  </div>
+                </div>
+
+                {/* DESCRIPTION */}
+                <p style={styles.description}>{property.description?.substring(0, 70)}...</p>
+
+                {/* AMENITIES PREVIEW */}
                 {property.amenities?.length > 0 && (
                   <div style={styles.amenitiesPreview}>
-                    {property.amenities.slice(0, 2).map((amenity, idx) => (
-                      <span key={idx} style={styles.amenityChip}>✓ {amenity}</span>
+                    {property.amenities.slice(0, 2).map((a, i) => (
+                      <span key={i} style={styles.amenityTag}>{a}</span>
                     ))}
                     {property.amenities.length > 2 && (
-                      <span style={styles.amenityChip}>+{property.amenities.length - 2} more</span>
+                      <span style={styles.amenityTag}>+{property.amenities.length - 2}</span>
                     )}
                   </div>
                 )}
-                <button
-                  style={{ ...styles.contactBtn, ...(property.availableUnits === 0 ? styles.contactBtnDisabled : {}) }}
-                  onClick={() => handleContactLandlord(property)}
-                  disabled={property.availableUnits === 0}
-                >
-                  Contact via WhatsApp
-                </button>
-                <button style={styles.viewBtn} onClick={() => openModal(property)}>
-                  View Details
-                </button>
+
+                {/* ACTION BUTTONS */}
+                <div style={styles.cardActions}>
+                  <button
+                    style={{...styles.primaryBtn, ...(property.availableUnits === 0 ? styles.btnDisabled : {})}}
+                    onClick={() => handleContactLandlord(property)}
+                    disabled={property.availableUnits === 0}
+                  >
+                    💬 WhatsApp
+                  </button>
+                  <button style={styles.secondaryBtn} onClick={() => openModal(property)}>
+                    Details →
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* ─── MODAL ─── */}
+      {/* MODAL */}
       {selectedProperty && (
         <div style={styles.modal} onClick={closeModal}>
           <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <button style={styles.closeBtn} onClick={closeModal}>✕</button>
 
-            <div style={styles.modalImage}>
+            {/* MODAL IMAGE */}
+            <div style={styles.modalImageContainer}>
               {selectedProperty.images?.length > 0 ? (
                 <>
-                  <img
-                    src={selectedProperty.images[currentImageIndex]}
-                    alt={`${selectedProperty.title} ${currentImageIndex + 1}`}
-                    style={styles.modalImg}
-                  />
+                  <img src={selectedProperty.images[currentImageIndex]} alt="Property" style={styles.modalImage} />
                   {selectedProperty.images.length > 1 && (
                     <>
-                      <button style={styles.prevBtn} onClick={prevImage}>❮</button>
-                      <button style={styles.nextBtn} onClick={nextImage}>❯</button>
-                      <div style={styles.imageCounter}>{currentImageIndex + 1} / {selectedProperty.images.length}</div>
+                      <button style={styles.navBtn} style={{ ...styles.navBtn, left: "12px" }} onClick={prevImage}>❮</button>
+                      <button style={styles.navBtn} style={{ ...styles.navBtn, right: "12px" }} onClick={nextImage}>❯</button>
+                      <div style={styles.imageCounter}>{currentImageIndex + 1}/{selectedProperty.images.length}</div>
                     </>
                   )}
                 </>
               ) : (
-                <div style={styles.noImage}>📷 No Images Available</div>
+                <div style={styles.noImageModal}>📷 No Images Available</div>
               )}
             </div>
 
+            {/* THUMBNAILS */}
             {selectedProperty.images?.length > 1 && (
-              <div style={styles.thumbnails}>
+              <div style={styles.thumbnailsContainer}>
                 {selectedProperty.images.map((img, idx) => (
                   <img
                     key={idx}
                     src={img}
-                    alt={`Thumbnail ${idx + 1}`}
+                    alt={`Thumb ${idx + 1}`}
                     style={{ ...styles.thumbnail, ...(idx === currentImageIndex ? styles.activeThumbnail : {}) }}
                     onClick={() => setCurrentImageIndex(idx)}
                   />
@@ -312,112 +356,94 @@ export default function Listings() {
               </div>
             )}
 
-            <div style={styles.modalDetails}>
-              <h2 style={styles.modalTitle}>{selectedProperty.title}</h2>
-              <p style={styles.modalLocation}>
-                 {selectedProperty.county} • {selectedProperty.location}
-              </p>
-
-              <div style={styles.specs}>
-                <span style={styles.spec}>🛏️ {selectedProperty.bedrooms} Bedrooms</span>
-                <span style={styles.spec}>🚿 {selectedProperty.bathrooms} Bathrooms</span>
-                <span style={styles.spec}>{selectedProperty.furnished ? " Furnished" : " Unfurnished"}</span>
+            {/* MODAL CONTENT */}
+            <div style={styles.modalContentWrapper}>
+              <div style={styles.modalHeader}>
+                <h2 style={styles.modalTitle}>{selectedProperty.title}</h2>
+                <div style={styles.modalPrice}>KES {selectedProperty.price?.toLocaleString()}/month</div>
               </div>
 
-              <div style={styles.pricingRow}>
-                <div style={styles.pricingBox}>
-                  <span style={styles.pricingLabel}>Monthly Rent</span>
-                  <span style={styles.pricingValue}>KES {selectedProperty.price?.toLocaleString()}</span>
+              <div style={styles.modalLocation}>📍 {selectedProperty.location}, {selectedProperty.county}</div>
+
+              {/* SPECS GRID */}
+              <div style={styles.modalSpecsGrid}>
+                <div style={styles.specBox}>
+                  <span style={styles.specLabel}>Bedrooms</span>
+                  <span style={styles.specValue}>{selectedProperty.bedrooms}</span>
                 </div>
-                {selectedProperty.deposit > 0 && (
-                  <div style={styles.pricingBox}>
-                    <span style={styles.pricingLabel}>Deposit</span>
-                    <span style={styles.pricingValue}>KES {selectedProperty.deposit?.toLocaleString()}</span>
-                  </div>
-                )}
-                {selectedProperty.leaseType && (
-                  <div style={styles.pricingBox}>
-                    <span style={styles.pricingLabel}>Lease</span>
-                    <span style={styles.pricingValue}>{leaseLabel[selectedProperty.leaseType] || selectedProperty.leaseType}</span>
-                  </div>
-                )}
+                <div style={styles.specBox}>
+                  <span style={styles.specLabel}>Bathrooms</span>
+                  <span style={styles.specValue}>{selectedProperty.bathrooms}</span>
+                </div>
+                <div style={styles.specBox}>
+                  <span style={styles.specLabel}>Condition</span>
+                  <span style={styles.specValue}>{selectedProperty.furnished ? "Furnished" : "Unfurnished"}</span>
+                </div>
+                <div style={styles.specBox}>
+                  <span style={styles.specLabel}>Available</span>
+                  <span style={styles.specValue}>{selectedProperty.availableUnits}</span>
+                </div>
               </div>
 
-              <p style={styles.fullDescription}>{selectedProperty.description}</p>
-
-              {selectedProperty.rules && (
-                <div style={styles.rulesBox}>
-                  <h3 style={styles.rulesHead}> House Rules</h3>
-                  <p style={styles.rulesText}>{selectedProperty.rules}</p>
+              {/* PRICING INFO */}
+              {selectedProperty.deposit > 0 && (
+                <div style={styles.infoBox}>
+                  <span style={styles.infoLabel}>Security Deposit</span>
+                  <span style={styles.infoValue}>KES {selectedProperty.deposit?.toLocaleString()}</span>
                 </div>
               )}
 
+              {/* DESCRIPTION */}
+              <div style={styles.descriptionSection}>
+                <h3 style={styles.sectionTitle}>About This Property</h3>
+                <p style={styles.descriptionText}>{selectedProperty.description}</p>
+              </div>
+
+              {/* AMENITIES */}
               {selectedProperty.amenities?.length > 0 && (
                 <div style={styles.amenitiesSection}>
-                  <h3 style={styles.amenitiesHead}>✨ Amenities</h3>
+                  <h3 style={styles.sectionTitle}>Amenities</h3>
                   <div style={styles.amenitiesGrid}>
-                    {selectedProperty.amenities.map((amenity, idx) => (
-                      <span key={idx} style={styles.amenityChip}>✓ {amenity}</span>
+                    {selectedProperty.amenities.map((a, i) => (
+                      <span key={i} style={styles.amenityBadge}>✓ {a}</span>
                     ))}
                   </div>
                 </div>
               )}
 
-              <div style={styles.unitInfoModal}>
-                <h3 style={styles.unitHeading}> Availability</h3>
-                <div style={styles.unitGrid}>
-                  <div style={styles.unitBox}>
-                    <p style={styles.unitBoxLabel}>Total Units</p>
-                    <p style={styles.unitBoxNumber}>{selectedProperty.totalUnits || 1}</p>
-                  </div>
-                  <div style={styles.unitBox}>
-                    <p style={styles.unitBoxLabel}>Booked</p>
-                    <p style={styles.unitBoxNumber}>{selectedProperty.bookedUnits || 0}</p>
-                  </div>
-                  <div style={styles.unitBox}>
-                    <p style={styles.unitBoxLabel}>Available</p>
-                    <p style={styles.unitBoxNumber}>{selectedProperty.availableUnits}</p>
-                  </div>
+              {/* RULES */}
+              {selectedProperty.rules && (
+                <div style={styles.rulesSection}>
+                  <h3 style={styles.sectionTitle}>House Rules</h3>
+                  <p style={styles.rulesText}>{selectedProperty.rules}</p>
                 </div>
-              </div>
+              )}
 
-              {/* ✅ LANDLORD CONTACT — now shows real data */}
-              <div style={styles.landlordInfo}>
-  <h3 style={styles.landlordHead}>👤 Landlord Contact</h3>
-  <p style={styles.landlordDetail}>
-    <strong>Name:</strong> —
-  </p>
-  <p style={styles.landlordDetail}>
-    <strong>Phone:</strong> —
-  </p>
-</div>
-
-              {/* ✅ SHARE PROPERTY */}
+              {/* SHARE PROPERTY */}
               <ShareProperty property={selectedProperty} />
 
-              {/* Four Buttons: WhatsApp, Call, SMS, Book */}
-              <div style={styles.contactButtonsContainer}>
+              {/* CONTACT BUTTONS */}
+              <div style={styles.contactGrid}>
                 <button
-                  style={{ ...styles.whatsappBtn, ...(selectedProperty.availableUnits === 0 ? styles.contactBtnDisabled : {}) }}
+                  style={{...styles.contactBtnGreen, ...(selectedProperty.availableUnits === 0 ? styles.btnDisabled : {})}}
                   onClick={() => handleContactLandlord(selectedProperty)}
                   disabled={selectedProperty.availableUnits === 0}
                 >
-                   WhatsApp
+                  💬 WhatsApp Message
                 </button>
-                <button style={styles.callBtn} onClick={() => window.open(`tel:${selectedProperty.owner?.phone || selectedProperty.phone}`)}>
+                <button style={styles.contactBtnBlue} onClick={() => window.open(`tel:${selectedProperty.owner?.phone || selectedProperty.phone}`)}>
                   📞 Call Landlord
                 </button>
-                <button style={styles.smsBtn} onClick={() => handleSendSMS(selectedProperty)}>
+                <button style={styles.contactBtnOrange} onClick={() => handleSendSMS(selectedProperty)}>
                   📱 Send SMS
                 </button>
-                <button style={styles.bookBtn} onClick={() => handleBookNow(selectedProperty)}>
-                  Book This Property
+                <button style={styles.contactBtnYellow} onClick={() => handleBookNow(selectedProperty)}>
+                  🔥 Book Now
                 </button>
               </div>
 
-              {/* ✅ REVIEWS & RATINGS */}
+              {/* REVIEWS */}
               <ReviewsSection propertyId={selectedProperty._id} />
-
             </div>
           </div>
         </div>
@@ -426,95 +452,159 @@ export default function Listings() {
   );
 }
 
-/* ==================== STYLES — all original + no changes ==================== */
 const styles = {
-  container: { maxWidth: "1200px", margin: "0 auto", padding: "20px", background: "linear-gradient(135deg, #06101f 0%, #0f1729 100%)", minHeight: "100vh", fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont" },
-  header: { textAlign: "center", marginBottom: "40px", color: "#f1f5f9" },
-  heading: { fontSize: "2.5rem", margin: 0, color: "#fbbf24", fontWeight: 700 },
-  tagline: { fontSize: "1rem", color: "#94a3b8", marginTop: "8px" },
-  error: { background: "rgba(239, 68, 68, 0.15)", border: "1px solid rgba(239, 68, 68, 0.4)", color: "#fca5a5", padding: "12px 16px", borderRadius: "8px", marginBottom: "20px", textAlign: "center", fontWeight: 500 },
-  loading: { textAlign: "center", color: "#94a3b8", fontSize: "1.1rem", padding: "60px 20px" },
-  filters: { display: "flex", gap: "12px", marginBottom: "32px", flexWrap: "wrap", alignItems: "center" },
-  filterInput: { padding: "10px 14px", border: "1px solid #334155", borderRadius: "6px", background: "#1e293b", color: "#f1f5f9", fontSize: "0.95rem", minWidth: "150px" },
-  filterSelect: { padding: "10px 14px", border: "1px solid #334155", borderRadius: "6px", background: "#1e293b", color: "#f1f5f9", fontSize: "0.95rem", minWidth: "140px" },
-  priceRange: { display: "flex", gap: "8px", alignItems: "center" },
-  priceSeparator: { color: "#94a3b8", fontWeight: 600 },
-  resultsRow: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px", flexWrap: "wrap", gap: "10px" },
-  resultsCount: { color: "#94a3b8", fontSize: "0.95rem" },
-  mapToggleBtn: { padding: "8px 18px", background: "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.9rem", transition: "all 0.3s ease" },
-  noResults: { textAlign: "center", color: "#94a3b8", padding: "60px 20px", background: "rgba(30, 41, 59, 0.5)", borderRadius: "12px", border: "2px dashed #475569" },
-  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "24px" },
-  card: { background: "linear-gradient(135deg, #1e293b 0%, #0f1729 100%)", border: "1px solid #334155", borderRadius: "12px", overflow: "hidden", transition: "all 0.3s ease", display: "flex", flexDirection: "column", height: "100%" },
-  imageContainer: { position: "relative", width: "100%", height: "200px", overflow: "hidden", background: "#0f1729", cursor: "pointer" },
-  image: { width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.3s ease" },
-  noImage: { width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#334155", color: "#94a3b8", fontWeight: 600 },
-  availabilityBadge: { position: "absolute", top: "12px", left: "12px", padding: "8px 14px", borderRadius: "20px", fontSize: "0.85rem", fontWeight: 600 },
-  availableBadge: { background: "#10b981", color: "white" },
-  unavailableBadge: { background: "#ef4444", color: "white" },
-  imageCount: { position: "absolute", bottom: "12px", right: "12px", background: "rgba(0,0,0,0.6)", color: "white", padding: "6px 12px", borderRadius: "6px", fontSize: "0.85rem", fontWeight: 600 },
-  content: { padding: "20px", flex: 1, display: "flex", flexDirection: "column" },
-  title: { color: "#f1f5f9", fontSize: "1.2rem", margin: "0 0 8px 0", wordBreak: "break-word" },
-  location: { color: "#94a3b8", margin: "0 0 12px 0", fontSize: "0.9rem" },
-  specs: { display: "flex", gap: "10px", margin: "12px 0", flexWrap: "wrap" },
-  spec: { color: "#cbd5e1", fontSize: "0.85rem" },
-  price: { color: "#fbbf24", fontSize: "1.1rem", fontWeight: 700, margin: "8px 0" },
-  description: { color: "#cbd5e1", fontSize: "0.85rem", margin: "8px 0", lineHeight: "1.4" },
-  unitInfo: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", padding: "12px", background: "rgba(59, 130, 246, 0.1)", borderRadius: "6px", margin: "12px 0", fontSize: "0.8rem", color: "#cbd5e1" },
-  unitLabel: { color: "#94a3b8", display: "block", fontSize: "0.75rem", marginBottom: "2px" },
-  unitValue: { display: "block", fontWeight: 600 },
-  unitValueBold: { display: "block", color: "#22c55e", fontWeight: 700, fontSize: "1rem" },
-  amenitiesPreview: { display: "flex", flexWrap: "wrap", gap: "6px", margin: "8px 0" },
-  amenityChip: { background: "rgba(139, 92, 246, 0.2)", color: "#cbd5e1", padding: "4px 8px", borderRadius: "4px", fontSize: "0.75rem", fontWeight: 500 },
-  contactBtn: { padding: "10px 12px", background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.9rem", marginTop: "8px", transition: "all 0.3s ease" },
-  contactBtnDisabled: { opacity: 0.5, cursor: "not-allowed" },
-  viewBtn: { padding: "10px 12px", background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.9rem", marginTop: "6px", transition: "all 0.3s ease" },
-  modal: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000, padding: "20px" },
-  modalContent: { background: "linear-gradient(135deg, #1e293b 0%, #0f1729 100%)", borderRadius: "12px", maxWidth: "600px", width: "100%", maxHeight: "90vh", overflowY: "auto", border: "1px solid #334155", position: "relative" },
-  closeBtn: { position: "absolute", top: "12px", right: "12px", background: "rgba(0,0,0,0.6)", border: "none", color: "white", width: "32px", height: "32px", borderRadius: "50%", cursor: "pointer", fontSize: "1.2rem", zIndex: 1001 },
-  modalImage: { position: "relative", width: "100%", height: "300px", overflow: "hidden", background: "#0f1729" },
-  modalImg: { width: "100%", height: "100%", objectFit: "cover" },
-  imageCounter: { position: "absolute", bottom: "12px", left: "50%", transform: "translateX(-50%)", background: "rgba(0,0,0,0.6)", color: "white", padding: "4px 12px", borderRadius: "12px", fontSize: "0.85rem", fontWeight: 600 },
-  prevBtn: { position: "absolute", top: "50%", left: "12px", transform: "translateY(-50%)", background: "rgba(0,0,0,0.6)", border: "none", color: "white", width: "40px", height: "40px", borderRadius: "50%", cursor: "pointer", fontSize: "1.2rem" },
-  nextBtn: { position: "absolute", top: "50%", right: "12px", transform: "translateY(-50%)", background: "rgba(0,0,0,0.6)", border: "none", color: "white", width: "40px", height: "40px", borderRadius: "50%", cursor: "pointer", fontSize: "1.2rem" },
-  thumbnails: { display: "flex", gap: "8px", padding: "12px", overflowX: "auto", background: "#0f1729" },
-  thumbnail: { width: "60px", height: "60px", objectFit: "cover", borderRadius: "6px", cursor: "pointer", opacity: 0.6, border: "2px solid transparent", flexShrink: 0 },
-  activeThumbnail: { opacity: 1, borderColor: "#fbbf24" },
-  modalDetails: { padding: "24px", color: "#f1f5f9" },
-  modalTitle: { fontSize: "1.5rem", margin: "0 0 8px 0", color: "#fbbf24" },
-  modalLocation: { color: "#94a3b8", marginBottom: "16px" },
-  pricingRow: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))", gap: "12px", margin: "16px 0" },
-  pricingBox: { background: "rgba(251, 191, 36, 0.1)", border: "1px solid rgba(251, 191, 36, 0.2)", borderRadius: "8px", padding: "12px", textAlign: "center" },
-  pricingLabel: { display: "block", color: "#94a3b8", fontSize: "0.75rem", marginBottom: "4px" },
-  pricingValue: { display: "block", color: "#fbbf24", fontWeight: 700, fontSize: "1rem" },
-  fullDescription: { color: "#cbd5e1", lineHeight: "1.6", margin: "16px 0" },
-  rulesBox: { margin: "16px 0", padding: "16px", background: "rgba(148, 163, 184, 0.08)", borderRadius: "8px", borderLeft: "3px solid #475569" },
-  rulesHead: { margin: "0 0 8px 0", color: "#94a3b8", fontSize: "1rem" },
-  rulesText: { color: "#cbd5e1", fontSize: "0.9rem", lineHeight: "1.6", margin: 0 },
-  amenitiesSection: { margin: "20px 0", padding: "16px", background: "rgba(59, 130, 246, 0.1)", borderRadius: "8px" },
-  amenitiesHead: { margin: "0 0 12px 0", color: "#fbbf24" },
+  container: { minHeight: "100vh", background: "linear-gradient(135deg, #f8f9fa 0%, #f0f1f3 100%)", fontFamily: "'DM Sans', sans-serif", padding: "0" },
+  
+  loadingState: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100vh", color: "#0B2140" },
+  spinner: { width: "50px", height: "50px", border: "4px solid #e5e7eb", borderTop: "4px solid #E31B1B", borderRadius: "50%", animation: "spin 1s linear infinite" },
+  loadingText: { marginTop: "20px", fontSize: "18px", fontWeight: 600 },
+
+  heroHeader: { background: "linear-gradient(135deg, #0B2140 0%, #152B4A 100%)", color: "white", padding: "60px 20px", textAlign: "center", borderBottom: "3px solid #E31B1B" },
+  headerContent: { maxWidth: "1200px", margin: "0 auto" },
+  mainTitle: { fontSize: "clamp(28px, 5vw, 42px)", fontWeight: 800, margin: "0 0 12px", letterSpacing: "-0.5px" },
+  subtitle: { fontSize: "16px", opacity: 0.9, margin: 0 },
+
+  filterSection: { background: "white", borderBottom: "1px solid #e5e7eb", padding: "24px 20px", sticky: "top", zIndex: 40 },
+  filterWrapper: { maxWidth: "1200px", margin: "0 auto" },
+  filterGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px", marginBottom: "12px" },
+  filterInput: { padding: "12px 16px", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit" },
+  filterSelect: { padding: "12px 16px", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", background: "white", color: "#0B2140" },
+  priceFilterWrapper: { display: "flex", gap: "8px", alignItems: "center" },
+  priceInput: { flex: 1, padding: "12px 16px", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit" },
+  priceSeparator: { color: "#9ca3af", fontWeight: 600 },
+  mapToggleBtn: { padding: "12px 20px", background: "#0ea5e9", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" },
+
+  resultsInfo: { maxWidth: "1200px", margin: "20px auto", padding: "0 20px", display: "flex", justifyContent: "space-between", alignItems: "center" },
+  resultsCount: { fontSize: "14px", fontWeight: 600, color: "#6b7280" },
+
+  emptyState: { textAlign: "center", padding: "80px 20px", maxWidth: "1200px", margin: "0 auto" },
+  emptyIcon: { fontSize: "64px", marginBottom: "20px" },
+  emptyTitle: { fontSize: "24px", fontWeight: 800, color: "#0B2140", margin: "0 0 8px" },
+  emptyText: { color: "#6b7280", fontSize: "16px", margin: 0 },
+
+  listingsGrid: { maxWidth: "1200px", margin: "0 auto", padding: "20px", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "24px" },
+
+  propertyCard: { background: "white", borderRadius: "12px", overflow: "hidden", border: "1px solid #e5e7eb", boxShadow: "0 1px 3px rgba(0,0,0,0.08)", transition: "all 0.3s ease", display: "flex", flexDirection: "column" },
+
+  cardImageWrapper: { position: "relative", height: "220px", overflow: "hidden", background: "#f3f4f6", cursor: "pointer" },
+  cardImage: { width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.4s ease" },
+  noImage: { width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "48px", background: "#f3f4f6" },
+  badgesContainer: { position: "absolute", top: "12px", left: "12px", display: "flex", gap: "8px", flexWrap: "wrap" },
+  badgeAvailable: { display: "inline-block", background: "#10b981", color: "white", padding: "6px 12px", borderRadius: "20px", fontSize: "12px", fontWeight: 600 },
+  badgeUnavailable: { display: "inline-block", background: "#ef4444", color: "white", padding: "6px 12px", borderRadius: "20px", fontSize: "12px", fontWeight: 600 },
+  badgeImage: { display: "inline-block", background: "rgba(0,0,0,0.6)", color: "white", padding: "6px 12px", borderRadius: "20px", fontSize: "12px", fontWeight: 600 },
+  cardOverlay: { position: "absolute", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", opacity: 0, transition: "opacity 0.3s ease" },
+  viewDetailsBtn: { padding: "12px 24px", background: "#E31B1B", color: "white", border: "none", borderRadius: "8px", fontWeight: 700, fontSize: "14px", cursor: "pointer" },
+
+  cardContent: { padding: "20px", flex: 1, display: "flex", flexDirection: "column" },
+  titleArea: { display: "flex", justifyContent: "space-between", alignItems: "start", gap: "8px", marginBottom: "8px" },
+  propertyTitle: { fontSize: "16px", fontWeight: 800, color: "#0B2140", margin: 0, flex: 1 },
+  priceTag: { fontSize: "14px", fontWeight: 700, color: "#E31B1B", whiteSpace: "nowrap" },
+
+  locationBar: { display: "flex", gap: "8px", marginBottom: "12px", fontSize: "13px", flexWrap: "wrap" },
+  location: { color: "#6b7280", fontWeight: 500 },
+  county: { color: "#9ca3af", fontSize: "12px" },
+
+  specsRow: { display: "flex", gap: "16px", marginBottom: "12px", padding: "12px 0", borderBottom: "1px solid #f3f4f6" },
+  spec: { display: "flex", alignItems: "center", gap: "4px", fontSize: "13px", color: "#4b5563" },
+  specIcon: { fontSize: "16px" },
+
+  description: { fontSize: "13px", color: "#6b7280", margin: "0 0 12px", lineHeight: "1.5" },
+
+  amenitiesPreview: { display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "12px" },
+  amenityTag: { background: "#f3f4f6", color: "#6b7280", padding: "4px 10px", borderRadius: "20px", fontSize: "11px", fontWeight: 500 },
+
+  cardActions: { display: "flex", gap: "8px", marginTop: "auto" },
+  primaryBtn: { flex: 1, padding: "12px", background: "#E31B1B", color: "white", border: "none", borderRadius: "8px", fontWeight: 700, fontSize: "13px", cursor: "pointer", transition: "all 0.3s" },
+  secondaryBtn: { flex: 1, padding: "12px", background: "#f3f4f6", color: "#0B2140", border: "1px solid #e5e7eb", borderRadius: "8px", fontWeight: 700, fontSize: "13px", cursor: "pointer", transition: "all 0.3s" },
+  btnDisabled: { opacity: 0.5, cursor: "not-allowed" },
+
+  modal: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000, padding: "20px" },
+  modalContent: { background: "white", borderRadius: "16px", maxWidth: "700px", width: "100%", maxHeight: "90vh", overflowY: "auto", position: "relative" },
+  closeBtn: { position: "absolute", top: "16px", right: "16px", background: "white", border: "none", width: "40px", height: "40px", borderRadius: "50%", fontSize: "24px", cursor: "pointer", zIndex: 1001, boxShadow: "0 2px 8px rgba(0,0,0,0.1)" },
+
+  modalImageContainer: { position: "relative", width: "100%", height: "350px", background: "#f3f4f6", overflow: "hidden" },
+  modalImage: { width: "100%", height: "100%", objectFit: "cover" },
+  noImageModal: { width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "48px" },
+  navBtn: { position: "absolute", top: "50%", transform: "translateY(-50%)", background: "rgba(0,0,0,0.6)", color: "white", border: "none", width: "44px", height: "44px", borderRadius: "50%", fontSize: "20px", cursor: "pointer" },
+  imageCounter: { position: "absolute", bottom: "16px", left: "50%", transform: "translateX(-50%)", background: "rgba(0,0,0,0.7)", color: "white", padding: "6px 14px", borderRadius: "20px", fontSize: "12px", fontWeight: 600 },
+
+  thumbnailsContainer: { display: "flex", gap: "8px", padding: "12px", overflowX: "auto", background: "#f9fafb", borderBottom: "1px solid #e5e7eb" },
+  thumbnail: { width: "60px", height: "60px", objectFit: "cover", borderRadius: "6px", cursor: "pointer", border: "2px solid transparent", opacity: 0.6, transition: "all 0.3s", flexShrink: 0 },
+  activeThumbnail: { opacity: 1, borderColor: "#E31B1B" },
+
+  modalContentWrapper: { padding: "28px" },
+  modalHeader: { display: "flex", justifyContent: "space-between", alignItems: "start", gap: "12px", marginBottom: "8px" },
+  modalTitle: { fontSize: "24px", fontWeight: 800, color: "#0B2140", margin: 0 },
+  modalPrice: { fontSize: "18px", fontWeight: 700, color: "#E31B1B", whiteSpace: "nowrap" },
+  modalLocation: { fontSize: "14px", color: "#6b7280", marginBottom: "20px" },
+
+  modalSpecsGrid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px", marginBottom: "20px" },
+  specBox: { background: "#f9fafb", padding: "12px", borderRadius: "8px", border: "1px solid #e5e7eb" },
+  specLabel: { display: "block", fontSize: "11px", color: "#9ca3af", textTransform: "uppercase", fontWeight: 600, marginBottom: "4px" },
+  specValue: { display: "block", fontSize: "16px", fontWeight: 700, color: "#0B2140" },
+
+  infoBox: { display: "flex", justifyContent: "space-between", padding: "12px", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "8px", marginBottom: "16px" },
+  infoLabel: { color: "#166534", fontWeight: 600 },
+  infoValue: { color: "#15803d", fontWeight: 700 },
+
+  descriptionSection: { marginBottom: "20px" },
+  sectionTitle: { fontSize: "16px", fontWeight: 800, color: "#0B2140", margin: "0 0 12px" },
+  descriptionText: { fontSize: "14px", color: "#4b5563", lineHeight: "1.7", margin: 0 },
+
+  amenitiesSection: { marginBottom: "20px" },
   amenitiesGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: "8px" },
-  unitInfoModal: { margin: "20px 0", padding: "16px", background: "rgba(34, 197, 94, 0.1)", borderRadius: "8px" },
-  unitHeading: { margin: "0 0 12px 0", color: "#10b981" },
-  unitGrid: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" },
-  unitBox: { textAlign: "center", padding: "12px", background: "rgba(255,255,255,0.05)", borderRadius: "6px" },
-  unitBoxLabel: { margin: 0, color: "#94a3b8", fontSize: "0.85rem" },
-  unitBoxNumber: { margin: "4px 0 0 0", color: "#22c55e", fontSize: "1.5rem", fontWeight: 700 },
-  landlordInfo: { margin: "20px 0", padding: "16px", background: "rgba(139, 92, 246, 0.1)", borderRadius: "8px" },
-  landlordHead: { margin: "0 0 12px 0", color: "#8b5cf6" },
-  landlordDetail: { color: "#cbd5e1", margin: "8px 0" },
-  contactButtonsContainer: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px", marginTop: "20px" },
-  whatsappBtn: { padding: "14px 16px", background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", fontSize: "0.95rem" },
-  callBtn: { padding: "14px 16px", background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", fontSize: "0.95rem" },
-  smsBtn: { padding: "14px 16px", background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", fontSize: "0.95rem" },
-  bookBtn: { padding: "14px 16px", background: "linear-gradient(135deg, #eab308, #ca8a04)", color: "white", border: "none", borderRadius: "8px", fontWeight: 700, cursor: "pointer", fontSize: "0.95rem" },
+  amenityBadge: { background: "#f3f4f6", color: "#0B2140", padding: "8px 12px", borderRadius: "6px", fontSize: "12px", fontWeight: 600, textAlign: "center" },
+
+  rulesSection: { marginBottom: "20px", padding: "16px", background: "#fef2f2", borderRadius: "8px", borderLeft: "3px solid #E31B1B" },
+  rulesText: { fontSize: "13px", color: "#4b5563", lineHeight: "1.6", margin: 0 },
+
+  contactGrid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "10px", marginBottom: "20px" },
+  contactBtnGreen: { padding: "14px", background: "#10b981", color: "white", border: "none", borderRadius: "8px", fontWeight: 700, fontSize: "13px", cursor: "pointer" },
+  contactBtnBlue: { padding: "14px", background: "#3b82f6", color: "white", border: "none", borderRadius: "8px", fontWeight: 700, fontSize: "13px", cursor: "pointer" },
+  contactBtnOrange: { padding: "14px", background: "#f59e0b", color: "white", border: "none", borderRadius: "8px", fontWeight: 700, fontSize: "13px", cursor: "pointer" },
+  contactBtnYellow: { padding: "14px", background: "#E31B1B", color: "white", border: "none", borderRadius: "8px", fontWeight: 700, fontSize: "13px", cursor: "pointer" },
 };
 
 const cssStyles = `
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+  
   * { box-sizing: border-box; }
-  button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
-  input:focus, select:focus { outline: none; border-color: #fbbf24 !important; box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1) !important; }
-  textarea:focus { outline: none; border-color: #fbbf24 !important; box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1) !important; }
+  
+  @keyframes spin { 
+    to { transform: rotate(360deg); }
+  }
+  
+  .property-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+    border-color: #E31B1B;
+  }
+  
+  .property-card:hover img {
+    transform: scale(1.05);
+  }
+  
+  .property-card:hover [style*="cardOverlay"] {
+    opacity: 1 !important;
+  }
+  
+  button:not(:disabled):hover {
+    transform: translateY(-2px);
+  }
+  
+  input:focus, select:focus {
+    outline: none;
+    border-color: #E31B1B !important;
+    box-shadow: 0 0 0 3px rgba(227, 27, 27, 0.1) !important;
+  }
+  
   @media (max-width: 768px) {
-    [style*="gridTemplateColumns"] { grid-template-columns: 1fr !important; }
+    [style*="gridTemplateColumns: repeat"] {
+      grid-template-columns: 1fr !important;
+    }
+    .filterGrid {
+      grid-template-columns: 1fr !important;
+    }
   }
 `;
