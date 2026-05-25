@@ -898,7 +898,7 @@ const styles = {
   upgradeBtn: {
     padding: "10px 20px", background: "#3b82f6",
     color: "white", border: "none", borderRadius: "8px",
-    fontWeight: 700, cursor: pointer, fontSize: "14px",
+    fontWeight: 700, cursor: "pointer", fontSize: "14px",
   },
   plansGrid: {
     display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px",
@@ -911,7 +911,7 @@ const styles = {
   planBtn: {
     width: "100%", padding: "10px", color: "white",
     border: "none", borderRadius: "8px",
-    fontWeight: 700, cursor: pointer, fontSize: "13px",
+    fontWeight: 700, cursor: "pointer", fontSize: "13px",
     marginTop: "12px",
   },
   boostGrid: {
@@ -924,7 +924,7 @@ const styles = {
   boostBtn: {
     width: "100%", padding: "10px", background: "#22c55e",
     color: "white", border: "none", borderRadius: "8px",
-    fontWeight: 700, cursor: pointer, fontSize: "13px",
+    fontWeight: 700, cursor: "pointer", fontSize: "13px",
   },
 };
 
