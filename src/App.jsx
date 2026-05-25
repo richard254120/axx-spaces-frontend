@@ -25,6 +25,7 @@ import Materials from "./pages/Materials";
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
 import TermsAndPrivacy from "./pages/TermsAndPrivacy";
+import Reviews from "./pages/Reviews";
 
 // ─── Tourism Pages ───────────────────────────────────────────────────────────
 import TourismPage from "./pages/tourism/TourismPage";
@@ -90,6 +91,7 @@ function App() {
       <Route path="/faq" element={<PublicLayout><FAQ /></PublicLayout>} />
       <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
       <Route path="/terms" element={<PublicLayout><TermsAndPrivacy /></PublicLayout>} />
+      <Route path="/reviews" element={<PublicLayout><Reviews /></PublicLayout>} />
 
       {/* ── TOURISM ROUTES (have Navbar) ── */}
       {/* IMPORTANT: specific /tourism/* paths must come before /tourism/:id */}

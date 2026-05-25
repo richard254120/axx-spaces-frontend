@@ -65,7 +65,7 @@ const faqs = [
       },
       {
         q: "How do I become a listed merchant?",
-        a: "Register an account and contact our support team at support@axxspaces.com. We'll get your shop set up on the platform.",
+        a: "Register an account and contact our support team at support@axxspace.com. We'll get your shop set up on the platform.",
       },
     ],
   },

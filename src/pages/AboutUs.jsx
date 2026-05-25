@@ -360,7 +360,7 @@ export default function AboutPage() {
             </button>
             <button
               style={{ ...styles.ctaBtnSecondary, background: "#6366f1", color: "white" }}
-              onClick={() => window.open("mailto:partners@axxspaces.com")}
+              onClick={() => window.open("mailto:partners@axxspace.com")}
             >
               Become a Partner
             </button>
@@ -384,7 +384,7 @@ export default function AboutPage() {
           </div>
           <div style={styles.footerSection}>
             <h4 style={styles.footerTitle}>Support</h4>
-            <p style={styles.footerLink}> axxspaces@gmail.com</p>
+            <p style={styles.footerLink}> axxspace@gmail.com</p>
             <p style={styles.footerLink}> +254 796740883</p>
             <p style={styles.footerLink}> WhatsApp Support</p>
           </div>

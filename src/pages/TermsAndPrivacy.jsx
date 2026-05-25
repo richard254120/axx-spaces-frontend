@@ -71,7 +71,7 @@ You have the right to:
 - Request deletion of your account and associated data.
 - Withdraw consent for marketing emails.
 
-To exercise any of these rights, contact us at privacy@axxspaces.com.
+To exercise any of these rights, contact us at privacy@axxspace.com.
 
 ## 7. Data Retention
 We retain your data for as long as your account is active, or as long as necessary to provide services and comply with legal obligations. Deleted accounts are purged within 90 days.
@@ -83,7 +83,7 @@ Axx Spaces is not intended for users under the age of 18. We do not knowingly co
 We may update this Privacy Policy from time to time. We will notify you by email or an in-app notice if the changes are material.
 
 ## 10. Contact
-For privacy-related questions: **privacy@axxspaces.com**
+For privacy-related questions: **privacy@axxspace.com**
 
 **Last updated: May 2026**
 `;
