@@ -11,6 +11,7 @@ export default function Movers() {
   const [loading, setLoading] = useState(false);
   const [selectedCounty, setSelectedCounty] = useState("all");
   const [movers, setMovers] = useState([]);
+  const [featuredMovers, setFeaturedMovers] = useState([]);
 
   // Booking modal state
   const [bookingMover, setBookingMover] = useState(null);
@@ -71,7 +72,17 @@ export default function Movers() {
       }
     };
     fetchMovers();
+    fetchFeaturedMovers();
   }, [selectedCounty, activeTab]);
+
+  const fetchFeaturedMovers = async () => {
+    try {
+      const res = await API.get("/payment/featured-movers");
+      setFeaturedMovers(res.data || []);
+    } catch {
+      setFeaturedMovers([]);
+    }
+  };
 
   const handleServiceToggle = (service) => {
     setRegisterData(prev => ({
@@ -339,6 +350,49 @@ export default function Movers() {
       {/* ── SEARCH TAB ── */}
       {activeTab === "search" && (
         <div style={styles.viewContainer}>
+          {/* Featured Movers Section */}
+          {featuredMovers.length > 0 && (
+            <div style={{ marginBottom: "40px" }}>
+              <h2 style={{ color: "#fbbf24", fontSize: "24px", marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
+                ⭐ Featured Movers
+              </h2>
+              <div style={styles.grid}>
+                {featuredMovers.map(m => (
+                  <div key={m._id} style={{ ...styles.card, border: "2px solid #fbbf24", boxShadow: "0 4px 12px rgba(251,191,36,0.2)" }}>
+                    <div style={styles.cardHeader}>
+                      <h3 style={styles.moverName}>{m.name} ⭐</h3>
+                      <span style={{ ...styles.verifiedBadge, background: "rgba(251,191,36,0.2)", color: "#fbbf24" }}>Featured</span>
+                    </div>
+                    <p style={styles.detail}>📍 {m.county} • ⭐ {m.experienceYears || m.experience || 0} yrs exp</p>
+                    {m.vehicleType && <p style={styles.detail}>🚗 {m.vehicleType}</p>}
+                    {m.bio && (
+                      <p style={{ ...styles.detail, fontStyle: "italic", marginTop: "8px" }}>"{m.bio}"</p>
+                    )}
+                    <div style={styles.tagContainer}>
+                      {m.services?.map(s => <span key={s} style={styles.miniTag}>{s}</span>)}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div style={styles.actionCluster}>
+                      <button onClick={() => openBooking(m)} style={styles.bookBtn}>
+                        📋 Book a Mover
+                      </button>
+                      <button onClick={() => window.open(`tel:${m.phone}`)} style={styles.callBtn}>
+                        📞 Call
+                      </button>
+                      <button
+                        onClick={() => window.open(`https://wa.me/${m.phone}`, "_blank")}
+                        style={styles.whatsappBtn}
+                      >
+                        💬 WA
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <select
             value={selectedCounty}
             onChange={e => setSelectedCounty(e.target.value)}

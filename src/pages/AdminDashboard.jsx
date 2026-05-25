@@ -7,7 +7,9 @@ export default function AdminDashboard() {
   const { token, user } = useContext(AuthContext);
   const navigate = useNavigate();
   const [pending, setPending] = useState([]);
+  const [pendingProviders, setPendingProviders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("properties");
 
   useEffect(() => {
     // Security check: ensure only admins can stay on this page
@@ -16,6 +18,7 @@ export default function AdminDashboard() {
       return;
     }
     loadPending();
+    loadPendingProviders();
   }, []);
 
   const loadPending = async () => {
@@ -31,6 +34,15 @@ export default function AdminDashboard() {
     }
   };
 
+  const loadPendingProviders = async () => {
+    try {
+      const res = await API.get("/users/pending-tourism-providers");
+      setPendingProviders(res.data);
+    } catch (err) {
+      console.error("❌ Failed to load pending tourism providers", err);
+    }
+  };
+
   const handleStatusUpdate = async (id, status) => {
     try {
       // Using a single PATCH route is cleaner for state management
@@ -42,63 +54,140 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleProviderApproval = async (userId, approve) => {
+    try {
+      await API.patch(`/users/${userId}/approve-tourism-provider`, { approve });
+      setPendingProviders((prev) => prev.filter((p) => p._id !== userId));
+      console.log(`✅ Tourism provider ${approve ? 'approved' : 'rejected'} successfully`);
+    } catch (err) {
+      alert("❌ Operation failed. Please check permissions.");
+    }
+  };
+
   return (
     <div style={styles.container}>
-      <style>{cssStyles}</style>
-      
+      <style>{cssStyles}></style>
+
       <div style={styles.header}>
         <h1 style={styles.title}>🛡️ Admin Review Panel</h1>
         <p style={styles.subtitle}>Manage pending submissions for Axxspace</p>
       </div>
 
+      {/* Tabs */}
+      <div style={styles.tabs}>
+        <button
+          style={{ ...styles.tab, ...(activeTab === "properties" ? styles.tabActive : {}) }}
+          onClick={() => setActiveTab("properties")}
+        >
+          🏠 Properties ({pending.length})
+        </button>
+        <button
+          style={{ ...styles.tab, ...(activeTab === "providers" ? styles.tabActive : {}) }}
+          onClick={() => setActiveTab("providers")}
+        >
+          🏨 Tourism Providers ({pendingProviders.length})
+        </button>
+      </div>
+
       {loading ? (
         <div style={styles.loader}>⏳ Syncing with database...</div>
-      ) : pending.length === 0 ? (
-        <div style={styles.emptyCard}>
-          <p style={styles.emptyText}>✅ All caught up! No pending properties to review.</p>
-        </div>
-      ) : (
-        <div style={styles.tableContainer}>
-          <table style={styles.table}>
-            <thead>
-              <tr style={styles.theadRow}>
-                <th style={styles.th}>Property Details</th>
-                <th style={styles.th}>Owner Info</th>
-                <th style={styles.th}>Price (KES)</th>
-                <th style={styles.th}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pending.map((item) => (
-                <tr key={item._id} style={styles.tr}>
-                  <td style={styles.td}>
-                    <div style={styles.propTitle}>{item.title}</div>
-                    <div style={styles.propLoc}>📍 {item.location || `${item.area}, ${item.county}`}</div>
-                  </td>
-                  <td style={styles.td}>
-                    <div style={styles.ownerName}>{item.owner?.name || "Member"}</div>
-                    <div style={styles.ownerContact}>{item.owner?.phone}</div>
-                  </td>
-                  <td style={styles.td}>
-                    <span style={styles.priceBadge}>{item.price.toLocaleString()}</span>
-                  </td>
-                  <td style={styles.td}>
-                    <div style={styles.btnGroup}>
-                      <button 
-                        onClick={() => handleStatusUpdate(item._id, "approved")} 
-                        style={styles.approveBtn}
-                      >Approve</button>
-                      <button 
-                        onClick={() => handleStatusUpdate(item._id, "rejected")} 
-                        style={styles.rejectBtn}
-                      >Reject</button>
-                    </div>
-                  </td>
+      ) : activeTab === "properties" ? (
+        pending.length === 0 ? (
+          <div style={styles.emptyCard}>
+            <p style={styles.emptyText}>✅ All caught up! No pending properties to review.</p>
+          </div>
+        ) : (
+          <div style={styles.tableContainer}>
+            <table style={styles.table}>
+              <thead>
+                <tr style={styles.theadRow}>
+                  <th style={styles.th}>Property Details</th>
+                  <th style={styles.th}>Owner Info</th>
+                  <th style={styles.th}>Price (KES)</th>
+                  <th style={styles.th}>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {pending.map((item) => (
+                  <tr key={item._id} style={styles.tr}>
+                    <td style={styles.td}>
+                      <div style={styles.propTitle}>{item.title}</div>
+                      <div style={styles.propLoc}>📍 {item.location || `${item.area}, ${item.county}`}</div>
+                    </td>
+                    <td style={styles.td}>
+                      <div style={styles.ownerName}>{item.owner?.name || "Member"}</div>
+                      <div style={styles.ownerContact}>{item.owner?.phone}</div>
+                    </td>
+                    <td style={styles.td}>
+                      <span style={styles.priceBadge}>{item.price.toLocaleString()}</span>
+                    </td>
+                    <td style={styles.td}>
+                      <div style={styles.btnGroup}>
+                        <button
+                          onClick={() => handleStatusUpdate(item._id, "approved")}
+                          style={styles.approveBtn}
+                        >Approve</button>
+                        <button
+                          onClick={() => handleStatusUpdate(item._id, "rejected")}
+                          style={styles.rejectBtn}
+                        >Reject</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
+      ) : (
+        // Tourism Providers Tab
+        pendingProviders.length === 0 ? (
+          <div style={styles.emptyCard}>
+            <p style={styles.emptyText}>✅ All caught up! No pending tourism providers to review.</p>
+          </div>
+        ) : (
+          <div style={styles.tableContainer}>
+            <table style={styles.table}>
+              <thead>
+                <tr style={styles.theadRow}>
+                  <th style={styles.th}>Provider Details</th>
+                  <th style={styles.th}>Contact Info</th>
+                  <th style={styles.th}>Role</th>
+                  <th style={styles.th}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pendingProviders.map((provider) => (
+                  <tr key={provider._id} style={styles.tr}>
+                    <td style={styles.td}>
+                      <div style={styles.propTitle}>{provider.name}</div>
+                      <div style={styles.propLoc}>📧 {provider.email}</div>
+                    </td>
+                    <td style={styles.td}>
+                      <div style={styles.ownerName}>{provider.phone}</div>
+                      <div style={styles.ownerContact}>Registered: {new Date(provider.createdAt).toLocaleDateString()}</div>
+                    </td>
+                    <td style={styles.td}>
+                      <span style={styles.roleBadge}>{provider.role}</span>
+                    </td>
+                    <td style={styles.td}>
+                      <div style={styles.btnGroup}>
+                        <button
+                          onClick={() => handleProviderApproval(provider._id, true)}
+                          style={styles.approveBtn}
+                        >Approve</button>
+                        <button
+                          onClick={() => handleProviderApproval(provider._id, false)}
+                          style={styles.rejectBtn}
+                        >Reject</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
       )}
     </div>
   );
@@ -147,10 +236,27 @@ const styles = {
     background: "#22c55e", color: "white", border: "none", 
     padding: "8px 16px", borderRadius: "8px", fontWeight: 700, cursor: "pointer" 
   },
-  rejectBtn: { 
-    background: "rgba(239, 68, 68, 0.1)", color: "#ef4444", border: "1px solid #ef4444", 
-    padding: "8px 16px", borderRadius: "8px", fontWeight: 700, cursor: "pointer" 
-  }
+  rejectBtn: {
+    background: "rgba(239, 68, 68, 0.1)", color: "#ef4444", border: "1px solid #ef4444",
+    padding: "8px 16px", borderRadius: "8px", fontWeight: 700, cursor: "pointer"
+  },
+  tabs: { display: "flex", gap: "10px", marginBottom: "30px", justifyContent: "center" },
+  tab: {
+    background: "rgba(30, 41, 59, 0.6)",
+    color: "#94a3b8",
+    border: "1px solid rgba(255,255,255,0.1)",
+    padding: "12px 24px",
+    borderRadius: "10px",
+    fontWeight: 700,
+    cursor: "pointer",
+    transition: "0.2s",
+  },
+  tabActive: {
+    background: "#fbbf24",
+    color: "#1f2937",
+    borderColor: "#fbbf24",
+  },
+  roleBadge: { background: "rgba(251, 191, 36, 0.1)", color: "#fbbf24", padding: "6px 12px", borderRadius: "6px", fontWeight: 700 }
 };
 
 const cssStyles = `
