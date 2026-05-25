@@ -489,10 +489,10 @@ export default function Home() {
         </div>
         <div style={styles.testimonialsGrid}>
           {[
-            { name: "Sarah Wanjiku", role: "Tenant · Nairobi", rating: 5, text: "Found my dream apartment in 2 days! The WhatsApp feature made connecting with the landlord so easy. No agents, no hidden fees.", avatar: "👩", tag: "Rentals" },
-            { name: "David Mwangi", role: "Customer · Mombasa", rating: 5, text: "Booked movers through Axx Spaces for my relocation to Nairobi. Professional team, transparent pricing, everything arrived safely.", avatar: "👨", tag: "Movers" },
-            { name: "Grace Omondi", role: "Developer · Kisumu", rating: 5, text: "The merchant listings saved me thousands on my construction project. Found roofing materials at 20% below market prices.", avatar: "👩", tag: "Merchants" },
-            { name: "James Kariuki", role: "Tourist · Nairobi", rating: 5, text: "Planned a full safari weekend through Axx Spaces Tourism. Best lodge, easy booking, and zero commission. Absolutely loved it!", avatar: "👨", tag: "Tourism" },
+            { name: "Sarah Wanjiku", role: "Tenant · Nairobi", rating: 5, text: "Found my dream apartment in 2 days! The WhatsApp feature made connecting with the landlord so easy. No agents, no hidden fees.", avatar: "", tag: "Rentals" },
+            { name: "David Mwangi", role: "Customer · Mombasa", rating: 5, text: "Booked movers through Axx Spaces for my relocation to Nairobi. Professional team, transparent pricing, everything arrived safely.", avatar: "", tag: "Movers" },
+            { name: "Grace Omondi", role: "Developer · Kisumu", rating: 5, text: "The merchant listings saved me thousands on my construction project. Found roofing materials at 20% below market prices.", avatar: "", tag: "Merchants" },
+            { name: "James Kariuki", role: "Tourist · Nairobi", rating: 5, text: "Planned a full safari weekend through Axx Spaces Tourism. Best lodge, easy booking, and zero commission. Absolutely loved it!", avatar: "", tag: "Tourism" },
           ].map((t) => (
             <div key={t.name} style={styles.testimonialCard} className="testimonial-card">
               <div style={styles.testimonialTop}>
