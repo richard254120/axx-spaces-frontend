@@ -153,7 +153,7 @@ export default function TourismLogin() {
       }
 
       if (!data.user.isApproved) {
-        throw new Error("Your account is pending approval from the admin. Please wait for approval.");
+        throw new Error("Your account is pending admin approval. Approval typically takes less than 5 hours. Please wait for approval email before logging in.");
       }
 
       login(data.token, {

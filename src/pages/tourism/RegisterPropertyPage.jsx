@@ -85,7 +85,7 @@ export default function RegisterPropertyPage() {
           )}
           <div style={{ background: "#fef3c7", border: "1px solid #fcd34d", borderRadius: "12px", padding: "16px", marginBottom: "20px", textAlign: "left" }}>
             <div style={{ fontSize: "13px", fontWeight: 800, color: "#92400e", marginBottom: "8px" }}>⏳ Account Pending Approval</div>
-            <div style={{ fontSize: "12px", color: "#78350f" }}>Your account requires admin approval before you can access the dashboard. You will receive an email once approved.</div>
+            <div style={{ fontSize: "12px", color: "#78350f" }}>Your account requires admin approval before you can access the dashboard. Approval typically takes less than 5 hours. You will receive an email once approved.</div>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             <button style={{ background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "10px", padding: "14px", fontWeight: 800, fontSize: "15px", cursor: "pointer", fontFamily: "inherit" }} onClick={() => navigate("/tourism/login")}>
