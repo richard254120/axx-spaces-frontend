@@ -102,7 +102,7 @@ function App() {
         path="/tourism/dashboard"
         element={
           <DashboardLayout>
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["tourism_provider"]}>
               <ProviderDashboard />
             </ProtectedRoute>
           </DashboardLayout>
@@ -112,7 +112,7 @@ function App() {
         path="/tourism/dashboard/property/:id"
         element={
           <DashboardLayout>
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["tourism_provider"]}>
               <EditPropertyPage />
             </ProtectedRoute>
           </DashboardLayout>

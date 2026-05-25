@@ -61,7 +61,7 @@ export default function RegisterPropertyPage() {
           _id: result.user?.id,
           name: result.user?.name,
           email: result.user?.email,
-          role: "landlord",
+          role: "tourism_provider",
         });
       }
       setSubmitted(true);
