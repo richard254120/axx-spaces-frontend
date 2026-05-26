@@ -882,5 +882,9 @@ const css = `
       max-width: 100% !important;
       max-height: 100% !important;
     }
+    section[style*="hero"] {
+      min-height: 120vh !important;
+      padding: 60px 16px 80px !important;
+    }
   }
 `;

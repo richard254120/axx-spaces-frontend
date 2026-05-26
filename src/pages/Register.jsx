@@ -90,10 +90,6 @@ export default function Register() {
       <style>{css}</style>
 
       <div style={styles.container}>
-        <div style={styles.logoSection}>
-          <img src={logo} alt="Axxspace" style={styles.logo} />
-        </div>
-
         <div style={styles.formBox}>
           <h1 style={styles.title}>Landlord Sign Up</h1>
           <p style={styles.subtitle}>Start listing your properties on Axxspace</p>

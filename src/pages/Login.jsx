@@ -104,10 +104,6 @@ export default function Login() {
     <div style={styles.root}>
       <style>{css}</style>
       <div style={styles.container}>
-        <div style={styles.logoSection}>
-          <img src={logo} alt="Axxspace" style={styles.logo} />
-        </div>
-
         <div style={styles.formBox}>
 
           {/* ✅ FORGOT PASSWORD FORM */}
