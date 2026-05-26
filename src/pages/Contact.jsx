@@ -20,7 +20,7 @@ export default function Contact() {
   const channels = [
     { icon: "📧", label: "Email", value: "axxspace@gmail.com", href: "mailto:axxspace@gmail.com" },
     { icon: "💬", label: "Live Chat", value: "Available Mon–Sun, 8am–6pm", href: null },
-    { icon: "📱", label: "WhatsApp", value: "+254 796740883", href: "https://wa.me/254796740883" },
+    { icon: "📱", label: "WhatsApp", value: "+254 745 689773", href: "https://wa.me/254745689773" },
   ];
 
   return (
