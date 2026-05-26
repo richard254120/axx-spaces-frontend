@@ -495,7 +495,7 @@ const styles = {
     display: "inline-block",
     width: "7px",
     height: "7px",
-    background: "#ef4444",
+    background: "#a244ef",
     borderRadius: "50%",
     marginLeft: "auto",
     flexShrink: 0,
