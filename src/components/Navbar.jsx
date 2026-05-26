@@ -339,7 +339,7 @@ const styles = {
   brandName: {
     fontSize: "16px",
     fontWeight: 800,
-    color: "#fbbf24",
+    color: "rgb(251, 36, 36)",
     letterSpacing: "0.5px",
   },
 
