@@ -25,6 +25,7 @@ import Materials from "./pages/Materials";
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
 import TermsAndPrivacy from "./pages/TermsAndPrivacy";
+import LeaveReview from "./pages/LeaveReview";
 
 // ─── Tourism Pages ───────────────────────────────────────────────────────────
 import TourismPage from "./pages/tourism/TourismPage";
@@ -169,6 +170,7 @@ function App() {
           </PublicLayout>
         }
       />
+      <Route path="/leave-review" element={<PublicLayout><LeaveReview /></PublicLayout>} />
 
       {/* ── 404 ── */}
       <Route

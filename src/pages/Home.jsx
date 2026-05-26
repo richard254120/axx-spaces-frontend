@@ -15,6 +15,8 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [animatedStats, setAnimatedStats] = useState({ listings: 0, counties: 0, tenants: 0 });
   const [activeCategoryTab, setActiveCategoryTab] = useState("rentals");
+  const [reviews, setReviews] = useState([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
 
   const counties = [
     "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
@@ -127,6 +129,23 @@ export default function Home() {
       }
     };
     fetchFeatured();
+  }, []);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const res = await API.get("/reviews", { timeout: 15000 });
+        const data = res?.data;
+        if (Array.isArray(data)) setReviews(data.slice(0, 4));
+        else setReviews([]);
+      } catch (err) {
+        console.error("Failed to load reviews:", err?.message || err);
+        setReviews([]);
+      } finally {
+        setLoadingReviews(false);
+      }
+    };
+    fetchReviews();
   }, []);
 
   useEffect(() => {
@@ -488,25 +507,55 @@ export default function Home() {
           <p style={{ ...styles.sectionSubtitle, color: "rgba(255,255,255,0.7)" }}>Real stories from happy customers across all our services</p>
         </div>
         <div style={styles.testimonialsGrid}>
-          {[
-            { name: "Sarah Wanjiku", role: "Tenant · Nairobi", rating: 5, text: "Found my dream apartment in 2 days! The WhatsApp feature made connecting with the landlord so easy. No agents, no hidden fees.", avatar: "", tag: "Rentals" },
-            { name: "David Mwangi", role: "Customer · Mombasa", rating: 5, text: "Booked movers through Axxspace for my relocation to Nairobi. Professional team, transparent pricing, everything arrived safely.", avatar: "", tag: "Movers" },
-            { name: "Grace Omondi", role: "Developer · Kisumu", rating: 5, text: "The merchant listings saved me thousands on my construction project. Found roofing materials at 20% below market prices.", avatar: "", tag: "Merchants" },
-            { name: "James Kariuki", role: "Tourist · Nairobi", rating: 5, text: "Planned a full safari weekend through Axxspace Tourism. Best lodge, easy booking, and zero commission. Absolutely loved it!", avatar: "", tag: "Tourism" },
-          ].map((t) => (
-            <div key={t.name} style={styles.testimonialCard} className="testimonial-card">
-              <div style={styles.testimonialTop}>
-                <div style={styles.testimonialAvatar}>{t.avatar}</div>
-                <div style={{ ...styles.testimonialServiceTag, background: t.tag === "Rentals" ? "#E31B1B" : t.tag === "Movers" ? "#0B2140" : t.tag === "Merchants" ? "#d97706" : "#059669" }}>{t.tag}</div>
-              </div>
-              <div style={styles.testimonialRating}>{"⭐".repeat(t.rating)}</div>
-              <p style={styles.testimonialText}>"{t.text}"</p>
-              <div style={styles.testimonialAuthor}>
-                <strong style={styles.testimonialName}>{t.name}</strong>
-                <span style={styles.testimonialRole}>{t.role}</span>
-              </div>
+          {loadingReviews ? (
+            <div style={{ textAlign: "center", gridColumn: "1 / -1", padding: "40px" }}>
+              <div className="spinner"></div>
+              <p style={{ color: "rgba(255,255,255,0.7)", marginTop: "16px" }}>Loading reviews...</p>
             </div>
-          ))}
+          ) : reviews.length > 0 ? (
+            reviews.map((review) => (
+              <div key={review._id} style={styles.testimonialCard} className="testimonial-card">
+                <div style={styles.testimonialTop}>
+                  <div style={styles.testimonialAvatar}>{review.userName?.charAt(0).toUpperCase() || "U"}</div>
+                  <div style={{ ...styles.testimonialServiceTag, background: review.category === "property" ? "#E31B1B" : review.category === "mover" ? "#0B2140" : review.category === "merchant" ? "#d97706" : review.category === "tourism" ? "#059669" : "#6b7280" }}>
+                    {review.category === "general" ? "General" : review.category.charAt(0).toUpperCase() + review.category.slice(1)}
+                  </div>
+                </div>
+                <div style={styles.testimonialRating}>{"⭐".repeat(review.rating)}</div>
+                <h3 style={styles.testimonialTitle}>{review.title}</h3>
+                <p style={styles.testimonialText}>"{review.comment}"</p>
+                <div style={styles.testimonialAuthor}>
+                  <strong style={styles.testimonialName}>{review.userName}</strong>
+                  <span style={styles.testimonialRole}>{new Date(review.createdAt).toLocaleDateString()}</span>
+                </div>
+              </div>
+            ))
+          ) : (
+            [
+              { name: "Sarah Wanjiku", role: "Tenant · Nairobi", rating: 5, text: "Found my dream apartment in 2 days! The WhatsApp feature made connecting with the landlord so easy. No agents, no hidden fees.", avatar: "", tag: "Rentals" },
+              { name: "David Mwangi", role: "Customer · Mombasa", rating: 5, text: "Booked movers through Axxspace for my relocation to Nairobi. Professional team, transparent pricing, everything arrived safely.", avatar: "", tag: "Movers" },
+              { name: "Grace Omondi", role: "Developer · Kisumu", rating: 5, text: "The merchant listings saved me thousands on my construction project. Found roofing materials at 20% below market prices.", avatar: "", tag: "Merchants" },
+              { name: "James Kariuki", role: "Tourist · Nairobi", rating: 5, text: "Planned a full safari weekend through Axxspace Tourism. Best lodge, easy booking, and zero commission. Absolutely loved it!", avatar: "", tag: "Tourism" },
+            ].map((t) => (
+              <div key={t.name} style={styles.testimonialCard} className="testimonial-card">
+                <div style={styles.testimonialTop}>
+                  <div style={styles.testimonialAvatar}>{t.avatar}</div>
+                  <div style={{ ...styles.testimonialServiceTag, background: t.tag === "Rentals" ? "#E31B1B" : t.tag === "Movers" ? "#0B2140" : t.tag === "Merchants" ? "#d97706" : "#059669" }}>{t.tag}</div>
+                </div>
+                <div style={styles.testimonialRating}>{"⭐".repeat(t.rating)}</div>
+                <p style={styles.testimonialText}>"{t.text}"</p>
+                <div style={styles.testimonialAuthor}>
+                  <strong style={styles.testimonialName}>{t.name}</strong>
+                  <span style={styles.testimonialRole}>{t.role}</span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+        <div style={{ textAlign: "center", marginTop: "32px" }}>
+          <button onClick={() => navigate("/leave-review")} style={styles.leaveReviewBtn}>
+            ✍️ Leave a Review
+          </button>
         </div>
       </section>
 
@@ -715,10 +764,12 @@ const styles = {
   testimonialAvatar: { fontSize: "40px" },
   testimonialServiceTag: { padding: "4px 12px", borderRadius: "20px", fontSize: "11px", fontWeight: 700, color: "white" },
   testimonialRating: { fontSize: "14px", marginBottom: "10px" },
+  testimonialTitle: { fontSize: "15px", fontWeight: 700, color: "white", margin: "0 0 8px" },
   testimonialText: { fontSize: "14px", lineHeight: 1.7, color: "rgba(255, 255, 255, 0.85)", margin: "0 0 14px", fontStyle: "italic" },
   testimonialAuthor: { display: "flex", flexDirection: "column", gap: "2px" },
   testimonialName: { fontSize: "14px", color: "#fbbf24" },
   testimonialRole: { fontSize: "12px", color: "rgba(255, 255, 255, 0.5)" },
+  leaveReviewBtn: { padding: "14px 32px", background: "white", color: "#0B2140", border: "none", borderRadius: "10px", fontSize: "16px", fontWeight: 700, cursor: "pointer", transition: "all 0.2s", boxShadow: "0 4px 14px rgba(0,0,0,0.2)" },
 
   /* Features */
   featuresSection: { padding: "72px 20px", background: "#FFFFFF", maxWidth: "1200px", margin: "0 auto" },
