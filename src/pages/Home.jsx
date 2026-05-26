@@ -652,7 +652,7 @@ export default function Home() {
 const styles = {
   root: { fontFamily: "'DM Sans', sans-serif", background: "#FFFFFF", color: "#0B2140", minHeight: "100vh" },
 
-  marqueeWrapper: { overflow: "hidden", background: "linear-gradient(90deg, #e3321b 0%, #1438d9 50%, #c9351b 100%)", padding: "9px 0", borderBottom: "2px solid #5fc010a1" },
+  marqueeWrapper: { overflow: "hidden", background: "linear-gradient(90deg, #e3321b 0%, #d91414 50%, #c9351b 100%)", padding: "9px 0", borderBottom: "2px solid #5fc010a1" },
   marqueePill: { display: "inline-flex", alignItems: "center", gap: "10px", background: "white", borderRadius: "20px", padding: "4px 16px", margin: "0 8px", fontSize: "13px", fontWeight: 600, color: "#0B2140", whiteSpace: "nowrap", boxShadow: "0 2px 8px rgba(227, 27, 27, 0.15)" },
   marqueeSep: { color: "#2a10c0", fontWeight: 700, fontSize: "16px", marginLeft: "8px" },
 
