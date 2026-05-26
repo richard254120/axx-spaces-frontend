@@ -1,7 +1,6 @@
 import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import logo from "../assets/logo.jpeg";
 import { COLORS, buttonStyles, inputStyles, pageStyles } from "../styles/theme";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
