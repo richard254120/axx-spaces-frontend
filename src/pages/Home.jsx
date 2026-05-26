@@ -875,16 +875,14 @@ const css = `
 
   @media (max-width: 768px) {
     .hero-video {
-      object-fit: contain !important;
+      object-fit: cover !important;
       object-position: center center !important;
       width: 100vw !important;
       height: 100vh !important;
-      max-width: 100% !important;
-      max-height: 100% !important;
     }
     section[style*="hero"] {
-      min-height: 120vh !important;
-      padding: 60px 16px 80px !important;
+      min-height: 100vh !important;
+      padding: 40px 16px 60px !important;
     }
   }
 `;
