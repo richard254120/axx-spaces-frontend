@@ -608,7 +608,7 @@ const styles = {
   marqueeSep: { color: "#C01010", fontWeight: 700, fontSize: "16px", marginLeft: "8px" },
 
   hero: { position: "relative", padding: "80px 16px 60px", textAlign: "center", borderBottom: "3px solid #E31B1B", width: "100%", boxSizing: "border-box", overflow: "hidden", minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center" },
-  bgVideo: { position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center center", zIndex: 0, display: "block", pointerEvents: "none" },
+  bgVideo: { position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center center", zIndex: 0, display: "block", pointerEvents: "none", background: "#0B2140" },
   videoOverlay: { position: "absolute", top: 0, left: 0, width: "100%", height: "100%", background: "linear-gradient(180deg, rgba(11, 33, 64, 0.75) 0%, rgba(11, 33, 64, 0.65) 50%, rgba(11, 33, 64, 0.80) 100%)", zIndex: 1 },
   heroContent: { maxWidth: "860px", margin: "0 auto", position: "relative", zIndex: 2 },
 
@@ -871,5 +871,12 @@ const css = `
 
   @media (max-width: 620px) {
     .stepConnector { display: none !important; }
+  }
+
+  @media (max-width: 768px) {
+    video[style*="bgVideo"] {
+      object-fit: contain !important;
+      object-position: center center !important;
+    }
   }
 `;
