@@ -654,7 +654,7 @@ const styles = {
 
   marqueeWrapper: { overflow: "hidden", background: "linear-gradient(90deg, #E31B1B 0%, #D91414 50%, #E31B1B 100%)", padding: "9px 0", borderBottom: "2px solid #C01010" },
   marqueePill: { display: "inline-flex", alignItems: "center", gap: "10px", background: "white", borderRadius: "20px", padding: "4px 16px", margin: "0 8px", fontSize: "13px", fontWeight: 600, color: "#0B2140", whiteSpace: "nowrap", boxShadow: "0 2px 8px rgba(227, 27, 27, 0.15)" },
-  marqueeSep: { color: "#C01010", fontWeight: 700, fontSize: "16px", marginLeft: "8px" },
+  marqueeSep: { color: "#2a10c0", fontWeight: 700, fontSize: "16px", marginLeft: "8px" },
 
   hero: { position: "relative", padding: "80px 16px 60px", textAlign: "center", borderBottom: "3px solid #E31B1B", width: "100%", boxSizing: "border-box", overflow: "hidden", minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center" },
   bgVideo: { position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center center", zIndex: 0, display: "block", pointerEvents: "none", background: "#0B2140" },
