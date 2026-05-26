@@ -139,7 +139,7 @@ export default function Navbar() {
 
         <div style={styles.topSection}>
           <Link to="/mover-dashboard" style={styles.logoContainer}>
-            <img src={logo} alt="Axx Spaces" style={styles.logo} />
+            <img src={logo} alt="Axxspace" style={styles.logo} />
             <div style={styles.titleSection}>
               <span style={styles.brandName}>Axx Movers</span>
             </div>
