@@ -348,8 +348,8 @@ export default function TourismPage() {
             </div>
             <div style={s.footerCol}>
               <div style={s.footerColTitle}>Contact</div>
-              <div style={{ ...s.footerLink, cursor: "default" }}>📧 tourism@axxspace.co.ke</div>
-              <div style={{ ...s.footerLink, cursor: "default" }}>📞 +254 700 AXX 001</div>
+              <div style={{ ...s.footerLink, cursor: "default" }}>📧 tourismaxxspace@gmail.com</div>
+              <div style={{ ...s.footerLink, cursor: "default" }}>📞 +254 745689773</div>
               <div style={{ ...s.footerLink, cursor: "default" }}>💬 WhatsApp Business</div>
             </div>
           </div>
