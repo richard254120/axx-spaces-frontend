@@ -184,7 +184,7 @@ export default function Home() {
 
       {/* ── HERO WITH BACKGROUND VIDEO ── */}
       <section style={styles.hero}>
-        <video autoPlay muted loop playsInline style={styles.bgVideo}>
+        <video autoPlay muted loop playsInline style={styles.bgVideo} className="hero-video">
           <source src={bgVideo} type="video/mp4" />
         </video>
         <div style={styles.videoOverlay}></div>
@@ -874,9 +874,13 @@ const css = `
   }
 
   @media (max-width: 768px) {
-    video[style*="bgVideo"] {
+    .hero-video {
       object-fit: contain !important;
       object-position: center center !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
     }
   }
 `;
