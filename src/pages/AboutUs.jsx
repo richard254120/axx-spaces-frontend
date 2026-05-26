@@ -308,9 +308,11 @@ export default function AboutPage() {
           <div style={styles.futureLabel}>What's Next</div>
           <h2 style={{ ...styles.sectionTitle, color: "#fbbf24" }}>Building the Future</h2>
           <p style={styles.futureText}>
-            Axxspace is more than a platform. It is a growing ecosystem built around convenience, opportunity, and innovation.
-            From finding a home, booking tourism experiences, relocating, starting a business, or purchasing affordable second-hand products — we aim to
-            make the process smarter, faster, and more connected for everyone.
+           Axxspace is evolving into a dynamic all-in-one ecosystem built to simplify everyday living for both local communities and international visitors. Our platform brings together trusted housing solutions, tourism experiences, business connections, property advertising, and essential services into one seamless digital space designed around real human needs.
+
+            Whether you are relocating, traveling, investing, launching a business, or searching for new opportunities, Axxspace is committed to making every experience smoother, safer, faster, and more connected. We aim to bridge convenience with trust by creating a platform where users can confidently explore opportunities, discover reliable services, and build meaningful connections.
+
+            As Axxspace continues to grow, we are actively developing innovative features that will enhance accessibility, comfort, security, and overall user experience — creating a smarter and more connected future for everyone.
           </p>
           <div style={styles.futurePillars}>
             {["Convenience", "Opportunity", "Innovation"].map((p) => (
