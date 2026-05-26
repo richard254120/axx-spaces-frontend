@@ -179,9 +179,9 @@ export default function Navbar() {
 
       <div style={styles.topSection}>
         <Link to="/" style={styles.logoContainer}>
-          <img src={logo} alt="Axx Spaces" style={styles.logo} />
+          <img src={logo} alt="AxxSpace" style={styles.logo} />
           <div style={styles.titleSection}>
-            <span style={styles.brandName}>Axx Spaces</span>
+            <span style={styles.brandName}>AxxSpace</span>
           </div>
         </Link>
 
