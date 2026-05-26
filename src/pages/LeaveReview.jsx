@@ -37,19 +37,18 @@ export default function LeaveReview() {
       return;
     }
 
-    if (!token) {
-      setError("❌ Please login to leave a review");
-      navigate("/login");
-      return;
-    }
-
     setLoading(true);
 
     try {
-      const response = await API.post("/reviews", {
+      const payload = {
         ...formData,
         userName: user?.name || "Anonymous",
-      });
+      };
+
+      // If user is not authenticated, use a public endpoint or anonymous submission
+      const response = token
+        ? await API.post("/reviews", payload)
+        : await API.post("/reviews", payload, { skipAuth: true });
 
       setSuccess("✅ Review submitted successfully!");
       
@@ -57,6 +56,7 @@ export default function LeaveReview() {
         navigate("/");
       }, 2000);
     } catch (err) {
+      console.error("Review submission error:", err);
       setError(err.response?.data?.error || "Failed to submit review. Please try again.");
     } finally {
       setLoading(false);
