@@ -26,6 +26,7 @@ import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
 import TermsAndPrivacy from "./pages/TermsAndPrivacy";
 import LeaveReview from "./pages/LeaveReview";
+import VerifyEmail from "./pages/VerifyEmail";
 
 // ─── Tourism Pages ───────────────────────────────────────────────────────────
 import TourismPage from "./pages/tourism/TourismPage";
@@ -86,6 +87,7 @@ function App() {
       <Route path="/register" element={<PublicLayout><Register /></PublicLayout>} />
       <Route path="/about" element={<PublicLayout><AboutUs /></PublicLayout>} />
       <Route path="/reset-password/:token" element={<PublicLayout><ResetPassword /></PublicLayout>} />
+      <Route path="/verify-email/:token" element={<PublicLayout><VerifyEmail /></PublicLayout>} />
       <Route path="/seller-login" element={<PublicLayout><SellerLogin /></PublicLayout>} />
       <Route path="/materials" element={<PublicLayout><Materials /></PublicLayout>} />
       <Route path="/faq" element={<PublicLayout><FAQ /></PublicLayout>} />

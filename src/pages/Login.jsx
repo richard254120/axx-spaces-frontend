@@ -11,6 +11,7 @@ export default function Login() {
 
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -23,6 +24,104 @@ export default function Login() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleGoogleLogin = async () => {
+    setGoogleLoading(true);
+    setError("");
+    
+    try {
+      // Load Google Identity Services
+      if (!window.google) {
+        // Load Google SDK dynamically
+        const script = document.createElement('script');
+        script.src = 'https://accounts.google.com/gsi/client';
+        script.async = true;
+        script.defer = true;
+        script.onload = () => initializeGoogleSignIn();
+        script.onerror = () => {
+          setError("Failed to load Google Sign-In. Please try again or use email/password.");
+          setGoogleLoading(false);
+        };
+        document.head.appendChild(script);
+      } else {
+        initializeGoogleSignIn();
+      }
+    } catch (err) {
+      setError("Google Sign-In is not configured. Please use email/password.");
+      setGoogleLoading(false);
+    }
+  };
+
+  const initializeGoogleSignIn = () => {
+    try {
+      window.google.accounts.id.initialize({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID",
+        callback: handleGoogleCredentialResponse,
+        auto_select: false,
+      });
+      
+      window.google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed()) {
+          setError("Google Sign-In popup was blocked. Please allow popups or use email/password.");
+          setGoogleLoading(false);
+        }
+      });
+    } catch (err) {
+      setError("Google Sign-In initialization failed. Please use email/password.");
+      setGoogleLoading(false);
+    }
+  };
+
+  const handleGoogleCredentialResponse = async (response) => {
+    try {
+      // Decode the JWT token
+      const base64Url = response.credential.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      
+      const googleUser = JSON.parse(jsonPayload);
+      
+      // Send to backend
+      const res = await fetch(`${API_BASE}/auth/google`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          googleId: googleUser.sub,
+          email: googleUser.email,
+          name: googleUser.name,
+          picture: googleUser.picture,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Google authentication failed");
+      }
+
+      login(data.token, data.user);
+
+      const userRole = data.user?.role?.toLowerCase().trim();
+      setSuccess("✅ Google login successful! Redirecting...");
+
+      setTimeout(() => {
+        if (userRole === "landlord") {
+          navigate("/dashboard");
+        } else if (userRole === "mover") {
+          navigate("/mover-dashboard");
+        } else {
+          navigate("/");
+        }
+      }, 1000);
+
+    } catch (err) {
+      setError(err.message || "Google authentication failed. Please try again.");
+    } finally {
+      setGoogleLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -213,6 +312,22 @@ export default function Login() {
 
               <div style={styles.divider}></div>
 
+              {/* Google Login Button */}
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                disabled={googleLoading}
+                style={{
+                  ...styles.googleBtn,
+                  opacity: googleLoading ? 0.7 : 1,
+                  cursor: googleLoading ? "not-allowed" : "pointer",
+                }}
+              >
+                {googleLoading ? "⏳ Connecting..." : "🔐 Sign in with Google"}
+              </button>
+
+              <div style={styles.divider}></div>
+
               <p style={styles.footer}>
                 Need to register a property?{" "}
                 <Link to="/register" style={styles.link}>Create Account</Link>
@@ -256,6 +371,22 @@ const styles = {
   label: { fontSize: "12px", fontWeight: 700, color: COLORS.textMutedLight, textTransform: "uppercase", letterSpacing: "0.5px" },
   input: inputStyles.dark,
   submitBtn: buttonStyles.primary,
+  googleBtn: {
+    width: "100%",
+    background: "white",
+    color: "#1f2937",
+    border: "1px solid #e5e7eb",
+    borderRadius: "10px",
+    padding: "14px",
+    fontSize: "15px",
+    fontWeight: 700,
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "10px",
+    transition: "all 0.2s",
+  },
   divider: { height: "1px", background: COLORS.border, margin: "25px 0" },
   footer: { textAlign: "center", color: COLORS.textMutedLight, fontSize: "14px" },
   link: { color: COLORS.accent, textDecoration: "none", fontWeight: 700, cursor: "pointer" },

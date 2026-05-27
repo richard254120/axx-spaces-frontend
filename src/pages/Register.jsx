@@ -17,12 +17,101 @@ export default function Register() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleGoogleLogin = async () => {
+    setGoogleLoading(true);
+    setError("");
+    
+    try {
+      // Load Google Identity Services
+      if (!window.google) {
+        const script = document.createElement('script');
+        script.src = 'https://accounts.google.com/gsi/client';
+        script.async = true;
+        script.defer = true;
+        script.onload = () => initializeGoogleSignIn();
+        script.onerror = () => {
+          setError("Failed to load Google Sign-In. Please try again or use email/password.");
+          setGoogleLoading(false);
+        };
+        document.head.appendChild(script);
+      } else {
+        initializeGoogleSignIn();
+      }
+    } catch (err) {
+      setError("Google Sign-In is not configured. Please use email/password.");
+      setGoogleLoading(false);
+    }
+  };
+
+  const initializeGoogleSignIn = () => {
+    try {
+      window.google.accounts.id.initialize({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID",
+        callback: handleGoogleCredentialResponse,
+        auto_select: false,
+      });
+      
+      window.google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed()) {
+          setError("Google Sign-In popup was blocked. Please allow popups or use email/password.");
+          setGoogleLoading(false);
+        }
+      });
+    } catch (err) {
+      setError("Google Sign-In initialization failed. Please use email/password.");
+      setGoogleLoading(false);
+    }
+  };
+
+  const handleGoogleCredentialResponse = async (response) => {
+    try {
+      const base64Url = response.credential.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      
+      const googleUser = JSON.parse(jsonPayload);
+      
+      const res = await fetch(`${API_BASE}/auth/google`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          googleId: googleUser.sub,
+          email: googleUser.email,
+          name: googleUser.name,
+          picture: googleUser.picture,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Google authentication failed");
+      }
+
+      login(data.token, data.user);
+
+      setSuccess("✅ Google registration successful! Redirecting...");
+
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1000);
+
+    } catch (err) {
+      setError(err.message || "Google authentication failed. Please try again.");
+    } finally {
+      setGoogleLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -69,13 +158,21 @@ export default function Register() {
         throw new Error(data.error || data.message || "Registration failed");
       }
 
-      setSuccess(`✅ Account created! Logging you in...`);
+      // Registration successful but email verification required
+      setSuccess(data.message || "✅ Registration successful! Please check your email to verify your account.");
 
-      login(data.token, data.user);
+      // Clear form
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+        phone: "",
+      });
 
+      // Redirect to login after 3 seconds
       setTimeout(() => {
-        navigate("/dashboard"); // Landlords always go to the standard dashboard
-      }, 1500);
+        navigate("/login");
+      }, 3000);
 
     } catch (err) {
       console.error("❌ Registration error:", err);
@@ -162,6 +259,22 @@ export default function Register() {
               {loading ? "Creating Account..." : "Create Landlord Account"}
             </button>
           </form>
+
+          <div style={styles.divider}></div>
+
+          {/* Google Login Button */}
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={googleLoading}
+            style={{
+              ...styles.googleBtn,
+              opacity: googleLoading ? 0.7 : 1,
+              cursor: googleLoading ? "not-allowed" : "pointer",
+            }}
+          >
+            {googleLoading ? "⏳ Connecting..." : "🔐 Sign up with Google"}
+          </button>
 
           <div style={styles.divider}></div>
 
@@ -258,6 +371,22 @@ const styles = {
   },
   input: inputStyles.dark,
   submitBtn: buttonStyles.primary,
+  googleBtn: {
+    width: "100%",
+    background: "white",
+    color: "#1f2937",
+    border: "1px solid #e5e7eb",
+    borderRadius: "10px",
+    padding: "14px",
+    fontSize: "15px",
+    fontWeight: 700,
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "10px",
+    transition: "all 0.2s",
+  },
   divider: {
     height: "1px",
     background: COLORS.border,
