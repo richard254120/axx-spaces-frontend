@@ -87,9 +87,9 @@ export default function Marketplace() {
 
       const res = await fetch(`${API_BASE}/materials?${query}`);
       const data = await res.json();
-      
+
       if (Array.isArray(data)) {
-        const approvedItems = data.filter(item => item.status === "approved");
+        const approvedItems = data.filter(item => item.status === "active");
         setItems(approvedItems);
       } else {
         setItems([]);
