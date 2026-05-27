@@ -16,11 +16,21 @@ const COUNTIES = [
 const CATEGORIES = ["Construction Materials","Furniture","Appliances","Electronics","Tools","Other"];
 const CONDITIONS = ["Like New","Good","Fair","Poor"];
 
+// ✅ FIXED: "active" is the single live status. "approved" alias added for any
+//    legacy documents already in the DB that were saved with the old status value.
 const STATUS_COLORS = {
-  pending: { bg: "rgba(251,191,36,0.15)", color: "#fbbf24", label: "⏳ Pending Approval" },
-  active: { bg: "rgba(34,197,94,0.15)", color: "#22c55e", label: "✅ Live" },
-  sold: { bg: "rgba(148,163,184,0.15)", color: "#94a3b8", label: "🏷️ Sold" },
-  archived: { bg: "rgba(239,68,68,0.15)", color: "#ef4444", label: "❌ Rejected" },
+  pending:  { bg: "rgba(251,191,36,0.15)",  color: "#fbbf24", label: "⏳ Pending Approval" },
+  active:   { bg: "rgba(34,197,94,0.15)",   color: "#22c55e", label: "✅ Live" },
+  approved: { bg: "rgba(34,197,94,0.15)",   color: "#22c55e", label: "✅ Live" }, // legacy alias
+  sold:     { bg: "rgba(148,163,184,0.15)", color: "#94a3b8", label: "🏷️ Sold" },
+  archived: { bg: "rgba(239,68,68,0.15)",   color: "#ef4444", label: "❌ Rejected" },
+};
+
+// ✅ Helper: normalise status so "approved" (old DB docs) shows the same as "active"
+const resolveStatus = (material) => {
+  const raw = material.status || "pending";
+  if (raw === "approved") return "active"; // treat legacy value as active
+  return raw;
 };
 
 export default function SellerDashboard() {
@@ -59,12 +69,14 @@ export default function SellerDashboard() {
 
   useEffect(() => {
     if (materials.length > 0) {
+      // ✅ FIXED: count live items using resolveStatus so both "active" and
+      //    legacy "approved" documents are counted correctly.
       const earnings = materials
-        .filter(m => m.status === "sold")
+        .filter(m => resolveStatus(m) === "sold")
         .reduce((sum, item) => sum + ((item.price || 0) * (item.quantity || 1)), 0);
 
-      const live = materials.filter(m => m.status === "active" || m.isVerified === true).length;
-      const pending = materials.filter(m => m.status === "pending" && !m.isVerified).length;
+      const live = materials.filter(m => resolveStatus(m) === "active").length;
+      const pending = materials.filter(m => resolveStatus(m) === "pending").length;
       const views = materials.reduce((sum, item) => sum + (item.views || 0), 0);
 
       setStats({ totalEarnings: earnings, liveItems: live, pendingReview: pending, totalViews: views });
@@ -138,10 +150,11 @@ export default function SellerDashboard() {
     fetchMyMaterials(token);
   };
 
+  // ✅ FIXED: use resolveStatus so filter dropdown works correctly for both
+  //    "active" (new) and "approved" (legacy) documents.
   const filteredMaterials = materials.filter((m) => {
     const matchesSearch = (m.title || "").toLowerCase().includes(searchQuery.toLowerCase());
-    let currentStatus = m.status || "pending";
-    if (m.isVerified && currentStatus === "pending") currentStatus = "active";
+    const currentStatus = resolveStatus(m);
     return matchesSearch && (statusFilter === "all" ? true : currentStatus === statusFilter);
   });
 
@@ -177,12 +190,20 @@ export default function SellerDashboard() {
         </div>
         {view === "listings" && (
           <div style={s.filterGroup}>
-            <input type="text" placeholder="Filter inventory..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={s.searchBar} />
+            <input
+              type="text"
+              placeholder="Filter inventory..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={s.searchBar}
+            />
+            {/* ✅ FIXED: dropdown values now match resolveStatus() output ("active" not "approved") */}
             <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} style={s.statusDropdown}>
               <option value="all">All</option>
               <option value="active">Live</option>
               <option value="pending">Pending</option>
               <option value="sold">Sold</option>
+              <option value="archived">Rejected</option>
             </select>
             <button style={s.refreshBtn} onClick={() => fetchMyMaterials(token)}>🔄 Refresh Status</button>
           </div>
@@ -197,30 +218,59 @@ export default function SellerDashboard() {
           onUpdated={(u) => u && setSeller(u)}
         />
       ) : view === "listings" ? (
-        <div style={s.grid}>
-          {filteredMaterials.map((m) => {
-            const currentStatus = m.isVerified && m.status === "pending" ? "active" : (m.status || "pending");
-            const st = STATUS_COLORS[currentStatus] || STATUS_COLORS.pending;
-            return (
-              <div key={m._id} style={s.card}>
-                <div style={s.cardImg}>
-                  {m.images?.[0] ? <img src={m.images[0]} alt="" style={s.img} /> : <div style={s.noImg}>📷 No Image</div>}
-                  <span style={{ ...s.statusBadge, background: st.bg, color: st.color }}>{st.label}</span>
-                </div>
-                <div style={s.cardBody}>
-                  <h3 style={s.cardTitle}>{m.title}</h3>
-                  <p style={s.cardPrice}>KES {m.price?.toLocaleString()}</p>
-                  <p style={s.cardMeta}>Qty: {m.quantity} • Location: {m.location}</p>
-                  <div style={s.cardBtns}>
-                    {currentStatus === "active" && <button style={s.soldBtn} onClick={() => handleMarkSold(m._id)}>Mark Sold</button>}
-                    <button style={s.deleteBtn} onClick={() => handleDelete(m._id)}>Delete</button>
+        loading ? (
+          <div style={s.loadingBox}>
+            <div className="spinner"></div>
+            <p style={{ color: "#94a3b8", marginTop: "12px" }}>Loading your inventory...</p>
+          </div>
+        ) : filteredMaterials.length === 0 ? (
+          <div style={s.emptyBox}>
+            <p style={{ fontSize: "3rem" }}>📦</p>
+            <p style={{ color: "#94a3b8" }}>
+              {materials.length === 0
+                ? "No materials yet. Upload your first listing!"
+                : "No materials match your current filter."}
+            </p>
+          </div>
+        ) : (
+          <div style={s.grid}>
+            {filteredMaterials.map((m) => {
+              // ✅ FIXED: use resolveStatus so the card badge always shows correctly
+              const currentStatus = resolveStatus(m);
+              const st = STATUS_COLORS[currentStatus] || STATUS_COLORS.pending;
+              return (
+                <div key={m._id} style={s.card}>
+                  <div style={s.cardImg}>
+                    {m.images?.[0]
+                      ? <img src={m.images[0]} alt="" style={s.img} />
+                      : <div style={s.noImg}>📷 No Image</div>
+                    }
+                    <span style={{ ...s.statusBadge, background: st.bg, color: st.color }}>
+                      {st.label}
+                    </span>
+                  </div>
+                  <div style={s.cardBody}>
+                    <h3 style={s.cardTitle}>{m.title}</h3>
+                    <p style={s.cardPrice}>KES {m.price?.toLocaleString()}</p>
+                    <p style={s.cardMeta}>Qty: {m.quantity} • {m.location}, {m.county}</p>
+                    <div style={s.cardBtns}>
+                      {currentStatus === "active" && (
+                        <button style={s.soldBtn} onClick={() => handleMarkSold(m._id)}>
+                          Mark Sold
+                        </button>
+                      )}
+                      <button style={s.deleteBtn} onClick={() => handleDelete(m._id)}>
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )
       ) : (
+        /* ============ UPLOAD FORM ============ */
         <div style={s.formBox}>
           {error && <div style={s.errorMsg}>{error}</div>}
           {success && <div style={s.successMsg}>{success}</div>}
@@ -230,6 +280,9 @@ export default function SellerDashboard() {
               <option value="">Select Category</option>
               {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
+            <select name="condition" value={form.condition} onChange={handleChange} style={s.input}>
+              {CONDITIONS.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
             <input name="price" type="number" placeholder="Price (KES)" value={form.price} onChange={handleChange} style={s.input} />
             <input name="quantity" type="number" placeholder="Quantity" value={form.quantity} onChange={handleChange} style={s.input} />
             <input name="location" placeholder="Specific Area (e.g. Westlands)" value={form.location} onChange={handleChange} style={s.input} />
@@ -237,10 +290,31 @@ export default function SellerDashboard() {
               <option value="">Select County</option>
               {COUNTIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
-            <textarea name="description" placeholder="Description Details" value={form.description} onChange={handleChange} style={{ ...s.input, gridColumn: "1/-1" }} />
-            <input type="file" multiple accept="image/*" onChange={handleImages} style={{ ...s.input, gridColumn: "1/-1" }} />
+            <textarea
+              name="description"
+              placeholder="Description Details"
+              value={form.description}
+              onChange={handleChange}
+              rows={4}
+              style={{ ...s.input, gridColumn: "1/-1", resize: "vertical" }}
+            />
+            <div style={{ gridColumn: "1/-1" }}>
+              <label style={{ color: "#94a3b8", fontSize: "0.85rem", display: "block", marginBottom: "6px" }}>
+                Images (at least one required)
+              </label>
+              <input type="file" multiple accept="image/*" onChange={handleImages} style={{ ...s.input }} />
+              {previews.length > 0 && (
+                <div style={s.previews}>
+                  {previews.map((p, i) => (
+                    <img key={i} src={p} alt="" style={s.previewImg} />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-          <button style={s.submitBtn} onClick={handleSubmit} disabled={submitLoading}>{submitLoading ? "Processing..." : "Publish Material"}</button>
+          <button style={s.submitBtn} onClick={handleSubmit} disabled={submitLoading}>
+            {submitLoading ? "Publishing..." : "Publish Material"}
+          </button>
         </div>
       )}
     </div>
@@ -249,7 +323,7 @@ export default function SellerDashboard() {
 
 const s = {
   page: { maxWidth: "1200px", margin: "0 auto", padding: "24px", background: "#0f172a", minHeight: "100vh", fontFamily: "sans-serif", color: "#f8fafc" },
-  topBar: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "32px" },
+  topBar: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "32px", flexWrap: "wrap", gap: "12px" },
   topTitle: { margin: 0, color: "#fbbf24" },
   topSub: { margin: "4px 0 0 0", color: "#94a3b8" },
   uploadBtn: { padding: "10px 20px", background: "#fbbf24", color: "#0f172a", border: "none", borderRadius: "6px", fontWeight: "bold", cursor: "pointer" },
@@ -260,17 +334,17 @@ const s = {
   statVal: { fontSize: "1.2rem", fontWeight: "bold", marginTop: "2px" },
   controlsRow: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", flexWrap: "wrap", gap: "12px" },
   tabs: { display: "flex" },
-  tab: { padding: "8px 16px", background: "transparent", border: "none", color: "#94a3b8", cursor: "pointer" },
+  tab: { padding: "8px 16px", background: "transparent", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: "0.95rem" },
   activeTab: { color: "#fbbf24", fontWeight: "bold" },
-  filterGroup: { display: "flex", gap: "8px" },
-  searchBar: { padding: "8px", background: "#1e293b", border: "1px solid #334155", borderRadius: "6px", color: "#fff" },
-  statusDropdown: { padding: "8px", background: "#1e293b", border: "1px solid #334155", borderRadius: "6px", color: "#fff" },
+  filterGroup: { display: "flex", gap: "8px", flexWrap: "wrap" },
+  searchBar: { padding: "8px 12px", background: "#1e293b", border: "1px solid #334155", borderRadius: "6px", color: "#fff" },
+  statusDropdown: { padding: "8px 12px", background: "#1e293b", border: "1px solid #334155", borderRadius: "6px", color: "#fff" },
   refreshBtn: { padding: "8px 12px", background: "rgba(59,130,246,0.2)", color: "#60a5fa", border: "1px solid #2563eb", borderRadius: "6px", cursor: "pointer" },
   grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "24px" },
   card: { background: "#1e293b", border: "1px solid #334155", borderRadius: "8px", overflow: "hidden" },
   cardImg: { position: "relative", height: "160px", background: "#0f172a" },
   img: { width: "100%", height: "100%", objectFit: "cover" },
-  noImg: { height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569" },
+  noImg: { height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569", fontSize: "2rem" },
   statusBadge: { position: "absolute", top: "8px", left: "8px", padding: "4px 8px", borderRadius: "4px", fontSize: "0.75rem", fontWeight: "bold" },
   cardBody: { padding: "16px" },
   cardTitle: { margin: "0 0 8px 0", fontSize: "1rem" },
@@ -281,12 +355,19 @@ const s = {
   deleteBtn: { flex: 1, padding: "6px", background: "rgba(239,68,68,0.2)", color: "#f87171", border: "1px solid #ef4444", borderRadius: "4px", cursor: "pointer" },
   formBox: { background: "#1e293b", padding: "24px", borderRadius: "8px", border: "1px solid #334155" },
   formGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "20px" },
-  input: { width: "100%", padding: "10px", background: "#0f172a", border: "1px solid #334155", borderRadius: "6px", color: "#fff" },
-  submitBtn: { padding: "10px 24px", background: "#fbbf24", color: "#0f172a", border: "none", borderRadius: "6px", fontWeight: "bold", cursor: "pointer" },
+  input: { width: "100%", padding: "10px", background: "#0f172a", border: "1px solid #334155", borderRadius: "6px", color: "#fff", boxSizing: "border-box", fontFamily: "sans-serif" },
+  submitBtn: { padding: "10px 24px", background: "#fbbf24", color: "#0f172a", border: "none", borderRadius: "6px", fontWeight: "bold", cursor: "pointer", fontSize: "1rem" },
   errorMsg: { background: "rgba(239,68,68,0.2)", padding: "10px", borderRadius: "6px", color: "#f87171", marginBottom: "16px" },
-  successMsg: { background: "rgba(34,197,94,0.2)", padding: "10px", borderRadius: "6px", color: "#4ade80", marginBottom: "16px" }
+  successMsg: { background: "rgba(34,197,94,0.2)", padding: "10px", borderRadius: "6px", color: "#4ade80", marginBottom: "16px" },
+  loadingBox: { display: "flex", flexDirection: "column", alignItems: "center", padding: "60px 20px" },
+  emptyBox: { textAlign: "center", padding: "60px 20px" },
+  previews: { display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "12px" },
+  previewImg: { width: "80px", height: "80px", objectFit: "cover", borderRadius: "6px", border: "1px solid #334155" },
 };
 
 const css = `
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner { width: 36px; height: 36px; border: 3px solid #334155; border-top-color: #fbbf24; border-radius: 50%; animation: spin 0.8s linear infinite; }
   input:focus, select:focus, textarea:focus { border-color: #fbbf24 !important; outline: none; }
+  button:hover:not(:disabled) { opacity: 0.85; }
 `;
