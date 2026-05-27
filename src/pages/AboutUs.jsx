@@ -17,46 +17,46 @@ export default function AboutPage() {
 
   const team = [
     {
-      name: "Kenfred",
-      role: "Co-Founder & CEO",
-      image: kenfredImg,
-      color: "#fbbf24",
-      bio: "Passionate about solving Kenya's housing challenges through technology. Kenfred leads product vision and strategy at Axxspace.",
-    },
-    {
       name: "Lucie",
       role: "Co-Founder & Operations",
       image: lucieImg,
       color: "#22c55e",
-      bio: "Lucie oversees landlord relations and ensures every listing on Axxspace meets our quality and verification standards.",
+      bio: "Ensures smooth operations and maintains quality standards across all platform services.",
     },
     {
-      name: "Richard",
-      role: "Technical Lead",
-      image: richardImg,
+      name: "Clare",
+      role: "Communication Lead",
+      image: clareImg,
       color: "#3b82f6",
-      bio: "Drives the technical infrastructure that powers Axxspace, ensuring a seamless experience for landlords and tenants alike.",
+      bio: "Manages communication strategies and ensures consistent messaging across all channels.",
+    },
+    {
+      name: "Kenfred",
+      role: "Co-Founder & CEO",
+      image: kenfredImg,
+      color: "#fbbf24",
+      bio: "Leads the product vision and strategy, driving innovation in Kenya's property and services sector.",
     },
     {
       name: "Ian",
       role: "Chief Financial Officer",
       image: ianImg,
       color: "#8b5cf6",
-      bio: "Stewards the financial health and strategic direction of Axxspace.",
+      bio: "Oversees financial planning and strategic direction for sustainable growth.",
     },
     {
       name: "Brian",
       role: "UI/UX Designer",
       image: brianImg,
       color: "#ec4899",
-      bio: "Creates intuitive and engaging user experiences for Axxspace.",
+      bio: "Designs intuitive and engaging user experiences that make the platform easy to use.",
     },
     {
-      name: "Clare",
-      role: "Communication lead",
-      image: clareImg,
+      name: "Richard",
+      role: "Technical Lead",
+      image: richardImg,
       color: "#3b82f6",
-      bio: "Drives our communication strategies and ensures consistent messaging across all channels.",
+      bio: "Builds and maintains the technical infrastructure that powers the entire platform.",
     },
   ];
 
@@ -268,12 +268,14 @@ export default function AboutPage() {
           <p style={{ ...styles.sectionSubtitle, color: "#94a3b8" }}>The young innovators behind Axxspace</p>
 
           <div style={styles.teamGrid}>
-            {team.map((member) => (
-              <div key={member.name} style={styles.teamCard} className="team-card">
+            {team.map((member, index) => (
+              <div key={index} style={styles.teamCard} className="team-card">
                 <img
                   src={member.image}
                   alt={member.name}
                   style={styles.teamImage}
+                  onContextMenu={(e) => e.preventDefault()}
+                  draggable="false"
                 />
                 <h3 style={styles.teamName}>{member.name}</h3>
                 <p style={{ ...styles.teamRole, color: member.color }}>{member.role}</p>
