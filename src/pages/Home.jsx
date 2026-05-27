@@ -38,7 +38,7 @@ export default function Home() {
     "👋 Welcome to Axxspace!",
     "🏠 Rentals Across All 47 Counties",
     "🚛 Trusted Moving Services",
-    "🛍️ Building Materials & Merchants",
+    "🛍️ Building Materials & Second-Hand Items",
     "🏨 Hotels & Tourism Experiences",
     "✅ Verified Listings — Zero Hidden Fees",
     "💬 Connect Directly via WhatsApp",
@@ -79,10 +79,10 @@ export default function Home() {
       id: "merchants",
       icon: "🛍️",
       title: "Merchants",
-      tagline: "Building materials & supplies",
-      description: "Source quality construction materials, hardware, and home supplies from verified merchants. Compare prices and order directly.",
-      features: ["Verified suppliers", "Hardware & materials", "Wholesale pricing", "Delivery available"],
-      cta: "Shop Materials",
+      tagline: "Building materials & second-hand items",
+      description: "Source quality construction materials, hardware, home supplies, and second-hand items from verified merchants. Compare prices and order directly.",
+      features: ["Verified suppliers", "Building materials", "Second-hand items", "Wholesale pricing"],
+      cta: "Shop Items",
       route: "/materials",
       color: "#d97706",
       bg: "linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)",
@@ -427,14 +427,14 @@ export default function Home() {
         <div style={{ ...styles.spotlightStrip, flexDirection: "row-reverse", background: "linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)" }} className="spotlight-strip">
           <div style={styles.spotlightText}>
             <span style={{ ...styles.spotlightBadge, background: "#fef3c7", color: "#b45309" }}>🛍️ Merchants</span>
-            <h3 style={styles.spotlightTitle}>Building or Renovating?</h3>
-            <p style={styles.spotlightDesc}>Source construction materials, hardware, paint, tiles, roofing, and more from 150+ verified Kenyan merchants at competitive wholesale prices.</p>
+            <h3 style={styles.spotlightTitle}>Building, Renovating, or Shopping?</h3>
+            <p style={styles.spotlightDesc}>Source construction materials, hardware, home supplies, and quality second-hand items from 150+ verified Kenyan merchants at competitive prices.</p>
             <div style={styles.spotlightFeatures}>
-              {["Hardware & tools", "Roofing & tiles", "Paint & finishes", "Plumbing & electrical"].map(f => (
+              {["Building materials", "Second-hand items", "Wholesale pricing", "Delivery available"].map(f => (
                 <span key={f} style={{ ...styles.spotlightFeature, color: "#b45309" }}>✓ {f}</span>
               ))}
             </div>
-            <button style={{ ...styles.spotlightBtn, background: "#d97706" }} onClick={() => navigate("/materials")}>Shop Materials →</button>
+            <button style={{ ...styles.spotlightBtn, background: "#d97706" }} onClick={() => navigate("/materials")}>Shop Items →</button>
           </div>
           <div style={styles.spotlightVisual}>
             <div style={{ ...styles.spotlightEmoji, background: "linear-gradient(135deg, #fef3c7, #fde68a)" }}>🛍️</div>
