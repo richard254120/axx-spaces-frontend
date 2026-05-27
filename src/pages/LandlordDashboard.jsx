@@ -16,6 +16,8 @@ export default function LandlordDashboard() {
   const [activeTab, setActiveTab] = useState("all");
   const [successMessage, setSuccessMessage] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [agents, setAgents] = useState([]);
+  const [selectedAgents, setSelectedAgents] = useState({});
 
   useEffect(() => {
     if (!token) {
@@ -28,6 +30,7 @@ export default function LandlordDashboard() {
       } else {
         setAuthLoading(false);
         fetchMyProperties();
+        fetchAgents();
       }
     } else {
       const timeout = setTimeout(() => {
@@ -52,11 +55,30 @@ export default function LandlordDashboard() {
         availableUnits: Math.max(0, (p.totalUnits || 1) - (p.bookedUnits || 0)),
       }));
       setProperties(processed);
+      // Initialize selected agents with existing assignments
+      const initialSelectedAgents = {};
+      processed.forEach(p => {
+        if (p.assignedAgent) {
+          initialSelectedAgents[p._id] = p.assignedAgent;
+        }
+      });
+      setSelectedAgents(initialSelectedAgents);
     } catch (err) {
       console.error("Fetch Error:", err);
       setError("Failed to load your properties. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAgents = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/properties/agents/all`);
+      if (!response.ok) throw new Error("Failed to fetch agents");
+      const data = await response.json();
+      setAgents(data);
+    } catch (err) {
+      console.error("Fetch agents error:", err);
     }
   };
 
@@ -82,6 +104,28 @@ export default function LandlordDashboard() {
 
   const handleBoost = (propertyId) => {
     navigate(`/premium-plans?propertyId=${propertyId}`);
+  };
+
+  const handleAssignAgent = async (propertyId, agentId) => {
+    try {
+      const response = await fetch(`${API_BASE}/properties/${propertyId}/assign-agent`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ agentId }),
+      });
+      if (!response.ok) throw new Error("Failed to assign agent");
+      const data = await response.json();
+      setSelectedAgents(prev => ({ ...prev, [propertyId]: agentId }));
+      setSuccessMessage("✅ Agent assigned successfully");
+      setTimeout(() => setSuccessMessage(""), 2500);
+      fetchMyProperties();
+    } catch (err) {
+      setError(err.message);
+      setTimeout(() => setError(""), 3000);
+    }
   };
 
   const counts = {
@@ -308,6 +352,23 @@ export default function LandlordDashboard() {
                       >
                         ⭐ Boost Property
                       </button>
+
+                      {/* ASSIGN AGENT — full width */}
+                      <div style={{ gridColumn: "1 / -1", marginTop: "8px" }}>
+                        <label style={{ ...styles.unitLbl, marginBottom: "4px" }}>Assign Agent:</label>
+                        <select
+                          value={selectedAgents[property._id] || ""}
+                          onChange={(e) => handleAssignAgent(property._id, e.target.value)}
+                          style={styles.agentSelect}
+                        >
+                          <option value="">No Agent Assigned</option>
+                          {agents.map((agent) => (
+                            <option key={agent._id} value={agent._id}>
+                              {agent.name} - {agent.phone}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -439,6 +500,11 @@ const styles = {
     fontWeight: 700, cursor: "pointer", transition: "all 0.2s",
   },
   boostActionBtn: { background: "#fbbf24", color: "#0f1729" },
+  agentSelect: {
+    width: "100%", padding: "10px", background: "#1e293b",
+    color: "#f1f5f9", border: "1px solid #334155", borderRadius: "8px",
+    fontSize: "12px", fontWeight: 600, cursor: "pointer",
+  },
   logoutBtn: {
     width: "100%", padding: "12px", background: "#ef4444", color: "white",
     border: "none", borderRadius: "8px", fontSize: "14px",

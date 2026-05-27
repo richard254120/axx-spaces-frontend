@@ -385,12 +385,44 @@ export default function Listings() {
               <div style={styles.landlordInfo}>
   <h3 style={styles.landlordHead}>👤 Landlord Contact</h3>
   <p style={styles.landlordDetail}>
-    <strong>Name:</strong> —
+    <strong>Name:</strong> {selectedProperty.owner?.name || "—"}
   </p>
   <p style={styles.landlordDetail}>
-    <strong>Phone:</strong> —
+    <strong>Phone:</strong> {selectedProperty.owner?.phone || "—"}
   </p>
 </div>
+
+              {/* ✅ AGENT CONTACT — shows if assigned */}
+              {selectedProperty.assignedAgent && (
+                <div style={styles.agentInfo}>
+                  <h3 style={styles.agentHead}>🤵 Property Agent</h3>
+                  <p style={styles.agentDetail}>
+                    <strong>Name:</strong> {selectedProperty.assignedAgent?.name || "—"}
+                  </p>
+                  <p style={styles.agentDetail}>
+                    <strong>Phone:</strong> {selectedProperty.assignedAgent?.phone || "—"}
+                  </p>
+                  <div style={styles.agentButtons}>
+                    <button
+                      style={styles.agentWhatsappBtn}
+                      onClick={() => {
+                        const phoneNumber = formatKenyaPhone(selectedProperty.assignedAgent?.phone || "");
+                        const agentName = selectedProperty.assignedAgent?.name || "Agent";
+                        const message = `Hi ${agentName}, I'm interested in the property "${selectedProperty.title}" located in ${selectedProperty.location}. Can you provide more details?`;
+                        window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
+                      }}
+                    >
+                      WhatsApp
+                    </button>
+                    <button
+                      style={styles.agentCallBtn}
+                      onClick={() => window.open(`tel:+254${selectedProperty.assignedAgent?.phone || ""}`)}
+                    >
+                      Call Agent
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* ✅ SHARE PROPERTY */}
               <ShareProperty property={selectedProperty} />
@@ -502,6 +534,12 @@ const styles = {
   landlordInfo: { margin: "20px 0", padding: "16px", background: "rgba(139, 92, 246, 0.1)", borderRadius: "8px" },
   landlordHead: { margin: "0 0 12px 0", color: "#8b5cf6" },
   landlordDetail: { color: "#cbd5e1", margin: "8px 0" },
+  agentInfo: { margin: "20px 0", padding: "16px", background: "rgba(251, 191, 36, 0.1)", borderRadius: "8px", border: "1px solid rgba(251, 191, 36, 0.2)" },
+  agentHead: { margin: "0 0 12px 0", color: "#fbbf24" },
+  agentDetail: { color: "#cbd5e1", margin: "8px 0" },
+  agentButtons: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginTop: "12px" },
+  agentWhatsappBtn: { padding: "12px 16px", background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", fontSize: "0.9rem" },
+  agentCallBtn: { padding: "12px 16px", background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", fontSize: "0.9rem" },
   contactButtonsContainer: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px", marginTop: "20px" },
   whatsappBtn: { padding: "14px 16px", background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", fontSize: "0.95rem" },
   callBtn: { padding: "14px 16px", background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", fontSize: "0.95rem" },
