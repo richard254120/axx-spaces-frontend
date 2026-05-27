@@ -18,45 +18,39 @@ export default function AboutPage() {
   const team = [
     {
       name: "Lucie",
-      role: "Co-Founder & Operations",
       image: lucieImg,
       color: "#22c55e",
       bio: "Ensures smooth operations and maintains quality standards across all platform services.",
     },
     {
+      name: "Richard",
+      image: richardImg,
+      color: "#3b82f6",
+      bio: "Builds and maintains the technical infrastructure that powers the entire platform.",
+    },
+    {
       name: "Clare",
-      role: "Communication Lead",
       image: clareImg,
       color: "#3b82f6",
       bio: "Manages communication strategies and ensures consistent messaging across all channels.",
     },
     {
       name: "Kenfred",
-      role: "Co-Founder & CEO",
       image: kenfredImg,
       color: "#fbbf24",
       bio: "Leads the product vision and strategy, driving innovation in Kenya's property and services sector.",
     },
     {
       name: "Ian",
-      role: "Chief Financial Officer",
       image: ianImg,
       color: "#8b5cf6",
       bio: "Oversees financial planning and strategic direction for sustainable growth.",
     },
     {
       name: "Brian",
-      role: "UI/UX Designer",
       image: brianImg,
       color: "#ec4899",
       bio: "Designs intuitive and engaging user experiences that make the platform easy to use.",
-    },
-    {
-      name: "Richard",
-      role: "Technical Lead",
-      image: richardImg,
-      color: "#3b82f6",
-      bio: "Builds and maintains the technical infrastructure that powers the entire platform.",
     },
   ];
 
@@ -278,7 +272,6 @@ export default function AboutPage() {
                   draggable="false"
                 />
                 <h3 style={styles.teamName}>{member.name}</h3>
-                <p style={{ ...styles.teamRole, color: member.color }}>{member.role}</p>
                 <p style={styles.teamBio}>{member.bio}</p>
               </div>
             ))}
