@@ -4,10 +4,10 @@ import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 
 // ── tiny helpers ──────────────────────────────────────────────
-const TABS = ["properties","materials","tourism","movers","sellers","payment"];
+const TABS = ["properties","materials","tourism","movers","sellers","sold","payment"];
 const TAB_LABELS = {
   properties:"🏠 Properties", materials:"🛍️ Materials", tourism:"🏨 Tourism",
-  movers:"🚛 Movers", sellers:"📋 Sellers", payment:"💳 Payment"
+  movers:"🚛 Movers", sellers:"📋 Sellers", sold:"💰 Sold", payment:"💳 Payment"
 };
 const STATUS_VIEWS = ["pending","approved","rejected"];
 
@@ -40,7 +40,8 @@ export default function AdminDashboard() {
 
   // ── reload items when tab or statusView changes ─────────────
   useEffect(() => {
-    if (activeTab !== "payment") loadItems(activeTab, statusView);
+    if (activeTab !== "payment" && activeTab !== "sold") loadItems(activeTab, statusView);
+    else if (activeTab === "sold") loadItems("sold", "sold");
   }, [activeTab, statusView]);
 
   // ── data loaders ───────────────────────────────────────────
@@ -148,7 +149,13 @@ export default function AdminDashboard() {
 
   // ── field helpers ──────────────────────────────────────────
   const getTitle   = (item) => item.title || item.name || item.businessName || "—";
-  const getSub     = (item) => item.category || item.county || (item.businessRegNumber ? `Reg: ${item.businessRegNumber}` : "") || item.vehicleType || "—";
+  const getSub     = (item) => {
+    if (activeTab === "sold") {
+      const typeLabels = { property: "🏠 Property", material: "🛍️ Material", tourism: "🏨 Tourism" };
+      return `${typeLabels[item.itemType] || item.itemType} · ${item.category || item.county || ""}`;
+    }
+    return item.category || item.county || (item.businessRegNumber ? `Reg: ${item.businessRegNumber}` : "") || item.vehicleType || "—";
+  };
   const getOwner   = (item) => item.owner?.name || item.seller?.name || item.name || "—";
   const getContact = (item) => item.owner?.phone || item.seller?.phone || item.phone || item.owner?.email || "—";
   const getPrice   = (item) => item.price != null ? `KES ${item.price.toLocaleString()}` : item.vehicleType || (item.kraPin ? `KRA: ${item.kraPin}` : "—");
@@ -198,14 +205,14 @@ export default function AdminDashboard() {
         {TABS.map(t => (
           <button key={t}
             style={{ ...S.tab, ...(activeTab === t ? S.tabActive : {}) }}
-            onClick={() => { setActiveTab(t); setStatusView("pending"); }}>
+            onClick={() => { setActiveTab(t); if (t !== "sold" && t !== "payment") setStatusView("pending"); }}>
             {TAB_LABELS[t]}{pendingCount(t)}
           </button>
         ))}
       </div>
 
-      {/* STATUS VIEW TOGGLE (not for payment) */}
-      {activeTab !== "payment" && (
+      {/* STATUS VIEW TOGGLE (not for payment or sold) */}
+      {activeTab !== "payment" && activeTab !== "sold" && (
         <div style={S.statusToggle}>
           {STATUS_VIEWS.map(v => (
             <button key={v}
@@ -224,10 +231,10 @@ export default function AdminDashboard() {
           configSaving={configSaving} configMessage={configMessage}
           handleSave={handleSaveMpesaConfig} />
       ) : loading ? (
-        <div style={S.loader}>⏳ Loading {statusView} {activeTab}...</div>
+        <div style={S.loader}>⏳ Loading {activeTab === "sold" ? "sold" : statusView} {activeTab}...</div>
       ) : displayItems.length === 0 ? (
         <div style={S.empty}>
-          <p style={S.emptyText}>✅ No {statusView} {activeTab} found.</p>
+          <p style={S.emptyText}>✅ No {activeTab === "sold" ? "sold" : statusView} {activeTab} found.</p>
         </div>
       ) : (
         <div style={S.grid}>
@@ -247,7 +254,7 @@ export default function AdminDashboard() {
                     {item.status || (item.isApproved ? "approved" : "pending")}
                   </span>
                 </div>
-                {statusView === "pending" && (
+                {statusView === "pending" && activeTab !== "sold" && (
                   <div style={S.cardBtns} onClick={e => e.stopPropagation()}>
                     <button style={S.approveBtn} onClick={() => handleApprove(activeTab, item._id)}>✅ Approve</button>
                     <button style={S.rejectBtn}  onClick={() => handleReject(activeTab, item._id)}>❌ Reject</button>
@@ -355,13 +362,13 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
             </>
           ) : (
             <>
-              {statusView === "pending" && (
+              {statusView === "pending" && tab !== "sold" && (
                 <>
                   <button style={S.approveBtn} onClick={onApprove}>✅ Approve</button>
                   <button style={S.rejectBtn}  onClick={onReject}>❌ Reject</button>
                 </>
               )}
-              {["properties","materials","tourism"].includes(tab) && (
+              {["properties","materials","tourism"].includes(tab) && tab !== "sold" && (
                 <button style={S.editBtn} onClick={onEdit}>✏️ Edit</button>
               )}
               <button style={S.cancelBtn} onClick={onClose}>Close</button>
