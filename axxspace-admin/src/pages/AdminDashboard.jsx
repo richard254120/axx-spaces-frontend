@@ -25,6 +25,8 @@ export default function AdminDashboard() {
   const [editMode,   setEditMode]     = useState(false);
   const [editData,   setEditData]     = useState({});
   const [saving,     setSaving]       = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
 
   const [mpesaConfig,   setMpesaConfig]   = useState({ mpesa_shortcode:"", mpesa_passkey:"", mpesa_consumer_key:"", mpesa_consumer_secret:"" });
   const [configSaving,  setConfigSaving]  = useState(false);
@@ -101,6 +103,32 @@ export default function AdminDashboard() {
 
   const refresh = () => { loadStats(); loadAllPending(); loadItems(activeTab, statusView); };
 
+  // ── export functionality ─────────────────────────────────────
+  const exportData = () => {
+    const dataToExport = filteredItems.map(item => ({
+      title: getTitle(item),
+      category: item.category || item.county || "",
+      owner: getOwner(item),
+      contact: getContact(item),
+      price: getPrice(item),
+      status: item.status || (item.isApproved ? "approved" : "pending"),
+      createdAt: item.createdAt || new Date().toISOString()
+    }));
+
+    const csv = [
+      Object.keys(dataToExport[0]).join(","),
+      ...dataToExport.map(row => Object.values(row).map(val => `"${val}"`).join(","))
+    ].join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${activeTab}_${statusView}_${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
   // ── edit / save ────────────────────────────────────────────
   const openEdit = (item) => { setEditData({ ...item }); setEditMode(true); };
 
@@ -147,6 +175,20 @@ export default function AdminDashboard() {
     ? (allPending?.[activeTab] || [])
     : allItems;
 
+  // ── filter items based on search and category ──────────────
+  const filteredItems = displayItems.filter(item => {
+    const matchesSearch = searchQuery === "" ||
+      getTitle(item).toLowerCase().includes(searchQuery.toLowerCase()) ||
+      getOwner(item).toLowerCase().includes(searchQuery.toLowerCase()) ||
+      getContact(item).toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesCategory = filterCategory === "" ||
+      (item.category && item.category.toLowerCase() === filterCategory.toLowerCase()) ||
+      (item.county && item.county.toLowerCase() === filterCategory.toLowerCase());
+
+    return matchesSearch && matchesCategory;
+  });
+
   // ── field helpers ──────────────────────────────────────────
   const getTitle   = (item) => item.title || item.name || item.businessName || "—";
   const getSub     = (item) => {
@@ -183,21 +225,82 @@ export default function AdminDashboard() {
 
       {/* STATS */}
       {stats && (
-        <div style={S.statsGrid}>
-          {[
-            { label:"🏢 Properties", total:stats.properties.total, pending:stats.properties.pending },
-            { label:"🛍️ Materials",  total:stats.materials.total,  pending:stats.materials.pending  },
-            { label:"🚛 Movers",     total:stats.movers.total,     pending:stats.movers.pending     },
-            { label:"🏨 Tourism",    total:stats.tourism.total,    pending:stats.tourism.pending    },
-            { label:"📋 Sellers",    total:stats.sellers.total,    pending:stats.sellers.pending    },
-          ].map(s => (
-            <div key={s.label} style={S.statCard}>
-              <p style={S.statLabel}>{s.label}</p>
-              <p style={S.statVal}>{s.total}</p>
-              {s.pending > 0 && <p style={S.statPending}>{s.pending} pending</p>}
+        <>
+          <div style={S.statsGrid}>
+            {[
+              { label:"🏢 Properties", total:stats.properties.total, pending:stats.properties.pending, color:"#3b82f6" },
+              { label:"🛍️ Materials",  total:stats.materials.total,  pending:stats.materials.pending,  color:"#22c55e" },
+              { label:"🚛 Movers",     total:stats.movers.total,     pending:stats.movers.pending,     color:"#f59e0b" },
+              { label:"🏨 Tourism",    total:stats.tourism.total,    pending:stats.tourism.pending,    color:"#8b5cf6" },
+              { label:"📋 Sellers",    total:stats.sellers.total,    pending:stats.sellers.pending,    color:"#ec4899" },
+            ].map(s => (
+              <div key={s.label} style={{...S.statCard, borderTop:`3px solid ${s.color}`}}>
+                <p style={S.statLabel}>{s.label}</p>
+                <p style={S.statVal}>{s.total}</p>
+                {s.pending > 0 && <p style={S.statPending}>{s.pending} pending</p>}
+              </div>
+            ))}
+          </div>
+
+          {/* ACTIVITY CHART */}
+          <div style={S.chartContainer}>
+            <h3 style={S.chartTitle}>📊 Overview Distribution</h3>
+            <div style={S.chartBars}>
+              {[
+                { label:"Properties", total:stats.properties.total, pending:stats.properties.pending, color:"#3b82f6" },
+                { label:"Materials",  total:stats.materials.total,  pending:stats.materials.pending,  color:"#22c55e" },
+                { label:"Movers",     total:stats.movers.total,     pending:stats.movers.pending,     color:"#f59e0b" },
+                { label:"Tourism",    total:stats.tourism.total,    pending:stats.tourism.pending,    color:"#8b5cf6" },
+                { label:"Sellers",    total:stats.sellers.total,    pending:stats.sellers.pending,    color:"#ec4899" },
+              ].map(s => {
+                const maxTotal = Math.max(...[stats.properties.total, stats.materials.total, stats.movers.total, stats.tourism.total, stats.sellers.total]);
+                const barWidth = maxTotal > 0 ? (s.total / maxTotal) * 100 : 0;
+                const pendingWidth = maxTotal > 0 ? (s.pending / maxTotal) * 100 : 0;
+                return (
+                  <div key={s.label} style={S.chartBar}>
+                    <div style={S.chartLabel}>{s.label}</div>
+                    <div style={S.chartBarTrack}>
+                      <div style={{...S.chartBarFill, width:`${barWidth}%`, background:s.color}} />
+                      {s.pending > 0 && (
+                        <div style={{...S.chartBarPending, width:`${pendingWidth}%`}} />
+                      )}
+                    </div>
+                    <div style={S.chartValues}>
+                      <span style={S.chartTotal}>{s.total}</span>
+                      {s.pending > 0 && <span style={S.chartPending}>{s.pending} pending</span>}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          ))}
-        </div>
+          </div>
+
+          {/* QUICK ACTIONS */}
+          <div style={S.quickActions}>
+            <h3 style={S.quickActionsTitle}>⚡ Quick Actions</h3>
+            <div style={S.quickActionsGrid}>
+              <button style={S.quickActionBtn} onClick={() => { setActiveTab("properties"); setStatusView("pending"); }}>
+                <span style={S.quickActionIcon}>🏠</span>
+                <span style={S.quickActionText}>Review Properties</span>
+                {stats?.properties?.pending > 0 && <span style={S.quickActionBadge}>{stats.properties.pending}</span>}
+              </button>
+              <button style={S.quickActionBtn} onClick={() => { setActiveTab("materials"); setStatusView("pending"); }}>
+                <span style={S.quickActionIcon}>🛍️</span>
+                <span style={S.quickActionText}>Review Materials</span>
+                {stats?.materials?.pending > 0 && <span style={S.quickActionBadge}>{stats.materials.pending}</span>}
+              </button>
+              <button style={S.quickActionBtn} onClick={() => { setActiveTab("tourism"); setStatusView("pending"); }}>
+                <span style={S.quickActionIcon}>🏨</span>
+                <span style={S.quickActionText}>Review Tourism</span>
+                {stats?.tourism?.pending > 0 && <span style={S.quickActionBadge}>{stats.tourism.pending}</span>}
+              </button>
+              <button style={S.quickActionBtn} onClick={() => { setActiveTab("sold"); }}>
+                <span style={S.quickActionIcon}>💰</span>
+                <span style={S.quickActionText}>View Sold Items</span>
+              </button>
+            </div>
+          </div>
+        </>
       )}
 
       {/* TABS */}
@@ -224,6 +327,57 @@ export default function AdminDashboard() {
         </div>
       )}
 
+      {/* SEARCH AND FILTER BAR */}
+      {activeTab !== "payment" && (
+        <div style={S.searchBar}>
+          <div style={S.searchInputWrapper}>
+            <span style={S.searchIcon}>🔍</span>
+            <input
+              style={S.searchInput}
+              placeholder="Search by title, owner, or contact..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && (
+              <button style={S.clearBtn} onClick={() => setSearchQuery("")}>✕</button>
+            )}
+          </div>
+          {(activeTab === "materials" || activeTab === "tourism" || activeTab === "properties") && (
+            <select
+              style={S.filterSelect}
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+            >
+              <option value="">All Categories</option>
+              {activeTab === "materials" && [
+                "Construction Materials", "Furniture", "Appliances", "Electronics", "Tools", "Other"
+              ].map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+              {activeTab === "properties" && [
+                "Apartment", "House", "Office", "Land", "Warehouse"
+              ].map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+              {activeTab === "tourism" && [
+                "Hotel", "Resort", "Airbnb", "Lodge", "Camping"
+              ].map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          )}
+          <button style={S.exportBtn} onClick={exportData}>📥 Export CSV</button>
+        </div>
+      )}
+
+      {/* RESULTS COUNT */}
+      {activeTab !== "payment" && !loading && filteredItems.length > 0 && (
+        <div style={S.resultsCount}>
+          Showing <strong>{filteredItems.length}</strong> of <strong>{displayItems.length}</strong> {activeTab}
+          {(searchQuery || filterCategory) && <span style={S.filterTag}> (filtered)</span>}
+        </div>
+      )}
+
       {/* CONTENT */}
       {activeTab === "payment" ? (
         <PaymentSettings
@@ -231,14 +385,22 @@ export default function AdminDashboard() {
           configSaving={configSaving} configMessage={configMessage}
           handleSave={handleSaveMpesaConfig} />
       ) : loading ? (
-        <div style={S.loader}>⏳ Loading {activeTab === "sold" ? "sold" : statusView} {activeTab}...</div>
-      ) : displayItems.length === 0 ? (
+        <div style={S.loader}>
+          <div style={S.spinner}></div>
+          <p>⏳ Loading {activeTab === "sold" ? "sold" : statusView} {activeTab}...</p>
+        </div>
+      ) : filteredItems.length === 0 ? (
         <div style={S.empty}>
           <p style={S.emptyText}>✅ No {activeTab === "sold" ? "sold" : statusView} {activeTab} found.</p>
+          {(searchQuery || filterCategory) && (
+            <button style={S.resetBtn} onClick={() => { setSearchQuery(""); setFilterCategory(""); }}>
+              Clear Filters
+            </button>
+          )}
         </div>
       ) : (
         <div style={S.grid}>
-          {displayItems.map(item => (
+          {filteredItems.map(item => (
             <div key={item._id} style={S.card} onClick={() => setSelected(item)} className="admin-card">
               {/* card image */}
               {getImages(item)[0] && (
@@ -417,13 +579,42 @@ const S = {
   statLabel:   { fontSize:12, color:"#94a3b8", margin:"0 0 6px" },
   statVal:     { fontSize:26, fontWeight:800, color:"#fbbf24", margin:"0 0 2px" },
   statPending: { fontSize:11, color:"#ef4444", margin:0 },
+  chartContainer:{ background:"rgba(30,41,59,0.6)", padding:"24px", borderRadius:16, border:"1px solid rgba(255,255,255,0.05)", marginBottom:28 },
+  chartTitle:  { fontSize:16, fontWeight:700, color:"#fbbf24", margin:"0 0 20px" },
+  chartBars:   { display:"flex", flexDirection:"column", gap:16 },
+  chartBar:    { display:"flex", alignItems:"center", gap:12 },
+  chartLabel:  { width:80, fontSize:12, color:"#94a3b8", fontWeight:600 },
+  chartBarTrack:{ flex:1, height:24, background:"rgba(15,23,42,0.8)", borderRadius:12, overflow:"hidden", position:"relative" },
+  chartBarFill:{ height:"100%", borderRadius:12, transition:"width 0.5s ease-out" },
+  chartBarPending:{ height:"100%", background:"rgba(239,68,68,0.6)", position:"absolute", top:0, left:0, borderRadius:12, transition:"width 0.5s ease-out" },
+  chartValues: { width:100, display:"flex", flexDirection:"column", alignItems:"flex-end", gap:2 },
+  chartTotal:  { fontSize:14, fontWeight:700, color:"#fbbf24" },
+  chartPending:{ fontSize:11, color:"#ef4444" },
+  quickActions:{ background:"rgba(30,41,59,0.6)", padding:"24px", borderRadius:16, border:"1px solid rgba(255,255,255,0.05)", marginBottom:28 },
+  quickActionsTitle:{ fontSize:16, fontWeight:700, color:"#fbbf24", margin:"0 0 16px" },
+  quickActionsGrid:{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))", gap:12 },
+  quickActionBtn:{ display:"flex", alignItems:"center", gap:10, background:"rgba(15,23,42,0.8)", border:"1px solid rgba(255,255,255,0.08)", padding:"14px 18px", borderRadius:12, cursor:"pointer", transition:"all 0.2s", position:"relative" },
+  quickActionIcon:{ fontSize:20 },
+  quickActionText:{ fontSize:13, fontWeight:600, color:"#f1f5f9", flex:1, textAlign:"left" },
+  quickActionBadge:{ background:"#ef4444", color:"#fff", fontSize:11, fontWeight:700, padding:"2px 8px", borderRadius:10, minWidth:20, textAlign:"center" },
   tabs:        { display:"flex", flexWrap:"wrap", gap:8, marginBottom:16 },
   tab:         { background:"rgba(30,41,59,0.6)", color:"#94a3b8", border:"1px solid rgba(255,255,255,0.1)", padding:"10px 20px", borderRadius:10, fontWeight:700, cursor:"pointer", fontSize:13 },
   tabActive:   { background:"#fbbf24", color:"#1f2937", borderColor:"#fbbf24" },
   statusToggle:{ display:"flex", gap:8, marginBottom:24 },
   stBtn:       { background:"rgba(30,41,59,0.4)", color:"#94a3b8", border:"1px solid rgba(255,255,255,0.08)", padding:"7px 16px", borderRadius:8, fontWeight:600, cursor:"pointer", fontSize:12 },
   stBtnActive: { background:"rgba(251,191,36,0.15)", color:"#fbbf24", borderColor:"#fbbf24" },
+  searchBar:   { display:"flex", gap:12, marginBottom:24, flexWrap:"wrap" },
+  searchInputWrapper:{ display:"flex", alignItems:"center", background:"rgba(30,41,59,0.6)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, padding:"8px 16px", flex:1, minWidth:280 },
+  searchIcon:  { fontSize:16, marginRight:8, color:"#94a3b8" },
+  searchInput: { background:"transparent", border:"none", color:"#f1f5f9", fontSize:14, flex:1, outline:"none", minWidth:200 },
+  clearBtn:    { background:"none", border:"none", color:"#64748b", cursor:"pointer", fontSize:16, padding:4, marginLeft:8, hover:{ color:"#fbbf24" } },
+  filterSelect:{ background:"rgba(30,41,59,0.6)", color:"#f1f5f9", border:"1px solid rgba(255,255,255,0.1)", padding:"8px 16px", borderRadius:10, fontSize:13, outline:"none", cursor:"pointer", minWidth:180 },
+  exportBtn:   { background:"rgba(59,130,246,0.1)", color:"#3b82f6", border:"1px solid #3b82f6", padding:"8px 16px", borderRadius:10, fontWeight:600, cursor:"pointer", fontSize:13, transition:"all 0.2s" },
+  resultsCount:{ fontSize:13, color:"#94a3b8", marginBottom:16 },
+  filterTag:   { color:"#fbbf24", fontWeight:600 },
+  resetBtn:    { background:"rgba(251,191,36,0.1)", color:"#fbbf24", border:"1px solid #fbbf24", padding:"8px 16px", borderRadius:8, fontWeight:600, cursor:"pointer", fontSize:12, marginTop:12 },
   loader:      { textAlign:"center", padding:80, color:"#fbbf24", fontSize:16 },
+  spinner:     { display:"inline-block", width:40, height:40, border:"4px solid rgba(251,191,36,0.2)", borderTopColor:"#fbbf24", borderRadius:"50%", animation:"spin 1s linear infinite", marginBottom:16 },
   empty:       { background:"rgba(30,41,59,0.4)", padding:60, borderRadius:16, textAlign:"center", border:"1px dashed rgba(251,191,36,0.3)" },
   emptyText:   { color:"#94a3b8", fontSize:16 },
   grid:        { display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:16 },
@@ -437,16 +628,16 @@ const S = {
   priceBadge:  { background:"rgba(59,130,246,0.15)", color:"#3b82f6", padding:"4px 10px", borderRadius:6, fontWeight:700, fontSize:12 },
   statusDot:   { padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:700, color:"#fff", textTransform:"capitalize" },
   cardBtns:    { display:"flex", gap:8, marginTop:8 },
-  approveBtn:  { background:"#22c55e", color:"#fff", border:"none", padding:"7px 14px", borderRadius:7, fontWeight:700, cursor:"pointer", fontSize:12 },
-  rejectBtn:   { background:"rgba(239,68,68,0.1)", color:"#ef4444", border:"1px solid #ef4444", padding:"7px 14px", borderRadius:7, fontWeight:700, cursor:"pointer", fontSize:12 },
-  editBtn:     { background:"rgba(251,191,36,0.1)", color:"#fbbf24", border:"1px solid #fbbf24", padding:"7px 14px", borderRadius:7, fontWeight:700, cursor:"pointer", fontSize:12 },
+  approveBtn:  { background:"#22c55e", color:"#fff", border:"none", padding:"7px 14px", borderRadius:7, fontWeight:700, cursor:"pointer", fontSize:12, transition:"all 0.2s" },
+  rejectBtn:   { background:"rgba(239,68,68,0.1)", color:"#ef4444", border:"1px solid #ef4444", padding:"7px 14px", borderRadius:7, fontWeight:700, cursor:"pointer", fontSize:12, transition:"all 0.2s" },
+  editBtn:     { background:"rgba(251,191,36,0.1)", color:"#fbbf24", border:"1px solid #fbbf24", padding:"7px 14px", borderRadius:7, fontWeight:700, cursor:"pointer", fontSize:12, transition:"all 0.2s" },
   saveBtn:     { background:"#fbbf24", color:"#1f2937", border:"none", padding:"10px 20px", borderRadius:8, fontWeight:800, cursor:"pointer", fontSize:13 },
   cancelBtn:   { background:"rgba(30,41,59,0.6)", color:"#94a3b8", border:"1px solid rgba(255,255,255,0.1)", padding:"10px 20px", borderRadius:8, fontWeight:700, cursor:"pointer", fontSize:13 },
-  overlay:     { position:"fixed", inset:0, background:"rgba(0,0,0,0.75)", zIndex:1000, display:"flex", alignItems:"center", justifyContent:"center", padding:16 },
-  modal:       { background:"#0f1729", borderRadius:20, border:"1px solid rgba(255,255,255,0.08)", width:"100%", maxWidth:720, maxHeight:"90vh", display:"flex", flexDirection:"column", overflow:"hidden" },
-  modalHeader: { display:"flex", justifyContent:"space-between", alignItems:"center", padding:"20px 24px", borderBottom:"1px solid rgba(255,255,255,0.07)" },
+  overlay:     { position:"fixed", inset:0, background:"rgba(0,0,0,0.8)", zIndex:1000, display:"flex", alignItems:"center", justifyContent:"center", padding:16, animation:"fadeIn 0.2s ease-out" },
+  modal:       { background:"#0f1729", borderRadius:20, border:"1px solid rgba(255,255,255,0.08)", width:"100%", maxWidth:720, maxHeight:"90vh", display:"flex", flexDirection:"column", overflow:"hidden", animation:"slideUp 0.3s ease-out", boxShadow:"0 25px 50px rgba(0,0,0,0.5)" },
+  modalHeader: { display:"flex", justifyContent:"space-between", alignItems:"center", padding:"20px 24px", borderBottom:"1px solid rgba(255,255,255,0.07)", background:"rgba(15,23,42,0.95)" },
   modalTitle:  { fontSize:20, fontWeight:800, color:"#fbbf24", margin:0 },
-  closeBtn:    { background:"none", border:"none", color:"#94a3b8", fontSize:20, cursor:"pointer" },
+  closeBtn:    { background:"rgba(239,68,68,0.1)", border:"1px solid rgba(239,68,68,0.3)", color:"#ef4444", width:32, height:32, borderRadius:8, fontSize:16, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.2s" },
   modalBody:   { flex:1, overflowY:"auto", padding:24 },
   modalFooter: { display:"flex", gap:10, padding:"16px 24px", borderTop:"1px solid rgba(255,255,255,0.07)", flexWrap:"wrap" },
   imgSection:  { marginBottom:20 },
@@ -473,4 +664,21 @@ const css = `
   .admin-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.4); }
   ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: rgba(251,191,36,0.3); border-radius: 3px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  button:hover { transform: translateY(-1px); }
+  .approveBtn:hover { background: #16a34a; }
+  .rejectBtn:hover { background: rgba(239,68,68,0.2); }
+  .editBtn:hover { background: rgba(251,191,36,0.2); }
+  .exportBtn:hover { background: rgba(59,130,246,0.2); }
+  .closeBtn:hover { background: rgba(239,68,68,0.2); }
+  .quickActionBtn:hover { background: rgba(251,191,36,0.1); border-color: #fbbf24; }
+  @media (max-width: 768px) {
+    .statsGrid { gridTemplateColumns: repeat(2, 1fr); }
+    .chartBar { flex-direction: column; align-items: flex-start; gap: 8; }
+    .chartLabel { width: 100%; }
+    .chartValues { width: 100%; flex-direction: row; justify-content: space-between; }
+    .quickActionsGrid { gridTemplateColumns: 1fr; }
+  }
 `;
