@@ -447,7 +447,7 @@ export default function AdminDashboard() {
                     <button style={S.rejectBtn} onClick={() => handleReject(activeTab, item._id)}>❌ Reject</button>
                   </div>
                 )}
-                <button style={S.deleteBtn} onClick={(e) => { e.stopPropagation(); confirmDelete(activeTab === "movers" ? "movers" : activeTab.slice(0, -1), item._id, getTitle(item)); }}>🗑️</button>
+                <button style={S.deleteBtn} onClick={(e) => { e.stopPropagation(); confirmDelete(activeTab, item._id, getTitle(item)); }}>🗑️</button>
               </div>
             </div>
           ))}
@@ -578,7 +578,7 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
               {["properties", "materials", "tourism"].includes(tab) && tab !== "sold" && (
                 <button style={S.editBtn} onClick={onEdit}>✏️ Edit</button>
               )}
-              <button style={S.deleteBtn} onClick={() => onDelete(tab === "movers" ? "movers" : tab.slice(0, -1), item._id, item.title || item.name || item.businessName)}>🗑️ Delete</button>
+              <button style={S.deleteBtn} onClick={() => onDelete(tab, item._id, item.title || item.name || item.businessName)}>🗑️ Delete</button>
               <button style={S.cancelBtn} onClick={onClose}>Close</button>
             </>
           )}
