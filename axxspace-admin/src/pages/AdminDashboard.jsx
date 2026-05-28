@@ -27,6 +27,7 @@ export default function AdminDashboard() {
   const [saving,     setSaving]       = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
+  const [deleteConfirm, setDeleteConfirm] = useState(null); // { type, id, title }
 
   const [mpesaConfig,   setMpesaConfig]   = useState({ mpesa_shortcode:"", mpesa_passkey:"", mpesa_consumer_key:"", mpesa_consumer_secret:"" });
   const [configSaving,  setConfigSaving]  = useState(false);
@@ -102,6 +103,27 @@ export default function AdminDashboard() {
   };
 
   const refresh = () => { loadStats(); loadAllPending(); loadItems(activeTab, statusView); };
+
+  // ── delete functionality ─────────────────────────────────────
+  const handleDelete = async (type, id) => {
+    try {
+      await API.delete(`/admin/${type}/${id}`);
+      refresh();
+      if (selected?._id === id) setSelected(null);
+      alert("✅ Deleted successfully");
+    } catch(e) { alert("❌ Failed to delete"); }
+  };
+
+  const confirmDelete = (type, id, title) => {
+    setDeleteConfirm({ type, id, title });
+  };
+
+  const executeDelete = () => {
+    if (deleteConfirm) {
+      handleDelete(deleteConfirm.type, deleteConfirm.id);
+      setDeleteConfirm(null);
+    }
+  };
 
   // ── export functionality ─────────────────────────────────────
   const exportData = () => {
@@ -422,6 +444,7 @@ export default function AdminDashboard() {
                     <button style={S.rejectBtn}  onClick={() => handleReject(activeTab, item._id)}>❌ Reject</button>
                   </div>
                 )}
+                <button style={S.deleteBtn} onClick={(e) => { e.stopPropagation(); confirmDelete(activeTab === "movers" ? "movers" : activeTab.slice(0, -1), item._id, getTitle(item)); }}>🗑️</button>
               </div>
             </div>
           ))}
@@ -438,8 +461,27 @@ export default function AdminDashboard() {
           editMode={editMode} editData={editData} setEditData={setEditData}
           onEdit={() => openEdit(selected)} onSave={saveEdit} saving={saving}
           onCancelEdit={() => setEditMode(false)}
+          onDelete={confirmDelete}
           getImages={getImages} getTitle={getTitle} getOwner={getOwner} getContact={getContact}
         />
+      )}
+
+      {/* DELETE CONFIRMATION MODAL */}
+      {deleteConfirm && (
+        <div style={S.overlay} onClick={() => setDeleteConfirm(null)}>
+          <div style={S.confirmModal} onClick={e => e.stopPropagation()}>
+            <h3 style={S.confirmTitle}>⚠️ Confirm Delete</h3>
+            <p style={S.confirmText}>
+              Are you sure you want to delete <strong>{deleteConfirm.title}</strong>?
+              <br />
+              <span style={{ fontSize:12, color:"#ef4444" }}>This action cannot be undone.</span>
+            </p>
+            <div style={S.confirmBtns}>
+              <button style={S.cancelBtn} onClick={() => setDeleteConfirm(null)}>Cancel</button>
+              <button style={S.confirmDeleteBtn} onClick={executeDelete}>🗑️ Delete</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -447,7 +489,7 @@ export default function AdminDashboard() {
 
 // ── DETAIL MODAL ──────────────────────────────────────────────
 function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
-  editMode, editData, setEditData, onEdit, onSave, saving, onCancelEdit,
+  editMode, editData, setEditData, onEdit, onSave, saving, onCancelEdit, onDelete,
   getImages, getTitle, getOwner, getContact }) {
 
   const images = getImages(item);
@@ -533,6 +575,7 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
               {["properties","materials","tourism"].includes(tab) && tab !== "sold" && (
                 <button style={S.editBtn} onClick={onEdit}>✏️ Edit</button>
               )}
+              <button style={S.deleteBtn} onClick={() => onDelete(tab === "movers" ? "movers" : tab.slice(0, -1), item._id, item.title || item.name || item.businessName)}>🗑️ Delete</button>
               <button style={S.cancelBtn} onClick={onClose}>Close</button>
             </>
           )}
@@ -631,6 +674,7 @@ const S = {
   approveBtn:  { background:"#22c55e", color:"#fff", border:"none", padding:"7px 14px", borderRadius:7, fontWeight:700, cursor:"pointer", fontSize:12, transition:"all 0.2s" },
   rejectBtn:   { background:"rgba(239,68,68,0.1)", color:"#ef4444", border:"1px solid #ef4444", padding:"7px 14px", borderRadius:7, fontWeight:700, cursor:"pointer", fontSize:12, transition:"all 0.2s" },
   editBtn:     { background:"rgba(251,191,36,0.1)", color:"#fbbf24", border:"1px solid #fbbf24", padding:"7px 14px", borderRadius:7, fontWeight:700, cursor:"pointer", fontSize:12, transition:"all 0.2s" },
+  deleteBtn:   { background:"rgba(239,68,68,0.1)", color:"#ef4444", border:"1px solid #ef4444", padding:"6px 12px", borderRadius:7, fontWeight:700, cursor:"pointer", fontSize:12, transition:"all 0.2s" },
   saveBtn:     { background:"#fbbf24", color:"#1f2937", border:"none", padding:"10px 20px", borderRadius:8, fontWeight:800, cursor:"pointer", fontSize:13 },
   cancelBtn:   { background:"rgba(30,41,59,0.6)", color:"#94a3b8", border:"1px solid rgba(255,255,255,0.1)", padding:"10px 20px", borderRadius:8, fontWeight:700, cursor:"pointer", fontSize:13 },
   overlay:     { position:"fixed", inset:0, background:"rgba(0,0,0,0.8)", zIndex:1000, display:"flex", alignItems:"center", justifyContent:"center", padding:16, animation:"fadeIn 0.2s ease-out" },
@@ -658,6 +702,11 @@ const S = {
   configBox:   { background:"rgba(15,23,42,0.8)", borderRadius:16, padding:32, maxWidth:600, margin:"0 auto", border:"1px solid rgba(255,255,255,0.05)" },
   configTitle: { fontSize:20, fontWeight:800, color:"#fbbf24", marginBottom:20 },
   configMsg:   { padding:"10px 14px", borderRadius:8, border:"1px solid", fontSize:13, fontWeight:600, marginBottom:16 },
+  confirmModal:{ background:"#0f1729", borderRadius:16, border:"1px solid rgba(255,255,255,0.08)", padding:"32px", maxWidth:400, width:"100%", animation:"slideUp 0.3s ease-out", boxShadow:"0 25px 50px rgba(0,0,0,0.5)" },
+  confirmTitle:{ fontSize:18, fontWeight:800, color:"#ef4444", margin:"0 0 16px" },
+  confirmText: { fontSize:14, color:"#cbd5e1", lineHeight:1.6, marginBottom:24 },
+  confirmBtns: { display:"flex", gap:12, justifyContent:"flex-end" },
+  confirmDeleteBtn:{ background:"#ef4444", color:"#fff", border:"none", padding:"10px 20px", borderRadius:8, fontWeight:700, cursor:"pointer", fontSize:13, transition:"all 0.2s" },
 };
 
 const css = `
@@ -671,8 +720,10 @@ const css = `
   .approveBtn:hover { background: #16a34a; }
   .rejectBtn:hover { background: rgba(239,68,68,0.2); }
   .editBtn:hover { background: rgba(251,191,36,0.2); }
+  .deleteBtn:hover { background: rgba(239,68,68,0.2); }
   .exportBtn:hover { background: rgba(59,130,246,0.2); }
   .closeBtn:hover { background: rgba(239,68,68,0.2); }
+  .confirmDeleteBtn:hover { background: #dc2626; }
   .quickActionBtn:hover { background: rgba(251,191,36,0.1); border-color: #fbbf24; }
   @media (max-width: 768px) {
     .statsGrid { gridTemplateColumns: repeat(2, 1fr); }
