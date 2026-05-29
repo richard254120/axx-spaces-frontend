@@ -60,7 +60,7 @@ export default function Navbar() {
             <span style={styles.dropdownIcon}>🚛</span> Movers
           </Link>
           <Link to="/materials" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>🛍️</span> Merchants
+            <span style={styles.dropdownIcon}>🛍️</span> MarketPlace
           </Link>
           <Link to="/tourism" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>🏨</span> Tourism
