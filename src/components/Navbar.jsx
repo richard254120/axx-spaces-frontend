@@ -261,7 +261,7 @@ export default function Navbar() {
           Movers
         </Link>
         <Link to="/materials" style={styles.navLink} onClick={() => setMenuOpen(false)}>
-          Merchants
+          MarketPlace
         </Link>
         <Link to="/tourism" style={styles.navLink} onClick={() => setMenuOpen(false)}>
           Tourism
