@@ -229,7 +229,7 @@ export default function Navbar() {
               >
                 <span style={styles.dropdownIcon}>🏢</span> All Listings
               </Link>
-              
+
 
               {/* Account section — only shown when not logged in */}
               {!(token && user) && (
@@ -328,6 +328,7 @@ const styles = {
   logo: {
     height: "40px",
     width: "auto",
+    borderRadius: "50%",
   },
 
   titleSection: {

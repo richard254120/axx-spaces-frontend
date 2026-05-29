@@ -124,7 +124,7 @@ const styles = {
   },
   container: { width: "100%", maxWidth: "450px" },
   logoSection: { textAlign: "center", marginBottom: "30px" },
-  logo: { height: "70px", width: "auto" },
+  logo: { height: "70px", width: "auto", borderRadius: "50%" },
   formBox: {
     background: COLORS.bgLight,
     border: `1px solid ${COLORS.border}`,
