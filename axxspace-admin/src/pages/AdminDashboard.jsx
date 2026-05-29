@@ -18,6 +18,8 @@ export default function AdminDashboard() {
   const [allPending, setAllPending] = useState(null);
   const [allItems, setAllItems] = useState([]);
   const [stats, setStats] = useState(null);
+  const [viewStats, setViewStats] = useState(null);
+  const [topViewed, setTopViewed] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("properties");
   const [statusView, setStatusView] = useState("pending");   // pending | approved | rejected
@@ -39,11 +41,17 @@ export default function AdminDashboard() {
     loadStats();
     loadAllPending();
     loadMpesaConfig();
+    loadViewStats();
+    loadTopViewed();
   }, [user, navigate]);
 
   // ── reload items when tab or statusView changes ─────────────
   useEffect(() => {
-    if (activeTab !== "payment" && activeTab !== "sold") loadItems(activeTab, statusView);
+    if (activeTab !== "payment" && activeTab !== "sold") {
+      loadItems(activeTab, statusView);
+      loadViewStats(activeTab);
+      loadTopViewed(activeTab);
+    }
     else if (activeTab === "sold") loadItems("sold", "sold");
   }, [activeTab, statusView]);
 
@@ -51,6 +59,22 @@ export default function AdminDashboard() {
   const loadStats = async () => {
     try { const r = await API.get("/admin/stats"); setStats(r.data); }
     catch (e) { console.error(e); }
+  };
+
+  const loadViewStats = async (type = null) => {
+    try {
+      const params = type ? { type } : {};
+      const r = await API.get("/admin/view-stats", { params });
+      setViewStats(r.data);
+    } catch (e) { console.error(e); }
+  };
+
+  const loadTopViewed = async (type = null) => {
+    try {
+      const params = type ? { type, limit: 10 } : { limit: 10 };
+      const r = await API.get("/admin/top-viewed", { params });
+      setTopViewed(r.data);
+    } catch (e) { console.error(e); }
   };
 
   const loadAllPending = async () => {
@@ -266,6 +290,96 @@ export default function AdminDashboard() {
               </div>
             ))}
           </div>
+
+          {/* VIEW STATISTICS */}
+          {viewStats && (
+            <div style={S.chartContainer}>
+              <h3 style={S.chartTitle}>👁️ View Statistics by Category</h3>
+              <div style={S.viewStatsGrid}>
+                {viewStats.properties && viewStats.properties.length > 0 && (
+                  <div style={S.viewStatSection}>
+                    <h4 style={S.viewStatTitle}>🏠 Properties</h4>
+                    {viewStats.properties.map(stat => (
+                      <div key={stat._id} style={S.viewStatItem}>
+                        <span style={S.viewStatLabel}>{stat._id}</span>
+                        <span style={S.viewStatValue}>{stat.totalViews.toLocaleString()} views</span>
+                        <span style={S.viewStatMeta}>({stat.totalItems} items, avg {Math.round(stat.avgViews)} views)</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {viewStats.materials && viewStats.materials.length > 0 && (
+                  <div style={S.viewStatSection}>
+                    <h4 style={S.viewStatTitle}>🛍️ Materials</h4>
+                    {viewStats.materials.map(stat => (
+                      <div key={stat._id} style={S.viewStatItem}>
+                        <span style={S.viewStatLabel}>{stat._id}</span>
+                        <span style={S.viewStatValue}>{stat.totalViews.toLocaleString()} views</span>
+                        <span style={S.viewStatMeta}>({stat.totalItems} items, avg {Math.round(stat.avgViews)} views)</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {viewStats.tourism && viewStats.tourism.length > 0 && (
+                  <div style={S.viewStatSection}>
+                    <h4 style={S.viewStatTitle}>🏨 Tourism</h4>
+                    {viewStats.tourism.map(stat => (
+                      <div key={stat._id} style={S.viewStatItem}>
+                        <span style={S.viewStatLabel}>{stat._id}</span>
+                        <span style={S.viewStatValue}>{stat.totalViews.toLocaleString()} views</span>
+                        <span style={S.viewStatMeta}>({stat.totalItems} items, avg {Math.round(stat.avgViews)} views)</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* TOP VIEWED ITEMS */}
+          {topViewed && (
+            <div style={S.chartContainer}>
+              <h3 style={S.chartTitle}>🔥 Top Viewed Items</h3>
+              <div style={S.topViewedGrid}>
+                {topViewed.properties && topViewed.properties.length > 0 && (
+                  <div style={S.viewStatSection}>
+                    <h4 style={S.viewStatTitle}>🏠 Properties</h4>
+                    {topViewed.properties.map(item => (
+                      <div key={item._id} style={S.topViewItem}>
+                        <span style={S.topViewTitle}>{item.title}</span>
+                        <span style={S.topViewMeta}>{item.location} · {item.propertyType}</span>
+                        <span style={S.topViewValue}>{item.views.toLocaleString()} views</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {topViewed.materials && topViewed.materials.length > 0 && (
+                  <div style={S.viewStatSection}>
+                    <h4 style={S.viewStatTitle}>🛍️ Materials</h4>
+                    {topViewed.materials.map(item => (
+                      <div key={item._id} style={S.topViewItem}>
+                        <span style={S.topViewTitle}>{item.title}</span>
+                        <span style={S.topViewMeta}>{item.category} · {item.condition}</span>
+                        <span style={S.topViewValue}>{item.views.toLocaleString()} views</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {topViewed.tourism && topViewed.tourism.length > 0 && (
+                  <div style={S.viewStatSection}>
+                    <h4 style={S.viewStatTitle}>🏨 Tourism</h4>
+                    {topViewed.tourism.map(item => (
+                      <div key={item._id} style={S.topViewItem}>
+                        <span style={S.topViewTitle}>{item.title}</span>
+                        <span style={S.topViewMeta}>{item.location} · {item.category}</span>
+                        <span style={S.topViewValue}>{item.views.toLocaleString()} views</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* ACTIVITY CHART */}
           <div style={S.chartContainer}>
