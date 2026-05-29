@@ -101,6 +101,15 @@ export default function TourismDetailPage() {
   }
 
   const roomPrice = roomTypes[selectedRoom]?.price ?? property.price;
+  const { user, token } = useAuth();
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentPhone, setPaymentPhone] = useState("");
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentError, setPaymentError] = useState("");
+  const [paymentSuccess, setPaymentSuccess] = useState("");
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
 
   // If property has its own booking URL, redirect there; otherwise handle internally
   const handleBook = () => {
@@ -108,6 +117,57 @@ export default function TourismDetailPage() {
       window.open(property.bookingUrl, "_blank", "noopener,noreferrer");
     } else {
       alert("Contact the property manager to book.");
+    }
+  };
+
+  const handleBookWithMpesa = () => {
+    if (!user) {
+      alert("Please log in to book this tourism listing");
+      return;
+    }
+    setPaymentAmount(roomPrice.toString());
+    setPaymentPhone(user.phone || "");
+    setShowPaymentModal(true);
+  };
+
+  const handlePaymentSubmit = async (e) => {
+    e.preventDefault();
+    setPaymentLoading(true);
+    setPaymentError("");
+    setPaymentSuccess("");
+
+    try {
+      const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
+      const response = await fetch(`${API_BASE}/payment/book-tourism`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          tourismId: property.id,
+          phone: paymentPhone,
+          amount: paymentAmount,
+          checkIn,
+          checkOut,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setPaymentSuccess("✅ M-Pesa prompt sent! Check your phone to complete payment.");
+        setTimeout(() => {
+          setShowPaymentModal(false);
+          setPaymentSuccess("");
+        }, 3000);
+      } else {
+        setPaymentError(data.error || "❌ Payment failed. Please try again.");
+      }
+    } catch (err) {
+      setPaymentError("❌ Payment failed. Please try again.");
+    } finally {
+      setPaymentLoading(false);
     }
   };
 
@@ -142,9 +202,14 @@ export default function TourismDetailPage() {
         </div>
       )}
 
-      <button style={{ ...s.bookNowBtn, background: property.color }} onClick={handleBook}>
-        {property.bookingUrl ? "🔗 Book on Official Site →" : "📞 Request Booking"}
-      </button>
+      <div style={s.buttonGroup}>
+        <button style={{ ...s.bookNowBtn, background: property.color }} onClick={handleBook}>
+          {property.bookingUrl ? "🔗 Book on Official Site →" : "📞 Request Booking"}
+        </button>
+        <button style={s.mpesaBookBtn} onClick={handleBookWithMpesa}>
+          📱 Pay with M-Pesa
+        </button>
+      </div>
       {property.bookingUrl && <div style={s.bookNote}>You'll be redirected to {new URL(property.bookingUrl).hostname}</div>}
     </div>
   );
@@ -323,6 +388,84 @@ export default function TourismDetailPage() {
           </div>
         </div>
       )}
+
+      {/* PAYMENT MODAL */}
+      {showPaymentModal && (
+        <div style={s.paymentModal} onClick={() => setShowPaymentModal(false)}>
+          <div style={s.paymentModalContent} onClick={(e) => e.stopPropagation()}>
+            <h3 style={s.paymentTitle}>💳 Book Tourism - M-Pesa Payment</h3>
+            <p style={s.paymentSubtitle}>
+              {property.name} - KES {paymentAmount}
+            </p>
+            {paymentSuccess && (
+              <div style={s.paymentSuccess}>{paymentSuccess}</div>
+            )}
+            {paymentError && (
+              <div style={s.paymentError}>{paymentError}</div>
+            )}
+            {!paymentSuccess && (
+              <form onSubmit={handlePaymentSubmit} style={s.paymentForm}>
+                <div style={s.paymentField}>
+                  <label style={s.paymentLabel}>M-Pesa Phone Number</label>
+                  <input
+                    type="tel"
+                    value={paymentPhone}
+                    onChange={(e) => setPaymentPhone(e.target.value)}
+                    placeholder="2547XXXXXXXX"
+                    style={s.paymentInput}
+                    required
+                  />
+                </div>
+                <div style={s.paymentField}>
+                  <label style={s.paymentLabel}>Amount (KES)</label>
+                  <input
+                    type="number"
+                    value={paymentAmount}
+                    onChange={(e) => setPaymentAmount(e.target.value)}
+                    placeholder="Enter amount"
+                    style={s.paymentInput}
+                    required
+                  />
+                </div>
+                <div style={s.paymentField}>
+                  <label style={s.paymentLabel}>Check-in Date</label>
+                  <input
+                    type="date"
+                    value={checkIn}
+                    onChange={(e) => setCheckIn(e.target.value)}
+                    style={s.paymentInput}
+                    required
+                  />
+                </div>
+                <div style={s.paymentField}>
+                  <label style={s.paymentLabel}>Check-out Date</label>
+                  <input
+                    type="date"
+                    value={checkOut}
+                    onChange={(e) => setCheckOut(e.target.value)}
+                    style={s.paymentInput}
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  style={s.paymentButton}
+                  disabled={paymentLoading}
+                >
+                  {paymentLoading ? "Processing..." : "📱 Pay with M-Pesa"}
+                </button>
+                <button
+                  type="button"
+                  style={s.paymentCancelButton}
+                  onClick={() => setShowPaymentModal(false)}
+                >
+                  Cancel
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -380,12 +523,27 @@ const s = {
 
   bookNowBtn: { width: "100%", color: "white", border: "none", borderRadius: "10px", padding: "15px", fontSize: "15px", fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginBottom: "8px" },
   bookNote: { textAlign: "center", fontSize: "11px", color: "#9ca3af" },
+  buttonGroup: { display: "flex", gap: "8px" },
+  mpesaBookBtn: { flex: 1, background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "white", border: "none", borderRadius: "10px", padding: "15px", fontSize: "15px", fontWeight: 800, cursor: "pointer", fontFamily: "inherit" },
 
   sideContact: { background: "white", borderRadius: "14px", padding: "18px", border: "1px solid #e5e7eb" },
 
   overlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "flex-end" },
   sheet: { background: "white", borderRadius: "20px 20px 0 0", padding: "20px 20px 32px", width: "100%", maxHeight: "85vh", overflowY: "auto" },
   sheetHandle: { width: "40px", height: "4px", background: "#e5e7eb", borderRadius: "2px", margin: "0 auto 16px" },
+
+  paymentModal: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.8)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 2000, padding: "20px" },
+  paymentModalContent: { background: "white", borderRadius: "12px", maxWidth: "400px", width: "100%", padding: "24px", border: "1px solid #e5e7eb", position: "relative" },
+  paymentTitle: { fontSize: "1.2rem", margin: "0 0 12px 0", color: "#1f2937", textAlign: "center" },
+  paymentSubtitle: { fontSize: "0.9rem", color: "#6b7280", textAlign: "center", marginBottom: "20px" },
+  paymentForm: { display: "flex", flexDirection: "column", gap: "16px" },
+  paymentField: { display: "flex", flexDirection: "column", gap: "6px" },
+  paymentLabel: { fontSize: "0.85rem", color: "#1f2937", fontWeight: 600 },
+  paymentInput: { padding: "10px 12px", border: "1px solid #e5e7eb", borderRadius: "6px", background: "#f9fafb", color: "#1f2937", fontSize: "0.95rem", outline: "none" },
+  paymentButton: { padding: "12px 16px", background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "white", border: "none", borderRadius: "6px", fontWeight: 700, cursor: "pointer", fontSize: "0.95rem", transition: "all 0.3s ease" },
+  paymentCancelButton: { padding: "12px 16px", background: "transparent", color: "#6b7280", border: "1px solid #e5e7eb", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.95rem", transition: "all 0.3s ease" },
+  paymentSuccess: { background: "rgba(34, 197, 94, 0.15)", color: "#86efac", padding: "12px", borderRadius: "6px", marginBottom: "16px", textAlign: "center", fontSize: "0.9rem", border: "1px solid rgba(34, 197, 94, 0.3)" },
+  paymentError: { background: "rgba(239, 68, 68, 0.15)", color: "#fca5a5", padding: "12px", borderRadius: "6px", marginBottom: "16px", textAlign: "center", fontSize: "0.9rem", border: "1px solid rgba(239, 68, 68, 0.3)" },
 };
 
 const css = `
