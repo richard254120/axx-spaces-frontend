@@ -29,6 +29,7 @@ const COUNTIES = [
 
 export default function MaterialsMarketplace() {
   const navigate = useNavigate();
+  const { user, token } = useAuth();
 
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -44,6 +45,13 @@ export default function MaterialsMarketplace() {
   });
 
   const [showFilters, setShowFilters] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedMaterial, setSelectedMaterial] = useState(null);
+  const [paymentPhone, setPaymentPhone] = useState("");
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentError, setPaymentError] = useState("");
+  const [paymentSuccess, setPaymentSuccess] = useState("");
 
   useEffect(() => {
     fetchMaterials();
@@ -98,6 +106,55 @@ export default function MaterialsMarketplace() {
 
   const handleInquiry = (materialId) => {
     navigate(`/materials/${materialId}/inquire`);
+  };
+
+  const handlePurchaseMaterial = (material) => {
+    if (!user) {
+      alert("Please log in to purchase this material");
+      return;
+    }
+    setSelectedMaterial(material);
+    setPaymentAmount(material.price?.toString() || "");
+    setPaymentPhone(user.phone || "");
+    setShowPaymentModal(true);
+  };
+
+  const handlePaymentSubmit = async (e) => {
+    e.preventDefault();
+    setPaymentLoading(true);
+    setPaymentError("");
+    setPaymentSuccess("");
+
+    try {
+      const response = await fetch(`${API_BASE}/payment/purchase-material`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          materialId: selectedMaterial._id,
+          phone: paymentPhone,
+          amount: paymentAmount,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setPaymentSuccess("✅ M-Pesa prompt sent! Check your phone to complete payment.");
+        setTimeout(() => {
+          setShowPaymentModal(false);
+          setPaymentSuccess("");
+        }, 3000);
+      } else {
+        setPaymentError(data.error || "❌ Payment failed. Please try again.");
+      }
+    } catch (err) {
+      setPaymentError("❌ Payment failed. Please try again.");
+    } finally {
+      setPaymentLoading(false);
+    }
   };
 
   return (
@@ -298,12 +355,20 @@ export default function MaterialsMarketplace() {
                       <span style={styles.price}>
                         KSh {Number(material.price).toLocaleString()}
                       </span>
-                      <button
-                        onClick={() => handleInquiry(material._id)}
-                        style={styles.inquireBtn}
-                      >
-                        💬 Inquire
-                      </button>
+                      <div style={styles.buttonGroup}>
+                        <button
+                          onClick={() => handleInquiry(material._id)}
+                          style={styles.inquireBtn}
+                        >
+                          💬 Inquire
+                        </button>
+                        <button
+                          onClick={() => handlePurchaseMaterial(material)}
+                          style={styles.purchaseBtn}
+                        >
+                          🛒 Buy Now
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -328,6 +393,64 @@ export default function MaterialsMarketplace() {
           </button>
         </div>
       </section>
+
+      {/* PAYMENT MODAL */}
+      {showPaymentModal && selectedMaterial && (
+        <div style={styles.paymentModal} onClick={() => setShowPaymentModal(false)}>
+          <div style={styles.paymentModalContent} onClick={(e) => e.stopPropagation()}>
+            <h3 style={styles.paymentTitle}>💳 Purchase Material - M-Pesa Payment</h3>
+            <p style={styles.paymentSubtitle}>
+              {selectedMaterial.title} - KES {paymentAmount}
+            </p>
+            {paymentSuccess && (
+              <div style={styles.paymentSuccess}>{paymentSuccess}</div>
+            )}
+            {paymentError && (
+              <div style={styles.paymentError}>{paymentError}</div>
+            )}
+            {!paymentSuccess && (
+              <form onSubmit={handlePaymentSubmit} style={styles.paymentForm}>
+                <div style={styles.paymentField}>
+                  <label style={styles.paymentLabel}>M-Pesa Phone Number</label>
+                  <input
+                    type="tel"
+                    value={paymentPhone}
+                    onChange={(e) => setPaymentPhone(e.target.value)}
+                    placeholder="2547XXXXXXXX"
+                    style={styles.paymentInput}
+                    required
+                  />
+                </div>
+                <div style={styles.paymentField}>
+                  <label style={styles.paymentLabel}>Amount (KES)</label>
+                  <input
+                    type="number"
+                    value={paymentAmount}
+                    onChange={(e) => setPaymentAmount(e.target.value)}
+                    placeholder="Enter amount"
+                    style={styles.paymentInput}
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  style={styles.paymentButton}
+                  disabled={paymentLoading}
+                >
+                  {paymentLoading ? "Processing..." : "📱 Pay with M-Pesa"}
+                </button>
+                <button
+                  type="button"
+                  style={styles.paymentCancelButton}
+                  onClick={() => setShowPaymentModal(false)}
+                >
+                  Cancel
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -679,6 +802,121 @@ const styles = {
     fontWeight: 700,
     cursor: "pointer",
     transition: "all 0.2s",
+  },
+  buttonGroup: {
+    display: "flex",
+    gap: "8px",
+  },
+  purchaseBtn: {
+    padding: "10px 20px",
+    background: `linear-gradient(135deg, #22c55e 0%, #16a34a 100%)`,
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: 700,
+    cursor: "pointer",
+    transition: "all 0.2s",
+  },
+  paymentModal: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: "rgba(0,0,0,0.8)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 2000,
+    padding: "20px",
+  },
+  paymentModalContent: {
+    background: `linear-gradient(135deg, ${COLORS.bgDark} 0%, ${COLORS.bgDarker} 100%)`,
+    borderRadius: "12px",
+    maxWidth: "400px",
+    width: "100%",
+    padding: "24px",
+    border: `1px solid ${COLORS.border}`,
+    position: "relative",
+  },
+  paymentTitle: {
+    fontSize: "1.2rem",
+    margin: "0 0 12px 0",
+    color: COLORS.primary,
+    textAlign: "center",
+  },
+  paymentSubtitle: {
+    fontSize: "0.9rem",
+    color: COLORS.textMutedLight,
+    textAlign: "center",
+    marginBottom: "20px",
+  },
+  paymentForm: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "16px",
+  },
+  paymentField: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "6px",
+  },
+  paymentLabel: {
+    fontSize: "0.85rem",
+    color: COLORS.textLight,
+    fontWeight: 600,
+  },
+  paymentInput: {
+    padding: "10px 12px",
+    border: `1px solid ${COLORS.border}`,
+    borderRadius: "6px",
+    background: COLORS.bgDarker,
+    color: COLORS.textLight,
+    fontSize: "0.95rem",
+    outline: "none",
+  },
+  paymentButton: {
+    padding: "12px 16px",
+    background: `linear-gradient(135deg, #22c55e 0%, #16a34a 100%)`,
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    fontWeight: 700,
+    cursor: "pointer",
+    fontSize: "0.95rem",
+    transition: "all 0.3s ease",
+  },
+  paymentCancelButton: {
+    padding: "12px 16px",
+    background: "transparent",
+    color: COLORS.textMutedLight,
+    border: `1px solid ${COLORS.border}`,
+    borderRadius: "6px",
+    fontWeight: 600,
+    cursor: "pointer",
+    fontSize: "0.95rem",
+    transition: "all 0.3s ease",
+  },
+  paymentSuccess: {
+    background: "rgba(34, 197, 94, 0.15)",
+    color: "#86efac",
+    padding: "12px",
+    borderRadius: "6px",
+    marginBottom: "16px",
+    textAlign: "center",
+    fontSize: "0.9rem",
+    border: "1px solid rgba(34, 197, 94, 0.3)",
+  },
+  paymentError: {
+    background: "rgba(239, 68, 68, 0.15)",
+    color: "#fca5a5",
+    padding: "12px",
+    borderRadius: "6px",
+    marginBottom: "16px",
+    textAlign: "center",
+    fontSize: "0.9rem",
+    border: "1px solid rgba(239, 68, 68, 0.3)",
   },
 
   /* CTA Section */

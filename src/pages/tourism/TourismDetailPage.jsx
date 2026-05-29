@@ -8,6 +8,7 @@ import {
   TOURISM_FONT_CSS,
   tourismTheme,
 } from "../../features/tourism";
+import { useAuth } from "../../context/AuthContext";
 
 const properties = {
   1: {

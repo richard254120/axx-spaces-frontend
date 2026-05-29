@@ -1,13 +1,13 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 
 // ── tiny helpers ──────────────────────────────────────────────
-const TABS = ["properties", "materials", "tourism", "movers", "sellers", "sold", "payment"];
+const TABS = ["properties", "materials", "tourism", "movers", "sellers", "sold", "payment", "boosts"];
 const TAB_LABELS = {
   properties: "🏠 Properties", materials: "🛍️ Materials", tourism: "🏨 Tourism",
-  movers: "🚛 Movers", sellers: "📋 Sellers", sold: "💰 Sold", payment: "💳 Payment"
+  movers: "🚛 Movers", sellers: "📋 Sellers", sold: "💰 Sold", payment: "💳 Payment", boosts: "🚀 Boosts"
 };
 const STATUS_VIEWS = ["pending", "approved", "rejected"];
 
@@ -22,14 +22,22 @@ export default function AdminDashboard() {
   const [topViewed, setTopViewed] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("properties");
-  const [statusView, setStatusView] = useState("pending");   // pending | approved | rejected
-  const [selected, setSelected] = useState(null);        // item open in modal
+  const [statusView, setStatusView] = useState("pending");
+  const [selected, setSelected] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState({});
   const [saving, setSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
-  const [deleteConfirm, setDeleteConfirm] = useState(null); // { type, id, title }
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+
+  // ── BOOST / PAYMENT NOTIFICATION STATE ──────────────────────
+  const [pendingBoosts, setPendingBoosts] = useState([]);
+  const [allBoosts, setAllBoosts] = useState([]);
+  const [showNotifPanel, setShowNotifPanel] = useState(false);
+  const [boostLoading, setBoostLoading] = useState(false);
+  const [boostMessage, setBoostMessage] = useState("");
+  const notifRef = useRef(null);
 
   const [mpesaConfig, setMpesaConfig] = useState({ mpesa_shortcode: "", mpesa_passkey: "", mpesa_consumer_key: "", mpesa_consumer_secret: "" });
   const [configSaving, setConfigSaving] = useState(false);
@@ -43,16 +51,40 @@ export default function AdminDashboard() {
     loadMpesaConfig();
     loadViewStats();
     loadTopViewed();
+    loadPendingBoosts();
+    loadAllBoosts();
   }, [user, navigate]);
+
+  // ── poll for new boost payments every 30 seconds ────────────
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadPendingBoosts();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // ── close notif panel on outside click ─────────────────────
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setShowNotifPanel(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
 
   // ── reload items when tab or statusView changes ─────────────
   useEffect(() => {
-    if (activeTab !== "payment" && activeTab !== "sold") {
+    if (activeTab !== "payment" && activeTab !== "sold" && activeTab !== "boosts") {
       loadItems(activeTab, statusView);
       loadViewStats(activeTab);
       loadTopViewed(activeTab);
+    } else if (activeTab === "sold") {
+      loadItems("sold", "sold");
+    } else if (activeTab === "boosts") {
+      loadAllBoosts();
     }
-    else if (activeTab === "sold") loadItems("sold", "sold");
   }, [activeTab, statusView]);
 
   // ── data loaders ───────────────────────────────────────────
@@ -107,7 +139,52 @@ export default function AdminDashboard() {
     } catch (e) { console.error(e); }
   };
 
-  // ── approve / reject ───────────────────────────────────────
+  // ── BOOST LOADERS ──────────────────────────────────────────
+  const loadPendingBoosts = async () => {
+    try {
+      const r = await API.get("/boosts/pending");
+      setPendingBoosts(Array.isArray(r.data) ? r.data : []);
+    } catch (e) { console.error("boost pending load:", e); }
+  };
+
+  const loadAllBoosts = async () => {
+    try {
+      setBoostLoading(true);
+      const r = await API.get("/boosts/all");
+      setAllBoosts(Array.isArray(r.data) ? r.data : []);
+    } catch (e) { console.error("boost all load:", e); }
+    finally { setBoostLoading(false); }
+  };
+
+  // ── APPROVE BOOST ──────────────────────────────────────────
+  // This marks the boost as confirmed, sets listing.isFeatured = true,
+  // and sets listing.featuredPriority so it sorts to the top.
+  const handleApproveBoost = async (boostId) => {
+    try {
+      await API.patch(`/boosts/${boostId}/approve`);
+      setBoostMessage("✅ Boost approved! Listing is now featured.");
+      loadPendingBoosts();
+      loadAllBoosts();
+      loadStats();
+    } catch (e) {
+      setBoostMessage("❌ Failed to approve boost: " + (e.response?.data?.error || e.message));
+    }
+    setTimeout(() => setBoostMessage(""), 4000);
+  };
+
+  const handleRejectBoost = async (boostId) => {
+    try {
+      await API.patch(`/boosts/${boostId}/reject`);
+      setBoostMessage("✅ Boost rejected and payment refund initiated.");
+      loadPendingBoosts();
+      loadAllBoosts();
+    } catch (e) {
+      setBoostMessage("❌ Failed to reject boost: " + (e.response?.data?.error || e.message));
+    }
+    setTimeout(() => setBoostMessage(""), 4000);
+  };
+
+  // ── approve / reject listings ──────────────────────────────
   const handleApprove = async (type, id) => {
     try {
       await API.patch(`/admin/${type}/${id}/approve`);
@@ -128,7 +205,6 @@ export default function AdminDashboard() {
 
   const refresh = () => { loadStats(); loadAllPending(); loadItems(activeTab, statusView); };
 
-  // ── delete functionality ─────────────────────────────────────
   const handleDelete = async (type, id) => {
     try {
       await API.delete(`/admin/${type}/${id}`);
@@ -136,51 +212,34 @@ export default function AdminDashboard() {
       if (selected?._id === id) setSelected(null);
       alert("✅ Deleted successfully");
     } catch (e) {
-      console.error("Delete error:", e);
       alert("❌ Failed to delete: " + (e.response?.data?.error || e.message));
     }
   };
 
-  const confirmDelete = (type, id, title) => {
-    setDeleteConfirm({ type, id, title });
-  };
-
+  const confirmDelete = (type, id, title) => setDeleteConfirm({ type, id, title });
   const executeDelete = () => {
-    if (deleteConfirm) {
-      handleDelete(deleteConfirm.type, deleteConfirm.id);
-      setDeleteConfirm(null);
-    }
+    if (deleteConfirm) { handleDelete(deleteConfirm.type, deleteConfirm.id); setDeleteConfirm(null); }
   };
 
-  // ── export functionality ─────────────────────────────────────
   const exportData = () => {
+    if (!filteredItems.length) return;
     const dataToExport = filteredItems.map(item => ({
-      title: getTitle(item),
-      category: item.category || item.county || "",
-      owner: getOwner(item),
-      contact: getContact(item),
-      price: getPrice(item),
+      title: getTitle(item), category: item.category || item.county || "",
+      owner: getOwner(item), contact: getContact(item), price: getPrice(item),
       status: item.status || (item.isApproved ? "approved" : "pending"),
       createdAt: item.createdAt || new Date().toISOString()
     }));
-
-    const csv = [
-      Object.keys(dataToExport[0]).join(","),
-      ...dataToExport.map(row => Object.values(row).map(val => `"${val}"`).join(","))
+    const csv = [Object.keys(dataToExport[0]).join(","),
+    ...dataToExport.map(row => Object.values(row).map(val => `"${val}"`).join(","))
     ].join("\n");
-
     const blob = new Blob([csv], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url;
-    a.download = `${activeTab}_${statusView}_${new Date().toISOString().split("T")[0]}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
+    a.href = url; a.download = `${activeTab}_${statusView}_${new Date().toISOString().split("T")[0]}.csv`;
+    a.click(); window.URL.revokeObjectURL(url);
   };
 
-  // ── edit / save ────────────────────────────────────────────
   const openEdit = (item) => { setEditData({ ...item }); setEditMode(true); };
-
   const saveEdit = async () => {
     setSaving(true);
     try {
@@ -188,15 +247,12 @@ export default function AdminDashboard() {
       const ep = endpointMap[activeTab];
       if (!ep) { alert("Edit not supported for this type."); setSaving(false); return; }
       await API.patch(`/${ep}/${editData._id}`, editData);
-      refresh();
-      setEditMode(false);
-      setSelected({ ...selected, ...editData });
+      refresh(); setEditMode(false); setSelected({ ...selected, ...editData });
       alert("✅ Saved successfully");
     } catch (e) { alert("❌ Failed to save: " + (e.response?.data?.error || e.message)); }
     finally { setSaving(false); }
   };
 
-  // ── mpesa save ─────────────────────────────────────────────
   const handleSaveMpesaConfig = async () => {
     setConfigSaving(true);
     try {
@@ -211,7 +267,6 @@ export default function AdminDashboard() {
     finally { setConfigSaving(false); setTimeout(() => setConfigMessage(""), 3000); }
   };
 
-  // ── pending counts for tab badge ───────────────────────────
   const pendingCount = (tab) => {
     if (!allPending) return "";
     const map = { properties: "properties", materials: "materials", tourism: "tourism", movers: "movers", sellers: "sellers" };
@@ -219,26 +274,18 @@ export default function AdminDashboard() {
     return key && allPending[key]?.length ? ` (${allPending[key].length})` : "";
   };
 
-  // ── items to show based on view ────────────────────────────
-  const displayItems = statusView === "pending"
-    ? (allPending?.[activeTab] || [])
-    : allItems;
-
-  // ── filter items based on search and category ──────────────
+  const displayItems = statusView === "pending" ? (allPending?.[activeTab] || []) : allItems;
   const filteredItems = displayItems.filter(item => {
     const matchesSearch = searchQuery === "" ||
       getTitle(item).toLowerCase().includes(searchQuery.toLowerCase()) ||
       getOwner(item).toLowerCase().includes(searchQuery.toLowerCase()) ||
       getContact(item).toLowerCase().includes(searchQuery.toLowerCase());
-
     const matchesCategory = filterCategory === "" ||
       (item.category && item.category.toLowerCase() === filterCategory.toLowerCase()) ||
       (item.county && item.county.toLowerCase() === filterCategory.toLowerCase());
-
     return matchesSearch && matchesCategory;
   });
 
-  // ── field helpers ──────────────────────────────────────────
   const getTitle = (item) => item.title || item.name || item.businessName || "—";
   const getSub = (item) => {
     if (activeTab === "sold") {
@@ -256,7 +303,8 @@ export default function AdminDashboard() {
     return Array.isArray(imgs) ? imgs.filter(Boolean) : [];
   };
 
-  // ── render ─────────────────────────────────────────────────
+  const hasPendingBoosts = pendingBoosts.length > 0;
+
   return (
     <div style={S.page}>
       <style>{css}</style>
@@ -267,9 +315,98 @@ export default function AdminDashboard() {
           <h1 style={S.logo}>🛡️ Axxspace Admin</h1>
           <p style={S.logoSub}>Welcome back, {user?.name?.split(" ")[0]}</p>
         </div>
-        <button style={S.logoutBtn} onClick={() => { localStorage.removeItem("token"); localStorage.removeItem("user"); navigate("/login"); }}>
-          🚪 Logout
-        </button>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          {/* 🔔 NOTIFICATION BELL */}
+          <div ref={notifRef} style={{ position: "relative" }}>
+            <button
+              style={S.notifBtn}
+              onClick={() => setShowNotifPanel(!showNotifPanel)}
+              className={hasPendingBoosts ? "notif-btn-active" : ""}
+              title={hasPendingBoosts ? `${pendingBoosts.length} payment(s) awaiting confirmation` : "No pending payments"}
+            >
+              🔔
+              {hasPendingBoosts && (
+                <span style={S.notifBadge} className="notif-badge-blink">
+                  {pendingBoosts.length}
+                </span>
+              )}
+            </button>
+
+            {/* NOTIFICATION DROPDOWN PANEL */}
+            {showNotifPanel && (
+              <div style={S.notifPanel} className="notif-panel-slide">
+                <div style={S.notifPanelHeader}>
+                  <span style={S.notifPanelTitle}>💳 Payment Notifications</span>
+                  <button style={S.notifCloseBtn} onClick={() => setShowNotifPanel(false)}>✕</button>
+                </div>
+
+                {hasPendingBoosts ? (
+                  <div style={S.notifList}>
+                    {pendingBoosts.map(boost => (
+                      <div key={boost._id} style={S.notifItem} className="notif-item-pulse">
+                        <div style={S.notifItemHeader}>
+                          <span style={S.notifRedDot} className="red-dot-blink" />
+                          <span style={S.notifItemTitle}>
+                            {boost.listing?.title || boost.listingTitle || "Listing"}
+                          </span>
+                        </div>
+                        <div style={S.notifItemMeta}>
+                          <span>👤 {boost.user?.name || boost.userName || "User"}</span>
+                          <span>📞 {boost.user?.phone || boost.userPhone || "—"}</span>
+                        </div>
+                        <div style={S.notifItemMeta}>
+                          <span style={{ color: "#fbbf24", fontWeight: 700 }}>
+                            KES {boost.amount?.toLocaleString() || "—"}
+                          </span>
+                          <span style={{ color: "#94a3b8", fontSize: 11 }}>
+                            {boost.mpesaRef || boost.transactionRef || "Pending verification"}
+                          </span>
+                        </div>
+                        <div style={S.notifItemMeta}>
+                          <span style={{ color: "#94a3b8", fontSize: 11 }}>
+                            {boost.plan === "weekly" ? "📅 7-day boost" : boost.plan === "monthly" ? "📅 30-day boost" : "📅 Boost"}
+                          </span>
+                          <span style={{ color: "#64748b", fontSize: 10 }}>
+                            {new Date(boost.createdAt).toLocaleString()}
+                          </span>
+                        </div>
+                        <div style={S.notifItemBtns}>
+                          <button
+                            style={S.notifApproveBtn}
+                            onClick={() => { handleApproveBoost(boost._id); setShowNotifPanel(false); setActiveTab("boosts"); }}
+                          >
+                            ✅ Confirm & Boost
+                          </button>
+                          <button
+                            style={S.notifRejectBtn}
+                            onClick={() => { handleRejectBoost(boost._id); }}
+                          >
+                            ❌ Reject
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={S.notifEmpty}>
+                    <p>✅ No pending payment confirmations</p>
+                  </div>
+                )}
+
+                <div style={S.notifFooter}>
+                  <button style={S.notifViewAllBtn} onClick={() => { setActiveTab("boosts"); setShowNotifPanel(false); }}>
+                    View All Boosts →
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <button style={S.logoutBtn} onClick={() => { localStorage.removeItem("token"); localStorage.removeItem("user"); navigate("/login"); }}>
+            🚪 Logout
+          </button>
+        </div>
       </div>
 
       {/* STATS */}
@@ -282,11 +419,15 @@ export default function AdminDashboard() {
               { label: "🚛 Movers", total: stats.movers.total, pending: stats.movers.pending, color: "#f59e0b" },
               { label: "🏨 Tourism", total: stats.tourism.total, pending: stats.tourism.pending, color: "#8b5cf6" },
               { label: "📋 Sellers", total: stats.sellers.total, pending: stats.sellers.pending, color: "#ec4899" },
+              { label: "🚀 Active Boosts", total: stats.boosts?.active || 0, pending: pendingBoosts.length, color: "#fbbf24", isPulse: pendingBoosts.length > 0 },
             ].map(s => (
-              <div key={s.label} style={{ ...S.statCard, borderTop: `3px solid ${s.color}` }}>
+              <div key={s.label} style={{ ...S.statCard, borderTop: `3px solid ${s.color}`, ...(s.isPulse && pendingBoosts.length > 0 ? { boxShadow: "0 0 0 2px rgba(239,68,68,0.4)" } : {}) }}
+                className={s.isPulse && pendingBoosts.length > 0 ? "stat-card-pulse" : ""}>
                 <p style={S.statLabel}>{s.label}</p>
-                <p style={S.statVal}>{s.total}</p>
-                {s.pending > 0 && <p style={S.statPending}>{s.pending} pending</p>}
+                <p style={{ ...S.statVal, color: s.color }}>{s.total}</p>
+                {s.pending > 0 && <p style={{ ...S.statPending, color: s.isPulse ? "#ef4444" : "#ef4444" }}>
+                  {s.isPulse ? `🔴 ${s.pending} awaiting payment confirm` : `${s.pending} pending`}
+                </p>}
               </div>
             ))}
           </div>
@@ -336,7 +477,7 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* TOP VIEWED ITEMS */}
+          {/* TOP VIEWED */}
           {topViewed && (
             <div style={S.chartContainer}>
               <h3 style={S.chartTitle}>🔥 Top Viewed Items</h3>
@@ -400,9 +541,7 @@ export default function AdminDashboard() {
                     <div style={S.chartLabel}>{s.label}</div>
                     <div style={S.chartBarTrack}>
                       <div style={{ ...S.chartBarFill, width: `${barWidth}%`, background: s.color }} />
-                      {s.pending > 0 && (
-                        <div style={{ ...S.chartBarPending, width: `${pendingWidth}%` }} />
-                      )}
+                      {s.pending > 0 && <div style={{ ...S.chartBarPending, width: `${pendingWidth}%` }} />}
                     </div>
                     <div style={S.chartValues}>
                       <span style={S.chartTotal}>{s.total}</span>
@@ -418,22 +557,29 @@ export default function AdminDashboard() {
           <div style={S.quickActions}>
             <h3 style={S.quickActionsTitle}>⚡ Quick Actions</h3>
             <div style={S.quickActionsGrid}>
-              <button style={S.quickActionBtn} onClick={() => { setActiveTab("properties"); setStatusView("pending"); }}>
+              <button style={S.quickActionBtn} className="quickActionBtn" onClick={() => { setActiveTab("properties"); setStatusView("pending"); }}>
                 <span style={S.quickActionIcon}>🏠</span>
                 <span style={S.quickActionText}>Review Properties</span>
                 {stats?.properties?.pending > 0 && <span style={S.quickActionBadge}>{stats.properties.pending}</span>}
               </button>
-              <button style={S.quickActionBtn} onClick={() => { setActiveTab("materials"); setStatusView("pending"); }}>
+              <button style={S.quickActionBtn} className="quickActionBtn" onClick={() => { setActiveTab("materials"); setStatusView("pending"); }}>
                 <span style={S.quickActionIcon}>🛍️</span>
                 <span style={S.quickActionText}>Review Materials</span>
                 {stats?.materials?.pending > 0 && <span style={S.quickActionBadge}>{stats.materials.pending}</span>}
               </button>
-              <button style={S.quickActionBtn} onClick={() => { setActiveTab("tourism"); setStatusView("pending"); }}>
+              <button style={S.quickActionBtn} className="quickActionBtn" onClick={() => { setActiveTab("tourism"); setStatusView("pending"); }}>
                 <span style={S.quickActionIcon}>🏨</span>
                 <span style={S.quickActionText}>Review Tourism</span>
                 {stats?.tourism?.pending > 0 && <span style={S.quickActionBadge}>{stats.tourism.pending}</span>}
               </button>
-              <button style={S.quickActionBtn} onClick={() => { setActiveTab("sold"); }}>
+              <button style={{ ...S.quickActionBtn, ...(hasPendingBoosts ? { borderColor: "#ef4444", boxShadow: "0 0 12px rgba(239,68,68,0.3)" } : {}) }}
+                className="quickActionBtn"
+                onClick={() => setActiveTab("boosts")}>
+                <span style={S.quickActionIcon}>🚀</span>
+                <span style={S.quickActionText}>Review Boost Payments</span>
+                {hasPendingBoosts && <span style={{ ...S.quickActionBadge, background: "#ef4444" }} className="notif-badge-blink">{pendingBoosts.length}</span>}
+              </button>
+              <button style={S.quickActionBtn} className="quickActionBtn" onClick={() => setActiveTab("sold")}>
                 <span style={S.quickActionIcon}>💰</span>
                 <span style={S.quickActionText}>View Sold Items</span>
               </button>
@@ -446,15 +592,22 @@ export default function AdminDashboard() {
       <div style={S.tabs}>
         {TABS.map(t => (
           <button key={t}
-            style={{ ...S.tab, ...(activeTab === t ? S.tabActive : {}) }}
-            onClick={() => { setActiveTab(t); if (t !== "sold" && t !== "payment") setStatusView("pending"); }}>
+            style={{
+              ...S.tab,
+              ...(activeTab === t ? S.tabActive : {}),
+              ...(t === "boosts" && hasPendingBoosts ? S.tabBoostAlert : {})
+            }}
+            onClick={() => { setActiveTab(t); if (t !== "sold" && t !== "payment" && t !== "boosts") setStatusView("pending"); }}>
             {TAB_LABELS[t]}{pendingCount(t)}
+            {t === "boosts" && hasPendingBoosts && (
+              <span style={S.tabBadge} className="notif-badge-blink">{pendingBoosts.length}</span>
+            )}
           </button>
         ))}
       </div>
 
-      {/* STATUS VIEW TOGGLE (not for payment or sold) */}
-      {activeTab !== "payment" && activeTab !== "sold" && (
+      {/* STATUS VIEW TOGGLE */}
+      {activeTab !== "payment" && activeTab !== "sold" && activeTab !== "boosts" && (
         <div style={S.statusToggle}>
           {STATUS_VIEWS.map(v => (
             <button key={v}
@@ -467,7 +620,7 @@ export default function AdminDashboard() {
       )}
 
       {/* SEARCH AND FILTER BAR */}
-      {activeTab !== "payment" && (
+      {activeTab !== "payment" && activeTab !== "boosts" && (
         <div style={S.searchBar}>
           <div style={S.searchInputWrapper}>
             <span style={S.searchIcon}>🔍</span>
@@ -477,32 +630,14 @@ export default function AdminDashboard() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            {searchQuery && (
-              <button style={S.clearBtn} onClick={() => setSearchQuery("")}>✕</button>
-            )}
+            {searchQuery && <button style={S.clearBtn} onClick={() => setSearchQuery("")}>✕</button>}
           </div>
           {(activeTab === "materials" || activeTab === "tourism" || activeTab === "properties") && (
-            <select
-              style={S.filterSelect}
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-            >
+            <select style={S.filterSelect} value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
               <option value="">All Categories</option>
-              {activeTab === "materials" && [
-                "Construction Materials", "Furniture", "Appliances", "Electronics", "Tools", "Other"
-              ].map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-              {activeTab === "properties" && [
-                "Apartment", "House", "Office", "Land", "Warehouse"
-              ].map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-              {activeTab === "tourism" && [
-                "Hotel", "Resort", "Airbnb", "Lodge", "Camping"
-              ].map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
+              {activeTab === "materials" && ["Construction Materials", "Furniture", "Appliances", "Electronics", "Tools", "Other"].map(cat => <option key={cat} value={cat}>{cat}</option>)}
+              {activeTab === "properties" && ["Apartment", "House", "Office", "Land", "Warehouse"].map(cat => <option key={cat} value={cat}>{cat}</option>)}
+              {activeTab === "tourism" && ["Hotel", "Resort", "Airbnb", "Lodge", "Camping"].map(cat => <option key={cat} value={cat}>{cat}</option>)}
             </select>
           )}
           <button style={S.exportBtn} onClick={exportData}>📥 Export CSV</button>
@@ -510,15 +645,30 @@ export default function AdminDashboard() {
       )}
 
       {/* RESULTS COUNT */}
-      {activeTab !== "payment" && !loading && filteredItems.length > 0 && (
+      {activeTab !== "payment" && activeTab !== "boosts" && !loading && filteredItems.length > 0 && (
         <div style={S.resultsCount}>
           Showing <strong>{filteredItems.length}</strong> of <strong>{displayItems.length}</strong> {activeTab}
           {(searchQuery || filterCategory) && <span style={S.filterTag}> (filtered)</span>}
         </div>
       )}
 
-      {/* CONTENT */}
-      {activeTab === "payment" ? (
+      {/* BOOST MESSAGE TOAST */}
+      {boostMessage && (
+        <div style={{ ...S.boostToast, background: boostMessage.startsWith("✅") ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)", borderColor: boostMessage.startsWith("✅") ? "#22c55e" : "#ef4444", color: boostMessage.startsWith("✅") ? "#22c55e" : "#ef4444" }}>
+          {boostMessage}
+        </div>
+      )}
+
+      {/* ── BOOST TAB CONTENT ─────────────────────────────── */}
+      {activeTab === "boosts" ? (
+        <BoostManagement
+          pendingBoosts={pendingBoosts}
+          allBoosts={allBoosts}
+          boostLoading={boostLoading}
+          onApprove={handleApproveBoost}
+          onReject={handleRejectBoost}
+        />
+      ) : activeTab === "payment" ? (
         <PaymentSettings
           mpesaConfig={mpesaConfig} setMpesaConfig={setMpesaConfig}
           configSaving={configSaving} configMessage={configMessage}
@@ -532,19 +682,15 @@ export default function AdminDashboard() {
         <div style={S.empty}>
           <p style={S.emptyText}>✅ No {activeTab === "sold" ? "sold" : statusView} {activeTab} found.</p>
           {(searchQuery || filterCategory) && (
-            <button style={S.resetBtn} onClick={() => { setSearchQuery(""); setFilterCategory(""); }}>
-              Clear Filters
-            </button>
+            <button style={S.resetBtn} onClick={() => { setSearchQuery(""); setFilterCategory(""); }}>Clear Filters</button>
           )}
         </div>
       ) : (
         <div style={S.grid}>
           {filteredItems.map(item => (
-            <div key={item._id} style={S.card} onClick={() => setSelected(item)} className="admin-card">
-              {/* card image */}
-              {getImages(item)[0] && (
-                <div style={{ ...S.cardImg, backgroundImage: `url(${getImages(item)[0]})` }} />
-              )}
+            <div key={item._id} style={{ ...S.card, ...(item.isFeatured ? S.featuredCard : {}) }} onClick={() => setSelected(item)} className="admin-card">
+              {item.isFeatured && <div style={S.featuredBanner}>⭐ FEATURED</div>}
+              {getImages(item)[0] && <div style={{ ...S.cardImg, backgroundImage: `url(${getImages(item)[0]})` }} />}
               <div style={S.cardBody}>
                 <p style={S.cardTitle}>{getTitle(item)}</p>
                 <p style={S.cardSub}>{getSub(item)}</p>
@@ -590,14 +736,151 @@ export default function AdminDashboard() {
             <h3 style={S.confirmTitle}>⚠️ Confirm Delete</h3>
             <p style={S.confirmText}>
               Are you sure you want to delete <strong>{deleteConfirm.title}</strong>?
-              <br />
-              <span style={{ fontSize: 12, color: "#ef4444" }}>This action cannot be undone.</span>
+              <br /><span style={{ fontSize: 12, color: "#ef4444" }}>This action cannot be undone.</span>
             </p>
             <div style={S.confirmBtns}>
               <button style={S.cancelBtn} onClick={() => setDeleteConfirm(null)}>Cancel</button>
               <button style={S.confirmDeleteBtn} onClick={executeDelete}>🗑️ Delete</button>
             </div>
           </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── BOOST MANAGEMENT TAB ──────────────────────────────────────
+function BoostManagement({ pendingBoosts, allBoosts, boostLoading, onApprove, onReject }) {
+  const [viewMode, setViewMode] = useState("pending"); // pending | all
+
+  const displayed = viewMode === "pending" ? pendingBoosts : allBoosts;
+
+  const statusColor = (status) => {
+    if (status === "approved" || status === "active") return "#22c55e";
+    if (status === "rejected" || status === "expired") return "#ef4444";
+    return "#fbbf24";
+  };
+
+  return (
+    <div>
+      {/* Toggle */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
+        <button
+          style={{ ...S.stBtn, ...(viewMode === "pending" ? S.stBtnActive : {}), position: "relative" }}
+          onClick={() => setViewMode("pending")}>
+          ⏳ Pending Confirmations
+          {pendingBoosts.length > 0 && (
+            <span style={{ ...S.notifBadge, position: "static", display: "inline-flex", marginLeft: 8 }} className="notif-badge-blink">
+              {pendingBoosts.length}
+            </span>
+          )}
+        </button>
+        <button style={{ ...S.stBtn, ...(viewMode === "all" ? S.stBtnActive : {}) }} onClick={() => setViewMode("all")}>
+          📋 All Boosts
+        </button>
+      </div>
+
+      {boostLoading ? (
+        <div style={S.loader}><div style={S.spinner}></div><p>Loading boosts...</p></div>
+      ) : displayed.length === 0 ? (
+        <div style={S.empty}>
+          <p style={S.emptyText}>
+            {viewMode === "pending" ? "✅ No pending boost payments to confirm." : "No boosts found."}
+          </p>
+        </div>
+      ) : (
+        <div style={S.boostGrid}>
+          {displayed.map(boost => (
+            <div key={boost._id} style={{ ...S.boostCard, ...(boost.status === "pending" ? S.boostCardPending : {}) }}
+              className={boost.status === "pending" ? "boost-card-glow" : ""}>
+              {/* Pending indicator */}
+              {boost.status === "pending" && (
+                <div style={S.boostPendingStrip}>
+                  <span style={S.redDotInline} className="red-dot-blink" />
+                  PAYMENT AWAITING CONFIRMATION
+                </div>
+              )}
+
+              <div style={S.boostCardBody}>
+                {/* Listing info */}
+                <div style={S.boostListingInfo}>
+                  {boost.listing?.images?.[0] && (
+                    <img src={boost.listing.images[0]} alt="" style={S.boostThumb} />
+                  )}
+                  <div style={{ flex: 1 }}>
+                    <p style={S.boostListingTitle}>
+                      {boost.listing?.title || boost.listingTitle || "Listing"}
+                      {boost.listing?.isFeatured && <span style={S.boostFeaturedTag}>⭐ Featured</span>}
+                    </p>
+                    <p style={S.boostListingMeta}>
+                      {boost.listing?.category || boost.listingType || "—"} · {boost.listing?.location || "—"}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Payment details */}
+                <div style={S.boostDetails}>
+                  <div style={S.boostDetailRow}>
+                    <span style={S.boostDetailKey}>👤 User</span>
+                    <span style={S.boostDetailVal}>{boost.user?.name || boost.userName || "—"}</span>
+                  </div>
+                  <div style={S.boostDetailRow}>
+                    <span style={S.boostDetailKey}>📞 Phone</span>
+                    <span style={S.boostDetailVal}>{boost.user?.phone || boost.userPhone || "—"}</span>
+                  </div>
+                  <div style={S.boostDetailRow}>
+                    <span style={S.boostDetailKey}>💰 Amount</span>
+                    <span style={{ ...S.boostDetailVal, color: "#fbbf24", fontWeight: 700 }}>
+                      KES {boost.amount?.toLocaleString() || "—"}
+                    </span>
+                  </div>
+                  <div style={S.boostDetailRow}>
+                    <span style={S.boostDetailKey}>📋 Plan</span>
+                    <span style={S.boostDetailVal}>{boost.plan === "weekly" ? "7-day boost" : boost.plan === "monthly" ? "30-day boost" : boost.plan || "—"}</span>
+                  </div>
+                  <div style={S.boostDetailRow}>
+                    <span style={S.boostDetailKey}>🔖 M-Pesa Ref</span>
+                    <span style={{ ...S.boostDetailVal, fontFamily: "monospace", color: "#a78bfa" }}>
+                      {boost.mpesaRef || boost.transactionRef || "Pending"}
+                    </span>
+                  </div>
+                  <div style={S.boostDetailRow}>
+                    <span style={S.boostDetailKey}>📅 Submitted</span>
+                    <span style={S.boostDetailVal}>{new Date(boost.createdAt).toLocaleString()}</span>
+                  </div>
+                  {boost.expiresAt && (
+                    <div style={S.boostDetailRow}>
+                      <span style={S.boostDetailKey}>⏰ Expires</span>
+                      <span style={S.boostDetailVal}>{new Date(boost.expiresAt).toLocaleDateString()}</span>
+                    </div>
+                  )}
+                  <div style={S.boostDetailRow}>
+                    <span style={S.boostDetailKey}>Status</span>
+                    <span style={{ ...S.boostDetailVal, color: statusColor(boost.status), fontWeight: 700, textTransform: "capitalize" }}>
+                      {boost.status || "pending"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                {boost.status === "pending" && (
+                  <div style={S.boostActions}>
+                    <button style={S.boostApproveBtn} onClick={() => onApprove(boost._id)}>
+                      ✅ Confirm Payment & Activate Boost
+                    </button>
+                    <button style={S.boostRejectBtn} onClick={() => onReject(boost._id)}>
+                      ❌ Reject
+                    </button>
+                  </div>
+                )}
+                {boost.status === "approved" && (
+                  <div style={{ padding: "10px 0", color: "#22c55e", fontWeight: 700, fontSize: 13 }}>
+                    ⭐ Boost active — listing is featured & prioritized
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>
@@ -611,23 +894,21 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
 
   const images = getImages(item);
   const [imgIdx, setImgIdx] = useState(0);
-
   const fields = Object.entries(item).filter(([k]) =>
-    !["_id", "__v", "password", "emailVerificationToken", "resetPasswordToken",
-      "images", "photos", "coverImage", "image", "owner", "seller"].includes(k)
+    !["_id", "__v", "password", "emailVerificationToken", "resetPasswordToken", "images", "photos", "coverImage", "image", "owner", "seller"].includes(k)
   );
 
   return (
     <div style={S.overlay} onClick={onClose}>
       <div style={S.modal} onClick={e => e.stopPropagation()}>
-        {/* modal header */}
         <div style={S.modalHeader}>
-          <h2 style={S.modalTitle}>{getTitle(item)}</h2>
+          <h2 style={S.modalTitle}>
+            {item.isFeatured && <span style={{ marginRight: 8 }}>⭐</span>}
+            {getTitle(item)}
+          </h2>
           <button style={S.closeBtn} onClick={onClose}>✕</button>
         </div>
-
         <div style={S.modalBody}>
-          {/* images */}
           {images.length > 0 && (
             <div style={S.imgSection}>
               <img src={images[imgIdx]} alt="" style={S.mainImg} />
@@ -641,14 +922,10 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
               )}
             </div>
           )}
-
-          {/* owner info */}
           <div style={S.ownerBox}>
             <p style={S.ownerLine}>👤 <strong>{getOwner(item)}</strong> &nbsp;|&nbsp; 📞 {getContact(item)}</p>
             {item.owner?.email && <p style={S.ownerLine}>✉️ {item.owner.email}</p>}
           </div>
-
-          {/* fields */}
           {editMode ? (
             <div style={S.editGrid}>
               {Object.entries(editData)
@@ -673,8 +950,6 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
             </div>
           )}
         </div>
-
-        {/* modal footer */}
         <div style={S.modalFooter}>
           {editMode ? (
             <>
@@ -734,6 +1009,58 @@ const S = {
   logo: { fontSize: 26, fontWeight: 800, color: "#fbbf24", margin: 0 },
   logoSub: { color: "#64748b", fontSize: 13, margin: "4px 0 0" },
   logoutBtn: { background: "rgba(239,68,68,0.1)", color: "#ef4444", border: "1px solid #ef4444", padding: "8px 18px", borderRadius: 8, fontWeight: 700, cursor: "pointer" },
+
+  // NOTIFICATION BELL
+  notifBtn: { background: "rgba(30,41,59,0.8)", border: "1px solid rgba(255,255,255,0.1)", color: "#f1f5f9", width: 44, height: 44, borderRadius: 12, fontSize: 20, cursor: "pointer", position: "relative", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" },
+  notifBadge: { position: "absolute", top: -6, right: -6, background: "#ef4444", color: "#fff", fontSize: 10, fontWeight: 800, minWidth: 18, height: 18, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 4px", border: "2px solid #06101f" },
+  notifPanel: { position: "absolute", top: 52, right: 0, width: 360, background: "#0f1729", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, boxShadow: "0 20px 60px rgba(0,0,0,0.6)", zIndex: 2000, overflow: "hidden" },
+  notifPanelHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.07)", background: "rgba(239,68,68,0.08)" },
+  notifPanelTitle: { fontSize: 14, fontWeight: 700, color: "#fbbf24" },
+  notifCloseBtn: { background: "none", border: "none", color: "#64748b", fontSize: 16, cursor: "pointer", padding: 4 },
+  notifList: { maxHeight: 400, overflowY: "auto" },
+  notifItem: { padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.05)" },
+  notifItemHeader: { display: "flex", alignItems: "center", gap: 8, marginBottom: 6 },
+  notifRedDot: { width: 8, height: 8, borderRadius: "50%", background: "#ef4444", flexShrink: 0 },
+  notifItemTitle: { fontSize: 13, fontWeight: 700, color: "#f1f5f9" },
+  notifItemMeta: { display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 4, fontSize: 12, color: "#94a3b8" },
+  notifItemBtns: { display: "flex", gap: 8, marginTop: 10 },
+  notifApproveBtn: { flex: 1, background: "#22c55e", color: "#fff", border: "none", padding: "8px 12px", borderRadius: 8, fontWeight: 700, cursor: "pointer", fontSize: 12 },
+  notifRejectBtn: { background: "rgba(239,68,68,0.1)", color: "#ef4444", border: "1px solid #ef4444", padding: "8px 12px", borderRadius: 8, fontWeight: 700, cursor: "pointer", fontSize: 12 },
+  notifEmpty: { padding: "32px 20px", textAlign: "center", color: "#64748b", fontSize: 13 },
+  notifFooter: { padding: "12px 20px", borderTop: "1px solid rgba(255,255,255,0.07)", background: "rgba(15,23,42,0.5)" },
+  notifViewAllBtn: { background: "none", border: "none", color: "#fbbf24", fontSize: 13, fontWeight: 700, cursor: "pointer", padding: 0 },
+
+  // BOOST CARDS
+  boostGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(340px,1fr))", gap: 20 },
+  boostCard: { background: "rgba(15,23,42,0.85)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.06)", overflow: "hidden" },
+  boostCardPending: { border: "1px solid rgba(239,68,68,0.4)", boxShadow: "0 0 20px rgba(239,68,68,0.1)" },
+  boostPendingStrip: { background: "rgba(239,68,68,0.15)", borderBottom: "1px solid rgba(239,68,68,0.3)", padding: "8px 16px", fontSize: 11, fontWeight: 800, color: "#ef4444", letterSpacing: "1px", display: "flex", alignItems: "center", gap: 8 },
+  redDotInline: { width: 8, height: 8, borderRadius: "50%", background: "#ef4444", flexShrink: 0 },
+  boostCardBody: { padding: 20 },
+  boostListingInfo: { display: "flex", gap: 12, marginBottom: 16, alignItems: "flex-start" },
+  boostThumb: { width: 64, height: 64, borderRadius: 10, objectFit: "cover", flexShrink: 0 },
+  boostListingTitle: { fontSize: 15, fontWeight: 700, color: "#f1f5f9", margin: "0 0 4px", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" },
+  boostListingMeta: { fontSize: 12, color: "#94a3b8", margin: 0 },
+  boostFeaturedTag: { background: "rgba(251,191,36,0.15)", color: "#fbbf24", fontSize: 10, padding: "2px 8px", borderRadius: 6, fontWeight: 700 },
+  boostDetails: { background: "rgba(30,41,59,0.4)", borderRadius: 10, padding: "12px 16px", marginBottom: 16 },
+  boostDetailRow: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" },
+  boostDetailKey: { fontSize: 12, color: "#64748b" },
+  boostDetailVal: { fontSize: 12, color: "#e2e8f0", fontWeight: 600 },
+  boostActions: { display: "flex", flexDirection: "column", gap: 8 },
+  boostApproveBtn: { background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#fff", border: "none", padding: "12px 20px", borderRadius: 10, fontWeight: 800, cursor: "pointer", fontSize: 13, transition: "all 0.2s" },
+  boostRejectBtn: { background: "rgba(239,68,68,0.1)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.4)", padding: "10px 20px", borderRadius: 10, fontWeight: 700, cursor: "pointer", fontSize: 13, transition: "all 0.2s" },
+
+  // BOOST TOAST
+  boostToast: { padding: "12px 20px", borderRadius: 10, border: "1px solid", fontSize: 14, fontWeight: 600, marginBottom: 20 },
+
+  // FEATURED CARD
+  featuredCard: { border: "1px solid rgba(251,191,36,0.4)", boxShadow: "0 0 20px rgba(251,191,36,0.1)" },
+  featuredBanner: { background: "linear-gradient(90deg,rgba(251,191,36,0.2),rgba(251,191,36,0.05))", padding: "6px 16px", fontSize: 11, fontWeight: 800, color: "#fbbf24", letterSpacing: "1px", borderBottom: "1px solid rgba(251,191,36,0.2)" },
+
+  // TAB BOOST ALERT
+  tabBoostAlert: { background: "rgba(239,68,68,0.15)", color: "#ef4444", borderColor: "rgba(239,68,68,0.5)" },
+  tabBadge: { display: "inline-flex", alignItems: "center", justifyContent: "center", background: "#ef4444", color: "#fff", fontSize: 10, fontWeight: 800, minWidth: 18, height: 18, borderRadius: 9, padding: "0 4px", marginLeft: 6, border: "2px solid #0a1428" },
+
   statsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12, marginBottom: 28 },
   statCard: { background: "rgba(30,41,59,0.6)", padding: "16px 20px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.05)" },
   statLabel: { fontSize: 12, color: "#94a3b8", margin: "0 0 6px" },
@@ -770,7 +1097,7 @@ const S = {
   quickActionText: { fontSize: 13, fontWeight: 600, color: "#f1f5f9", flex: 1, textAlign: "left" },
   quickActionBadge: { background: "#ef4444", color: "#fff", fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 10, minWidth: 20, textAlign: "center" },
   tabs: { display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 },
-  tab: { background: "rgba(30,41,59,0.6)", color: "#94a3b8", border: "1px solid rgba(255,255,255,0.1)", padding: "10px 20px", borderRadius: 10, fontWeight: 700, cursor: "pointer", fontSize: 13 },
+  tab: { background: "rgba(30,41,59,0.6)", color: "#94a3b8", border: "1px solid rgba(255,255,255,0.1)", padding: "10px 20px", borderRadius: 10, fontWeight: 700, cursor: "pointer", fontSize: 13, position: "relative" },
   tabActive: { background: "#fbbf24", color: "#1f2937", borderColor: "#fbbf24" },
   statusToggle: { display: "flex", gap: 8, marginBottom: 24 },
   stBtn: { background: "rgba(30,41,59,0.4)", color: "#94a3b8", border: "1px solid rgba(255,255,255,0.08)", padding: "7px 16px", borderRadius: 8, fontWeight: 600, cursor: "pointer", fontSize: 12 },
@@ -779,7 +1106,7 @@ const S = {
   searchInputWrapper: { display: "flex", alignItems: "center", background: "rgba(30,41,59,0.6)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "8px 16px", flex: 1, minWidth: 280 },
   searchIcon: { fontSize: 16, marginRight: 8, color: "#94a3b8" },
   searchInput: { background: "transparent", border: "none", color: "#f1f5f9", fontSize: 14, flex: 1, outline: "none", minWidth: 200 },
-  clearBtn: { background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 16, padding: 4, marginLeft: 8, hover: { color: "#fbbf24" } },
+  clearBtn: { background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 16, padding: 4, marginLeft: 8 },
   filterSelect: { background: "rgba(30,41,59,0.6)", color: "#f1f5f9", border: "1px solid rgba(255,255,255,0.1)", padding: "8px 16px", borderRadius: 10, fontSize: 13, outline: "none", cursor: "pointer", minWidth: 180 },
   exportBtn: { background: "rgba(59,130,246,0.1)", color: "#3b82f6", border: "1px solid #3b82f6", padding: "8px 16px", borderRadius: 10, fontWeight: 600, cursor: "pointer", fontSize: 13, transition: "all 0.2s" },
   resultsCount: { fontSize: 13, color: "#94a3b8", marginBottom: 16 },
@@ -845,20 +1172,19 @@ const css = `
   @keyframes spin { to { transform: rotate(360deg); } }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes notifPanelSlide { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes redBlink { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
+  @keyframes badgePulse { 0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.7); } 50% { box-shadow: 0 0 0 6px rgba(239,68,68,0); } }
+  @keyframes boostGlow { 0%,100% { box-shadow: 0 0 20px rgba(239,68,68,0.08); } 50% { box-shadow: 0 0 30px rgba(239,68,68,0.25); } }
+  @keyframes statPulse { 0%,100% { box-shadow: 0 0 0 2px rgba(239,68,68,0.4); } 50% { box-shadow: 0 0 0 4px rgba(239,68,68,0.15); } }
+
+  .red-dot-blink { animation: redBlink 1.2s ease-in-out infinite; }
+  .notif-badge-blink { animation: badgePulse 1.5s ease-in-out infinite; }
+  .notif-btn-active { border-color: rgba(239,68,68,0.5) !important; box-shadow: 0 0 12px rgba(239,68,68,0.3); }
+  .notif-panel-slide { animation: notifPanelSlide 0.2s ease-out; }
+  .notif-item-pulse { transition: background 0.2s; } .notif-item-pulse:hover { background: rgba(239,68,68,0.05); }
+  .boost-card-glow { animation: boostGlow 2s ease-in-out infinite; }
+  .stat-card-pulse { animation: statPulse 2s ease-in-out infinite; }
+  .quickActionBtn:hover { background: rgba(251,191,36,0.1) !important; border-color: #fbbf24 !important; }
   button:hover { transform: translateY(-1px); }
-  .approveBtn:hover { background: #16a34a; }
-  .rejectBtn:hover { background: rgba(239,68,68,0.2); }
-  .editBtn:hover { background: rgba(251,191,36,0.2); }
-  .deleteBtn:hover { background: rgba(239,68,68,0.2); }
-  .exportBtn:hover { background: rgba(59,130,246,0.2); }
-  .closeBtn:hover { background: rgba(239,68,68,0.2); }
-  .confirmDeleteBtn:hover { background: #dc2626; }
-  .quickActionBtn:hover { background: rgba(251,191,36,0.1); border-color: #fbbf24; }
-  @media (max-width: 768px) {
-    .statsGrid { gridTemplateColumns: repeat(2, 1fr); }
-    .chartBar { flex-direction: column; align-items: flex-start; gap: 8; }
-    .chartLabel { width: 100%; }
-    .chartValues { width: 100%; flex-direction: row; justify-content: space-between; }
-    .quickActionsGrid { gridTemplateColumns: 1fr; }
-  }
 `;
