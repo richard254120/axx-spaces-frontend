@@ -21,6 +21,12 @@ export default function AdminDashboard() {
   const [configSaving, setConfigSaving] = useState(false);
   const [configMessage, setConfigMessage] = useState("");
 
+  // ADDED: payments tab state
+  const [pendingPayments, setPendingPayments] = useState([]);
+  const [paymentsLoading, setPaymentsLoading] = useState(false);
+  const [verifyingId, setVerifyingId] = useState(null);
+  // END ADDED
+
   useEffect(() => {
     // Security check: ensure only admins can stay on this page
     if (user?.role !== "admin") {
@@ -31,6 +37,44 @@ export default function AdminDashboard() {
     loadAllPending();
     loadMpesaConfig();
   }, []);
+
+  // ADDED: load pending payments when tab is selected
+  useEffect(() => {
+    if (activeTab === "payments") {
+      loadPendingPayments();
+    }
+  }, [activeTab]);
+
+  const loadPendingPayments = async () => {
+    setPaymentsLoading(true);
+    try {
+      const res = await API.get("/payment/pending-bank-payments");
+      setPendingPayments(res.data.pendingPayments || []);
+    } catch (err) {
+      console.error("Failed to load pending payments:", err);
+    } finally {
+      setPaymentsLoading(false);
+    }
+  };
+
+  const handleVerifyPayment = async (payment, approve) => {
+    setVerifyingId(payment.transactionRef);
+    try {
+      await API.post("/payment/verify-bank-payment", {
+        transactionRef: payment.transactionRef,
+        userId: payment.userId,
+        approve,
+      });
+      setPendingPayments((prev) =>
+        prev.filter((p) => p.transactionRef !== payment.transactionRef)
+      );
+    } catch (err) {
+      alert("❌ Failed to process payment verification.");
+    } finally {
+      setVerifyingId(null);
+    }
+  };
+  // END ADDED
 
   const loadMpesaConfig = async () => {
     try {
@@ -230,6 +274,14 @@ export default function AdminDashboard() {
         >
           💳 Payment Settings
         </button>
+        {/* ADDED: Payments tab button */}
+        <button
+          style={{ ...styles.tab, ...(activeTab === "payments" ? styles.tabActive : {}) }}
+          onClick={() => setActiveTab("payments")}
+        >
+          💰 Payments {pendingPayments.length > 0 ? `(${pendingPayments.length})` : ""}
+        </button>
+        {/* END ADDED */}
       </div>
 
       {loading ? (
@@ -483,7 +535,7 @@ export default function AdminDashboard() {
         <div style={styles.configContainer}>
           <h2 style={styles.configTitle}>💳 M-Pesa Payment Configuration</h2>
           <p style={styles.configSubtitle}>Configure your M-Pesa credentials to enable payments for subscriptions, boosts, and property promotions.</p>
-          
+
           {configMessage && (
             <div style={{
               ...styles.configMessage,
@@ -563,6 +615,86 @@ export default function AdminDashboard() {
             </ul>
           </div>
         </div>
+      ) : activeTab === "payments" ? (
+        // ADDED: Payments Tab
+        paymentsLoading ? (
+          <div style={styles.loader}>⏳ Loading pending payments...</div>
+        ) : pendingPayments.length === 0 ? (
+          <div style={styles.emptyCard}>
+            <p style={styles.emptyText}>✅ No pending bank transfer payments.</p>
+          </div>
+        ) : (
+          <div style={styles.tableContainer}>
+            <table style={styles.table}>
+              <thead>
+                <tr style={styles.theadRow}>
+                  <th style={styles.th}>User</th>
+                  <th style={styles.th}>Amount (KSh)</th>
+                  <th style={styles.th}>Plan</th>
+                  <th style={styles.th}>Transaction Code</th>
+                  <th style={styles.th}>M-Pesa Message</th>
+                  <th style={styles.th}>Date</th>
+                  <th style={styles.th}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pendingPayments.map((p) => {
+                  const codeMatch = (p.bankMessage || "").match(/([A-Z0-9]{10,12})\s+confirmed/i);
+                  const txCode = codeMatch ? codeMatch[1] : p.transactionRef?.slice(0, 20) || "—";
+                  return (
+                    <tr key={p.transactionRef} style={styles.tr}>
+                      <td style={styles.td}>
+                        <div style={styles.propTitle}>{p.userName}</div>
+                        <div style={styles.propLoc}>{p.userPhone}</div>
+                        <div style={styles.propLoc}>{p.userEmail}</div>
+                      </td>
+                      <td style={styles.td}>
+                        <span style={styles.priceBadge}>{Number(p.amount).toLocaleString()}</span>
+                      </td>
+                      <td style={styles.td}>
+                        <span style={styles.roleBadge}>{p.plan || p.subscriptionType || "Boost"}</span>
+                      </td>
+                      <td style={styles.td}>
+                        <code style={styles.txCode}>{txCode}</code>
+                      </td>
+                      <td style={styles.td}>
+                        <div style={styles.smsPreview}>
+                          {p.bankMessage
+                            ? p.bankMessage.slice(0, 80) + (p.bankMessage.length > 80 ? "…" : "")
+                            : <span style={{ color: "#475569" }}>No message</span>}
+                        </div>
+                      </td>
+                      <td style={styles.td}>
+                        <div style={styles.propLoc}>
+                          {p.date ? new Date(p.date).toLocaleDateString("en-KE", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}
+                        </div>
+                      </td>
+                      <td style={styles.td}>
+                        <div style={styles.btnGroup}>
+                          <button
+                            disabled={verifyingId === p.transactionRef}
+                            onClick={() => handleVerifyPayment(p, true)}
+                            style={styles.approveBtn}
+                          >
+                            {verifyingId === p.transactionRef ? "..." : "✅ Approve"}
+                          </button>
+                          <button
+                            disabled={verifyingId === p.transactionRef}
+                            onClick={() => handleVerifyPayment(p, false)}
+                            style={styles.rejectBtn}
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )
+        // END ADDED
       ) : null}
     </div>
   );
@@ -586,12 +718,12 @@ const styles = {
   statValue: { fontSize: "28px", fontWeight: 800, color: "#fbbf24", margin: "0 0 4px 0" },
   statPending: { fontSize: "12px", color: "#ef4444", margin: 0 },
   loader: { textAlign: "center", padding: "100px", color: "#fbbf24", fontSize: "18px" },
-  emptyCard: { 
-    background: "rgba(30, 41, 59, 0.4)", 
-    padding: "60px", 
-    borderRadius: "20px", 
-    textAlign: "center", 
-    border: "1px dashed rgba(251, 191, 36, 0.3)" 
+  emptyCard: {
+    background: "rgba(30, 41, 59, 0.4)",
+    padding: "60px",
+    borderRadius: "20px",
+    textAlign: "center",
+    border: "1px dashed rgba(251, 191, 36, 0.3)"
   },
   emptyText: { color: "#94a3b8", fontSize: "18px" },
   tableContainer: {
@@ -612,9 +744,9 @@ const styles = {
   ownerContact: { fontSize: "12px", color: "#64748b" },
   priceBadge: { background: "rgba(59, 130, 246, 0.1)", color: "#3b82f6", padding: "6px 12px", borderRadius: "6px", fontWeight: 700 },
   btnGroup: { display: "flex", gap: "10px" },
-  approveBtn: { 
-    background: "#22c55e", color: "white", border: "none", 
-    padding: "8px 16px", borderRadius: "8px", fontWeight: 700, cursor: "pointer" 
+  approveBtn: {
+    background: "#22c55e", color: "white", border: "none",
+    padding: "8px 16px", borderRadius: "8px", fontWeight: 700, cursor: "pointer"
   },
   rejectBtn: {
     background: "rgba(239, 68, 68, 0.1)", color: "#ef4444", border: "1px solid #ef4444",
@@ -637,6 +769,10 @@ const styles = {
     borderColor: "#fbbf24",
   },
   roleBadge: { background: "rgba(251, 191, 36, 0.1)", color: "#fbbf24", padding: "6px 12px", borderRadius: "6px", fontWeight: 700 },
+  // ADDED styles
+  txCode: { background: "rgba(34, 197, 94, 0.1)", color: "#22c55e", padding: "4px 10px", borderRadius: "6px", fontSize: "13px", fontFamily: "monospace" },
+  smsPreview: { fontSize: "12px", color: "#64748b", maxWidth: "220px", lineHeight: "1.5" },
+  // END ADDED
   configContainer: {
     background: "rgba(15, 23, 42, 0.8)",
     borderRadius: "16px",

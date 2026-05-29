@@ -3,6 +3,7 @@ import ReviewsSection from "../components/ReviewsSection";
 import RecentlyViewed, { trackView } from "../components/RecentlyViewed";
 import ShareProperty from "../components/ShareProperty";
 import MapView from "../components/MapView";
+import { useAuth } from "../context/AuthContext";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
 
@@ -15,6 +16,7 @@ const formatKenyaPhone = (phone) => {
 };
 
 export default function Listings() {
+  const { user, token } = useAuth();
   const [properties, setProperties] = useState([]);
   const [filteredProperties, setFilteredProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,6 +32,12 @@ export default function Listings() {
   });
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentPhone, setPaymentPhone] = useState("");
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentError, setPaymentError] = useState("");
+  const [paymentSuccess, setPaymentSuccess] = useState("");
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -111,26 +119,62 @@ export default function Listings() {
   };
 
   const handleBookNow = (property) => {
-    const phoneNumber = formatKenyaPhone(property.owner?.phone || property.phone || "");
-    const message = `Hello,\n\nI want to BOOK this property right now:\n\n` +
-                    `🏠 ${property.title}\n` +
-                    `📍 ${property.county} - ${property.location}\n` +
-                    `💰 KES ${property.price?.toLocaleString()}/month\n` +
-                    `🛏 ${property.bedrooms} Bedrooms | 🚿 ${property.bathrooms} Bathrooms\n` +
-                    `📊 Available: ${property.availableUnits} units\n\n` +
-                    `Please confirm availability and let me know the next steps for booking. Thank you!`;
-    window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
+    if (!user) {
+      alert("Please log in to book this property");
+      return;
+    }
+    setPaymentAmount(property.price?.toString() || "");
+    setPaymentPhone(user.phone || "");
+    setShowPaymentModal(true);
+  };
+
+  const handlePaymentSubmit = async (e) => {
+    e.preventDefault();
+    setPaymentLoading(true);
+    setPaymentError("");
+    setPaymentSuccess("");
+
+    try {
+      const response = await fetch(`${API_BASE}/payment/book-property`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          propertyId: selectedProperty._id,
+          phone: paymentPhone,
+          amount: paymentAmount,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setPaymentSuccess("✅ M-Pesa prompt sent! Check your phone to complete payment.");
+        setTimeout(() => {
+          setShowPaymentModal(false);
+          setPaymentSuccess("");
+        }, 3000);
+      } else {
+        setPaymentError(data.error || "❌ Payment failed. Please try again.");
+      }
+    } catch (err) {
+      setPaymentError("❌ Payment failed. Please try again.");
+    } finally {
+      setPaymentLoading(false);
+    }
   };
 
   const handleSendSMS = (property) => {
     const phoneNumber = formatKenyaPhone(property.owner?.phone || property.phone || "");
     const message = `Hello, I want to BOOK this property:\n` +
-                    `${property.title}\n` +
-                    `${property.county} - ${property.location}\n` +
-                    `KES ${property.price?.toLocaleString()}/month\n` +
-                    `${property.bedrooms} Bed | ${property.bathrooms} Bath\n` +
-                    `Available: ${property.availableUnits} units\n\n` +
-                    `Please reply with availability and booking details. Thank you!`;
+      `${property.title}\n` +
+      `${property.county} - ${property.location}\n` +
+      `KES ${property.price?.toLocaleString()}/month\n` +
+      `${property.bedrooms} Bed | ${property.bathrooms} Bath\n` +
+      `Available: ${property.availableUnits} units\n\n` +
+      `Please reply with availability and booking details. Thank you!`;
     window.open(`sms:${phoneNumber}?body=${encodeURIComponent(message)}`, "_blank");
   };
 
@@ -277,6 +321,64 @@ export default function Listings() {
           <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <button style={styles.closeBtn} onClick={closeModal}>✕</button>
 
+            {/* PAYMENT MODAL */}
+            {showPaymentModal && (
+              <div style={styles.paymentModal}>
+                <div style={styles.paymentModalContent}>
+                  <h3 style={styles.paymentTitle}>💳 Book Property - M-Pesa Payment</h3>
+                  <p style={styles.paymentSubtitle}>
+                    {selectedProperty.title} - KES {paymentAmount}
+                  </p>
+                  {paymentSuccess && (
+                    <div style={styles.paymentSuccess}>{paymentSuccess}</div>
+                  )}
+                  {paymentError && (
+                    <div style={styles.paymentError}>{paymentError}</div>
+                  )}
+                  {!paymentSuccess && (
+                    <form onSubmit={handlePaymentSubmit} style={styles.paymentForm}>
+                      <div style={styles.paymentField}>
+                        <label style={styles.paymentLabel}>M-Pesa Phone Number</label>
+                        <input
+                          type="tel"
+                          value={paymentPhone}
+                          onChange={(e) => setPaymentPhone(e.target.value)}
+                          placeholder="2547XXXXXXXX"
+                          style={styles.paymentInput}
+                          required
+                        />
+                      </div>
+                      <div style={styles.paymentField}>
+                        <label style={styles.paymentLabel}>Amount (KES)</label>
+                        <input
+                          type="number"
+                          value={paymentAmount}
+                          onChange={(e) => setPaymentAmount(e.target.value)}
+                          placeholder="Enter amount"
+                          style={styles.paymentInput}
+                          required
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        style={styles.paymentButton}
+                        disabled={paymentLoading}
+                      >
+                        {paymentLoading ? "Processing..." : "📱 Pay with M-Pesa"}
+                      </button>
+                      <button
+                        type="button"
+                        style={styles.paymentCancelButton}
+                        onClick={() => setShowPaymentModal(false)}
+                      >
+                        Cancel
+                      </button>
+                    </form>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div style={styles.modalImage}>
               {selectedProperty.images?.length > 0 ? (
                 <>
@@ -315,7 +417,7 @@ export default function Listings() {
             <div style={styles.modalDetails}>
               <h2 style={styles.modalTitle}>{selectedProperty.title}</h2>
               <p style={styles.modalLocation}>
-                 {selectedProperty.county} • {selectedProperty.location}
+                {selectedProperty.county} • {selectedProperty.location}
               </p>
 
               <div style={styles.specs}>
@@ -383,14 +485,14 @@ export default function Listings() {
 
               {/* ✅ LANDLORD CONTACT — now shows real data */}
               <div style={styles.landlordInfo}>
-  <h3 style={styles.landlordHead}>👤 Landlord Contact</h3>
-  <p style={styles.landlordDetail}>
-    <strong>Name:</strong> {selectedProperty.owner?.name || "—"}
-  </p>
-  <p style={styles.landlordDetail}>
-    <strong>Phone:</strong> {selectedProperty.owner?.phone || "—"}
-  </p>
-</div>
+                <h3 style={styles.landlordHead}>👤 Landlord Contact</h3>
+                <p style={styles.landlordDetail}>
+                  <strong>Name:</strong> {selectedProperty.owner?.name || "—"}
+                </p>
+                <p style={styles.landlordDetail}>
+                  <strong>Phone:</strong> {selectedProperty.owner?.phone || "—"}
+                </p>
+              </div>
 
               {/* ✅ AGENT CONTACT — shows if assigned */}
               {selectedProperty.assignedAgent && (
@@ -434,7 +536,7 @@ export default function Listings() {
                   onClick={() => handleContactLandlord(selectedProperty)}
                   disabled={selectedProperty.availableUnits === 0}
                 >
-                   WhatsApp
+                  WhatsApp
                 </button>
                 <button style={styles.callBtn} onClick={() => window.open(`tel:${selectedProperty.owner?.phone || selectedProperty.phone}`)}>
                   📞 Call Landlord
@@ -535,6 +637,18 @@ const styles = {
   landlordHead: { margin: "0 0 12px 0", color: "#8b5cf6" },
   landlordDetail: { color: "#cbd5e1", margin: "8px 0" },
   agentInfo: { margin: "20px 0", padding: "16px", background: "rgba(251, 191, 36, 0.1)", borderRadius: "8px", border: "1px solid rgba(251, 191, 36, 0.2)" },
+  paymentModal: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.8)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 2000, padding: "20px" },
+  paymentModalContent: { background: "linear-gradient(135deg, #1e293b 0%, #0f1729 100%)", borderRadius: "12px", maxWidth: "400px", width: "100%", padding: "24px", border: "1px solid #334155", position: "relative" },
+  paymentTitle: { fontSize: "1.2rem", margin: "0 0 12px 0", color: "#fbbf24", textAlign: "center" },
+  paymentSubtitle: { fontSize: "0.9rem", color: "#94a3b8", textAlign: "center", marginBottom: "20px" },
+  paymentForm: { display: "flex", flexDirection: "column", gap: "16px" },
+  paymentField: { display: "flex", flexDirection: "column", gap: "6px" },
+  paymentLabel: { fontSize: "0.85rem", color: "#cbd5e1", fontWeight: 600 },
+  paymentInput: { padding: "10px 12px", border: "1px solid #334155", borderRadius: "6px", background: "#0f1729", color: "#f1f5f9", fontSize: "0.95rem", outline: "none" },
+  paymentButton: { padding: "12px 16px", background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "white", border: "none", borderRadius: "6px", fontWeight: 700, cursor: "pointer", fontSize: "0.95rem", transition: "all 0.3s ease" },
+  paymentCancelButton: { padding: "12px 16px", background: "transparent", color: "#94a3b8", border: "1px solid #334155", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.95rem", transition: "all 0.3s ease" },
+  paymentSuccess: { background: "rgba(34, 197, 94, 0.15)", color: "#86efac", padding: "12px", borderRadius: "6px", marginBottom: "16px", textAlign: "center", fontSize: "0.9rem", border: "1px solid rgba(34, 197, 94, 0.3)" },
+  paymentError: { background: "rgba(239, 68, 68, 0.15)", color: "#fca5a5", padding: "12px", borderRadius: "6px", marginBottom: "16px", textAlign: "center", fontSize: "0.9rem", border: "1px solid rgba(239, 68, 68, 0.3)" },
   agentHead: { margin: "0 0 12px 0", color: "#fbbf24" },
   agentDetail: { color: "#cbd5e1", margin: "8px 0" },
   agentButtons: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginTop: "12px" },

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 import { COLORS, buttonStyles, inputStyles, pageStyles, cardStyles } from "../styles/theme";
+import { useAuth } from "../context/AuthContext";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
 
@@ -17,22 +18,22 @@ const CATEGORIES = [
 const CONDITIONS = ["Like New", "Good", "Fair", "Poor"];
 
 const COUNTIES = [
-  "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
-  "Garissa","Wajir","Mandera","Marsabit","Isiolo","Meru","Tharaka Nithi",
-  "Embu","Kitui","Machakos","Makueni","Nyandarua","Nyeri","Kirinyaga",
-  "Murang'a","Kiambu","Turkana","West Pokot","Samburu","Trans Nzoia",
-  "Uasin Gishu","Elgeyo Marakwet","Nandi","Baringo","Laikipia","Nakuru",
-  "Narok","Kajiado","Kericho","Bomet","Kakamega","Vihiga","Bungoma",
-  "Busia","Siaya","Kisumu","Homa Bay","Migori","Kisii","Nyamira","Nairobi City",
+  "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta",
+  "Garissa", "Wajir", "Mandera", "Marsabit", "Isiolo", "Meru", "Tharaka Nithi",
+  "Embu", "Kitui", "Machakos", "Makueni", "Nyandarua", "Nyeri", "Kirinyaga",
+  "Murang'a", "Kiambu", "Turkana", "West Pokot", "Samburu", "Trans Nzoia",
+  "Uasin Gishu", "Elgeyo Marakwet", "Nandi", "Baringo", "Laikipia", "Nakuru",
+  "Narok", "Kajiado", "Kericho", "Bomet", "Kakamega", "Vihiga", "Bungoma",
+  "Busia", "Siaya", "Kisumu", "Homa Bay", "Migori", "Kisii", "Nyamira", "Nairobi City",
 ];
 
 export default function MaterialsMarketplace() {
   const navigate = useNavigate();
-  
+
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  
+
   const [filters, setFilters] = useState({
     category: "",
     condition: "",
@@ -41,7 +42,7 @@ export default function MaterialsMarketplace() {
     maxPrice: "",
     search: "",
   });
-  
+
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
@@ -61,7 +62,7 @@ export default function MaterialsMarketplace() {
 
       const response = await fetch(`${API_BASE}/materials?${params.toString()}`);
       const data = await response.json();
-      
+
       if (response.ok) {
         setMaterials(data);
       } else {
@@ -111,7 +112,7 @@ export default function MaterialsMarketplace() {
           <p style={styles.heroSubtitle}>
             Browse construction materials, furniture, appliances, and more from verified sellers across Kenya
           </p>
-          
+
           {/* Search Bar */}
           <div style={styles.searchBar}>
             <input
@@ -124,7 +125,7 @@ export default function MaterialsMarketplace() {
             <button onClick={() => { fetchMaterials(); }} style={styles.searchBtn}>
               🔍 Search
             </button>
-            <button 
+            <button
               onClick={() => setShowFilters(!showFilters)}
               style={styles.filterToggleBtn}
             >
@@ -251,7 +252,7 @@ export default function MaterialsMarketplace() {
                 Showing {materials.length} approved material{materials.length !== 1 ? "s" : ""}
               </p>
             </div>
-            
+
             <div style={styles.materialsGrid}>
               {materials.map((material) => (
                 <div key={material._id} style={styles.materialCard} className="material-card">
@@ -269,7 +270,7 @@ export default function MaterialsMarketplace() {
                     <div style={styles.categoryBadge}>{material.category}</div>
                     <div style={styles.conditionBadge}>{material.condition}</div>
                   </div>
-                  
+
                   <div style={styles.materialInfo}>
                     <h3 style={styles.materialTitle}>{material.title}</h3>
                     <p style={styles.materialDescription}>
@@ -277,12 +278,12 @@ export default function MaterialsMarketplace() {
                         ? material.description.substring(0, 100) + "..."
                         : material.description}
                     </p>
-                    
+
                     <div style={styles.materialMeta}>
                       <span style={styles.metaItem}>📍 {material.location}, {material.county}</span>
                       <span style={styles.metaItem}>📦 Qty: {material.quantity}</span>
                     </div>
-                    
+
                     <div style={styles.sellerInfo}>
                       <span style={styles.sellerLabel}>Seller:</span>
                       <span style={styles.sellerName}>{material.sellerName}</span>
@@ -292,7 +293,7 @@ export default function MaterialsMarketplace() {
                         </span>
                       )}
                     </div>
-                    
+
                     <div style={styles.priceSection}>
                       <span style={styles.price}>
                         KSh {Number(material.price).toLocaleString()}
@@ -319,7 +320,7 @@ export default function MaterialsMarketplace() {
           <p style={styles.ctaText}>
             Join our verified seller network and reach thousands of buyers across Kenya
           </p>
-          <button 
+          <button
             onClick={() => navigate("/seller-login")}
             style={styles.ctaBtn}
           >
