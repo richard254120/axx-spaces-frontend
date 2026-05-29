@@ -82,3 +82,5 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+import { useContext } from "react";
+export const useAuth = () => useContext(AuthContext);
