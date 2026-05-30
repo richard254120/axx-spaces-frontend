@@ -203,22 +203,22 @@ const styles = {
     color: "#64748b",
   },
   addButton: {
-    position: "fixed",
-    bottom: "30px",
-    right: "30px",
-    width: "60px",
-    height: "60px",
-    borderRadius: "50%",
+    padding: "12px 24px",
     background: "#fbbf24",
     color: "#0f172a",
     border: "none",
-    fontSize: "30px",
+    borderRadius: "10px",
+    fontSize: "16px",
+    fontWeight: 700,
     cursor: "pointer",
-    boxShadow: "0 10px 30px rgba(251, 191, 36, 0.4)",
-    transition: "transform 0.3s",
+    boxShadow: "0 4px 15px rgba(251, 191, 36, 0.3)",
+    transition: "opacity 0.3s",
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
   },
   addButtonHover: {
-    transform: "scale(1.1)",
+    opacity: 0.9,
   },
 };
 
@@ -285,7 +285,21 @@ export default function AxxBiashara() {
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <h1 style={styles.title}>🏪 AxxBiashara</h1>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+          <h1 style={styles.title}>🏪 AxxBiashara</h1>
+          <button
+            style={styles.addButton}
+            onClick={() => navigate("/business/create")}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.opacity = "0.9";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = "1";
+            }}
+          >
+            + Create Business
+          </button>
+        </div>
         <p style={styles.subtitle}>Discover and connect with trusted businesses across Kenya</p>
       </div>
 
@@ -348,7 +362,7 @@ export default function AxxBiashara() {
                   📍 {business.location.town}, {business.location.county}
                 </p>
                 <p style={styles.cardDescription}>{business.description}</p>
-                
+
                 {business.verificationBadges && business.verificationBadges.length > 0 && (
                   <div style={styles.badges}>
                     {business.verificationBadges.map((badge, index) => (
@@ -440,19 +454,6 @@ export default function AxxBiashara() {
           ))}
         </div>
       )}
-
-      <button
-        style={styles.addButton}
-        onClick={() => navigate("/business/create")}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "scale(1.1)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "scale(1)";
-        }}
-      >
-        +
-      </button>
     </div>
   );
 }
