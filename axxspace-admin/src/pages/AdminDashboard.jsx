@@ -4,10 +4,10 @@ import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 
 // ── tiny helpers ──────────────────────────────────────────────
-const TABS = ["properties", "materials", "tourism", "movers", "sellers", "sold", "payment", "boosts", "businesses"];
+const TABS = ["properties", "materials", "tourism", "movers", "sellers", "sold", "payment", "boosts", "businesses", "announcements"];
 const TAB_LABELS = {
   properties: "🏠 Properties", materials: "🛍️ Materials", tourism: "🏨 Tourism",
-  movers: "🚛 Movers", sellers: "📋 Sellers", sold: "💰 Sold", payment: "💳 Payment", boosts: "🚀 Payments", businesses: "🏪 Businesses"
+  movers: "🚛 Movers", sellers: "📋 Sellers", sold: "💰 Sold", payment: "💳 Payment", boosts: "🚀 Payments", businesses: "🏪 Businesses", announcements: "📢 Announcements"
 };
 const STATUS_VIEWS = ["pending", "approved", "rejected"];
 
@@ -47,6 +47,10 @@ export default function AdminDashboard() {
   const [pendingBusinesses, setPendingBusinesses] = useState([]);
   const [businessesLoading, setBusinessesLoading] = useState(false);
 
+  // ── ANNOUNCEMENTS STATE ────────────────────────────────────
+  const [pendingAnnouncements, setPendingAnnouncements] = useState([]);
+  const [announcementsLoading, setAnnouncementsLoading] = useState(false);
+
   // ── auth guard ─────────────────────────────────────────────
   useEffect(() => {
     if (user?.role !== "admin") { navigate("/login"); return; }
@@ -58,6 +62,13 @@ export default function AdminDashboard() {
     loadPendingBoosts();
     loadAllBoosts();
   }, [user, navigate]);
+
+  // ── load pending announcements when tab changes ─────────────
+  useEffect(() => {
+    if (activeTab === "announcements") {
+      loadPendingAnnouncements();
+    }
+  }, [activeTab]);
 
   // ── poll for new notifications every 30 seconds ─────────────
   useEffect(() => {
@@ -283,6 +294,30 @@ export default function AdminDashboard() {
     }
   };
 
+  // ── load pending announcements ────────────────────────────────
+  const loadPendingAnnouncements = async () => {
+    setAnnouncementsLoading(true);
+    try {
+      const res = await API.get("/business/admin/announcements/pending");
+      setPendingAnnouncements(res.data.announcements || []);
+    } catch (err) {
+      console.error("Failed to load pending announcements:", err);
+    } finally {
+      setAnnouncementsLoading(false);
+    }
+  };
+
+  // ── approve/reject announcement ────────────────────────────────
+  const handleAnnouncementStatus = async (businessId, announcementId, status) => {
+    try {
+      await API.patch(`/business/admin/${businessId}/announcements/${announcementId}/status`, { status });
+      loadPendingAnnouncements();
+      alert(`✅ Announcement ${status} successfully`);
+    } catch (err) {
+      alert("❌ Failed to update announcement status");
+    }
+  };
+
   // ── edit / save ────────────────────────────────────────────
   const openEdit = (item) => { setEditData({ ...item }); setEditMode(true); };
   const saveEdit = async () => {
@@ -317,6 +352,9 @@ export default function AdminDashboard() {
   const pendingCount = (tab) => {
     if (tab === "businesses") {
       return stats?.businesses?.pending > 0 ? ` (${stats.businesses.pending})` : "";
+    }
+    if (tab === "announcements") {
+      return pendingAnnouncements.length > 0 ? ` (${pendingAnnouncements.length})` : "";
     }
     if (!allPending) return "";
     const map = { properties: "properties", materials: "materials", tourism: "tourism", movers: "movers", sellers: "sellers" };
@@ -801,6 +839,34 @@ export default function AdminDashboard() {
                     <option value="location_verified">🟣 Location</option>
                     <option value="premium_verified">⭐ Premium</option>
                   </select>
+                </div>
+              </div>
+            ))}
+          </div>
+        )
+      ) : activeTab === "announcements" ? (
+        announcementsLoading ? (
+          <div style={S.loader}>
+            <div style={S.spinner}></div>
+            <p>⏳ Loading pending announcements...</p>
+          </div>
+        ) : pendingAnnouncements.length === 0 ? (
+          <div style={S.empty}>
+            <p style={S.emptyText}>✅ No pending announcements found.</p>
+          </div>
+        ) : (
+          <div style={S.grid}>
+            {pendingAnnouncements.map(announcement => (
+              <div key={announcement.announcementId} style={S.card} className="admin-card">
+                <div style={S.cardBody}>
+                  <p style={S.cardTitle}>{announcement.title}</p>
+                  <p style={S.cardSub}>📢 {announcement.businessName}</p>
+                  <p style={S.cardOwner}>📅 {new Date(announcement.createdAt).toLocaleDateString()}</p>
+                  <p style={S.cardDescription}>{announcement.content}</p>
+                  <div style={S.cardBtns}>
+                    <button style={S.approveBtn} onClick={() => handleAnnouncementStatus(announcement.businessId, announcement.announcementId, "approved")}>✅ Approve</button>
+                    <button style={S.rejectBtn} onClick={() => handleAnnouncementStatus(announcement.businessId, announcement.announcementId, "rejected")}>❌ Reject</button>
+                  </div>
                 </div>
               </div>
             ))}
