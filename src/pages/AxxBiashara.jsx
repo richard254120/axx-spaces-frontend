@@ -313,14 +313,10 @@ const styles = {
   announcementsScroll: {
     display: "flex",
     gap: "20px",
-    overflowX: "hidden",
+    overflowX: "auto",
     paddingBottom: "10px",
-    width: "100%",
-  },
-  announcementsScrollInner: {
-    display: "flex",
-    gap: "20px",
-    transition: "transform 0.1s linear",
+    scrollbarWidth: "thin",
+    scrollbarColor: "#fbbf24 rgba(30, 41, 59, 0.5)",
   },
   announcementBox: {
     background: "rgba(15, 23, 42, 0.8)",
@@ -708,36 +704,34 @@ export default function AxxBiashara() {
           <h3 style={styles.announcementsTitle}>📢 Latest Announcements</h3>
           {announcements.length > 0 ? (
             <div style={styles.announcementsScroll}>
-              <div style={styles.announcementsScrollInner}>
-                {[...announcements.slice(0, 10), ...announcements.slice(0, 10)].map((announcement, index) => (
-                  <div
-                    key={`${index}-${announcement._id}`}
-                    style={styles.announcementBox}
-                    onClick={() => {
-                      setSelectedAnnouncement(announcement);
-                      setShowAnnouncementModal(true);
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = "translateY(-5px)";
-                      e.currentTarget.style.boxShadow = "0 10px 30px rgba(251, 191, 36, 0.3)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = "translateY(0)";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  >
-                    <span style={styles.announcementBusiness}>{announcement.businessName}</span>
-                    <h4 style={styles.announcementBoxTitle}>{announcement.title}</h4>
-                    <span style={styles.announcementSubmitter}>
-                      👤 {announcement.submitterName || "Anonymous"}
-                      {announcement.organizationName && ` • 🏢 ${announcement.organizationName}`}
-                    </span>
-                    <span style={styles.announcementBoxDate}>
-                      {new Date(announcement.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              {announcements.slice(0, 10).map((announcement, index) => (
+                <div
+                  key={index}
+                  style={styles.announcementBox}
+                  onClick={() => {
+                    setSelectedAnnouncement(announcement);
+                    setShowAnnouncementModal(true);
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-5px)";
+                    e.currentTarget.style.boxShadow = "0 10px 30px rgba(251, 191, 36, 0.3)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                >
+                  <span style={styles.announcementBusiness}>{announcement.businessName}</span>
+                  <h4 style={styles.announcementBoxTitle}>{announcement.title}</h4>
+                  <span style={styles.announcementSubmitter}>
+                    👤 {announcement.submitterName || "Anonymous"}
+                    {announcement.organizationName && ` • 🏢 ${announcement.organizationName}`}
+                  </span>
+                  <span style={styles.announcementBoxDate}>
+                    {new Date(announcement.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              ))}
             </div>
           ) : (
             <p style={{ color: "#94a3b8", fontSize: "14px" }}>No announcements yet. Create one on a business page!</p>
