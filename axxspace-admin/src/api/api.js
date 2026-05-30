@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "https://axx-spaces-backend-1.onrender.com/api",
+  baseURL: process.env.REACT_APP_API_URL || "http://localhost:1000/api",
 });
 
 API.interceptors.request.use((config) => {
