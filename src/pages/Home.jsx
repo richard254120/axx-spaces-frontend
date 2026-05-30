@@ -19,19 +19,19 @@ export default function Home() {
   const [loadingReviews, setLoadingReviews] = useState(true);
 
   const counties = [
-    "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
-    "Garissa","Wajir","Mandera","Marsabit","Isiolo","Meru",
-    "Tharaka Nithi","Embu","Kitui","Machakos","Makueni","Nyandarua",
-    "Nyeri","Kirinyaga","Murang'a","Kiambu","Turkana","West Pokot",
-    "Samburu","Trans Nzoia","Uasin Gishu","Elgeyo Marakwet","Nandi",
-    "Baringo","Laikipia","Nakuru","Narok","Kajiado","Kericho","Bomet",
-    "Kakamega","Vihiga","Bungoma","Busia","Siaya","Kisumu","Homa Bay",
-    "Migori","Kisii","Nyamira","Nairobi City",
+    "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta",
+    "Garissa", "Wajir", "Mandera", "Marsabit", "Isiolo", "Meru",
+    "Tharaka Nithi", "Embu", "Kitui", "Machakos", "Makueni", "Nyandarua",
+    "Nyeri", "Kirinyaga", "Murang'a", "Kiambu", "Turkana", "West Pokot",
+    "Samburu", "Trans Nzoia", "Uasin Gishu", "Elgeyo Marakwet", "Nandi",
+    "Baringo", "Laikipia", "Nakuru", "Narok", "Kajiado", "Kericho", "Bomet",
+    "Kakamega", "Vihiga", "Bungoma", "Busia", "Siaya", "Kisumu", "Homa Bay",
+    "Migori", "Kisii", "Nyamira", "Nairobi City",
   ];
 
   const types = [
-    "Bedsitter","Studio Apartment","1 Bedroom","2 Bedroom","3 Bedroom",
-    "4+ Bedroom","Maisonette","Bungalow","Townhouse","Apartment Block",
+    "Bedsitter", "Studio Apartment", "1 Bedroom", "2 Bedroom", "3 Bedroom",
+    "4+ Bedroom", "Maisonette", "Bungalow", "Townhouse", "Apartment Block",
   ];
 
   const marqueeItems = [
@@ -105,10 +105,10 @@ export default function Home() {
 
   // Stats per category
   const categoryStats = {
-    rentals:   [{ val: "280+", label: "Active Listings" }, { val: "47", label: "Counties" }, { val: "500+", label: "Happy Tenants" }],
-    movers:    [{ val: "60+", label: "Moving Companies" }, { val: "47", label: "Counties Covered" }, { val: "1,200+", label: "Moves Completed" }],
+    rentals: [{ val: "280+", label: "Active Listings" }, { val: "47", label: "Counties" }, { val: "500+", label: "Happy Tenants" }],
+    movers: [{ val: "60+", label: "Moving Companies" }, { val: "47", label: "Counties Covered" }, { val: "1,200+", label: "Moves Completed" }],
     merchants: [{ val: "150+", label: "Verified Merchants" }, { val: "5,000+", label: "Products Listed" }, { val: "30+", label: "Counties" }],
-    tourism:   [{ val: "200+", label: "Hotels & Lodges" }, { val: "47", label: "Counties" }, { val: "3,000+", label: "Happy Guests" }],
+    tourism: [{ val: "200+", label: "Hotels & Lodges" }, { val: "47", label: "Counties" }, { val: "3,000+", label: "Happy Guests" }],
   };
 
   useEffect(() => {
@@ -219,7 +219,7 @@ export default function Home() {
             <span style={styles.heroTitleAccent}>Under One Roof</span>
           </h1>
           <p style={styles.heroSubtitle}>
-            Rentals · Movers · Merchants · Tourism — verified across all 47 counties
+            Rentals · Movers · MarketPlace · Tourism — verified across all 47 counties
           </p>
 
           {/* ── CATEGORY QUICK LINKS ── */}

@@ -310,36 +310,92 @@ const styles = {
     color: "#fbbf24",
     marginBottom: "20px",
   },
-  announcementsList: {
+  announcementsGrid: {
     display: "grid",
-    gap: "15px",
+    gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+    gap: "20px",
   },
-  announcementCard: {
+  announcementBox: {
     background: "rgba(15, 23, 42, 0.8)",
-    borderRadius: "12px",
+    borderRadius: "15px",
     padding: "20px",
     border: "1px solid rgba(255, 255, 255, 0.1)",
-  },
-  announcementHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "10px",
+    cursor: "pointer",
+    transition: "all 0.3s",
   },
   announcementBusiness: {
-    fontSize: "14px",
+    fontSize: "13px",
     fontWeight: 600,
-    color: "#fbbf24",
-  },
-  announcementDate: {
-    fontSize: "12px",
     color: "#94a3b8",
+    marginBottom: "10px",
+    display: "block",
   },
-  announcementTitle: {
+  announcementBoxTitle: {
     fontSize: "16px",
-    fontWeight: 700,
+    fontWeight: 600,
     color: "#f1f5f9",
-    marginBottom: "8px",
+    marginBottom: "10px",
+    margin: 0,
+  },
+  announcementBoxDate: {
+    fontSize: "12px",
+    color: "#64748b",
+  },
+  modalOverlay: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: "rgba(0, 0, 0, 0.8)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1000,
+  },
+  modalContent: {
+    background: "rgba(30, 41, 59, 0.95)",
+    borderRadius: "20px",
+    padding: "40px",
+    maxWidth: "600px",
+    width: "90%",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    position: "relative",
+  },
+  modalClose: {
+    position: "absolute",
+    top: "20px",
+    right: "20px",
+    background: "rgba(255, 255, 255, 0.1)",
+    border: "none",
+    borderRadius: "50%",
+    width: "40px",
+    height: "40px",
+    fontSize: "20px",
+    color: "#f1f5f9",
+    cursor: "pointer",
+    transition: "all 0.3s",
+  },
+  modalTitle: {
+    fontSize: "28px",
+    fontWeight: 700,
+    color: "#fbbf24",
+    marginBottom: "15px",
+  },
+  modalBusiness: {
+    fontSize: "16px",
+    color: "#94a3b8",
+    marginBottom: "10px",
+  },
+  modalDate: {
+    fontSize: "14px",
+    color: "#64748b",
+    marginBottom: "20px",
+  },
+  modalContentText: {
+    fontSize: "16px",
+    color: "#cbd5e1",
+    lineHeight: "1.8",
   },
   announcementContent: {
     fontSize: "14px",
@@ -430,6 +486,8 @@ export default function AxxBiashara() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [announcements, setAnnouncements] = useState([]);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
+  const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
 
   useEffect(() => {
     loadBusinesses();
@@ -491,6 +549,39 @@ export default function AxxBiashara() {
         </div>
         <p style={styles.subtitle}>Discover and connect with trusted businesses across Kenya</p>
 
+        {/* Announcements Section */}
+        {announcements.length > 0 && (
+          <div style={styles.announcementsSection}>
+            <h3 style={styles.announcementsTitle}>📢 Latest Announcements</h3>
+            <div style={styles.announcementsGrid}>
+              {announcements.slice(0, 5).map((announcement, index) => (
+                <div
+                  key={index}
+                  style={styles.announcementBox}
+                  onClick={() => {
+                    setSelectedAnnouncement(announcement);
+                    setShowAnnouncementModal(true);
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-5px)";
+                    e.currentTarget.style.boxShadow = "0 10px 30px rgba(251, 191, 36, 0.3)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                >
+                  <span style={styles.announcementBusiness}>{announcement.businessName}</span>
+                  <h4 style={styles.announcementBoxTitle}>{announcement.title}</h4>
+                  <span style={styles.announcementBoxDate}>
+                    {new Date(announcement.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Pricing Section */}
         <div style={styles.pricingSection}>
           <div style={styles.pricingCard}>
@@ -501,27 +592,6 @@ export default function AxxBiashara() {
           </div>
         </div>
       </div>
-
-      {/* Announcements Section */}
-      {announcements.length > 0 && (
-        <div style={styles.announcementsSection}>
-          <h3 style={styles.announcementsTitle}>📢 Latest Announcements</h3>
-          <div style={styles.announcementsList}>
-            {announcements.slice(0, 5).map((announcement, index) => (
-              <div key={index} style={styles.announcementCard}>
-                <div style={styles.announcementHeader}>
-                  <span style={styles.announcementBusiness}>{announcement.businessName}</span>
-                  <span style={styles.announcementDate}>
-                    {new Date(announcement.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-                <h4 style={styles.announcementTitle}>{announcement.title}</h4>
-                <p style={styles.announcementContent}>{announcement.content}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Search Bar */}
       <div style={styles.searchSection}>
@@ -725,6 +795,24 @@ export default function AxxBiashara() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Announcement Modal */}
+      {showAnnouncementModal && selectedAnnouncement && (
+        <div style={styles.modalOverlay} onClick={() => setShowAnnouncementModal(false)}>
+          <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <button
+              style={styles.modalClose}
+              onClick={() => setShowAnnouncementModal(false)}
+            >
+              ✕
+            </button>
+            <h3 style={styles.modalTitle}>{selectedAnnouncement.title}</h3>
+            <p style={styles.modalBusiness}>📢 {selectedAnnouncement.businessName}</p>
+            <p style={styles.modalDate}>📅 {new Date(selectedAnnouncement.createdAt).toLocaleDateString()}</p>
+            <p style={styles.modalContentText}>{selectedAnnouncement.content}</p>
+          </div>
         </div>
       )}
     </div>
