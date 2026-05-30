@@ -4,10 +4,10 @@ import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 
 // ── tiny helpers ──────────────────────────────────────────────
-const TABS = ["properties", "materials", "tourism", "movers", "sellers", "sold", "payment", "boosts"];
+const TABS = ["properties", "materials", "tourism", "movers", "sellers", "sold", "payment", "boosts", "businesses"];
 const TAB_LABELS = {
   properties: "🏠 Properties", materials: "🛍️ Materials", tourism: "🏨 Tourism",
-  movers: "🚛 Movers", sellers: "📋 Sellers", sold: "💰 Sold", payment: "💳 Payment", boosts: "🚀 Payments"
+  movers: "🚛 Movers", sellers: "📋 Sellers", sold: "💰 Sold", payment: "💳 Payment", boosts: "🚀 Payments", businesses: "🏪 Businesses"
 };
 const STATUS_VIEWS = ["pending", "approved", "rejected"];
 
@@ -43,6 +43,10 @@ export default function AdminDashboard() {
   const [configSaving, setConfigSaving] = useState(false);
   const [configMessage, setConfigMessage] = useState("");
 
+  // ── BUSINESSES STATE ───────────────────────────────────────
+  const [pendingBusinesses, setPendingBusinesses] = useState([]);
+  const [businessesLoading, setBusinessesLoading] = useState(false);
+
   // ── auth guard ─────────────────────────────────────────────
   useEffect(() => {
     if (user?.role !== "admin") { navigate("/login"); return; }
@@ -77,7 +81,7 @@ export default function AdminDashboard() {
 
   // ── reload items when tab or statusView changes ─────────────
   useEffect(() => {
-    if (activeTab !== "payment" && activeTab !== "sold" && activeTab !== "boosts") {
+    if (activeTab !== "payment" && activeTab !== "sold" && activeTab !== "boosts" && activeTab !== "businesses") {
       loadItems(activeTab, statusView);
       loadViewStats(activeTab);
       loadTopViewed(activeTab);
@@ -85,6 +89,8 @@ export default function AdminDashboard() {
       loadItems("sold", "sold");
     } else if (activeTab === "boosts") {
       loadAllBoosts();
+    } else if (activeTab === "businesses") {
+      loadPendingBusinesses();
     }
   }, [activeTab, statusView]);
 
@@ -240,6 +246,41 @@ export default function AdminDashboard() {
     const a = document.createElement("a");
     a.href = url; a.download = `${activeTab}_${statusView}_${new Date().toISOString().split("T")[0]}.csv`;
     a.click(); window.URL.revokeObjectURL(url);
+  };
+
+  // ── BUSINESSES FUNCTIONS ─────────────────────────────────────
+  const loadPendingBusinesses = async () => {
+    setBusinessesLoading(true);
+    try {
+      console.log("Loading pending businesses...");
+      const res = await API.get("/business/admin/pending");
+      console.log("Pending businesses response:", res.data);
+      setPendingBusinesses(res.data.businesses || []);
+    } catch (err) {
+      console.error("Failed to load pending businesses:", err);
+    } finally {
+      setBusinessesLoading(false);
+    }
+  };
+
+  const handleBusinessStatus = async (businessId, status) => {
+    try {
+      await API.patch(`/business/admin/${businessId}/status`, { status });
+      setPendingBusinesses((prev) => prev.filter((b) => b._id !== businessId));
+      alert(`✅ Business ${status} successfully`);
+    } catch (err) {
+      alert("❌ Failed to update business status");
+    }
+  };
+
+  const handleAddBadge = async (businessId, badgeType) => {
+    try {
+      await API.post(`/business/admin/${businessId}/verify`, { badgeType });
+      loadPendingBusinesses();
+      alert("✅ Verification badge added successfully");
+    } catch (err) {
+      alert("❌ Failed to add verification badge");
+    }
   };
 
   // ── edit / save ────────────────────────────────────────────
@@ -638,7 +679,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* STATUS VIEW TOGGLE */}
-      {activeTab !== "payment" && activeTab !== "sold" && activeTab !== "boosts" && (
+      {activeTab !== "payment" && activeTab !== "sold" && activeTab !== "boosts" && activeTab !== "businesses" && (
         <div style={S.statusToggle}>
           {STATUS_VIEWS.map(v => (
             <button key={v}
@@ -651,7 +692,7 @@ export default function AdminDashboard() {
       )}
 
       {/* SEARCH AND FILTER BAR */}
-      {activeTab !== "payment" && activeTab !== "boosts" && (
+      {activeTab !== "payment" && activeTab !== "boosts" && activeTab !== "businesses" && (
         <div style={S.searchBar}>
           <div style={S.searchInputWrapper}>
             <span style={S.searchIcon}>🔍</span>
@@ -706,6 +747,56 @@ export default function AdminDashboard() {
           mpesaConfig={mpesaConfig} setMpesaConfig={setMpesaConfig}
           configSaving={configSaving} configMessage={configMessage}
           handleSave={handleSaveMpesaConfig} />
+      ) : activeTab === "businesses" ? (
+        businessesLoading ? (
+          <div style={S.loader}>
+            <div style={S.spinner}></div>
+            <p>⏳ Loading pending businesses...</p>
+          </div>
+        ) : pendingBusinesses.length === 0 ? (
+          <div style={S.empty}>
+            <p style={S.emptyText}>✅ No pending businesses found.</p>
+          </div>
+        ) : (
+          <div style={S.grid}>
+            {pendingBusinesses.map(business => (
+              <div key={business._id} style={S.card} className="admin-card">
+                {business.images && business.images.length > 0 && (
+                  <div style={{ ...S.cardImg, backgroundImage: `url(${business.images[0]})` }} />
+                )}
+                <div style={S.cardBody}>
+                  <p style={S.cardTitle}>{business.name}</p>
+                  <p style={S.cardSub}>{business.categories.join(", ")}</p>
+                  <p style={S.cardOwner}>📍 {business.location.town}, {business.location.county}</p>
+                  <p style={S.cardOwner}>👤 {business.owner?.name || "Anonymous"}</p>
+                  <p style={S.cardOwner}>📞 {business.contact.phone}</p>
+                  <div style={S.cardFooter}>
+                    <span style={{ ...S.statusDot, background: business.status === "approved" ? "#22c55e" : business.status === "rejected" ? "#ef4444" : "#fbbf24" }}>
+                      {business.status}
+                    </span>
+                  </div>
+                  <div style={S.cardBtns}>
+                    <button style={S.approveBtn} onClick={() => handleBusinessStatus(business._id, "approved")}>✅ Approve</button>
+                    <button style={S.rejectBtn} onClick={() => handleBusinessStatus(business._id, "rejected")}>❌ Reject</button>
+                  </div>
+                  <select
+                    style={{ ...S.filterSelect, marginTop: "10px", padding: "8px", fontSize: "12px" }}
+                    onChange={(e) => handleAddBadge(business._id, e.target.value)}
+                    defaultValue=""
+                  >
+                    <option value="">Add Badge</option>
+                    <option value="student_verified">🟢 Student</option>
+                    <option value="identity_verified">🟢 Identity</option>
+                    <option value="business_verified">🔵 Business</option>
+                    <option value="online_verified">🔵 Online</option>
+                    <option value="location_verified">🟣 Location</option>
+                    <option value="premium_verified">⭐ Premium</option>
+                  </select>
+                </div>
+              </div>
+            ))}
+          </div>
+        )
       ) : loading ? (
         <div style={S.loader}>
           <div style={S.spinner}></div>
