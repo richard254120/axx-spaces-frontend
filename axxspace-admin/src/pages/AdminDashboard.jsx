@@ -7,7 +7,7 @@ import API from "../api/api";
 const TABS = ["properties", "materials", "tourism", "movers", "sellers", "sold", "payment", "boosts"];
 const TAB_LABELS = {
   properties: "🏠 Properties", materials: "🛍️ Materials", tourism: "🏨 Tourism",
-  movers: "🚛 Movers", sellers: "📋 Sellers", sold: "💰 Sold", payment: "💳 Payment", boosts: "🚀 Boosts"
+  movers: "🚛 Movers", sellers: "📋 Sellers", sold: "💰 Sold", payment: "💳 Payment", boosts: "🚀 Payments"
 };
 const STATUS_VIEWS = ["pending", "approved", "rejected"];
 
@@ -31,7 +31,7 @@ export default function AdminDashboard() {
   const [filterCategory, setFilterCategory] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
-  // ── BOOST / PAYMENT NOTIFICATION STATE ──────────────────────
+  // ── NOTIFICATION STATE ─────────────────────────────────────
   const [pendingBoosts, setPendingBoosts] = useState([]);
   const [allBoosts, setAllBoosts] = useState([]);
   const [showNotifPanel, setShowNotifPanel] = useState(false);
@@ -55,7 +55,7 @@ export default function AdminDashboard() {
     loadAllBoosts();
   }, [user, navigate]);
 
-  // ── poll for new boost payments every 30 seconds ────────────
+  // ── poll for new notifications every 30 seconds ─────────────
   useEffect(() => {
     const interval = setInterval(() => {
       loadPendingBoosts();
@@ -139,47 +139,46 @@ export default function AdminDashboard() {
     } catch (e) { console.error(e); }
   };
 
-  // ── BOOST LOADERS ──────────────────────────────────────────
+  // ── NOTIFICATION LOADERS (uses your existing /payment/notifications) ──
   const loadPendingBoosts = async () => {
     try {
-      const r = await API.get("/boosts/pending");
-      setPendingBoosts(Array.isArray(r.data) ? r.data : []);
-    } catch (e) { console.error("boost pending load:", e); }
+      const r = await API.get("/payment/notifications");
+      const all = Array.isArray(r.data?.notifications) ? r.data.notifications : [];
+      setPendingBoosts(all.filter(n => !n.read));
+    } catch (e) { console.error("notifications load:", e); }
   };
 
   const loadAllBoosts = async () => {
     try {
       setBoostLoading(true);
-      const r = await API.get("/boosts/all");
-      setAllBoosts(Array.isArray(r.data) ? r.data : []);
-    } catch (e) { console.error("boost all load:", e); }
+      const r = await API.get("/payment/notifications");
+      setAllBoosts(Array.isArray(r.data?.notifications) ? r.data.notifications : []);
+    } catch (e) { console.error("all notifications load:", e); }
     finally { setBoostLoading(false); }
   };
 
-  // ── APPROVE BOOST ──────────────────────────────────────────
-  // This marks the boost as confirmed, sets listing.isFeatured = true,
-  // and sets listing.featuredPriority so it sorts to the top.
-  const handleApproveBoost = async (boostId) => {
+  // ── MARK NOTIFICATION AS READ (confirm payment) ─────────────
+  const handleApproveBoost = async (notifId) => {
     try {
-      await API.patch(`/boosts/${boostId}/approve`);
-      setBoostMessage("✅ Boost approved! Listing is now featured.");
+      await API.put(`/payment/notifications/${notifId}/read`);
+      setBoostMessage("✅ Payment confirmed!");
       loadPendingBoosts();
       loadAllBoosts();
       loadStats();
     } catch (e) {
-      setBoostMessage("❌ Failed to approve boost: " + (e.response?.data?.error || e.message));
+      setBoostMessage("❌ Failed: " + (e.response?.data?.error || e.message));
     }
     setTimeout(() => setBoostMessage(""), 4000);
   };
 
-  const handleRejectBoost = async (boostId) => {
+  const handleRejectBoost = async (notifId) => {
     try {
-      await API.patch(`/boosts/${boostId}/reject`);
-      setBoostMessage("✅ Boost rejected and payment refund initiated.");
+      await API.put(`/payment/notifications/${notifId}/read`);
+      setBoostMessage("✅ Notification dismissed.");
       loadPendingBoosts();
       loadAllBoosts();
     } catch (e) {
-      setBoostMessage("❌ Failed to reject boost: " + (e.response?.data?.error || e.message));
+      setBoostMessage("❌ Failed: " + (e.response?.data?.error || e.message));
     }
     setTimeout(() => setBoostMessage(""), 4000);
   };
@@ -205,6 +204,7 @@ export default function AdminDashboard() {
 
   const refresh = () => { loadStats(); loadAllPending(); loadItems(activeTab, statusView); };
 
+  // ── delete ─────────────────────────────────────────────────
   const handleDelete = async (type, id) => {
     try {
       await API.delete(`/admin/${type}/${id}`);
@@ -212,6 +212,7 @@ export default function AdminDashboard() {
       if (selected?._id === id) setSelected(null);
       alert("✅ Deleted successfully");
     } catch (e) {
+      console.error("Delete error:", e);
       alert("❌ Failed to delete: " + (e.response?.data?.error || e.message));
     }
   };
@@ -221,6 +222,7 @@ export default function AdminDashboard() {
     if (deleteConfirm) { handleDelete(deleteConfirm.type, deleteConfirm.id); setDeleteConfirm(null); }
   };
 
+  // ── export ─────────────────────────────────────────────────
   const exportData = () => {
     if (!filteredItems.length) return;
     const dataToExport = filteredItems.map(item => ({
@@ -239,6 +241,7 @@ export default function AdminDashboard() {
     a.click(); window.URL.revokeObjectURL(url);
   };
 
+  // ── edit / save ────────────────────────────────────────────
   const openEdit = (item) => { setEditData({ ...item }); setEditMode(true); };
   const saveEdit = async () => {
     setSaving(true);
@@ -253,6 +256,7 @@ export default function AdminDashboard() {
     finally { setSaving(false); }
   };
 
+  // ── mpesa save ─────────────────────────────────────────────
   const handleSaveMpesaConfig = async () => {
     setConfigSaving(true);
     try {
@@ -267,6 +271,7 @@ export default function AdminDashboard() {
     finally { setConfigSaving(false); setTimeout(() => setConfigMessage(""), 3000); }
   };
 
+  // ── pending counts for tab badge ───────────────────────────
   const pendingCount = (tab) => {
     if (!allPending) return "";
     const map = { properties: "properties", materials: "materials", tourism: "tourism", movers: "movers", sellers: "sellers" };
@@ -274,6 +279,7 @@ export default function AdminDashboard() {
     return key && allPending[key]?.length ? ` (${allPending[key].length})` : "";
   };
 
+  // ── items to show ──────────────────────────────────────────
   const displayItems = statusView === "pending" ? (allPending?.[activeTab] || []) : allItems;
   const filteredItems = displayItems.filter(item => {
     const matchesSearch = searchQuery === "" ||
@@ -286,6 +292,7 @@ export default function AdminDashboard() {
     return matchesSearch && matchesCategory;
   });
 
+  // ── field helpers ──────────────────────────────────────────
   const getTitle = (item) => item.title || item.name || item.businessName || "—";
   const getSub = (item) => {
     if (activeTab === "sold") {
@@ -303,8 +310,24 @@ export default function AdminDashboard() {
     return Array.isArray(imgs) ? imgs.filter(Boolean) : [];
   };
 
+  // ── notification helpers ───────────────────────────────────
+  const getNotifTitle = (n) => {
+    if (n.type === "property_booking") return n.propertyId?.title || "Property Booking";
+    if (n.type === "material_purchase") return n.materialId?.title || "Material Purchase";
+    if (n.type === "tourism_booking") return n.tourismId?.title || "Tourism Booking";
+    if (n.type === "boost") return "Listing Boost";
+    if (n.type === "subscription") return "Subscription Payment";
+    return "Payment";
+  };
+
+  const getNotifIcon = (type) => {
+    const icons = { property_booking: "🏠", material_purchase: "🛍️", tourism_booking: "🏨", boost: "🚀", subscription: "📋" };
+    return icons[type] || "💳";
+  };
+
   const hasPendingBoosts = pendingBoosts.length > 0;
 
+  // ── render ─────────────────────────────────────────────────
   return (
     <div style={S.page}>
       <style>{css}</style>
@@ -343,46 +366,49 @@ export default function AdminDashboard() {
 
                 {hasPendingBoosts ? (
                   <div style={S.notifList}>
-                    {pendingBoosts.map(boost => (
-                      <div key={boost._id} style={S.notifItem} className="notif-item-pulse">
+                    {pendingBoosts.map(notif => (
+                      <div key={notif._id} style={S.notifItem} className="notif-item-pulse">
                         <div style={S.notifItemHeader}>
                           <span style={S.notifRedDot} className="red-dot-blink" />
                           <span style={S.notifItemTitle}>
-                            {boost.listing?.title || boost.listingTitle || "Listing"}
+                            {getNotifIcon(notif.type)} {getNotifTitle(notif)}
                           </span>
                         </div>
                         <div style={S.notifItemMeta}>
-                          <span>👤 {boost.user?.name || boost.userName || "User"}</span>
-                          <span>📞 {boost.user?.phone || boost.userPhone || "—"}</span>
+                          <span>👤 {notif.userName || notif.userId?.name || "User"}</span>
+                          <span>📞 {notif.userPhone || notif.userId?.phone || "—"}</span>
                         </div>
                         <div style={S.notifItemMeta}>
                           <span style={{ color: "#fbbf24", fontWeight: 700 }}>
-                            KES {boost.amount?.toLocaleString() || "—"}
+                            KES {notif.amount?.toLocaleString() || "—"}
                           </span>
                           <span style={{ color: "#94a3b8", fontSize: 11 }}>
-                            {boost.mpesaRef || boost.transactionRef || "Pending verification"}
+                            {notif.mpesaRef || notif.transactionId || "Pending verification"}
                           </span>
                         </div>
+                        {notif.type === "tourism_booking" && notif.checkIn && (
+                          <div style={{ ...S.notifItemMeta, fontSize: 11 }}>
+                            <span>📅 Check-in: {new Date(notif.checkIn).toLocaleDateString()}</span>
+                            <span>Check-out: {new Date(notif.checkOut).toLocaleDateString()}</span>
+                          </div>
+                        )}
                         <div style={S.notifItemMeta}>
-                          <span style={{ color: "#94a3b8", fontSize: 11 }}>
-                            {boost.plan === "weekly" ? "📅 7-day boost" : boost.plan === "monthly" ? "📅 30-day boost" : "📅 Boost"}
-                          </span>
                           <span style={{ color: "#64748b", fontSize: 10 }}>
-                            {new Date(boost.createdAt).toLocaleString()}
+                            {new Date(notif.createdAt).toLocaleString()}
                           </span>
                         </div>
                         <div style={S.notifItemBtns}>
                           <button
                             style={S.notifApproveBtn}
-                            onClick={() => { handleApproveBoost(boost._id); setShowNotifPanel(false); setActiveTab("boosts"); }}
+                            onClick={() => { handleApproveBoost(notif._id); setShowNotifPanel(false); setActiveTab("boosts"); }}
                           >
-                            ✅ Confirm & Boost
+                            ✅ Confirm
                           </button>
                           <button
                             style={S.notifRejectBtn}
-                            onClick={() => { handleRejectBoost(boost._id); }}
+                            onClick={() => handleRejectBoost(notif._id)}
                           >
-                            ❌ Reject
+                            ✕ Dismiss
                           </button>
                         </div>
                       </div>
@@ -396,7 +422,7 @@ export default function AdminDashboard() {
 
                 <div style={S.notifFooter}>
                   <button style={S.notifViewAllBtn} onClick={() => { setActiveTab("boosts"); setShowNotifPanel(false); }}>
-                    View All Boosts →
+                    View All Payments →
                   </button>
                 </div>
               </div>
@@ -419,15 +445,18 @@ export default function AdminDashboard() {
               { label: "🚛 Movers", total: stats.movers.total, pending: stats.movers.pending, color: "#f59e0b" },
               { label: "🏨 Tourism", total: stats.tourism.total, pending: stats.tourism.pending, color: "#8b5cf6" },
               { label: "📋 Sellers", total: stats.sellers.total, pending: stats.sellers.pending, color: "#ec4899" },
-              { label: "🚀 Active Boosts", total: stats.boosts?.active || 0, pending: pendingBoosts.length, color: "#fbbf24", isPulse: pendingBoosts.length > 0 },
+              { label: "💳 Payments", total: allBoosts.length, pending: pendingBoosts.length, color: "#fbbf24", isPulse: pendingBoosts.length > 0 },
             ].map(s => (
-              <div key={s.label} style={{ ...S.statCard, borderTop: `3px solid ${s.color}`, ...(s.isPulse && pendingBoosts.length > 0 ? { boxShadow: "0 0 0 2px rgba(239,68,68,0.4)" } : {}) }}
-                className={s.isPulse && pendingBoosts.length > 0 ? "stat-card-pulse" : ""}>
+              <div key={s.label}
+                style={{ ...S.statCard, borderTop: `3px solid ${s.color}`, ...(s.isPulse && s.pending > 0 ? { boxShadow: "0 0 0 2px rgba(239,68,68,0.4)" } : {}) }}
+                className={s.isPulse && s.pending > 0 ? "stat-card-pulse" : ""}>
                 <p style={S.statLabel}>{s.label}</p>
                 <p style={{ ...S.statVal, color: s.color }}>{s.total}</p>
-                {s.pending > 0 && <p style={{ ...S.statPending, color: s.isPulse ? "#ef4444" : "#ef4444" }}>
-                  {s.isPulse ? `🔴 ${s.pending} awaiting payment confirm` : `${s.pending} pending`}
-                </p>}
+                {s.pending > 0 && (
+                  <p style={S.statPending}>
+                    {s.isPulse ? `🔴 ${s.pending} unread` : `${s.pending} pending`}
+                  </p>
+                )}
               </div>
             ))}
           </div>
@@ -477,7 +506,7 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* TOP VIEWED */}
+          {/* TOP VIEWED ITEMS */}
           {topViewed && (
             <div style={S.chartContainer}>
               <h3 style={S.chartTitle}>🔥 Top Viewed Items</h3>
@@ -572,11 +601,12 @@ export default function AdminDashboard() {
                 <span style={S.quickActionText}>Review Tourism</span>
                 {stats?.tourism?.pending > 0 && <span style={S.quickActionBadge}>{stats.tourism.pending}</span>}
               </button>
-              <button style={{ ...S.quickActionBtn, ...(hasPendingBoosts ? { borderColor: "#ef4444", boxShadow: "0 0 12px rgba(239,68,68,0.3)" } : {}) }}
+              <button
+                style={{ ...S.quickActionBtn, ...(hasPendingBoosts ? { borderColor: "#ef4444", boxShadow: "0 0 12px rgba(239,68,68,0.3)" } : {}) }}
                 className="quickActionBtn"
                 onClick={() => setActiveTab("boosts")}>
-                <span style={S.quickActionIcon}>🚀</span>
-                <span style={S.quickActionText}>Review Boost Payments</span>
+                <span style={S.quickActionIcon}>💳</span>
+                <span style={S.quickActionText}>Review Payments</span>
                 {hasPendingBoosts && <span style={{ ...S.quickActionBadge, background: "#ef4444" }} className="notif-badge-blink">{pendingBoosts.length}</span>}
               </button>
               <button style={S.quickActionBtn} className="quickActionBtn" onClick={() => setActiveTab("sold")}>
@@ -652,21 +682,23 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* BOOST MESSAGE TOAST */}
+      {/* BOOST / PAYMENT MESSAGE TOAST */}
       {boostMessage && (
         <div style={{ ...S.boostToast, background: boostMessage.startsWith("✅") ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)", borderColor: boostMessage.startsWith("✅") ? "#22c55e" : "#ef4444", color: boostMessage.startsWith("✅") ? "#22c55e" : "#ef4444" }}>
           {boostMessage}
         </div>
       )}
 
-      {/* ── BOOST TAB CONTENT ─────────────────────────────── */}
+      {/* CONTENT */}
       {activeTab === "boosts" ? (
-        <BoostManagement
+        <PaymentNotifications
           pendingBoosts={pendingBoosts}
           allBoosts={allBoosts}
           boostLoading={boostLoading}
           onApprove={handleApproveBoost}
           onReject={handleRejectBoost}
+          getNotifTitle={getNotifTitle}
+          getNotifIcon={getNotifIcon}
         />
       ) : activeTab === "payment" ? (
         <PaymentSettings
@@ -682,7 +714,9 @@ export default function AdminDashboard() {
         <div style={S.empty}>
           <p style={S.emptyText}>✅ No {activeTab === "sold" ? "sold" : statusView} {activeTab} found.</p>
           {(searchQuery || filterCategory) && (
-            <button style={S.resetBtn} onClick={() => { setSearchQuery(""); setFilterCategory(""); }}>Clear Filters</button>
+            <button style={S.resetBtn} onClick={() => { setSearchQuery(""); setFilterCategory(""); }}>
+              Clear Filters
+            </button>
           )}
         </div>
       ) : (
@@ -690,7 +724,9 @@ export default function AdminDashboard() {
           {filteredItems.map(item => (
             <div key={item._id} style={{ ...S.card, ...(item.isFeatured ? S.featuredCard : {}) }} onClick={() => setSelected(item)} className="admin-card">
               {item.isFeatured && <div style={S.featuredBanner}>⭐ FEATURED</div>}
-              {getImages(item)[0] && <div style={{ ...S.cardImg, backgroundImage: `url(${getImages(item)[0]})` }} />}
+              {getImages(item)[0] && (
+                <div style={{ ...S.cardImg, backgroundImage: `url(${getImages(item)[0]})` }} />
+              )}
               <div style={S.cardBody}>
                 <p style={S.cardTitle}>{getTitle(item)}</p>
                 <p style={S.cardSub}>{getSub(item)}</p>
@@ -736,7 +772,8 @@ export default function AdminDashboard() {
             <h3 style={S.confirmTitle}>⚠️ Confirm Delete</h3>
             <p style={S.confirmText}>
               Are you sure you want to delete <strong>{deleteConfirm.title}</strong>?
-              <br /><span style={{ fontSize: 12, color: "#ef4444" }}>This action cannot be undone.</span>
+              <br />
+              <span style={{ fontSize: 12, color: "#ef4444" }}>This action cannot be undone.</span>
             </p>
             <div style={S.confirmBtns}>
               <button style={S.cancelBtn} onClick={() => setDeleteConfirm(null)}>Cancel</button>
@@ -749,26 +786,27 @@ export default function AdminDashboard() {
   );
 }
 
-// ── BOOST MANAGEMENT TAB ──────────────────────────────────────
-function BoostManagement({ pendingBoosts, allBoosts, boostLoading, onApprove, onReject }) {
-  const [viewMode, setViewMode] = useState("pending"); // pending | all
-
+// ── PAYMENT NOTIFICATIONS TAB ─────────────────────────────────
+function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprove, onReject, getNotifTitle, getNotifIcon }) {
+  const [viewMode, setViewMode] = useState("pending");
   const displayed = viewMode === "pending" ? pendingBoosts : allBoosts;
 
-  const statusColor = (status) => {
-    if (status === "approved" || status === "active") return "#22c55e";
-    if (status === "rejected" || status === "expired") return "#ef4444";
+  const typeLabel = (type) => {
+    const labels = { property_booking: "Property Booking", material_purchase: "Material Purchase", tourism_booking: "Tourism Booking", boost: "Listing Boost", subscription: "Subscription" };
+    return labels[type] || type;
+  };
+
+  const statusColor = (n) => {
+    if (n.read) return "#22c55e";
     return "#fbbf24";
   };
 
   return (
     <div>
-      {/* Toggle */}
       <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
-        <button
-          style={{ ...S.stBtn, ...(viewMode === "pending" ? S.stBtnActive : {}), position: "relative" }}
+        <button style={{ ...S.stBtn, ...(viewMode === "pending" ? S.stBtnActive : {}), position: "relative" }}
           onClick={() => setViewMode("pending")}>
-          ⏳ Pending Confirmations
+          🔴 Unread Payments
           {pendingBoosts.length > 0 && (
             <span style={{ ...S.notifBadge, position: "static", display: "inline-flex", marginLeft: 8 }} className="notif-badge-blink">
               {pendingBoosts.length}
@@ -776,106 +814,102 @@ function BoostManagement({ pendingBoosts, allBoosts, boostLoading, onApprove, on
           )}
         </button>
         <button style={{ ...S.stBtn, ...(viewMode === "all" ? S.stBtnActive : {}) }} onClick={() => setViewMode("all")}>
-          📋 All Boosts
+          📋 All Payments
         </button>
       </div>
 
       {boostLoading ? (
-        <div style={S.loader}><div style={S.spinner}></div><p>Loading boosts...</p></div>
+        <div style={S.loader}><div style={S.spinner}></div><p>Loading payments...</p></div>
       ) : displayed.length === 0 ? (
         <div style={S.empty}>
           <p style={S.emptyText}>
-            {viewMode === "pending" ? "✅ No pending boost payments to confirm." : "No boosts found."}
+            {viewMode === "pending" ? "✅ No unread payment notifications." : "No payment records found."}
           </p>
         </div>
       ) : (
         <div style={S.boostGrid}>
-          {displayed.map(boost => (
-            <div key={boost._id} style={{ ...S.boostCard, ...(boost.status === "pending" ? S.boostCardPending : {}) }}
-              className={boost.status === "pending" ? "boost-card-glow" : ""}>
-              {/* Pending indicator */}
-              {boost.status === "pending" && (
+          {displayed.map(notif => (
+            <div key={notif._id}
+              style={{ ...S.boostCard, ...(!notif.read ? S.boostCardPending : {}) }}
+              className={!notif.read ? "boost-card-glow" : ""}>
+              {!notif.read && (
                 <div style={S.boostPendingStrip}>
                   <span style={S.redDotInline} className="red-dot-blink" />
-                  PAYMENT AWAITING CONFIRMATION
+                  NEW PAYMENT — AWAITING REVIEW
                 </div>
               )}
 
               <div style={S.boostCardBody}>
-                {/* Listing info */}
-                <div style={S.boostListingInfo}>
-                  {boost.listing?.images?.[0] && (
-                    <img src={boost.listing.images[0]} alt="" style={S.boostThumb} />
-                  )}
-                  <div style={{ flex: 1 }}>
-                    <p style={S.boostListingTitle}>
-                      {boost.listing?.title || boost.listingTitle || "Listing"}
-                      {boost.listing?.isFeatured && <span style={S.boostFeaturedTag}>⭐ Featured</span>}
-                    </p>
-                    <p style={S.boostListingMeta}>
-                      {boost.listing?.category || boost.listingType || "—"} · {boost.listing?.location || "—"}
-                    </p>
-                  </div>
+                <div style={{ marginBottom: 16 }}>
+                  <p style={S.boostListingTitle}>
+                    {getNotifIcon(notif.type)} {getNotifTitle(notif)}
+                    {notif.read && <span style={{ ...S.boostFeaturedTag, background: "rgba(34,197,94,0.15)", color: "#22c55e" }}>✅ Read</span>}
+                  </p>
+                  <p style={S.boostListingMeta}>{typeLabel(notif.type)}</p>
                 </div>
 
-                {/* Payment details */}
                 <div style={S.boostDetails}>
                   <div style={S.boostDetailRow}>
                     <span style={S.boostDetailKey}>👤 User</span>
-                    <span style={S.boostDetailVal}>{boost.user?.name || boost.userName || "—"}</span>
+                    <span style={S.boostDetailVal}>{notif.userName || "—"}</span>
                   </div>
                   <div style={S.boostDetailRow}>
                     <span style={S.boostDetailKey}>📞 Phone</span>
-                    <span style={S.boostDetailVal}>{boost.user?.phone || boost.userPhone || "—"}</span>
+                    <span style={S.boostDetailVal}>{notif.userPhone || "—"}</span>
+                  </div>
+                  <div style={S.boostDetailRow}>
+                    <span style={S.boostDetailKey}>✉️ Email</span>
+                    <span style={S.boostDetailVal}>{notif.userEmail || "—"}</span>
                   </div>
                   <div style={S.boostDetailRow}>
                     <span style={S.boostDetailKey}>💰 Amount</span>
                     <span style={{ ...S.boostDetailVal, color: "#fbbf24", fontWeight: 700 }}>
-                      KES {boost.amount?.toLocaleString() || "—"}
+                      KES {notif.amount?.toLocaleString() || "—"}
                     </span>
                   </div>
                   <div style={S.boostDetailRow}>
-                    <span style={S.boostDetailKey}>📋 Plan</span>
-                    <span style={S.boostDetailVal}>{boost.plan === "weekly" ? "7-day boost" : boost.plan === "monthly" ? "30-day boost" : boost.plan || "—"}</span>
-                  </div>
-                  <div style={S.boostDetailRow}>
-                    <span style={S.boostDetailKey}>🔖 M-Pesa Ref</span>
-                    <span style={{ ...S.boostDetailVal, fontFamily: "monospace", color: "#a78bfa" }}>
-                      {boost.mpesaRef || boost.transactionRef || "Pending"}
+                    <span style={S.boostDetailKey}>🔖 Transaction ID</span>
+                    <span style={{ ...S.boostDetailVal, fontFamily: "monospace", color: "#a78bfa", fontSize: 11 }}>
+                      {notif.transactionId || notif.mpesaRef || "—"}
                     </span>
                   </div>
-                  <div style={S.boostDetailRow}>
-                    <span style={S.boostDetailKey}>📅 Submitted</span>
-                    <span style={S.boostDetailVal}>{new Date(boost.createdAt).toLocaleString()}</span>
-                  </div>
-                  {boost.expiresAt && (
-                    <div style={S.boostDetailRow}>
-                      <span style={S.boostDetailKey}>⏰ Expires</span>
-                      <span style={S.boostDetailVal}>{new Date(boost.expiresAt).toLocaleDateString()}</span>
-                    </div>
+                  {notif.type === "tourism_booking" && notif.checkIn && (
+                    <>
+                      <div style={S.boostDetailRow}>
+                        <span style={S.boostDetailKey}>📅 Check-in</span>
+                        <span style={S.boostDetailVal}>{new Date(notif.checkIn).toLocaleDateString()}</span>
+                      </div>
+                      <div style={S.boostDetailRow}>
+                        <span style={S.boostDetailKey}>📅 Check-out</span>
+                        <span style={S.boostDetailVal}>{new Date(notif.checkOut).toLocaleDateString()}</span>
+                      </div>
+                    </>
                   )}
                   <div style={S.boostDetailRow}>
+                    <span style={S.boostDetailKey}>📅 Received</span>
+                    <span style={S.boostDetailVal}>{new Date(notif.createdAt).toLocaleString()}</span>
+                  </div>
+                  <div style={S.boostDetailRow}>
                     <span style={S.boostDetailKey}>Status</span>
-                    <span style={{ ...S.boostDetailVal, color: statusColor(boost.status), fontWeight: 700, textTransform: "capitalize" }}>
-                      {boost.status || "pending"}
+                    <span style={{ ...S.boostDetailVal, color: statusColor(notif), fontWeight: 700, textTransform: "capitalize" }}>
+                      {notif.read ? "✅ Read" : "🔴 Unread"}
                     </span>
                   </div>
                 </div>
 
-                {/* Actions */}
-                {boost.status === "pending" && (
+                {!notif.read && (
                   <div style={S.boostActions}>
-                    <button style={S.boostApproveBtn} onClick={() => onApprove(boost._id)}>
-                      ✅ Confirm Payment & Activate Boost
+                    <button style={S.boostApproveBtn} onClick={() => onApprove(notif._id)}>
+                      ✅ Mark as Confirmed
                     </button>
-                    <button style={S.boostRejectBtn} onClick={() => onReject(boost._id)}>
-                      ❌ Reject
+                    <button style={S.boostRejectBtn} onClick={() => onReject(notif._id)}>
+                      ✕ Dismiss
                     </button>
                   </div>
                 )}
-                {boost.status === "approved" && (
-                  <div style={{ padding: "10px 0", color: "#22c55e", fontWeight: 700, fontSize: 13 }}>
-                    ⭐ Boost active — listing is featured & prioritized
+                {notif.read && (
+                  <div style={{ padding: "10px 0", color: "#22c55e", fontWeight: 600, fontSize: 13 }}>
+                    ✅ Payment reviewed
                   </div>
                 )}
               </div>
@@ -895,7 +929,8 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
   const images = getImages(item);
   const [imgIdx, setImgIdx] = useState(0);
   const fields = Object.entries(item).filter(([k]) =>
-    !["_id", "__v", "password", "emailVerificationToken", "resetPasswordToken", "images", "photos", "coverImage", "image", "owner", "seller"].includes(k)
+    !["_id", "__v", "password", "emailVerificationToken", "resetPasswordToken",
+      "images", "photos", "coverImage", "image", "owner", "seller"].includes(k)
   );
 
   return (
@@ -1009,8 +1044,6 @@ const S = {
   logo: { fontSize: 26, fontWeight: 800, color: "#fbbf24", margin: 0 },
   logoSub: { color: "#64748b", fontSize: 13, margin: "4px 0 0" },
   logoutBtn: { background: "rgba(239,68,68,0.1)", color: "#ef4444", border: "1px solid #ef4444", padding: "8px 18px", borderRadius: 8, fontWeight: 700, cursor: "pointer" },
-
-  // NOTIFICATION BELL
   notifBtn: { background: "rgba(30,41,59,0.8)", border: "1px solid rgba(255,255,255,0.1)", color: "#f1f5f9", width: 44, height: 44, borderRadius: 12, fontSize: 20, cursor: "pointer", position: "relative", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" },
   notifBadge: { position: "absolute", top: -6, right: -6, background: "#ef4444", color: "#fff", fontSize: 10, fontWeight: 800, minWidth: 18, height: 18, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 4px", border: "2px solid #06101f" },
   notifPanel: { position: "absolute", top: 52, right: 0, width: 360, background: "#0f1729", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, boxShadow: "0 20px 60px rgba(0,0,0,0.6)", zIndex: 2000, overflow: "hidden" },
@@ -1029,8 +1062,6 @@ const S = {
   notifEmpty: { padding: "32px 20px", textAlign: "center", color: "#64748b", fontSize: 13 },
   notifFooter: { padding: "12px 20px", borderTop: "1px solid rgba(255,255,255,0.07)", background: "rgba(15,23,42,0.5)" },
   notifViewAllBtn: { background: "none", border: "none", color: "#fbbf24", fontSize: 13, fontWeight: 700, cursor: "pointer", padding: 0 },
-
-  // BOOST CARDS
   boostGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(340px,1fr))", gap: 20 },
   boostCard: { background: "rgba(15,23,42,0.85)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.06)", overflow: "hidden" },
   boostCardPending: { border: "1px solid rgba(239,68,68,0.4)", boxShadow: "0 0 20px rgba(239,68,68,0.1)" },
@@ -1049,18 +1080,11 @@ const S = {
   boostActions: { display: "flex", flexDirection: "column", gap: 8 },
   boostApproveBtn: { background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#fff", border: "none", padding: "12px 20px", borderRadius: 10, fontWeight: 800, cursor: "pointer", fontSize: 13, transition: "all 0.2s" },
   boostRejectBtn: { background: "rgba(239,68,68,0.1)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.4)", padding: "10px 20px", borderRadius: 10, fontWeight: 700, cursor: "pointer", fontSize: 13, transition: "all 0.2s" },
-
-  // BOOST TOAST
   boostToast: { padding: "12px 20px", borderRadius: 10, border: "1px solid", fontSize: 14, fontWeight: 600, marginBottom: 20 },
-
-  // FEATURED CARD
   featuredCard: { border: "1px solid rgba(251,191,36,0.4)", boxShadow: "0 0 20px rgba(251,191,36,0.1)" },
   featuredBanner: { background: "linear-gradient(90deg,rgba(251,191,36,0.2),rgba(251,191,36,0.05))", padding: "6px 16px", fontSize: 11, fontWeight: 800, color: "#fbbf24", letterSpacing: "1px", borderBottom: "1px solid rgba(251,191,36,0.2)" },
-
-  // TAB BOOST ALERT
   tabBoostAlert: { background: "rgba(239,68,68,0.15)", color: "#ef4444", borderColor: "rgba(239,68,68,0.5)" },
   tabBadge: { display: "inline-flex", alignItems: "center", justifyContent: "center", background: "#ef4444", color: "#fff", fontSize: 10, fontWeight: 800, minWidth: 18, height: 18, borderRadius: 9, padding: "0 4px", marginLeft: 6, border: "2px solid #0a1428" },
-
   statsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12, marginBottom: 28 },
   statCard: { background: "rgba(30,41,59,0.6)", padding: "16px 20px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.05)" },
   statLabel: { fontSize: 12, color: "#94a3b8", margin: "0 0 6px" },
@@ -1177,7 +1201,6 @@ const css = `
   @keyframes badgePulse { 0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.7); } 50% { box-shadow: 0 0 0 6px rgba(239,68,68,0); } }
   @keyframes boostGlow { 0%,100% { box-shadow: 0 0 20px rgba(239,68,68,0.08); } 50% { box-shadow: 0 0 30px rgba(239,68,68,0.25); } }
   @keyframes statPulse { 0%,100% { box-shadow: 0 0 0 2px rgba(239,68,68,0.4); } 50% { box-shadow: 0 0 0 4px rgba(239,68,68,0.15); } }
-
   .red-dot-blink { animation: redBlink 1.2s ease-in-out infinite; }
   .notif-badge-blink { animation: badgePulse 1.5s ease-in-out infinite; }
   .notif-btn-active { border-color: rgba(239,68,68,0.5) !important; box-shadow: 0 0 12px rgba(239,68,68,0.3); }
