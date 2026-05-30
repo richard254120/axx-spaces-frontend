@@ -252,12 +252,12 @@ export default function AdminDashboard() {
   const loadPendingBusinesses = async () => {
     setBusinessesLoading(true);
     try {
-      console.log("Loading pending businesses...");
-      const res = await API.get("/business/admin/pending");
-      console.log("Pending businesses response:", res.data);
+      console.log("Loading businesses with status:", statusView);
+      const res = await API.get(`/business/admin/${statusView}`);
+      console.log("Businesses response:", res.data);
       setPendingBusinesses(res.data.businesses || []);
     } catch (err) {
-      console.error("Failed to load pending businesses:", err);
+      console.error("Failed to load businesses:", err);
     } finally {
       setBusinessesLoading(false);
     }
@@ -315,6 +315,9 @@ export default function AdminDashboard() {
 
   // ── pending counts for tab badge ───────────────────────────
   const pendingCount = (tab) => {
+    if (tab === "businesses") {
+      return stats?.businesses?.pending > 0 ? ` (${stats.businesses.pending})` : "";
+    }
     if (!allPending) return "";
     const map = { properties: "properties", materials: "materials", tourism: "tourism", movers: "movers", sellers: "sellers" };
     const key = map[tab];
@@ -603,8 +606,9 @@ export default function AdminDashboard() {
                 { label: "Movers", total: stats.movers.total, pending: stats.movers.pending, color: "#f59e0b" },
                 { label: "Tourism", total: stats.tourism.total, pending: stats.tourism.pending, color: "#8b5cf6" },
                 { label: "Sellers", total: stats.sellers.total, pending: stats.sellers.pending, color: "#ec4899" },
+                { label: "Businesses", total: stats.businesses?.total || 0, pending: stats.businesses?.pending || 0, color: "#fbbf24" },
               ].map(s => {
-                const maxTotal = Math.max(...[stats.properties.total, stats.materials.total, stats.movers.total, stats.tourism.total, stats.sellers.total]);
+                const maxTotal = Math.max(...[stats.properties.total, stats.materials.total, stats.movers.total, stats.tourism.total, stats.sellers.total, stats.businesses?.total || 0]);
                 const barWidth = maxTotal > 0 ? (s.total / maxTotal) * 100 : 0;
                 const pendingWidth = maxTotal > 0 ? (s.pending / maxTotal) * 100 : 0;
                 return (
@@ -643,6 +647,11 @@ export default function AdminDashboard() {
                 <span style={S.quickActionText}>Review Tourism</span>
                 {stats?.tourism?.pending > 0 && <span style={S.quickActionBadge}>{stats.tourism.pending}</span>}
               </button>
+              <button style={S.quickActionBtn} className="quickActionBtn" onClick={() => { setActiveTab("businesses"); setStatusView("pending"); }}>
+                <span style={S.quickActionIcon}>🏪</span>
+                <span style={S.quickActionText}>Review Businesses</span>
+                {stats?.businesses?.pending > 0 && <span style={S.quickActionBadge}>{stats.businesses.pending}</span>}
+              </button>
               <button
                 style={{ ...S.quickActionBtn, ...(hasPendingBoosts ? { borderColor: "#ef4444", boxShadow: "0 0 12px rgba(239,68,68,0.3)" } : {}) }}
                 className="quickActionBtn"
@@ -679,7 +688,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* STATUS VIEW TOGGLE */}
-      {activeTab !== "payment" && activeTab !== "sold" && activeTab !== "boosts" && activeTab !== "businesses" && (
+      {activeTab !== "payment" && activeTab !== "sold" && activeTab !== "boosts" && (
         <div style={S.statusToggle}>
           {STATUS_VIEWS.map(v => (
             <button key={v}
