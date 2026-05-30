@@ -31,10 +31,31 @@ const styles = {
   },
   filters: {
     display: "flex",
-    gap: "15px",
+    gap: "20px",
     marginBottom: "30px",
     flexWrap: "wrap",
     justifyContent: "center",
+  },
+  filterGroup: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+  },
+  filterLabel: {
+    fontSize: "14px",
+    fontWeight: 600,
+    color: "#cbd5e1",
+  },
+  filterSelect: {
+    padding: "12px 16px",
+    background: "rgba(15, 23, 42, 0.8)",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    borderRadius: "10px",
+    color: "#f1f5f9",
+    fontSize: "14px",
+    cursor: "pointer",
+    outline: "none",
+    minWidth: "200px",
   },
   filterButton: {
     padding: "12px 24px",
@@ -127,6 +148,26 @@ const styles = {
     borderRadius: "20px",
     fontSize: "12px",
     fontWeight: 600,
+  },
+  cardActions: {
+    display: "flex",
+    gap: "10px",
+    marginTop: "15px",
+  },
+  contactButton: {
+    padding: "10px 20px",
+    background: "#fbbf24",
+    color: "#0f172a",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: 600,
+    cursor: "pointer",
+    textDecoration: "none",
+    transition: "all 0.3s",
+    display: "flex",
+    alignItems: "center",
+    gap: "5px",
   },
   badgeStudent: {
     background: "rgba(34, 197, 94, 0.2)",
@@ -305,6 +346,44 @@ const styles = {
     color: "#cbd5e1",
     lineHeight: "1.5",
   },
+  searchSection: {
+    marginBottom: "30px",
+  },
+  searchInputWrapper: {
+    position: "relative",
+    maxWidth: "600px",
+    margin: "0 auto",
+  },
+  searchIcon: {
+    position: "absolute",
+    left: "15px",
+    top: "50%",
+    transform: "translateY(-50%)",
+    fontSize: "20px",
+  },
+  searchInput: {
+    width: "100%",
+    padding: "15px 15px 15px 50px",
+    background: "rgba(15, 23, 42, 0.8)",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    borderRadius: "12px",
+    color: "#f1f5f9",
+    fontSize: "16px",
+    outline: "none",
+    transition: "border-color 0.3s",
+  },
+  clearSearchBtn: {
+    position: "absolute",
+    right: "15px",
+    top: "50%",
+    transform: "translateY(-50%)",
+    background: "none",
+    border: "none",
+    color: "#94a3b8",
+    cursor: "pointer",
+    fontSize: "18px",
+    padding: "5px",
+  },
 };
 
 const BUSINESS_CATEGORIES = [
@@ -337,20 +416,24 @@ export default function AxxBiashara() {
   const [businesses, setBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCounty, setSelectedCounty] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
   const [announcements, setAnnouncements] = useState([]);
 
   useEffect(() => {
     loadBusinesses();
     loadAnnouncements();
-  }, [selectedCategory, searchQuery]);
+  }, [selectedCategory, selectedCounty, searchQuery, sortBy]);
 
   const loadBusinesses = async () => {
     setLoading(true);
     try {
       const params = {};
       if (selectedCategory) params.category = selectedCategory;
+      if (selectedCounty) params.county = selectedCounty;
       if (searchQuery) params.search = searchQuery;
+      if (sortBy) params.sort = sortBy;
 
       const res = await API.get("/business", { params });
       setBusinesses(res.data.businesses || []);
@@ -430,32 +513,64 @@ export default function AxxBiashara() {
         </div>
       )}
 
-      <div style={styles.filters}>
-        <button
-          style={{ ...styles.filterButton, ...(selectedCategory === null ? styles.filterButtonActive : {}) }}
-          onClick={() => setSelectedCategory(null)}
-        >
-          All Categories
-        </button>
-        {BUSINESS_CATEGORIES.map((category) => (
-          <button
-            key={category}
-            style={{ ...styles.filterButton, ...(selectedCategory === category ? styles.filterButtonActive : {}) }}
-            onClick={() => setSelectedCategory(category)}
-          >
-            {category}
-          </button>
-        ))}
+      {/* Search Bar */}
+      <div style={styles.searchSection}>
+        <div style={styles.searchInputWrapper}>
+          <span style={styles.searchIcon}>🔍</span>
+          <input
+            type="text"
+            style={styles.searchInput}
+            placeholder="Search businesses by name, category, or location..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button style={styles.clearSearchBtn} onClick={() => setSearchQuery("")}>✕</button>
+          )}
+        </div>
       </div>
 
       <div style={styles.filters}>
-        <input
-          type="text"
-          style={styles.searchInput}
-          placeholder="🔍 Search businesses..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+        <div style={styles.filterGroup}>
+          <label style={styles.filterLabel}>Category:</label>
+          <select
+            style={styles.filterSelect}
+            value={selectedCategory || ""}
+            onChange={(e) => setSelectedCategory(e.target.value || null)}
+          >
+            <option value="">All Categories</option>
+            {BUSINESS_CATEGORIES.map((category) => (
+              <option key={category} value={category}>{category}</option>
+            ))}
+          </select>
+        </div>
+        <div style={styles.filterGroup}>
+          <label style={styles.filterLabel}>County:</label>
+          <select
+            style={styles.filterSelect}
+            value={selectedCounty || ""}
+            onChange={(e) => setSelectedCounty(e.target.value || null)}
+          >
+            <option value="">All Counties</option>
+            {KENYA_COUNTIES.map((county) => (
+              <option key={county} value={county}>{county}</option>
+            ))}
+          </select>
+        </div>
+        <div style={styles.filterGroup}>
+          <label style={styles.filterLabel}>Sort By:</label>
+          <select
+            style={styles.filterSelect}
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="rating">Highest Rated</option>
+            <option value="views">Most Viewed</option>
+            <option value="name">Name A-Z</option>
+          </select>
+        </div>
       </div>
 
       {loading ? (
@@ -499,6 +614,27 @@ export default function AxxBiashara() {
                     ))}
                   </div>
                 )}
+
+                <div style={styles.cardActions}>
+                  {business.contact.phone && (
+                    <a
+                      href={`tel:${business.contact.phone}`}
+                      style={styles.contactButton}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      📞 Call
+                    </a>
+                  )}
+                  {business.contact.email && (
+                    <a
+                      href={`mailto:${business.contact.email}`}
+                      style={styles.contactButton}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      ✉️ Email
+                    </a>
+                  )}
+                </div>
 
                 {business.socialMedia && (
                   <div style={styles.socialLinks}>
