@@ -566,37 +566,11 @@ export default function AxxBiashara() {
   const [announcementSuccess, setAnnouncementSuccess] = useState("");
   const [submitterName, setSubmitterName] = useState("");
   const [organizationName, setOrganizationName] = useState("");
-  const [scrollPosition, setScrollPosition] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const scrollRef = React.useRef(null);
 
   useEffect(() => {
     loadBusinesses();
     loadAnnouncements();
   }, [selectedCategory, selectedCounty, searchQuery, sortBy]);
-
-  // Auto-scroll announcements
-  useEffect(() => {
-    if (!scrollRef.current || announcements.length === 0) return;
-
-    const scrollContainer = scrollRef.current;
-    let animationFrame;
-
-    const scroll = () => {
-      if (!isPaused) {
-        setScrollPosition(prev => {
-          const newPosition = prev + 0.5;
-          const maxScroll = scrollContainer.scrollWidth / 2;
-          return newPosition >= maxScroll ? 0 : newPosition;
-        });
-      }
-      animationFrame = requestAnimationFrame(scroll);
-    };
-
-    animationFrame = requestAnimationFrame(scroll);
-
-    return () => cancelAnimationFrame(animationFrame);
-  }, [isPaused, announcements]);
 
   const loadBusinesses = async () => {
     setLoading(true);
@@ -733,13 +707,8 @@ export default function AxxBiashara() {
         <div style={styles.announcementsSection}>
           <h3 style={styles.announcementsTitle}>📢 Latest Announcements</h3>
           {announcements.length > 0 ? (
-            <div
-              ref={scrollRef}
-              style={styles.announcementsScroll}
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={() => setIsPaused(false)}
-            >
-              <div style={{ ...styles.announcementsScrollInner, transform: `translateX(-${scrollPosition}px)` }}>
+            <div style={styles.announcementsScroll}>
+              <div style={styles.announcementsScrollInner}>
                 {[...announcements.slice(0, 10), ...announcements.slice(0, 10)].map((announcement, index) => (
                   <div
                     key={`${index}-${announcement._id}`}
