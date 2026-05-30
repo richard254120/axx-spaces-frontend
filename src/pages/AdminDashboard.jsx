@@ -48,8 +48,8 @@ export default function AdminDashboard() {
   const loadPendingPayments = async () => {
     setPaymentsLoading(true);
     try {
-      const res = await API.get("/payment/pending-bank-payments");
-      setPendingPayments(res.data.pendingPayments || []);
+      const res = await API.get("/payment-verification/pending");
+      setPendingPayments(res.data || []);
     } catch (err) {
       console.error("Failed to load pending payments:", err);
     } finally {
@@ -58,15 +58,14 @@ export default function AdminDashboard() {
   };
 
   const handleVerifyPayment = async (payment, approve) => {
-    setVerifyingId(payment.transactionRef);
+    setVerifyingId(payment._id);
     try {
-      await API.post("/payment/verify-bank-payment", {
-        transactionRef: payment.transactionRef,
-        userId: payment.userId,
+      await API.patch(`/payment-verification/${payment._id}/process`, {
         approve,
+        adminNotes: approve ? "Payment verified manually" : "Payment rejected",
       });
       setPendingPayments((prev) =>
-        prev.filter((p) => p.transactionRef !== payment.transactionRef)
+        prev.filter((p) => p._id !== payment._id)
       );
     } catch (err) {
       alert("❌ Failed to process payment verification.");
@@ -621,7 +620,7 @@ export default function AdminDashboard() {
           <div style={styles.loader}>⏳ Loading pending payments...</div>
         ) : pendingPayments.length === 0 ? (
           <div style={styles.emptyCard}>
-            <p style={styles.emptyText}>✅ No pending bank transfer payments.</p>
+            <p style={styles.emptyText}>✅ No pending payment verifications.</p>
           </div>
         ) : (
           <div style={styles.tableContainer}>
@@ -629,67 +628,62 @@ export default function AdminDashboard() {
               <thead>
                 <tr style={styles.theadRow}>
                   <th style={styles.th}>User</th>
+                  <th style={styles.th}>Type</th>
                   <th style={styles.th}>Amount (KSh)</th>
                   <th style={styles.th}>Plan</th>
-                  <th style={styles.th}>Transaction Code</th>
                   <th style={styles.th}>M-Pesa Message</th>
                   <th style={styles.th}>Date</th>
                   <th style={styles.th}>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {pendingPayments.map((p) => {
-                  const codeMatch = (p.bankMessage || "").match(/([A-Z0-9]{10,12})\s+confirmed/i);
-                  const txCode = codeMatch ? codeMatch[1] : p.transactionRef?.slice(0, 20) || "—";
-                  return (
-                    <tr key={p.transactionRef} style={styles.tr}>
-                      <td style={styles.td}>
-                        <div style={styles.propTitle}>{p.userName}</div>
-                        <div style={styles.propLoc}>{p.userPhone}</div>
-                        <div style={styles.propLoc}>{p.userEmail}</div>
-                      </td>
-                      <td style={styles.td}>
-                        <span style={styles.priceBadge}>{Number(p.amount).toLocaleString()}</span>
-                      </td>
-                      <td style={styles.td}>
-                        <span style={styles.roleBadge}>{p.plan || p.subscriptionType || "Boost"}</span>
-                      </td>
-                      <td style={styles.td}>
-                        <code style={styles.txCode}>{txCode}</code>
-                      </td>
-                      <td style={styles.td}>
-                        <div style={styles.smsPreview}>
-                          {p.bankMessage
-                            ? p.bankMessage.slice(0, 80) + (p.bankMessage.length > 80 ? "…" : "")
-                            : <span style={{ color: "#475569" }}>No message</span>}
-                        </div>
-                      </td>
-                      <td style={styles.td}>
-                        <div style={styles.propLoc}>
-                          {p.date ? new Date(p.date).toLocaleDateString("en-KE", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}
-                        </div>
-                      </td>
-                      <td style={styles.td}>
-                        <div style={styles.btnGroup}>
-                          <button
-                            disabled={verifyingId === p.transactionRef}
-                            onClick={() => handleVerifyPayment(p, true)}
-                            style={styles.approveBtn}
-                          >
-                            {verifyingId === p.transactionRef ? "..." : "✅ Approve"}
-                          </button>
-                          <button
-                            disabled={verifyingId === p.transactionRef}
-                            onClick={() => handleVerifyPayment(p, false)}
-                            style={styles.rejectBtn}
-                          >
-                            Reject
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
+                {pendingPayments.map((p) => (
+                  <tr key={p._id} style={styles.tr}>
+                    <td style={styles.td}>
+                      <div style={styles.propTitle}>{p.user?.name || "Unknown"}</div>
+                      <div style={styles.propLoc}>{p.phoneNumber}</div>
+                      <div style={styles.propLoc}>{p.user?.email}</div>
+                    </td>
+                    <td style={styles.td}>
+                      <span style={styles.roleBadge}>{p.type}</span>
+                    </td>
+                    <td style={styles.td}>
+                      <span style={styles.priceBadge}>{p.amount.toLocaleString()}</span>
+                    </td>
+                    <td style={styles.td}>
+                      <div style={styles.propTitle}>{p.plan || "—"}</div>
+                    </td>
+                    <td style={styles.td}>
+                      <div style={styles.propLoc} style={{ maxWidth: "300px", wordBreak: "break-word" }}>
+                        {p.mpesaMessage}
+                      </div>
+                      {p.mpesaTransactionId && (
+                        <div style={styles.propLoc}>ID: {p.mpesaTransactionId}</div>
+                      )}
+                    </td>
+                    <td style={styles.td}>
+                      <div style={styles.propLoc}>{new Date(p.createdAt).toLocaleDateString()}</div>
+                    </td>
+                    <td style={styles.td}>
+                      <div style={styles.btnGroup}>
+                        <button
+                          onClick={() => handleVerifyPayment(p, true)}
+                          disabled={verifyingId === p._id}
+                          style={styles.approveBtn}
+                        >
+                          {verifyingId === p._id ? "Processing..." : "Approve"}
+                        </button>
+                        <button
+                          onClick={() => handleVerifyPayment(p, false)}
+                          disabled={verifyingId === p._id}
+                          style={styles.rejectBtn}
+                        >
+                          {verifyingId === p._id ? "Processing..." : "Reject"}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
