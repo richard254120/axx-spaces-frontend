@@ -547,7 +547,6 @@ export default function AxxBiashara() {
             + Create Business
           </button>
         </div>
-        <p style={styles.subtitle}>Discover and connect with trusted businesses across Kenya</p>
 
         {/* Announcements Section */}
         {announcements.length > 0 && (
@@ -581,6 +580,8 @@ export default function AxxBiashara() {
             </div>
           </div>
         )}
+
+        <p style={styles.subtitle}>Discover and connect with trusted businesses across Kenya</p>
 
         {/* Pricing Section */}
         <div style={styles.pricingSection}>
