@@ -48,10 +48,13 @@ export default function AdminDashboard() {
   const loadPendingPayments = async () => {
     setPaymentsLoading(true);
     try {
+      console.log("Loading pending payments...");
       const res = await API.get("/payment-verification/pending");
+      console.log("Pending payments response:", res.data);
       setPendingPayments(res.data || []);
     } catch (err) {
       console.error("Failed to load pending payments:", err);
+      console.error("Error response:", err.response);
     } finally {
       setPaymentsLoading(false);
     }

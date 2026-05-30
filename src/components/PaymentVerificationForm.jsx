@@ -122,6 +122,17 @@ export default function PaymentVerificationForm({ propertyId, tourismPropertyId,
     setSuccess("");
 
     try {
+      console.log("Submitting payment verification:", {
+        propertyId,
+        tourismPropertyId,
+        type,
+        amount: amount || 0,
+        mpesaMessage,
+        mpesaTransactionId,
+        phoneNumber,
+        plan,
+      });
+
       const response = await API.post("/payment-verification/submit", {
         propertyId,
         tourismPropertyId,
@@ -133,6 +144,8 @@ export default function PaymentVerificationForm({ propertyId, tourismPropertyId,
         plan,
       });
 
+      console.log("Payment verification response:", response.data);
+
       setSuccess("Payment verification submitted successfully! Admin will review it shortly.");
       setMpesaMessage("");
       setMpesaTransactionId("");
@@ -142,6 +155,8 @@ export default function PaymentVerificationForm({ propertyId, tourismPropertyId,
         onSuccess(response.data);
       }
     } catch (err) {
+      console.error("Failed to submit payment verification:", err);
+      console.error("Error response:", err.response);
       setError(err.response?.data?.error || "Failed to submit payment verification. Please try again.");
     } finally {
       setLoading(false);
