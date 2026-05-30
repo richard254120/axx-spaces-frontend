@@ -128,16 +128,7 @@ function App() {
 
       {/* ── AXXBIASHARA BUSINESS DIRECTORY ROUTES (have Navbar) ── */}
       <Route path="/axxbiashara" element={<PublicLayout><AxxBiashara /></PublicLayout>} />
-      <Route
-        path="/business/create"
-        element={
-          <DashboardLayout>
-            <ProtectedRoute>
-              <BusinessForm />
-            </ProtectedRoute>
-          </DashboardLayout>
-        }
-      />
+      <Route path="/business/create" element={<PublicLayout><BusinessForm /></PublicLayout>} />
       <Route
         path="/business/edit/:id"
         element={

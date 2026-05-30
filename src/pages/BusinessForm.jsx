@@ -280,7 +280,14 @@ export default function BusinessForm() {
         navigate("/axxbiashara");
       }, 2000);
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to save business");
+      if (err.response?.status === 401) {
+        setError("Please log in to create a business");
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      } else {
+        setError(err.response?.data?.error || "Failed to save business");
+      }
     } finally {
       setLoading(false);
     }
