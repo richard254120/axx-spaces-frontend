@@ -397,6 +397,62 @@ const styles = {
     color: "#cbd5e1",
     lineHeight: "1.8",
   },
+  announcementSuccess: {
+    background: "rgba(34, 197, 94, 0.2)",
+    border: "1px solid #22c55e",
+    color: "#22c55e",
+    padding: "12px 20px",
+    borderRadius: "10px",
+    marginBottom: "20px",
+    textAlign: "center",
+  },
+  announcementForm: {
+    background: "rgba(30, 41, 59, 0.8)",
+    borderRadius: "20px",
+    padding: "30px",
+    marginBottom: "30px",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+  },
+  formTitle: {
+    fontSize: "24px",
+    fontWeight: 700,
+    color: "#fbbf24",
+    marginBottom: "20px",
+  },
+  formInput: {
+    width: "100%",
+    padding: "12px 16px",
+    background: "rgba(15, 23, 42, 0.8)",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    borderRadius: "10px",
+    color: "#f1f5f9",
+    fontSize: "16px",
+    marginBottom: "15px",
+    outline: "none",
+  },
+  formTextarea: {
+    width: "100%",
+    padding: "12px 16px",
+    background: "rgba(15, 23, 42, 0.8)",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    borderRadius: "10px",
+    color: "#f1f5f9",
+    fontSize: "16px",
+    marginBottom: "15px",
+    outline: "none",
+    resize: "vertical",
+  },
+  formSubmit: {
+    padding: "12px 24px",
+    background: "#fbbf24",
+    color: "#0f172a",
+    border: "none",
+    borderRadius: "10px",
+    fontSize: "16px",
+    fontWeight: 600,
+    cursor: "pointer",
+    transition: "all 0.3s",
+  },
   announcementContent: {
     fontSize: "14px",
     color: "#cbd5e1",
@@ -488,6 +544,10 @@ export default function AxxBiashara() {
   const [announcements, setAnnouncements] = useState([]);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
+  const [showAnnouncementForm, setShowAnnouncementForm] = useState(false);
+  const [announcementTitle, setAnnouncementTitle] = useState("");
+  const [announcementContent, setAnnouncementContent] = useState("");
+  const [announcementSuccess, setAnnouncementSuccess] = useState("");
 
   useEffect(() => {
     loadBusinesses();
@@ -521,6 +581,23 @@ export default function AxxBiashara() {
     }
   };
 
+  const handleAddAnnouncement = async (e) => {
+    e.preventDefault();
+    try {
+      await API.post("/business/announcements", {
+        title: announcementTitle,
+        content: announcementContent,
+      });
+      setAnnouncementSuccess("✅ Announcement submitted for approval!");
+      setAnnouncementTitle("");
+      setAnnouncementContent("");
+      setShowAnnouncementForm(false);
+      setTimeout(() => setAnnouncementSuccess(""), 3000);
+    } catch (err) {
+      alert("❌ Failed to submit announcement");
+    }
+  };
+
   const getBadgeLabel = (badgeType) => {
     return BADGE_CONFIG[badgeType]?.label || badgeType;
   };
@@ -534,19 +611,60 @@ export default function AxxBiashara() {
       <div style={styles.header}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
           <h1 style={styles.title}>🏪 AxxBiashara</h1>
-          <button
-            style={styles.addButton}
-            onClick={() => navigate("/business/create")}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.opacity = "0.9";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.opacity = "1";
-            }}
-          >
-            + Create Business
-          </button>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <button
+              style={styles.addButton}
+              onClick={() => navigate("/business/create")}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = "0.9";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = "1";
+              }}
+            >
+              + Create Business
+            </button>
+            <button
+              style={{ ...styles.addButton, background: "#22c55e" }}
+              onClick={() => setShowAnnouncementForm(!showAnnouncementForm)}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = "0.9";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = "1";
+              }}
+            >
+              {showAnnouncementForm ? "Cancel" : "+ Create Announcement"}
+            </button>
+          </div>
         </div>
+
+        {announcementSuccess && <div style={styles.announcementSuccess}>{announcementSuccess}</div>}
+
+        {showAnnouncementForm && (
+          <form onSubmit={handleAddAnnouncement} style={styles.announcementForm}>
+            <h3 style={styles.formTitle}>Create Announcement</h3>
+            <input
+              type="text"
+              placeholder="Announcement Title"
+              value={announcementTitle}
+              onChange={(e) => setAnnouncementTitle(e.target.value)}
+              style={styles.formInput}
+              required
+            />
+            <textarea
+              placeholder="Announcement Content"
+              value={announcementContent}
+              onChange={(e) => setAnnouncementContent(e.target.value)}
+              style={styles.formTextarea}
+              required
+              rows={4}
+            />
+            <button type="submit" style={styles.formSubmit}>
+              Submit for Approval
+            </button>
+          </form>
+        )}
 
         {/* Announcements Section */}
         <div style={styles.announcementsSection}>

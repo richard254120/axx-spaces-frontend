@@ -216,74 +216,6 @@ const styles = {
     display: "inline-block",
     fontWeight: 600,
   },
-  success: {
-    background: "rgba(34, 197, 94, 0.2)",
-    border: "1px solid #22c55e",
-    color: "#22c55e",
-    padding: "12px 20px",
-    borderRadius: "10px",
-    marginBottom: "20px",
-    textAlign: "center",
-  },
-  announcementButton: {
-    padding: "12px 24px",
-    background: "#fbbf24",
-    color: "#0f172a",
-    border: "none",
-    borderRadius: "10px",
-    fontSize: "16px",
-    fontWeight: 600,
-    cursor: "pointer",
-    marginBottom: "20px",
-    transition: "all 0.3s",
-  },
-  announcementForm: {
-    background: "rgba(30, 41, 59, 0.8)",
-    borderRadius: "20px",
-    padding: "30px",
-    marginBottom: "30px",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
-  },
-  formTitle: {
-    fontSize: "24px",
-    fontWeight: 700,
-    color: "#fbbf24",
-    marginBottom: "20px",
-  },
-  formInput: {
-    width: "100%",
-    padding: "12px 16px",
-    background: "rgba(15, 23, 42, 0.8)",
-    border: "1px solid rgba(255, 255, 255, 0.2)",
-    borderRadius: "10px",
-    color: "#f1f5f9",
-    fontSize: "16px",
-    marginBottom: "15px",
-    outline: "none",
-  },
-  formTextarea: {
-    width: "100%",
-    padding: "12px 16px",
-    background: "rgba(15, 23, 42, 0.8)",
-    border: "1px solid rgba(255, 255, 255, 0.2)",
-    borderRadius: "10px",
-    color: "#f1f5f9",
-    fontSize: "16px",
-    marginBottom: "15px",
-    outline: "none",
-    resize: "vertical",
-  },
-  formSubmit: {
-    padding: "12px 24px",
-    background: "#fbbf24",
-    color: "#0f172a",
-    border: "none",
-    borderRadius: "10px",
-    fontSize: "16px",
-    fontWeight: 600,
-    cursor: "pointer",
-    transition: "all 0.3s",
-  },
 };
 
 const BADGE_CONFIG = {
@@ -301,10 +233,6 @@ export default function BusinessDetail() {
   const [business, setBusiness] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [showAnnouncementForm, setShowAnnouncementForm] = useState(false);
-  const [announcementTitle, setAnnouncementTitle] = useState("");
-  const [announcementContent, setAnnouncementContent] = useState("");
-  const [announcementSuccess, setAnnouncementSuccess] = useState("");
 
   useEffect(() => {
     loadBusiness();
@@ -319,23 +247,6 @@ export default function BusinessDetail() {
       setError("Failed to load business");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleAddAnnouncement = async (e) => {
-    e.preventDefault();
-    try {
-      await API.post(`/business/${id}/announcements`, {
-        title: announcementTitle,
-        content: announcementContent,
-      });
-      setAnnouncementSuccess("✅ Announcement submitted for approval!");
-      setAnnouncementTitle("");
-      setAnnouncementContent("");
-      setShowAnnouncementForm(false);
-      setTimeout(() => setAnnouncementSuccess(""), 3000);
-    } catch (err) {
-      alert("❌ Failed to submit announcement");
     }
   };
 
@@ -365,40 +276,6 @@ export default function BusinessDetail() {
       <a href="/axxbiashara" style={styles.backButton}>
         ← Back to Businesses
       </a>
-
-      {announcementSuccess && <div style={styles.success}>{announcementSuccess}</div>}
-
-      <button
-        onClick={() => setShowAnnouncementForm(!showAnnouncementForm)}
-        style={styles.announcementButton}
-      >
-        {showAnnouncementForm ? "Cancel" : "+ Create Announcement"}
-      </button>
-
-      {showAnnouncementForm && (
-        <form onSubmit={handleAddAnnouncement} style={styles.announcementForm}>
-          <h3 style={styles.formTitle}>Create Announcement</h3>
-          <input
-            type="text"
-            placeholder="Announcement Title"
-            value={announcementTitle}
-            onChange={(e) => setAnnouncementTitle(e.target.value)}
-            style={styles.formInput}
-            required
-          />
-          <textarea
-            placeholder="Announcement Content"
-            value={announcementContent}
-            onChange={(e) => setAnnouncementContent(e.target.value)}
-            style={styles.formTextarea}
-            required
-            rows={4}
-          />
-          <button type="submit" style={styles.formSubmit}>
-            Submit for Approval
-          </button>
-        </form>
-      )}
 
       <div style={styles.header}>
         <h1 style={styles.title}>{business.name}</h1>
