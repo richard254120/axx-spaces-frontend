@@ -130,32 +130,54 @@ const styles = {
     borderRadius: "10px",
     marginBottom: "20px",
   },
-  hoursGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-    gap: "15px",
+  instructions: {
+    background: "rgba(251, 191, 36, 0.1)",
+    border: "1px solid #fbbf24",
+    borderRadius: "15px",
+    padding: "20px",
+    marginBottom: "30px",
+  },
+  instructionsTitle: {
+    fontSize: "18px",
+    fontWeight: 700,
+    color: "#fbbf24",
     marginBottom: "15px",
   },
+  instructionsList: {
+    margin: 0,
+    paddingLeft: "20px",
+    color: "#cbd5e1",
+    lineHeight: "1.8",
+  },
+  hoursGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+    gap: "20px",
+    marginBottom: "20px",
+  },
   hoursItem: {
-    background: "rgba(15, 23, 42, 0.5)",
-    padding: "15px",
-    borderRadius: "10px",
+    background: "rgba(30, 41, 59, 0.8)",
+    padding: "20px",
+    borderRadius: "12px",
     border: "1px solid rgba(255, 255, 255, 0.1)",
   },
   hoursLabel: {
-    fontSize: "14px",
-    fontWeight: 600,
-    color: "#cbd5e1",
-    marginBottom: "10px",
+    fontSize: "16px",
+    fontWeight: 700,
+    color: "#fbbf24",
+    marginBottom: "12px",
+    textTransform: "capitalize",
   },
   hoursInputs: {
     display: "flex",
-    gap: "10px",
+    gap: "12px",
     alignItems: "center",
+    flexWrap: "wrap",
   },
   hoursInput: {
     flex: 1,
-    padding: "8px 12px",
+    minWidth: "120px",
+    padding: "10px 14px",
     background: "rgba(15, 23, 42, 0.5)",
     border: "1px solid rgba(255, 255, 255, 0.1)",
     borderRadius: "8px",
@@ -201,6 +223,9 @@ export default function BusinessForm() {
     name: "",
     description: "",
     categories: [],
+    yearEstablished: "",
+    employeeCount: "",
+    priceRange: "",
     location: {
       county: "",
       town: "",
@@ -311,6 +336,19 @@ export default function BusinessForm() {
           {isEditing ? "Edit Business" : "Create Business"}
         </h1>
 
+        {!isEditing && (
+          <div style={styles.instructions}>
+            <h3 style={styles.instructionsTitle}>📋 Instructions</h3>
+            <ul style={styles.instructionsList}>
+              <li>Fill in your business details to list on AxxBiashara</li>
+              <li>Select multiple categories that describe your business</li>
+              <li>Add your business hours for each day of the week</li>
+              <li>Include social media links to help customers find you</li>
+              <li>Your business will be reviewed and approved by admin before appearing</li>
+            </ul>
+          </div>
+        )}
+
         {error && <div style={styles.error}>{error}</div>}
         {success && <div style={styles.success}>{success}</div>}
 
@@ -323,6 +361,7 @@ export default function BusinessForm() {
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
+            placeholder="Enter your business name"
           />
 
           <label style={styles.label}>Description *</label>
@@ -331,7 +370,46 @@ export default function BusinessForm() {
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             required
+            placeholder="Describe your business, products, and services in detail"
           />
+
+          <label style={styles.label}>Year Established</label>
+          <input
+            type="number"
+            style={styles.input}
+            value={formData.yearEstablished || ""}
+            onChange={(e) => setFormData({ ...formData, yearEstablished: e.target.value })}
+            placeholder="e.g., 2015"
+            min="1900"
+            max={new Date().getFullYear()}
+          />
+
+          <label style={styles.label}>Number of Employees</label>
+          <select
+            style={styles.select}
+            value={formData.employeeCount || ""}
+            onChange={(e) => setFormData({ ...formData, employeeCount: e.target.value })}
+          >
+            <option value="">Select size</option>
+            <option value="1-10">1-10 employees</option>
+            <option value="11-50">11-50 employees</option>
+            <option value="51-200">51-200 employees</option>
+            <option value="201-500">201-500 employees</option>
+            <option value="500+">500+ employees</option>
+          </select>
+
+          <label style={styles.label}>Price Range</label>
+          <select
+            style={styles.select}
+            value={formData.priceRange || ""}
+            onChange={(e) => setFormData({ ...formData, priceRange: e.target.value })}
+          >
+            <option value="">Select price range</option>
+            <option value="$">$ - Budget friendly</option>
+            <option value="$$">$$ - Moderate</option>
+            <option value="$$$">$$$ - Expensive</option>
+            <option value="$$$$">$$$$ - Premium</option>
+          </select>
 
           <label style={styles.label}>Categories (Select multiple) *</label>
           <div style={styles.checkboxGroup}>
