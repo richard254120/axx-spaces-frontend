@@ -777,7 +777,7 @@ export default function AdminDashboard() {
                   <p style={S.cardTitle}>{business.name}</p>
                   <p style={S.cardSub}>{business.categories.join(", ")}</p>
                   <p style={S.cardOwner}>📍 {business.location.town}, {business.location.county}</p>
-                  <p style={S.cardOwner}>👤 {business.owner?.name || "Anonymous"}</p>
+                  <p style={S.cardOwner}>👤 {business.submitterName || business.owner?.name || "Anonymous"}</p>
                   <p style={S.cardOwner}>📞 {business.contact.phone}</p>
                   <div style={S.cardFooter}>
                     <span style={{ ...S.statusDot, background: business.status === "approved" ? "#22c55e" : business.status === "rejected" ? "#ef4444" : "#fbbf24" }}>

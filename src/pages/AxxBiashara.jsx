@@ -256,6 +256,55 @@ const styles = {
     color: "#cbd5e1",
     lineHeight: "1.6",
   },
+  announcementsSection: {
+    background: "rgba(30, 41, 59, 0.5)",
+    borderRadius: "20px",
+    padding: "30px",
+    marginBottom: "30px",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+  },
+  announcementsTitle: {
+    fontSize: "24px",
+    fontWeight: 700,
+    color: "#fbbf24",
+    marginBottom: "20px",
+  },
+  announcementsList: {
+    display: "grid",
+    gap: "15px",
+  },
+  announcementCard: {
+    background: "rgba(15, 23, 42, 0.8)",
+    borderRadius: "12px",
+    padding: "20px",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+  },
+  announcementHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "10px",
+  },
+  announcementBusiness: {
+    fontSize: "14px",
+    fontWeight: 600,
+    color: "#fbbf24",
+  },
+  announcementDate: {
+    fontSize: "12px",
+    color: "#94a3b8",
+  },
+  announcementTitle: {
+    fontSize: "16px",
+    fontWeight: 700,
+    color: "#f1f5f9",
+    marginBottom: "8px",
+  },
+  announcementContent: {
+    fontSize: "14px",
+    color: "#cbd5e1",
+    lineHeight: "1.5",
+  },
 };
 
 const BUSINESS_CATEGORIES = [
@@ -289,9 +338,11 @@ export default function AxxBiashara() {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [announcements, setAnnouncements] = useState([]);
 
   useEffect(() => {
     loadBusinesses();
+    loadAnnouncements();
   }, [selectedCategory, searchQuery]);
 
   const loadBusinesses = async () => {
@@ -307,6 +358,15 @@ export default function AxxBiashara() {
       console.error("Failed to load businesses:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadAnnouncements = async () => {
+    try {
+      const res = await API.get("/business/announcements");
+      setAnnouncements(res.data.announcements || []);
+    } catch (err) {
+      console.error("Failed to load announcements:", err);
     }
   };
 
@@ -348,6 +408,27 @@ export default function AxxBiashara() {
           </div>
         </div>
       </div>
+
+      {/* Announcements Section */}
+      {announcements.length > 0 && (
+        <div style={styles.announcementsSection}>
+          <h3 style={styles.announcementsTitle}>📢 Latest Announcements</h3>
+          <div style={styles.announcementsList}>
+            {announcements.slice(0, 5).map((announcement, index) => (
+              <div key={index} style={styles.announcementCard}>
+                <div style={styles.announcementHeader}>
+                  <span style={styles.announcementBusiness}>{announcement.businessName}</span>
+                  <span style={styles.announcementDate}>
+                    {new Date(announcement.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+                <h4 style={styles.announcementTitle}>{announcement.title}</h4>
+                <p style={styles.announcementContent}>{announcement.content}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div style={styles.filters}>
         <button

@@ -226,6 +226,7 @@ export default function BusinessForm() {
     yearEstablished: "",
     employeeCount: "",
     priceRange: "",
+    submitterName: "",
     location: {
       county: "",
       town: "",
@@ -354,6 +355,16 @@ export default function BusinessForm() {
 
         <div style={styles.section}>
           <h2 style={styles.sectionTitle}>Basic Information</h2>
+          <label style={styles.label}>Your Name or Company Name *</label>
+          <input
+            type="text"
+            style={styles.input}
+            value={formData.submitterName}
+            onChange={(e) => setFormData({ ...formData, submitterName: e.target.value })}
+            required
+            placeholder="Enter your name or company name"
+          />
+
           <label style={styles.label}>Business Name *</label>
           <input
             type="text"
