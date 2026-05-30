@@ -310,10 +310,24 @@ const styles = {
     color: "#fbbf24",
     marginBottom: "20px",
   },
-  announcementsGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+  announcementsScroll: {
+    display: "flex",
     gap: "20px",
+    overflowX: "auto",
+    paddingBottom: "10px",
+    scrollbarWidth: "none",
+    animation: "scroll 30s linear infinite",
+    "&:hover": {
+      animationPlayState: "paused",
+    },
+    "@keyframes scroll": {
+      "0%": {
+        transform: "translateX(0)",
+      },
+      "100%": {
+        transform: "translateX(-50%)",
+      },
+    },
   },
   announcementBox: {
     background: "rgba(15, 23, 42, 0.8)",
@@ -322,12 +336,21 @@ const styles = {
     border: "1px solid rgba(255, 255, 255, 0.1)",
     cursor: "pointer",
     transition: "all 0.3s",
+    minWidth: "280px",
+    maxWidth: "320px",
+    flexShrink: 0,
   },
   announcementBusiness: {
     fontSize: "13px",
     fontWeight: 600,
     color: "#94a3b8",
     marginBottom: "10px",
+    display: "block",
+  },
+  announcementSubmitter: {
+    fontSize: "13px",
+    color: "#64748b",
+    marginBottom: "5px",
     display: "block",
   },
   announcementBoxTitle: {
@@ -548,6 +571,8 @@ export default function AxxBiashara() {
   const [announcementTitle, setAnnouncementTitle] = useState("");
   const [announcementContent, setAnnouncementContent] = useState("");
   const [announcementSuccess, setAnnouncementSuccess] = useState("");
+  const [submitterName, setSubmitterName] = useState("");
+  const [organizationName, setOrganizationName] = useState("");
 
   useEffect(() => {
     loadBusinesses();
@@ -587,10 +612,14 @@ export default function AxxBiashara() {
       await API.post("/business/announcements", {
         title: announcementTitle,
         content: announcementContent,
+        submitterName,
+        organizationName,
       });
       setAnnouncementSuccess("✅ Announcement submitted for approval!");
       setAnnouncementTitle("");
       setAnnouncementContent("");
+      setSubmitterName("");
+      setOrganizationName("");
       setShowAnnouncementForm(false);
       setTimeout(() => setAnnouncementSuccess(""), 3000);
     } catch (err) {
@@ -646,6 +675,21 @@ export default function AxxBiashara() {
             <h3 style={styles.formTitle}>Create Announcement</h3>
             <input
               type="text"
+              placeholder="Your Name"
+              value={submitterName}
+              onChange={(e) => setSubmitterName(e.target.value)}
+              style={styles.formInput}
+              required
+            />
+            <input
+              type="text"
+              placeholder="Organization/Company Name (Optional)"
+              value={organizationName}
+              onChange={(e) => setOrganizationName(e.target.value)}
+              style={styles.formInput}
+            />
+            <input
+              type="text"
               placeholder="Announcement Title"
               value={announcementTitle}
               onChange={(e) => setAnnouncementTitle(e.target.value)}
@@ -670,10 +714,10 @@ export default function AxxBiashara() {
         <div style={styles.announcementsSection}>
           <h3 style={styles.announcementsTitle}>📢 Latest Announcements</h3>
           {announcements.length > 0 ? (
-            <div style={styles.announcementsGrid}>
-              {announcements.slice(0, 5).map((announcement, index) => (
+            <div style={styles.announcementsScroll}>
+              {[...announcements.slice(0, 10), ...announcements.slice(0, 10)].map((announcement, index) => (
                 <div
-                  key={index}
+                  key={`${index}-${announcement._id}`}
                   style={styles.announcementBox}
                   onClick={() => {
                     setSelectedAnnouncement(announcement);
@@ -690,6 +734,10 @@ export default function AxxBiashara() {
                 >
                   <span style={styles.announcementBusiness}>{announcement.businessName}</span>
                   <h4 style={styles.announcementBoxTitle}>{announcement.title}</h4>
+                  <span style={styles.announcementSubmitter}>
+                    👤 {announcement.submitterName || "Anonymous"}
+                    {announcement.organizationName && ` • 🏢 ${announcement.organizationName}`}
+                  </span>
                   <span style={styles.announcementBoxDate}>
                     {new Date(announcement.createdAt).toLocaleDateString()}
                   </span>

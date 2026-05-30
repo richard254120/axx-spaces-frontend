@@ -170,24 +170,6 @@ const styles = {
     fontSize: "14px",
     color: "#94a3b8",
   },
-  announcementCard: {
-    background: "rgba(15, 23, 42, 0.5)",
-    padding: "20px",
-    borderRadius: "15px",
-    marginBottom: "15px",
-    border: "1px solid rgba(59, 130, 246, 0.3)",
-  },
-  announcementTitle: {
-    fontSize: "18px",
-    fontWeight: 700,
-    color: "#3b82f6",
-    marginBottom: "10px",
-  },
-  announcementContent: {
-    fontSize: "14px",
-    color: "#cbd5e1",
-    lineHeight: "1.6",
-  },
   contactInfo: {
     fontSize: "16px",
     lineHeight: "2",
@@ -441,21 +423,6 @@ export default function BusinessDetail() {
                       Valid until: {new Date(offer.validUntil).toLocaleDateString()}
                     </div>
                   )}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {business.announcements && business.announcements.length > 0 && (
-            <div style={styles.section}>
-              <h2 style={styles.sectionTitle}>Announcements</h2>
-              {business.announcements.map((announcement, index) => (
-                <div key={index} style={styles.announcementCard}>
-                  <div style={styles.announcementTitle}>{announcement.title}</div>
-                  <div style={styles.announcementContent}>{announcement.content}</div>
-                  <div style={styles.offerValid}>
-                    {new Date(announcement.createdAt).toLocaleDateString()}
-                  </div>
                 </div>
               ))}
             </div>

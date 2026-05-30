@@ -294,14 +294,14 @@ export default function AdminDashboard() {
     }
   };
 
-  // ── load pending announcements ────────────────────────────────
+  // ── load all announcements ────────────────────────────────
   const loadPendingAnnouncements = async () => {
     setAnnouncementsLoading(true);
     try {
-      const res = await API.get("/business/admin/announcements/pending");
+      const res = await API.get("/business/admin/announcements");
       setPendingAnnouncements(res.data.announcements || []);
     } catch (err) {
-      console.error("Failed to load pending announcements:", err);
+      console.error("Failed to load announcements:", err);
     } finally {
       setAnnouncementsLoading(false);
     }
@@ -315,6 +315,20 @@ export default function AdminDashboard() {
       alert(`✅ Announcement ${status} successfully`);
     } catch (err) {
       alert("❌ Failed to update announcement status");
+    }
+  };
+
+  // ── delete announcement ────────────────────────────────
+  const handleDeleteAnnouncement = async (businessId, announcementId) => {
+    if (!window.confirm("Are you sure you want to delete this announcement?")) {
+      return;
+    }
+    try {
+      await API.delete(`/business/admin/${businessId}/announcements/${announcementId}`);
+      loadPendingAnnouncements();
+      alert("✅ Announcement deleted successfully");
+    } catch (err) {
+      alert("❌ Failed to delete announcement");
     }
   };
 
@@ -848,11 +862,11 @@ export default function AdminDashboard() {
         announcementsLoading ? (
           <div style={S.loader}>
             <div style={S.spinner}></div>
-            <p>⏳ Loading pending announcements...</p>
+            <p>⏳ Loading announcements...</p>
           </div>
         ) : pendingAnnouncements.length === 0 ? (
           <div style={S.empty}>
-            <p style={S.emptyText}>✅ No pending announcements found.</p>
+            <p style={S.emptyText}>✅ No announcements found.</p>
           </div>
         ) : (
           <div style={S.grid}>
@@ -861,11 +875,23 @@ export default function AdminDashboard() {
                 <div style={S.cardBody}>
                   <p style={S.cardTitle}>{announcement.title}</p>
                   <p style={S.cardSub}>📢 {announcement.businessName}</p>
-                  <p style={S.cardOwner}>📅 {new Date(announcement.createdAt).toLocaleDateString()}</p>
+                  <p style={S.cardOwner}>� Submitted by: {announcement.submitterName || "Unknown"}</p>
+                  {announcement.organizationName && (
+                    <p style={S.cardOwner}>🏢 Organization: {announcement.organizationName}</p>
+                  )}
+                  <p style={S.cardOwner}>�📅 {new Date(announcement.createdAt).toLocaleDateString()}</p>
+                  <p style={{ ...S.cardOwner, color: announcement.status === "approved" ? "#22c55e" : announcement.status === "rejected" ? "#ef4444" : "#fbbf24" }}>
+                    Status: {announcement.status.toUpperCase()}
+                  </p>
                   <p style={S.cardDescription}>{announcement.content}</p>
                   <div style={S.cardBtns}>
-                    <button style={S.approveBtn} onClick={() => handleAnnouncementStatus(announcement.businessId, announcement.announcementId, "approved")}>✅ Approve</button>
-                    <button style={S.rejectBtn} onClick={() => handleAnnouncementStatus(announcement.businessId, announcement.announcementId, "rejected")}>❌ Reject</button>
+                    {announcement.status === "pending" && (
+                      <>
+                        <button style={S.approveBtn} onClick={() => handleAnnouncementStatus(announcement.businessId, announcement.announcementId, "approved")}>✅ Approve</button>
+                        <button style={S.rejectBtn} onClick={() => handleAnnouncementStatus(announcement.businessId, announcement.announcementId, "rejected")}>❌ Reject</button>
+                      </>
+                    )}
+                    <button style={S.rejectBtn} onClick={() => handleDeleteAnnouncement(announcement.businessId, announcement.announcementId)}>🗑️ Delete</button>
                   </div>
                 </div>
               </div>
