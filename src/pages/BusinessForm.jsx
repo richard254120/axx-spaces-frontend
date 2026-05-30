@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
 
 const styles = {
@@ -195,7 +194,6 @@ const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"
 
 export default function BusinessForm() {
   const navigate = useNavigate();
-  const { token } = useContext(AuthContext);
   const { id } = useParams();
   const isEditing = !!id;
 
