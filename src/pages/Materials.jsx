@@ -1,25 +1,25 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
+const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
 const COUNTIES = [
-  "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
-  "Garissa","Wajir","Mandera","Marsabit","Isiolo","Meru","Tharaka Nithi",
-  "Embu","Kitui","Machakos","Makueni","Nyandarua","Nyeri","Kirinyaga",
-  "Murang'a","Kiambu","Turkana","West Pokot","Samburu","Trans Nzoia",
-  "Uasin Gishu","Elgeyo Marakwet","Nandi","Baringo","Laikipia","Nakuru",
-  "Narok","Kajiado","Kericho","Bomet","Kakamega","Vihiga","Bungoma",
-  "Busia","Siaya","Kisumu","Homa Bay","Migori","Kisii","Nyamira","Nairobi City",
+  "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta",
+  "Garissa", "Wajir", "Mandera", "Marsabit", "Isiolo", "Meru", "Tharaka Nithi",
+  "Embu", "Kitui", "Machakos", "Makueni", "Nyandarua", "Nyeri", "Kirinyaga",
+  "Murang'a", "Kiambu", "Turkana", "West Pokot", "Samburu", "Trans Nzoia",
+  "Uasin Gishu", "Elgeyo Marakwet", "Nandi", "Baringo", "Laikipia", "Nakuru",
+  "Narok", "Kajiado", "Kericho", "Bomet", "Kakamega", "Vihiga", "Bungoma",
+  "Busia", "Siaya", "Kisumu", "Homa Bay", "Migori", "Kisii", "Nyamira", "Nairobi City",
 ];
 
 const CATEGORIES = [
-  "Furniture","Electronics","Appliances","Tools","Clothing","Books",
-  "Sports & Outdoors","Home & Garden","Beauty & Personal Care","Toys & Games",
-  "Construction Materials","Vehicles & Parts","Other",
+  "Furniture", "Electronics", "Appliances", "Tools", "Clothing", "Books",
+  "Sports & Outdoors", "Home & Garden", "Beauty & Personal Care", "Toys & Games",
+  "Construction Materials", "Vehicles & Parts", "Other",
 ];
 
-const CONDITIONS = ["Like New","Excellent","Good","Fair","For Parts"];
+const CONDITIONS = ["Like New", "Excellent", "Good", "Fair", "For Parts"];
 
 export default function Marketplace() {
   const navigate = useNavigate();
@@ -30,7 +30,7 @@ export default function Marketplace() {
   const [error, setError] = useState("");
   const [selected, setSelected] = useState(null);
   const [currentImage, setCurrentImage] = useState(0);
-  
+
   const [favorites, setFavorites] = useState(() => {
     const saved = localStorage.getItem("fav_marketplace");
     return saved ? JSON.parse(saved) : [];
@@ -65,7 +65,7 @@ export default function Marketplace() {
   useEffect(() => {
     if (searchInput === filters.search) return;
     if (debounceTimer.current) clearTimeout(debounceTimer.current);
-    
+
     debounceTimer.current = setTimeout(() => {
       setFilters((prev) => ({ ...prev, search: searchInput }));
     }, 400);
@@ -121,7 +121,7 @@ export default function Marketplace() {
 
   const handleToggleFavorite = (e, id) => {
     e.stopPropagation();
-    setFavorites(prev => 
+    setFavorites(prev =>
       prev.includes(id) ? prev.filter(favId => favId !== id) : [...prev, id]
     );
   };
@@ -195,13 +195,13 @@ export default function Marketplace() {
       <div style={styles.filterContainer}>
         <h3 style={styles.filterTitle}>🔍 Find What You're Looking For</h3>
         <div style={styles.filterGrid}>
-          <input 
-            type="text" 
-            name="search" 
+          <input
+            type="text"
+            name="search"
             placeholder="Search for furniture, electronics, tools..."
-            value={searchInput} 
-            onChange={(e) => setSearchInput(e.target.value)} 
-            style={{ ...styles.filterInput, gridColumn: "span 2" }} 
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            style={{ ...styles.filterInput, gridColumn: "span 2" }}
           />
           <select name="category" value={filters.category} onChange={handleFilterChange} style={styles.filterInput}>
             <option value="">All Categories</option>
@@ -259,7 +259,7 @@ export default function Marketplace() {
               <div key={item._id} style={styles.card} className="item-card" onClick={() => openModal(item)}>
                 <div style={styles.imageWrapper}>
                   <img src={item.images?.[0] || "/placeholder.jpg"} alt={item.title} style={styles.itemImage} />
-                  
+
                   {/* BADGES */}
                   <div style={styles.badgeStack}>
                     <span style={styles.conditionBadge}>{item.condition}</span>
@@ -268,15 +268,15 @@ export default function Marketplace() {
                   </div>
 
                   {/* ACTION BUTTONS */}
-                  <button 
-                    style={{ ...styles.actionBtn, ...styles.favBtn, color: isFavorite ? "#ef4444" : "#9ca3af" }} 
+                  <button
+                    style={{ ...styles.actionBtn, ...styles.favBtn, color: isFavorite ? "#ef4444" : "#9ca3af" }}
                     onClick={(e) => handleToggleFavorite(e, item._id)}
                   >
                     ❤️
                   </button>
 
-                  <button 
-                    style={{ ...styles.actionBtn, ...styles.shareBtn }} 
+                  <button
+                    style={{ ...styles.actionBtn, ...styles.shareBtn }}
                     onClick={(e) => handleShareListing(e, item)}
                   >
                     {copiedId === item._id ? "✅" : "🔗"}
@@ -294,7 +294,7 @@ export default function Marketplace() {
                   </div>
 
                   <p style={styles.itemLocation}>📍 {item.location}, {item.county}</p>
-                  
+
                   <div style={styles.priceSection}>
                     <p style={styles.price}>KES {Number(item.price).toLocaleString()}</p>
                     <span style={styles.dealBadge}>✓ Great Deal</span>
@@ -427,7 +427,7 @@ export default function Marketplace() {
 
 const styles = {
   container: { background: "#ffffff", minHeight: "100vh", padding: "20px", fontFamily: "'DM Sans', sans-serif", color: "#0B2140", maxWidth: "1200px", margin: "0 auto" },
-  
+
   heroSection: { background: "linear-gradient(135deg, #0B2140 0%, #152B4A 100%)", borderRadius: "16px", padding: "48px 36px", marginBottom: "32px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "32px", flexWrap: "wrap", color: "white" },
   taglineBadge: { background: "rgba(227, 27, 27, 0.15)", color: "#E31B1B", padding: "8px 14px", borderRadius: "20px", fontSize: "0.8rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", display: "inline-block", marginBottom: "12px" },
   heroTitle: { margin: 0, fontSize: "2.5rem", fontWeight: 900, letterSpacing: "-0.5px", marginBottom: "8px" },

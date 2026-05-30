@@ -2,7 +2,7 @@
  * Tourism API — all backend calls in one place.
  * Set VITE_API_URL in .env (e.g. http://localhost:1000/api)
  */
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
+const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
 async function request(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, options);
@@ -44,7 +44,7 @@ export async function fetchTourismById(id) {
 }
 
 export async function recordTourismView(id) {
-  await fetch(`${API_BASE}/tourism/${id}/view`, { method: "PATCH" }).catch(() => {});
+  await fetch(`${API_BASE}/tourism/${id}/view`, { method: "PATCH" }).catch(() => { });
 }
 
 // ─── Auth (uses main auth routes) ─────────────────────────────────────

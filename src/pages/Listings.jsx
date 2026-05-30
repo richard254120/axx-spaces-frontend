@@ -5,7 +5,7 @@ import ShareProperty from "../components/ShareProperty";
 import MapView from "../components/MapView";
 import { useAuth } from "../context/AuthContext";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
+const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
 const formatKenyaPhone = (phone) => {
   if (!phone) return "";

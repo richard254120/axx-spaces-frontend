@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
+const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
 export default function PremiumPlans() {
   const navigate = useNavigate();
@@ -76,7 +76,7 @@ export default function PremiumPlans() {
               ))}
             </ul>
 
-            <button 
+            <button
               onClick={() => handleSelectPlan(plan)}
               style={{ ...styles.selectBtn, backgroundColor: plan.color }}
             >

@@ -3,7 +3,7 @@ import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { UserProfileEditor } from "../features/profile";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
+const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
 const VEHICLE_TYPES = ["Pickup", "Van", "Lorry", "Motorbike", "Truck"];
 const SERVICE_OPTIONS = [
@@ -80,8 +80,8 @@ export default function MoverDashboard() {
 
   const computeStats = (jobList) => {
     const completed = jobList.filter(j => j.status === "completed");
-    const active    = jobList.filter(j => j.status === "active" || j.status === "accepted");
-    const earnings  = completed.reduce((sum, j) => sum + (j.amount || 0), 0);
+    const active = jobList.filter(j => j.status === "active" || j.status === "accepted");
+    const earnings = completed.reduce((sum, j) => sum + (j.amount || 0), 0);
     setMoverStats({
       totalJobs: jobList.length,
       completedJobs: completed.length,
@@ -213,7 +213,7 @@ export default function MoverDashboard() {
       </header>
 
       {/* FEEDBACK TOASTS */}
-      {error   && <div style={styles.errorToast}>{error}</div>}
+      {error && <div style={styles.errorToast}>{error}</div>}
       {success && <div style={styles.successToast}>{success}</div>}
 
       {/* PENDING JOBS BANNER */}
@@ -246,10 +246,10 @@ export default function MoverDashboard() {
 
             <div style={styles.statsGrid}>
               {[
-                { icon: "📦", label: "Total Jobs",       value: moverStats.totalJobs },
-                { icon: "✅", label: "Completed",        value: moverStats.completedJobs },
-                { icon: "🔄", label: "Active",           value: moverStats.activeJobs },
-                { icon: "💰", label: "Earnings",         value: `KES ${moverStats.totalEarnings.toLocaleString()}` },
+                { icon: "📦", label: "Total Jobs", value: moverStats.totalJobs },
+                { icon: "✅", label: "Completed", value: moverStats.completedJobs },
+                { icon: "🔄", label: "Active", value: moverStats.activeJobs },
+                { icon: "💰", label: "Earnings", value: `KES ${moverStats.totalEarnings.toLocaleString()}` },
               ].map(stat => (
                 <div key={stat.label} style={styles.statCard}>
                   <div style={styles.statIcon}>{stat.icon}</div>
@@ -355,9 +355,9 @@ export default function MoverDashboard() {
       <nav style={styles.bottomNav}>
         {[
           { tab: "overview", icon: "📊", label: "Overview", badge: 0 },
-          { tab: "jobs",     icon: "📦", label: "Jobs",     badge: pendingJobsCount },
+          { tab: "jobs", icon: "📦", label: "Jobs", badge: pendingJobsCount },
           { tab: "earnings", icon: "💰", label: "Earnings", badge: 0 },
-          { tab: "profile",  icon: "👤", label: "Profile",  badge: 0 },
+          { tab: "profile", icon: "👤", label: "Profile", badge: 0 },
         ].map(({ tab, icon, label, badge }) => (
           <button
             key={tab}

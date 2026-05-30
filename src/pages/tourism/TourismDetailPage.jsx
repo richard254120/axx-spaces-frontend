@@ -137,7 +137,7 @@ export default function TourismDetailPage() {
     setPaymentSuccess("");
 
     try {
-      const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
+      const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
       const response = await fetch(`${API_BASE}/payment/book-tourism`, {
         method: "POST",
         headers: {

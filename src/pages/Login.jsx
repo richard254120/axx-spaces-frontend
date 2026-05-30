@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { COLORS, buttonStyles, inputStyles, pageStyles } from "../styles/theme";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
+const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ export default function Login() {
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
     setError("");
-    
+
     try {
       // Load Google Identity Services
       if (!window.google) {
@@ -60,7 +60,7 @@ export default function Login() {
         callback: handleGoogleCredentialResponse,
         auto_select: false,
       });
-      
+
       window.google.accounts.id.prompt((notification) => {
         if (notification.isNotDisplayed()) {
           setError("Google Sign-In popup was blocked. Please allow popups or use email/password.");
@@ -81,9 +81,9 @@ export default function Login() {
       const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
       }).join(''));
-      
+
       const googleUser = JSON.parse(jsonPayload);
-      
+
       // Send to backend
       const res = await fetch(`${API_BASE}/auth/google`, {
         method: "POST",

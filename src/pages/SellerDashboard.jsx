@@ -2,28 +2,28 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserProfileEditor, ProfileAvatar } from "../features/profile";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
+const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
 const COUNTIES = [
-  "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta","Garissa","Wajir",
-  "Mandera","Marsabit","Isiolo","Meru","Tharaka Nithi","Embu","Kitui","Machakos",
-  "Makueni","Nyandarua","Nyeri","Kirinyaga","Murang'a","Kiambu","Turkana","West Pokot",
-  "Samburu","Trans Nzoia","Uasin Gishu","Elgeyo Marakwet","Nandi","Baringo","Laikipia",
-  "Nakuru","Narok","Kajiado","Kericho","Bomet","Kakamega","Vihiga","Bungoma","Busia",
-  "Siaya","Kisumu","Homa Bay","Migori","Kisii","Nyamira","Nairobi City"
+  "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta", "Garissa", "Wajir",
+  "Mandera", "Marsabit", "Isiolo", "Meru", "Tharaka Nithi", "Embu", "Kitui", "Machakos",
+  "Makueni", "Nyandarua", "Nyeri", "Kirinyaga", "Murang'a", "Kiambu", "Turkana", "West Pokot",
+  "Samburu", "Trans Nzoia", "Uasin Gishu", "Elgeyo Marakwet", "Nandi", "Baringo", "Laikipia",
+  "Nakuru", "Narok", "Kajiado", "Kericho", "Bomet", "Kakamega", "Vihiga", "Bungoma", "Busia",
+  "Siaya", "Kisumu", "Homa Bay", "Migori", "Kisii", "Nyamira", "Nairobi City"
 ];
 
-const CATEGORIES = ["Construction Materials","Furniture","Appliances","Electronics","Tools","Other"];
-const CONDITIONS = ["Like New","Good","Fair","Poor"];
+const CATEGORIES = ["Construction Materials", "Furniture", "Appliances", "Electronics", "Tools", "Other"];
+const CONDITIONS = ["Like New", "Good", "Fair", "Poor"];
 
 // ✅ FIXED: "active" is the single live status. "approved" alias added for any
 //    legacy documents already in the DB that were saved with the old status value.
 const STATUS_COLORS = {
-  pending:  { bg: "rgba(251,191,36,0.15)",  color: "#fbbf24", label: "⏳ Pending Approval" },
-  active:   { bg: "rgba(34,197,94,0.15)",   color: "#22c55e", label: "✅ Live" },
-  approved: { bg: "rgba(34,197,94,0.15)",   color: "#22c55e", label: "✅ Live" }, // legacy alias
-  sold:     { bg: "rgba(148,163,184,0.15)", color: "#94a3b8", label: "🏷️ Sold" },
-  archived: { bg: "rgba(239,68,68,0.15)",   color: "#ef4444", label: "❌ Rejected" },
+  pending: { bg: "rgba(251,191,36,0.15)", color: "#fbbf24", label: "⏳ Pending Approval" },
+  active: { bg: "rgba(34,197,94,0.15)", color: "#22c55e", label: "✅ Live" },
+  approved: { bg: "rgba(34,197,94,0.15)", color: "#22c55e", label: "✅ Live" }, // legacy alias
+  sold: { bg: "rgba(148,163,184,0.15)", color: "#94a3b8", label: "🏷️ Sold" },
+  archived: { bg: "rgba(239,68,68,0.15)", color: "#ef4444", label: "❌ Rejected" },
 };
 
 // ✅ Helper: normalise status so "approved" (old DB docs) shows the same as "active"

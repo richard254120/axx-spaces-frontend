@@ -1,7 +1,7 @@
 /**
  * Site-wide user profile API (all roles: landlord, mover, seller, tourism)
  */
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
+const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
 function authHeaders(token) {
   return token ? { Authorization: `Bearer ${token}` } : {};

@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
+const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
 const COUNTIES = [
-  "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
-  "Garissa","Wajir","Mandera","Marsabit","Isiolo","Meru","Tharaka Nithi",
-  "Embu","Kitui","Machakos","Makueni","Nyandarua","Nyeri","Kirinyaga",
-  "Murang'a","Kiambu","Turkana","West Pokot","Samburu","Trans Nzoia",
-  "Uasin Gishu","Elgeyo Marakwet","Nandi","Baringo","Laikipia","Nakuru",
-  "Narok","Kajiado","Kericho","Bomet","Kakamega","Vihiga","Bungoma",
-  "Busia","Siaya","Kisumu","Homa Bay","Migori","Kisii","Nyamira","Nairobi City",
+  "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta",
+  "Garissa", "Wajir", "Mandera", "Marsabit", "Isiolo", "Meru", "Tharaka Nithi",
+  "Embu", "Kitui", "Machakos", "Makueni", "Nyandarua", "Nyeri", "Kirinyaga",
+  "Murang'a", "Kiambu", "Turkana", "West Pokot", "Samburu", "Trans Nzoia",
+  "Uasin Gishu", "Elgeyo Marakwet", "Nandi", "Baringo", "Laikipia", "Nakuru",
+  "Narok", "Kajiado", "Kericho", "Bomet", "Kakamega", "Vihiga", "Bungoma",
+  "Busia", "Siaya", "Kisumu", "Homa Bay", "Migori", "Kisii", "Nyamira", "Nairobi City",
 ];
 
 export default function SellerLogin() {

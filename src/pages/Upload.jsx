@@ -2,31 +2,31 @@ import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
+const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
 const AMENITIES_LIST = [
-  "WiFi","Parking","AC/Cooler","Water Tank","Generator","Security Fence",
-  "Balcony","TV","Refrigerator","Cooking Stove","Bed","Sofa","Dining Table",
-  "Shower","Kitchen Cabinet","Wardrobes","Ceiling Fans","Lights",
-  "24/7 Security","Swimming Pool","Gym","Garden","Workspace","Pet Friendly",
+  "WiFi", "Parking", "AC/Cooler", "Water Tank", "Generator", "Security Fence",
+  "Balcony", "TV", "Refrigerator", "Cooking Stove", "Bed", "Sofa", "Dining Table",
+  "Shower", "Kitchen Cabinet", "Wardrobes", "Ceiling Fans", "Lights",
+  "24/7 Security", "Swimming Pool", "Gym", "Garden", "Workspace", "Pet Friendly",
 ];
 
 const PROPERTY_TYPES = [
-  "Bedsitter","Studio Apartment","1 Bedroom","2 Bedroom","3 Bedroom",
-  "4+ Bedroom","Maisonette","Bungalow","Townhouse","Apartment Block",
-  "Single Room","Shared Room","Hostel Room","Commercial Office",
-  "Shop / Retail Space","Warehouse","Plot / Land","Furnished Apartment",
-  "Unfurnished Apartment","Penthouse","Duplex"
+  "Bedsitter", "Studio Apartment", "1 Bedroom", "2 Bedroom", "3 Bedroom",
+  "4+ Bedroom", "Maisonette", "Bungalow", "Townhouse", "Apartment Block",
+  "Single Room", "Shared Room", "Hostel Room", "Commercial Office",
+  "Shop / Retail Space", "Warehouse", "Plot / Land", "Furnished Apartment",
+  "Unfurnished Apartment", "Penthouse", "Duplex"
 ];
 
 const COUNTIES = [
-  "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita Taveta",
-  "Garissa","Wajir","Mandera","Marsabit","Isiolo","Meru","Tharaka Nithi",
-  "Embu","Kitui","Machakos","Makueni","Nyandarua","Nyeri","Kirinyaga",
-  "Murang'a","Kiambu","Turkana","West Pokot","Samburu","Trans Nzoia",
-  "Uasin Gishu","Elgeyo Marakwet","Nandi","Baringo","Laikipia","Nakuru",
-  "Narok","Kajiado","Kericho","Bomet","Kakamega","Vihiga","Bungoma",
-  "Busia","Siaya","Kisumu","Homa Bay","Migori","Kisii","Nyamira",
+  "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta",
+  "Garissa", "Wajir", "Mandera", "Marsabit", "Isiolo", "Meru", "Tharaka Nithi",
+  "Embu", "Kitui", "Machakos", "Makueni", "Nyandarua", "Nyeri", "Kirinyaga",
+  "Murang'a", "Kiambu", "Turkana", "West Pokot", "Samburu", "Trans Nzoia",
+  "Uasin Gishu", "Elgeyo Marakwet", "Nandi", "Baringo", "Laikipia", "Nakuru",
+  "Narok", "Kajiado", "Kericho", "Bomet", "Kakamega", "Vihiga", "Bungoma",
+  "Busia", "Siaya", "Kisumu", "Homa Bay", "Migori", "Kisii", "Nyamira",
   "Nairobi City"
 ];
 
@@ -147,8 +147,8 @@ export default function Upload() {
     }
 
     if (!formData.title || !formData.description || !formData.location ||
-        !formData.price || !formData.bedrooms || !formData.bathrooms ||
-        !formData.propertyType || !formData.county) {
+      !formData.price || !formData.bedrooms || !formData.bathrooms ||
+      !formData.propertyType || !formData.county) {
       setError("Fill all required fields");
       return;
     }
@@ -244,7 +244,7 @@ export default function Upload() {
         {["basic", "details", "images", "amenities"].map((section) => (
           <button
             key={section}
-            style={{...styles.sectionTab, ...(activeSection === section && styles.sectionTabActive)}}
+            style={{ ...styles.sectionTab, ...(activeSection === section && styles.sectionTabActive) }}
             onClick={() => setActiveSection(section)}
           >
             {section === "basic" && "📋"}

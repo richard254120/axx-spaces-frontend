@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { COLORS, buttonStyles, inputStyles, pageStyles } from "../styles/theme";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
+const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ export default function Register() {
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
     setError("");
-    
+
     try {
       // Load Google Identity Services
       if (!window.google) {
@@ -59,7 +59,7 @@ export default function Register() {
         callback: handleGoogleCredentialResponse,
         auto_select: false,
       });
-      
+
       window.google.accounts.id.prompt((notification) => {
         if (notification.isNotDisplayed()) {
           setError("Google Sign-In popup was blocked. Please allow popups or use email/password.");
@@ -79,9 +79,9 @@ export default function Register() {
       const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
       }).join(''));
-      
+
       const googleUser = JSON.parse(jsonPayload);
-      
+
       const res = await fetch(`${API_BASE}/auth/google`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -197,53 +197,53 @@ export default function Register() {
           <form onSubmit={handleSubmit} style={styles.form}>
             <div style={styles.formGroup}>
               <label style={styles.label}>Full Name</label>
-              <input 
-                type="text" 
-                name="name" 
-                placeholder="e.g., John Doe" 
-                value={formData.name} 
-                onChange={handleChange} 
-                style={styles.input} 
-                required 
+              <input
+                type="text"
+                name="name"
+                placeholder="e.g., John Doe"
+                value={formData.name}
+                onChange={handleChange}
+                style={styles.input}
+                required
               />
             </div>
 
             <div style={styles.formGroup}>
               <label style={styles.label}>Email Address</label>
-              <input 
-                type="email" 
-                name="email" 
-                placeholder="e.g., landlord@example.com" 
-                value={formData.email} 
-                onChange={handleChange} 
-                style={styles.input} 
-                required 
+              <input
+                type="email"
+                name="email"
+                placeholder="e.g., landlord@example.com"
+                value={formData.email}
+                onChange={handleChange}
+                style={styles.input}
+                required
               />
             </div>
 
             <div style={styles.formGroup}>
               <label style={styles.label}>Phone Number</label>
-              <input 
-                type="tel" 
-                name="phone" 
-                placeholder="e.g., 254712345678" 
-                value={formData.phone} 
-                onChange={handleChange} 
-                style={styles.input} 
-                required 
+              <input
+                type="tel"
+                name="phone"
+                placeholder="e.g., 254712345678"
+                value={formData.phone}
+                onChange={handleChange}
+                style={styles.input}
+                required
               />
             </div>
 
             <div style={styles.formGroup}>
               <label style={styles.label}>Password</label>
-              <input 
-                type="password" 
-                name="password" 
-                placeholder="Min 6 characters" 
-                value={formData.password} 
-                onChange={handleChange} 
-                style={styles.input} 
-                required 
+              <input
+                type="password"
+                name="password"
+                placeholder="Min 6 characters"
+                value={formData.password}
+                onChange={handleChange}
+                style={styles.input}
+                required
               />
             </div>
 
