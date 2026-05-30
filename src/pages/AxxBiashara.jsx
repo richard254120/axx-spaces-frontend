@@ -549,9 +549,9 @@ export default function AxxBiashara() {
         </div>
 
         {/* Announcements Section */}
-        {announcements.length > 0 && (
-          <div style={styles.announcementsSection}>
-            <h3 style={styles.announcementsTitle}>📢 Latest Announcements</h3>
+        <div style={styles.announcementsSection}>
+          <h3 style={styles.announcementsTitle}>📢 Latest Announcements</h3>
+          {announcements.length > 0 ? (
             <div style={styles.announcementsGrid}>
               {announcements.slice(0, 5).map((announcement, index) => (
                 <div
@@ -578,8 +578,10 @@ export default function AxxBiashara() {
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          ) : (
+            <p style={{ color: "#94a3b8", fontSize: "14px" }}>No announcements yet. Create one on a business page!</p>
+          )}
+        </div>
 
         <p style={styles.subtitle}>Discover and connect with trusted businesses across Kenya</p>
 
