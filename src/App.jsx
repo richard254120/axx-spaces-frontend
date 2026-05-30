@@ -36,6 +36,11 @@ import RegisterPropertyPage from "./pages/tourism/RegisterPropertyPage";
 import ProviderDashboard from "./pages/tourism/ProviderDashboard";
 import EditPropertyPage from "./pages/tourism/EditPropertyPage";
 
+// ─── AxxBiashara Business Directory Pages ─────────────────────────────────────
+import AxxBiashara from "./pages/AxxBiashara";
+import BusinessForm from "./pages/BusinessForm";
+import BusinessDetail from "./pages/BusinessDetail";
+
 import "leaflet/dist/leaflet.css";
 
 // ─── Layouts ────────────────────────────────────────────────────────────────
@@ -120,6 +125,30 @@ function App() {
         }
       />
       <Route path="/tourism/:id" element={<PublicLayout><TourismDetailPage /></PublicLayout>} />
+
+      {/* ── AXXBIASHARA BUSINESS DIRECTORY ROUTES (have Navbar) ── */}
+      <Route path="/axxbiashara" element={<PublicLayout><AxxBiashara /></PublicLayout>} />
+      <Route
+        path="/business/create"
+        element={
+          <DashboardLayout>
+            <ProtectedRoute>
+              <BusinessForm />
+            </ProtectedRoute>
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/business/edit/:id"
+        element={
+          <DashboardLayout>
+            <ProtectedRoute>
+              <BusinessForm />
+            </ProtectedRoute>
+          </DashboardLayout>
+        }
+      />
+      <Route path="/business/:id" element={<PublicLayout><BusinessDetail /></PublicLayout>} />
 
       {/* ── DASHBOARD ROUTES (no Navbar) ── */}
       <Route

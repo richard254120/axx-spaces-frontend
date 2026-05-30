@@ -1,0 +1,458 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import API from "../api/api";
+
+const styles = {
+  container: {
+    minHeight: "100vh",
+    background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+    padding: "20px",
+    color: "#f1f5f9",
+    fontFamily: "'DM Sans', sans-serif",
+  },
+  header: {
+    textAlign: "center",
+    marginBottom: "40px",
+    padding: "40px 20px",
+    background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
+    borderRadius: "20px",
+    boxShadow: "0 10px 40px rgba(251, 191, 36, 0.3)",
+  },
+  title: {
+    fontSize: "48px",
+    fontWeight: 900,
+    color: "#0f172a",
+    marginBottom: "10px",
+  },
+  subtitle: {
+    fontSize: "18px",
+    color: "#1e293b",
+    fontWeight: 500,
+  },
+  filters: {
+    display: "flex",
+    gap: "15px",
+    marginBottom: "30px",
+    flexWrap: "wrap",
+    justifyContent: "center",
+  },
+  filterButton: {
+    padding: "12px 24px",
+    background: "rgba(255, 255, 255, 0.1)",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    borderRadius: "10px",
+    color: "#f1f5f9",
+    cursor: "pointer",
+    transition: "all 0.3s",
+    fontWeight: 600,
+  },
+  filterButtonActive: {
+    background: "#fbbf24",
+    color: "#0f172a",
+    border: "1px solid #fbbf24",
+  },
+  searchInput: {
+    padding: "12px 20px",
+    background: "rgba(255, 255, 255, 0.1)",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    borderRadius: "10px",
+    color: "#f1f5f9",
+    fontSize: "16px",
+    width: "300px",
+  },
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))",
+    gap: "25px",
+    maxWidth: "1400px",
+    margin: "0 auto",
+  },
+  card: {
+    background: "rgba(30, 41, 59, 0.8)",
+    borderRadius: "16px",
+    overflow: "hidden",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    transition: "transform 0.3s, box-shadow 0.3s",
+    cursor: "pointer",
+  },
+  cardHover: {
+    transform: "translateY(-5px)",
+    boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)",
+  },
+  image: {
+    width: "100%",
+    height: "200px",
+    objectFit: "cover",
+  },
+  cardContent: {
+    padding: "20px",
+  },
+  cardTitle: {
+    fontSize: "20px",
+    fontWeight: 700,
+    color: "#fbbf24",
+    marginBottom: "8px",
+  },
+  cardCategory: {
+    fontSize: "14px",
+    color: "#94a3b8",
+    marginBottom: "12px",
+  },
+  cardLocation: {
+    fontSize: "14px",
+    color: "#64748b",
+    marginBottom: "12px",
+    display: "flex",
+    alignItems: "center",
+    gap: "5px",
+  },
+  cardDescription: {
+    fontSize: "14px",
+    color: "#cbd5e1",
+    marginBottom: "15px",
+    lineHeight: "1.5",
+    display: "-webkit-box",
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: "vertical",
+    overflow: "hidden",
+  },
+  badges: {
+    display: "flex",
+    gap: "8px",
+    flexWrap: "wrap",
+    marginBottom: "15px",
+  },
+  badge: {
+    padding: "4px 10px",
+    borderRadius: "20px",
+    fontSize: "12px",
+    fontWeight: 600,
+  },
+  badgeStudent: {
+    background: "rgba(34, 197, 94, 0.2)",
+    color: "#22c55e",
+    border: "1px solid #22c55e",
+  },
+  badgeIdentity: {
+    background: "rgba(34, 197, 94, 0.2)",
+    color: "#22c55e",
+    border: "1px solid #22c55e",
+  },
+  badgeBusiness: {
+    background: "rgba(59, 130, 246, 0.2)",
+    color: "#3b82f6",
+    border: "1px solid #3b82f6",
+  },
+  badgeOnline: {
+    background: "rgba(59, 130, 246, 0.2)",
+    color: "#3b82f6",
+    border: "1px solid #3b82f6",
+  },
+  badgeLocation: {
+    background: "rgba(168, 85, 247, 0.2)",
+    color: "#a855f7",
+    border: "1px solid #a855f7",
+  },
+  badgePremium: {
+    background: "rgba(251, 191, 36, 0.2)",
+    color: "#fbbf24",
+    border: "1px solid #fbbf24",
+  },
+  socialLinks: {
+    display: "flex",
+    gap: "10px",
+    marginBottom: "15px",
+  },
+  socialIcon: {
+    width: "32px",
+    height: "32px",
+    borderRadius: "50%",
+    background: "rgba(255, 255, 255, 0.1)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#f1f5f9",
+    textDecoration: "none",
+    transition: "background 0.3s",
+  },
+  socialIconHover: {
+    background: "#fbbf24",
+    color: "#0f172a",
+  },
+  featured: {
+    position: "absolute",
+    top: "10px",
+    right: "10px",
+    background: "#fbbf24",
+    color: "#0f172a",
+    padding: "5px 15px",
+    borderRadius: "20px",
+    fontSize: "12px",
+    fontWeight: 700,
+  },
+  loading: {
+    textAlign: "center",
+    padding: "60px 20px",
+    fontSize: "24px",
+    color: "#94a3b8",
+  },
+  empty: {
+    textAlign: "center",
+    padding: "60px 20px",
+    fontSize: "18px",
+    color: "#64748b",
+  },
+  addButton: {
+    position: "fixed",
+    bottom: "30px",
+    right: "30px",
+    width: "60px",
+    height: "60px",
+    borderRadius: "50%",
+    background: "#fbbf24",
+    color: "#0f172a",
+    border: "none",
+    fontSize: "30px",
+    cursor: "pointer",
+    boxShadow: "0 10px 30px rgba(251, 191, 36, 0.4)",
+    transition: "transform 0.3s",
+  },
+  addButtonHover: {
+    transform: "scale(1.1)",
+  },
+};
+
+const BUSINESS_CATEGORIES = [
+  "Restaurants",
+  "Retail",
+  "Services",
+  "Technology",
+  "Healthcare",
+  "Education",
+  "Entertainment",
+  "Professional Services",
+  "Manufacturing",
+  "Agriculture",
+  "Construction",
+  "Transportation",
+  "Other",
+];
+
+const BADGE_CONFIG = {
+  student_verified: { label: "🟢 Student Verified", style: styles.badgeStudent },
+  identity_verified: { label: "🟢 Identity Verified", style: styles.badgeIdentity },
+  business_verified: { label: "🔵 Business Verified", style: styles.badgeBusiness },
+  online_verified: { label: "🔵 Online Verified", style: styles.badgeOnline },
+  location_verified: { label: "🟣 Location Verified", style: styles.badgeLocation },
+  premium_verified: { label: "⭐ Premium Verified", style: styles.badgePremium },
+};
+
+export default function AxxBiashara() {
+  const navigate = useNavigate();
+  const [businesses, setBusinesses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    loadBusinesses();
+  }, [selectedCategory, searchQuery]);
+
+  const loadBusinesses = async () => {
+    setLoading(true);
+    try {
+      const params = {};
+      if (selectedCategory) params.category = selectedCategory;
+      if (searchQuery) params.search = searchQuery;
+
+      const res = await API.get("/business", { params });
+      setBusinesses(res.data.businesses || []);
+    } catch (err) {
+      console.error("Failed to load businesses:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getBadgeLabel = (badgeType) => {
+    return BADGE_CONFIG[badgeType]?.label || badgeType;
+  };
+
+  const getBadgeStyle = (badgeType) => {
+    return BADGE_CONFIG[badgeType]?.style || styles.badge;
+  };
+
+  return (
+    <div style={styles.container}>
+      <div style={styles.header}>
+        <h1 style={styles.title}>🏪 AxxBiashara</h1>
+        <p style={styles.subtitle}>Discover and connect with trusted businesses across Kenya</p>
+      </div>
+
+      <div style={styles.filters}>
+        <button
+          style={{ ...styles.filterButton, ...(selectedCategory === null ? styles.filterButtonActive : {}) }}
+          onClick={() => setSelectedCategory(null)}
+        >
+          All Categories
+        </button>
+        {BUSINESS_CATEGORIES.map((category) => (
+          <button
+            key={category}
+            style={{ ...styles.filterButton, ...(selectedCategory === category ? styles.filterButtonActive : {}) }}
+            onClick={() => setSelectedCategory(category)}
+          >
+            {category}
+          </button>
+        ))}
+      </div>
+
+      <div style={styles.filters}>
+        <input
+          type="text"
+          style={styles.searchInput}
+          placeholder="🔍 Search businesses..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+
+      {loading ? (
+        <div style={styles.loading}>Loading businesses...</div>
+      ) : businesses.length === 0 ? (
+        <div style={styles.empty}>No businesses found</div>
+      ) : (
+        <div style={styles.grid}>
+          {businesses.map((business) => (
+            <div
+              key={business._id}
+              style={styles.card}
+              onClick={() => navigate(`/business/${business._id}`)}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-5px)";
+                e.currentTarget.style.boxShadow = "0 20px 40px rgba(0, 0, 0, 0.3)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            >
+              {business.featured && <div style={styles.featured}>⭐ Featured</div>}
+              {business.images && business.images.length > 0 && (
+                <img src={business.images[0]} alt={business.name} style={styles.image} />
+              )}
+              <div style={styles.cardContent}>
+                <h3 style={styles.cardTitle}>{business.name}</h3>
+                <p style={styles.cardCategory}>{business.categories.join(", ")}</p>
+                <p style={styles.cardLocation}>
+                  📍 {business.location.town}, {business.location.county}
+                </p>
+                <p style={styles.cardDescription}>{business.description}</p>
+                
+                {business.verificationBadges && business.verificationBadges.length > 0 && (
+                  <div style={styles.badges}>
+                    {business.verificationBadges.map((badge, index) => (
+                      <span key={index} style={{ ...styles.badge, ...getBadgeStyle(badge.type) }}>
+                        {getBadgeLabel(badge.type)}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {business.socialMedia && (
+                  <div style={styles.socialLinks}>
+                    {business.socialMedia.facebook && (
+                      <a
+                        href={business.socialMedia.facebook}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={styles.socialIcon}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "#fbbf24";
+                          e.currentTarget.style.color = "#0f172a";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
+                          e.currentTarget.style.color = "#f1f5f9";
+                        }}
+                      >
+                        f
+                      </a>
+                    )}
+                    {business.socialMedia.instagram && (
+                      <a
+                        href={business.socialMedia.instagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={styles.socialIcon}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "#fbbf24";
+                          e.currentTarget.style.color = "#0f172a";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
+                          e.currentTarget.style.color = "#f1f5f9";
+                        }}
+                      >
+                        📷
+                      </a>
+                    )}
+                    {business.socialMedia.whatsapp && (
+                      <a
+                        href={`https://wa.me/${business.socialMedia.whatsapp}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={styles.socialIcon}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "#fbbf24";
+                          e.currentTarget.style.color = "#0f172a";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
+                          e.currentTarget.style.color = "#f1f5f9";
+                        }}
+                      >
+                        💬
+                      </a>
+                    )}
+                    {business.contact.website && (
+                      <a
+                        href={business.contact.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={styles.socialIcon}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "#fbbf24";
+                          e.currentTarget.style.color = "#0f172a";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
+                          e.currentTarget.style.color = "#f1f5f9";
+                        }}
+                      >
+                        🔗
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <button
+        style={styles.addButton}
+        onClick={() => navigate("/business/create")}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = "scale(1.1)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = "scale(1)";
+        }}
+      >
+        +
+      </button>
+    </div>
+  );
+}

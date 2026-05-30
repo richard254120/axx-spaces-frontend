@@ -27,6 +27,11 @@ export default function AdminDashboard() {
   const [verifyingId, setVerifyingId] = useState(null);
   // END ADDED
 
+  // ADDED: businesses tab state
+  const [pendingBusinesses, setPendingBusinesses] = useState([]);
+  const [businessesLoading, setBusinessesLoading] = useState(false);
+  // END ADDED
+
   useEffect(() => {
     // Security check: ensure only admins can stay on this page
     if (user?.role !== "admin") {
@@ -42,6 +47,13 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (activeTab === "payments") {
       loadPendingPayments();
+    }
+  }, [activeTab]);
+
+  // ADDED: load pending businesses when tab is selected
+  useEffect(() => {
+    if (activeTab === "businesses") {
+      loadPendingBusinesses();
     }
   }, [activeTab]);
 
@@ -75,6 +87,45 @@ export default function AdminDashboard() {
       alert("❌ Failed to process payment verification.");
     } finally {
       setVerifyingId(null);
+    }
+  };
+  // END ADDED
+
+  // ADDED: load pending businesses function
+  const loadPendingBusinesses = async () => {
+    setBusinessesLoading(true);
+    try {
+      console.log("Loading pending businesses...");
+      const res = await API.get("/business/admin/pending");
+      console.log("Pending businesses response:", res.data);
+      setPendingBusinesses(res.data.businesses || []);
+    } catch (err) {
+      console.error("Failed to load pending businesses:", err);
+      console.error("Error response:", err.response);
+    } finally {
+      setBusinessesLoading(false);
+    }
+  };
+
+  const handleBusinessStatus = async (businessId, status) => {
+    try {
+      await API.patch(`/business/admin/${businessId}/status`, { status });
+      setPendingBusinesses((prev) =>
+        prev.filter((b) => b._id !== businessId)
+      );
+      alert(`✅ Business ${status} successfully`);
+    } catch (err) {
+      alert("❌ Failed to update business status");
+    }
+  };
+
+  const handleAddBadge = async (businessId, badgeType) => {
+    try {
+      await API.post(`/business/admin/${businessId}/verify`, { badgeType });
+      loadPendingBusinesses();
+      alert("✅ Verification badge added successfully");
+    } catch (err) {
+      alert("❌ Failed to add verification badge");
     }
   };
   // END ADDED
@@ -283,6 +334,14 @@ export default function AdminDashboard() {
           onClick={() => setActiveTab("payments")}
         >
           💰 Payments {pendingPayments.length > 0 ? `(${pendingPayments.length})` : ""}
+        </button>
+        {/* END ADDED */}
+        {/* ADDED: Businesses tab button */}
+        <button
+          style={{ ...styles.tab, ...(activeTab === "businesses" ? styles.tabActive : {}) }}
+          onClick={() => setActiveTab("businesses")}
+        >
+          🏪 Businesses {pendingBusinesses.length > 0 ? `(${pendingBusinesses.length})` : ""}
         </button>
         {/* END ADDED */}
       </div>
@@ -693,6 +752,89 @@ export default function AdminDashboard() {
                     </tr>
                   );
                 })}
+              </tbody>
+            </table>
+          </div>
+        )
+        // END ADDED
+      ) : activeTab === "businesses" ? (
+        // ADDED: Businesses Tab
+        businessesLoading ? (
+          <div style={styles.loader}>⏳ Loading pending businesses...</div>
+        ) : pendingBusinesses.length === 0 ? (
+          <div style={styles.emptyCard}>
+            <p style={styles.emptyText}>✅ No pending businesses to review.</p>
+          </div>
+        ) : (
+          <div style={styles.tableContainer}>
+            <table style={styles.table}>
+              <thead>
+                <tr style={styles.theadRow}>
+                  <th style={styles.th}>Business</th>
+                  <th style={styles.th}>Categories</th>
+                  <th style={styles.th}>Location</th>
+                  <th style={styles.th}>Owner</th>
+                  <th style={styles.th}>Badges</th>
+                  <th style={styles.th}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pendingBusinesses.map((business) => (
+                  <tr key={business._id} style={styles.tr}>
+                    <td style={styles.td}>
+                      <div style={styles.propTitle}>{business.name}</div>
+                      <div style={styles.propLoc}>{business.description?.substring(0, 50)}...</div>
+                    </td>
+                    <td style={styles.td}>
+                      <span style={styles.roleBadge}>{business.categories.join(", ")}</span>
+                    </td>
+                    <td style={styles.td}>
+                      <div style={styles.propLoc}>{business.location.town}, {business.location.county}</div>
+                    </td>
+                    <td style={styles.td}>
+                      <div style={styles.propTitle}>{business.owner?.name}</div>
+                      <div style={styles.propLoc}>{business.owner?.email}</div>
+                    </td>
+                    <td style={styles.td}>
+                      <div style={styles.badges}>
+                        {business.verificationBadges && business.verificationBadges.map((badge, index) => (
+                          <span key={index} style={styles.badge}>
+                            {badge.type}
+                          </span>
+                        ))}
+                      </div>
+                      <select
+                        style={{ ...styles.select, fontSize: "12px", padding: "5px" }}
+                        onChange={(e) => handleAddBadge(business._id, e.target.value)}
+                        defaultValue=""
+                      >
+                        <option value="">Add Badge</option>
+                        <option value="student_verified">🟢 Student</option>
+                        <option value="identity_verified">🟢 Identity</option>
+                        <option value="business_verified">🔵 Business</option>
+                        <option value="online_verified">🔵 Online</option>
+                        <option value="location_verified">🟣 Location</option>
+                        <option value="premium_verified">⭐ Premium</option>
+                      </select>
+                    </td>
+                    <td style={styles.td}>
+                      <div style={styles.btnGroup}>
+                        <button
+                          onClick={() => handleBusinessStatus(business._id, "approved")}
+                          style={styles.approveBtn}
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleBusinessStatus(business._id, "rejected")}
+                          style={styles.rejectBtn}
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
