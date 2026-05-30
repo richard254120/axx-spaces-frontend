@@ -59,6 +59,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const interval = setInterval(() => {
       loadPendingBoosts();
+      loadNotifications();
     }, 30000);
     return () => clearInterval(interval);
   }, []);
