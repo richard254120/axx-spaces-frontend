@@ -567,11 +567,6 @@ export default function AxxBiashara() {
   const [submitterName, setSubmitterName] = useState("");
   const [organizationName, setOrganizationName] = useState("");
 
-  useEffect(() => {
-    loadBusinesses();
-    loadAnnouncements();
-  }, [selectedCategory, selectedCounty, searchQuery, sortBy]);
-
   const loadBusinesses = async () => {
     setLoading(true);
     try {
@@ -598,6 +593,11 @@ export default function AxxBiashara() {
       console.error("Failed to load announcements:", err);
     }
   };
+
+  useEffect(() => {
+    loadBusinesses();
+    loadAnnouncements();
+  }, [selectedCategory, selectedCounty, searchQuery, sortBy]);
 
   const handleAddAnnouncement = async (e) => {
     e.preventDefault();
