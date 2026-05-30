@@ -313,21 +313,14 @@ const styles = {
   announcementsScroll: {
     display: "flex",
     gap: "20px",
-    overflowX: "auto",
+    overflowX: "hidden",
     paddingBottom: "10px",
-    scrollbarWidth: "none",
-    animation: "scroll 30s linear infinite",
-    "&:hover": {
-      animationPlayState: "paused",
-    },
-    "@keyframes scroll": {
-      "0%": {
-        transform: "translateX(0)",
-      },
-      "100%": {
-        transform: "translateX(-50%)",
-      },
-    },
+    width: "100%",
+  },
+  announcementsScrollInner: {
+    display: "flex",
+    gap: "20px",
+    transition: "transform 0.1s linear",
   },
   announcementBox: {
     background: "rgba(15, 23, 42, 0.8)",
@@ -573,11 +566,37 @@ export default function AxxBiashara() {
   const [announcementSuccess, setAnnouncementSuccess] = useState("");
   const [submitterName, setSubmitterName] = useState("");
   const [organizationName, setOrganizationName] = useState("");
+  const [scrollPosition, setScrollPosition] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const scrollRef = React.useRef(null);
 
   useEffect(() => {
     loadBusinesses();
     loadAnnouncements();
   }, [selectedCategory, selectedCounty, searchQuery, sortBy]);
+
+  // Auto-scroll announcements
+  useEffect(() => {
+    if (!scrollRef.current || announcements.length === 0) return;
+
+    const scrollContainer = scrollRef.current;
+    let animationFrame;
+
+    const scroll = () => {
+      if (!isPaused) {
+        setScrollPosition(prev => {
+          const newPosition = prev + 0.5;
+          const maxScroll = scrollContainer.scrollWidth / 2;
+          return newPosition >= maxScroll ? 0 : newPosition;
+        });
+      }
+      animationFrame = requestAnimationFrame(scroll);
+    };
+
+    animationFrame = requestAnimationFrame(scroll);
+
+    return () => cancelAnimationFrame(animationFrame);
+  }, [isPaused, announcements]);
 
   const loadBusinesses = async () => {
     setLoading(true);
@@ -714,35 +733,42 @@ export default function AxxBiashara() {
         <div style={styles.announcementsSection}>
           <h3 style={styles.announcementsTitle}>📢 Latest Announcements</h3>
           {announcements.length > 0 ? (
-            <div style={styles.announcementsScroll}>
-              {[...announcements.slice(0, 10), ...announcements.slice(0, 10)].map((announcement, index) => (
-                <div
-                  key={`${index}-${announcement._id}`}
-                  style={styles.announcementBox}
-                  onClick={() => {
-                    setSelectedAnnouncement(announcement);
-                    setShowAnnouncementModal(true);
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "translateY(-5px)";
-                    e.currentTarget.style.boxShadow = "0 10px 30px rgba(251, 191, 36, 0.3)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
-                >
-                  <span style={styles.announcementBusiness}>{announcement.businessName}</span>
-                  <h4 style={styles.announcementBoxTitle}>{announcement.title}</h4>
-                  <span style={styles.announcementSubmitter}>
-                    👤 {announcement.submitterName || "Anonymous"}
-                    {announcement.organizationName && ` • 🏢 ${announcement.organizationName}`}
-                  </span>
-                  <span style={styles.announcementBoxDate}>
-                    {new Date(announcement.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-              ))}
+            <div
+              ref={scrollRef}
+              style={styles.announcementsScroll}
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}
+            >
+              <div style={{ ...styles.announcementsScrollInner, transform: `translateX(-${scrollPosition}px)` }}>
+                {[...announcements.slice(0, 10), ...announcements.slice(0, 10)].map((announcement, index) => (
+                  <div
+                    key={`${index}-${announcement._id}`}
+                    style={styles.announcementBox}
+                    onClick={() => {
+                      setSelectedAnnouncement(announcement);
+                      setShowAnnouncementModal(true);
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translateY(-5px)";
+                      e.currentTarget.style.boxShadow = "0 10px 30px rgba(251, 191, 36, 0.3)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  >
+                    <span style={styles.announcementBusiness}>{announcement.businessName}</span>
+                    <h4 style={styles.announcementBoxTitle}>{announcement.title}</h4>
+                    <span style={styles.announcementSubmitter}>
+                      👤 {announcement.submitterName || "Anonymous"}
+                      {announcement.organizationName && ` • 🏢 ${announcement.organizationName}`}
+                    </span>
+                    <span style={styles.announcementBoxDate}>
+                      {new Date(announcement.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : (
             <p style={{ color: "#94a3b8", fontSize: "14px" }}>No announcements yet. Create one on a business page!</p>
