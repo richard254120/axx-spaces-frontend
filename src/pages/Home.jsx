@@ -640,6 +640,12 @@ export default function Home() {
                 <span key={l} style={styles.footerLink}>{l}</span>
               ))}
             </div>
+            <div style={styles.footerCol}>
+              <p style={styles.footerColTitle}>Contact</p>
+              <span style={styles.footerLink}>📧 info@axxspace.com</span>
+              <span style={styles.footerLink}>📧 support@axxspace.com</span>
+              <span style={styles.footerLink}>📧 admin@axxspace.com</span>
+            </div>
           </div>
           <p style={styles.footerCopy}>© 2026 Axxspace. All rights reserved.</p>
         </div>

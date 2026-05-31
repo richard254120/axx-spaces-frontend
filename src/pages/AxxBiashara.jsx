@@ -207,6 +207,14 @@ const styles = {
     marginBottom: "10px",
     lineHeight: "1.6",
   },
+  footer: { background: "#0f172a", color: "#cbd5e1", padding: "40px 20px 20px", marginTop: "60px" },
+  footerInner: { maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "30px", marginBottom: "30px" },
+  footerSection: { fontSize: "13px" },
+  footerTitle: { color: "#fbbf24", fontSize: "14px", fontWeight: 700, margin: "0 0 12px" },
+  footerTagline: { fontSize: "13px", color: "#94a3b8", margin: "6px 0 4px" },
+  footerLink: { margin: "6px 0", cursor: "pointer", transition: "color 0.2s", color: "#9ca3af" },
+  footerBottom: { textAlign: "center", paddingTop: "20px", borderTop: "1px solid rgba(255, 255, 255, 0.1)" },
+  footerCopy: { fontSize: "12px", color: "#64748b", margin: 0 },
   cardCategory: {
     fontSize: "14px",
     color: "#94a3b8",
@@ -1316,6 +1324,25 @@ export default function AxxBiashara() {
           </div>
         </div>
       )}
+
+      {/* Footer with Email Contacts */}
+      <div style={styles.footer}>
+        <div style={styles.footerInner}>
+          <div style={styles.footerSection}>
+            <strong style={{ color: "#fbbf24", fontSize: "18px" }}>AxxBiashara</strong>
+            <p style={styles.footerTagline}>Kenya's premier business directory</p>
+          </div>
+          <div style={styles.footerSection}>
+            <h4 style={styles.footerTitle}>Contact Support</h4>
+            <p style={styles.footerLink}>📧 info@axxspace.com</p>
+            <p style={styles.footerLink}>📧 support@axxspace.com</p>
+            <p style={styles.footerLink}>📧 admin@axxspace.com</p>
+          </div>
+        </div>
+        <div style={styles.footerBottom}>
+          <p style={styles.footerCopy}>© 2026 Axxspace. All rights reserved.</p>
+        </div>
+      </div>
     </div>
   );
 }

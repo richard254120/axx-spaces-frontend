@@ -399,9 +399,11 @@ export default function AboutPage() {
           </div>
           <div style={styles.footerSection}>
             <h4 style={styles.footerTitle}>Support</h4>
-            <p style={styles.footerLink}> axxspace@gmail.com</p>
-            <p style={styles.footerLink}> +254 796740883</p>
-            <p style={styles.footerLink}> WhatsApp Support</p>
+            <p style={styles.footerLink}>📧 info@axxspace.com</p>
+            <p style={styles.footerLink}>📧 support@axxspace.com</p>
+            <p style={styles.footerLink}>📧 admin@axxspace.com</p>
+            <p style={styles.footerLink}>📞 +254 796740883</p>
+            <p style={styles.footerLink}>💬 WhatsApp Support</p>
           </div>
         </div>
         <div style={styles.footerBottom}>

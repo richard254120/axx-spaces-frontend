@@ -7,7 +7,7 @@ import { AuthContext } from "../context/AuthContext";
 const styles = {
   container: {
     minHeight: "100vh",
-    background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+    background: "linear-gradient(135deg, #0c4a6e 0%, #1e3a5f 50%, #0f172a 100%)",
     padding: "20px",
     color: "#f1f5f9",
     fontFamily: "'DM Sans', sans-serif",
@@ -16,15 +16,17 @@ const styles = {
     maxWidth: "1200px",
     margin: "0 auto 40px",
     padding: "40px",
-    background: "rgba(30, 41, 59, 0.8)",
-    borderRadius: "20px",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
+    background: "rgba(30, 58, 95, 0.6)",
+    borderRadius: "24px",
+    border: "1px solid rgba(59, 130, 246, 0.3)",
+    boxShadow: "0 8px 32px rgba(59, 130, 246, 0.15)",
   },
   title: {
-    fontSize: "48px",
+    fontSize: "52px",
     fontWeight: 900,
-    color: "#fbbf24",
+    color: "#60a5fa",
     marginBottom: "15px",
+    textShadow: "0 2px 8px rgba(96, 165, 250, 0.3)",
   },
   category: {
     fontSize: "18px",
@@ -33,7 +35,7 @@ const styles = {
   },
   location: {
     fontSize: "16px",
-    color: "#64748b",
+    color: "#cbd5e1",
     marginBottom: "20px",
     display: "flex",
     alignItems: "center",
@@ -42,7 +44,7 @@ const styles = {
   description: {
     fontSize: "18px",
     lineHeight: "1.8",
-    color: "#cbd5e1",
+    color: "#e2e8f0",
     marginBottom: "25px",
   },
   badges: {
@@ -59,27 +61,27 @@ const styles = {
   },
   badgeStudent: {
     background: "rgba(34, 197, 94, 0.2)",
-    color: "#22c55e",
+    color: "#4ade80",
     border: "1px solid #22c55e",
   },
   badgeIdentity: {
     background: "rgba(34, 197, 94, 0.2)",
-    color: "#22c55e",
+    color: "#4ade80",
     border: "1px solid #22c55e",
   },
   badgeBusiness: {
     background: "rgba(59, 130, 246, 0.2)",
-    color: "#3b82f6",
+    color: "#60a5fa",
     border: "1px solid #3b82f6",
   },
   badgeOnline: {
     background: "rgba(59, 130, 246, 0.2)",
-    color: "#3b82f6",
+    color: "#60a5fa",
     border: "1px solid #3b82f6",
   },
   badgeLocation: {
     background: "rgba(168, 85, 247, 0.2)",
-    color: "#a855f7",
+    color: "#c084fc",
     border: "1px solid #a855f7",
   },
   badgePremium: {
@@ -94,18 +96,18 @@ const styles = {
   },
   socialButton: {
     padding: "12px 24px",
-    background: "rgba(255, 255, 255, 0.1)",
-    border: "1px solid rgba(255, 255, 255, 0.2)",
+    background: "rgba(59, 130, 246, 0.2)",
+    border: "1px solid rgba(59, 130, 246, 0.4)",
     borderRadius: "10px",
-    color: "#f1f5f9",
+    color: "#60a5fa",
     textDecoration: "none",
     transition: "all 0.3s",
     fontWeight: 600,
   },
   socialButtonHover: {
-    background: "#fbbf24",
-    color: "#0f172a",
-    border: "1px solid #fbbf24",
+    background: "#3b82f6",
+    color: "#ffffff",
+    border: "1px solid #3b82f6",
   },
   content: {
     maxWidth: "1200px",
@@ -115,19 +117,20 @@ const styles = {
     gap: "30px",
   },
   section: {
-    background: "rgba(30, 41, 59, 0.8)",
+    background: "rgba(30, 58, 95, 0.6)",
     borderRadius: "20px",
     padding: "30px",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
+    border: "1px solid rgba(59, 130, 246, 0.2)",
     marginBottom: "30px",
+    boxShadow: "0 4px 16px rgba(59, 130, 246, 0.1)",
   },
   sectionTitle: {
     fontSize: "24px",
     fontWeight: 700,
-    color: "#fbbf24",
+    color: "#60a5fa",
     marginBottom: "20px",
     paddingBottom: "15px",
-    borderBottom: "2px solid #fbbf24",
+    borderBottom: "2px solid #3b82f6",
   },
   hoursGrid: {
     display: "grid",
@@ -156,7 +159,7 @@ const styles = {
     padding: "20px",
     borderRadius: "15px",
     marginBottom: "15px",
-    border: "1px solid rgba(251, 191, 36, 0.3)",
+    border: "1px solid rgba(59, 130, 246, 0.3)",
     display: "flex",
     gap: "15px",
   },
@@ -172,7 +175,7 @@ const styles = {
   promoTitle: {
     fontSize: "18px",
     fontWeight: 700,
-    color: "#fbbf24",
+    color: "#60a5fa",
     marginBottom: "8px",
   },
   promoDescription: {
@@ -184,7 +187,7 @@ const styles = {
   promoDiscount: {
     fontSize: "20px",
     fontWeight: 800,
-    color: "#22c55e",
+    color: "#4ade80",
     marginBottom: "8px",
   },
   promoDates: {
@@ -194,9 +197,9 @@ const styles = {
   },
   promoCode: {
     fontSize: "14px",
-    color: "#fbbf24",
+    color: "#60a5fa",
     fontWeight: 600,
-    background: "rgba(251, 191, 36, 0.1)",
+    background: "rgba(59, 130, 246, 0.1)",
     padding: "4px 8px",
     borderRadius: "4px",
     display: "inline-block",
@@ -220,10 +223,10 @@ const styles = {
   },
   backButton: {
     padding: "12px 24px",
-    background: "rgba(255, 255, 255, 0.1)",
-    border: "1px solid rgba(255, 255, 255, 0.2)",
+    background: "rgba(59, 130, 246, 0.2)",
+    border: "1px solid rgba(59, 130, 246, 0.4)",
     borderRadius: "10px",
-    color: "#f1f5f9",
+    color: "#60a5fa",
     textDecoration: "none",
     marginBottom: "20px",
     display: "inline-block",
@@ -248,7 +251,7 @@ const styles = {
   announcementInput: {
     padding: "10px 12px",
     background: "rgba(15, 23, 42, 0.5)",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
+    border: "1px solid rgba(59, 130, 246, 0.3)",
     borderRadius: "8px",
     color: "#f1f5f9",
     fontSize: "14px",
@@ -256,7 +259,7 @@ const styles = {
   announcementTextarea: {
     padding: "10px 12px",
     background: "rgba(15, 23, 42, 0.5)",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
+    border: "1px solid rgba(59, 130, 246, 0.3)",
     borderRadius: "8px",
     color: "#f1f5f9",
     fontSize: "14px",
@@ -265,8 +268,8 @@ const styles = {
   },
   submitButton: {
     padding: "10px 16px",
-    background: "#fbbf24",
-    color: "#0f172a",
+    background: "#3b82f6",
+    color: "#ffffff",
     border: "none",
     borderRadius: "8px",
     fontSize: "14px",
@@ -278,9 +281,85 @@ const styles = {
     background: "rgba(34, 197, 94, 0.2)",
     border: "1px solid #22c55e",
     borderRadius: "8px",
-    color: "#22c55e",
+    color: "#4ade80",
     fontSize: "14px",
     marginTop: "10px",
+  },
+  actionButtons: {
+    display: "flex",
+    gap: "10px",
+    marginBottom: "20px",
+    flexWrap: "wrap",
+  },
+  actionButton: {
+    padding: "10px 20px",
+    background: "rgba(59, 130, 246, 0.2)",
+    border: "1px solid rgba(59, 130, 246, 0.4)",
+    borderRadius: "8px",
+    color: "#60a5fa",
+    textDecoration: "none",
+    fontSize: "14px",
+    fontWeight: 600,
+    cursor: "pointer",
+    transition: "all 0.3s",
+  },
+  imageGallery: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+    gap: "15px",
+    marginBottom: "25px",
+  },
+  galleryImage: {
+    width: "100%",
+    height: "200px",
+    objectFit: "cover",
+    borderRadius: "12px",
+    cursor: "pointer",
+    transition: "transform 0.3s",
+  },
+  statsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, 1fr)",
+    gap: "15px",
+    marginBottom: "20px",
+  },
+  statItem: {
+    background: "rgba(59, 130, 246, 0.1)",
+    padding: "15px",
+    borderRadius: "12px",
+    textAlign: "center",
+    border: "1px solid rgba(59, 130, 246, 0.2)",
+  },
+  statValue: {
+    fontSize: "24px",
+    fontWeight: 800,
+    color: "#60a5fa",
+    marginBottom: "5px",
+  },
+  statLabel: {
+    fontSize: "12px",
+    color: "#94a3b8",
+  },
+  emailContact: {
+    background: "rgba(59, 130, 246, 0.1)",
+    padding: "15px",
+    borderRadius: "12px",
+    marginTop: "20px",
+    border: "1px solid rgba(59, 130, 246, 0.2)",
+  },
+  emailContactTitle: {
+    fontSize: "14px",
+    fontWeight: 700,
+    color: "#60a5fa",
+    marginBottom: "10px",
+  },
+  emailContactItem: {
+    fontSize: "13px",
+    color: "#cbd5e1",
+    marginBottom: "6px",
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
   },
 };
 
@@ -385,6 +464,34 @@ export default function BusinessDetail() {
           </div>
         )}
 
+        <div style={styles.actionButtons}>
+          <a href={`tel:${business.contact.phone}`} style={styles.actionButton}>
+            📞 Call
+          </a>
+          <a href={`mailto:${business.contact.email}`} style={styles.actionButton}>
+            ✉️ Email
+          </a>
+          {business.contact.website && (
+            <a href={business.contact.website} target="_blank" rel="noopener noreferrer" style={styles.actionButton}>
+              🌐 Website
+            </a>
+          )}
+          <button style={styles.actionButton} onClick={() => window.open(`https://wa.me/${business.contact.phone}`)}>
+            💬 WhatsApp
+          </button>
+          <button style={styles.actionButton} onClick={() => navigator.share?.({ title: business.name, url: window.location.href })}>
+            📤 Share
+          </button>
+        </div>
+
+        {business.images && business.images.length > 0 && (
+          <div style={styles.imageGallery}>
+            {business.images.slice(0, 4).map((image, index) => (
+              <img key={index} src={image} alt={`${business.name} ${index + 1}`} style={styles.galleryImage} />
+            ))}
+          </div>
+        )}
+
         {business.socialMedia && (
           <div style={styles.socialLinks}>
             {business.socialMedia.facebook && (
@@ -394,12 +501,12 @@ export default function BusinessDetail() {
                 rel="noopener noreferrer"
                 style={styles.socialButton}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#fbbf24";
-                  e.currentTarget.style.color = "#0f172a";
+                  e.currentTarget.style.background = "#3b82f6";
+                  e.currentTarget.style.color = "#ffffff";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
-                  e.currentTarget.style.color = "#f1f5f9";
+                  e.currentTarget.style.background = "rgba(59, 130, 246, 0.2)";
+                  e.currentTarget.style.color = "#60a5fa";
                 }}
               >
                 Facebook
@@ -412,12 +519,12 @@ export default function BusinessDetail() {
                 rel="noopener noreferrer"
                 style={styles.socialButton}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#fbbf24";
-                  e.currentTarget.style.color = "#0f172a";
+                  e.currentTarget.style.background = "#3b82f6";
+                  e.currentTarget.style.color = "#ffffff";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
-                  e.currentTarget.style.color = "#f1f5f9";
+                  e.currentTarget.style.background = "rgba(59, 130, 246, 0.2)";
+                  e.currentTarget.style.color = "#60a5fa";
                 }}
               >
                 Instagram
@@ -430,12 +537,12 @@ export default function BusinessDetail() {
                 rel="noopener noreferrer"
                 style={styles.socialButton}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#fbbf24";
-                  e.currentTarget.style.color = "#0f172a";
+                  e.currentTarget.style.background = "#3b82f6";
+                  e.currentTarget.style.color = "#ffffff";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
-                  e.currentTarget.style.color = "#f1f5f9";
+                  e.currentTarget.style.background = "rgba(59, 130, 246, 0.2)";
+                  e.currentTarget.style.color = "#60a5fa";
                 }}
               >
                 Twitter
@@ -448,12 +555,12 @@ export default function BusinessDetail() {
                 rel="noopener noreferrer"
                 style={styles.socialButton}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#fbbf24";
-                  e.currentTarget.style.color = "#0f172a";
+                  e.currentTarget.style.background = "#3b82f6";
+                  e.currentTarget.style.color = "#ffffff";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
-                  e.currentTarget.style.color = "#f1f5f9";
+                  e.currentTarget.style.background = "rgba(59, 130, 246, 0.2)";
+                  e.currentTarget.style.color = "#60a5fa";
                 }}
               >
                 LinkedIn
@@ -466,33 +573,15 @@ export default function BusinessDetail() {
                 rel="noopener noreferrer"
                 style={styles.socialButton}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#fbbf24";
-                  e.currentTarget.style.color = "#0f172a";
+                  e.currentTarget.style.background = "#3b82f6";
+                  e.currentTarget.style.color = "#ffffff";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
-                  e.currentTarget.style.color = "#f1f5f9";
+                  e.currentTarget.style.background = "rgba(59, 130, 246, 0.2)";
+                  e.currentTarget.style.color = "#60a5fa";
                 }}
               >
                 WhatsApp
-              </a>
-            )}
-            {business.contact.website && (
-              <a
-                href={business.contact.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={styles.socialButton}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#fbbf24";
-                  e.currentTarget.style.color = "#0f172a";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
-                  e.currentTarget.style.color = "#f1f5f9";
-                }}
-              >
-                Website
               </a>
             )}
           </div>
@@ -550,16 +639,41 @@ export default function BusinessDetail() {
 
         <div>
           <div style={styles.section}>
+            <h2 style={styles.sectionTitle}>Business Stats</h2>
+            <div style={styles.statsGrid}>
+              <div style={styles.statItem}>
+                <div style={styles.statValue}>{business.views || 0}</div>
+                <div style={styles.statLabel}>Views</div>
+              </div>
+              <div style={styles.statItem}>
+                <div style={styles.statValue}>{business.rating.toFixed(1)}</div>
+                <div style={styles.statLabel}>Rating</div>
+              </div>
+              <div style={styles.statItem}>
+                <div style={styles.statValue}>{business.reviewCount || 0}</div>
+                <div style={styles.statLabel}>Reviews</div>
+              </div>
+              <div style={styles.statItem}>
+                <div style={styles.statValue}>{business.yearEstablished || "N/A"}</div>
+                <div style={styles.statLabel}>Est.</div>
+              </div>
+            </div>
+          </div>
+
+          <div style={styles.section}>
             <h2 style={styles.sectionTitle}>Contact Information</h2>
             <div style={styles.contactInfo}>
               <p>📞 {business.contact.phone}</p>
               {business.contact.email && <p>✉️ {business.contact.email}</p>}
               {business.location.address && <p>📍 {business.location.address}</p>}
-              <p>👁️ {business.views} views</p>
-              {business.rating > 0 && (
-                <p>⭐ {business.rating.toFixed(1)} ({business.reviewCount} reviews)</p>
-              )}
             </div>
+          </div>
+
+          <div style={styles.emailContact}>
+            <div style={styles.emailContactTitle}>📧 Axxspace Support</div>
+            <div style={styles.emailContactItem}>info@axxspace.com</div>
+            <div style={styles.emailContactItem}>support@axxspace.com</div>
+            <div style={styles.emailContactItem}>admin@axxspace.com</div>
           </div>
 
           {business.owner && (
