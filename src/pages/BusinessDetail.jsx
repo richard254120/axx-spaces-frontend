@@ -151,28 +151,55 @@ const styles = {
     fontSize: "12px",
     color: "#94a3b8",
   },
-  offerCard: {
+  promoCard: {
     background: "rgba(15, 23, 42, 0.5)",
     padding: "20px",
     borderRadius: "15px",
     marginBottom: "15px",
     border: "1px solid rgba(251, 191, 36, 0.3)",
+    display: "flex",
+    gap: "15px",
   },
-  offerTitle: {
+  promoImage: {
+    width: "120px",
+    height: "120px",
+    objectFit: "cover",
+    borderRadius: "10px",
+  },
+  promoContent: {
+    flex: 1,
+  },
+  promoTitle: {
     fontSize: "18px",
     fontWeight: 700,
     color: "#fbbf24",
-    marginBottom: "10px",
+    marginBottom: "8px",
   },
-  offerDiscount: {
-    fontSize: "24px",
+  promoDescription: {
+    fontSize: "14px",
+    color: "#cbd5e1",
+    marginBottom: "10px",
+    lineHeight: "1.5",
+  },
+  promoDiscount: {
+    fontSize: "20px",
     fontWeight: 800,
     color: "#22c55e",
-    marginBottom: "10px",
+    marginBottom: "8px",
   },
-  offerValid: {
-    fontSize: "14px",
+  promoDates: {
+    fontSize: "13px",
     color: "#94a3b8",
+    marginBottom: "6px",
+  },
+  promoCode: {
+    fontSize: "14px",
+    color: "#fbbf24",
+    fontWeight: 600,
+    background: "rgba(251, 191, 36, 0.1)",
+    padding: "4px 8px",
+    borderRadius: "4px",
+    display: "inline-block",
   },
   contactInfo: {
     fontSize: "14px",
@@ -490,21 +517,33 @@ export default function BusinessDetail() {
             </div>
           </div>
 
-          {business.offers && business.offers.length > 0 && (
+          {business.promotions && business.promotions.length > 0 && (
             <div style={styles.section}>
-              <h2 style={styles.sectionTitle}>Special Offers</h2>
-              {business.offers.map((offer, index) => (
-                <div key={index} style={styles.offerCard}>
-                  <div style={styles.offerTitle}>{offer.title}</div>
-                  <div style={styles.offerDiscount}>{offer.discount}% OFF</div>
-                  <div style={styles.offerDescription}>{offer.description}</div>
-                  {offer.validUntil && (
-                    <div style={styles.offerValid}>
-                      Valid until: {new Date(offer.validUntil).toLocaleDateString()}
+              <h2 style={styles.sectionTitle}>Featured Promotions</h2>
+              {business.promotions
+                .filter(p => p.status === "active" && p.isFeatured)
+                .map((promo, index) => (
+                  <div key={index} style={styles.promoCard}>
+                    {promo.imageUrl && (
+                      <img src={promo.imageUrl} alt={promo.title} style={styles.promoImage} />
+                    )}
+                    <div style={styles.promoContent}>
+                      <div style={styles.promoTitle}>{promo.title}</div>
+                      <div style={styles.promoDescription}>{promo.description}</div>
+                      <div style={styles.promoDiscount}>
+                        {promo.discountType === "percentage"
+                          ? `${promo.discountValue}% OFF`
+                          : promo.discountType === "fixed"
+                            ? `KES ${promo.discountValue} OFF`
+                            : "Buy One Get One"}
+                      </div>
+                      <div style={styles.promoDates}>
+                        Valid: {new Date(promo.startDate).toLocaleDateString()} - {new Date(promo.endDate).toLocaleDateString()}
+                      </div>
+                      {promo.code && <div style={styles.promoCode}>Code: {promo.code}</div>}
                     </div>
-                  )}
-                </div>
-              ))}
+                  </div>
+                ))}
             </div>
           )}
         </div>
