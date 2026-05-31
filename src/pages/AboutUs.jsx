@@ -56,37 +56,44 @@ export default function AboutPage() {
 
   const whatWeDo = [
     {
-      icon: "🏠",
-      title: "Rental Space",
+      icon: "�",
+      title: "AxxBiashara",
       color: "#fbbf24",
+      desc: "Kenya's premier business directory connecting users with trusted businesses across all sectors. Features reviews, ratings, advanced search, business comparison, and premium listings.",
+      items: ["Reviews & Ratings", "Favorites & Bookmarks", "Business Analytics", "Events & Promotions", "Verification Badges"],
+    },
+    {
+      icon: "�",
+      title: "Rental Space",
+      color: "#22c55e",
       desc: "We help users discover available rental houses and business spaces — compare pricing and locations, connect directly with landlords and caretakers, and access property information more conveniently.",
       items: null,
     },
     {
       icon: "🏢",
       title: "Business Space",
-      color: "#22c55e",
+      color: "#3b82f6",
       desc: "We help entrepreneurs and businesses find spaces that match their operational needs and budgets.",
       items: ["Shops", "Offices", "Commercial spaces", "Small business locations"],
     },
     {
       icon: "🚚",
       title: "Movers & Relocation",
-      color: "#3b82f6",
+      color: "#0ea5e9",
       desc: "Moving can be stressful and expensive. Axxspace connects users with movers and relocation service providers to make transitions easier and more organized.",
       items: null,
     },
     {
       icon: "🏨",
       title: "Tourism & Hospitality",
-      color: "#0ea5e9",
+      color: "#a855f7",
       desc: "Discover and book amazing hotels, resorts, lodges, and tourism experiences across Kenya. Property owners advertise their properties with flexible subscription packages.",
       items: ["Beach Resorts", "Mountain Lodges", "Hotels", "Adventure Tours", "Spa & Wellness"],
     },
     {
       icon: "🛍️",
       title: "Second-Hand Marketplace",
-      color: "#a855f7",
+      color: "#ec4899",
       desc: "A platform where second-hand merchants showcase products to buyers looking for affordable and accessible options.",
       items: ["Sustainability", "Affordable living", "Small-scale traders and local businesses"],
     },
@@ -116,10 +123,10 @@ export default function AboutPage() {
       <section style={styles.hero}>
         <div style={styles.heroContent}>
           <div style={styles.badge}>🌍 About Axxspace</div>
-          <h1 style={styles.heroTitle}>Spaces. Services.<br />Solutions. All in One.</h1>
+          <h1 style={styles.heroTitle}>Spaces. Services.<br />Businesses. All in One.</h1>
           <p style={styles.heroSubtitle}>
             A digital ecosystem connecting tenants, landlords, business owners, movers, tourism providers, and
-            second-hand merchants through technology — built by young innovators in Kenya.
+            second-hand merchants through technology — built by young innovators in Kenya. Discover trusted businesses with AxxBiashara.
           </p>
         </div>
       </section>
@@ -224,6 +231,7 @@ export default function AboutPage() {
               { val: "47", label: "Counties Covered", icon: "" },
               { val: "500+", label: "Happy Tenants", icon: "" },
               { val: "150+", label: "Landlords Onboarded", icon: "" },
+              { val: "100+", label: "Verified Businesses", icon: "" },
             ].map((s) => (
               <div key={s.label} style={styles.statCard} className="stat-card">
                 <div style={styles.statIcon}>{s.icon}</div>
@@ -303,7 +311,7 @@ export default function AboutPage() {
           <div style={styles.futureLabel}>What's Next</div>
           <h2 style={{ ...styles.sectionTitle, color: "#fbbf24" }}>Building the Future</h2>
           <p style={styles.futureText}>
-           Axxspace is evolving into a dynamic all-in-one ecosystem built to simplify everyday living for both local communities and international visitors. Our platform brings together trusted housing solutions, tourism experiences, business connections, property advertising, and essential services into one seamless digital space designed around real human needs.
+            Axxspace is evolving into a dynamic all-in-one ecosystem built to simplify everyday living for both local communities and international visitors. Our platform brings together trusted housing solutions, tourism experiences, business connections, property advertising, and essential services into one seamless digital space designed around real human needs.
 
             Whether you are relocating, traveling, investing, launching a business, or searching for new opportunities, Axxspace is committed to making every experience smoother, safer, faster, and more connected. We aim to bridge convenience with trust by creating a platform where users can confidently explore opportunities, discover reliable services, and build meaningful connections.
 
@@ -332,6 +340,16 @@ export default function AboutPage() {
             <button
               style={{
                 ...styles.ctaBtnSecondary,
+                background: "#fbbf24",
+                color: "#0f172a",
+              }}
+              onClick={() => navigate("/axxbiashara")}
+            >
+              AxxBiashara
+            </button>
+            <button
+              style={{
+                ...styles.ctaBtnSecondary,
                 background: "#0ea5e9",
                 color: "white",
               }}
@@ -353,7 +371,7 @@ export default function AboutPage() {
               style={{ ...styles.ctaBtnSecondary, background: "#3b82f6", color: "white" }}
               onClick={() => navigate("/materials")}
             >
-               Buy Materials
+              Buy Materials
             </button>
             <button
               style={{ ...styles.ctaBtnSecondary, background: "#6366f1", color: "white" }}
