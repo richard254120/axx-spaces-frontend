@@ -113,6 +113,99 @@ const styles = {
     fontWeight: 700,
     color: "#fbbf24",
     marginBottom: "8px",
+    flex: 1,
+  },
+  cardHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "10px",
+  },
+  cardButtons: {
+    display: "flex",
+    gap: "8px",
+  },
+  iconButton: {
+    width: "36px",
+    height: "36px",
+    borderRadius: "50%",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    background: "rgba(15, 23, 42, 0.8)",
+    color: "#f1f5f9",
+    fontSize: "16px",
+    cursor: "pointer",
+    transition: "all 0.3s",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  comparisonBar: {
+    position: "fixed",
+    bottom: "20px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    background: "rgba(15, 23, 42, 0.95)",
+    border: "1px solid rgba(251, 191, 36, 0.3)",
+    borderRadius: "15px",
+    padding: "15px 25px",
+    display: "flex",
+    alignItems: "center",
+    gap: "20px",
+    boxShadow: "0 10px 40px rgba(0, 0, 0, 0.5)",
+    zIndex: 1000,
+  },
+  comparisonText: {
+    color: "#f1f5f9",
+    fontSize: "14px",
+    fontWeight: 600,
+  },
+  compareButton: {
+    padding: "10px 20px",
+    background: "#fbbf24",
+    border: "none",
+    borderRadius: "8px",
+    color: "#0f172a",
+    fontSize: "14px",
+    fontWeight: 700,
+    cursor: "pointer",
+    transition: "all 0.3s",
+  },
+  clearButton: {
+    padding: "10px 20px",
+    background: "rgba(239, 68, 68, 0.2)",
+    border: "1px solid rgba(239, 68, 68, 0.5)",
+    borderRadius: "8px",
+    color: "#ef4444",
+    fontSize: "14px",
+    fontWeight: 600,
+    cursor: "pointer",
+    transition: "all 0.3s",
+  },
+  comparisonTable: {
+    display: "flex",
+    gap: "20px",
+    marginTop: "20px",
+  },
+  comparisonColumn: {
+    flex: 1,
+    background: "rgba(15, 23, 42, 0.5)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    borderRadius: "10px",
+    padding: "20px",
+  },
+  comparisonBusinessName: {
+    fontSize: "18px",
+    fontWeight: 700,
+    color: "#fbbf24",
+    marginBottom: "15px",
+    paddingBottom: "10px",
+    borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+  },
+  comparisonItem: {
+    fontSize: "14px",
+    color: "#cbd5e1",
+    marginBottom: "10px",
+    lineHeight: "1.6",
   },
   cardCategory: {
     fontSize: "14px",
@@ -563,6 +656,12 @@ export default function AxxBiashara() {
   const [selectedCounty, setSelectedCounty] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
+  const [minRating, setMinRating] = useState("");
+  const [maxRating, setMaxRating] = useState("");
+  const [priceRange, setPriceRange] = useState("");
+  const [openNow, setOpenNow] = useState(false);
+  const [verification, setVerification] = useState("");
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [announcements, setAnnouncements] = useState([]);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
@@ -573,6 +672,10 @@ export default function AxxBiashara() {
   const [submitterName, setSubmitterName] = useState("");
   const [organizationName, setOrganizationName] = useState("");
   const [isMarqueePaused, setIsMarqueePaused] = useState(false);
+  const [favorites, setFavorites] = useState([]);
+  const [comparisonList, setComparisonList] = useState([]);
+  const [showComparisonModal, setShowComparisonModal] = useState(false);
+  const [comparisonData, setComparisonData] = useState([]);
 
   const loadBusinesses = async () => {
     setLoading(true);
@@ -582,6 +685,11 @@ export default function AxxBiashara() {
       if (selectedCounty) params.county = selectedCounty;
       if (searchQuery) params.search = searchQuery;
       if (sortBy) params.sort = sortBy;
+      if (minRating) params.minRating = minRating;
+      if (maxRating) params.maxRating = maxRating;
+      if (priceRange) params.priceRange = priceRange;
+      if (openNow) params.openNow = "true";
+      if (verification) params.verification = verification;
 
       const res = await API.get("/business", { params });
       setBusinesses(res.data.businesses || []);
@@ -606,11 +714,69 @@ export default function AxxBiashara() {
 
   useEffect(() => {
     loadBusinesses();
-  }, [selectedCategory, selectedCounty, searchQuery, sortBy]);
+  }, [selectedCategory, selectedCounty, searchQuery, sortBy, minRating, maxRating, priceRange, openNow, verification]);
 
   useEffect(() => {
     loadAnnouncements();
   }, []);
+
+  useEffect(() => {
+    loadFavorites();
+  }, []);
+
+  const loadFavorites = async () => {
+    try {
+      const res = await API.get("/favorites");
+      setFavorites(res.data.favorites || []);
+    } catch (err) {
+      console.error("Failed to load favorites:", err);
+    }
+  };
+
+  const toggleFavorite = async (businessId) => {
+    try {
+      const existingFavorite = favorites.find(f => f.business._id === businessId);
+      if (existingFavorite) {
+        await API.delete(`/favorites/${existingFavorite._id}`);
+        setFavorites(favorites.filter(f => f._id !== existingFavorite._id));
+      } else {
+        await API.post("/favorites", { businessId });
+        loadFavorites();
+      }
+    } catch (err) {
+      console.error("Failed to toggle favorite:", err);
+    }
+  };
+
+  const toggleComparison = (businessId) => {
+    if (comparisonList.includes(businessId)) {
+      setComparisonList(comparisonList.filter(id => id !== businessId));
+    } else {
+      if (comparisonList.length < 3) {
+        setComparisonList([...comparisonList, businessId]);
+      } else {
+        alert("You can compare up to 3 businesses at a time");
+      }
+    }
+  };
+
+  const openComparison = async () => {
+    if (comparisonList.length < 2) {
+      alert("Please select at least 2 businesses to compare");
+      return;
+    }
+    try {
+      const res = await API.get(`/business/compare?ids=${comparisonList.join(",")}`);
+      setComparisonData(res.data.businesses);
+      setShowComparisonModal(true);
+    } catch (err) {
+      console.error("Failed to load comparison data:", err);
+    }
+  };
+
+  const isFavorite = (businessId) => {
+    return favorites.some(f => f.business._id === businessId);
+  };
 
   const handleAddAnnouncement = async (e) => {
     e.preventDefault();
@@ -778,6 +944,24 @@ export default function AxxBiashara() {
 
         <p style={styles.subtitle}>Discover and connect with trusted businesses across Kenya</p>
 
+        {comparisonList.length > 0 && (
+          <div style={styles.comparisonBar}>
+            <span style={styles.comparisonText}>{comparisonList.length} businesses selected for comparison</span>
+            <button
+              style={styles.compareButton}
+              onClick={openComparison}
+            >
+              Compare Now
+            </button>
+            <button
+              style={styles.clearButton}
+              onClick={() => setComparisonList([])}
+            >
+              Clear
+            </button>
+          </div>
+        )}
+
         {/* Pricing Section */}
         <div style={styles.pricingSection}>
           <div style={styles.pricingCard}>
@@ -844,10 +1028,92 @@ export default function AxxBiashara() {
             <option value="oldest">Oldest First</option>
             <option value="rating">Highest Rated</option>
             <option value="views">Most Viewed</option>
+            <option value="reviews">Most Reviews</option>
             <option value="name">Name A-Z</option>
           </select>
         </div>
+        <button
+          style={styles.filterButton}
+          onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+        >
+          {showAdvancedFilters ? "▼ Advanced Filters" : "▶ Advanced Filters"}
+        </button>
       </div>
+
+      {showAdvancedFilters && (
+        <div style={{ ...styles.filters, background: "rgba(15, 23, 42, 0.5)", padding: "20px", borderRadius: "10px" }}>
+          <div style={styles.filterGroup}>
+            <label style={styles.filterLabel}>Min Rating:</label>
+            <select
+              style={styles.filterSelect}
+              value={minRating}
+              onChange={(e) => setMinRating(e.target.value)}
+            >
+              <option value="">Any</option>
+              <option value="1">1+ Stars</option>
+              <option value="2">2+ Stars</option>
+              <option value="3">3+ Stars</option>
+              <option value="4">4+ Stars</option>
+              <option value="5">5 Stars</option>
+            </select>
+          </div>
+          <div style={styles.filterGroup}>
+            <label style={styles.filterLabel}>Max Rating:</label>
+            <select
+              style={styles.filterSelect}
+              value={maxRating}
+              onChange={(e) => setMaxRating(e.target.value)}
+            >
+              <option value="">Any</option>
+              <option value="1">1 Star</option>
+              <option value="2">2 Stars</option>
+              <option value="3">3 Stars</option>
+              <option value="4">4 Stars</option>
+              <option value="5">5 Stars</option>
+            </select>
+          </div>
+          <div style={styles.filterGroup}>
+            <label style={styles.filterLabel}>Price Range:</label>
+            <select
+              style={styles.filterSelect}
+              value={priceRange}
+              onChange={(e) => setPriceRange(e.target.value)}
+            >
+              <option value="">Any</option>
+              <option value="$">$ (Budget)</option>
+              <option value="$$">$$ (Mid-range)</option>
+              <option value="$$$">$$$ (Premium)</option>
+              <option value="$$$$">$$$$ (Luxury)</option>
+            </select>
+          </div>
+          <div style={styles.filterGroup}>
+            <label style={styles.filterLabel}>Verification:</label>
+            <select
+              style={styles.filterSelect}
+              value={verification}
+              onChange={(e) => setVerification(e.target.value)}
+            >
+              <option value="">Any</option>
+              <option value="business_verified">Business Verified</option>
+              <option value="location_verified">Location Verified</option>
+              <option value="bronze">Bronze Tier</option>
+              <option value="silver">Silver Tier</option>
+              <option value="gold">Gold Tier</option>
+            </select>
+          </div>
+          <div style={styles.filterGroup}>
+            <label style={styles.filterLabel}>
+              <input
+                type="checkbox"
+                checked={openNow}
+                onChange={(e) => setOpenNow(e.target.checked)}
+                style={{ marginRight: "8px" }}
+              />
+              Open Now
+            </label>
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <div style={styles.loading}>Loading businesses...</div>
@@ -874,7 +1140,29 @@ export default function AxxBiashara() {
                 <img src={business.images[0]} alt={business.name} style={styles.image} />
               )}
               <div style={styles.cardContent}>
-                <h3 style={styles.cardTitle}>{business.name}</h3>
+                <div style={styles.cardHeader}>
+                  <h3 style={styles.cardTitle}>{business.name}</h3>
+                  <div style={styles.cardButtons}>
+                    <button
+                      style={styles.iconButton}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFavorite(business._id);
+                      }}
+                    >
+                      {isFavorite(business._id) ? "❤️" : "🤍"}
+                    </button>
+                    <button
+                      style={styles.iconButton}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleComparison(business._id);
+                      }}
+                    >
+                      {comparisonList.includes(business._id) ? "✓" : "⚖️"}
+                    </button>
+                  </div>
+                </div>
                 <p style={styles.cardCategory}>{business.categories.join(", ")}</p>
                 <p style={styles.cardLocation}>
                   📍 {business.location.town}, {business.location.county}
@@ -1008,6 +1296,37 @@ export default function AxxBiashara() {
             <p style={styles.modalBusiness}>📢 {selectedAnnouncement.businessName}</p>
             <p style={styles.modalDate}>📅 {new Date(selectedAnnouncement.createdAt).toLocaleDateString()}</p>
             <p style={styles.modalContentText}>{selectedAnnouncement.content}</p>
+          </div>
+        </div>
+      )}
+
+      {showComparisonModal && (
+        <div style={styles.modalOverlay} onClick={() => setShowComparisonModal(false)}>
+          <div style={{ ...styles.modalContent, maxWidth: "900px", maxHeight: "80vh", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>
+            <button
+              style={styles.modalClose}
+              onClick={() => setShowComparisonModal(false)}
+            >
+              ✕
+            </button>
+            <h3 style={styles.modalTitle}>Business Comparison</h3>
+            <div style={styles.comparisonTable}>
+              {comparisonData.map((business) => (
+                <div key={business._id} style={styles.comparisonColumn}>
+                  <h4 style={styles.comparisonBusinessName}>{business.name}</h4>
+                  <p style={styles.comparisonItem}><strong>Category:</strong> {business.categories.join(", ")}</p>
+                  <p style={styles.comparisonItem}><strong>Location:</strong> {business.location.town}, {business.location.county}</p>
+                  <p style={styles.comparisonItem}><strong>Rating:</strong> {business.rating || "N/A"} ⭐</p>
+                  <p style={styles.comparisonItem}><strong>Reviews:</strong> {business.reviewCount || 0}</p>
+                  <p style={styles.comparisonItem}><strong>Price Range:</strong> {business.priceRange || "N/A"}</p>
+                  <p style={styles.comparisonItem}><strong>Employees:</strong> {business.employeeCount || "N/A"}</p>
+                  <p style={styles.comparisonItem}><strong>Year Established:</strong> {business.yearEstablished || "N/A"}</p>
+                  <p style={styles.comparisonItem}><strong>Phone:</strong> {business.contact.phone || "N/A"}</p>
+                  <p style={styles.comparisonItem}><strong>Email:</strong> {business.contact.email || "N/A"}</p>
+                  <p style={styles.comparisonItem}><strong>Website:</strong> {business.contact.website || "N/A"}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}

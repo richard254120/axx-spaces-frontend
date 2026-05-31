@@ -32,6 +32,11 @@ export default function AdminDashboard() {
   const [businessesLoading, setBusinessesLoading] = useState(false);
   // END ADDED
 
+  // ADDED: announcements tab state
+  const [pendingAnnouncements, setPendingAnnouncements] = useState([]);
+  const [announcementsLoading, setAnnouncementsLoading] = useState(false);
+  // END ADDED
+
   useEffect(() => {
     // Security check: ensure only admins can stay on this page
     if (user?.role !== "admin") {
@@ -47,6 +52,13 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (activeTab === "payments") {
       loadPendingPayments();
+    }
+  }, [activeTab]);
+
+  // ADDED: load pending announcements when tab is selected
+  useEffect(() => {
+    if (activeTab === "announcements") {
+      loadPendingAnnouncements();
     }
   }, [activeTab]);
 
@@ -128,6 +140,37 @@ export default function AdminDashboard() {
       alert("❌ Failed to add verification badge");
     }
   };
+
+  // ADDED: load pending announcements function
+  const loadPendingAnnouncements = async () => {
+    setAnnouncementsLoading(true);
+    try {
+      console.log("Loading pending announcements...");
+      const res = await API.get("/business/admin/announcements");
+      console.log("Pending announcements response:", res.data);
+      setPendingAnnouncements(res.data.announcements || []);
+    } catch (err) {
+      console.error("Failed to load pending announcements:", err);
+      console.error("Error response:", err.response);
+    } finally {
+      setAnnouncementsLoading(false);
+    }
+  };
+
+  const handleAnnouncementStatus = async (businessId, announcementIndex, status, announcement) => {
+    try {
+      await API.patch(`/business/admin/announcements/${businessId}/${announcementIndex}`, {
+        status,
+        title: announcement.title,
+        createdAt: announcement.createdAt,
+      });
+      loadPendingAnnouncements();
+      alert(`✅ Announcement ${status} successfully`);
+    } catch (err) {
+      alert("❌ Failed to update announcement status");
+    }
+  };
+  // END ADDED
   // END ADDED
 
   const loadMpesaConfig = async () => {
@@ -342,6 +385,13 @@ export default function AdminDashboard() {
           onClick={() => setActiveTab("businesses")}
         >
           🏪 Businesses {pendingBusinesses.length > 0 ? `(${pendingBusinesses.length})` : ""}
+        </button>
+        {/* ADDED: Announcements tab button */}
+        <button
+          style={{ ...styles.tab, ...(activeTab === "announcements" ? styles.tabActive : {}) }}
+          onClick={() => setActiveTab("announcements")}
+        >
+          📢 Announcements {pendingAnnouncements.filter(a => a.status === "pending").length > 0 ? `(${pendingAnnouncements.filter(a => a.status === "pending").length})` : ""}
         </button>
         {/* END ADDED */}
       </div>
@@ -827,6 +877,58 @@ export default function AdminDashboard() {
                         </button>
                         <button
                           onClick={() => handleBusinessStatus(business._id, "rejected")}
+                          style={styles.rejectBtn}
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
+        // END ADDED
+      ) : activeTab === "announcements" ? (
+        // ADDED: Announcements Tab
+        announcementsLoading ? (
+          <div style={styles.loader}>⏳ Loading pending announcements...</div>
+        ) : pendingAnnouncements.filter(a => a.status === "pending").length === 0 ? (
+          <div style={styles.emptyCard}>
+            <p style={styles.emptyText}>✅ All caught up! No pending announcements to review.</p>
+          </div>
+        ) : (
+          <div style={styles.tableContainer}>
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  <th style={styles.th}>Business</th>
+                  <th style={styles.th}>Title</th>
+                  <th style={styles.th}>Content</th>
+                  <th style={styles.th}>Submitter</th>
+                  <th style={styles.th}>Date</th>
+                  <th style={styles.th}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pendingAnnouncements.filter(a => a.status === "pending").map((announcement, index) => (
+                  <tr key={index} style={styles.tr}>
+                    <td style={styles.td}>{announcement.businessName}</td>
+                    <td style={styles.td}>{announcement.title}</td>
+                    <td style={styles.td}>{announcement.content.substring(0, 100)}...</td>
+                    <td style={styles.td}>{announcement.submitterName || "Anonymous"}</td>
+                    <td style={styles.td}>{new Date(announcement.createdAt).toLocaleDateString()}</td>
+                    <td style={styles.td}>
+                      <div style={styles.actionButtons}>
+                        <button
+                          onClick={() => handleAnnouncementStatus(announcement.businessId, index, "approved", announcement)}
+                          style={styles.approveBtn}
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleAnnouncementStatus(announcement.businessId, index, "rejected", announcement)}
                           style={styles.rejectBtn}
                         >
                           Reject
