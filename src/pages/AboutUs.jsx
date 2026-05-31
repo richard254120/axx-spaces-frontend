@@ -392,10 +392,11 @@ export default function AboutPage() {
           </div>
           <div style={styles.footerSection}>
             <h4 style={styles.footerTitle}>Quick Links</h4>
-            <p style={styles.footerLink} onClick={() => navigate("/listings")}>Browse Listings</p>
-            <p style={styles.footerLink} onClick={() => navigate("/tourism")}>Tourism</p>
-            <p style={styles.footerLink} onClick={() => navigate("/")}>Home</p>
-            <p style={styles.footerLink} onClick={() => navigate("/materials")}>Materials Marketplace</p>
+            <p style={styles.footerLink} onClick={() => navigate("/listings")}>🏢 Browse Listings</p>
+            <p style={styles.footerLink} onClick={() => navigate("/axxbiashara")}>💼 AxxBiashara</p>
+            <p style={styles.footerLink} onClick={() => navigate("/tourism")}>🏨 Tourism</p>
+            <p style={styles.footerLink} onClick={() => navigate("/")}>🏠 Home</p>
+            <p style={styles.footerLink} onClick={() => navigate("/materials")}>🛍️ Materials Marketplace</p>
           </div>
           <div style={styles.footerSection}>
             <h4 style={styles.footerTitle}>Support</h4>
