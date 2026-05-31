@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext'
 import ReactGA from 'react-ga4'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import 'leaflet/dist/leaflet.css'
 import './index.css'
 
@@ -21,6 +22,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <AuthProvider>
       <App />
+      <SpeedInsights />
     </AuthProvider>
   </BrowserRouter>
 )
