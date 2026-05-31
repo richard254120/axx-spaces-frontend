@@ -592,8 +592,11 @@ export default function AxxBiashara() {
 
   useEffect(() => {
     loadBusinesses();
-    loadAnnouncements();
   }, [selectedCategory, selectedCounty, searchQuery, sortBy]);
+
+  useEffect(() => {
+    loadAnnouncements();
+  }, []);
 
   const handleAddAnnouncement = async (e) => {
     e.preventDefault();
