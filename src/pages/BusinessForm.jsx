@@ -11,7 +11,7 @@ const styles = {
     fontFamily: "'DM Sans', sans-serif",
   },
   form: {
-    maxWidth: "800px",
+    maxWidth: "900px",
     margin: "0 auto",
     background: "rgba(30, 41, 59, 0.8)",
     borderRadius: "20px",
@@ -21,9 +21,41 @@ const styles = {
   title: {
     fontSize: "32px",
     fontWeight: 800,
-    color: "#fbbf24",
+    color: "#60a5fa",
     marginBottom: "30px",
     textAlign: "center",
+  },
+  instructions: {
+    background: "rgba(96, 165, 250, 0.1)",
+    border: "1px solid rgba(96, 165, 250, 0.3)",
+    borderRadius: "12px",
+    padding: "20px",
+    marginBottom: "30px",
+  },
+  instructionsTitle: {
+    fontSize: "16px",
+    fontWeight: 700,
+    color: "#60a5fa",
+    marginBottom: "10px",
+  },
+  instructionsList: {
+    listStyle: "none",
+    padding: 0,
+    margin: 0,
+  },
+  instructionsItem: {
+    fontSize: "14px",
+    color: "#cbd5e1",
+    marginBottom: "8px",
+    paddingLeft: "20px",
+    position: "relative",
+  },
+  instructionsItemBefore: {
+    content: "✓",
+    position: "absolute",
+    left: 0,
+    color: "#60a5fa",
+    fontWeight: "bold",
   },
   section: {
     marginBottom: "30px",
@@ -31,10 +63,10 @@ const styles = {
   sectionTitle: {
     fontSize: "20px",
     fontWeight: 700,
-    color: "#f1f5f9",
+    color: "#60a5fa",
     marginBottom: "15px",
     paddingBottom: "10px",
-    borderBottom: "2px solid #fbbf24",
+    borderBottom: "2px solid #60a5fa",
   },
   label: {
     fontSize: "14px",
@@ -94,14 +126,14 @@ const styles = {
     transition: "all 0.3s",
   },
   checkboxLabelSelected: {
-    background: "#fbbf24",
+    background: "#60a5fa",
     color: "#0f172a",
-    border: "1px solid #fbbf24",
+    border: "1px solid #60a5fa",
   },
   button: {
     width: "100%",
     padding: "16px",
-    background: "#fbbf24",
+    background: "#60a5fa",
     color: "#0f172a",
     border: "none",
     borderRadius: "10px",
@@ -263,7 +295,8 @@ export default function BusinessForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [uploading, setUploading] = useState({ logo: false, product: false, pricelist: false });
+  const [uploading, setUploading] = useState({ logo: false, photos: false, product: false, pricelist: false });
+  const [businessPhotos, setBusinessPhotos] = useState([]);
 
   useEffect(() => {
     if (isEditing) {
@@ -351,6 +384,43 @@ export default function BusinessForm() {
     } finally {
       setUploading((prev) => ({ ...prev, pricelist: false }));
     }
+  };
+
+  const handleBusinessPhotosUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    if (!files || files.length === 0) return;
+
+    if (businessPhotos.length + files.length > 18) {
+      setError("You can upload a maximum of 18 photos");
+      return;
+    }
+
+    setUploading((prev) => ({ ...prev, photos: true }));
+    const formData = new FormData();
+    files.forEach((file) => formData.append("photos", file));
+
+    try {
+      const res = await API.post("/uploads/business-photos", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setBusinessPhotos((prev) => [...prev, ...res.data.urls]);
+      setFormData((prev) => ({
+        ...prev,
+        images: [...(prev.images || []), ...res.data.urls],
+      }));
+    } catch (err) {
+      setError("Failed to upload photos");
+    } finally {
+      setUploading((prev) => ({ ...prev, photos: false }));
+    }
+  };
+
+  const removePhoto = (index) => {
+    setBusinessPhotos((prev) => prev.filter((_, i) => i !== index));
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -742,11 +812,55 @@ export default function BusinessForm() {
             onChange={handleLogoUpload}
             disabled={uploading.logo}
           />
-          {uploading.logo && <p style={{ fontSize: "12px", color: "#fbbf24" }}>Uploading logo...</p>}
+          {uploading.logo && <p style={{ fontSize: "12px", color: "#60a5fa" }}>Uploading logo...</p>}
           {formData.logo && (
             <div style={{ marginTop: "10px" }}>
               <img src={formData.logo} alt="Logo preview" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "10px" }} />
               <p style={{ fontSize: "12px", color: "#4ade80" }}>✅ Logo uploaded successfully</p>
+            </div>
+          )}
+        </div>
+
+        <div style={styles.section}>
+          <h2 style={styles.sectionTitle}>Business Photos (Up to 18)</h2>
+          <label style={styles.label}>Upload Photos</label>
+          <input
+            type="file"
+            style={styles.input}
+            accept="image/*"
+            multiple
+            onChange={handleBusinessPhotosUpload}
+            disabled={uploading.photos}
+          />
+          {uploading.photos && <p style={{ fontSize: "12px", color: "#60a5fa" }}>Uploading photos...</p>}
+          <p style={{ fontSize: "12px", color: "#94a3b8" }}>{businessPhotos.length} / 18 photos uploaded</p>
+          {businessPhotos.length > 0 && (
+            <div style={{ marginTop: "15px", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", gap: "10px" }}>
+              {businessPhotos.map((photo, index) => (
+                <div key={index} style={{ position: "relative" }}>
+                  <img src={photo} alt={`Business photo ${index + 1}`} style={{ width: "100%", height: "100px", objectFit: "cover", borderRadius: "8px" }} />
+                  <button
+                    type="button"
+                    onClick={() => removePhoto(index)}
+                    style={{
+                      position: "absolute",
+                      top: "5px",
+                      right: "5px",
+                      background: "#ef4444",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "50%",
+                      width: "24px",
+                      height: "24px",
+                      cursor: "pointer",
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
             </div>
           )}
         </div>
