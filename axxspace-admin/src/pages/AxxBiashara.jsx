@@ -240,28 +240,15 @@ const styles = {
     textAlign: "center",
     maxWidth: "500px",
   },
-  pricingOriginal: {
-    fontSize: "24px",
-    color: "#94a3b8",
-    textDecoration: "line-through",
-    marginBottom: "10px",
-  },
-  pricingCurrent: {
-    fontSize: "48px",
-    fontWeight: 900,
+  pricingPlaceholder: {
+    fontSize: "20px",
+    fontWeight: 700,
     color: "#fbbf24",
     marginBottom: "10px",
   },
-  pricingDiscount: {
-    fontSize: "20px",
-    fontWeight: 700,
-    color: "#22c55e",
-    marginBottom: "15px",
-  },
-  pricingUrgency: {
+  pricingSubtext: {
     fontSize: "14px",
-    color: "#cbd5e1",
-    lineHeight: "1.6",
+    color: "#94a3b8",
   },
   announcementsSection: {
     background: "rgba(30, 41, 59, 0.5)",
@@ -491,31 +478,31 @@ const KENYA_COUNTIES = [
 ];
 
 const BADGE_CONFIG = {
-  student_verified:  { label: "🟢 Student Verified",  style: styles.badgeStudent  },
+  student_verified: { label: "🟢 Student Verified", style: styles.badgeStudent },
   identity_verified: { label: "🟢 Identity Verified", style: styles.badgeIdentity },
   business_verified: { label: "🔵 Business Verified", style: styles.badgeBusiness },
-  online_verified:   { label: "🔵 Online Verified",   style: styles.badgeOnline   },
+  online_verified: { label: "🔵 Online Verified", style: styles.badgeOnline },
   location_verified: { label: "🟣 Location Verified", style: styles.badgeLocation },
-  premium_verified:  { label: "⭐ Premium Verified",  style: styles.badgePremium  },
+  premium_verified: { label: "⭐ Premium Verified", style: styles.badgePremium },
 };
 
 export default function AxxBiashara() {
   const navigate = useNavigate();
-  const [businesses, setBusinesses]               = useState([]);
-  const [loading, setLoading]                     = useState(true);
-  const [selectedCategory, setSelectedCategory]   = useState(null);
-  const [selectedCounty, setSelectedCounty]       = useState(null);
-  const [searchQuery, setSearchQuery]             = useState("");
-  const [sortBy, setSortBy]                       = useState("newest");
-  const [announcements, setAnnouncements]         = useState([]);
+  const [businesses, setBusinesses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCounty, setSelectedCounty] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
+  const [announcements, setAnnouncements] = useState([]);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
-  const [showAnnouncementForm, setShowAnnouncementForm]   = useState(false);
+  const [showAnnouncementForm, setShowAnnouncementForm] = useState(false);
   const [announcementTitle, setAnnouncementTitle] = useState("");
   const [announcementContent, setAnnouncementContent] = useState("");
-  const [announcementSuccess, setAnnouncementSuccess]   = useState("");
-  const [submitterName, setSubmitterName]         = useState("");
-  const [organizationName, setOrganizationName]   = useState("");
+  const [announcementSuccess, setAnnouncementSuccess] = useState("");
+  const [submitterName, setSubmitterName] = useState("");
+  const [organizationName, setOrganizationName] = useState("");
 
   // ── Load businesses whenever filters change ──────────────────────────────
   const loadBusinesses = async () => {
@@ -523,9 +510,9 @@ export default function AxxBiashara() {
     try {
       const params = {};
       if (selectedCategory) params.category = selectedCategory;
-      if (selectedCounty)   params.county   = selectedCounty;
-      if (searchQuery)      params.search   = searchQuery;
-      if (sortBy)           params.sort     = sortBy;
+      if (selectedCounty) params.county = selectedCounty;
+      if (searchQuery) params.search = searchQuery;
+      if (sortBy) params.sort = sortBy;
 
       const res = await API.get("/business", { params });
       // FIX: safe optional-chain + fallback so a bad API shape never crashes render
@@ -692,15 +679,11 @@ export default function AxxBiashara() {
 
         <p style={styles.subtitle}>Discover and connect with trusted businesses across Kenya</p>
 
-        {/* Pricing Section */}
+        {/* Pricing Section - Dynamic Offers */}
         <div style={styles.pricingSection}>
           <div style={styles.pricingCard}>
-            <div style={styles.pricingOriginal}>KSh 999/month</div>
-            <div style={styles.pricingCurrent}>KSh 499/month</div>
-            <div style={styles.pricingDiscount}>50% OFF Launch Offer</div>
-            <div style={styles.pricingUrgency}>
-              Offer ends soon • Only for early verified businesses • Price increases after launch phase
-            </div>
+            <div style={styles.pricingPlaceholder}>Special offers coming soon</div>
+            <div style={styles.pricingSubtext}>Stay tuned for exclusive deals and promotions</div>
           </div>
         </div>
       </div>
