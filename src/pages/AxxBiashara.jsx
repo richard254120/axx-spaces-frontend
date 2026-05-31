@@ -14,7 +14,7 @@ const styles = {
     textAlign: "center",
     marginBottom: "40px",
     padding: "40px 20px",
-    background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
+    background: "linear-gradient(135deg, #60a5fa 0%, #f59e0b 100%)",
     borderRadius: "20px",
     boxShadow: "0 10px 40px rgba(251, 191, 36, 0.3)",
   },
@@ -68,9 +68,9 @@ const styles = {
     fontWeight: 600,
   },
   filterButtonActive: {
-    background: "#fbbf24",
+    background: "#60a5fa",
     color: "#0f172a",
-    border: "1px solid #fbbf24",
+    border: "1px solid #60a5fa",
   },
   searchInput: {
     padding: "12px 20px",
@@ -111,7 +111,7 @@ const styles = {
   cardTitle: {
     fontSize: "20px",
     fontWeight: 700,
-    color: "#fbbf24",
+    color: "#60a5fa",
     marginBottom: "8px",
     flex: 1,
   },
@@ -161,7 +161,7 @@ const styles = {
   },
   compareButton: {
     padding: "10px 20px",
-    background: "#fbbf24",
+    background: "#60a5fa",
     border: "none",
     borderRadius: "8px",
     color: "#0f172a",
@@ -196,7 +196,7 @@ const styles = {
   comparisonBusinessName: {
     fontSize: "18px",
     fontWeight: 700,
-    color: "#fbbf24",
+    color: "#60a5fa",
     marginBottom: "15px",
     paddingBottom: "10px",
     borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
@@ -210,7 +210,7 @@ const styles = {
   footer: { background: "#0f172a", color: "#cbd5e1", padding: "40px 20px 20px", marginTop: "60px" },
   footerInner: { maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "30px", marginBottom: "30px" },
   footerSection: { fontSize: "13px" },
-  footerTitle: { color: "#fbbf24", fontSize: "14px", fontWeight: 700, margin: "0 0 12px" },
+  footerTitle: { color: "#60a5fa", fontSize: "14px", fontWeight: 700, margin: "0 0 12px" },
   footerTagline: { fontSize: "13px", color: "#94a3b8", margin: "6px 0 4px" },
   footerLink: { margin: "6px 0", cursor: "pointer", transition: "color 0.2s", color: "#9ca3af" },
   footerBottom: { textAlign: "center", paddingTop: "20px", borderTop: "1px solid rgba(255, 255, 255, 0.1)" },
@@ -257,7 +257,7 @@ const styles = {
   },
   contactButton: {
     padding: "10px 20px",
-    background: "#fbbf24",
+    background: "#60a5fa",
     color: "#0f172a",
     border: "none",
     borderRadius: "8px",
@@ -297,8 +297,8 @@ const styles = {
   },
   badgePremium: {
     background: "rgba(251, 191, 36, 0.2)",
-    color: "#fbbf24",
-    border: "1px solid #fbbf24",
+    color: "#60a5fa",
+    border: "1px solid #60a5fa",
   },
   socialLinks: {
     display: "flex",
@@ -318,14 +318,14 @@ const styles = {
     transition: "background 0.3s",
   },
   socialIconHover: {
-    background: "#fbbf24",
+    background: "#60a5fa",
     color: "#0f172a",
   },
   featured: {
     position: "absolute",
     top: "10px",
     right: "10px",
-    background: "#fbbf24",
+    background: "#60a5fa",
     color: "#0f172a",
     padding: "5px 15px",
     borderRadius: "20px",
@@ -346,7 +346,7 @@ const styles = {
   },
   addButton: {
     padding: "10px 16px",
-    background: "#fbbf24",
+    background: "#60a5fa",
     color: "#0f172a",
     border: "none",
     borderRadius: "10px",
@@ -370,7 +370,7 @@ const styles = {
   },
   pricingCard: {
     background: "rgba(251, 191, 36, 0.1)",
-    border: "2px solid #fbbf24",
+    border: "2px solid #60a5fa",
     borderRadius: "20px",
     padding: "30px 50px",
     textAlign: "center",
@@ -379,7 +379,7 @@ const styles = {
   pricingPlaceholder: {
     fontSize: "20px",
     fontWeight: 700,
-    color: "#fbbf24",
+    color: "#60a5fa",
     marginBottom: "10px",
   },
   pricingSubtext: {
@@ -396,7 +396,7 @@ const styles = {
   announcementsTitle: {
     fontSize: "24px",
     fontWeight: 700,
-    color: "#fbbf24",
+    color: "#60a5fa",
     marginBottom: "20px",
   },
   announcementsScroll: {
@@ -490,7 +490,7 @@ const styles = {
   modalTitle: {
     fontSize: "28px",
     fontWeight: 700,
-    color: "#fbbf24",
+    color: "#60a5fa",
     marginBottom: "15px",
   },
   modalBusiness: {
@@ -527,7 +527,7 @@ const styles = {
   formTitle: {
     fontSize: "24px",
     fontWeight: 700,
-    color: "#fbbf24",
+    color: "#60a5fa",
     marginBottom: "20px",
   },
   formInput: {
@@ -555,7 +555,7 @@ const styles = {
   },
   formSubmit: {
     padding: "12px 24px",
-    background: "#fbbf24",
+    background: "#60a5fa",
     color: "#0f172a",
     border: "none",
     borderRadius: "10px",
@@ -1203,7 +1203,7 @@ export default function AxxBiashara() {
                         rel="noopener noreferrer"
                         style={styles.socialIcon}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.background = "#fbbf24";
+                          e.currentTarget.style.background = "#60a5fa";
                           e.currentTarget.style.color = "#0f172a";
                         }}
                         onMouseLeave={(e) => {
@@ -1221,7 +1221,7 @@ export default function AxxBiashara() {
                         rel="noopener noreferrer"
                         style={styles.socialIcon}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.background = "#fbbf24";
+                          e.currentTarget.style.background = "#60a5fa";
                           e.currentTarget.style.color = "#0f172a";
                         }}
                         onMouseLeave={(e) => {
@@ -1239,7 +1239,7 @@ export default function AxxBiashara() {
                         rel="noopener noreferrer"
                         style={styles.socialIcon}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.background = "#fbbf24";
+                          e.currentTarget.style.background = "#60a5fa";
                           e.currentTarget.style.color = "#0f172a";
                         }}
                         onMouseLeave={(e) => {
@@ -1257,7 +1257,7 @@ export default function AxxBiashara() {
                         rel="noopener noreferrer"
                         style={styles.socialIcon}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.background = "#fbbf24";
+                          e.currentTarget.style.background = "#60a5fa";
                           e.currentTarget.style.color = "#0f172a";
                         }}
                         onMouseLeave={(e) => {
@@ -1329,7 +1329,7 @@ export default function AxxBiashara() {
       <div style={styles.footer}>
         <div style={styles.footerInner}>
           <div style={styles.footerSection}>
-            <strong style={{ color: "#fbbf24", fontSize: "18px" }}>AxxBiashara</strong>
+            <strong style={{ color: "#60a5fa", fontSize: "18px" }}>AxxBiashara</strong>
             <p style={styles.footerTagline}>Kenya's premier business directory</p>
           </div>
           <div style={styles.footerSection}>
