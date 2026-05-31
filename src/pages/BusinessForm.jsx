@@ -255,6 +255,9 @@ export default function BusinessForm() {
       whatsapp: "",
     },
     images: [],
+    logo: "",
+    products: [],
+    pricelist: { url: "", name: "" },
   });
 
   const [loading, setLoading] = useState(false);
@@ -662,6 +665,124 @@ export default function BusinessForm() {
             }
             placeholder="2547XXXXXXXXX"
           />
+        </div>
+
+        <div style={styles.section}>
+          <h2 style={styles.sectionTitle}>Business Logo</h2>
+          <label style={styles.label}>Logo URL</label>
+          <input
+            type="url"
+            style={styles.input}
+            value={formData.logo}
+            onChange={(e) => setFormData({ ...formData, logo: e.target.value })}
+            placeholder="https://example.com/logo.png"
+          />
+          <p style={{ fontSize: "12px", color: "#94a3b8" }}>Enter the URL of your business logo image</p>
+        </div>
+
+        <div style={styles.section}>
+          <h2 style={styles.sectionTitle}>Products & Services</h2>
+          <label style={styles.label}>Product Name</label>
+          <input
+            type="text"
+            style={styles.input}
+            placeholder="Product name"
+            id="productName"
+          />
+          <label style={styles.label}>Description</label>
+          <input
+            type="text"
+            style={styles.input}
+            placeholder="Product description"
+            id="productDescription"
+          />
+          <label style={styles.label}>Price (KES)</label>
+          <input
+            type="number"
+            style={styles.input}
+            placeholder="Price"
+            id="productPrice"
+          />
+          <label style={styles.label}>Category</label>
+          <input
+            type="text"
+            style={styles.input}
+            placeholder="Category"
+            id="productCategory"
+          />
+          <label style={styles.label}>Image URL</label>
+          <input
+            type="url"
+            style={styles.input}
+            placeholder="https://example.com/product.jpg"
+            id="productImageUrl"
+          />
+          <button
+            type="button"
+            style={{ ...styles.button, marginTop: "10px" }}
+            onClick={() => {
+              const name = document.getElementById("productName").value;
+              const description = document.getElementById("productDescription").value;
+              const price = parseFloat(document.getElementById("productPrice").value);
+              const category = document.getElementById("productCategory").value;
+              const imageUrl = document.getElementById("productImageUrl").value;
+
+              if (name) {
+                setFormData({
+                  ...formData,
+                  products: [...formData.products, { name, description, price, category, imageUrl }],
+                });
+                document.getElementById("productName").value = "";
+                document.getElementById("productDescription").value = "";
+                document.getElementById("productPrice").value = "";
+                document.getElementById("productCategory").value = "";
+                document.getElementById("productImageUrl").value = "";
+              }
+            }}
+          >
+            + Add Product
+          </button>
+          {formData.products.length > 0 && (
+            <div style={{ marginTop: "15px" }}>
+              <p style={{ fontSize: "14px", fontWeight: 600, marginBottom: "10px" }}>Added Products:</p>
+              {formData.products.map((product, index) => (
+                <div key={index} style={{ padding: "10px", background: "rgba(15, 23, 42, 0.5)", borderRadius: "8px", marginBottom: "8px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div>
+                    <div style={{ fontWeight: 600 }}>{product.name}</div>
+                    {product.price && <div style={{ fontSize: "12px", color: "#94a3b8" }}>KES {product.price.toLocaleString()}</div>}
+                  </div>
+                  <button
+                    type="button"
+                    style={{ padding: "5px 10px", background: "#ef4444", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}
+                    onClick={() => setFormData({ ...formData, products: formData.products.filter((_, i) => i !== index) })}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div style={styles.section}>
+          <h2 style={styles.sectionTitle}>Pricelist / Menu</h2>
+          <label style={styles.label}>Pricelist Name</label>
+          <input
+            type="text"
+            style={styles.input}
+            value={formData.pricelist.name}
+            onChange={(e) => setFormData({ ...formData, pricelist: { ...formData.pricelist, name: e.target.value } })}
+            placeholder="e.g., Restaurant Menu, Service Pricelist"
+          />
+          <label style={styles.label}>Pricelist URL</label>
+          <input
+            type="url"
+            style={styles.input}
+            value={formData.pricelist.url}
+            onChange={(e) => setFormData({ ...formData, pricelist: { ...formData.pricelist, url: e.target.value } })}
+            placeholder="https://example.com/pricelist.pdf"
+          />
+          <p style={{ fontSize: "12px", color: "#94a3b8" }}>Enter the URL of your pricelist/menu document (PDF, image, etc.)</p>
         </div>
 
         <button

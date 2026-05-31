@@ -361,6 +361,74 @@ const styles = {
     alignItems: "center",
     gap: "8px",
   },
+  logoContainer: {
+    display: "flex",
+    alignItems: "center",
+    gap: "20px",
+    marginBottom: "25px",
+  },
+  logo: {
+    width: "120px",
+    height: "120px",
+    borderRadius: "16px",
+    objectFit: "cover",
+    border: "3px solid rgba(59, 130, 246, 0.3)",
+    boxShadow: "0 4px 16px rgba(59, 130, 246, 0.2)",
+  },
+  productsSection: {
+    marginTop: "20px",
+  },
+  productsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+    gap: "15px",
+  },
+  productCard: {
+    background: "rgba(15, 23, 42, 0.5)",
+    padding: "15px",
+    borderRadius: "12px",
+    border: "1px solid rgba(59, 130, 246, 0.2)",
+  },
+  productName: {
+    fontSize: "16px",
+    fontWeight: 700,
+    color: "#60a5fa",
+    marginBottom: "8px",
+  },
+  productDescription: {
+    fontSize: "13px",
+    color: "#cbd5e1",
+    marginBottom: "8px",
+    lineHeight: "1.5",
+  },
+  productPrice: {
+    fontSize: "18px",
+    fontWeight: 800,
+    color: "#4ade80",
+    marginBottom: "6px",
+  },
+  productCategory: {
+    fontSize: "12px",
+    color: "#94a3b8",
+  },
+  pricelistSection: {
+    marginTop: "20px",
+  },
+  pricelistButton: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "12px 24px",
+    background: "rgba(59, 130, 246, 0.2)",
+    border: "1px solid rgba(59, 130, 246, 0.4)",
+    borderRadius: "10px",
+    color: "#60a5fa",
+    textDecoration: "none",
+    fontSize: "14px",
+    fontWeight: 600",
+    cursor: "pointer",
+    transition: "all 0.3s",
+  },
 };
 
 const BADGE_CONFIG = {
@@ -446,8 +514,15 @@ export default function BusinessDetail() {
       </a>
 
       <div style={styles.header}>
-        <h1 style={styles.title}>{business.name}</h1>
-        <p style={styles.category}>{business.categories.join(", ")}</p>
+        <div style={styles.logoContainer}>
+          {business.logo && (
+            <img src={business.logo} alt={`${business.name} logo`} style={styles.logo} />
+          )}
+          <div>
+            <h1 style={styles.title}>{business.name}</h1>
+            <p style={styles.category}>{business.categories.join(", ")}</p>
+          </div>
+        </div>
         <p style={styles.location}>
           📍 {business.location.town}, {business.location.county}
           {business.location.address && `, ${business.location.address}`}
@@ -633,6 +708,36 @@ export default function BusinessDetail() {
                     </div>
                   </div>
                 ))}
+            </div>
+          )}
+
+          {business.products && business.products.length > 0 && (
+            <div style={styles.section}>
+              <h2 style={styles.sectionTitle}>Products & Services</h2>
+              <div style={styles.productsGrid}>
+                {business.products.map((product, index) => (
+                  <div key={index} style={styles.productCard}>
+                    {product.imageUrl && (
+                      <img src={product.imageUrl} alt={product.name} style={{ width: "100%", height: "120px", objectFit: "cover", borderRadius: "8px", marginBottom: "10px" }} />
+                    )}
+                    <div style={styles.productName}>{product.name}</div>
+                    {product.description && <div style={styles.productDescription}>{product.description}</div>}
+                    {product.price && <div style={styles.productPrice}>KES {product.price.toLocaleString()}</div>}
+                    {product.category && <div style={styles.productCategory}>{product.category}</div>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {business.pricelist && business.pricelist.url && (
+            <div style={styles.section}>
+              <h2 style={styles.sectionTitle}>Pricelist / Menu</h2>
+              <div style={styles.pricelistSection}>
+                <a href={business.pricelist.url} target="_blank" rel="noopener noreferrer" style={styles.pricelistButton}>
+                  📄 Download {business.pricelist.name || "Pricelist"}
+                </a>
+              </div>
             </div>
           )}
         </div>
