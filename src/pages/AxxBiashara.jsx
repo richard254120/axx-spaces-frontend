@@ -337,12 +337,12 @@ const styles = {
     color: "#64748b",
   },
   addButton: {
-    padding: "12px 24px",
+    padding: "10px 16px",
     background: "#fbbf24",
     color: "#0f172a",
     border: "none",
     borderRadius: "10px",
-    fontSize: "16px",
+    fontSize: "14px",
     fontWeight: 700,
     cursor: "pointer",
     boxShadow: "0 4px 15px rgba(251, 191, 36, 0.3)",
@@ -350,6 +350,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "8px",
+    whiteSpace: "nowrap",
   },
   addButtonHover: {
     opacity: 0.9,
@@ -820,9 +821,9 @@ export default function AxxBiashara() {
         }
       `}</style>
       <div style={styles.header}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "15px" }}>
           <h1 style={styles.title}>🏪 AxxBiashara</h1>
-          <div style={{ display: "flex", gap: "10px" }}>
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
             <button
               style={styles.addButton}
               onClick={() => navigate("/business/create")}
