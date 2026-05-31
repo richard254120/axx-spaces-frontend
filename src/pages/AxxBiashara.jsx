@@ -583,10 +583,13 @@ export default function AxxBiashara() {
 
   const loadAnnouncements = async () => {
     try {
+      console.log("Loading announcements from:", "/business/announcements");
       const res = await API.get("/business/announcements");
+      console.log("Announcements response:", res.data);
       setAnnouncements(res.data.announcements || []);
     } catch (err) {
       console.error("Failed to load announcements:", err);
+      console.error("Error details:", err.response?.data || err.message);
     }
   };
 
