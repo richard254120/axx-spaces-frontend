@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import API from "../api/api";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 const styles = {
   container: {
@@ -129,22 +131,24 @@ const styles = {
   },
   hoursGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-    gap: "15px",
+    gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+    gap: "8px",
   },
   hoursItem: {
-    padding: "15px",
+    padding: "8px 12px",
     background: "rgba(15, 23, 42, 0.5)",
-    borderRadius: "10px",
+    borderRadius: "8px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   hoursDay: {
-    fontSize: "16px",
+    fontSize: "13px",
     fontWeight: 600,
     color: "#cbd5e1",
-    marginBottom: "8px",
   },
   hoursTime: {
-    fontSize: "14px",
+    fontSize: "12px",
     color: "#94a3b8",
   },
   offerCard: {
@@ -171,8 +175,8 @@ const styles = {
     color: "#94a3b8",
   },
   contactInfo: {
-    fontSize: "16px",
-    lineHeight: "2",
+    fontSize: "14px",
+    lineHeight: "1.6",
     color: "#cbd5e1",
   },
   loading: {
@@ -198,6 +202,59 @@ const styles = {
     display: "inline-block",
     fontWeight: 600,
   },
+  adminButton: {
+    padding: "10px 16px",
+    background: "#22c55e",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: 600,
+    cursor: "pointer",
+    marginBottom: "15px",
+  },
+  announcementForm: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "12px",
+  },
+  announcementInput: {
+    padding: "10px 12px",
+    background: "rgba(15, 23, 42, 0.5)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    borderRadius: "8px",
+    color: "#f1f5f9",
+    fontSize: "14px",
+  },
+  announcementTextarea: {
+    padding: "10px 12px",
+    background: "rgba(15, 23, 42, 0.5)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    borderRadius: "8px",
+    color: "#f1f5f9",
+    fontSize: "14px",
+    minHeight: "80px",
+    resize: "vertical",
+  },
+  submitButton: {
+    padding: "10px 16px",
+    background: "#fbbf24",
+    color: "#0f172a",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: 600,
+    cursor: "pointer",
+  },
+  successMessage: {
+    padding: "10px 12px",
+    background: "rgba(34, 197, 94, 0.2)",
+    border: "1px solid #22c55e",
+    borderRadius: "8px",
+    color: "#22c55e",
+    fontSize: "14px",
+    marginTop: "10px",
+  },
 };
 
 const BADGE_CONFIG = {
@@ -212,9 +269,14 @@ const BADGE_CONFIG = {
 export default function BusinessDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
   const [business, setBusiness] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showAnnouncementForm, setShowAnnouncementForm] = useState(false);
+  const [announcementTitle, setAnnouncementTitle] = useState("");
+  const [announcementContent, setAnnouncementContent] = useState("");
+  const [announcementSuccess, setAnnouncementSuccess] = useState("");
 
   useEffect(() => {
     loadBusiness();
@@ -247,6 +309,24 @@ export default function BusinessDetail() {
     const ampm = hour >= 12 ? "PM" : "AM";
     const hour12 = hour % 12 || 12;
     return `${hour12}:${minutes} ${ampm}`;
+  };
+
+  const handleAddAnnouncement = async (e) => {
+    e.preventDefault();
+    try {
+      await API.post(`/business/${id}/announcements`, {
+        title: announcementTitle,
+        content: announcementContent,
+      });
+      setAnnouncementSuccess("Announcement added successfully!");
+      setAnnouncementTitle("");
+      setAnnouncementContent("");
+      setShowAnnouncementForm(false);
+      loadBusiness();
+      setTimeout(() => setAnnouncementSuccess(""), 3000);
+    } catch (err) {
+      setAnnouncementSuccess("Failed to add announcement");
+    }
   };
 
   if (loading) return <div style={styles.loading}>Loading business...</div>;
@@ -451,6 +531,43 @@ export default function BusinessDetail() {
                 <p>📧 {business.owner.email}</p>
                 <p>📱 {business.owner.phone}</p>
               </div>
+            </div>
+          )}
+
+          {user?.role === "admin" && (
+            <div style={styles.section}>
+              <h2 style={styles.sectionTitle}>Admin Actions</h2>
+              <button
+                onClick={() => setShowAnnouncementForm(!showAnnouncementForm)}
+                style={styles.adminButton}
+              >
+                {showAnnouncementForm ? "Cancel" : "+ Add Announcement"}
+              </button>
+              {showAnnouncementForm && (
+                <form onSubmit={handleAddAnnouncement} style={styles.announcementForm}>
+                  <input
+                    type="text"
+                    placeholder="Announcement Title"
+                    value={announcementTitle}
+                    onChange={(e) => setAnnouncementTitle(e.target.value)}
+                    style={styles.announcementInput}
+                    required
+                  />
+                  <textarea
+                    placeholder="Announcement Content"
+                    value={announcementContent}
+                    onChange={(e) => setAnnouncementContent(e.target.value)}
+                    style={styles.announcementTextarea}
+                    required
+                  />
+                  <button type="submit" style={styles.submitButton}>
+                    Submit Announcement
+                  </button>
+                </form>
+              )}
+              {announcementSuccess && (
+                <div style={styles.successMessage}>{announcementSuccess}</div>
+              )}
             </div>
           )}
         </div>
