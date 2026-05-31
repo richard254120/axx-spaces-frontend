@@ -822,6 +822,7 @@ export default function AdminDashboard() {
                 <tr style={styles.theadRow}>
                   <th style={styles.th}>Business</th>
                   <th style={styles.th}>Logo</th>
+                  <th style={styles.th}>Photos</th>
                   <th style={styles.th}>Categories</th>
                   <th style={styles.th}>Location</th>
                   <th style={styles.th}>Owner</th>
@@ -842,6 +843,11 @@ export default function AdminDashboard() {
                       {business.logo && (
                         <img src={business.logo} alt={business.name} style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "8px" }} />
                       )}
+                    </td>
+                    <td style={styles.td}>
+                      <div style={{ fontSize: "12px", color: "#94a3b8" }}>
+                        {business.images && business.images.length > 0 ? `${business.images.length} photos` : "None"}
+                      </div>
                     </td>
                     <td style={styles.td}>
                       <span style={styles.roleBadge}>{business.categories.join(", ")}</span>

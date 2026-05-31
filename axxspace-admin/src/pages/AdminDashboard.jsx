@@ -831,6 +831,7 @@ export default function AdminDashboard() {
                   <p style={S.cardOwner}>📍 {business.location.town}, {business.location.county}</p>
                   <p style={S.cardOwner}>👤 {business.submitterName || business.owner?.name || "Anonymous"}</p>
                   <p style={S.cardOwner}>📞 {business.contact.phone}</p>
+                  <p style={S.cardOwner}>📸 {business.images && business.images.length > 0 ? `${business.images.length} photos` : "No photos"}</p>
                   <div style={S.cardFooter}>
                     <span style={{ ...S.statusDot, background: business.status === "approved" ? "#22c55e" : business.status === "rejected" ? "#ef4444" : "#fbbf24" }}>
                       {business.status}
