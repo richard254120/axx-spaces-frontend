@@ -601,12 +601,14 @@ export default function AxxBiashara() {
   const handleAddAnnouncement = async (e) => {
     e.preventDefault();
     try {
-      await API.post("/business/announcements", {
+      console.log("Submitting announcement:", { title: announcementTitle, content: announcementContent, submitterName, organizationName });
+      const response = await API.post("/business/announcements", {
         title: announcementTitle,
         content: announcementContent,
         submitterName,
         organizationName,
       });
+      console.log("Announcement response:", response.data);
       setAnnouncementSuccess("✅ Announcement submitted for approval!");
       setAnnouncementTitle("");
       setAnnouncementContent("");
@@ -615,7 +617,9 @@ export default function AxxBiashara() {
       setShowAnnouncementForm(false);
       setTimeout(() => setAnnouncementSuccess(""), 3000);
     } catch (err) {
-      alert("❌ Failed to submit announcement");
+      console.error("Announcement submission error:", err);
+      const errorMessage = err.response?.data?.error || err.message || "Unknown error";
+      alert(`❌ Failed to submit announcement: ${errorMessage}`);
     }
   };
 
