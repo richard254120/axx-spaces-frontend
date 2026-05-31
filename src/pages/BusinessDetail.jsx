@@ -425,7 +425,7 @@ const styles = {
     color: "#60a5fa",
     textDecoration: "none",
     fontSize: "14px",
-    fontWeight: 600",
+    fontWeight: "600",
     cursor: "pointer",
     transition: "all 0.3s",
   },

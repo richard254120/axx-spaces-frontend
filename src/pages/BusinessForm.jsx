@@ -263,6 +263,7 @@ export default function BusinessForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [uploading, setUploading] = useState({ logo: false, product: false, pricelist: false });
 
   useEffect(() => {
     if (isEditing) {
@@ -286,6 +287,70 @@ export default function BusinessForm() {
         ? prev.categories.filter((c) => c !== category)
         : [...prev.categories, category],
     }));
+  };
+
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading((prev) => ({ ...prev, logo: true }));
+    const formData = new FormData();
+    formData.append("logo", file);
+
+    try {
+      const res = await API.post("/uploads/logo", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setFormData((prev) => ({ ...prev, logo: res.data.url }));
+    } catch (err) {
+      setError("Failed to upload logo");
+    } finally {
+      setUploading((prev) => ({ ...prev, logo: false }));
+    }
+  };
+
+  const handleProductImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading((prev) => ({ ...prev, product: true }));
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await API.post("/uploads/product-image", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return res.data.url;
+    } catch (err) {
+      setError("Failed to upload product image");
+      return null;
+    } finally {
+      setUploading((prev) => ({ ...prev, product: false }));
+    }
+  };
+
+  const handlePricelistUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading((prev) => ({ ...prev, pricelist: true }));
+    const formData = new FormData();
+    formData.append("pricelist", file);
+
+    try {
+      const res = await API.post("/uploads/pricelist", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setFormData((prev) => ({
+        ...prev,
+        pricelist: { ...prev.pricelist, url: res.data.url, name: res.data.originalName || file.name },
+      }));
+    } catch (err) {
+      setError("Failed to upload pricelist");
+    } finally {
+      setUploading((prev) => ({ ...prev, pricelist: false }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -669,15 +734,21 @@ export default function BusinessForm() {
 
         <div style={styles.section}>
           <h2 style={styles.sectionTitle}>Business Logo</h2>
-          <label style={styles.label}>Logo URL</label>
+          <label style={styles.label}>Upload Logo</label>
           <input
-            type="url"
+            type="file"
             style={styles.input}
-            value={formData.logo}
-            onChange={(e) => setFormData({ ...formData, logo: e.target.value })}
-            placeholder="https://example.com/logo.png"
+            accept="image/*"
+            onChange={handleLogoUpload}
+            disabled={uploading.logo}
           />
-          <p style={{ fontSize: "12px", color: "#94a3b8" }}>Enter the URL of your business logo image</p>
+          {uploading.logo && <p style={{ fontSize: "12px", color: "#fbbf24" }}>Uploading logo...</p>}
+          {formData.logo && (
+            <div style={{ marginTop: "10px" }}>
+              <img src={formData.logo} alt="Logo preview" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "10px" }} />
+              <p style={{ fontSize: "12px", color: "#4ade80" }}>✅ Logo uploaded successfully</p>
+            </div>
+          )}
         </div>
 
         <div style={styles.section}>
@@ -710,24 +781,31 @@ export default function BusinessForm() {
             placeholder="Category"
             id="productCategory"
           />
-          <label style={styles.label}>Image URL</label>
+          <label style={styles.label}>Product Image</label>
           <input
-            type="url"
+            type="file"
             style={styles.input}
-            placeholder="https://example.com/product.jpg"
-            id="productImageUrl"
+            accept="image/*"
+            id="productImage"
+            disabled={uploading.product}
           />
+          {uploading.product && <p style={{ fontSize: "12px", color: "#fbbf24" }}>Uploading product image...</p>}
           <button
             type="button"
             style={{ ...styles.button, marginTop: "10px" }}
-            onClick={() => {
+            onClick={async () => {
               const name = document.getElementById("productName").value;
               const description = document.getElementById("productDescription").value;
               const price = parseFloat(document.getElementById("productPrice").value);
               const category = document.getElementById("productCategory").value;
-              const imageUrl = document.getElementById("productImageUrl").value;
+              const imageFile = document.getElementById("productImage").files[0];
 
               if (name) {
+                let imageUrl = "";
+                if (imageFile) {
+                  imageUrl = await handleProductImageUpload({ target: { files: [imageFile] } });
+                }
+
                 setFormData({
                   ...formData,
                   products: [...formData.products, { name, description, price, category, imageUrl }],
@@ -736,7 +814,7 @@ export default function BusinessForm() {
                 document.getElementById("productDescription").value = "";
                 document.getElementById("productPrice").value = "";
                 document.getElementById("productCategory").value = "";
-                document.getElementById("productImageUrl").value = "";
+                document.getElementById("productImage").value = "";
               }
             }}
           >
@@ -747,9 +825,12 @@ export default function BusinessForm() {
               <p style={{ fontSize: "14px", fontWeight: 600, marginBottom: "10px" }}>Added Products:</p>
               {formData.products.map((product, index) => (
                 <div key={index} style={{ padding: "10px", background: "rgba(15, 23, 42, 0.5)", borderRadius: "8px", marginBottom: "8px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div>
-                    <div style={{ fontWeight: 600 }}>{product.name}</div>
-                    {product.price && <div style={{ fontSize: "12px", color: "#94a3b8" }}>KES {product.price.toLocaleString()}</div>}
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    {product.imageUrl && <img src={product.imageUrl} alt={product.name} style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "5px" }} />}
+                    <div>
+                      <div style={{ fontWeight: 600 }}>{product.name}</div>
+                      {product.price && <div style={{ fontSize: "12px", color: "#94a3b8" }}>KES {product.price.toLocaleString()}</div>}
+                    </div>
                   </div>
                   <button
                     type="button"
@@ -766,23 +847,20 @@ export default function BusinessForm() {
 
         <div style={styles.section}>
           <h2 style={styles.sectionTitle}>Pricelist / Menu</h2>
-          <label style={styles.label}>Pricelist Name</label>
+          <label style={styles.label}>Upload Pricelist/Menu</label>
           <input
-            type="text"
+            type="file"
             style={styles.input}
-            value={formData.pricelist.name}
-            onChange={(e) => setFormData({ ...formData, pricelist: { ...formData.pricelist, name: e.target.value } })}
-            placeholder="e.g., Restaurant Menu, Service Pricelist"
+            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+            onChange={handlePricelistUpload}
+            disabled={uploading.pricelist}
           />
-          <label style={styles.label}>Pricelist URL</label>
-          <input
-            type="url"
-            style={styles.input}
-            value={formData.pricelist.url}
-            onChange={(e) => setFormData({ ...formData, pricelist: { ...formData.pricelist, url: e.target.value } })}
-            placeholder="https://example.com/pricelist.pdf"
-          />
-          <p style={{ fontSize: "12px", color: "#94a3b8" }}>Enter the URL of your pricelist/menu document (PDF, image, etc.)</p>
+          {uploading.pricelist && <p style={{ fontSize: "12px", color: "#fbbf24" }}>Uploading pricelist...</p>}
+          {formData.pricelist.url && (
+            <div style={{ marginTop: "10px" }}>
+              <p style={{ fontSize: "12px", color: "#4ade80" }}>✅ Pricelist uploaded: {formData.pricelist.name}</p>
+            </div>
+          )}
         </div>
 
         <button
