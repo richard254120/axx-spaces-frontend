@@ -821,9 +821,12 @@ export default function AdminDashboard() {
               <thead>
                 <tr style={styles.theadRow}>
                   <th style={styles.th}>Business</th>
+                  <th style={styles.th}>Logo</th>
                   <th style={styles.th}>Categories</th>
                   <th style={styles.th}>Location</th>
                   <th style={styles.th}>Owner</th>
+                  <th style={styles.th}>Products</th>
+                  <th style={styles.th}>Pricelist</th>
                   <th style={styles.th}>Badges</th>
                   <th style={styles.th}>Actions</th>
                 </tr>
@@ -836,6 +839,11 @@ export default function AdminDashboard() {
                       <div style={styles.propLoc}>{business.description?.substring(0, 50)}...</div>
                     </td>
                     <td style={styles.td}>
+                      {business.logo && (
+                        <img src={business.logo} alt={business.name} style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "8px" }} />
+                      )}
+                    </td>
+                    <td style={styles.td}>
                       <span style={styles.roleBadge}>{business.categories.join(", ")}</span>
                     </td>
                     <td style={styles.td}>
@@ -844,6 +852,20 @@ export default function AdminDashboard() {
                     <td style={styles.td}>
                       <div style={styles.propTitle}>{business.owner?.name}</div>
                       <div style={styles.propLoc}>{business.owner?.email}</div>
+                    </td>
+                    <td style={styles.td}>
+                      <div style={{ fontSize: "12px", color: "#94a3b8" }}>
+                        {business.products && business.products.length > 0 ? `${business.products.length} products` : "None"}
+                      </div>
+                    </td>
+                    <td style={styles.td}>
+                      {business.pricelist && business.pricelist.url ? (
+                        <a href={business.pricelist.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: "12px", color: "#60a5fa", textDecoration: "none" }}>
+                          📄 View
+                        </a>
+                      ) : (
+                        <span style={{ fontSize: "12px", color: "#94a3b8" }}>None</span>
+                      )}
                     </td>
                     <td style={styles.td}>
                       <div style={styles.badges}>
