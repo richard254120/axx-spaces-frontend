@@ -368,28 +368,15 @@ const styles = {
     textAlign: "center",
     maxWidth: "500px",
   },
-  pricingOriginal: {
-    fontSize: "24px",
-    color: "#94a3b8",
-    textDecoration: "line-through",
-    marginBottom: "10px",
-  },
-  pricingCurrent: {
-    fontSize: "48px",
-    fontWeight: 900,
+  pricingPlaceholder: {
+    fontSize: "20px",
+    fontWeight: 700,
     color: "#fbbf24",
     marginBottom: "10px",
   },
-  pricingDiscount: {
-    fontSize: "20px",
-    fontWeight: 700,
-    color: "#22c55e",
-    marginBottom: "15px",
-  },
-  pricingUrgency: {
+  pricingSubtext: {
     fontSize: "14px",
-    color: "#cbd5e1",
-    lineHeight: "1.6",
+    color: "#94a3b8",
   },
   announcementsSection: {
     background: "rgba(30, 41, 59, 0.5)",
@@ -963,13 +950,11 @@ export default function AxxBiashara() {
           </div>
         )}
 
-        {/* Pricing Section */}
+        {/* Pricing Section - Dynamic Offers */}
         <div style={styles.pricingSection}>
           <div style={styles.pricingCard}>
-            <div style={styles.pricingOriginal}>KSh 999/month</div>
-            <div style={styles.pricingCurrent}>KSh 499/month</div>
-            <div style={styles.pricingDiscount}>50% OFF Launch Offer</div>
-            <div style={styles.pricingUrgency}>Offer ends soon • Only for early verified businesses • Price increases after launch phase</div>
+            <div style={styles.pricingPlaceholder}>Special offers coming soon</div>
+            <div style={styles.pricingSubtext}>Stay tuned for exclusive deals and promotions</div>
           </div>
         </div>
       </div>
