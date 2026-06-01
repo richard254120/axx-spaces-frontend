@@ -2,646 +2,29 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 
-const styles = {
-  container: {
-    minHeight: "100vh",
-    background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
-    padding: "20px",
-    color: "#f1f5f9",
-    fontFamily: "'DM Sans', sans-serif",
-  },
-  header: {
-    textAlign: "center",
-    marginBottom: "40px",
-    padding: "40px 20px",
-    background: "linear-gradient(135deg, #60a5fa 0%, #f59e0b 100%)",
-    borderRadius: "20px",
-    boxShadow: "0 10px 40px rgba(251, 191, 36, 0.3)",
-  },
-  title: {
-    fontSize: "48px",
-    fontWeight: 900,
-    color: "#0f172a",
-    marginBottom: "10px",
-  },
-  subtitle: {
-    fontSize: "18px",
-    color: "#1e293b",
-    fontWeight: 500,
-  },
-  filters: {
-    display: "flex",
-    gap: "20px",
-    marginBottom: "30px",
-    flexWrap: "wrap",
-    justifyContent: "center",
-  },
-  filterGroup: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "8px",
-  },
-  filterLabel: {
-    fontSize: "14px",
-    fontWeight: 600,
-    color: "#cbd5e1",
-  },
-  filterSelect: {
-    padding: "12px 16px",
-    background: "rgba(15, 23, 42, 0.8)",
-    border: "1px solid rgba(255, 255, 255, 0.2)",
-    borderRadius: "10px",
-    color: "#f1f5f9",
-    fontSize: "14px",
-    cursor: "pointer",
-    outline: "none",
-    minWidth: "200px",
-  },
-  filterButton: {
-    padding: "12px 24px",
-    background: "rgba(255, 255, 255, 0.1)",
-    border: "1px solid rgba(255, 255, 255, 0.2)",
-    borderRadius: "10px",
-    color: "#f1f5f9",
-    cursor: "pointer",
-    transition: "all 0.3s",
-    fontWeight: 600,
-  },
-  filterButtonActive: {
-    background: "#60a5fa",
-    color: "#0f172a",
-    border: "1px solid #60a5fa",
-  },
-  searchInput: {
-    padding: "12px 20px",
-    background: "rgba(255, 255, 255, 0.1)",
-    border: "1px solid rgba(255, 255, 255, 0.2)",
-    borderRadius: "10px",
-    color: "#f1f5f9",
-    fontSize: "16px",
-    width: "300px",
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))",
-    gap: "25px",
-    maxWidth: "1400px",
-    margin: "0 auto",
-  },
-  card: {
-    background: "rgba(30, 41, 59, 0.8)",
-    borderRadius: "16px",
-    overflow: "hidden",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
-    transition: "transform 0.3s, box-shadow 0.3s",
-    cursor: "pointer",
-  },
-  cardHover: {
-    transform: "translateY(-5px)",
-    boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)",
-  },
-  image: {
-    width: "100%",
-    height: "200px",
-    objectFit: "cover",
-  },
-  cardContent: {
-    padding: "20px",
-  },
-  cardTitle: {
-    fontSize: "20px",
-    fontWeight: 700,
-    color: "#60a5fa",
-    marginBottom: "8px",
-    flex: 1,
-  },
-  cardHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "10px",
-  },
-  cardButtons: {
-    display: "flex",
-    gap: "8px",
-  },
-  iconButton: {
-    width: "36px",
-    height: "36px",
-    borderRadius: "50%",
-    border: "1px solid rgba(255, 255, 255, 0.2)",
-    background: "rgba(15, 23, 42, 0.8)",
-    color: "#f1f5f9",
-    fontSize: "16px",
-    cursor: "pointer",
-    transition: "all 0.3s",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  comparisonBar: {
-    position: "fixed",
-    bottom: "20px",
-    left: "50%",
-    transform: "translateX(-50%)",
-    background: "rgba(15, 23, 42, 0.95)",
-    border: "1px solid rgba(251, 191, 36, 0.3)",
-    borderRadius: "15px",
-    padding: "15px 25px",
-    display: "flex",
-    alignItems: "center",
-    gap: "20px",
-    boxShadow: "0 10px 40px rgba(0, 0, 0, 0.5)",
-    zIndex: 1000,
-  },
-  comparisonText: {
-    color: "#f1f5f9",
-    fontSize: "14px",
-    fontWeight: 600,
-  },
-  compareButton: {
-    padding: "10px 20px",
-    background: "#60a5fa",
-    border: "none",
-    borderRadius: "8px",
-    color: "#0f172a",
-    fontSize: "14px",
-    fontWeight: 700,
-    cursor: "pointer",
-    transition: "all 0.3s",
-  },
-  clearButton: {
-    padding: "10px 20px",
-    background: "rgba(239, 68, 68, 0.2)",
-    border: "1px solid rgba(239, 68, 68, 0.5)",
-    borderRadius: "8px",
-    color: "#ef4444",
-    fontSize: "14px",
-    fontWeight: 600,
-    cursor: "pointer",
-    transition: "all 0.3s",
-  },
-  comparisonTable: {
-    display: "flex",
-    gap: "20px",
-    marginTop: "20px",
-  },
-  comparisonColumn: {
-    flex: 1,
-    background: "rgba(15, 23, 42, 0.5)",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
-    borderRadius: "10px",
-    padding: "20px",
-  },
-  comparisonBusinessName: {
-    fontSize: "18px",
-    fontWeight: 700,
-    color: "#60a5fa",
-    marginBottom: "15px",
-    paddingBottom: "10px",
-    borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
-  },
-  comparisonItem: {
-    fontSize: "14px",
-    color: "#cbd5e1",
-    marginBottom: "10px",
-    lineHeight: "1.6",
-  },
-  footer: { background: "#0f172a", color: "#cbd5e1", padding: "40px 20px 20px", marginTop: "60px" },
-  footerInner: { maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "30px", marginBottom: "30px" },
-  footerSection: { fontSize: "13px" },
-  footerTitle: { color: "#60a5fa", fontSize: "14px", fontWeight: 700, margin: "0 0 12px" },
-  footerTagline: { fontSize: "13px", color: "#94a3b8", margin: "6px 0 4px" },
-  footerLink: { margin: "6px 0", cursor: "pointer", transition: "color 0.2s", color: "#9ca3af" },
-  footerBottom: { textAlign: "center", paddingTop: "20px", borderTop: "1px solid rgba(255, 255, 255, 0.1)" },
-  footerCopy: { fontSize: "12px", color: "#64748b", margin: 0 },
-  cardCategory: {
-    fontSize: "14px",
-    color: "#94a3b8",
-    marginBottom: "12px",
-  },
-  cardLocation: {
-    fontSize: "14px",
-    color: "#64748b",
-    marginBottom: "12px",
-    display: "flex",
-    alignItems: "center",
-    gap: "5px",
-  },
-  cardDescription: {
-    fontSize: "14px",
-    color: "#cbd5e1",
-    marginBottom: "15px",
-    lineHeight: "1.5",
-    display: "-webkit-box",
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: "vertical",
-    overflow: "hidden",
-  },
-  badges: {
-    display: "flex",
-    gap: "8px",
-    flexWrap: "wrap",
-    marginBottom: "15px",
-  },
-  badge: {
-    padding: "4px 10px",
-    borderRadius: "20px",
-    fontSize: "12px",
-    fontWeight: 600,
-  },
-  cardActions: {
-    display: "flex",
-    gap: "10px",
-    marginTop: "15px",
-  },
-  contactButton: {
-    padding: "10px 20px",
-    background: "#60a5fa",
-    color: "#0f172a",
-    border: "none",
-    borderRadius: "8px",
-    fontSize: "14px",
-    fontWeight: 600,
-    cursor: "pointer",
-    textDecoration: "none",
-    transition: "all 0.3s",
-    display: "flex",
-    alignItems: "center",
-    gap: "5px",
-  },
-  badgeStudent: {
-    background: "rgba(34, 197, 94, 0.2)",
-    color: "#22c55e",
-    border: "1px solid #22c55e",
-  },
-  badgeIdentity: {
-    background: "rgba(34, 197, 94, 0.2)",
-    color: "#22c55e",
-    border: "1px solid #22c55e",
-  },
-  badgeBusiness: {
-    background: "rgba(59, 130, 246, 0.2)",
-    color: "#3b82f6",
-    border: "1px solid #3b82f6",
-  },
-  badgeOnline: {
-    background: "rgba(59, 130, 246, 0.2)",
-    color: "#3b82f6",
-    border: "1px solid #3b82f6",
-  },
-  badgeLocation: {
-    background: "rgba(168, 85, 247, 0.2)",
-    color: "#a855f7",
-    border: "1px solid #a855f7",
-  },
-  badgePremium: {
-    background: "rgba(251, 191, 36, 0.2)",
-    color: "#60a5fa",
-    border: "1px solid #60a5fa",
-  },
-  socialLinks: {
-    display: "flex",
-    gap: "10px",
-    marginBottom: "15px",
-  },
-  socialIcon: {
-    width: "32px",
-    height: "32px",
-    borderRadius: "50%",
-    background: "rgba(255, 255, 255, 0.1)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "#f1f5f9",
-    textDecoration: "none",
-    transition: "background 0.3s",
-  },
-  socialIconHover: {
-    background: "#60a5fa",
-    color: "#0f172a",
-  },
-  featured: {
-    position: "absolute",
-    top: "10px",
-    right: "10px",
-    background: "#60a5fa",
-    color: "#0f172a",
-    padding: "5px 15px",
-    borderRadius: "20px",
-    fontSize: "12px",
-    fontWeight: 700,
-  },
-  loading: {
-    textAlign: "center",
-    padding: "60px 20px",
-    fontSize: "24px",
-    color: "#94a3b8",
-  },
-  empty: {
-    textAlign: "center",
-    padding: "60px 20px",
-    fontSize: "18px",
-    color: "#64748b",
-  },
-  addButton: {
-    padding: "10px 16px",
-    background: "#60a5fa",
-    color: "#0f172a",
-    border: "none",
-    borderRadius: "10px",
-    fontSize: "14px",
-    fontWeight: 700,
-    cursor: "pointer",
-    boxShadow: "0 4px 15px rgba(251, 191, 36, 0.3)",
-    transition: "opacity 0.3s",
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-    whiteSpace: "nowrap",
-  },
-  addButtonHover: {
-    opacity: 0.9,
-  },
-  pricingSection: {
-    marginTop: "30px",
-    display: "flex",
-    justifyContent: "center",
-  },
-  pricingCard: {
-    background: "rgba(251, 191, 36, 0.1)",
-    border: "2px solid #60a5fa",
-    borderRadius: "20px",
-    padding: "30px 50px",
-    textAlign: "center",
-    maxWidth: "500px",
-  },
-  pricingPlaceholder: {
-    fontSize: "20px",
-    fontWeight: 700,
-    color: "#60a5fa",
-    marginBottom: "10px",
-  },
-  pricingSubtext: {
-    fontSize: "14px",
-    color: "#94a3b8",
-  },
-  announcementsSection: {
-    background: "rgba(30, 41, 59, 0.5)",
-    borderRadius: "20px",
-    padding: "30px",
-    marginBottom: "30px",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
-  },
-  announcementsTitle: {
-    fontSize: "24px",
-    fontWeight: 700,
-    color: "#60a5fa",
-    marginBottom: "20px",
-  },
-  announcementsScroll: {
-    display: "flex",
-    gap: "20px",
-    overflowX: "hidden",
-    paddingBottom: "10px",
-    position: "relative",
-  },
-  announcementsTrack: {
-    display: "flex",
-    gap: "20px",
-    animation: "marquee 40s linear infinite",
-    "&:hover": {
-      animationPlayState: "paused",
-    },
-  },
-  announcementsTrackPaused: {
-    animationPlayState: "paused",
-  },
-  announcementBox: {
-    background: "rgba(15, 23, 42, 0.8)",
-    borderRadius: "15px",
-    padding: "20px",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
-    cursor: "pointer",
-    transition: "all 0.3s",
-    minWidth: "280px",
-    maxWidth: "320px",
-    flexShrink: 0,
-  },
-  announcementBusiness: {
-    fontSize: "13px",
-    fontWeight: 600,
-    color: "#94a3b8",
-    marginBottom: "10px",
-    display: "block",
-  },
-  announcementSubmitter: {
-    fontSize: "13px",
-    color: "#64748b",
-    marginBottom: "5px",
-    display: "block",
-  },
-  announcementBoxTitle: {
-    fontSize: "16px",
-    fontWeight: 600,
-    color: "#f1f5f9",
-    marginBottom: "10px",
-    margin: 0,
-  },
-  announcementBoxDate: {
-    fontSize: "12px",
-    color: "#64748b",
-  },
-  modalOverlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: "rgba(0, 0, 0, 0.8)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 1000,
-  },
-  modalContent: {
-    background: "rgba(30, 41, 59, 0.95)",
-    borderRadius: "20px",
-    padding: "40px",
-    maxWidth: "600px",
-    width: "90%",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
-    position: "relative",
-  },
-  modalClose: {
-    position: "absolute",
-    top: "20px",
-    right: "20px",
-    background: "rgba(255, 255, 255, 0.1)",
-    border: "none",
-    borderRadius: "50%",
-    width: "40px",
-    height: "40px",
-    fontSize: "20px",
-    color: "#f1f5f9",
-    cursor: "pointer",
-    transition: "all 0.3s",
-  },
-  modalTitle: {
-    fontSize: "28px",
-    fontWeight: 700,
-    color: "#60a5fa",
-    marginBottom: "15px",
-  },
-  modalBusiness: {
-    fontSize: "16px",
-    color: "#94a3b8",
-    marginBottom: "10px",
-  },
-  modalDate: {
-    fontSize: "14px",
-    color: "#64748b",
-    marginBottom: "20px",
-  },
-  modalContentText: {
-    fontSize: "16px",
-    color: "#cbd5e1",
-    lineHeight: "1.8",
-  },
-  announcementSuccess: {
-    background: "rgba(34, 197, 94, 0.2)",
-    border: "1px solid #22c55e",
-    color: "#22c55e",
-    padding: "12px 20px",
-    borderRadius: "10px",
-    marginBottom: "20px",
-    textAlign: "center",
-  },
-  announcementForm: {
-    background: "rgba(30, 41, 59, 0.8)",
-    borderRadius: "20px",
-    padding: "30px",
-    marginBottom: "30px",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
-  },
-  formTitle: {
-    fontSize: "24px",
-    fontWeight: 700,
-    color: "#60a5fa",
-    marginBottom: "20px",
-  },
-  formInput: {
-    width: "100%",
-    padding: "12px 16px",
-    background: "rgba(15, 23, 42, 0.8)",
-    border: "1px solid rgba(255, 255, 255, 0.2)",
-    borderRadius: "10px",
-    color: "#f1f5f9",
-    fontSize: "16px",
-    marginBottom: "15px",
-    outline: "none",
-  },
-  formTextarea: {
-    width: "100%",
-    padding: "12px 16px",
-    background: "rgba(15, 23, 42, 0.8)",
-    border: "1px solid rgba(255, 255, 255, 0.2)",
-    borderRadius: "10px",
-    color: "#f1f5f9",
-    fontSize: "16px",
-    marginBottom: "15px",
-    outline: "none",
-    resize: "vertical",
-  },
-  formSubmit: {
-    padding: "12px 24px",
-    background: "#60a5fa",
-    color: "#0f172a",
-    border: "none",
-    borderRadius: "10px",
-    fontSize: "16px",
-    fontWeight: 600,
-    cursor: "pointer",
-    transition: "all 0.3s",
-  },
-  announcementContent: {
-    fontSize: "14px",
-    color: "#cbd5e1",
-    lineHeight: "1.5",
-  },
-  searchSection: {
-    marginBottom: "30px",
-  },
-  searchInputWrapper: {
-    position: "relative",
-    maxWidth: "600px",
-    margin: "0 auto",
-  },
-  searchIcon: {
-    position: "absolute",
-    left: "15px",
-    top: "50%",
-    transform: "translateY(-50%)",
-    fontSize: "20px",
-  },
-  searchInput: {
-    width: "100%",
-    padding: "15px 15px 15px 50px",
-    background: "rgba(15, 23, 42, 0.8)",
-    border: "1px solid rgba(255, 255, 255, 0.2)",
-    borderRadius: "12px",
-    color: "#f1f5f9",
-    fontSize: "16px",
-    outline: "none",
-    transition: "border-color 0.3s",
-  },
-  clearSearchBtn: {
-    position: "absolute",
-    right: "15px",
-    top: "50%",
-    transform: "translateY(-50%)",
-    background: "none",
-    border: "none",
-    color: "#94a3b8",
-    cursor: "pointer",
-    fontSize: "18px",
-    padding: "5px",
-  },
-};
-
 const BUSINESS_CATEGORIES = [
-  "Restaurants",
-  "Retail",
-  "Services",
-  "Technology",
-  "Healthcare",
-  "Education",
-  "Entertainment",
-  "Professional Services",
-  "Manufacturing",
-  "Agriculture",
-  "Construction",
-  "Transportation",
-  "Other",
+  "Restaurants", "Retail", "Services", "Technology", "Healthcare", "Education",
+  "Entertainment", "Professional Services", "Manufacturing", "Agriculture",
+  "Construction", "Transportation", "Other",
 ];
 
 const KENYA_COUNTIES = [
-  "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta",
-  "Garissa", "Wajir", "Mandera", "Marsabit", "Isiolo", "Meru", "Tharaka Nithi",
-  "Embu", "Kitui", "Machakos", "Makueni", "Nyandarua", "Nyeri", "Kirinyaga",
-  "Murang'a", "Kiambu", "Turkana", "West Pokot", "Samburu", "Trans Nzoia",
-  "Uasin Gishu", "Elgeyo Marakwet", "Nandi", "Baringo", "Laikipia", "Nakuru",
-  "Narok", "Kajiado", "Kericho", "Bomet", "Kakamega", "Vihiga", "Bungoma",
-  "Busia", "Siaya", "Kisumu", "Homa Bay", "Migori", "Kisii", "Nyamira", "Nairobi City",
+  "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta", "Garissa", "Wajir",
+  "Mandera", "Marsabit", "Isiolo", "Meru", "Tharaka Nithi", "Embu", "Kitui", "Machakos",
+  "Makueni", "Nyandarua", "Nyeri", "Kirinyaga", "Murang'a", "Kiambu", "Turkana",
+  "West Pokot", "Samburu", "Trans Nzoia", "Uasin Gishu", "Elgeyo Marakwet", "Nandi",
+  "Baringo", "Laikipia", "Nakuru", "Narok", "Kajiado", "Kericho", "Bomet", "Kakamega",
+  "Vihiga", "Bungoma", "Busia", "Siaya", "Kisumu", "Homa Bay", "Migori", "Kisii",
+  "Nyamira", "Nairobi City",
 ];
 
 const BADGE_CONFIG = {
-  student_verified: { label: "🟢 Student Verified", style: styles.badgeStudent },
-  identity_verified: { label: "🟢 Identity Verified", style: styles.badgeIdentity },
-  business_verified: { label: "🔵 Business Verified", style: styles.badgeBusiness },
-  online_verified: { label: "🔵 Online Verified", style: styles.badgeOnline },
-  location_verified: { label: "🟣 Location Verified", style: styles.badgeLocation },
-  premium_verified: { label: "⭐ Premium Verified", style: styles.badgePremium },
+  student_verified: { label: "Student Verified", color: "#10b981", icon: "✦" },
+  identity_verified: { label: "Identity Verified", color: "#10b981", icon: "✦" },
+  business_verified: { label: "Business Verified", color: "#3b82f6", icon: "◈" },
+  online_verified: { label: "Online Verified", color: "#3b82f6", icon: "◈" },
+  location_verified: { label: "Location Verified", color: "#8b5cf6", icon: "◉" },
+  premium_verified: { label: "Premium", color: "#f59e0b", icon: "★" },
 };
 
 export default function AxxBiashara() {
@@ -653,8 +36,6 @@ export default function AxxBiashara() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [minRating, setMinRating] = useState("");
-  const [maxRating, setMaxRating] = useState("");
-  const [priceRange, setPriceRange] = useState("");
   const [openNow, setOpenNow] = useState(false);
   const [verification, setVerification] = useState("");
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
@@ -672,6 +53,7 @@ export default function AxxBiashara() {
   const [comparisonList, setComparisonList] = useState([]);
   const [showComparisonModal, setShowComparisonModal] = useState(false);
   const [comparisonData, setComparisonData] = useState([]);
+  const [hoveredCard, setHoveredCard] = useState(null);
 
   const loadBusinesses = async () => {
     setLoading(true);
@@ -682,11 +64,8 @@ export default function AxxBiashara() {
       if (searchQuery) params.search = searchQuery;
       if (sortBy) params.sort = sortBy;
       if (minRating) params.minRating = minRating;
-      if (maxRating) params.maxRating = maxRating;
-      if (priceRange) params.priceRange = priceRange;
       if (openNow) params.openNow = "true";
       if (verification) params.verification = verification;
-
       const res = await API.get("/business", { params });
       setBusinesses(res.data.businesses || []);
     } catch (err) {
@@ -698,25 +77,19 @@ export default function AxxBiashara() {
 
   const loadAnnouncements = async () => {
     try {
-      console.log("Loading announcements from:", "/business/announcements");
       const res = await API.get("/business/announcements");
-      console.log("Announcements response:", res.data);
       setAnnouncements(res.data.announcements || []);
     } catch (err) {
       console.error("Failed to load announcements:", err);
-      console.error("Error details:", err.response?.data || err.message);
     }
   };
 
   useEffect(() => {
     loadBusinesses();
-  }, [selectedCategory, selectedCounty, searchQuery, sortBy, minRating, maxRating, priceRange, openNow, verification]);
+  }, [selectedCategory, selectedCounty, searchQuery, sortBy, minRating, openNow, verification]);
 
   useEffect(() => {
     loadAnnouncements();
-  }, []);
-
-  useEffect(() => {
     loadFavorites();
   }, []);
 
@@ -724,600 +97,676 @@ export default function AxxBiashara() {
     try {
       const res = await API.get("/favorites");
       setFavorites(res.data.favorites || []);
-    } catch (err) {
-      console.error("Failed to load favorites:", err);
-    }
+    } catch (err) { }
   };
 
-  const toggleFavorite = async (businessId) => {
+  const toggleFavorite = async (businessId, e) => {
+    e.stopPropagation();
     try {
-      const existingFavorite = favorites.find(f => f.business._id === businessId);
-      if (existingFavorite) {
-        await API.delete(`/favorites/${existingFavorite._id}`);
-        setFavorites(favorites.filter(f => f._id !== existingFavorite._id));
+      const existing = favorites.find(f => f.business._id === businessId);
+      if (existing) {
+        await API.delete(`/favorites/${existing._id}`);
+        setFavorites(favorites.filter(f => f._id !== existing._id));
       } else {
         await API.post("/favorites", { businessId });
         loadFavorites();
       }
-    } catch (err) {
-      console.error("Failed to toggle favorite:", err);
-    }
+    } catch (err) { }
   };
 
-  const toggleComparison = (businessId) => {
+  const toggleComparison = (businessId, e) => {
+    e.stopPropagation();
     if (comparisonList.includes(businessId)) {
       setComparisonList(comparisonList.filter(id => id !== businessId));
+    } else if (comparisonList.length < 3) {
+      setComparisonList([...comparisonList, businessId]);
     } else {
-      if (comparisonList.length < 3) {
-        setComparisonList([...comparisonList, businessId]);
-      } else {
-        alert("You can compare up to 3 businesses at a time");
-      }
+      alert("You can compare up to 3 businesses");
     }
   };
 
   const openComparison = async () => {
-    if (comparisonList.length < 2) {
-      alert("Please select at least 2 businesses to compare");
-      return;
-    }
+    if (comparisonList.length < 2) { alert("Select at least 2 businesses"); return; }
     try {
       const res = await API.get(`/business/compare?ids=${comparisonList.join(",")}`);
       setComparisonData(res.data.businesses);
       setShowComparisonModal(true);
-    } catch (err) {
-      console.error("Failed to load comparison data:", err);
-    }
+    } catch (err) { }
   };
 
-  const isFavorite = (businessId) => {
-    return favorites.some(f => f.business._id === businessId);
-  };
+  const isFavorite = (id) => favorites.some(f => f.business._id === id);
 
   const handleAddAnnouncement = async (e) => {
     e.preventDefault();
     try {
-      console.log("Submitting announcement:", { title: announcementTitle, content: announcementContent, submitterName, organizationName });
-      const response = await API.post("/business/announcements", {
-        title: announcementTitle,
-        content: announcementContent,
-        submitterName,
-        organizationName,
-      });
-      console.log("Announcement response:", response.data);
-      setAnnouncementSuccess("✅ Announcement submitted for approval!");
-      setAnnouncementTitle("");
-      setAnnouncementContent("");
-      setSubmitterName("");
-      setOrganizationName("");
+      await API.post("/business/announcements", { title: announcementTitle, content: announcementContent, submitterName, organizationName });
+      setAnnouncementSuccess("Announcement submitted for approval!");
+      setAnnouncementTitle(""); setAnnouncementContent(""); setSubmitterName(""); setOrganizationName("");
       setShowAnnouncementForm(false);
-      setTimeout(() => setAnnouncementSuccess(""), 3000);
+      setTimeout(() => setAnnouncementSuccess(""), 4000);
     } catch (err) {
-      console.error("Announcement submission error:", err);
-      const errorMessage = err.response?.data?.error || err.message || "Unknown error";
-      alert(`❌ Failed to submit announcement: ${errorMessage}`);
+      alert("Failed to submit: " + (err.response?.data?.error || err.message));
     }
   };
 
-  const getBadgeLabel = (badgeType) => {
-    return BADGE_CONFIG[badgeType]?.label || badgeType;
-  };
-
-  const getBadgeStyle = (badgeType) => {
-    return BADGE_CONFIG[badgeType]?.style || styles.badge;
-  };
-
   return (
-    <div style={styles.container}>
+    <div style={{ minHeight: "100vh", background: "#06070d", color: "#e8eaf0", fontFamily: "'Sora', 'DM Sans', sans-serif", overflowX: "hidden" }}>
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0d0f1a; }
+        ::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 3px; }
+
         @keyframes marquee {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
+        @keyframes fadeSlideUp {
+          from { opacity: 0; transform: translateY(28px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shimmer {
+          0%   { background-position: -400px 0; }
+          100% { background-position: 400px 0; }
+        }
+        @keyframes pulse-ring {
+          0%   { box-shadow: 0 0 0 0 rgba(56,189,248,0.4); }
+          70%  { box-shadow: 0 0 0 12px rgba(56,189,248,0); }
+          100% { box-shadow: 0 0 0 0 rgba(56,189,248,0); }
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50%       { transform: translateY(-6px); }
+        }
+
+        .axx-card {
+          animation: fadeSlideUp 0.5s ease both;
+          transition: transform 0.3s cubic-bezier(.22,.68,0,1.2), box-shadow 0.3s ease;
+          cursor: pointer;
+          position: relative;
+          background: linear-gradient(145deg, #0e1629 0%, #111827 100%);
+          border-radius: 20px;
+          border: 1px solid rgba(56,189,248,0.08);
+          overflow: hidden;
+        }
+        .axx-card:hover {
+          transform: translateY(-8px) scale(1.01);
+          box-shadow: 0 28px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(56,189,248,0.2);
+        }
+        .axx-card::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(135deg, rgba(56,189,248,0.03) 0%, transparent 60%);
+          pointer-events: none;
+        }
+
+        .card-img-wrap { position: relative; overflow: hidden; height: 200px; }
+        .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block; }
+        .axx-card:hover .card-img-wrap img { transform: scale(1.06); }
+        .card-img-overlay {
+          position: absolute; inset: 0;
+          background: linear-gradient(to top, rgba(6,7,13,0.85) 0%, transparent 55%);
+        }
+
+        .badge-pill {
+          display: inline-flex; align-items: center; gap: 4px;
+          padding: 3px 10px; border-radius: 20px;
+          font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
+        }
+
+        .action-btn {
+          display: inline-flex; align-items: center; gap: 6px;
+          padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 600;
+          border: none; cursor: pointer; transition: all 0.2s ease; text-decoration: none;
+        }
+        .action-btn-primary { background: rgba(56,189,248,0.15); color: #38bdf8; border: 1px solid rgba(56,189,248,0.3); }
+        .action-btn-primary:hover { background: #38bdf8; color: #06070d; }
+        .action-btn-success { background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+        .action-btn-success:hover { background: #10b981; color: #06070d; }
+
+        .icon-btn {
+          width: 34px; height: 34px; border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+          cursor: pointer; font-size: 15px; transition: all 0.2s;
+        }
+        .icon-btn:hover { background: rgba(56,189,248,0.2); border-color: rgba(56,189,248,0.4); }
+
+        .filter-select {
+          padding: 10px 14px;
+          background: #0e1629;
+          border: 1px solid rgba(56,189,248,0.15);
+          border-radius: 10px;
+          color: #cbd5e1;
+          font-size: 13px;
+          font-family: inherit;
+          cursor: pointer;
+          outline: none;
+          transition: border-color 0.2s;
+          min-width: 180px;
+          appearance: none;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2338bdf8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: right 12px center;
+          padding-right: 32px;
+        }
+        .filter-select:focus, .filter-select:hover { border-color: rgba(56,189,248,0.4); }
+
+        .search-input {
+          width: 100%; padding: 14px 14px 14px 48px;
+          background: #0e1629;
+          border: 1px solid rgba(56,189,248,0.2);
+          border-radius: 14px;
+          color: #f1f5f9;
+          font-size: 15px;
+          font-family: inherit;
+          outline: none;
+          transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .search-input:focus {
+          border-color: rgba(56,189,248,0.5);
+          box-shadow: 0 0 0 3px rgba(56,189,248,0.08);
+        }
+        .search-input::placeholder { color: #475569; }
+
+        .ann-card {
+          background: #0e1629;
+          border: 1px solid rgba(56,189,248,0.1);
+          border-radius: 14px;
+          padding: 18px 20px;
+          min-width: 260px;
+          max-width: 290px;
+          flex-shrink: 0;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+        .ann-card:hover {
+          transform: translateY(-4px);
+          border-color: rgba(56,189,248,0.35);
+          box-shadow: 0 12px 32px rgba(56,189,248,0.12);
+        }
+
+        .modal-overlay {
+          position: fixed; inset: 0;
+          background: rgba(0,0,0,0.85);
+          backdrop-filter: blur(6px);
+          display: flex; align-items: center; justify-content: center;
+          z-index: 9999;
+          animation: fadeSlideUp 0.2s ease;
+        }
+        .modal-box {
+          background: #0e1629;
+          border: 1px solid rgba(56,189,248,0.2);
+          border-radius: 24px;
+          padding: 40px;
+          position: relative;
+          max-height: 85vh;
+          overflow-y: auto;
+        }
+
+        .shimmer-card {
+          background: linear-gradient(90deg, #0e1629 25%, #162236 50%, #0e1629 75%);
+          background-size: 400px 100%;
+          animation: shimmer 1.4s infinite;
+          border-radius: 20px;
+          height: 340px;
+        }
+
+        .cta-btn {
+          display: inline-flex; align-items: center; gap: 8px;
+          padding: 12px 24px; border-radius: 12px;
+          font-size: 14px; font-weight: 700;
+          border: none; cursor: pointer;
+          transition: all 0.25s ease; font-family: inherit;
+          text-decoration: none;
+        }
+        .cta-primary {
+          background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+          color: #06070d;
+          box-shadow: 0 4px 20px rgba(56,189,248,0.3);
+        }
+        .cta-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(56,189,248,0.45); }
+        .cta-green {
+          background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+          color: #fff;
+          box-shadow: 0 4px 16px rgba(16,185,129,0.25);
+        }
+        .cta-green:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(16,185,129,0.4); }
+
+        .comparison-bar {
+          position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+          background: rgba(14,22,41,0.96);
+          border: 1px solid rgba(56,189,248,0.3);
+          border-radius: 16px; padding: 14px 24px;
+          display: flex; align-items: center; gap: 16px;
+          box-shadow: 0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(56,189,248,0.1);
+          z-index: 1000; backdrop-filter: blur(10px);
+          animation: float 3s ease-in-out infinite;
+        }
+
+        .section-label {
+          font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+          text-transform: uppercase; color: #38bdf8;
+        }
+        .section-title {
+          font-size: 28px; font-weight: 800;
+          background: linear-gradient(135deg, #f1f5f9 30%, #94a3b8 100%);
+          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .no-results {
+          text-align: center; padding: 80px 20px;
+          color: #475569; font-size: 16px;
+        }
+        .no-results-icon { font-size: 56px; margin-bottom: 16px; opacity: 0.5; }
+
+        .form-input {
+          width: 100%; padding: 12px 16px;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(56,189,248,0.15);
+          border-radius: 10px; color: #f1f5f9;
+          font-size: 14px; font-family: inherit;
+          outline: none; transition: border-color 0.2s;
+          margin-bottom: 12px;
+        }
+        .form-input:focus { border-color: rgba(56,189,248,0.45); }
+        .form-input::placeholder { color: #475569; }
+
+        .social-dot {
+          width: 30px; height: 30px; border-radius: 50%;
+          background: rgba(255,255,255,0.06);
+          display: flex; align-items: center; justify-content: center;
+          font-size: 13px; text-decoration: none;
+          border: 1px solid rgba(255,255,255,0.08);
+          transition: all 0.2s;
+        }
+        .social-dot:hover { background: rgba(56,189,248,0.2); border-color: rgba(56,189,248,0.4); transform: scale(1.15); }
+
+        .featured-tag {
+          position: absolute; top: 12px; left: 12px;
+          background: linear-gradient(135deg, #f59e0b, #fbbf24);
+          color: #06070d; padding: 4px 12px; border-radius: 20px;
+          font-size: 11px; font-weight: 800; letter-spacing: 0.05em;
+          text-transform: uppercase; z-index: 2;
+        }
+
+        .stat-chip {
+          display: inline-flex; align-items: center; gap: 5px;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.07);
+          border-radius: 8px; padding: 4px 10px;
+          font-size: 12px; color: #94a3b8;
+        }
+        .stat-chip strong { color: #e2e8f0; font-weight: 600; }
+
+        .divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 14px 0; }
       `}</style>
-      <div style={styles.header}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "15px" }}>
-          <h1 style={styles.title}>🏪 AxxBiashara</h1>
-          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-            <button
-              style={styles.addButton}
-              onClick={() => navigate("/business/create")}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.opacity = "0.9";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.opacity = "1";
-              }}
-            >
-              + Add Business
-            </button>
-            <button
-              style={{ ...styles.addButton, background: "#22c55e" }}
-              onClick={() => setShowAnnouncementForm(!showAnnouncementForm)}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.opacity = "0.9";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.opacity = "1";
-              }}
-            >
-              {showAnnouncementForm ? "Cancel" : "+ Create Announcement"}
-            </button>
+
+      {/* ── HERO HEADER ── */}
+      <div style={{
+        background: "linear-gradient(160deg, #0a1628 0%, #0c1a2e 40%, #06070d 100%)",
+        borderBottom: "1px solid rgba(56,189,248,0.1)",
+        padding: "48px 24px 36px",
+        position: "relative", overflow: "hidden",
+      }}>
+        {/* Decorative orbs */}
+        <div style={{ position: "absolute", top: "-80px", right: "-60px", width: "340px", height: "340px", borderRadius: "50%", background: "radial-gradient(circle, rgba(56,189,248,0.06) 0%, transparent 70%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", bottom: "-60px", left: "10%", width: "240px", height: "240px", borderRadius: "50%", background: "radial-gradient(circle, rgba(16,185,129,0.04) 0%, transparent 70%)", pointerEvents: "none" }} />
+
+        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+          {/* Top bar */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "20px", marginBottom: "36px" }}>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" }}>
+                <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: "linear-gradient(135deg,#0ea5e9,#38bdf8)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", boxShadow: "0 4px 16px rgba(56,189,248,0.3)" }}>🏪</div>
+                <div>
+                  <div className="section-label">Kenya Business Directory</div>
+                  <h1 style={{ fontSize: "clamp(28px,5vw,44px)", fontWeight: 800, background: "linear-gradient(135deg, #f8fafc 0%, #38bdf8 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", lineHeight: 1.1 }}>
+                    AxxBiashara
+                  </h1>
+                </div>
+              </div>
+              <p style={{ color: "#64748b", fontSize: "15px", maxWidth: "420px", lineHeight: "1.6" }}>
+                Discover and connect with verified businesses across all 47 counties of Kenya.
+              </p>
+            </div>
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+              <button className="cta-primary cta-btn" onClick={() => navigate("/business/create")}>
+                + Add Business
+              </button>
+              <button className="cta-green cta-btn" onClick={() => setShowAnnouncementForm(!showAnnouncementForm)}>
+                {showAnnouncementForm ? "✕ Cancel" : "📢 Announce"}
+              </button>
+            </div>
           </div>
+
+          {/* Stats strip */}
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "28px" }}>
+            {[
+              { label: "Businesses", value: businesses.length },
+              { label: "Counties", value: "47" },
+              { label: "Categories", value: BUSINESS_CATEGORIES.length },
+              { label: "Verified", value: businesses.filter(b => b.verificationBadges?.length).length },
+            ].map(s => (
+              <div key={s.label} className="stat-chip"><strong>{s.value}</strong> {s.label}</div>
+            ))}
+          </div>
+
+          {/* Success message */}
+          {announcementSuccess && (
+            <div style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.3)", color: "#10b981", padding: "12px 18px", borderRadius: "10px", marginBottom: "20px", fontSize: "14px", fontWeight: 600 }}>
+              ✓ {announcementSuccess}
+            </div>
+          )}
+
+          {/* Announcement form */}
+          {showAnnouncementForm && (
+            <div style={{ background: "rgba(14,22,41,0.8)", border: "1px solid rgba(56,189,248,0.15)", borderRadius: "18px", padding: "28px", marginBottom: "28px" }}>
+              <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#38bdf8", marginBottom: "18px" }}>Create Announcement</h3>
+              <form onSubmit={handleAddAnnouncement}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "0" }}>
+                  <input className="form-input" type="text" placeholder="Your Name *" value={submitterName} onChange={e => setSubmitterName(e.target.value)} required style={{ marginBottom: 0 }} />
+                  <input className="form-input" type="text" placeholder="Organisation (optional)" value={organizationName} onChange={e => setOrganizationName(e.target.value)} style={{ marginBottom: 0 }} />
+                </div>
+                <div style={{ height: 12 }} />
+                <input className="form-input" type="text" placeholder="Announcement Title *" value={announcementTitle} onChange={e => setAnnouncementTitle(e.target.value)} required />
+                <textarea className="form-input" placeholder="Content *" value={announcementContent} onChange={e => setAnnouncementContent(e.target.value)} required rows={4} style={{ resize: "vertical" }} />
+                <button type="submit" className="cta-primary cta-btn" style={{ width: "100%", justifyContent: "center", marginTop: "4px" }}>Submit for Approval</button>
+              </form>
+            </div>
+          )}
+
+          {/* Announcements ticker */}
+          {announcements.length > 0 && (
+            <div style={{ background: "rgba(14,22,41,0.6)", border: "1px solid rgba(56,189,248,0.1)", borderRadius: "16px", padding: "20px 22px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
+                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#38bdf8", boxShadow: "0 0 8px #38bdf8", animation: "pulse-ring 2s infinite", display: "inline-block" }} />
+                <span style={{ fontSize: "13px", fontWeight: 700, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.1em" }}>Live Announcements</span>
+              </div>
+              <div style={{ overflow: "hidden" }} onMouseEnter={() => setIsMarqueePaused(true)} onMouseLeave={() => setIsMarqueePaused(false)}>
+                <div style={{ display: "flex", gap: "16px", animation: "marquee 50s linear infinite", animationPlayState: isMarqueePaused ? "paused" : "running" }}>
+                  {[...announcements.slice(0, 10), ...announcements.slice(0, 10)].map((a, i) => (
+                    <div key={`${i}-${a._id}`} className="ann-card" onClick={() => { setSelectedAnnouncement(a); setShowAnnouncementModal(true); }}>
+                      <div style={{ fontSize: "11px", color: "#38bdf8", fontWeight: 700, marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.06em" }}>{a.businessName || "General"}</div>
+                      <div style={{ fontSize: "14px", fontWeight: 600, color: "#f1f5f9", marginBottom: "8px", lineHeight: "1.4" }}>{a.title}</div>
+                      <div style={{ fontSize: "11px", color: "#64748b" }}>
+                        {a.submitterName && `👤 ${a.submitterName}`}
+                        {a.organizationName && ` · ${a.organizationName}`}
+                      </div>
+                      <div style={{ fontSize: "11px", color: "#475569", marginTop: "6px" }}>{new Date(a.createdAt).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" })}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
+      </div>
 
-        {announcementSuccess && <div style={styles.announcementSuccess}>{announcementSuccess}</div>}
+      {/* ── FILTERS ── */}
+      <div style={{ background: "#080b13", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "20px 24px", position: "sticky", top: 0, zIndex: 100, backdropFilter: "blur(12px)" }}>
+        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+          {/* Search */}
+          <div style={{ position: "relative", marginBottom: "14px" }}>
+            <span style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", fontSize: "18px", color: "#475569" }}>🔍</span>
+            <input className="search-input" type="text" placeholder="Search businesses by name, category, or location…" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery("")} style={{ position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: "16px" }}>✕</button>
+            )}
+          </div>
 
-        {showAnnouncementForm && (
-          <form onSubmit={handleAddAnnouncement} style={styles.announcementForm}>
-            <h3 style={styles.formTitle}>Create Announcement</h3>
-            <input
-              type="text"
-              placeholder="Your Name"
-              value={submitterName}
-              onChange={(e) => setSubmitterName(e.target.value)}
-              style={styles.formInput}
-              required
-            />
-            <input
-              type="text"
-              placeholder="Organization/Company Name (Optional)"
-              value={organizationName}
-              onChange={(e) => setOrganizationName(e.target.value)}
-              style={styles.formInput}
-            />
-            <input
-              type="text"
-              placeholder="Announcement Title"
-              value={announcementTitle}
-              onChange={(e) => setAnnouncementTitle(e.target.value)}
-              style={styles.formInput}
-              required
-            />
-            <textarea
-              placeholder="Announcement Content"
-              value={announcementContent}
-              onChange={(e) => setAnnouncementContent(e.target.value)}
-              style={styles.formTextarea}
-              required
-              rows={4}
-            />
-            <button type="submit" style={styles.formSubmit}>
-              Submit for Approval
+          {/* Filter row */}
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
+            <select className="filter-select" value={selectedCategory || ""} onChange={e => setSelectedCategory(e.target.value || null)}>
+              <option value="">All Categories</option>
+              {BUSINESS_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <select className="filter-select" value={selectedCounty || ""} onChange={e => setSelectedCounty(e.target.value || null)}>
+              <option value="">All Counties</option>
+              {KENYA_COUNTIES.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <select className="filter-select" value={sortBy} onChange={e => setSortBy(e.target.value)}>
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="rating">Top Rated</option>
+              <option value="views">Most Viewed</option>
+              <option value="reviews">Most Reviews</option>
+              <option value="name">Name A–Z</option>
+            </select>
+            <button
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              style={{ padding: "10px 16px", background: showAdvancedFilters ? "rgba(56,189,248,0.15)" : "rgba(255,255,255,0.04)", border: `1px solid ${showAdvancedFilters ? "rgba(56,189,248,0.4)" : "rgba(255,255,255,0.1)"}`, borderRadius: "10px", color: showAdvancedFilters ? "#38bdf8" : "#94a3b8", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }}
+            >
+              ⚙ Filters {showAdvancedFilters ? "▲" : "▼"}
             </button>
-          </form>
+
+            {(selectedCategory || selectedCounty || searchQuery || openNow || minRating || verification) && (
+              <button onClick={() => { setSelectedCategory(null); setSelectedCounty(null); setSearchQuery(""); setOpenNow(false); setMinRating(""); setVerification(""); }}
+                style={{ padding: "10px 14px", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: "10px", color: "#f87171", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+                Clear All
+              </button>
+            )}
+          </div>
+
+          {/* Advanced */}
+          {showAdvancedFilters && (
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "12px", paddingTop: "12px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+              <select className="filter-select" value={minRating} onChange={e => setMinRating(e.target.value)}>
+                <option value="">Min Rating</option>
+                {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}+ Stars</option>)}
+              </select>
+              <select className="filter-select" value={verification} onChange={e => setVerification(e.target.value)}>
+                <option value="">Any Verification</option>
+                <option value="business_verified">Business Verified</option>
+                <option value="location_verified">Location Verified</option>
+                <option value="premium_verified">Premium</option>
+              </select>
+              <label style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 14px", background: openNow ? "rgba(16,185,129,0.1)" : "rgba(255,255,255,0.03)", border: `1px solid ${openNow ? "rgba(16,185,129,0.35)" : "rgba(255,255,255,0.08)"}`, borderRadius: "10px", color: openNow ? "#10b981" : "#94a3b8", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
+                <input type="checkbox" checked={openNow} onChange={e => setOpenNow(e.target.checked)} style={{ accentColor: "#10b981" }} />
+                Open Now
+              </label>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── MAIN CONTENT ── */}
+      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "36px 24px 80px" }}>
+
+        {/* Results header */}
+        {!loading && (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px", flexWrap: "wrap", gap: "12px" }}>
+            <div>
+              <div className="section-label" style={{ marginBottom: "4px" }}>Results</div>
+              <div className="section-title" style={{ fontSize: "22px" }}>
+                {businesses.length} {businesses.length === 1 ? "Business" : "Businesses"} Found
+              </div>
+            </div>
+            {comparisonList.length > 0 && (
+              <div style={{ fontSize: "13px", color: "#38bdf8", fontWeight: 600 }}>
+                {comparisonList.length}/3 selected for comparison
+              </div>
+            )}
+          </div>
         )}
 
-        {/* Announcements Section */}
-        <div style={styles.announcementsSection}>
-          <h3 style={styles.announcementsTitle}>📢 Latest Announcements</h3>
-          {announcements.length > 0 ? (
-            <div
-              style={styles.announcementsScroll}
-              onMouseEnter={() => setIsMarqueePaused(true)}
-              onMouseLeave={() => setIsMarqueePaused(false)}
-            >
+        {/* Grid */}
+        {loading ? (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "22px" }}>
+            {[...Array(6)].map((_, i) => <div key={i} className="shimmer-card" style={{ animationDelay: `${i * 0.1}s` }} />)}
+          </div>
+        ) : businesses.length === 0 ? (
+          <div className="no-results">
+            <div className="no-results-icon">🔭</div>
+            <p style={{ fontSize: "18px", fontWeight: 600, color: "#334155", marginBottom: "8px" }}>No businesses found</p>
+            <p style={{ color: "#475569" }}>Try adjusting your filters or search terms</p>
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "22px" }}>
+            {businesses.map((biz, idx) => (
               <div
-                style={{
-                  ...styles.announcementsTrack,
-                  animationPlayState: isMarqueePaused ? 'paused' : 'running',
-                }}
+                key={biz._id}
+                className="axx-card"
+                style={{ animationDelay: `${Math.min(idx * 0.06, 0.5)}s` }}
+                onClick={() => navigate(`/business/${biz._id}`)}
+                onMouseEnter={() => setHoveredCard(biz._id)}
+                onMouseLeave={() => setHoveredCard(null)}
               >
-                {[...announcements.slice(0, 10), ...announcements.slice(0, 10)].map((announcement, index) => (
-                  <div
-                    key={`${index}-${announcement._id}`}
-                    style={styles.announcementBox}
-                    onClick={() => {
-                      setSelectedAnnouncement(announcement);
-                      setShowAnnouncementModal(true);
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = "translateY(-5px)";
-                      e.currentTarget.style.boxShadow = "0 10px 30px rgba(251, 191, 36, 0.3)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = "translateY(0)";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  >
-                    <span style={styles.announcementBusiness}>{announcement.businessName}</span>
-                    <h4 style={styles.announcementBoxTitle}>{announcement.title}</h4>
-                    <span style={styles.announcementSubmitter}>
-                      👤 {announcement.submitterName || "Anonymous"}
-                      {announcement.organizationName && ` • 🏢 ${announcement.organizationName}`}
-                    </span>
-                    <span style={styles.announcementBoxDate}>
-                      {new Date(announcement.createdAt).toLocaleDateString()}
-                    </span>
+                {biz.featured && <div className="featured-tag">⭐ Featured</div>}
+
+                {/* Image */}
+                {biz.images?.length > 0 ? (
+                  <div className="card-img-wrap">
+                    <img src={biz.images[0]} alt={biz.name} />
+                    <div className="card-img-overlay" />
+                    {/* Rating over image */}
+                    {biz.rating > 0 && (
+                      <div style={{ position: "absolute", bottom: "12px", left: "14px", background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)", borderRadius: "8px", padding: "4px 10px", fontSize: "12px", fontWeight: 700, color: "#fbbf24", zIndex: 2 }}>
+                        ★ {biz.rating?.toFixed(1)} · {biz.reviewCount || 0} reviews
+                      </div>
+                    )}
                   </div>
-                ))}
+                ) : (
+                  <div style={{ height: "80px", background: "linear-gradient(135deg, rgba(56,189,248,0.06), rgba(16,185,129,0.04))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "32px" }}>🏪</div>
+                )}
+
+                {/* Body */}
+                <div style={{ padding: "18px 20px 20px" }}>
+                  {/* Title row */}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "6px" }}>
+                    <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#f1f5f9", lineHeight: 1.3, flex: 1, paddingRight: "8px" }}>{biz.name}</h3>
+                    <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
+                      <button className="icon-btn" onClick={e => toggleFavorite(biz._id, e)} title="Favourite">
+                        {isFavorite(biz._id) ? "❤️" : "🤍"}
+                      </button>
+                      <button className="icon-btn" onClick={e => toggleComparison(biz._id, e)} title="Compare" style={{ background: comparisonList.includes(biz._id) ? "rgba(56,189,248,0.15)" : undefined, borderColor: comparisonList.includes(biz._id) ? "rgba(56,189,248,0.4)" : undefined }}>
+                        {comparisonList.includes(biz._id) ? <span style={{ color: "#38bdf8", fontWeight: 700, fontSize: "13px" }}>✓</span> : "⚖"}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div style={{ fontSize: "12px", color: "#38bdf8", fontWeight: 600, marginBottom: "4px" }}>{biz.categories?.join(" · ")}</div>
+                  <div style={{ fontSize: "13px", color: "#64748b", marginBottom: "10px", display: "flex", alignItems: "center", gap: "4px" }}>
+                    <span>📍</span> {biz.location?.town}, {biz.location?.county}
+                  </div>
+
+                  <p style={{ fontSize: "13px", color: "#94a3b8", lineHeight: "1.55", marginBottom: "12px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                    {biz.description}
+                  </p>
+
+                  {/* Badges */}
+                  {biz.verificationBadges?.length > 0 && (
+                    <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "12px" }}>
+                      {biz.verificationBadges.map((badge, i) => {
+                        const cfg = BADGE_CONFIG[badge.type] || {};
+                        return (
+                          <span key={i} className="badge-pill" style={{ background: `${cfg.color}18`, color: cfg.color, border: `1px solid ${cfg.color}40` }}>
+                            {cfg.icon} {cfg.label || badge.type}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  <hr className="divider" />
+
+                  {/* Actions */}
+                  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: biz.socialMedia ? "10px" : "0" }}>
+                    {biz.contact?.phone && (
+                      <a href={`tel:${biz.contact.phone}`} className="action-btn action-btn-primary" onClick={e => e.stopPropagation()}>
+                        📞 Call
+                      </a>
+                    )}
+                    {biz.contact?.email && (
+                      <a href={`mailto:${biz.contact.email}`} className="action-btn action-btn-success" onClick={e => e.stopPropagation()}>
+                        ✉ Email
+                      </a>
+                    )}
+                    {biz.contact?.phone && (
+                      <a href={`https://wa.me/${biz.contact.phone}`} target="_blank" rel="noopener noreferrer" className="action-btn" style={{ background: "rgba(37,211,102,0.1)", color: "#25d366", border: "1px solid rgba(37,211,102,0.25)", display: "inline-flex", alignItems: "center", gap: "6px", padding: "8px 14px", borderRadius: "10px", fontSize: "13px", fontWeight: 600, textDecoration: "none" }} onClick={e => e.stopPropagation()}>
+                        💬 WhatsApp
+                      </a>
+                    )}
+                  </div>
+
+                  {/* Social icons */}
+                  {biz.socialMedia && (
+                    <div style={{ display: "flex", gap: "7px", flexWrap: "wrap" }}>
+                      {biz.socialMedia.facebook && <a href={biz.socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>f</a>}
+                      {biz.socialMedia.instagram && <a href={biz.socialMedia.instagram} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>📷</a>}
+                      {biz.socialMedia.twitter && <a href={biz.socialMedia.twitter} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>𝕏</a>}
+                      {biz.socialMedia.whatsapp && <a href={`https://wa.me/${biz.socialMedia.whatsapp}`} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>💬</a>}
+                      {biz.contact?.website && <a href={biz.contact.website} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>🔗</a>}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ) : (
-            <p style={{ color: "#94a3b8", fontSize: "14px" }}>No announcements yet. Create one on a business page!</p>
-          )}
-        </div>
-
-        <p style={styles.subtitle}>Discover and connect with trusted businesses across Kenya</p>
-
-        {comparisonList.length > 0 && (
-          <div style={styles.comparisonBar}>
-            <span style={styles.comparisonText}>{comparisonList.length} businesses selected for comparison</span>
-            <button
-              style={styles.compareButton}
-              onClick={openComparison}
-            >
-              Compare Now
-            </button>
-            <button
-              style={styles.clearButton}
-              onClick={() => setComparisonList([])}
-            >
-              Clear
-            </button>
+            ))}
           </div>
         )}
-
-        {/* Pricing Section - Dynamic Offers */}
-        <div style={styles.pricingSection}>
-          <div style={styles.pricingCard}>
-            <div style={styles.pricingPlaceholder}>Special offers coming soon</div>
-            <div style={styles.pricingSubtext}>Stay tuned for exclusive deals and promotions</div>
-          </div>
-        </div>
       </div>
 
-      {/* Search Bar */}
-      <div style={styles.searchSection}>
-        <div style={styles.searchInputWrapper}>
-          <span style={styles.searchIcon}>🔍</span>
-          <input
-            type="text"
-            style={styles.searchInput}
-            placeholder="Search businesses by name, category, or location..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          {searchQuery && (
-            <button style={styles.clearSearchBtn} onClick={() => setSearchQuery("")}>✕</button>
-          )}
-        </div>
-      </div>
-
-      <div style={styles.filters}>
-        <div style={styles.filterGroup}>
-          <label style={styles.filterLabel}>Category:</label>
-          <select
-            style={styles.filterSelect}
-            value={selectedCategory || ""}
-            onChange={(e) => setSelectedCategory(e.target.value || null)}
-          >
-            <option value="">All Categories</option>
-            {BUSINESS_CATEGORIES.map((category) => (
-              <option key={category} value={category}>{category}</option>
-            ))}
-          </select>
-        </div>
-        <div style={styles.filterGroup}>
-          <label style={styles.filterLabel}>County:</label>
-          <select
-            style={styles.filterSelect}
-            value={selectedCounty || ""}
-            onChange={(e) => setSelectedCounty(e.target.value || null)}
-          >
-            <option value="">All Counties</option>
-            {KENYA_COUNTIES.map((county) => (
-              <option key={county} value={county}>{county}</option>
-            ))}
-          </select>
-        </div>
-        <div style={styles.filterGroup}>
-          <label style={styles.filterLabel}>Sort By:</label>
-          <select
-            style={styles.filterSelect}
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-          >
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-            <option value="rating">Highest Rated</option>
-            <option value="views">Most Viewed</option>
-            <option value="reviews">Most Reviews</option>
-            <option value="name">Name A-Z</option>
-          </select>
-        </div>
-        <button
-          style={styles.filterButton}
-          onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-        >
-          {showAdvancedFilters ? "▼ Advanced Filters" : "▶ Advanced Filters"}
-        </button>
-      </div>
-
-      {showAdvancedFilters && (
-        <div style={{ ...styles.filters, background: "rgba(15, 23, 42, 0.5)", padding: "20px", borderRadius: "10px" }}>
-          <div style={styles.filterGroup}>
-            <label style={styles.filterLabel}>Min Rating:</label>
-            <select
-              style={styles.filterSelect}
-              value={minRating}
-              onChange={(e) => setMinRating(e.target.value)}
-            >
-              <option value="">Any</option>
-              <option value="1">1+ Stars</option>
-              <option value="2">2+ Stars</option>
-              <option value="3">3+ Stars</option>
-              <option value="4">4+ Stars</option>
-              <option value="5">5 Stars</option>
-            </select>
+      {/* ── COMPARISON FLOATING BAR ── */}
+      {comparisonList.length > 0 && (
+        <div className="comparison-bar">
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <span style={{ width: "32px", height: "32px", borderRadius: "50%", background: "rgba(56,189,248,0.15)", border: "1px solid rgba(56,189,248,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px", fontWeight: 800, color: "#38bdf8" }}>{comparisonList.length}</span>
+            <span style={{ color: "#cbd5e1", fontSize: "14px", fontWeight: 500 }}>businesses to compare</span>
           </div>
-          <div style={styles.filterGroup}>
-            <label style={styles.filterLabel}>Max Rating:</label>
-            <select
-              style={styles.filterSelect}
-              value={maxRating}
-              onChange={(e) => setMaxRating(e.target.value)}
-            >
-              <option value="">Any</option>
-              <option value="1">1 Star</option>
-              <option value="2">2 Stars</option>
-              <option value="3">3 Stars</option>
-              <option value="4">4 Stars</option>
-              <option value="5">5 Stars</option>
-            </select>
-          </div>
-          <div style={styles.filterGroup}>
-            <label style={styles.filterLabel}>Price Range:</label>
-            <select
-              style={styles.filterSelect}
-              value={priceRange}
-              onChange={(e) => setPriceRange(e.target.value)}
-            >
-              <option value="">Any</option>
-              <option value="$">$ (Budget)</option>
-              <option value="$$">$$ (Mid-range)</option>
-              <option value="$$$">$$$ (Premium)</option>
-              <option value="$$$$">$$$$ (Luxury)</option>
-            </select>
-          </div>
-          <div style={styles.filterGroup}>
-            <label style={styles.filterLabel}>Verification:</label>
-            <select
-              style={styles.filterSelect}
-              value={verification}
-              onChange={(e) => setVerification(e.target.value)}
-            >
-              <option value="">Any</option>
-              <option value="business_verified">Business Verified</option>
-              <option value="location_verified">Location Verified</option>
-              <option value="bronze">Bronze Tier</option>
-              <option value="silver">Silver Tier</option>
-              <option value="gold">Gold Tier</option>
-            </select>
-          </div>
-          <div style={styles.filterGroup}>
-            <label style={styles.filterLabel}>
-              <input
-                type="checkbox"
-                checked={openNow}
-                onChange={(e) => setOpenNow(e.target.checked)}
-                style={{ marginRight: "8px" }}
-              />
-              Open Now
-            </label>
-          </div>
+          <button className="cta-primary cta-btn" style={{ padding: "8px 18px", fontSize: "13px" }} onClick={openComparison}>Compare Now</button>
+          <button onClick={() => setComparisonList([])} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: "8px", color: "#f87171", fontSize: "13px", fontWeight: 600, padding: "8px 14px", cursor: "pointer", fontFamily: "inherit" }}>Clear</button>
         </div>
       )}
 
-      {loading ? (
-        <div style={styles.loading}>Loading businesses...</div>
-      ) : businesses.length === 0 ? (
-        <div style={styles.empty}>No businesses found</div>
-      ) : (
-        <div style={styles.grid}>
-          {businesses.map((business) => (
-            <div
-              key={business._id}
-              style={styles.card}
-              onClick={() => navigate(`/business/${business._id}`)}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-5px)";
-                e.currentTarget.style.boxShadow = "0 20px 40px rgba(0, 0, 0, 0.3)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "none";
-              }}
-            >
-              {business.featured && <div style={styles.featured}>⭐ Featured</div>}
-              {business.images && business.images.length > 0 && (
-                <img src={business.images[0]} alt={business.name} style={styles.image} />
-              )}
-              <div style={styles.cardContent}>
-                <div style={styles.cardHeader}>
-                  <h3 style={styles.cardTitle}>{business.name}</h3>
-                  <div style={styles.cardButtons}>
-                    <button
-                      style={styles.iconButton}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleFavorite(business._id);
-                      }}
-                    >
-                      {isFavorite(business._id) ? "❤️" : "🤍"}
-                    </button>
-                    <button
-                      style={styles.iconButton}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleComparison(business._id);
-                      }}
-                    >
-                      {comparisonList.includes(business._id) ? "✓" : "⚖️"}
-                    </button>
-                  </div>
-                </div>
-                <p style={styles.cardCategory}>{business.categories.join(", ")}</p>
-                <p style={styles.cardLocation}>
-                  📍 {business.location.town}, {business.location.county}
-                </p>
-                <p style={styles.cardDescription}>{business.description}</p>
-
-                {business.verificationBadges && business.verificationBadges.length > 0 && (
-                  <div style={styles.badges}>
-                    {business.verificationBadges.map((badge, index) => (
-                      <span key={index} style={{ ...styles.badge, ...getBadgeStyle(badge.type) }}>
-                        {getBadgeLabel(badge.type)}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                <div style={styles.cardActions}>
-                  {business.contact.phone && (
-                    <a
-                      href={`tel:${business.contact.phone}`}
-                      style={styles.contactButton}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      📞 Call
-                    </a>
-                  )}
-                  {business.contact.email && (
-                    <a
-                      href={`mailto:${business.contact.email}`}
-                      style={styles.contactButton}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      ✉️ Email
-                    </a>
-                  )}
-                </div>
-
-                {business.socialMedia && (
-                  <div style={styles.socialLinks}>
-                    {business.socialMedia.facebook && (
-                      <a
-                        href={business.socialMedia.facebook}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={styles.socialIcon}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = "#60a5fa";
-                          e.currentTarget.style.color = "#0f172a";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
-                          e.currentTarget.style.color = "#f1f5f9";
-                        }}
-                      >
-                        f
-                      </a>
-                    )}
-                    {business.socialMedia.instagram && (
-                      <a
-                        href={business.socialMedia.instagram}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={styles.socialIcon}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = "#60a5fa";
-                          e.currentTarget.style.color = "#0f172a";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
-                          e.currentTarget.style.color = "#f1f5f9";
-                        }}
-                      >
-                        📷
-                      </a>
-                    )}
-                    {business.socialMedia.whatsapp && (
-                      <a
-                        href={`https://wa.me/${business.socialMedia.whatsapp}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={styles.socialIcon}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = "#60a5fa";
-                          e.currentTarget.style.color = "#0f172a";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
-                          e.currentTarget.style.color = "#f1f5f9";
-                        }}
-                      >
-                        💬
-                      </a>
-                    )}
-                    {business.contact.website && (
-                      <a
-                        href={business.contact.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={styles.socialIcon}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = "#60a5fa";
-                          e.currentTarget.style.color = "#0f172a";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
-                          e.currentTarget.style.color = "#f1f5f9";
-                        }}
-                      >
-                        🔗
-                      </a>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Announcement Modal */}
+      {/* ── ANNOUNCEMENT MODAL ── */}
       {showAnnouncementModal && selectedAnnouncement && (
-        <div style={styles.modalOverlay} onClick={() => setShowAnnouncementModal(false)}>
-          <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <button
-              style={styles.modalClose}
-              onClick={() => setShowAnnouncementModal(false)}
-            >
-              ✕
-            </button>
-            <h3 style={styles.modalTitle}>{selectedAnnouncement.title}</h3>
-            <p style={styles.modalBusiness}>📢 {selectedAnnouncement.businessName}</p>
-            <p style={styles.modalDate}>📅 {new Date(selectedAnnouncement.createdAt).toLocaleDateString()}</p>
-            <p style={styles.modalContentText}>{selectedAnnouncement.content}</p>
+        <div className="modal-overlay" onClick={() => setShowAnnouncementModal(false)}>
+          <div className="modal-box" style={{ maxWidth: "560px", width: "90%" }} onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowAnnouncementModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+            <div style={{ fontSize: "11px", fontWeight: 700, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>📢 {selectedAnnouncement.businessName || "Announcement"}</div>
+            <h3 style={{ fontSize: "24px", fontWeight: 800, color: "#f1f5f9", marginBottom: "12px", lineHeight: "1.3" }}>{selectedAnnouncement.title}</h3>
+            <div style={{ fontSize: "13px", color: "#64748b", marginBottom: "20px" }}>
+              {selectedAnnouncement.submitterName && `👤 ${selectedAnnouncement.submitterName}`}
+              {selectedAnnouncement.organizationName && ` · 🏢 ${selectedAnnouncement.organizationName}`}
+              <span style={{ marginLeft: "10px" }}>📅 {new Date(selectedAnnouncement.createdAt).toLocaleDateString("en-KE", { weekday: "short", day: "numeric", month: "long", year: "numeric" })}</span>
+            </div>
+            <hr className="divider" />
+            <p style={{ fontSize: "15px", color: "#cbd5e1", lineHeight: "1.75", marginTop: "16px" }}>{selectedAnnouncement.content}</p>
           </div>
         </div>
       )}
 
+      {/* ── COMPARISON MODAL ── */}
       {showComparisonModal && (
-        <div style={styles.modalOverlay} onClick={() => setShowComparisonModal(false)}>
-          <div style={{ ...styles.modalContent, maxWidth: "900px", maxHeight: "80vh", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>
-            <button
-              style={styles.modalClose}
-              onClick={() => setShowComparisonModal(false)}
-            >
-              ✕
-            </button>
-            <h3 style={styles.modalTitle}>Business Comparison</h3>
-            <div style={styles.comparisonTable}>
-              {comparisonData.map((business) => (
-                <div key={business._id} style={styles.comparisonColumn}>
-                  <h4 style={styles.comparisonBusinessName}>{business.name}</h4>
-                  <p style={styles.comparisonItem}><strong>Category:</strong> {business.categories.join(", ")}</p>
-                  <p style={styles.comparisonItem}><strong>Location:</strong> {business.location.town}, {business.location.county}</p>
-                  <p style={styles.comparisonItem}><strong>Rating:</strong> {business.rating || "N/A"} ⭐</p>
-                  <p style={styles.comparisonItem}><strong>Reviews:</strong> {business.reviewCount || 0}</p>
-                  <p style={styles.comparisonItem}><strong>Price Range:</strong> {business.priceRange || "N/A"}</p>
-                  <p style={styles.comparisonItem}><strong>Employees:</strong> {business.employeeCount || "N/A"}</p>
-                  <p style={styles.comparisonItem}><strong>Year Established:</strong> {business.yearEstablished || "N/A"}</p>
-                  <p style={styles.comparisonItem}><strong>Phone:</strong> {business.contact.phone || "N/A"}</p>
-                  <p style={styles.comparisonItem}><strong>Email:</strong> {business.contact.email || "N/A"}</p>
-                  <p style={styles.comparisonItem}><strong>Website:</strong> {business.contact.website || "N/A"}</p>
+        <div className="modal-overlay" onClick={() => setShowComparisonModal(false)}>
+          <div className="modal-box" style={{ maxWidth: "860px", width: "95%" }} onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowComparisonModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+            <div className="section-label" style={{ marginBottom: "6px" }}>Side by Side</div>
+            <h3 style={{ fontSize: "22px", fontWeight: 800, color: "#f1f5f9", marginBottom: "24px" }}>Business Comparison</h3>
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(${comparisonData.length}, 1fr)`, gap: "16px" }}>
+              {comparisonData.map(biz => (
+                <div key={biz._id} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(56,189,248,0.12)", borderRadius: "14px", padding: "20px" }}>
+                  <div style={{ fontSize: "16px", fontWeight: 800, color: "#38bdf8", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>{biz.name}</div>
+                  {[
+                    ["Category", biz.categories?.join(", ")],
+                    ["Location", `${biz.location?.town}, ${biz.location?.county}`],
+                    ["Rating", biz.rating ? `★ ${biz.rating}` : "N/A"],
+                    ["Reviews", biz.reviewCount || 0],
+                    ["Price Range", biz.priceRange || "N/A"],
+                    ["Est.", biz.yearEstablished || "N/A"],
+                    ["Phone", biz.contact?.phone || "N/A"],
+                    ["Email", biz.contact?.email || "N/A"],
+                  ].map(([label, val]) => (
+                    <div key={label} style={{ marginBottom: "10px" }}>
+                      <div style={{ fontSize: "11px", color: "#475569", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: "2px" }}>{label}</div>
+                      <div style={{ fontSize: "13px", color: "#cbd5e1" }}>{val}</div>
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
@@ -1325,24 +774,34 @@ export default function AxxBiashara() {
         </div>
       )}
 
-      {/* Footer with Email Contacts */}
-      <div style={styles.footer}>
-        <div style={styles.footerInner}>
-          <div style={styles.footerSection}>
-            <strong style={{ color: "#60a5fa", fontSize: "18px" }}>AxxBiashara</strong>
-            <p style={styles.footerTagline}>Kenya's premier business directory</p>
+      {/* ── FOOTER ── */}
+      <footer style={{ background: "#06070d", borderTop: "1px solid rgba(255,255,255,0.06)", padding: "48px 24px 28px" }}>
+        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "32px", marginBottom: "36px" }}>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
+                <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "linear-gradient(135deg,#0ea5e9,#38bdf8)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px" }}>🏪</div>
+                <span style={{ fontSize: "18px", fontWeight: 800, color: "#f1f5f9" }}>AxxBiashara</span>
+              </div>
+              <p style={{ fontSize: "13px", color: "#475569", lineHeight: "1.6" }}>Kenya's premier verified business directory.</p>
+            </div>
+            <div>
+              <div style={{ fontSize: "12px", fontWeight: 700, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "14px" }}>Support</div>
+              {["info@axxspace.com", "support@axxspace.com", "admin@axxspace.com"].map(e => (
+                <a key={e} href={`mailto:${e}`} style={{ display: "block", fontSize: "13px", color: "#64748b", marginBottom: "8px", textDecoration: "none", transition: "color 0.2s" }}
+                  onMouseEnter={ev => ev.target.style.color = "#38bdf8"}
+                  onMouseLeave={ev => ev.target.style.color = "#64748b"}>
+                  📧 {e}
+                </a>
+              ))}
+            </div>
           </div>
-          <div style={styles.footerSection}>
-            <h4 style={styles.footerTitle}>Contact Support</h4>
-            <p style={styles.footerLink}>📧 info@axxspace.com</p>
-            <p style={styles.footerLink}>📧 support@axxspace.com</p>
-            <p style={styles.footerLink}>📧 admin@axxspace.com</p>
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "20px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+            <p style={{ fontSize: "12px", color: "#334155" }}>© 2026 Axxspace. All rights reserved.</p>
+            <p style={{ fontSize: "12px", color: "#1e3a5f" }}>Built for Kenya 🇰🇪</p>
           </div>
         </div>
-        <div style={styles.footerBottom}>
-          <p style={styles.footerCopy}>© 2026 Axxspace. All rights reserved.</p>
-        </div>
-      </div>
+      </footer>
     </div>
   );
 }
