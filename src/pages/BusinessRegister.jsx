@@ -118,6 +118,7 @@ export default function BusinessRegister() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
   });
@@ -152,6 +153,7 @@ export default function BusinessRegister() {
       const res = await API.post("/auth/register", {
         name: formData.name,
         email: formData.email,
+        phone: formData.phone,
         password: formData.password,
       });
 
@@ -198,6 +200,17 @@ export default function BusinessRegister() {
             value={formData.email}
             onChange={handleChange}
             placeholder="your@email.com"
+            required
+          />
+
+          <label style={styles.label}>Phone Number</label>
+          <input
+            type="tel"
+            name="phone"
+            style={styles.input}
+            value={formData.phone}
+            onChange={handleChange}
+            placeholder="+254 7XX XXX XXX"
             required
           />
 
