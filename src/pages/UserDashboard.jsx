@@ -158,7 +158,7 @@ export default function UserDashboard() {
 
   useEffect(() => {
     if (!token) {
-      navigate("/login");
+      navigate("/business-login");
       return;
     }
     loadBusinesses();

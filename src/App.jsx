@@ -41,6 +41,8 @@ import AxxBiashara from "./pages/AxxBiashara";
 import BusinessForm from "./pages/BusinessForm";
 import BusinessDetail from "./pages/BusinessDetail";
 import UserDashboard from "./pages/UserDashboard";
+import BusinessLogin from "./pages/BusinessLogin";
+import BusinessRegister from "./pages/BusinessRegister";
 
 import "leaflet/dist/leaflet.css";
 
@@ -64,10 +66,15 @@ function DashboardLayout({ children }) {
 
 // ─── Route guard ────────────────────────────────────────────────────────────
 
-const ProtectedRoute = ({ children, allowedRoles = [] }) => {
+const ProtectedRoute = ({ children, allowedRoles = [], businessRoute = false }) => {
   const { token, user } = useContext(AuthContext);
 
-  if (!token) return <Navigate to="/login" replace />;
+  if (!token) {
+    if (businessRoute) {
+      return <Navigate to="/business-login" replace />;
+    }
+    return <Navigate to="/login" replace />;
+  }
 
   if (allowedRoles.length > 0 && user?.role && !allowedRoles.includes(user.role)) {
     return <Navigate to="/" replace />;
@@ -129,11 +136,13 @@ function App() {
 
       {/* ── AXXBIASHARA BUSINESS DIRECTORY ROUTES (have Navbar) ── */}
       <Route path="/axxbiashara" element={<PublicLayout><AxxBiashara /></PublicLayout>} />
+      <Route path="/business-login" element={<PublicLayout><BusinessLogin /></PublicLayout>} />
+      <Route path="/business-register" element={<PublicLayout><BusinessRegister /></PublicLayout>} />
       <Route
         path="/business/create"
         element={
           <PublicLayout>
-            <ProtectedRoute><BusinessForm /></ProtectedRoute>
+            <ProtectedRoute businessRoute><BusinessForm /></ProtectedRoute>
           </PublicLayout>
         }
       />
@@ -141,7 +150,7 @@ function App() {
         path="/business/edit/:id"
         element={
           <DashboardLayout>
-            <ProtectedRoute>
+            <ProtectedRoute businessRoute>
               <BusinessForm />
             </ProtectedRoute>
           </DashboardLayout>
@@ -152,7 +161,7 @@ function App() {
         path="/business-dashboard"
         element={
           <DashboardLayout>
-            <ProtectedRoute>
+            <ProtectedRoute businessRoute>
               <UserDashboard />
             </ProtectedRoute>
           </DashboardLayout>
