@@ -292,6 +292,8 @@ export default function BusinessForm() {
     pricelist: { url: "", name: "" },
   });
 
+  const [productImageFile, setProductImageFile] = useState(null);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -938,6 +940,11 @@ export default function BusinessForm() {
             accept="image/*"
             id="productImage"
             disabled={uploading.product}
+            onChange={(e) => {
+              const file = e.target.files[0];
+              console.log("Product image file selected:", file);
+              setProductImageFile(file);
+            }}
           />
           {uploading.product && <p style={{ fontSize: "12px", color: "#fbbf24" }}>Uploading product image...</p>}
           <button
@@ -948,20 +955,19 @@ export default function BusinessForm() {
               const description = document.getElementById("productDescription").value;
               const price = parseFloat(document.getElementById("productPrice").value);
               const category = document.getElementById("productCategory").value;
-              const imageFile = document.getElementById("productImage").files[0];
 
               console.log("=== ADD PRODUCT CLICKED ===");
               console.log("Product name:", name);
               console.log("Product description:", description);
               console.log("Product price:", price);
               console.log("Product category:", category);
-              console.log("Image file:", imageFile);
+              console.log("Product image file from state:", productImageFile);
               console.log("Current products:", formData.products);
 
               if (name) {
                 let imageUrl = "";
-                if (imageFile) {
-                  imageUrl = await handleProductImageUpload({ target: { files: [imageFile] } });
+                if (productImageFile) {
+                  imageUrl = await handleProductImageUpload({ target: { files: [productImageFile] } });
                   console.log("Image URL after upload:", imageUrl);
                 }
 
@@ -978,6 +984,7 @@ export default function BusinessForm() {
                 document.getElementById("productPrice").value = "";
                 document.getElementById("productCategory").value = "";
                 document.getElementById("productImage").value = "";
+                setProductImageFile(null);
               }
             }}
           >
