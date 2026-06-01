@@ -186,7 +186,7 @@ export default function UserDashboard() {
   };
 
   const handleEditBusiness = (businessId) => {
-    navigate(`/business-form/${businessId}`);
+    navigate(`/business/edit/${businessId}`);
   };
 
   const handleDeleteBusiness = async (businessId) => {
@@ -294,8 +294,11 @@ export default function UserDashboard() {
                     <div style={{ fontSize: "14px", color: "#94a3b8", marginBottom: "10px" }}>
                       📍 {business.location?.town}, {business.location?.county}
                     </div>
-                    <div style={{ fontSize: "14px", color: "#94a3b8" }}>
+                    <div style={{ fontSize: "14px", color: "#94a3b8", marginBottom: "10px" }}>
                       📂 {business.categories?.join(", ")}
+                    </div>
+                    <div style={{ fontSize: "14px", color: "#94a3b8" }}>
+                      📷 {business.images?.length || 0} photo(s)
                     </div>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>

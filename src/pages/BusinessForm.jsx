@@ -429,6 +429,12 @@ export default function BusinessForm() {
     setError("");
     setSuccess("");
 
+    console.log("=== BUSINESS SUBMISSION ===");
+    console.log("Form data images:", formData.images);
+    console.log("Form data images length:", formData.images?.length);
+    console.log("Business photos state:", businessPhotos);
+    console.log("Business photos state length:", businessPhotos?.length);
+
     try {
       if (isEditing) {
         await API.put(`/business/${id}`, formData);
