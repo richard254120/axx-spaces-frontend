@@ -829,6 +829,5 @@ export default function BusinessDetail() {
         )}
       </div>
     </div>
-    </div >
   );
 }

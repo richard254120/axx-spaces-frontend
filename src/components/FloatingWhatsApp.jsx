@@ -8,52 +8,50 @@ export default function FloatingWhatsApp() {
     const message = "Hello Axxspace! 👋 I need help finding a property.";
     const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 
-    // Always clean up first to handle StrictMode double-fire
     const existing = document.getElementById("wa-float-root");
     const existingStyle = document.getElementById("wa-float-style");
     if (existing) existing.remove();
     if (existingStyle) existingStyle.remove();
 
-    // STYLE
     const style = document.createElement("style");
     style.id = "wa-float-style";
     style.innerHTML = `
       #wa-float-root {
         position: fixed !important;
-        bottom: 28px !important;
-        right: 20px !important;
+        bottom: 16px !important;
+        right: 14px !important;
         z-index: 2147483647 !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
-        gap: 8px !important;
+        gap: 4px !important;
       }
       #wa-float-label {
         background: #111827;
         color: #ffffff;
-        padding: 5px 13px;
-        border-radius: 16px;
-        font-size: 12px;
+        padding: 2px 7px;
+        border-radius: 10px;
+        font-size: 9px;
         font-weight: 700;
         font-family: sans-serif;
         white-space: nowrap;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.4);
         pointer-events: none;
       }
       #wa-float-btn {
-        width: 64px !important;
-        height: 64px !important;
-        min-width: 64px !important;
-        min-height: 64px !important;
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px !important;
+        min-height: 32px !important;
         border-radius: 50% !important;
         background-color: #25D366 !important;
-        border: 3px solid #ffffff !important;
+        border: 2px solid #ffffff !important;
         cursor: pointer !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         text-decoration: none !important;
-        box-shadow: 0 4px 20px rgba(37,211,102,0.7) !important;
+        box-shadow: 0 2px 8px rgba(37,211,102,0.6) !important;
         animation: wa-ring 2s ease-in-out infinite !important;
       }
       #wa-float-btn:hover {
@@ -62,26 +60,23 @@ export default function FloatingWhatsApp() {
       }
       #wa-float-btn svg {
         display: block !important;
-        width: 32px !important;
-        height: 32px !important;
+        width: 15px !important;
+        height: 15px !important;
       }
       @keyframes wa-ring {
-        0%   { box-shadow: 0 0 0 0px rgba(37,211,102,0.6), 0 4px 20px rgba(37,211,102,0.5); }
-        70%  { box-shadow: 0 0 0 16px rgba(37,211,102,0), 0 4px 20px rgba(37,211,102,0.5); }
-        100% { box-shadow: 0 0 0 0px rgba(37,211,102,0), 0 4px 20px rgba(37,211,102,0.5); }
+        0%   { box-shadow: 0 0 0 0px rgba(37,211,102,0.6), 0 2px 8px rgba(37,211,102,0.5); }
+        70%  { box-shadow: 0 0 0 7px rgba(37,211,102,0), 0 2px 8px rgba(37,211,102,0.5); }
+        100% { box-shadow: 0 0 0 0px rgba(37,211,102,0), 0 2px 8px rgba(37,211,102,0.5); }
       }
     `;
 
-    // CONTAINER
     const root = document.createElement("div");
     root.id = "wa-float-root";
 
-    // LABEL
     const label = document.createElement("div");
     label.id = "wa-float-label";
     label.textContent = "Chat with us";
 
-    // BUTTON — use <a> tag for maximum compatibility
     const btn = document.createElement("a");
     btn.id = "wa-float-btn";
     btn.href = waUrl;
