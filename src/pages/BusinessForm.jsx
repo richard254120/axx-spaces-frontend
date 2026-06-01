@@ -926,10 +926,10 @@ export default function BusinessForm() {
                   imageUrl = await handleProductImageUpload({ target: { files: [imageFile] } });
                 }
 
-                setFormData({
-                  ...formData,
-                  products: [...formData.products, { name, description, price, category, imageUrl }],
-                });
+                setFormData((prev) => ({
+                  ...prev,
+                  products: [...prev.products, { name, description, price, category, imageUrl }],
+                }));
                 document.getElementById("productName").value = "";
                 document.getElementById("productDescription").value = "";
                 document.getElementById("productPrice").value = "";
