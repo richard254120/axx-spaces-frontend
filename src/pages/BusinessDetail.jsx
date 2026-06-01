@@ -740,9 +740,7 @@ export default function BusinessDetail() {
               </div>
             </div>
           )}
-        </div>
 
-        <div>
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>Business Stats</h2>
             <div style={styles.statsGrid}>
@@ -791,45 +789,46 @@ export default function BusinessDetail() {
               </div>
             </div>
           )}
-
-          {user?.role === "admin" && (
-            <div style={styles.section}>
-              <h2 style={styles.sectionTitle}>Admin Actions</h2>
-              <button
-                onClick={() => setShowAnnouncementForm(!showAnnouncementForm)}
-                style={styles.adminButton}
-              >
-                {showAnnouncementForm ? "Cancel" : "+ Add Announcement"}
-              </button>
-              {showAnnouncementForm && (
-                <form onSubmit={handleAddAnnouncement} style={styles.announcementForm}>
-                  <input
-                    type="text"
-                    placeholder="Announcement Title"
-                    value={announcementTitle}
-                    onChange={(e) => setAnnouncementTitle(e.target.value)}
-                    style={styles.announcementInput}
-                    required
-                  />
-                  <textarea
-                    placeholder="Announcement Content"
-                    value={announcementContent}
-                    onChange={(e) => setAnnouncementContent(e.target.value)}
-                    style={styles.announcementTextarea}
-                    required
-                  />
-                  <button type="submit" style={styles.submitButton}>
-                    Submit Announcement
-                  </button>
-                </form>
-              )}
-              {announcementSuccess && (
-                <div style={styles.successMessage}>{announcementSuccess}</div>
-              )}
-            </div>
-          )}
         </div>
+
+        {user?.role === "admin" && (
+          <div style={styles.section}>
+            <h2 style={styles.sectionTitle}>Admin Actions</h2>
+            <button
+              onClick={() => setShowAnnouncementForm(!showAnnouncementForm)}
+              style={styles.adminButton}
+            >
+              {showAnnouncementForm ? "Cancel" : "+ Add Announcement"}
+            </button>
+            {showAnnouncementForm && (
+              <form onSubmit={handleAddAnnouncement} style={styles.announcementForm}>
+                <input
+                  type="text"
+                  placeholder="Announcement Title"
+                  value={announcementTitle}
+                  onChange={(e) => setAnnouncementTitle(e.target.value)}
+                  style={styles.announcementInput}
+                  required
+                />
+                <textarea
+                  placeholder="Announcement Content"
+                  value={announcementContent}
+                  onChange={(e) => setAnnouncementContent(e.target.value)}
+                  style={styles.announcementTextarea}
+                  required
+                />
+                <button type="submit" style={styles.submitButton}>
+                  Submit Announcement
+                </button>
+              </form>
+            )}
+            {announcementSuccess && (
+              <div style={styles.successMessage}>{announcementSuccess}</div>
+            )}
+          </div>
+        )}
       </div>
     </div>
+    </div >
   );
 }
