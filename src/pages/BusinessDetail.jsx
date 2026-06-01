@@ -112,8 +112,8 @@ const styles = {
   content: {
     maxWidth: "1200px",
     margin: "0 auto",
-    display: "grid",
-    gridTemplateColumns: "2fr 1fr",
+    display: "flex",
+    flexDirection: "column",
     gap: "30px",
   },
   section: {
