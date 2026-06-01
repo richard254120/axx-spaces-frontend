@@ -109,9 +109,9 @@ function App() {
 
       {/* ── TOURISM ROUTES (have Navbar) ── */}
       {/* IMPORTANT: specific /tourism/* paths must come before /tourism/:id */}
-      <Route path="/tourism" element={<PublicLayout><TourismPage /></PublicLayout>} />
-      <Route path="/tourism/listings" element={<PublicLayout><TourismListingsPage /></PublicLayout>} />
-      <Route path="/tourism/register-property" element={<PublicLayout><RegisterPropertyPage /></PublicLayout>} />
+      <Route path="/tourism" element={<DashboardLayout><TourismPage /></DashboardLayout>} />
+      <Route path="/tourism/listings" element={<DashboardLayout><TourismListingsPage /></DashboardLayout>} />
+      <Route path="/tourism/register-property" element={<DashboardLayout><RegisterPropertyPage /></DashboardLayout>} />
       <Route
         path="/tourism/dashboard"
         element={
@@ -132,10 +132,10 @@ function App() {
           </DashboardLayout>
         }
       />
-      <Route path="/tourism/:id" element={<PublicLayout><TourismDetailPage /></PublicLayout>} />
+      <Route path="/tourism/:id" element={<DashboardLayout><TourismDetailPage /></DashboardLayout>} />
 
       {/* ── AXXBIASHARA BUSINESS DIRECTORY ROUTES (have Navbar) ── */}
-      <Route path="/axxbiashara" element={<PublicLayout><AxxBiashara /></PublicLayout>} />
+      <Route path="/axxbiashara" element={<DashboardLayout><AxxBiashara /></DashboardLayout>} />
       <Route path="/business-login" element={<DashboardLayout><BusinessLogin /></DashboardLayout>} />
       <Route path="/business-register" element={<DashboardLayout><BusinessRegister /></DashboardLayout>} />
       <Route
@@ -156,7 +156,7 @@ function App() {
           </DashboardLayout>
         }
       />
-      <Route path="/business/:id" element={<PublicLayout><BusinessDetail /></PublicLayout>} />
+      <Route path="/business/:id" element={<DashboardLayout><BusinessDetail /></DashboardLayout>} />
       <Route
         path="/business-dashboard"
         element={
@@ -198,34 +198,34 @@ function App() {
       <Route
         path="/upload"
         element={
-          <PublicLayout>
+          <DashboardLayout>
             <ProtectedRoute><Upload /></ProtectedRoute>
-          </PublicLayout>
+          </DashboardLayout>
         }
       />
       <Route
         path="/premium-plans"
         element={
-          <PublicLayout>
+          <DashboardLayout>
             <ProtectedRoute><PremiumPlans /></ProtectedRoute>
-          </PublicLayout>
+          </DashboardLayout>
         }
       />
       <Route
         path="/checkout"
         element={
-          <PublicLayout>
+          <DashboardLayout>
             <ProtectedRoute><Checkout /></ProtectedRoute>
-          </PublicLayout>
+          </DashboardLayout>
         }
       />
-      <Route path="/leave-review" element={<PublicLayout><LeaveReview /></PublicLayout>} />
+      <Route path="/leave-review" element={<DashboardLayout><LeaveReview /></DashboardLayout>} />
 
       {/* ── 404 ── */}
       <Route
         path="*"
         element={
-          <PublicLayout>
+          <DashboardLayout>
             <div style={{
               minHeight: "80vh", display: "flex", flexDirection: "column",
               alignItems: "center", justifyContent: "center",
@@ -245,7 +245,7 @@ function App() {
                 Go Home
               </button>
             </div>
-          </PublicLayout>
+          </DashboardLayout>
         }
       />
     </Routes>
