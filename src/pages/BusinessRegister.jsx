@@ -157,13 +157,11 @@ export default function BusinessRegister() {
         password: formData.password,
       });
 
-      const { token, user } = res.data;
-      login(token, user);
-      setSuccess("✅ Registration successful! Redirecting to your dashboard...");
+      setSuccess("✅ Registration successful! Please check your email to verify your account, then login.");
 
       setTimeout(() => {
-        navigate("/business-dashboard");
-      }, 1500);
+        navigate("/business-login");
+      }, 3000);
     } catch (err) {
       setError(err.response?.data?.error || "Registration failed. Please try again.");
     } finally {
