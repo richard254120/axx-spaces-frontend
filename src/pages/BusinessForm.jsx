@@ -388,6 +388,11 @@ export default function BusinessForm() {
 
   const handleBusinessPhotosUpload = async (e) => {
     const files = Array.from(e.target.files);
+    console.log("=== BUSINESS PHOTOS UPLOAD START ===");
+    console.log("Files selected:", files);
+    console.log("Files length:", files.length);
+    console.log("Current businessPhotos length:", businessPhotos.length);
+
     if (!files || files.length === 0) return;
 
     if (businessPhotos.length + files.length > 18) {
@@ -400,15 +405,32 @@ export default function BusinessForm() {
     files.forEach((file) => formData.append("photos", file));
 
     try {
+      console.log("Sending upload request to /uploads/business-photos");
       const res = await API.post("/uploads/business-photos", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      setBusinessPhotos((prev) => [...prev, ...res.data.urls]);
-      setFormData((prev) => ({
-        ...prev,
-        images: [...(prev.images || []), ...res.data.urls],
-      }));
+      console.log("Upload response:", res.data);
+      console.log("Upload response URLs:", res.data.urls);
+      console.log("Upload response URLs length:", res.data.urls?.length);
+
+      setBusinessPhotos((prev) => {
+        const newPhotos = [...prev, ...res.data.urls];
+        console.log("New businessPhotos state:", newPhotos);
+        console.log("New businessPhotos length:", newPhotos.length);
+        return newPhotos;
+      });
+      setFormData((prev) => {
+        const newImages = [...(prev.images || []), ...res.data.urls];
+        console.log("New formData.images state:", newImages);
+        console.log("New formData.images length:", newImages.length);
+        return {
+          ...prev,
+          images: newImages,
+        };
+      });
     } catch (err) {
+      console.error("Photo upload error:", err);
+      console.error("Error response:", err.response);
       setError("Failed to upload photos");
     } finally {
       setUploading((prev) => ({ ...prev, photos: false }));
