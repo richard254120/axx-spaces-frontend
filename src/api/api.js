@@ -7,9 +7,13 @@ const API = axios.create({
   timeout: 30000, // Add timeout to prevent hanging
 });
 
-// Add request interceptor for debugging
+// Add request interceptor for debugging and auth token
 API.interceptors.request.use(
   (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`, config.data);
     return config;
   },
