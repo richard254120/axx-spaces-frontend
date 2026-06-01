@@ -203,7 +203,7 @@ export default function UserDashboard() {
   };
 
   const handleCreateBusiness = () => {
-    navigate("/business-form");
+    navigate("/business/create");
   };
 
   const getStatusStyle = (status) => {
