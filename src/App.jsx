@@ -93,19 +93,19 @@ function App() {
     <Routes>
 
       {/* ── PUBLIC ROUTES (have Navbar) ── */}
-      <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
-      <Route path="/listings" element={<PublicLayout><Listings /></PublicLayout>} />
-      <Route path="/movers" element={<PublicLayout><Movers /></PublicLayout>} />
-      <Route path="/login" element={<PublicLayout><Login /></PublicLayout>} />
-      <Route path="/register" element={<PublicLayout><Register /></PublicLayout>} />
-      <Route path="/about" element={<PublicLayout><AboutUs /></PublicLayout>} />
-      <Route path="/reset-password/:token" element={<PublicLayout><ResetPassword /></PublicLayout>} />
-      <Route path="/verify-email/:token" element={<PublicLayout><VerifyEmail /></PublicLayout>} />
-      <Route path="/seller-login" element={<PublicLayout><SellerLogin /></PublicLayout>} />
-      <Route path="/materials" element={<PublicLayout><Materials /></PublicLayout>} />
-      <Route path="/faq" element={<PublicLayout><FAQ /></PublicLayout>} />
-      <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
-      <Route path="/terms" element={<PublicLayout><TermsAndPrivacy /></PublicLayout>} />
+      <Route path="/" element={<DashboardLayout><Home /></DashboardLayout>} />
+      <Route path="/listings" element={<DashboardLayout><Listings /></DashboardLayout>} />
+      <Route path="/movers" element={<DashboardLayout><Movers /></DashboardLayout>} />
+      <Route path="/login" element={<DashboardLayout><Login /></DashboardLayout>} />
+      <Route path="/register" element={<DashboardLayout><Register /></DashboardLayout>} />
+      <Route path="/about" element={<DashboardLayout><AboutUs /></DashboardLayout>} />
+      <Route path="/reset-password/:token" element={<DashboardLayout><ResetPassword /></DashboardLayout>} />
+      <Route path="/verify-email/:token" element={<DashboardLayout><VerifyEmail /></DashboardLayout>} />
+      <Route path="/seller-login" element={<DashboardLayout><SellerLogin /></DashboardLayout>} />
+      <Route path="/materials" element={<DashboardLayout><Materials /></DashboardLayout>} />
+      <Route path="/faq" element={<DashboardLayout><FAQ /></DashboardLayout>} />
+      <Route path="/contact" element={<DashboardLayout><Contact /></DashboardLayout>} />
+      <Route path="/terms" element={<DashboardLayout><TermsAndPrivacy /></DashboardLayout>} />
 
       {/* ── TOURISM ROUTES (have Navbar) ── */}
       {/* IMPORTANT: specific /tourism/* paths must come before /tourism/:id */}
@@ -136,14 +136,14 @@ function App() {
 
       {/* ── AXXBIASHARA BUSINESS DIRECTORY ROUTES (have Navbar) ── */}
       <Route path="/axxbiashara" element={<PublicLayout><AxxBiashara /></PublicLayout>} />
-      <Route path="/business-login" element={<PublicLayout><BusinessLogin /></PublicLayout>} />
-      <Route path="/business-register" element={<PublicLayout><BusinessRegister /></PublicLayout>} />
+      <Route path="/business-login" element={<DashboardLayout><BusinessLogin /></DashboardLayout>} />
+      <Route path="/business-register" element={<DashboardLayout><BusinessRegister /></DashboardLayout>} />
       <Route
         path="/business/create"
         element={
-          <PublicLayout>
+          <DashboardLayout>
             <ProtectedRoute businessRoute><BusinessForm /></ProtectedRoute>
-          </PublicLayout>
+          </DashboardLayout>
         }
       />
       <Route
