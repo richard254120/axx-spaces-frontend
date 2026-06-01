@@ -103,6 +103,9 @@ export default function Navbar() {
               <Link to="/upload" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
                 <span style={styles.dropdownIcon}>📤</span> Upload Property
               </Link>
+              <Link to="/business-dashboard" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+                <span style={styles.dropdownIcon}>🏪</span> Business Dashboard
+              </Link>
               <Link to="/dashboard" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
                 <span style={styles.dropdownIcon}>📊</span> Dashboard
               </Link>

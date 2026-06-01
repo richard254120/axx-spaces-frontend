@@ -40,6 +40,7 @@ import EditPropertyPage from "./pages/tourism/EditPropertyPage";
 import AxxBiashara from "./pages/AxxBiashara";
 import BusinessForm from "./pages/BusinessForm";
 import BusinessDetail from "./pages/BusinessDetail";
+import UserDashboard from "./pages/UserDashboard";
 
 import "leaflet/dist/leaflet.css";
 
@@ -128,7 +129,14 @@ function App() {
 
       {/* ── AXXBIASHARA BUSINESS DIRECTORY ROUTES (have Navbar) ── */}
       <Route path="/axxbiashara" element={<PublicLayout><AxxBiashara /></PublicLayout>} />
-      <Route path="/business/create" element={<PublicLayout><BusinessForm /></PublicLayout>} />
+      <Route
+        path="/business/create"
+        element={
+          <PublicLayout>
+            <ProtectedRoute><BusinessForm /></ProtectedRoute>
+          </PublicLayout>
+        }
+      />
       <Route
         path="/business/edit/:id"
         element={
@@ -140,6 +148,16 @@ function App() {
         }
       />
       <Route path="/business/:id" element={<PublicLayout><BusinessDetail /></PublicLayout>} />
+      <Route
+        path="/business-dashboard"
+        element={
+          <DashboardLayout>
+            <ProtectedRoute>
+              <UserDashboard />
+            </ProtectedRoute>
+          </DashboardLayout>
+        }
+      />
 
       {/* ── DASHBOARD ROUTES (no Navbar) ── */}
       <Route
