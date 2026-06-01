@@ -439,7 +439,7 @@ export default function BusinessForm() {
       }
 
       setTimeout(() => {
-        navigate("/axxbiashara");
+        navigate("/business-dashboard");
       }, 2000);
     } catch (err) {
       if (err.response?.status === 401) {
