@@ -443,9 +443,9 @@ export default function BusinessForm() {
       }, 2000);
     } catch (err) {
       if (err.response?.status === 401) {
-        setError("Please log in to create a business");
+        setError("Please log in to add a business");
         setTimeout(() => {
-          navigate("/login");
+          navigate("/business-login");
         }, 2000);
       } else {
         setError(err.response?.data?.error || "Failed to save business");
@@ -472,7 +472,7 @@ export default function BusinessForm() {
     <div style={styles.container}>
       <form style={styles.form} onSubmit={handleSubmit}>
         <h1 style={styles.title}>
-          {isEditing ? "Edit Business" : "Create Business"}
+          {isEditing ? "Edit Business" : "Add Business"}
         </h1>
 
         {!isEditing && (
@@ -982,7 +982,7 @@ export default function BusinessForm() {
           style={{ ...styles.button, ...(loading ? styles.buttonDisabled : {}) }}
           disabled={loading}
         >
-          {loading ? "Saving..." : isEditing ? "Update Business" : "Create Business"}
+          {loading ? "Saving..." : isEditing ? "Update Business" : "Add Business"}
         </button>
       </form>
     </div>

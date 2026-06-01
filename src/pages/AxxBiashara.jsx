@@ -829,7 +829,7 @@ export default function AxxBiashara() {
                 e.currentTarget.style.opacity = "1";
               }}
             >
-              + Create Business
+              + Add Business
             </button>
             <button
               style={{ ...styles.addButton, background: "#22c55e" }}

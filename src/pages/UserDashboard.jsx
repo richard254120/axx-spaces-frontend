@@ -268,7 +268,7 @@ export default function UserDashboard() {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
             <h2 style={styles.sectionTitle}>My Businesses</h2>
             <button style={styles.button} onClick={handleCreateBusiness}>
-              + Create New Business
+              + Add Your Business
             </button>
           </div>
 
@@ -276,7 +276,7 @@ export default function UserDashboard() {
             <div style={styles.empty}>
               <p>You haven't submitted any businesses yet.</p>
               <button style={styles.button} onClick={handleCreateBusiness}>
-                Create Your First Business
+                Add Your First Business
               </button>
             </div>
           ) : (

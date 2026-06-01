@@ -173,7 +173,7 @@ export default function BusinessRegister() {
     <div style={styles.container}>
       <div style={styles.form}>
         <h1 style={styles.title}>Business Registration</h1>
-        <p style={styles.subtitle}>Create your business account on AxxBiashara</p>
+        <p style={styles.subtitle}>Add your business account on AxxBiashara</p>
 
         {error && <div style={styles.error}>{error}</div>}
         {success && <div style={styles.success}>{success}</div>}
