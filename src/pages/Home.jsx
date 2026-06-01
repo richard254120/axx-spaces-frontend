@@ -1419,46 +1419,46 @@ export default function Home() {
       </section>
 
       {/* ── FEATURED LISTINGS ── */}
-      <section style={styles.featuredSection}>
-        <div style={styles.sectionHeader}>
-          <h2 style={styles.sectionTitle}>⭐ Featured Premium Listings</h2>
-          <p style={styles.sectionSubtitle}>Verified & boosted properties — handpicked for maximum trust</p>
+      <section className="featured-section">
+        <div className="section-header">
+          <h2 className="section-title">⭐ Featured Premium Listings</h2>
+          <p className="section-subtitle">Verified & boosted properties — handpicked for maximum trust</p>
         </div>
         {loadingFeatured ? (
-          <div style={styles.loadingWrap}>
+          <div className="loading-wrap">
             <div className="spinner"></div>
-            <p style={styles.loadingText}>Loading featured properties...</p>
+            <p className="loading-text">Loading featured properties...</p>
           </div>
         ) : fetchError ? (
-          <div style={styles.noFeatured}>
-            <div style={styles.noFeaturedIcon}>⚠️</div>
-            <p style={styles.noFeaturedText}>Could not load featured listings</p>
-            <p style={styles.noFeaturedSub}>Please refresh in a moment.</p>
-            <button onClick={() => window.location.reload()} style={styles.boostBtn}>🔄 Retry</button>
+          <div className="no-featured">
+            <div className="no-featured-icon">⚠️</div>
+            <p className="no-featured-text">Could not load featured listings</p>
+            <p className="no-featured-sub">Please refresh in a moment.</p>
+            <button onClick={() => window.location.reload()} className="boost-btn">🔄 Retry</button>
           </div>
         ) : featuredProperties.length > 0 ? (
           <>
-            <div style={styles.marqueeCardsWrapper}>
+            <div className="marquee-cards-wrapper">
               <div className="cards-marquee-track">
                 {[...featuredProperties, ...featuredProperties].map((property, idx) => (
-                  <div key={`${property._id}-${idx}`} style={styles.featuredCard} className="featured-card">
-                    <div style={styles.featuredImageWrapper}>
-                      <img src={property.images?.[0] || ""} alt={property.title || "Property"} style={styles.featuredImage} onError={(e) => { e.target.style.display = "none"; }} />
-                      <div style={styles.boostedBadge}>⭐ BOOSTED</div>
-                      <div style={styles.featuredType}>{property.type || "Rental"}</div>
+                  <div key={`${property._id}-${idx}`} className="featured-card">
+                    <div className="featured-image-wrapper">
+                      <img src={property.images?.[0] || ""} alt={property.title || "Property"} className="featured-image" onError={(e) => { e.target.style.display = "none"; }} />
+                      <div className="boosted-badge">⭐ BOOSTED</div>
+                      <div className="featured-type">{property.type || "Rental"}</div>
                     </div>
-                    <div style={styles.featuredInfo}>
-                      <h3 style={styles.featuredTitle}>{property.title}</h3>
-                      <p style={styles.featuredLocation}>📍 {property.area}, {property.county}</p>
-                      <div style={styles.featuredMeta}>
-                        {property.bedrooms && <span style={styles.metaTag}>🛏 {property.bedrooms} Bed</span>}
-                        {property.bathrooms && <span style={styles.metaTag}>🚿 {property.bathrooms} Bath</span>}
+                    <div className="featured-info">
+                      <h3 className="featured-title">{property.title}</h3>
+                      <p className="featured-location">📍 {property.area}, {property.county}</p>
+                      <div className="featured-meta">
+                        {property.bedrooms && <span className="meta-tag">🛏 {property.bedrooms} Bed</span>}
+                        {property.bathrooms && <span className="meta-tag">🚿 {property.bathrooms} Bath</span>}
                       </div>
-                      <p style={styles.featuredPrice}>
+                      <p className="featured-price">
                         KSh {Number(property.price).toLocaleString()}
-                        <span style={styles.perMonth}> / month</span>
+                        <span className="per-month"> / month</span>
                       </p>
-                      <button onClick={() => navigate(`/listings?highlight=${property._id}`)} style={styles.viewBtn} className="view-btn">
+                      <button onClick={() => navigate(`/listings?highlight=${property._id}`)} className="view-btn">
                         View Property →
                       </button>
                     </div>
@@ -1467,41 +1467,41 @@ export default function Home() {
               </div>
             </div>
             <div style={{ textAlign: "center", marginTop: "32px" }}>
-              <button onClick={() => navigate("/listings")} style={styles.viewAllBtn}>View All Listings →</button>
+              <button onClick={() => navigate("/listings")} className="view-all-btn">View All Listings →</button>
             </div>
           </>
         ) : (
-          <div style={styles.noFeatured}>
-            <div style={styles.noFeaturedIcon}>🏡</div>
-            <p style={styles.noFeaturedText}>No featured listings yet</p>
-            <p style={styles.noFeaturedSub}>Boost your property to appear here and reach thousands of tenants!</p>
-            <button onClick={handleListProperty} style={styles.boostBtn}>🚀 Boost Your Property</button>
+          <div className="no-featured">
+            <div className="no-featured-icon">🏡</div>
+            <p className="no-featured-text">No featured listings yet</p>
+            <p className="no-featured-sub">Boost your property to appear here and reach thousands of tenants!</p>
+            <button onClick={handleListProperty} className="boost-btn">🚀 Boost Your Property</button>
           </div>
         )}
       </section>
 
       {/* ── SERVICE SPOTLIGHT STRIPS ── */}
-      <section style={styles.spotlightSection}>
+      <section className="spotlight-section">
         {/* Movers strip */}
-        <div style={styles.spotlightStrip} className="spotlight-strip">
-          <div style={styles.spotlightText}>
-            <span style={styles.spotlightBadge}>🚛 Movers</span>
-            <h3 style={styles.spotlightTitle}>Planning a Move?</h3>
-            <p style={styles.spotlightDesc}>Connect with 60+ vetted moving companies across Kenya. Get instant quotes, compare prices, and book your move today — local or long-distance.</p>
-            <div style={styles.spotlightFeatures}>
+        <div className="spotlight-strip">
+          <div className="spotlight-text">
+            <span className="spotlight-badge">🚛 Movers</span>
+            <h3 className="spotlight-title">Planning a Move?</h3>
+            <p className="spotlight-desc">Connect with 60+ vetted moving companies across Kenya. Get instant quotes, compare prices, and book your move today — local or long-distance.</p>
+            <div className="spotlight-features">
               {["Insured cargo", "Trained crews", "Transparent quotes", "Available 24/7"].map(f => (
-                <span key={f} style={styles.spotlightFeature}>✓ {f}</span>
+                <span key={f} className="spotlight-feature">✓ {f}</span>
               ))}
             </div>
-            <button style={{ ...styles.spotlightBtn, background: "#0B2140" }} onClick={() => navigate("/movers")}>Find a Mover →</button>
+            <button className="spotlight-btn" style={{ background: "#0B2140" }} onClick={() => navigate("/movers")}>Find a Mover →</button>
           </div>
-          <div style={styles.spotlightVisual}>
-            <div style={{ ...styles.spotlightEmoji, background: "linear-gradient(135deg, #dce8ff, #b8d0f8)" }}>🚛</div>
-            <div style={styles.spotlightStatGrid}>
+          <div className="spotlight-visual">
+            <div className="spotlight-emoji" style={{ background: "linear-gradient(135deg, #dce8ff, #b8d0f8)" }}>🚛</div>
+            <div className="spotlight-stat-grid">
               {[["60+", "Moving Companies"], ["47", "Counties"], ["1,200+", "Moves Done"]].map(([v, l]) => (
-                <div key={l} style={styles.spotlightStat}>
-                  <span style={{ ...styles.spotlightStatVal, color: "#0B2140" }}>{v}</span>
-                  <span style={styles.spotlightStatLabel}>{l}</span>
+                <div key={l} className="spotlight-stat">
+                  <span className="spotlight-stat-val" style={{ color: "#0B2140" }}>{v}</span>
+                  <span className="spotlight-stat-label">{l}</span>
                 </div>
               ))}
             </div>
@@ -1509,25 +1509,25 @@ export default function Home() {
         </div>
 
         {/* Merchants strip */}
-        <div style={{ ...styles.spotlightStrip, flexDirection: "row-reverse", background: "linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)" }} className="spotlight-strip">
-          <div style={styles.spotlightText}>
-            <span style={{ ...styles.spotlightBadge, background: "#fef3c7", color: "#b45309" }}>🛍️ Merchants</span>
-            <h3 style={styles.spotlightTitle}>Building, Renovating, or Shopping?</h3>
-            <p style={styles.spotlightDesc}>Source construction materials, hardware, home supplies, and quality second-hand items from 150+ verified Kenyan merchants at competitive prices.</p>
-            <div style={styles.spotlightFeatures}>
+        <div className="spotlight-strip" style={{ flexDirection: "row-reverse", background: "linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)" }}>
+          <div className="spotlight-text">
+            <span className="spotlight-badge" style={{ background: "#fef3c7", color: "#b45309" }}>🛍️ Merchants</span>
+            <h3 className="spotlight-title">Building, Renovating, or Shopping?</h3>
+            <p className="spotlight-desc">Source construction materials, hardware, home supplies, and quality second-hand items from 150+ verified Kenyan merchants at competitive prices.</p>
+            <div className="spotlight-features">
               {["Building materials", "Second-hand items", "Wholesale pricing", "Delivery available"].map(f => (
-                <span key={f} style={{ ...styles.spotlightFeature, color: "#b45309" }}>✓ {f}</span>
+                <span key={f} className="spotlight-feature" style={{ color: "#b45309" }}>✓ {f}</span>
               ))}
             </div>
-            <button style={{ ...styles.spotlightBtn, background: "#d97706" }} onClick={() => navigate("/materials")}>Shop Items →</button>
+            <button className="spotlight-btn" style={{ background: "#d97706" }} onClick={() => navigate("/materials")}>Shop Items →</button>
           </div>
-          <div style={styles.spotlightVisual}>
-            <div style={{ ...styles.spotlightEmoji, background: "linear-gradient(135deg, #fef3c7, #fde68a)" }}>🛍️</div>
-            <div style={styles.spotlightStatGrid}>
+          <div className="spotlight-visual">
+            <div className="spotlight-emoji" style={{ background: "linear-gradient(135deg, #fef3c7, #fde68a)" }}>🛍️</div>
+            <div className="spotlight-stat-grid">
               {[["150+", "Merchants"], ["5,000+", "Products"], ["30+", "Counties"]].map(([v, l]) => (
-                <div key={l} style={styles.spotlightStat}>
-                  <span style={{ ...styles.spotlightStatVal, color: "#d97706" }}>{v}</span>
-                  <span style={styles.spotlightStatLabel}>{l}</span>
+                <div key={l} className="spotlight-stat">
+                  <span className="spotlight-stat-val" style={{ color: "#d97706" }}>{v}</span>
+                  <span className="spotlight-stat-label">{l}</span>
                 </div>
               ))}
             </div>
@@ -1535,25 +1535,25 @@ export default function Home() {
         </div>
 
         {/* Tourism strip */}
-        <div style={{ ...styles.spotlightStrip, background: "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)" }} className="spotlight-strip">
-          <div style={styles.spotlightText}>
-            <span style={{ ...styles.spotlightBadge, background: "#dcfce7", color: "#047857" }}>🏨 Tourism</span>
-            <h3 style={styles.spotlightTitle}>Explore Kenya Like Never Before</h3>
-            <p style={styles.spotlightDesc}>Discover hotels, beach resorts, safari lodges, and unique experiences across Kenya's 47 counties. Book directly — no commission fees.</p>
-            <div style={styles.spotlightFeatures}>
+        <div className="spotlight-strip" style={{ background: "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)" }}>
+          <div className="spotlight-text">
+            <span className="spotlight-badge" style={{ background: "#dcfce7", color: "#047857" }}>🏨 Tourism</span>
+            <h3 className="spotlight-title">Explore Kenya Like Never Before</h3>
+            <p className="spotlight-desc">Discover hotels, beach resorts, safari lodges, and unique experiences across Kenya's 47 counties. Book directly — no commission fees.</p>
+            <div className="spotlight-features">
               {["Hotels & resorts", "Safari packages", "Beach getaways", "City escapes"].map(f => (
-                <span key={f} style={{ ...styles.spotlightFeature, color: "#047857" }}>✓ {f}</span>
+                <span key={f} className="spotlight-feature" style={{ color: "#047857" }}>✓ {f}</span>
               ))}
             </div>
-            <button style={{ ...styles.spotlightBtn, background: "#059669" }} onClick={() => navigate("/tourism")}>Explore Tourism →</button>
+            <button className="spotlight-btn" style={{ background: "#059669" }} onClick={() => navigate("/tourism")}>Explore Tourism →</button>
           </div>
-          <div style={styles.spotlightVisual}>
-            <div style={{ ...styles.spotlightEmoji, background: "linear-gradient(135deg, #dcfce7, #a7f3d0)" }}>🏨</div>
-            <div style={styles.spotlightStatGrid}>
+          <div className="spotlight-visual">
+            <div className="spotlight-emoji" style={{ background: "linear-gradient(135deg, #dcfce7, #a7f3d0)" }}>🏨</div>
+            <div className="spotlight-stat-grid">
               {[["200+", "Hotels & Lodges"], ["47", "Counties"], ["3,000+", "Guests"]].map(([v, l]) => (
-                <div key={l} style={styles.spotlightStat}>
-                  <span style={{ ...styles.spotlightStatVal, color: "#059669" }}>{v}</span>
-                  <span style={styles.spotlightStatLabel}>{l}</span>
+                <div key={l} className="spotlight-stat">
+                  <span className="spotlight-stat-val" style={{ color: "#059669" }}>{v}</span>
+                  <span className="spotlight-stat-label">{l}</span>
                 </div>
               ))}
             </div>
@@ -1562,8 +1562,8 @@ export default function Home() {
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section style={styles.howItWorksSection}>
-        <div style={styles.sectionHeader}>
+      <section className="how-it-works-section">
+        <div className="section-header">
           <h2 style={styles.sectionTitle}>How It Works</h2>
           <p style={styles.sectionSubtitle}>One platform. Four services. Endless possibilities.</p>
         </div>
