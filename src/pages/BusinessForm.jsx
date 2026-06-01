@@ -346,16 +346,24 @@ export default function BusinessForm() {
     const file = e.target.files[0];
     if (!file) return;
 
+    console.log("=== PRODUCT IMAGE UPLOAD START ===");
+    console.log("File:", file);
+
     setUploading((prev) => ({ ...prev, product: true }));
     const formData = new FormData();
     formData.append("image", file);
 
     try {
+      console.log("Sending upload request to /uploads/product-image");
       const res = await API.post("/uploads/product-image", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+      console.log("Upload response:", res.data);
+      console.log("Upload URL:", res.data.url);
       return res.data.url;
     } catch (err) {
+      console.error("Product image upload error:", err);
+      console.error("Error response:", err.response);
       setError("Failed to upload product image");
       return null;
     } finally {
@@ -942,16 +950,29 @@ export default function BusinessForm() {
               const category = document.getElementById("productCategory").value;
               const imageFile = document.getElementById("productImage").files[0];
 
+              console.log("=== ADD PRODUCT CLICKED ===");
+              console.log("Product name:", name);
+              console.log("Product description:", description);
+              console.log("Product price:", price);
+              console.log("Product category:", category);
+              console.log("Image file:", imageFile);
+              console.log("Current products:", formData.products);
+
               if (name) {
                 let imageUrl = "";
                 if (imageFile) {
                   imageUrl = await handleProductImageUpload({ target: { files: [imageFile] } });
+                  console.log("Image URL after upload:", imageUrl);
                 }
 
-                setFormData((prev) => ({
-                  ...prev,
-                  products: [...prev.products, { name, description, price, category, imageUrl }],
-                }));
+                setFormData((prev) => {
+                  const newProducts = [...prev.products, { name, description, price, category, imageUrl }];
+                  console.log("New products array:", newProducts);
+                  return {
+                    ...prev,
+                    products: newProducts,
+                  };
+                });
                 document.getElementById("productName").value = "";
                 document.getElementById("productDescription").value = "";
                 document.getElementById("productPrice").value = "";

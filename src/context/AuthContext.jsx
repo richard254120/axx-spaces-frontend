@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
-  const logout = (redirectTo = "/") => {
+  const logout = (redirectTo = "/axxbiashara") => {
     setToken(null);
     setUser(null);
     localStorage.removeItem("token");
@@ -70,13 +70,13 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      token, 
-      login, 
+    <AuthContext.Provider value={{
+      user,
+      token,
+      login,
       logout,
       updateUser,
-      isAuthenticated: !!token 
+      isAuthenticated: !!token
     }}>
       {children}
     </AuthContext.Provider>
