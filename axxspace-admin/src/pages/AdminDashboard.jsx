@@ -39,6 +39,12 @@ export default function AdminDashboard() {
   const [boostMessage, setBoostMessage] = useState("");
   const notifRef = useRef(null);
 
+  // ── UNIFIED NOTIFICATIONS STATE ───────────────────────────────
+  const [allNotifications, setAllNotifications] = useState([]);
+  const [notificationSummary, setNotificationSummary] = useState(null);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
+  const [previousNotificationCount, setPreviousNotificationCount] = useState(0);
+
   const [mpesaConfig, setMpesaConfig] = useState({ mpesa_shortcode: "", mpesa_passkey: "", mpesa_consumer_key: "", mpesa_consumer_secret: "" });
   const [configSaving, setConfigSaving] = useState(false);
   const [configMessage, setConfigMessage] = useState("");
@@ -61,6 +67,7 @@ export default function AdminDashboard() {
     loadTopViewed();
     loadPendingBoosts();
     loadAllBoosts();
+    loadAllNotifications();
   }, [user, navigate]);
 
   // ── load pending announcements when tab changes ─────────────
@@ -74,7 +81,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const interval = setInterval(() => {
       loadPendingBoosts();
-      loadNotifications();
+      loadAllNotifications();
     }, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -173,6 +180,25 @@ export default function AdminDashboard() {
       setAllBoosts(Array.isArray(r.data?.notifications) ? r.data.notifications : []);
     } catch (e) { console.error("all notifications load:", e); }
     finally { setBoostLoading(false); }
+  };
+
+  // ── LOAD ALL UNIFIED NOTIFICATIONS ─────────────────────────────
+  const loadAllNotifications = async () => {
+    try {
+      setNotificationsLoading(true);
+      const r = await API.get("/admin/notifications");
+      const notifications = Array.isArray(r.data?.notifications) ? r.data.notifications : [];
+      setAllNotifications(notifications);
+      setNotificationSummary(r.data?.summary || null);
+
+      // Check for new notifications and show alert
+      if (notifications.length > previousNotificationCount && previousNotificationCount > 0) {
+        const newCount = notifications.length - previousNotificationCount;
+        alert(`🔔 You have ${newCount} new notification${newCount > 1 ? 's' : ''} awaiting approval!`);
+      }
+      setPreviousNotificationCount(notifications.length);
+    } catch (e) { console.error("unified notifications load:", e); }
+    finally { setNotificationsLoading(false); }
   };
 
   // ── MARK NOTIFICATION AS READ (confirm payment) ─────────────
@@ -409,20 +435,38 @@ export default function AdminDashboard() {
 
   // ── notification helpers ───────────────────────────────────
   const getNotifTitle = (n) => {
-    if (n.type === "property_booking") return n.propertyId?.title || "Property Booking";
-    if (n.type === "material_purchase") return n.materialId?.title || "Material Purchase";
-    if (n.type === "tourism_booking") return n.tourismId?.title || "Tourism Booking";
-    if (n.type === "boost") return "Listing Boost";
-    if (n.type === "subscription") return "Subscription Payment";
-    return "Payment";
+    if (n.isPayment) {
+      if (n.type === "property_booking") return n.propertyId?.title || "Property Booking";
+      if (n.type === "material_purchase") return n.materialId?.title || "Material Purchase";
+      if (n.type === "tourism_booking") return n.tourismId?.title || "Tourism Booking";
+      if (n.type === "boost") return "Listing Boost";
+      if (n.type === "subscription") return "Subscription Payment";
+      return "Payment";
+    }
+    // For approval notifications
+    const typeLabels = {
+      property: "Property",
+      material: "Material",
+      tourism: "Tourism",
+      mover: "Mover",
+      seller: "Seller Verification",
+      business: "Business",
+      announcement: "Announcement"
+    };
+    return n.title || typeLabels[n.type] || "Upload";
   };
 
-  const getNotifIcon = (type) => {
-    const icons = { property_booking: "🏠", material_purchase: "🛍️", tourism_booking: "🏨", boost: "🚀", subscription: "📋" };
-    return icons[type] || "💳";
+  const getNotifIcon = (type, isPayment) => {
+    if (isPayment) {
+      const icons = { property_booking: "🏠", material_purchase: "🛍️", tourism_booking: "🏨", boost: "🚀", subscription: "📋" };
+      return icons[type] || "💳";
+    }
+    const icons = { property: "🏠", material: "🛍️", tourism: "🏨", mover: "🚛", seller: "📋", business: "🏪", announcement: "📢" };
+    return icons[type] || "📄";
   };
 
   const hasPendingBoosts = pendingBoosts.length > 0;
+  const hasAllNotifications = allNotifications.length > 0;
 
   // ── render ─────────────────────────────────────────────────
   return (
@@ -442,13 +486,13 @@ export default function AdminDashboard() {
             <button
               style={S.notifBtn}
               onClick={() => setShowNotifPanel(!showNotifPanel)}
-              className={hasPendingBoosts ? "notif-btn-active" : ""}
-              title={hasPendingBoosts ? `${pendingBoosts.length} payment(s) awaiting confirmation` : "No pending payments"}
+              className={hasAllNotifications ? "notif-btn-active" : ""}
+              title={hasAllNotifications ? `${allNotifications.length} notification(s) awaiting approval` : "No pending notifications"}
             >
               🔔
-              {hasPendingBoosts && (
+              {hasAllNotifications && (
                 <span style={S.notifBadge} className="notif-badge-blink">
-                  {pendingBoosts.length}
+                  {allNotifications.length}
                 </span>
               )}
             </button>
@@ -457,32 +501,44 @@ export default function AdminDashboard() {
             {showNotifPanel && (
               <div style={S.notifPanel} className="notif-panel-slide">
                 <div style={S.notifPanelHeader}>
-                  <span style={S.notifPanelTitle}>💳 Payment Notifications</span>
+                  <span style={S.notifPanelTitle}>� All Notifications</span>
                   <button style={S.notifCloseBtn} onClick={() => setShowNotifPanel(false)}>✕</button>
                 </div>
 
-                {hasPendingBoosts ? (
+                {hasAllNotifications ? (
                   <div style={S.notifList}>
-                    {pendingBoosts.map(notif => (
-                      <div key={notif._id} style={S.notifItem} className="notif-item-pulse">
+                    {allNotifications.map(notif => (
+                      <div key={notif._id} style={S.notifItem} className={notif.isPayment ? "notif-item-pulse" : ""}>
                         <div style={S.notifItemHeader}>
-                          <span style={S.notifRedDot} className="red-dot-blink" />
+                          {!notif.isPayment && <span style={S.notifRedDot} className="red-dot-blink" />}
                           <span style={S.notifItemTitle}>
-                            {getNotifIcon(notif.type)} {getNotifTitle(notif)}
+                            {getNotifIcon(notif.type, notif.isPayment)} {getNotifTitle(notif)}
+                          </span>
+                          <span style={{ fontSize: 10, color: "#94a3b8", marginLeft: "auto" }}>
+                            {notif.isPayment ? "💳 Payment" : "📝 Approval"}
                           </span>
                         </div>
                         <div style={S.notifItemMeta}>
-                          <span>👤 {notif.userName || notif.userId?.name || "User"}</span>
-                          <span>📞 {notif.userPhone || notif.userId?.phone || "—"}</span>
+                          <span>👤 {notif.ownerName || notif.userName || notif.userId?.name || "User"}</span>
+                          <span>📞 {notif.ownerPhone || notif.userPhone || notif.userId?.phone || "—"}</span>
                         </div>
-                        <div style={S.notifItemMeta}>
-                          <span style={{ color: "#fbbf24", fontWeight: 700 }}>
-                            KES {notif.amount?.toLocaleString() || "—"}
-                          </span>
-                          <span style={{ color: "#94a3b8", fontSize: 11 }}>
-                            {notif.mpesaRef || notif.transactionId || "Pending verification"}
-                          </span>
-                        </div>
+                        {notif.isPayment && (
+                          <div style={S.notifItemMeta}>
+                            <span style={{ color: "#fbbf24", fontWeight: 700 }}>
+                              KES {notif.amount?.toLocaleString() || "—"}
+                            </span>
+                            <span style={{ color: "#94a3b8", fontSize: 11 }}>
+                              {notif.mpesaRef || notif.transactionId || "Pending verification"}
+                            </span>
+                          </div>
+                        )}
+                        {!notif.isPayment && (
+                          <div style={S.notifItemMeta}>
+                            <span style={{ color: "#64748b", fontSize: 11 }}>
+                              {notif.category || "—"}
+                            </span>
+                          </div>
+                        )}
                         {notif.type === "tourism_booking" && notif.checkIn && (
                           <div style={{ ...S.notifItemMeta, fontSize: 11 }}>
                             <span>📅 Check-in: {new Date(notif.checkIn).toLocaleDateString()}</span>
@@ -495,31 +551,55 @@ export default function AdminDashboard() {
                           </span>
                         </div>
                         <div style={S.notifItemBtns}>
-                          <button
-                            style={S.notifApproveBtn}
-                            onClick={() => { handleApproveBoost(notif._id); setShowNotifPanel(false); setActiveTab("boosts"); }}
-                          >
-                            ✅ Confirm
-                          </button>
-                          <button
-                            style={S.notifRejectBtn}
-                            onClick={() => handleRejectBoost(notif._id)}
-                          >
-                            ✕ Dismiss
-                          </button>
+                          {notif.isPayment ? (
+                            <>
+                              <button
+                                style={S.notifApproveBtn}
+                                onClick={() => { handleApproveBoost(notif._id); setShowNotifPanel(false); setActiveTab("boosts"); }}
+                              >
+                                ✅ Confirm
+                              </button>
+                              <button
+                                style={S.notifRejectBtn}
+                                onClick={() => handleRejectBoost(notif._id)}
+                              >
+                                ✕ Dismiss
+                              </button>
+                            </>
+                          ) : (
+                            <button
+                              style={S.notifApproveBtn}
+                              onClick={() => {
+                                const tabMap = {
+                                  property: "properties",
+                                  material: "materials",
+                                  tourism: "tourism",
+                                  mover: "movers",
+                                  seller: "sellers",
+                                  business: "businesses",
+                                  announcement: "announcements"
+                                };
+                                setActiveTab(tabMap[notif.type] || "properties");
+                                setStatusView("pending");
+                                setShowNotifPanel(false);
+                              }}
+                            >
+                              👁️ Review
+                            </button>
+                          )}
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
                   <div style={S.notifEmpty}>
-                    <p>✅ No pending payment confirmations</p>
+                    <p>✅ No pending notifications</p>
                   </div>
                 )}
 
                 <div style={S.notifFooter}>
-                  <button style={S.notifViewAllBtn} onClick={() => { setActiveTab("boosts"); setShowNotifPanel(false); }}>
-                    View All Payments →
+                  <button style={S.notifViewAllBtn} onClick={() => { setActiveTab("properties"); setStatusView("pending"); setShowNotifPanel(false); }}>
+                    Review All Pending →
                   </button>
                 </div>
               </div>

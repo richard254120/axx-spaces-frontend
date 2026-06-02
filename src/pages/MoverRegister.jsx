@@ -29,12 +29,12 @@ export default function MoverRegister() {
     setMessage("");
 
     try {
-      const res = await API.post("/auth/register-mover", formData);
+      const res = await API.post("/auth/register", formData);
       
-      setMessage("✅ Mover registration successful! You can now login.");
+      setMessage("✅ Mover registration successful! Please check your email to verify your account.");
       setTimeout(() => {
         navigate("/login");
-      }, 2000);
+      }, 3000);
     } catch (err) {
       setMessage("❌ " + (err.response?.data?.error || "Registration failed"));
     } finally {
