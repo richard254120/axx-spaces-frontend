@@ -54,23 +54,20 @@ export default function Navbar() {
         <div style={styles.dropdown}>
           {/* NAVIGATION SECTION */}
           <div style={styles.dropdownHeader}>Navigation</div>
-          <Link to="/" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>🏠</span> Home
+          <Link to="/axxbiashara" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+            <span style={styles.dropdownIcon}>�</span> AxxBiashara
           </Link>
           <Link to="/listings" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>🏢</span> Listings
           </Link>
-          <Link to="/movers" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>🚛</span> Movers
-          </Link>
-          <Link to="/materials" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>🛍️</span> MarketPlace
-          </Link>
           <Link to="/tourism" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>🏨</span> Tourism
           </Link>
-          <Link to="/axxbiashara" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>🏪</span> AxxBiashara
+          <Link to="/movers" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+            <span style={styles.dropdownIcon}>�</span> Movers
+          </Link>
+          <Link to="/materials" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+            <span style={styles.dropdownIcon}>🛍️</span> MarketPlace
           </Link>
           <Link to="/about" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>ℹ️</span> About
@@ -209,8 +206,8 @@ export default function Navbar() {
       </div>
 
       <div style={{ ...styles.navLinksContainer, ...(menuOpen && styles.navLinksContainerOpen) }}>
-        <Link to="/" style={styles.navLink} onClick={() => setMenuOpen(false)}>
-          Home
+        <Link to="/axxbiashara" style={styles.navLink} onClick={() => setMenuOpen(false)}>
+          AxxBiashara
         </Link>
         {/* ─── RENTALS DROPDOWN ─── */}
         <div style={styles.accountWrapper} ref={accountRef}>
@@ -269,14 +266,14 @@ export default function Navbar() {
           )}
         </div>
 
+        <Link to="/tourism" style={styles.navLink} onClick={() => setMenuOpen(false)}>
+          Tourism
+        </Link>
         <Link to="/movers" style={styles.navLink} onClick={() => setMenuOpen(false)}>
           Movers
         </Link>
         <Link to="/materials" style={styles.navLink} onClick={() => setMenuOpen(false)}>
           MarketPlace
-        </Link>
-        <Link to="/tourism" style={styles.navLink} onClick={() => setMenuOpen(false)}>
-          Tourism
         </Link>
         <Link to="/about" style={styles.navLink} onClick={() => setMenuOpen(false)}>
           About
