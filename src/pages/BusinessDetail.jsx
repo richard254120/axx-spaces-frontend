@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
 import { AuthContext } from "../context/AuthContext";
 
@@ -696,6 +696,7 @@ const formatTime = (time) => {
 export default function BusinessDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useContext(AuthContext);
 
   const [business, setBusiness] = useState(null);
@@ -711,6 +712,15 @@ export default function BusinessDetail() {
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
   useEffect(() => { loadBusiness(); }, [id]);
+
+  /* ── Refresh trigger from BusinessForm after update ── */
+  useEffect(() => {
+    if (location.state?.refresh) {
+      loadBusiness();
+      // Clear the router state so back-navigation doesn't re-trigger
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const loadBusiness = async () => {
     setLoading(true);
