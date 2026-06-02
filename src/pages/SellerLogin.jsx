@@ -24,6 +24,12 @@ export default function SellerLogin() {
     name: "", email: "", password: "", phone: "", county: "",
   });
 
+  // Forgot password state
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotMsg, setForgotMsg] = useState("");
+
   const handleChange = (e) => {
     setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
     setError("");
@@ -73,81 +79,157 @@ export default function SellerLogin() {
     }
   };
 
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setForgotMsg("");
+
+    if (!forgotEmail) {
+      setForgotMsg("❌ Please enter your email address.");
+      return;
+    }
+
+    setForgotLoading(true);
+
+    try {
+      const res = await fetch(`${API_BASE}/auth/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail }),
+      });
+
+      const data = await res.json();
+      setForgotMsg(data.message || "✅ Reset link sent! Check your inbox.");
+    } catch (err) {
+      setForgotMsg("❌ Failed to send reset email. Try again.");
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
   return (
     <div style={s.page}>
       <style>{css}</style>
 
       <div style={s.card}>
-        {/* Header */}
-        <div style={s.header}>
-          <div style={s.icon}>🛒</div>
-          <h1 style={s.title}>Seller Portal</h1>
-          <p style={s.subtitle}>
-            {mode === "login"
-              ? "Login to manage your listings"
-              : "Create a seller account to start selling"}
-          </p>
-        </div>
+        {showForgot ? (
+          <>
+            {/* Forgot Password Form */}
+            <div style={s.header}>
+              <div style={s.icon}>🔐</div>
+              <h1 style={s.title}>Reset Password</h1>
+              <p style={s.subtitle}>Enter your email to receive a reset link</p>
+            </div>
 
-        {/* Tab Toggle */}
-        <div style={s.tabs}>
-          <button
-            style={{ ...s.tab, ...(mode === "login" ? s.activeTab : {}) }}
-            onClick={() => { setMode("login"); setError(""); setSuccess(""); }}
-          >
-            Login
-          </button>
-          <button
-            style={{ ...s.tab, ...(mode === "register" ? s.activeTab : {}) }}
-            onClick={() => { setMode("register"); setError(""); setSuccess(""); }}
-          >
-            Register
-          </button>
-        </div>
+            {forgotMsg && (
+              <div style={forgotMsg.includes("❌") ? s.error : s.successMsg}>
+                {forgotMsg}
+              </div>
+            )}
 
-        {/* Alerts */}
-        {error && <div style={s.error}>{error}</div>}
-        {success && <div style={s.successMsg}>{success}</div>}
+            <div style={s.form}>
+              <input
+                type="email"
+                placeholder="Enter your registered email"
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                style={s.input}
+              />
+              <button style={s.submitBtn} onClick={handleForgotPassword} disabled={forgotLoading}>
+                {forgotLoading ? "Sending..." : "📧 Send Reset Link"}
+              </button>
+            </div>
 
-        {/* Form */}
-        <div style={s.form}>
-          {mode === "register" && (
-            <>
-              <input name="name" placeholder="Full Name" value={form.name}
+            <p style={s.backLink}>
+              <span style={s.link} onClick={() => { setShowForgot(false); setForgotMsg(""); }}>
+                ← Back to Login
+              </span>
+            </p>
+          </>
+        ) : (
+          <>
+            {/* Header */}
+            <div style={s.header}>
+              <div style={s.icon}>🛒</div>
+              <h1 style={s.title}>Seller Portal</h1>
+              <p style={s.subtitle}>
+                {mode === "login"
+                  ? "Login to manage your listings"
+                  : "Create a seller account to start selling"}
+              </p>
+            </div>
+
+            {/* Tab Toggle */}
+            <div style={s.tabs}>
+              <button
+                style={{ ...s.tab, ...(mode === "login" ? s.activeTab : {}) }}
+                onClick={() => { setMode("login"); setError(""); setSuccess(""); }}
+              >
+                Login
+              </button>
+              <button
+                style={{ ...s.tab, ...(mode === "register" ? s.activeTab : {}) }}
+                onClick={() => { setMode("register"); setError(""); setSuccess(""); }}
+              >
+                Register
+              </button>
+            </div>
+
+            {/* Alerts */}
+            {error && <div style={s.error}>{error}</div>}
+            {success && <div style={s.successMsg}>{success}</div>}
+
+            {/* Form */}
+            <div style={s.form}>
+              {mode === "register" && (
+                <>
+                  <input name="name" placeholder="Full Name" value={form.name}
+                    onChange={handleChange} style={s.input} />
+                  <input name="phone" placeholder="Phone (e.g. 0712345678)" value={form.phone}
+                    onChange={handleChange} style={s.input} />
+                  <select name="county" value={form.county} onChange={handleChange} style={s.input}>
+                    <option value="">Select County</option>
+                    {COUNTIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </>
+              )}
+
+              <input name="email" type="email" placeholder="Email Address" value={form.email}
                 onChange={handleChange} style={s.input} />
-              <input name="phone" placeholder="Phone (e.g. 0712345678)" value={form.phone}
+              <input name="password" type="password" placeholder="Password" value={form.password}
                 onChange={handleChange} style={s.input} />
-              <select name="county" value={form.county} onChange={handleChange} style={s.input}>
-                <option value="">Select County</option>
-                {COUNTIES.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </>
-          )}
 
-          <input name="email" type="email" placeholder="Email Address" value={form.email}
-            onChange={handleChange} style={s.input} />
-          <input name="password" type="password" placeholder="Password" value={form.password}
-            onChange={handleChange} style={s.input} />
+              {mode === "login" && (
+                <div style={{ textAlign: "right", fontSize: "13px" }}>
+                  <span
+                    onClick={() => { setShowForgot(true); setError(""); }}
+                    style={{ color: "#fbbf24", cursor: "pointer", fontWeight: 600 }}
+                  >
+                    Forgot password?
+                  </span>
+                </div>
+              )}
 
-          <button style={s.submitBtn} onClick={handleSubmit} disabled={loading}>
-            {loading ? "Please wait..." : mode === "login" ? "Login" : "Create Account"}
-          </button>
-        </div>
+              <button style={s.submitBtn} onClick={handleSubmit} disabled={loading}>
+                {loading ? "Please wait..." : mode === "login" ? "Login" : "Create Account"}
+              </button>
+            </div>
 
-        {/* Info box */}
-        <div style={s.infoBox}>
-          <p style={s.infoText}>
-            📋 After registering, you can upload your materials immediately.
-            They will appear on the marketplace once approved by our admin team.
-          </p>
-        </div>
+            {/* Info box */}
+            <div style={s.infoBox}>
+              <p style={s.infoText}>
+                📋 After registering, you can upload your materials immediately.
+                They will appear on the marketplace once approved by our admin team.
+              </p>
+            </div>
 
-        {/* Back link */}
-        <p style={s.backLink}>
-          <span style={s.link} onClick={() => navigate("/materials")}>
-            ← Back to Marketplace
-          </span>
-        </p>
+            {/* Back link */}
+            <p style={s.backLink}>
+              <span style={s.link} onClick={() => navigate("/materials")}>
+                ← Back to Marketplace
+              </span>
+            </p>
+          </>
+        )}
       </div>
     </div>
   );

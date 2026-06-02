@@ -11,6 +11,12 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Forgot password state
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotMsg, setForgotMsg] = useState("");
+
   const handleLogin = async () => {
     setLoading(true);
     setError("");
@@ -30,25 +36,79 @@ export default function Login() {
     }
   };
 
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setForgotMsg("");
+
+    if (!forgotEmail) {
+      setForgotMsg("❌ Please enter your email address.");
+      return;
+    }
+
+    setForgotLoading(true);
+
+    try {
+      const res = await API.post("/auth/forgot-password", { email: forgotEmail });
+      setForgotMsg(res.data.message || "✅ Reset link sent! Check your inbox.");
+    } catch (err) {
+      setForgotMsg("❌ Failed to send reset email. Try again.");
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h1 style={styles.title}>🛡️ Axxspace Admin</h1>
-        <p style={styles.subtitle}>Sign in to access the admin panel</p>
-        {error && <div style={styles.error}>{error}</div>}
-        <div style={styles.form}>
-          <div style={styles.field}>
-            <label style={styles.label}>Email</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@axxspace.com" style={styles.input} />
-          </div>
-          <div style={styles.field}>
-            <label style={styles.label}>Password</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" style={styles.input} onKeyDown={(e) => e.key === "Enter" && handleLogin()} />
-          </div>
-          <button onClick={handleLogin} disabled={loading} style={styles.btn}>
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
-        </div>
+        {showForgot ? (
+          <>
+            <h1 style={styles.title}>🔐 Reset Password</h1>
+            <p style={styles.subtitle}>Enter your email to receive a reset link</p>
+            {forgotMsg && (
+              <div style={forgotMsg.includes("❌") ? styles.error : { ...styles.error, background: "rgba(34,197,94,0.1)", color: "#22c55e", borderColor: "#22c55e" }}>
+                {forgotMsg}
+              </div>
+            )}
+            <div style={styles.form}>
+              <div style={styles.field}>
+                <label style={styles.label}>Email</label>
+                <input type="email" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} placeholder="Enter your registered email" style={styles.input} />
+              </div>
+              <button onClick={handleForgotPassword} disabled={forgotLoading} style={styles.btn}>
+                {forgotLoading ? "Sending..." : "📧 Send Reset Link"}
+              </button>
+            </div>
+            <div style={{ textAlign: "center", marginTop: "20px" }}>
+              <span onClick={() => { setShowForgot(false); setForgotMsg(""); }} style={{ color: "#fbbf24", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}>
+                ← Back to Login
+              </span>
+            </div>
+          </>
+        ) : (
+          <>
+            <h1 style={styles.title}>🛡️ Axxspace Admin</h1>
+            <p style={styles.subtitle}>Sign in to access the admin panel</p>
+            {error && <div style={styles.error}>{error}</div>}
+            <div style={styles.form}>
+              <div style={styles.field}>
+                <label style={styles.label}>Email</label>
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@axxspace.com" style={styles.input} />
+              </div>
+              <div style={styles.field}>
+                <label style={styles.label}>Password</label>
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" style={styles.input} onKeyDown={(e) => e.key === "Enter" && handleLogin()} />
+                <div style={{ textAlign: "right", marginTop: "4px" }}>
+                  <span onClick={() => { setShowForgot(true); setError(""); }} style={{ color: "#fbbf24", cursor: "pointer", fontSize: "12px", fontWeight: 600 }}>
+                    Forgot password?
+                  </span>
+                </div>
+              </div>
+              <button onClick={handleLogin} disabled={loading} style={styles.btn}>
+                {loading ? "Signing in..." : "Sign In"}
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

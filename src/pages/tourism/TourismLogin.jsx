@@ -125,6 +125,12 @@ export default function TourismLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Forgot password state
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotMsg, setForgotMsg] = useState("");
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) {
@@ -171,67 +177,150 @@ export default function TourismLogin() {
     }
   };
 
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setForgotMsg("");
+
+    if (!forgotEmail) {
+      setForgotMsg("❌ Please enter your email address.");
+      return;
+    }
+
+    setForgotLoading(true);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE}/api/auth/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail }),
+      });
+
+      const data = await response.json();
+      setForgotMsg(data.message || "✅ Reset link sent! Check your inbox.");
+    } catch (err) {
+      setForgotMsg("❌ Failed to send reset email. Try again.");
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
   return (
     <div style={styles.root}>
       <style>{css}</style>
 
       <div style={styles.card}>
-        <div style={styles.logo}>
-          <span style={styles.logoAccent}>AXX</span>
-          <span style={styles.logoWord}>SPACE</span>
-        </div>
+        {showForgot ? (
+          <>
+            <div style={styles.logo}>
+              <span style={styles.logoAccent}>AXX</span>
+              <span style={styles.logoWord}>SPACE</span>
+            </div>
 
-        <h1 style={styles.title}>Tourism Provider Login</h1>
-        <p style={styles.subtitle}>Access your tourism property dashboard</p>
+            <h1 style={styles.title}>🔐 Reset Password</h1>
+            <p style={styles.subtitle}>Enter your email to receive a reset link</p>
 
-        {error && <div style={styles.error}>{error}</div>}
+            {forgotMsg && (
+              <div style={forgotMsg.includes("❌") ? styles.error : { ...styles.error, background: "#f0fdf4", borderColor: "#22c55e", color: "#16a34a" }}>
+                {forgotMsg}
+              </div>
+            )}
 
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div>
-            <label style={styles.label}>Email</label>
-            <input
-              type="email"
-              style={styles.input}
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+            <form onSubmit={handleForgotPassword} style={styles.form}>
+              <div>
+                <label style={styles.label}>Email</label>
+                <input
+                  type="email"
+                  style={styles.input}
+                  placeholder="Enter your registered email"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  required
+                />
+              </div>
 
-          <div>
-            <label style={styles.label}>Password</label>
-            <input
-              type="password"
-              style={styles.input}
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+              <button
+                type="submit"
+                style={{ ...styles.button, ...(forgotLoading ? styles.buttonDisabled : {}) }}
+                disabled={forgotLoading}
+              >
+                {forgotLoading ? "Sending..." : "📧 Send Reset Link"}
+              </button>
+            </form>
 
-          <button
-            type="submit"
-            style={{ ...styles.button, ...(loading ? styles.buttonDisabled : {}) }}
-            disabled={loading}
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
+            <div style={styles.link}>
+              <span style={styles.linkText} onClick={() => { setShowForgot(false); setForgotMsg(""); }}>
+                ← Back to Login
+              </span>
+            </div>
+          </>
+        ) : (
+          <>
+            <div style={styles.logo}>
+              <span style={styles.logoAccent}>AXX</span>
+              <span style={styles.logoWord}>SPACE</span>
+            </div>
 
-        <div style={styles.link}>
-          Don't have an account?{" "}
-          <span style={styles.linkText} onClick={() => navigate("/tourism/register-property")}>
-            Register Your Property
-          </span>
-        </div>
+            <h1 style={styles.title}>Tourism Provider Login</h1>
+            <p style={styles.subtitle}>Access your tourism property dashboard</p>
 
-        <div style={styles.link}>
-          <span style={styles.linkText} onClick={() => navigate("/tourism")}>
-            ← Back to Tourism
-          </span>
-        </div>
+            {error && <div style={styles.error}>{error}</div>}
+
+            <form onSubmit={handleSubmit} style={styles.form}>
+              <div>
+                <label style={styles.label}>Email</label>
+                <input
+                  type="email"
+                  style={styles.input}
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div>
+                <label style={styles.label}>Password</label>
+                <input
+                  type="password"
+                  style={styles.input}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <div style={{ textAlign: "right", marginTop: "8px" }}>
+                  <span
+                    onClick={() => { setShowForgot(true); setError(""); }}
+                    style={{ color: "#fbbf24", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}
+                  >
+                    Forgot password?
+                  </span>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                style={{ ...styles.button, ...(loading ? styles.buttonDisabled : {}) }}
+                disabled={loading}
+              >
+                {loading ? "Logging in..." : "Login"}
+              </button>
+            </form>
+
+            <div style={styles.link}>
+              Don't have an account?{" "}
+              <span style={styles.linkText} onClick={() => navigate("/tourism/register-property")}>
+                Register Your Property
+              </span>
+            </div>
+
+            <div style={styles.link}>
+              <span style={styles.linkText} onClick={() => navigate("/tourism")}>
+                ← Back to Tourism
+              </span>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

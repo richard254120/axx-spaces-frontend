@@ -123,6 +123,12 @@ export default function BusinessLogin() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  // Forgot password state
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotMsg, setForgotMsg] = useState("");
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -151,60 +157,135 @@ export default function BusinessLogin() {
     }
   };
 
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setForgotMsg("");
+
+    if (!forgotEmail) {
+      setForgotMsg("❌ Please enter your email address.");
+      return;
+    }
+
+    setForgotLoading(true);
+
+    try {
+      const res = await API.post("/auth/forgot-password", { email: forgotEmail });
+      setForgotMsg(res.data.message || "✅ Reset link sent! Check your inbox.");
+    } catch (err) {
+      setForgotMsg("❌ Failed to send reset email. Try again.");
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.form}>
-        <h1 style={styles.title}>Business Login</h1>
-        <p style={styles.subtitle}>Sign in to manage your business on AxxBiashara</p>
+        {showForgot ? (
+          <>
+            <h1 style={styles.title}>🔐 Reset Password</h1>
+            <p style={styles.subtitle}>Enter your email to receive a reset link</p>
 
-        {error && <div style={styles.error}>{error}</div>}
-        {success && <div style={styles.success}>{success}</div>}
+            {forgotMsg && (
+              <div style={forgotMsg.includes("❌") ? styles.error : styles.success}>
+                {forgotMsg}
+              </div>
+            )}
 
-        <form onSubmit={handleSubmit}>
-          <label style={styles.label}>Email Address</label>
-          <input
-            type="email"
-            name="email"
-            style={styles.input}
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="your@email.com"
-            required
-          />
+            <form onSubmit={handleForgotPassword}>
+              <label style={styles.label}>Email Address</label>
+              <input
+                type="email"
+                style={styles.input}
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                placeholder="Enter your registered email"
+                required
+              />
 
-          <label style={styles.label}>Password</label>
-          <input
-            type="password"
-            name="password"
-            style={styles.input}
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="••••••••"
-            required
-          />
+              <button
+                type="submit"
+                style={{ ...styles.button, ...(forgotLoading ? styles.buttonDisabled : {}) }}
+                disabled={forgotLoading}
+              >
+                {forgotLoading ? "Sending..." : "📧 Send Reset Link"}
+              </button>
+            </form>
 
-          <button
-            type="submit"
-            style={{ ...styles.button, ...(loading ? styles.buttonDisabled : {}) }}
-            disabled={loading}
-          >
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
-        </form>
+            <div style={styles.divider}>
+              <div style={styles.dividerLine}></div>
+              <span style={styles.dividerText}>or</span>
+              <div style={styles.dividerLine}></div>
+            </div>
 
-        <div style={styles.divider}>
-          <div style={styles.dividerLine}></div>
-          <span style={styles.dividerText}>or</span>
-          <div style={styles.dividerLine}></div>
-        </div>
+            <Link to="/business-login" style={styles.link} onClick={() => { setShowForgot(false); setForgotMsg(""); }}>
+              ← Back to Login
+            </Link>
+          </>
+        ) : (
+          <>
+            <h1 style={styles.title}>Business Login</h1>
+            <p style={styles.subtitle}>Sign in to manage your business on AxxBiashara</p>
 
-        <Link to="/business-register" style={styles.link}>
-          Don't have a business account? <strong>Register here</strong>
-        </Link>
+            {error && <div style={styles.error}>{error}</div>}
+            {success && <div style={styles.success}>{success}</div>}
 
-        <Link to="/axxbiashara" style={styles.link}>
-          ← Back to AxxBiashara
-        </Link>
+            <form onSubmit={handleSubmit}>
+              <label style={styles.label}>Email Address</label>
+              <input
+                type="email"
+                name="email"
+                style={styles.input}
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="your@email.com"
+                required
+              />
+
+              <label style={styles.label}>Password</label>
+              <input
+                type="password"
+                name="password"
+                style={styles.input}
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="••••••••"
+                required
+              />
+
+              <div style={{ textAlign: "right", marginBottom: "20px" }}>
+                <span
+                  onClick={() => { setShowForgot(true); setError(""); }}
+                  style={{ color: "#60a5fa", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}
+                >
+                  Forgot password?
+                </span>
+              </div>
+
+              <button
+                type="submit"
+                style={{ ...styles.button, ...(loading ? styles.buttonDisabled : {}) }}
+                disabled={loading}
+              >
+                {loading ? "Signing in..." : "Sign In"}
+              </button>
+            </form>
+
+            <div style={styles.divider}>
+              <div style={styles.dividerLine}></div>
+              <span style={styles.dividerText}>or</span>
+              <div style={styles.dividerLine}></div>
+            </div>
+
+            <Link to="/business-register" style={styles.link}>
+              Don't have a business account? <strong>Register here</strong>
+            </Link>
+
+            <Link to="/axxbiashara" style={styles.link}>
+              ← Back to AxxBiashara
+            </Link>
+          </>
+        )}
       </div>
     </div>
   );
