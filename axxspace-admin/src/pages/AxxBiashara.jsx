@@ -677,7 +677,7 @@ export default function AxxBiashara() {
           )}
         </div>
 
-        <p style={styles.subtitle}>Discover and connect with trusted businesses across Kenya</p>
+        <p style={styles.subtitle}><img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "24px", height: "24px", marginRight: "8px", verticalAlign: "middle", borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(15,23,42,0.2)" }} /> Kenya Business Directory</p>
 
         {/* Pricing Section - Dynamic Offers */}
         <div style={styles.pricingSection}>
