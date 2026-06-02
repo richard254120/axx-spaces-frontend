@@ -53,6 +53,7 @@ const styles = {
     fontSize: "16px",
     marginBottom: "15px",
     transition: "border-color 0.3s",
+    boxSizing: "border-box",
   },
   textarea: {
     width: "100%",
@@ -65,6 +66,7 @@ const styles = {
     marginBottom: "15px",
     minHeight: "120px",
     resize: "vertical",
+    boxSizing: "border-box",
   },
   select: {
     width: "100%",
@@ -75,6 +77,7 @@ const styles = {
     color: "#f1f5f9",
     fontSize: "16px",
     marginBottom: "15px",
+    boxSizing: "border-box",
   },
   checkboxGroup: {
     display: "flex",
@@ -189,7 +192,6 @@ const styles = {
     color: "#f1f5f9",
     fontSize: "14px",
   },
-  /* ── redirect countdown bar ── */
   redirectBar: {
     marginTop: "12px",
     background: "rgba(56,189,248,0.08)",
@@ -201,6 +203,102 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "8px",
+  },
+  /* ── Product section styles ── */
+  productFormBox: {
+    background: "rgba(15, 23, 42, 0.6)",
+    border: "1px solid rgba(96, 165, 250, 0.2)",
+    borderRadius: "12px",
+    padding: "20px",
+    marginBottom: "16px",
+  },
+  productFormTitle: {
+    fontSize: "14px",
+    fontWeight: 700,
+    color: "#60a5fa",
+    marginBottom: "14px",
+    textTransform: "uppercase",
+    letterSpacing: "0.06em",
+  },
+  addProductBtn: {
+    width: "100%",
+    padding: "13px",
+    background: "rgba(96, 165, 250, 0.15)",
+    color: "#60a5fa",
+    border: "1px solid rgba(96, 165, 250, 0.4)",
+    borderRadius: "10px",
+    fontSize: "15px",
+    fontWeight: 700,
+    cursor: "pointer",
+    transition: "all 0.2s",
+    marginTop: "4px",
+  },
+  productCard: {
+    padding: "12px",
+    background: "rgba(15, 23, 42, 0.5)",
+    borderRadius: "10px",
+    marginBottom: "10px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    border: "1px solid rgba(255,255,255,0.06)",
+  },
+  productCardLeft: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    flex: 1,
+    minWidth: 0,
+  },
+  productThumb: {
+    width: "54px",
+    height: "54px",
+    objectFit: "cover",
+    borderRadius: "8px",
+    flexShrink: 0,
+    border: "1px solid rgba(255,255,255,0.1)",
+  },
+  productThumbPlaceholder: {
+    width: "54px",
+    height: "54px",
+    borderRadius: "8px",
+    background: "rgba(96,165,250,0.1)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "22px",
+    flexShrink: 0,
+    border: "1px solid rgba(96,165,250,0.2)",
+  },
+  productName: {
+    fontWeight: 700,
+    fontSize: "14px",
+    color: "#f1f5f9",
+    marginBottom: "2px",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+  },
+  productMeta: {
+    fontSize: "12px",
+    color: "#94a3b8",
+  },
+  removeBtn: {
+    padding: "6px 14px",
+    background: "rgba(239,68,68,0.15)",
+    color: "#f87171",
+    border: "1px solid rgba(239,68,68,0.3)",
+    borderRadius: "7px",
+    cursor: "pointer",
+    fontSize: "13px",
+    fontWeight: 600,
+    flexShrink: 0,
+    marginLeft: "10px",
+  },
+  uploadingNote: {
+    fontSize: "12px",
+    color: "#fbbf24",
+    marginBottom: "8px",
   },
 };
 
@@ -221,6 +319,9 @@ const KENYA_COUNTIES = [
 ];
 
 const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+
+/* ── Empty product template ── */
+const EMPTY_PRODUCT = { name: "", description: "", price: "", category: "", imageUrl: "" };
 
 export default function BusinessForm() {
   const navigate = useNavigate();
@@ -253,7 +354,10 @@ export default function BusinessForm() {
     pricelist: { url: "", name: "" },
   });
 
+  /* ── FIX 1: Controlled product form state (replaces uncontrolled DOM inputs) ── */
+  const [newProduct, setNewProduct] = useState({ ...EMPTY_PRODUCT });
   const [productImageFile, setProductImageFile] = useState(null);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -261,12 +365,12 @@ export default function BusinessForm() {
   const [uploading, setUploading] = useState({ logo: false, photos: false, product: false, pricelist: false });
   const [businessPhotos, setBusinessPhotos] = useState([]);
 
-  /* ── load existing business when editing ── */
+  /* ── Load existing business when editing ── */
   useEffect(() => {
     if (isEditing) loadBusiness();
   }, [id]);
 
-  /* ── countdown timer after successful edit ── */
+  /* ── Countdown timer after successful edit ── */
   useEffect(() => {
     if (countdown === null) return;
     if (countdown === 0) {
@@ -280,17 +384,17 @@ export default function BusinessForm() {
   const loadBusiness = async () => {
     try {
       const res = await API.get(`/business/${id}`);
-      setFormData(res.data.business);
-      // Pre-fill businessPhotos preview from existing images
-      if (res.data.business.images?.length) {
-        setBusinessPhotos(res.data.business.images);
+      const biz = res.data.business;
+      setFormData(biz);
+      if (biz.images?.length) {
+        setBusinessPhotos(biz.images);
       }
     } catch (err) {
       setError("Failed to load business");
     }
   };
 
-  /* ── category toggle ── */
+  /* ── Category toggle ── */
   const toggleCategory = (category) => {
     setFormData(prev => ({
       ...prev,
@@ -300,7 +404,7 @@ export default function BusinessForm() {
     }));
   };
 
-  /* ── upload handlers ── */
+  /* ── Upload handlers ── */
   const handleLogoUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -317,18 +421,18 @@ export default function BusinessForm() {
     }
   };
 
-  const handleProductImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return null;
+  /* ── FIX 2: Product image upload now takes the actual File object directly ── */
+  const uploadProductImage = async (file) => {
+    if (!file) return "";
     setUploading(prev => ({ ...prev, product: true }));
     const fd = new FormData();
     fd.append("image", file);
     try {
       const res = await API.post("/uploads/product-image", fd, { headers: { "Content-Type": "multipart/form-data" } });
-      return res.data.url;
+      return res.data.url || "";
     } catch {
       setError("Failed to upload product image");
-      return null;
+      return "";
     } finally {
       setUploading(prev => ({ ...prev, product: false }));
     }
@@ -342,7 +446,10 @@ export default function BusinessForm() {
     fd.append("pricelist", file);
     try {
       const res = await API.post("/uploads/pricelist", fd, { headers: { "Content-Type": "multipart/form-data" } });
-      setFormData(prev => ({ ...prev, pricelist: { ...prev.pricelist, url: res.data.url, name: res.data.originalName || file.name } }));
+      setFormData(prev => ({
+        ...prev,
+        pricelist: { ...prev.pricelist, url: res.data.url, name: res.data.originalName || file.name },
+      }));
     } catch {
       setError("Failed to upload pricelist");
     } finally {
@@ -376,7 +483,7 @@ export default function BusinessForm() {
     setFormData(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }));
   };
 
-  /* ── hours helper ── */
+  /* ── Hours helper ── */
   const updateHours = (day, field, value) => {
     setFormData(prev => ({
       ...prev,
@@ -387,13 +494,46 @@ export default function BusinessForm() {
     }));
   };
 
-  /* ══════════════════════════════════════════
-     SUBMIT — KEY LOGIC
-     • isEditing  → PUT → show success → redirect
-       to /axxbiashara with { state: { refresh: true } }
-       so the homepage immediately refetches fresh data
-     • new listing → POST → redirect to /business-dashboard
-  ══════════════════════════════════════════ */
+  /* ── FIX 1+2: Add product using controlled state + clean upload ── */
+  const handleAddProduct = async () => {
+    if (!newProduct.name.trim()) {
+      setError("Product name is required");
+      return;
+    }
+
+    let imageUrl = "";
+    if (productImageFile) {
+      imageUrl = await uploadProductImage(productImageFile);
+    }
+
+    const productToAdd = {
+      name: newProduct.name.trim(),
+      description: newProduct.description.trim(),
+      price: newProduct.price ? parseFloat(newProduct.price) : 0,
+      category: newProduct.category.trim(),
+      imageUrl,
+    };
+
+    /* ── FIX 3: Use functional updater to avoid stale closure ── */
+    setFormData(prev => ({
+      ...prev,
+      products: [...prev.products, productToAdd],
+    }));
+
+    /* Reset the product form */
+    setNewProduct({ ...EMPTY_PRODUCT });
+    setProductImageFile(null);
+  };
+
+  /* ── FIX 3: Remove product with functional updater (no stale closure) ── */
+  const handleRemoveProduct = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      products: prev.products.filter((_, i) => i !== index),
+    }));
+  };
+
+  /* ── Submit ── */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -402,13 +542,10 @@ export default function BusinessForm() {
 
     try {
       if (isEditing) {
-        /* ── UPDATE path ── */
         await API.put(`/business/${id}`, formData);
         setSuccess("Business updated successfully! Redirecting to directory…");
-        // Start 3-second countdown, then navigate with refresh signal
         setCountdown(3);
       } else {
-        /* ── CREATE path ── */
         const res = await API.post("/business", formData);
         setSuccess(res.data.message || "Business submitted for review!");
         setTimeout(() => navigate("/business-dashboard"), 2000);
@@ -456,15 +593,20 @@ export default function BusinessForm() {
               <span style={{ fontSize: "20px" }}>✅</span>
               {success}
             </div>
-            {/* Countdown bar — only shown when editing */}
             {isEditing && countdown !== null && (
               <div style={styles.redirectBar}>
                 <span>🔄</span>
-                Taking you to the business directory in <strong style={{ color: "#f1f5f9", margin: "0 4px" }}>{countdown}</strong> second{countdown !== 1 ? "s" : ""}…
+                Taking you to the business directory in{" "}
+                <strong style={{ color: "#f1f5f9", margin: "0 4px" }}>{countdown}</strong>
+                {" "}second{countdown !== 1 ? "s" : ""}…
                 <button
                   type="button"
                   onClick={() => navigate("/axxbiashara", { state: { refresh: true } })}
-                  style={{ marginLeft: "auto", background: "none", border: "none", color: "#38bdf8", cursor: "pointer", fontSize: "13px", fontWeight: 700, textDecoration: "underline" }}
+                  style={{
+                    marginLeft: "auto", background: "none", border: "none",
+                    color: "#38bdf8", cursor: "pointer", fontSize: "13px",
+                    fontWeight: 700, textDecoration: "underline",
+                  }}
                 >
                   Go now
                 </button>
@@ -482,7 +624,7 @@ export default function BusinessForm() {
             type="text"
             style={styles.input}
             value={formData.submitterName}
-            onChange={e => setFormData({ ...formData, submitterName: e.target.value })}
+            onChange={e => setFormData(prev => ({ ...prev, submitterName: e.target.value }))}
             required
             placeholder="Enter your name or company name"
           />
@@ -492,7 +634,7 @@ export default function BusinessForm() {
             type="text"
             style={styles.input}
             value={formData.name}
-            onChange={e => setFormData({ ...formData, name: e.target.value })}
+            onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
             required
             placeholder="Enter your business name"
           />
@@ -501,7 +643,7 @@ export default function BusinessForm() {
           <textarea
             style={styles.textarea}
             value={formData.description}
-            onChange={e => setFormData({ ...formData, description: e.target.value })}
+            onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
             required
             placeholder="Describe your business, products, and services in detail"
           />
@@ -511,7 +653,7 @@ export default function BusinessForm() {
             type="number"
             style={styles.input}
             value={formData.yearEstablished || ""}
-            onChange={e => setFormData({ ...formData, yearEstablished: e.target.value })}
+            onChange={e => setFormData(prev => ({ ...prev, yearEstablished: e.target.value }))}
             placeholder="e.g., 2015"
             min="1900"
             max={new Date().getFullYear()}
@@ -521,7 +663,7 @@ export default function BusinessForm() {
           <select
             style={styles.select}
             value={formData.employeeCount || ""}
-            onChange={e => setFormData({ ...formData, employeeCount: e.target.value })}
+            onChange={e => setFormData(prev => ({ ...prev, employeeCount: e.target.value }))}
           >
             <option value="">Select size</option>
             <option value="1-10">1-10 employees</option>
@@ -535,7 +677,7 @@ export default function BusinessForm() {
           <select
             style={styles.select}
             value={formData.priceRange || ""}
-            onChange={e => setFormData({ ...formData, priceRange: e.target.value })}
+            onChange={e => setFormData(prev => ({ ...prev, priceRange: e.target.value }))}
           >
             <option value="">Select price range</option>
             <option value="$">$ - Budget friendly</option>
@@ -549,7 +691,10 @@ export default function BusinessForm() {
             {BUSINESS_CATEGORIES.map(category => (
               <label
                 key={category}
-                style={{ ...styles.checkboxLabel, ...(formData.categories.includes(category) ? styles.checkboxLabelSelected : {}) }}
+                style={{
+                  ...styles.checkboxLabel,
+                  ...(formData.categories.includes(category) ? styles.checkboxLabelSelected : {}),
+                }}
               >
                 <input
                   type="checkbox"
@@ -570,7 +715,7 @@ export default function BusinessForm() {
           <select
             style={styles.select}
             value={formData.location.county}
-            onChange={e => setFormData({ ...formData, location: { ...formData.location, county: e.target.value } })}
+            onChange={e => setFormData(prev => ({ ...prev, location: { ...prev.location, county: e.target.value } }))}
             required
           >
             <option value="">Select County</option>
@@ -582,7 +727,7 @@ export default function BusinessForm() {
             type="text"
             style={styles.input}
             value={formData.location.town}
-            onChange={e => setFormData({ ...formData, location: { ...formData.location, town: e.target.value } })}
+            onChange={e => setFormData(prev => ({ ...prev, location: { ...prev.location, town: e.target.value } }))}
             required
           />
 
@@ -591,7 +736,7 @@ export default function BusinessForm() {
             type="text"
             style={styles.input}
             value={formData.location.address}
-            onChange={e => setFormData({ ...formData, location: { ...formData.location, address: e.target.value } })}
+            onChange={e => setFormData(prev => ({ ...prev, location: { ...prev.location, address: e.target.value } }))}
           />
         </div>
 
@@ -604,7 +749,7 @@ export default function BusinessForm() {
             type="tel"
             style={styles.input}
             value={formData.contact.phone}
-            onChange={e => setFormData({ ...formData, contact: { ...formData.contact, phone: e.target.value } })}
+            onChange={e => setFormData(prev => ({ ...prev, contact: { ...prev.contact, phone: e.target.value } }))}
             required
           />
 
@@ -613,7 +758,7 @@ export default function BusinessForm() {
             type="email"
             style={styles.input}
             value={formData.contact.email}
-            onChange={e => setFormData({ ...formData, contact: { ...formData.contact, email: e.target.value } })}
+            onChange={e => setFormData(prev => ({ ...prev, contact: { ...prev.contact, email: e.target.value } }))}
           />
 
           <label style={styles.label}>Website (Optional)</label>
@@ -621,7 +766,7 @@ export default function BusinessForm() {
             type="url"
             style={styles.input}
             value={formData.contact.website}
-            onChange={e => setFormData({ ...formData, contact: { ...formData.contact, website: e.target.value } })}
+            onChange={e => setFormData(prev => ({ ...prev, contact: { ...prev.contact, website: e.target.value } }))}
             placeholder="https://example.com"
           />
         </div>
@@ -637,22 +782,22 @@ export default function BusinessForm() {
                   <input
                     type="time"
                     style={styles.hoursInput}
-                    value={formData.businessHours[day].open}
+                    value={formData.businessHours[day]?.open || ""}
                     onChange={e => updateHours(day, "open", e.target.value)}
-                    disabled={formData.businessHours[day].closed}
+                    disabled={formData.businessHours[day]?.closed}
                   />
                   <span>-</span>
                   <input
                     type="time"
                     style={styles.hoursInput}
-                    value={formData.businessHours[day].close}
+                    value={formData.businessHours[day]?.close || ""}
                     onChange={e => updateHours(day, "close", e.target.value)}
-                    disabled={formData.businessHours[day].closed}
+                    disabled={formData.businessHours[day]?.closed}
                   />
-                  <label>
+                  <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "#94a3b8", cursor: "pointer" }}>
                     <input
                       type="checkbox"
-                      checked={formData.businessHours[day].closed}
+                      checked={formData.businessHours[day]?.closed || false}
                       onChange={e => updateHours(day, "closed", e.target.checked)}
                     />
                     Closed
@@ -667,47 +812,50 @@ export default function BusinessForm() {
         <div style={styles.section}>
           <h2 style={styles.sectionTitle}>Social Media (Optional)</h2>
 
-          <label style={styles.label}>Facebook</label>
-          <input type="url" style={styles.input} value={formData.socialMedia.facebook}
-            onChange={e => setFormData({ ...formData, socialMedia: { ...formData.socialMedia, facebook: e.target.value } })}
-            placeholder="https://facebook.com/yourbusiness" />
-
-          <label style={styles.label}>Instagram</label>
-          <input type="url" style={styles.input} value={formData.socialMedia.instagram}
-            onChange={e => setFormData({ ...formData, socialMedia: { ...formData.socialMedia, instagram: e.target.value } })}
-            placeholder="https://instagram.com/yourbusiness" />
-
-          <label style={styles.label}>Twitter/X</label>
-          <input type="url" style={styles.input} value={formData.socialMedia.twitter}
-            onChange={e => setFormData({ ...formData, socialMedia: { ...formData.socialMedia, twitter: e.target.value } })}
-            placeholder="https://twitter.com/yourbusiness" />
-
-          <label style={styles.label}>LinkedIn</label>
-          <input type="url" style={styles.input} value={formData.socialMedia.linkedin}
-            onChange={e => setFormData({ ...formData, socialMedia: { ...formData.socialMedia, linkedin: e.target.value } })}
-            placeholder="https://linkedin.com/company/yourbusiness" />
-
-          <label style={styles.label}>TikTok</label>
-          <input type="url" style={styles.input} value={formData.socialMedia.tiktok}
-            onChange={e => setFormData({ ...formData, socialMedia: { ...formData.socialMedia, tiktok: e.target.value } })}
-            placeholder="https://tiktok.com/@yourbusiness" />
-
-          <label style={styles.label}>WhatsApp</label>
-          <input type="tel" style={styles.input} value={formData.socialMedia.whatsapp}
-            onChange={e => setFormData({ ...formData, socialMedia: { ...formData.socialMedia, whatsapp: e.target.value } })}
-            placeholder="2547XXXXXXXXX" />
+          {[
+            { label: "Facebook", key: "facebook", placeholder: "https://facebook.com/yourbusiness", type: "url" },
+            { label: "Instagram", key: "instagram", placeholder: "https://instagram.com/yourbusiness", type: "url" },
+            { label: "Twitter/X", key: "twitter", placeholder: "https://twitter.com/yourbusiness", type: "url" },
+            { label: "LinkedIn", key: "linkedin", placeholder: "https://linkedin.com/company/yourbusiness", type: "url" },
+            { label: "TikTok", key: "tiktok", placeholder: "https://tiktok.com/@yourbusiness", type: "url" },
+            { label: "WhatsApp", key: "whatsapp", placeholder: "2547XXXXXXXXX", type: "tel" },
+          ].map(({ label, key, placeholder, type }) => (
+            <div key={key}>
+              <label style={styles.label}>{label}</label>
+              <input
+                type={type}
+                style={styles.input}
+                value={formData.socialMedia[key] || ""}
+                onChange={e => setFormData(prev => ({
+                  ...prev,
+                  socialMedia: { ...prev.socialMedia, [key]: e.target.value },
+                }))}
+                placeholder={placeholder}
+              />
+            </div>
+          ))}
         </div>
 
         {/* ── LOGO ── */}
         <div style={styles.section}>
           <h2 style={styles.sectionTitle}>Business Logo</h2>
           <label style={styles.label}>Upload Logo</label>
-          <input type="file" style={styles.input} accept="image/*" onChange={handleLogoUpload} disabled={uploading.logo} />
-          {uploading.logo && <p style={{ fontSize: "12px", color: "#60a5fa" }}>Uploading logo...</p>}
+          <input
+            type="file"
+            style={styles.input}
+            accept="image/*"
+            onChange={handleLogoUpload}
+            disabled={uploading.logo}
+          />
+          {uploading.logo && <p style={styles.uploadingNote}>Uploading logo...</p>}
           {formData.logo && (
             <div style={{ marginTop: "10px" }}>
-              <img src={formData.logo} alt="Logo preview" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "10px" }} />
-              <p style={{ fontSize: "12px", color: "#4ade80" }}>✅ Logo uploaded successfully</p>
+              <img
+                src={formData.logo}
+                alt="Logo preview"
+                style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "10px" }}
+              />
+              <p style={{ fontSize: "12px", color: "#4ade80", marginTop: "6px" }}>✅ Logo uploaded successfully</p>
             </div>
           )}
         </div>
@@ -716,18 +864,39 @@ export default function BusinessForm() {
         <div style={styles.section}>
           <h2 style={styles.sectionTitle}>Business Photos (Up to 18)</h2>
           <label style={styles.label}>Upload Photos</label>
-          <input type="file" style={styles.input} accept="image/*" multiple onChange={handleBusinessPhotosUpload} disabled={uploading.photos} />
-          {uploading.photos && <p style={{ fontSize: "12px", color: "#60a5fa" }}>Uploading photos...</p>}
+          <input
+            type="file"
+            style={styles.input}
+            accept="image/*"
+            multiple
+            onChange={handleBusinessPhotosUpload}
+            disabled={uploading.photos}
+          />
+          {uploading.photos && <p style={styles.uploadingNote}>Uploading photos...</p>}
           <p style={{ fontSize: "12px", color: "#94a3b8" }}>{businessPhotos.length} / 18 photos uploaded</p>
           {businessPhotos.length > 0 && (
-            <div style={{ marginTop: "15px", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", gap: "10px" }}>
+            <div style={{
+              marginTop: "15px",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
+              gap: "10px",
+            }}>
               {businessPhotos.map((photo, index) => (
                 <div key={index} style={{ position: "relative" }}>
-                  <img src={photo} alt={`Business photo ${index + 1}`} style={{ width: "100%", height: "100px", objectFit: "cover", borderRadius: "8px" }} />
+                  <img
+                    src={photo}
+                    alt={`Business photo ${index + 1}`}
+                    style={{ width: "100%", height: "100px", objectFit: "cover", borderRadius: "8px" }}
+                  />
                   <button
                     type="button"
                     onClick={() => removePhoto(index)}
-                    style={{ position: "absolute", top: "5px", right: "5px", background: "#ef4444", color: "white", border: "none", borderRadius: "50%", width: "24px", height: "24px", cursor: "pointer", fontSize: "12px", fontWeight: "bold" }}
+                    style={{
+                      position: "absolute", top: "5px", right: "5px",
+                      background: "#ef4444", color: "white", border: "none",
+                      borderRadius: "50%", width: "24px", height: "24px",
+                      cursor: "pointer", fontSize: "12px", fontWeight: "bold",
+                    }}
                   >×</button>
                 </div>
               ))}
@@ -735,73 +904,125 @@ export default function BusinessForm() {
           )}
         </div>
 
-        {/* ── PRODUCTS ── */}
+        {/* ══════════════════════════════════════════════════════════
+            PRODUCTS & SERVICES
+            FIX: All inputs are now controlled React state.
+                 No more document.getElementById.
+                 Upload uses the actual File object directly.
+                 Remove uses functional updater (no stale closure).
+        ══════════════════════════════════════════════════════════ */}
         <div style={styles.section}>
           <h2 style={styles.sectionTitle}>Products & Services</h2>
-          <label style={styles.label}>Product Name</label>
-          <input type="text" style={styles.input} placeholder="Product name" id="productName" />
-          <label style={styles.label}>Description</label>
-          <input type="text" style={styles.input} placeholder="Product description" id="productDescription" />
-          <label style={styles.label}>Price (KES)</label>
-          <input type="number" style={styles.input} placeholder="Price" id="productPrice" />
-          <label style={styles.label}>Category</label>
-          <input type="text" style={styles.input} placeholder="Category" id="productCategory" />
-          <label style={styles.label}>Product Image</label>
-          <input
-            type="file"
-            style={styles.input}
-            accept="image/*"
-            id="productImage"
-            disabled={uploading.product}
-            onChange={e => setProductImageFile(e.target.files[0])}
-          />
-          {uploading.product && <p style={{ fontSize: "12px", color: "#fbbf24" }}>Uploading product image...</p>}
 
-          <button
-            type="button"
-            style={{ ...styles.button, marginTop: "10px" }}
-            onClick={async () => {
-              const name = document.getElementById("productName").value;
-              const description = document.getElementById("productDescription").value;
-              const price = parseFloat(document.getElementById("productPrice").value);
-              const category = document.getElementById("productCategory").value;
-              if (!name) return;
-              let imageUrl = "";
-              if (productImageFile) {
-                imageUrl = await handleProductImageUpload({ target: { files: [productImageFile] } }) || "";
-              }
-              setFormData(prev => ({ ...prev, products: [...prev.products, { name, description, price, category, imageUrl }] }));
-              document.getElementById("productName").value = "";
-              document.getElementById("productDescription").value = "";
-              document.getElementById("productPrice").value = "";
-              document.getElementById("productCategory").value = "";
-              document.getElementById("productImage").value = "";
-              setProductImageFile(null);
-            }}
-          >
-            + Add Product
-          </button>
+          {/* ── New product entry form ── */}
+          <div style={styles.productFormBox}>
+            <p style={styles.productFormTitle}>➕ Add a Product or Service</p>
 
+            <label style={styles.label}>Product / Service Name *</label>
+            <input
+              type="text"
+              style={styles.input}
+              placeholder="e.g. Beef Burger, Web Design Package"
+              value={newProduct.name}
+              onChange={e => setNewProduct(prev => ({ ...prev, name: e.target.value }))}
+            />
+
+            <label style={styles.label}>Description</label>
+            <input
+              type="text"
+              style={styles.input}
+              placeholder="Brief description of the product or service"
+              value={newProduct.description}
+              onChange={e => setNewProduct(prev => ({ ...prev, description: e.target.value }))}
+            />
+
+            <label style={styles.label}>Price (KES)</label>
+            <input
+              type="number"
+              style={styles.input}
+              placeholder="e.g. 1500"
+              value={newProduct.price}
+              onChange={e => setNewProduct(prev => ({ ...prev, price: e.target.value }))}
+              min="0"
+            />
+
+            <label style={styles.label}>Category</label>
+            <input
+              type="text"
+              style={styles.input}
+              placeholder="e.g. Food, Design, Consulting"
+              value={newProduct.category}
+              onChange={e => setNewProduct(prev => ({ ...prev, category: e.target.value }))}
+            />
+
+            <label style={styles.label}>Product Image (Optional)</label>
+            <input
+              type="file"
+              style={styles.input}
+              accept="image/*"
+              disabled={uploading.product}
+              onChange={e => setProductImageFile(e.target.files[0] || null)}
+            />
+            {uploading.product && <p style={styles.uploadingNote}>Uploading product image…</p>}
+            {productImageFile && !uploading.product && (
+              <p style={{ fontSize: "12px", color: "#94a3b8", marginBottom: "10px" }}>
+                📎 {productImageFile.name} selected
+              </p>
+            )}
+
+            <button
+              type="button"
+              style={styles.addProductBtn}
+              onClick={handleAddProduct}
+              disabled={uploading.product}
+            >
+              {uploading.product ? "Uploading image…" : "+ Add Product / Service"}
+            </button>
+          </div>
+
+          {/* ── List of added products ── */}
           {formData.products.length > 0 && (
-            <div style={{ marginTop: "15px" }}>
-              <p style={{ fontSize: "14px", fontWeight: 600, marginBottom: "10px" }}>Added Products:</p>
+            <div>
+              <p style={{ fontSize: "13px", fontWeight: 700, color: "#94a3b8", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                {formData.products.length} {formData.products.length === 1 ? "Product" : "Products"} Added
+              </p>
               {formData.products.map((product, index) => (
-                <div key={index} style={{ padding: "10px", background: "rgba(15, 23, 42, 0.5)", borderRadius: "8px", marginBottom: "8px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                    {product.imageUrl && <img src={product.imageUrl} alt={product.name} style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "5px" }} />}
-                    <div>
-                      <div style={{ fontWeight: 600 }}>{product.name}</div>
-                      {product.price && <div style={{ fontSize: "12px", color: "#94a3b8" }}>KES {product.price.toLocaleString()}</div>}
+                <div key={index} style={styles.productCard}>
+                  <div style={styles.productCardLeft}>
+                    {product.imageUrl
+                      ? <img src={product.imageUrl} alt={product.name} style={styles.productThumb} />
+                      : <div style={styles.productThumbPlaceholder}>🛍</div>
+                    }
+                    <div style={{ minWidth: 0 }}>
+                      <div style={styles.productName}>{product.name}</div>
+                      <div style={styles.productMeta}>
+                        {product.price ? `KES ${Number(product.price).toLocaleString()}` : "No price set"}
+                        {product.category ? ` · ${product.category}` : ""}
+                      </div>
+                      {product.description && (
+                        <div style={{ ...styles.productMeta, marginTop: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "260px" }}>
+                          {product.description}
+                        </div>
+                      )}
                     </div>
                   </div>
+                  {/* FIX 3: functional updater, no stale closure */}
                   <button
                     type="button"
-                    style={{ padding: "5px 10px", background: "#ef4444", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}
-                    onClick={() => setFormData({ ...formData, products: formData.products.filter((_, i) => i !== index) })}
-                  >Remove</button>
+                    style={styles.removeBtn}
+                    onClick={() => handleRemoveProduct(index)}
+                  >
+                    Remove
+                  </button>
                 </div>
               ))}
             </div>
+          )}
+
+          {formData.products.length === 0 && (
+            <p style={{ fontSize: "13px", color: "#475569", textAlign: "center", padding: "20px 0" }}>
+              No products added yet. Use the form above to add your first product or service.
+            </p>
           )}
         </div>
 
@@ -809,17 +1030,25 @@ export default function BusinessForm() {
         <div style={styles.section}>
           <h2 style={styles.sectionTitle}>Pricelist / Menu</h2>
           <label style={styles.label}>Upload Pricelist/Menu</label>
-          <input type="file" style={styles.input} accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onChange={handlePricelistUpload} disabled={uploading.pricelist} />
-          {uploading.pricelist && <p style={{ fontSize: "12px", color: "#fbbf24" }}>Uploading pricelist...</p>}
+          <input
+            type="file"
+            style={styles.input}
+            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+            onChange={handlePricelistUpload}
+            disabled={uploading.pricelist}
+          />
+          {uploading.pricelist && <p style={styles.uploadingNote}>Uploading pricelist...</p>}
           {formData.pricelist?.url && (
-            <p style={{ fontSize: "12px", color: "#4ade80", marginTop: "8px" }}>✅ Pricelist uploaded: {formData.pricelist.name}</p>
+            <p style={{ fontSize: "12px", color: "#4ade80", marginTop: "8px" }}>
+              ✅ Pricelist uploaded: {formData.pricelist.name}
+            </p>
           )}
         </div>
 
         {/* ── SUBMIT ── */}
         <button
           type="submit"
-          style={{ ...styles.button, ...(loading ? styles.buttonDisabled : {}) }}
+          style={{ ...styles.button, ...(loading || countdown !== null ? styles.buttonDisabled : {}) }}
           disabled={loading || countdown !== null}
         >
           {loading
