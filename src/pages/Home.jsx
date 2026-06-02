@@ -40,6 +40,8 @@ export default function Home() {
     "🚛 Trusted Moving Services",
     "🛍️ Building Materials & Second-Hand Items",
     "🏨 Hotels & Tourism Experiences",
+    "💼 AXXBIASHARA Business Services",
+    "🏪 Marketplace for All Your Needs",
     "✅ Verified Listings — Zero Hidden Fees",
     "💬 Connect Directly via WhatsApp",
     "🗺 GPS Maps for Every Listing",
@@ -101,6 +103,32 @@ export default function Home() {
       bg: "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)",
       accent: "#047857",
     },
+    {
+      id: "axxbiashara",
+      icon: "💼",
+      title: "AxxBiashara",
+      tagline: "Business solutions & services",
+      description: "Access professional business services, from company registration to accounting, legal support, and digital solutions. Grow your business with trusted experts.",
+      features: ["Business registration", "Accounting & tax", "Legal services", "Digital solutions"],
+      cta: "Explore Services",
+      route: "/axxbiashara",
+      color: "#7c3aed",
+      bg: "linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)",
+      accent: "#6d28d9",
+    },
+    {
+      id: "marketplace",
+      icon: "🏪",
+      title: "Marketplace",
+      tagline: "Buy & sell anything",
+      description: "The ultimate marketplace for buying and selling new and used items. From electronics to furniture, fashion to cars — find great deals or sell your items.",
+      features: ["New & used items", "Secure transactions", "Nationwide delivery", "Direct seller contact"],
+      cta: "Browse Marketplace",
+      route: "/sellers",
+      color: "#0891b2",
+      bg: "linear-gradient(135deg, #ecfeff 0%, #cffafe 100%)",
+      accent: "#0e7490",
+    },
   ];
 
   // Stats per category
@@ -109,6 +137,8 @@ export default function Home() {
     movers: [{ val: "60+", label: "Moving Companies" }, { val: "47", label: "Counties Covered" }, { val: "1,200+", label: "Moves Completed" }],
     merchants: [{ val: "150+", label: "Verified Merchants" }, { val: "5,000+", label: "Products Listed" }, { val: "30+", label: "Counties" }],
     tourism: [{ val: "200+", label: "Hotels & Lodges" }, { val: "47", label: "Counties" }, { val: "3,000+", label: "Happy Guests" }],
+    axxbiashara: [{ val: "100+", label: "Service Providers" }, { val: "47", label: "Counties" }, { val: "2,000+", label: "Businesses Served" }],
+    marketplace: [{ val: "10,000+", label: "Active Listings" }, { val: "47", label: "Counties" }, { val: "5,000+", label: "Happy Users" }],
   };
 
   useEffect(() => {
@@ -1305,7 +1335,7 @@ export default function Home() {
             <span className="hero-title-accent">Under One Roof</span>
           </h1>
           <p className="hero-subtitle">
-            Rentals · Movers · MarketPlace · Tourism — verified across all 47 counties
+            Rentals · Movers · Merchants · Tourism · AXXBIASHARA · Marketplace — verified across all 47 counties
           </p>
 
           {/* ── CATEGORY QUICK LINKS ── */}

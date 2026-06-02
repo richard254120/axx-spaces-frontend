@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
+import { AuthContext } from "../context/AuthContext";
 
 const BUSINESS_CATEGORIES = [
   "Restaurants", "Retail", "Services", "Technology", "Healthcare", "Education",
@@ -30,6 +31,7 @@ const BADGE_CONFIG = {
 export default function AxxBiashara() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { token } = useContext(AuthContext);
 
   const [businesses, setBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -89,6 +91,9 @@ export default function AxxBiashara() {
   };
 
   const loadFavorites = async () => {
+    // Only load favorites if user is logged in
+    if (!token) return;
+
     try {
       const res = await API.get("/favorites");
       setFavorites(res.data.favorites || []);
