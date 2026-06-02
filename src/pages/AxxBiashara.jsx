@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
 
 const BUSINESS_CATEGORIES = [
@@ -29,6 +29,7 @@ const BADGE_CONFIG = {
 
 export default function AxxBiashara() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [businesses, setBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -92,6 +93,10 @@ export default function AxxBiashara() {
     loadAnnouncements();
     loadFavorites();
   }, []);
+
+  useEffect(() => {
+    loadBusinesses();
+  }, [location]);
 
   const loadFavorites = async () => {
     try {

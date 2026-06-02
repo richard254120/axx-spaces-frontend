@@ -309,7 +309,9 @@ export default function BusinessForm() {
   const loadBusiness = async () => {
     try {
       const res = await API.get(`/business/${id}`);
-      setFormData(res.data.business);
+      const business = res.data.business;
+      setFormData(business);
+      setBusinessPhotos(business.images || []);
     } catch (err) {
       setError("Failed to load business");
     }
