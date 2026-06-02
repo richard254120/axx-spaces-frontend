@@ -114,7 +114,7 @@ export default function TourismPage() {
       <nav style={s.nav}>
         <div style={s.navInner}>
           <div style={s.logo}>
-            <img src="/tourism.png" alt="Tourism" style={{ width: "40px", height: "40px", marginRight: "10px", verticalAlign: "middle", filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.2))" }} />
+            <img src="/tourism.png" alt="Tourism" style={{ width: "40px", height: "40px", marginRight: "10px", verticalAlign: "middle", filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.2))", borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(0,0,0,0.1)" }} />
             <span style={s.logoAccent}>AXX</span>
             <span style={s.logoSub}>SPACE</span>
             <span style={s.logoDivider}>|</span>

@@ -194,7 +194,7 @@ export default function Listings() {
       <style>{cssStyles}</style>
 
       <div style={styles.header}>
-        <h1 style={styles.heading}><img src="/rentals.png" alt="Rentals" style={{ width: "40px", height: "40px", marginRight: "14px", verticalAlign: "middle", filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.15))" }} /> Available Properties</h1>
+        <h1 style={styles.heading}><img src="/rentals.png" alt="Rentals" style={{ width: "40px", height: "40px", marginRight: "14px", verticalAlign: "middle", filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.15))", borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(0,0,0,0.1)" }} /> Available Properties</h1>
         <p style={styles.tagline}>Find your perfect rental home in Kenya</p>
       </div>
 

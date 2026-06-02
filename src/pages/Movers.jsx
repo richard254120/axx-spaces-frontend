@@ -497,7 +497,7 @@ export default function Movers() {
           🇰🇪 Kenya's Verified Relocation Network
         </div>
         <h1 style={{ fontSize: "clamp(2rem,6vw,3.4rem)", fontWeight: 900, margin: "0 0 14px", letterSpacing: -1, background: `linear-gradient(135deg,${C.text} 0%,${C.gold} 100%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", display: "flex", alignItems: "center", gap: "16px", justifyContent: "center" }}>
-          <img src="/movers.png" alt="Axx Movers" style={{ width: "clamp(2.5rem,6vw,3.5rem)", height: "clamp(2.5rem,6vw,3.5rem)", objectFit: "contain", filter: "drop-shadow(0 4px 12px rgba(230,168,23,0.3))" }} />
+          <img src="/movers.png" alt="Axx Movers" style={{ width: "clamp(2.5rem,6vw,3.5rem)", height: "clamp(2.5rem,6vw,3.5rem)", objectFit: "cover", filter: "drop-shadow(0 4px 12px rgba(230,168,23,0.3))", borderRadius: "50%", border: "3px solid rgba(230,168,23,0.3)" }} />
           <span>Axx Movers</span>
         </h1>
         <p style={{ color: C.muted, fontSize: 17, margin: 0 }}>Find trusted movers across all 47 counties — fast, safe, and affordable.</p>

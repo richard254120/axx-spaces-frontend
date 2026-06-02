@@ -571,7 +571,7 @@ export default function AxxBiashara() {
       {/* ── HEADER ─────────────────────────────────────────────────────────── */}
       <div style={styles.header}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-          <h1 style={styles.title}><img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "56px", height: "56px", marginRight: "14px", verticalAlign: "middle", filter: "drop-shadow(0 4px 12px rgba(251,191,36,0.4))" }} /> AxxBiashara</h1>
+          <h1 style={styles.title}><img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "56px", height: "56px", marginRight: "14px", verticalAlign: "middle", filter: "drop-shadow(0 4px 12px rgba(251,191,36,0.4))", borderRadius: "50%", objectFit: "cover", border: "3px solid rgba(251,191,36,0.3)" }} /> AxxBiashara</h1>
           <div style={{ display: "flex", gap: "10px" }}>
             <button
               style={styles.addButton}
