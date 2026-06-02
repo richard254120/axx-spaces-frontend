@@ -2,6 +2,7 @@ import { useContext, useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { ProfileAvatar } from "../features/profile";
+import AccountTypeSelector from "./AccountTypeSelector";
 import logo from "../assets/image.png";
 
 export default function Navbar() {
@@ -11,11 +12,25 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const [accountSelectorOpen, setAccountSelectorOpen] = useState(false);
+  const [accountSelectorMode, setAccountSelectorMode] = useState("login");
   const dropdownRef = useRef(null);
   const accountRef = useRef(null);
 
   // Check if user is on a business-related page
   const isBusinessPage = location.pathname.startsWith('/business') || location.pathname === '/axxbiashara';
+
+  const handleLoginClick = () => {
+    setAccountSelectorMode("login");
+    setAccountSelectorOpen(true);
+    setDropdownOpen(false);
+  };
+
+  const handleRegisterClick = () => {
+    setAccountSelectorMode("register");
+    setAccountSelectorOpen(true);
+    setDropdownOpen(false);
+  };
 
   const handleLogout = () => {
     logout();
@@ -130,16 +145,22 @@ export default function Navbar() {
             <>
               <div style={styles.dropdownDivider} />
               <div style={styles.dropdownHeader}>Account</div>
-              <Link to="/login" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+              <button style={styles.dropdownItem} onClick={handleLoginClick}>
                 <span style={styles.dropdownIcon}>🔑</span> Login
-              </Link>
-              <Link to="/register" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+              </button>
+              <button style={styles.dropdownItem} onClick={handleRegisterClick}>
                 <span style={styles.dropdownIcon}>📝</span> Register
-              </Link>
+              </button>
             </>
           )}
         </div>
       )}
+
+      <AccountTypeSelector
+        isOpen={accountSelectorOpen}
+        onClose={() => setAccountSelectorOpen(false)}
+        mode={accountSelectorMode}
+      />
     </div>
   );
 
@@ -255,20 +276,18 @@ export default function Navbar() {
                   <div style={styles.rentalsDropdownDivider} />
                   <div style={styles.rentalsDropdownHeader}>Account</div>
                   <p style={styles.accountDropdownSubtitle}>Sign in or create an account</p>
-                  <Link
-                    to="/login"
+                  <button
                     style={styles.accountBtn}
-                    onClick={() => { setAccountOpen(false); setMenuOpen(false); }}
+                    onClick={() => { handleLoginClick(); setAccountOpen(false); setMenuOpen(false); }}
                   >
                     Login
-                  </Link>
-                  <Link
-                    to="/register"
+                  </button>
+                  <button
                     style={styles.accountBtnOutline}
-                    onClick={() => { setAccountOpen(false); setMenuOpen(false); }}
+                    onClick={() => { handleRegisterClick(); setAccountOpen(false); setMenuOpen(false); }}
                   >
                     Register
-                  </Link>
+                  </button>
                 </>
               )}
             </div>
