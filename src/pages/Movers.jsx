@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
 
@@ -361,6 +361,7 @@ function BookingModal({ mover, onClose, availableServices }) {
 export default function Movers() {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
+  const { search } = useLocation();
 
   const [activeTab, setActiveTab] = useState("search");
   const [loading, setLoading] = useState(false);
@@ -368,6 +369,15 @@ export default function Movers() {
   const [movers, setMovers] = useState([]);
   const [featuredMovers, setFeaturedMovers] = useState([]);
   const [bookingMover, setBookingMover] = useState(null);
+
+  // Check for tab query parameter on mount
+  useEffect(() => {
+    const params = new URLSearchParams(search);
+    const tabParam = params.get("tab");
+    if (tabParam === "login" || tabParam === "register") {
+      setActiveTab(tabParam);
+    }
+  }, [search]);
 
   const [registerData, setRegisterData] = useState({
     name: "", email: "", password: "", phone: "", county: "",

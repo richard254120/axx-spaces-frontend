@@ -123,7 +123,7 @@ const accountTypes = [
     name: "Tourism Account",
     icon: "🏨",
     description: "List and manage tourism properties",
-    loginPath: "/tourism-login",
+    loginPath: "/tourism/login",
     registerPath: "/tourism/register-property",
   },
 ];
@@ -134,7 +134,13 @@ export default function AccountTypeSelector({ isOpen, onClose, mode = "login" })
   if (!isOpen) return null;
 
   const handleAccountSelect = (account) => {
-    const path = mode === "login" ? account.loginPath : account.registerPath;
+    let path = mode === "login" ? account.loginPath : account.registerPath;
+
+    // For movers, add query parameter to indicate which tab to show
+    if (account.id === "mover") {
+      path = `${path}?tab=${mode}`;
+    }
+
     navigate(path);
     onClose();
   };

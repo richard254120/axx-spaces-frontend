@@ -32,6 +32,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import TourismPage from "./pages/tourism/TourismPage";
 import TourismListingsPage from "./pages/tourism/TourismListingsPage";
 import TourismDetailPage from "./pages/tourism/TourismDetailPage";
+import TourismLogin from "./pages/tourism/TourismLogin";
 import RegisterPropertyPage from "./pages/tourism/RegisterPropertyPage";
 import ProviderDashboard from "./pages/tourism/ProviderDashboard";
 import EditPropertyPage from "./pages/tourism/EditPropertyPage";
@@ -110,6 +111,7 @@ function App() {
       {/* ── TOURISM ROUTES (have Navbar) ── */}
       {/* IMPORTANT: specific /tourism/* paths must come before /tourism/:id */}
       <Route path="/tourism" element={<PublicLayout><TourismPage /></PublicLayout>} />
+      <Route path="/tourism/login" element={<PublicLayout><TourismLogin /></PublicLayout>} />
       <Route path="/tourism/listings" element={<PublicLayout><TourismListingsPage /></PublicLayout>} />
       <Route path="/tourism/register-property" element={<PublicLayout><RegisterPropertyPage /></PublicLayout>} />
       <Route
