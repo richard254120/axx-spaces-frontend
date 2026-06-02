@@ -59,7 +59,7 @@ const globalCSS = `
     position: relative;
   }
 
-  /* ── Top noise/glow bar ── */
+  /* ── Top glow bar ── */
   .bd-root::before {
     content: '';
     position: fixed;
@@ -180,10 +180,10 @@ const globalCSS = `
     border-radius: 20px;
     letter-spacing: 0.03em;
   }
-  .bd-badge-green { background: var(--green-soft); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
-  .bd-badge-blue  { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--border-bright); }
+  .bd-badge-green  { background: var(--green-soft);  color: var(--green);  border: 1px solid rgba(34,197,94,0.3);  }
+  .bd-badge-blue   { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--border-bright); }
   .bd-badge-purple { background: var(--purple-soft); color: var(--purple); border: 1px solid rgba(168,85,247,0.3); }
-  .bd-badge-gold  { background: var(--gold-soft); color: var(--gold); border: 1px solid rgba(245,158,11,0.3); }
+  .bd-badge-gold   { background: var(--gold-soft);   color: var(--gold);   border: 1px solid rgba(245,158,11,0.3); }
 
   /* ── CTA pill buttons ── */
   .bd-cta-row {
@@ -220,26 +220,60 @@ const globalCSS = `
 
   .bd-cta-btn.span2 { grid-column: span 2; }
 
-  /* ── Gallery ── */
+  /* ══════════════════════════════════════════
+     GALLERY — shows ALL uploaded photos in a
+     responsive masonry-style grid with NO cap
+  ══════════════════════════════════════════ */
   .bd-gallery {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 6px;
     margin-bottom: 20px;
-    border-radius: var(--radius);
-    overflow: hidden;
   }
 
-  .bd-gallery img {
-    width: 100%;
+  /* First photo is bigger — hero treatment */
+  .bd-gallery-item {
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--surface);
+  }
+
+  .bd-gallery-item:first-child {
+    grid-column: span 3;
+    aspect-ratio: 16/7;
+  }
+
+  .bd-gallery-item:not(:first-child) {
     aspect-ratio: 1;
+  }
+
+  .bd-gallery-item img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     display: block;
+    transition: transform 0.3s ease;
   }
 
-  .bd-gallery img:first-child {
-    grid-column: span 2;
-    aspect-ratio: 2/1.2;
+  .bd-gallery-item img:hover {
+    transform: scale(1.04);
+  }
+
+  /* Photo count badge */
+  .bd-photo-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent-soft);
+    border: 1px solid var(--border-bright);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+    font-family: var(--font-head);
+    letter-spacing: 0.04em;
   }
 
   /* ── Social links ── */
@@ -303,8 +337,8 @@ const globalCSS = `
     align-items: center;
   }
 
-  .bd-hours-day { font-size: 12px; font-weight: 600; color: var(--text); }
-  .bd-hours-time { font-size: 11px; color: var(--text-dim); }
+  .bd-hours-day    { font-size: 12px; font-weight: 600; color: var(--text); }
+  .bd-hours-time   { font-size: 11px; color: var(--text-dim); }
   .bd-hours-closed { color: var(--text-muted); }
 
   /* ── Promo cards ── */
@@ -316,24 +350,22 @@ const globalCSS = `
     margin-bottom: 12px;
   }
 
-  .bd-promo-img {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-  }
-
-  .bd-promo-body { padding: 14px; }
-  .bd-promo-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
-  .bd-promo-desc  { font-size: 13px; color: var(--text-dim); margin-bottom: 10px; line-height: 1.5; }
+  .bd-promo-img      { width: 100%; height: 150px; object-fit: cover; }
+  .bd-promo-body     { padding: 14px; }
+  .bd-promo-title    { font-family: var(--font-head); font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .bd-promo-desc     { font-size: 13px; color: var(--text-dim); margin-bottom: 10px; line-height: 1.5; }
   .bd-promo-discount { font-size: 22px; font-weight: 800; color: var(--green); margin-bottom: 6px; font-family: var(--font-head); }
-  .bd-promo-dates { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
-  .bd-promo-code  { font-size: 12px; color: var(--accent); background: var(--accent-soft); border: 1px solid var(--border-bright); padding: 4px 10px; border-radius: 6px; display: inline-block; font-weight: 700; letter-spacing: 0.06em; }
+  .bd-promo-dates    { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+  .bd-promo-code     { font-size: 12px; color: var(--accent); background: var(--accent-soft); border: 1px solid var(--border-bright); padding: 4px 10px; border-radius: 6px; display: inline-block; font-weight: 700; letter-spacing: 0.06em; }
 
-  /* ── Products grid ── */
+  /* ══════════════════════════════════════════
+     PRODUCTS GRID — auto-fill so ALL products
+     appear regardless of how many there are
+  ══════════════════════════════════════════ */
   .bd-products-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
   }
 
   .bd-product-card {
@@ -341,14 +373,51 @@ const globalCSS = `
     border-radius: var(--radius-sm);
     border: 1px solid var(--border);
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
-  .bd-product-img { width: 100%; height: 100px; object-fit: cover; display: block; }
-  .bd-product-body { padding: 10px; }
-  .bd-product-name { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-  .bd-product-desc { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; line-height: 1.4; }
+  .bd-product-img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .bd-product-img-placeholder {
+    width: 100%;
+    height: 120px;
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    flex-shrink: 0;
+  }
+
+  .bd-product-body  { padding: 10px; flex: 1; display: flex; flex-direction: column; }
+  .bd-product-name  { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; line-height: 1.3; }
+  .bd-product-desc  { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; line-height: 1.4; flex: 1; }
   .bd-product-price { font-size: 15px; font-weight: 800; color: var(--green); font-family: var(--font-head); }
-  .bd-product-cat { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .bd-product-cat   { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+  /* Product count badge */
+  .bd-product-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--green-soft);
+    border: 1px solid rgba(34,197,94,0.3);
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+    font-family: var(--font-head);
+    letter-spacing: 0.04em;
+  }
 
   /* ── Stats ── */
   .bd-stats-grid {
@@ -410,7 +479,7 @@ const globalCSS = `
   }
 
   .bd-support-title { font-family: var(--font-head); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
-  .bd-support-item { font-size: 13px; color: var(--text-dim); margin-bottom: 4px; }
+  .bd-support-item  { font-size: 13px; color: var(--text-dim); margin-bottom: 4px; }
 
   /* ── Owner card ── */
   .bd-owner-card {
@@ -436,7 +505,7 @@ const globalCSS = `
     flex-shrink: 0;
   }
 
-  .bd-owner-name { font-family: var(--font-head); font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+  .bd-owner-name   { font-family: var(--font-head); font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
   .bd-owner-detail { font-size: 12px; color: var(--text-dim); }
 
   /* ── Admin section ── */
@@ -531,6 +600,69 @@ const globalCSS = `
   }
   .bd-scroll-x::-webkit-scrollbar { display: none; }
   .bd-scroll-x-inner { display: flex; gap: 8px; width: max-content; }
+
+  /* ── Lightbox overlay ── */
+  .bd-lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.94);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .bd-lightbox img {
+    max-width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: 10px;
+  }
+
+  .bd-lightbox-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bd-lightbox-nav {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: rgba(255,255,255,0.6);
+    font-size: 13px;
+    font-family: var(--font-head);
+  }
+
+  .bd-lightbox-btn {
+    width: 44px;
+    height: 44px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 50%;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .bd-lightbox-btn:hover { background: rgba(255,255,255,0.18); }
 `;
 
 /* ─── Inject styles once ─── */
@@ -574,6 +706,10 @@ export default function BusinessDetail() {
   const [annContent, setAnnContent] = useState("");
   const [annMsg, setAnnMsg] = useState("");
 
+  /* Lightbox state */
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
   useEffect(() => { loadBusiness(); }, [id]);
 
   const loadBusiness = async () => {
@@ -602,6 +738,25 @@ export default function BusinessDetail() {
     }
   };
 
+  /* Lightbox helpers */
+  const openLightbox = (index) => { setLightboxIndex(index); setLightboxOpen(true); };
+  const closeLightbox = () => setLightboxOpen(false);
+  const prevPhoto = () => setLightboxIndex(i => (i - 1 + b.images.length) % b.images.length);
+  const nextPhoto = () => setLightboxIndex(i => (i + 1) % b.images.length);
+
+  /* Keyboard nav for lightbox */
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const handler = (e) => {
+      if (e.key === "ArrowLeft") prevPhoto();
+      if (e.key === "ArrowRight") nextPhoto();
+      if (e.key === "Escape") closeLightbox();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [lightboxOpen, lightboxIndex]);
+
+  /* ── Loading / error states ── */
   if (loading) return (
     <div className="bd-state-center">
       <div className="bd-state-icon">⟳</div>
@@ -617,8 +772,13 @@ export default function BusinessDetail() {
   );
 
   const b = business;
+  const images = b.images || [];
+  const products = b.products || [];
   const activePromos = (b.promotions || []).filter(p => p.status === "active" && p.isFeatured);
 
+  /* ════════════════════════════════════════════
+     RENDER
+  ════════════════════════════════════════════ */
   return (
     <div className="bd-root">
 
@@ -627,7 +787,7 @@ export default function BusinessDetail() {
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="15 18 9 12 15 6" />
         </svg>
-        Back
+        Back to Directory
       </a>
 
       {/* ── Hero ── */}
@@ -644,7 +804,9 @@ export default function BusinessDetail() {
         </div>
 
         <div className="bd-location">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" /></svg>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+          </svg>
           {b.location.town}, {b.location.county}{b.location.address && `, ${b.location.address}`}
         </div>
 
@@ -667,37 +829,73 @@ export default function BusinessDetail() {
         {/* CTA buttons */}
         <div className="bd-cta-row">
           <a href={`tel:${b.contact.phone}`} className="bd-cta-btn bd-cta-primary">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" /></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
+            </svg>
             Call
           </a>
           <button className="bd-cta-btn bd-cta-green" onClick={() => window.open(`https://wa.me/${b.contact.phone}`)}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" /><path d="M12 0C5.373 0 0 5.373 0 12c0 2.132.554 4.133 1.524 5.875L.057 23.986l6.305-1.651A11.952 11.952 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.914 0-3.708-.504-5.254-1.385l-.377-.222-3.906 1.023 1.041-3.808-.245-.396A9.957 9.957 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" /></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+              <path d="M12 0C5.373 0 0 5.373 0 12c0 2.132.554 4.133 1.524 5.875L.057 23.986l6.305-1.651A11.952 11.952 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.914 0-3.708-.504-5.254-1.385l-.377-.222-3.906 1.023 1.041-3.808-.245-.396A9.957 9.957 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
+            </svg>
             WhatsApp
           </button>
           {b.contact.email && (
             <a href={`mailto:${b.contact.email}`} className="bd-cta-btn bd-cta-ghost">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
               Email
             </a>
           )}
           {b.contact.website && (
             <a href={b.contact.website} target="_blank" rel="noopener noreferrer" className="bd-cta-btn bd-cta-ghost">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              </svg>
               Website
             </a>
           )}
           <button className="bd-cta-btn bd-cta-ghost span2" onClick={() => navigator.share?.({ title: b.name, url: window.location.href })}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" /></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="18" cy="5" r="3" />
+              <circle cx="6" cy="12" r="3" />
+              <circle cx="18" cy="19" r="3" />
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+            </svg>
             Share Business
           </button>
         </div>
 
-        {/* Gallery */}
-        {b.images?.length > 0 && (
-          <div className="bd-gallery">
-            {b.images.slice(0, 4).map((img, i) => (
-              <img key={i} src={img} alt={`${b.name} ${i + 1}`} />
-            ))}
+        {/* ══════════════════════════════════════
+            GALLERY — ALL photos, no slice cap
+            First photo = hero (full width)
+            Rest = 3-column grid, tap to enlarge
+        ══════════════════════════════════════ */}
+        {images.length > 0 && (
+          <div>
+            {/* Photo count badge */}
+            <div className="bd-photo-count">
+              📷 {images.length} {images.length === 1 ? "Photo" : "Photos"}
+            </div>
+
+            <div className="bd-gallery">
+              {images.map((img, i) => (
+                <div
+                  key={i}
+                  className="bd-gallery-item"
+                  onClick={() => openLightbox(i)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <img src={img} alt={`${b.name} photo ${i + 1}`} loading="lazy" />
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -785,21 +983,39 @@ export default function BusinessDetail() {
         </>
       )}
 
-      {/* ── Products ── */}
-      {b.products?.length > 0 && (
+      {/* ══════════════════════════════════════
+          PRODUCTS — ALL items, auto-fill grid
+          No slice, no hardcoded column count
+      ══════════════════════════════════════ */}
+      {products.length > 0 && (
         <>
           <div className="bd-divider" />
           <div className="bd-section">
             <p className="bd-section-title">Products & Services</p>
+
+            {/* Product count badge */}
+            <div className="bd-product-count">
+              🛍 {products.length} {products.length === 1 ? "Item" : "Items"}
+            </div>
+
             <div className="bd-products-grid">
-              {b.products.map((p, i) => (
+              {products.map((product, i) => (
                 <div key={i} className="bd-product-card">
-                  {p.imageUrl && <img src={p.imageUrl} alt={p.name} className="bd-product-img" />}
+                  {product.imageUrl
+                    ? <img src={product.imageUrl} alt={product.name} className="bd-product-img" loading="lazy" />
+                    : <div className="bd-product-img-placeholder">🛍</div>
+                  }
                   <div className="bd-product-body">
-                    <div className="bd-product-name">{p.name}</div>
-                    {p.description && <div className="bd-product-desc">{p.description}</div>}
-                    {p.price && <div className="bd-product-price">KES {p.price.toLocaleString()}</div>}
-                    {p.category && <div className="bd-product-cat">{p.category}</div>}
+                    <div className="bd-product-name">{product.name}</div>
+                    {product.description && (
+                      <div className="bd-product-desc">{product.description}</div>
+                    )}
+                    {product.price && (
+                      <div className="bd-product-price">KES {product.price.toLocaleString()}</div>
+                    )}
+                    {product.category && (
+                      <div className="bd-product-cat">{product.category}</div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -815,7 +1031,10 @@ export default function BusinessDetail() {
           <div className="bd-section">
             <p className="bd-section-title">Menu / Pricelist</p>
             <a href={b.pricelist.url} target="_blank" rel="noopener noreferrer" className="bd-pricelist-btn">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
               {b.pricelist.name || "Download Pricelist"}
             </a>
           </div>
@@ -903,6 +1122,28 @@ export default function BusinessDetail() {
       )}
 
       <div className="bd-safe-bottom" />
+
+      {/* ══════════════════════════════════════
+          LIGHTBOX — tap any photo to enlarge,
+          arrow keys / buttons to navigate
+      ══════════════════════════════════════ */}
+      {lightboxOpen && images.length > 0 && (
+        <div className="bd-lightbox" onClick={closeLightbox}>
+          <button className="bd-lightbox-close" onClick={closeLightbox}>✕</button>
+
+          <img
+            src={images[lightboxIndex]}
+            alt={`${b.name} photo ${lightboxIndex + 1}`}
+            onClick={e => e.stopPropagation()}
+          />
+
+          <div className="bd-lightbox-nav" onClick={e => e.stopPropagation()}>
+            <button className="bd-lightbox-btn" onClick={prevPhoto}>‹</button>
+            <span>{lightboxIndex + 1} / {images.length}</span>
+            <button className="bd-lightbox-btn" onClick={nextPhoto}>›</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
