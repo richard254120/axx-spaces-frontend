@@ -651,6 +651,11 @@ const css = `
     }
 
     [style*="display: flex"][style*="gap: 8px"][style*="flexWrap"] {
+      display: none !important;
+    }
+
+    [style*="display: flex"][style*="gap: 8px"][style*="flexWrap"][style*="display: flex"] {
+      display: flex !important;
       position: fixed !important;
       top: 76px !important;
       left: 0 !important;
@@ -659,15 +664,10 @@ const css = `
       background: linear-gradient(135deg, #1e293b 0%, #0f1729 100%) !important;
       padding: 12px 0 !important;
       gap: 0 !important;
-      max-height: 0 !important;
-      overflow: hidden !important;
-      transition: max-height 0.3s ease !important;
+      max-height: 600px !important;
+      overflow-y: auto !important;
       align-items: stretch !important;
       z-index: 99 !important;
-    }
-
-    [style*="display: flex"][style*="gap: 8px"][style*="flexWrap"][style*="display: flex"] {
-      max-height: 600px !important;
     }
 
     [style*="display: flex"][style*="gap: 8px"][style*="flexWrap"] a {

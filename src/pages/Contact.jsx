@@ -18,8 +18,8 @@ export default function Contact() {
   };
 
   const channels = [
-    { icon: "📧", label: "Email", value: "axxspace@gmail.com", href: "mailto:axxspace@gmail.com" },
-    { icon: "💬", label: "Live Chat", value: "Available Mon–Sun, 8am–6pm", href: null },
+    { icon: "📧", label: "Email", value: "info@axxspace.co.ke", href: "mailto:info@axxspace.co.ke" },
+    { icon: "�", label: "Support", value: "support@axxspace.co.ke", href: "mailto:support@axxspace.co.ke" },
     { icon: "📱", label: "WhatsApp", value: "+254 745 689773", href: "https://wa.me/254745689773" },
   ];
 
@@ -184,13 +184,13 @@ const styles = {
     margin: "0 auto",
   },
   layout: {
-    maxWidth: "960px",
+    maxWidth: "600px",
     margin: "0 auto",
     padding: "48px 24px 80px",
-    display: "grid",
-    gridTemplateColumns: "1fr 2fr",
+    display: "flex",
+    flexDirection: "column",
     gap: "32px",
-    alignItems: "start",
+    alignItems: "stretch",
   },
   sidebar: {
     display: "flex",
@@ -332,7 +332,6 @@ const css = `
   button[type="submit"]:hover { opacity: 0.85; }
 
   @media (max-width: 640px) {
-    [style*="gridTemplateColumns: 1fr 2fr"] { grid-template-columns: 1fr !important; }
     [style*="gridTemplateColumns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
   }
 `;
