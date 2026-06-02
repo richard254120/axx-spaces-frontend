@@ -861,7 +861,7 @@ export default function AxxBiashara() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "32px", marginBottom: "36px" }}>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "linear-gradient(135deg,#0ea5e9,#38bdf8)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px" }}>🏪</div>
+                <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "linear-gradient(135deg,#0ea5e9,#38bdf8)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px" }}><img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "28px", height: "28px", objectFit: "cover", borderRadius: "6px" }} /></div>
                 <span style={{ fontSize: "18px", fontWeight: 800, color: "#f1f5f9" }}>AxxBiashara</span>
               </div>
               <p style={{ fontSize: "13px", color: "#475569", lineHeight: "1.6" }}>Kenya's premier verified business directory.</p>
