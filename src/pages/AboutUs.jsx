@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { COLORS, buttonStyles, pageStyles } from "../styles/theme";
+import SocialMediaLinks from "../components/SocialMediaLinks";
 
 // Import team images from src/assets
 import kenfredImg from "../assets/kenfred.jpg";
