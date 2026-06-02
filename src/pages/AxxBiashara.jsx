@@ -30,6 +30,7 @@ const BADGE_CONFIG = {
 export default function AxxBiashara() {
   const navigate = useNavigate();
   const location = useLocation();
+
   const [businesses, setBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -55,7 +56,9 @@ export default function AxxBiashara() {
   const [showComparisonModal, setShowComparisonModal] = useState(false);
   const [comparisonData, setComparisonData] = useState([]);
   const [hoveredCard, setHoveredCard] = useState(null);
+  const [refreshBanner, setRefreshBanner] = useState(false);
 
+  /* ── core data fetchers ── */
   const loadBusinesses = async () => {
     setLoading(true);
     try {
@@ -85,19 +88,6 @@ export default function AxxBiashara() {
     }
   };
 
-  useEffect(() => {
-    loadBusinesses();
-  }, [selectedCategory, selectedCounty, searchQuery, sortBy, minRating, openNow, verification]);
-
-  useEffect(() => {
-    loadAnnouncements();
-    loadFavorites();
-  }, []);
-
-  useEffect(() => {
-    loadBusinesses();
-  }, [location]);
-
   const loadFavorites = async () => {
     try {
       const res = await API.get("/favorites");
@@ -105,6 +95,30 @@ export default function AxxBiashara() {
     } catch (err) { }
   };
 
+  /* ── filter-driven reload ── */
+  useEffect(() => {
+    loadBusinesses();
+  }, [selectedCategory, selectedCounty, searchQuery, sortBy, minRating, openNow, verification]);
+
+  /* ── initial load ── */
+  useEffect(() => {
+    loadAnnouncements();
+    loadFavorites();
+  }, []);
+
+  /* ── refresh trigger from BusinessForm after update ── */
+  useEffect(() => {
+    if (location.state?.refresh) {
+      loadBusinesses();
+      setRefreshBanner(true);
+      // Clear the router state so back-navigation doesn't re-trigger
+      window.history.replaceState({}, document.title);
+      const t = setTimeout(() => setRefreshBanner(false), 4000);
+      return () => clearTimeout(t);
+    }
+  }, [location.state]);
+
+  /* ── favourites ── */
   const toggleFavorite = async (businessId, e) => {
     e.stopPropagation();
     try {
@@ -119,6 +133,9 @@ export default function AxxBiashara() {
     } catch (err) { }
   };
 
+  const isFavorite = (id) => favorites.some(f => f.business._id === id);
+
+  /* ── comparison ── */
   const toggleComparison = (businessId, e) => {
     e.stopPropagation();
     if (comparisonList.includes(businessId)) {
@@ -139,14 +156,21 @@ export default function AxxBiashara() {
     } catch (err) { }
   };
 
-  const isFavorite = (id) => favorites.some(f => f.business._id === id);
-
+  /* ── announcement submit ── */
   const handleAddAnnouncement = async (e) => {
     e.preventDefault();
     try {
-      await API.post("/business/announcements", { title: announcementTitle, content: announcementContent, submitterName, organizationName });
+      await API.post("/business/announcements", {
+        title: announcementTitle,
+        content: announcementContent,
+        submitterName,
+        organizationName,
+      });
       setAnnouncementSuccess("Announcement submitted for approval!");
-      setAnnouncementTitle(""); setAnnouncementContent(""); setSubmitterName(""); setOrganizationName("");
+      setAnnouncementTitle("");
+      setAnnouncementContent("");
+      setSubmitterName("");
+      setOrganizationName("");
       setShowAnnouncementForm(false);
       setTimeout(() => setAnnouncementSuccess(""), 4000);
     } catch (err) {
@@ -154,6 +178,9 @@ export default function AxxBiashara() {
     }
   };
 
+  /* ════════════════════════════════════════════
+     RENDER
+  ════════════════════════════════════════════ */
   return (
     <div style={{ minHeight: "100vh", background: "#06070d", color: "#e8eaf0", fontFamily: "'Sora', 'DM Sans', sans-serif", overflowX: "hidden" }}>
       <style>{`
@@ -175,16 +202,20 @@ export default function AxxBiashara() {
         }
         @keyframes shimmer {
           0%   { background-position: -400px 0; }
-          100% { background-position: 400px 0; }
+          100% { background-position:  400px 0; }
         }
         @keyframes pulse-ring {
-          0%   { box-shadow: 0 0 0 0 rgba(56,189,248,0.4); }
-          70%  { box-shadow: 0 0 0 12px rgba(56,189,248,0); }
-          100% { box-shadow: 0 0 0 0 rgba(56,189,248,0); }
+          0%   { box-shadow: 0 0 0 0   rgba(56,189,248,0.4); }
+          70%  { box-shadow: 0 0 0 12px rgba(56,189,248,0);   }
+          100% { box-shadow: 0 0 0 0   rgba(56,189,248,0);   }
         }
         @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50%       { transform: translateY(-6px); }
+          0%, 100% { transform: translateX(-50%) translateY(0px); }
+          50%       { transform: translateX(-50%) translateY(-6px); }
+        }
+        @keyframes slideDown {
+          from { opacity: 0; transform: translateY(-12px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
 
         .axx-card {
@@ -410,6 +441,21 @@ export default function AxxBiashara() {
         .stat-chip strong { color: #e2e8f0; font-weight: 600; }
 
         .divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 14px 0; }
+
+        .refresh-banner {
+          animation: slideDown 0.35s ease;
+          background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(56,189,248,0.1));
+          border: 1px solid rgba(16,185,129,0.35);
+          color: #10b981;
+          padding: 12px 20px;
+          border-radius: 12px;
+          font-size: 14px;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 20px;
+        }
       `}</style>
 
       {/* ── HERO HEADER ── */}
@@ -462,7 +508,15 @@ export default function AxxBiashara() {
             ))}
           </div>
 
-          {/* Success message */}
+          {/* ── REFRESH BANNER — shown after a business update ── */}
+          {refreshBanner && (
+            <div className="refresh-banner">
+              <span style={{ fontSize: "18px" }}>✅</span>
+              Business updated successfully! The directory has been refreshed with your latest changes.
+            </div>
+          )}
+
+          {/* Success message (announcement) */}
           {announcementSuccess && (
             <div style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.3)", color: "#10b981", padding: "12px 18px", borderRadius: "10px", marginBottom: "20px", fontSize: "14px", fontWeight: 600 }}>
               ✓ {announcementSuccess}
@@ -519,7 +573,13 @@ export default function AxxBiashara() {
           {/* Search */}
           <div style={{ position: "relative", marginBottom: "14px" }}>
             <span style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", fontSize: "18px", color: "#475569" }}>🔍</span>
-            <input className="search-input" type="text" placeholder="Search businesses by name, category, or location…" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+            <input
+              className="search-input"
+              type="text"
+              placeholder="Search businesses by name, category, or location…"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+            />
             {searchQuery && (
               <button onClick={() => setSearchQuery("")} style={{ position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: "16px" }}>✕</button>
             )}
@@ -551,8 +611,10 @@ export default function AxxBiashara() {
             </button>
 
             {(selectedCategory || selectedCounty || searchQuery || openNow || minRating || verification) && (
-              <button onClick={() => { setSelectedCategory(null); setSelectedCounty(null); setSearchQuery(""); setOpenNow(false); setMinRating(""); setVerification(""); }}
-                style={{ padding: "10px 14px", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: "10px", color: "#f87171", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+              <button
+                onClick={() => { setSelectedCategory(null); setSelectedCounty(null); setSearchQuery(""); setOpenNow(false); setMinRating(""); setVerification(""); }}
+                style={{ padding: "10px 14px", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: "10px", color: "#f87171", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+              >
                 Clear All
               </button>
             )}
@@ -629,7 +691,6 @@ export default function AxxBiashara() {
                   <div className="card-img-wrap">
                     <img src={biz.images[0]} alt={biz.name} />
                     <div className="card-img-overlay" />
-                    {/* Rating over image */}
                     {biz.rating > 0 && (
                       <div style={{ position: "absolute", bottom: "12px", left: "14px", background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)", borderRadius: "8px", padding: "4px 10px", fontSize: "12px", fontWeight: 700, color: "#fbbf24", zIndex: 2 }}>
                         ★ {biz.rating?.toFixed(1)} · {biz.reviewCount || 0} reviews
@@ -649,7 +710,15 @@ export default function AxxBiashara() {
                       <button className="icon-btn" onClick={e => toggleFavorite(biz._id, e)} title="Favourite">
                         {isFavorite(biz._id) ? "❤️" : "🤍"}
                       </button>
-                      <button className="icon-btn" onClick={e => toggleComparison(biz._id, e)} title="Compare" style={{ background: comparisonList.includes(biz._id) ? "rgba(56,189,248,0.15)" : undefined, borderColor: comparisonList.includes(biz._id) ? "rgba(56,189,248,0.4)" : undefined }}>
+                      <button
+                        className="icon-btn"
+                        onClick={e => toggleComparison(biz._id, e)}
+                        title="Compare"
+                        style={{
+                          background: comparisonList.includes(biz._id) ? "rgba(56,189,248,0.15)" : undefined,
+                          borderColor: comparisonList.includes(biz._id) ? "rgba(56,189,248,0.4)" : undefined,
+                        }}
+                      >
                         {comparisonList.includes(biz._id) ? <span style={{ color: "#38bdf8", fontWeight: 700, fontSize: "13px" }}>✓</span> : "⚖"}
                       </button>
                     </div>
@@ -693,7 +762,14 @@ export default function AxxBiashara() {
                       </a>
                     )}
                     {biz.contact?.phone && (
-                      <a href={`https://wa.me/${biz.contact.phone}`} target="_blank" rel="noopener noreferrer" className="action-btn" style={{ background: "rgba(37,211,102,0.1)", color: "#25d366", border: "1px solid rgba(37,211,102,0.25)", display: "inline-flex", alignItems: "center", gap: "6px", padding: "8px 14px", borderRadius: "10px", fontSize: "13px", fontWeight: 600, textDecoration: "none" }} onClick={e => e.stopPropagation()}>
+                      <a
+                        href={`https://wa.me/${biz.contact.phone}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="action-btn"
+                        style={{ background: "rgba(37,211,102,0.1)", color: "#25d366", border: "1px solid rgba(37,211,102,0.25)", display: "inline-flex", alignItems: "center", gap: "6px", padding: "8px 14px", borderRadius: "10px", fontSize: "13px", fontWeight: 600, textDecoration: "none" }}
+                        onClick={e => e.stopPropagation()}
+                      >
                         💬 WhatsApp
                       </a>
                     )}
@@ -793,9 +869,13 @@ export default function AxxBiashara() {
             <div>
               <div style={{ fontSize: "12px", fontWeight: 700, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "14px" }}>Support</div>
               {["info@axxspace.com", "support@axxspace.com", "admin@axxspace.com"].map(e => (
-                <a key={e} href={`mailto:${e}`} style={{ display: "block", fontSize: "13px", color: "#64748b", marginBottom: "8px", textDecoration: "none", transition: "color 0.2s" }}
+                <a
+                  key={e}
+                  href={`mailto:${e}`}
+                  style={{ display: "block", fontSize: "13px", color: "#64748b", marginBottom: "8px", textDecoration: "none", transition: "color 0.2s" }}
                   onMouseEnter={ev => ev.target.style.color = "#38bdf8"}
-                  onMouseLeave={ev => ev.target.style.color = "#64748b"}>
+                  onMouseLeave={ev => ev.target.style.color = "#64748b"}
+                >
                   📧 {e}
                 </a>
               ))}
