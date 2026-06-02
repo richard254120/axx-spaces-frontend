@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { ProfileAvatar } from "../features/profile";
 import logo from "../assets/image.png";
@@ -7,11 +7,15 @@ import logo from "../assets/image.png";
 export default function Navbar() {
   const { token, user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const dropdownRef = useRef(null);
   const accountRef = useRef(null);
+
+  // Check if user is on a business-related page
+  const isBusinessPage = location.pathname.startsWith('/business') || location.pathname === '/axxbiashara';
 
   const handleLogout = () => {
     logout();
@@ -106,9 +110,11 @@ export default function Navbar() {
               <Link to="/business-dashboard" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
                 <span style={styles.dropdownIcon}>🏪</span> Business Dashboard
               </Link>
-              <Link to="/dashboard" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                <span style={styles.dropdownIcon}>📊</span> Dashboard
-              </Link>
+              {!isBusinessPage && (
+                <Link to="/dashboard" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+                  <span style={styles.dropdownIcon}>📊</span> Dashboard
+                </Link>
+              )}
               <Link to="/profile" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
                 <span style={styles.dropdownIcon}>👤</span> Profile
               </Link>
@@ -281,9 +287,11 @@ export default function Navbar() {
             <Link to="/upload" style={styles.navLink} onClick={() => setMenuOpen(false)}>
               Upload
             </Link>
-            <Link to="/dashboard" style={styles.navLink} onClick={() => setMenuOpen(false)}>
-              Dashboard
-            </Link>
+            {!isBusinessPage && (
+              <Link to="/dashboard" style={styles.navLink} onClick={() => setMenuOpen(false)}>
+                Dashboard
+              </Link>
+            )}
             <div style={styles.userSection}>
               <ProfileAvatar user={user} size={32} />
               <span style={styles.userName}>{user.name}</span>
