@@ -108,15 +108,15 @@ const accountTypes = [
     icon: "🛍️",
     description: "Buy and sell goods in the marketplace",
     loginPath: "/seller-login",
-    registerPath: "/seller-register",
+    registerPath: "/seller-login",
   },
   {
     id: "mover",
     name: "Movers Account",
     icon: "🚛",
     description: "Offer moving and logistics services",
-    loginPath: "/mover-login",
-    registerPath: "/mover-register",
+    loginPath: "/movers",
+    registerPath: "/movers",
   },
   {
     id: "tourism",
@@ -124,7 +124,7 @@ const accountTypes = [
     icon: "🏨",
     description: "List and manage tourism properties",
     loginPath: "/tourism-login",
-    registerPath: "/tourism-register",
+    registerPath: "/tourism/register-property",
   },
 ];
 
@@ -146,7 +146,7 @@ export default function AccountTypeSelector({ isOpen, onClose, mode = "login" })
           {mode === "login" ? "Choose Account to Login" : "Choose Account Type to Register"}
         </h2>
         <p style={styles.subtitle}>
-          {mode === "login" 
+          {mode === "login"
             ? "Select the type of account you want to log into"
             : "Select the type of account you want to create"}
         </p>
