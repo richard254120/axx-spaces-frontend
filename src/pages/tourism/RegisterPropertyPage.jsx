@@ -156,7 +156,7 @@ export default function RegisterPropertyPage() {
                   </div>
                   <div style={s.field}>
                     <label style={s.label}>Phone / WhatsApp *</label>
-                    <input style={s.input} placeholder="+254 7XX XXX XXX" value={form.ownerPhone} onChange={(e) => update("ownerPhone", e.target.value)} />
+                    <PhoneInput style={s.input} value={form.ownerPhone} onChange={(value) => update("ownerPhone", value)} />
                   </div>
                 </div>
                 <div style={s.field}>

@@ -4,6 +4,7 @@ import RecentlyViewed, { trackView } from "../components/RecentlyViewed";
 import ShareProperty from "../components/ShareProperty";
 import MapView from "../components/MapView";
 import { useAuth } from "../context/AuthContext";
+import PhoneInput from "../components/PhoneInput";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -339,11 +340,9 @@ export default function Listings() {
                     <form onSubmit={handlePaymentSubmit} style={styles.paymentForm}>
                       <div style={styles.paymentField}>
                         <label style={styles.paymentLabel}>M-Pesa Phone Number</label>
-                        <input
-                          type="tel"
+                        <PhoneInput
                           value={paymentPhone}
-                          onChange={(e) => setPaymentPhone(e.target.value)}
-                          placeholder="2547XXXXXXXX"
+                          onChange={(value) => setPaymentPhone(value)}
                           style={styles.paymentInput}
                           required
                         />

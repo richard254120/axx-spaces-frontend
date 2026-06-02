@@ -3,6 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
 import bgVideo from "../assets/AXX Homepage Video.mp4";
+import rentalsIcon from "/rentals.png";
+import moversIcon from "/movers.png";
+import tourismIcon from "/tourism.png";
+import axxbiasharaIcon from "/axxbiashara.png";
+import SocialMediaLinks from "../components/SocialMediaLinks";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -38,9 +43,8 @@ export default function Home() {
     "👋 Welcome to Axxspace!",
     "🏠 Rentals Across All 47 Counties",
     "🚛 Trusted Moving Services",
-    "🛍️ Building Materials & Second-Hand Items",
     "🏨 Hotels & Tourism Experiences",
-    "💼 AXXBIASHARA Business Services",
+    "💼 AxxBiashara Business Services",
     "🏪 Marketplace for All Your Needs",
     "✅ Verified Listings — Zero Hidden Fees",
     "💬 Connect Directly via WhatsApp",
@@ -53,7 +57,8 @@ export default function Home() {
   const platformCategories = [
     {
       id: "rentals",
-      icon: "🏢",
+      icon: rentalsIcon,
+      iconType: "image",
       title: "Rentals",
       tagline: "Find your next home",
       description: "Browse verified rental properties across all 47 counties. Bedsitters, apartments, maisonettes & more — no agents, no hidden fees.",
@@ -66,7 +71,8 @@ export default function Home() {
     },
     {
       id: "movers",
-      icon: "🚛",
+      icon: moversIcon,
+      iconType: "image",
       title: "Movers",
       tagline: "Stress-free moving",
       description: "Connect with trusted, vetted moving companies across Kenya. Get quotes, compare rates, and book your move with confidence.",
@@ -78,21 +84,9 @@ export default function Home() {
       accent: "#1a3a52",
     },
     {
-      id: "merchants",
-      icon: "🛍️",
-      title: "Merchants",
-      tagline: "Building materials & second-hand items",
-      description: "Source quality construction materials, hardware, home supplies, and second-hand items from verified merchants. Compare prices and order directly.",
-      features: ["Verified suppliers", "Building materials", "Second-hand items", "Wholesale pricing"],
-      cta: "Shop Items",
-      route: "/materials",
-      color: "#d97706",
-      bg: "linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)",
-      accent: "#b45309",
-    },
-    {
       id: "tourism",
-      icon: "🏨",
+      icon: tourismIcon,
+      iconType: "image",
       title: "Tourism",
       tagline: "Discover Kenya's best",
       description: "Explore hotels, lodges, resorts, and unique experiences across Kenya's 47 counties. From Nairobi to the coast and beyond.",
@@ -105,7 +99,8 @@ export default function Home() {
     },
     {
       id: "axxbiashara",
-      icon: "💼",
+      icon: axxbiasharaIcon,
+      iconType: "image",
       title: "AxxBiashara",
       tagline: "Business solutions & services",
       description: "Access professional business services, from company registration to accounting, legal support, and digital solutions. Grow your business with trusted experts.",
@@ -119,12 +114,13 @@ export default function Home() {
     {
       id: "marketplace",
       icon: "🏪",
+      iconType: "emoji",
       title: "Marketplace",
       tagline: "Buy & sell anything",
       description: "The ultimate marketplace for buying and selling new and used items. From electronics to furniture, fashion to cars — find great deals or sell your items.",
       features: ["New & used items", "Secure transactions", "Nationwide delivery", "Direct seller contact"],
       cta: "Browse Marketplace",
-      route: "/sellers",
+      route: "/materials",
       color: "#0891b2",
       bg: "linear-gradient(135deg, #ecfeff 0%, #cffafe 100%)",
       accent: "#0e7490",
@@ -1335,7 +1331,7 @@ export default function Home() {
             <span className="hero-title-accent">Under One Roof</span>
           </h1>
           <p className="hero-subtitle">
-            Rentals · Movers · Merchants · Tourism · AXXBIASHARA · Marketplace — verified across all 47 counties
+            Rentals · Movers · Tourism · AxxBiashara · Marketplace — verified across all 47 counties
           </p>
 
           {/* ── CATEGORY QUICK LINKS ── */}
@@ -1356,7 +1352,11 @@ export default function Home() {
                 }}
                 onClick={() => setActiveCategoryTab(cat.id)}
               >
-                <span style={{ fontSize: "18px" }}>{cat.icon}</span>
+                {cat.iconType === "image" ? (
+                  <img src={cat.icon} alt={cat.title} style={{ width: "24px", height: "24px", objectFit: "contain" }} />
+                ) : (
+                  <span style={{ fontSize: "18px" }}>{cat.icon}</span>
+                )}
                 {cat.title}
               </button>
             ))}
@@ -1429,7 +1429,13 @@ export default function Home() {
               style={{ background: cat.bg, borderTop: `4px solid ${cat.color}` }}
               onClick={() => navigate(cat.route)}
             >
-              <div className="category-card-icon" style={{ background: cat.color }}>{cat.icon}</div>
+              <div className="category-card-icon" style={{ background: cat.color }}>
+                {cat.iconType === "image" ? (
+                  <img src={cat.icon} alt={cat.title} style={{ width: "32px", height: "32px", objectFit: "contain" }} />
+                ) : (
+                  <span style={{ fontSize: "26px" }}>{cat.icon}</span>
+                )}
+              </div>
               <h3 className="category-card-title" style={{ color: cat.color }}>{cat.title}</h3>
               <p className="category-card-tagline">{cat.tagline}</p>
               <p className="category-card-desc">{cat.description}</p>
@@ -1515,7 +1521,10 @@ export default function Home() {
         {/* Movers strip */}
         <div className="spotlight-strip">
           <div className="spotlight-text">
-            <span className="spotlight-badge">🚛 Movers</span>
+            <span className="spotlight-badge">
+              <img src={moversIcon} alt="Movers" style={{ width: "16px", height: "16px", marginRight: "6px", verticalAlign: "middle" }} />
+              Movers
+            </span>
             <h3 className="spotlight-title">Planning a Move?</h3>
             <p className="spotlight-desc">Connect with 60+ vetted moving companies across Kenya. Get instant quotes, compare prices, and book your move today — local or long-distance.</p>
             <div className="spotlight-features">
@@ -1526,7 +1535,9 @@ export default function Home() {
             <button className="spotlight-btn" style={{ background: "#0B2140" }} onClick={() => navigate("/movers")}>Find a Mover →</button>
           </div>
           <div className="spotlight-visual">
-            <div className="spotlight-emoji" style={{ background: "linear-gradient(135deg, #dce8ff, #b8d0f8)" }}>🚛</div>
+            <div className="spotlight-emoji" style={{ background: "linear-gradient(135deg, #dce8ff, #b8d0f8)" }}>
+              <img src={moversIcon} alt="Movers" style={{ width: "60px", height: "60px", objectFit: "contain" }} />
+            </div>
             <div className="spotlight-stat-grid">
               {[["60+", "Moving Companies"], ["47", "Counties"], ["1,200+", "Moves Done"]].map(([v, l]) => (
                 <div key={l} className="spotlight-stat">
@@ -1538,36 +1549,13 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Merchants strip */}
-        <div className="spotlight-strip" style={{ flexDirection: "row-reverse", background: "linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)" }}>
-          <div className="spotlight-text">
-            <span className="spotlight-badge" style={{ background: "#fef3c7", color: "#b45309" }}>🛍️ Merchants</span>
-            <h3 className="spotlight-title">Building, Renovating, or Shopping?</h3>
-            <p className="spotlight-desc">Source construction materials, hardware, home supplies, and quality second-hand items from 150+ verified Kenyan merchants at competitive prices.</p>
-            <div className="spotlight-features">
-              {["Building materials", "Second-hand items", "Wholesale pricing", "Delivery available"].map(f => (
-                <span key={f} className="spotlight-feature" style={{ color: "#b45309" }}>✓ {f}</span>
-              ))}
-            </div>
-            <button className="spotlight-btn" style={{ background: "#d97706" }} onClick={() => navigate("/materials")}>Shop Items →</button>
-          </div>
-          <div className="spotlight-visual">
-            <div className="spotlight-emoji" style={{ background: "linear-gradient(135deg, #fef3c7, #fde68a)" }}>🛍️</div>
-            <div className="spotlight-stat-grid">
-              {[["150+", "Merchants"], ["5,000+", "Products"], ["30+", "Counties"]].map(([v, l]) => (
-                <div key={l} className="spotlight-stat">
-                  <span className="spotlight-stat-val" style={{ color: "#d97706" }}>{v}</span>
-                  <span className="spotlight-stat-label">{l}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
         {/* Tourism strip */}
-        <div className="spotlight-strip" style={{ background: "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)" }}>
+        <div className="spotlight-strip" style={{ flexDirection: "row-reverse", background: "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)" }}>
           <div className="spotlight-text">
-            <span className="spotlight-badge" style={{ background: "#dcfce7", color: "#047857" }}>🏨 Tourism</span>
+            <span className="spotlight-badge" style={{ background: "#dcfce7", color: "#047857" }}>
+              <img src={tourismIcon} alt="Tourism" style={{ width: "16px", height: "16px", marginRight: "6px", verticalAlign: "middle" }} />
+              Tourism
+            </span>
             <h3 className="spotlight-title">Explore Kenya Like Never Before</h3>
             <p className="spotlight-desc">Discover hotels, beach resorts, safari lodges, and unique experiences across Kenya's 47 counties. Book directly — no commission fees.</p>
             <div className="spotlight-features">
@@ -1578,11 +1566,74 @@ export default function Home() {
             <button className="spotlight-btn" style={{ background: "#059669" }} onClick={() => navigate("/tourism")}>Explore Tourism →</button>
           </div>
           <div className="spotlight-visual">
-            <div className="spotlight-emoji" style={{ background: "linear-gradient(135deg, #dcfce7, #a7f3d0)" }}>🏨</div>
+            <div className="spotlight-emoji" style={{ background: "linear-gradient(135deg, #dcfce7, #a7f3d0)" }}>
+              <img src={tourismIcon} alt="Tourism" style={{ width: "60px", height: "60px", objectFit: "contain" }} />
+            </div>
             <div className="spotlight-stat-grid">
               {[["200+", "Hotels & Lodges"], ["47", "Counties"], ["3,000+", "Guests"]].map(([v, l]) => (
                 <div key={l} className="spotlight-stat">
                   <span className="spotlight-stat-val" style={{ color: "#059669" }}>{v}</span>
+                  <span className="spotlight-stat-label">{l}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* AxxBiashara strip */}
+        <div className="spotlight-strip" style={{ background: "linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)" }}>
+          <div className="spotlight-text">
+            <span className="spotlight-badge" style={{ background: "#ede9fe", color: "#6d28d9" }}>
+              <img src={axxbiasharaIcon} alt="AxxBiashara" style={{ width: "16px", height: "16px", marginRight: "6px", verticalAlign: "middle" }} />
+              AxxBiashara
+            </span>
+            <h3 className="spotlight-title">Grow Your Business with AxxBiashara</h3>
+            <p className="spotlight-desc">Access professional business services across Kenya. From company registration to accounting, legal support, and digital solutions — we've got you covered.</p>
+            <div className="spotlight-features">
+              {["Business registration", "Accounting & tax", "Legal services", "Digital solutions"].map(f => (
+                <span key={f} className="spotlight-feature" style={{ color: "#6d28d9" }}>✓ {f}</span>
+              ))}
+            </div>
+            <button className="spotlight-btn" style={{ background: "#7c3aed" }} onClick={() => navigate("/axxbiashara")}>Explore Services →</button>
+          </div>
+          <div className="spotlight-visual">
+            <div className="spotlight-emoji" style={{ background: "linear-gradient(135deg, #ede9fe, #ddd6fe)" }}>
+              <img src={axxbiasharaIcon} alt="AxxBiashara" style={{ width: "60px", height: "60px", objectFit: "contain" }} />
+            </div>
+            <div className="spotlight-stat-grid">
+              {[["100+", "Service Providers"], ["47", "Counties"], ["2,000+", "Businesses Served"]].map(([v, l]) => (
+                <div key={l} className="spotlight-stat">
+                  <span className="spotlight-stat-val" style={{ color: "#7c3aed" }}>{v}</span>
+                  <span className="spotlight-stat-label">{l}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Marketplace strip */}
+        <div className="spotlight-strip" style={{ flexDirection: "row-reverse", background: "linear-gradient(135deg, #ecfeff 0%, #cffafe 100%)" }}>
+          <div className="spotlight-text">
+            <span className="spotlight-badge" style={{ background: "#cffafe", color: "#0e7490" }}>
+              � Marketplace
+            </span>
+            <h3 className="spotlight-title">Buy & Sell Anything</h3>
+            <p className="spotlight-desc">The ultimate marketplace for buying and selling new and used items. From electronics to furniture, fashion to cars — find great deals or sell your items.</p>
+            <div className="spotlight-features">
+              {["New & used items", "Secure transactions", "Nationwide delivery", "Direct seller contact"].map(f => (
+                <span key={f} className="spotlight-feature" style={{ color: "#0e7490" }}>✓ {f}</span>
+              ))}
+            </div>
+            <button className="spotlight-btn" style={{ background: "#0891b2" }} onClick={() => navigate("/materials")}>Browse Marketplace →</button>
+          </div>
+          <div className="spotlight-visual">
+            <div className="spotlight-emoji" style={{ background: "linear-gradient(135deg, #cffafe, #a5f3fc)" }}>
+              �
+            </div>
+            <div className="spotlight-stat-grid">
+              {[["10,000+", "Active Listings"], ["47", "Counties"], ["5,000+", "Happy Users"]].map(([v, l]) => (
+                <div key={l} className="spotlight-stat">
+                  <span className="spotlight-stat-val" style={{ color: "#0891b2" }}>{v}</span>
                   <span className="spotlight-stat-label">{l}</span>
                 </div>
               ))}
@@ -1735,6 +1786,9 @@ export default function Home() {
           <div style={styles.footerBrand}>
             <strong style={{ color: "#E31B1B", fontSize: "18px" }}>Axxspace</strong>
             <p style={styles.footerTagline}>Kenya's most trusted property & services platform</p>
+            <div style={{ marginTop: "16px" }}>
+              <SocialMediaLinks iconSize={20} />
+            </div>
           </div>
           <div style={styles.footerColumns}>
             <div style={styles.footerCol}>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import PhoneInput from "../components/PhoneInput";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
 
@@ -159,12 +160,10 @@ export default function Checkout() {
         {/* ADDED: show original form only when mpesa selected */}
         {paymentMethod === "mpesa" && (
           <form onSubmit={handlePayment}>
-            <label style={styles.label}>M-Pesa Phone Number (07xxxxxxxx)</label>
-            <input
-              type="tel"
-              placeholder="0712345678"
+            <label style={styles.label}>M-Pesa Phone Number</label>
+            <PhoneInput
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(value) => setPhone(value)}
               style={styles.input}
               required
             />

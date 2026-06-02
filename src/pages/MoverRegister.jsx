@@ -30,7 +30,7 @@ export default function MoverRegister() {
 
     try {
       const res = await API.post("/auth/register", formData);
-      
+
       setMessage("✅ Mover registration successful! Please check your email to verify your account.");
       setTimeout(() => {
         navigate("/login");
@@ -49,93 +49,91 @@ export default function MoverRegister() {
         <p style={styles.subtitle}>Join Axxspace Movers Network</p>
 
         <form onSubmit={handleSubmit}>
-          <input 
-            type="text" 
-            name="name" 
-            placeholder="Full Name or Company Name" 
-            value={formData.name} 
-            onChange={handleChange} 
-            style={styles.input} 
-            required 
+          <input
+            type="text"
+            name="name"
+            placeholder="Full Name or Company Name"
+            value={formData.name}
+            onChange={handleChange}
+            style={styles.input}
+            required
           />
 
-          <input 
-            type="email" 
-            name="email" 
-            placeholder="Email Address" 
-            value={formData.email} 
-            onChange={handleChange} 
-            style={styles.input} 
-            required 
+          <input
+            type="email"
+            name="email"
+            placeholder="Email Address"
+            value={formData.email}
+            onChange={handleChange}
+            style={styles.input}
+            required
           />
 
-          <input 
-            type="password" 
-            name="password" 
-            placeholder="Create Password" 
-            value={formData.password} 
-            onChange={handleChange} 
-            style={styles.input} 
-            required 
+          <input
+            type="password"
+            name="password"
+            placeholder="Create Password"
+            value={formData.password}
+            onChange={handleChange}
+            style={styles.input}
+            required
           />
 
-          <input 
-            type="tel" 
-            name="phone" 
-            placeholder="Phone Number (07xxxxxxxx)" 
-            value={formData.phone} 
-            onChange={handleChange} 
-            style={styles.input} 
-            required 
+          <PhoneInput
+            name="phone"
+            value={formData.phone}
+            onChange={(value) => setFormData((prev) => ({ ...prev, phone: value }))}
+            style={styles.input}
+            required
           />
 
-          <select 
-            name="county" 
-            value={formData.county} 
-            onChange={handleChange} 
-            style={styles.input} 
+          <select
+            name="county"
+            value={formData.county}
+            onChange={handleChange}
+            style={styles.input}
             required
           >
             <option value="">Select Operating County</option>
             {[
-              "Nairobi City","Mombasa","Kiambu","Nakuru","Uasin Gishu","Kisumu",
-              "Kakamega","Machakos","Kajiado","Kilifi","Meru","Nyeri","Bungoma",
-              "Busia","Homa Bay","Siaya","Migori","Kitui","Embu","Murang’a",
-              "Kirinyaga","Tharaka Nithi","Laikipia","Baringo","Nandi","Kericho",
-              "Bomet","Vihiga","Trans Nzoia","West Pokot","Turkana","Samburu",
-              "Mandera","Wajir","Garissa","Tana River","Lamu","Taita Taveta",
-              "Marsabit","Isiolo","Nyandarua","Nyamira","Elgeyo Marakwet"
+              "Nairobi City", "Mombasa", "Kiambu", "Nakuru", "Uasin Gishu", "Kisumu",
+              "Kakamega", "Machakos", "Kajiado", "Kilifi", "Meru", "Nyeri", "Bungoma",
+              "Busia", "Homa Bay", "Siaya", "Migori", "Kitui", "Embu", "Murang’a",
+              "Kirinyaga", "Tharaka Nithi", "Laikipia", "Baringo", "Nandi", "Kericho",
+              "Bomet", "Vihiga", "Trans Nzoia", "West Pokot", "Turkana", "Samburu",
+              "Mandera", "Wajir", "Garissa", "Tana River", "Lamu", "Taita Taveta",
+              "Marsabit", "Isiolo", "Nyandarua", "Nyamira", "Elgeyo Marakwet"
             ].map(c => (
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
 
-          <input 
-            type="text" 
-            name="services" 
-            placeholder="Services (e.g. House Moving, Office, Packing)" 
-            value={formData.services} 
-            onChange={handleChange} 
-            style={styles.input} 
-            required 
+          <input
+            type="text"
+            name="services"
+            placeholder="Services (e.g. House Moving, Office, Packing)"
+            value={formData.services}
+            onChange={handleChange}
+            style={styles.input}
+            required
           />
 
-          <input 
-            type="text" 
-            name="experience" 
-            placeholder="Years of Experience (e.g. 5 years)" 
-            value={formData.experience} 
-            onChange={handleChange} 
-            style={styles.input} 
+          <input
+            type="text"
+            name="experience"
+            placeholder="Years of Experience (e.g. 5 years)"
+            value={formData.experience}
+            onChange={handleChange}
+            style={styles.input}
           />
 
-          <input 
-            type="text" 
-            name="company" 
-            placeholder="Company Name (Optional)" 
-            value={formData.company} 
-            onChange={handleChange} 
-            style={styles.input} 
+          <input
+            type="text"
+            name="company"
+            placeholder="Company Name (Optional)"
+            value={formData.company}
+            onChange={handleChange}
+            style={styles.input}
           />
 
           <button type="submit" disabled={loading} style={styles.submitBtn}>
@@ -166,16 +164,16 @@ const styles = {
     width: "100%",
     border: "1px solid #334155"
   },
-  title: { 
-    textAlign: "center", 
-    color: "#fbbf24", 
-    fontSize: "2rem", 
-    marginBottom: "8px" 
+  title: {
+    textAlign: "center",
+    color: "#fbbf24",
+    fontSize: "2rem",
+    marginBottom: "8px"
   },
-  subtitle: { 
-    textAlign: "center", 
-    color: "#94a3b8", 
-    marginBottom: "30px" 
+  subtitle: {
+    textAlign: "center",
+    color: "#94a3b8",
+    marginBottom: "30px"
   },
   input: {
     width: "100%",

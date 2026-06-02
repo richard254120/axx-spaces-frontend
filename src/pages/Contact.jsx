@@ -249,6 +249,22 @@ const styles = {
     color: "#fbbf24",
     textDecoration: "none",
   },
+  socialSection: {
+    marginTop: "16px",
+    padding: "16px",
+    background: "rgba(30,41,59,0.7)",
+    border: "1px solid #334155",
+    borderRadius: "10px",
+    textAlign: "center",
+  },
+  socialTitle: {
+    fontSize: "11px",
+    fontWeight: 700,
+    letterSpacing: "1px",
+    textTransform: "uppercase",
+    color: "#64748b",
+    marginBottom: "12px",
+  },
   formCard: {
     background: "rgba(30,41,59,0.6)",
     border: "1px solid #334155",

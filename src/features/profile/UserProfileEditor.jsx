@@ -2,6 +2,7 @@ import { useState, useEffect, useContext, useRef } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { fetchUserProfile, updateUserProfile, buildProfileFormData } from "../../api/profile";
 import ProfileAvatar from "./ProfileAvatar";
+import PhoneInput from "../../components/PhoneInput";
 
 const MOVER_SERVICES = [
   "Household Moving", "Office Relocation", "Furniture Moving",

@@ -755,11 +755,10 @@ export default function BusinessForm() {
           <h2 style={styles.sectionTitle}>Contact Information</h2>
 
           <label style={styles.label}>Phone *</label>
-          <input
-            type="tel"
+          <PhoneInput
             style={styles.input}
             value={formData.contact.phone}
-            onChange={e => setFormData(prev => ({ ...prev, contact: { ...prev.contact, phone: e.target.value } }))}
+            onChange={value => setFormData(prev => ({ ...prev, contact: { ...prev.contact, phone: value } }))}
             required
           />
 
@@ -828,7 +827,6 @@ export default function BusinessForm() {
             { label: "Twitter/X", key: "twitter", placeholder: "https://twitter.com/yourbusiness", type: "url" },
             { label: "LinkedIn", key: "linkedin", placeholder: "https://linkedin.com/company/yourbusiness", type: "url" },
             { label: "TikTok", key: "tiktok", placeholder: "https://tiktok.com/@yourbusiness", type: "url" },
-            { label: "WhatsApp", key: "whatsapp", placeholder: "2547XXXXXXXXX", type: "tel" },
           ].map(({ label, key, placeholder, type }) => (
             <div key={key}>
               <label style={styles.label}>{label}</label>
@@ -844,6 +842,17 @@ export default function BusinessForm() {
               />
             </div>
           ))}
+          <div>
+            <label style={styles.label}>WhatsApp</label>
+            <PhoneInput
+              style={styles.input}
+              value={formData.socialMedia.whatsapp || ""}
+              onChange={value => setFormData(prev => ({
+                ...prev,
+                socialMedia: { ...prev.socialMedia, whatsapp: value },
+              }))}
+            />
+          </div>
         </div>
 
         {/* ── LOGO ── */}

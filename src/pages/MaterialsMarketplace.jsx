@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 import { COLORS, buttonStyles, inputStyles, pageStyles, cardStyles } from "../styles/theme";
 import { useAuth } from "../context/AuthContext";
+import PhoneInput from "../components/PhoneInput";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -412,11 +413,9 @@ export default function MaterialsMarketplace() {
               <form onSubmit={handlePaymentSubmit} style={styles.paymentForm}>
                 <div style={styles.paymentField}>
                   <label style={styles.paymentLabel}>M-Pesa Phone Number</label>
-                  <input
-                    type="tel"
+                  <PhoneInput
                     value={paymentPhone}
-                    onChange={(e) => setPaymentPhone(e.target.value)}
-                    placeholder="2547XXXXXXXX"
+                    onChange={(value) => setPaymentPhone(value)}
                     style={styles.paymentInput}
                     required
                   />

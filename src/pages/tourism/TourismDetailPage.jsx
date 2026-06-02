@@ -8,6 +8,7 @@ import {
   TOURISM_FONT_CSS,
   tourismTheme,
 } from "../../features/tourism";
+import PhoneInput from "../../components/PhoneInput";
 import { useAuth } from "../../context/AuthContext";
 
 const properties = {
@@ -407,11 +408,9 @@ export default function TourismDetailPage() {
               <form onSubmit={handlePaymentSubmit} style={s.paymentForm}>
                 <div style={s.paymentField}>
                   <label style={s.paymentLabel}>M-Pesa Phone Number</label>
-                  <input
-                    type="tel"
+                  <PhoneInput
                     value={paymentPhone}
-                    onChange={(e) => setPaymentPhone(e.target.value)}
-                    placeholder="2547XXXXXXXX"
+                    onChange={(value) => setPaymentPhone(value)}
                     style={s.paymentInput}
                     required
                   />

@@ -389,6 +389,9 @@ export default function AboutPage() {
           <div style={styles.footerSection}>
             <strong style={{ color: "#fbbf24", fontSize: "18px" }}>Axxspace</strong>
             <p style={styles.footerTagline}>Kenya's most trusted rental platform</p>
+            <div style={{ marginTop: "16px" }}>
+              <SocialMediaLinks iconSize={20} />
+            </div>
           </div>
           <div style={styles.footerSection}>
             <h4 style={styles.footerTitle}>Quick Links</h4>

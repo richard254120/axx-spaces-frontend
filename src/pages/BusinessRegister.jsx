@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
+import PhoneInput from "../components/PhoneInput";
 
 const styles = {
   container: {
@@ -202,13 +203,11 @@ export default function BusinessRegister() {
           />
 
           <label style={styles.label}>Phone Number</label>
-          <input
-            type="tel"
+          <PhoneInput
             name="phone"
             style={styles.input}
             value={formData.phone}
-            onChange={handleChange}
-            placeholder="+254 7XX XXX XXX"
+            onChange={(value) => setFormData((prev) => ({ ...prev, phone: value }))}
             required
           />
 

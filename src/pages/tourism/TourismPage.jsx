@@ -11,6 +11,7 @@ import {
   isTourismLoggedIn,
   getTourismUser,
 } from "../../features/tourism";
+import SocialMediaLinks from "../../components/SocialMediaLinks";
 
 const featuredProperties = [
   {
@@ -333,6 +334,9 @@ export default function TourismPage() {
             <p style={{ color: "#6b7280", fontSize: "12px", marginTop: "8px", maxWidth: "220px", lineHeight: 1.6 }}>
               Kenya's premier platform for discovering and advertising tourism properties.
             </p>
+            <div style={{ marginTop: "16px" }}>
+              <SocialMediaLinks iconSize={20} />
+            </div>
           </div>
           <div style={s.footerLinks}>
             <div style={s.footerCol}>

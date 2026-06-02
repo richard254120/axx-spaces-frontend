@@ -218,12 +218,10 @@ export default function PaymentVerificationForm({ propertyId, tourismPropertyId,
 
         <div>
           <label style={styles.label}>Phone Number Used for Payment</label>
-          <input
-            type="tel"
+          <PhoneInput
             style={styles.input}
-            placeholder="e.g., 0712345678"
             value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
+            onChange={(value) => setPhoneNumber(value)}
             required
           />
           <p style={styles.hint}>

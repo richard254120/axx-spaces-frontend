@@ -187,7 +187,7 @@ export default function AxxBiashara() {
      RENDER
   ════════════════════════════════════════════ */
   return (
-    <div style={{ minHeight: "100vh", background: "#06070d", color: "#e8eaf0", fontFamily: "'Sora', 'DM Sans', sans-serif", overflowX: "hidden" }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(160deg, #1a0a0a 0%, #2d1010 30%, #06070d 100%)", color: "#e8eaf0", fontFamily: "'Sora', 'DM Sans', sans-serif", overflowX: "hidden" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
 
@@ -275,12 +275,12 @@ export default function AxxBiashara() {
           background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
           cursor: pointer; font-size: 15px; transition: all 0.2s;
         }
-        .icon-btn:hover { background: rgba(56,189,248,0.2); border-color: rgba(56,189,248,0.4); }
+        .icon-btn:hover { background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.4); }
 
         .filter-select {
           padding: 10px 14px;
-          background: #0e1629;
-          border: 1px solid rgba(56,189,248,0.15);
+          background: #1a0f0f;
+          border: 1px solid rgba(239,68,68,0.15);
           border-radius: 10px;
           color: #cbd5e1;
           font-size: 13px;
@@ -290,12 +290,12 @@ export default function AxxBiashara() {
           transition: border-color 0.2s;
           min-width: 180px;
           appearance: none;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2338bdf8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23ef4444' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
           background-repeat: no-repeat;
           background-position: right 12px center;
           padding-right: 32px;
         }
-        .filter-select:focus, .filter-select:hover { border-color: rgba(56,189,248,0.4); }
+        .filter-select:focus, .filter-select:hover { border-color: rgba(239,68,68,0.4); }
 
         .search-input {
           width: 100%; padding: 14px 14px 14px 48px;
@@ -315,8 +315,8 @@ export default function AxxBiashara() {
         .search-input::placeholder { color: #475569; }
 
         .ann-card {
-          background: #0e1629;
-          border: 1px solid rgba(56,189,248,0.1);
+          background: #1a0f0f;
+          border: 1px solid rgba(239,68,68,0.1);
           border-radius: 14px;
           padding: 18px 20px;
           min-width: 260px;
@@ -327,8 +327,8 @@ export default function AxxBiashara() {
         }
         .ann-card:hover {
           transform: translateY(-4px);
-          border-color: rgba(56,189,248,0.35);
-          box-shadow: 0 12px 32px rgba(56,189,248,0.12);
+          border-color: rgba(239,68,68,0.35);
+          box-shadow: 0 12px 32px rgba(239,68,68,0.12);
         }
 
         .modal-overlay {
@@ -350,7 +350,7 @@ export default function AxxBiashara() {
         }
 
         .shimmer-card {
-          background: linear-gradient(90deg, #0e1629 25%, #162236 50%, #0e1629 75%);
+          background: linear-gradient(90deg, #1a0f0f 25%, #2d1515 50%, #1a0f0f 75%);
           background-size: 400px 100%;
           animation: shimmer 1.4s infinite;
           border-radius: 20px;
@@ -366,11 +366,11 @@ export default function AxxBiashara() {
           text-decoration: none;
         }
         .cta-primary {
-          background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+          background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
           color: #06070d;
-          box-shadow: 0 4px 20px rgba(56,189,248,0.3);
+          box-shadow: 0 4px 20px rgba(239,68,68,0.3);
         }
-        .cta-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(56,189,248,0.45); }
+        .cta-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(239,68,68,0.45); }
         .cta-green {
           background: linear-gradient(135deg, #059669 0%, #10b981 100%);
           color: #fff;
@@ -391,7 +391,7 @@ export default function AxxBiashara() {
 
         .section-label {
           font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
-          text-transform: uppercase; color: #38bdf8;
+          text-transform: uppercase; color: #ef4444;
         }
         .section-title {
           font-size: 28px; font-weight: 800;
@@ -409,13 +409,13 @@ export default function AxxBiashara() {
         .form-input {
           width: 100%; padding: 12px 16px;
           background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(56,189,248,0.15);
+          border: 1px solid rgba(239,68,68,0.15);
           border-radius: 10px; color: #f1f5f9;
           font-size: 14px; font-family: inherit;
           outline: none; transition: border-color 0.2s;
           margin-bottom: 12px;
         }
-        .form-input:focus { border-color: rgba(56,189,248,0.45); }
+        .form-input:focus { border-color: rgba(239,68,68,0.45); }
         .form-input::placeholder { color: #475569; }
 
         .social-dot {
@@ -465,14 +465,14 @@ export default function AxxBiashara() {
 
       {/* ── HERO HEADER ── */}
       <div style={{
-        background: "linear-gradient(160deg, #0a1628 0%, #0c1a2e 40%, #06070d 100%)",
-        borderBottom: "1px solid rgba(56,189,248,0.1)",
+        background: "linear-gradient(160deg, #2d0a0a 0%, #1a0a0a 40%, #0d0a0a 100%)",
+        borderBottom: "1px solid rgba(239,68,68,0.15)",
         padding: "48px 24px 36px",
         position: "relative", overflow: "hidden",
       }}>
         {/* Decorative orbs */}
-        <div style={{ position: "absolute", top: "-80px", right: "-60px", width: "340px", height: "340px", borderRadius: "50%", background: "radial-gradient(circle, rgba(56,189,248,0.06) 0%, transparent 70%)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: "-60px", left: "10%", width: "240px", height: "240px", borderRadius: "50%", background: "radial-gradient(circle, rgba(16,185,129,0.04) 0%, transparent 70%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", top: "-80px", right: "-60px", width: "340px", height: "340px", borderRadius: "50%", background: "radial-gradient(circle, rgba(239,68,68,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", bottom: "-60px", left: "10%", width: "240px", height: "240px", borderRadius: "50%", background: "radial-gradient(circle, rgba(220,38,38,0.06) 0%, transparent 70%)", pointerEvents: "none" }} />
 
         <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
           {/* Top bar */}
@@ -482,7 +482,7 @@ export default function AxxBiashara() {
                 <img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "42px", height: "42px", borderRadius: "12px", objectFit: "cover", boxShadow: "0 4px 16px rgba(56,189,248,0.3)" }} />
                 <div>
                   <div className="section-label">Kenya Business Directory</div>
-                  <h1 style={{ fontSize: "clamp(28px,5vw,44px)", fontWeight: 800, background: "linear-gradient(135deg, #f8fafc 0%, #38bdf8 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", lineHeight: 1.1 }}>
+                  <h1 style={{ fontSize: "clamp(28px,5vw,44px)", fontWeight: 800, background: "linear-gradient(135deg, #f8fafc 0%, #ef4444 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", lineHeight: 1.1 }}>
                     AxxBiashara
                   </h1>
                 </div>
@@ -547,7 +547,7 @@ export default function AxxBiashara() {
 
           {/* Announcements ticker */}
           {announcements.length > 0 && (
-            <div style={{ background: "rgba(14,22,41,0.6)", border: "1px solid rgba(56,189,248,0.1)", borderRadius: "16px", padding: "20px 22px" }}>
+            <div style={{ background: "rgba(26,15,15,0.6)", border: "1px solid rgba(239,68,68,0.1)", borderRadius: "16px", padding: "20px 22px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
                 <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#38bdf8", boxShadow: "0 0 8px #38bdf8", animation: "pulse-ring 2s infinite", display: "inline-block" }} />
                 <span style={{ fontSize: "13px", fontWeight: 700, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.1em" }}>Live Announcements</span>
@@ -573,7 +573,7 @@ export default function AxxBiashara() {
       </div>
 
       {/* ── FILTERS ── */}
-      <div style={{ background: "#080b13", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "20px 24px", position: "sticky", top: 0, zIndex: 100, backdropFilter: "blur(12px)" }}>
+      <div style={{ background: "#120a0a", borderBottom: "1px solid rgba(239,68,68,0.1)", padding: "20px 24px", position: "sticky", top: 0, zIndex: 100, backdropFilter: "blur(12px)" }}>
         <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
           {/* Search */}
           <div style={{ position: "relative", marginBottom: "14px" }}>

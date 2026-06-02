@@ -223,12 +223,10 @@ export default function Register() {
 
             <div style={styles.formGroup}>
               <label style={styles.label}>Phone Number</label>
-              <input
-                type="tel"
+              <PhoneInput
                 name="phone"
-                placeholder="e.g., 254712345678"
                 value={formData.phone}
-                onChange={handleChange}
+                onChange={(value) => setFormData((prev) => ({ ...prev, phone: value }))}
                 style={styles.input}
                 required
               />
