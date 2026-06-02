@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../api/api";
 
@@ -355,6 +355,14 @@ export default function BusinessForm() {
   });
 
   /* ── FIX 1: Controlled product form state (replaces uncontrolled DOM inputs) ── */
+  /*
+   * KEY FIX: formDataRef always holds the LATEST formData.
+   * handleSubmit reads from the ref so it never uses a stale closure —
+   * this is what caused newly-added products to be missing from the PUT.
+   */
+  const formDataRef = useRef(formData);
+  useEffect(() => { formDataRef.current = formData; }, [formData]);
+
   const [newProduct, setNewProduct] = useState({ ...EMPTY_PRODUCT });
   const [productImageFile, setProductImageFile] = useState(null);
 
@@ -540,13 +548,15 @@ export default function BusinessForm() {
     setError("");
     setSuccess("");
 
+    const payload = formDataRef.current; // always latest, never stale
+
     try {
       if (isEditing) {
-        await API.put(`/business/${id}`, formData);
+        await API.put(`/business/${id}`, payload);
         setSuccess("Business updated successfully! Redirecting to directory…");
         setCountdown(3);
       } else {
-        const res = await API.post("/business", formData);
+        const res = await API.post("/business", payload);
         setSuccess(res.data.message || "Business submitted for review!");
         setTimeout(() => navigate("/business-dashboard"), 2000);
       }
