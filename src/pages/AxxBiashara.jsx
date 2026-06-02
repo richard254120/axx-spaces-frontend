@@ -474,7 +474,7 @@ export default function AxxBiashara() {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "20px", marginBottom: "36px" }}>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" }}>
-                <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: "linear-gradient(135deg,#0ea5e9,#38bdf8)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", boxShadow: "0 4px 16px rgba(56,189,248,0.3)" }}>🏪</div>
+                <img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "42px", height: "42px", borderRadius: "12px", objectFit: "cover", boxShadow: "0 4px 16px rgba(56,189,248,0.3)" }} />
                 <div>
                   <div className="section-label">Kenya Business Directory</div>
                   <h1 style={{ fontSize: "clamp(28px,5vw,44px)", fontWeight: 800, background: "linear-gradient(135deg, #f8fafc 0%, #38bdf8 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", lineHeight: 1.1 }}>
