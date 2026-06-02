@@ -240,6 +240,10 @@ export default function Home() {
       from { opacity: 0; transform: translateY(-8px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
 
     .home-root {
       font-family: 'DM Sans', sans-serif;
@@ -1461,9 +1465,21 @@ export default function Home() {
           <p className="section-subtitle">Verified & boosted properties — handpicked for maximum trust</p>
         </div>
         {loadingFeatured ? (
-          <div className="loading-wrap">
-            <div className="spinner"></div>
-            <p className="loading-text">Loading featured properties...</p>
+          <div className="marquee-cards-wrapper">
+            <div className="cards-marquee-track" style={{ animation: "none" }}>
+              {[1, 2, 3, 4, 5].map((idx) => (
+                <div key={idx} className="skeleton-card">
+                  <div className="skeleton-image"></div>
+                  <div className="skeleton-info">
+                    <div className="skeleton-title"></div>
+                    <div className="skeleton-location"></div>
+                    <div className="skeleton-meta"></div>
+                    <div className="skeleton-price"></div>
+                    <div className="skeleton-btn"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         ) : fetchError ? (
           <div className="no-featured">

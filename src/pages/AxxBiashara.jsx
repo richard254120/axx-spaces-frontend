@@ -315,8 +315,8 @@ export default function AxxBiashara() {
         .search-input::placeholder { color: #475569; }
 
         .ann-card {
-          background: #1a0f0f;
-          border: 1px solid rgba(239,68,68,0.1);
+          background: linear-gradient(135deg, rgba(251,191,36,0.08) 0%, rgba(245,158,11,0.05) 50%, rgba(217,119,6,0.08) 100%);
+          border: 1px solid rgba(251,191,36,0.25);
           border-radius: 14px;
           padding: 18px 20px;
           min-width: 260px;
@@ -324,11 +324,24 @@ export default function AxxBiashara() {
           flex-shrink: 0;
           cursor: pointer;
           transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+        }
+        .ann-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 3px;
+          background: linear-gradient(90deg, #fbbf24, #f59e0b, #d97706, #fbbf24);
+          background-size: 300% 100%;
+          animation: shimmer 3s linear infinite;
         }
         .ann-card:hover {
           transform: translateY(-4px);
-          border-color: rgba(239,68,68,0.35);
-          box-shadow: 0 12px 32px rgba(239,68,68,0.12);
+          border-color: rgba(251,191,36,0.5);
+          box-shadow: 0 12px 32px rgba(251,191,36,0.2), 0 0 0 1px rgba(251,191,36,0.1);
         }
 
         .modal-overlay {
@@ -556,7 +569,7 @@ export default function AxxBiashara() {
                 <div style={{ display: "flex", gap: "16px", animation: "marquee 50s linear infinite", animationPlayState: isMarqueePaused ? "paused" : "running" }}>
                   {[...announcements.slice(0, 10), ...announcements.slice(0, 10)].map((a, i) => (
                     <div key={`${i}-${a._id}`} className="ann-card" onClick={() => { setSelectedAnnouncement(a); setShowAnnouncementModal(true); }}>
-                      <div style={{ fontSize: "11px", color: "#38bdf8", fontWeight: 700, marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.06em" }}>{a.businessName || "General"}</div>
+                      <div style={{ fontSize: "11px", color: "#fbbf24", fontWeight: 700, marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.06em" }}>{a.businessName || "General"}</div>
                       <div style={{ fontSize: "14px", fontWeight: 600, color: "#f1f5f9", marginBottom: "8px", lineHeight: "1.4" }}>{a.title}</div>
                       <div style={{ fontSize: "11px", color: "#64748b" }}>
                         {a.submitterName && `👤 ${a.submitterName}`}
