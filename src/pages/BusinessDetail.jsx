@@ -601,6 +601,98 @@ const globalCSS = `
   .bd-scroll-x::-webkit-scrollbar { display: none; }
   .bd-scroll-x-inner { display: flex; gap: 8px; width: max-content; }
 
+  /* ── Reviews section ── */
+  .bd-reviews-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .bd-reviews-title { font-family: var(--font-head); font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+  .bd-review-btn {
+    padding: 8px 14px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: 1px solid var(--border-bright);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-head);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .bd-review-card {
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .bd-review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+  }
+  .bd-review-user {
+    font-family: var(--font-head);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .bd-review-date {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .bd-review-rating {
+    color: var(--gold);
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+  .bd-review-title {
+    font-family: var(--font-head);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .bd-review-comment {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+  .bd-review-verified {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--green-soft);
+    color: var(--green);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    margin-left: 8px;
+  }
+  .bd-rating-stars {
+    display: flex;
+    gap: 2px;
+  }
+  .bd-rating-star {
+    cursor: pointer;
+    font-size: 24px;
+    color: var(--text-muted);
+    transition: color 0.2s;
+  }
+  .bd-rating-star.active { color: var(--gold); }
+  .bd-rating-star:hover { color: var(--gold); }
+  .bd-no-reviews {
+    text-align: center;
+    padding: 30px 20px;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
   /* ── Lightbox overlay ── */
   .bd-lightbox {
     position: fixed;
@@ -707,11 +799,22 @@ export default function BusinessDetail() {
   const [annContent, setAnnContent] = useState("");
   const [annMsg, setAnnMsg] = useState("");
 
+  // Reviews state
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewTitle, setReviewTitle] = useState("");
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewMsg, setReviewMsg] = useState("");
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
+
   /* Lightbox state */
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
   useEffect(() => { loadBusiness(); }, [id]);
+  useEffect(() => { loadReviews(); }, [id]);
 
   /* ── Refresh trigger from BusinessForm after update ── */
   useEffect(() => {
@@ -731,6 +834,45 @@ export default function BusinessDetail() {
       setError("Failed to load business");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadReviews = async () => {
+    setReviewsLoading(true);
+    try {
+      const res = await API.get(`/businessReviews/business/${id}`);
+      setReviews(res.data.reviews || []);
+    } catch (err) {
+      console.error("Failed to load reviews:", err);
+      setReviews([]);
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!user) {
+      setReviewMsg("Please log in to submit a review");
+      return;
+    }
+    try {
+      await API.post(`/businessReviews/business/${id}`, {
+        rating: reviewRating,
+        title: reviewTitle,
+        comment: reviewComment,
+      });
+      setReviewMsg("Review submitted successfully!");
+      setReviewRating(5);
+      setReviewTitle("");
+      setReviewComment("");
+      setShowReviewForm(false);
+      setReviewSubmitted(true);
+      loadReviews();
+      loadBusiness(); // Reload to update rating
+      setTimeout(() => setReviewMsg(""), 3000);
+    } catch (err) {
+      setReviewMsg("Failed to submit review: " + (err.response?.data?.error || err.message));
     }
   };
 
@@ -946,6 +1088,100 @@ export default function BusinessDetail() {
             <div className="bd-stat-label">Est.</div>
           </div>
         </div>
+      </div>
+
+      <div className="bd-divider" />
+
+      {/* ── Reviews ── */}
+      <div className="bd-section">
+        <div className="bd-reviews-header">
+          <p className="bd-reviews-title">Reviews & Ratings</p>
+          <button className="bd-review-btn" onClick={() => setShowReviewForm(!showReviewForm)}>
+            {showReviewForm ? "✕ Cancel" : "+ Write Review"}
+          </button>
+        </div>
+
+        {/* Review form */}
+        {showReviewForm && (
+          <form onSubmit={handleReviewSubmit} className="bd-form" style={{ marginBottom: "16px" }}>
+            <div style={{ marginBottom: "12px" }}>
+              <label style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Your Rating</label>
+              <div className="bd-rating-stars">
+                {[1, 2, 3, 4, 5].map(star => (
+                  <span
+                    key={star}
+                    className={`bd-rating-star ${star <= reviewRating ? "active" : ""}`}
+                    onClick={() => setReviewRating(star)}
+                  >
+                    ★
+                  </span>
+                ))}
+              </div>
+            </div>
+            <input
+              className="bd-input"
+              type="text"
+              placeholder="Review title"
+              value={reviewTitle}
+              onChange={e => setReviewTitle(e.target.value)}
+              required
+            />
+            <textarea
+              className="bd-textarea"
+              placeholder="Share your experience..."
+              value={reviewComment}
+              onChange={e => setReviewComment(e.target.value)}
+              required
+              rows={4}
+            />
+            <button type="submit" className="bd-submit-btn">Submit Review</button>
+            {reviewMsg && <div className="bd-success">{reviewMsg}</div>}
+          </form>
+        )}
+
+        {/* Reviews list */}
+        {reviewsLoading ? (
+          <div style={{ textAlign: "center", padding: "20px", color: "var(--text-muted)" }}>Loading reviews...</div>
+        ) : reviews.length === 0 ? (
+          <div className="bd-no-reviews">
+            <div style={{ fontSize: "32px", marginBottom: "8px" }}>⭐</div>
+            <div>No reviews yet</div>
+            <div style={{ fontSize: "12px", marginTop: "4px" }}>Be the first to review this business</div>
+          </div>
+        ) : (
+          <div>
+            {reviews.map(review => (
+              <div key={review._id} className="bd-review-card">
+                <div className="bd-review-header">
+                  <div>
+                    <span className="bd-review-user">{review.userName}</span>
+                    {review.verified && <span className="bd-review-verified">✓ Verified</span>}
+                  </div>
+                  <span className="bd-review-date">
+                    {new Date(review.createdAt).toLocaleDateString("en-KE", { month: "short", day: "numeric", year: "numeric" })}
+                  </span>
+                </div>
+                <div className="bd-review-rating">
+                  {"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}
+                </div>
+                <div className="bd-review-title">{review.title}</div>
+                <div className="bd-review-comment">{review.comment}</div>
+                {review.pros && review.pros.length > 0 && (
+                  <div style={{ marginTop: "8px" }}>
+                    <div style={{ fontSize: "11px", color: "var(--green)", fontWeight: 700, marginBottom: "4px" }}>Pros:</div>
+                    <div style={{ fontSize: "12px", color: "var(--text-dim)" }}>{review.pros.join(", ")}</div>
+                  </div>
+                )}
+                {review.cons && review.cons.length > 0 && (
+                  <div style={{ marginTop: "8px" }}>
+                    <div style={{ fontSize: "11px", color: "#ef4444", fontWeight: 700, marginBottom: "4px" }}>Cons:</div>
+                    <div style={{ fontSize: "12px", color: "var(--text-dim)" }}>{review.cons.join(", ")}</div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="bd-divider" />

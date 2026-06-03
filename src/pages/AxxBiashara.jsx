@@ -614,6 +614,7 @@ export default function AxxBiashara() {
               {KENYA_COUNTIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
             <select className="filter-select" value={sortBy} onChange={e => setSortBy(e.target.value)}>
+              <option value="verified">⭐ Verified First</option>
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
               <option value="rating">Top Rated</option>
