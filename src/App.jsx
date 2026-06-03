@@ -35,6 +35,14 @@ import Saved from "./pages/Saved";
 import Messages from "./pages/Messages";
 import Notifications from "./pages/Notifications";
 
+// ─── User Account Pages ──────────────────────────────────────────────────────
+import ProfilePage from "./pages/ProfilePage";
+import SettingsPage from "./pages/SettingsPage";
+import WalletPage from "./pages/WalletPage";
+import SavedListingsPage from "./pages/SavedListingsPage";
+import MessagesPage from "./pages/MessagesPage";
+import NotificationsPage from "./pages/NotificationsPage";
+
 // ─── Tourism Pages ───────────────────────────────────────────────────────────
 import TourismPage from "./pages/tourism/TourismPage";
 import TourismListingsPage from "./pages/tourism/TourismListingsPage";
@@ -229,6 +237,56 @@ function App() {
         }
       />
       <Route path="/leave-review" element={<PublicLayout><LeaveReview /></PublicLayout>} />
+
+      {/* ── USER ACCOUNT ROUTES (have Navbar, require auth) ── */}
+      <Route
+        path="/profile"
+        element={
+          <PublicLayout>
+            <ProtectedRoute><ProfilePage /></ProtectedRoute>
+          </PublicLayout>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <PublicLayout>
+            <ProtectedRoute><SettingsPage /></ProtectedRoute>
+          </PublicLayout>
+        }
+      />
+      <Route
+        path="/wallet"
+        element={
+          <PublicLayout>
+            <ProtectedRoute><WalletPage /></ProtectedRoute>
+          </PublicLayout>
+        }
+      />
+      <Route
+        path="/saved"
+        element={
+          <PublicLayout>
+            <ProtectedRoute><SavedListingsPage /></ProtectedRoute>
+          </PublicLayout>
+        }
+      />
+      <Route
+        path="/messages"
+        element={
+          <PublicLayout>
+            <ProtectedRoute><MessagesPage /></ProtectedRoute>
+          </PublicLayout>
+        }
+      />
+      <Route
+        path="/notifications"
+        element={
+          <PublicLayout>
+            <ProtectedRoute><NotificationsPage /></ProtectedRoute>
+          </PublicLayout>
+        }
+      />
       <Route
         path="/payment-history"
         element={
