@@ -866,7 +866,7 @@ export default function AdminDashboard() {
                     </td>
                     <td style={styles.td}>
                       {business.pricelist && business.pricelist.url ? (
-                        <a href={business.pricelist.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: "12px", color: "#60a5fa", textDecoration: "none" }}>
+                        <a href={`/api/uploads/pricelist/${business.pricelist.publicId || business.pricelist.url.split('/').pop()}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: "12px", color: "#60a5fa", textDecoration: "none" }}>
                           📄 View
                         </a>
                       ) : (

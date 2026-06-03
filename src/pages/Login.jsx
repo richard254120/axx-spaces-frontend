@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { COLORS, buttonStyles, inputStyles, pageStyles } from "../styles/theme";
 
@@ -9,6 +9,8 @@ const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 export default function Login() {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
+  const [searchParams] = useSearchParams();
+  const loginType = searchParams.get("type");
 
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
@@ -268,8 +270,8 @@ export default function Login() {
           ) : (
             <>
               {/* ✅ LOGIN FORM */}
-              <h1 style={styles.title}>🏠 Landlord Portal</h1>
-              <p style={styles.subtitle}>Manage your properties and tenants</p>
+              <h1 style={styles.title}>{loginType === "mover" ? "🚛 Mover Portal" : "🏠 Landlord Portal"}</h1>
+              <p style={styles.subtitle}>{loginType === "mover" ? "Manage your moving services and jobs" : "Manage your properties and tenants"}</p>
 
               {error && <div style={styles.error}>{error}</div>}
               {success && <div style={styles.success}>{success}</div>}

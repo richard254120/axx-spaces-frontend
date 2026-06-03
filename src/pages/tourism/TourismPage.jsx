@@ -13,45 +13,6 @@ import {
 } from "../../features/tourism";
 import SocialMediaLinks from "../../components/SocialMediaLinks";
 
-const featuredProperties = [
-  {
-    id: 1, name: "Serena Beach Resort & Spa", location: "Nyali, Mombasa",
-    category: "Beach Resort", price: 12500, rating: 4.8, reviews: 312,
-    color: "#0ea5e9", tag: "Top Rated", emoji: "🏖️",
-    shortDesc: "Pristine Indian Ocean shores, infinity pools, authentic Swahili hospitality.",
-  },
-  {
-    id: 2, name: "Fairmont Mount Kenya Safari Club", location: "Nanyuki, Laikipia",
-    category: "Mountain Lodge", price: 28000, rating: 4.9, reviews: 198,
-    color: "#22c55e", tag: "Luxury", emoji: "⛰️",
-    shortDesc: "On the equator at 7,000ft. Colonial elegance, game drives & star gazing.",
-  },
-  {
-    id: 3, name: "Nairobi Serena Hotel", location: "Nairobi CBD",
-    category: "City Hotel", price: 9500, rating: 4.7, reviews: 541,
-    color: "#f59e0b", tag: "Most Booked", emoji: "🏨",
-    shortDesc: "Heart of Nairobi. Business & leisure, fine dining, rooftop pool.",
-  },
-  {
-    id: 4, name: "Ol Pejeta Bush Camp", location: "Laikipia Conservancy",
-    category: "Safari Camp", price: 18000, rating: 4.9, reviews: 87,
-    color: "#a855f7", tag: "Hidden Gem", emoji: "🦁",
-    shortDesc: "Home of the last northern white rhinos. Immersive Big Five experience.",
-  },
-  {
-    id: 5, name: "Diani Reef Beach Resort", location: "Diani Beach, Kwale",
-    category: "Beach Resort", price: 15000, rating: 4.6, reviews: 189,
-    color: "#06b6d4", tag: null, emoji: "🤿",
-    shortDesc: "Award-winning coral reef, watersports paradise & white sand beaches.",
-  },
-  {
-    id: 6, name: "Hemingways Nairobi", location: "Karen, Nairobi",
-    category: "Boutique Hotel", price: 32000, rating: 4.8, reviews: 134,
-    color: "#f97316", tag: "Premium", emoji: "🌿",
-    shortDesc: "Karen Blixen country. Award-winning spa, colonial architecture, safari access.",
-  },
-];
-
 const packages = ADVERTISING_PACKAGES.map((p) => ({
   ...p,
   features: p.desc.split(",").map((x) => x.trim()),
@@ -162,7 +123,7 @@ export default function TourismPage() {
             <span style={s.heroAccent}>Finest Getaways</span>
           </h1>
           <p style={s.heroSub}>
-            From Diani's white sands to Masai Mara's golden plains — find, compare & book Kenya's best tourism experiences.
+            From Diani's pristine beaches to Masai Mara's wildlife safaris — explore Kenya's most breathtaking destinations with verified properties and direct bookings.
           </p>
           <div style={s.searchBox}>
             <span style={s.searchIcon}>🔍</span>
@@ -189,7 +150,10 @@ export default function TourismPage() {
       {/* ── CATEGORIES ── */}
       <section style={s.section}>
         <div style={s.sectionInner}>
-          <h2 style={s.sectionTitle}>Browse by Category</h2>
+          <div style={{ textAlign: "center", marginBottom: "36px" }}>
+            <h2 style={s.sectionTitle}>Explore by Category</h2>
+            <p style={{ fontSize: "15px", color: "#6b7280", marginTop: "8px" }}>Find the perfect accommodation for your Kenyan adventure</p>
+          </div>
           <div className="cat-grid">
             {categories.map((c) => (
               <button key={c.name} style={s.catCard} onClick={() => navigate("/tourism/listings")} className="cat-card">
@@ -203,11 +167,12 @@ export default function TourismPage() {
       </section>
 
       {/* ── FEATURED ── */}
-      <section style={{ ...s.section, background: "#f8f4f0" }}>
+      <section style={{ ...s.section, background: "linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%)" }}>
         <div style={s.sectionInner}>
           <div style={s.sectionHead}>
             <div>
               <h2 style={s.sectionTitle}>Featured Properties</h2>
+              <p style={{ fontSize: "14px", color: "#6b7280", marginTop: "4px" }}>Curated selection of Kenya's top-rated accommodations</p>
             </div>
             <button style={s.viewAllBtn} onClick={() => navigate("/tourism/listings")}>View All →</button>
           </div>
@@ -485,50 +450,50 @@ const s = {
   userChip: { background: "#f3f4f6", borderRadius: "20px", padding: "6px 14px", fontSize: "13px", fontWeight: 700, color: "#1f2937" },
 
   // Hero
-  hero: { background: "linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0c4a6e 100%)", position: "relative", overflow: "hidden", padding: "80px 20px" },
-  heroOverlay: { position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle at 20% 50%, rgba(14,165,233,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(251,191,36,0.1) 0%, transparent 40%)" },
-  heroContent: { maxWidth: "780px", margin: "0 auto", textAlign: "center", position: "relative", zIndex: 1 },
-  heroBadge: { display: "inline-block", background: "rgba(251,191,36,0.15)", border: "1px solid rgba(251,191,36,0.3)", color: "#fbbf24", fontSize: "12px", fontWeight: 700, padding: "6px 16px", borderRadius: "20px", marginBottom: "20px" },
-  heroTitle: { fontSize: "clamp(32px,6vw,56px)", fontWeight: 900, color: "white", lineHeight: 1.1, marginBottom: "16px", letterSpacing: "-1px" },
+  hero: { background: "linear-gradient(135deg, #065f46 0%, #047857 50%, #059669 100%)", position: "relative", overflow: "hidden", padding: "100px 20px 80px" },
+  heroOverlay: { position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(251, 191, 36, 0.1) 0%, transparent 40%)" },
+  heroContent: { maxWidth: "800px", margin: "0 auto", textAlign: "center", position: "relative", zIndex: 1 },
+  heroBadge: { display: "inline-block", background: "rgba(251, 191, 36, 0.2)", border: "1px solid rgba(251, 191, 36, 0.4)", color: "#fbbf24", fontSize: "12px", fontWeight: 700, padding: "8px 20px", borderRadius: "24px", marginBottom: "24px", letterSpacing: "0.05em" },
+  heroTitle: { fontSize: "clamp(36px, 6vw, 58px)", fontWeight: 900, color: "white", lineHeight: 1.1, marginBottom: "20px", letterSpacing: "-1.5px" },
   heroAccent: { color: "#fbbf24" },
-  heroSub: { fontSize: "16px", color: "#93c5fd", lineHeight: 1.7, marginBottom: "32px" },
-  searchBox: { background: "white", borderRadius: "14px", padding: "6px 6px 6px 18px", display: "flex", alignItems: "center", gap: "10px", maxWidth: "620px", margin: "0 auto 36px", boxShadow: "0 20px 60px rgba(0,0,0,0.3)" },
-  searchIcon: { fontSize: "18px", flexShrink: 0 },
-  searchInput: { flex: 1, border: "none", outline: "none", fontSize: "15px", fontFamily: "inherit", color: "#1f2937", background: "transparent" },
-  searchBtn: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "10px", padding: "12px 22px", fontSize: "14px", fontWeight: 800, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" },
-  heroStats: { display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap" },
-  heroStat: { textAlign: "center" },
-  heroStatVal: { fontSize: "22px", fontWeight: 900, color: "#fbbf24" },
-  heroStatLabel: { fontSize: "11px", color: "#93c5fd", fontWeight: 600 },
+  heroSub: { fontSize: "17px", color: "#d1fae5", lineHeight: 1.8, marginBottom: "36px", maxWidth: "600px", margin: "0 auto 36px" },
+  searchBox: { background: "white", borderRadius: "16px", padding: "8px 8px 8px 20px", display: "flex", alignItems: "center", gap: "12px", maxWidth: "650px", margin: "0 auto 40px", boxShadow: "0 25px 80px rgba(0, 0, 0, 0.25)" },
+  searchIcon: { fontSize: "20px", flexShrink: 0 },
+  searchInput: { flex: 1, border: "none", outline: "none", fontSize: "16px", fontFamily: "inherit", color: "#1f2937", background: "transparent" },
+  searchBtn: { background: "linear-gradient(135deg, #059669 0%, #047857 100%)", color: "white", border: "none", borderRadius: "12px", padding: "14px 28px", fontSize: "15px", fontWeight: 800, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap", transition: "all 0.3s" },
+  heroStats: { display: "flex", gap: "32px", justifyContent: "center", flexWrap: "wrap", marginTop: "8px" },
+  heroStat: { textAlign: "center", minWidth: "100px" },
+  heroStatVal: { fontSize: "28px", fontWeight: 900, color: "#fbbf24", lineHeight: 1.2 },
+  heroStatLabel: { fontSize: "12px", color: "#d1fae5", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", marginTop: "4px" },
 
   // Sections
-  section: { padding: "60px 20px" },
+  section: { padding: "80px 20px" },
   sectionInner: { maxWidth: "1400px", margin: "0 auto" },
-  sectionHead: { display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "28px", flexWrap: "wrap", gap: "12px" },
-  sectionTitle: { fontSize: "24px", fontWeight: 800, color: "#1f2937", marginBottom: "6px" },
-  sectionSub: { fontSize: "13px", color: "#6b7280" },
-  viewAllBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "9px 18px", fontSize: "13px", fontWeight: 700, color: "#1f2937", cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" },
+  sectionHead: { display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "36px", flexWrap: "wrap", gap: "16px" },
+  sectionTitle: { fontSize: "28px", fontWeight: 900, color: "#065f46", marginBottom: "8px", letterSpacing: "-0.5px" },
+  sectionSub: { fontSize: "14px", color: "#6b7280" },
+  viewAllBtn: { background: "transparent", border: "2px solid #059669", borderRadius: "10px", padding: "10px 20px", fontSize: "14px", fontWeight: 700, color: "#059669", cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap", transition: "all 0.3s" },
 
   // Categories
-  catCard: { background: "white", border: "1px solid #e5e7eb", borderRadius: "14px", padding: "20px 16px", cursor: "pointer", fontFamily: "inherit", textAlign: "center", transition: "all 0.2s" },
-  catEmoji: { fontSize: "32px", display: "block", marginBottom: "8px" },
-  catName: { fontSize: "13px", fontWeight: 700, color: "#1f2937", marginBottom: "4px" },
-  catCount: { fontSize: "11px", color: "#9ca3af" },
+  catCard: { background: "white", border: "2px solid #e5e7eb", borderRadius: "16px", padding: "24px 20px", cursor: "pointer", fontFamily: "inherit", textAlign: "center", transition: "all 0.3s", boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)" },
+  catEmoji: { fontSize: "40px", display: "block", marginBottom: "12px" },
+  catName: { fontSize: "15px", fontWeight: 800, color: "#065f46", marginBottom: "6px" },
+  catCount: { fontSize: "12px", color: "#6b7280", fontWeight: 600 },
 
   // Properties
-  propCard: { background: "white", borderRadius: "16px", border: "1px solid #e5e7eb", overflow: "hidden", cursor: "pointer" },
-  propImg: { height: "160px", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" },
-  propTag: { position: "absolute", top: "10px", left: "10px", color: "white", fontSize: "10px", fontWeight: 700, padding: "3px 9px", borderRadius: "20px" },
-  propBody: { padding: "16px" },
-  propCat: { fontSize: "10px", color: "#9ca3af", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.08em", marginBottom: "4px" },
-  propName: { fontSize: "15px", fontWeight: 800, color: "#1f2937", margin: "0 0 4px", lineHeight: 1.3 },
-  propLoc: { fontSize: "12px", color: "#6b7280", marginBottom: "6px" },
-  propDesc: { fontSize: "12px", color: "#6b7280", lineHeight: 1.6, marginBottom: "12px" },
-  propFooter: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" },
-  propPrice: { fontSize: "17px", fontWeight: 800 },
-  propPer: { fontSize: "11px", color: "#9ca3af" },
-  propRating: { fontSize: "12px", color: "#fbbf24", fontWeight: 700 },
-  propBtn: { width: "100%", border: "none", color: "white", padding: "10px", borderRadius: "8px", fontSize: "13px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" },
+  propCard: { background: "white", borderRadius: "18px", border: "2px solid #e5e7eb", overflow: "hidden", cursor: "pointer", transition: "all 0.3s", boxShadow: "0 4px 16px rgba(0, 0, 0, 0.08)" },
+  propImg: { height: "180px", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" },
+  propTag: { position: "absolute", top: "12px", left: "12px", color: "white", fontSize: "11px", fontWeight: 800, padding: "4px 12px", borderRadius: "20px", textTransform: "uppercase", letterSpacing: "0.05em" },
+  propBody: { padding: "20px" },
+  propCat: { fontSize: "11px", color: "#059669", textTransform: "uppercase", fontWeight: 800, letterSpacing: "0.1em", marginBottom: "6px" },
+  propName: { fontSize: "17px", fontWeight: 800, color: "#065f46", margin: "0 0 6px", lineHeight: 1.3 },
+  propLoc: { fontSize: "13px", color: "#6b7280", marginBottom: "10px", fontWeight: 500 },
+  propDesc: { fontSize: "13px", color: "#4b5563", lineHeight: 1.7, marginBottom: "16px" },
+  propFooter: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px", paddingTop: "14px", borderTop: "1px solid #f3f4f6" },
+  propPrice: { fontSize: "19px", fontWeight: 900 },
+  propPer: { fontSize: "12px", color: "#9ca3af", fontWeight: 500 },
+  propRating: { fontSize: "13px", color: "#fbbf24", fontWeight: 800 },
+  propBtn: { width: "100%", border: "none", color: "white", padding: "12px", borderRadius: "10px", fontSize: "14px", fontWeight: 800, cursor: "pointer", fontFamily: "inherit", transition: "all 0.3s" },
 
   // Packages
   pkgCard: { background: "#111827", border: "1px solid #374151", borderRadius: "16px", padding: "24px 20px", position: "relative" },
@@ -595,15 +560,14 @@ const css = `
     gap: 12px;
     margin-bottom: 0;
   }
-  .cat-card:hover { border-color: #fbbf24; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+  .cat-card:hover { border-color: #059669; transform: translateY(-4px); box-shadow: 0 12px 32px rgba(6, 95, 70, 0.15); }
 
   .prop-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
   }
-  .prop-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.1); border-color: #fbbf24; }
-  .prop-card { transition: all 0.22s; }
+  .prop-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(6, 95, 70, 0.12); border-color: #059669; }
 
   .pkg-grid {
     display: grid;

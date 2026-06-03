@@ -22,6 +22,7 @@ export default function Home() {
   const [activeCategoryTab, setActiveCategoryTab] = useState("rentals");
   const [reviews, setReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
+  const [showBoostModal, setShowBoostModal] = useState(false);
 
   const counties = [
     "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta",
@@ -206,7 +207,7 @@ export default function Home() {
   };
 
   const handleListProperty = () => {
-    if (!token) { navigate("/login"); return; }
+    if (!token) { setShowBoostModal(true); return; }
     navigate("/upload");
   };
 
@@ -1212,6 +1213,136 @@ export default function Home() {
       font-style: italic;
     }
 
+    .boost-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(11, 33, 64, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .boost-modal {
+      background: white;
+      border-radius: 20px;
+      max-width: 520px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 32px;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .boost-modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: #f3f4f6;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      font-size: 20px;
+      color: #6b7280;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .boost-modal-close:hover {
+      background: #e5e7eb;
+      color: #0B2140;
+    }
+
+    .boost-modal-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: #0B2140;
+      margin: 0 0 8px;
+      text-align: center;
+    }
+
+    .boost-modal-subtitle {
+      font-size: 14px;
+      color: #6b7280;
+      text-align: center;
+      margin: 0 0 24px;
+      line-height: 1.6;
+    }
+
+    .boost-services-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .boost-service-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
+    }
+
+    .boost-service-card:hover {
+      border-color: #E31B1B;
+      background: #fef2f2;
+      transform: translateY(-2px);
+    }
+
+    .boost-service-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .boost-service-info {
+      flex: 1;
+    }
+
+    .boost-service-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0B2140;
+      margin: 0 0 4px;
+    }
+
+    .boost-service-desc {
+      font-size: 13px;
+      color: #6b7280;
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    .boost-service-arrow {
+      color: #9ca3af;
+      font-size: 20px;
+      transition: all 0.2s;
+    }
+
+    .boost-service-card:hover .boost-service-arrow {
+      color: #E31B1B;
+      transform: translateX(4px);
+    }
+
     .footer {
       background: #060f1e;
       color: #cbd5e1;
@@ -1835,6 +1966,74 @@ export default function Home() {
           <p style={styles.footerCopy}>© 2026 Axxspace. All rights reserved.</p>
         </div>
       </footer>
+
+      {/* ── BOOST SERVICE SELECTION MODAL ── */}
+      {showBoostModal && (
+        <div className="boost-modal-overlay" onClick={() => setShowBoostModal(false)}>
+          <div className="boost-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="boost-modal-close" onClick={() => setShowBoostModal(false)}>✕</button>
+            <h2 className="boost-modal-title">Choose Your Service</h2>
+            <p className="boost-modal-subtitle">Select the type of service you want to list or boost on Axxspace</p>
+
+            <div className="boost-services-grid">
+              <div className="boost-service-card" onClick={() => { setShowBoostModal(false); navigate("/login"); }}>
+                <div className="boost-service-icon" style={{ background: "linear-gradient(135deg, #E31B1B 0%, #C01010 100%)" }}>
+                  🏠
+                </div>
+                <div className="boost-service-info">
+                  <h3 className="boost-service-title">Landlord / Rentals</h3>
+                  <p className="boost-service-desc">List rental properties and boost your listings</p>
+                </div>
+                <span className="boost-service-arrow">→</span>
+              </div>
+
+              <div className="boost-service-card" onClick={() => { setShowBoostModal(false); navigate("/login?type=mover"); }}>
+                <div className="boost-service-icon" style={{ background: "linear-gradient(135deg, #0B2140 0%, #152B4A 100%)" }}>
+                  🚛
+                </div>
+                <div className="boost-service-info">
+                  <h3 className="boost-service-title">Mover / Moving Company</h3>
+                  <p className="boost-service-desc">Offer moving services across Kenya</p>
+                </div>
+                <span className="boost-service-arrow">→</span>
+              </div>
+
+              <div className="boost-service-card" onClick={() => { setShowBoostModal(false); navigate("/seller-login"); }}>
+                <div className="boost-service-icon" style={{ background: "linear-gradient(135deg, #0891b2 0%, #0e7490 100%)" }}>
+                  🛍️
+                </div>
+                <div className="boost-service-info">
+                  <h3 className="boost-service-title">Seller / Marketplace</h3>
+                  <p className="boost-service-desc">Sell items in the materials marketplace</p>
+                </div>
+                <span className="boost-service-arrow">→</span>
+              </div>
+
+              <div className="boost-service-card" onClick={() => { setShowBoostModal(false); navigate("/tourism/login"); }}>
+                <div className="boost-service-icon" style={{ background: "linear-gradient(135deg, #059669 0%, #047857 100%)" }}>
+                  🏨
+                </div>
+                <div className="boost-service-info">
+                  <h3 className="boost-service-title">Tourism Provider</h3>
+                  <p className="boost-service-desc">List hotels, lodges, and tourism experiences</p>
+                </div>
+                <span className="boost-service-arrow">→</span>
+              </div>
+
+              <div className="boost-service-card" onClick={() => { setShowBoostModal(false); navigate("/business-login"); }}>
+                <div className="boost-service-icon" style={{ background: "linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)" }}>
+                  💼
+                </div>
+                <div className="boost-service-info">
+                  <h3 className="boost-service-title">Business / AxxBiashara</h3>
+                  <p className="boost-service-desc">List professional business services</p>
+                </div>
+                <span className="boost-service-arrow">→</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

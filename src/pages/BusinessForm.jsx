@@ -456,7 +456,7 @@ export default function BusinessForm() {
       const res = await API.post("/uploads/pricelist", fd, { headers: { "Content-Type": "multipart/form-data" } });
       setFormData(prev => ({
         ...prev,
-        pricelist: { ...prev.pricelist, url: res.data.url, name: res.data.originalName || file.name },
+        pricelist: { ...prev.pricelist, url: res.data.url, publicId: res.data.publicId, name: res.data.originalName || file.name },
       }));
     } catch {
       setError("Failed to upload pricelist");
