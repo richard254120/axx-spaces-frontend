@@ -208,7 +208,6 @@ export default function TourismPage() {
           <div style={s.sectionHead}>
             <div>
               <h2 style={s.sectionTitle}>Featured Properties</h2>
-              <p style={s.sectionSub}>Handpicked top-rated destinations across Kenya</p>
             </div>
             <button style={s.viewAllBtn} onClick={() => navigate("/tourism/listings")}>View All →</button>
           </div>

@@ -1462,7 +1462,7 @@ export default function Home() {
       <section className="featured-section">
         <div className="section-header">
           <h2 className="section-title">⭐ Featured Premium Listings</h2>
-          <p className="section-subtitle">Verified & boosted properties — handpicked for maximum trust</p>
+          <p className="section-subtitle">Verified & boosted properties from trusted landlords</p>
         </div>
         {loadingFeatured ? (
           <div className="marquee-cards-wrapper">
