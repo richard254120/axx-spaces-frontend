@@ -40,7 +40,8 @@ export default function Login() {
         script.defer = true;
         script.onload = () => initializeGoogleSignIn();
         script.onerror = () => {
-          setError("Failed to load Google Sign-In. Please try again or use email/password.");
+          console.error("Google SDK failed to load. Check network connection and ensure this origin is authorized in Google Cloud Console.");
+          setError("Failed to load Google Sign-In. Ensure your origin is authorized in Google Cloud Console.");
           setGoogleLoading(false);
         };
         document.head.appendChild(script);
@@ -48,6 +49,7 @@ export default function Login() {
         initializeGoogleSignIn();
       }
     } catch (err) {
+      console.error("Google Sign-In error:", err);
       setError("Google Sign-In is not configured. Please use email/password.");
       setGoogleLoading(false);
     }
