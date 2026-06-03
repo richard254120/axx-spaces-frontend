@@ -1500,23 +1500,10 @@ export default function BusinessDetail() {
             <button onClick={() => setDeleteConfirmReviewId(null)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
             <h3 style={{ fontSize: "20px", fontWeight: 800, color: "#f1f5f9", marginBottom: "12px" }}>Delete Review</h3>
             <p style={{ fontSize: "14px", color: "#94a3b8", marginBottom: "16px" }}>Are you sure you want to delete this review?</p>
-            {!user && (
-              <div style={{ marginBottom: "16px" }}>
-                <label style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Enter your name to confirm</label>
-                <input
-                  className="bd-input"
-                  type="text"
-                  placeholder="Your name"
-                  value={deleteUserName}
-                  onChange={e => setDeleteUserName(e.target.value)}
-                />
-              </div>
-            )}
             <div style={{ display: "flex", gap: "10px" }}>
               <button
                 onClick={() => {
-                  const review = reviews.find(r => r._id === deleteConfirmReviewId);
-                  handleDeleteReview(deleteConfirmReviewId, user?.name || deleteUserName || review?.userName);
+                  handleDeleteReview(deleteConfirmReviewId, user?.name || "Anonymous");
                 }}
                 className="bd-submit-btn"
                 style={{ background: "#ef4444", flex: 1 }}
