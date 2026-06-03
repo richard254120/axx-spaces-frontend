@@ -809,6 +809,8 @@ export default function BusinessDetail() {
   const [reviewUserName, setReviewUserName] = useState("");
   const [reviewMsg, setReviewMsg] = useState("");
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
+  const [deleteConfirmReviewId, setDeleteConfirmReviewId] = useState(null);
+  const [deleteUserName, setDeleteUserName] = useState("");
 
   /* Lightbox state */
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -872,6 +874,22 @@ export default function BusinessDetail() {
       setTimeout(() => setReviewMsg(""), 3000);
     } catch (err) {
       setReviewMsg("Failed to submit review: " + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const handleDeleteReview = async (reviewId, reviewUserNameToDelete) => {
+    try {
+      await API.delete(`/business-reviews/${reviewId}`, {
+        data: { userName: reviewUserNameToDelete }
+      });
+      setReviewMsg("Review deleted successfully!");
+      setDeleteConfirmReviewId(null);
+      setDeleteUserName("");
+      loadReviews();
+      loadBusiness();
+      setTimeout(() => setReviewMsg(""), 3000);
+    } catch (err) {
+      setReviewMsg("Failed to delete review: " + (err.response?.data?.error || err.message));
     }
   };
 
@@ -1165,9 +1183,27 @@ export default function BusinessDetail() {
                     <span className="bd-review-user">{review.userName}</span>
                     {review.verified && <span className="bd-review-verified">✓ Verified</span>}
                   </div>
-                  <span className="bd-review-date">
-                    {new Date(review.createdAt).toLocaleDateString("en-KE", { month: "short", day: "numeric", year: "numeric" })}
-                  </span>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span className="bd-review-date">
+                      {new Date(review.createdAt).toLocaleDateString("en-KE", { month: "short", day: "numeric", year: "numeric" })}
+                    </span>
+                    <button
+                      onClick={() => setDeleteConfirmReviewId(review._id)}
+                      style={{
+                        padding: "4px 8px",
+                        background: "rgba(239,68,68,0.1)",
+                        border: "1px solid rgba(239,68,68,0.3)",
+                        borderRadius: "6px",
+                        color: "#f87171",
+                        fontSize: "11px",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        fontFamily: "inherit"
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
                 <div className="bd-review-rating">
                   {"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}
@@ -1376,6 +1412,51 @@ export default function BusinessDetail() {
       )}
 
       <div className="bd-safe-bottom" />
+
+      {/* ── Delete Review Confirmation Modal ── */}
+      {deleteConfirmReviewId && (
+        <div className="modal-overlay" onClick={() => setDeleteConfirmReviewId(null)}>
+          <div className="modal-box" style={{ maxWidth: "400px", width: "90%" }} onClick={e => e.stopPropagation()}>
+            <button onClick={() => setDeleteConfirmReviewId(null)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+            <h3 style={{ fontSize: "20px", fontWeight: 800, color: "#f1f5f9", marginBottom: "12px" }}>Delete Review</h3>
+            <p style={{ fontSize: "14px", color: "#94a3b8", marginBottom: "16px" }}>Are you sure you want to delete this review?</p>
+            {!user && (
+              <div style={{ marginBottom: "16px" }}>
+                <label style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Enter your name to confirm</label>
+                <input
+                  className="bd-input"
+                  type="text"
+                  placeholder="Your name"
+                  value={deleteUserName}
+                  onChange={e => setDeleteUserName(e.target.value)}
+                />
+              </div>
+            )}
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button
+                onClick={() => {
+                  const review = reviews.find(r => r._id === deleteConfirmReviewId);
+                  handleDeleteReview(deleteConfirmReviewId, user?.name || deleteUserName || review?.userName);
+                }}
+                className="bd-submit-btn"
+                style={{ background: "#ef4444", flex: 1 }}
+              >
+                Confirm Delete
+              </button>
+              <button
+                onClick={() => {
+                  setDeleteConfirmReviewId(null);
+                  setDeleteUserName("");
+                }}
+                className="bd-submit-btn"
+                style={{ background: "var(--surface2)", color: "var(--text-dim)", flex: 1 }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ══════════════════════════════════════
           LIGHTBOX — tap any photo to enlarge,
