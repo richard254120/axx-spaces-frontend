@@ -45,12 +45,12 @@ export default function ReviewsSection({ propertyId }) {
     setLoading(true);
     try {
       const res = await fetch(`${API_BASE}/properties/${propertyId}/reviews`);
-      if (res.ok) {
-        const data = await res.json();
-        setReviews(Array.isArray(data) ? data : []);
-      }
+      if (!res.ok) throw new Error(`Failed to fetch reviews (${res.status})`);
+      const data = await res.json();
+      setReviews(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error("Failed to fetch reviews", err);
+      console.error("Failed to fetch reviews:", err);
+      setError("Failed to load reviews. Please try again.");
     } finally {
       setLoading(false);
     }

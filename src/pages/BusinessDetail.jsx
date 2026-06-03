@@ -850,6 +850,7 @@ export default function BusinessDetail() {
     } catch (err) {
       console.error("Failed to load reviews:", err);
       setReviews([]);
+      setReviewMsg("Failed to load reviews. Please try again.");
     } finally {
       setReviewsLoading(false);
     }

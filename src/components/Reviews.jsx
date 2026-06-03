@@ -254,6 +254,7 @@ export default function Reviews({ category = "general", relatedId = null, limit 
       }
     } catch (err) {
       console.error("Error marking helpful:", err);
+      setError("Failed to mark review as helpful.");
     }
   };
 

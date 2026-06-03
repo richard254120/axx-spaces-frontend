@@ -59,6 +59,7 @@ export default function AxxBiashara() {
   const [comparisonData, setComparisonData] = useState([]);
   const [hoveredCard, setHoveredCard] = useState(null);
   const [refreshBanner, setRefreshBanner] = useState(false);
+  const [error, setError] = useState("");
 
   /* ── core data fetchers ── */
   const loadBusinesses = async () => {
@@ -76,6 +77,7 @@ export default function AxxBiashara() {
       setBusinesses(res.data.businesses || []);
     } catch (err) {
       console.error("Failed to load businesses:", err);
+      setError("Failed to load businesses. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -87,6 +89,7 @@ export default function AxxBiashara() {
       setAnnouncements(res.data.announcements || []);
     } catch (err) {
       console.error("Failed to load announcements:", err);
+      setError("Failed to load announcements.");
     }
   };
 
@@ -97,7 +100,9 @@ export default function AxxBiashara() {
     try {
       const res = await API.get("/favorites");
       setFavorites(res.data.favorites || []);
-    } catch (err) { }
+    } catch (err) {
+      console.error("Failed to load favorites:", err);
+    }
   };
 
   /* ── filter-driven reload ── */
@@ -135,7 +140,9 @@ export default function AxxBiashara() {
         await API.post("/favorites", { businessId });
         loadFavorites();
       }
-    } catch (err) { }
+    } catch (err) {
+      console.error("Failed to toggle favorite:", err);
+    }
   };
 
   const isFavorite = (id) => favorites.some(f => f.business._id === id);
@@ -158,7 +165,10 @@ export default function AxxBiashara() {
       const res = await API.get(`/business/compare?ids=${comparisonList.join(",")}`);
       setComparisonData(res.data.businesses);
       setShowComparisonModal(true);
-    } catch (err) { }
+    } catch (err) {
+      console.error("Failed to load comparison data:", err);
+      setError("Failed to compare businesses. Please try again.");
+    }
   };
 
   /* ── announcement submit ── */
@@ -531,6 +541,14 @@ export default function AxxBiashara() {
             <div className="refresh-banner">
               <span style={{ fontSize: "18px" }}>✅</span>
               Business updated successfully! The directory has been refreshed with your latest changes.
+            </div>
+          )}
+
+          {/* Error banner */}
+          {error && (
+            <div style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)", color: "#ef4444", padding: "12px 18px", borderRadius: "10px", marginBottom: "20px", fontSize: "14px", fontWeight: 600, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span>{error}</span>
+              <button onClick={() => setError("")} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: "18px" }}>&times;</button>
             </div>
           )}
 
