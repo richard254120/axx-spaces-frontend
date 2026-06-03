@@ -127,7 +127,7 @@ const styles = {
   },
   emptyTitle: {
     fontSize: "24px",
-    fontWeight: 700",
+    fontWeight: 700,
     color: "#f1f5f9",
     marginBottom: "12px",
   },
