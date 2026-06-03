@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { ProfileAvatar } from "../features/profile";
 import AccountTypeSelector from "./AccountTypeSelector";
+import NotificationBell from "./NotificationSystem";
 import logo from "../assets/image.png";
 
 export default function Navbar() {
@@ -314,11 +315,41 @@ export default function Navbar() {
               </Link>
             )}
             <div style={styles.userSection}>
-              <ProfileAvatar user={user} size={32} />
-              <span style={styles.userName}>{user.name}</span>
-              <button style={styles.logoutBtn} onClick={handleLogout} title="Log out" aria-label="Log out">
-                🚪
-              </button>
+              <NotificationBell />
+              <div style={styles.userDropdownWrapper} ref={dropdownRef}>
+                <button
+                  style={styles.userDropdownBtn}
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                >
+                  <ProfileAvatar user={user} size={32} />
+                  <span style={styles.userName}>{user.name}</span>
+                  <span style={styles.dropdownArrow}>{dropdownOpen ? "▲" : "▼"}</span>
+                </button>
+                {dropdownOpen && (
+                  <div style={styles.userDropdown}>
+                    <Link
+                      to="/payment-history"
+                      style={styles.dropdownItem}
+                      onClick={() => { setDropdownOpen(false); setMenuOpen(false); }}
+                    >
+                      💳 Payment History
+                    </Link>
+                    <Link
+                      to="/dashboard"
+                      style={styles.dropdownItem}
+                      onClick={() => { setDropdownOpen(false); setMenuOpen(false); }}
+                    >
+                      📊 Dashboard
+                    </Link>
+                    <button
+                      style={styles.dropdownItem}
+                      onClick={() => { handleLogout(); setDropdownOpen(false); setMenuOpen(false); }}
+                    >
+                      🚪 Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </>
         )}
@@ -425,6 +456,40 @@ const styles = {
     borderLeft: "1px solid #334155",
     paddingLeft: "8px",
     marginLeft: "8px",
+  },
+
+  userDropdownWrapper: {
+    position: "relative",
+  },
+
+  userDropdownBtn: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    background: "transparent",
+    border: "none",
+    cursor: "pointer",
+    padding: "4px 8px",
+    borderRadius: "8px",
+    transition: "all 0.2s",
+  },
+
+  dropdownArrow: {
+    fontSize: "10px",
+    color: "#94a3b8",
+  },
+
+  userDropdown: {
+    position: "absolute",
+    right: 0,
+    top: "calc(100% + 8px)",
+    background: "linear-gradient(180deg, rgba(30,41,59,0.98) 0%, rgba(15,23,41,0.98) 100%)",
+    border: "1px solid #334155",
+    borderRadius: "12px",
+    minWidth: "200px",
+    zIndex: 1000,
+    boxShadow: "0 10px 40px rgba(0,0,0,0.4)",
+    overflow: "hidden",
   },
 
   userName: {

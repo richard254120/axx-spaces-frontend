@@ -3,6 +3,9 @@ import ReviewsSection from "../components/ReviewsSection";
 import RecentlyViewed, { trackView } from "../components/RecentlyViewed";
 import ShareProperty from "../components/ShareProperty";
 import MapView from "../components/MapView";
+import MessagingSystem from "../components/MessagingSystem";
+import ReviewRatingSystem from "../components/ReviewRatingSystem";
+import BookingCalendar from "../components/BookingCalendar";
 import { useAuth } from "../context/AuthContext";
 import PhoneInput from "../components/PhoneInput";
 
@@ -30,6 +33,10 @@ export default function Listings() {
     bedrooms: "",
     bathrooms: "",
     furnished: "",
+    propertyType: "",
+    amenities: "",
+    petFriendly: "",
+    availableFrom: "",
   });
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -39,6 +46,10 @@ export default function Listings() {
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentError, setPaymentError] = useState("");
   const [paymentSuccess, setPaymentSuccess] = useState("");
+  const [favorites, setFavorites] = useState([]);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [savedSearches, setSavedSearches] = useState([]);
+  const [showSavedSearches, setShowSavedSearches] = useState(false);
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -62,6 +73,18 @@ export default function Listings() {
       }
     };
     fetchProperties();
+
+    // Load favorites from localStorage
+    const savedFavorites = localStorage.getItem("axxspace_favorites");
+    if (savedFavorites) {
+      setFavorites(JSON.parse(savedFavorites));
+    }
+
+    // Load saved searches from localStorage
+    const savedSearchesData = localStorage.getItem("axxspace_saved_searches");
+    if (savedSearchesData) {
+      setSavedSearches(JSON.parse(savedSearchesData));
+    }
   }, []);
 
   useEffect(() => {
@@ -80,11 +103,33 @@ export default function Listings() {
     if (filters.furnished !== "") {
       filtered = filtered.filter((p) => p.furnished === (filters.furnished === "true"));
     }
+    if (filters.propertyType) {
+      filtered = filtered.filter((p) =>
+        (p.propertyType || "").toLowerCase() === filters.propertyType.toLowerCase()
+      );
+    }
+    if (filters.amenities) {
+      filtered = filtered.filter((p) =>
+        p.amenities?.some((a) => a.toLowerCase().includes(filters.amenities.toLowerCase()))
+      );
+    }
+    if (filters.petFriendly !== "") {
+      filtered = filtered.filter((p) => p.petFriendly === (filters.petFriendly === "true"));
+    }
+    if (filters.availableFrom) {
+      filtered = filtered.filter((p) => {
+        if (!p.availableFrom) return true;
+        return new Date(p.availableFrom) <= new Date(filters.availableFrom);
+      });
+    }
+    if (showFavoritesOnly) {
+      filtered = filtered.filter((p) => favorites.includes(p._id));
+    }
     filtered = filtered.filter(
       (p) => p.price >= filters.minPrice && p.price <= filters.maxPrice
     );
     setFilteredProperties(filtered);
-  }, [filters, properties]);
+  }, [filters, properties, favorites, showFavoritesOnly]);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -179,6 +224,48 @@ export default function Listings() {
     window.open(`sms:${phoneNumber}?body=${encodeURIComponent(message)}`, "_blank");
   };
 
+  const toggleFavorite = (propertyId) => {
+    const newFavorites = favorites.includes(propertyId)
+      ? favorites.filter(id => id !== propertyId)
+      : [...favorites, propertyId];
+    setFavorites(newFavorites);
+    localStorage.setItem("axxspace_favorites", JSON.stringify(newFavorites));
+  };
+
+  const saveCurrentSearch = () => {
+    const hasActiveFilters = Object.values(filters).some(v => v !== "" && v !== 0 && v !== 1000000);
+    if (!hasActiveFilters) {
+      alert("Please apply some filters before saving a search");
+      return;
+    }
+
+    const searchName = prompt("Name this search (e.g., 'Nairobi 2-bedroom apartments'):");
+    if (!searchName) return;
+
+    const newSearch = {
+      id: Date.now(),
+      name: searchName,
+      filters: { ...filters },
+      createdAt: new Date().toISOString(),
+    };
+
+    const updatedSearches = [...savedSearches, newSearch];
+    setSavedSearches(updatedSearches);
+    localStorage.setItem("axxspace_saved_searches", JSON.stringify(updatedSearches));
+    alert("✅ Search saved successfully!");
+  };
+
+  const applySavedSearch = (search) => {
+    setFilters(search.filters);
+    setShowSavedSearches(false);
+  };
+
+  const deleteSavedSearch = (searchId) => {
+    const updatedSearches = savedSearches.filter(s => s.id !== searchId);
+    setSavedSearches(updatedSearches);
+    localStorage.setItem("axxspace_saved_searches", JSON.stringify(updatedSearches));
+  };
+
   const leaseLabel = { monthly: "Monthly", "6months": "6 Months", yearly: "Yearly" };
 
   if (loading) {
@@ -201,7 +288,7 @@ export default function Listings() {
 
       {error && <div style={styles.error}>{error}</div>}
 
-      {/* FILTERS — unchanged */}
+      {/* FILTERS — enhanced with new options */}
       <div style={styles.filters}>
         <input
           type="text"
@@ -211,6 +298,14 @@ export default function Listings() {
           onChange={handleFilterChange}
           style={styles.filterInput}
         />
+        <select name="propertyType" value={filters.propertyType} onChange={handleFilterChange} style={styles.filterSelect}>
+          <option value="">All Property Types</option>
+          <option value="apartment">Apartment</option>
+          <option value="bedsitter">Bedsitter</option>
+          <option value="maisonette">Maisonette</option>
+          <option value="studio">Studio</option>
+          <option value="house">House</option>
+        </select>
         <select name="bedrooms" value={filters.bedrooms} onChange={handleFilterChange} style={styles.filterSelect}>
           <option value="">All Bedrooms</option>
           <option value="1">1 Bedroom</option>
@@ -229,6 +324,27 @@ export default function Listings() {
           <option value="true">Furnished</option>
           <option value="false">Unfurnished</option>
         </select>
+        <select name="petFriendly" value={filters.petFriendly} onChange={handleFilterChange} style={styles.filterSelect}>
+          <option value="">Pet Policy</option>
+          <option value="true">🐕 Pet Friendly</option>
+          <option value="false">🚫 No Pets</option>
+        </select>
+        <input
+          type="text"
+          name="amenities"
+          placeholder="🔍 Search amenities (WiFi, Parking...)"
+          value={filters.amenities}
+          onChange={handleFilterChange}
+          style={styles.filterInput}
+        />
+        <input
+          type="date"
+          name="availableFrom"
+          placeholder="📅 Available from"
+          value={filters.availableFrom}
+          onChange={handleFilterChange}
+          style={styles.filterInput}
+        />
         <div style={styles.priceRange}>
           <input type="number" name="minPrice" placeholder="Min Price" value={filters.minPrice} onChange={handleFilterChange} style={styles.filterInput} />
           <span style={styles.priceSeparator}>-</span>
@@ -236,15 +352,73 @@ export default function Listings() {
         </div>
       </div>
 
-      {/* ✅ RESULTS COUNT + MAP TOGGLE */}
+      {/* ✅ RESULTS COUNT + MAP TOGGLE + FAVORITES + SAVED SEARCHES */}
       <div style={styles.resultsRow}>
         <span style={styles.resultsCount}>
           Found {filteredProperties.length} {filteredProperties.length === 1 ? "property" : "properties"}
+          {favorites.length > 0 && ` • ❤️ ${favorites.length} saved`}
+          {savedSearches.length > 0 && ` • 🔖 ${savedSearches.length} saved searches`}
         </span>
-        <button style={styles.mapToggleBtn} onClick={() => setShowMap((v) => !v)}>
-          {showMap ? "🗒️ Hide Map" : "🗺️ Show Map"}
-        </button>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button
+            style={{ ...styles.mapToggleBtn, background: "#8b5cf6" }}
+            onClick={saveCurrentSearch}
+            title="Save current search filters"
+          >
+            🔖 Save Search
+          </button>
+          {savedSearches.length > 0 && (
+            <button
+              style={{ ...styles.mapToggleBtn, background: showSavedSearches ? "#8b5cf6" : "#0B2140" }}
+              onClick={() => setShowSavedSearches(!showSavedSearches)}
+            >
+              {showSavedSearches ? "✕ Hide" : "🔖 Saved Searches"}
+            </button>
+          )}
+          {favorites.length > 0 && (
+            <button
+              style={{ ...styles.mapToggleBtn, background: showFavoritesOnly ? "#E31B1B" : "#0B2140" }}
+              onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+            >
+              {showFavoritesOnly ? "❤️ Show All" : "❤️ Show Favorites"}
+            </button>
+          )}
+          <button style={styles.mapToggleBtn} onClick={() => setShowMap((v) => !v)}>
+            {showMap ? "🗒️ Hide Map" : "🗺️ Show Map"}
+          </button>
+        </div>
       </div>
+
+      {/* ✅ SAVED SEARCHES DROPDOWN */}
+      {showSavedSearches && savedSearches.length > 0 && (
+        <div style={styles.savedSearchesDropdown}>
+          <h3 style={styles.savedSearchesTitle}>Saved Searches</h3>
+          {savedSearches.map((search) => (
+            <div key={search.id} style={styles.savedSearchItem}>
+              <div style={styles.savedSearchInfo}>
+                <strong style={styles.savedSearchName}>{search.name}</strong>
+                <span style={styles.savedSearchDate}>
+                  {new Date(search.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+              <div style={styles.savedSearchActions}>
+                <button
+                  style={styles.applySearchBtn}
+                  onClick={() => applySavedSearch(search)}
+                >
+                  Apply
+                </button>
+                <button
+                  style={styles.deleteSearchBtn}
+                  onClick={() => deleteSavedSearch(search.id)}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* ✅ MAP VIEW — toggled */}
       {showMap && <MapView properties={filteredProperties} />}
@@ -274,6 +448,13 @@ export default function Listings() {
                 {property.images?.length > 1 && (
                   <div style={styles.imageCount}>📷 {property.images.length}</div>
                 )}
+                <button
+                  style={styles.favoriteBtn}
+                  onClick={(e) => { e.stopPropagation(); toggleFavorite(property._id); }}
+                  title={favorites.includes(property._id) ? "Remove from favorites" : "Add to favorites"}
+                >
+                  {favorites.includes(property._id) ? "❤️" : "🤍"}
+                </button>
               </div>
               <div style={styles.content}>
                 <h2 style={styles.title}>{property.title}</h2>
@@ -548,7 +729,41 @@ export default function Listings() {
                 </button>
               </div>
 
+              {/* ✅ BOOKING CALENDAR */}
+              <div style={styles.modalSection}>
+                <h3 style={styles.sectionTitle}>📅 Check Availability</h3>
+                <BookingCalendar
+                  propertyId={selectedProperty._id}
+                  availableUnits={selectedProperty.availableUnits}
+                />
+              </div>
+
+              {/* ✅ MESSAGING SYSTEM */}
+              {user && (
+                <div style={styles.modalSection}>
+                  <h3 style={styles.sectionTitle}>💬 Message Landlord</h3>
+                  <MessagingSystem
+                    recipientId={selectedProperty.owner?._id || selectedProperty.owner?.id}
+                    recipientName={selectedProperty.owner?.name || "Landlord"}
+                    recipientType="landlord"
+                    propertyId={selectedProperty._id}
+                    propertyTitle={selectedProperty.title}
+                  />
+                </div>
+              )}
+
               {/* ✅ REVIEWS & RATINGS */}
+              <div style={styles.modalSection}>
+                <h3 style={styles.sectionTitle}>⭐ Reviews & Ratings</h3>
+                <ReviewRatingSystem
+                  entityId={selectedProperty._id}
+                  entityType="property"
+                  currentUser={user}
+                  existingReviews={[]}
+                />
+              </div>
+
+              {/* ✅ EXISTING REVIEWS SECTION */}
               <ReviewsSection propertyId={selectedProperty._id} />
 
             </div>
@@ -585,6 +800,19 @@ const styles = {
   availableBadge: { background: "#10b981", color: "white" },
   unavailableBadge: { background: "#ef4444", color: "white" },
   imageCount: { position: "absolute", bottom: "12px", right: "12px", background: "rgba(0,0,0,0.6)", color: "white", padding: "6px 12px", borderRadius: "6px", fontSize: "0.85rem", fontWeight: 600 },
+  favoriteBtn: { position: "absolute", top: "12px", right: "12px", background: "rgba(255,255,255,0.9)", border: "none", borderRadius: "50%", width: "36px", height: "36px", cursor: "pointer", fontSize: "1.2rem", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s", boxShadow: "0 2px 8px rgba(0,0,0,0.3)" },
+  favoriteBtnHover: { transform: "scale(1.1)", background: "white" },
+  savedSearchesDropdown: { background: "rgba(30, 41, 59, 0.95)", border: "1px solid #334155", borderRadius: "12px", padding: "20px", marginBottom: "20px", maxWidth: "1000px", margin: "0 auto 20px" },
+  savedSearchesTitle: { color: "#f1f5f9", fontSize: "1.1rem", margin: "0 0 16px", fontWeight: 600 },
+  savedSearchItem: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px", background: "rgba(255,255,255,0.05)", borderRadius: "8px", marginBottom: "8px" },
+  savedSearchInfo: { flex: 1 },
+  savedSearchName: { color: "#f1f5f9", fontSize: "0.95rem", display: "block", marginBottom: "4px" },
+  savedSearchDate: { color: "#94a3b8", fontSize: "0.85rem" },
+  savedSearchActions: { display: "flex", gap: "8px" },
+  applySearchBtn: { padding: "6px 12px", background: "#8b5cf6", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem", fontWeight: 600 },
+  deleteSearchBtn: { padding: "6px 12px", background: "rgba(239, 68, 68, 0.2)", color: "#ef4444", border: "1px solid rgba(239, 68, 68, 0.3)", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem", fontWeight: 600 },
+  modalSection: { marginTop: "24px", paddingTop: "24px", borderTop: "1px solid #334155" },
+  sectionTitle: { color: "#f1f5f9", fontSize: "1.1rem", margin: "0 0 16px", fontWeight: 600 },
   content: { padding: "20px", flex: 1, display: "flex", flexDirection: "column" },
   title: { color: "#f1f5f9", fontSize: "1.2rem", margin: "0 0 8px 0", wordBreak: "break-word" },
   location: { color: "#94a3b8", margin: "0 0 12px 0", fontSize: "0.9rem" },

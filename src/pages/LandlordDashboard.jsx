@@ -2,6 +2,8 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { UserProfileEditor } from "../features/profile";
+import VerificationBadges from "../components/VerificationBadges";
+import AnalyticsDashboard from "../components/AnalyticsDashboard";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -232,7 +234,11 @@ export default function LandlordDashboard() {
       </div>
 
       {activeTab === "profile" ? (
-        <UserProfileEditor token={token} user={user} accentColor="#60a5fa" onUpdated={(u) => { if (u) login(token, u); }} />
+        <div style={styles.profileSection}>
+          <VerificationBadges userId={user?._id || user?.id} userType="landlord" />
+          <AnalyticsDashboard userType="landlord" userId={user?._id || user?.id} />
+          <UserProfileEditor token={token} user={user} accentColor="#60a5fa" onUpdated={(u) => { if (u) login(token, u); }} />
+        </div>
       ) : null}
 
       {/* PROPERTIES LIST */}
@@ -514,6 +520,11 @@ const styles = {
   empty: {
     textAlign: "center", color: "#94a3b8", padding: "40px 20px",
     background: "#1e293b", borderRadius: "12px", border: "1px dashed #334155",
+  },
+  profileSection: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "24px",
   },
 };
 

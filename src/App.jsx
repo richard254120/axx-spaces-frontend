@@ -27,6 +27,7 @@ import Contact from "./pages/Contact";
 import TermsAndPrivacy from "./pages/TermsAndPrivacy";
 import LeaveReview from "./pages/LeaveReview";
 import VerifyEmail from "./pages/VerifyEmail";
+import PaymentHistory from "./pages/PaymentHistory";
 
 // ─── Tourism Pages ───────────────────────────────────────────────────────────
 import TourismPage from "./pages/tourism/TourismPage";
@@ -222,6 +223,14 @@ function App() {
         }
       />
       <Route path="/leave-review" element={<PublicLayout><LeaveReview /></PublicLayout>} />
+      <Route
+        path="/payment-history"
+        element={
+          <PublicLayout>
+            <ProtectedRoute><PaymentHistory /></ProtectedRoute>
+          </PublicLayout>
+        }
+      />
 
       {/* ── 404 ── */}
       <Route
