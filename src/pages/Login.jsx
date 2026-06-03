@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { COLORS, buttonStyles, inputStyles, pageStyles } from "../styles/theme";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
