@@ -284,6 +284,16 @@ export default function Listings() {
       <div style={styles.header}>
         <h1 style={styles.heading}><img src="/rentals.png" alt="Rentals" style={{ width: "40px", height: "40px", marginRight: "14px", verticalAlign: "middle", filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.15))", borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(0,0,0,0.1)" }} /> Available Properties</h1>
         <p style={styles.tagline}>Find your perfect rental home in Kenya</p>
+        {!user && (
+          <div style={styles.authButtons}>
+            <button style={styles.loginBtn} onClick={() => window.location.href = "/login"}>
+              🔑 Login
+            </button>
+            <button style={styles.registerBtn} onClick={() => window.location.href = "/register"}>
+              📝 Register as Landlord
+            </button>
+          </div>
+        )}
       </div>
 
       {error && <div style={styles.error}>{error}</div>}
@@ -780,6 +790,9 @@ const styles = {
   header: { textAlign: "center", marginBottom: "40px", color: "#ffffff" },
   heading: { fontSize: "2.5rem", margin: 0, color: "#ffffff", fontWeight: 700, textShadow: "0 2px 10px rgba(0,0,0,0.2)" },
   tagline: { fontSize: "1rem", color: "#ffffff", marginTop: "8px", textShadow: "0 1px 5px rgba(0,0,0,0.2)" },
+  authButtons: { display: "flex", gap: "12px", justifyContent: "center", marginTop: "20px" },
+  loginBtn: { padding: "10px 24px", background: "rgba(255, 255, 255, 0.2)", color: "#ffffff", border: "2px solid rgba(255, 255, 255, 0.4)", borderRadius: "8px", fontWeight: 600, cursor: "pointer", fontSize: "0.95rem", transition: "all 0.3s ease", backdropFilter: "blur(10px)" },
+  registerBtn: { padding: "10px 24px", background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)", color: "#0f1729", border: "none", borderRadius: "8px", fontWeight: 700, cursor: "pointer", fontSize: "0.95rem", transition: "all 0.3s ease", boxShadow: "0 4px 15px rgba(251, 191, 36, 0.4)" },
   error: { background: "rgba(239, 68, 68, 0.15)", border: "1px solid rgba(239, 68, 68, 0.4)", color: "#fca5a5", padding: "12px 16px", borderRadius: "8px", marginBottom: "20px", textAlign: "center", fontWeight: 500 },
   loading: { textAlign: "center", color: "#94a3b8", fontSize: "1.1rem", padding: "60px 20px" },
   filters: { display: "flex", gap: "12px", marginBottom: "32px", flexWrap: "wrap", alignItems: "center" },

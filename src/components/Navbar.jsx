@@ -236,61 +236,9 @@ export default function Navbar() {
         <Link to="/materials" style={styles.navLink} onClick={() => setMenuOpen(false)}>
           MarketPlace
         </Link>
-        {/* ─── RENTALS DROPDOWN ─── */}
-        <div style={styles.accountWrapper} ref={accountRef}>
-          <button
-            style={{
-              ...styles.navLink,
-              background: accountOpen ? "rgba(251,191,36,0.12)" : "transparent",
-              color: accountOpen ? "#fbbf24" : "#cbd5e1",
-              border: "none",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "5px",
-            }}
-            onClick={() => setAccountOpen(!accountOpen)}
-          >
-            Rentals <span style={{ fontSize: "10px", opacity: 0.7 }}>{accountOpen ? "▲" : "▼"}</span>
-          </button>
-
-          {accountOpen && (
-            <div style={styles.accountDropdown}>
-              {/* Listings links */}
-              <div style={styles.rentalsDropdownHeader}>Browse</div>
-              <Link
-                to="/listings"
-                style={styles.rentalsDropdownItem}
-                onClick={() => { setAccountOpen(false); setMenuOpen(false); }}
-              >
-                <span style={styles.dropdownIcon}>🏢</span> All Listings
-              </Link>
-
-
-              {/* Account section — only shown when not logged in */}
-              {!(token && user) && (
-                <>
-                  <div style={styles.rentalsDropdownDivider} />
-                  <div style={styles.rentalsDropdownHeader}>Account</div>
-                  <p style={styles.accountDropdownSubtitle}>Sign in or create an account</p>
-                  <button
-                    style={styles.accountBtn}
-                    onClick={() => { handleLoginClick(); setAccountOpen(false); setMenuOpen(false); }}
-                  >
-                    Login
-                  </button>
-                  <button
-                    style={styles.accountBtnOutline}
-                    onClick={() => { handleRegisterClick(); setAccountOpen(false); setMenuOpen(false); }}
-                  >
-                    Register
-                  </button>
-                </>
-              )}
-            </div>
-          )}
-        </div>
-
+        <Link to="/listings" style={styles.navLink} onClick={() => setMenuOpen(false)}>
+          Rentals
+        </Link>
         <Link to="/movers" style={styles.navLink} onClick={() => setMenuOpen(false)}>
           Movers
         </Link>
