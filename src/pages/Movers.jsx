@@ -3,6 +3,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
 
+const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+
 // ─── Glassmorphism + Kenyan-inspired palette ──────────────────────────────────
 const C = {
   gold: "#E6A817",
@@ -386,6 +389,8 @@ export default function Movers() {
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [loginError, setLoginError] = useState("");
   const [loginSuccess, setLoginSuccess] = useState("");
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [googleError, setGoogleError] = useState("");
   const [showForgot, setShowForgot] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotLoading, setForgotLoading] = useState(false);
@@ -464,6 +469,94 @@ export default function Movers() {
       setForgotMsg(res.data?.message || "✅ Reset link sent!");
     } catch { setForgotMsg("❌ Failed to send reset email."); }
     finally { setForgotLoading(false); }
+  };
+
+  const handleGoogleLogin = async () => {
+    setGoogleLoading(true);
+    setGoogleError("");
+    setLoginError("");
+
+    try {
+      if (!window.google) {
+        const script = document.createElement('script');
+        script.src = 'https://accounts.google.com/gsi/client';
+        script.async = true;
+        script.defer = true;
+        script.onload = () => initializeGoogleSignIn();
+        script.onerror = () => {
+          setGoogleError("Failed to load Google Sign-In. Please try again or use email/password.");
+          setGoogleLoading(false);
+        };
+        document.head.appendChild(script);
+      } else {
+        initializeGoogleSignIn();
+      }
+    } catch (err) {
+      setGoogleError("Google Sign-In is not configured. Please use email/password.");
+      setGoogleLoading(false);
+    }
+  };
+
+  const initializeGoogleSignIn = () => {
+    try {
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleGoogleCredentialResponse,
+        auto_select: false,
+      });
+
+      window.google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed()) {
+          setGoogleError("Google Sign-In popup was blocked. Please allow popups or use email/password.");
+          setGoogleLoading(false);
+        }
+      });
+    } catch (err) {
+      setGoogleError("Google Sign-In initialization failed. Please use email/password.");
+      setGoogleLoading(false);
+    }
+  };
+
+  const handleGoogleCredentialResponse = async (response) => {
+    try {
+      const base64Url = response.credential.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+
+      const googleUser = JSON.parse(jsonPayload);
+
+      const res = await fetch(`${API_BASE}/auth/google`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          googleId: googleUser.sub,
+          email: googleUser.email,
+          name: googleUser.name,
+          picture: googleUser.picture,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Google authentication failed");
+      }
+
+      if (data.user.role !== "mover") {
+        throw new Error("This login is for mover accounts only");
+      }
+
+      login(data.token, data.user);
+      setLoginSuccess("✅ Google login successful! Redirecting...");
+      setTimeout(() => navigate("/mover-dashboard"), 1000);
+
+    } catch (err) {
+      setGoogleError(err.message || "Google authentication failed. Please try again.");
+    } finally {
+      setGoogleLoading(false);
+    }
   };
 
   // ── Shared input handler for nested objects
@@ -673,6 +766,43 @@ export default function Movers() {
                 </div>
                 {loginError && <Alert type="error">{loginError}</Alert>}
                 {loginSuccess && <Alert type="success">{loginSuccess}</Alert>}
+                {googleError && <Alert type="error">{googleError}</Alert>}
+
+                {GOOGLE_CLIENT_ID && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleGoogleLogin}
+                      disabled={googleLoading}
+                      style={{
+                        width: "100%",
+                        padding: "13px",
+                        background: "white",
+                        color: "#1f2937",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: 12,
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        fontSize: 14,
+                        fontFamily: font,
+                        marginBottom: 20,
+                        opacity: googleLoading ? 0.6 : 1,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 10,
+                      }}
+                    >
+                      {googleLoading ? "⏳ Connecting..." : "🔐 Sign in with Google"}
+                    </button>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "20px 0" }}>
+                      <div style={{ flex: 1, height: 1, background: C.border }} />
+                      <span style={{ fontSize: 10, fontWeight: 800, color: C.gold, letterSpacing: 2, textTransform: "uppercase" }}>OR</span>
+                      <div style={{ flex: 1, height: 1, background: C.border }} />
+                    </div>
+                  </>
+                )}
+
                 <FieldInput label="Email *" required type="email" placeholder="you@example.com" value={loginData.email} onChange={lChange("email")} />
                 <div>
                   <FieldInput label="Password *" required type="password" placeholder="••••••••" value={loginData.password} onChange={lChange("password")} />
