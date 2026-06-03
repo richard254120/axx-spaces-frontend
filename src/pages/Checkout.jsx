@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import PhoneInput from "../components/PhoneInput";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
+const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
 export default function Checkout() {
   const [searchParams] = useSearchParams();
@@ -59,8 +59,7 @@ export default function Checkout() {
       } else {
         setMessage("❌ " + (data.error || "Payment failed"));
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       setMessage("❌ Connection error. Please try again.");
     } finally {
       setLoading(false);
@@ -100,8 +99,7 @@ export default function Checkout() {
       } else {
         setMessage("❌ " + (data.error || "Submission failed. Please try again."));
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       setMessage("❌ Connection error. Please try again.");
     } finally {
       setLoading(false);

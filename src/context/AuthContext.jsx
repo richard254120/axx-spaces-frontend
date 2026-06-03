@@ -14,8 +14,7 @@ export const AuthProvider = ({ children }) => {
 
       if (savedToken) setToken(savedToken);
       if (savedUser) setUser(JSON.parse(savedUser));
-    } catch (err) {
-      console.error("Auth restore error:", err);
+    } catch {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
     } finally {

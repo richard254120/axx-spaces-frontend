@@ -174,7 +174,13 @@ function App() {
       {/* ── DASHBOARD ROUTES (no Navbar) ── */}
       <Route
         path="/seller-dashboard"
-        element={<DashboardLayout><SellerDashboard /></DashboardLayout>}
+        element={
+          <DashboardLayout>
+            <ProtectedRoute>
+              <SellerDashboard />
+            </ProtectedRoute>
+          </DashboardLayout>
+        }
       />
       <Route
         path="/dashboard"

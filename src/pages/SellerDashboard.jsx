@@ -94,7 +94,7 @@ export default function SellerDashboard() {
       const data = await res.json();
       setMaterials(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error(err);
+      // silently handle fetch failure
     } finally {
       setLoading(false);
     }

@@ -147,8 +147,7 @@ export default function Home() {
         if (Array.isArray(data)) setFeaturedProperties(data);
         else if (data && Array.isArray(data.properties)) setFeaturedProperties(data.properties);
         else setFeaturedProperties([]);
-      } catch (err) {
-        console.error("Failed to load featured properties:", err?.message || err);
+      } catch {
         setFetchError(true);
         setFeaturedProperties([]);
       } finally {
@@ -165,8 +164,7 @@ export default function Home() {
         const data = res?.data;
         if (Array.isArray(data)) setReviews(data.slice(0, 4));
         else setReviews([]);
-      } catch (err) {
-        console.error("Failed to load reviews:", err?.message || err);
+      } catch {
         setReviews([]);
       } finally {
         setLoadingReviews(false);

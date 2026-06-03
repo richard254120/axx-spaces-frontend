@@ -140,9 +140,6 @@ export default function Register() {
         role: "landlord", // Hardcoded to landlord
       };
 
-      console.log("📤 Sending registration payload:", payload);
-      console.log("🌐 API URL:", `${API_BASE}/auth/register`);
-
       const response = await fetch(`${API_BASE}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -150,9 +147,6 @@ export default function Register() {
       });
 
       const data = await response.json();
-
-      console.log("📥 Backend response:", data);
-      console.log("Status:", response.status);
 
       if (!response.ok) {
         throw new Error(data.error || data.message || "Registration failed");
@@ -175,7 +169,6 @@ export default function Register() {
       }, 3000);
 
     } catch (err) {
-      console.error("❌ Registration error:", err);
       setError(err.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
