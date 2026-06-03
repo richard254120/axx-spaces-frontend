@@ -28,6 +28,12 @@ import TermsAndPrivacy from "./pages/TermsAndPrivacy";
 import LeaveReview from "./pages/LeaveReview";
 import VerifyEmail from "./pages/VerifyEmail";
 import PaymentHistory from "./pages/PaymentHistory";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
+import Wallet from "./pages/Wallet";
+import Saved from "./pages/Saved";
+import Messages from "./pages/Messages";
+import Notifications from "./pages/Notifications";
 
 // ─── Tourism Pages ───────────────────────────────────────────────────────────
 import TourismPage from "./pages/tourism/TourismPage";
