@@ -1,9 +1,12 @@
 import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import jwtDecode from "jwt-decode";
 import { COLORS, buttonStyles, inputStyles, pageStyles } from "../styles/theme";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -11,7 +14,7 @@ export default function Login() {
 
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
+  const [googleError, setGoogleError] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -26,90 +29,48 @@ export default function Login() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleGoogleLogin = async () => {
-    setGoogleLoading(true);
+  // ✅ Google Sign-In Success
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setGoogleError("");
     setError("");
 
     try {
-      // Load Google Identity Services
-      if (!window.google) {
-        // Load Google SDK dynamically
-        const script = document.createElement('script');
-        script.src = 'https://accounts.google.com/gsi/client';
-        script.async = true;
-        script.defer = true;
-        script.onload = () => initializeGoogleSignIn();
-        script.onerror = () => {
-          console.error("Google SDK failed to load. Check network connection and ensure this origin is authorized in Google Cloud Console.");
-          setError("Failed to load Google Sign-In. Ensure your origin is authorized in Google Cloud Console.");
-          setGoogleLoading(false);
-        };
-        document.head.appendChild(script);
-      } else {
-        initializeGoogleSignIn();
+      if (!credentialResponse?.credential) {
+        setGoogleError("Google authentication failed. Please try again.");
+        return;
       }
-    } catch (err) {
-      console.error("Google Sign-In error:", err);
-      setError("Google Sign-In is not configured. Please use email/password.");
-      setGoogleLoading(false);
-    }
-  };
 
-  const initializeGoogleSignIn = () => {
-    try {
-      window.google.accounts.id.initialize({
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID",
-        callback: handleGoogleCredentialResponse,
-        auto_select: false,
-      });
+      // Decode JWT from Google
+      const decoded = jwtDecode(credentialResponse.credential);
 
-      window.google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed()) {
-          setError("Google Sign-In popup was blocked. Please allow popups or use email/password.");
-          setGoogleLoading(false);
-        }
-      });
-    } catch (err) {
-      setError("Google Sign-In initialization failed. Please use email/password.");
-      setGoogleLoading(false);
-    }
-  };
-
-  const handleGoogleCredentialResponse = async (response) => {
-    try {
-      // Decode the JWT token
-      const base64Url = response.credential.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
-
-      const googleUser = JSON.parse(jsonPayload);
+      console.log("✅ Google decoded:", { email: decoded.email, name: decoded.name });
 
       // Send to backend
       const res = await fetch(`${API_BASE}/auth/google`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          googleId: googleUser.sub,
-          email: googleUser.email,
-          name: googleUser.name,
-          picture: googleUser.picture,
+          googleId: decoded.sub,
+          email: decoded.email,
+          name: decoded.name,
+          picture: decoded.picture,
         }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Google authentication failed");
+        setGoogleError(data.error || "Google authentication failed");
+        console.error("Backend error:", data);
+        return;
       }
 
+      // Login successful
       login(data.token, data.user);
-
-      const userRole = data.user?.role?.toLowerCase().trim();
       setSuccess("✅ Google login successful! Redirecting...");
 
       setTimeout(() => {
+        const userRole = data.user?.role?.toLowerCase().trim();
         if (userRole === "landlord") {
           navigate("/dashboard");
         } else if (userRole === "mover") {
@@ -117,19 +78,25 @@ export default function Login() {
         } else {
           navigate("/");
         }
-      }, 1000);
+      }, 800);
 
     } catch (err) {
-      setError(err.message || "Google authentication failed. Please try again.");
-    } finally {
-      setGoogleLoading(false);
+      console.error("❌ Google login error:", err);
+      setGoogleError(err.message || "Failed to process Google login");
     }
   };
 
+  // ✅ Google Sign-In Error
+  const handleGoogleError = () => {
+    setGoogleError("Google Sign-In failed. Please try again or use email/password.");
+  };
+
+  // ✅ Email/Password Login
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setGoogleError("");
 
     if (!formData.email || !formData.password) {
       setError("❌ Email and password are required");
@@ -152,11 +119,10 @@ export default function Login() {
       }
 
       login(data.token, data.user);
-
-      const userRole = data.user?.role?.toLowerCase().trim();
       setSuccess("✅ Login successful! Redirecting...");
 
       setTimeout(() => {
+        const userRole = data.user?.role?.toLowerCase().trim();
         if (userRole === "landlord") {
           navigate("/dashboard");
         } else if (userRole === "mover") {
@@ -164,7 +130,7 @@ export default function Login() {
         } else {
           navigate("/");
         }
-      }, 1000);
+      }, 800);
 
     } catch (err) {
       setError(err.message || "❌ Login failed. Please try again.");
@@ -194,6 +160,13 @@ export default function Login() {
 
       const data = await response.json();
       setForgotMsg(data.message || "✅ Reset link sent! Check your inbox.");
+      if (data.message?.includes("✅")) {
+        setTimeout(() => {
+          setShowForgot(false);
+          setForgotEmail("");
+          setForgotMsg("");
+        }, 2000);
+      }
     } catch (err) {
       setForgotMsg("❌ Failed to send reset email. Try again.");
     } finally {
@@ -202,147 +175,167 @@ export default function Login() {
   };
 
   return (
-    <div style={styles.root}>
-      <style>{css}</style>
-      <div style={styles.container}>
-        <div style={styles.formBox}>
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <div style={styles.root}>
+        <style>{css}</style>
+        <div style={styles.container}>
+          <div style={styles.formBox}>
 
-          {/* ✅ FORGOT PASSWORD FORM */}
-          {showForgot ? (
-            <>
-              <h1 style={styles.title}>🔐 Reset Password</h1>
-              <p style={styles.subtitle}>Enter your email to receive a reset link</p>
+            {/* ✅ FORGOT PASSWORD FORM */}
+            {showForgot ? (
+              <>
+                <h1 style={styles.title}>🔐 Reset Password</h1>
+                <p style={styles.subtitle}>Enter your email to receive a reset link</p>
 
-              {forgotMsg && (
-                <div style={forgotMsg.includes("❌") ? styles.error : styles.success}>
-                  {forgotMsg}
-                </div>
-              )}
+                {forgotMsg && (
+                  <div style={forgotMsg.includes("❌") ? styles.error : styles.success}>
+                    {forgotMsg}
+                  </div>
+                )}
 
-              <form onSubmit={handleForgotPassword} style={styles.form}>
-                <div style={styles.formGroup}>
-                  <label style={styles.label}>Email Address</label>
-                  <input
-                    type="email"
-                    placeholder="Enter your registered email"
-                    value={forgotEmail}
-                    onChange={(e) => setForgotEmail(e.target.value)}
-                    style={styles.input}
-                    required
-                  />
-                </div>
+                <form onSubmit={handleForgotPassword} style={styles.form}>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Email Address</label>
+                    <input
+                      type="email"
+                      placeholder="Enter your registered email"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      style={styles.input}
+                      required
+                    />
+                  </div>
 
-                <button
-                  type="submit"
-                  disabled={forgotLoading}
-                  style={{
-                    ...styles.submitBtn,
-                    opacity: forgotLoading ? 0.7 : 1,
-                    cursor: forgotLoading ? "not-allowed" : "pointer",
-                  }}
-                >
-                  {forgotLoading ? "⏳ Sending..." : "📧 Send Reset Link"}
-                </button>
-              </form>
-
-              <div style={styles.divider}></div>
-
-              <p style={styles.footer}>
-                <span
-                  onClick={() => { setShowForgot(false); setForgotMsg(""); }}
-                  style={styles.link}
-                >
-                  ← Back to Login
-                </span>
-              </p>
-            </>
-          ) : (
-            <>
-              {/* ✅ LOGIN FORM */}
-              <h1 style={styles.title}>🏠 Landlord Portal</h1>
-              <p style={styles.subtitle}>Manage your properties and tenants</p>
-
-              {error && <div style={styles.error}>{error}</div>}
-              {success && <div style={styles.success}>{success}</div>}
-
-              <form onSubmit={handleSubmit} style={styles.form}>
-                <div style={styles.formGroup}>
-                  <label style={styles.label}>Email Address</label>
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="e.g., landlord@example.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    style={styles.input}
-                    required
-                  />
-                </div>
-
-                <div style={styles.formGroup}>
-                  <label style={styles.label}>Password</label>
-                  <input
-                    type="password"
-                    name="password"
-                    placeholder="Enter your password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    style={styles.input}
-                    required
-                  />
-                  {/* ✅ FORGOT PASSWORD LINK */}
-                  <span
-                    onClick={() => { setShowForgot(true); setError(""); }}
-                    style={styles.forgotLink}
+                  <button
+                    type="submit"
+                    disabled={forgotLoading}
+                    style={{
+                      ...styles.submitBtn,
+                      opacity: forgotLoading ? 0.7 : 1,
+                      cursor: forgotLoading ? "not-allowed" : "pointer",
+                    }}
                   >
-                    Forgot password?
+                    {forgotLoading ? "⏳ Sending..." : "📧 Send Reset Link"}
+                  </button>
+                </form>
+
+                <div style={styles.divider}></div>
+
+                <p style={styles.footer}>
+                  <span
+                    onClick={() => {
+                      setShowForgot(false);
+                      setForgotMsg("");
+                      setForgotEmail("");
+                    }}
+                    style={styles.link}
+                  >
+                    ← Back to Login
                   </span>
-                </div>
+                </p>
+              </>
+            ) : (
+              <>
+                {/* ✅ LOGIN FORM */}
+                <h1 style={styles.title}>🏠 Landlord Portal</h1>
+                <p style={styles.subtitle}>Manage your properties and tenants</p>
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  style={{
-                    ...styles.submitBtn,
-                    opacity: loading ? 0.7 : 1,
-                    cursor: loading ? "not-allowed" : "pointer",
-                  }}
-                >
-                  {loading ? "⏳ Verifying..." : "🚀 Login to Dashboard"}
-                </button>
-              </form>
+                {error && <div style={styles.error}>{error}</div>}
+                {success && <div style={styles.success}>{success}</div>}
+                {googleError && <div style={styles.error}>{googleError}</div>}
 
-              <div style={styles.divider}></div>
+                {/* GOOGLE SIGN-IN BUTTON */}
+                {GOOGLE_CLIENT_ID ? (
+                  <div style={styles.googleSection}>
+                    <p style={styles.googleLabel}>Quick Sign In</p>
+                    <GoogleLogin
+                      onSuccess={handleGoogleSuccess}
+                      onError={handleGoogleError}
+                      theme="outline"
+                      size="large"
+                      width="100%"
+                    />
+                  </div>
+                ) : (
+                  <div style={styles.warningBox}>
+                    ⚠️ Google Sign-In not configured. Check your .env file.
+                  </div>
+                )}
 
-              {/* Google Login Button */}
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                disabled={googleLoading}
-                style={{
-                  ...styles.googleBtn,
-                  opacity: googleLoading ? 0.7 : 1,
-                  cursor: googleLoading ? "not-allowed" : "pointer",
-                }}
-              >
-                {googleLoading ? "⏳ Connecting..." : "🔐 Sign in with Google"}
-              </button>
+                <div style={styles.divider}></div>
 
-              <div style={styles.divider}></div>
+                {/* EMAIL/PASSWORD LOGIN FORM */}
+                <form onSubmit={handleSubmit} style={styles.form}>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Email Address</label>
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="e.g., landlord@example.com"
+                      value={formData.email}
+                      onChange={handleChange}
+                      style={styles.input}
+                      required
+                    />
+                  </div>
 
-              <p style={styles.footer}>
-                Need to register a property?{" "}
-                <Link to="/register" style={styles.link}>Create Account</Link>
-              </p>
-              <p style={{ ...styles.footer, marginTop: "10px", fontSize: "12px" }}>
-                Are you a mover?{" "}
-                <Link to="/movers" style={styles.link}>Go to Mover Portal</Link>
-              </p>
-            </>
-          )}
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Password</label>
+                    <input
+                      type="password"
+                      name="password"
+                      placeholder="Enter your password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      style={styles.input}
+                      required
+                    />
+                    {/* ✅ FORGOT PASSWORD LINK */}
+                    <span
+                      onClick={() => {
+                        setShowForgot(true);
+                        setError("");
+                      }}
+                      style={styles.forgotLink}
+                    >
+                      Forgot password?
+                    </span>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    style={{
+                      ...styles.submitBtn,
+                      opacity: loading ? 0.7 : 1,
+                      cursor: loading ? "not-allowed" : "pointer",
+                    }}
+                  >
+                    {loading ? "⏳ Verifying..." : "🚀 Login to Dashboard"}
+                  </button>
+                </form>
+
+                <div style={styles.divider}></div>
+
+                {/* FOOTER LINKS */}
+                <p style={styles.footer}>
+                  Need to register a property?{" "}
+                  <Link to="/register" style={styles.link}>
+                    Create Account
+                  </Link>
+                </p>
+                <p style={{ ...styles.footer, marginTop: "10px", fontSize: "12px" }}>
+                  Are you a mover?{" "}
+                  <Link to="/movers" style={styles.link}>
+                    Go to Mover Portal
+                  </Link>
+                </p>
+              </>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </GoogleOAuthProvider>
   );
 }
 
@@ -355,8 +348,6 @@ const styles = {
     padding: "20px",
   },
   container: { width: "100%", maxWidth: "450px" },
-  logoSection: { textAlign: "center", marginBottom: "30px" },
-  logo: { height: "70px", width: "auto" },
   formBox: {
     background: COLORS.bgLight,
     border: `1px solid ${COLORS.border}`,
@@ -368,27 +359,16 @@ const styles = {
   subtitle: { fontSize: "14px", color: COLORS.textMutedLight, margin: "0 0 30px", textAlign: "center" },
   error: { background: "rgba(239, 68, 68, 0.15)", color: "#fca5a5", padding: "12px", borderRadius: "8px", marginBottom: "20px", fontSize: "14px", textAlign: "center", border: "1px solid rgba(239, 68, 68, 0.3)" },
   success: { background: "rgba(34, 197, 94, 0.15)", color: "#86efac", padding: "12px", borderRadius: "8px", marginBottom: "20px", fontSize: "14px", textAlign: "center", border: "1px solid rgba(34, 197, 94, 0.3)" },
+  warningBox: { background: "rgba(245, 158, 11, 0.15)", color: "#fbbf24", padding: "12px", borderRadius: "8px", marginBottom: "20px", fontSize: "14px", textAlign: "center", border: "1px solid rgba(245, 158, 11, 0.3)" },
+
+  googleSection: { marginBottom: "20px" },
+  googleLabel: { fontSize: "12px", fontWeight: 700, color: COLORS.textMutedLight, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "12px", textAlign: "center" },
+
   form: { display: "flex", flexDirection: "column", gap: "20px" },
   formGroup: { display: "flex", flexDirection: "column", gap: "6px" },
   label: { fontSize: "12px", fontWeight: 700, color: COLORS.textMutedLight, textTransform: "uppercase", letterSpacing: "0.5px" },
   input: inputStyles.dark,
   submitBtn: buttonStyles.primary,
-  googleBtn: {
-    width: "100%",
-    background: "white",
-    color: "#1f2937",
-    border: "1px solid #e5e7eb",
-    borderRadius: "10px",
-    padding: "14px",
-    fontSize: "15px",
-    fontWeight: 700,
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "10px",
-    transition: "all 0.2s",
-  },
   divider: { height: "1px", background: COLORS.border, margin: "25px 0" },
   footer: { textAlign: "center", color: COLORS.textMutedLight, fontSize: "14px" },
   link: { color: COLORS.accent, textDecoration: "none", fontWeight: 700, cursor: "pointer" },
