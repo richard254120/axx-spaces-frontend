@@ -934,6 +934,12 @@ export default function AdminDashboard() {
                     <option value="location_verified">🟣 Location</option>
                     <option value="premium_verified">⭐ Premium</option>
                   </select>
+                  <button
+                    style={{ ...S.editBtn, marginTop: "10px", width: "100%" }}
+                    onClick={() => navigate(`/business/${business._id}`)}
+                  >
+                    👁️ View Details & Reviews
+                  </button>
                 </div>
               </div>
             ))}
