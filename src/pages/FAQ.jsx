@@ -5,7 +5,7 @@ const faqs = [
     category: "Listings",
     items: [
       {
-        q: "How do I list my property on Axxspace?",
+        q: "How do I list my  propertyproperty on Axxspace?",
         a: "Create an account, go to your Dashboard and click 'Upload Property'. Fill in the details — title, description, photos, price, and location — then submit for review. Your listing goes live within 24 hours.",
       },
       {
