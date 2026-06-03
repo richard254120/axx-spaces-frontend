@@ -806,6 +806,7 @@ export default function BusinessDetail() {
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewTitle, setReviewTitle] = useState("");
   const [reviewComment, setReviewComment] = useState("");
+  const [reviewUserName, setReviewUserName] = useState("");
   const [reviewMsg, setReviewMsg] = useState("");
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
 
@@ -852,20 +853,18 @@ export default function BusinessDetail() {
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
-    if (!user) {
-      setReviewMsg("Please log in to submit a review");
-      return;
-    }
     try {
       await API.post(`/businessReviews/business/${id}`, {
         rating: reviewRating,
         title: reviewTitle,
         comment: reviewComment,
+        userName: user?.name || reviewUserName || "Anonymous",
       });
       setReviewMsg("Review submitted successfully!");
       setReviewRating(5);
       setReviewTitle("");
       setReviewComment("");
+      setReviewUserName("");
       setShowReviewForm(false);
       setReviewSubmitted(true);
       loadReviews();
@@ -1104,6 +1103,15 @@ export default function BusinessDetail() {
         {/* Review form */}
         {showReviewForm && (
           <form onSubmit={handleReviewSubmit} className="bd-form" style={{ marginBottom: "16px" }}>
+            {!user && (
+              <input
+                className="bd-input"
+                type="text"
+                placeholder="Your name (optional)"
+                value={reviewUserName}
+                onChange={e => setReviewUserName(e.target.value)}
+              />
+            )}
             <div style={{ marginBottom: "12px" }}>
               <label style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Your Rating</label>
               <div className="bd-rating-stars">
