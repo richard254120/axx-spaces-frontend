@@ -841,7 +841,7 @@ export default function BusinessDetail() {
   const loadReviews = async () => {
     setReviewsLoading(true);
     try {
-      const res = await API.get(`/businessReviews/business/${id}`);
+      const res = await API.get(`/business-reviews/business/${id}`);
       setReviews(res.data.reviews || []);
     } catch (err) {
       console.error("Failed to load reviews:", err);
@@ -854,7 +854,7 @@ export default function BusinessDetail() {
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     try {
-      await API.post(`/businessReviews/business/${id}`, {
+      await API.post(`/business-reviews/business/${id}`, {
         rating: reviewRating,
         title: reviewTitle,
         comment: reviewComment,
