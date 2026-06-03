@@ -811,6 +811,8 @@ export default function BusinessDetail() {
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
   const [deleteConfirmReviewId, setDeleteConfirmReviewId] = useState(null);
   const [deleteUserName, setDeleteUserName] = useState("");
+  const [editReviewId, setEditReviewId] = useState(null);
+  const [editUserName, setEditUserName] = useState("");
 
   /* Lightbox state */
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -891,6 +893,49 @@ export default function BusinessDetail() {
     } catch (err) {
       setReviewMsg("Failed to delete review: " + (err.response?.data?.error || err.message));
     }
+  };
+
+  const handleEditReview = (review) => {
+    setEditReviewId(review._id);
+    setReviewRating(review.rating);
+    setReviewTitle(review.title);
+    setReviewComment(review.comment);
+    setReviewUserName(review.userName);
+    setShowReviewForm(true);
+  };
+
+  const handleUpdateReview = async (e) => {
+    e.preventDefault();
+    if (!editReviewId) return;
+    try {
+      await API.put(`/business-reviews/${editReviewId}`, {
+        rating: reviewRating,
+        title: reviewTitle,
+        comment: reviewComment,
+        userName: user?.name || reviewUserName || "Anonymous",
+      });
+      setReviewMsg("Review updated successfully!");
+      setReviewRating(5);
+      setReviewTitle("");
+      setReviewComment("");
+      setReviewUserName("");
+      setShowReviewForm(false);
+      setEditReviewId(null);
+      loadReviews();
+      loadBusiness();
+      setTimeout(() => setReviewMsg(""), 3000);
+    } catch (err) {
+      setReviewMsg("Failed to update review: " + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditReviewId(null);
+    setReviewRating(5);
+    setReviewTitle("");
+    setReviewComment("");
+    setReviewUserName("");
+    setShowReviewForm(false);
   };
 
   const handleAnnouncement = async (e) => {
@@ -1120,7 +1165,10 @@ export default function BusinessDetail() {
 
         {/* Review form */}
         {showReviewForm && (
-          <form onSubmit={handleReviewSubmit} className="bd-form" style={{ marginBottom: "16px" }}>
+          <form onSubmit={editReviewId ? handleUpdateReview : handleReviewSubmit} className="bd-form" style={{ marginBottom: "16px" }}>
+            <h4 style={{ fontSize: "14px", fontWeight: 700, color: "var(--text)", marginBottom: "12px" }}>
+              {editReviewId ? "Edit Your Review" : "Write a Review"}
+            </h4>
             {!user && (
               <input
                 className="bd-input"
@@ -1160,7 +1208,21 @@ export default function BusinessDetail() {
               required
               rows={4}
             />
-            <button type="submit" className="bd-submit-btn">Submit Review</button>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button type="submit" className="bd-submit-btn" style={{ flex: 1 }}>
+                {editReviewId ? "Update Review" : "Submit Review"}
+              </button>
+              {editReviewId && (
+                <button
+                  type="button"
+                  onClick={handleCancelEdit}
+                  className="bd-submit-btn"
+                  style={{ background: "var(--surface2)", color: "var(--text-dim)", flex: 1 }}
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
             {reviewMsg && <div className="bd-success">{reviewMsg}</div>}
           </form>
         )}
@@ -1187,22 +1249,6 @@ export default function BusinessDetail() {
                     <span className="bd-review-date">
                       {new Date(review.createdAt).toLocaleDateString("en-KE", { month: "short", day: "numeric", year: "numeric" })}
                     </span>
-                    <button
-                      onClick={() => setDeleteConfirmReviewId(review._id)}
-                      style={{
-                        padding: "4px 8px",
-                        background: "rgba(239,68,68,0.1)",
-                        border: "1px solid rgba(239,68,68,0.3)",
-                        borderRadius: "6px",
-                        color: "#f87171",
-                        fontSize: "11px",
-                        fontWeight: 600,
-                        cursor: "pointer",
-                        fontFamily: "inherit"
-                      }}
-                    >
-                      Delete
-                    </button>
                   </div>
                 </div>
                 <div className="bd-review-rating">
@@ -1222,6 +1268,40 @@ export default function BusinessDetail() {
                     <div style={{ fontSize: "12px", color: "var(--text-dim)" }}>{review.cons.join(", ")}</div>
                   </div>
                 )}
+                <div style={{ display: "flex", gap: "8px", marginTop: "12px", paddingTop: "12px", borderTop: "1px solid var(--border)" }}>
+                  <button
+                    onClick={() => handleEditReview(review)}
+                    style={{
+                      padding: "6px 12px",
+                      background: "rgba(56,189,248,0.1)",
+                      border: "1px solid rgba(56,189,248,0.3)",
+                      borderRadius: "6px",
+                      color: "#38bdf8",
+                      fontSize: "11px",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      fontFamily: "inherit"
+                    }}
+                  >
+                    ✏ Edit
+                  </button>
+                  <button
+                    onClick={() => setDeleteConfirmReviewId(review._id)}
+                    style={{
+                      padding: "6px 12px",
+                      background: "rgba(239,68,68,0.1)",
+                      border: "1px solid rgba(239,68,68,0.3)",
+                      borderRadius: "6px",
+                      color: "#f87171",
+                      fontSize: "11px",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      fontFamily: "inherit"
+                    }}
+                  >
+                    🗑 Delete
+                  </button>
+                </div>
               </div>
             ))}
           </div>
