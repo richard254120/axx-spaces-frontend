@@ -1,8 +1,9 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-
-const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
+import { API_BASE } from "../../utils/constants";
+import useGoogleAuth from "../../hooks/useGoogleAuth";
+import useForgotPassword from "../../hooks/useForgotPassword";
 
 const styles = {
   root: {
@@ -156,114 +157,38 @@ export default function TourismLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Forgot password state
-  const [showForgot, setShowForgot] = useState(false);
-  const [forgotEmail, setForgotEmail] = useState("");
-  const [forgotLoading, setForgotLoading] = useState(false);
-  const [forgotMsg, setForgotMsg] = useState("");
-
-  const handleGoogleLogin = async () => {
-    setGoogleLoading(true);
-    setError("");
-
-    try {
-      if (!window.google) {
-        const script = document.createElement('script');
-        script.src = 'https://accounts.google.com/gsi/client';
-        script.async = true;
-        script.defer = true;
-        script.onload = () => initializeGoogleSignIn();
-        script.onerror = () => {
-          setError("Failed to load Google Sign-In. Please try again or use email/password.");
-          setGoogleLoading(false);
-        };
-        document.head.appendChild(script);
-      } else {
-        initializeGoogleSignIn();
-      }
-    } catch (err) {
-      setError("Google Sign-In is not configured. Please use email/password.");
-      setGoogleLoading(false);
-    }
-  };
-
-  const initializeGoogleSignIn = () => {
-    try {
-      window.google.accounts.id.initialize({
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID",
-        callback: handleGoogleCredentialResponse,
-        auto_select: false,
-      });
-
-      window.google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed()) {
-          setError("Google Sign-In popup was blocked. Please allow popups or use email/password.");
-          setGoogleLoading(false);
-        }
-      });
-    } catch (err) {
-      setError("Google Sign-In initialization failed. Please use email/password.");
-      setGoogleLoading(false);
-    }
-  };
-
-  const handleGoogleCredentialResponse = async (response) => {
-    try {
-      const base64Url = response.credential.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
-
-      const googleUser = JSON.parse(jsonPayload);
-
-      const res = await fetch(`${API_BASE}/auth/google`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          googleId: googleUser.sub,
-          email: googleUser.email,
-          name: googleUser.name,
-          picture: googleUser.picture,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Google authentication failed");
-      }
-
+  const { googleLoading, handleGoogleLogin } = useGoogleAuth({
+    skipLogin: true,
+    validate: (data) => {
       if (data.user.role !== "tourism_provider") {
         throw new Error("This login is for tourism providers only");
       }
-
       if (!data.user.isApproved) {
         throw new Error("Your account is pending admin approval. Approval typically takes less than 5 hours. Please wait for approval email before logging in.");
       }
-
+    },
+    onSuccess: (data) => {
       login(data.token, {
         _id: data.user._id,
         name: data.user.name,
         email: data.user.email,
         role: data.user.role,
       });
-
       setSuccess("✅ Google login successful! Redirecting...");
-      setTimeout(() => {
-        navigate("/tourism/dashboard");
-      }, 1000);
+      setTimeout(() => navigate("/tourism/dashboard"), 1000);
+    },
+    onError: (msg) => setError(msg),
+  });
 
-    } catch (err) {
-      setError(err.message || "Google authentication failed. Please try again.");
-    } finally {
-      setGoogleLoading(false);
-    }
-  };
+  const {
+    showForgot, setShowForgot, forgotEmail, setForgotEmail,
+    forgotLoading, forgotMsg, handleForgotPassword, resetForgotState,
+  } = useForgotPassword();
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -311,32 +236,7 @@ export default function TourismLogin() {
     }
   };
 
-  const handleForgotPassword = async (e) => {
-    e.preventDefault();
-    setForgotMsg("");
 
-    if (!forgotEmail) {
-      setForgotMsg("❌ Please enter your email address.");
-      return;
-    }
-
-    setForgotLoading(true);
-
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE}/api/auth/forgot-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: forgotEmail }),
-      });
-
-      const data = await response.json();
-      setForgotMsg(data.message || "✅ Reset link sent! Check your inbox.");
-    } catch (err) {
-      setForgotMsg("❌ Failed to send reset email. Try again.");
-    } finally {
-      setForgotLoading(false);
-    }
-  };
 
   return (
     <div style={styles.root}>
@@ -382,7 +282,7 @@ export default function TourismLogin() {
             </form>
 
             <div style={styles.link}>
-              <span style={styles.linkText} onClick={() => { setShowForgot(false); setForgotMsg(""); }}>
+              <span style={styles.linkText} onClick={resetForgotState}>
                 ← Back to Login
               </span>
             </div>

@@ -1,17 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-
-const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
-
-const COUNTIES = [
-  "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta",
-  "Garissa", "Wajir", "Mandera", "Marsabit", "Isiolo", "Meru", "Tharaka Nithi",
-  "Embu", "Kitui", "Machakos", "Makueni", "Nyandarua", "Nyeri", "Kirinyaga",
-  "Murang'a", "Kiambu", "Turkana", "West Pokot", "Samburu", "Trans Nzoia",
-  "Uasin Gishu", "Elgeyo Marakwet", "Nandi", "Baringo", "Laikipia", "Nakuru",
-  "Narok", "Kajiado", "Kericho", "Bomet", "Kakamega", "Vihiga", "Bungoma",
-  "Busia", "Siaya", "Kisumu", "Homa Bay", "Migori", "Kisii", "Nyamira", "Nairobi City",
-];
+import { API_BASE, KENYA_COUNTIES } from "../utils/constants";
 
 const CATEGORIES = [
   "Furniture", "Electronics", "Appliances", "Tools", "Clothing", "Books",
@@ -213,7 +202,7 @@ export default function Marketplace() {
           </select>
           <select name="county" value={filters.county} onChange={handleFilterChange} style={styles.filterInput}>
             <option value="">All Counties</option>
-            {COUNTIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            {KENYA_COUNTIES.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
           <input type="number" name="minPrice" placeholder="Min Price (KES)" value={filters.minPrice} onChange={handleFilterChange} style={styles.filterInput} />
           <input type="number" name="maxPrice" placeholder="Max Price (KES)" value={filters.maxPrice} onChange={handleFilterChange} style={styles.filterInput} />

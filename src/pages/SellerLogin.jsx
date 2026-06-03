@@ -1,25 +1,13 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
-
-const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
-
-const COUNTIES = [
-  "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta",
-  "Garissa", "Wajir", "Mandera", "Marsabit", "Isiolo", "Meru", "Tharaka Nithi",
-  "Embu", "Kitui", "Machakos", "Makueni", "Nyandarua", "Nyeri", "Kirinyaga",
-  "Murang'a", "Kiambu", "Turkana", "West Pokot", "Samburu", "Trans Nzoia",
-  "Uasin Gishu", "Elgeyo Marakwet", "Nandi", "Baringo", "Laikipia", "Nakuru",
-  "Narok", "Kajiado", "Kericho", "Bomet", "Kakamega", "Vihiga", "Bungoma",
-  "Busia", "Siaya", "Kisumu", "Homa Bay", "Migori", "Kisii", "Nyamira", "Nairobi City",
-];
+import { API_BASE, KENYA_COUNTIES } from "../utils/constants";
+import useGoogleAuth from "../hooks/useGoogleAuth";
+import useForgotPassword from "../hooks/useForgotPassword";
 
 export default function SellerLogin() {
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
   const [mode, setMode] = useState("login"); // "login" | "register"
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -27,102 +15,24 @@ export default function SellerLogin() {
     name: "", email: "", password: "", phone: "", county: "",
   });
 
-  // Forgot password state
-  const [showForgot, setShowForgot] = useState(false);
-  const [forgotEmail, setForgotEmail] = useState("");
-  const [forgotLoading, setForgotLoading] = useState(false);
-  const [forgotMsg, setForgotMsg] = useState("");
+  const { googleLoading, googleError, handleGoogleLogin } = useGoogleAuth({
+    onSuccess: () => {
+      setSuccess("✅ Google login successful! Redirecting...");
+      setTimeout(() => navigate("/seller-dashboard"), 1000);
+    },
+  });
+
+  const {
+    showForgot, setShowForgot, forgotEmail, setForgotEmail,
+    forgotLoading, forgotMsg, handleForgotPassword, resetForgotState,
+  } = useForgotPassword();
 
   const handleChange = (e) => {
     setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
     setError("");
   };
 
-  const handleGoogleLogin = async () => {
-    setGoogleLoading(true);
-    setError("");
 
-    try {
-      if (!window.google) {
-        const script = document.createElement('script');
-        script.src = 'https://accounts.google.com/gsi/client';
-        script.async = true;
-        script.defer = true;
-        script.onload = () => initializeGoogleSignIn();
-        script.onerror = () => {
-          setError("Failed to load Google Sign-In. Please try again or use email/password.");
-          setGoogleLoading(false);
-        };
-        document.head.appendChild(script);
-      } else {
-        initializeGoogleSignIn();
-      }
-    } catch (err) {
-      setError("Google Sign-In is not configured. Please use email/password.");
-      setGoogleLoading(false);
-    }
-  };
-
-  const initializeGoogleSignIn = () => {
-    try {
-      window.google.accounts.id.initialize({
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID",
-        callback: handleGoogleCredentialResponse,
-        auto_select: false,
-      });
-
-      window.google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed()) {
-          setError("Google Sign-In popup was blocked. Please allow popups or use email/password.");
-          setGoogleLoading(false);
-        }
-      });
-    } catch (err) {
-      setError("Google Sign-In initialization failed. Please use email/password.");
-      setGoogleLoading(false);
-    }
-  };
-
-  const handleGoogleCredentialResponse = async (response) => {
-    try {
-      const base64Url = response.credential.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
-
-      const googleUser = JSON.parse(jsonPayload);
-
-      const res = await fetch(`${API_BASE}/auth/google`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          googleId: googleUser.sub,
-          email: googleUser.email,
-          name: googleUser.name,
-          picture: googleUser.picture,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Google authentication failed");
-      }
-
-      login(data.token, data.user);
-      setSuccess("✅ Google login successful! Redirecting...");
-
-      setTimeout(() => {
-        navigate("/seller-dashboard");
-      }, 1000);
-
-    } catch (err) {
-      setError(err.message || "Google authentication failed. Please try again.");
-    } finally {
-      setGoogleLoading(false);
-    }
-  };
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -168,32 +78,7 @@ export default function SellerLogin() {
     }
   };
 
-  const handleForgotPassword = async (e) => {
-    e.preventDefault();
-    setForgotMsg("");
 
-    if (!forgotEmail) {
-      setForgotMsg("❌ Please enter your email address.");
-      return;
-    }
-
-    setForgotLoading(true);
-
-    try {
-      const res = await fetch(`${API_BASE}/auth/forgot-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: forgotEmail }),
-      });
-
-      const data = await res.json();
-      setForgotMsg(data.message || "✅ Reset link sent! Check your inbox.");
-    } catch (err) {
-      setForgotMsg("❌ Failed to send reset email. Try again.");
-    } finally {
-      setForgotLoading(false);
-    }
-  };
 
   return (
     <div style={s.page}>
@@ -229,7 +114,7 @@ export default function SellerLogin() {
             </div>
 
             <p style={s.backLink}>
-              <span style={s.link} onClick={() => { setShowForgot(false); setForgotMsg(""); }}>
+              <span style={s.link} onClick={resetForgotState}>
                 ← Back to Login
               </span>
             </p>
@@ -264,7 +149,7 @@ export default function SellerLogin() {
             </div>
 
             {/* Alerts */}
-            {error && <div style={s.error}>{error}</div>}
+            {(error || googleError) && <div style={s.error}>{error || googleError}</div>}
             {success && <div style={s.successMsg}>{success}</div>}
 
             {/* Form */}
@@ -277,7 +162,7 @@ export default function SellerLogin() {
                     onChange={handleChange} style={s.input} />
                   <select name="county" value={form.county} onChange={handleChange} style={s.input}>
                     <option value="">Select County</option>
-                    {COUNTIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                    {KENYA_COUNTIES.map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </>
               )}

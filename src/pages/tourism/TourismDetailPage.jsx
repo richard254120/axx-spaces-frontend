@@ -8,6 +8,7 @@ import {
   TOURISM_FONT_CSS,
   tourismTheme,
 } from "../../features/tourism";
+import { API_BASE } from "../../utils/constants";
 import PhoneInput from "../../components/PhoneInput";
 import { useAuth } from "../../context/AuthContext";
 
@@ -138,7 +139,6 @@ export default function TourismDetailPage() {
     setPaymentSuccess("");
 
     try {
-      const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
       const response = await fetch(`${API_BASE}/payment/book-tourism`, {
         method: "POST",
         headers: {

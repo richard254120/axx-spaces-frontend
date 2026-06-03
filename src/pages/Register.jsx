@@ -1,13 +1,12 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
 import { COLORS, buttonStyles, inputStyles, pageStyles } from "../styles/theme";
-
-const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
+import { API_BASE } from "../utils/constants";
+import useGoogleAuth from "../hooks/useGoogleAuth";
 
 export default function Register() {
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
+
 
   const [formData, setFormData] = useState({
     name: "",
@@ -17,102 +16,22 @@ export default function Register() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const { googleLoading, googleError, handleGoogleLogin, GOOGLE_CLIENT_ID } = useGoogleAuth({
+    onSuccess: () => {
+      setSuccess("✅ Google registration successful! Redirecting...");
+      setTimeout(() => navigate("/dashboard"), 1000);
+    },
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleGoogleLogin = async () => {
-    setGoogleLoading(true);
-    setError("");
 
-    try {
-      // Load Google Identity Services
-      if (!window.google) {
-        const script = document.createElement('script');
-        script.src = 'https://accounts.google.com/gsi/client';
-        script.async = true;
-        script.defer = true;
-        script.onload = () => initializeGoogleSignIn();
-        script.onerror = () => {
-          setError("Failed to load Google Sign-In. Please try again or use email/password.");
-          setGoogleLoading(false);
-        };
-        document.head.appendChild(script);
-      } else {
-        initializeGoogleSignIn();
-      }
-    } catch (err) {
-      setError("Google Sign-In is not configured. Please use email/password.");
-      setGoogleLoading(false);
-    }
-  };
-
-  const initializeGoogleSignIn = () => {
-    try {
-      window.google.accounts.id.initialize({
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID",
-        callback: handleGoogleCredentialResponse,
-        auto_select: false,
-      });
-
-      window.google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed()) {
-          setError("Google Sign-In popup was blocked. Please allow popups or use email/password.");
-          setGoogleLoading(false);
-        }
-      });
-    } catch (err) {
-      setError("Google Sign-In initialization failed. Please use email/password.");
-      setGoogleLoading(false);
-    }
-  };
-
-  const handleGoogleCredentialResponse = async (response) => {
-    try {
-      const base64Url = response.credential.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
-
-      const googleUser = JSON.parse(jsonPayload);
-
-      const res = await fetch(`${API_BASE}/auth/google`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          googleId: googleUser.sub,
-          email: googleUser.email,
-          name: googleUser.name,
-          picture: googleUser.picture,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Google authentication failed");
-      }
-
-      login(data.token, data.user);
-
-      setSuccess("✅ Google registration successful! Redirecting...");
-
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 1000);
-
-    } catch (err) {
-      setError(err.message || "Google authentication failed. Please try again.");
-    } finally {
-      setGoogleLoading(false);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -191,7 +110,7 @@ export default function Register() {
           <h1 style={styles.title}>Landlord Sign Up</h1>
           <p style={styles.subtitle}>Start listing your properties on Axxspace</p>
 
-          {error && <div style={styles.error}>{error}</div>}
+          {(error || googleError) && <div style={styles.error}>{error || googleError}</div>}
           {success && <div style={styles.success}>{success}</div>}
 
           <form onSubmit={handleSubmit} style={styles.form}>

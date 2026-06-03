@@ -2,8 +2,8 @@ import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
-
-const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
+import useGoogleAuth from "../hooks/useGoogleAuth";
+import useForgotPassword from "../hooks/useForgotPassword";
 
 const styles = {
   container: {
@@ -138,105 +138,24 @@ export default function BusinessLogin() {
 
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Forgot password state
-  const [showForgot, setShowForgot] = useState(false);
-  const [forgotEmail, setForgotEmail] = useState("");
-  const [forgotLoading, setForgotLoading] = useState(false);
-  const [forgotMsg, setForgotMsg] = useState("");
+  const { googleLoading, googleError, handleGoogleLogin } = useGoogleAuth({
+    onSuccess: () => {
+      setSuccess("✅ Google login successful! Redirecting...");
+      setTimeout(() => navigate("/business-dashboard"), 1000);
+    },
+  });
+
+  const {
+    showForgot, setShowForgot, forgotEmail, setForgotEmail,
+    forgotLoading, forgotMsg, handleForgotPassword, resetForgotState,
+  } = useForgotPassword();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleGoogleLogin = async () => {
-    setGoogleLoading(true);
-    setError("");
-
-    try {
-      if (!window.google) {
-        const script = document.createElement('script');
-        script.src = 'https://accounts.google.com/gsi/client';
-        script.async = true;
-        script.defer = true;
-        script.onload = () => initializeGoogleSignIn();
-        script.onerror = () => {
-          setError("Failed to load Google Sign-In. Please try again or use email/password.");
-          setGoogleLoading(false);
-        };
-        document.head.appendChild(script);
-      } else {
-        initializeGoogleSignIn();
-      }
-    } catch (err) {
-      setError("Google Sign-In is not configured. Please use email/password.");
-      setGoogleLoading(false);
-    }
-  };
-
-  const initializeGoogleSignIn = () => {
-    try {
-      window.google.accounts.id.initialize({
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID",
-        callback: handleGoogleCredentialResponse,
-        auto_select: false,
-      });
-
-      window.google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed()) {
-          setError("Google Sign-In popup was blocked. Please allow popups or use email/password.");
-          setGoogleLoading(false);
-        }
-      });
-    } catch (err) {
-      setError("Google Sign-In initialization failed. Please use email/password.");
-      setGoogleLoading(false);
-    }
-  };
-
-  const handleGoogleCredentialResponse = async (response) => {
-    try {
-      const base64Url = response.credential.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
-
-      const googleUser = JSON.parse(jsonPayload);
-
-      const res = await fetch(`${API_BASE}/auth/google`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          googleId: googleUser.sub,
-          email: googleUser.email,
-          name: googleUser.name,
-          picture: googleUser.picture,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Google authentication failed");
-      }
-
-      login(data.token, data.user);
-      setSuccess("✅ Google login successful! Redirecting...");
-
-      setTimeout(() => {
-        navigate("/business-dashboard");
-      }, 1000);
-
-    } catch (err) {
-      setError(err.message || "Google authentication failed. Please try again.");
-    } finally {
-      setGoogleLoading(false);
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -262,26 +181,7 @@ export default function BusinessLogin() {
     }
   };
 
-  const handleForgotPassword = async (e) => {
-    e.preventDefault();
-    setForgotMsg("");
 
-    if (!forgotEmail) {
-      setForgotMsg("❌ Please enter your email address.");
-      return;
-    }
-
-    setForgotLoading(true);
-
-    try {
-      const res = await API.post("/auth/forgot-password", { email: forgotEmail });
-      setForgotMsg(res.data.message || "✅ Reset link sent! Check your inbox.");
-    } catch (err) {
-      setForgotMsg("❌ Failed to send reset email. Try again.");
-    } finally {
-      setForgotLoading(false);
-    }
-  };
 
   return (
     <div style={styles.container}>
@@ -323,7 +223,7 @@ export default function BusinessLogin() {
               <div style={styles.dividerLine}></div>
             </div>
 
-            <Link to="/business-login" style={styles.link} onClick={() => { setShowForgot(false); setForgotMsg(""); }}>
+            <Link to="/business-login" style={styles.link} onClick={resetForgotState}>
               ← Back to Login
             </Link>
           </>
@@ -332,7 +232,7 @@ export default function BusinessLogin() {
             <h1 style={styles.title}>Business Login</h1>
             <p style={styles.subtitle}>Sign in to manage your business on AxxBiashara</p>
 
-            {error && <div style={styles.error}>{error}</div>}
+            {(error || googleError) && <div style={styles.error}>{error || googleError}</div>}
             {success && <div style={styles.success}>{success}</div>}
 
             <form onSubmit={handleSubmit}>
