@@ -253,6 +253,12 @@ export default function SellerDashboard() {
                     <h3 style={s.cardTitle}>{m.title}</h3>
                     <p style={s.cardPrice}>KES {m.price?.toLocaleString()}</p>
                     <p style={s.cardMeta}>Qty: {m.quantity} • {m.location}, {m.county}</p>
+                    {/* Engagement Stats */}
+                    <div style={s.engagementStats}>
+                      <span style={s.engagementItem}>👁️ {m.views || 0} views</span>
+                      <span style={s.engagementSeparator}>·</span>
+                      <span style={s.engagementItem}>★ {(m.rating && m.rating > 0) ? m.rating.toFixed(1) : "—"} · {m.reviewCount || 0} reviews</span>
+                    </div>
                     <div style={s.cardBtns}>
                       {currentStatus === "active" && (
                         <button style={s.soldBtn} onClick={() => handleMarkSold(m._id)}>
@@ -352,6 +358,9 @@ const s = {
   cardTitle: { margin: "0 0 8px 0", fontSize: "1rem" },
   cardPrice: { color: "#fbbf24", fontWeight: "bold", fontSize: "1.1rem", margin: "0 0 4px 0" },
   cardMeta: { color: "#94a3b8", fontSize: "0.85rem", margin: 0 },
+  engagementStats: { display: "flex", alignItems: "center", gap: "8px", marginTop: "8px", fontSize: "0.8rem", color: "#94a3b8" },
+  engagementItem: { display: "flex", alignItems: "center", gap: "4px" },
+  engagementSeparator: { color: "#94a3b8" },
   cardBtns: { display: "flex", gap: "8px", marginTop: "16px" },
   soldBtn: { flex: 1, padding: "6px", background: "rgba(34,197,94,0.2)", color: "#4ade80", border: "1px solid #22c55e", borderRadius: "4px", cursor: "pointer" },
   deleteBtn: { flex: 1, padding: "6px", background: "rgba(239,68,68,0.2)", color: "#f87171", border: "1px solid #ef4444", borderRadius: "4px", cursor: "pointer" },

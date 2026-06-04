@@ -54,7 +54,7 @@ export default function MaterialsMarketplace() {
   const [paymentError, setPaymentError] = useState("");
   const [paymentSuccess, setPaymentSuccess] = useState("");
 
-  // Reviews state
+  // Reviews state for payment modal
   const [reviews, setReviews] = useState([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -64,6 +64,12 @@ export default function MaterialsMarketplace() {
   const [reviewUserName, setReviewUserName] = useState("");
   const [reviewMsg, setReviewMsg] = useState("");
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
+
+  // Reviews state for marketplace cards
+  const [showReviewsModal, setShowReviewsModal] = useState(false);
+  const [selectedMaterialForReviews, setSelectedMaterialForReviews] = useState(null);
+  const [materialReviews, setMaterialReviews] = useState([]);
+  const [materialReviewsLoading, setMaterialReviewsLoading] = useState(false);
 
   useEffect(() => {
     fetchMaterials();
@@ -191,6 +197,27 @@ export default function MaterialsMarketplace() {
       loadReviews();
     }
   }, [selectedMaterial]);
+
+  // Load reviews for marketplace modal
+  const loadMaterialReviews = async (materialId) => {
+    setMaterialReviewsLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/reviews?category=merchant&relatedId=${materialId}`);
+      const data = await res.json();
+      setMaterialReviews(data.reviews || []);
+    } catch (err) {
+      console.error("Failed to load reviews:", err);
+      setMaterialReviews([]);
+    } finally {
+      setMaterialReviewsLoading(false);
+    }
+  };
+
+  const handleViewReviews = (material) => {
+    setSelectedMaterialForReviews(material);
+    setShowReviewsModal(true);
+    loadMaterialReviews(material._id);
+  };
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
@@ -456,6 +483,12 @@ export default function MaterialsMarketplace() {
                       </span>
                       <div style={styles.buttonGroup}>
                         <button
+                          onClick={() => handleViewReviews(material)}
+                          style={styles.reviewsBtn}
+                        >
+                          ⭐ Reviews
+                        </button>
+                        <button
                           onClick={() => handleInquiry(material._id)}
                           style={styles.inquireBtn}
                         >
@@ -492,6 +525,37 @@ export default function MaterialsMarketplace() {
           </button>
         </div>
       </section>
+
+      {/* REVIEWS MODAL */}
+      {showReviewsModal && selectedMaterialForReviews && (
+        <div style={styles.reviewsModal} onClick={() => setShowReviewsModal(false)}>
+          <div style={styles.reviewsModalContent} onClick={(e) => e.stopPropagation()}>
+            <div style={styles.reviewsModalHeader}>
+              <h3 style={styles.reviewsModalTitle}>⭐ Reviews - {selectedMaterialForReviews.title}</h3>
+              <button style={styles.closeBtn} onClick={() => setShowReviewsModal(false)}>✕</button>
+            </div>
+            {materialReviewsLoading ? (
+              <p style={styles.loadingText}>Loading reviews...</p>
+            ) : materialReviews.length === 0 ? (
+              <p style={styles.noReviews}>No reviews yet. Be the first to review!</p>
+            ) : (
+              <div style={styles.reviewsList}>
+                {materialReviews.map((review) => (
+                  <div key={review._id} style={styles.reviewCard}>
+                    <div style={styles.reviewHeader}>
+                      <div style={styles.reviewUser}>{review.userName}</div>
+                      <div style={styles.reviewDate}>{new Date(review.createdAt).toLocaleDateString()}</div>
+                    </div>
+                    <div style={styles.reviewRating}>{"★".repeat(review.rating)}</div>
+                    <div style={styles.reviewTitle}>{review.title}</div>
+                    <p style={styles.reviewComment}>{review.comment}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* PAYMENT MODAL */}
       {showPaymentModal && selectedMaterial && (
@@ -1036,6 +1100,17 @@ const styles = {
     display: "flex",
     gap: "8px",
   },
+  reviewsBtn: {
+    padding: "10px 16px",
+    background: "rgba(251, 191, 36, 0.2)",
+    color: "#fbbf24",
+    border: "1px solid #fbbf24",
+    borderRadius: "8px",
+    fontSize: "13px",
+    fontWeight: 600,
+    cursor: "pointer",
+    transition: "all 0.2s",
+  },
   purchaseBtn: {
     padding: "10px 20px",
     background: `linear-gradient(135deg, #22c55e 0%, #16a34a 100%)`,
@@ -1046,6 +1121,50 @@ const styles = {
     fontWeight: 700,
     cursor: "pointer",
     transition: "all 0.2s",
+  },
+  reviewsModal: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: "rgba(0,0,0,0.8)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 2000,
+    padding: "20px",
+  },
+  reviewsModalContent: {
+    background: `linear-gradient(135deg, ${COLORS.bgDark} 0%, ${COLORS.bgDarker} 100%)`,
+    borderRadius: "12px",
+    maxWidth: "500px",
+    width: "100%",
+    padding: "24px",
+    border: `1px solid ${COLORS.border}`,
+    position: "relative",
+    maxHeight: "80vh",
+    overflowY: "auto",
+  },
+  reviewsModalHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "20px",
+  },
+  reviewsModalTitle: {
+    margin: 0,
+    fontSize: "18px",
+    fontWeight: 700,
+    color: COLORS.textLight,
+  },
+  closeBtn: {
+    background: "transparent",
+    border: "none",
+    color: COLORS.textMutedLight,
+    fontSize: "24px",
+    cursor: "pointer",
+    padding: "4px 8px",
   },
   paymentModal: {
     position: "fixed",
