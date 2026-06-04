@@ -43,7 +43,6 @@ export default function SellerLogin() {
   };
 
 
-
   const handleSubmit = async () => {
     setLoading(true);
     setError("");

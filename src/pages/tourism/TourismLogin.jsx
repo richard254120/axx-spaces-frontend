@@ -206,7 +206,6 @@ export default function TourismLogin() {
   }, []);
 
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) {
