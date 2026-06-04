@@ -91,10 +91,12 @@ export default function SellerDashboard() {
       const res = await fetch(`${API_BASE}/materials/seller/my-materials?_cb=${Date.now()}`, {
         headers: { Authorization: `Bearer ${tkn}` },
       });
+      if (!res.ok) throw new Error(`Failed to load materials (${res.status})`);
       const data = await res.json();
       setMaterials(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error(err);
+      console.error("Failed to load materials:", err);
+      setError("Failed to load your materials. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -141,13 +143,25 @@ export default function SellerDashboard() {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete permanently?")) return;
-    await fetch(`${API_BASE}/materials/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
-    fetchMyMaterials(token);
+    try {
+      const res = await fetch(`${API_BASE}/materials/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) throw new Error("Failed to delete material");
+      fetchMyMaterials(token);
+    } catch (err) {
+      console.error("Failed to delete material:", err);
+      setError("Failed to delete material. Please try again.");
+    }
   };
 
   const handleMarkSold = async (id) => {
-    await fetch(`${API_BASE}/materials/${id}/sold`, { method: "PATCH", headers: { Authorization: `Bearer ${token}` } });
-    fetchMyMaterials(token);
+    try {
+      const res = await fetch(`${API_BASE}/materials/${id}/sold`, { method: "PATCH", headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) throw new Error("Failed to mark as sold");
+      fetchMyMaterials(token);
+    } catch (err) {
+      console.error("Failed to mark as sold:", err);
+      setError("Failed to mark item as sold. Please try again.");
+    }
   };
 
   // ✅ FIXED: use resolveStatus so filter dropdown works correctly for both

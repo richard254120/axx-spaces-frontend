@@ -81,6 +81,7 @@ export default function LandlordDashboard() {
       setAgents(data);
     } catch (err) {
       console.error("Fetch agents error:", err);
+      setError("Failed to load agents. Please try again.");
     }
   };
 

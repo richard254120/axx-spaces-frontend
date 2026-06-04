@@ -20,6 +20,7 @@ export default function AdminDashboard() {
   });
   const [configSaving, setConfigSaving] = useState(false);
   const [configMessage, setConfigMessage] = useState("");
+  const [error, setError] = useState("");
 
   // ADDED: payments tab state
   const [pendingPayments, setPendingPayments] = useState([]);
@@ -92,7 +93,7 @@ export default function AdminDashboard() {
       setPendingPayments(res.data.pendingPayments || []);
     } catch (err) {
       console.error("Failed to load pending payments:", err);
-      console.error("Error response:", err.response);
+      setError("Failed to load pending payments.");
     } finally {
       setPaymentsLoading(false);
     }
@@ -127,7 +128,7 @@ export default function AdminDashboard() {
       setPendingBusinesses(res.data.businesses || []);
     } catch (err) {
       console.error("Failed to load pending businesses:", err);
-      console.error("Error response:", err.response);
+      setError("Failed to load pending businesses.");
     } finally {
       setBusinessesLoading(false);
     }
@@ -165,7 +166,7 @@ export default function AdminDashboard() {
       setPendingAnnouncements(res.data.announcements || []);
     } catch (err) {
       console.error("Failed to load pending announcements:", err);
-      console.error("Error response:", err.response);
+      setError("Failed to load pending announcements.");
     } finally {
       setAnnouncementsLoading(false);
     }
@@ -227,6 +228,7 @@ export default function AdminDashboard() {
       });
     } catch (err) {
       console.error("Failed to load M-Pesa config:", err);
+      setError("Failed to load M-Pesa configuration.");
     }
   };
 
@@ -236,6 +238,7 @@ export default function AdminDashboard() {
       setStats(res.data);
     } catch (err) {
       console.error("Failed to load stats:", err);
+      setError("Failed to load dashboard statistics.");
     }
   };
 
@@ -246,6 +249,7 @@ export default function AdminDashboard() {
       setAllPending(res.data);
     } catch (err) {
       console.error("Failed to load pending items:", err);
+      setError("Failed to load pending items.");
     } finally {
       setLoading(false);
     }
@@ -278,7 +282,8 @@ export default function AdminDashboard() {
       const res = await API.get("/properties/admin/pending");
       setPending(res.data);
     } catch (err) {
-      console.error("❌ Failed to load pending properties", err);
+      console.error("Failed to load pending properties:", err);
+      setError("Failed to load pending properties.");
     } finally {
       setLoading(false);
     }
@@ -289,7 +294,8 @@ export default function AdminDashboard() {
       const res = await API.get("/users/pending-tourism-providers");
       setPendingProviders(res.data);
     } catch (err) {
-      console.error("❌ Failed to load pending tourism providers", err);
+      console.error("Failed to load pending tourism providers:", err);
+      setError("Failed to load pending tourism providers.");
     }
   };
 
@@ -344,6 +350,13 @@ export default function AdminDashboard() {
         <h1 style={styles.title}>🛡️ Admin Review Panel</h1>
         <p style={styles.subtitle}>Manage pending submissions for Axxspace</p>
       </div>
+
+      {error && (
+        <div style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)", color: "#ef4444", padding: "12px 18px", borderRadius: "10px", margin: "0 20px 20px", fontSize: "14px", fontWeight: 600, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span>{error}</span>
+          <button onClick={() => setError("")} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: "18px" }}>&times;</button>
+        </div>
+      )}
 
       {/* Stats */}
       {stats && (
