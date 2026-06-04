@@ -47,9 +47,14 @@ export default function Register() {
         script.src = 'https://accounts.google.com/gsi/client';
         script.async = true;
         script.defer = true;
-        script.onload = () => initializeGoogleSignIn();
+        script.crossOrigin = 'anonymous';
+        script.onload = () => {
+          console.log('Google Sign-In script loaded successfully');
+          initializeGoogleSignIn();
+        };
         script.onerror = () => {
-          setError("Failed to load Google Sign-In. Please try again or use email/password.");
+          console.error('Failed to load Google Sign-In script');
+          setError("Failed to load Google Sign-In. Please check your internet connection or use email/password.");
           setGoogleLoading(false);
         };
         document.head.appendChild(script);
@@ -57,6 +62,7 @@ export default function Register() {
         initializeGoogleSignIn();
       }
     } catch (err) {
+      console.error('Google Sign-In error:', err);
       setError("Google Sign-In is not configured. Please use email/password.");
       setGoogleLoading(false);
     }
