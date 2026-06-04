@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 
 export default function UsersPage() {
@@ -6,6 +7,7 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadUsers();
@@ -37,10 +39,14 @@ export default function UsersPage() {
     }
   };
 
+  const handleSendMessage = (userId) => {
+    navigate("/messages", { state: { recipientId: userId } });
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <h1 style={styles.title}>👥 Our Community</h1>
+        <h1 style={styles.title}>Our Community</h1>
         <p style={styles.subtitle}>Meet the amazing people who make Axxspace thrive</p>
       </div>
 
@@ -68,7 +74,7 @@ export default function UsersPage() {
       </div>
 
       {loading ? (
-        <div style={styles.loader}>⏳ Loading users...</div>
+        <div style={styles.loader}>Loading users...</div>
       ) : users.length === 0 ? (
         <div style={styles.emptyState}>
           <p style={styles.emptyText}>No users found matching your criteria.</p>
@@ -88,11 +94,11 @@ export default function UsersPage() {
                     />
                   ) : (
                     <div style={styles.avatarPlaceholder}>
-                      {user.name.charAt(0).toUpperCase()}
+                      {user.name?.charAt(0).toUpperCase() || "?"}
                     </div>
                   )}
                   <div style={styles.userInfo}>
-                    <h3 style={styles.userName}>{user.name}</h3>
+                    <h3 style={styles.userName}>{user.name || "Anonymous"}</h3>
                     <span
                       style={{
                         ...styles.roleBadge,
@@ -106,21 +112,22 @@ export default function UsersPage() {
                 </div>
                 <div style={styles.cardBody}>
                   <div style={styles.infoRow}>
-                    <span style={styles.infoLabel}>📍</span>
+                    <span style={styles.infoLabel}>Location</span>
                     <span style={styles.infoValue}>{user.county || "Kenya"}</span>
                   </div>
                   <div style={styles.infoRow}>
-                    <span style={styles.infoLabel}>📧</span>
-                    <span style={styles.infoValue}>{user.email}</span>
-                  </div>
-                  <div style={styles.infoRow}>
-                    <span style={styles.infoLabel}>📅</span>
+                    <span style={styles.infoLabel}>Joined</span>
                     <span style={styles.infoValue}>
-                      Joined {new Date(user.createdAt).toLocaleDateString("en-KE", { month: "short", year: "numeric" })}
+                      {new Date(user.createdAt).toLocaleDateString("en-KE", { month: "short", year: "numeric" })}
                     </span>
                   </div>
                 </div>
-                <button style={styles.contactBtn}>View Profile</button>
+                <button
+                  onClick={() => handleSendMessage(user._id)}
+                  style={styles.messageBtn}
+                >
+                  Send Message
+                </button>
               </div>
             );
           })}
@@ -271,11 +278,11 @@ const styles = {
     fontSize: "14px",
     color: "#94a3b8",
   },
-  contactBtn: {
+  messageBtn: {
     width: "100%",
     padding: "12px",
-    background: "linear-gradient(135deg, #fbbf24, #f59e0b)",
-    color: "#0f1729",
+    background: "linear-gradient(135deg, #3b82f6, #2563eb)",
+    color: "white",
     border: "none",
     borderRadius: "10px",
     fontSize: "14px",
