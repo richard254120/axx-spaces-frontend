@@ -86,13 +86,10 @@ export default function AdminDashboard() {
   const loadPendingPayments = async () => {
     setPaymentsLoading(true);
     try {
-      console.log("Loading pending payments...");
       const res = await API.get("/payment/pending-bank-payments");
-      console.log("Pending payments response:", res.data);
       setPendingPayments(res.data.pendingPayments || []);
     } catch (err) {
-      console.error("Failed to load pending payments:", err);
-      console.error("Error response:", err.response);
+
     } finally {
       setPaymentsLoading(false);
     }
@@ -121,13 +118,10 @@ export default function AdminDashboard() {
   const loadPendingBusinesses = async () => {
     setBusinessesLoading(true);
     try {
-      console.log("Loading pending businesses...");
       const res = await API.get("/business/admin/pending");
-      console.log("Pending businesses response:", res.data);
       setPendingBusinesses(res.data.businesses || []);
     } catch (err) {
-      console.error("Failed to load pending businesses:", err);
-      console.error("Error response:", err.response);
+
     } finally {
       setBusinessesLoading(false);
     }
@@ -159,13 +153,10 @@ export default function AdminDashboard() {
   const loadPendingAnnouncements = async () => {
     setAnnouncementsLoading(true);
     try {
-      console.log("Loading pending announcements...");
       const res = await API.get("/business/admin/announcements");
-      console.log("Pending announcements response:", res.data);
       setPendingAnnouncements(res.data.announcements || []);
     } catch (err) {
-      console.error("Failed to load pending announcements:", err);
-      console.error("Error response:", err.response);
+
     } finally {
       setAnnouncementsLoading(false);
     }
@@ -226,7 +217,7 @@ export default function AdminDashboard() {
         mpesa_consumer_secret: res.data.mpesa_consumer_secret || "",
       });
     } catch (err) {
-      console.error("Failed to load M-Pesa config:", err);
+
     }
   };
 
@@ -235,7 +226,7 @@ export default function AdminDashboard() {
       const res = await API.get("/admin/stats");
       setStats(res.data);
     } catch (err) {
-      console.error("Failed to load stats:", err);
+
     }
   };
 
@@ -245,7 +236,7 @@ export default function AdminDashboard() {
       const res = await API.get("/admin/pending");
       setAllPending(res.data);
     } catch (err) {
-      console.error("Failed to load pending items:", err);
+
     } finally {
       setLoading(false);
     }
@@ -278,7 +269,7 @@ export default function AdminDashboard() {
       const res = await API.get("/properties/admin/pending");
       setPending(res.data);
     } catch (err) {
-      console.error("❌ Failed to load pending properties", err);
+
     } finally {
       setLoading(false);
     }
@@ -289,7 +280,7 @@ export default function AdminDashboard() {
       const res = await API.get("/users/pending-tourism-providers");
       setPendingProviders(res.data);
     } catch (err) {
-      console.error("❌ Failed to load pending tourism providers", err);
+
     }
   };
 

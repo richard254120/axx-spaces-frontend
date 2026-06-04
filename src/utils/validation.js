@@ -144,13 +144,9 @@ export const detectXSS = (input) => {
   return xssPatterns.some(pattern => pattern.test(input));
 };
 
-// Safe HTML rendering (basic)
+// Safe HTML rendering — always escape to prevent XSS
 export const safeHtml = (html) => {
-  if (detectXSS(html)) {
-    console.warn('XSS attempt detected, content sanitized');
-    return escapeHtml(html);
-  }
-  return html;
+  return escapeHtml(html);
 };
 
 export default {

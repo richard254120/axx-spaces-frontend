@@ -11,7 +11,19 @@ import hpp from 'hpp';
 import cookieParser from 'cookie-parser';
 
 const helmetConfig = helmet({
-  contentSecurityPolicy: false,
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://unpkg.com"],
+      imgSrc: ["'self'", "data:", "https:", "blob:"],
+      fontSrc: ["'self'", "data:", "https://fonts.gstatic.com", "https://fonts.googleapis.com", "https://unpkg.com"],
+      connectSrc: ["'self'", "https://axx-spaces-backend-1.onrender.com", "wss://axx-spaces-backend-1.onrender.com", "https://*.tile.openstreetmap.org"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+    },
+  },
   crossOriginResourcePolicy: { policy: "cross-origin" },
 });
 

@@ -8,8 +8,8 @@ import { SpeedInsights } from '@vercel/speed-insights/react'
 import 'leaflet/dist/leaflet.css'
 import './index.css'
 
-// Initialize Google Analytics
-ReactGA.initialize('G-9J06HNJ4T1')
+const GA_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
+if (GA_ID) ReactGA.initialize(GA_ID);
 
 // Suppress error details from leaking in production
 window.addEventListener('error', (event) => {
