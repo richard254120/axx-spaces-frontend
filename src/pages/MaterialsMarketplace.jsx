@@ -54,6 +54,17 @@ export default function MaterialsMarketplace() {
   const [paymentError, setPaymentError] = useState("");
   const [paymentSuccess, setPaymentSuccess] = useState("");
 
+  // Reviews state
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewTitle, setReviewTitle] = useState("");
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewUserName, setReviewUserName] = useState("");
+  const [reviewMsg, setReviewMsg] = useState("");
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
+
   useEffect(() => {
     fetchMaterials();
   }, []);
@@ -155,6 +166,64 @@ export default function MaterialsMarketplace() {
       setPaymentError("❌ Payment failed. Please try again.");
     } finally {
       setPaymentLoading(false);
+    }
+  };
+
+  // Load reviews for selected material
+  const loadReviews = async () => {
+    if (!selectedMaterial?._id) return;
+    setReviewsLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/reviews?category=merchant&relatedId=${selectedMaterial._id}`);
+      const data = await res.json();
+      setReviews(data.reviews || []);
+    } catch (err) {
+      console.error("Failed to load reviews:", err);
+      setReviews([]);
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
+
+  // Load reviews when material is selected
+  useEffect(() => {
+    if (selectedMaterial?._id) {
+      loadReviews();
+    }
+  }, [selectedMaterial]);
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch(`${API_BASE}/reviews`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          category: "merchant",
+          relatedId: selectedMaterial._id,
+          rating: reviewRating,
+          title: reviewTitle,
+          comment: reviewComment,
+          userName: reviewUserName || "Anonymous",
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setReviewMsg("Review submitted successfully!");
+        setReviewRating(5);
+        setReviewTitle("");
+        setReviewComment("");
+        setReviewUserName("");
+        setShowReviewForm(false);
+        setReviewSubmitted(true);
+        loadReviews();
+        fetchMaterials();
+        setTimeout(() => setReviewMsg(""), 3000);
+      } else {
+        setReviewMsg("Failed to submit review: " + (data.error || "Unknown error"));
+      }
+    } catch (err) {
+      setReviewMsg("Failed to submit review: " + err.message);
     }
   };
 
@@ -370,6 +439,25 @@ export default function MaterialsMarketplace() {
                       )}
                     </div>
 
+                    {/* Views and Rating */}
+                    <div style={styles.engagementStats}>
+                      <div style={styles.statItem}>
+                        <span style={styles.statIcon}>👁️</span>
+                        <span style={styles.statValue}>{material.views || 0}</span>
+                        <span style={styles.statLabel}>Views</span>
+                      </div>
+                      <div style={styles.statItem}>
+                        <span style={styles.statIcon}>⭐</span>
+                        <span style={styles.statValue}>{material.rating?.toFixed(1) || "—"}</span>
+                        <span style={styles.statLabel}>Rating</span>
+                      </div>
+                      <div style={styles.statItem}>
+                        <span style={styles.statIcon}>💬</span>
+                        <span style={styles.statValue}>{material.reviewCount || 0}</span>
+                        <span style={styles.statLabel}>Reviews</span>
+                      </div>
+                    </div>
+
                     <div style={styles.priceSection}>
                       <span style={styles.price}>
                         KSh {Number(material.price).toLocaleString()}
@@ -465,6 +553,90 @@ export default function MaterialsMarketplace() {
                 </button>
               </form>
             )}
+
+            {/* Reviews Section */}
+            <div style={styles.reviewsSection}>
+              <div style={styles.reviewsHeader}>
+                <p style={styles.reviewsTitle}>Reviews & Ratings</p>
+                <button style={styles.reviewBtn} onClick={() => setShowReviewForm(!showReviewForm)}>
+                  {showReviewForm ? "✕ Cancel" : "+ Write Review"}
+                </button>
+              </div>
+              {reviewMsg && (
+                <div style={styles.reviewMsg}>{reviewMsg}</div>
+              )}
+              {showReviewForm && (
+                <form onSubmit={handleReviewSubmit} style={styles.reviewForm}>
+                  <div style={styles.reviewField}>
+                    <label style={styles.reviewLabel}>Your Name</label>
+                    <input
+                      type="text"
+                      value={reviewUserName}
+                      onChange={(e) => setReviewUserName(e.target.value)}
+                      style={styles.reviewInput}
+                      placeholder="Enter your name"
+                    />
+                  </div>
+                  <div style={styles.reviewField}>
+                    <label style={styles.reviewLabel}>Rating</label>
+                    <div style={styles.ratingStars}>
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <span
+                          key={star}
+                          style={{ ...styles.ratingStar, ...(reviewRating >= star ? styles.ratingStarActive : {}) }}
+                          onClick={() => setReviewRating(star)}
+                        >
+                          ★
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div style={styles.reviewField}>
+                    <label style={styles.reviewLabel}>Title</label>
+                    <input
+                      type="text"
+                      value={reviewTitle}
+                      onChange={(e) => setReviewTitle(e.target.value)}
+                      style={styles.reviewInput}
+                      placeholder="Review title"
+                      required
+                    />
+                  </div>
+                  <div style={styles.reviewField}>
+                    <label style={styles.reviewLabel}>Comment</label>
+                    <textarea
+                      value={reviewComment}
+                      onChange={(e) => setReviewComment(e.target.value)}
+                      style={styles.reviewTextarea}
+                      placeholder="Share your experience..."
+                      required
+                    />
+                  </div>
+                  <button type="submit" style={styles.reviewSubmitBtn}>
+                    Submit Review
+                  </button>
+                </form>
+              )}
+              {reviewsLoading ? (
+                <p style={styles.loadingText}>Loading reviews...</p>
+              ) : reviews.length === 0 ? (
+                <p style={styles.noReviews}>No reviews yet. Be the first to review!</p>
+              ) : (
+                <div style={styles.reviewsList}>
+                  {reviews.map((review) => (
+                    <div key={review._id} style={styles.reviewCard}>
+                      <div style={styles.reviewHeader}>
+                        <div style={styles.reviewUser}>{review.userName}</div>
+                        <div style={styles.reviewDate}>{new Date(review.createdAt).toLocaleDateString()}</div>
+                      </div>
+                      <div style={styles.reviewRating}>{"★".repeat(review.rating)}</div>
+                      <div style={styles.reviewTitle}>{review.title}</div>
+                      <p style={styles.reviewComment}>{review.comment}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -828,6 +1000,30 @@ const styles = {
     fontSize: "13px",
     color: COLORS.accent,
   },
+  engagementStats: {
+    display: "flex",
+    gap: "12px",
+    marginBottom: "12px",
+    paddingBottom: "12px",
+    borderBottom: `1px solid ${COLORS.border}`,
+  },
+  statItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "4px",
+  },
+  statIcon: {
+    fontSize: "12px",
+  },
+  statValue: {
+    fontSize: "13px",
+    fontWeight: 600,
+    color: COLORS.textLight,
+  },
+  statLabel: {
+    fontSize: "11px",
+    color: COLORS.textMutedLight,
+  },
   priceSection: {
     display: "flex",
     alignItems: "center",
@@ -964,6 +1160,171 @@ const styles = {
     textAlign: "center",
     fontSize: "0.9rem",
     border: "1px solid rgba(239, 68, 68, 0.3)",
+  },
+
+  /* Reviews Section */
+  reviewsSection: {
+    marginTop: "24px",
+    paddingTop: "20px",
+    borderTop: `1px solid ${COLORS.border}`,
+  },
+  reviewsHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "16px",
+  },
+  reviewsTitle: {
+    fontSize: "14px",
+    fontWeight: 700,
+    color: COLORS.textMutedLight,
+    textTransform: "uppercase",
+    letterSpacing: "0.1em",
+    margin: 0,
+  },
+  reviewBtn: {
+    padding: "8px 14px",
+    background: "rgba(59, 130, 246, 0.1)",
+    color: COLORS.primary,
+    border: `1px solid ${COLORS.primary}`,
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontSize: "13px",
+    fontWeight: 600,
+  },
+  reviewMsg: {
+    padding: "10px 14px",
+    background: "rgba(34, 197, 94, 0.1)",
+    border: "1px solid #22c55e",
+    borderRadius: "6px",
+    color: "#22c55e",
+    fontSize: "13px",
+    marginBottom: "12px",
+  },
+  reviewForm: {
+    background: "rgba(59, 130, 246, 0.05)",
+    border: `1px solid rgba(59, 130, 246, 0.2)`,
+    borderRadius: "8px",
+    padding: "16px",
+    marginBottom: "16px",
+  },
+  reviewField: {
+    marginBottom: "12px",
+  },
+  reviewLabel: {
+    display: "block",
+    fontSize: "12px",
+    fontWeight: 600,
+    color: COLORS.textMutedLight,
+    marginBottom: "6px",
+  },
+  reviewInput: {
+    width: "100%",
+    padding: "10px 12px",
+    background: COLORS.bgLight,
+    border: `1px solid ${COLORS.border}`,
+    borderRadius: "6px",
+    color: COLORS.textLight,
+    fontSize: "14px",
+  },
+  reviewTextarea: {
+    width: "100%",
+    padding: "10px 12px",
+    background: COLORS.bgLight,
+    border: `1px solid ${COLORS.border}`,
+    borderRadius: "6px",
+    color: COLORS.textLight,
+    fontSize: "14px",
+    minHeight: "80px",
+    resize: "vertical",
+  },
+  ratingStars: {
+    display: "flex",
+    gap: "4px",
+  },
+  ratingStar: {
+    fontSize: "24px",
+    color: COLORS.textMutedLight,
+    cursor: "pointer",
+    transition: "color 0.2s",
+  },
+  ratingStarActive: {
+    color: "#fbbf24",
+  },
+  reviewSubmitBtn: {
+    padding: "10px 20px",
+    background: COLORS.primary,
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontSize: "14px",
+    fontWeight: 600",
+    marginRight: "8px",
+  },
+  reviewCancelBtn: {
+    padding: "10px 20px",
+    background: "transparent",
+    color: COLORS.textMutedLight,
+    border: `1px solid ${COLORS.border}`,
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontSize: "14px",
+  },
+  loadingText: {
+    color: COLORS.textMutedLight,
+    fontSize: "14px",
+    textAlign: "center",
+    padding: "20px",
+  },
+  noReviews: {
+    color: COLORS.textMutedLight,
+    fontSize: "14px",
+    textAlign: "center",
+    padding: "20px",
+  },
+  reviewsList: {
+    maxHeight: "300px",
+    overflowY: "auto",
+  },
+  reviewCard: {
+    background: COLORS.bgLight,
+    border: `1px solid ${COLORS.border}`,
+    borderRadius: "8px",
+    padding: "14px",
+    marginBottom: "10px",
+  },
+  reviewHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "8px",
+  },
+  reviewUser: {
+    fontSize: "14px",
+    fontWeight: 700,
+    color: COLORS.textLight,
+  },
+  reviewDate: {
+    fontSize: "12px",
+    color: COLORS.textMutedLight,
+  },
+  reviewRating: {
+    color: "#fbbf24",
+    fontSize: "14px",
+    marginBottom: "6px",
+  },
+  reviewTitle: {
+    fontSize: "14px",
+    fontWeight: 700,
+    color: COLORS.textLight,
+    marginBottom: "4px",
+  },
+  reviewComment: {
+    fontSize: "13px",
+    color: COLORS.textMutedLight,
+    lineHeight: 1.6,
+    margin: "0",
   },
 
   /* CTA Section */
