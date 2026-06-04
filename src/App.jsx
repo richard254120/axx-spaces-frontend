@@ -28,6 +28,21 @@ import TermsAndPrivacy from "./pages/TermsAndPrivacy";
 import LeaveReview from "./pages/LeaveReview";
 import VerifyEmail from "./pages/VerifyEmail";
 import PaymentHistory from "./pages/PaymentHistory";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
+import Wallet from "./pages/Wallet";
+import Saved from "./pages/Saved";
+import Messages from "./pages/Messages";
+import Notifications from "./pages/Notifications";
+import UsersPage from "./pages/UsersPage";
+
+// ─── User Account Pages ──────────────────────────────────────────────────────
+import ProfilePage from "./pages/ProfilePage";
+import SettingsPage from "./pages/SettingsPage";
+import WalletPage from "./pages/WalletPage";
+import SavedListingsPage from "./pages/SavedListingsPage";
+import MessagesPage from "./pages/MessagesPage";
+import NotificationsPage from "./pages/NotificationsPage";
 
 // ─── Tourism Pages ───────────────────────────────────────────────────────────
 import TourismPage from "./pages/tourism/TourismPage";
@@ -108,6 +123,7 @@ function App() {
       <Route path="/faq" element={<PublicLayout><FAQ /></PublicLayout>} />
       <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
       <Route path="/terms" element={<PublicLayout><TermsAndPrivacy /></PublicLayout>} />
+      <Route path="/users" element={<PublicLayout><UsersPage /></PublicLayout>} />
 
       {/* ── TOURISM ROUTES (have Navbar) ── */}
       {/* IMPORTANT: specific /tourism/* paths must come before /tourism/:id */}
@@ -223,6 +239,56 @@ function App() {
         }
       />
       <Route path="/leave-review" element={<PublicLayout><LeaveReview /></PublicLayout>} />
+
+      {/* ── USER ACCOUNT ROUTES (have Navbar, require auth) ── */}
+      <Route
+        path="/profile"
+        element={
+          <PublicLayout>
+            <ProtectedRoute><ProfilePage /></ProtectedRoute>
+          </PublicLayout>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <PublicLayout>
+            <ProtectedRoute><SettingsPage /></ProtectedRoute>
+          </PublicLayout>
+        }
+      />
+      <Route
+        path="/wallet"
+        element={
+          <PublicLayout>
+            <ProtectedRoute><WalletPage /></ProtectedRoute>
+          </PublicLayout>
+        }
+      />
+      <Route
+        path="/saved"
+        element={
+          <PublicLayout>
+            <ProtectedRoute><SavedListingsPage /></ProtectedRoute>
+          </PublicLayout>
+        }
+      />
+      <Route
+        path="/messages"
+        element={
+          <PublicLayout>
+            <ProtectedRoute><MessagesPage /></ProtectedRoute>
+          </PublicLayout>
+        }
+      />
+      <Route
+        path="/notifications"
+        element={
+          <PublicLayout>
+            <ProtectedRoute><NotificationsPage /></ProtectedRoute>
+          </PublicLayout>
+        }
+      />
       <Route
         path="/payment-history"
         element={

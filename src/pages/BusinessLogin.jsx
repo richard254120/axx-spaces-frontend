@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
@@ -114,6 +114,13 @@ const styles = {
   dividerText: {
     padding: "0 10px",
   },
+  googleButtonContainer: {
+    width: "100%",
+    minHeight: "44px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   googleButton: {
     width: "100%",
     padding: "14px",
@@ -141,7 +148,10 @@ export default function BusinessLogin() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const { googleLoading, googleError, handleGoogleLogin } = useGoogleAuth({
+  const googleButtonRef = useRef(null);
+
+  const { googleError, handleGoogleLogin } = useGoogleAuth({
+    buttonRef: googleButtonRef,
     onSuccess: () => {
       setSuccess("✅ Google login successful! Redirecting...");
       setTimeout(() => navigate("/business-dashboard"), 1000);
@@ -152,6 +162,13 @@ export default function BusinessLogin() {
     showForgot, setShowForgot, forgotEmail, setForgotEmail,
     forgotLoading, forgotMsg, handleForgotPassword, resetForgotState,
   } = useForgotPassword();
+
+  // Initialize Google Sign-In on component mount
+  useEffect(() => {
+    if (import.meta.env.VITE_GOOGLE_CLIENT_ID) {
+      handleGoogleLogin();
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -282,17 +299,7 @@ export default function BusinessLogin() {
               <div style={styles.dividerLine}></div>
             </div>
 
-            <button
-              type="button"
-              onClick={handleGoogleLogin}
-              disabled={googleLoading}
-              style={{
-                ...styles.googleButton,
-                ...(googleLoading ? styles.buttonDisabled : {}),
-              }}
-            >
-              {googleLoading ? "⏳ Connecting..." : "🔐 Sign in with Google"}
-            </button>
+            <div ref={googleButtonRef} style={styles.googleButtonContainer}></div>
 
             <div style={styles.divider}>
               <div style={styles.dividerLine}></div>

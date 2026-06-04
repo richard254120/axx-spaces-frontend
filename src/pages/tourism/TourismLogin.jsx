@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { API_BASE } from "../../utils/constants";
@@ -124,6 +124,13 @@ const styles = {
   dividerText: {
     padding: "0 10px",
   },
+  googleButtonContainer: {
+    width: "100%",
+    minHeight: "44px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   googleButton: {
     width: "100%",
     padding: "14px",
@@ -160,7 +167,10 @@ export default function TourismLogin() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const { googleLoading, handleGoogleLogin } = useGoogleAuth({
+  const googleButtonRef = useRef(null);
+
+  const { handleGoogleLogin } = useGoogleAuth({
+    buttonRef: googleButtonRef,
     skipLogin: true,
     validate: (data) => {
       if (data.user.role !== "tourism_provider") {
@@ -187,6 +197,13 @@ export default function TourismLogin() {
     showForgot, setShowForgot, forgotEmail, setForgotEmail,
     forgotLoading, forgotMsg, handleForgotPassword, resetForgotState,
   } = useForgotPassword();
+
+  // Initialize Google Sign-In on component mount
+  useEffect(() => {
+    if (import.meta.env.VITE_GOOGLE_CLIENT_ID) {
+      handleGoogleLogin();
+    }
+  }, []);
 
 
 
@@ -349,17 +366,7 @@ export default function TourismLogin() {
                 <div style={styles.dividerLine}></div>
               </div>
 
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                disabled={googleLoading}
-                style={{
-                  ...styles.googleButton,
-                  ...(googleLoading ? styles.buttonDisabled : {}),
-                }}
-              >
-                {googleLoading ? "⏳ Connecting..." : "🔐 Sign in with Google"}
-              </button>
+              <div ref={googleButtonRef} style={styles.googleButtonContainer}></div>
             </div>
 
             <div style={styles.link}>

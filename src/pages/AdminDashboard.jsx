@@ -37,6 +37,11 @@ export default function AdminDashboard() {
   const [announcementsLoading, setAnnouncementsLoading] = useState(false);
   // END ADDED
 
+  // ADDED: users tab state
+  const [users, setUsers] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+  // END ADDED
+
   useEffect(() => {
     // Security check: ensure only admins can stay on this page
     if (user?.role !== "admin") {
@@ -66,6 +71,15 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (activeTab === "businesses") {
       loadPendingBusinesses();
+    }
+  }, [activeTab]);
+
+  // ADDED: load users when tab is selected
+  useEffect(() => {
+    console.log("Active tab changed to:", activeTab);
+    if (activeTab === "users") {
+      console.log("Loading users...");
+      loadUsers();
     }
   }, [activeTab]);
 
@@ -171,6 +185,35 @@ export default function AdminDashboard() {
     }
   };
   // END ADDED
+  // END ADDED
+
+  // ADDED: load users function
+  const loadUsers = async () => {
+    setUsersLoading(true);
+    try {
+      console.log("Loading users...");
+      const res = await API.get("/admin/users");
+      console.log("Users response:", res.data);
+      setUsers(res.data.users || []);
+    } catch (err) {
+      console.error("Failed to load users:", err);
+      console.error("Error response:", err.response);
+    } finally {
+      setUsersLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm("Are you sure you want to delete this user? This will also delete all their properties, materials, and tourism listings.")) return;
+
+    try {
+      await API.delete(`/admin/users/${userId}`);
+      setUsers((prev) => prev.filter((u) => u._id !== userId));
+      alert("✅ User deleted successfully");
+    } catch (err) {
+      alert("❌ Failed to delete user");
+    }
+  };
   // END ADDED
 
   const loadMpesaConfig = async () => {
@@ -392,6 +435,14 @@ export default function AdminDashboard() {
           onClick={() => setActiveTab("announcements")}
         >
           📢 Announcements {pendingAnnouncements.filter(a => a.status === "pending").length > 0 ? `(${pendingAnnouncements.filter(a => a.status === "pending").length})` : ""}
+        </button>
+        {/* END ADDED */}
+        {/* ADDED: Users tab button */}
+        <button
+          style={{ ...styles.tab, ...(activeTab === "users" ? styles.tabActive : {}) }}
+          onClick={() => setActiveTab("users")}
+        >
+          👥 Users {users.length > 0 ? `(${users.length})` : ""}
         </button>
         {/* END ADDED */}
       </div>
@@ -960,6 +1011,95 @@ export default function AdminDashboard() {
                           style={styles.rejectBtn}
                         >
                           Reject
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
+        // END ADDED
+      ) : activeTab === "users" ? (
+        // ADDED: Users Tab
+        usersLoading ? (
+          <div style={styles.loader}>⏳ Loading users...</div>
+        ) : users.length === 0 ? (
+          <div style={styles.emptyCard}>
+            <p style={styles.emptyText}>✅ No users found in the system.</p>
+          </div>
+        ) : (
+          <div style={styles.tableContainer}>
+            <table style={styles.table}>
+              <thead>
+                <tr style={styles.theadRow}>
+                  <th style={styles.th}>User Details</th>
+                  <th style={styles.th}>Email</th>
+                  <th style={styles.th}>Phone</th>
+                  <th style={styles.th}>Role</th>
+                  <th style={styles.th}>Status</th>
+                  <th style={styles.th}>Joined</th>
+                  <th style={styles.th}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((user) => (
+                  <tr key={user._id} style={styles.tr}>
+                    <td style={styles.td}>
+                      <div style={styles.propTitle}>{user.name}</div>
+                      {user.profileImage && (
+                        <img src={user.profileImage} alt={user.name} style={{ width: "40px", height: "40px", borderRadius: "50%", objectFit: "cover", marginTop: "8px" }} />
+                      )}
+                    </td>
+                    <td style={styles.td}>
+                      <div style={styles.ownerContact}>{user.email}</div>
+                    </td>
+                    <td style={styles.td}>
+                      <div style={styles.ownerContact}>{user.phone}</div>
+                    </td>
+                    <td style={styles.td}>
+                      <span style={{
+                        ...styles.roleBadge,
+                        background: user.role === "admin" ? "rgba(239, 68, 68, 0.2)" :
+                          user.role === "landlord" ? "rgba(34, 197, 94, 0.2)" :
+                            user.role === "mover" ? "rgba(14, 165, 233, 0.2)" :
+                              user.role === "seller" ? "rgba(251, 191, 36, 0.2)" :
+                                "rgba(148, 163, 184, 0.2)",
+                        color: user.role === "admin" ? "#ef4444" :
+                          user.role === "landlord" ? "#22c55e" :
+                            user.role === "mover" ? "#0ea5e9" :
+                              user.role === "seller" ? "#fbbf24" :
+                                "#94a3b8",
+                      }}>
+                        {user.role?.toUpperCase() || "USER"}
+                      </span>
+                    </td>
+                    <td style={styles.td}>
+                      <span style={{
+                        ...styles.roleBadge,
+                        background: user.status === "approved" ? "rgba(34, 197, 94, 0.2)" :
+                          user.status === "rejected" ? "rgba(239, 68, 68, 0.2)" :
+                            "rgba(251, 191, 36, 0.2)",
+                        color: user.status === "approved" ? "#22c55e" :
+                          user.status === "rejected" ? "#ef4444" :
+                            "#fbbf24",
+                      }}>
+                        {user.status?.toUpperCase() || "PENDING"}
+                      </span>
+                    </td>
+                    <td style={styles.td}>
+                      <div style={styles.propLoc}>
+                        {new Date(user.createdAt).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" })}
+                      </div>
+                    </td>
+                    <td style={styles.td}>
+                      <div style={styles.btnGroup}>
+                        <button
+                          onClick={() => handleDeleteUser(user._id)}
+                          style={styles.rejectBtn}
+                        >
+                          Delete
                         </button>
                       </div>
                     </td>

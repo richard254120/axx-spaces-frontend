@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { COLORS, buttonStyles, inputStyles, pageStyles } from "../styles/theme";
 import { API_BASE } from "../utils/constants";
@@ -19,12 +19,22 @@ export default function Register() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const { googleLoading, googleError, handleGoogleLogin, GOOGLE_CLIENT_ID } = useGoogleAuth({
+  const googleButtonRef = useRef(null);
+
+  const { googleError, handleGoogleLogin, GOOGLE_CLIENT_ID } = useGoogleAuth({
+    buttonRef: googleButtonRef,
     onSuccess: () => {
       setSuccess("✅ Google registration successful! Redirecting...");
       setTimeout(() => navigate("/dashboard"), 1000);
     },
   });
+
+  // Initialize Google Sign-In on component mount
+  useEffect(() => {
+    if (GOOGLE_CLIENT_ID) {
+      handleGoogleLogin();
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -180,18 +190,7 @@ export default function Register() {
           <div style={styles.divider}></div>
 
           {/* Google Login Button */}
-          <button
-            type="button"
-            onClick={handleGoogleLogin}
-            disabled={googleLoading}
-            style={{
-              ...styles.googleBtn,
-              opacity: googleLoading ? 0.7 : 1,
-              cursor: googleLoading ? "not-allowed" : "pointer",
-            }}
-          >
-            {googleLoading ? "⏳ Connecting..." : "🔐 Sign up with Google"}
-          </button>
+          <div ref={googleButtonRef} style={styles.googleButtonContainer}></div>
 
           <div style={styles.divider}></div>
 
@@ -288,6 +287,13 @@ const styles = {
   },
   input: inputStyles.dark,
   submitBtn: buttonStyles.primary,
+  googleButtonContainer: {
+    width: "100%",
+    minHeight: "44px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   googleBtn: {
     width: "100%",
     background: "white",

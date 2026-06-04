@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useRef, useEffect } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { COLORS, buttonStyles, inputStyles, pageStyles } from "../styles/theme";
@@ -17,7 +17,10 @@ export default function Login() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const { googleLoading, googleError, setGoogleError, handleGoogleLogin, GOOGLE_CLIENT_ID } = useGoogleAuth({
+  const googleButtonRef = useRef(null);
+
+  const { googleError, setGoogleError, handleGoogleLogin, GOOGLE_CLIENT_ID } = useGoogleAuth({
+    buttonRef: googleButtonRef,
     onSuccess: (data) => {
       setSuccess("✅ Google login successful! Redirecting...");
       setTimeout(() => {
@@ -33,6 +36,13 @@ export default function Login() {
     showForgot, setShowForgot, forgotEmail, setForgotEmail,
     forgotLoading, forgotMsg, handleForgotPassword, resetForgotState,
   } = useForgotPassword();
+
+  // Initialize Google Sign-In on component mount
+  useEffect(() => {
+    if (GOOGLE_CLIENT_ID) {
+      handleGoogleLogin();
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -160,17 +170,7 @@ export default function Login() {
               {GOOGLE_CLIENT_ID ? (
                 <div style={styles.googleSection}>
                   <p style={styles.googleLabel}>Quick Sign In</p>
-                  <button
-                    type="button"
-                    onClick={handleGoogleLogin}
-                    disabled={googleLoading}
-                    style={{
-                      ...styles.googleButton,
-                      ...(googleLoading ? styles.buttonDisabled : {}),
-                    }}
-                  >
-                    {googleLoading ? "⏳ Connecting..." : "🔐 Sign in with Google"}
-                  </button>
+                  <div ref={googleButtonRef} style={styles.googleButtonContainer}></div>
                 </div>
               ) : (
                 <div style={styles.warningBox}>
@@ -278,6 +278,13 @@ const styles = {
 
   googleSection: { marginBottom: "20px" },
   googleLabel: { fontSize: "12px", fontWeight: 700, color: COLORS.textMutedLight, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "12px", textAlign: "center" },
+  googleButtonContainer: {
+    width: "100%",
+    minHeight: "44px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   googleButton: {
     width: "100%",
     padding: "14px",

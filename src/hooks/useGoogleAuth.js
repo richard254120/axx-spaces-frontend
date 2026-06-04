@@ -9,9 +9,10 @@ import { API_BASE, GOOGLE_CLIENT_ID } from "../utils/constants";
  * @param {function} [options.onError] - Called with error message string.
  * @param {function} [options.validate] - Called with data before login. Throw to reject.
  * @param {boolean} [options.skipLogin] - If true, onSuccess receives data but login() is not called automatically.
+ * @param {React.RefObject} [options.buttonRef] - If provided, renders a Google Sign-In button into this element.
  * @returns {{ googleLoading, googleError, setGoogleError, handleGoogleLogin, GOOGLE_CLIENT_ID }}
  */
-export default function useGoogleAuth({ onSuccess, onError, validate, skipLogin }) {
+export default function useGoogleAuth({ onSuccess, onError, validate, skipLogin, buttonRef }) {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [googleError, setGoogleError] = useState("");
   const { login } = useContext(AuthContext);
@@ -66,17 +67,27 @@ export default function useGoogleAuth({ onSuccess, onError, validate, skipLogin 
         auto_select: false,
       });
 
-      window.google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed()) {
-          setGoogleError("Google Sign-In popup was blocked. Please allow popups or use email/password.");
-          setGoogleLoading(false);
-        }
-      });
+      if (buttonRef && buttonRef.current) {
+        window.google.accounts.id.renderButton(buttonRef.current, {
+          theme: "outline",
+          size: "large",
+          text: "signin_with",
+          width: "100%",
+        });
+        setGoogleLoading(false);
+      } else {
+        window.google.accounts.id.prompt((notification) => {
+          if (notification.isNotDisplayed()) {
+            setGoogleError("Google Sign-In popup was blocked. Please allow popups or use email/password.");
+            setGoogleLoading(false);
+          }
+        });
+      }
     } catch {
       setGoogleError("Google Sign-In initialization failed. Please use email/password.");
       setGoogleLoading(false);
     }
-  }, [handleGoogleCredentialResponse]);
+  }, [handleGoogleCredentialResponse, buttonRef]);
 
   const handleGoogleLogin = useCallback(() => {
     setGoogleLoading(true);

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_BASE, KENYA_COUNTIES } from "../utils/constants";
 import useGoogleAuth from "../hooks/useGoogleAuth";
@@ -15,7 +15,10 @@ export default function SellerLogin() {
     name: "", email: "", password: "", phone: "", county: "",
   });
 
-  const { googleLoading, googleError, handleGoogleLogin } = useGoogleAuth({
+  const googleButtonRef = useRef(null);
+
+  const { googleError, handleGoogleLogin } = useGoogleAuth({
+    buttonRef: googleButtonRef,
     onSuccess: () => {
       setSuccess("✅ Google login successful! Redirecting...");
       setTimeout(() => navigate("/seller-dashboard"), 1000);
@@ -26,6 +29,13 @@ export default function SellerLogin() {
     showForgot, setShowForgot, forgotEmail, setForgotEmail,
     forgotLoading, forgotMsg, handleForgotPassword, resetForgotState,
   } = useForgotPassword();
+
+  // Initialize Google Sign-In on component mount
+  useEffect(() => {
+    if (import.meta.env.VITE_GOOGLE_CLIENT_ID) {
+      handleGoogleLogin();
+    }
+  }, []);
 
   const handleChange = (e) => {
     setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
@@ -196,17 +206,7 @@ export default function SellerLogin() {
                   <div style={s.dividerLine}></div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleGoogleLogin}
-                  disabled={googleLoading}
-                  style={{
-                    ...s.googleButton,
-                    ...(googleLoading ? s.buttonDisabled : {}),
-                  }}
-                >
-                  {googleLoading ? "⏳ Connecting..." : "🔐 Sign in with Google"}
-                </button>
+                <div ref={googleButtonRef} style={s.googleButtonContainer}></div>
               </>
             )}
 
@@ -253,6 +253,13 @@ const s = {
   divider: { display: "flex", alignItems: "center", margin: "20px 0", color: "#94a3b8", fontSize: "14px" },
   dividerLine: { flex: 1, height: "1px", background: "rgba(255, 255, 255, 0.1)" },
   dividerText: { padding: "0 10px" },
+  googleButtonContainer: {
+    width: "100%",
+    minHeight: "44px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   googleButton: {
     width: "100%",
     padding: "13px",

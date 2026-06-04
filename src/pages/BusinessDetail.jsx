@@ -1268,40 +1268,6 @@ export default function BusinessDetail() {
                     <div style={{ fontSize: "12px", color: "var(--text-dim)" }}>{review.cons.join(", ")}</div>
                   </div>
                 )}
-                <div style={{ display: "flex", gap: "8px", marginTop: "12px", paddingTop: "12px", borderTop: "1px solid var(--border)" }}>
-                  <button
-                    onClick={() => handleEditReview(review)}
-                    style={{
-                      padding: "6px 12px",
-                      background: "rgba(56,189,248,0.1)",
-                      border: "1px solid rgba(56,189,248,0.3)",
-                      borderRadius: "6px",
-                      color: "#38bdf8",
-                      fontSize: "11px",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      fontFamily: "inherit"
-                    }}
-                  >
-                    ✏ Edit
-                  </button>
-                  <button
-                    onClick={() => setDeleteConfirmReviewId(review._id)}
-                    style={{
-                      padding: "6px 12px",
-                      background: "rgba(239,68,68,0.1)",
-                      border: "1px solid rgba(239,68,68,0.3)",
-                      borderRadius: "6px",
-                      color: "#f87171",
-                      fontSize: "11px",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      fontFamily: "inherit"
-                    }}
-                  >
-                    🗑 Delete
-                  </button>
-                </div>
               </div>
             ))}
           </div>
