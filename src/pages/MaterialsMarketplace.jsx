@@ -441,21 +441,13 @@ export default function MaterialsMarketplace() {
 
                     {/* Views and Rating */}
                     <div style={styles.engagementStats}>
-                      <div style={styles.statItem}>
-                        <span style={styles.statIcon}>👁️</span>
-                        <span style={styles.statValue}>{material.views || 0}</span>
-                        <span style={styles.statLabel}>Views</span>
-                      </div>
-                      <div style={styles.statItem}>
-                        <span style={styles.statIcon}>⭐</span>
-                        <span style={styles.statValue}>{(material.rating && material.rating > 0) ? material.rating.toFixed(1) : "—"}</span>
-                        <span style={styles.statLabel}>Rating</span>
-                      </div>
-                      <div style={styles.statItem}>
-                        <span style={styles.statIcon}>💬</span>
-                        <span style={styles.statValue}>{material.reviewCount || 0}</span>
-                        <span style={styles.statLabel}>Reviews</span>
-                      </div>
+                      <span style={styles.engagementItem}>
+                        👁️ {material.views || 0} views
+                      </span>
+                      <span style={styles.engagementSeparator}>·</span>
+                      <span style={styles.engagementItem}>
+                        ★ {(material.rating && material.rating > 0) ? material.rating.toFixed(1) : "—"} · {material.reviewCount || 0} reviews
+                      </span>
                     </div>
 
                     <div style={styles.priceSection}>
@@ -1002,26 +994,20 @@ const styles = {
   },
   engagementStats: {
     display: "flex",
-    gap: "12px",
+    alignItems: "center",
+    gap: "8px",
     marginBottom: "12px",
     paddingBottom: "12px",
     borderBottom: `1px solid ${COLORS.border}`,
+    fontSize: "13px",
+    color: COLORS.textMutedLight,
   },
-  statItem: {
+  engagementItem: {
     display: "flex",
     alignItems: "center",
     gap: "4px",
   },
-  statIcon: {
-    fontSize: "12px",
-  },
-  statValue: {
-    fontSize: "13px",
-    fontWeight: 600,
-    color: COLORS.textLight,
-  },
-  statLabel: {
-    fontSize: "11px",
+  engagementSeparator: {
     color: COLORS.textMutedLight,
   },
   priceSection: {
