@@ -23,6 +23,7 @@ export default function Home() {
   const [reviews, setReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [showBoostModal, setShowBoostModal] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
 
   const counties = [
     "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta",
@@ -317,6 +318,17 @@ export default function Home() {
       display: block;
       pointer-events: none;
       background: #0B2140;
+    }
+
+    .bg-video-fallback {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0B2140 0%, #1a3a52 100%);
+      z-index: 0;
+      display: block;
     }
 
     .video-overlay {
@@ -1450,7 +1462,17 @@ export default function Home() {
 
       {/* ── HERO WITH BACKGROUND VIDEO ── */}
       <section className="hero">
-        <video autoPlay muted loop playsInline className="bg-video hero-video">
+        <div className="bg-video-fallback"></div>
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="bg-video hero-video"
+          onLoadedData={() => setVideoLoaded(true)}
+          onError={() => setVideoLoaded(false)}
+          style={{ opacity: videoLoaded ? 1 : 0 }}
+        >
           <source src={bgVideo} type="video/mp4" />
         </video>
         <div className="video-overlay"></div>
