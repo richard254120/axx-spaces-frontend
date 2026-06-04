@@ -84,6 +84,9 @@ export default function Navbar() {
           <Link to="/tourism" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>🏨</span> Tourism
           </Link>
+          <Link to="/users" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+            <span style={styles.dropdownIcon}>👥</span> Users
+          </Link>
           <Link to="/about" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>ℹ️</span> About
           </Link>

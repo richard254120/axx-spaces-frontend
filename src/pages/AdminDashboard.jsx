@@ -76,7 +76,9 @@ export default function AdminDashboard() {
 
   // ADDED: load users when tab is selected
   useEffect(() => {
+    console.log("Active tab changed to:", activeTab);
     if (activeTab === "users") {
+      console.log("Loading users...");
       loadUsers();
     }
   }, [activeTab]);

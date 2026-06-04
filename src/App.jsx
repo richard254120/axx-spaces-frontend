@@ -34,6 +34,7 @@ import Wallet from "./pages/Wallet";
 import Saved from "./pages/Saved";
 import Messages from "./pages/Messages";
 import Notifications from "./pages/Notifications";
+import UsersPage from "./pages/UsersPage";
 
 // ─── User Account Pages ──────────────────────────────────────────────────────
 import ProfilePage from "./pages/ProfilePage";
@@ -122,6 +123,7 @@ function App() {
       <Route path="/faq" element={<PublicLayout><FAQ /></PublicLayout>} />
       <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
       <Route path="/terms" element={<PublicLayout><TermsAndPrivacy /></PublicLayout>} />
+      <Route path="/users" element={<PublicLayout><UsersPage /></PublicLayout>} />
 
       {/* ── TOURISM ROUTES (have Navbar) ── */}
       {/* IMPORTANT: specific /tourism/* paths must come before /tourism/:id */}
