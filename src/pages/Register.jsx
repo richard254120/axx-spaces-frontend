@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { COLORS, buttonStyles, inputStyles, pageStyles } from "../styles/theme";
@@ -20,6 +20,16 @@ export default function Register() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // Google Sign-In button ref
+  const googleButtonRef = useRef(null);
+
+  // Initialize Google Sign-In on component mount
+  useEffect(() => {
+    if (import.meta.env.VITE_GOOGLE_CLIENT_ID) {
+      handleGoogleLogin();
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -60,12 +70,16 @@ export default function Register() {
         auto_select: false,
       });
 
-      window.google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed()) {
-          setError("Google Sign-In popup was blocked. Please allow popups or use email/password.");
-          setGoogleLoading(false);
-        }
-      });
+      // Render the Google Sign-In button instead of using prompt
+      if (googleButtonRef.current) {
+        window.google.accounts.id.renderButton(googleButtonRef.current, {
+          theme: 'outline',
+          size: 'large',
+          text: 'signin_with',
+          width: '100%',
+        });
+        setGoogleLoading(false);
+      }
     } catch (err) {
       setError("Google Sign-In initialization failed. Please use email/password.");
       setGoogleLoading(false);
@@ -261,18 +275,7 @@ export default function Register() {
           <div style={styles.divider}></div>
 
           {/* Google Login Button */}
-          <button
-            type="button"
-            onClick={handleGoogleLogin}
-            disabled={googleLoading}
-            style={{
-              ...styles.googleBtn,
-              opacity: googleLoading ? 0.7 : 1,
-              cursor: googleLoading ? "not-allowed" : "pointer",
-            }}
-          >
-            {googleLoading ? "⏳ Connecting..." : "🔐 Sign up with Google"}
-          </button>
+          <div ref={googleButtonRef} style={styles.googleButtonContainer}></div>
 
           <div style={styles.divider}></div>
 
@@ -369,6 +372,13 @@ const styles = {
   },
   input: inputStyles.dark,
   submitBtn: buttonStyles.primary,
+  googleButtonContainer: {
+    width: "100%",
+    minHeight: "44px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   googleBtn: {
     width: "100%",
     background: "white",

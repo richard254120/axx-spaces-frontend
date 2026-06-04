@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
@@ -114,6 +114,13 @@ const styles = {
   dividerText: {
     padding: "0 10px",
   },
+  googleButtonContainer: {
+    width: "100%",
+    minHeight: "44px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   googleButton: {
     width: "100%",
     padding: "14px",
@@ -147,6 +154,16 @@ export default function BusinessLogin() {
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotMsg, setForgotMsg] = useState("");
+
+  // Google Sign-In button ref
+  const googleButtonRef = useRef(null);
+
+  // Initialize Google Sign-In on component mount
+  useEffect(() => {
+    if (import.meta.env.VITE_GOOGLE_CLIENT_ID) {
+      handleGoogleLogin();
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -186,12 +203,16 @@ export default function BusinessLogin() {
         auto_select: false,
       });
 
-      window.google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed()) {
-          setError("Google Sign-In popup was blocked. Please allow popups or use email/password.");
-          setGoogleLoading(false);
-        }
-      });
+      // Render the Google Sign-In button instead of using prompt
+      if (googleButtonRef.current) {
+        window.google.accounts.id.renderButton(googleButtonRef.current, {
+          theme: 'outline',
+          size: 'large',
+          text: 'signin_with',
+          width: '100%',
+        });
+        setGoogleLoading(false);
+      }
     } catch (err) {
       setError("Google Sign-In initialization failed. Please use email/password.");
       setGoogleLoading(false);
@@ -382,17 +403,7 @@ export default function BusinessLogin() {
               <div style={styles.dividerLine}></div>
             </div>
 
-            <button
-              type="button"
-              onClick={handleGoogleLogin}
-              disabled={googleLoading}
-              style={{
-                ...styles.googleButton,
-                ...(googleLoading ? styles.buttonDisabled : {}),
-              }}
-            >
-              {googleLoading ? "⏳ Connecting..." : "🔐 Sign in with Google"}
-            </button>
+            <div ref={googleButtonRef} style={styles.googleButtonContainer}></div>
 
             <div style={styles.divider}>
               <div style={styles.dividerLine}></div>

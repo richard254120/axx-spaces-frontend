@@ -606,12 +606,6 @@ export default function Listings() {
                 </div>
               )}
 
-              {/* Reviews */}
-              <div style={S.section}>
-                <h4 style={S.sectionHead}>Reviews & Ratings</h4>
-                <ReviewRatingSystem entityId={selectedProperty._id} entityType="property" currentUser={user} existingReviews={[]} />
-              </div>
-
               <ReviewsSection propertyId={selectedProperty._id} />
             </div>
           </div>

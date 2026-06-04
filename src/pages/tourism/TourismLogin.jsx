@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -123,6 +123,13 @@ const styles = {
   dividerText: {
     padding: "0 10px",
   },
+  googleButtonContainer: {
+    width: "100%",
+    minHeight: "44px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   googleButton: {
     width: "100%",
     padding: "14px",
@@ -166,6 +173,16 @@ export default function TourismLogin() {
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotMsg, setForgotMsg] = useState("");
 
+  // Google Sign-In button ref
+  const googleButtonRef = useRef(null);
+
+  // Initialize Google Sign-In on component mount
+  useEffect(() => {
+    if (import.meta.env.VITE_GOOGLE_CLIENT_ID) {
+      handleGoogleLogin();
+    }
+  }, []);
+
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
     setError("");
@@ -199,12 +216,16 @@ export default function TourismLogin() {
         auto_select: false,
       });
 
-      window.google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed()) {
-          setError("Google Sign-In popup was blocked. Please allow popups or use email/password.");
-          setGoogleLoading(false);
-        }
-      });
+      // Render the Google Sign-In button instead of using prompt
+      if (googleButtonRef.current) {
+        window.google.accounts.id.renderButton(googleButtonRef.current, {
+          theme: 'outline',
+          size: 'large',
+          text: 'signin_with',
+          width: '100%',
+        });
+        setGoogleLoading(false);
+      }
     } catch (err) {
       setError("Google Sign-In initialization failed. Please use email/password.");
       setGoogleLoading(false);
@@ -449,17 +470,7 @@ export default function TourismLogin() {
                 <div style={styles.dividerLine}></div>
               </div>
 
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                disabled={googleLoading}
-                style={{
-                  ...styles.googleButton,
-                  ...(googleLoading ? styles.buttonDisabled : {}),
-                }}
-              >
-                {googleLoading ? "⏳ Connecting..." : "🔐 Sign in with Google"}
-              </button>
+              <div ref={googleButtonRef} style={styles.googleButtonContainer}></div>
             </div>
 
             <div style={styles.link}>
