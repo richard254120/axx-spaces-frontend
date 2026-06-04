@@ -220,6 +220,57 @@ export default function Navbar() {
 
         <div style={styles.topRight}>
           <HamburgerDropdown />
+          {/* Account Indicator */}
+          {token && user ? (
+            <div style={styles.accountIndicator} ref={accountRef}>
+              <button
+                style={styles.accountBtn}
+                onClick={() => setAccountOpen(!accountOpen)}
+              >
+                <ProfileAvatar user={user} size={28} />
+                <span style={styles.accountStatus}>In Account</span>
+              </button>
+              {accountOpen && (
+                <div style={styles.accountDropdown}>
+                  <div style={styles.accountHeader}>
+                    <ProfileAvatar user={user} size={40} />
+                    <div>
+                      <div style={styles.accountName}>{user.name}</div>
+                      <div style={styles.accountRole}>{user.role?.toUpperCase() || "USER"}</div>
+                    </div>
+                  </div>
+                  <div style={styles.accountDivider} />
+                  <Link
+                    to="/profile"
+                    style={styles.accountItem}
+                    onClick={() => { setAccountOpen(false); setMenuOpen(false); }}
+                  >
+                    My Profile
+                  </Link>
+                  <Link
+                    to="/settings"
+                    style={styles.accountItem}
+                    onClick={() => { setAccountOpen(false); setMenuOpen(false); }}
+                  >
+                    Settings
+                  </Link>
+                  <button
+                    style={styles.accountLogout}
+                    onClick={() => { handleLogout(); setAccountOpen(false); setMenuOpen(false); }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              style={styles.guestAccountBtn}
+              onClick={() => setAccountSelectorOpen(true)}
+            >
+              Sign In
+            </button>
+          )}
           <button
             style={styles.hamburger}
             onClick={() => setMenuOpen(!menuOpen)}
@@ -564,24 +615,121 @@ const styles = {
     flexShrink: 0,
   },
 
-  // ─── ACCOUNT TAB DROPDOWN STYLES ─────────────────────────────────────────
+  // ─── ACCOUNT INDICATOR STYLES ───────────────────────────────────────────────
 
-  accountWrapper: {
+  accountIndicator: {
     position: "relative",
+  },
+
+  accountBtn: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "8px 14px",
+    background: "linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(251, 191, 36, 0.08) 100%)",
+    border: "1px solid rgba(251, 191, 36, 0.3)",
+    borderRadius: "20px",
+    color: "#fbbf24",
+    fontSize: "13px",
+    fontWeight: 600,
+    cursor: "pointer",
+    transition: "all 0.2s ease",
+  },
+
+  accountStatus: {
+    fontSize: "12px",
+    fontWeight: 600,
+    letterSpacing: "0.5px",
   },
 
   accountDropdown: {
     position: "absolute",
-    top: "calc(100% + 10px)",
-    left: "50%",
-    transform: "translateX(-50%)",
-    background: "#1e293b",
-    border: "1px solid #334155",
-    borderRadius: "14px",
-    padding: "16px",
-    minWidth: "220px",
+    top: "calc(100% + 12px)",
+    right: 0,
+    background: "linear-gradient(180deg, rgba(30,41,59,0.98) 0%, rgba(15,23,41,0.98) 100%)",
+    border: "1px solid rgba(251, 191, 36, 0.3)",
+    borderRadius: "16px",
+    minWidth: "240px",
     zIndex: 300,
-    boxShadow: "0 12px 32px rgba(0,0,0,0.5)",
+    overflow: "hidden",
+    boxShadow: "0 20px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(251,191,36,0.15)",
+    backdropFilter: "blur(12px)",
+  },
+
+  accountHeader: {
+    padding: "16px 20px",
+    borderBottom: "1px solid rgba(51, 65, 85, 0.3)",
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    background: "linear-gradient(180deg, rgba(251,191,36,0.05) 0%, transparent 100%)",
+  },
+
+  accountName: {
+    fontSize: "15px",
+    fontWeight: 700,
+    color: "#f1f5f9",
+    marginBottom: "4px",
+  },
+
+  accountRole: {
+    fontSize: "11px",
+    fontWeight: 600,
+    color: "#fbbf24",
+    letterSpacing: "0.5px",
+    textTransform: "uppercase",
+  },
+
+  accountDivider: {
+    height: "1px",
+    background: "linear-gradient(90deg, transparent 0%, rgba(51,65,85,0.5) 20%, rgba(51,65,85,0.5) 80%, transparent 100%)",
+    margin: "6px 0",
+    border: "none",
+  },
+
+  accountItem: {
+    display: "block",
+    padding: "12px 20px",
+    color: "#e2e8f0",
+    fontSize: "14px",
+    fontWeight: 600,
+    textDecoration: "none",
+    cursor: "pointer",
+    transition: "all 0.2s ease",
+    borderBottom: "1px solid rgba(51,65,85,0.2)",
+  },
+
+  accountLogout: {
+    display: "block",
+    width: "100%",
+    padding: "12px 20px",
+    color: "#fca5a5",
+    fontSize: "14px",
+    fontWeight: 700,
+    background: "linear-gradient(135deg, rgba(239,68,68,0.15) 0%, rgba(220,38,38,0.08) 100%)",
+    border: "none",
+    textAlign: "left",
+    cursor: "pointer",
+    transition: "all 0.2s ease",
+    borderTop: "1px solid rgba(239,68,68,0.3)",
+  },
+
+  guestAccountBtn: {
+    padding: "8px 18px",
+    background: "linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(251, 191, 36, 0.08) 100%)",
+    border: "1px solid rgba(251, 191, 36, 0.3)",
+    borderRadius: "20px",
+    color: "#fbbf24",
+    fontSize: "13px",
+    fontWeight: 600,
+    cursor: "pointer",
+    transition: "all 0.2s ease",
+  },
+
+  // ─── ACCOUNT TAB DROPDOWN STYLES ─────────────────────────────────────────
+
+  accountWrapper: {
+    position: "relative",
   },
 
   // ─── RENTALS DROPDOWN STYLES ─────────────────────────────────────────────

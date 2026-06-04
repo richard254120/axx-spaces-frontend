@@ -34,6 +34,7 @@ export default function UsersPage() {
       case "landlord": return { bg: "rgba(34, 197, 94, 0.2)", color: "#22c55e" };
       case "mover": return { bg: "rgba(14, 165, 233, 0.2)", color: "#0ea5e9" };
       case "seller": return { bg: "rgba(251, 191, 36, 0.2)", color: "#fbbf24" };
+      case "team": return { bg: "rgba(168, 85, 247, 0.2)", color: "#a855f7" };
       default: return { bg: "rgba(148, 163, 184, 0.2)", color: "#94a3b8" };
     }
   };
@@ -59,6 +60,9 @@ export default function UsersPage() {
         break;
       case "mover":
         navigate(`/movers?userId=${userId}`);
+        break;
+      case "team":
+        navigate(`/profile?userId=${userId}`);
         break;
       case "user":
         navigate(`/profile?userId=${userId}`);
@@ -94,6 +98,7 @@ export default function UsersPage() {
           <option value="landlord">Landlords</option>
           <option value="mover">Movers</option>
           <option value="seller">Sellers</option>
+          <option value="team">Team Members</option>
         </select>
       </div>
 
