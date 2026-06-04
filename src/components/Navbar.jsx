@@ -67,40 +67,40 @@ export default function Navbar() {
           {/* NAVIGATION SECTION */}
           <div style={styles.dropdownHeader}>Navigation</div>
           <Link to="/" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>🏠</span> Home
+            <span style={styles.dropdownIcon}>Home</span>
           </Link>
           <Link to="/axxbiashara" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>�</span> AxxBiashara
+            <span style={styles.dropdownIcon}>AxxBiashara</span>
           </Link>
           <Link to="/materials" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>🛍️</span> MarketPlace
+            <span style={styles.dropdownIcon}>MarketPlace</span>
           </Link>
           <Link to="/listings" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>🏢</span> Rentals
+            <span style={styles.dropdownIcon}>Rentals</span>
           </Link>
           <Link to="/movers" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>🚛</span> Movers
+            <span style={styles.dropdownIcon}>Movers</span>
           </Link>
           <Link to="/tourism" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>🏨</span> Tourism
+            <span style={styles.dropdownIcon}>Tourism</span>
           </Link>
           <Link to="/users" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>👥</span> Users
+            <span style={styles.dropdownIcon}>Users</span>
           </Link>
           <Link to="/about" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>ℹ️</span> About
+            <span style={styles.dropdownIcon}>About</span>
           </Link>
           <Link to="/faq" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>❓</span> FAQ
+            <span style={styles.dropdownIcon}>FAQ</span>
           </Link>
 
           <div style={styles.dropdownDivider} />
           <div style={styles.dropdownHeader}>Help & Legal</div>
           <Link to="/contact" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>📞</span> Contact & Support
+            <span style={styles.dropdownIcon}>Contact & Support</span>
           </Link>
           <Link to="/terms" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>📄</span> Terms & Privacy
+            <span style={styles.dropdownIcon}>Terms & Privacy</span>
           </Link>
 
           {token && user ? (
@@ -109,36 +109,36 @@ export default function Navbar() {
               {/* ACCOUNT SECTION */}
               <div style={styles.dropdownHeader}>Account</div>
               <Link to="/messages" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                <span style={styles.dropdownIcon}>💬</span> Messages
+                <span style={styles.dropdownIcon}>Messages</span>
                 <span style={styles.notifDot} />
               </Link>
               <Link to="/notifications" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                <span style={styles.dropdownIcon}>🔔</span> Notifications
+                <span style={styles.dropdownIcon}>Notifications</span>
                 <span style={styles.notifDot} />
               </Link>
               <Link to="/saved" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                <span style={styles.dropdownIcon}>❤️</span> Saved Listings
+                <span style={styles.dropdownIcon}>Saved Listings</span>
               </Link>
               <Link to="/upload" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                <span style={styles.dropdownIcon}>📤</span> Upload Property
+                <span style={styles.dropdownIcon}>Upload Property</span>
               </Link>
               <Link to="/business-dashboard" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                <span style={styles.dropdownIcon}>🏪</span> Business Dashboard
+                <span style={styles.dropdownIcon}>Business Dashboard</span>
               </Link>
               {user?.role === "landlord" && (
                 <Link to="/dashboard" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                  <span style={styles.dropdownIcon}>📊</span> Dashboard
+                  <span style={styles.dropdownIcon}>Dashboard</span>
                 </Link>
               )}
               <Link to="/profile" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                <span style={styles.dropdownIcon}>👤</span> Profile
+                <span style={styles.dropdownIcon}>Profile</span>
               </Link>
               <Link to="/settings" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                <span style={styles.dropdownIcon}>⚙️</span> Settings
+                <span style={styles.dropdownIcon}>Settings</span>
               </Link>
               <div style={styles.dropdownDivider} />
               <button style={styles.dropdownItemDanger} onClick={handleLogout}>
-                <span style={styles.dropdownIcon}>🚪</span> Logout
+                <span style={styles.dropdownIcon}>Logout</span>
               </button>
             </>
           ) : (
@@ -146,10 +146,10 @@ export default function Navbar() {
               <div style={styles.dropdownDivider} />
               <div style={styles.dropdownHeader}>Account</div>
               <button style={styles.dropdownItem} onClick={handleLoginClick}>
-                <span style={styles.dropdownIcon}>🔑</span> Login
+                <span style={styles.dropdownIcon}>Login</span>
               </button>
               <button style={styles.dropdownItem} onClick={handleRegisterClick}>
-                <span style={styles.dropdownIcon}>📝</span> Register
+                <span style={styles.dropdownIcon}>Register</span>
               </button>
             </>
           )}
@@ -485,39 +485,42 @@ const styles = {
     right: 0,
     top: "calc(100% + 12px)",
     background: "linear-gradient(180deg, rgba(30,41,59,0.98) 0%, rgba(15,23,41,0.98) 100%)",
-    border: "1px solid rgba(251,191,36,0.2)",
+    border: "1px solid rgba(251,191,36,0.3)",
     borderRadius: "16px",
-    minWidth: "240px",
+    minWidth: "260px",
     zIndex: 200,
     overflow: "hidden",
-    boxShadow: "0 20px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(251,191,36,0.1)",
+    boxShadow: "0 20px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(251,191,36,0.15)",
     backdropFilter: "blur(12px)",
     animation: "dropdownFadeIn 0.25s ease-out",
   },
 
   dropdownHeader: {
-    padding: "8px 14px",
-    fontSize: "10px",
-    fontWeight: 700,
-    color: "#64748b",
+    padding: "12px 18px",
+    fontSize: "11px",
+    fontWeight: 800,
+    color: "#fbbf24",
     textTransform: "uppercase",
-    letterSpacing: "1px",
-    borderBottom: "1px solid #1e3a5f22",
+    letterSpacing: "1.5px",
+    borderBottom: "1px solid " +
+      "linear-gradient(90deg, transparent 0%, rgba(251,191,36,0.3) 50%, transparent 100%)",
+    background: "linear-gradient(180deg, rgba(251,191,36,0.05) 0%, transparent 100%)",
   },
 
   dropdownItem: {
     display: "flex",
     alignItems: "center",
     gap: "12px",
-    padding: "12px 18px",
+    padding: "14px 20px",
     color: "#e2e8f0",
     fontSize: "14px",
     fontWeight: 600,
     textDecoration: "none",
     cursor: "pointer",
     transition: "all 0.2s ease",
-    borderBottom: "1px solid rgba(51,65,85,0.3)",
+    borderBottom: "1px solid rgba(51,65,85,0.2)",
     position: "relative",
+    background: "transparent",
   },
 
   dropdownItemDanger: {
@@ -525,24 +528,23 @@ const styles = {
     alignItems: "center",
     gap: "12px",
     width: "100%",
-    padding: "12px 18px",
+    padding: "14px 20px",
     color: "#fca5a5",
     fontSize: "14px",
     fontWeight: 700,
-    background: "linear-gradient(135deg, rgba(239,68,68,0.1) 0%, rgba(220,38,38,0.05) 100%)",
+    background: "linear-gradient(135deg, rgba(239,68,68,0.15) 0%, rgba(220,38,38,0.08) 100%)",
     border: "none",
     textAlign: "left",
     cursor: "pointer",
     transition: "all 0.2s ease",
-    borderTop: "1px solid rgba(239,68,68,0.2)",
+    borderTop: "1px solid rgba(239,68,68,0.3)",
   },
 
   dropdownIcon: {
-    fontSize: "16px",
-    width: "22px",
-    textAlign: "center",
+    fontSize: "14px",
+    fontWeight: 600,
+    color: "#fbbf24",
     flexShrink: 0,
-    filter: "drop-shadow(0 0 4px rgba(251,191,36,0.3))",
   },
 
   dropdownDivider: {
@@ -677,12 +679,16 @@ const css = `
 
   a[style*="color: #cbd5e1"][style*="display: flex"]:hover,
   button[style*="color: #cbd5e1"]:hover {
-    background: rgba(251, 191, 36, 0.08) !important;
+    background: linear-gradient(90deg, rgba(251, 191, 36, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%) !important;
     color: #fbbf24 !important;
+    border-left: 3px solid #fbbf24 !important;
+    padding-left: 17px !important;
   }
 
   button[style*="color: #fca5a5"]:hover {
-    background: rgba(239, 68, 68, 0.15) !important;
+    background: rgba(239, 68, 68, 0.2) !important;
+    border-left: 3px solid #ef4444 !important;
+    padding-left: 17px !important;
   }
 
   @media (max-width: 768px) {
