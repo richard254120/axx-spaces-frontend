@@ -448,7 +448,7 @@ export default function MaterialsMarketplace() {
                       </div>
                       <div style={styles.statItem}>
                         <span style={styles.statIcon}>⭐</span>
-                        <span style={styles.statValue}>{material.rating?.toFixed(1) || "—"}</span>
+                        <span style={styles.statValue}>{(material.rating && material.rating > 0) ? material.rating.toFixed(1) : "—"}</span>
                         <span style={styles.statLabel}>Rating</span>
                       </div>
                       <div style={styles.statItem}>
