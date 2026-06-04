@@ -271,6 +271,33 @@ export default function TourismDetailPage() {
             <p style={s.description}>{property.description}</p>
           </div>
 
+          {/* GPS LOCATION */}
+          {property.coordinates?.lat && property.coordinates?.lng && (
+            <div style={s.card}>
+              <h2 style={s.cardTitle}>📍 Exact Location</h2>
+              <div style={s.locationBox}>
+                <div style={s.coordsDisplay}>
+                  <div style={s.coordItem}>
+                    <span style={s.coordLabel}>Latitude:</span>
+                    <span style={s.coordValue}>{property.coordinates.lat}</span>
+                  </div>
+                  <div style={s.coordItem}>
+                    <span style={s.coordLabel}>Longitude:</span>
+                    <span style={s.coordValue}>{property.coordinates.lng}</span>
+                  </div>
+                </div>
+                <a
+                  href={`https://www.google.com/maps?q=${property.coordinates.lat},${property.coordinates.lng}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={s.mapBtn}
+                >
+                  🗺️ Open in Google Maps
+                </a>
+              </div>
+            </div>
+          )}
+
           {/* MOBILE BOOK */}
           <button className="mobile-book-btn" style={{ ...s.mobileBookBtn, background: property.color }} onClick={() => setBookingOpen(true)}>
             {property.bookingUrl ? "🔗 Book on Official Site" : "📅 Enquire Now"} — KSh {roomPrice.toLocaleString()}/night
@@ -504,6 +531,14 @@ const s = {
 
   contactBtns: { display: "flex", gap: "8px" },
   contactBtn: { flex: 1, background: "#1f2937", color: "white", border: "none", borderRadius: "8px", padding: "10px 6px", fontSize: "12px", fontWeight: 700, cursor: "pointer", textAlign: "center", textDecoration: "none", display: "block" },
+
+  // GPS Location
+  locationBox: { background: "#f9fafb", borderRadius: "10px", padding: "14px", border: "1px solid #e5e7eb" },
+  coordsDisplay: { display: "flex", gap: "20px", marginBottom: "12px" },
+  coordItem: { display: "flex", flexDirection: "column", gap: "4px" },
+  coordLabel: { fontSize: "11px", fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.06em" },
+  coordValue: { fontSize: "14px", fontWeight: 600, color: "#1f2937" },
+  mapBtn: { display: "block", background: "#3b82f6", color: "white", border: "none", borderRadius: "8px", padding: "10px 16px", fontSize: "13px", fontWeight: 700, cursor: "pointer", textAlign: "center", textDecoration: "none" },
 
   // Booking widget
   bookingCard: { background: "white", borderRadius: "16px", padding: "20px", border: "1px solid #e5e7eb", boxShadow: "0 8px 32px rgba(0,0,0,0.08)" },

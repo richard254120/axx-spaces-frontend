@@ -501,6 +501,30 @@ export default function Listings() {
                 </div>
               </div>
 
+              {/* GPS Coordinates */}
+              {selectedProperty.lat && selectedProperty.lng && (
+                <div style={S.gpsBox}>
+                  <div style={S.gpsCoords}>
+                    <div style={S.gpsCoordItem}>
+                      <span style={S.gpsLabel}>Latitude:</span>
+                      <span style={S.gpsValue}>{selectedProperty.lat.toFixed(6)}</span>
+                    </div>
+                    <div style={S.gpsCoordItem}>
+                      <span style={S.gpsLabel}>Longitude:</span>
+                      <span style={S.gpsValue}>{selectedProperty.lng.toFixed(6)}</span>
+                    </div>
+                  </div>
+                  <a
+                    href={`https://www.google.com/maps?q=${selectedProperty.lat},${selectedProperty.lng}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={S.mapLink}
+                  >
+                    🗺️ Open in Google Maps
+                  </a>
+                </div>
+              )}
+
               <div style={S.modalSpecsRow}>
                 <div style={S.modalSpec}><span style={S.modalSpecNum}>{selectedProperty.bedrooms}</span><span style={S.modalSpecLbl}>Bedrooms</span></div>
                 <div style={S.modalSpecDiv} />
@@ -770,6 +794,14 @@ const S = {
   modalPriceBlock: { textAlign: "right", flexShrink: 0 },
   modalPrice: { fontFamily: "'Cormorant Garamond', 'Georgia', serif", fontSize: "1.6rem", fontWeight: 700, color: C.gold },
   modalPriceSub: { color: C.textDim, fontSize: "0.8rem" },
+
+  /* GPS Coordinates */
+  gpsBox: { background: "rgba(59, 130, 246, 0.08)", border: "1px solid rgba(59, 130, 246, 0.25)", borderRadius: "10px", padding: "14px 18px", marginBottom: "20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" },
+  gpsCoords: { display: "flex", gap: "24px", alignItems: "center" },
+  gpsCoordItem: { display: "flex", flexDirection: "column", gap: "3px" },
+  gpsLabel: { fontSize: "0.68rem", fontWeight: 700, color: "#60a5fa", textTransform: "uppercase", letterSpacing: "0.08em" },
+  gpsValue: { fontSize: "0.9rem", fontWeight: 600, color: C.textMain, fontFamily: "monospace" },
+  mapLink: { background: "#3b82f6", color: "white", border: "none", borderRadius: "6px", padding: "8px 16px", fontSize: "0.82rem", fontWeight: 700, cursor: "pointer", textDecoration: "none", whiteSpace: "nowrap" },
 
   modalSpecsRow: { display: "flex", alignItems: "center", background: C.navyLight, borderRadius: "10px", padding: "18px 22px", marginBottom: "22px", flexWrap: "wrap", gap: "0" },
   modalSpec: { flex: 1, textAlign: "center", display: "flex", flexDirection: "column", gap: "4px", minWidth: "70px" },

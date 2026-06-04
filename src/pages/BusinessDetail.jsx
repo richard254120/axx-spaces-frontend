@@ -1024,6 +1024,51 @@ export default function BusinessDetail() {
           {b.location.town}, {b.location.county}{b.location.address && `, ${b.location.address}`}
         </div>
 
+        {/* GPS Coordinates */}
+        {b.location.coordinates?.lat && b.location.coordinates?.lng && (
+          <div style={{
+            background: "rgba(59, 130, 246, 0.08)",
+            border: "1px solid rgba(59, 130, 246, 0.25)",
+            borderRadius: "8px",
+            padding: "10px 14px",
+            marginBottom: "16px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "12px",
+          }}>
+            <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                <span style={{ fontSize: "10px", fontWeight: 700, color: "#60a5fa", textTransform: "uppercase", letterSpacing: "0.06em" }}>Latitude</span>
+                <span style={{ fontSize: "13px", fontWeight: 600, color: "#e8f0fe", fontFamily: "monospace" }}>{b.location.coordinates.lat}</span>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                <span style={{ fontSize: "10px", fontWeight: 700, color: "#60a5fa", textTransform: "uppercase", letterSpacing: "0.06em" }}>Longitude</span>
+                <span style={{ fontSize: "13px", fontWeight: 600, color: "#e8f0fe", fontFamily: "monospace" }}>{b.location.coordinates.lng}</span>
+              </div>
+            </div>
+            <a
+              href={`https://www.google.com/maps?q=${b.location.coordinates.lat},${b.location.coordinates.lng}`}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                background: "#3b82f6",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                padding: "8px 14px",
+                fontSize: "12px",
+                fontWeight: 700,
+                cursor: "pointer",
+                textDecoration: "none",
+                whiteSpace: "nowrap",
+              }}
+            >
+              🗺️ Open Map
+            </a>
+          </div>
+        )}
+
         <p className="bd-description">{b.description}</p>
 
         {/* Badges */}

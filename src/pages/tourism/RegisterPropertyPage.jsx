@@ -242,6 +242,19 @@ export default function RegisterPropertyPage() {
                   <label style={s.label}>Google Maps Link (optional)</label>
                   <input style={s.input} placeholder="https://maps.google.com/..." value={form.mapLink} onChange={(e) => update("mapLink", e.target.value)} />
                 </div>
+                <div className="two-col-form">
+                  <div style={s.field}>
+                    <label style={s.label}>GPS Latitude (optional)</label>
+                    <input style={s.input} type="number" step="any" placeholder="e.g. -1.286389" value={form.lat} onChange={(e) => update("lat", e.target.value)} />
+                  </div>
+                  <div style={s.field}>
+                    <label style={s.label}>GPS Longitude (optional)</label>
+                    <input style={s.input} type="number" step="any" placeholder="e.g. 36.817223" value={form.lng} onChange={(e) => update("lng", e.target.value)} />
+                  </div>
+                </div>
+                <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "4px" }}>
+                  💡 Add GPS coordinates for precise location tracking. Get them from Google Maps (right-click → coordinates).
+                </div>
               </div>
             )}
 

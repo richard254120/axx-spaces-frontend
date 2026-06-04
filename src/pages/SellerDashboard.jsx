@@ -52,7 +52,7 @@ export default function SellerDashboard() {
 
   const [form, setForm] = useState({
     title: "", description: "", category: "", condition: "Good",
-    price: "", quantity: "", location: "", county: ""
+    price: "", quantity: "", location: "", county: "", lat: "", lng: ""
   });
 
   useEffect(() => {
@@ -129,7 +129,7 @@ export default function SellerDashboard() {
 
       if (!res.ok) { setError("Failed to submit"); return; }
       setSuccess("✅ Upload completed successfully!");
-      setForm({ title: "", description: "", category: "", condition: "Good", price: "", quantity: "", location: "", county: "" });
+      setForm({ title: "", description: "", category: "", condition: "Good", price: "", quantity: "", location: "", county: "", lat: "", lng: "" });
       setImages([]); setPreviews([]); setView("listings");
       fetchMyMaterials(token);
     } catch (err) {
@@ -290,6 +290,8 @@ export default function SellerDashboard() {
               <option value="">Select County</option>
               {COUNTIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
+            <input name="lat" type="number" step="any" placeholder="GPS Latitude (optional)" value={form.lat} onChange={handleChange} style={s.input} />
+            <input name="lng" type="number" step="any" placeholder="GPS Longitude (optional)" value={form.lng} onChange={handleChange} style={s.input} />
             <textarea
               name="description"
               placeholder="Description Details"

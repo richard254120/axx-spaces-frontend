@@ -342,6 +342,24 @@ export default function MaterialsMarketplace() {
                       <span style={styles.metaItem}>📦 Qty: {material.quantity}</span>
                     </div>
 
+                    {/* GPS Coordinates */}
+                    {material.lat && material.lng && (
+                      <div style={styles.gpsSection}>
+                        <div style={styles.gpsCoords}>
+                          <span style={styles.gpsLabel}>📍 GPS:</span>
+                          <span style={styles.gpsValue}>{material.lat.toFixed(6)}, {material.lng.toFixed(6)}</span>
+                        </div>
+                        <a
+                          href={`https://www.google.com/maps?q=${material.lat},${material.lng}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={styles.mapLink}
+                        >
+                          🗺️ View on Map
+                        </a>
+                      </div>
+                    )}
+
                     <div style={styles.sellerInfo}>
                       <span style={styles.sellerLabel}>Seller:</span>
                       <span style={styles.sellerName}>{material.sellerName}</span>
@@ -758,6 +776,36 @@ const styles = {
   metaItem: {
     fontSize: "13px",
     color: COLORS.textMutedLight,
+  },
+  gpsSection: {
+    background: "rgba(59, 130, 246, 0.08)",
+    border: "1px solid rgba(59, 130, 246, 0.25)",
+    borderRadius: "8px",
+    padding: "10px 12px",
+    marginBottom: "12px",
+  },
+  gpsCoords: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    marginBottom: "6px",
+  },
+  gpsLabel: {
+    fontSize: "11px",
+    fontWeight: 700,
+    color: COLORS.primary,
+  },
+  gpsValue: {
+    fontSize: "12px",
+    color: COLORS.textLight,
+    fontFamily: "monospace",
+  },
+  mapLink: {
+    display: "inline-block",
+    fontSize: "12px",
+    color: COLORS.primary,
+    textDecoration: "none",
+    fontWeight: 600,
   },
   sellerInfo: {
     display: "flex",

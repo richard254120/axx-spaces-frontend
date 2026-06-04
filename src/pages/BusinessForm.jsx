@@ -748,6 +748,26 @@ export default function BusinessForm() {
             value={formData.location.address}
             onChange={e => setFormData(prev => ({ ...prev, location: { ...prev.location, address: e.target.value } }))}
           />
+
+          <label style={styles.label}>GPS Latitude (optional)</label>
+          <input
+            type="number"
+            step="any"
+            style={styles.input}
+            value={formData.location.coordinates?.lat || ""}
+            onChange={e => setFormData(prev => ({ ...prev, location: { ...prev.location, coordinates: { ...prev.location.coordinates, lat: e.target.value } } }))}
+            placeholder="e.g. -1.286389"
+          />
+
+          <label style={styles.label}>GPS Longitude (optional)</label>
+          <input
+            type="number"
+            step="any"
+            style={styles.input}
+            value={formData.location.coordinates?.lng || ""}
+            onChange={e => setFormData(prev => ({ ...prev, location: { ...prev.location, coordinates: { ...prev.location.coordinates, lng: e.target.value } } }))}
+            placeholder="e.g. 36.817223"
+          />
         </div>
 
         {/* ── CONTACT ── */}
