@@ -40,6 +40,7 @@ import UsersPage from "./pages/UsersPage";
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 import WalletPage from "./pages/WalletPage";
+import AxxWallet from "./pages/AxxWallet";
 import SavedListingsPage from "./pages/SavedListingsPage";
 import MessagesPage from "./pages/MessagesPage";
 import NotificationsPage from "./pages/NotificationsPage";
@@ -262,6 +263,14 @@ function App() {
         element={
           <PublicLayout>
             <ProtectedRoute><WalletPage /></ProtectedRoute>
+          </PublicLayout>
+        }
+      />
+      <Route
+        path="/axxwallet"
+        element={
+          <PublicLayout>
+            <ProtectedRoute><AxxWallet /></ProtectedRoute>
           </PublicLayout>
         }
       />

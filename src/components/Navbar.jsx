@@ -119,6 +119,9 @@ export default function Navbar() {
               <Link to="/saved" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
                 <span style={styles.dropdownIcon}>Saved Listings</span>
               </Link>
+              <Link to="/axxwallet" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+                <span style={styles.dropdownIcon}>AxxWallet</span>
+              </Link>
               <Link to="/upload" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
                 <span style={styles.dropdownIcon}>Upload Property</span>
               </Link>
