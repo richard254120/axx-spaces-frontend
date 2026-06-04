@@ -20,9 +20,12 @@ export default function AxxWallet() {
   const [notification, setNotification] = useState(null);
 
   useEffect(() => {
-    if (!token) { navigate("/login"); return; }
-    fetchWalletData();
-  }, [token, navigate]);
+    if (token) {
+      fetchWalletData();
+    } else {
+      setLoading(false);
+    }
+  }, [token]);
 
   const fetchWalletData = async () => {
     try {
@@ -45,73 +48,20 @@ export default function AxxWallet() {
 
   const handleDeposit = async (e) => {
     e.preventDefault();
-    if (!depositAmount || parseFloat(depositAmount) < 10) {
-      showNotification("Minimum deposit is KES 10", "error");
-      return;
-    }
-    try {
-      const response = await API.post("/payment/initiate-mpesa", {
-        phone: user.phone,
-        amount: parseFloat(depositAmount),
-        plan: "Wallet Deposit",
-      });
-      showNotification("M-Pesa prompt sent! Enter your PIN to complete deposit.", "success");
-      setShowDepositModal(false);
-      setDepositAmount("");
-      setTimeout(fetchWalletData, 2000);
-    } catch (err) {
-      showNotification("Failed to initiate deposit", "error");
-    }
+    showNotification("AxxWallet is coming soon! Deposit feature will be available soon.", "error");
+    setShowDepositModal(false);
   };
 
   const handleWithdraw = async (e) => {
     e.preventDefault();
-    if (!withdrawAmount || parseFloat(withdrawAmount) < 100) {
-      showNotification("Minimum withdrawal is KES 100", "error");
-      return;
-    }
-    if (parseFloat(withdrawAmount) > (walletData?.balance || 0)) {
-      showNotification("Insufficient balance", "error");
-      return;
-    }
-    try {
-      await API.post("/payment/withdraw", { amount: parseFloat(withdrawAmount) });
-      showNotification("Withdrawal request submitted successfully", "success");
-      setShowWithdrawModal(false);
-      setWithdrawAmount("");
-      fetchWalletData();
-    } catch (err) {
-      showNotification("Failed to process withdrawal", "error");
-    }
+    showNotification("AxxWallet is coming soon! Withdraw feature will be available soon.", "error");
+    setShowWithdrawModal(false);
   };
 
   const handleTransfer = async (e) => {
     e.preventDefault();
-    if (!transferAmount || parseFloat(transferAmount) < 10) {
-      showNotification("Minimum transfer is KES 10", "error");
-      return;
-    }
-    if (!transferPhone) {
-      showNotification("Recipient phone number is required", "error");
-      return;
-    }
-    if (parseFloat(transferAmount) > (walletData?.balance || 0)) {
-      showNotification("Insufficient balance", "error");
-      return;
-    }
-    try {
-      await API.post("/payment/transfer", {
-        amount: parseFloat(transferAmount),
-        recipientPhone: transferPhone,
-      });
-      showNotification("Transfer successful!", "success");
-      setShowTransferModal(false);
-      setTransferAmount("");
-      setTransferPhone("");
-      fetchWalletData();
-    } catch (err) {
-      showNotification("Failed to process transfer", "error");
-    }
+    showNotification("AxxWallet is coming soon! Transfer feature will be available soon.", "error");
+    setShowTransferModal(false);
   };
 
   const getStatusStyle = (status) => {
@@ -147,6 +97,15 @@ export default function AxxWallet() {
   return (
     <div style={styles.container}>
       <style>{css}</style>
+
+      {/* Coming Soon Banner */}
+      <div style={styles.comingSoonBanner}>
+        <div style={styles.comingSoonIcon}>🚧</div>
+        <div style={styles.comingSoonText}>
+          <div style={styles.comingSoonTitle}>AxxWallet Coming Soon</div>
+          <div style={styles.comingSoonSubtitle}>We're working hard to bring you the best wallet experience. Stay tuned!</div>
+        </div>
+      </div>
 
       {notification && (
         <div style={{ ...styles.notification, background: notification.type === "error" ? "rgba(239,68,68,0.9)" : "rgba(34,197,94,0.9)" }}>
@@ -204,14 +163,17 @@ export default function AxxWallet() {
               <button style={styles.actionBtn} onClick={() => setShowDepositModal(true)}>
                 <div style={styles.actionIcon}>📥</div>
                 <div style={styles.actionLabel}>Deposit</div>
+                <div style={styles.comingSoonBadge}>Coming Soon</div>
               </button>
               <button style={styles.actionBtn} onClick={() => setShowWithdrawModal(true)}>
                 <div style={styles.actionIcon}>📤</div>
                 <div style={styles.actionLabel}>Withdraw</div>
+                <div style={styles.comingSoonBadge}>Coming Soon</div>
               </button>
               <button style={styles.actionBtn} onClick={() => setShowTransferModal(true)}>
                 <div style={styles.actionIcon}>💸</div>
                 <div style={styles.actionLabel}>Transfer</div>
+                <div style={styles.comingSoonBadge}>Coming Soon</div>
               </button>
               <button style={styles.actionBtn} onClick={() => setActiveTab("transactions")}>
                 <div style={styles.actionIcon}>📋</div>
@@ -517,6 +479,30 @@ const styles = {
     zIndex: 1000,
     boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
   },
+  comingSoonBanner: {
+    background: "linear-gradient(135deg, rgba(251,191,36,0.2) 0%, rgba(245,158,11,0.15) 100%)",
+    border: "2px solid rgba(251,191,36,0.5)",
+    borderRadius: 16,
+    padding: "24px 32px",
+    maxWidth: 1200,
+    margin: "0 auto 30px",
+    display: "flex",
+    alignItems: "center",
+    gap: 20,
+  },
+  comingSoonIcon: { fontSize: "3rem" },
+  comingSoonText: { flex: 1 },
+  comingSoonTitle: {
+    color: "#fbbf24",
+    fontSize: "1.5rem",
+    fontWeight: 700,
+    marginBottom: 8,
+  },
+  comingSoonSubtitle: {
+    color: "#94a3b8",
+    fontSize: "0.95rem",
+    lineHeight: 1.5,
+  },
   header: {
     display: "flex",
     alignItems: "center",
@@ -626,6 +612,15 @@ const styles = {
   },
   actionIcon: { fontSize: "2rem" },
   actionLabel: { color: "#f1f5f9", fontSize: "0.9rem", fontWeight: 600 },
+  comingSoonBadge: {
+    background: "rgba(251,191,36,0.2)",
+    color: "#fbbf24",
+    fontSize: "0.7rem",
+    fontWeight: 600,
+    padding: "4px 8px",
+    borderRadius: 4,
+    marginTop: 4,
+  },
 
   recentSection: { marginBottom: 30 },
   emptyState: {

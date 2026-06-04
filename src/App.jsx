@@ -270,7 +270,7 @@ function App() {
         path="/axxwallet"
         element={
           <PublicLayout>
-            <ProtectedRoute><AxxWallet /></ProtectedRoute>
+            <AxxWallet />
           </PublicLayout>
         }
       />

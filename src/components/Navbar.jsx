@@ -84,6 +84,9 @@ export default function Navbar() {
           <Link to="/tourism" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>Tourism</span>
           </Link>
+          <Link to="/axxwallet" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+            <span style={styles.dropdownIcon}>AxxWallet</span>
+          </Link>
           <Link to="/users" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>Users</span>
           </Link>
@@ -337,7 +340,7 @@ export default function Navbar() {
                       style={styles.dropdownItem}
                       onClick={() => { setDropdownOpen(false); setMenuOpen(false); }}
                     >
-                      💳 Payment History
+                      📋 Payment History
                     </Link>
                     <Link
                       to="/dashboard"
