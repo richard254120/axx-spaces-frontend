@@ -4,8 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { UserProfileEditor } from "../features/profile";
 import VerificationBadges from "../components/VerificationBadges";
 import AnalyticsDashboard from "../components/AnalyticsDashboard";
-
-const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
+import { API_BASE } from "../utils/constants";
 
 export default function LandlordDashboard() {
   const { token, user, logout, login } = useContext(AuthContext);

@@ -2,8 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { UserProfileEditor } from "../features/profile";
-
-const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
+import { API_BASE } from "../utils/constants";
 
 const VEHICLE_TYPES = ["Pickup", "Van", "Lorry", "Motorbike", "Truck"];
 const SERVICE_OPTIONS = [

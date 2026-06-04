@@ -1,17 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserProfileEditor, ProfileAvatar } from "../features/profile";
-
-const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
-
-const COUNTIES = [
-  "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta", "Garissa", "Wajir",
-  "Mandera", "Marsabit", "Isiolo", "Meru", "Tharaka Nithi", "Embu", "Kitui", "Machakos",
-  "Makueni", "Nyandarua", "Nyeri", "Kirinyaga", "Murang'a", "Kiambu", "Turkana", "West Pokot",
-  "Samburu", "Trans Nzoia", "Uasin Gishu", "Elgeyo Marakwet", "Nandi", "Baringo", "Laikipia",
-  "Nakuru", "Narok", "Kajiado", "Kericho", "Bomet", "Kakamega", "Vihiga", "Bungoma", "Busia",
-  "Siaya", "Kisumu", "Homa Bay", "Migori", "Kisii", "Nyamira", "Nairobi City"
-];
+import { API_BASE, KENYA_COUNTIES } from "../utils/constants";
 
 const CATEGORIES = ["Construction Materials", "Furniture", "Appliances", "Electronics", "Tools", "Other"];
 const CONDITIONS = ["Like New", "Good", "Fair", "Poor"];
@@ -294,7 +284,7 @@ export default function SellerDashboard() {
             <input name="location" placeholder="Specific Area (e.g. Westlands)" value={form.location} onChange={handleChange} style={s.input} />
             <select name="county" value={form.county} onChange={handleChange} style={s.input}>
               <option value="">Select County</option>
-              {COUNTIES.map(c => <option key={c} value={c}>{c}</option>)}
+              {KENYA_COUNTIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
             <input name="lat" type="number" step="any" placeholder="GPS Latitude (optional)" value={form.lat} onChange={handleChange} style={s.input} />
             <input name="lng" type="number" step="any" placeholder="GPS Longitude (optional)" value={form.lng} onChange={handleChange} style={s.input} />

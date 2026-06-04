@@ -8,8 +8,7 @@ import ReviewRatingSystem from "../components/ReviewRatingSystem";
 import BookingCalendar from "../components/BookingCalendar";
 import { useAuth } from "../context/AuthContext";
 import PhoneInput from "../components/PhoneInput";
-
-const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
+import { API_BASE } from "../utils/constants";
 
 const formatKenyaPhone = (phone) => {
   if (!phone) return "";

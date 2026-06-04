@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE || "https://axx-spaces-backend-1.onrender.com/api";
+import { API_BASE } from "../utils/constants";
 
 // Get all reviews
 export const getAllReviews = async (params = {}) => {

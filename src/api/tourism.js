@@ -2,7 +2,7 @@
  * Tourism API — all backend calls in one place.
  * Set VITE_API_URL in .env (e.g. http://localhost:1000/api)
  */
-const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
+import { API_BASE } from "../utils/constants";
 
 async function request(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, options);

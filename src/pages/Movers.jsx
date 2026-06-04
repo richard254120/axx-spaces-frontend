@@ -2,9 +2,9 @@ import { useState, useEffect, useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
-
-const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+import { API_BASE, KENYA_COUNTIES } from "../utils/constants";
+import useGoogleAuth from "../hooks/useGoogleAuth";
+import useForgotPassword from "../hooks/useForgotPassword";
 
 // ─── Mixed Colour Palette ──────────────────────────────────────────────────────
 const C = {
@@ -434,12 +434,22 @@ export default function Movers() {
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [loginError, setLoginError] = useState("");
   const [loginSuccess, setLoginSuccess] = useState("");
-  const [googleLoading, setGoogleLoading] = useState(false);
-  const [googleError, setGoogleError] = useState("");
-  const [showForgot, setShowForgot] = useState(false);
-  const [forgotEmail, setForgotEmail] = useState("");
-  const [forgotLoading, setForgotLoading] = useState(false);
-  const [forgotMsg, setForgotMsg] = useState("");
+
+  const { googleLoading, googleError, handleGoogleLogin, GOOGLE_CLIENT_ID } = useGoogleAuth({
+    validate: (data) => {
+      if (data.user.role !== "mover") throw new Error("This login is for mover accounts only");
+    },
+    onSuccess: () => {
+      setLoginSuccess("✅ Google login successful! Redirecting...");
+      setTimeout(() => navigate("/mover-dashboard"), 1000);
+    },
+    onError: () => {},
+  });
+
+  const {
+    showForgot, setShowForgot, forgotEmail, setForgotEmail,
+    forgotLoading, forgotMsg, setForgotMsg, handleForgotPassword, resetForgotState,
+  } = useForgotPassword();
 
   useEffect(() => {
     const params = new URLSearchParams(search);
@@ -447,15 +457,7 @@ export default function Movers() {
     if (tab === "login" || tab === "register") setActiveTab(tab);
   }, [search]);
 
-  const counties = [
-    "Baringo", "Bomet", "Bungoma", "Busia", "Elgeyo Marakwet", "Embu", "Garissa",
-    "Homa Bay", "Isiolo", "Kajiado", "Kakamega", "Kericho", "Kiambu", "Kilifi",
-    "Kirinyaga", "Kisii", "Kisumu", "Kitui", "Kwale", "Laikipia", "Lamu",
-    "Machakos", "Makueni", "Mandera", "Marsabit", "Meru", "Migori", "Mombasa",
-    "Murang'a", "Nairobi City", "Nakuru", "Nandi", "Narok", "Nyamira",
-    "Nyandarua", "Nyeri", "Samburu", "Siaya", "Taita Taveta", "Tana River",
-    "Tharaka Nithi", "Trans Nzoia", "Turkana", "Uasin Gishu", "Vihiga", "Wajir", "West Pokot",
-  ];
+  const counties = KENYA_COUNTIES;
 
   const availableServices = [
     "Household Moving", "Office Relocation", "Packing & Unpacking",
@@ -503,55 +505,7 @@ export default function Movers() {
     finally { setLoading(false); }
   };
 
-  const handleForgotPassword = async (e) => {
-    e.preventDefault();
-    if (!forgotEmail) { setForgotMsg("❌ Please enter your email."); return; }
-    setForgotLoading(true);
-    try {
-      const res = await API.post("/auth/forgot-password", { email: forgotEmail });
-      setForgotMsg(res.data?.message || "✅ Reset link sent!");
-    } catch { setForgotMsg("❌ Failed to send reset email."); }
-    finally { setForgotLoading(false); }
-  };
 
-  const handleGoogleLogin = async () => {
-    setGoogleLoading(true); setGoogleError(""); setLoginError("");
-    try {
-      if (!window.google) {
-        const s = document.createElement("script");
-        s.src = "https://accounts.google.com/gsi/client"; s.async = true; s.defer = true;
-        s.onload = () => initGoogleSignIn();
-        s.onerror = () => { setGoogleError("Failed to load Google Sign-In."); setGoogleLoading(false); };
-        document.head.appendChild(s);
-      } else { initGoogleSignIn(); }
-    } catch { setGoogleError("Google Sign-In is not configured."); setGoogleLoading(false); }
-  };
-
-  const initGoogleSignIn = () => {
-    try {
-      window.google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleGoogleCredential, auto_select: false });
-      window.google.accounts.id.prompt(n => {
-        if (n.isNotDisplayed()) { setGoogleError("Popup blocked. Allow popups or use email/password."); setGoogleLoading(false); }
-      });
-    } catch { setGoogleError("Google Sign-In initialization failed."); setGoogleLoading(false); }
-  };
-
-  const handleGoogleCredential = async (response) => {
-    try {
-      const payload = JSON.parse(decodeURIComponent(atob(response.credential.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")).split("").map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)).join("")));
-      const res = await fetch(`${API_BASE}/auth/google`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ googleId: payload.sub, email: payload.email, name: payload.name, picture: payload.picture }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Google authentication failed");
-      if (data.user.role !== "mover") throw new Error("This login is for mover accounts only");
-      login(data.token, data.user);
-      setLoginSuccess("✅ Google login successful! Redirecting...");
-      setTimeout(() => navigate("/mover-dashboard"), 1000);
-    } catch (err) { setGoogleError(err.message || "Google authentication failed."); }
-    finally { setGoogleLoading(false); }
-  };
 
   const rChange = k => e => setRegisterData(p => ({ ...p, [k]: e.target.value }));
   const lChange = k => e => setLoginData(p => ({ ...p, [k]: e.target.value }));
@@ -809,7 +763,7 @@ export default function Movers() {
                   fontWeight: 700, cursor: "pointer", fontSize: 14, fontFamily: font,
                   opacity: forgotLoading ? 0.6 : 1,
                 }}>{forgotLoading ? "Sending..." : "📧 Send Reset Link"}</button>
-                <div onClick={() => { setShowForgot(false); setForgotMsg(""); setForgotEmail(""); }}
+                <div onClick={resetForgotState}
                   style={{ textAlign: "center", color: C.navyLight, marginTop: 16, cursor: "pointer", fontSize: 13, fontWeight: 500 }}>
                   ← Back to Login
                 </div>

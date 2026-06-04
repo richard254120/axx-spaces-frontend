@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import PhoneInput from "../components/PhoneInput";
-
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
+import { API_BASE } from "../utils/constants";
 
 export default function Checkout() {
   const [searchParams] = useSearchParams();

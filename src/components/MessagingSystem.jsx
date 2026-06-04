@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-
-const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
+import { API_BASE } from "../utils/constants";
 
 export default function MessagingSystem({ recipientId, recipientName, recipientType = "landlord", propertyId = null, propertyTitle = null }) {
   const [isOpen, setIsOpen] = useState(false);

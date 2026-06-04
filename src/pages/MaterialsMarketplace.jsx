@@ -4,8 +4,7 @@ import API from "../api/api";
 import { COLORS, buttonStyles, inputStyles, pageStyles, cardStyles } from "../styles/theme";
 import { useAuth } from "../context/AuthContext";
 import PhoneInput from "../components/PhoneInput";
-
-const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
+import { API_BASE, KENYA_COUNTIES } from "../utils/constants";
 
 const CATEGORIES = [
   "Construction Materials",
@@ -17,16 +16,6 @@ const CATEGORIES = [
 ];
 
 const CONDITIONS = ["Like New", "Good", "Fair", "Poor"];
-
-const COUNTIES = [
-  "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta",
-  "Garissa", "Wajir", "Mandera", "Marsabit", "Isiolo", "Meru", "Tharaka Nithi",
-  "Embu", "Kitui", "Machakos", "Makueni", "Nyandarua", "Nyeri", "Kirinyaga",
-  "Murang'a", "Kiambu", "Turkana", "West Pokot", "Samburu", "Trans Nzoia",
-  "Uasin Gishu", "Elgeyo Marakwet", "Nandi", "Baringo", "Laikipia", "Nakuru",
-  "Narok", "Kajiado", "Kericho", "Bomet", "Kakamega", "Vihiga", "Bungoma",
-  "Busia", "Siaya", "Kisumu", "Homa Bay", "Migori", "Kisii", "Nyamira", "Nairobi City",
-];
 
 export default function MaterialsMarketplace() {
   const navigate = useNavigate();
@@ -330,7 +319,7 @@ export default function MaterialsMarketplace() {
                     style={styles.filterSelect}
                   >
                     <option value="">All Counties</option>
-                    {COUNTIES.map((county) => (
+                    {KENYA_COUNTIES.map((county) => (
                       <option key={county} value={county}>{county}</option>
                     ))}
                   </select>

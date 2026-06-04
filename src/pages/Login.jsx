@@ -2,9 +2,9 @@ import { useState, useContext, useRef, useEffect } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { COLORS, buttonStyles, inputStyles, pageStyles } from "../styles/theme";
-
-const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+import { API_BASE } from "../utils/constants";
+import useGoogleAuth from "../hooks/useGoogleAuth";
+import useForgotPassword from "../hooks/useForgotPassword";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -14,19 +14,28 @@ export default function Login() {
 
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
-  const [googleError, setGoogleError] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // ✅ Forgot password state
-  const [showForgot, setShowForgot] = useState(false);
-  const [forgotEmail, setForgotEmail] = useState("");
-  const [forgotLoading, setForgotLoading] = useState(false);
-  const [forgotMsg, setForgotMsg] = useState("");
-
-  // Google Sign-In button ref
   const googleButtonRef = useRef(null);
+
+  const { googleError, setGoogleError, handleGoogleLogin, GOOGLE_CLIENT_ID } = useGoogleAuth({
+    buttonRef: googleButtonRef,
+    onSuccess: (data) => {
+      setSuccess("✅ Google login successful! Redirecting...");
+      setTimeout(() => {
+        const userRole = data.user?.role?.toLowerCase().trim();
+        if (userRole === "landlord") navigate("/dashboard");
+        else if (userRole === "mover") navigate("/mover-dashboard");
+        else navigate("/");
+      }, 800);
+    },
+  });
+
+  const {
+    showForgot, setShowForgot, forgotEmail, setForgotEmail,
+    forgotLoading, forgotMsg, handleForgotPassword, resetForgotState,
+  } = useForgotPassword();
 
   // Initialize Google Sign-In on component mount
   useEffect(() => {
@@ -40,111 +49,6 @@ export default function Login() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ Google Sign-In
-  const handleGoogleLogin = async () => {
-    setGoogleLoading(true);
-    setGoogleError("");
-    setError("");
-
-    try {
-      if (!window.google) {
-        // Load Google Identity Services script
-        const script = document.createElement('script');
-        script.src = 'https://accounts.google.com/gsi/client';
-        script.async = true;
-        script.defer = true;
-        script.crossOrigin = 'anonymous';
-        script.onload = () => {
-          console.log('Google Sign-In script loaded successfully');
-          initializeGoogleSignIn();
-        };
-        script.onerror = () => {
-          console.error('Failed to load Google Sign-In script');
-          setGoogleError("Failed to load Google Sign-In. Please check your internet connection or use email/password.");
-          setGoogleLoading(false);
-        };
-        document.head.appendChild(script);
-      } else {
-        initializeGoogleSignIn();
-      }
-    } catch (err) {
-      console.error('Google Sign-In error:', err);
-      setGoogleError("Google Sign-In is not configured. Please use email/password.");
-      setGoogleLoading(false);
-    }
-  };
-
-  const initializeGoogleSignIn = () => {
-    try {
-      window.google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: handleGoogleCredentialResponse,
-        auto_select: false,
-      });
-
-      // Render the Google Sign-In button instead of using prompt
-      if (googleButtonRef.current) {
-        window.google.accounts.id.renderButton(googleButtonRef.current, {
-          theme: 'outline',
-          size: 'large',
-          text: 'signin_with',
-          width: '100%',
-        });
-        setGoogleLoading(false);
-      }
-    } catch (err) {
-      setGoogleError("Google Sign-In initialization failed. Please use email/password.");
-      setGoogleLoading(false);
-    }
-  };
-
-  const handleGoogleCredentialResponse = async (response) => {
-    try {
-      const base64Url = response.credential.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
-
-      const googleUser = JSON.parse(jsonPayload);
-
-      const res = await fetch(`${API_BASE}/auth/google`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          googleId: googleUser.sub,
-          email: googleUser.email,
-          name: googleUser.name,
-          picture: googleUser.picture,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Google authentication failed");
-      }
-
-      login(data.token, data.user);
-      setSuccess("✅ Google login successful! Redirecting...");
-
-      setTimeout(() => {
-        const userRole = data.user?.role?.toLowerCase().trim();
-        if (userRole === "landlord") {
-          navigate("/dashboard");
-        } else if (userRole === "mover") {
-          navigate("/mover-dashboard");
-        } else {
-          navigate("/");
-        }
-      }, 800);
-
-    } catch (err) {
-      setGoogleError(err.message || "Google authentication failed. Please try again.");
-    } finally {
-      setGoogleLoading(false);
-    }
-  };
 
   // ✅ Email/Password Login
   const handleSubmit = async (e) => {
@@ -194,40 +98,7 @@ export default function Login() {
     }
   };
 
-  // ✅ Handle forgot password
-  const handleForgotPassword = async (e) => {
-    e.preventDefault();
-    setForgotMsg("");
 
-    if (!forgotEmail) {
-      setForgotMsg("❌ Please enter your email address.");
-      return;
-    }
-
-    setForgotLoading(true);
-
-    try {
-      const response = await fetch(`${API_BASE}/auth/forgot-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: forgotEmail }),
-      });
-
-      const data = await response.json();
-      setForgotMsg(data.message || "✅ Reset link sent! Check your inbox.");
-      if (data.message?.includes("✅")) {
-        setTimeout(() => {
-          setShowForgot(false);
-          setForgotEmail("");
-          setForgotMsg("");
-        }, 2000);
-      }
-    } catch (err) {
-      setForgotMsg("❌ Failed to send reset email. Try again.");
-    } finally {
-      setForgotLoading(false);
-    }
-  };
 
   return (
     <div style={styles.root}>
@@ -277,11 +148,7 @@ export default function Login() {
 
               <p style={styles.footer}>
                 <span
-                  onClick={() => {
-                    setShowForgot(false);
-                    setForgotMsg("");
-                    setForgotEmail("");
-                  }}
+                  onClick={resetForgotState}
                   style={styles.link}
                 >
                   ← Back to Login
