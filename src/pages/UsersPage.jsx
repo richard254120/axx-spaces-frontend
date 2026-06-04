@@ -31,7 +31,6 @@ export default function UsersPage() {
 
   const getRoleBadgeColor = (role) => {
     switch (role) {
-      case "admin": return { bg: "rgba(239, 68, 68, 0.2)", color: "#ef4444" };
       case "landlord": return { bg: "rgba(34, 197, 94, 0.2)", color: "#22c55e" };
       case "mover": return { bg: "rgba(14, 165, 233, 0.2)", color: "#0ea5e9" };
       case "seller": return { bg: "rgba(251, 191, 36, 0.2)", color: "#fbbf24" };
@@ -39,8 +38,34 @@ export default function UsersPage() {
     }
   };
 
-  const handleSendMessage = (userId) => {
-    navigate("/messages", { state: { recipientId: userId } });
+  const handleWhatsApp = (phone) => {
+    if (!phone) {
+      alert("This user has not provided a phone number.");
+      return;
+    }
+    // Remove any non-digit characters and ensure it starts with country code
+    const cleanPhone = phone.replace(/\D/g, "");
+    const whatsappUrl = `https://wa.me/${cleanPhone}`;
+    window.open(whatsappUrl, "_blank");
+  };
+
+  const handleViewProperties = (userId, role) => {
+    switch (role) {
+      case "seller":
+        navigate(`/seller-dashboard?userId=${userId}`);
+        break;
+      case "landlord":
+        navigate(`/listings?owner=${userId}`);
+        break;
+      case "mover":
+        navigate(`/movers?userId=${userId}`);
+        break;
+      case "user":
+        navigate(`/profile?userId=${userId}`);
+        break;
+      default:
+        navigate(`/profile?userId=${userId}`);
+    }
   };
 
   return (
@@ -69,7 +94,6 @@ export default function UsersPage() {
           <option value="landlord">Landlords</option>
           <option value="mover">Movers</option>
           <option value="seller">Sellers</option>
-          <option value="admin">Admins</option>
         </select>
       </div>
 
@@ -122,12 +146,22 @@ export default function UsersPage() {
                     </span>
                   </div>
                 </div>
-                <button
-                  onClick={() => handleSendMessage(user._id)}
-                  style={styles.messageBtn}
-                >
-                  Send Message
-                </button>
+                <div style={styles.actionButtons}>
+                  <button
+                    onClick={() => handleWhatsApp(user.phone)}
+                    style={styles.whatsappBtn}
+                    title="Contact on WhatsApp"
+                  >
+                    <span style={styles.arrowIcon}>→</span>
+                  </button>
+                  <button
+                    onClick={() => handleViewProperties(user._id, user.role)}
+                    style={styles.propertiesBtn}
+                    title="View Details"
+                  >
+                    <span style={styles.arrowIcon}>→</span>
+                  </button>
+                </div>
               </div>
             );
           })}
@@ -278,10 +312,15 @@ const styles = {
     fontSize: "14px",
     color: "#94a3b8",
   },
-  messageBtn: {
-    width: "100%",
+  actionButtons: {
+    display: "flex",
+    gap: "12px",
+    marginTop: "16px",
+  },
+  whatsappBtn: {
+    flex: 1,
     padding: "12px",
-    background: "linear-gradient(135deg, #3b82f6, #2563eb)",
+    background: "linear-gradient(135deg, #25d366, #128c7e)",
     color: "white",
     border: "none",
     borderRadius: "10px",
@@ -289,5 +328,27 @@ const styles = {
     fontWeight: 700,
     cursor: "pointer",
     transition: "all 0.2s",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  propertiesBtn: {
+    flex: 1,
+    padding: "12px",
+    background: "linear-gradient(135deg, #fbbf24, #f59e0b)",
+    color: "#0f1729",
+    border: "none",
+    borderRadius: "10px",
+    fontSize: "14px",
+    fontWeight: 700,
+    cursor: "pointer",
+    transition: "all 0.2s",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  arrowIcon: {
+    fontSize: "20px",
+    fontWeight: 800,
   },
 };
