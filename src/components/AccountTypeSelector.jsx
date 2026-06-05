@@ -60,6 +60,15 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    borderRadius: "8px",
+    background: "transparent",
+  },
+
+  accountIconImg: {
+    width: "100%",
+    height: "100%",
+    objectFit: "contain",
+    mixBlendMode: "screen",
   },
   accountInfo: {
     flex: 1,
@@ -176,7 +185,9 @@ export default function AccountTypeSelector({ isOpen, onClose, mode = "login" })
                 e.currentTarget.style.borderColor = "#334155";
               }}
             >
-              <img src={account.icon} alt={account.name} style={styles.accountIcon} />
+              <div style={styles.accountIcon}>
+                <img src={account.icon} alt={account.name} style={styles.accountIconImg} />
+              </div>
               <div style={styles.accountInfo}>
                 <div style={styles.accountName}>{account.name}</div>
                 <div style={styles.accountDesc}>{account.description}</div>
