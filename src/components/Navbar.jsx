@@ -98,6 +98,27 @@ export default function Navbar() {
           </Link>
 
           <div style={styles.dropdownDivider} />
+          <div style={styles.dropdownHeader}>Jobs & Careers</div>
+          <Link to="/jobs/web-development" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+            <div style={styles.jobItem}>
+              <span style={styles.dropdownIcon}>Web Development</span>
+              <span style={styles.jobDesc}>Custom websites, web apps, e-commerce platforms, and full-stack solutions tailored to your business needs</span>
+            </div>
+          </Link>
+          <Link to="/jobs/marketing" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+            <div style={styles.jobItem}>
+              <span style={styles.dropdownIcon}>Marketing</span>
+              <span style={styles.jobDesc}>Digital marketing, SEO, social media management, content creation, and brand strategy to grow your online presence</span>
+            </div>
+          </Link>
+          <Link to="/jobs/ui-ux-design" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+            <div style={styles.jobItem}>
+              <span style={styles.dropdownIcon}>UI/UX Design</span>
+              <span style={styles.jobDesc}>User interface design, user experience research, wireframing, prototyping, and design systems for digital products</span>
+            </div>
+          </Link>
+
+          <div style={styles.dropdownDivider} />
           <div style={styles.dropdownHeader}>Help & Legal</div>
           <Link to="/contact" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>Contact & Support</span>
@@ -607,6 +628,20 @@ const styles = {
     fontWeight: 600,
     color: "#fbbf24",
     flexShrink: 0,
+  },
+
+  jobItem: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "2px",
+  },
+
+  jobDesc: {
+    fontSize: "11px",
+    color: "#64748b",
+    fontWeight: 400,
+    lineHeight: "1.4",
+    maxWidth: "280px",
   },
 
   dropdownDivider: {
