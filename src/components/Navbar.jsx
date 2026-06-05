@@ -385,28 +385,38 @@ const styles = {
   logoContainer: {
     display: "flex",
     alignItems: "center",
-    gap: "12px",
+    gap: "10px",
     textDecoration: "none",
     cursor: "pointer",
+    padding: "6px 12px",
+    background: "linear-gradient(135deg, rgba(251, 36, 36, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%)",
+    border: "1px solid rgba(251, 36, 36, 0.2)",
+    borderRadius: "12px",
+    transition: "all 0.3s ease",
   },
 
   logo: {
-    height: "40px",
+    height: "36px",
     width: "auto",
-    borderRadius: "50%",
+    borderRadius: "8px",
+    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
   },
 
   titleSection: {
     display: "flex",
     flexDirection: "column",
-    gap: "2px",
+    gap: "1px",
   },
 
   brandName: {
-    fontSize: "16px",
-    fontWeight: 800,
-    color: "rgb(251, 36, 36)",
-    letterSpacing: "0.5px",
+    fontSize: "18px",
+    fontWeight: 900,
+    background: "linear-gradient(135deg, #FB2424 0%, #F59E0B 100%)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    backgroundClip: "text",
+    letterSpacing: "0.8px",
+    textTransform: "uppercase",
   },
 
   hamburger: {
@@ -855,17 +865,26 @@ const css = `
 
   @media (max-width: 480px) {
     [style*="display: flex"][style*="gap: 4px"][style*="flexWrap: nowrap"] {
-      gap: 2px !important;
+      gap: 3px !important;
     }
 
     [style*="display: flex"][style*="gap: 4px"][style*="flexWrap: nowrap"] a {
-      padding: 5px 4px !important;
-      font-size: 10px !important;
+      padding: 6px 5px !important;
+      font-size: 11px !important;
+      min-width: fit-content !important;
     }
 
     img[style*="height: 40px"] {
       height: 32px !important;
       width: auto !important;
+    }
+
+    [style*="background: linear-gradient(135deg, rgba(251, 36, 36, 0.1)"] {
+      padding: 4px 8px !important;
+    }
+
+    [style*="background: linear-gradient(135deg, #FB2424"] {
+      font-size: 15px !important;
     }
   }
 `;
