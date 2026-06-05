@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { ProfileAvatar } from "../features/profile";
 import AccountTypeSelector from "./AccountTypeSelector";
@@ -9,6 +9,7 @@ import logo from "../assets/image.png";
 export default function Navbar() {
   const { token, user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
@@ -16,6 +17,13 @@ export default function Navbar() {
   const [accountSelectorMode, setAccountSelectorMode] = useState("login");
   const dropdownRef = useRef(null);
   const accountRef = useRef(null);
+
+  const isActive = (path) => {
+    if (path === "/") {
+      return location.pathname === "/";
+    }
+    return location.pathname.startsWith(path);
+  };
 
   const handleLoginClick = () => {
     setAccountSelectorMode("login");
@@ -217,7 +225,7 @@ export default function Navbar() {
         </div>
 
         <div style={{ ...styles.navLinksContainer, ...(menuOpen && styles.navLinksContainerOpen) }}>
-          <Link to="/mover-dashboard" style={styles.navLink} onClick={() => setMenuOpen(false)}>
+          <Link to="/mover-dashboard" style={{ ...styles.navLink, ...(isActive("/mover-dashboard") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
             Dashboard
           </Link>
           <div style={styles.userSection}>
@@ -308,29 +316,29 @@ export default function Navbar() {
       </div>
 
       <div style={{ ...styles.navLinksContainer, ...(menuOpen && styles.navLinksContainerOpen) }}>
-        <Link to="/" style={styles.navLink} onClick={() => setMenuOpen(false)}>
+        <Link to="/" style={{ ...styles.navLink, ...(isActive("/") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
           Home
         </Link>
-        <Link to="/axxbiashara" style={styles.navLink} onClick={() => setMenuOpen(false)}>
+        <Link to="/axxbiashara" style={{ ...styles.navLink, ...(isActive("/axxbiashara") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
           AxxBiashara
         </Link>
-        <Link to="/materials" style={styles.navLink} onClick={() => setMenuOpen(false)}>
+        <Link to="/materials" style={{ ...styles.navLink, ...(isActive("/materials") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
           QuickSales
         </Link>
-        <Link to="/listings" style={styles.navLink} onClick={() => setMenuOpen(false)}>
+        <Link to="/listings" style={{ ...styles.navLink, ...(isActive("/listings") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
           Rentals
         </Link>
-        <Link to="/tourism" style={styles.navLink} onClick={() => setMenuOpen(false)}>
+        <Link to="/tourism" style={{ ...styles.navLink, ...(isActive("/tourism") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
           Tourism
         </Link>
 
         {token && user && (
           <>
-            <Link to="/upload" style={styles.navLink} onClick={() => setMenuOpen(false)}>
+            <Link to="/upload" style={{ ...styles.navLink, ...(isActive("/upload") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
               Upload
             </Link>
             {user?.role === "landlord" && (
-              <Link to="/dashboard" style={styles.navLink} onClick={() => setMenuOpen(false)}>
+              <Link to="/dashboard" style={{ ...styles.navLink, ...(isActive("/dashboard") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
                 Dashboard
               </Link>
             )}
@@ -478,6 +486,13 @@ const styles = {
     padding: "6px 8px",
     borderRadius: "6px",
     whiteSpace: "nowrap",
+    position: "relative",
+  },
+
+  navLinkActive: {
+    color: "#fbbf24",
+    paddingBottom: "4px",
+    borderBottom: "2px solid #fbbf24",
   },
 
   userSection: {
