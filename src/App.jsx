@@ -1,11 +1,12 @@
 // App.jsx
 import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "./context/AuthContext";
 import { useDevToolsProtection } from "./hooks/useDevToolsProtection";
 
 import Navbar from "./components/Navbar";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
+import SplashScreen from "./components/SplashScreen";
 
 import Home from "./pages/Home";
 import Listings from "./pages/Listings";
@@ -106,6 +107,33 @@ const ProtectedRoute = ({ children, allowedRoles = [], businessRoute = false }) 
 function App() {
   const navigate = useNavigate();
   useDevToolsProtection();
+  const [showSplash, setShowSplash] = useState(true); // Always show for testing
+
+  useEffect(() => {
+    // Check if this is the first visit or if forced via URL parameter
+    const hasVisited = localStorage.getItem('axxspace_visited');
+    const urlParams = new URLSearchParams(window.location.search);
+    const forceSplash = urlParams.get('splash') === 'true';
+
+    if (!hasVisited || forceSplash) {
+      setShowSplash(true);
+      if (!forceSplash) {
+        localStorage.setItem('axxspace_visited', 'true');
+      }
+    }
+  }, []);
+
+  // Function to reset splash screen for testing (call from browser console: window.resetSplash())
+  useEffect(() => {
+    window.resetSplash = () => {
+      localStorage.removeItem('axxspace_visited');
+      window.location.reload();
+    };
+  }, []);
+
+  if (showSplash) {
+    return <SplashScreen onComplete={() => setShowSplash(false)} />;
+  }
 
   return (
     <Routes>
