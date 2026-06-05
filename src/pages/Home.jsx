@@ -143,6 +143,13 @@ option { background: #162233; color: #F0EAD8; }
   z-index: 0; pointer-events: none;
   transition: opacity 0.7s;
 }
+
+@media (max-width: 768px) {
+  .hero-bg-video {
+    object-fit: contain;
+    object-position: center top;
+  }
+}
 .hero-bg-fallback {
   position: absolute; inset: 0;
   background: linear-gradient(135deg, #071018 0%, #0D1B2A 40%, #162233 70%, #0a1520 100%);

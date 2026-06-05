@@ -55,7 +55,11 @@ const styles = {
     gap: "16px",
   },
   accountIcon: {
-    fontSize: "32px",
+    width: "48px",
+    height: "48px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
   accountInfo: {
     flex: 1,
@@ -89,7 +93,7 @@ const accountTypes = [
   {
     id: "landlord",
     name: "Landlord Account",
-    icon: "🏠",
+    icon: "/assets/landlord-icon.png",
     description: "List and manage rental properties",
     loginPath: "/login",
     registerPath: "/register",
@@ -97,7 +101,7 @@ const accountTypes = [
   {
     id: "axxbiashara",
     name: "AxxBiashara Account",
-    icon: "🏪",
+    icon: "/assets/axxbiashara-icon.png",
     description: "Manage your business on AxxBiashara",
     loginPath: "/business-login",
     registerPath: "/business-register",
@@ -105,7 +109,7 @@ const accountTypes = [
   {
     id: "marketplace",
     name: "Marketplace Account",
-    icon: "🛍️",
+    icon: "/assets/marketplace-icon.png",
     description: "Buy and sell goods in the marketplace",
     loginPath: "/seller-login",
     registerPath: "/seller-login",
@@ -113,7 +117,7 @@ const accountTypes = [
   {
     id: "mover",
     name: "Movers Account",
-    icon: "🚛",
+    icon: "/assets/mover-icon.png",
     description: "Offer moving and logistics services",
     loginPath: "/movers",
     registerPath: "/movers",
@@ -121,7 +125,7 @@ const accountTypes = [
   {
     id: "tourism",
     name: "Tourism Account",
-    icon: "🏨",
+    icon: "/assets/tourism-icon.png",
     description: "List and manage tourism properties",
     loginPath: "/tourism/login",
     registerPath: "/tourism/register-property",
@@ -172,7 +176,7 @@ export default function AccountTypeSelector({ isOpen, onClose, mode = "login" })
                 e.currentTarget.style.borderColor = "#334155";
               }}
             >
-              <span style={styles.accountIcon}>{account.icon}</span>
+              <img src={account.icon} alt={account.name} style={styles.accountIcon} />
               <div style={styles.accountInfo}>
                 <div style={styles.accountName}>{account.name}</div>
                 <div style={styles.accountDesc}>{account.description}</div>
