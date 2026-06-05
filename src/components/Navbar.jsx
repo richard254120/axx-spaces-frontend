@@ -73,7 +73,7 @@ export default function Navbar() {
             <span style={styles.dropdownIcon}>AxxBiashara</span>
           </Link>
           <Link to="/materials" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>MarketPlace</span>
+            <span style={styles.dropdownIcon}>QuickSales</span>
           </Link>
           <Link to="/listings" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>Rentals</span>
@@ -84,17 +84,17 @@ export default function Navbar() {
           <Link to="/tourism" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>Tourism</span>
           </Link>
-          <Link to="/axxwallet" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>AxxWallet</span>
-          </Link>
-          <Link to="/users" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>Users</span>
-          </Link>
           <Link to="/about" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>About</span>
           </Link>
           <Link to="/faq" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>FAQ</span>
+          </Link>
+          <Link to="/axxwallet" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+            <span style={styles.dropdownIcon}>AxxWallet</span>
+          </Link>
+          <Link to="/users" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+            <span style={styles.dropdownIcon}>Users</span>
           </Link>
 
           <div style={styles.dropdownDivider} />
@@ -294,22 +294,13 @@ export default function Navbar() {
           AxxBiashara
         </Link>
         <Link to="/materials" style={styles.navLink} onClick={() => setMenuOpen(false)}>
-          MarketPlace
+          QuickSales
         </Link>
         <Link to="/listings" style={styles.navLink} onClick={() => setMenuOpen(false)}>
           Rentals
         </Link>
-        <Link to="/movers" style={styles.navLink} onClick={() => setMenuOpen(false)}>
-          Movers
-        </Link>
         <Link to="/tourism" style={styles.navLink} onClick={() => setMenuOpen(false)}>
           Tourism
-        </Link>
-        <Link to="/about" style={styles.navLink} onClick={() => setMenuOpen(false)}>
-          About
-        </Link>
-        <Link to="/faq" style={styles.navLink} onClick={() => setMenuOpen(false)}>
-          FAQ
         </Link>
 
         {token && user && (
@@ -434,11 +425,12 @@ const styles = {
   navLinksContainer: {
     display: "flex",
     alignItems: "center",
-    gap: "8px",
-    flexWrap: "wrap",
+    gap: "4px",
+    flexWrap: "nowrap",
     listStyle: "none",
     margin: 0,
     padding: 0,
+    overflowX: "auto",
   },
 
   navLinksContainerOpen: {
@@ -448,11 +440,11 @@ const styles = {
   navLink: {
     color: "#cbd5e1",
     textDecoration: "none",
-    fontSize: "13px",
+    fontSize: "12px",
     fontWeight: 700,
     transition: "all 0.2s",
     cursor: "pointer",
-    padding: "6px 10px",
+    padding: "6px 8px",
     borderRadius: "6px",
     whiteSpace: "nowrap",
   },
@@ -850,56 +842,27 @@ const css = `
       display: block !important;
     }
 
-    [style*="display: flex"][style*="gap: 8px"][style*="flexWrap"] {
-      display: none !important;
-    }
-
-    [style*="display: flex"][style*="gap: 8px"][style*="flexWrap"][style*="display: flex"] {
+    [style*="display: flex"][style*="gap: 4px"][style*="flexWrap: nowrap"] {
       display: flex !important;
-      position: fixed !important;
-      top: 76px !important;
-      left: 0 !important;
-      right: 0 !important;
-      flex-direction: column !important;
-      background: linear-gradient(135deg, #1e293b 0%, #0f1729 100%) !important;
-      padding: 12px 0 !important;
-      gap: 0 !important;
-      max-height: 600px !important;
-      overflow-y: auto !important;
-      align-items: stretch !important;
-      z-index: 99 !important;
+      gap: 2px !important;
     }
 
-    [style*="display: flex"][style*="gap: 8px"][style*="flexWrap"] a {
-      padding: 14px 16px !important;
-      width: 100% !important;
-      text-align: left !important;
-      border-bottom: 1px solid #334155 !important;
-      font-size: 14px !important;
-      border-radius: 0 !important;
-    }
-
-    [style*="display: flex"][style*="gap: 8px"][style*="flexWrap"] [style*="borderLeft"] {
-      border-left: none !important;
-      border-top: 1px solid #334155 !important;
-      padding-left: 16px !important;
-      padding-top: 12px !important;
-      margin-left: 0 !important;
-      margin-top: 0 !important;
-      flex-direction: column !important;
-      gap: 10px !important;
-      width: 100% !important;
-      padding: 12px 16px !important;
-      align-items: flex-start !important;
-    }
-
-    [style*="display: flex"][style*="gap: 8px"][style*="flexWrap"] button[style*="background: rgba(239"] {
-      width: 100% !important;
-      padding: 10px 12px !important;
+    [style*="display: flex"][style*="gap: 4px"][style*="flexWrap: nowrap"] a {
+      padding: 6px 6px !important;
+      font-size: 11px !important;
     }
   }
 
   @media (max-width: 480px) {
+    [style*="display: flex"][style*="gap: 4px"][style*="flexWrap: nowrap"] {
+      gap: 2px !important;
+    }
+
+    [style*="display: flex"][style*="gap: 4px"][style*="flexWrap: nowrap"] a {
+      padding: 5px 4px !important;
+      font-size: 10px !important;
+    }
+
     img[style*="height: 40px"] {
       height: 32px !important;
       width: auto !important;

@@ -1597,30 +1597,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ── */}
-      <section className="how-section">
-        <div className="section-hdr">
-          <p className="section-eyebrow">The Process</p>
-          <h2 className="section-title">How It Works</h2>
-          <p className="section-sub" style={{ color: "#7A7260" }}>One platform. Five services. Endless possibilities.</p>
-        </div>
-        <div className="steps-grid">
-          {[
-            { num: "01", icon: "🔍", title: "Search & Discover", text: "Browse verified listings across Rentals, Movers, Merchants, and Tourism — all in one place." },
-            { num: "02", icon: "💬", title: "Connect Directly", text: "Chat with landlords, movers, merchants, or hotels via WhatsApp or call — no middlemen." },
-            { num: "03", icon: "✅", title: "Book & Confirm", text: "Schedule viewings, get quotes, place orders, or book stays — with full transparency." },
-            { num: "04", icon: "🏠", title: "Move In & Thrive", text: "Find your home, move your stuff, furnish it, and explore Kenya — all through Axxspace." },
-          ].map(s => (
-            <div key={s.num} className="step-card">
-              <span className="step-num">{s.num}</span>
-              <span className="step-icon">{s.icon}</span>
-              <h3 className="step-title">{s.title}</h3>
-              <p className="step-text">{s.text}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ── TESTIMONIALS ── */}
       <section className="test-section">
         <div className="section-hdr">
@@ -1669,33 +1645,6 @@ export default function Home() {
         </div>
         <div style={{ textAlign: "center" }}>
           <button onClick={() => navigate("/leave-review")} className="review-btn">✍️ Leave a Review</button>
-        </div>
-      </section>
-
-      {/* ── WHY AXXSPACE ── */}
-      <section className="why-section">
-        <div className="section-hdr">
-          <p className="section-eyebrow">Our Advantages</p>
-          <h2 className="section-title">Why Axxspace?</h2>
-          <p className="section-sub">Built for Kenyans, by Kenyans — serving every need</p>
-        </div>
-        <div className="why-grid">
-          {[
-            { icon: "✓", title: "Verified Listings", text: "Every listing is manually reviewed before going live", color: C.gold },
-            { icon: "💬", title: "Direct WhatsApp", text: "Skip the middleman. Chat directly with landlords, movers & hotels", color: C.gold },
-            { icon: "🌍", title: "All 47 Counties", text: "The only platform serving every corner of Kenya across all services", color: "#60A5FA" },
-            { icon: "📱", title: "Mobile Optimised", text: "Fully responsive — works seamlessly on any device", color: "#60A5FA" },
-            { icon: "🗺", title: "GPS Maps", text: "Interactive maps with exact coordinates for every listing and service", color: C.gold },
-            { icon: "💰", title: "Zero Hidden Fees", text: "What you see is what you pay. Transparent pricing across all categories", color: "#4CAF74" },
-            { icon: "🔒", title: "Safe & Secure", text: "Industry-standard encryption protects all your personal data", color: "#A78BFA" },
-            { icon: "⚡", title: "One Platform", text: "Rent, move, build, and explore without switching apps", color: C.gold },
-          ].map(f => (
-            <div key={f.title} className="why-card" style={{ borderTopColor: f.color }}>
-              <span className="why-icon">{f.icon}</span>
-              <h3 className="why-title">{f.title}</h3>
-              <p className="why-text">{f.text}</p>
-            </div>
-          ))}
         </div>
       </section>
 
