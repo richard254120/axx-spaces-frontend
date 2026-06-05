@@ -365,7 +365,7 @@ const styles = {
     fontFamily: "'DM Sans', sans-serif",
     position: "sticky",
     top: 0,
-    zIndex: 50,
+    zIndex: 1000,
     padding: "12px 16px",
   },
 
@@ -524,6 +524,7 @@ const styles = {
 
   dropdownWrapper: {
     position: "relative",
+    zIndex: 1000,
   },
 
   menuIconBtn: {
@@ -547,8 +548,10 @@ const styles = {
     border: "1px solid rgba(251,191,36,0.3)",
     borderRadius: "16px",
     minWidth: "260px",
-    zIndex: 200,
-    overflow: "hidden",
+    zIndex: 9999,
+    overflow: "visible",
+    maxHeight: "80vh",
+    overflowY: "auto",
     boxShadow: "0 20px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(251,191,36,0.15)",
     backdropFilter: "blur(12px)",
     animation: "dropdownFadeIn 0.25s ease-out",
