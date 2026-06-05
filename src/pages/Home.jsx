@@ -9,160 +9,861 @@ import tourismIcon from "/tourism.png";
 import axxbiasharaIcon from "/axxbiashara.png";
 import SocialMediaLinks from "../components/SocialMediaLinks";
 
-/* ═══════════════════════ STYLES ═══════════════════════ */
-const styles = {
-  root: { fontFamily: "'DM Sans', sans-serif", background: "#FFFFFF", color: "#0B2140", minHeight: "100vh" },
+/* ═══════════════════════ INJECTED GLOBAL CSS ═══════════════════════ */
+const css = `
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
 
-  marqueeWrapper: { overflow: "hidden", background: "linear-gradient(90deg, #391be3 0%, #d91414 50%, #1b1ec9 100%)", padding: "9px 0", borderBottom: "2px solid #5fc010a1" },
-  marqueePill: { display: "inline-flex", alignItems: "center", gap: "10px", background: "white", borderRadius: "20px", padding: "4px 16px", margin: "0 8px", fontSize: "13px", fontWeight: 600, color: "#0B2140", whiteSpace: "nowrap", boxShadow: "0 2px 8px rgba(227, 27, 27, 0.15)" },
-  marqueeSep: { color: "#2a10c0", fontWeight: 700, fontSize: "16px", marginLeft: "8px" },
+:root {
+  --red: #E31B1B;
+  --red-dark: #B01212;
+  --navy: #0B1F3A;
+  --navy-mid: #142B50;
+  --navy-light: #1E3A6A;
+  --gold: #F0B429;
+  --gold-light: #FDE68A;
+  --off-white: #F5F3EE;
+  --cream: #FAF8F4;
+  --gray-soft: #E8E4DC;
+  --gray-text: #6B6860;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+}
 
-  hero: { position: "relative", padding: "80px 16px 60px", textAlign: "center", borderBottom: "3px solid #E31B1B", width: "100%", boxSizing: "border-box", overflow: "hidden", minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center" },
-  bgVideo: { position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center center", zIndex: 0, display: "block", pointerEvents: "none", background: "#0B2140" },
-  videoOverlay: { position: "absolute", top: 0, left: 0, width: "100%", height: "100%", background: "linear-gradient(180deg, rgba(11, 33, 64, 0.75) 0%, rgba(11, 33, 64, 0.65) 50%, rgba(11, 33, 64, 0.80) 100%)", zIndex: 1 },
-  heroContent: { maxWidth: "860px", margin: "0 auto", position: "relative", zIndex: 2 },
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-body); background: var(--cream); color: var(--navy); }
 
-  trustBadge: { display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(255, 255, 255, 0.95)", color: "#0B2140", padding: "8px 18px", borderRadius: "20px", fontSize: "13px", fontWeight: 700, marginBottom: "18px", border: "1px solid rgba(227, 27, 27, 0.3)", boxShadow: "0 4px 16px rgba(227, 27, 27, 0.2)" },
-  trustDot: { width: "8px", height: "8px", borderRadius: "50%", background: "#E31B1B", display: "inline-block", animation: "pulse 1.8s infinite" },
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--navy); }
+::-webkit-scrollbar-thumb { background: var(--red); border-radius: 3px; }
 
-  heroTitle: { fontSize: "clamp(28px, 5vw, 50px)", fontWeight: 800, color: "white", margin: "0 0 6px", letterSpacing: "-1px", lineHeight: 1.15, textShadow: "0 2px 16px rgba(11, 33, 64, 0.8)" },
-  heroTitleAccent: { color: "#fbbf24" },
-  heroSubtitle: { fontSize: "15px", color: "#f3f4f6", margin: "0 auto 24px", maxWidth: "520px", lineHeight: 1.6, textShadow: "0 1px 8px rgba(11, 33, 64, 0.6)" },
+/* ── KEYFRAMES ── */
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes cardsScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes pulseDot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(227,27,27,0.7); }
+  50% { box-shadow: 0 0 0 8px rgba(227,27,27,0); }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+@keyframes floatY {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+@keyframes borderSpin {
+  to { transform: rotate(360deg); }
+}
 
-  heroCategories: { display: "flex", justifyContent: "center", gap: "10px", flexWrap: "wrap", marginBottom: "24px" },
-  heroCategoryBtn: { display: "flex", alignItems: "center", gap: "8px", padding: "10px 18px", borderRadius: "50px", fontSize: "14px", cursor: "pointer", transition: "all 0.2s", backdropFilter: "blur(8px)" },
+/* ── HOME ROOT ── */
+.home-root {
+  font-family: var(--font-body);
+  background: var(--cream);
+  color: var(--navy);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
-  searchPropertyLabel: { fontSize: "13px", fontWeight: 700, color: "rgba(255,255,255,0.9)", textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 8px", textShadow: "0 1px 4px rgba(11, 33, 64, 0.5)" },
-  hamburgerWrapper: { display: "inline-flex", alignItems: "center", gap: "12px", background: "rgba(255,255,255,0.15)", border: "1.5px solid rgba(255,255,255,0.35)", borderRadius: "50px", padding: "8px 20px 8px 8px", margin: "0 auto 16px", cursor: "pointer", backdropFilter: "blur(8px)" },
-  hamburgerLabel: { color: "white", fontWeight: 700, fontSize: "15px", letterSpacing: "0.02em", textShadow: "0 1px 4px rgba(11, 33, 64, 0.5)" },
-  hamburgerBtn: { background: "#0B2140", border: "none", borderRadius: "50%", width: "42px", height: "42px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "5px", flexShrink: 0, transition: "background 0.2s", padding: 0 },
-  hamburgerLine: { display: "block", width: "20px", height: "2.5px", background: "#E31B1B", borderRadius: "2px", transition: "transform 0.25s ease, opacity 0.2s ease" },
-  searchDropdown: { background: "rgba(255,255,255,0.98)", borderRadius: "16px", padding: "16px", boxShadow: "0 12px 40px rgba(227, 27, 27, 0.25)", maxWidth: "400px", width: "100%", margin: "0 auto 20px", display: "flex", flexDirection: "column", gap: "10px", boxSizing: "border-box", backdropFilter: "blur(8px)", border: "1px solid rgba(227, 27, 27, 0.1)" },
-  searchInput: { padding: "12px 14px", border: "2px solid #e5e7eb", borderRadius: "10px", fontSize: "14px", fontFamily: "inherit", background: "#f9fafb", color: "#0B2140", transition: "all 0.2s", width: "100%", boxSizing: "border-box" },
-  searchBtn: { padding: "13px 22px", background: "linear-gradient(135deg, #E31B1B 0%, #C01010 100%)", color: "white", border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 700, cursor: "pointer", transition: "all 0.2s", boxShadow: "0 4px 14px rgba(227, 27, 27, 0.35)", width: "100%" },
+/* ── TICKER ── */
+.ticker-outer {
+  background: var(--navy);
+  padding: 0;
+  border-bottom: 2px solid var(--red);
+  overflow: hidden;
+  height: 38px;
+  display: flex;
+  align-items: center;
+}
+.ticker-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  animation: ticker 40s linear infinite;
+}
+.ticker-track:hover { animation-play-state: paused; }
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 24px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: rgba(255,255,255,0.8);
+  white-space: nowrap;
+  border-right: 1px solid rgba(255,255,255,0.1);
+}
+.ticker-item b { color: var(--gold); }
+.ticker-dot { width: 4px; height: 4px; background: var(--red); border-radius: 50%; flex-shrink: 0; }
 
-  categoryHeroCta: { maxWidth: "480px", margin: "0 auto 20px", textAlign: "center" },
-  categoryHeroDesc: { color: "rgba(255,255,255,0.9)", fontSize: "15px", lineHeight: 1.6, marginBottom: "16px", textShadow: "0 1px 6px rgba(11,33,64,0.5)" },
-  categoryHeroBtn: { padding: "13px 32px", background: "white", color: "#0B2140", border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 800, cursor: "pointer", transition: "all 0.2s", boxShadow: "0 4px 14px rgba(0,0,0,0.2)" },
+/* ── HERO ── */
+.hero {
+  position: relative;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  border-bottom: 3px solid var(--red);
+}
+.hero-bg-video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  z-index: 0;
+  pointer-events: none;
+}
+.hero-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(160deg,
+    rgba(11,31,58,0.88) 0%,
+    rgba(11,31,58,0.72) 40%,
+    rgba(11,31,58,0.82) 100%);
+  z-index: 1;
+}
+.hero-grain {
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  z-index: 2; opacity: 0.4; pointer-events: none;
+}
+.hero-content {
+  position: relative; z-index: 3;
+  max-width: 900px;
+  padding: 80px 24px 60px;
+  animation: fadeUp 0.9s ease both;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  backdrop-filter: blur(12px);
+  padding: 8px 20px;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.9);
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+.hero-eyebrow-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  animation: pulseDot 2s infinite;
+  flex-shrink: 0;
+}
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 6vw, 72px);
+  font-weight: 800;
+  line-height: 1.05;
+  color: #fff;
+  margin: 0 0 8px;
+  letter-spacing: -2px;
+}
+.hero-title em {
+  font-style: normal;
+  color: var(--gold);
+  position: relative;
+}
+.hero-subtitle {
+  font-family: var(--font-body);
+  font-size: clamp(15px, 2vw, 18px);
+  color: rgba(255,255,255,0.72);
+  max-width: 540px;
+  margin: 0 auto 36px;
+  line-height: 1.65;
+  font-weight: 300;
+}
 
-  heroStats: { display: "flex", justifyContent: "center", gap: "32px", flexWrap: "wrap", marginTop: "4px" },
-  heroStat: { display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" },
-  heroStatVal: { fontSize: "20px", fontWeight: 800, color: "white", textShadow: "0 2px 10px rgba(11, 33, 64, 0.6)" },
-  heroStatLabel: { fontSize: "11px", color: "rgba(255, 255, 255, 0.95)", fontWeight: 500, textShadow: "0 1px 4px rgba(11, 33, 64, 0.5)" },
+/* ── HERO CATEGORY TABS ── */
+.hero-tabs {
+  display: flex; justify-content: center; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 28px;
+}
+.hero-tab {
+  display: flex; align-items: center; gap: 7px;
+  padding: 9px 20px;
+  border-radius: 2px;
+  font-family: var(--font-display);
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1.5px solid transparent;
+}
+.hero-tab-inactive {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.75);
+  backdrop-filter: blur(8px);
+}
+.hero-tab-inactive:hover {
+  background: rgba(255,255,255,0.14);
+  color: #fff;
+}
+.hero-tab-active {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(227,27,27,0.5);
+}
 
-  /* Categories showcase */
-  categoriesSection: { padding: "80px 20px", background: "linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%)" },
-  sectionHeader: { textAlign: "center", marginBottom: "44px", padding: "0 20px" },
-  sectionTitle: { fontSize: "30px", fontWeight: 800, color: "#E31B1B", margin: "0 0 10px" },
-  sectionSubtitle: { color: "#6b7280", fontSize: "16px", margin: 0 },
-  categoriesGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "24px", maxWidth: "1200px", margin: "0 auto" },
-  categoryCard: { padding: "28px 24px", borderRadius: "16px", border: "1px solid rgba(0,0,0,0.06)", cursor: "pointer", transition: "all 0.25s", position: "relative" },
-  categoryCardIcon: { width: "52px", height: "52px", borderRadius: "14px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "26px", marginBottom: "16px" },
-  categoryCardTitle: { fontSize: "22px", fontWeight: 800, margin: "0 0 4px" },
-  categoryCardTagline: { fontSize: "13px", color: "#6b7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 12px" },
-  categoryCardDesc: { fontSize: "14px", color: "#4b5563", lineHeight: 1.6, margin: "0 0 16px" },
-  categoryFeatureList: { listStyle: "none", padding: 0, margin: "0 0 20px", display: "flex", flexDirection: "column", gap: "6px" },
-  categoryFeatureItem: { fontSize: "13px", fontWeight: 600, display: "flex", alignItems: "center", gap: "8px" },
-  categoryCardBtn: { width: "100%", padding: "12px", color: "white", border: "none", borderRadius: "10px", fontSize: "14px", fontWeight: 700, cursor: "pointer", transition: "all 0.2s" },
+/* ── SEARCH PANEL ── */
+.search-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: rgba(255,255,255,0.6);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.search-trigger {
+  display: inline-flex; align-items: center; gap: 12px;
+  background: rgba(255,255,255,0.1);
+  border: 1.5px solid rgba(255,255,255,0.25);
+  backdrop-filter: blur(12px);
+  border-radius: 2px;
+  padding: 8px 22px 8px 8px;
+  cursor: pointer;
+  margin: 0 auto 14px;
+  transition: all 0.2s;
+}
+.search-trigger:hover { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.15); }
+.search-trigger-icon {
+  width: 40px; height: 40px;
+  background: var(--red);
+  border-radius: 2px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 4px;
+  flex-shrink: 0;
+}
+.search-trigger-line {
+  width: 18px; height: 2px;
+  background: #fff; border-radius: 1px;
+  transition: transform 0.25s, opacity 0.2s;
+}
+.search-trigger-text {
+  font-family: var(--font-display);
+  font-weight: 700; font-size: 15px;
+  color: #fff;
+}
+.search-panel {
+  background: #fff;
+  border-radius: 4px;
+  padding: 18px;
+  max-width: 420px; width: 100%;
+  margin: 0 auto 18px;
+  display: flex; flex-direction: column; gap: 10px;
+  box-shadow: 0 20px 60px rgba(11,31,58,0.4);
+  border-top: 3px solid var(--red);
+  animation: slideDown 0.2s ease;
+}
+.search-select {
+  padding: 12px 38px 12px 14px;
+  border: 1.5px solid var(--gray-soft);
+  border-radius: 2px;
+  font-family: var(--font-body);
+  font-size: 14px; font-weight: 500;
+  color: var(--navy);
+  background: var(--off-white);
+  width: 100%; cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B6860' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 18px;
+  transition: border-color 0.2s;
+}
+.search-select:focus { outline: none; border-color: var(--red); box-shadow: 0 0 0 3px rgba(227,27,27,0.1); }
+.search-submit {
+  padding: 14px;
+  background: var(--red);
+  color: #fff; border: none; border-radius: 2px;
+  font-family: var(--font-display);
+  font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+  letter-spacing: 0.02em;
+}
+.search-submit:hover { background: var(--red-dark); transform: translateY(-1px); }
 
-  /* Featured */
-  featuredSection: { padding: "60px 0", background: "white", overflow: "hidden" },
-  loadingWrap: { display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", padding: "40px 0" },
-  loadingText: { color: "#6b7280", fontSize: "15px" },
-  marqueeCardsWrapper: { overflow: "hidden", width: "100%" },
-  featuredCard: { background: "white", borderRadius: "14px", overflow: "hidden", border: "1px solid #e5e7eb", transition: "transform 0.25s, box-shadow 0.25s", minWidth: "280px", maxWidth: "280px", flexShrink: 0, margin: "0 12px", boxShadow: "0 2px 8px rgba(0,0,0,0.08)" },
-  featuredImageWrapper: { position: "relative" },
-  featuredImage: { width: "100%", height: "180px", objectFit: "cover", display: "block" },
-  boostedBadge: { position: "absolute", top: "12px", left: "12px", background: "#E31B1B", color: "white", padding: "4px 12px", borderRadius: "20px", fontSize: "11px", fontWeight: 700 },
-  featuredType: { position: "absolute", top: "12px", right: "12px", background: "rgba(11, 33, 64, 0.85)", color: "white", padding: "4px 10px", borderRadius: "6px", fontSize: "11px", fontWeight: 600 },
-  featuredInfo: { padding: "16px 18px 20px" },
-  featuredTitle: { fontSize: "15px", fontWeight: 700, margin: "0 0 6px", color: "#0B2140" },
-  featuredLocation: { color: "#6b7280", margin: "0 0 8px", fontSize: "12px" },
-  featuredMeta: { display: "flex", gap: "8px", marginBottom: "8px", flexWrap: "wrap" },
-  metaTag: { background: "rgba(227, 27, 27, 0.1)", color: "#E31B1B", padding: "3px 10px", borderRadius: "6px", fontSize: "11px", fontWeight: 500 },
-  featuredPrice: { color: "#E31B1B", fontSize: "17px", fontWeight: 800, margin: "8px 0 0" },
-  perMonth: { fontSize: "12px", color: "#C01010", fontWeight: 400 },
-  viewBtn: { marginTop: "14px", width: "100%", padding: "11px", background: "linear-gradient(135deg, #0B2140 0%, #152B4A 100%)", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: 700, fontSize: "13px", transition: "background 0.2s" },
-  viewAllBtn: { padding: "13px 36px", background: "transparent", color: "#E31B1B", border: "2px solid #E31B1B", borderRadius: "10px", fontSize: "15px", fontWeight: 700, cursor: "pointer", transition: "all 0.2s" },
-  noFeatured: { textAlign: "center", padding: "40px 20px" },
-  noFeaturedIcon: { fontSize: "52px", marginBottom: "12px" },
-  noFeaturedText: { color: "#0B2140", fontSize: "18px", fontWeight: 700, margin: "0 0 6px" },
-  noFeaturedSub: { color: "#6b7280", fontSize: "14px", margin: "0 0 20px" },
-  boostBtn: { padding: "12px 28px", background: "linear-gradient(135deg, #E31B1B 0%, #C01010 100%)", color: "white", border: "none", borderRadius: "8px", fontWeight: 700, fontSize: "15px", cursor: "pointer" },
+/* ── CATEGORY CTA (non-rentals) ── */
+.cat-cta-desc {
+  font-size: 15px; color: rgba(255,255,255,0.8);
+  line-height: 1.65; margin-bottom: 18px; max-width: 440px; margin-inline: auto;
+}
+.cat-cta-btn {
+  padding: 14px 36px;
+  background: #fff; color: var(--navy);
+  border: none; border-radius: 2px;
+  font-family: var(--font-display);
+  font-size: 15px; font-weight: 800;
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+}
+.cat-cta-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(0,0,0,0.3); }
 
-  /* Spotlight strips */
-  spotlightSection: { background: "#f8f9fa" },
-  spotlightStrip: { display: "flex", alignItems: "center", gap: "48px", padding: "64px 40px", maxWidth: "1200px", margin: "0 auto", background: "linear-gradient(135deg, #f0f4ff 0%, #dce8ff 100%)" },
-  spotlightText: { flex: 1, minWidth: 0 },
-  spotlightBadge: { display: "inline-block", background: "#dce8ff", color: "#0B2140", padding: "5px 14px", borderRadius: "20px", fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "14px" },
-  spotlightTitle: { fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 800, color: "#0B2140", margin: "0 0 12px", lineHeight: 1.2 },
-  spotlightDesc: { fontSize: "15px", color: "#4b5563", lineHeight: 1.7, margin: "0 0 18px" },
-  spotlightFeatures: { display: "flex", flexWrap: "wrap", gap: "10px", marginBottom: "24px" },
-  spotlightFeature: { fontSize: "13px", fontWeight: 600, color: "#1a3a52" },
-  spotlightBtn: { display: "inline-block", padding: "13px 28px", color: "white", border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 700, cursor: "pointer", transition: "all 0.2s", boxShadow: "0 4px 14px rgba(0,0,0,0.15)" },
-  spotlightVisual: { display: "flex", flexDirection: "column", alignItems: "center", gap: "24px", flexShrink: 0 },
-  spotlightEmoji: { width: "120px", height: "120px", borderRadius: "24px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "60px" },
-  spotlightStatGrid: { display: "flex", gap: "20px" },
-  spotlightStat: { display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" },
-  spotlightStatVal: { fontSize: "20px", fontWeight: 800 },
-  spotlightStatLabel: { fontSize: "11px", color: "#6b7280", fontWeight: 500, textAlign: "center" },
+/* ── HERO STATS ── */
+.hero-stats {
+  display: flex; justify-content: center;
+  gap: 0; flex-wrap: wrap; margin-top: 10px;
+}
+.hero-stat {
+  display: flex; flex-direction: column;
+  align-items: center; padding: 12px 28px;
+  border-right: 1px solid rgba(255,255,255,0.12);
+}
+.hero-stat:last-child { border-right: none; }
+.hero-stat-val {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 800;
+  color: #fff;
+}
+.hero-stat-label {
+  font-family: var(--font-mono);
+  font-size: 10px; color: rgba(255,255,255,0.55);
+  text-transform: uppercase; letter-spacing: 0.1em;
+  margin-top: 3px;
+}
 
-  /* How it works */
-  howItWorksSection: { padding: "80px 20px", background: "white", maxWidth: "1200px", margin: "0 auto" },
-  stepsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "40px", marginTop: "40px", position: "relative" },
-  stepCard: { position: "relative", padding: "32px 24px", background: "white", borderRadius: "16px", border: "1px solid #e5e7eb", textAlign: "center", transition: "all 0.3s" },
-  stepNumber: { position: "absolute", top: "-16px", left: "50%", transform: "translateX(-50%)", background: "linear-gradient(135deg, #E31B1B 0%, #C01010 100%)", color: "white", width: "40px", height: "40px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: 800, boxShadow: "0 4px 12px rgba(227, 27, 27, 0.3)" },
-  stepIcon: { fontSize: "48px", marginBottom: "16px" },
-  stepTitle: { fontSize: "17px", fontWeight: 700, color: "#0B2140", margin: "0 0 12px", fontFamily: "'Cormorant Garamond', 'Georgia', serif" },
-  stepText: { fontSize: "13px", color: "#6b7280", lineHeight: 1.6, margin: 0 },
-  stepConnector: { position: "absolute", top: "50%", right: "-20px", width: "40px", height: "2px", background: "#E31B1B", opacity: 0.3 },
+/* ── SECTION BASICS ── */
+.section-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--red);
+  margin-bottom: 8px;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 4vw, 40px);
+  font-weight: 800; color: var(--navy);
+  margin: 0 0 10px; letter-spacing: -1px;
+}
+.section-sub {
+  font-family: var(--font-body);
+  font-size: 16px; color: var(--gray-text); margin: 0;
+}
+.section-hdr { text-align: center; margin-bottom: 50px; }
 
-  /* Testimonials */
-  testimonialsSection: { padding: "80px 20px", background: "#0B2140", color: "white" },
-  testimonialsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "24px", marginTop: "40px", maxWidth: "1200px", margin: "40px auto 0" },
-  testimonialCard: { background: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "16px", padding: "24px", transition: "all 0.3s" },
-  testimonialTop: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" },
-  testimonialAvatar: { fontSize: "40px" },
-  testimonialServiceTag: { padding: "4px 12px", borderRadius: "20px", fontSize: "11px", fontWeight: 700, color: "white" },
-  testimonialRating: { fontSize: "14px", marginBottom: "10px" },
-  testimonialTitle: { fontSize: "15px", fontWeight: 700, color: "white", margin: "0 0 8px" },
-  testimonialText: { fontSize: "14px", lineHeight: 1.7, color: "rgba(255, 255, 255, 0.85)", margin: "0 0 14px", fontStyle: "italic" },
-  testimonialAuthor: { display: "flex", flexDirection: "column", gap: "2px" },
-  testimonialName: { fontSize: "14px", color: "#fbbf24" },
-  testimonialRole: { fontSize: "12px", color: "rgba(255, 255, 255, 0.5)" },
-  leaveReviewBtn: { padding: "14px 32px", background: "white", color: "#0B2140", border: "none", borderRadius: "10px", fontSize: "16px", fontWeight: 700, cursor: "pointer", transition: "all 0.2s", boxShadow: "0 4px 14px rgba(0,0,0,0.2)" },
+/* ── CATEGORIES SHOWCASE ── */
+.cats-section {
+  padding: 96px 24px;
+  background: var(--off-white);
+  position: relative;
+}
+.cats-section::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--red), var(--gold), var(--red));
+}
+.cats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(268px, 1fr));
+  gap: 20px; max-width: 1240px; margin: 0 auto;
+}
+.cat-card {
+  padding: 30px 26px 26px;
+  border-radius: 4px;
+  border: 1.5px solid var(--gray-soft);
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative; overflow: hidden;
+  background: #fff;
+}
+.cat-card::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.3s ease;
+}
+.cat-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(11,31,58,0.1); }
+.cat-card:hover::after { transform: scaleX(1); }
+.cat-icon-wrap {
+  width: 54px; height: 54px; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 18px; font-size: 26px;
+}
+.cat-card-title {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 800;
+  margin: 0 0 4px;
+  letter-spacing: -0.5px;
+}
+.cat-card-tagline {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--gray-text);
+  margin: 0 0 14px;
+}
+.cat-card-desc {
+  font-size: 14px; color: #4B5563;
+  line-height: 1.65; margin: 0 0 18px;
+}
+.cat-feature-list {
+  list-style: none; margin: 0 0 22px;
+  display: flex; flex-direction: column; gap: 7px;
+}
+.cat-feature-item {
+  font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; gap: 8px;
+}
+.cat-btn {
+  width: 100%; padding: 13px;
+  color: #fff; border: none; border-radius: 2px;
+  font-family: var(--font-display);
+  font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+  letter-spacing: 0.03em;
+}
+.cat-btn:hover { filter: brightness(1.12); transform: translateY(-1px); }
 
-  /* Features */
-  featuresSection: { padding: "72px 20px", background: "#FFFFFF", maxWidth: "1200px", margin: "0 auto" },
-  featureGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "20px", marginTop: "8px" },
-  featureCard: { padding: "26px", background: "#F8F9FA", borderRadius: "12px", textAlign: "center", border: "1px solid #e5e7eb", transition: "all 0.22s" },
-  featureIcon: { fontSize: "34px", marginBottom: "14px" },
-  featureTitle: { fontSize: "16px", fontWeight: 700, color: "#0B2140", margin: "0 0 10px" },
-  featureText: { fontSize: "13px", color: "#6b7280", lineHeight: 1.6, margin: 0 },
+/* ── FEATURED LISTINGS ── */
+.featured-section {
+  padding: 80px 0;
+  background: var(--navy);
+  overflow: hidden;
+}
+.featured-header { padding: 0 24px; text-align: center; margin-bottom: 44px; }
+.featured-header .section-title { color: #fff; }
+.featured-header .section-sub { color: rgba(255,255,255,0.55); }
+.cards-track-wrap { overflow: hidden; width: 100%; }
+.cards-track {
+  display: flex; align-items: stretch;
+  width: max-content;
+  animation: cardsScroll 32s linear infinite;
+  padding: 8px 0 24px;
+}
+.cards-track:hover { animation-play-state: paused; }
+.feat-card {
+  background: var(--navy-mid);
+  border-radius: 4px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  min-width: 290px; max-width: 290px;
+  flex-shrink: 0; margin: 0 12px;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.feat-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+  border-color: var(--red);
+}
+.feat-img-wrap { position: relative; }
+.feat-img {
+  width: 100%; height: 185px;
+  object-fit: cover; display: block;
+}
+.feat-boosted {
+  position: absolute; top: 10px; left: 10px;
+  background: var(--red); color: #fff;
+  padding: 3px 10px; border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+}
+.feat-type {
+  position: absolute; top: 10px; right: 10px;
+  background: rgba(11,31,58,0.85); color: rgba(255,255,255,0.9);
+  padding: 3px 10px; border-radius: 2px;
+  font-family: var(--font-mono); font-size: 10px;
+}
+.feat-body { padding: 18px 18px 20px; }
+.feat-title {
+  font-family: var(--font-display);
+  font-size: 16px; font-weight: 700;
+  color: #fff; margin: 0 0 6px; letter-spacing: -0.3px;
+}
+.feat-loc { color: rgba(255,255,255,0.45); font-size: 12px; margin: 0 0 10px; }
+.feat-meta { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 10px; }
+.feat-tag {
+  background: rgba(227,27,27,0.15);
+  color: #ff7070;
+  padding: 3px 10px; border-radius: 2px;
+  font-size: 11px; font-weight: 600;
+}
+.feat-price {
+  font-family: var(--font-display);
+  color: var(--gold); font-size: 18px; font-weight: 800;
+  margin: 8px 0 0;
+}
+.feat-price span { font-size: 12px; color: rgba(240,180,41,0.65); font-weight: 400; }
+.feat-view-btn {
+  margin-top: 14px; width: 100%;
+  padding: 12px; background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.85);
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 2px;
+  font-family: var(--font-display); font-weight: 700; font-size: 13px;
+  cursor: pointer; transition: all 0.2s;
+}
+.feat-view-btn:hover { background: var(--red); border-color: var(--red); color: #fff; }
+.view-all-wrap { text-align: center; margin-top: 36px; padding: 0 24px; }
+.view-all-btn {
+  padding: 13px 40px;
+  background: transparent;
+  color: #fff; border: 1.5px solid rgba(255,255,255,0.3);
+  border-radius: 2px;
+  font-family: var(--font-display);
+  font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+  letter-spacing: 0.03em;
+}
+.view-all-btn:hover { border-color: var(--gold); color: var(--gold); }
+.no-featured-wrap { text-align: center; padding: 50px 24px; }
+.no-feat-icon { font-size: 56px; margin-bottom: 14px; display: block; }
+.no-feat-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.no-feat-sub { color: rgba(255,255,255,0.5); font-size: 14px; margin-bottom: 24px; }
+.no-feat-btn {
+  padding: 13px 30px; background: var(--red); color: #fff;
+  border: none; border-radius: 2px; font-family: var(--font-display);
+  font-size: 15px; font-weight: 700; cursor: pointer;
+}
 
-  /* CTA */
-  cta: { background: "linear-gradient(135deg, #0B2140 0%, #1a3a52 100%)", padding: "76px 20px", textAlign: "center", borderTop: "3px solid #E31B1B" },
-  ctaInner: { maxWidth: "760px", margin: "0 auto" },
-  ctaTitle: { fontSize: "34px", fontWeight: 700, color: "white", margin: "0 0 12px", fontFamily: "'Cormorant Garamond', 'Georgia', serif" },
-  ctaText: { fontSize: "16px", color: "rgba(255,255,255,0.85)", margin: "0 0 32px", lineHeight: 1.6 },
-  ctaButtons: { display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", marginBottom: "20px" },
-  ctaBtnPrimary: { padding: "13px 22px", background: "linear-gradient(135deg, #E31B1B 0%, #C01010 100%)", color: "white", border: "none", borderRadius: "10px", fontSize: "14px", fontWeight: 700, cursor: "pointer", transition: "all 0.2s", boxShadow: "0 4px 14px rgba(0,0,0,0.2)" },
-  ctaDivider: { height: "1px", background: "rgba(255,255,255,0.15)", margin: "24px auto", maxWidth: "400px" },
-  ctaBtnSecondary: { padding: "14px 32px", borderRadius: "10px", fontSize: "15px", fontWeight: 700, cursor: "pointer", transition: "all 0.2s" },
-  loginHint: { fontSize: "13px", color: "rgba(255,255,255,0.65)", marginTop: "14px", fontStyle: "italic" },
+/* ── SKELETON ── */
+.skel-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 4px; overflow: hidden;
+  min-width: 290px; max-width: 290px; margin: 0 12px; flex-shrink: 0;
+}
+.skel-img { height: 185px; background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%); background-size: 400px; animation: shimmer 1.5s infinite; }
+.skel-body { padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+.skel-line { height: 12px; border-radius: 2px; background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%); background-size: 400px; animation: shimmer 1.5s infinite; }
 
-  /* Footer */
-  footer: { background: "#060f1e", color: "#cbd5e1", padding: "48px 20px 24px" },
-  footerInner: { maxWidth: "960px", margin: "0 auto" },
-  footerBrand: { textAlign: "center", marginBottom: "32px" },
-  footerTagline: { fontSize: "13px", color: "#94a3b8", margin: "4px 0 0" },
-  footerColumns: { display: "flex", justifyContent: "center", gap: "60px", flexWrap: "wrap", marginBottom: "32px" },
-  footerCol: { display: "flex", flexDirection: "column", gap: "8px" },
-  footerColTitle: { fontSize: "12px", fontWeight: 700, color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 4px" },
-  footerLink: { fontSize: "13px", color: "#94a3b8", cursor: "pointer", transition: "color 0.2s" },
-  footerCopy: { fontSize: "12px", color: "#475569", textAlign: "center", margin: 0 },
-};
+/* ── SPOTLIGHT STRIPS ── */
+.spotlight-section { background: var(--cream); }
+.spotlight-strip {
+  display: flex; align-items: center; gap: 60px;
+  padding: 72px 60px;
+  max-width: 1240px; margin: 0 auto;
+}
+.spotlight-strip.reverse { flex-direction: row-reverse; }
+.spot-text { flex: 1; min-width: 0; }
+.spot-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 14px; border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+  font-weight: 700; margin-bottom: 18px;
+  border: 1px solid currentColor;
+}
+.spot-title {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 800; color: var(--navy);
+  margin: 0 0 14px; line-height: 1.15; letter-spacing: -1px;
+}
+.spot-desc { font-size: 15px; color: var(--gray-text); line-height: 1.75; margin: 0 0 22px; }
+.spot-features { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 28px; }
+.spot-feat {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; gap: 6px;
+  color: var(--navy);
+}
+.spot-btn {
+  padding: 14px 32px; color: #fff;
+  border: none; border-radius: 2px;
+  font-family: var(--font-display);
+  font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  letter-spacing: 0.03em;
+}
+.spot-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+.spot-visual {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 28px; flex-shrink: 0;
+}
+.spot-icon-box {
+  width: 130px; height: 130px; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  animation: floatY 4s ease-in-out infinite;
+  position: relative;
+}
+.spot-stats { display: flex; gap: 24px; }
+.spot-stat { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.spot-stat-val { font-family: var(--font-display); font-size: 22px; font-weight: 800; }
+.spot-stat-label { font-family: var(--font-mono); font-size: 10px; color: var(--gray-text); letter-spacing: 0.08em; text-align: center; }
 
+/* ── DIVIDER ── */
+.strip-divider {
+  height: 1px;
+  background: var(--gray-soft);
+  max-width: 1240px; margin: 0 auto;
+}
+
+/* ── HOW IT WORKS ── */
+.how-section {
+  padding: 96px 24px;
+  background: var(--navy);
+}
+.how-section .section-title { color: #fff; }
+.how-section .section-sub { color: rgba(255,255,255,0.5); }
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 2px; margin-top: 50px;
+  max-width: 1100px; margin-inline: auto;
+}
+.step-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  padding: 36px 28px;
+  position: relative;
+  transition: all 0.3s;
+  text-align: center;
+}
+.step-card:hover {
+  background: rgba(255,255,255,0.07);
+  border-color: var(--red);
+  transform: translateY(-4px);
+}
+.step-num {
+  font-family: var(--font-display);
+  font-size: 72px; font-weight: 800;
+  color: rgba(255,255,255,0.04);
+  position: absolute; top: 10px; right: 16px;
+  line-height: 1; pointer-events: none;
+}
+.step-icon { font-size: 44px; margin-bottom: 18px; display: block; }
+.step-title {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 700;
+  color: #fff; margin: 0 0 12px; letter-spacing: -0.3px;
+}
+.step-text { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.7; margin: 0; }
+
+/* ── TESTIMONIALS ── */
+.test-section {
+  padding: 96px 24px;
+  background: var(--off-white);
+}
+.test-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 20px; max-width: 1200px; margin: 50px auto 0;
+}
+.test-card {
+  background: #fff; border: 1.5px solid var(--gray-soft);
+  border-radius: 4px; padding: 26px;
+  transition: all 0.3s; position: relative;
+  overflow: hidden;
+}
+.test-card::before {
+  content: '"';
+  font-family: var(--font-display);
+  font-size: 120px; color: var(--gray-soft);
+  position: absolute; top: -20px; left: 16px;
+  line-height: 1; pointer-events: none;
+}
+.test-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(11,31,58,0.1); border-color: var(--red); }
+.test-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+.test-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--navy); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 800; flex-shrink: 0;
+}
+.test-service-tag {
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #fff;
+  padding: 4px 12px; border-radius: 2px;
+}
+.test-rating { font-size: 13px; margin-bottom: 10px; }
+.test-text {
+  font-size: 14px; line-height: 1.75;
+  color: var(--gray-text); margin: 0 0 18px;
+  position: relative; z-index: 1;
+}
+.test-name { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--navy); }
+.test-role { font-family: var(--font-mono); font-size: 11px; color: var(--gray-text); margin-top: 2px; }
+.review-btn {
+  padding: 14px 36px;
+  background: var(--navy); color: #fff;
+  border: none; border-radius: 2px;
+  font-family: var(--font-display);
+  font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; margin-top: 40px;
+  display: block; margin-inline: auto;
+}
+.review-btn:hover { background: var(--red); transform: translateY(-2px); }
+
+/* ── WHY AXXSPACE ── */
+.why-section {
+  padding: 96px 24px;
+  background: var(--cream);
+}
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px; max-width: 1200px; margin: 50px auto 0;
+}
+.why-card {
+  padding: 28px; background: #fff;
+  border: 1.5px solid var(--gray-soft);
+  border-radius: 4px; text-align: center;
+  transition: all 0.25s;
+  border-top-width: 4px;
+}
+.why-card:hover { transform: translateY(-4px); box-shadow: 0 10px 32px rgba(11,31,58,0.08); }
+.why-icon { font-size: 36px; margin-bottom: 16px; display: block; }
+.why-title { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--navy); margin: 0 0 10px; }
+.why-text { font-size: 13px; color: var(--gray-text); line-height: 1.65; margin: 0; }
+
+/* ── FINAL CTA ── */
+.cta-section {
+  padding: 96px 24px;
+  background: var(--navy);
+  text-align: center;
+  border-top: 3px solid var(--red);
+  position: relative; overflow: hidden;
+}
+.cta-section::before {
+  content: 'AXXSPACE';
+  font-family: var(--font-display);
+  font-size: clamp(80px, 14vw, 200px);
+  font-weight: 800; color: rgba(255,255,255,0.02);
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  white-space: nowrap; pointer-events: none; letter-spacing: -4px;
+}
+.cta-inner { max-width: 800px; margin: 0 auto; position: relative; z-index: 1; }
+.cta-title {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 5vw, 54px);
+  font-weight: 800; color: #fff;
+  margin: 0 0 14px; letter-spacing: -2px;
+}
+.cta-title em { font-style: normal; color: var(--gold); }
+.cta-text { font-size: 17px; color: rgba(255,255,255,0.6); margin: 0 0 40px; line-height: 1.6; }
+.cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 22px; }
+.cta-btn {
+  padding: 14px 24px;
+  border: none; border-radius: 2px;
+  font-family: var(--font-display);
+  font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+  letter-spacing: 0.03em;
+}
+.cta-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 28px auto; max-width: 420px; }
+.cta-list-btn {
+  padding: 16px 38px;
+  font-family: var(--font-display);
+  font-size: 16px; font-weight: 700;
+  border-radius: 2px; cursor: pointer; transition: all 0.2s;
+  letter-spacing: 0.03em;
+}
+.cta-hint {
+  font-family: var(--font-mono);
+  font-size: 11px; color: rgba(255,255,255,0.35);
+  margin-top: 16px; letter-spacing: 0.08em;
+}
+
+/* ── FOOTER ── */
+.footer {
+  background: #050D1A;
+  color: rgba(255,255,255,0.55);
+  padding: 56px 24px 28px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.footer-inner { max-width: 1000px; margin: 0 auto; }
+.footer-top { text-align: center; margin-bottom: 44px; }
+.footer-brand {
+  font-family: var(--font-display);
+  font-size: 28px; font-weight: 800; color: #fff;
+}
+.footer-brand span { color: var(--red); }
+.footer-tagline { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.12em; margin-top: 6px; text-transform: uppercase; }
+.footer-cols { display: flex; justify-content: center; gap: 64px; flex-wrap: wrap; margin-bottom: 44px; }
+.footer-col { display: flex; flex-direction: column; gap: 10px; }
+.footer-col-title { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 4px; }
+.footer-link { font-size: 13px; color: rgba(255,255,255,0.45); cursor: pointer; transition: color 0.2s; }
+.footer-link:hover { color: #fff; }
+.footer-copy { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.2); text-align: center; letter-spacing: 0.08em; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(11,31,58,0.9);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999; padding: 20px;
+  backdrop-filter: blur(8px);
+}
+.modal-box {
+  background: #fff; border-radius: 4px;
+  max-width: 540px; width: 100%;
+  max-height: 90vh; overflow-y: auto;
+  padding: 36px; position: relative;
+  border-top: 4px solid var(--red);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+}
+.modal-close {
+  position: absolute; top: 16px; right: 16px;
+  background: var(--off-white); border: none;
+  border-radius: 2px; width: 38px; height: 38px;
+  cursor: pointer; font-size: 18px; color: var(--gray-text);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.modal-close:hover { background: var(--red); color: #fff; }
+.modal-title { font-family: var(--font-display); font-size: 26px; font-weight: 800; color: var(--navy); margin: 0 0 6px; letter-spacing: -0.5px; }
+.modal-sub { font-size: 14px; color: var(--gray-text); margin: 0 0 26px; line-height: 1.6; }
+.modal-services { display: flex; flex-direction: column; gap: 10px; }
+.modal-service-card {
+  display: flex; align-items: center; gap: 16px;
+  padding: 16px; border: 1.5px solid var(--gray-soft);
+  border-radius: 4px; cursor: pointer; transition: all 0.2s;
+}
+.modal-service-card:hover { border-color: var(--red); background: #fef2f2; transform: translateY(-2px); }
+.modal-svc-icon {
+  width: 50px; height: 50px; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; flex-shrink: 0;
+}
+.modal-svc-title { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--navy); margin: 0 0 3px; }
+.modal-svc-desc { font-size: 13px; color: var(--gray-text); margin: 0; }
+.modal-arrow { color: var(--gray-soft); font-size: 20px; margin-left: auto; transition: all 0.2s; }
+.modal-service-card:hover .modal-arrow { color: var(--red); transform: translateX(4px); }
+
+/* ── SPINNER ── */
+.spinner { width: 34px; height: 34px; border: 3px solid var(--gray-soft); border-top-color: var(--red); border-radius: 50%; animation: spin 0.8s linear infinite; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .spotlight-strip, .spotlight-strip.reverse { flex-direction: column !important; padding: 48px 24px !important; }
+  .spot-visual { width: 100%; }
+  .spot-stats { justify-content: center; }
+}
+@media (max-width: 640px) {
+  .hero-stat { padding: 10px 16px; }
+  .hero-stats { gap: 0; }
+  .cta-btn { width: 100%; }
+}
+`;
+
+/* ═══════════════════════ COMPONENT ═══════════════════════ */
 export default function Home() {
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
@@ -197,98 +898,66 @@ export default function Home() {
   ];
 
   const marqueeItems = [
-    "👋 Welcome to Axxspace!",
-    "🏠 Rentals Across All 47 Counties",
-    "🚛 Trusted Moving Services",
-    "🏨 Hotels & Tourism Experiences",
-    "💼 AxxBiashara Business Services",
-    "🏪 Marketplace for All Your Needs",
-    "✅ Verified Listings — Zero Hidden Fees",
-    "💬 Connect Directly via WhatsApp",
-    "🗺 GPS Maps for Every Listing",
-    "🔒 Safe, Secure & 100% Transparent",
-    "🎉 One Platform. Everything You Need.",
+    { label: "Welcome to Axxspace!", accent: "Kenya's #1 Platform" },
+    { label: "Rentals Across All", accent: "47 Counties" },
+    { label: "Trusted Moving", accent: "Services" },
+    { label: "Hotels & Tourism", accent: "Experiences" },
+    { label: "AxxBiashara", accent: "Business Services" },
+    { label: "Marketplace for", accent: "All Your Needs" },
+    { label: "Verified Listings —", accent: "Zero Hidden Fees" },
+    { label: "Connect via", accent: "WhatsApp" },
+    { label: "GPS Maps for", accent: "Every Listing" },
+    { label: "Safe, Secure &", accent: "Transparent" },
+    { label: "One Platform.", accent: "Everything." },
   ];
 
-  // Platform categories
   const platformCategories = [
     {
-      id: "rentals",
-      icon: rentalsIcon,
-      iconType: "image",
-      title: "Rentals",
-      tagline: "Find your next home",
+      id: "rentals", icon: rentalsIcon, iconType: "image",
+      title: "Rentals", tagline: "Find your next home",
       description: "Browse verified rental properties across all 47 counties. Bedsitters, apartments, maisonettes & more — no agents, no hidden fees.",
       features: ["Verified landlords", "All property types", "GPS-mapped locations", "Direct WhatsApp contact"],
-      cta: "Browse Rentals",
-      route: "/listings",
-      color: "#E31B1B",
-      bg: "linear-gradient(135deg, #fff5f5 0%, #ffe4e4 100%)",
-      accent: "#C01010",
+      cta: "Browse Rentals", route: "/listings",
+      color: "#E31B1B", bg: "linear-gradient(135deg,#fff8f8 0%,#ffe4e4 100%)", accent: "#B01212",
     },
     {
-      id: "movers",
-      icon: moversIcon,
-      iconType: "image",
-      title: "Movers",
-      tagline: "Stress-free moving",
+      id: "movers", icon: moversIcon, iconType: "image",
+      title: "Movers", tagline: "Stress-free moving",
       description: "Connect with trusted, vetted moving companies across Kenya. Get quotes, compare rates, and book your move with confidence.",
       features: ["Vetted moving crews", "Transparent pricing", "Local & long-distance", "Real-time tracking"],
-      cta: "Find Movers",
-      route: "/movers",
-      color: "#0B2140",
-      bg: "linear-gradient(135deg, #f0f4ff 0%, #dce8ff 100%)",
-      accent: "#1a3a52",
+      cta: "Find Movers", route: "/movers",
+      color: "#0B1F3A", bg: "linear-gradient(135deg,#EEF2FF 0%,#C7D7F8 100%)", accent: "#142B50",
     },
     {
-      id: "tourism",
-      icon: tourismIcon,
-      iconType: "image",
-      title: "Tourism",
-      tagline: "Discover Kenya's best",
+      id: "tourism", icon: tourismIcon, iconType: "image",
+      title: "Tourism", tagline: "Discover Kenya's best",
       description: "Explore hotels, lodges, resorts, and unique experiences across Kenya's 47 counties. From Nairobi to the coast and beyond.",
       features: ["Hotels & lodges", "Safari packages", "Weekend getaways", "Direct bookings"],
-      cta: "Explore Tourism",
-      route: "/tourism",
-      color: "#059669",
-      bg: "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)",
-      accent: "#047857",
+      cta: "Explore Tourism", route: "/tourism",
+      color: "#047857", bg: "linear-gradient(135deg,#F0FDF4 0%,#BBF7D0 100%)", accent: "#065F46",
     },
     {
-      id: "axxbiashara",
-      icon: axxbiasharaIcon,
-      iconType: "image",
-      title: "AxxBiashara",
-      tagline: "Business solutions & services",
-      description: "Access professional business services, from company registration to accounting, legal support, and digital solutions. Grow your business with trusted experts.",
+      id: "axxbiashara", icon: axxbiasharaIcon, iconType: "image",
+      title: "AxxBiashara", tagline: "Business solutions",
+      description: "Access professional business services, from company registration to accounting, legal support, and digital solutions.",
       features: ["Business registration", "Accounting & tax", "Legal services", "Digital solutions"],
-      cta: "Explore Services",
-      route: "/axxbiashara",
-      color: "#7c3aed",
-      bg: "linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)",
-      accent: "#6d28d9",
+      cta: "Explore Services", route: "/axxbiashara",
+      color: "#6D28D9", bg: "linear-gradient(135deg,#F5F3FF 0%,#DDD6FE 100%)", accent: "#5B21B6",
     },
     {
-      id: "marketplace",
-      icon: "🏪",
-      iconType: "emoji",
-      title: "Marketplace",
-      tagline: "Buy & sell anything",
-      description: "The ultimate marketplace for buying and selling new and used items. From electronics to furniture, fashion to cars — find great deals or sell your items.",
+      id: "marketplace", icon: "🏪", iconType: "emoji",
+      title: "Marketplace", tagline: "Buy & sell anything",
+      description: "The ultimate marketplace for buying and selling new and used items. From electronics to furniture, fashion to cars.",
       features: ["New & used items", "Secure transactions", "Nationwide delivery", "Direct seller contact"],
-      cta: "Browse Marketplace",
-      route: "/materials",
-      color: "#0891b2",
-      bg: "linear-gradient(135deg, #ecfeff 0%, #cffafe 100%)",
-      accent: "#0e7490",
+      cta: "Browse Marketplace", route: "/materials",
+      color: "#0891B2", bg: "linear-gradient(135deg,#ECFEFF 0%,#A5F3FC 100%)", accent: "#0E7490",
     },
   ];
 
-  // Stats per category
   const categoryStats = {
     rentals: [{ val: "280+", label: "Active Listings" }, { val: "47", label: "Counties" }, { val: "500+", label: "Happy Tenants" }],
     movers: [{ val: "60+", label: "Moving Companies" }, { val: "47", label: "Counties Covered" }, { val: "1,200+", label: "Moves Completed" }],
-    merchants: [{ val: "150+", label: "Verified Merchants" }, { val: "5,000+", label: "Products Listed" }, { val: "30+", label: "Counties" }],
+    merchants: [{ val: "150+", label: "Merchants" }, { val: "5,000+", label: "Products" }, { val: "30+", label: "Counties" }],
     tourism: [{ val: "200+", label: "Hotels & Lodges" }, { val: "47", label: "Counties" }, { val: "3,000+", label: "Happy Guests" }],
     axxbiashara: [{ val: "100+", label: "Service Providers" }, { val: "47", label: "Counties" }, { val: "2,000+", label: "Businesses Served" }],
     marketplace: [{ val: "10,000+", label: "Active Listings" }, { val: "47", label: "Counties" }, { val: "5,000+", label: "Happy Users" }],
@@ -307,14 +976,9 @@ export default function Home() {
         console.error("Failed to load featured properties:", err?.message || err);
         setFetchError(true);
         setFeaturedProperties([]);
-      } finally {
-        setLoadingFeatured(false);
-      }
+      } finally { setLoadingFeatured(false); }
     };
-    fetchFeatured().catch(err => {
-      console.error("Featured fetch error:", err);
-      setComponentError("Failed to load featured properties");
-    });
+    fetchFeatured().catch(err => { setComponentError("Failed to load featured properties"); });
   }, []);
 
   useEffect(() => {
@@ -327,22 +991,15 @@ export default function Home() {
       } catch (err) {
         console.error("Failed to load reviews:", err?.message || err);
         setReviews([]);
-      } finally {
-        setLoadingReviews(false);
-      }
+      } finally { setLoadingReviews(false); }
     };
-    fetchReviews().catch(err => {
-      console.error("Reviews fetch error:", err);
-      setComponentError("Failed to load reviews");
-    });
+    fetchReviews().catch(err => { setComponentError("Failed to load reviews"); });
   }, []);
 
   useEffect(() => {
     const targetStats = { listings: 280, counties: 47, tenants: 500 };
-    const duration = 2000;
-    const steps = 60;
-    const interval = duration / steps;
-    let currentStep = 0;
+    const duration = 2000; const steps = 60;
+    const interval = duration / steps; let currentStep = 0;
     const timer = setInterval(() => {
       currentStep++;
       const progress = currentStep / steps;
@@ -352,10 +1009,7 @@ export default function Home() {
         counties: Math.floor(targetStats.counties * easeOut),
         tenants: Math.floor(targetStats.tenants * easeOut),
       });
-      if (currentStep >= steps) {
-        clearInterval(timer);
-        setAnimatedStats(targetStats);
-      }
+      if (currentStep >= steps) { clearInterval(timer); setAnimatedStats(targetStats); }
     }, interval);
     return () => clearInterval(timer);
   }, []);
@@ -375,1247 +1029,12 @@ export default function Home() {
 
   const activeCategory = platformCategories.find(c => c.id === activeCategoryTab);
 
-  /* ─────────────── GLOBAL STYLE INJECTION ─────────────── */
-  const globalCSS = `
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700;800&display=swap');
-    :root {
-      --primary: #E31B1B;
-      --primary-dark: #C01010;
-      --secondary: #0B2140;
-      --secondary-light: #152B4A;
-      --accent: #fbbf24;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'DM Sans', sans-serif; background: #FFFFFF; color: #0B2140; }
-
-    @keyframes marquee {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(1.3); }
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes shimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
-    }
-
-    .home-root {
-      font-family: 'DM Sans', sans-serif;
-      background: #FFFFFF;
-      color: #0B2140;
-      min-height: 100vh;
-    }
-
-    .marquee-wrapper {
-      overflow: hidden;
-      background: linear-gradient(90deg, #391be3 0%, #d91414 50%, #1b1ec9 100%);
-      padding: 9px 0;
-      border-bottom: 2px solid #5fc010a1;
-    }
-
-    .marquee-track {
-      display: flex;
-      align-items: center;
-      width: max-content;
-      animation: marquee 36s linear infinite;
-    }
-
-    .marquee-track:hover { animation-play-state: paused; }
-
-    .marquee-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: white;
-      border-radius: 20px;
-      padding: 4px 16px;
-      margin: 0 8px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #0B2140;
-      white-space: nowrap;
-      box-shadow: 0 2px 8px rgba(227, 27, 27, 0.15);
-    }
-
-    .marquee-sep {
-      color: #2a10c0;
-      font-weight: 700;
-      font-size: 16px;
-      margin-left: 8px;
-    }
-
-    .hero {
-      position: relative;
-      padding: 80px 16px 60px;
-      text-align: center;
-      border-bottom: 3px solid #E31B1B;
-      width: 100%;
-      box-sizing: border-box;
-      overflow: hidden;
-      min-height: 100dvh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .bg-video {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center center;
-      z-index: 0;
-      display: block;
-      pointer-events: none;
-      background: #0B2140;
-    }
-
-    .bg-video-fallback {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, #0B2140 0%, #1a3a52 100%);
-      z-index: 0;
-      display: block;
-    }
-
-    .video-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(180deg, rgba(11, 33, 64, 0.75) 0%, rgba(11, 33, 64, 0.65) 50%, rgba(11, 33, 64, 0.80) 100%);
-      z-index: 1;
-    }
-
-    .hero-content {
-      max-width: 860px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 2;
-    }
-
-    .trust-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(255, 255, 255, 0.95);
-      color: #0B2140;
-      padding: 8px 18px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 700;
-      margin-bottom: 18px;
-      border: 1px solid rgba(227, 27, 27, 0.3);
-      box-shadow: 0 4px 16px rgba(227, 27, 27, 0.2);
-    }
-
-    .trust-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #E31B1B;
-      display: inline-block;
-      animation: pulse 1.8s infinite;
-    }
-
-    .hero-title {
-      font-size: clamp(28px, 5vw, 50px);
-      font-weight: 800;
-      color: white;
-      margin: 0 0 6px;
-      letter-spacing: -1px;
-      line-height: 1.15;
-      text-shadow: 0 2px 16px rgba(11, 33, 64, 0.8);
-    }
-
-    .hero-title-accent { color: #fbbf24; }
-
-    .hero-subtitle {
-      font-size: 15px;
-      color: #f3f4f6;
-      margin: 0 auto 24px;
-      max-width: 520px;
-      line-height: 1.6;
-      text-shadow: 0 1px 8px rgba(11, 33, 64, 0.6);
-    }
-
-    .hero-categories {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 24px;
-    }
-
-    .hero-category-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 18px;
-      border-radius: 50px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-      backdrop-filter: blur(8px);
-    }
-
-    .search-property-label {
-      font-size: 13px;
-      font-weight: 700;
-      color: rgba(255,255,255,0.9);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      margin: 0 0 8px;
-      text-shadow: 0 1px 4px rgba(11, 33, 64, 0.5);
-    }
-
-    .hamburger-wrapper {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      background: rgba(255,255,255,0.15);
-      border: 1.5px solid rgba(255,255,255,0.35);
-      border-radius: 50px;
-      padding: 8px 20px 8px 8px;
-      margin: 0 auto 16px;
-      cursor: pointer;
-      backdrop-filter: blur(8px);
-    }
-
-    .hamburger-label {
-      color: white;
-      font-weight: 700;
-      font-size: 15px;
-      letter-spacing: 0.02em;
-      text-shadow: 0 1px 4px rgba(11, 33, 64, 0.5);
-    }
-
-    .hamburger-btn {
-      background: #0B2140;
-      border: none;
-      border-radius: 50%;
-      width: 42px;
-      height: 42px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      flex-shrink: 0;
-      transition: background 0.2s;
-      padding: 0;
-    }
-
-    .hamburger-btn:hover {
-      background: #152B4A !important;
-      transform: scale(1.05);
-    }
-
-    .hamburger-line {
-      display: block;
-      width: 20px;
-      height: 2.5px;
-      background: #E31B1B;
-      border-radius: 2px;
-      transition: transform 0.25s ease, opacity 0.2s ease;
-    }
-
-    .search-dropdown {
-      background: rgba(255,255,255,0.98);
-      border-radius: 16px;
-      padding: 16px;
-      box-shadow: 0 12px 40px rgba(227, 27, 27, 0.25);
-      max-width: 400px;
-      width: 100%;
-      margin: 0 auto 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      box-sizing: border-box;
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(227, 27, 27, 0.1);
-    }
-
-    .search-input {
-      padding: 12px 14px;
-      border: 2px solid #e5e7eb;
-      border-radius: 10px;
-      font-size: 14px;
-      font-family: inherit;
-      background: #f9fafb;
-      color: #0B2140;
-      transition: all 0.2s;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
-    .search-btn {
-      padding: 13px 22px;
-      background: linear-gradient(135deg, #E31B1B 0%, #C01010 100%);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 4px 14px rgba(227, 27, 27, 0.35);
-      width: 100%;
-    }
-
-    .category-hero-cta {
-      max-width: 480px;
-      margin: 0 auto 20px;
-      text-align: center;
-    }
-
-    .category-hero-desc {
-      color: rgba(255,255,255,0.9);
-      font-size: 15px;
-      line-height: 1.6;
-      margin-bottom: 16px;
-      text-shadow: 0 1px 6px rgba(11,33,64,0.5);
-    }
-
-    .category-hero-btn {
-      padding: 13px 32px;
-      background: white;
-      color: #0B2140;
-      border: none;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
-    }
-
-    .hero-stats {
-      display: flex;
-      justify-content: center;
-      gap: 32px;
-      flex-wrap: wrap;
-      margin-top: 4px;
-    }
-
-    .hero-stat {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-    }
-
-    .hero-stat-val {
-      font-size: 20px;
-      font-weight: 800;
-      color: white;
-      text-shadow: 0 2px 10px rgba(11, 33, 64, 0.6);
-    }
-
-    .hero-stat-label {
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.95);
-      font-weight: 500;
-      text-shadow: 0 1px 4px rgba(11, 33, 64, 0.5);
-    }
-
-    .categories-section {
-      padding: 80px 20px;
-      background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
-    }
-
-    .section-header {
-      text-align: center;
-      margin-bottom: 44px;
-      padding: 0 20px;
-    }
-
-    .section-title {
-      font-size: 30px;
-      font-weight: 800;
-      color: #E31B1B;
-      margin: 0 0 10px;
-    }
-
-    .section-subtitle {
-      color: #6b7280;
-      font-size: 16px;
-      margin: 0;
-    }
-
-    .categories-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 24px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .category-card {
-      padding: 28px 24px;
-      border-radius: 16px;
-      border: 1px solid rgba(0,0,0,0.06);
-      cursor: pointer;
-      transition: all 0.25s;
-      position: relative;
-    }
-
-    .category-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 16px 40px rgba(0,0,0,0.10);
-    }
-
-    .category-card-icon {
-      width: 52px;
-      height: 52px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
-      margin-bottom: 16px;
-    }
-
-    .category-card-title {
-      font-size: 22px;
-      font-weight: 700;
-      margin: 0 0 4px;
-      font-family: 'Cormorant Garamond', 'Georgia', serif;
-    }
-
-    .category-card-tagline {
-      font-size: 13px;
-      color: #6b7280;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin: 0 0 12px;
-    }
-
-    .category-card-desc {
-      font-size: 14px;
-      color: #4b5563;
-      line-height: 1.6;
-      margin: 0 0 16px;
-    }
-
-    .category-feature-list {
-      list-style: none;
-      padding: 0;
-      margin: 0 0 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .category-feature-item {
-      font-size: 13px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .category-card-btn {
-      width: 100%;
-      padding: 12px;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .featured-section {
-      padding: 60px 0;
-      background: white;
-      overflow: hidden;
-    }
-
-    .loading-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      padding: 40px 0;
-    }
-
-    .loading-text {
-      color: #6b7280;
-      font-size: 15px;
-    }
-
-    .spinner {
-      width: 32px;
-      height: 32px;
-      border: 3px solid #e5e7eb;
-      border-top-color: #E31B1B;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    .marquee-cards-wrapper {
-      overflow: hidden;
-      width: 100%;
-    }
-
-    @keyframes cardsMarquee {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-
-    .cards-marquee-track {
-      display: flex;
-      align-items: stretch;
-      width: max-content;
-      animation: cardsMarquee 30s linear infinite;
-      padding: 10px 0 20px;
-    }
-
-    .cards-marquee-track:hover { animation-play-state: paused; }
-
-    .featured-card {
-      background: white;
-      border-radius: 14px;
-      overflow: hidden;
-      border: 1px solid #e5e7eb;
-      transition: transform 0.25s, box-shadow 0.25s;
-      min-width: 280px;
-      max-width: 280px;
-      flex-shrink: 0;
-      margin: 0 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-
-    .featured-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 12px 32px rgba(227, 27, 27, 0.15);
-    }
-
-    .featured-image-wrapper {
-      position: relative;
-    }
-
-    .featured-image {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-      display: block;
-    }
-
-    .boosted-badge {
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      background: #E31B1B;
-      color: white;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    .featured-type {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: rgba(11, 33, 64, 0.85);
-      color: white;
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 600;
-    }
-
-    .featured-info {
-      padding: 16px 18px 20px;
-    }
-
-    .featured-title {
-      font-size: 15px;
-      font-weight: 700;
-      margin: 0 0 6px;
-      color: #0B2140;
-      font-family: 'Cormorant Garamond', 'Georgia', serif;
-    }
-
-    .featured-location {
-      color: #6b7280;
-      margin: 0 0 8px;
-      font-size: 12px;
-    }
-
-    .featured-meta {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 8px;
-      flex-wrap: wrap;
-    }
-
-    .meta-tag {
-      background: rgba(227, 27, 27, 0.1);
-      color: #E31B1B;
-      padding: 3px 10px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 500;
-    }
-
-    .featured-price {
-      color: #E31B1B;
-      font-size: 17px;
-      font-weight: 800;
-      margin: 8px 0 0;
-    }
-
-    .per-month {
-      font-size: 12px;
-      color: #C01010;
-      font-weight: 400;
-    }
-
-    .view-btn {
-      margin-top: 14px;
-      width: 100%;
-      padding: 11px;
-      background: linear-gradient(135deg, #0B2140 0%, #152B4A 100%);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 13px;
-      transition: background 0.2s;
-    }
-
-    .view-btn:hover {
-      background: linear-gradient(135deg, #152B4A 0%, #1a3a52 100%) !important;
-    }
-
-    .view-all-btn {
-      padding: 13px 36px;
-      background: transparent;
-      color: #E31B1B;
-      border: 2px solid #E31B1B;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .no-featured {
-      text-align: center;
-      padding: 40px 20px;
-    }
-
-    .no-featured-icon {
-      font-size: 52px;
-      margin-bottom: 12px;
-    }
-
-    .no-featured-text {
-      color: #0B2140;
-      font-size: 18px;
-      font-weight: 700;
-      margin: 0 0 6px;
-      font-family: 'Cormorant Garamond', 'Georgia', serif;
-    }
-
-    .no-featured-sub {
-      color: #6b7280;
-      font-size: 14px;
-      margin: 0 0 20px;
-    }
-
-    .boost-btn {
-      padding: 12px 28px;
-      background: linear-gradient(135deg, #E31B1B 0%, #C01010 100%);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 15px;
-      cursor: pointer;
-    }
-
-    .spotlight-section { background: #f8f9fa; }
-    .spotlight-strip {
-      display: flex;
-      align-items: center;
-      gap: 48px;
-      padding: 64px 40px;
-      max-width: 1200px;
-      margin: 0 auto;
-      background: linear-gradient(135deg, #f0f4ff 0%, #dce8ff 100%);
-    }
-    .spotlight-text { flex: 1; min-width: 0; }
-    .spotlight-badge {
-      display: inline-block;
-      background: #dce8ff;
-      color: #0B2140;
-      padding: 5px 14px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 14px;
-    }
-    .spotlight-title {
-      font-size: clamp(22px, 3vw, 32px);
-      font-weight: 800;
-      color: #0B2140;
-      margin: 0 0 12px;
-      line-height: 1.2;
-    }
-    .spotlight-desc {
-      font-size: 15px;
-      color: #4b5563;
-      line-height: 1.7;
-      margin: 0 0 18px;
-    }
-    .spotlight-features {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-    .spotlight-feature {
-      font-size: 13px;
-      font-weight: 600;
-      color: #1a3a52;
-    }
-    .spotlight-btn {
-      display: inline-block;
-      padding: 13px 28px;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-    }
-
-    .spotlight-visual {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 24px;
-      flex-shrink: 0;
-    }
-    .spotlight-emoji {
-      width: 120px;
-      height: 120px;
-      border-radius: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 60px;
-    }
-    .spotlight-stat-grid { display: flex; gap: 20px; }
-    .spotlight-stat {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-    }
-    .spotlight-stat-val { font-size: 20px; font-weight: 800; }
-    .spotlight-stat-label {
-      font-size: 11px;
-      color: #6b7280;
-      font-weight: 500;
-      text-align: center;
-    }
-
-    .how-it-works-section {
-      padding: 80px 20px;
-      background: white;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .steps-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 40px;
-      margin-top: 40px;
-      position: relative;
-    }
-    .step-card {
-      position: relative;
-      padding: 32px 24px;
-      background: white;
-      border-radius: 16px;
-      border: 1px solid #e5e7eb;
-      text-align: center;
-      transition: all 0.3s;
-    }
-    .step-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 12px 32px rgba(227, 27, 27, 0.15);
-      border-color: #E31B1B;
-    }
-    .step-number {
-      position: absolute;
-      top: -16px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: linear-gradient(135deg, #E31B1B 0%, #C01010 100%);
-      color: white;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: 800;
-      box-shadow: 0 4px 12px rgba(227, 27, 27, 0.3);
-    }
-    .step-icon { font-size: 48px; margin-bottom: 16px; }
-    .step-title {
-      font-size: 17px;
-      font-weight: 700;
-      color: #0B2140;
-      margin: 0 0 12px;
-    }
-    .step-text {
-      font-size: 13px;
-      color: #6b7280;
-      line-height: 1.6;
-      margin: 0;
-    }
-    .step-connector {
-      position: absolute;
-      top: 50%;
-      right: -20px;
-      width: 40px;
-      height: 2px;
-      background: #E31B1B;
-      opacity: 0.3;
-    }
-
-    .testimonials-section {
-      padding: 80px 20px;
-      background: #0B2140;
-      color: white;
-    }
-    .testimonials-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 24px;
-      margin-top: 40px;
-      max-width: 1200px;
-      margin: 40px auto 0;
-    }
-    .testimonial-card {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 24px;
-      transition: all 0.3s;
-    }
-    .testimonial-card:hover {
-      transform: translateY(-4px);
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(251, 191, 36, 0.3);
-    }
-    .testimonial-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    .testimonial-avatar { font-size: 40px; }
-    .testimonial-service-tag {
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-      color: white;
-    }
-    .testimonial-rating { font-size: 14px; margin-bottom: 10px; }
-    .testimonial-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: white;
-      margin: 0 0 8px;
-    }
-    .testimonial-text {
-      font-size: 14px;
-      line-height: 1.7;
-      color: rgba(255, 255, 255, 0.85);
-      margin: 0 0 14px;
-      font-style: italic;
-    }
-    .testimonial-author {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .testimonial-name { font-size: 14px; color: #fbbf24; }
-    .testimonial-role {
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.5);
-    }
-    .leave-review-btn {
-      padding: 14px 32px;
-      background: white;
-      color: #0B2140;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
-    }
-
-    .features-section {
-      padding: 72px 20px;
-      background: #FFFFFF;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 20px;
-      margin-top: 8px;
-    }
-    .feature-card {
-      padding: 26px;
-      background: #F8F9FA;
-      border-radius: 12px;
-      text-align: center;
-      border: 1px solid #e5e7eb;
-      transition: all 0.22s;
-    }
-    .feature-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(227, 27, 27, 0.08);
-      background: white;
-    }
-    .feature-icon { font-size: 34px; margin-bottom: 14px; }
-    .feature-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: #0B2140;
-      margin: 0 0 10px;
-    }
-    .feature-text {
-      font-size: 13px;
-      color: #6b7280;
-      line-height: 1.6;
-      margin: 0;
-    }
-
-    .cta {
-      background: linear-gradient(135deg, #0B2140 0%, #1a3a52 100%);
-      padding: 76px 20px;
-      text-align: center;
-      border-top: 3px solid #E31B1B;
-    }
-    .cta-inner { max-width: 760px; margin: 0 auto; }
-    .cta-title {
-      font-size: 34px;
-      font-weight: 700;
-      color: white;
-      margin: 0 0 12px;
-      font-family: 'Cormorant Garamond', 'Georgia', serif;
-    }
-    .cta-text {
-      font-size: 16px;
-      color: rgba(255,255,255,0.85);
-      margin: 0 0 32px;
-      line-height: 1.6;
-    }
-    .cta-buttons {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
-    .cta-btn-primary {
-      padding: 13px 22px;
-      background: linear-gradient(135deg, #E31B1B 0%, #C01010 100%);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
-    }
-    .cta-divider {
-      height: 1px;
-      background: rgba(255,255,255,0.15);
-      margin: 24px auto;
-      max-width: 400px;
-    }
-    .cta-btn-secondary {
-      padding: 14px 32px;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .login-hint {
-      font-size: 13px;
-      color: rgba(255,255,255,0.65);
-      margin-top: 14px;
-      font-style: italic;
-    }
-
-    .boost-modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(11, 33, 64, 0.85);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-
-    .boost-modal {
-      background: white;
-      border-radius: 20px;
-      max-width: 520px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      padding: 32px;
-      position: relative;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    }
-
-    .boost-modal-close {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: #f3f4f6;
-      border: none;
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      cursor: pointer;
-      font-size: 20px;
-      color: #6b7280;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-    }
-
-    .boost-modal-close:hover {
-      background: #e5e7eb;
-      color: #0B2140;
-    }
-
-    .boost-modal-title {
-      font-size: 24px;
-      font-weight: 800;
-      color: #0B2140;
-      margin: 0 0 8px;
-      text-align: center;
-    }
-
-    .boost-modal-subtitle {
-      font-size: 14px;
-      color: #6b7280;
-      text-align: center;
-      margin: 0 0 24px;
-      line-height: 1.6;
-    }
-
-    .boost-services-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-
-    .boost-service-card {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 16px;
-      border: 2px solid #e5e7eb;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.2s;
-      background: white;
-    }
-
-    .boost-service-card:hover {
-      border-color: #E31B1B;
-      background: #fef2f2;
-      transform: translateY(-2px);
-    }
-
-    .boost-service-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      flex-shrink: 0;
-    }
-
-    .boost-service-info {
-      flex: 1;
-    }
-
-    .boost-service-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: #0B2140;
-      margin: 0 0 4px;
-    }
-
-    .boost-service-desc {
-      font-size: 13px;
-      color: #6b7280;
-      margin: 0;
-      line-height: 1.4;
-    }
-
-    .boost-service-arrow {
-      color: #9ca3af;
-      font-size: 20px;
-      transition: all 0.2s;
-    }
-
-    .boost-service-card:hover .boost-service-arrow {
-      color: #E31B1B;
-      transform: translateX(4px);
-    }
-
-    .footer {
-      background: #060f1e;
-      color: #cbd5e1;
-      padding: 48px 20px 24px;
-    }
-    .footer-inner { max-width: 960px; margin: 0 auto; }
-    .footer-brand { text-align: center; margin-bottom: 32px; }
-    .footer-tagline {
-      font-size: 13px;
-      color: #94a3b8;
-      margin: 4px 0 0;
-    }
-    .footer-columns {
-      display: flex;
-      justify-content: center;
-      gap: 60px;
-      flex-wrap: wrap;
-      margin-bottom: 32px;
-    }
-    .footer-col {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .footer-col-title {
-      font-size: 12px;
-      font-weight: 700;
-      color: #fbbf24;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin: 0 0 4px;
-    }
-    .footer-link {
-      font-size: 13px;
-      color: #94a3b8;
-      cursor: pointer;
-      transition: color 0.2s;
-    }
-    .footer-copy {
-      font-size: 12px;
-      color: #475569;
-      text-align: center;
-      margin: 0;
-    }
-
-    button:hover:not(:disabled) { transform: translateY(-2px); opacity: 0.93; }
-
-    input:focus, select:focus {
-      outline: none;
-      border-color: #E31B1B !important;
-      box-shadow: 0 0 0 3px rgba(227, 27, 27, 0.12);
-    }
-
-    select {
-      appearance: none;
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-      background-repeat: no-repeat;
-      background-position: right 8px center;
-      background-size: 18px;
-      padding-right: 32px;
-      cursor: pointer;
-    }
-
-    @media (max-width: 768px) {
-      .spotlight-strip {
-        flex-direction: column !important;
-        padding: 40px 20px !important;
-      }
-      .spotlight-strip > div:last-child { width: 100%; }
-      .spotlight-stat-grid { justify-content: center; }
-      .step-connector { display: none !important; }
-      .hero-video {
-        object-fit: cover !important;
-        object-position: center center !important;
-        width: 100vw !important;
-        height: 100vh !important;
-      }
-      .hero {
-        min-height: 100vh !important;
-        padding: 40px 16px 60px !important;
-      }
-    }
-  `;
-  if (typeof document !== "undefined" && !document.getElementById("home-styles")) {
-    const tag = document.createElement("style");
-    tag.id = "home-styles";
-    tag.textContent = globalCSS;
-    document.head.appendChild(tag);
-  }
-
   if (componentError) {
     return (
-      <div style={{ padding: "40px", textAlign: "center", fontFamily: "sans-serif" }}>
-        <h2 style={{ color: "#E31B1B" }}>Error Loading Page</h2>
-        <p>{componentError}</p>
-        <button onClick={() => window.location.reload()} style={{ padding: "10px 20px", background: "#E31B1B", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}>
+      <div style={{ padding: "60px 24px", textAlign: "center", fontFamily: "'Outfit',sans-serif" }}>
+        <h2 style={{ fontFamily: "'Syne',sans-serif", color: "#E31B1B", marginBottom: "12px" }}>Error Loading Page</h2>
+        <p style={{ color: "#6B6860", marginBottom: "20px" }}>{componentError}</p>
+        <button onClick={() => window.location.reload()} style={{ padding: "12px 28px", background: "#E31B1B", color: "#fff", border: "none", borderRadius: "2px", cursor: "pointer", fontFamily: "'Syne',sans-serif", fontWeight: 700 }}>
           Reload Page
         </button>
       </div>
@@ -1626,120 +1045,101 @@ export default function Home() {
     <div className="home-root">
       <style>{css}</style>
 
-      {/* ── MARQUEE ── */}
-      <div className="marquee-wrapper">
-        <div className="marquee-track">
+      {/* ── TICKER ── */}
+      <div className="ticker-outer">
+        <div className="ticker-track">
           {[...marqueeItems, ...marqueeItems].map((item, idx) => (
-            <span key={idx} className="marquee-pill">
-              {item}<span className="marquee-sep">·</span>
+            <span key={idx} className="ticker-item">
+              <span className="ticker-dot"></span>
+              {item.label} <b>{item.accent}</b>
             </span>
           ))}
         </div>
       </div>
 
-      {/* ── HERO WITH BACKGROUND VIDEO ── */}
+      {/* ── HERO ── */}
       <section className="hero">
-        <div className="bg-video-fallback"></div>
+        <div style={{ position: "absolute", inset: 0, background: "#0B1F3A", zIndex: 0 }}></div>
         <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="bg-video hero-video"
+          autoPlay muted loop playsInline
+          className="hero-bg-video"
           onLoadedData={() => setVideoLoaded(true)}
           onError={() => setVideoLoaded(false)}
-          style={{ opacity: videoLoaded ? 1 : 0 }}
+          style={{ opacity: videoLoaded ? 1 : 0, transition: "opacity 0.6s" }}
         >
           <source src={bgVideo} type="video/mp4" />
         </video>
-        <div className="video-overlay"></div>
+        <div className="hero-overlay"></div>
+        <div className="hero-grain"></div>
 
         <div className="hero-content">
-          <div className="trust-badge">
-            <span className="trust-dot"></span>
+          <div className="hero-eyebrow">
+            <span className="hero-eyebrow-dot"></span>
             Kenya's #1 Property & Services Platform
           </div>
 
           <h1 className="hero-title">
             Everything You Need<br />
-            <span className="hero-title-accent">Under One Roof</span>
+            <em>Under One Roof</em>
           </h1>
           <p className="hero-subtitle">
             Rentals · Movers · Tourism · AxxBiashara · Marketplace — verified across all 47 counties
           </p>
 
-          {/* ── CATEGORY QUICK LINKS ── */}
-          <div className="hero-categories">
+          {/* CATEGORY TABS */}
+          <div className="hero-tabs">
             {platformCategories.map((cat) => (
               <button
                 key={cat.id}
-                className="hero-category-btn"
-                style={{
-                  background: activeCategoryTab === cat.id
-                    ? "white"
-                    : "rgba(255,255,255,0.15)",
-                  color: activeCategoryTab === cat.id ? "#0B2140" : "white",
-                  border: activeCategoryTab === cat.id
-                    ? "2px solid white"
-                    : "2px solid rgba(255,255,255,0.3)",
-                  fontWeight: activeCategoryTab === cat.id ? 800 : 600,
-                }}
+                className={`hero-tab ${activeCategoryTab === cat.id ? "hero-tab-active" : "hero-tab-inactive"}`}
                 onClick={() => setActiveCategoryTab(cat.id)}
               >
-                {cat.iconType === "image" ? (
-                  <img src={cat.icon} alt={cat.title} style={{ width: "24px", height: "24px", objectFit: "contain" }} />
-                ) : (
-                  <span style={{ fontSize: "18px" }}>{cat.icon}</span>
-                )}
+                {cat.iconType === "image"
+                  ? <img src={cat.icon} alt={cat.title} style={{ width: "20px", height: "20px", objectFit: "contain" }} />
+                  : <span style={{ fontSize: "17px" }}>{cat.icon}</span>
+                }
                 {cat.title}
               </button>
             ))}
           </div>
 
-          {/* ── SEARCH PANEL (Rentals only) or Quick CTA ── */}
+          {/* SEARCH / CTA */}
           {activeCategoryTab === "rentals" ? (
             <>
-              <p className="search-property-label">Search Rental Properties</p>
-              <div className="hamburger-wrapper" onClick={() => setMenuOpen(!menuOpen)}>
-                <button
-                  type="button"
-                  className="hamburger-btn"
-                  aria-label="Open property search"
-                >
-                  <span className="hamburger-line" style={{ transform: menuOpen ? "rotate(45deg) translate(4px, 4px)" : "none" }}></span>
-                  <span className="hamburger-line" style={{ opacity: menuOpen ? 0 : 1, transform: menuOpen ? "scaleX(0)" : "none" }}></span>
-                  <span className="hamburger-line" style={{ transform: menuOpen ? "rotate(-45deg) translate(4px, -4px)" : "none" }}></span>
-                </button>
-                <span className="hamburger-label">Search Properties</span>
+              <p className="search-label">Search Rental Properties</p>
+              <div className="search-trigger" onClick={() => setMenuOpen(!menuOpen)}>
+                <div className="search-trigger-icon">
+                  <span className="search-trigger-line" style={{ transform: menuOpen ? "rotate(45deg) translate(3px,3px)" : "none" }}></span>
+                  <span className="search-trigger-line" style={{ opacity: menuOpen ? 0 : 1 }}></span>
+                  <span className="search-trigger-line" style={{ transform: menuOpen ? "rotate(-45deg) translate(3px,-3px)" : "none" }}></span>
+                </div>
+                <span className="search-trigger-text">Search Properties</span>
               </div>
               {menuOpen && (
-                <form onSubmit={(e) => { handleSearch(e); setMenuOpen(false); }} className="search-dropdown hamburger-menu">
-                  <select className="search-input" value={searchForm.county} onChange={(e) => setSearchForm({ ...searchForm, county: e.target.value })}>
+                <form onSubmit={(e) => { handleSearch(e); setMenuOpen(false); }} className="search-panel">
+                  <select className="search-select" value={searchForm.county} onChange={(e) => setSearchForm({ ...searchForm, county: e.target.value })}>
                     <option value="">📍 Select County</option>
-                    {counties.map((c) => <option key={c} value={c}>{c}</option>)}
+                    {counties.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
-                  <select className="search-input" value={searchForm.type} onChange={(e) => setSearchForm({ ...searchForm, type: e.target.value })}>
+                  <select className="search-select" value={searchForm.type} onChange={(e) => setSearchForm({ ...searchForm, type: e.target.value })}>
                     <option value="">🏗 Property Type</option>
-                    {types.map((t) => <option key={t} value={t}>{t}</option>)}
+                    {types.map(t => <option key={t} value={t}>{t}</option>)}
                   </select>
-                  <button type="submit" className="search-btn">🔍 Search Now</button>
+                  <button type="submit" className="search-submit">🔍 Search Now</button>
                 </form>
               )}
             </>
           ) : (
-            <div className="category-hero-cta">
-              <p className="category-hero-desc">{activeCategory?.description}</p>
-              <button
-                className="category-hero-btn"
-                onClick={() => navigate(activeCategory?.route)}
-              >
+            <div style={{ maxWidth: "480px", margin: "0 auto 16px", textAlign: "center" }}>
+              <p className="cat-cta-desc">{activeCategory?.description}</p>
+              <button className="cat-cta-btn" onClick={() => navigate(activeCategory?.route)}>
                 {activeCategory?.cta} →
               </button>
             </div>
           )}
 
           <div className="hero-stats">
-            {categoryStats[activeCategoryTab].map((s) => (
+            {categoryStats[activeCategoryTab].map(s => (
               <div key={s.label} className="hero-stat">
                 <span className="hero-stat-val">{s.val}</span>
                 <span className="hero-stat-label">{s.label}</span>
@@ -1749,38 +1149,39 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── PLATFORM CATEGORIES SHOWCASE ── */}
-      <section className="categories-section">
-        <div className="section-header">
+      {/* ── CATEGORIES SHOWCASE ── */}
+      <section className="cats-section">
+        <div className="section-hdr">
+          <p className="section-eyebrow">What We Offer</p>
           <h2 className="section-title">Everything on One Platform</h2>
-          <p className="section-subtitle">From finding a home to settling in — Axxspace has you covered</p>
+          <p className="section-sub">From finding a home to settling in — Axxspace has you covered</p>
         </div>
-        <div className="categories-grid">
-          {platformCategories.map((cat) => (
+        <div className="cats-grid">
+          {platformCategories.map(cat => (
             <div
               key={cat.id}
-              className="category-card"
-              style={{ background: cat.bg, borderTop: `4px solid ${cat.color}` }}
+              className="cat-card"
+              style={{ background: cat.bg }}
               onClick={() => navigate(cat.route)}
             >
-              <div className="category-card-icon" style={{ background: cat.color }}>
-                {cat.iconType === "image" ? (
-                  <img src={cat.icon} alt={cat.title} style={{ width: "32px", height: "32px", objectFit: "contain" }} />
-                ) : (
-                  <span style={{ fontSize: "26px" }}>{cat.icon}</span>
-                )}
+              <style>{`.cat-card:hover::after { background: ${cat.color}; }`}</style>
+              <div className="cat-icon-wrap" style={{ background: cat.color }}>
+                {cat.iconType === "image"
+                  ? <img src={cat.icon} alt={cat.title} style={{ width: "30px", height: "30px", objectFit: "contain" }} />
+                  : <span style={{ fontSize: "26px" }}>{cat.icon}</span>
+                }
               </div>
-              <h3 className="category-card-title" style={{ color: cat.color }}>{cat.title}</h3>
-              <p className="category-card-tagline">{cat.tagline}</p>
-              <p className="category-card-desc">{cat.description}</p>
-              <ul className="category-feature-list">
-                {cat.features.map((f) => (
-                  <li key={f} className="category-feature-item" style={{ color: cat.accent }}>
+              <h3 className="cat-card-title" style={{ color: cat.color }}>{cat.title}</h3>
+              <p className="cat-card-tagline">{cat.tagline}</p>
+              <p className="cat-card-desc">{cat.description}</p>
+              <ul className="cat-feature-list">
+                {cat.features.map(f => (
+                  <li key={f} className="cat-feature-item" style={{ color: cat.accent }}>
                     <span style={{ color: cat.color, fontWeight: 800 }}>✓</span> {f}
                   </li>
                 ))}
               </ul>
-              <button className="category-card-btn" style={{ background: cat.color }} onClick={(e) => { e.stopPropagation(); navigate(cat.route); }}>
+              <button className="cat-btn" style={{ background: cat.color }} onClick={e => { e.stopPropagation(); navigate(cat.route); }}>
                 {cat.cta} →
               </button>
             </div>
@@ -1790,57 +1191,63 @@ export default function Home() {
 
       {/* ── FEATURED LISTINGS ── */}
       <section className="featured-section">
-        <div className="section-header">
-          <h2 className="section-title">⭐ Featured Premium Listings</h2>
-          <p className="section-subtitle">Verified & boosted properties from trusted landlords</p>
+        <div className="featured-header">
+          <p className="section-eyebrow" style={{ color: "rgba(240,180,41,0.8)" }}>Premium Listings</p>
+          <h2 className="section-title">⭐ Featured Properties</h2>
+          <p className="section-sub">Verified & boosted properties from trusted landlords</p>
         </div>
+
         {loadingFeatured ? (
-          <div className="marquee-cards-wrapper">
-            <div className="cards-marquee-track" style={{ animation: "none" }}>
-              {[1, 2, 3, 4, 5].map((idx) => (
-                <div key={idx} className="skeleton-card">
-                  <div className="skeleton-image"></div>
-                  <div className="skeleton-info">
-                    <div className="skeleton-title"></div>
-                    <div className="skeleton-location"></div>
-                    <div className="skeleton-meta"></div>
-                    <div className="skeleton-price"></div>
-                    <div className="skeleton-btn"></div>
+          <div className="cards-track-wrap">
+            <div className="cards-track" style={{ animation: "none" }}>
+              {[1, 2, 3, 4, 5].map(idx => (
+                <div key={idx} className="skel-card">
+                  <div className="skel-img"></div>
+                  <div className="skel-body">
+                    <div className="skel-line" style={{ width: "70%" }}></div>
+                    <div className="skel-line" style={{ width: "50%" }}></div>
+                    <div className="skel-line" style={{ width: "40%" }}></div>
+                    <div className="skel-line" style={{ width: "60%", height: "20px" }}></div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
         ) : fetchError ? (
-          <div className="no-featured">
-            <div className="no-featured-icon">⚠️</div>
-            <p className="no-featured-text">Could not load featured listings</p>
-            <p className="no-featured-sub">Please refresh in a moment.</p>
-            <button onClick={() => window.location.reload()} className="boost-btn">🔄 Retry</button>
+          <div className="no-featured-wrap">
+            <span className="no-feat-icon">⚠️</span>
+            <p className="no-feat-title">Could not load featured listings</p>
+            <p className="no-feat-sub">Please refresh in a moment.</p>
+            <button onClick={() => window.location.reload()} className="no-feat-btn">🔄 Retry</button>
           </div>
         ) : featuredProperties.length > 0 ? (
           <>
-            <div className="marquee-cards-wrapper">
-              <div className="cards-marquee-track">
+            <div className="cards-track-wrap">
+              <div className="cards-track">
                 {[...featuredProperties, ...featuredProperties].map((property, idx) => (
-                  <div key={`${property._id}-${idx}`} className="featured-card">
-                    <div className="featured-image-wrapper">
-                      <img src={property.images?.[0] || ""} alt={property.title || "Property"} className="featured-image" onError={(e) => { e.target.style.display = "none"; }} />
-                      <div className="boosted-badge">⭐ BOOSTED</div>
-                      <div className="featured-type">{property.type || "Rental"}</div>
+                  <div key={`${property._id}-${idx}`} className="feat-card">
+                    <div className="feat-img-wrap">
+                      <img
+                        src={property.images?.[0] || ""}
+                        alt={property.title || "Property"}
+                        className="feat-img"
+                        onError={e => { e.target.style.display = "none"; }}
+                      />
+                      <div className="feat-boosted">★ BOOSTED</div>
+                      <div className="feat-type">{property.type || "Rental"}</div>
                     </div>
-                    <div className="featured-info">
-                      <h3 className="featured-title">{property.title}</h3>
-                      <p className="featured-location">📍 {property.area}, {property.county}</p>
-                      <div className="featured-meta">
-                        {property.bedrooms && <span className="meta-tag">🛏 {property.bedrooms} Bed</span>}
-                        {property.bathrooms && <span className="meta-tag">🚿 {property.bathrooms} Bath</span>}
+                    <div className="feat-body">
+                      <h3 className="feat-title">{property.title}</h3>
+                      <p className="feat-loc">📍 {property.area}, {property.county}</p>
+                      <div className="feat-meta">
+                        {property.bedrooms && <span className="feat-tag">🛏 {property.bedrooms} Bed</span>}
+                        {property.bathrooms && <span className="feat-tag">🚿 {property.bathrooms} Bath</span>}
                       </div>
-                      <p className="featured-price">
+                      <p className="feat-price">
                         KSh {Number(property.price).toLocaleString()}
-                        <span className="per-month"> / month</span>
+                        <span> / month</span>
                       </p>
-                      <button onClick={() => navigate(`/listings?highlight=${property._id}`)} className="view-btn">
+                      <button onClick={() => navigate(`/listings?highlight=${property._id}`)} className="feat-view-btn">
                         View Property →
                       </button>
                     </div>
@@ -1848,139 +1255,142 @@ export default function Home() {
                 ))}
               </div>
             </div>
-            <div style={{ textAlign: "center", marginTop: "32px" }}>
+            <div className="view-all-wrap">
               <button onClick={() => navigate("/listings")} className="view-all-btn">View All Listings →</button>
             </div>
           </>
         ) : (
-          <div className="no-featured">
-            <div className="no-featured-icon">🏡</div>
-            <p className="no-featured-text">No featured listings yet</p>
-            <p className="no-featured-sub">Boost your property to appear here and reach thousands of tenants!</p>
-            <button onClick={handleListProperty} className="boost-btn">🚀 Boost Your Property</button>
+          <div className="no-featured-wrap">
+            <span className="no-feat-icon">🏡</span>
+            <p className="no-feat-title">No featured listings yet</p>
+            <p className="no-feat-sub">Boost your property to appear here and reach thousands of tenants!</p>
+            <button onClick={handleListProperty} className="no-feat-btn">🚀 Boost Your Property</button>
           </div>
         )}
       </section>
 
       {/* ── SERVICE SPOTLIGHT STRIPS ── */}
       <section className="spotlight-section">
-        {/* Movers strip */}
+        {/* Movers */}
         <div className="spotlight-strip">
-          <div className="spotlight-text">
-            <span className="spotlight-badge">
-              <img src={moversIcon} alt="Movers" style={{ width: "16px", height: "16px", marginRight: "6px", verticalAlign: "middle" }} />
+          <div className="spot-text">
+            <span className="spot-badge" style={{ color: "#0B1F3A", borderColor: "#0B1F3A" }}>
+              <img src={moversIcon} alt="Movers" style={{ width: "14px", height: "14px", marginRight: "4px", verticalAlign: "middle" }} />
               Movers
             </span>
-            <h3 className="spotlight-title">Planning a Move?</h3>
-            <p className="spotlight-desc">Connect with 60+ vetted moving companies across Kenya. Get instant quotes, compare prices, and book your move today — local or long-distance.</p>
-            <div className="spotlight-features">
+            <h3 className="spot-title">Planning a Move?</h3>
+            <p className="spot-desc">Connect with 60+ vetted moving companies across Kenya. Get instant quotes, compare prices, and book your move — local or long-distance.</p>
+            <div className="spot-features">
               {["Insured cargo", "Trained crews", "Transparent quotes", "Available 24/7"].map(f => (
-                <span key={f} className="spotlight-feature">✓ {f}</span>
+                <span key={f} className="spot-feat"><span style={{ color: "#0B1F3A" }}>✓</span> {f}</span>
               ))}
             </div>
-            <button className="spotlight-btn" style={{ background: "#0B2140" }} onClick={() => navigate("/movers")}>Find a Mover →</button>
+            <button className="spot-btn" style={{ background: "#0B1F3A" }} onClick={() => navigate("/movers")}>Find a Mover →</button>
           </div>
-          <div className="spotlight-visual">
-            <div className="spotlight-emoji" style={{ background: "linear-gradient(135deg, #dce8ff, #b8d0f8)" }}>
-              <img src={moversIcon} alt="Movers" style={{ width: "60px", height: "60px", objectFit: "contain" }} />
+          <div className="spot-visual">
+            <div className="spot-icon-box" style={{ background: "linear-gradient(135deg,#EEF2FF,#C7D7F8)" }}>
+              <img src={moversIcon} alt="Movers" style={{ width: "70px", height: "70px", objectFit: "contain" }} />
             </div>
-            <div className="spotlight-stat-grid">
-              {[["60+", "Moving Companies"], ["47", "Counties"], ["1,200+", "Moves Done"]].map(([v, l]) => (
-                <div key={l} className="spotlight-stat">
-                  <span className="spotlight-stat-val" style={{ color: "#0B2140" }}>{v}</span>
-                  <span className="spotlight-stat-label">{l}</span>
+            <div className="spot-stats">
+              {[["60+", "Companies"], ["47", "Counties"], ["1,200+", "Moves Done"]].map(([v, l]) => (
+                <div key={l} className="spot-stat">
+                  <span className="spot-stat-val" style={{ color: "#0B1F3A" }}>{v}</span>
+                  <span className="spot-stat-label">{l}</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
+        <div className="strip-divider"></div>
 
-        {/* Tourism strip */}
-        <div className="spotlight-strip" style={{ flexDirection: "row-reverse", background: "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)" }}>
-          <div className="spotlight-text">
-            <span className="spotlight-badge" style={{ background: "#dcfce7", color: "#047857" }}>
-              <img src={tourismIcon} alt="Tourism" style={{ width: "16px", height: "16px", marginRight: "6px", verticalAlign: "middle" }} />
+        {/* Tourism */}
+        <div className="spotlight-strip reverse" style={{ background: "#F0FDF4" }}>
+          <div className="spot-text">
+            <span className="spot-badge" style={{ color: "#047857", borderColor: "#047857" }}>
+              <img src={tourismIcon} alt="Tourism" style={{ width: "14px", height: "14px", marginRight: "4px", verticalAlign: "middle" }} />
               Tourism
             </span>
-            <h3 className="spotlight-title">Explore Kenya Like Never Before</h3>
-            <p className="spotlight-desc">Discover hotels, beach resorts, safari lodges, and unique experiences across Kenya's 47 counties. Book directly — no commission fees.</p>
-            <div className="spotlight-features">
+            <h3 className="spot-title">Explore Kenya Like Never Before</h3>
+            <p className="spot-desc">Discover hotels, beach resorts, safari lodges, and unique experiences across Kenya's 47 counties. Book directly — no commission fees.</p>
+            <div className="spot-features">
               {["Hotels & resorts", "Safari packages", "Beach getaways", "City escapes"].map(f => (
-                <span key={f} className="spotlight-feature" style={{ color: "#047857" }}>✓ {f}</span>
+                <span key={f} className="spot-feat"><span style={{ color: "#047857" }}>✓</span> {f}</span>
               ))}
             </div>
-            <button className="spotlight-btn" style={{ background: "#059669" }} onClick={() => navigate("/tourism")}>Explore Tourism →</button>
+            <button className="spot-btn" style={{ background: "#047857" }} onClick={() => navigate("/tourism")}>Explore Tourism →</button>
           </div>
-          <div className="spotlight-visual">
-            <div className="spotlight-emoji" style={{ background: "linear-gradient(135deg, #dcfce7, #a7f3d0)" }}>
-              <img src={tourismIcon} alt="Tourism" style={{ width: "60px", height: "60px", objectFit: "contain" }} />
+          <div className="spot-visual">
+            <div className="spot-icon-box" style={{ background: "linear-gradient(135deg,#D1FAE5,#6EE7B7)" }}>
+              <img src={tourismIcon} alt="Tourism" style={{ width: "70px", height: "70px", objectFit: "contain" }} />
             </div>
-            <div className="spotlight-stat-grid">
-              {[["200+", "Hotels & Lodges"], ["47", "Counties"], ["3,000+", "Guests"]].map(([v, l]) => (
-                <div key={l} className="spotlight-stat">
-                  <span className="spotlight-stat-val" style={{ color: "#059669" }}>{v}</span>
-                  <span className="spotlight-stat-label">{l}</span>
+            <div className="spot-stats">
+              {[["200+", "Hotels"], ["47", "Counties"], ["3,000+", "Guests"]].map(([v, l]) => (
+                <div key={l} className="spot-stat">
+                  <span className="spot-stat-val" style={{ color: "#047857" }}>{v}</span>
+                  <span className="spot-stat-label">{l}</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
+        <div className="strip-divider"></div>
 
-        {/* AxxBiashara strip */}
-        <div className="spotlight-strip" style={{ background: "linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)" }}>
-          <div className="spotlight-text">
-            <span className="spotlight-badge" style={{ background: "#ede9fe", color: "#6d28d9" }}>
-              <img src={axxbiasharaIcon} alt="AxxBiashara" style={{ width: "16px", height: "16px", marginRight: "6px", verticalAlign: "middle" }} />
+        {/* AxxBiashara */}
+        <div className="spotlight-strip" style={{ background: "#FAF7FF" }}>
+          <div className="spot-text">
+            <span className="spot-badge" style={{ color: "#6D28D9", borderColor: "#6D28D9" }}>
+              <img src={axxbiasharaIcon} alt="AxxBiashara" style={{ width: "14px", height: "14px", marginRight: "4px", verticalAlign: "middle" }} />
               AxxBiashara
             </span>
-            <h3 className="spotlight-title">Grow Your Business with AxxBiashara</h3>
-            <p className="spotlight-desc">Access professional business services across Kenya. From company registration to accounting, legal support, and digital solutions — we've got you covered.</p>
-            <div className="spotlight-features">
+            <h3 className="spot-title">Grow Your Business</h3>
+            <p className="spot-desc">Access professional business services across Kenya. From company registration to accounting, legal support, and digital solutions.</p>
+            <div className="spot-features">
               {["Business registration", "Accounting & tax", "Legal services", "Digital solutions"].map(f => (
-                <span key={f} className="spotlight-feature" style={{ color: "#6d28d9" }}>✓ {f}</span>
+                <span key={f} className="spot-feat"><span style={{ color: "#6D28D9" }}>✓</span> {f}</span>
               ))}
             </div>
-            <button className="spotlight-btn" style={{ background: "#7c3aed" }} onClick={() => navigate("/axxbiashara")}>Explore Services →</button>
+            <button className="spot-btn" style={{ background: "#6D28D9" }} onClick={() => navigate("/axxbiashara")}>Explore Services →</button>
           </div>
-          <div className="spotlight-visual">
-            <div className="spotlight-emoji" style={{ background: "linear-gradient(135deg, #ede9fe, #ddd6fe)" }}>
-              <img src={axxbiasharaIcon} alt="AxxBiashara" style={{ width: "60px", height: "60px", objectFit: "contain" }} />
+          <div className="spot-visual">
+            <div className="spot-icon-box" style={{ background: "linear-gradient(135deg,#EDE9FE,#C4B5FD)" }}>
+              <img src={axxbiasharaIcon} alt="AxxBiashara" style={{ width: "70px", height: "70px", objectFit: "contain" }} />
             </div>
-            <div className="spotlight-stat-grid">
-              {[["100+", "Service Providers"], ["47", "Counties"], ["2,000+", "Businesses Served"]].map(([v, l]) => (
-                <div key={l} className="spotlight-stat">
-                  <span className="spotlight-stat-val" style={{ color: "#7c3aed" }}>{v}</span>
-                  <span className="spotlight-stat-label">{l}</span>
+            <div className="spot-stats">
+              {[["100+", "Providers"], ["47", "Counties"], ["2,000+", "Businesses"]].map(([v, l]) => (
+                <div key={l} className="spot-stat">
+                  <span className="spot-stat-val" style={{ color: "#6D28D9" }}>{v}</span>
+                  <span className="spot-stat-label">{l}</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
+        <div className="strip-divider"></div>
 
-        {/* Marketplace strip */}
-        <div className="spotlight-strip" style={{ flexDirection: "row-reverse", background: "linear-gradient(135deg, #ecfeff 0%, #cffafe 100%)" }}>
-          <div className="spotlight-text">
-            <span className="spotlight-badge" style={{ background: "#cffafe", color: "#0e7490" }}>
-              � Marketplace
+        {/* Marketplace */}
+        <div className="spotlight-strip reverse" style={{ background: "#ECFEFF" }}>
+          <div className="spot-text">
+            <span className="spot-badge" style={{ color: "#0891B2", borderColor: "#0891B2" }}>
+              🏪 Marketplace
             </span>
-            <h3 className="spotlight-title">Buy & Sell Anything</h3>
-            <p className="spotlight-desc">The ultimate marketplace for buying and selling new and used items. From electronics to furniture, fashion to cars — find great deals or sell your items.</p>
-            <div className="spotlight-features">
+            <h3 className="spot-title">Buy & Sell Anything</h3>
+            <p className="spot-desc">The ultimate marketplace for buying and selling new and used items. From electronics to furniture, fashion to cars — find great deals.</p>
+            <div className="spot-features">
               {["New & used items", "Secure transactions", "Nationwide delivery", "Direct seller contact"].map(f => (
-                <span key={f} className="spotlight-feature" style={{ color: "#0e7490" }}>✓ {f}</span>
+                <span key={f} className="spot-feat"><span style={{ color: "#0891B2" }}>✓</span> {f}</span>
               ))}
             </div>
-            <button className="spotlight-btn" style={{ background: "#0891b2" }} onClick={() => navigate("/materials")}>Browse Marketplace →</button>
+            <button className="spot-btn" style={{ background: "#0891B2" }} onClick={() => navigate("/materials")}>Browse Marketplace →</button>
           </div>
-          <div className="spotlight-visual">
-            <div className="spotlight-emoji" style={{ background: "linear-gradient(135deg, #cffafe, #a5f3fc)" }}>
-              �
+          <div className="spot-visual">
+            <div className="spot-icon-box" style={{ background: "linear-gradient(135deg,#CFFAFE,#67E8F9)", fontSize: "64px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              🏪
             </div>
-            <div className="spotlight-stat-grid">
-              {[["10,000+", "Active Listings"], ["47", "Counties"], ["5,000+", "Happy Users"]].map(([v, l]) => (
-                <div key={l} className="spotlight-stat">
-                  <span className="spotlight-stat-val" style={{ color: "#0891b2" }}>{v}</span>
-                  <span className="spotlight-stat-label">{l}</span>
+            <div className="spot-stats">
+              {[["10K+", "Listings"], ["47", "Counties"], ["5,000+", "Users"]].map(([v, l]) => (
+                <div key={l} className="spot-stat">
+                  <span className="spot-stat-val" style={{ color: "#0891B2" }}>{v}</span>
+                  <span className="spot-stat-label">{l}</span>
                 </div>
               ))}
             </div>
@@ -1989,246 +1399,200 @@ export default function Home() {
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section className="how-it-works-section">
-        <div className="section-header">
-          <h2 style={styles.sectionTitle}>How It Works</h2>
-          <p style={styles.sectionSubtitle}>One platform. Four services. Endless possibilities.</p>
+      <section className="how-section">
+        <div className="section-hdr">
+          <p className="section-eyebrow" style={{ color: "rgba(240,180,41,0.7)" }}>The Process</p>
+          <h2 className="section-title">How It Works</h2>
+          <p className="section-sub" style={{ color: "rgba(255,255,255,0.45)" }}>One platform. Five services. Endless possibilities.</p>
         </div>
-        <div style={styles.stepsGrid}>
+        <div className="steps-grid">
           {[
-            { step: "01", icon: "🔍", title: "Search & Discover", text: "Browse verified listings across Rentals, Movers, Merchants, and Tourism — all in one place." },
-            { step: "02", icon: "💬", title: "Connect Directly", text: "Chat with landlords, movers, merchants, or hotels via WhatsApp or call — no middlemen." },
-            { step: "03", icon: "✅", title: "Book & Confirm", text: "Schedule viewings, get quotes, place orders, or book stays — with full transparency." },
-            { step: "04", icon: "🏠", title: "Move In & Thrive", text: "Find your home, move your stuff, furnish it, and explore Kenya — all through Axxspace." },
-          ].map((s, idx) => (
-            <div key={s.step} style={styles.stepCard} className="step-card">
-              <div style={styles.stepNumber}>{s.step}</div>
-              <div style={styles.stepIcon}>{s.icon}</div>
-              <h3 style={styles.stepTitle}>{s.title}</h3>
-              <p style={styles.stepText}>{s.text}</p>
-              {idx < 3 && <div style={styles.stepConnector}></div>}
+            { num: "01", icon: "🔍", title: "Search & Discover", text: "Browse verified listings across Rentals, Movers, Merchants, and Tourism — all in one place." },
+            { num: "02", icon: "💬", title: "Connect Directly", text: "Chat with landlords, movers, merchants, or hotels via WhatsApp or call — no middlemen." },
+            { num: "03", icon: "✅", title: "Book & Confirm", text: "Schedule viewings, get quotes, place orders, or book stays — with full transparency." },
+            { num: "04", icon: "🏠", title: "Move In & Thrive", text: "Find your home, move your stuff, furnish it, and explore Kenya — all through Axxspace." },
+          ].map(s => (
+            <div key={s.num} className="step-card">
+              <span className="step-num">{s.num}</span>
+              <span className="step-icon">{s.icon}</span>
+              <h3 className="step-title">{s.title}</h3>
+              <p className="step-text">{s.text}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section style={styles.testimonialsSection}>
-        <div style={styles.sectionHeader}>
-          <h2 style={{ ...styles.sectionTitle, color: "white" }}>What Our Users Say</h2>
-          <p style={{ ...styles.sectionSubtitle, color: "rgba(255,255,255,0.7)" }}>Real stories from happy customers across all our services</p>
+      <section className="test-section">
+        <div className="section-hdr">
+          <p className="section-eyebrow">Social Proof</p>
+          <h2 className="section-title">What Our Users Say</h2>
+          <p className="section-sub">Real stories from happy customers across all our services</p>
         </div>
-        <div style={styles.testimonialsGrid}>
+        <div className="test-grid">
           {loadingReviews ? (
-            <div style={{ textAlign: "center", gridColumn: "1 / -1", padding: "40px" }}>
-              <div className="spinner"></div>
-              <p style={{ color: "rgba(255,255,255,0.7)", marginTop: "16px" }}>Loading reviews...</p>
+            <div style={{ textAlign: "center", gridColumn: "1/-1", padding: "50px" }}>
+              <div className="spinner" style={{ margin: "0 auto" }}></div>
+              <p style={{ color: "#6B6860", marginTop: "16px" }}>Loading reviews...</p>
             </div>
           ) : reviews.length > 0 ? (
-            reviews.map((review) => (
-              <div key={review._id} style={styles.testimonialCard} className="testimonial-card">
-                <div style={styles.testimonialTop}>
-                  <div style={styles.testimonialAvatar}>{review.userName?.charAt(0).toUpperCase() || "U"}</div>
-                  <div style={{ ...styles.testimonialServiceTag, background: review.category === "property" ? "#E31B1B" : review.category === "mover" ? "#0B2140" : review.category === "merchant" ? "#d97706" : review.category === "tourism" ? "#059669" : "#6b7280" }}>
+            reviews.map(review => (
+              <div key={review._id} className="test-card">
+                <div className="test-top">
+                  <div className="test-avatar">{review.userName?.charAt(0).toUpperCase() || "U"}</div>
+                  <div className="test-service-tag" style={{ background: review.category === "property" ? "#E31B1B" : review.category === "mover" ? "#0B1F3A" : review.category === "merchant" ? "#D97706" : review.category === "tourism" ? "#047857" : "#6B7280" }}>
                     {review.category === "general" ? "General" : review.category.charAt(0).toUpperCase() + review.category.slice(1)}
                   </div>
                 </div>
-                <div style={styles.testimonialRating}>{"⭐".repeat(review.rating)}</div>
-                <h3 style={styles.testimonialTitle}>{review.title}</h3>
-                <p style={styles.testimonialText}>"{review.comment}"</p>
-                <div style={styles.testimonialAuthor}>
-                  <strong style={styles.testimonialName}>{review.userName}</strong>
-                  <span style={styles.testimonialRole}>{new Date(review.createdAt).toLocaleDateString()}</span>
+                <div className="test-rating">{"⭐".repeat(review.rating)}</div>
+                <p className="test-text">"{review.comment}"</p>
+                <div>
+                  <div className="test-name">{review.userName}</div>
+                  <div className="test-role">{new Date(review.createdAt).toLocaleDateString()}</div>
                 </div>
               </div>
             ))
           ) : (
             [
-              { name: "Sarah Wanjiku", role: "Tenant · Nairobi", rating: 5, text: "Found my dream apartment in 2 days! The WhatsApp feature made connecting with the landlord so easy. No agents, no hidden fees.", avatar: "", tag: "Rentals" },
-              { name: "David Mwangi", role: "Customer · Mombasa", rating: 5, text: "Booked movers through Axxspace for my relocation to Nairobi. Professional team, transparent pricing, everything arrived safely.", avatar: "", tag: "Movers" },
-              { name: "Grace Omondi", role: "Developer · Kisumu", rating: 5, text: "The merchant listings saved me thousands on my construction project. Found roofing materials at 20% below market prices.", avatar: "", tag: "Merchants" },
-              { name: "James Kariuki", role: "Tourist · Nairobi", rating: 5, text: "Planned a full safari weekend through Axxspace Tourism. Best lodge, easy booking, and zero commission. Absolutely loved it!", avatar: "", tag: "Tourism" },
-            ].map((t) => (
-              <div key={t.name} style={styles.testimonialCard} className="testimonial-card">
-                <div style={styles.testimonialTop}>
-                  <div style={styles.testimonialAvatar}>{t.avatar}</div>
-                  <div style={{ ...styles.testimonialServiceTag, background: t.tag === "Rentals" ? "#E31B1B" : t.tag === "Movers" ? "#0B2140" : t.tag === "Merchants" ? "#d97706" : "#059669" }}>{t.tag}</div>
+              { name: "Sarah Wanjiku", role: "Tenant · Nairobi", rating: 5, text: "Found my dream apartment in 2 days! The WhatsApp feature made connecting with the landlord so easy. No agents, no hidden fees.", tag: "Rentals", tagColor: "#E31B1B" },
+              { name: "David Mwangi", role: "Customer · Mombasa", rating: 5, text: "Booked movers through Axxspace for my relocation to Nairobi. Professional team, transparent pricing, everything arrived safely.", tag: "Movers", tagColor: "#0B1F3A" },
+              { name: "Grace Omondi", role: "Developer · Kisumu", rating: 5, text: "The merchant listings saved me thousands on my construction project. Found roofing materials at 20% below market prices.", tag: "Merchants", tagColor: "#D97706" },
+              { name: "James Kariuki", role: "Tourist · Nairobi", rating: 5, text: "Planned a full safari weekend through Axxspace Tourism. Best lodge, easy booking, and zero commission. Absolutely loved it!", tag: "Tourism", tagColor: "#047857" },
+            ].map(t => (
+              <div key={t.name} className="test-card">
+                <div className="test-top">
+                  <div className="test-avatar" style={{ background: t.tagColor }}>{t.name.charAt(0)}</div>
+                  <div className="test-service-tag" style={{ background: t.tagColor }}>{t.tag}</div>
                 </div>
-                <div style={styles.testimonialRating}>{"⭐".repeat(t.rating)}</div>
-                <p style={styles.testimonialText}>"{t.text}"</p>
-                <div style={styles.testimonialAuthor}>
-                  <strong style={styles.testimonialName}>{t.name}</strong>
-                  <span style={styles.testimonialRole}>{t.role}</span>
+                <div className="test-rating">{"⭐".repeat(t.rating)}</div>
+                <p className="test-text">"{t.text}"</p>
+                <div>
+                  <div className="test-name">{t.name}</div>
+                  <div className="test-role">{t.role}</div>
                 </div>
               </div>
             ))
           )}
         </div>
-        <div style={{ textAlign: "center", marginTop: "32px" }}>
-          <button onClick={() => navigate("/leave-review")} style={styles.leaveReviewBtn}>
-            ✍️ Leave a Review
-          </button>
+        <div style={{ textAlign: "center" }}>
+          <button onClick={() => navigate("/leave-review")} className="review-btn">✍️ Leave a Review</button>
         </div>
       </section>
 
       {/* ── WHY AXXSPACE ── */}
-      <section style={styles.featuresSection}>
-        <div style={styles.sectionHeader}>
-          <h2 style={{ ...styles.sectionTitle, color: "#0B2140" }}>Why Axxspace?</h2>
-          <p style={{ ...styles.sectionSubtitle, color: "#6b7280" }}>Built for Kenyans, by Kenyans — serving every need</p>
+      <section className="why-section">
+        <div className="section-hdr">
+          <p className="section-eyebrow">Our Advantages</p>
+          <h2 className="section-title">Why Axxspace?</h2>
+          <p className="section-sub">Built for Kenyans, by Kenyans — serving every need</p>
         </div>
-        <div style={styles.featureGrid}>
+        <div className="why-grid">
           {[
-            { icon: "✓", title: "Verified Listings", text: "Every listing across all categories is manually reviewed before going live", color: "#E31B1B" },
-            { icon: "💬", title: "Direct WhatsApp", text: "Skip the middleman. Chat directly with landlords, movers, merchants, or hotels", color: "#E31B1B" },
-            { icon: "🌍", title: "All 47 Counties", text: "The only platform serving every corner of Kenya across all services", color: "#0B2140" },
-            { icon: "📱", title: "Mobile Optimized", text: "Fully responsive — find homes, book services, shop materials on any device", color: "#0B2140" },
-            { icon: "🗺", title: "GPS Maps", text: "Interactive maps with exact coordinates for every listing and service", color: "#E31B1B" },
-            { icon: "💰", title: "Zero Hidden Fees", text: "What you see is what you pay. Transparent pricing across all categories", color: "#059669" },
-            { icon: "🔒", title: "Safe & Secure", text: "Industry-standard encryption protects all your personal data and transactions", color: "#d97706" },
-            { icon: "⚡", title: "One Platform", text: "Rent, move, build, and explore — everything you need without switching apps", color: "#0B2140" },
-          ].map((f) => (
-            <div key={f.title} style={{ ...styles.featureCard, borderTop: `4px solid ${f.color}` }} className="feature-card">
-              <div style={styles.featureIcon}>{f.icon}</div>
-              <h3 style={styles.featureTitle}>{f.title}</h3>
-              <p style={styles.featureText}>{f.text}</p>
+            { icon: "✓", title: "Verified Listings", text: "Every listing is manually reviewed before going live", color: "#E31B1B" },
+            { icon: "💬", title: "Direct WhatsApp", text: "Skip the middleman. Chat directly with providers", color: "#E31B1B" },
+            { icon: "🌍", title: "All 47 Counties", text: "The only platform serving every corner of Kenya", color: "#0B1F3A" },
+            { icon: "📱", title: "Mobile Optimized", text: "Fully responsive — works on any device", color: "#0B1F3A" },
+            { icon: "🗺", title: "GPS Maps", text: "Interactive maps with exact coordinates for every listing", color: "#E31B1B" },
+            { icon: "💰", title: "Zero Hidden Fees", text: "What you see is what you pay. Transparent pricing", color: "#047857" },
+            { icon: "🔒", title: "Safe & Secure", text: "Industry-standard encryption protects your data", color: "#D97706" },
+            { icon: "⚡", title: "One Platform", text: "Rent, move, build, and explore without switching apps", color: "#0B1F3A" },
+          ].map(f => (
+            <div key={f.title} className="why-card" style={{ borderTopColor: f.color }}>
+              <span className="why-icon">{f.icon}</span>
+              <h3 className="why-title">{f.title}</h3>
+              <p className="why-text">{f.text}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* ── FINAL CTA ── */}
-      <section style={styles.cta}>
-        <div style={styles.ctaInner}>
-          <h2 style={styles.ctaTitle}>Start Your Journey Today</h2>
-          <p style={styles.ctaText}>
-            Join thousands of Kenyans who find homes, move smarter, build better, and explore more — all through Axxspace.
-          </p>
-          <div style={styles.ctaButtons}>
-            <button style={styles.ctaBtnPrimary} onClick={() => navigate("/listings")}>🏢 Browse Rentals</button>
-            <button style={{ ...styles.ctaBtnPrimary, background: "linear-gradient(135deg, #0B2140, #1a3a52)" }} onClick={() => navigate("/movers")}>🚛 Find Movers</button>
-            <button style={{ ...styles.ctaBtnPrimary, background: "linear-gradient(135deg, #d97706, #b45309)" }} onClick={() => navigate("/materials")}>🛍️ Shop Materials</button>
-            <button style={{ ...styles.ctaBtnPrimary, background: "linear-gradient(135deg, #059669, #047857)" }} onClick={() => navigate("/tourism")}>🏨 Explore Tourism</button>
+      <section className="cta-section">
+        <div className="cta-inner">
+          <h2 className="cta-title">Start Your Journey <em>Today</em></h2>
+          <p className="cta-text">Join thousands of Kenyans who find homes, move smarter, build better, and explore more — all through Axxspace.</p>
+          <div className="cta-btns">
+            <button className="cta-btn" style={{ background: "#E31B1B", color: "#fff" }} onClick={() => navigate("/listings")}>🏢 Browse Rentals</button>
+            <button className="cta-btn" style={{ background: "rgba(255,255,255,0.1)", color: "#fff", border: "1px solid rgba(255,255,255,0.2)" }} onClick={() => navigate("/movers")}>🚛 Find Movers</button>
+            <button className="cta-btn" style={{ background: "rgba(255,255,255,0.1)", color: "#fff", border: "1px solid rgba(255,255,255,0.2)" }} onClick={() => navigate("/materials")}>🛍️ Shop Materials</button>
+            <button className="cta-btn" style={{ background: "rgba(255,255,255,0.1)", color: "#fff", border: "1px solid rgba(255,255,255,0.2)" }} onClick={() => navigate("/tourism")}>🏨 Explore Tourism</button>
           </div>
-          <div style={styles.ctaDivider}></div>
+          <div className="cta-divider"></div>
           <button
-            style={{
-              ...styles.ctaBtnSecondary,
-              background: token ? "#E31B1B" : "white",
-              color: token ? "white" : "#0B2140",
-              border: token ? "none" : "2px solid #0B2140",
-            }}
+            className="cta-list-btn"
+            style={token ? { background: "#E31B1B", color: "#fff", border: "none" } : { background: "#fff", color: "#0B1F3A", border: "none" }}
             onClick={handleListProperty}
           >
             {token ? "📝 List Your Property / Service" : "🔐 Login to List Your Business"}
           </button>
-          {!token && <p style={styles.loginHint}>💡 Free to join — no credit card required</p>}
+          {!token && <p className="cta-hint">FREE TO JOIN — NO CREDIT CARD REQUIRED</p>}
         </div>
       </section>
 
       {/* ── FOOTER ── */}
-      <footer style={styles.footer}>
-        <div style={styles.footerInner}>
-          <div style={styles.footerBrand}>
-            <strong style={{ color: "#E31B1B", fontSize: "18px" }}>Axxspace</strong>
-            <p style={styles.footerTagline}>Kenya's most trusted property & services platform</p>
-            <div style={{ marginTop: "16px" }}>
+      <footer className="footer">
+        <div className="footer-inner">
+          <div className="footer-top">
+            <div className="footer-brand">Axx<span>space</span></div>
+            <p className="footer-tagline">Kenya's Most Trusted Property & Services Platform</p>
+            <div style={{ marginTop: "18px" }}>
               <SocialMediaLinks iconSize={20} />
             </div>
           </div>
-          <div style={styles.footerColumns}>
-            <div style={styles.footerCol}>
-              <p style={styles.footerColTitle}>Services</p>
+          <div className="footer-cols">
+            <div className="footer-col">
+              <p className="footer-col-title">Services</p>
               {[["🏢 Rentals", "/listings"], ["🚛 Movers", "/movers"], ["🛍️ Merchants", "/materials"], ["🏨 Tourism", "/tourism"]].map(([l, r]) => (
-                <span key={l} style={styles.footerLink} onClick={() => navigate(r)}>{l}</span>
+                <span key={l} className="footer-link" onClick={() => navigate(r)}>{l}</span>
               ))}
             </div>
-            <div style={styles.footerCol}>
-              <p style={styles.footerColTitle}>Company</p>
-              {["About Us", "How It Works", "Contact Us", "Advertise"].map((l) => (
-                <span key={l} style={styles.footerLink}>{l}</span>
+            <div className="footer-col">
+              <p className="footer-col-title">Company</p>
+              {["About Us", "How It Works", "Contact Us", "Advertise"].map(l => (
+                <span key={l} className="footer-link">{l}</span>
               ))}
             </div>
-            <div style={styles.footerCol}>
-              <p style={styles.footerColTitle}>Legal</p>
-              {["Terms of Service", "Privacy Policy", "FAQ", "Safety Tips"].map((l) => (
-                <span key={l} style={styles.footerLink}>{l}</span>
+            <div className="footer-col">
+              <p className="footer-col-title">Legal</p>
+              {["Terms of Service", "Privacy Policy", "FAQ", "Safety Tips"].map(l => (
+                <span key={l} className="footer-link">{l}</span>
               ))}
             </div>
-            <div style={styles.footerCol}>
-              <p style={styles.footerColTitle}>Contact</p>
-              <span style={styles.footerLink}>📧 info@axxspace.com</span>
-              <span style={styles.footerLink}>📧 support@axxspace.com</span>
-              <span style={styles.footerLink}>📧 admin@axxspace.com</span>
+            <div className="footer-col">
+              <p className="footer-col-title">Contact</p>
+              <span className="footer-link">📧 info@axxspace.com</span>
+              <span className="footer-link">📧 support@axxspace.com</span>
+              <span className="footer-link">📧 admin@axxspace.com</span>
             </div>
           </div>
-          <p style={styles.footerCopy}>© 2026 Axxspace. All rights reserved.</p>
+          <p className="footer-copy">© 2026 AXXSPACE · ALL RIGHTS RESERVED</p>
         </div>
       </footer>
 
-      {/* ── BOOST SERVICE SELECTION MODAL ── */}
+      {/* ── BOOST / SERVICE SELECTION MODAL ── */}
       {showBoostModal && (
-        <div className="boost-modal-overlay" onClick={() => setShowBoostModal(false)}>
-          <div className="boost-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="boost-modal-close" onClick={() => setShowBoostModal(false)}>✕</button>
-            <h2 className="boost-modal-title">Choose Your Service</h2>
-            <p className="boost-modal-subtitle">Select the type of service you want to list or boost on Axxspace</p>
-
-            <div className="boost-services-grid">
-              <div className="boost-service-card" onClick={() => { setShowBoostModal(false); navigate("/login"); }}>
-                <div className="boost-service-icon" style={{ background: "linear-gradient(135deg, #E31B1B 0%, #C01010 100%)" }}>
-                  🏠
+        <div className="modal-overlay" onClick={() => setShowBoostModal(false)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShowBoostModal(false)}>✕</button>
+            <h2 className="modal-title">Choose Your Service</h2>
+            <p className="modal-sub">Select the type of service you want to list or boost on Axxspace</p>
+            <div className="modal-services">
+              {[
+                { icon: "🏠", title: "Landlord / Rentals", desc: "List rental properties and boost your listings", bg: "linear-gradient(135deg,#E31B1B,#B01212)", route: "/login" },
+                { icon: "🚛", title: "Mover / Moving Company", desc: "Offer moving services across Kenya", bg: "linear-gradient(135deg,#0B1F3A,#142B50)", route: "/login?type=mover" },
+                { icon: "🛍️", title: "Seller / Marketplace", desc: "Sell items in the materials marketplace", bg: "linear-gradient(135deg,#0891B2,#0E7490)", route: "/seller-login" },
+                { icon: "🏨", title: "Tourism Provider", desc: "List hotels, lodges, and tourism experiences", bg: "linear-gradient(135deg,#047857,#065F46)", route: "/tourism/login" },
+                { icon: "💼", title: "Business / AxxBiashara", desc: "List professional business services", bg: "linear-gradient(135deg,#6D28D9,#5B21B6)", route: "/business-login" },
+              ].map(svc => (
+                <div key={svc.title} className="modal-service-card" onClick={() => { setShowBoostModal(false); navigate(svc.route); }}>
+                  <div className="modal-svc-icon" style={{ background: svc.bg }}>{svc.icon}</div>
+                  <div>
+                    <p className="modal-svc-title">{svc.title}</p>
+                    <p className="modal-svc-desc">{svc.desc}</p>
+                  </div>
+                  <span className="modal-arrow">→</span>
                 </div>
-                <div className="boost-service-info">
-                  <h3 className="boost-service-title">Landlord / Rentals</h3>
-                  <p className="boost-service-desc">List rental properties and boost your listings</p>
-                </div>
-                <span className="boost-service-arrow">→</span>
-              </div>
-
-              <div className="boost-service-card" onClick={() => { setShowBoostModal(false); navigate("/login?type=mover"); }}>
-                <div className="boost-service-icon" style={{ background: "linear-gradient(135deg, #0B2140 0%, #152B4A 100%)" }}>
-                  🚛
-                </div>
-                <div className="boost-service-info">
-                  <h3 className="boost-service-title">Mover / Moving Company</h3>
-                  <p className="boost-service-desc">Offer moving services across Kenya</p>
-                </div>
-                <span className="boost-service-arrow">→</span>
-              </div>
-
-              <div className="boost-service-card" onClick={() => { setShowBoostModal(false); navigate("/seller-login"); }}>
-                <div className="boost-service-icon" style={{ background: "linear-gradient(135deg, #0891b2 0%, #0e7490 100%)" }}>
-                  🛍️
-                </div>
-                <div className="boost-service-info">
-                  <h3 className="boost-service-title">Seller / Marketplace</h3>
-                  <p className="boost-service-desc">Sell items in the materials marketplace</p>
-                </div>
-                <span className="boost-service-arrow">→</span>
-              </div>
-
-              <div className="boost-service-card" onClick={() => { setShowBoostModal(false); navigate("/tourism/login"); }}>
-                <div className="boost-service-icon" style={{ background: "linear-gradient(135deg, #059669 0%, #047857 100%)" }}>
-                  🏨
-                </div>
-                <div className="boost-service-info">
-                  <h3 className="boost-service-title">Tourism Provider</h3>
-                  <p className="boost-service-desc">List hotels, lodges, and tourism experiences</p>
-                </div>
-                <span className="boost-service-arrow">→</span>
-              </div>
-
-              <div className="boost-service-card" onClick={() => { setShowBoostModal(false); navigate("/business-login"); }}>
-                <div className="boost-service-icon" style={{ background: "linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)" }}>
-                  💼
-                </div>
-                <div className="boost-service-info">
-                  <h3 className="boost-service-title">Business / AxxBiashara</h3>
-                  <p className="boost-service-desc">List professional business services</p>
-                </div>
-                <span className="boost-service-arrow">→</span>
-              </div>
+              ))}
             </div>
           </div>
         </div>
@@ -2236,251 +1600,3 @@ export default function Home() {
     </div>
   );
 }
-
-/* ════════ INJECTED CSS ════════ */
-const css = `
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
-
-@keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-@keyframes cardsMarquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(1.3); }
-}
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-  .marquee-track {
-  display: flex;
-  align-items: center;
-  width: max-content;
-  animation: marquee 36s linear infinite;
-}
-  .marquee-track:hover { animation-play-state: paused; }
-
-  .cards-marquee-track {
-  display: flex;
-  align-items: stretch;
-  width: max-content;
-  animation: cardsMarquee 30s linear infinite;
-  padding: 10px 0 20px;
-}
-  .cards-marquee-track:hover { animation-play-state: paused; }
-
-  .spinner {
-  width: 32px; height: 32px;
-  border: 3px solid #e5e7eb;
-  border-top-color: #E31B1B;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-  .hamburger-menu { animation: slideDown 0.2s ease; }
-
-  .hamburger-btn:hover {
-  background: #152B4A!important;
-  transform: scale(1.05);
-}
-
-  select {
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 8px center;
-  background-size: 18px;
-  padding-right: 32px;
-  cursor: pointer;
-}
-
-input:focus, select:focus {
-  outline: none;
-  border-color: #E31B1B!important;
-  box-shadow: 0 0 0 3px rgba(227, 27, 27, 0.12);
-}
-
-button:hover:not(:disabled) { transform: translateY(-2px); opacity: 0.93; }
-
-  .featured-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 32px rgba(227, 27, 27, 0.15);
-}
-  .view-btn:hover { background: linear-gradient(135deg, #152B4A 0%, #1a3a52 100%)!important; }
-
-  .category-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.10);
-}
-
-  .feature-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(227, 27, 27, 0.08);
-  background: white;
-}
-
-  .step-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 32px rgba(227, 27, 27, 0.15);
-  border-color: #E31B1B;
-}
-
-  .testimonial-card:hover {
-  transform: translateY(-4px);
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(251, 191, 36, 0.3);
-}
-
-  .spotlight-strip:hover { box-shadow: 0 8px 40px rgba(0, 0, 0, 0.06); }
-
-@media(max-width: 768px) {
-    .spotlight-strip {
-    flex-direction: column!important;
-    padding: 40px 20px!important;
-  }
-    .spotlight-strip > div:last-child {
-    width: 100%;
-  }
-    .spotlight-stat-grid {
-    justify-content: center;
-  }
-}
-
-@media(max-width: 620px) {
-    .stepConnector { display: none!important; }
-}
-
-@media(max-width: 768px) {
-    .hero-video {
-    object-fit: cover!important;
-    object-position: center center!important;
-    width: 100vw!important;
-    height: 100vh!important;
-  }
-  section[style*="hero"] {
-    min-height: 100vh!important;
-    padding: 40px 16px 60px!important;
-  }
-}
-`;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
