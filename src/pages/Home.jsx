@@ -113,7 +113,7 @@ const styles = {
   stepCard: { position: "relative", padding: "32px 24px", background: "white", borderRadius: "16px", border: "1px solid #e5e7eb", textAlign: "center", transition: "all 0.3s" },
   stepNumber: { position: "absolute", top: "-16px", left: "50%", transform: "translateX(-50%)", background: "linear-gradient(135deg, #E31B1B 0%, #C01010 100%)", color: "white", width: "40px", height: "40px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: 800, boxShadow: "0 4px 12px rgba(227, 27, 27, 0.3)" },
   stepIcon: { fontSize: "48px", marginBottom: "16px" },
-  stepTitle: { fontSize: "17px", fontWeight: 700, color: "#0B2140", margin: "0 0 12px" },
+  stepTitle: { fontSize: "17px", fontWeight: 700, color: "#0B2140", margin: "0 0 12px", fontFamily: "'Cormorant Garamond', 'Georgia', serif" },
   stepText: { fontSize: "13px", color: "#6b7280", lineHeight: 1.6, margin: 0 },
   stepConnector: { position: "absolute", top: "50%", right: "-20px", width: "40px", height: "2px", background: "#E31B1B", opacity: 0.3 },
 
@@ -143,7 +143,7 @@ const styles = {
   /* CTA */
   cta: { background: "linear-gradient(135deg, #0B2140 0%, #1a3a52 100%)", padding: "76px 20px", textAlign: "center", borderTop: "3px solid #E31B1B" },
   ctaInner: { maxWidth: "760px", margin: "0 auto" },
-  ctaTitle: { fontSize: "34px", fontWeight: 800, color: "white", margin: "0 0 12px" },
+  ctaTitle: { fontSize: "34px", fontWeight: 700, color: "white", margin: "0 0 12px", fontFamily: "'Cormorant Garamond', 'Georgia', serif" },
   ctaText: { fontSize: "16px", color: "rgba(255,255,255,0.85)", margin: "0 0 32px", lineHeight: 1.6 },
   ctaButtons: { display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", marginBottom: "20px" },
   ctaBtnPrimary: { padding: "13px 22px", background: "linear-gradient(135deg, #E31B1B 0%, #C01010 100%)", color: "white", border: "none", borderRadius: "10px", fontSize: "14px", fontWeight: 700, cursor: "pointer", transition: "all 0.2s", boxShadow: "0 4px 14px rgba(0,0,0,0.2)" },
@@ -377,7 +377,7 @@ export default function Home() {
 
   /* ─────────────── GLOBAL STYLE INJECTION ─────────────── */
   const globalCSS = `
-    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700;800&display=swap');
     :root {
       --primary: #E31B1B;
       --primary-dark: #C01010;
@@ -794,8 +794,9 @@ export default function Home() {
 
     .category-card-title {
       font-size: 22px;
-      font-weight: 800;
+      font-weight: 700;
       margin: 0 0 4px;
+      font-family: 'Cormorant Garamond', 'Georgia', serif;
     }
 
     .category-card-tagline {
@@ -953,6 +954,7 @@ export default function Home() {
       font-weight: 700;
       margin: 0 0 6px;
       color: #0B2140;
+      font-family: 'Cormorant Garamond', 'Georgia', serif;
     }
 
     .featured-location {
@@ -1035,6 +1037,7 @@ export default function Home() {
       font-size: 18px;
       font-weight: 700;
       margin: 0 0 6px;
+      font-family: 'Cormorant Garamond', 'Georgia', serif;
     }
 
     .no-featured-sub {
@@ -1336,9 +1339,10 @@ export default function Home() {
     .cta-inner { max-width: 760px; margin: 0 auto; }
     .cta-title {
       font-size: 34px;
-      font-weight: 800;
+      font-weight: 700;
       color: white;
       margin: 0 0 12px;
+      font-family: 'Cormorant Garamond', 'Georgia', serif;
     }
     .cta-text {
       font-size: 16px;
@@ -2368,3 +2372,115 @@ button:hover:not(:disabled) { transform: translateY(-2px); opacity: 0.93; }
   }
 }
 `;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
