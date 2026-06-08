@@ -69,6 +69,9 @@ export default function ProviderDashboard() {
                 <button type="button" style={iconBtn} title={`Signed in as ${displayName}`} aria-label="Account">
                   <ProfileAvatar user={avatarUser} size={28} style={{ border: "none" }} />
                 </button>
+                <button type="button" style={iconBtn} onClick={() => navigate("/settings")} title="Settings" aria-label="Settings">
+                  ⚙️
+                </button>
                 <button type="button" style={iconBtn} onClick={handleLogout} title="Log out" aria-label="Log out">
                   🚪
                 </button>
@@ -105,9 +108,14 @@ export default function ProviderDashboard() {
 
         <div style={sidebarFooter}>
           {loggedIn ? (
-            <button type="button" style={logoutLink} onClick={handleLogout}>
-              <span aria-hidden>🚪</span> Log out
-            </button>
+            <>
+              <button type="button" style={settingsLink} onClick={() => navigate("/settings")}>
+                <span aria-hidden>⚙️</span> Settings
+              </button>
+              <button type="button" style={logoutLink} onClick={handleLogout}>
+                <span aria-hidden>🚪</span> Log out
+              </button>
+            </>
           ) : (
             <button type="button" style={loginLink} onClick={() => setShowLogin(true)}>
               <span aria-hidden>🔑</span> Log in
@@ -285,6 +293,7 @@ const sidebarUser = { display: "flex", alignItems: "center", gap: "12px", paddin
 const navItem = { padding: "12px 14px", borderRadius: "10px", background: "transparent", border: "none", color: "#9ca3af", textAlign: "left", cursor: "pointer", fontFamily: "inherit", fontSize: "14px" };
 const sidebarFooter = { marginTop: "auto", paddingTop: "20px" };
 const logoutLink = { width: "100%", padding: "12px 14px", borderRadius: "10px", background: "transparent", border: "1px solid #4b5563", color: "#fca5a5", textAlign: "left", cursor: "pointer", fontFamily: "inherit", fontSize: "14px", fontWeight: 600, display: "flex", alignItems: "center", gap: "8px" };
+const settingsLink = { width: "100%", padding: "12px 14px", borderRadius: "10px", background: "transparent", border: "1px solid #4b5563", color: "#9ca3af", textAlign: "left", cursor: "pointer", fontFamily: "inherit", fontSize: "14px", fontWeight: 600, display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" };
 const loginLink = { width: "100%", padding: "12px 14px", borderRadius: "10px", background: "#fbbf24", border: "none", color: "#1f2937", textAlign: "left", cursor: "pointer", fontFamily: "inherit", fontSize: "14px", fontWeight: 700, display: "flex", alignItems: "center", gap: "8px" };
 const mainHeader = { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px", marginBottom: "24px", flexWrap: "wrap" };
 const headerLogout = { background: "white", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "10px 16px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit", fontSize: "13px" };

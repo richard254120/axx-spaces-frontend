@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { ProfileAvatar } from "../features/profile";
 import { fetchUserProfile, updateUserProfile, buildProfileFormData } from "../api/profile";
+import VerificationStatus from "../components/VerificationStatus";
+import VerificationHistory from "../components/VerificationHistory";
 
 export default function SettingsPage() {
   const { token, user, login, logout } = useContext(AuthContext);
@@ -131,6 +133,7 @@ export default function SettingsPage() {
 
   const tabs = [
     { id: "profile", label: "Profile", icon: "👤" },
+    { id: "verification", label: "Verification", icon: "✓" },
     { id: "security", label: "Security", icon: "🔒" },
     { id: "danger", label: "Danger Zone", icon: "⚠️" },
   ];
@@ -273,6 +276,14 @@ export default function SettingsPage() {
                   </button>
                 </form>
               )}
+            </div>
+          )}
+
+          {activeTab === "verification" && (
+            <div style={styles.section}>
+              <h2 style={styles.sectionTitle}>Identity Verification</h2>
+              <VerificationStatus />
+              <VerificationHistory />
             </div>
           )}
 

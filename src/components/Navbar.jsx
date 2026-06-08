@@ -15,6 +15,7 @@ export default function Navbar() {
   const [accountOpen, setAccountOpen] = useState(false);
   const [accountSelectorOpen, setAccountSelectorOpen] = useState(false);
   const [accountSelectorMode, setAccountSelectorMode] = useState("login");
+  const [jobDropdownOpen, setJobDropdownOpen] = useState(null);
   const dropdownRef = useRef(null);
   const accountRef = useRef(null);
 
@@ -107,24 +108,57 @@ export default function Navbar() {
 
           <div style={styles.dropdownDivider} />
           <div style={styles.dropdownHeader}>Jobs & Careers</div>
-          <Link to="/jobs/web-development" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+          <button
+            style={styles.dropdownItem}
+            onClick={() => setJobDropdownOpen(jobDropdownOpen === 'web-development' ? null : 'web-development')}
+          >
             <div style={styles.jobItem}>
               <span style={styles.dropdownIcon}>Web Development</span>
-              <span style={styles.jobDesc}>Custom websites, web apps, e-commerce platforms, and full-stack solutions tailored to your business needs</span>
+              <span style={styles.dropdownArrow}>{jobDropdownOpen === 'web-development' ? '▼' : '▶'}</span>
             </div>
-          </Link>
-          <Link to="/jobs/marketing" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+          </button>
+          {jobDropdownOpen === 'web-development' && (
+            <div style={styles.jobDropdownContent}>
+              <span style={styles.jobDesc}>Custom websites, web apps, e-commerce platforms, and full-stack solutions tailored to your business needs</span>
+              <Link to="/jobs/web-development" style={styles.jobLink} onClick={() => { setDropdownOpen(false); setJobDropdownOpen(null); }}>
+                View Jobs →
+              </Link>
+            </div>
+          )}
+          <button
+            style={styles.dropdownItem}
+            onClick={() => setJobDropdownOpen(jobDropdownOpen === 'marketing' ? null : 'marketing')}
+          >
             <div style={styles.jobItem}>
               <span style={styles.dropdownIcon}>Marketing</span>
-              <span style={styles.jobDesc}>Digital marketing, SEO, social media management, content creation, and brand strategy to grow your online presence</span>
+              <span style={styles.dropdownArrow}>{jobDropdownOpen === 'marketing' ? '▼' : '▶'}</span>
             </div>
-          </Link>
-          <Link to="/jobs/ui-ux-design" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+          </button>
+          {jobDropdownOpen === 'marketing' && (
+            <div style={styles.jobDropdownContent}>
+              <span style={styles.jobDesc}>Digital marketing, SEO, social media management, content creation, and brand strategy to grow your online presence</span>
+              <Link to="/jobs/marketing" style={styles.jobLink} onClick={() => { setDropdownOpen(false); setJobDropdownOpen(null); }}>
+                View Jobs →
+              </Link>
+            </div>
+          )}
+          <button
+            style={styles.dropdownItem}
+            onClick={() => setJobDropdownOpen(jobDropdownOpen === 'ui-ux-design' ? null : 'ui-ux-design')}
+          >
             <div style={styles.jobItem}>
               <span style={styles.dropdownIcon}>UI/UX Design</span>
-              <span style={styles.jobDesc}>User interface design, user experience research, wireframing, prototyping, and design systems for digital products</span>
+              <span style={styles.dropdownArrow}>{jobDropdownOpen === 'ui-ux-design' ? '▼' : '▶'}</span>
             </div>
-          </Link>
+          </button>
+          {jobDropdownOpen === 'ui-ux-design' && (
+            <div style={styles.jobDropdownContent}>
+              <span style={styles.jobDesc}>User interface design, user experience research, wireframing, prototyping, and design systems for digital products</span>
+              <Link to="/jobs/ui-ux-design" style={styles.jobLink} onClick={() => { setDropdownOpen(false); setJobDropdownOpen(null); }}>
+                View Jobs →
+              </Link>
+            </div>
+          )}
 
           <div style={styles.dropdownDivider} />
           <div style={styles.dropdownHeader}>Help & Legal</div>
@@ -331,6 +365,12 @@ export default function Navbar() {
         <Link to="/tourism" style={{ ...styles.navLink, ...(isActive("/tourism") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
           Tourism
         </Link>
+
+        {token && user && (
+          <Link to="/settings" style={{ ...styles.navLink, ...(isActive("/settings") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
+            Settings
+          </Link>
+        )}
 
         {token && user && (
           <>
@@ -649,6 +689,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: "2px",
+    width: "100%",
   },
 
   jobDesc: {
@@ -657,6 +698,22 @@ const styles = {
     fontWeight: 400,
     lineHeight: "1.4",
     maxWidth: "280px",
+  },
+
+  jobDropdownContent: {
+    padding: "12px 20px",
+    background: "rgba(15, 23, 41, 0.5)",
+    borderBottom: "1px solid rgba(51, 65, 85, 0.2)",
+  },
+
+  jobLink: {
+    display: "inline-block",
+    marginTop: "8px",
+    color: "#fbbf24",
+    fontSize: "12px",
+    fontWeight: 600,
+    textDecoration: "none",
+    transition: "all 0.2s",
   },
 
   dropdownDivider: {

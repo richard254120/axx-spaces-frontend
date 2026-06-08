@@ -236,6 +236,12 @@ export default function UserDashboard() {
             <p style={styles.welcome}>Welcome, {user?.name || user?.email || "User"}!</p>
           </div>
           <button
+            style={{ ...styles.button, ...styles.buttonPrimary }}
+            onClick={() => navigate("/settings")}
+          >
+            ⚙️ Settings
+          </button>
+          <button
             style={{ ...styles.button, ...styles.buttonSecondary }}
             onClick={() => logout("/login")}
           >

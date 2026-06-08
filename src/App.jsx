@@ -36,6 +36,7 @@ import Saved from "./pages/Saved";
 import Messages from "./pages/Messages";
 import Notifications from "./pages/Notifications";
 import UsersPage from "./pages/UsersPage";
+import Verification from "./pages/Verification";
 
 // ─── User Account Pages ──────────────────────────────────────────────────────
 import ProfilePage from "./pages/ProfilePage";
@@ -295,6 +296,14 @@ function App() {
         }
       />
       <Route
+        path="/verification"
+        element={
+          <PublicLayout>
+            <ProtectedRoute><Verification /></ProtectedRoute>
+          </PublicLayout>
+        }
+      />
+      <Route
         path="/axxwallet"
         element={
           <PublicLayout>
@@ -362,7 +371,7 @@ function App() {
           </PublicLayout>
         }
       />
-    </Routes>
+    </Routes >
   );
 }
 

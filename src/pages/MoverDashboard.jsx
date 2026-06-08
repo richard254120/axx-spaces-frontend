@@ -208,6 +208,7 @@ export default function MoverDashboard() {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <button onClick={fetchAll} style={styles.refreshBtn} title="Refresh Data">refresh</button>
+          <button onClick={() => navigate("/settings")} style={styles.settingsIcon} title="Settings">⚙️</button>
           <button onClick={handleLogout} style={styles.logoutIcon} title="Logout">logout</button>
         </div>
       </header>
@@ -548,6 +549,7 @@ const styles = {
   logoSection: { display: "flex", alignItems: "center", gap: "8px" },
   logoText: { fontWeight: 800, fontSize: "16px", color: "#fbbf24", letterSpacing: "0.5px" },
   logoutIcon: { background: "none", border: "none", fontSize: "22px", cursor: "pointer" },
+  settingsIcon: { background: "none", border: "none", fontSize: "20px", cursor: "pointer" },
   refreshBtn: { background: "none", border: "none", fontSize: "18px", cursor: "pointer", marginRight: "10px" },
   notificationBanner: {
     display: "flex", alignItems: "center", gap: "12px",

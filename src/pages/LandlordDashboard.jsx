@@ -181,6 +181,9 @@ export default function LandlordDashboard() {
             <span style={styles.menuLabel}>Email:</span>
             <span style={styles.menuValue}>{user?.email}</span>
           </div>
+          <button style={styles.menuActionBtn} onClick={() => { navigate("/settings"); setMobileMenuOpen(false); }}>
+            ⚙️ Settings
+          </button>
           <button style={styles.logoutBtn} onClick={() => { logout(); setMobileMenuOpen(false); }}>
             Logout
           </button>
@@ -418,6 +421,12 @@ const styles = {
   },
   menuLabel: { color: "#94a3b8", fontSize: "13px", fontWeight: 600 },
   menuValue: { color: "#fbbf24", fontSize: "14px", fontWeight: 600 },
+  menuActionBtn: {
+    width: "100%", padding: "12px", background: "rgba(251, 191, 36, 0.15)",
+    border: "1px solid rgba(251, 191, 36, 0.3)", borderRadius: "8px",
+    color: "#fbbf24", fontSize: "14px", fontWeight: 600, cursor: "pointer",
+    marginBottom: "12px", transition: "all 0.2s",
+  },
   statsContainer: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px", marginBottom: "20px" },
   statCard: {
     background: "#1e293b", border: "1px solid #334155",
