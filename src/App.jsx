@@ -284,9 +284,9 @@ function App() {
       <Route
         path="/settings"
         element={
-          <PublicLayout>
-            <div style={{ padding: '40px', color: 'white' }}>Settings Page Test</div>
-          </PublicLayout>
+          <DashboardLayout>
+            <Verification />
+          </DashboardLayout>
         }
       />
       <Route
@@ -300,9 +300,9 @@ function App() {
       <Route
         path="/verification"
         element={
-          <PublicLayout>
+          <DashboardLayout>
             <div style={{ padding: '40px', color: 'white' }}>Verification Page Test</div>
-          </PublicLayout>
+          </DashboardLayout>
         }
       />
       <Route
