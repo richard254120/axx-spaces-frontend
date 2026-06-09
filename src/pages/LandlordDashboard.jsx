@@ -3,6 +3,7 @@ import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { UserProfileEditor } from "../features/profile";
 import VerificationBadges from "../components/VerificationBadges";
+import VerificationStatus from "../components/VerificationStatus";
 import AnalyticsDashboard from "../components/AnalyticsDashboard";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
@@ -204,6 +205,11 @@ export default function LandlordDashboard() {
           <div style={styles.statValue}>{counts.booked}</div>
           <div style={styles.statName}>Occupied</div>
         </div>
+      </div>
+
+      {/* VERIFICATION STATUS */}
+      <div style={{ marginBottom: '20px' }}>
+        <VerificationStatus />
       </div>
 
       {/* UPLOAD BUTTON */}

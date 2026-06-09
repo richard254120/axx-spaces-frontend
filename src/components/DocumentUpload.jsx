@@ -1,9 +1,9 @@
 import { useState, useRef } from 'react';
 
-const DocumentUpload = ({ 
-  label, 
-  onFileChange, 
-  acceptedTypes = 'image/*,.pdf', 
+const DocumentUpload = ({
+  label,
+  onFileChange,
+  acceptedTypes = 'image/*,.pdf',
   maxSize = 5 * 1024 * 1024, // 5MB
   previewUrl,
   onRemove,
@@ -26,7 +26,7 @@ const DocumentUpload = ({
     const allowedTypes = acceptedTypes.split(',').map(t => t.trim());
     const fileType = file.type;
     const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
-    
+
     const isValidType = allowedTypes.some(type => {
       if (type.startsWith('.')) {
         return fileExtension === type;
@@ -47,7 +47,17 @@ const DocumentUpload = ({
     const file = e.target.files[0];
     const validFile = validateFile(file);
     if (validFile) {
-      onFileChange(validFile);
+      // Create preview URL for images
+      if (validFile.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          onFileChange(validFile, reader.result);
+        };
+        reader.readAsDataURL(validFile);
+      } else {
+        // For PDFs, just pass the file
+        onFileChange(validFile, null);
+      }
     }
   };
 
@@ -57,7 +67,17 @@ const DocumentUpload = ({
     const file = e.dataTransfer.files[0];
     const validFile = validateFile(file);
     if (validFile) {
-      onFileChange(validFile);
+      // Create preview URL for images
+      if (validFile.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          onFileChange(validFile, reader.result);
+        };
+        reader.readAsDataURL(validFile);
+      } else {
+        // For PDFs, just pass the file
+        onFileChange(validFile, null);
+      }
     }
   };
 
@@ -80,7 +100,7 @@ const DocumentUpload = ({
         {label}
         {required && <span style={styles.required}>*</span>}
       </label>
-      
+
       {!previewUrl ? (
         <div
           style={{
@@ -133,7 +153,7 @@ const DocumentUpload = ({
           </button>
         </div>
       )}
-      
+
       {error && <div style={styles.error}>{error}</div>}
     </div>
   );

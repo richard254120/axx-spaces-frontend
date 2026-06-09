@@ -15,6 +15,12 @@ const SelfieCapture = ({ onCapture, capturedImage, onRetake }) => {
     };
   }, [stream]);
 
+  useEffect(() => {
+    if (stream && videoRef.current) {
+      videoRef.current.srcObject = stream;
+    }
+  }, [stream]);
+
   const startCamera = async () => {
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -44,13 +50,13 @@ const SelfieCapture = ({ onCapture, capturedImage, onRetake }) => {
       setIsCapturing(true);
       const video = videoRef.current;
       const canvas = canvasRef.current;
-      
+
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-      
+
       const ctx = canvas.getContext('2d');
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      
+
       const imageData = canvas.toDataURL('image/jpeg', 0.9);
       onCapture(imageData);
       stopCamera();
@@ -85,7 +91,7 @@ const SelfieCapture = ({ onCapture, capturedImage, onRetake }) => {
         Selfie Verification
         <span style={styles.required}>*</span>
       </label>
-      
+
       {!stream ? (
         <div style={styles.startCameraContainer}>
           <button
@@ -121,7 +127,7 @@ const SelfieCapture = ({ onCapture, capturedImage, onRetake }) => {
               </div>
             </div>
           </div>
-          
+
           <div style={styles.cameraControls}>
             <button
               style={styles.cancelButton}
@@ -137,7 +143,7 @@ const SelfieCapture = ({ onCapture, capturedImage, onRetake }) => {
               {isCapturing ? '⏳ Capturing...' : '📸 Capture'}
             </button>
           </div>
-          
+
           <canvas ref={canvasRef} style={styles.hiddenCanvas} />
         </div>
       )}

@@ -445,6 +445,13 @@ export default function AdminDashboard() {
           👥 Users {users.length > 0 ? `(${users.length})` : ""}
         </button>
         {/* END ADDED */}
+        {/* Verification tab button */}
+        <button
+          style={{ ...styles.tab, ...(activeTab === "verification" ? styles.tabActive : {}) }}
+          onClick={() => navigate("/admin/verification")}
+        >
+          ✓ Verification
+        </button>
       </div>
 
       {loading ? (

@@ -284,6 +284,16 @@ export default function SettingsPage() {
               <h2 style={styles.sectionTitle}>Identity Verification</h2>
               <VerificationStatus />
               <VerificationHistory />
+              {profile?.verificationStatus === 'approved' && (
+                <div style={styles.successBanner}>
+                  ✓ Your verification has been approved! You are now a verified user.
+                </div>
+              )}
+              {profile?.verificationStatus === 'rejected' && (
+                <div style={styles.errorBanner}>
+                  ✕ Your verification was rejected. Please review the rejection reason and resubmit.
+                </div>
+              )}
             </div>
           )}
 

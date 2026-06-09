@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { tourismLogin } from "../../api/tourism";
 import { UserProfileEditor, ProfileAvatar } from "../../features/profile";
+import VerificationStatus from "../../components/VerificationStatus";
 import {
   useOwnerProfile,
   StatusBadge,
@@ -167,6 +168,10 @@ export default function ProviderDashboard() {
                   <div style={{ fontSize: "26px", fontWeight: 900, color: s.color || tourismTheme.text }}>{s.value}</div>
                 </div>
               ))}
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
+              <VerificationStatus />
             </div>
 
             <h2 style={{ ...sectionHead, marginTop: "28px" }}>Your properties</h2>

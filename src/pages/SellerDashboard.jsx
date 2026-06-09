@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserProfileEditor, ProfileAvatar } from "../features/profile";
+import VerificationStatus from "../components/VerificationStatus";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -181,6 +182,10 @@ export default function SellerDashboard() {
         <div style={s.statCard}><span style={s.statIcon}>🌐</span><div><div style={s.statLabel}>Live Listings</div><div style={s.statVal}>{stats.liveItems}</div></div></div>
         <div style={s.statCard}><span style={s.statIcon}>⏳</span><div><div style={s.statLabel}>Pending</div><div style={s.statVal}>{stats.pendingReview}</div></div></div>
         <div style={s.statCard}><span style={s.statIcon}>👁️</span><div><div style={s.statLabel}>Views</div><div style={s.statVal}>{stats.totalViews}</div></div></div>
+      </div>
+
+      <div style={{ marginBottom: '24px' }}>
+        <VerificationStatus />
       </div>
 
       <div style={s.controlsRow}>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import VerificationStatus from "../components/VerificationStatus";
 import { UserProfileEditor } from "../features/profile";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
@@ -260,6 +261,10 @@ export default function MoverDashboard() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
+              <VerificationStatus />
             </div>
 
             {jobs.filter(j => j.status === "pending").length > 0 && (

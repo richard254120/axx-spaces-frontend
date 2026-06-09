@@ -45,16 +45,12 @@ const Verification = () => {
     { level: 4, name: 'Business Verification', description: 'Verify your business for premium features', required: false },
   ];
 
-  const handleFileChange = (field, file) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setFormData(prev => ({
-        ...prev,
-        [field]: file,
-        [`${field}Preview`]: reader.result
-      }));
-    };
-    reader.readAsDataURL(file);
+  const handleFileChange = (field, file, previewUrl) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: file,
+      [`${field}Preview`]: previewUrl
+    }));
   };
 
   const handleRemoveFile = (field) => {
@@ -107,8 +103,19 @@ const Verification = () => {
       }
       if (formData.selfie) {
         // Convert base64 to blob
-        const response = await fetch(formData.selfie);
-        const blob = await response.blob();
+        const base64Data = formData.selfie.split(',')[1];
+        const byteCharacters = atob(base64Data);
+        const byteArrays = [];
+        for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+          const slice = byteCharacters.slice(offset, offset + 512);
+          const byteNumbers = new Array(slice.length);
+          for (let i = 0; i < slice.length; i++) {
+            byteNumbers[i] = slice.charCodeAt(i);
+          }
+          const byteArray = new Uint8Array(byteNumbers);
+          byteArrays.push(byteArray);
+        }
+        const blob = new Blob(byteArrays, { type: 'image/jpeg' });
         formDataToSend.append('selfie', blob, 'selfie.jpg');
       }
 

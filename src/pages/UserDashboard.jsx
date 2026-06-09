@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
+import VerificationStatus from "../components/VerificationStatus";
 
 const styles = {
   container: {
@@ -267,6 +268,11 @@ export default function UserDashboard() {
             <div style={styles.statValue}>{stats.rejected}</div>
             <div style={styles.statLabel}>Rejected</div>
           </div>
+        </div>
+
+        {/* Verification Status */}
+        <div style={{ marginBottom: '24px' }}>
+          <VerificationStatus />
         </div>
 
         {/* My Businesses Section */}

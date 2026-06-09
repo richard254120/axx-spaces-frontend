@@ -32,6 +32,7 @@ import PaymentHistory from "./pages/PaymentHistory";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Wallet from "./pages/Wallet";
+import AdminVerification from "./pages/AdminVerification";
 import Saved from "./pages/Saved";
 import Messages from "./pages/Messages";
 import Notifications from "./pages/Notifications";
@@ -108,7 +109,7 @@ const ProtectedRoute = ({ children, allowedRoles = [], businessRoute = false }) 
 function App() {
   const navigate = useNavigate();
   useDevToolsProtection();
-  const [showSplash, setShowSplash] = useState(true); // Always show for testing
+  const [showSplash, setShowSplash] = useState(false);
 
   useEffect(() => {
     // Check if this is the first visit or if forced via URL parameter
@@ -340,6 +341,14 @@ function App() {
         element={
           <PublicLayout>
             <ProtectedRoute><PaymentHistory /></ProtectedRoute>
+          </PublicLayout>
+        }
+      />
+      <Route
+        path="/admin/verification"
+        element={
+          <PublicLayout>
+            <ProtectedRoute><AdminVerification /></ProtectedRoute>
           </PublicLayout>
         }
       />
