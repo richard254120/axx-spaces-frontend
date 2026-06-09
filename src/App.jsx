@@ -301,7 +301,7 @@ function App() {
         path="/verification"
         element={
           <DashboardLayout>
-            <div style={{ padding: '40px', color: 'white' }}>Verification Page Test</div>
+            <Verification />
           </DashboardLayout>
         }
       />
