@@ -1,97 +1,169 @@
 import { useEffect, useState } from 'react';
 
 const SplashScreen = ({ onComplete }) => {
-  const [visibleLetters, setVisibleLetters] = useState(0);
-  const text = 'AXXSPACE';
-  const totalDuration = 4000;
-  const letterDelay = totalDuration / text.length;
+  const [particles, setParticles] = useState([]);
+  const [showLogo, setShowLogo] = useState(false);
+  const [showText, setShowText] = useState(false);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setVisibleLetters((prev) => {
-        if (prev < text.length) {
-          return prev + 1;
-        }
-        return prev;
-      });
-    }, letterDelay);
+    // Generate particles with pre-calculated animation values
+    const particleCount = 150;
+    const newParticles = [];
+    const colors = ['#8B4513', '#A0522D', '#CD853F', '#D2691E', '#DEB887', '#F4A460', '#FFD700', '#FFA500'];
 
-    const timeout = setTimeout(() => {
+    for (let i = 0; i < particleCount; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 200 + Math.random() * 400;
+      const size = 5 + Math.random() * 15;
+      const duration = 1.5 + Math.random() * 2;
+      const delay = Math.random() * 0.5;
+      const endX = Math.cos(angle) * distance;
+      const endY = Math.sin(angle) * distance;
+      const rotation = Math.random() * 720;
+
+      newParticles.push({
+        id: i,
+        size,
+        duration,
+        delay,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        endX,
+        endY,
+        rotation
+      });
+    }
+
+    setParticles(newParticles);
+
+    // Show logo after particles spread
+    const logoTimeout = setTimeout(() => {
+      setShowLogo(true);
+    }, 1500);
+
+    // Show text after logo
+    const textTimeout = setTimeout(() => {
+      setShowText(true);
+    }, 2000);
+
+    // Complete animation
+    const completeTimeout = setTimeout(() => {
       if (onComplete) onComplete();
-    }, totalDuration + 500);
+    }, 4000);
 
     return () => {
-      clearInterval(interval);
-      clearTimeout(timeout);
+      clearTimeout(logoTimeout);
+      clearTimeout(textTimeout);
+      clearTimeout(completeTimeout);
     };
-  }, [letterDelay, text.length, onComplete]);
-
-  const colors = ['#FFD700', '#FFA500', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD'];
+  }, [onComplete]);
 
   return (
     <div style={{
       position: 'fixed',
       inset: 0,
-      background: 'linear-gradient(135deg, #0D1B2A 0%, #1a2a4a 50%, #0D1B2A 100%)',
+      background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 9999,
       overflow: 'hidden'
     }}>
+      {/* Particle Container */}
       <div style={{
-        textAlign: 'center',
-        perspective: '1000px'
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        {particles.map((particle) => (
+          <div
+            key={particle.id}
+            style={{
+              position: 'absolute',
+              width: particle.size,
+              height: particle.size,
+              borderRadius: '50%',
+              background: particle.color,
+              boxShadow: `0 0 ${particle.size}px ${particle.color}`,
+              animation: `explode ${particle.duration}s ease-out ${particle.delay}s forwards`,
+              '--endX': `${particle.endX}px`,
+              '--endY': `${particle.endY}px`,
+              '--rotation': `${particle.rotation}deg`
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Central Logo */}
+      <div style={{
+        position: 'relative',
+        zIndex: 10,
+        opacity: showLogo ? 1 : 0,
+        transform: showLogo ? 'scale(1)' : 'scale(0)',
+        transition: 'all 1s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        textAlign: 'center'
       }}>
         <div style={{
+          width: '120px',
+          height: '120px',
+          background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF6B6B 100%)',
+          borderRadius: '50%',
+          margin: '0 auto 20px',
+          boxShadow: '0 0 60px rgba(255, 215, 0, 0.5)',
           display: 'flex',
-          gap: '16px',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '48px',
+          fontWeight: 'bold',
+          color: '#fff'
+        }}>
+          A
+        </div>
+
+        {/* Text */}
+        <div style={{
+          opacity: showText ? 1 : 0,
+          transform: showText ? 'translateY(0)' : 'translateY(20px)',
+          transition: 'all 0.8s ease',
           fontFamily: 'Cormorant Garamond, Georgia, serif',
-          fontSize: 'clamp(48px, 10vw, 120px)',
+          fontSize: 'clamp(36px, 8vw, 72px)',
           fontWeight: 700,
+          letterSpacing: '0.2em',
+          color: '#fff',
+          textShadow: '0 0 30px rgba(255, 215, 0, 0.8)'
+        }}>
+          AXXSPACE
+        </div>
+
+        {/* Tagline */}
+        <div style={{
+          opacity: showText ? 1 : 0,
+          transform: showText ? 'translateY(0)' : 'translateY(20px)',
+          transition: 'all 0.8s ease 0.2s',
+          marginTop: '16px',
+          fontSize: 'clamp(14px, 3vw, 18px)',
+          color: 'rgba(255, 255, 255, 0.7)',
           letterSpacing: '0.1em'
         }}>
-          {text.split('').map((letter, index) => (
-            <span
-              key={index}
-              style={{
-                color: colors[index % colors.length],
-                opacity: index < visibleLetters ? 1 : 0,
-                transform: index < visibleLetters
-                  ? 'scale(1) rotateY(0deg)'
-                  : 'scale(0.5) rotateY(-90deg)',
-                transition: 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                display: 'inline-block',
-                transformStyle: 'preserve-3d',
-                textShadow: index < visibleLetters
-                  ? '0 0 20px currentColor, 0 0 40px currentColor'
-                  : 'none'
-              }}
-            >
-              {letter}
-            </span>
-          ))}
-        </div>
-        <div style={{
-          marginTop: '60px',
-          width: '200px',
-          height: '4px',
-          background: 'rgba(255,255,255,0.1)',
-          borderRadius: '2px',
-          overflow: 'hidden',
-          marginLeft: 'auto',
-          marginRight: 'auto'
-        }}>
-          <div style={{
-            height: '100%',
-            width: `${(visibleLetters / text.length) * 100}%`,
-            background: 'linear-gradient(90deg, #FFD700, #FFA500, #FF6B6B, #4ECDC4, #45B7D1)',
-            borderRadius: '2px',
-            transition: 'width 0.5s ease',
-            boxShadow: '0 0 10px rgba(255,215,0,0.5)'
-          }} />
+          Your Space, Your Way
         </div>
       </div>
+
+      {/* CSS Animation */}
+      <style>{`
+        @keyframes explode {
+          0% {
+            transform: translate(0, 0) rotate(0deg) scale(1);
+            opacity: 1;
+          }
+          100% {
+            transform: translate(var(--endX), var(--endY)) rotate(var(--rotation)) scale(0);
+            opacity: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 };

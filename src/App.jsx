@@ -109,7 +109,7 @@ const ProtectedRoute = ({ children, allowedRoles = [], businessRoute = false }) 
 function App() {
   const navigate = useNavigate();
   useDevToolsProtection();
-  const [showSplash, setShowSplash] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
     // Check if this is the first visit or if forced via URL parameter
@@ -117,11 +117,12 @@ function App() {
     const urlParams = new URLSearchParams(window.location.search);
     const forceSplash = urlParams.get('splash') === 'true';
 
-    if (!hasVisited || forceSplash) {
-      setShowSplash(true);
-      if (!forceSplash) {
-        localStorage.setItem('axxspace_visited', 'true');
-      }
+    if (hasVisited && !forceSplash) {
+      // Already visited, skip splash screen
+      setShowSplash(false);
+    } else {
+      // First visit or forced, show splash and mark as visited
+      localStorage.setItem('axxspace_visited', 'true');
     }
   }, []);
 
@@ -284,7 +285,7 @@ function App() {
         path="/settings"
         element={
           <PublicLayout>
-            <ProtectedRoute><SettingsPage /></ProtectedRoute>
+            <SettingsPage />
           </PublicLayout>
         }
       />
@@ -300,7 +301,7 @@ function App() {
         path="/verification"
         element={
           <PublicLayout>
-            <ProtectedRoute><Verification /></ProtectedRoute>
+            <Verification />
           </PublicLayout>
         }
       />
