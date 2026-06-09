@@ -212,7 +212,7 @@ const Verification = () => {
 
               <DocumentUpload
                 label="Government ID Document"
-                onFileChange={(file) => handleFileChange('idDocument', file)}
+                onFileChange={(file, previewUrl) => handleFileChange('idDocument', file, previewUrl)}
                 previewUrl={formData.idPreview}
                 onRemove={() => handleRemoveFile('idDocument')}
                 required
@@ -236,7 +236,7 @@ const Verification = () => {
             <div style={styles.formSection}>
               <DocumentUpload
                 label="Proof of Address (Utility Bill, Bank Statement)"
-                onFileChange={(file) => handleFileChange('addressDocument', file)}
+                onFileChange={(file, previewUrl) => handleFileChange('addressDocument', file, previewUrl)}
                 previewUrl={formData.addressPreview}
                 onRemove={() => handleRemoveFile('addressDocument')}
                 required={selectedLevel >= 3}
@@ -282,7 +282,7 @@ const Verification = () => {
 
               <DocumentUpload
                 label="Business Registration Certificate"
-                onFileChange={(file) => handleFileChange('businessRegistration', file)}
+                onFileChange={(file, previewUrl) => handleFileChange('businessRegistration', file, previewUrl)}
                 previewUrl={formData.businessPreview}
                 onRemove={() => handleRemoveFile('businessRegistration')}
                 required={selectedLevel >= 4}
