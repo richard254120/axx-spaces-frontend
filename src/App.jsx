@@ -285,7 +285,7 @@ function App() {
         path="/settings"
         element={
           <PublicLayout>
-            <SettingsPage />
+            <div style={{ padding: '40px', color: 'white' }}>Settings Page Test</div>
           </PublicLayout>
         }
       />
@@ -301,7 +301,7 @@ function App() {
         path="/verification"
         element={
           <PublicLayout>
-            <Verification />
+            <div style={{ padding: '40px', color: 'white' }}>Verification Page Test</div>
           </PublicLayout>
         }
       />
