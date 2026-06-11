@@ -1086,6 +1086,8 @@ export default function Home() {
   const [showBoostModal, setShowBoostModal] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [componentError, setComponentError] = useState(null);
+  const [demographics, setDemographics] = useState(null);
+  const [loadingDemographics, setLoadingDemographics] = useState(true);
 
   const counties = [
     "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta",
@@ -1170,6 +1172,25 @@ export default function Home() {
   };
 
   /* ── DATA FETCHING ── */
+  useEffect(() => {
+    const fetchDemographics = async () => {
+      try {
+        setLoadingDemographics(true);
+        const res = await API.get("/analytics/demographics");
+        setDemographics(res.data?.data || null);
+      } catch (err) {
+        console.error("Failed to load demographics:", err?.message || err);
+      } finally {
+        setLoadingDemographics(false);
+      }
+    };
+
+    fetchDemographics();
+    // Auto-refresh every 5 minutes
+    const interval = setInterval(fetchDemographics, 300000);
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
@@ -1472,6 +1493,102 @@ export default function Home() {
             <p className="no-feat-title">No Featured Listings Yet</p>
             <p className="no-feat-sub">Boost your property to appear here and reach thousands of tenants!</p>
             <button onClick={handleListProperty} className="no-feat-btn">🚀 Boost Your Property</button>
+          </div>
+        )}
+      </section>
+
+      {/* ── DEMOGRAPHICS SECTION ── */}
+      <section style={{ padding: "96px 28px", background: "#162233", borderTop: "1px solid rgba(201,168,76,0.1)" }}>
+        <div className="section-hdr">
+          <p className="section-eyebrow">Live Analytics</p>
+          <h2 className="section-title">Platform Demographics</h2>
+          <p className="section-sub">Real-time data from across all 47 counties</p>
+        </div>
+
+        {loadingDemographics ? (
+          <div style={{ textAlign: "center", padding: "60px 28px" }}>
+            <div className="spinner" style={{ fontSize: "40px", color: "#C9A84C", marginBottom: "20px" }}>⟳</div>
+            <p style={{ color: "#7A7260", fontSize: "14px" }}>Loading demographic data...</p>
+          </div>
+        ) : demographics ? (
+          <div style={{ maxWidth: "1280px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))", gap: "24px" }}>
+            {/* County Distribution */}
+            <div style={{ background: "#1E3148", border: "1px solid rgba(201,168,76,0.14)", borderRadius: "12px", padding: "28px" }}>
+              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", fontWeight: 700, color: "#F0EAD8", margin: "0 0 20px" }}>📍 Top Counties</h3>
+              {demographics.counties && demographics.counties.length > 0 ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                  {demographics.counties.slice(0, 5).map((item, idx) => {
+                    const maxCount = Math.max(...demographics.counties.map(c => c.count));
+                    const percentage = (item.count / maxCount) * 100;
+                    return (
+                      <div key={item.county} style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 600, color: "#F0EAD8" }}>{item.county}</span>
+                          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 700, color: "#C9A84C" }}>{item.count}</span>
+                        </div>
+                        <div style={{ height: "8px", background: "rgba(201,168,76,0.1)", borderRadius: "4px", overflow: "hidden" }}>
+                          <div style={{ height: "100%", background: "linear-gradient(90deg, #C9A84C, #E2C47A)", borderRadius: "4px", width: `${percentage}%`, transition: "width 0.5s ease" }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p style={{ color: "#7A7260", fontSize: "14px" }}>No county data available</p>
+              )}
+            </div>
+
+            {/* Service Popularity */}
+            <div style={{ background: "#1E3148", border: "1px solid rgba(201,168,76,0.14)", borderRadius: "12px", padding: "28px" }}>
+              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", fontWeight: 700, color: "#F0EAD8", margin: "0 0 20px" }}>📊 Service Popularity</h3>
+              {demographics.services && demographics.services.length > 0 ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                  {demographics.services.map((item, idx) => {
+                    const maxCount = Math.max(...demographics.services.map(s => s.count));
+                    const percentage = (item.count / maxCount) * 100;
+                    const colors = ["#C9A84C", "#60A5FA", "#4CAF74", "#A78BFA", "#38BDF8"];
+                    return (
+                      <div key={item.service} style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 600, color: "#F0EAD8" }}>{item.service}</span>
+                          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 700, color: colors[idx % colors.length] }}>{item.count}</span>
+                        </div>
+                        <div style={{ height: "8px", background: "rgba(201,168,76,0.1)", borderRadius: "4px", overflow: "hidden" }}>
+                          <div style={{ height: "100%", background: colors[idx % colors.length], borderRadius: "4px", width: `${percentage}%`, transition: "width 0.5s ease" }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p style={{ color: "#7A7260", fontSize: "14px" }}>No service data available</p>
+              )}
+            </div>
+
+            {/* Summary Stats */}
+            <div style={{ background: "#1E3148", border: "1px solid rgba(201,168,76,0.14)", borderRadius: "12px", padding: "28px" }}>
+              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", fontWeight: 700, color: "#F0EAD8", margin: "0 0 20px" }}>📈 Platform Overview</h3>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+                <div style={{ background: "rgba(201,168,76,0.08)", padding: "20px", borderRadius: "8px", textAlign: "center" }}>
+                  <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "36px", fontWeight: 700, color: "#C9A84C", display: "block" }}>{demographics.totalListings || 0}</span>
+                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", fontWeight: 600, color: "#7A7260", textTransform: "uppercase", letterSpacing: "0.1em" }}>Total Listings</span>
+                </div>
+                <div style={{ background: "rgba(201,168,76,0.08)", padding: "20px", borderRadius: "8px", textAlign: "center" }}>
+                  <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "36px", fontWeight: 700, color: "#C9A84C", display: "block" }}>{demographics.totalUsers || 0}</span>
+                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", fontWeight: 600, color: "#7A7260", textTransform: "uppercase", letterSpacing: "0.1em" }}>Total Users</span>
+                </div>
+              </div>
+              <div style={{ marginTop: "20px", padding: "16px", background: "rgba(96,165,250,0.08)", borderRadius: "8px", border: "1px solid rgba(96,165,250,0.2)" }}>
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#60A5FA", fontWeight: 600, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: "0.1em" }}>🔄 Auto-refreshing every 5 minutes</p>
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#B8AD96", margin: 0, fontWeight: 300" }}>Data updates automatically to show the latest platform activity</p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div style={{ textAlign: "center", padding: "60px 28px" }}>
+            <span style={{ fontSize: "52px", marginBottom: "16px", display: "block" }}>📊</span>
+            <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#F0EAD8", marginBottom: "8px" }}>Demographics Unavailable</p>
+            <p style={{ color: "#7A7260", fontSize: "14px", marginBottom: "24px", fontWeight: 300" }}>Unable to load demographic data at this time</p>
           </div>
         )}
       </section>
