@@ -6,6 +6,7 @@ const VerificationStatus = ({ verificationLevel = 1, status = 'pending' }) => {
   const { token } = useContext(AuthContext);
   const [verificationData, setVerificationData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showRejectionReason, setShowRejectionReason] = useState(false);
 
   useEffect(() => {
     const fetchVerificationStatus = async () => {
@@ -128,7 +129,26 @@ const VerificationStatus = ({ verificationLevel = 1, status = 'pending' }) => {
         </ul>
       </div>
 
-      {currentLevel < 4 && (
+      {currentStatus === 'rejected' && verificationData?.rejectionReason && (
+        <div style={styles.rejectionSection}>
+          <button
+            style={styles.rejectionToggle}
+            onClick={() => setShowRejectionReason(!showRejectionReason)}
+          >
+            {showRejectionReason ? '▼' : '▶'} View Rejection Reason
+          </button>
+          {showRejectionReason && (
+            <div style={styles.rejectionReason}>
+              <strong>Reason:</strong> {verificationData.rejectionReason}
+            </div>
+          )}
+          <Link to="/verification" style={styles.resubmitButton}>
+            Resubmit Verification
+          </Link>
+        </div>
+      )}
+
+      {currentLevel < 4 && currentStatus !== 'rejected' && (
         <Link to="/verification" style={styles.upgradeButton}>
           Upgrade Verification →
         </Link>
@@ -265,6 +285,43 @@ const styles = {
     fontWeight: '700',
     textAlign: 'center',
     transition: 'all 0.3s',
+  },
+  rejectionSection: {
+    marginTop: '16px',
+    padding: '16px',
+    background: 'rgba(239, 68, 68, 0.1)',
+    border: '1px solid rgba(239, 68, 68, 0.3)',
+    borderRadius: '8px',
+  },
+  rejectionToggle: {
+    background: 'transparent',
+    border: 'none',
+    color: '#ef4444',
+    fontSize: '13px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    padding: '0',
+    marginBottom: '8px',
+  },
+  rejectionReason: {
+    fontSize: '13px',
+    color: '#fca5a5',
+    lineHeight: '1.5',
+    marginBottom: '12px',
+    padding: '8px',
+    background: 'rgba(239, 68, 68, 0.1)',
+    borderRadius: '4px',
+  },
+  resubmitButton: {
+    display: 'inline-block',
+    padding: '8px 16px',
+    background: 'rgba(239, 68, 68, 0.2)',
+    color: '#ef4444',
+    textDecoration: 'none',
+    borderRadius: '6px',
+    fontWeight: '600',
+    fontSize: '13px',
+    border: '1px solid rgba(239, 68, 68, 0.3)',
   },
 };
 

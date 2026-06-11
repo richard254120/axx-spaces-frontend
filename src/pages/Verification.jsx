@@ -7,7 +7,7 @@ import SelfieCapture from '../components/SelfieCapture';
 
 const Verification = () => {
   const navigate = useNavigate();
-  const { token } = useContext(AuthContext);
+  const { token, user } = useContext(AuthContext);
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedLevel, setSelectedLevel] = useState(2);
   const [loading, setLoading] = useState(false);
@@ -121,7 +121,17 @@ const Verification = () => {
       if (!response.ok) throw new Error(data.message || data.error || 'Failed to submit verification');
 
       setSuccess('Verification submitted successfully! You will be notified once reviewed.');
-      setTimeout(() => navigate('/settings'), 2000);
+
+      // Redirect to appropriate dashboard based on user role
+      const userRole = user?.role || user?.userType || 'user';
+      let dashboardRoute = '/user-dashboard';
+
+      if (userRole === 'landlord') dashboardRoute = '/landlord-dashboard';
+      else if (userRole === 'seller') dashboardRoute = '/seller-dashboard';
+      else if (userRole === 'mover') dashboardRoute = '/mover-dashboard';
+      else if (userRole === 'admin') dashboardRoute = '/admin-dashboard';
+
+      setTimeout(() => navigate(dashboardRoute), 2000);
     } catch (err) {
       setError(err.message || 'Failed to submit verification. Please try again.');
     } finally {

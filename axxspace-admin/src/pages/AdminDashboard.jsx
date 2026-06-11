@@ -4,10 +4,10 @@ import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 
 // ── tiny helpers ──────────────────────────────────────────────
-const TABS = ["properties", "materials", "tourism", "movers", "sellers", "sold", "payment", "boosts", "businesses", "announcements"];
+const TABS = ["properties", "materials", "tourism", "movers", "sellers", "sold", "payment", "boosts", "businesses", "announcements", "verification"];
 const TAB_LABELS = {
   properties: "🏠 Properties", materials: "🛍️ Materials", tourism: "🏨 Tourism",
-  movers: "🚛 Movers", sellers: "📋 Sellers", sold: "💰 Sold", payment: "💳 Payment", boosts: "🚀 Payments", businesses: "🏪 Businesses", announcements: "📢 Announcements"
+  movers: "🚛 Movers", sellers: "📋 Sellers", sold: "💰 Sold", payment: "💳 Payment", boosts: "🚀 Payments", businesses: "🏪 Businesses", announcements: "📢 Announcements", verification: "✓ KYC Verification"
 };
 const STATUS_VIEWS = ["pending", "approved", "rejected"];
 
@@ -57,6 +57,12 @@ export default function AdminDashboard() {
   const [pendingAnnouncements, setPendingAnnouncements] = useState([]);
   const [announcementsLoading, setAnnouncementsLoading] = useState(false);
 
+  // ── KYC VERIFICATION STATE ─────────────────────────────────
+  const [pendingVerifications, setPendingVerifications] = useState([]);
+  const [selectedVerification, setSelectedVerification] = useState(null);
+  const [verificationLoading, setVerificationLoading] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState('');
+
   // ── auth guard ─────────────────────────────────────────────
   useEffect(() => {
     if (user?.role !== "admin") { navigate("/login"); return; }
@@ -96,6 +102,64 @@ export default function AdminDashboard() {
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
+
+  // ── load pending KYC verifications when tab changes ─────────
+  useEffect(() => {
+    if (activeTab === "verification") {
+      loadPendingVerifications();
+    }
+  }, [activeTab]);
+
+  // ── KYC VERIFICATION FUNCTIONS ───────────────────────────────
+  const loadPendingVerifications = async () => {
+    setVerificationLoading(true);
+    try {
+      const res = await API.get("/kyc-verification/admin/pending");
+      setPendingVerifications(res.data?.data || []);
+    } catch (err) {
+      console.error("Failed to load pending verifications:", err);
+    } finally {
+      setVerificationLoading(false);
+    }
+  };
+
+  const loadVerificationDetails = async (verificationId) => {
+    try {
+      const res = await API.get(`/kyc-verification/admin/${verificationId}`);
+      setSelectedVerification(res.data?.data);
+    } catch (err) {
+      console.error("Failed to load verification details:", err);
+    }
+  };
+
+  const handleApproveVerification = async (verificationId) => {
+    if (!window.confirm("Are you sure you want to approve this verification?")) return;
+    try {
+      await API.put(`/kyc-verification/admin/${verificationId}/approve`);
+      alert("✅ Verification approved successfully");
+      loadPendingVerifications();
+      setSelectedVerification(null);
+    } catch (err) {
+      alert("❌ Failed to approve verification");
+    }
+  };
+
+  const handleRejectVerification = async (verificationId) => {
+    if (!rejectionReason.trim()) {
+      alert("Please provide a rejection reason");
+      return;
+    }
+    if (!window.confirm("Are you sure you want to reject this verification?")) return;
+    try {
+      await API.put(`/kyc-verification/admin/${verificationId}/reject`, { rejectionReason });
+      alert("✅ Verification rejected successfully");
+      loadPendingVerifications();
+      setSelectedVerification(null);
+      setRejectionReason('');
+    } catch (err) {
+      alert("❌ Failed to reject verification");
+    }
+  };
 
   // ── reload items when tab or statusView changes ─────────────
   useEffect(() => {
@@ -985,6 +1049,113 @@ export default function AdminDashboard() {
             ))}
           </div>
         )
+      ) : activeTab === "verification" ? (
+        selectedVerification ? (
+          <div style={S.verificationDetail}>
+            <button style={S.backBtn} onClick={() => setSelectedVerification(null)}>← Back to List</button>
+            <div style={S.detailCard}>
+              <h2 style={S.detailTitle}>Verification Details</h2>
+              <div style={S.detailSection}>
+                <p style={S.detailLabel}>User ID:</p>
+                <p style={S.detailValue}>{selectedVerification.user?._id || selectedVerification.user}</p>
+              </div>
+              <div style={S.detailSection}>
+                <p style={S.detailLabel}>Verification Level:</p>
+                <p style={S.detailValue}>Level {selectedVerification.verificationLevel}</p>
+              </div>
+              <div style={S.detailSection}>
+                <p style={S.detailLabel}>Status:</p>
+                <p style={{ ...S.detailValue, color: selectedVerification.status === 'approved' ? '#22c55e' : selectedVerification.status === 'rejected' ? '#ef4444' : '#fbbf24' }}>
+                  {selectedVerification.status.toUpperCase()}
+                </p>
+              </div>
+              {selectedVerification.idType && (
+                <div style={S.detailSection}>
+                  <p style={S.detailLabel}>ID Type:</p>
+                  <p style={S.detailValue}>{selectedVerification.idType.replace(/_/g, ' ')}</p>
+                </div>
+              )}
+              {selectedVerification.businessName && (
+                <div style={S.detailSection}>
+                  <p style={S.detailLabel}>Business Name:</p>
+                  <p style={S.detailValue}>{selectedVerification.businessName}</p>
+                </div>
+              )}
+              {selectedVerification.taxId && (
+                <div style={S.detailSection}>
+                  <p style={S.detailLabel}>Tax ID:</p>
+                  <p style={S.detailValue}>{selectedVerification.taxId}</p>
+                </div>
+              )}
+              {selectedVerification.documents && selectedVerification.documents.length > 0 && (
+                <div style={S.detailSection}>
+                  <p style={S.detailLabel}>Documents:</p>
+                  {selectedVerification.documents.map((doc, idx) => (
+                    <div key={idx} style={S.documentItem}>
+                      <p style={S.docType}>{doc.type.replace(/_/g, ' ')}</p>
+                      <a href={doc.url} target="_blank" rel="noopener noreferrer" style={S.docLink}>
+                        📄 View Document
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {selectedVerification.selfie && selectedVerification.selfie.url && (
+                <div style={S.detailSection}>
+                  <p style={S.detailLabel}>Selfie:</p>
+                  <img src={selectedVerification.selfie.url} alt="Selfie" style={S.selfieImage} />
+                </div>
+              )}
+              {selectedVerification.status === 'pending' && (
+                <div style={S.actionButtons}>
+                  <button style={S.approveBtn} onClick={() => handleApproveVerification(selectedVerification._id)}>
+                    ✅ Approve
+                  </button>
+                  <div style={S.rejectSection}>
+                    <textarea
+                      style={S.rejectInput}
+                      placeholder="Enter rejection reason..."
+                      value={rejectionReason}
+                      onChange={(e) => setRejectionReason(e.target.value)}
+                    />
+                    <button style={S.rejectBtn} onClick={() => handleRejectVerification(selectedVerification._id)}>
+                      ❌ Reject
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : verificationLoading ? (
+          <div style={S.loader}>
+            <div style={S.spinner}></div>
+            <p>⏳ Loading verifications...</p>
+          </div>
+        ) : pendingVerifications.length === 0 ? (
+          <div style={S.empty}>
+            <p style={S.emptyText}>✅ No pending verifications found.</p>
+          </div>
+        ) : (
+          <div style={S.grid}>
+            {pendingVerifications.map(verification => (
+              <div key={verification._id} style={S.card} className="admin-card">
+                <div style={S.cardBody}>
+                  <p style={S.cardTitle}>Level {verification.verificationLevel} Verification</p>
+                  <p style={S.cardSub}>👤 User: {verification.user?.name || verification.user?.email || 'Unknown'}</p>
+                  <p style={S.cardOwner}>📅 Submitted: {new Date(verification.submittedAt).toLocaleDateString()}</p>
+                  <p style={{ ...S.cardOwner, color: '#fbbf24' }}>
+                    Status: {verification.status.toUpperCase()}
+                  </p>
+                  <div style={S.cardBtns}>
+                    <button style={S.viewBtn} onClick={() => loadVerificationDetails(verification._id)}>
+                      👁️ Review Verification
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )
       ) : loading ? (
         <div style={S.loader}>
           <div style={S.spinner}></div>
@@ -1467,6 +1638,21 @@ const S = {
   confirmText: { fontSize: 14, color: "#cbd5e1", lineHeight: 1.6, marginBottom: 24 },
   confirmBtns: { display: "flex", gap: 12, justifyContent: "flex-end" },
   confirmDeleteBtn: { background: "#ef4444", color: "#fff", border: "none", padding: "10px 20px", borderRadius: 8, fontWeight: 700, cursor: "pointer", fontSize: 13, transition: "all 0.2s" },
+  verificationDetail: { padding: "20px" },
+  backBtn: { background: "rgba(30,41,59,0.6)", color: "#f1f5f9", border: "1px solid rgba(255,255,255,0.1)", padding: "8px 16px", borderRadius: 8, fontWeight: 600, cursor: "pointer", marginBottom: "20px", fontSize: 13 },
+  detailCard: { background: "rgba(15,23,42,0.8)", borderRadius: 16, padding: "24px", border: "1px solid rgba(255,255,255,0.05)" },
+  detailTitle: { fontSize: 20, fontWeight: 800, color: "#fbbf24", margin: "0 0 24px" },
+  detailSection: { marginBottom: "16px", paddingBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.05)" },
+  detailLabel: { fontSize: 12, color: "#64748b", fontWeight: 600, marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.5px" },
+  detailValue: { fontSize: 14, color: "#f1f5f9", fontWeight: 500 },
+  documentItem: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: "rgba(30,41,59,0.5)", borderRadius: 8, marginBottom: "8px" },
+  docType: { fontSize: 13, color: "#cbd5e1", fontWeight: 600 },
+  docLink: { fontSize: 12, color: "#3b82f6", textDecoration: "none", fontWeight: 600 },
+  selfieImage: { maxWidth: "200px", maxHeight: "200px", borderRadius: 8, border: "2px solid rgba(255,255,255,0.1)" },
+  actionButtons: { display: "flex", gap: "12px", marginTop: "24px", flexWrap: "wrap" },
+  rejectSection: { display: "flex", flexDirection: "column", gap: "8px", flex: 1 },
+  rejectInput: { padding: "10px 12px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(30,41,59,0.7)", color: "#f1f5f9", fontSize: 13, outline: "none", minHeight: "60px", resize: "vertical" },
+  viewBtn: { background: "rgba(59,130,246,0.1)", color: "#3b82f6", border: "1px solid #3b82f6", padding: "7px 14px", borderRadius: 7, fontWeight: 700, cursor: "pointer", fontSize: 12, transition: "all 0.2s" },
 };
 
 const css = `
