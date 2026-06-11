@@ -220,7 +220,8 @@ const Verification = () => {
 
               <DocumentUpload
                 label="Government ID Document"
-                eweviewUrl={formData.idDocumentPreview}
+                onFileChange={(file, previewUrl) => handleFileChange('idDocument', file, previewUrl)}
+                previewUrl={formData.idDocumentPreview}
                 fileName={formData.idDocumentName}
                 onRemove={() => handleRemoveFile('idDocument')}
                 required
