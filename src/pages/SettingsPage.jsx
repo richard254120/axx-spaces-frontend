@@ -1,417 +1,573 @@
-import { useState, useEffect, useContext, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
-import { ProfileAvatar } from "../features/profile";
-import { fetchUserProfile, updateUserProfile, buildProfileFormData } from "../api/profile";
-import VerificationStatus from "../components/VerificationStatus";
-import VerificationHistory from "../components/VerificationHistory";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
+import DocumentUpload from '../components/DocumentUpload';
+import SelfieCapture from '../components/SelfieCapture';
 
-export default function SettingsPage() {
-  const { token, user, login, logout } = useContext(AuthContext);
+const Verification = () => {
   const navigate = useNavigate();
-  const fileRef = useRef(null);
+  const { token } = useContext(AuthContext);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [selectedLevel, setSelectedLevel] = useState(2);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [formData, setFormData] = useState({
+    // Level 2: Identity
+    idType: '',
+    idDocument: null,
+    idDocumentPreview: null,
+    idDocumentName: null,
+    selfie: null,
 
-  const [profile, setProfile] = useState(user);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [activeTab, setActiveTab] = useState("profile");
+    // Level 3: Address
+    addressDocument: null,
+    addressDocumentPreview: null,
+    addressDocumentName: null,
 
-  const [form, setForm] = useState({ name: "", phone: "", county: "", description: "" });
-  const [avatarFile, setAvatarFile] = useState(null);
-  const [avatarPreview, setAvatarPreview] = useState(null);
+    // Level 4: Business
+    businessName: '',
+    businessRegistration: null,
+    businessRegistrationPreview: null,
+    businessRegistrationName: null,
+    taxId: '',
+  });
 
-  const [passwordForm, setPasswordForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
-  const [passwordError, setPasswordError] = useState("");
-  const [passwordSuccess, setPasswordSuccess] = useState("");
-  const [changingPassword, setChangingPassword] = useState(false);
-
-  useEffect(() => {
-    if (!token) { navigate("/login"); return; }
-    (async () => {
-      try {
-        setLoading(true);
-        const data = await fetchUserProfile(token);
-        if (data) {
-          setProfile(data);
-          setForm({
-            name: data.name || "",
-            phone: data.phone || "",
-            county: data.county || "",
-            description: data.description || "",
-          });
-        }
-      } catch {
-        setError("Unable to load profile");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [token, navigate]);
-
-  const onPickPhoto = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/")) { setError("Please choose an image file."); return; }
-    setAvatarFile(file);
-    setAvatarPreview(URL.createObjectURL(file));
-    setError("");
-  };
-
-  const handleSaveProfile = async (e) => {
-    e.preventDefault();
-    if (!form.name.trim() || !form.phone.trim()) { setError("Name and phone are required."); return; }
-    setSaving(true);
-    setError("");
-    setSuccess("");
-    try {
-      const fd = buildProfileFormData({
-        name: form.name.trim(),
-        phone: form.phone.trim(),
-        county: form.county,
-        description: form.description,
-        avatarFile,
-      });
-      const res = await updateUserProfile(token, fd);
-      const updated = res.data?.user;
-      if (updated) {
-        setProfile(updated);
-        login(token, updated);
-        setAvatarFile(null);
-        setAvatarPreview(null);
-      }
-      setSuccess("Profile updated successfully!");
-    } catch (err) {
-      setError(err.message || "Failed to update profile");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleChangePassword = async (e) => {
-    e.preventDefault();
-    setPasswordError("");
-    setPasswordSuccess("");
-    if (passwordForm.newPassword.length < 6) { setPasswordError("Password must be at least 6 characters."); return; }
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) { setPasswordError("Passwords do not match."); return; }
-    setChangingPassword(true);
-    try {
-      const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
-      const res = await fetch(`${API_BASE}/auth/change-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ currentPassword: passwordForm.currentPassword, newPassword: passwordForm.newPassword }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || data.message || "Failed to change password");
-      setPasswordSuccess("Password changed successfully!");
-      setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
-    } catch (err) {
-      setPasswordError(err.message);
-    } finally {
-      setChangingPassword(false);
-    }
-  };
-
-  const handleDeleteAccount = async () => {
-    if (!window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) return;
-    if (!window.confirm("This will permanently delete all your data. Type OK to confirm.")) return;
-    try {
-      const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
-      const res = await fetch(`${API_BASE}/auth/delete-account`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        logout("/");
-      }
-    } catch {
-      setError("Failed to delete account. Please try again.");
-    }
-  };
-
-  const tabs = [
-    { id: "profile", label: "Profile", icon: "👤" },
-    { id: "verification", label: "Verification", icon: "✓" },
-    { id: "security", label: "Security", icon: "🔒" },
-    { id: "danger", label: "Danger Zone", icon: "⚠️" },
+  const steps = [
+    { step: 1, title: 'Select Level', description: 'Choose your verification level' },
+    { step: 2, title: 'Identity Verification', description: 'Upload ID and take selfie' },
+    { step: 3, title: 'Address Verification', description: 'Upload proof of address' },
+    { step: 4, title: 'Business Verification', description: 'Upload business documents' },
+    { step: 5, title: 'Review & Submit', description: 'Review your information' },
   ];
 
-  if (loading) {
-    return (
-      <div style={styles.container}>
-        <style>{css}</style>
-        <div style={styles.loadingState}>
-          <div style={styles.spinner} />
-          <p style={styles.loadingText}>Loading settings...</p>
-        </div>
-      </div>
-    );
-  }
+  const levels = [
+    { level: 2, name: 'Identity Verification', description: 'Verify your identity with ID and selfie', required: true },
+    { level: 3, name: 'Address Verification', description: 'Verify your address with utility bill', required: false },
+    { level: 4, name: 'Business Verification', description: 'Verify your business for premium features', required: false },
+  ];
 
-  const displayUser = avatarPreview ? { ...profile, profileImage: avatarPreview } : profile;
+  // DocumentUpload passes '__pdf__' as previewUrl for PDF files — store as-is.
+  const handleFileChange = (field, file, previewUrl) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: file,
+      [`${field}Preview`]: previewUrl,
+      [`${field}Name`]: file ? file.name : null,
+    }));
+  };
+
+  const handleRemoveFile = (field) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: null,
+      [`${field}Preview`]: null,
+      [`${field}Name`]: null,
+    }));
+  };
+
+  const handleNext = () => {
+    if (currentStep < steps.length) setCurrentStep(prev => prev + 1);
+  };
+
+  const handleBack = () => {
+    if (currentStep > 1) setCurrentStep(prev => prev - 1);
+  };
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const API_BASE = import.meta.env.VITE_API_URL || 'https://axx-spaces-backend-1.onrender.com/api';
+      const formDataToSend = new FormData();
+      formDataToSend.append('verificationLevel', selectedLevel);
+      formDataToSend.append('idType', formData.idType);
+
+      if (selectedLevel >= 4) {
+        formDataToSend.append('businessName', formData.businessName);
+        formDataToSend.append('taxId', formData.taxId);
+      }
+
+      // File objects work for both images and PDFs natively
+      if (formData.idDocument) formDataToSend.append('idDocument', formData.idDocument);
+      if (formData.addressDocument && selectedLevel >= 3) formDataToSend.append('addressDocument', formData.addressDocument);
+      if (formData.businessRegistration && selectedLevel >= 4) formDataToSend.append('businessRegistration', formData.businessRegistration);
+
+      // Selfie is a base64 data URL from camera — convert to Blob
+      if (formData.selfie) {
+        const base64Data = formData.selfie.split(',')[1];
+        const byteCharacters = atob(base64Data);
+        const byteArrays = [];
+        for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+          const slice = byteCharacters.slice(offset, offset + 512);
+          const byteNumbers = new Array(slice.length);
+          for (let i = 0; i < slice.length; i++) byteNumbers[i] = slice.charCodeAt(i);
+          byteArrays.push(new Uint8Array(byteNumbers));
+        }
+        const blob = new Blob(byteArrays, { type: 'image/jpeg' });
+        formDataToSend.append('selfie', blob, 'selfie.jpg');
+      }
+
+      const response = await fetch(`${API_BASE}/kyc-verification/submit`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formDataToSend,
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || data.error || 'Failed to submit verification');
+
+      setSuccess('Verification submitted successfully! You will be notified once reviewed.');
+      setTimeout(() => navigate('/settings'), 2000);
+    } catch (err) {
+      setError(err.message || 'Failed to submit verification. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isStepValid = () => {
+    switch (currentStep) {
+      case 1: return selectedLevel >= 2;
+      case 2: return formData.idDocument && formData.selfie;
+      case 3: return selectedLevel < 3 || formData.addressDocument;
+      case 4: return selectedLevel < 4 || (formData.businessName && formData.businessRegistration && formData.taxId);
+      case 5: return true;
+      default: return false;
+    }
+  };
+
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div style={styles.stepContent}>
+            <h2 style={styles.stepTitle}>Select Verification Level</h2>
+            <p style={styles.stepDescription}>Choose the level of verification you want to complete</p>
+            <div style={styles.levelsContainer}>
+              {levels.map((level) => (
+                <div
+                  key={level.level}
+                  style={{ ...styles.levelCard, ...(selectedLevel === level.level && styles.levelCardSelected) }}
+                  onClick={() => setSelectedLevel(level.level)}
+                >
+                  <div style={styles.levelHeader}>
+                    <div style={styles.levelNumber}>Level {level.level}</div>
+                    {level.required && <span style={styles.requiredBadge}>Required</span>}
+                  </div>
+                  <h3 style={styles.levelName}>{level.name}</h3>
+                  <p style={styles.levelDescription}>{level.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 2:
+        return (
+          <div style={styles.stepContent}>
+            <h2 style={styles.stepTitle}>Identity Verification</h2>
+            <p style={styles.stepDescription}>Upload your government-issued ID and take a selfie</p>
+            <div style={styles.formSection}>
+              <div>
+                <label style={styles.formLabel}>ID Type</label>
+                <select
+                  style={styles.select}
+                  value={formData.idType}
+                  onChange={(e) => setFormData(prev => ({ ...prev, idType: e.target.value }))}
+                >
+                  <option value="">Select ID Type</option>
+                  <option value="national_id">National ID</option>
+                  <option value="passport">Passport</option>
+                  <option value="driver_license">Driver's License</option>
+                </select>
+              </div>
+
+              <DocumentUpload
+                label="Government ID Document"
+                onFileChange={(file, previewUrl) => handleFileChange('idDocument', file, previewUrl)}
+                previewUrl={formData.idDocumentPreview}
+                fileName={formData.idDocumentName}
+                onRemove={() => handleRemoveFile('idDocument')}
+                required
+              />
+
+              <SelfieCapture
+                onCapture={(image) => setFormData(prev => ({ ...prev, selfie: image }))}
+                capturedImage={formData.selfie}
+                onRetake={() => setFormData(prev => ({ ...prev, selfie: null }))}
+              />
+            </div>
+          </div>
+        );
+
+      case 3:
+        return (
+          <div style={styles.stepContent}>
+            <h2 style={styles.stepTitle}>Address Verification</h2>
+            <p style={styles.stepDescription}>Upload a proof of address document</p>
+            <div style={styles.formSection}>
+              <DocumentUpload
+                label="Proof of Address (Utility Bill, Bank Statement)"
+                onFileChange={(file, previewUrl) => handleFileChange('addressDocument', file, previewUrl)}
+                previewUrl={formData.addressDocumentPreview}
+                fileName={formData.addressDocumentName}
+                onRemove={() => handleRemoveFile('addressDocument')}
+                required={selectedLevel >= 3}
+              />
+              <div style={styles.infoBox}>
+                <span style={styles.infoIcon}>ℹ️</span>
+                <span style={styles.infoText}>
+                  Accepted: Utility bills, bank statements, or government letters issued within the last 3 months.
+                  Images and PDF files are both supported.
+                </span>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 4:
+        return (
+          <div style={styles.stepContent}>
+            <h2 style={styles.stepTitle}>Business Verification</h2>
+            <p style={styles.stepDescription}>Upload your business documents</p>
+            <div style={styles.formSection}>
+              <div>
+                <label style={styles.formLabel}>Business Name</label>
+                <input
+                  type="text"
+                  style={styles.input}
+                  placeholder="Enter your business name"
+                  value={formData.businessName}
+                  onChange={(e) => setFormData(prev => ({ ...prev, businessName: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label style={styles.formLabel}>Tax Identification Number</label>
+                <input
+                  type="text"
+                  style={styles.input}
+                  placeholder="Enter your tax ID"
+                  value={formData.taxId}
+                  onChange={(e) => setFormData(prev => ({ ...prev, taxId: e.target.value }))}
+                />
+              </div>
+              <DocumentUpload
+                label="Business Registration Certificate"
+                onFileChange={(file, previewUrl) => handleFileChange('businessRegistration', file, previewUrl)}
+                previewUrl={formData.businessRegistrationPreview}
+                fileName={formData.businessRegistrationName}
+                onRemove={() => handleRemoveFile('businessRegistration')}
+                required={selectedLevel >= 4}
+              />
+            </div>
+          </div>
+        );
+
+      case 5:
+        return (
+          <div style={styles.stepContent}>
+            <h2 style={styles.stepTitle}>Review & Submit</h2>
+            <p style={styles.stepDescription}>Review your information before submitting</p>
+
+            {error && <div style={styles.errorBox}>{error}</div>}
+            {success && <div style={styles.successBox}>{success}</div>}
+
+            <div style={styles.reviewSection}>
+              <div style={styles.reviewItem}>
+                <span style={styles.reviewLabel}>Verification Level</span>
+                <span style={styles.reviewValue}>Level {selectedLevel}</span>
+              </div>
+              {formData.idType && (
+                <div style={styles.reviewItem}>
+                  <span style={styles.reviewLabel}>ID Type</span>
+                  <span style={styles.reviewValue}>{formData.idType.replace(/_/g, ' ')}</span>
+                </div>
+              )}
+              {formData.idDocument && (
+                <div style={styles.reviewItem}>
+                  <span style={styles.reviewLabel}>ID Document</span>
+                  <span style={styles.reviewValueGreen}>✓ {formData.idDocumentName}</span>
+                </div>
+              )}
+              {formData.selfie && (
+                <div style={styles.reviewItem}>
+                  <span style={styles.reviewLabel}>Selfie</span>
+                  <span style={styles.reviewValueGreen}>✓ Captured</span>
+                </div>
+              )}
+              {formData.addressDocument && (
+                <div style={styles.reviewItem}>
+                  <span style={styles.reviewLabel}>Address Document</span>
+                  <span style={styles.reviewValueGreen}>✓ {formData.addressDocumentName}</span>
+                </div>
+              )}
+              {formData.businessName && (
+                <div style={styles.reviewItem}>
+                  <span style={styles.reviewLabel}>Business Name</span>
+                  <span style={styles.reviewValue}>{formData.businessName}</span>
+                </div>
+              )}
+              {formData.taxId && (
+                <div style={styles.reviewItem}>
+                  <span style={styles.reviewLabel}>Tax ID</span>
+                  <span style={styles.reviewValue}>{formData.taxId}</span>
+                </div>
+              )}
+              {formData.businessRegistration && (
+                <div style={styles.reviewItem}>
+                  <span style={styles.reviewLabel}>Business Registration</span>
+                  <span style={styles.reviewValueGreen}>✓ {formData.businessRegistrationName}</span>
+                </div>
+              )}
+            </div>
+
+            <div style={styles.termsBox}>
+              <input type="checkbox" id="terms" style={styles.checkbox} />
+              <label htmlFor="terms" style={styles.termsLabel}>
+                I confirm that all information provided is accurate and I agree to the terms and conditions.
+              </label>
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   return (
     <div style={styles.container}>
-      <style>{css}</style>
-
-      <div style={styles.header}>
-        <button style={styles.backBtn} onClick={() => navigate(-1)}>← Back</button>
-        <div>
-          <h1 style={styles.title}>Settings</h1>
-          <p style={styles.subtitle}>Manage your account preferences</p>
-        </div>
-      </div>
-
-      <div style={styles.layout}>
-        {/* Sidebar Tabs */}
-        <div style={styles.sidebar}>
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              style={{ ...styles.tabBtn, ...(activeTab === tab.id ? styles.tabBtnActive : {}) }}
-              onClick={() => setActiveTab(tab.id)}
+      <div style={styles.wizard}>
+        {/* Step Indicator */}
+        <div style={styles.stepIndicator}>
+          {steps.map((step) => (
+            <div
+              key={step.step}
+              style={{
+                ...styles.stepIndicatorItem,
+                ...(step.step === currentStep && styles.stepIndicatorItemActive),
+                ...(step.step < currentStep && styles.stepIndicatorItemCompleted),
+              }}
             >
-              <span>{tab.icon}</span> {tab.label}
-            </button>
+              <div style={{
+                ...styles.stepNumber,
+                ...(step.step === currentStep && styles.stepNumberActive),
+                ...(step.step < currentStep && styles.stepNumberCompleted),
+              }}>
+                {step.step < currentStep ? '✓' : step.step}
+              </div>
+              <div style={styles.stepInfo}>
+                <div style={styles.stepIndicatorTitle}>{step.title}</div>
+                <div style={styles.stepIndicatorDescription}>{step.description}</div>
+              </div>
+            </div>
           ))}
         </div>
 
-        {/* Content */}
-        <div style={styles.main}>
-          {error && <div style={styles.errorBanner}>{error}</div>}
-          {success && <div style={styles.successBanner}>{success}</div>}
+        {/* Step Content */}
+        <div style={styles.content}>
+          {renderStep()}
+        </div>
 
-          {activeTab === "profile" && (
-            <form onSubmit={handleSaveProfile} style={styles.section}>
-              <h2 style={styles.sectionTitle}>Edit Profile</h2>
+        {/* Navigation */}
+        <div style={styles.navigation}>
+          <button
+            style={{ ...styles.backButton, ...(currentStep === 1 && styles.disabledBtn) }}
+            onClick={handleBack}
+            disabled={currentStep === 1}
+          >
+            ← Back
+          </button>
 
-              <div style={styles.avatarSection}>
-                <ProfileAvatar user={displayUser} size={80} />
-                <div>
-                  <button type="button" style={styles.uploadBtn} onClick={() => fileRef.current?.click()}>
-                    Change Photo
-                  </button>
-                  <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={onPickPhoto} />
-                  <p style={styles.uploadHint}>JPG, PNG, or WebP. Max 5MB.</p>
-                </div>
-              </div>
-
-              <div style={styles.formGrid}>
-                <div style={styles.formGroup}>
-                  <label style={styles.label}>Name</label>
-                  <input style={styles.input} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Your name" />
-                </div>
-                <div style={styles.formGroup}>
-                  <label style={styles.label}>Phone</label>
-                  <input style={styles.input} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="Phone number" />
-                </div>
-                <div style={styles.formGroup}>
-                  <label style={styles.label}>County</label>
-                  <input style={styles.input} value={form.county} onChange={(e) => setForm({ ...form, county: e.target.value })} placeholder="Your county" />
-                </div>
-              </div>
-
-              <div style={styles.formGroup}>
-                <label style={styles.label}>Bio / Description</label>
-                <textarea
-                  style={{ ...styles.input, minHeight: 100, resize: "vertical" }}
-                  value={form.description}
-                  onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  placeholder="Tell us about yourself..."
-                />
-              </div>
-
-              <button type="submit" style={styles.saveBtn} disabled={saving}>
-                {saving ? "Saving..." : "Save Changes"}
-              </button>
-            </form>
-          )}
-
-          {activeTab === "security" && (
-            <div style={styles.section}>
-              <h2 style={styles.sectionTitle}>Change Password</h2>
-              {profile?.isGoogleUser && (
-                <div style={styles.infoBanner}>
-                  You signed in with Google. Password changes are managed through your Google account.
-                </div>
-              )}
-              {!profile?.isGoogleUser && (
-                <form onSubmit={handleChangePassword}>
-                  {passwordError && <div style={styles.errorBanner}>{passwordError}</div>}
-                  {passwordSuccess && <div style={styles.successBanner}>{passwordSuccess}</div>}
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>Current Password</label>
-                    <input
-                      style={styles.input}
-                      type="password"
-                      value={passwordForm.currentPassword}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                      placeholder="Enter current password"
-                    />
-                  </div>
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>New Password</label>
-                    <input
-                      style={styles.input}
-                      type="password"
-                      value={passwordForm.newPassword}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                      placeholder="Enter new password (min 6 chars)"
-                    />
-                  </div>
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>Confirm New Password</label>
-                    <input
-                      style={styles.input}
-                      type="password"
-                      value={passwordForm.confirmPassword}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                      placeholder="Confirm new password"
-                    />
-                  </div>
-                  <button type="submit" style={styles.saveBtn} disabled={changingPassword}>
-                    {changingPassword ? "Changing..." : "Change Password"}
-                  </button>
-                </form>
-              )}
-            </div>
-          )}
-
-          {activeTab === "verification" && (
-            <div style={styles.section}>
-              <h2 style={styles.sectionTitle}>Identity Verification</h2>
-              <VerificationStatus />
-              <VerificationHistory />
-              {profile?.verificationStatus === 'approved' && (
-                <div style={styles.successBanner}>
-                  ✓ Your verification has been approved! You are now a verified user.
-                </div>
-              )}
-              {profile?.verificationStatus === 'rejected' && (
-                <div style={styles.errorBanner}>
-                  ✕ Your verification was rejected. Please review the rejection reason and resubmit.
-                </div>
-              )}
-            </div>
-          )}
-
-          {activeTab === "danger" && (
-            <div style={styles.section}>
-              <h2 style={{ ...styles.sectionTitle, color: "#ef4444" }}>Danger Zone</h2>
-              <div style={styles.dangerCard}>
-                <div>
-                  <h3 style={styles.dangerTitle}>Delete Account</h3>
-                  <p style={styles.dangerText}>
-                    Permanently delete your account and all associated data. This action cannot be undone.
-                  </p>
-                </div>
-                <button style={styles.deleteBtn} onClick={handleDeleteAccount}>
-                  Delete Account
-                </button>
-              </div>
-            </div>
+          {currentStep < steps.length ? (
+            <button
+              style={{ ...styles.nextButton, ...(!isStepValid() && styles.disabledBtn) }}
+              onClick={handleNext}
+              disabled={!isStepValid()}
+            >
+              Next →
+            </button>
+          ) : (
+            <button
+              style={{ ...styles.submitButton, ...(loading && styles.disabledBtn) }}
+              onClick={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? 'Submitting...' : 'Submit Verification'}
+            </button>
           )}
         </div>
       </div>
     </div>
   );
-}
+};
 
 const styles = {
   container: {
-    minHeight: "100vh",
-    background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
-    padding: "20px",
-    fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont",
+    minHeight: '100vh',
+    background: 'linear-gradient(135deg, #0f1729 0%, #1e293b 100%)',
+    padding: '40px 20px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
   },
-  header: {
-    display: "flex", alignItems: "center", gap: 20,
-    maxWidth: 1000, margin: "0 auto 30px",
+  wizard: {
+    width: '100%',
+    maxWidth: '800px',
+    background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 41, 0.95) 100%)',
+    border: '1px solid #334155',
+    borderRadius: '20px',
+    padding: '32px',
+    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
   },
-  backBtn: {
-    padding: "10px 20px", background: "rgba(255,255,255,0.1)", color: "#f1f5f9",
-    border: "1px solid rgba(255,255,255,0.2)", borderRadius: 8, cursor: "pointer",
-    fontSize: "0.95rem", fontWeight: 600,
+  stepIndicator: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+    marginBottom: '32px',
   },
-  title: { fontSize: "2rem", color: "#f1f5f9", margin: 0, fontWeight: 700 },
-  subtitle: { color: "#94a3b8", margin: "4px 0 0", fontSize: "1rem" },
-  loadingState: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh" },
-  spinner: { width: 50, height: 50, border: "4px solid rgba(251,191,36,0.2)", borderTop: "4px solid #fbbf24", borderRadius: "50%", animation: "spin 1s linear infinite" },
-  loadingText: { color: "#94a3b8", marginTop: 20, fontSize: "1rem" },
-
-  layout: {
-    maxWidth: 1000, margin: "0 auto", display: "flex", gap: 24, alignItems: "flex-start", flexWrap: "wrap",
+  stepIndicatorItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '16px',
+    padding: '14px 16px',
+    borderRadius: '12px',
+    background: 'rgba(15, 23, 41, 0.5)',
+    border: '1px solid #334155',
+    opacity: 0.45,
+    transition: 'all 0.25s',
   },
-  sidebar: {
-    width: 220, display: "flex", flexDirection: "column", gap: 8,
-    background: "rgba(30,41,59,0.8)", border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: 12, padding: 12,
+  stepIndicatorItemActive: {
+    opacity: 1,
+    borderColor: '#fbbf24',
+    background: 'rgba(251, 191, 36, 0.08)',
   },
-  tabBtn: {
-    display: "flex", alignItems: "center", gap: 10, padding: "12px 16px",
-    background: "transparent", color: "#94a3b8", border: "none", borderRadius: 8,
-    cursor: "pointer", fontSize: "0.95rem", fontWeight: 500, textAlign: "left", width: "100%",
+  stepIndicatorItemCompleted: {
+    opacity: 1,
+    borderColor: '#22c55e',
+    background: 'rgba(34, 197, 94, 0.08)',
   },
-  tabBtnActive: { background: "rgba(251,191,36,0.15)", color: "#fbbf24" },
-
-  main: { flex: 1, minWidth: 0 },
-
-  errorBanner: { padding: "12px 20px", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 8, color: "#ef4444", fontSize: "0.95rem", marginBottom: 16 },
-  successBanner: { padding: "12px 20px", background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: 8, color: "#22c55e", fontSize: "0.95rem", marginBottom: 16 },
-  infoBanner: { padding: "12px 20px", background: "rgba(59,130,246,0.15)", border: "1px solid rgba(59,130,246,0.3)", borderRadius: 8, color: "#3b82f6", fontSize: "0.95rem", marginBottom: 16 },
-
-  section: {
-    background: "rgba(30,41,59,0.8)", border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: 16, padding: 30,
+  stepNumber: {
+    width: '38px',
+    height: '38px',
+    borderRadius: '50%',
+    background: '#334155',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '15px',
+    fontWeight: '700',
+    color: '#f1f5f9',
+    flexShrink: 0,
+    transition: 'all 0.25s',
   },
-  sectionTitle: { color: "#f1f5f9", fontSize: "1.3rem", margin: "0 0 24px", fontWeight: 700 },
-
-  avatarSection: { display: "flex", alignItems: "center", gap: 20, marginBottom: 24 },
-  uploadBtn: {
-    padding: "8px 18px", background: "rgba(251,191,36,0.15)", color: "#fbbf24",
-    border: "1px solid rgba(251,191,36,0.3)", borderRadius: 8, cursor: "pointer",
-    fontSize: "0.9rem", fontWeight: 600,
+  stepNumberActive: { background: '#fbbf24', color: '#0f1729' },
+  stepNumberCompleted: { background: '#22c55e', color: '#0f1729' },
+  stepInfo: { flex: 1 },
+  stepIndicatorTitle: { fontSize: '13px', fontWeight: '700', color: '#f1f5f9', marginBottom: '2px' },
+  stepIndicatorDescription: { fontSize: '12px', color: '#64748b' },
+  content: { marginBottom: '32px' },
+  stepContent: {},
+  stepTitle: { fontSize: '22px', fontWeight: '700', color: '#f1f5f9', margin: '0 0 6px 0' },
+  stepDescription: { fontSize: '14px', color: '#64748b', margin: '0 0 24px 0' },
+  levelsContainer: { display: 'grid', gap: '14px' },
+  levelCard: {
+    padding: '20px',
+    borderRadius: '12px',
+    border: '2px solid #334155',
+    background: 'rgba(15, 23, 41, 0.5)',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
   },
-  uploadHint: { color: "#64748b", fontSize: "0.8rem", margin: "6px 0 0" },
-
-  formGrid: {
-    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16, marginBottom: 16,
+  levelCardSelected: { borderColor: '#fbbf24', background: 'rgba(251, 191, 36, 0.1)' },
+  levelHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' },
+  levelNumber: { fontSize: '12px', fontWeight: '700', color: '#fbbf24' },
+  requiredBadge: {
+    fontSize: '10px', fontWeight: '700', color: '#22c55e',
+    background: 'rgba(34, 197, 94, 0.2)', padding: '3px 8px', borderRadius: '4px',
   },
-  formGroup: { marginBottom: 16 },
-  label: { display: "block", color: "#94a3b8", fontSize: "0.85rem", marginBottom: 6, fontWeight: 600 },
+  levelName: { fontSize: '15px', fontWeight: '700', color: '#f1f5f9', margin: '0 0 6px 0' },
+  levelDescription: { fontSize: '13px', color: '#64748b', margin: 0 },
+  formSection: { display: 'flex', flexDirection: 'column', gap: '20px' },
+  formLabel: { display: 'block', fontSize: '13px', fontWeight: '600', color: '#f1f5f9', marginBottom: '8px' },
+  select: {
+    width: '100%', padding: '12px 16px',
+    background: 'rgba(15, 23, 41, 0.6)', border: '1px solid #334155',
+    borderRadius: '8px', color: '#f1f5f9', fontSize: '14px',
+    outline: 'none', boxSizing: 'border-box',
+  },
   input: {
-    width: "100%", padding: "12px 16px", background: "rgba(15,23,42,0.8)",
-    border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, color: "#f1f5f9",
-    fontSize: "0.95rem", fontFamily: "inherit", outline: "none", boxSizing: "border-box",
+    width: '100%', padding: '12px 16px',
+    background: 'rgba(15, 23, 41, 0.6)', border: '1px solid #334155',
+    borderRadius: '8px', color: '#f1f5f9', fontSize: '14px',
+    outline: 'none', boxSizing: 'border-box',
   },
-
-  saveBtn: {
-    padding: "12px 28px", background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
-    color: "#1f2937", border: "none", borderRadius: 8, fontWeight: 700, fontSize: "0.95rem",
-    cursor: "pointer", marginTop: 8,
+  infoBox: {
+    display: 'flex', gap: '12px', padding: '12px 16px',
+    background: 'rgba(251, 191, 36, 0.08)', border: '1px solid rgba(251, 191, 36, 0.25)', borderRadius: '8px',
   },
-
-  dangerCard: {
-    display: "flex", alignItems: "center", justifyContent: "space-between", gap: 20,
-    padding: 20, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)",
-    borderRadius: 12, flexWrap: "wrap",
+  infoIcon: { fontSize: '16px' },
+  infoText: { fontSize: '13px', color: '#fbbf24', flex: 1, lineHeight: 1.5 },
+  errorBox: {
+    padding: '12px 16px', background: 'rgba(239, 68, 68, 0.1)',
+    border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px',
+    color: '#f87171', fontSize: '14px', marginBottom: '16px',
   },
-  dangerTitle: { color: "#f1f5f9", margin: "0 0 8px", fontSize: "1.1rem", fontWeight: 600 },
-  dangerText: { color: "#94a3b8", margin: 0, fontSize: "0.9rem", lineHeight: 1.5 },
-  deleteBtn: {
-    padding: "12px 24px", background: "#ef4444", color: "white", border: "none",
-    borderRadius: 8, fontWeight: 700, cursor: "pointer", fontSize: "0.95rem", whiteSpace: "nowrap",
+  successBox: {
+    padding: '12px 16px', background: 'rgba(34, 197, 94, 0.1)',
+    border: '1px solid rgba(34, 197, 94, 0.3)', borderRadius: '8px',
+    color: '#4ade80', fontSize: '14px', marginBottom: '16px',
   },
+  reviewSection: {
+    display: 'flex', flexDirection: 'column',
+    padding: '20px', background: 'rgba(15, 23, 41, 0.5)',
+    borderRadius: '12px', border: '1px solid #334155',
+  },
+  reviewItem: {
+    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+    padding: '10px 0', borderBottom: '1px solid #1e293b', gap: '12px',
+  },
+  reviewLabel: { fontSize: '13px', color: '#64748b' },
+  reviewValue: {
+    fontSize: '13px', fontWeight: '600', color: '#f1f5f9',
+    textAlign: 'right', maxWidth: '55%', overflow: 'hidden',
+    textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+  },
+  reviewValueGreen: {
+    fontSize: '13px', fontWeight: '600', color: '#4ade80',
+    textAlign: 'right', maxWidth: '55%', overflow: 'hidden',
+    textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+  },
+  termsBox: {
+    display: 'flex', alignItems: 'flex-start', gap: '12px', marginTop: '20px',
+    padding: '16px', background: 'rgba(15, 23, 41, 0.5)',
+    borderRadius: '8px', border: '1px solid #334155',
+  },
+  checkbox: { marginTop: '2px', cursor: 'pointer' },
+  termsLabel: { fontSize: '13px', color: '#94a3b8', cursor: 'pointer', lineHeight: '1.6' },
+  navigation: { display: 'flex', justifyContent: 'space-between', gap: '16px' },
+  backButton: {
+    padding: '12px 28px', background: 'rgba(15, 23, 41, 0.5)',
+    border: '1px solid #334155', borderRadius: '8px',
+    color: '#f1f5f9', fontSize: '14px', fontWeight: '600', cursor: 'pointer',
+  },
+  nextButton: {
+    padding: '12px 28px',
+    background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+    border: 'none', borderRadius: '8px',
+    color: '#0f1729', fontSize: '14px', fontWeight: '700', cursor: 'pointer',
+  },
+  submitButton: {
+    padding: '12px 28px',
+    background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+    border: 'none', borderRadius: '8px',
+    color: '#0f1729', fontSize: '14px', fontWeight: '700', cursor: 'pointer',
+  },
+  disabledBtn: { opacity: 0.4, cursor: 'not-allowed' },
 };
 
-const css = `
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  @media (max-width: 700px) {
-    .settings-layout { flex-direction: column !important; }
-  }
-`;
+export default Verification;

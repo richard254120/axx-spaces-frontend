@@ -48,6 +48,7 @@ const Verification = () => {
     { level: 4, name: 'Business Verification', description: 'Verify your business for premium features', required: false },
   ];
 
+  // DocumentUpload passes '__pdf__' as previewUrl for PDF files — store as-is.
   const handleFileChange = (field, file, previewUrl) => {
     setFormData(prev => ({
       ...prev,
@@ -67,15 +68,11 @@ const Verification = () => {
   };
 
   const handleNext = () => {
-    if (currentStep < steps.length) {
-      setCurrentStep(prev => prev + 1);
-    }
+    if (currentStep < steps.length) setCurrentStep(prev => prev + 1);
   };
 
   const handleBack = () => {
-    if (currentStep > 1) {
-      setCurrentStep(prev => prev - 1);
-    }
+    if (currentStep > 1) setCurrentStep(prev => prev - 1);
   };
 
   const handleSubmit = async () => {
@@ -85,7 +82,6 @@ const Verification = () => {
 
     try {
       const API_BASE = import.meta.env.VITE_API_URL || 'https://axx-spaces-backend-1.onrender.com/api';
-
       const formDataToSend = new FormData();
       formDataToSend.append('verificationLevel', selectedLevel);
       formDataToSend.append('idType', formData.idType);
@@ -95,15 +91,12 @@ const Verification = () => {
         formDataToSend.append('taxId', formData.taxId);
       }
 
-      if (formData.idDocument) {
-        formDataToSend.append('idDocument', formData.idDocument);
-      }
-      if (formData.addressDocument && selectedLevel >= 3) {
-        formDataToSend.append('addressDocument', formData.addressDocument);
-      }
-      if (formData.businessRegistration && selectedLevel >= 4) {
-        formDataToSend.append('businessRegistration', formData.businessRegistration);
-      }
+      // File objects work for both images and PDFs natively
+      if (formData.idDocument) formDataToSend.append('idDocument', formData.idDocument);
+      if (formData.addressDocument && selectedLevel >= 3) formDataToSend.append('addressDocument', formData.addressDocument);
+      if (formData.businessRegistration && selectedLevel >= 4) formDataToSend.append('businessRegistration', formData.businessRegistration);
+
+      // Selfie is a base64 data URL from camera — convert to Blob
       if (formData.selfie) {
         const base64Data = formData.selfie.split(',')[1];
         const byteCharacters = atob(base64Data);
@@ -111,11 +104,8 @@ const Verification = () => {
         for (let offset = 0; offset < byteCharacters.length; offset += 512) {
           const slice = byteCharacters.slice(offset, offset + 512);
           const byteNumbers = new Array(slice.length);
-          for (let i = 0; i < slice.length; i++) {
-            byteNumbers[i] = slice.charCodeAt(i);
-          }
-          const byteArray = new Uint8Array(byteNumbers);
-          byteArrays.push(byteArray);
+          for (let i = 0; i < slice.length; i++) byteNumbers[i] = slice.charCodeAt(i);
+          byteArrays.push(new Uint8Array(byteNumbers));
         }
         const blob = new Blob(byteArrays, { type: 'image/jpeg' });
         formDataToSend.append('selfie', blob, 'selfie.jpg');
@@ -123,22 +113,15 @@ const Verification = () => {
 
       const response = await fetch(`${API_BASE}/kyc-verification/submit`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
         body: formDataToSend,
       });
 
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || data.error || 'Failed to submit verification');
-      }
+      if (!response.ok) throw new Error(data.message || data.error || 'Failed to submit verification');
 
       setSuccess('Verification submitted successfully! You will be notified once reviewed.');
-      setTimeout(() => {
-        navigate('/settings');
-      }, 2000);
+      setTimeout(() => navigate('/settings'), 2000);
     } catch (err) {
       setError(err.message || 'Failed to submit verification. Please try again.');
     } finally {
@@ -148,18 +131,12 @@ const Verification = () => {
 
   const isStepValid = () => {
     switch (currentStep) {
-      case 1:
-        return selectedLevel >= 2;
-      case 2:
-        return formData.idDocument && formData.selfie;
-      case 3:
-        return selectedLevel < 3 || formData.addressDocument;
-      case 4:
-        return selectedLevel < 4 || (formData.businessName && formData.businessRegistration && formData.taxId);
-      case 5:
-        return true;
-      default:
-        return false;
+      case 1: return selectedLevel >= 2;
+      case 2: return formData.idDocument && formData.selfie;
+      case 3: return selectedLevel < 3 || formData.addressDocument;
+      case 4: return selectedLevel < 4 || (formData.businessName && formData.businessRegistration && formData.taxId);
+      case 5: return true;
+      default: return false;
     }
   };
 
@@ -170,15 +147,11 @@ const Verification = () => {
           <div style={styles.stepContent}>
             <h2 style={styles.stepTitle}>Select Verification Level</h2>
             <p style={styles.stepDescription}>Choose the level of verification you want to complete</p>
-
             <div style={styles.levelsContainer}>
               {levels.map((level) => (
                 <div
                   key={level.level}
-                  style={{
-                    ...styles.levelCard,
-                    ...(selectedLevel === level.level && styles.levelCardSelected),
-                  }}
+                  style={{ ...styles.levelCard, ...(selectedLevel === level.level && styles.levelCardSelected) }}
                   onClick={() => setSelectedLevel(level.level)}
                 >
                   <div style={styles.levelHeader}>
@@ -197,20 +170,21 @@ const Verification = () => {
         return (
           <div style={styles.stepContent}>
             <h2 style={styles.stepTitle}>Identity Verification</h2>
-            <p style={styles.stepDescription}>Upload your government ID and take a selfie</p>
-
+            <p style={styles.stepDescription}>Upload your government-issued ID and take a selfie</p>
             <div style={styles.formSection}>
-              <label style={styles.formLabel}>ID Type</label>
-              <select
-                style={styles.select}
-                value={formData.idType}
-                onChange={(e) => setFormData(prev => ({ ...prev, idType: e.target.value }))}
-              >
-                <option value="">Select ID Type</option>
-                <option value="national_id">National ID</option>
-                <option value="passport">Passport</option>
-                <option value="driver_license">Driver's License</option>
-              </select>
+              <div>
+                <label style={styles.formLabel}>ID Type</label>
+                <select
+                  style={styles.select}
+                  value={formData.idType}
+                  onChange={(e) => setFormData(prev => ({ ...prev, idType: e.target.value }))}
+                >
+                  <option value="">Select ID Type</option>
+                  <option value="national_id">National ID</option>
+                  <option value="passport">Passport</option>
+                  <option value="driver_license">Driver's License</option>
+                </select>
+              </div>
 
               <DocumentUpload
                 label="Government ID Document"
@@ -235,7 +209,6 @@ const Verification = () => {
           <div style={styles.stepContent}>
             <h2 style={styles.stepTitle}>Address Verification</h2>
             <p style={styles.stepDescription}>Upload a proof of address document</p>
-
             <div style={styles.formSection}>
               <DocumentUpload
                 label="Proof of Address (Utility Bill, Bank Statement)"
@@ -245,12 +218,11 @@ const Verification = () => {
                 onRemove={() => handleRemoveFile('addressDocument')}
                 required={selectedLevel >= 3}
               />
-
               <div style={styles.infoBox}>
                 <span style={styles.infoIcon}>ℹ️</span>
                 <span style={styles.infoText}>
-                  Accepted documents: Utility bills, bank statements, or government letters
-                  issued within the last 3 months.
+                  Accepted: Utility bills, bank statements, or government letters issued within the last 3 months.
+                  Images and PDF files are both supported.
                 </span>
               </div>
             </div>
@@ -262,35 +234,33 @@ const Verification = () => {
           <div style={styles.stepContent}>
             <h2 style={styles.stepTitle}>Business Verification</h2>
             <p style={styles.stepDescription}>Upload your business documents</p>
-
             <div style={styles.formSection}>
-              <label style={styles.formLabel}>Business Name</label>
-              <input
-                type="text"
-                style={styles.input}
-                placeholder="Enter your business name"
-                value={formData.businessName}
-                onChange={(e) => setFormData(prev => ({ ...prev, businessName: e.target.value }))}
-                required={selectedLevel >= 4}
-              />
-
-              <label style={styles.formLabel}>Tax Identification Number</label>
-              <input
-                type="text"
-                style={styles.input}
-                placeholder="Enter your tax ID"
-                value={formData.taxId}
-                onChange={(e) => setFormData(prev => ({ ...prev, taxId: e.target.value }))}
-                required={selectedLevel >= 4}
-              />
-
+              <div>
+                <label style={styles.formLabel}>Business Name</label>
+                <input
+                  type="text"
+                  style={styles.input}
+                  placeholder="Enter your business name"
+                  value={formData.businessName}
+                  onChange={(e) => setFormData(prev => ({ ...prev, businessName: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label style={styles.formLabel}>Tax Identification Number</label>
+                <input
+                  type="text"
+                  style={styles.input}
+                  placeholder="Enter your tax ID"
+                  value={formData.taxId}
+                  onChange={(e) => setFormData(prev => ({ ...prev, taxId: e.target.value }))}
+                />
+              </div>
               <DocumentUpload
                 label="Business Registration Certificate"
                 onFileChange={(file, previewUrl) => handleFileChange('businessRegistration', file, previewUrl)}
                 previewUrl={formData.businessRegistrationPreview}
                 fileName={formData.businessRegistrationName}
                 onRemove={() => handleRemoveFile('businessRegistration')}
-                acceptedTypes="image/*,.pdf"
                 required={selectedLevel >= 4}
               />
             </div>
@@ -308,56 +278,49 @@ const Verification = () => {
 
             <div style={styles.reviewSection}>
               <div style={styles.reviewItem}>
-                <span style={styles.reviewLabel}>Verification Level:</span>
+                <span style={styles.reviewLabel}>Verification Level</span>
                 <span style={styles.reviewValue}>Level {selectedLevel}</span>
               </div>
-
               {formData.idType && (
                 <div style={styles.reviewItem}>
-                  <span style={styles.reviewLabel}>ID Type:</span>
-                  <span style={styles.reviewValue}>{formData.idType.replace('_', ' ')}</span>
+                  <span style={styles.reviewLabel}>ID Type</span>
+                  <span style={styles.reviewValue}>{formData.idType.replace(/_/g, ' ')}</span>
                 </div>
               )}
-
               {formData.idDocument && (
                 <div style={styles.reviewItem}>
-                  <span style={styles.reviewLabel}>ID Document:</span>
-                  <span style={styles.reviewValue}>✓ {formData.idDocumentName}</span>
+                  <span style={styles.reviewLabel}>ID Document</span>
+                  <span style={styles.reviewValueGreen}>✓ {formData.idDocumentName}</span>
                 </div>
               )}
-
               {formData.selfie && (
                 <div style={styles.reviewItem}>
-                  <span style={styles.reviewLabel}>Selfie:</span>
-                  <span style={styles.reviewValue}>✓ Captured</span>
+                  <span style={styles.reviewLabel}>Selfie</span>
+                  <span style={styles.reviewValueGreen}>✓ Captured</span>
                 </div>
               )}
-
               {formData.addressDocument && (
                 <div style={styles.reviewItem}>
-                  <span style={styles.reviewLabel}>Address Document:</span>
-                  <span style={styles.reviewValue}>✓ {formData.addressDocumentName}</span>
+                  <span style={styles.reviewLabel}>Address Document</span>
+                  <span style={styles.reviewValueGreen}>✓ {formData.addressDocumentName}</span>
                 </div>
               )}
-
               {formData.businessName && (
                 <div style={styles.reviewItem}>
-                  <span style={styles.reviewLabel}>Business Name:</span>
+                  <span style={styles.reviewLabel}>Business Name</span>
                   <span style={styles.reviewValue}>{formData.businessName}</span>
                 </div>
               )}
-
               {formData.taxId && (
                 <div style={styles.reviewItem}>
-                  <span style={styles.reviewLabel}>Tax ID:</span>
+                  <span style={styles.reviewLabel}>Tax ID</span>
                   <span style={styles.reviewValue}>{formData.taxId}</span>
                 </div>
               )}
-
               {formData.businessRegistration && (
                 <div style={styles.reviewItem}>
-                  <span style={styles.reviewLabel}>Business Registration:</span>
-                  <span style={styles.reviewValue}>✓ {formData.businessRegistrationName}</span>
+                  <span style={styles.reviewLabel}>Business Registration</span>
+                  <span style={styles.reviewValueGreen}>✓ {formData.businessRegistrationName}</span>
                 </div>
               )}
             </div>
@@ -365,7 +328,7 @@ const Verification = () => {
             <div style={styles.termsBox}>
               <input type="checkbox" id="terms" style={styles.checkbox} />
               <label htmlFor="terms" style={styles.termsLabel}>
-                I confirm that all information provided is accurate and I agree to the terms and conditions
+                I confirm that all information provided is accurate and I agree to the terms and conditions.
               </label>
             </div>
           </div>
@@ -413,10 +376,7 @@ const Verification = () => {
         {/* Navigation */}
         <div style={styles.navigation}>
           <button
-            style={{
-              ...styles.backButton,
-              ...(currentStep === 1 && styles.backButtonDisabled),
-            }}
+            style={{ ...styles.backButton, ...(currentStep === 1 && styles.disabledBtn) }}
             onClick={handleBack}
             disabled={currentStep === 1}
           >
@@ -425,10 +385,7 @@ const Verification = () => {
 
           {currentStep < steps.length ? (
             <button
-              style={{
-                ...styles.nextButton,
-                ...(!isStepValid() && styles.nextButtonDisabled),
-              }}
+              style={{ ...styles.nextButton, ...(!isStepValid() && styles.disabledBtn) }}
               onClick={handleNext}
               disabled={!isStepValid()}
             >
@@ -436,10 +393,7 @@ const Verification = () => {
             </button>
           ) : (
             <button
-              style={{
-                ...styles.submitButton,
-                ...(loading && styles.nextButtonDisabled),
-              }}
+              style={{ ...styles.submitButton, ...(loading && styles.disabledBtn) }}
               onClick={handleSubmit}
               disabled={loading}
             >
@@ -473,282 +427,147 @@ const styles = {
   stepIndicator: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '16px',
+    gap: '10px',
     marginBottom: '32px',
   },
   stepIndicatorItem: {
     display: 'flex',
     alignItems: 'center',
     gap: '16px',
-    padding: '16px',
+    padding: '14px 16px',
     borderRadius: '12px',
     background: 'rgba(15, 23, 41, 0.5)',
     border: '1px solid #334155',
-    opacity: 0.5,
+    opacity: 0.45,
+    transition: 'all 0.25s',
   },
   stepIndicatorItemActive: {
     opacity: 1,
     borderColor: '#fbbf24',
-    background: 'rgba(251, 191, 36, 0.1)',
+    background: 'rgba(251, 191, 36, 0.08)',
   },
   stepIndicatorItemCompleted: {
     opacity: 1,
     borderColor: '#22c55e',
-    background: 'rgba(34, 197, 94, 0.1)',
+    background: 'rgba(34, 197, 94, 0.08)',
   },
   stepNumber: {
-    width: '40px',
-    height: '40px',
+    width: '38px',
+    height: '38px',
     borderRadius: '50%',
     background: '#334155',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: '16px',
+    fontSize: '15px',
     fontWeight: '700',
     color: '#f1f5f9',
     flexShrink: 0,
+    transition: 'all 0.25s',
   },
-  stepNumberActive: {
-    background: '#fbbf24',
-    color: '#0f1729',
-  },
-  stepNumberCompleted: {
-    background: '#22c55e',
-    color: '#0f1729',
-  },
-  stepInfo: {
-    flex: 1,
-  },
-  stepIndicatorTitle: {
-    fontSize: '14px',
-    fontWeight: '700',
-    color: '#f1f5f9',
-    marginBottom: '4px',
-  },
-  stepIndicatorDescription: {
-    fontSize: '12px',
-    color: '#64748b',
-  },
-  content: {
-    marginBottom: '32px',
-  },
-  stepContent: {
-    animation: 'fadeIn 0.3s ease',
-  },
-  stepTitle: {
-    fontSize: '24px',
-    fontWeight: '700',
-    color: '#f1f5f9',
-    margin: '0 0 8px 0',
-  },
-  stepDescription: {
-    fontSize: '14px',
-    color: '#64748b',
-    marginBottom: '24px',
-  },
-  levelsContainer: {
-    display: 'grid',
-    gap: '16px',
-  },
+  stepNumberActive: { background: '#fbbf24', color: '#0f1729' },
+  stepNumberCompleted: { background: '#22c55e', color: '#0f1729' },
+  stepInfo: { flex: 1 },
+  stepIndicatorTitle: { fontSize: '13px', fontWeight: '700', color: '#f1f5f9', marginBottom: '2px' },
+  stepIndicatorDescription: { fontSize: '12px', color: '#64748b' },
+  content: { marginBottom: '32px' },
+  stepContent: {},
+  stepTitle: { fontSize: '22px', fontWeight: '700', color: '#f1f5f9', margin: '0 0 6px 0' },
+  stepDescription: { fontSize: '14px', color: '#64748b', margin: '0 0 24px 0' },
+  levelsContainer: { display: 'grid', gap: '14px' },
   levelCard: {
     padding: '20px',
     borderRadius: '12px',
     border: '2px solid #334155',
     background: 'rgba(15, 23, 41, 0.5)',
     cursor: 'pointer',
-    transition: 'all 0.3s',
+    transition: 'all 0.2s',
   },
-  levelCardSelected: {
-    borderColor: '#fbbf24',
-    background: 'rgba(251, 191, 36, 0.1)',
-  },
-  levelHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '8px',
-  },
-  levelNumber: {
-    fontSize: '12px',
-    fontWeight: '700',
-    color: '#fbbf24',
-  },
+  levelCardSelected: { borderColor: '#fbbf24', background: 'rgba(251, 191, 36, 0.1)' },
+  levelHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' },
+  levelNumber: { fontSize: '12px', fontWeight: '700', color: '#fbbf24' },
   requiredBadge: {
-    fontSize: '10px',
-    fontWeight: '700',
-    color: '#22c55e',
-    background: 'rgba(34, 197, 94, 0.2)',
-    padding: '4px 8px',
-    borderRadius: '4px',
+    fontSize: '10px', fontWeight: '700', color: '#22c55e',
+    background: 'rgba(34, 197, 94, 0.2)', padding: '3px 8px', borderRadius: '4px',
   },
-  levelName: {
-    fontSize: '16px',
-    fontWeight: '700',
-    color: '#f1f5f9',
-    margin: '0 0 8px 0',
-  },
-  levelDescription: {
-    fontSize: '13px',
-    color: '#64748b',
-    margin: 0,
-  },
-  formSection: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px',
-  },
-  formLabel: {
-    fontSize: '14px',
-    fontWeight: '600',
-    color: '#f1f5f9',
-    marginBottom: '8px',
-  },
+  levelName: { fontSize: '15px', fontWeight: '700', color: '#f1f5f9', margin: '0 0 6px 0' },
+  levelDescription: { fontSize: '13px', color: '#64748b', margin: 0 },
+  formSection: { display: 'flex', flexDirection: 'column', gap: '20px' },
+  formLabel: { display: 'block', fontSize: '13px', fontWeight: '600', color: '#f1f5f9', marginBottom: '8px' },
   select: {
-    width: '100%',
-    padding: '12px 16px',
-    background: 'rgba(15, 23, 41, 0.5)',
-    border: '1px solid #334155',
-    borderRadius: '8px',
-    color: '#f1f5f9',
-    fontSize: '14px',
-    outline: 'none',
+    width: '100%', padding: '12px 16px',
+    background: 'rgba(15, 23, 41, 0.6)', border: '1px solid #334155',
+    borderRadius: '8px', color: '#f1f5f9', fontSize: '14px',
+    outline: 'none', boxSizing: 'border-box',
   },
   input: {
-    width: '100%',
-    padding: '12px 16px',
-    background: 'rgba(15, 23, 41, 0.5)',
-    border: '1px solid #334155',
-    borderRadius: '8px',
-    color: '#f1f5f9',
-    fontSize: '14px',
-    outline: 'none',
-    boxSizing: 'border-box',
+    width: '100%', padding: '12px 16px',
+    background: 'rgba(15, 23, 41, 0.6)', border: '1px solid #334155',
+    borderRadius: '8px', color: '#f1f5f9', fontSize: '14px',
+    outline: 'none', boxSizing: 'border-box',
   },
   infoBox: {
-    display: 'flex',
-    gap: '12px',
-    padding: '12px 16px',
-    background: 'rgba(251, 191, 36, 0.1)',
-    border: '1px solid rgba(251, 191, 36, 0.3)',
-    borderRadius: '8px',
+    display: 'flex', gap: '12px', padding: '12px 16px',
+    background: 'rgba(251, 191, 36, 0.08)', border: '1px solid rgba(251, 191, 36, 0.25)', borderRadius: '8px',
   },
-  infoIcon: {
-    fontSize: '16px',
-  },
-  infoText: {
-    fontSize: '13px',
-    color: '#fbbf24',
-    flex: 1,
-  },
+  infoIcon: { fontSize: '16px' },
+  infoText: { fontSize: '13px', color: '#fbbf24', flex: 1, lineHeight: 1.5 },
   errorBox: {
-    padding: '12px 16px',
-    background: 'rgba(239, 68, 68, 0.1)',
-    border: '1px solid rgba(239, 68, 68, 0.3)',
-    borderRadius: '8px',
-    color: '#f87171',
-    fontSize: '14px',
-    marginBottom: '16px',
+    padding: '12px 16px', background: 'rgba(239, 68, 68, 0.1)',
+    border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px',
+    color: '#f87171', fontSize: '14px', marginBottom: '16px',
   },
   successBox: {
-    padding: '12px 16px',
-    background: 'rgba(34, 197, 94, 0.1)',
-    border: '1px solid rgba(34, 197, 94, 0.3)',
-    borderRadius: '8px',
-    color: '#4ade80',
-    fontSize: '14px',
-    marginBottom: '16px',
+    padding: '12px 16px', background: 'rgba(34, 197, 94, 0.1)',
+    border: '1px solid rgba(34, 197, 94, 0.3)', borderRadius: '8px',
+    color: '#4ade80', fontSize: '14px', marginBottom: '16px',
   },
   reviewSection: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
-    padding: '20px',
-    background: 'rgba(15, 23, 41, 0.5)',
-    borderRadius: '12px',
-    border: '1px solid #334155',
+    display: 'flex', flexDirection: 'column',
+    padding: '20px', background: 'rgba(15, 23, 41, 0.5)',
+    borderRadius: '12px', border: '1px solid #334155',
   },
   reviewItem: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    padding: '8px 0',
-    borderBottom: '1px solid #1e293b',
+    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+    padding: '10px 0', borderBottom: '1px solid #1e293b', gap: '12px',
   },
-  reviewLabel: {
-    fontSize: '14px',
-    color: '#64748b',
-  },
+  reviewLabel: { fontSize: '13px', color: '#64748b' },
   reviewValue: {
-    fontSize: '14px',
-    fontWeight: '600',
-    color: '#f1f5f9',
+    fontSize: '13px', fontWeight: '600', color: '#f1f5f9',
+    textAlign: 'right', maxWidth: '55%', overflow: 'hidden',
+    textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+  },
+  reviewValueGreen: {
+    fontSize: '13px', fontWeight: '600', color: '#4ade80',
+    textAlign: 'right', maxWidth: '55%', overflow: 'hidden',
+    textOverflow: 'ellipsis', whiteSpace: 'nowrap',
   },
   termsBox: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    gap: '12px',
-    marginTop: '20px',
-    padding: '16px',
-    background: 'rgba(15, 23, 41, 0.5)',
-    borderRadius: '8px',
-    border: '1px solid #334155',
+    display: 'flex', alignItems: 'flex-start', gap: '12px', marginTop: '20px',
+    padding: '16px', background: 'rgba(15, 23, 41, 0.5)',
+    borderRadius: '8px', border: '1px solid #334155',
   },
-  checkbox: {
-    marginTop: '4px',
-    cursor: 'pointer',
-  },
-  termsLabel: {
-    fontSize: '13px',
-    color: '#64748b',
-    cursor: 'pointer',
-    lineHeight: '1.5',
-  },
-  navigation: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    gap: '16px',
-  },
+  checkbox: { marginTop: '2px', cursor: 'pointer' },
+  termsLabel: { fontSize: '13px', color: '#94a3b8', cursor: 'pointer', lineHeight: '1.6' },
+  navigation: { display: 'flex', justifyContent: 'space-between', gap: '16px' },
   backButton: {
-    padding: '12px 32px',
-    background: 'rgba(15, 23, 41, 0.5)',
-    border: '1px solid #334155',
-    borderRadius: '8px',
-    color: '#f1f5f9',
-    fontSize: '14px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-  },
-  backButtonDisabled: {
-    opacity: 0.3,
-    cursor: 'not-allowed',
+    padding: '12px 28px', background: 'rgba(15, 23, 41, 0.5)',
+    border: '1px solid #334155', borderRadius: '8px',
+    color: '#f1f5f9', fontSize: '14px', fontWeight: '600', cursor: 'pointer',
   },
   nextButton: {
-    padding: '12px 32px',
+    padding: '12px 28px',
     background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-    border: 'none',
-    borderRadius: '8px',
-    color: '#0f1729',
-    fontSize: '14px',
-    fontWeight: '700',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-  },
-  nextButtonDisabled: {
-    opacity: 0.5,
-    cursor: 'not-allowed',
+    border: 'none', borderRadius: '8px',
+    color: '#0f1729', fontSize: '14px', fontWeight: '700', cursor: 'pointer',
   },
   submitButton: {
-    padding: '12px 32px',
+    padding: '12px 28px',
     background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-    border: 'none',
-    borderRadius: '8px',
-    color: '#0f1729',
-    fontSize: '14px',
-    fontWeight: '700',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
+    border: 'none', borderRadius: '8px',
+    color: '#0f1729', fontSize: '14px', fontWeight: '700', cursor: 'pointer',
   },
+  disabledBtn: { opacity: 0.4, cursor: 'not-allowed' },
 };
 
 export default Verification;
