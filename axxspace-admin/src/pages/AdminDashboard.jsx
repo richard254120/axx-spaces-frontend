@@ -126,7 +126,19 @@ export default function AdminDashboard() {
   const loadVerificationDetails = async (verificationId) => {
     try {
       const res = await API.get(`/kyc-verification/admin/${verificationId}`);
-      setSelectedVerification(res.data?.data);
+      const data = res.data?.data;
+      // Construct full URLs for documents and selfie
+      const baseUrl = API.defaults.baseURL?.replace('/api', '') || 'http://localhost:1000';
+      if (data?.documents) {
+        data.documents = data.documents.map(doc => ({
+          ...doc,
+          url: doc.url.startsWith('http') ? doc.url : `${baseUrl}${doc.url}`
+        }));
+      }
+      if (data?.selfie?.url) {
+        data.selfie.url = data.selfie.url.startsWith('http') ? data.selfie.url : `${baseUrl}${data.selfie.url}`;
+      }
+      setSelectedVerification(data);
     } catch (err) {
       console.error("Failed to load verification details:", err);
     }
