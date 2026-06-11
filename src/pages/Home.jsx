@@ -1580,7 +1580,7 @@ export default function Home() {
               </div>
               <div style={{ marginTop: "20px", padding: "16px", background: "rgba(96,165,250,0.08)", borderRadius: "8px", border: "1px solid rgba(96,165,250,0.2)" }}>
                 <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#60A5FA", fontWeight: 600, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: "0.1em" }}>🔄 Auto-refreshing every 5 minutes</p>
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#B8AD96", margin: 0, fontWeight: 300" }}>Data updates automatically to show the latest platform activity</p>
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#B8AD96", margin: 0, fontWeight: 300 }}>Data updates automatically</p>
               </div>
             </div>
           </div>
@@ -1588,7 +1588,7 @@ export default function Home() {
           <div style={{ textAlign: "center", padding: "60px 28px" }}>
             <span style={{ fontSize: "52px", marginBottom: "16px", display: "block" }}>📊</span>
             <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#F0EAD8", marginBottom: "8px" }}>Demographics Unavailable</p>
-            <p style={{ color: "#7A7260", fontSize: "14px", marginBottom: "24px", fontWeight: 300" }}>Unable to load demographic data at this time</p>
+            <p style={{ color: "#7A7260", fontSize: "14px", marginBottom: "24px", fontWeight: 300 }}>Unable to load demographic data</p>
           </div>
         )}
       </section>
