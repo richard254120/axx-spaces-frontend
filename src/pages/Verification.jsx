@@ -55,7 +55,8 @@ const Verification = () => {
     setFormData(prev => ({
       ...prev,
       [field]: file,
-      [`${field}Preview`]: previewUrl
+      [`${field}Preview`]: previewUrl,
+      [`${field}Name`]: file ? file.name : null
     }));
   };
 

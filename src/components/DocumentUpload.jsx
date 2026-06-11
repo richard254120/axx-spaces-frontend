@@ -19,8 +19,7 @@ const DocumentUpload = ({
 
     // Check file size
     if (file.size > maxSize) {
-      1
-      setError('File size exceeds 5MB limit');
+      setError('File size exceeds 15MB limit');
       return null;
     }
 
