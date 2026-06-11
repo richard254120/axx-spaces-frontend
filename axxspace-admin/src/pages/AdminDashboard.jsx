@@ -108,13 +108,13 @@ export default function AdminDashboard() {
     if (activeTab === "verification") {
       loadPendingVerifications();
     }
-  }, [activeTab]);
+  }, [activeTab, statusView]);
 
   // ── KYC VERIFICATION FUNCTIONS ───────────────────────────────
   const loadPendingVerifications = async () => {
     setVerificationLoading(true);
     try {
-      const res = await API.get("/kyc-verification/admin/pending");
+      const res = await API.get(`/kyc-verification/admin/pending?status=${statusView}`);
       setPendingVerifications(res.data?.data || []);
     } catch (err) {
       console.error("Failed to load pending verifications:", err);
@@ -909,7 +909,7 @@ export default function AdminDashboard() {
       )}
 
       {/* SEARCH AND FILTER BAR */}
-      {activeTab !== "payment" && activeTab !== "boosts" && activeTab !== "businesses" && (
+      {activeTab !== "payment" && activeTab !== "boosts" && activeTab !== "businesses" && activeTab !== "verification" && (
         <div style={S.searchBar}>
           <div style={S.searchInputWrapper}>
             <span style={S.searchIcon}>🔍</span>
