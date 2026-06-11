@@ -290,6 +290,7 @@ const Verification = () => {
                 previewUrl={formData.businessRegistrationPreview}
                 fileName={formData.businessRegistrationName}
                 onRemove={() => handleRemoveFile('businessRegistration')}
+                acceptedTypes="image/*,.pdf"
                 required={selectedLevel >= 4}
               />
             </div>
