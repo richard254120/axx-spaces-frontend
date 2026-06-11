@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
-import bgVideo from "../assets/AXX Homepage Video.mp4";
+import bgVideo from "../assets/AXX Homepage video.mp4";
 import rentalsIcon from "/rentals.png";
 import moversIcon from "/movers.png";
 import tourismIcon from "/tourism.png";

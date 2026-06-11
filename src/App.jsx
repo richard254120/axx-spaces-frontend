@@ -117,12 +117,15 @@ function App() {
     const urlParams = new URLSearchParams(window.location.search);
     const forceSplash = urlParams.get('splash') === 'true';
 
-    if (hasVisited && !forceSplash) {
-      // Already visited, skip splash screen
+    // Only skip if explicitly visited AND not forced
+    // If hasVisited is null (first time ever), show the splash
+    if (hasVisited === 'true' && !forceSplash) {
       setShowSplash(false);
     } else {
-      // First visit or forced, show splash and mark as visited
-      localStorage.setItem('axxspace_visited', 'true');
+      // Only set the flag if not forced
+      if (!forceSplash) {
+        localStorage.setItem('axxspace_visited', 'true');
+      }
     }
   }, []);
 

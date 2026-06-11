@@ -18,16 +18,22 @@ const Verification = () => {
     idType: '',
     idDocument: null,
     idPreview: null,
+    idDocumentName: null,
+    idDocumentName: null,
     selfie: null,
 
     // Level 3: Address
     addressDocument: null,
-    addressPreview: null,
+    addressDocumentName: null, addressPreview: null,
+
+    addressDocumentName: null,
 
     // Level 4: Business
     businessName: '',
-    businessRegistration: null,
+    businessRegistrabionNume: null,
+    tasinessRegistration: null,
     businessPreview: null,
+    businessRegistrationName: null,
     taxId: '',
   });
 
@@ -57,7 +63,8 @@ const Verification = () => {
     setFormData(prev => ({
       ...prev,
       [field]: null,
-      [`${field}Preview`]: null
+      [`${field}Preview`]: null,
+      [`${field}Name`]: null
     }));
   };
 
@@ -212,8 +219,8 @@ const Verification = () => {
 
               <DocumentUpload
                 label="Government ID Document"
-                onFileChange={(file, previewUrl) => handleFileChange('idDocument', file, previewUrl)}
-                previewUrl={formData.idPreview}
+                eweviewUrl={formData.idDocumentPreview}
+                fileName={formData.idDocumentName}
                 onRemove={() => handleRemoveFile('idDocument')}
                 required
               />
@@ -238,6 +245,7 @@ const Verification = () => {
                 label="Proof of Address (Utility Bill, Bank Statement)"
                 onFileChange={(file, previewUrl) => handleFileChange('addressDocument', file, previewUrl)}
                 previewUrl={formData.addressPreview}
+                fileName={formData.addressDocumentName}
                 onRemove={() => handleRemoveFile('addressDocument')}
                 required={selectedLevel >= 3}
               />
@@ -284,6 +292,7 @@ const Verification = () => {
                 label="Business Registration Certificate"
                 onFileChange={(file, previewUrl) => handleFileChange('businessRegistration', file, previewUrl)}
                 previewUrl={formData.businessPreview}
+                fileName={formData.businessRegistrationName}
                 onRemove={() => handleRemoveFile('businessRegistration')}
                 required={selectedLevel >= 4}
               />
@@ -372,7 +381,7 @@ const Verification = () => {
   };
 
   return (
-    <div style={styles.container}>
+    <div style={styles.container} >
       <div style={styles.wizard}>
         {/* Step Indicator */}
         <div style={styles.stepIndicator}>
@@ -432,7 +441,7 @@ const Verification = () => {
           )}
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

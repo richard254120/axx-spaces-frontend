@@ -4,10 +4,11 @@ const DocumentUpload = ({
   label,
   onFileChange,
   acceptedTypes = 'image/*,.pdf',
-  maxSize = 5 * 1024 * 1024, // 5MB
+  maxSize = 15 * 1024 * 1024, // 15MB
   previewUrl,
   onRemove,
-  required = false
+  required = false,
+  fileName = null
 }) => {
   const [error, setError] = useState('');
   const [isDragging, setIsDragging] = useState(false);
@@ -18,6 +19,7 @@ const DocumentUpload = ({
 
     // Check file size
     if (file.size > maxSize) {
+      1
       setError('File size exceeds 5MB limit');
       return null;
     }
@@ -125,22 +127,25 @@ const DocumentUpload = ({
             <span style={styles.uploadTextSecondary}>or drag and drop</span>
           </div>
           <div style={styles.uploadHint}>
-            PNG, JPG, PDF (max 5MB)
+            PNG, JPG, PDF (max 15MB)
           </div>
         </div>
       ) : (
         <div style={styles.previewContainer}>
-          {previewUrl.endsWith('.pdf') ? (
+          {!previewUrl || !previewUrl.startsWith('data:') ? (
             <div style={styles.pdfPreview}>
               <div style={styles.pdfIcon}>📕</div>
-              <span style={styles.fileName}>Document uploaded</span>
+              <span style={styles.fileName}>{fileName || 'Document uploaded'}</span>
             </div>
           ) : (
-            <img
-              src={previewUrl}
-              alt="Preview"
-              style={styles.previewImage}
-            />
+            <div>
+              <img
+                src={previewUrl}
+                alt="Preview"
+                style={styles.previewImage}
+              />
+              {fileName && <div style={styles.imageFileName}>{fileName}</div>}
+            </div>
           )}
           <button
             style={styles.removeButton}
@@ -237,6 +242,15 @@ const styles = {
   fileName: {
     fontSize: '14px',
     color: '#f1f5f9',
+    wordBreak: 'break-word',
+  },
+  imageFileName: {
+    fontSize: '12px',
+    color: '#64748b',
+    marginTop: '8px',
+    padding: '8px',
+    background: 'rgba(15, 23, 41, 0.8)',
+    wordBreak: 'break-word',
   },
   removeButton: {
     position: 'absolute',
