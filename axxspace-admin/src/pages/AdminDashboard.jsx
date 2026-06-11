@@ -1105,9 +1105,13 @@ export default function AdminDashboard() {
                   {selectedVerification.documents.map((doc, idx) => (
                     <div key={idx} style={S.documentItem}>
                       <p style={S.docType}>{doc.type.replace(/_/g, ' ')}</p>
-                      <a href={doc.url} target="_blank" rel="noopener noreferrer" style={S.docLink}>
+                      <a href={doc.url} target="_blank" rel="noopener noreferrer" style={S.docLink} onClick={(e) => {
+                        e.preventDefault();
+                        window.open(doc.url, '_blank');
+                      }}>
                         📄 View Document
                       </a>
+                      <p style={{ fontSize: 11, color: '#64748b' }}>Filename: {doc.filename}</p>
                     </div>
                   ))}
                 </div>
@@ -1115,7 +1119,21 @@ export default function AdminDashboard() {
               {selectedVerification.selfie && selectedVerification.selfie.url && (
                 <div style={S.detailSection}>
                   <p style={S.detailLabel}>Selfie:</p>
-                  <img src={selectedVerification.selfie.url} alt="Selfie" style={S.selfieImage} />
+                  <img
+                    src={selectedVerification.selfie.url}
+                    alt="Selfie"
+                    style={S.selfieImage}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'block';
+                    }}
+                  />
+                  <p style={{ fontSize: 12, color: '#ef4444', display: 'none' }}>
+                    ⚠️ Selfie image not available (file may not exist on server)
+                  </p>
+                  <p style={{ fontSize: 11, color: '#64748b', marginTop: '8px' }}>
+                    Filename: {selectedVerification.selfie.filename}
+                  </p>
                 </div>
               )}
               {selectedVerification.status === 'pending' && (
