@@ -17,22 +17,19 @@ const Verification = () => {
     // Level 2: Identity
     idType: '',
     idDocument: null,
-    idPreview: null,
-    idDocumentName: null,
+    idDocumentPreview: null,
     idDocumentName: null,
     selfie: null,
 
     // Level 3: Address
     addressDocument: null,
-    addressDocumentName: null, addressPreview: null,
-
+    addressDocumentPreview: null,
     addressDocumentName: null,
 
     // Level 4: Business
     businessName: '',
-    businessRegistrabionNume: null,
-    tasinessRegistration: null,
-    businessPreview: null,
+    businessRegistration: null,
+    businessRegistrationPreview: null,
     businessRegistrationName: null,
     taxId: '',
   });
@@ -56,7 +53,7 @@ const Verification = () => {
       ...prev,
       [field]: file,
       [`${field}Preview`]: previewUrl,
-      [`${field}Name`]: file ? file.name : null
+      [`${field}Name`]: file ? file.name : null,
     }));
   };
 
@@ -65,7 +62,7 @@ const Verification = () => {
       ...prev,
       [field]: null,
       [`${field}Preview`]: null,
-      [`${field}Name`]: null
+      [`${field}Name`]: null,
     }));
   };
 
@@ -89,7 +86,6 @@ const Verification = () => {
     try {
       const API_BASE = import.meta.env.VITE_API_URL || 'https://axx-spaces-backend-1.onrender.com/api';
 
-      // Create FormData for file uploads
       const formDataToSend = new FormData();
       formDataToSend.append('verificationLevel', selectedLevel);
       formDataToSend.append('idType', formData.idType);
@@ -99,7 +95,6 @@ const Verification = () => {
         formDataToSend.append('taxId', formData.taxId);
       }
 
-      // Add files
       if (formData.idDocument) {
         formDataToSend.append('idDocument', formData.idDocument);
       }
@@ -110,7 +105,6 @@ const Verification = () => {
         formDataToSend.append('businessRegistration', formData.businessRegistration);
       }
       if (formData.selfie) {
-        // Convert base64 to blob
         const base64Data = formData.selfie.split(',')[1];
         const byteCharacters = atob(base64Data);
         const byteArrays = [];
@@ -183,7 +177,7 @@ const Verification = () => {
                   key={level.level}
                   style={{
                     ...styles.levelCard,
-                    ...(selectedLevel === level.level && styles.levelCardSelected)
+                    ...(selectedLevel === level.level && styles.levelCardSelected),
                   }}
                   onClick={() => setSelectedLevel(level.level)}
                 >
@@ -246,7 +240,7 @@ const Verification = () => {
               <DocumentUpload
                 label="Proof of Address (Utility Bill, Bank Statement)"
                 onFileChange={(file, previewUrl) => handleFileChange('addressDocument', file, previewUrl)}
-                previewUrl={formData.addressPreview}
+                previewUrl={formData.addressDocumentPreview}
                 fileName={formData.addressDocumentName}
                 onRemove={() => handleRemoveFile('addressDocument')}
                 required={selectedLevel >= 3}
@@ -293,7 +287,7 @@ const Verification = () => {
               <DocumentUpload
                 label="Business Registration Certificate"
                 onFileChange={(file, previewUrl) => handleFileChange('businessRegistration', file, previewUrl)}
-                previewUrl={formData.businessPreview}
+                previewUrl={formData.businessRegistrationPreview}
                 fileName={formData.businessRegistrationName}
                 onRemove={() => handleRemoveFile('businessRegistration')}
                 required={selectedLevel >= 4}
@@ -308,6 +302,9 @@ const Verification = () => {
             <h2 style={styles.stepTitle}>Review & Submit</h2>
             <p style={styles.stepDescription}>Review your information before submitting</p>
 
+            {error && <div style={styles.errorBox}>{error}</div>}
+            {success && <div style={styles.successBox}>{success}</div>}
+
             <div style={styles.reviewSection}>
               <div style={styles.reviewItem}>
                 <span style={styles.reviewLabel}>Verification Level:</span>
@@ -317,28 +314,28 @@ const Verification = () => {
               {formData.idType && (
                 <div style={styles.reviewItem}>
                   <span style={styles.reviewLabel}>ID Type:</span>
-                  <span style={styles.reviewValue}>{formData.idType}</span>
+                  <span style={styles.reviewValue}>{formData.idType.replace('_', ' ')}</span>
                 </div>
               )}
 
               {formData.idDocument && (
                 <div style={styles.reviewItem}>
                   <span style={styles.reviewLabel}>ID Document:</span>
-                  <span style={styles.reviewValue}>Uploaded ✓</span>
+                  <span style={styles.reviewValue}>✓ {formData.idDocumentName}</span>
                 </div>
               )}
 
               {formData.selfie && (
                 <div style={styles.reviewItem}>
                   <span style={styles.reviewLabel}>Selfie:</span>
-                  <span style={styles.reviewValue}>Captured ✓</span>
+                  <span style={styles.reviewValue}>✓ Captured</span>
                 </div>
               )}
 
               {formData.addressDocument && (
                 <div style={styles.reviewItem}>
                   <span style={styles.reviewLabel}>Address Document:</span>
-                  <span style={styles.reviewValue}>Uploaded ✓</span>
+                  <span style={styles.reviewValue}>✓ {formData.addressDocumentName}</span>
                 </div>
               )}
 
@@ -359,17 +356,13 @@ const Verification = () => {
               {formData.businessRegistration && (
                 <div style={styles.reviewItem}>
                   <span style={styles.reviewLabel}>Business Registration:</span>
-                  <span style={styles.reviewValue}>Uploaded ✓</span>
+                  <span style={styles.reviewValue}>✓ {formData.businessRegistrationName}</span>
                 </div>
               )}
             </div>
 
             <div style={styles.termsBox}>
-              <input
-                type="checkbox"
-                id="terms"
-                style={styles.checkbox}
-              />
+              <input type="checkbox" id="terms" style={styles.checkbox} />
               <label htmlFor="terms" style={styles.termsLabel}>
                 I confirm that all information provided is accurate and I agree to the terms and conditions
               </label>
@@ -383,7 +376,7 @@ const Verification = () => {
   };
 
   return (
-    <div style={styles.container} >
+    <div style={styles.container}>
       <div style={styles.wizard}>
         {/* Step Indicator */}
         <div style={styles.stepIndicator}>
@@ -393,10 +386,14 @@ const Verification = () => {
               style={{
                 ...styles.stepIndicatorItem,
                 ...(step.step === currentStep && styles.stepIndicatorItemActive),
-                ...(step.step < currentStep && styles.stepIndicatorItemCompleted)
+                ...(step.step < currentStep && styles.stepIndicatorItemCompleted),
               }}
             >
-              <div style={styles.stepNumber}>
+              <div style={{
+                ...styles.stepNumber,
+                ...(step.step === currentStep && styles.stepNumberActive),
+                ...(step.step < currentStep && styles.stepNumberCompleted),
+              }}>
                 {step.step < currentStep ? '✓' : step.step}
               </div>
               <div style={styles.stepInfo}>
@@ -415,7 +412,10 @@ const Verification = () => {
         {/* Navigation */}
         <div style={styles.navigation}>
           <button
-            style={styles.backButton}
+            style={{
+              ...styles.backButton,
+              ...(currentStep === 1 && styles.backButtonDisabled),
+            }}
             onClick={handleBack}
             disabled={currentStep === 1}
           >
@@ -426,7 +426,7 @@ const Verification = () => {
             <button
               style={{
                 ...styles.nextButton,
-                ...(!isStepValid() && styles.nextButtonDisabled)
+                ...(!isStepValid() && styles.nextButtonDisabled),
               }}
               onClick={handleNext}
               disabled={!isStepValid()}
@@ -435,15 +435,19 @@ const Verification = () => {
             </button>
           ) : (
             <button
-              style={styles.submitButton}
+              style={{
+                ...styles.submitButton,
+                ...(loading && styles.nextButtonDisabled),
+              }}
               onClick={handleSubmit}
+              disabled={loading}
             >
-              Submit Verification
+              {loading ? 'Submitting...' : 'Submit Verification'}
             </button>
           )}
         </div>
       </div>
-    </div >
+    </div>
   );
 };
 
@@ -503,6 +507,14 @@ const styles = {
     fontWeight: '700',
     color: '#f1f5f9',
     flexShrink: 0,
+  },
+  stepNumberActive: {
+    background: '#fbbf24',
+    color: '#0f1729',
+  },
+  stepNumberCompleted: {
+    background: '#22c55e',
+    color: '#0f1729',
   },
   stepInfo: {
     flex: 1,
@@ -610,6 +622,7 @@ const styles = {
     color: '#f1f5f9',
     fontSize: '14px',
     outline: 'none',
+    boxSizing: 'border-box',
   },
   infoBox: {
     display: 'flex',
@@ -627,6 +640,24 @@ const styles = {
     color: '#fbbf24',
     flex: 1,
   },
+  errorBox: {
+    padding: '12px 16px',
+    background: 'rgba(239, 68, 68, 0.1)',
+    border: '1px solid rgba(239, 68, 68, 0.3)',
+    borderRadius: '8px',
+    color: '#f87171',
+    fontSize: '14px',
+    marginBottom: '16px',
+  },
+  successBox: {
+    padding: '12px 16px',
+    background: 'rgba(34, 197, 94, 0.1)',
+    border: '1px solid rgba(34, 197, 94, 0.3)',
+    borderRadius: '8px',
+    color: '#4ade80',
+    fontSize: '14px',
+    marginBottom: '16px',
+  },
   reviewSection: {
     display: 'flex',
     flexDirection: 'column',
@@ -640,7 +671,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     padding: '8px 0',
-    borderBottom: '1px solid #334155',
+    borderBottom: '1px solid #1e293b',
   },
   reviewLabel: {
     fontSize: '14px',
@@ -659,14 +690,17 @@ const styles = {
     padding: '16px',
     background: 'rgba(15, 23, 41, 0.5)',
     borderRadius: '8px',
+    border: '1px solid #334155',
   },
   checkbox: {
     marginTop: '4px',
+    cursor: 'pointer',
   },
   termsLabel: {
     fontSize: '13px',
     color: '#64748b',
     cursor: 'pointer',
+    lineHeight: '1.5',
   },
   navigation: {
     display: 'flex',
@@ -683,6 +717,10 @@ const styles = {
     fontWeight: '600',
     cursor: 'pointer',
     transition: 'all 0.2s',
+  },
+  backButtonDisabled: {
+    opacity: 0.3,
+    cursor: 'not-allowed',
   },
   nextButton: {
     padding: '12px 32px',
