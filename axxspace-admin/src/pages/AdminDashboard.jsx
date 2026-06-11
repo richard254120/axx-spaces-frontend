@@ -1,7 +1,12 @@
-import { useEffect, useState, useContext, useRef } from "react";
+import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
+import AdminHeader from "../components/AdminHeader";
+import StatsCard from "../components/StatsCard";
+import TabNavigation from "../components/TabNavigation";
+import NotificationPanel from "../components/NotificationPanel";
+import "./AdminDashboard.css";
 
 // ── tiny helpers ──────────────────────────────────────────────
 const TABS = ["properties", "materials", "tourism", "movers", "sellers", "sold", "payment", "boosts", "businesses", "announcements", "verification"];
@@ -37,7 +42,6 @@ export default function AdminDashboard() {
   const [showNotifPanel, setShowNotifPanel] = useState(false);
   const [boostLoading, setBoostLoading] = useState(false);
   const [boostMessage, setBoostMessage] = useState("");
-  const notifRef = useRef(null);
 
   // ── UNIFIED NOTIFICATIONS STATE ───────────────────────────────
   const [allNotifications, setAllNotifications] = useState([]);
@@ -90,17 +94,6 @@ export default function AdminDashboard() {
       loadAllNotifications();
     }, 30000);
     return () => clearInterval(interval);
-  }, []);
-
-  // ── close notif panel on outside click ─────────────────────
-  useEffect(() => {
-    const handleClick = (e) => {
-      if (notifRef.current && !notifRef.current.contains(e.target)) {
-        setShowNotifPanel(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
   // ── load pending KYC verifications when tab changes ─────────
@@ -546,152 +539,41 @@ export default function AdminDashboard() {
 
   // ── render ─────────────────────────────────────────────────
   return (
-    <div style={S.page}>
-      <style>{css}</style>
+    <div className="admin-dashboard">
 
       {/* HEADER */}
-      <div style={S.header}>
-        <div>
-          <h1 style={S.logo}>🛡️ Axxspace Admin</h1>
-          <p style={S.logoSub}>Welcome back, {user?.name?.split(" ")[0]}</p>
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          {/* 🔔 NOTIFICATION BELL */}
-          <div ref={notifRef} style={{ position: "relative" }}>
-            <button
-              style={S.notifBtn}
-              onClick={() => setShowNotifPanel(!showNotifPanel)}
-              className={hasAllNotifications ? "notif-btn-active" : ""}
-              title={hasAllNotifications ? `${allNotifications.length} notification(s) awaiting approval` : "No pending notifications"}
-            >
-              🔔
-              {hasAllNotifications && (
-                <span style={S.notifBadge} className="notif-badge-blink">
-                  {allNotifications.length}
-                </span>
-              )}
-            </button>
-
-            {/* NOTIFICATION DROPDOWN PANEL */}
-            {showNotifPanel && (
-              <div style={S.notifPanel} className="notif-panel-slide">
-                <div style={S.notifPanelHeader}>
-                  <span style={S.notifPanelTitle}>� All Notifications</span>
-                  <button style={S.notifCloseBtn} onClick={() => setShowNotifPanel(false)}>✕</button>
-                </div>
-
-                {hasAllNotifications ? (
-                  <div style={S.notifList}>
-                    {allNotifications.map(notif => (
-                      <div key={notif._id} style={S.notifItem} className={notif.isPayment ? "notif-item-pulse" : ""}>
-                        <div style={S.notifItemHeader}>
-                          {!notif.isPayment && <span style={S.notifRedDot} className="red-dot-blink" />}
-                          <span style={S.notifItemTitle}>
-                            {getNotifIcon(notif.type, notif.isPayment)} {getNotifTitle(notif)}
-                          </span>
-                          <span style={{ fontSize: 10, color: "#94a3b8", marginLeft: "auto" }}>
-                            {notif.isPayment ? "💳 Payment" : "📝 Approval"}
-                          </span>
-                        </div>
-                        <div style={S.notifItemMeta}>
-                          <span>👤 {notif.ownerName || notif.userName || notif.userId?.name || "User"}</span>
-                          <span>📞 {notif.ownerPhone || notif.userPhone || notif.userId?.phone || "—"}</span>
-                        </div>
-                        {notif.isPayment && (
-                          <div style={S.notifItemMeta}>
-                            <span style={{ color: "#fbbf24", fontWeight: 700 }}>
-                              KES {notif.amount?.toLocaleString() || "—"}
-                            </span>
-                            <span style={{ color: "#94a3b8", fontSize: 11 }}>
-                              {notif.mpesaRef || notif.transactionId || "Pending verification"}
-                            </span>
-                          </div>
-                        )}
-                        {!notif.isPayment && (
-                          <div style={S.notifItemMeta}>
-                            <span style={{ color: "#64748b", fontSize: 11 }}>
-                              {notif.category || "—"}
-                            </span>
-                          </div>
-                        )}
-                        {notif.type === "tourism_booking" && notif.checkIn && (
-                          <div style={{ ...S.notifItemMeta, fontSize: 11 }}>
-                            <span>📅 Check-in: {new Date(notif.checkIn).toLocaleDateString()}</span>
-                            <span>Check-out: {new Date(notif.checkOut).toLocaleDateString()}</span>
-                          </div>
-                        )}
-                        <div style={S.notifItemMeta}>
-                          <span style={{ color: "#64748b", fontSize: 10 }}>
-                            {new Date(notif.createdAt).toLocaleString()}
-                          </span>
-                        </div>
-                        <div style={S.notifItemBtns}>
-                          {notif.isPayment ? (
-                            <>
-                              <button
-                                style={S.notifApproveBtn}
-                                onClick={() => { handleApproveBoost(notif._id); setShowNotifPanel(false); setActiveTab("boosts"); }}
-                              >
-                                ✅ Confirm
-                              </button>
-                              <button
-                                style={S.notifRejectBtn}
-                                onClick={() => handleRejectBoost(notif._id)}
-                              >
-                                ✕ Dismiss
-                              </button>
-                            </>
-                          ) : (
-                            <button
-                              style={S.notifApproveBtn}
-                              onClick={() => {
-                                const tabMap = {
-                                  property: "properties",
-                                  material: "materials",
-                                  tourism: "tourism",
-                                  mover: "movers",
-                                  seller: "sellers",
-                                  business: "businesses",
-                                  announcement: "announcements"
-                                };
-                                setActiveTab(tabMap[notif.type] || "properties");
-                                setStatusView("pending");
-                                setShowNotifPanel(false);
-                              }}
-                            >
-                              👁️ Review
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div style={S.notifEmpty}>
-                    <p>✅ No pending notifications</p>
-                  </div>
-                )}
-
-                <div style={S.notifFooter}>
-                  <button style={S.notifViewAllBtn} onClick={() => { setActiveTab("properties"); setStatusView("pending"); setShowNotifPanel(false); }}>
-                    Review All Pending →
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <button style={S.logoutBtn} onClick={() => { localStorage.removeItem("token"); localStorage.removeItem("user"); navigate("/login"); }}>
-            🚪 Logout
-          </button>
-        </div>
-      </div>
+      <AdminHeader>
+        <NotificationPanel
+          showNotifPanel={showNotifPanel}
+          setShowNotifPanel={setShowNotifPanel}
+          notifications={allNotifications}
+          onApprove={handleApproveBoost}
+          onReject={handleRejectBoost}
+          onReview={(notif) => {
+            if (notif) {
+              const tabMap = {
+                property: "properties",
+                material: "materials",
+                tourism: "tourism",
+                mover: "movers",
+                seller: "sellers",
+                business: "businesses",
+                announcement: "announcements"
+              };
+              setActiveTab(tabMap[notif.type] || "properties");
+              setStatusView("pending");
+            } else {
+              setActiveTab("properties");
+              setStatusView("pending");
+            }
+          }}
+        />
+      </AdminHeader>
 
       {/* STATS */}
       {stats && (
         <>
-          <div style={S.statsGrid}>
+          <div className="stats-grid">
             {[
               { label: "🏢 Properties", total: stats.properties.total, pending: stats.properties.pending, color: "#3b82f6" },
               { label: "🛍️ Materials", total: stats.materials.total, pending: stats.materials.pending, color: "#22c55e" },
@@ -700,17 +582,14 @@ export default function AdminDashboard() {
               { label: "📋 Sellers", total: stats.sellers.total, pending: stats.sellers.pending, color: "#ec4899" },
               { label: "💳 Payments", total: allBoosts.length, pending: pendingBoosts.length, color: "#fbbf24", isPulse: pendingBoosts.length > 0 },
             ].map(s => (
-              <div key={s.label}
-                style={{ ...S.statCard, borderTop: `3px solid ${s.color}`, ...(s.isPulse && s.pending > 0 ? { boxShadow: "0 0 0 2px rgba(239,68,68,0.4)" } : {}) }}
-                className={s.isPulse && s.pending > 0 ? "stat-card-pulse" : ""}>
-                <p style={S.statLabel}>{s.label}</p>
-                <p style={{ ...S.statVal, color: s.color }}>{s.total}</p>
-                {s.pending > 0 && (
-                  <p style={S.statPending}>
-                    {s.isPulse ? `🔴 ${s.pending} unread` : `${s.pending} pending`}
-                  </p>
-                )}
-              </div>
+              <StatsCard
+                key={s.label}
+                label={s.label}
+                total={s.total}
+                pending={s.pending}
+                color={s.color}
+                isPulse={s.isPulse}
+              />
             ))}
           </div>
 
@@ -878,22 +757,22 @@ export default function AdminDashboard() {
       )}
 
       {/* TABS */}
-      <div style={S.tabs}>
-        {TABS.map(t => (
-          <button key={t}
-            style={{
-              ...S.tab,
-              ...(activeTab === t ? S.tabActive : {}),
-              ...(t === "boosts" && hasPendingBoosts ? S.tabBoostAlert : {})
-            }}
-            onClick={() => { setActiveTab(t); if (t !== "sold" && t !== "payment" && t !== "boosts") setStatusView("pending"); }}>
-            {TAB_LABELS[t]}{pendingCount(t)}
-            {t === "boosts" && hasPendingBoosts && (
-              <span style={S.tabBadge} className="notif-badge-blink">{pendingBoosts.length}</span>
-            )}
-          </button>
-        ))}
-      </div>
+      <TabNavigation
+        tabs={TABS}
+        activeTab={activeTab}
+        setActiveTab={(tab) => {
+          setActiveTab(tab);
+          if (tab !== "sold" && tab !== "payment" && tab !== "boosts") setStatusView("pending");
+        }}
+        pendingCounts={{
+          allPending,
+          businesses: stats?.businesses,
+          announcements: pendingAnnouncements.length,
+          verification: pendingVerifications.length
+        }}
+        hasPendingBoosts={hasPendingBoosts}
+        pendingBoosts={pendingBoosts}
+      />
 
       {/* STATUS VIEW TOGGLE */}
       {activeTab !== "payment" && activeTab !== "sold" && activeTab !== "boosts" && (
