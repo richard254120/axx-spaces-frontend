@@ -2,326 +2,382 @@ import { Link } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 
-const VerificationStatus = ({ verificationLevel = 1, status = 'pending' }) => {
+const VerificationStatus = () => {
   const { token } = useContext(AuthContext);
   const [verificationData, setVerificationData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showRejectionReason, setShowRejectionReason] = useState(false);
+
+  const fetchVerificationStatus = async () => {
+    try {
+      const API_BASE = import.meta.env.VITE_API_URL || 'https://axx-spaces-backend-1.onrender.com/api';
+      const response = await fetch(`${API_BASE}/kyc-verification/status`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setVerificationData(data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch verification status:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchVerificationStatus = async () => {
-      try {
-        const API_BASE = import.meta.env.VITE_API_URL || 'https://axx-spaces-backend-1.onrender.com/api';
-        const response = await fetch(`${API_BASE}/kyc-verification/status`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-
-        const data = await response.json();
-        if (data.success) {
-          setVerificationData(data.data);
-        }
-      } catch (error) {
-        console.error('Failed to fetch verification status:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (token) {
       fetchVerificationStatus();
     }
   }, [token]);
 
   if (loading) {
-    return <div style={styles.container}>Loading verification status...</div>;
+    return (
+      <div style={styles.container}>
+        <div style={styles.loadingText}>⏳ Loading verification status...</div>
+      </div>
+    );
   }
 
-  const currentLevel = verificationData?.verificationLevel || verificationLevel;
-  const currentStatus = verificationData?.status || status;
+  const badges = verificationData?.verificationBadges || [];
   const levels = [
-    { level: 1, name: 'Basic', description: 'Email & Phone Verified' },
-    { level: 2, name: 'Identity', description: 'ID & Selfie Verified' },
-    { level: 3, name: 'Address', description: 'Address Verified' },
-    { level: 4, name: 'Business', description: 'Business Verified' },
+    {
+      level: 1,
+      name: 'Student ID Verification',
+      statusField: 'studentVerificationStatus',
+      badgeName: 'student_verified',
+      badgeText: '🎓 Student Badge',
+      description: 'Verifies you are an active student',
+      color: '#3b82f6',
+      details: verificationData?.levels?.student,
+    },
+    {
+      level: 2,
+      name: 'Standard ID & Address Verification',
+      statusField: 'standardVerificationStatus',
+      badgeName: 'standard_verified',
+      badgeText: '✓ Standard Verified Badge',
+      description: 'Verifies National ID, Selfie & Utility Bill',
+      color: '#10b981',
+      details: verificationData?.levels?.standard,
+    },
+    {
+      level: 3,
+      name: 'Premium Physical Verification',
+      statusField: 'premiumVerificationStatus',
+      badgeName: 'premium_verified',
+      badgeText: '👑 Premium Verified Gold Badge',
+      description: 'Physical inspection completed in-person',
+      color: '#f59e0b',
+      details: verificationData?.levels?.premium,
+    },
   ];
 
-  const getStatusColor = (level) => {
-    if (level < currentLevel) return '#22c55e'; // Completed
-    if (level === currentLevel) return currentStatus === 'approved' ? '#22c55e' : '#fbbf24'; // Current
-    return '#334155'; // Pending
+  const getStatusLabel = (status) => {
+    if (!status || status === 'none') return 'Not Submitted';
+    if (status === 'pending') return 'Pending Approval';
+    if (status === 'under_review') return 'Under Review';
+    if (status === 'approved') return 'Approved & Active';
+    if (status === 'rejected') return 'Rejected / Needs Action';
+    return status;
   };
 
-  const getStatusIcon = (level) => {
-    if (level < currentLevel) return '✓';
-    if (level === currentLevel) return currentStatus === 'approved' ? '✓' : '○';
-    return '○';
-  };
-
-  const getBenefits = () => {
-    switch (currentLevel) {
-      case 1:
-        return ['Basic platform access', 'Browse listings', 'Contact sellers'];
-      case 2:
-        return ['All Level 1 benefits', 'List properties', 'Receive payments', 'Verified badge'];
-      case 3:
-        return ['All Level 2 benefits', 'Priority listings', 'Higher trust score', 'Lower fees'];
-      case 4:
-        return ['All Level 3 benefits', 'Business dashboard', 'Bulk uploads', 'API access', 'Premium support'];
-      default:
-        return [];
+  const getStatusStyles = (status, color) => {
+    if (!status || status === 'none') {
+      return { background: 'rgba(255,255,255,0.05)', color: '#94a3b8', borderColor: 'rgba(255,255,255,0.08)' };
     }
+    if (status === 'pending' || status === 'under_review') {
+      return { background: 'rgba(245,158,11,0.1)', color: '#f59e0b', borderColor: 'rgba(245,158,11,0.2)' };
+    }
+    if (status === 'approved') {
+      return { background: `${color}15`, color: color, borderColor: `${color}30` };
+    }
+    if (status === 'rejected') {
+      return { background: 'rgba(239,68,68,0.1)', color: '#ef4444', borderColor: 'rgba(239,68,68,0.2)' };
+    }
+    return {};
   };
 
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <div style={styles.headerLeft}>
-          <h3 style={styles.title}>Verification Status</h3>
-          <div style={styles.currentLevel}>
-            Level {currentLevel}: {levels[currentLevel - 1]?.name}
+        <div>
+          <h3 style={styles.title}>Trust & Verification Workflow</h3>
+          <p style={styles.subtitle}>Complete verification milestones to unlock spaces and premium badges</p>
+        </div>
+        <Link to="/verification" style={styles.actionBtn}>
+          Submit Verification →
+        </Link>
+      </div>
+
+      {/* active badges section */}
+      {badges.length > 0 && (
+        <div style={styles.badgesRow}>
+          <span style={styles.badgesLabel}>Your Badges:</span>
+          <div style={styles.badgePillsContainer}>
+            {levels.map((lvl) => {
+              if (badges.includes(lvl.badgeName)) {
+                return (
+                  <span key={lvl.level} style={{ ...styles.badgePill, border: `1px solid ${lvl.color}`, color: lvl.color, background: `${lvl.color}10` }}>
+                    {lvl.badgeText}
+                  </span>
+                );
+              }
+              return null;
+            })}
           </div>
         </div>
-        <div style={{
-          ...styles.statusBadge,
-          ...(currentStatus === 'approved' && styles.statusBadgeApproved),
-          ...(currentStatus === 'pending' && styles.statusBadgePending),
-          ...(currentStatus === 'rejected' && styles.statusBadgeRejected),
-          ...(currentStatus === 'under_review' && styles.statusBadgePending),
-        }}>
-          {currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1).replace('_', ' ')}
-        </div>
-      </div>
+      )}
 
-      <div style={styles.progressSection}>
-        <div style={styles.progressBar}>
-          {levels.map((level) => (
-            <div
-              key={level.level}
-              style={{
-                ...styles.progressStep,
-                ...(level.level < currentLevel && styles.progressStepCompleted),
-                ...(level.level === currentLevel && styles.progressStepCurrent),
-              }}
-            >
-              <div style={{
-                ...styles.stepIcon,
-                backgroundColor: getStatusColor(level.level),
-              }}>
-                {getStatusIcon(level.level)}
+      {/* steps details */}
+      <div style={styles.levelsList}>
+        {levels.map((lvl) => {
+          const status = verificationData?.[lvl.statusField] || 'none';
+          const details = lvl.details;
+          const statusStyle = getStatusStyles(status, lvl.color);
+
+          return (
+            <div key={lvl.level} style={styles.levelCard}>
+              <div style={styles.levelCardHeader}>
+                <div style={styles.levelLeft}>
+                  <div style={{ ...styles.levelNumberIndicator, backgroundColor: lvl.color }}>
+                    {lvl.level}
+                  </div>
+                  <div>
+                    <h4 style={styles.levelName}>{lvl.name}</h4>
+                    <p style={styles.levelDesc}>{lvl.description}</p>
+                  </div>
+                </div>
+                <span style={{ ...styles.statusTag, ...statusStyle }}>
+                  {getStatusLabel(status)}
+                </span>
               </div>
-              <div style={styles.stepLabel}>{level.name}</div>
+
+              {status === 'rejected' && details?.rejectionReason && (
+                <div style={styles.rejectionBox}>
+                  <span style={styles.rejectionTitle}>❌ Rejection Reason:</span>
+                  <p style={styles.rejectionText}>{details.rejectionReason}</p>
+                  <Link to="/verification" style={styles.resubmitLink}>
+                    Modify & Resubmit Level {lvl.level}
+                  </Link>
+                </div>
+              )}
+
+              {status === 'pending' && (
+                <div style={styles.pendingBox}>
+                  <span style={styles.pendingIcon}>⏳</span>
+                  <span style={styles.pendingText}>
+                    Submitted on {new Date(details?.submittedAt || Date.now()).toLocaleDateString()}. Admin will review it shortly.
+                  </span>
+                </div>
+              )}
+
+              {status === 'approved' && (
+                <div style={styles.approvedBox}>
+                  <span style={styles.approvedIcon}>✅</span>
+                  <span style={styles.approvedText}>
+                    Approved! You have been awarded the <strong>{lvl.badgeText}</strong>.
+                  </span>
+                </div>
+              )}
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
-
-      <div style={styles.benefitsSection}>
-        <h4 style={styles.benefitsTitle}>Current Benefits</h4>
-        <ul style={styles.benefitsList}>
-          {getBenefits().map((benefit, index) => (
-            <li key={index} style={styles.benefitItem}>
-              <span style={styles.benefitIcon}>✓</span>
-              {benefit}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {currentStatus === 'rejected' && verificationData?.rejectionReason && (
-        <div style={styles.rejectionSection}>
-          <button
-            style={styles.rejectionToggle}
-            onClick={() => setShowRejectionReason(!showRejectionReason)}
-          >
-            {showRejectionReason ? '▼' : '▶'} View Rejection Reason
-          </button>
-          {showRejectionReason && (
-            <div style={styles.rejectionReason}>
-              <strong>Reason:</strong> {verificationData.rejectionReason}
-            </div>
-          )}
-          <Link to="/verification" style={styles.resubmitButton}>
-            Resubmit Verification
-          </Link>
-        </div>
-      )}
-
-      {currentLevel < 4 && currentStatus !== 'rejected' && (
-        <Link to="/verification" style={styles.upgradeButton}>
-          Upgrade Verification →
-        </Link>
-      )}
     </div>
   );
 };
 
 const styles = {
   container: {
-    background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 41, 0.9) 100%)',
-    border: '1px solid #334155',
-    borderRadius: '16px',
-    padding: '24px',
-    marginBottom: '24px',
+    background: 'linear-gradient(135deg, rgba(20, 27, 45, 0.7) 0%, rgba(10, 15, 28, 0.9) 100%)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '20px',
+    padding: '28px',
+    boxShadow: '0 15px 40px rgba(0, 0, 0, 0.25)',
+    fontFamily: "'DM Sans', sans-serif",
   },
   header: {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: '16px',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+    paddingBottom: '20px',
     marginBottom: '20px',
-  },
-  headerLeft: {
-    flex: 1,
   },
   title: {
-    fontSize: '18px',
-    fontWeight: '700',
+    fontSize: '20px',
+    fontWeight: '800',
     color: '#f1f5f9',
-    margin: '0 0 8px 0',
+    margin: '0 0 6px 0',
   },
-  currentLevel: {
+  subtitle: {
+    fontSize: '13px',
+    color: '#94a3b8',
+    margin: 0,
+  },
+  actionBtn: {
+    padding: '10px 20px',
+    background: 'linear-gradient(135deg, #c9a84c 0%, #a88832 100%)',
+    color: '#090e1a',
+    borderRadius: '10px',
+    fontSize: '13px',
+    fontWeight: '700',
+    textDecoration: 'none',
+    transition: 'all 0.2s',
+  },
+  loadingText: {
+    textAlign: 'center',
+    padding: '20px',
+    color: '#94a3b8',
     fontSize: '14px',
-    color: '#fbbf24',
-    fontWeight: '600',
   },
-  statusBadge: {
-    padding: '6px 12px',
-    borderRadius: '20px',
+  badgesRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    flexWrap: 'wrap',
+    marginBottom: '20px',
+    padding: '12px 16px',
+    background: 'rgba(255,255,255,0.02)',
+    borderRadius: '12px',
+    border: '1px solid rgba(255, 255, 255, 0.04)',
+  },
+  badgesLabel: {
     fontSize: '12px',
     fontWeight: '700',
+    color: '#cbd5e1',
     textTransform: 'uppercase',
-    letterSpacing: '0.5px',
   },
-  statusBadgeApproved: {
-    background: 'rgba(34, 197, 94, 0.2)',
-    color: '#22c55e',
-    border: '1px solid rgba(34, 197, 94, 0.3)',
+  badgePillsContainer: {
+    display: 'flex',
+    gap: '8px',
+    flexWrap: 'wrap',
   },
-  statusBadgePending: {
-    background: 'rgba(251, 191, 36, 0.2)',
-    color: '#fbbf24',
-    border: '1px solid rgba(251, 191, 36, 0.3)',
+  badgePill: {
+    fontSize: '12px',
+    fontWeight: '700',
+    padding: '4px 12px',
+    borderRadius: '20px',
   },
-  statusBadgeRejected: {
-    background: 'rgba(239, 68, 68, 0.2)',
-    color: '#ef4444',
-    border: '1px solid rgba(239, 68, 68, 0.3)',
+  levelsList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '14px',
   },
-  progressSection: {
-    marginBottom: '20px',
+  levelCard: {
+    background: 'rgba(255,255,255,0.02)',
+    border: '1px solid rgba(255, 255, 255, 0.05)',
+    borderRadius: '14px',
+    padding: '18px 20px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
   },
-  progressBar: {
+  levelCardHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    gap: '8px',
+    flexWrap: 'wrap',
+    gap: '12px',
   },
-  progressStep: {
+  levelLeft: {
     display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
-    gap: '8px',
-    flex: 1,
+    gap: '16px',
   },
-  progressStepCompleted: {
-    opacity: 1,
-  },
-  progressStepCurrent: {
-    opacity: 1,
-  },
-  stepIcon: {
-    width: '40px',
-    height: '40px',
+  levelNumberIndicator: {
+    width: '32px',
+    height: '32px',
     borderRadius: '50%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: '18px',
-    fontWeight: '700',
-    color: '#0f1729',
-    transition: 'all 0.3s',
-  },
-  stepLabel: {
-    fontSize: '11px',
-    fontWeight: '600',
-    color: '#64748b',
-    textAlign: 'center',
-  },
-  benefitsSection: {
-    marginBottom: '20px',
-  },
-  benefitsTitle: {
+    color: '#090e1a',
     fontSize: '14px',
-    fontWeight: '600',
-    color: '#f1f5f9',
-    margin: '0 0 12px 0',
+    fontWeight: '800',
   },
-  benefitsList: {
-    listStyle: 'none',
-    padding: 0,
+  levelName: {
+    fontSize: '15px',
+    fontWeight: '700',
+    color: '#f1f5f9',
+    margin: '0 0 4px 0',
+  },
+  levelDesc: {
+    fontSize: '12px',
+    color: '#64748b',
     margin: 0,
   },
-  benefitItem: {
+  statusTag: {
+    fontSize: '11px',
+    fontWeight: '700',
+    padding: '4px 10px',
+    borderRadius: '6px',
+    border: '1px solid',
+    textTransform: 'uppercase',
+  },
+  rejectionBox: {
+    background: 'rgba(239,68,68,0.05)',
+    border: '1px solid rgba(239,68,68,0.15)',
+    borderRadius: '8px',
+    padding: '12px 16px',
+    marginTop: '6px',
+  },
+  rejectionTitle: {
+    display: 'block',
+    fontSize: '12px',
+    fontWeight: '700',
+    color: '#f87171',
+    marginBottom: '4px',
+  },
+  rejectionText: {
+    fontSize: '13px',
+    color: '#cbd5e1',
+    margin: '0 0 10px 0',
+    lineHeight: '1.4',
+  },
+  resubmitLink: {
+    display: 'inline-block',
+    fontSize: '12px',
+    fontWeight: '700',
+    color: '#ef4444',
+    textDecoration: 'underline',
+  },
+  pendingBox: {
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
-    fontSize: '13px',
-    color: '#cbd5e1',
-    marginBottom: '8px',
-  },
-  benefitIcon: {
-    color: '#22c55e',
-    fontWeight: '700',
-  },
-  upgradeButton: {
-    display: 'inline-block',
-    padding: '12px 24px',
-    background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-    color: '#0f1729',
-    textDecoration: 'none',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: '700',
-    textAlign: 'center',
-    transition: 'all 0.3s',
-  },
-  rejectionSection: {
-    marginTop: '16px',
-    padding: '16px',
-    background: 'rgba(239, 68, 68, 0.1)',
-    border: '1px solid rgba(239, 68, 68, 0.3)',
-    borderRadius: '8px',
-  },
-  rejectionToggle: {
-    background: 'transparent',
-    border: 'none',
-    color: '#ef4444',
-    fontSize: '13px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    padding: '0',
-    marginBottom: '8px',
-  },
-  rejectionReason: {
-    fontSize: '13px',
-    color: '#fca5a5',
-    lineHeight: '1.5',
-    marginBottom: '12px',
-    padding: '8px',
-    background: 'rgba(239, 68, 68, 0.1)',
-    borderRadius: '4px',
-  },
-  resubmitButton: {
-    display: 'inline-block',
-    padding: '8px 16px',
-    background: 'rgba(239, 68, 68, 0.2)',
-    color: '#ef4444',
-    textDecoration: 'none',
+    fontSize: '12px',
+    color: '#f59e0b',
+    background: 'rgba(245,158,11,0.05)',
+    padding: '8px 12px',
     borderRadius: '6px',
-    fontWeight: '600',
-    fontSize: '13px',
-    border: '1px solid rgba(239, 68, 68, 0.3)',
+  },
+  pendingIcon: {
+    fontSize: '14px',
+  },
+  pendingText: {
+    lineHeight: '1.4',
+  },
+  approvedBox: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    fontSize: '12px',
+    color: '#10b981',
+    background: 'rgba(16, 185, 129, 0.05)',
+    padding: '8px 12px',
+    borderRadius: '6px',
+  },
+  approvedIcon: {
+    fontSize: '14px',
+  },
+  approvedText: {
+    lineHeight: '1.4',
   },
 };
 

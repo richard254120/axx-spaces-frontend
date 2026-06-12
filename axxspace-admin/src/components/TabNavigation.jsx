@@ -1,5 +1,6 @@
 export default function TabNavigation({ tabs, activeTab, setActiveTab, pendingCounts, hasPendingBoosts, pendingBoosts }) {
   const TAB_LABELS = {
+    overview: "📊 Overview",
     properties: "🏠 Properties",
     materials: "🛍️ Materials",
     tourism: "🏨 Tourism",

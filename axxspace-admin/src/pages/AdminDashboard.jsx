@@ -9,10 +9,20 @@ import NotificationPanel from "../components/NotificationPanel";
 import "./AdminDashboard.css";
 
 // ── tiny helpers ──────────────────────────────────────────────
-const TABS = ["properties", "materials", "tourism", "movers", "sellers", "sold", "payment", "boosts", "businesses", "announcements", "verification"];
+const TABS = ["overview", "properties", "materials", "tourism", "movers", "sellers", "sold", "payment", "boosts", "businesses", "announcements", "verification"];
 const TAB_LABELS = {
-  properties: "🏠 Properties", materials: "🛍️ Materials", tourism: "🏨 Tourism",
-  movers: "🚛 Movers", sellers: "📋 Sellers", sold: "💰 Sold", payment: "💳 Payment", boosts: "🚀 Payments", businesses: "🏪 Businesses", announcements: "📢 Announcements", verification: "✓ KYC Verification"
+  overview: "📊 Dashboard Overview",
+  properties: "🏠 Properties",
+  materials: "🛍️ Materials",
+  tourism: "🏨 Tourism",
+  movers: "🚛 Movers",
+  sellers: "📋 Sellers",
+  sold: "💰 Sold",
+  payment: "💳 Payment",
+  boosts: "🚀 Payments",
+  businesses: "🏪 Businesses",
+  announcements: "📢 Announcements",
+  verification: "✓ KYC Verification"
 };
 const STATUS_VIEWS = ["pending", "approved", "rejected"];
 
@@ -26,7 +36,7 @@ export default function AdminDashboard() {
   const [viewStats, setViewStats] = useState(null);
   const [topViewed, setTopViewed] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("properties");
+  const [activeTab, setActiveTab] = useState("overview");
   const [statusView, setStatusView] = useState("pending");
   const [selected, setSelected] = useState(null);
   const [editMode, setEditMode] = useState(false);
@@ -978,6 +988,14 @@ export default function AdminDashboard() {
                 <div className="detail-section">
                   <p className="detail-label">Tax ID:</p>
                   <p className="detail-value">{selectedVerification.taxId}</p>
+                </div>
+              )}
+              {selectedVerification.physicalDetails && (
+                <div className="detail-section">
+                  <p className="detail-label">Physical Address & Visitation Details:</p>
+                  <p className="detail-value" style={{ whiteSpace: 'pre-wrap', background: 'rgba(0,0,0,0.15)', padding: '10px', borderRadius: '6px' }}>
+                    {selectedVerification.physicalDetails}
+                  </p>
                 </div>
               )}
               {selectedVerification.documents && selectedVerification.documents.length > 0 && (

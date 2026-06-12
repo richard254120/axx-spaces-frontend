@@ -14,41 +14,75 @@ const Verification = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [formData, setFormData] = useState({
-    // Level 2: Identity
+    // Level 1: Student
+    studentIdDocument: null,
+    studentIdDocumentPreview: null,
+    studentIdDocumentName: null,
+
+    // Level 2: Standard (Identity & Address)
     idType: '',
     idDocument: null,
     idDocumentPreview: null,
     idDocumentName: null,
     selfie: null,
-
-    // Level 3: Address
     addressDocument: null,
     addressDocumentPreview: null,
     addressDocumentName: null,
 
-    // Level 4: Business
-    businessName: '',
-    businessRegistration: null,
-    businessRegistrationPreview: null,
-    businessRegistrationName: null,
-    taxId: '',
+    // Level 3: Premium (Physical Verification)
+    physicalDetails: '',
   });
 
-  const steps = [
-    { step: 1, title: 'Select Level', description: 'Choose your verification level' },
-    { step: 2, title: 'Identity Verification', description: 'Upload ID and take selfie' },
-    { step: 3, title: 'Address Verification', description: 'Upload proof of address' },
-    { step: 4, title: 'Business Verification', description: 'Upload business documents' },
-    { step: 5, title: 'Review & Submit', description: 'Review your information' },
-  ];
-
   const levels = [
-    { level: 2, name: 'Identity Verification', description: 'Verify your identity with ID and selfie', required: true },
-    { level: 3, name: 'Address Verification', description: 'Verify your address with utility bill', required: false },
-    { level: 4, name: 'Business Verification', description: 'Verify your business for premium features', required: false },
+    {
+      level: 1,
+      name: 'Student Verification',
+      description: 'Upload your Student ID to verify enrollment. Grants the academic Student Badge.',
+      badge: '🎓 Student Badge',
+      color: '#3b82f6'
+    },
+    {
+      level: 2,
+      name: 'Standard Verification',
+      description: 'Upload ID document, Proof of Address (utility bill), and Selfie to get verified.',
+      badge: '✓ Verified Standard Badge',
+      color: '#10b981'
+    },
+    {
+      level: 3,
+      name: 'Premium Verification',
+      description: 'Request physical, in-person verification by AxxSpace staff at your location.',
+      badge: '👑 Premium Verified Gold Badge',
+      color: '#f59e0b'
+    }
   ];
 
-  // DocumentUpload passes '__pdf__' as previewUrl for PDF files — store as-is.
+  // Dynamically generate wizard steps based on the selected verification level
+  const getSteps = () => {
+    if (selectedLevel === 1) {
+      return [
+        { step: 1, title: 'Select Level', description: 'Choose verification path' },
+        { step: 2, title: 'Student ID Upload', description: 'Upload student card' },
+        { step: 3, title: 'Review & Submit', description: 'Confirm your details' },
+      ];
+    } else if (selectedLevel === 2) {
+      return [
+        { step: 1, title: 'Select Level', description: 'Choose verification path' },
+        { step: 2, title: 'Identity Documents', description: 'Upload ID & Selfie' },
+        { step: 3, title: 'Address Verification', description: 'Upload utility bill' },
+        { step: 4, title: 'Review & Submit', description: 'Confirm your details' },
+      ];
+    } else {
+      return [
+        { step: 1, title: 'Select Level', description: 'Choose verification path' },
+        { step: 2, title: 'Physical Details', description: 'Location & appointment info' },
+        { step: 3, title: 'Review & Submit', description: 'Confirm your details' },
+      ];
+    }
+  };
+
+  const steps = getSteps();
+
   const handleFileChange = (field, file, previewUrl) => {
     setFormData(prev => ({
       ...prev,
@@ -75,6 +109,11 @@ const Verification = () => {
     if (currentStep > 1) setCurrentStep(prev => prev - 1);
   };
 
+  const handleLevelChange = (level) => {
+    setSelectedLevel(level);
+    setCurrentStep(1); // Reset step back to 1
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
     setError('');
@@ -84,31 +123,37 @@ const Verification = () => {
       const API_BASE = import.meta.env.VITE_API_URL || 'https://axx-spaces-backend-1.onrender.com/api';
       const formDataToSend = new FormData();
       formDataToSend.append('verificationLevel', selectedLevel);
-      formDataToSend.append('idType', formData.idType);
 
-      if (selectedLevel >= 4) {
-        formDataToSend.append('businessName', formData.businessName);
-        formDataToSend.append('taxId', formData.taxId);
-      }
-
-      // File objects work for both images and PDFs natively
-      if (formData.idDocument) formDataToSend.append('idDocument', formData.idDocument);
-      if (formData.addressDocument && selectedLevel >= 3) formDataToSend.append('addressDocument', formData.addressDocument);
-      if (formData.businessRegistration && selectedLevel >= 4) formDataToSend.append('businessRegistration', formData.businessRegistration);
-
-      // Selfie is a base64 data URL from camera — convert to Blob
-      if (formData.selfie) {
-        const base64Data = formData.selfie.split(',')[1];
-        const byteCharacters = atob(base64Data);
-        const byteArrays = [];
-        for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-          const slice = byteCharacters.slice(offset, offset + 512);
-          const byteNumbers = new Array(slice.length);
-          for (let i = 0; i < slice.length; i++) byteNumbers[i] = slice.charCodeAt(i);
-          byteArrays.push(new Uint8Array(byteNumbers));
+      if (selectedLevel === 1) {
+        if (formData.studentIdDocument) {
+          formDataToSend.append('studentIdDocument', formData.studentIdDocument);
         }
-        const blob = new Blob(byteArrays, { type: 'image/jpeg' });
-        formDataToSend.append('selfie', blob, 'selfie.jpg');
+      } else if (selectedLevel === 2) {
+        formDataToSend.append('idType', formData.idType);
+        if (formData.idDocument) {
+          formDataToSend.append('idDocument', formData.idDocument);
+        }
+        if (formData.addressDocument) {
+          formDataToSend.append('addressDocument', formData.addressDocument);
+        }
+        // Selfie base64 data conversion
+        if (formData.selfie) {
+          const base64Data = formData.selfie.split(',')[1];
+          const byteCharacters = atob(base64Data);
+          const byteArrays = [];
+          for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+            const slice = byteCharacters.slice(offset, offset + 512);
+            const byteNumbers = new Array(slice.length);
+            for (let i = 0; i < slice.length; i++) {
+              byteNumbers[i] = slice.charCodeAt(i);
+            }
+            byteArrays.push(new Uint8Array(byteNumbers));
+          }
+          const blob = new Blob(byteArrays, { type: 'image/jpeg' });
+          formDataToSend.append('selfie', blob, 'selfie.jpg');
+        }
+      } else if (selectedLevel === 3) {
+        formDataToSend.append('physicalDetails', formData.physicalDetails);
       }
 
       const response = await fetch(`${API_BASE}/kyc-verification/submit`, {
@@ -118,18 +163,19 @@ const Verification = () => {
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || data.error || 'Failed to submit verification');
+      if (!response.ok) {
+        throw new Error(data.message || data.error || 'Failed to submit verification');
+      }
 
       setSuccess('Verification submitted successfully! You will be notified once reviewed.');
 
       // Redirect to appropriate dashboard based on user role
       const userRole = user?.role || user?.userType || 'user';
-      let dashboardRoute = '/user-dashboard';
+      let dashboardRoute = '/business-dashboard';
 
-      if (userRole === 'landlord') dashboardRoute = '/landlord-dashboard';
+      if (userRole === 'landlord') dashboardRoute = '/dashboard';
       else if (userRole === 'seller') dashboardRoute = '/seller-dashboard';
       else if (userRole === 'mover') dashboardRoute = '/mover-dashboard';
-      else if (userRole === 'admin') dashboardRoute = '/admin-dashboard';
 
       setTimeout(() => navigate(dashboardRoute), 2000);
     } catch (err) {
@@ -140,36 +186,61 @@ const Verification = () => {
   };
 
   const isStepValid = () => {
-    switch (currentStep) {
-      case 1: return selectedLevel >= 2;
-      case 2: return formData.idDocument && formData.selfie;
-      case 3: return selectedLevel < 3 || formData.addressDocument;
-      case 4: return selectedLevel < 4 || (formData.businessName && formData.businessRegistration && formData.taxId);
-      case 5: return true;
-      default: return false;
+    const activeSteps = getSteps();
+    const currentStepConfig = activeSteps[currentStep - 1];
+
+    if (currentStep === 1) return selectedLevel >= 1;
+
+    // Student Flow
+    if (selectedLevel === 1) {
+      if (currentStep === 2) return formData.studentIdDocument !== null;
+      return true; // Review step
     }
+
+    // Standard Flow
+    if (selectedLevel === 2) {
+      if (currentStep === 2) return formData.idType !== '' && formData.idDocument !== null && formData.selfie !== null;
+      if (currentStep === 3) return formData.addressDocument !== null;
+      return true; // Review step
+    }
+
+    // Premium Flow
+    if (selectedLevel === 3) {
+      if (currentStep === 2) return formData.physicalDetails.trim().length > 15;
+      return true; // Review step
+    }
+
+    return false;
   };
 
-  const renderStep = () => {
+  const renderStepContent = () => {
     switch (currentStep) {
       case 1:
         return (
           <div style={styles.stepContent}>
-            <h2 style={styles.stepTitle}>Select Verification Level</h2>
-            <p style={styles.stepDescription}>Choose the level of verification you want to complete</p>
+            <h2 style={styles.stepTitle}>Select Verification Path</h2>
+            <p style={styles.stepDescription}>Choose the tier that matches your verification needs</p>
             <div style={styles.levelsContainer}>
-              {levels.map((level) => (
+              {levels.map((lvl) => (
                 <div
-                  key={level.level}
-                  style={{ ...styles.levelCard, ...(selectedLevel === level.level && styles.levelCardSelected) }}
-                  onClick={() => setSelectedLevel(level.level)}
+                  key={lvl.level}
+                  style={{
+                    ...styles.levelCard,
+                    ...(selectedLevel === lvl.level && {
+                      borderColor: lvl.color,
+                      background: `${lvl.color}15`,
+                    }),
+                  }}
+                  onClick={() => handleLevelChange(lvl.level)}
                 >
                   <div style={styles.levelHeader}>
-                    <div style={styles.levelNumber}>Level {level.level}</div>
-                    {level.required && <span style={styles.requiredBadge}>Required</span>}
+                    <div style={{ ...styles.levelNumber, color: lvl.color }}>Level {lvl.level}</div>
+                    <span style={{ ...styles.badgePill, backgroundColor: `${lvl.color}25`, color: lvl.color }}>
+                      {lvl.badge}
+                    </span>
                   </div>
-                  <h3 style={styles.levelName}>{level.name}</h3>
-                  <p style={styles.levelDescription}>{level.description}</p>
+                  <h3 style={styles.levelName}>{lvl.name}</h3>
+                  <p style={styles.levelDescription}>{lvl.description}</p>
                 </div>
               ))}
             </div>
@@ -177,176 +248,200 @@ const Verification = () => {
         );
 
       case 2:
-        return (
-          <div style={styles.stepContent}>
-            <h2 style={styles.stepTitle}>Identity Verification</h2>
-            <p style={styles.stepDescription}>Upload your government-issued ID and take a selfie</p>
-            <div style={styles.formSection}>
-              <div>
-                <label style={styles.formLabel}>ID Type</label>
-                <select
-                  style={styles.select}
-                  value={formData.idType}
-                  onChange={(e) => setFormData(prev => ({ ...prev, idType: e.target.value }))}
-                >
-                  <option value="">Select ID Type</option>
-                  <option value="national_id">National ID</option>
-                  <option value="passport">Passport</option>
-                  <option value="driver_license">Driver's License</option>
-                </select>
+        if (selectedLevel === 1) {
+          return (
+            <div style={styles.stepContent}>
+              <h2 style={styles.stepTitle}>Student Verification</h2>
+              <p style={styles.stepDescription}>Upload a valid Student ID Card issued by an accredited institution</p>
+              <div style={styles.formSection}>
+                <DocumentUpload
+                  label="Student ID (Image or PDF)"
+                  onFileChange={(file, previewUrl) => handleFileChange('studentIdDocument', file, previewUrl)}
+                  previewUrl={formData.studentIdDocumentPreview}
+                  fileName={formData.studentIdDocumentName}
+                  onRemove={() => handleRemoveFile('studentIdDocument')}
+                  required
+                />
+                <div style={styles.infoBox}>
+                  <span style={styles.infoIcon}>💡</span>
+                  <span style={styles.infoText}>
+                    Please ensure the ID clearly shows your name, institution name, student number, and expiry date.
+                  </span>
+                </div>
               </div>
-
-              <DocumentUpload
-                label="Government ID Document"
-                onFileChange={(file, previewUrl) => handleFileChange('idDocument', file, previewUrl)}
-                previewUrl={formData.idDocumentPreview}
-                fileName={formData.idDocumentName}
-                onRemove={() => handleRemoveFile('idDocument')}
-                required
-              />
-
-              <SelfieCapture
-                onCapture={(image) => setFormData(prev => ({ ...prev, selfie: image }))}
-                capturedImage={formData.selfie}
-                onRetake={() => setFormData(prev => ({ ...prev, selfie: null }))}
-              />
             </div>
-          </div>
-        );
+          );
+        } else if (selectedLevel === 2) {
+          return (
+            <div style={styles.stepContent}>
+              <h2 style={styles.stepTitle}>Identity Verification</h2>
+              <p style={styles.stepDescription}>Upload your Government-issued ID card or Passport and capture a live selfie</p>
+              <div style={styles.formSection}>
+                <div>
+                  <label style={styles.formLabel}>ID Document Type</label>
+                  <select
+                    style={styles.select}
+                    value={formData.idType}
+                    onChange={(e) => setFormData(prev => ({ ...prev, idType: e.target.value }))}
+                  >
+                    <option value="">-- Choose Document Type --</option>
+                    <option value="national_id">National Identification Card</option>
+                    <option value="passport">Passport</option>
+                    <option value="driver_license">Driver's License</option>
+                  </select>
+                </div>
+
+                <DocumentUpload
+                  label="Front / Photo Page of ID Document"
+                  onFileChange={(file, previewUrl) => handleFileChange('idDocument', file, previewUrl)}
+                  previewUrl={formData.idDocumentPreview}
+                  fileName={formData.idDocumentName}
+                  onRemove={() => handleRemoveFile('idDocument')}
+                  required
+                />
+
+                <SelfieCapture
+                  onCapture={(image) => setFormData(prev => ({ ...prev, selfie: image }))}
+                  capturedImage={formData.selfie}
+                  onRetake={() => setFormData(prev => ({ ...prev, selfie: null }))}
+                />
+              </div>
+            </div>
+          );
+        } else {
+          // Level 3: Premium Request
+          return (
+            <div style={styles.stepContent}>
+              <h2 style={styles.stepTitle}>Request Physical Verification</h2>
+              <p style={styles.stepDescription}>
+                Provide your primary physical address, preferred visitation date/time, and cell number to schedule a check
+              </p>
+              <div style={styles.formSection}>
+                <div>
+                  <label style={styles.formLabel}>Physical Address & Scheduling Notes (min 15 characters)</label>
+                  <textarea
+                    style={styles.textarea}
+                    placeholder="e.g. Ruiru, Kiambu County - Oak Apartments, Rm 4B. Available Mon-Fri 9AM to 4PM. Phone: 0712345678"
+                    value={formData.physicalDetails}
+                    onChange={(e) => setFormData(prev => ({ ...prev, physicalDetails: e.target.value }))}
+                    rows={6}
+                  />
+                </div>
+                <div style={styles.infoBoxGold}>
+                  <span style={styles.infoIcon}>👑</span>
+                  <span style={styles.infoTextGold}>
+                    Premium verification involves a quick on-site physical check by an authorized AxxSpace representative. Once completed, your profile will display the exclusive Premium Gold Badge.
+                  </span>
+                </div>
+              </div>
+            </div>
+          );
+        }
 
       case 3:
-        return (
-          <div style={styles.stepContent}>
-            <h2 style={styles.stepTitle}>Address Verification</h2>
-            <p style={styles.stepDescription}>Upload a proof of address document</p>
-            <div style={styles.formSection}>
-              <DocumentUpload
-                label="Proof of Address (Utility Bill, Bank Statement)"
-                onFileChange={(file, previewUrl) => handleFileChange('addressDocument', file, previewUrl)}
-                previewUrl={formData.addressDocumentPreview}
-                fileName={formData.addressDocumentName}
-                onRemove={() => handleRemoveFile('addressDocument')}
-                required={selectedLevel >= 3}
-              />
-              <div style={styles.infoBox}>
-                <span style={styles.infoIcon}>ℹ️</span>
-                <span style={styles.infoText}>
-                  Accepted: Utility bills, bank statements, or government letters issued within the last 3 months.
-                  Images and PDF files are both supported.
-                </span>
+        if (selectedLevel === 2) {
+          // Standard Level Address Proof
+          return (
+            <div style={styles.stepContent}>
+              <h2 style={styles.stepTitle}>Address Verification</h2>
+              <p style={styles.stepDescription}>Upload a utility bill or bank statement as proof of address</p>
+              <div style={styles.formSection}>
+                <DocumentUpload
+                  label="Utility Bill, Rent Invoice, or Bank Statement (issued within 3 months)"
+                  onFileChange={(file, previewUrl) => handleFileChange('addressDocument', file, previewUrl)}
+                  previewUrl={formData.addressDocumentPreview}
+                  fileName={formData.addressDocumentName}
+                  onRemove={() => handleRemoveFile('addressDocument')}
+                  required
+                />
+                <div style={styles.infoBox}>
+                  <span style={styles.infoIcon}>ℹ️</span>
+                  <span style={styles.infoText}>
+                    Document must display your full name and matching address.
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        );
+          );
+        } else {
+          // Level 1 and 3 Review step
+          return renderReviewStep();
+        }
 
       case 4:
-        return (
-          <div style={styles.stepContent}>
-            <h2 style={styles.stepTitle}>Business Verification</h2>
-            <p style={styles.stepDescription}>Upload your business documents</p>
-            <div style={styles.formSection}>
-              <div>
-                <label style={styles.formLabel}>Business Name</label>
-                <input
-                  type="text"
-                  style={styles.input}
-                  placeholder="Enter your business name"
-                  value={formData.businessName}
-                  onChange={(e) => setFormData(prev => ({ ...prev, businessName: e.target.value }))}
-                />
-              </div>
-              <div>
-                <label style={styles.formLabel}>Tax Identification Number</label>
-                <input
-                  type="text"
-                  style={styles.input}
-                  placeholder="Enter your tax ID"
-                  value={formData.taxId}
-                  onChange={(e) => setFormData(prev => ({ ...prev, taxId: e.target.value }))}
-                />
-              </div>
-              <DocumentUpload
-                label="Business Registration Certificate"
-                onFileChange={(file, previewUrl) => handleFileChange('businessRegistration', file, previewUrl)}
-                previewUrl={formData.businessRegistrationPreview}
-                fileName={formData.businessRegistrationName}
-                onRemove={() => handleRemoveFile('businessRegistration')}
-                required={selectedLevel >= 4}
-              />
-            </div>
-          </div>
-        );
-
-      case 5:
-        return (
-          <div style={styles.stepContent}>
-            <h2 style={styles.stepTitle}>Review & Submit</h2>
-            <p style={styles.stepDescription}>Review your information before submitting</p>
-
-            {error && <div style={styles.errorBox}>{error}</div>}
-            {success && <div style={styles.successBox}>{success}</div>}
-
-            <div style={styles.reviewSection}>
-              <div style={styles.reviewItem}>
-                <span style={styles.reviewLabel}>Verification Level</span>
-                <span style={styles.reviewValue}>Level {selectedLevel}</span>
-              </div>
-              {formData.idType && (
-                <div style={styles.reviewItem}>
-                  <span style={styles.reviewLabel}>ID Type</span>
-                  <span style={styles.reviewValue}>{formData.idType.replace(/_/g, ' ')}</span>
-                </div>
-              )}
-              {formData.idDocument && (
-                <div style={styles.reviewItem}>
-                  <span style={styles.reviewLabel}>ID Document</span>
-                  <span style={styles.reviewValueGreen}>✓ {formData.idDocumentName}</span>
-                </div>
-              )}
-              {formData.selfie && (
-                <div style={styles.reviewItem}>
-                  <span style={styles.reviewLabel}>Selfie</span>
-                  <span style={styles.reviewValueGreen}>✓ Captured</span>
-                </div>
-              )}
-              {formData.addressDocument && (
-                <div style={styles.reviewItem}>
-                  <span style={styles.reviewLabel}>Address Document</span>
-                  <span style={styles.reviewValueGreen}>✓ {formData.addressDocumentName}</span>
-                </div>
-              )}
-              {formData.businessName && (
-                <div style={styles.reviewItem}>
-                  <span style={styles.reviewLabel}>Business Name</span>
-                  <span style={styles.reviewValue}>{formData.businessName}</span>
-                </div>
-              )}
-              {formData.taxId && (
-                <div style={styles.reviewItem}>
-                  <span style={styles.reviewLabel}>Tax ID</span>
-                  <span style={styles.reviewValue}>{formData.taxId}</span>
-                </div>
-              )}
-              {formData.businessRegistration && (
-                <div style={styles.reviewItem}>
-                  <span style={styles.reviewLabel}>Business Registration</span>
-                  <span style={styles.reviewValueGreen}>✓ {formData.businessRegistrationName}</span>
-                </div>
-              )}
-            </div>
-
-            <div style={styles.termsBox}>
-              <input type="checkbox" id="terms" style={styles.checkbox} />
-              <label htmlFor="terms" style={styles.termsLabel}>
-                I confirm that all information provided is accurate and I agree to the terms and conditions.
-              </label>
-            </div>
-          </div>
-        );
+        if (selectedLevel === 2) {
+          // Level 2 Review step
+          return renderReviewStep();
+        }
+        return null;
 
       default:
         return null;
     }
+  };
+
+  const renderReviewStep = () => {
+    const activeLevelObj = levels.find(l => l.level === selectedLevel);
+    return (
+      <div style={styles.stepContent}>
+        <h2 style={styles.stepTitle}>Review & Submit Details</h2>
+        <p style={styles.stepDescription}>Please verify all fields before submitting your application</p>
+
+        {error && <div style={styles.errorBox}>{error}</div>}
+        {success && <div style={styles.successBox}>{success}</div>}
+
+        <div style={styles.reviewSection}>
+          <div style={styles.reviewItem}>
+            <span style={styles.reviewLabel}>Chosen Verification path</span>
+            <span style={{ ...styles.reviewValue, color: activeLevelObj?.color }}>
+              Level {selectedLevel}: {activeLevelObj?.name}
+            </span>
+          </div>
+
+          {selectedLevel === 1 && (
+            <div style={styles.reviewItem}>
+              <span style={styles.reviewLabel}>Student ID Document</span>
+              <span style={styles.reviewValueGreen}>✓ {formData.studentIdDocumentName}</span>
+            </div>
+          )}
+
+          {selectedLevel === 2 && (
+            <>
+              <div style={styles.reviewItem}>
+                <span style={styles.reviewLabel}>ID Type</span>
+                <span style={styles.reviewValue}>{formData.idType?.toUpperCase().replace(/_/g, ' ')}</span>
+              </div>
+              <div style={styles.reviewItem}>
+                <span style={styles.reviewLabel}>Government ID Photo</span>
+                <span style={styles.reviewValueGreen}>✓ {formData.idDocumentName}</span>
+              </div>
+              <div style={styles.reviewItem}>
+                <span style={styles.reviewLabel}>Biometric Selfie</span>
+                <span style={styles.reviewValueGreen}>✓ Selfie Captured</span>
+              </div>
+              <div style={styles.reviewItem}>
+                <span style={styles.reviewLabel}>Proof of Address Document</span>
+                <span style={styles.reviewValueGreen}>✓ {formData.addressDocumentName}</span>
+              </div>
+            </>
+          )}
+
+          {selectedLevel === 3 && (
+            <div style={{ ...styles.reviewItem, flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
+              <span style={styles.reviewLabel}>Physical Appointment & Address details</span>
+              <p style={styles.reviewParagraph}>{formData.physicalDetails}</p>
+            </div>
+          )}
+        </div>
+
+        <div style={styles.termsBox}>
+          <input type="checkbox" id="termsConfirm" style={styles.checkbox} />
+          <label htmlFor="termsConfirm" style={styles.termsLabel}>
+            I confirm that the details provided are correct and authorize AxxSpace to evaluate my credentials.
+          </label>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -354,25 +449,25 @@ const Verification = () => {
       <div style={styles.wizard}>
         {/* Step Indicator */}
         <div style={styles.stepIndicator}>
-          {steps.map((step) => (
+          {steps.map((st) => (
             <div
-              key={step.step}
+              key={st.step}
               style={{
                 ...styles.stepIndicatorItem,
-                ...(step.step === currentStep && styles.stepIndicatorItemActive),
-                ...(step.step < currentStep && styles.stepIndicatorItemCompleted),
+                ...(st.step === currentStep && styles.stepIndicatorItemActive),
+                ...(st.step < currentStep && styles.stepIndicatorItemCompleted),
               }}
             >
               <div style={{
                 ...styles.stepNumber,
-                ...(step.step === currentStep && styles.stepNumberActive),
-                ...(step.step < currentStep && styles.stepNumberCompleted),
+                ...(st.step === currentStep && styles.stepNumberActive),
+                ...(st.step < currentStep && styles.stepNumberCompleted),
               }}>
-                {step.step < currentStep ? '✓' : step.step}
+                {st.step < currentStep ? '✓' : st.step}
               </div>
               <div style={styles.stepInfo}>
-                <div style={styles.stepIndicatorTitle}>{step.title}</div>
-                <div style={styles.stepIndicatorDescription}>{step.description}</div>
+                <div style={styles.stepIndicatorTitle}>{st.title}</div>
+                <div style={styles.stepIndicatorDescription}>{st.description}</div>
               </div>
             </div>
           ))}
@@ -380,7 +475,7 @@ const Verification = () => {
 
         {/* Step Content */}
         <div style={styles.content}>
-          {renderStep()}
+          {renderStepContent()}
         </div>
 
         {/* Navigation */}
@@ -403,9 +498,9 @@ const Verification = () => {
             </button>
           ) : (
             <button
-              style={{ ...styles.submitButton, ...(loading && styles.disabledBtn) }}
+              style={{ ...styles.submitButton, ...((loading || !isStepValid()) && styles.disabledBtn) }}
               onClick={handleSubmit}
-              disabled={loading}
+              disabled={loading || !isStepValid()}
             >
               {loading ? 'Submitting...' : 'Submit Verification'}
             </button>
@@ -419,165 +514,183 @@ const Verification = () => {
 const styles = {
   container: {
     minHeight: '100vh',
-    background: 'linear-gradient(135deg, #0f1729 0%, #1e293b 100%)',
+    background: 'linear-gradient(135deg, #090e1a 0%, #151c2c 100%)',
     padding: '40px 20px',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'flex-start',
+    fontFamily: "'DM Sans', sans-serif",
   },
   wizard: {
     width: '100%',
-    maxWidth: '800px',
-    background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 41, 0.95) 100%)',
-    border: '1px solid #334155',
-    borderRadius: '20px',
-    padding: '32px',
-    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+    maxWidth: '850px',
+    background: 'linear-gradient(135deg, rgba(20, 27, 45, 0.9) 0%, rgba(10, 15, 28, 0.98) 100%)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '24px',
+    padding: '36px',
+    boxShadow: '0 25px 65px rgba(0, 0, 0, 0.4)',
   },
   stepIndicator: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px',
-    marginBottom: '32px',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+    gap: '12px',
+    marginBottom: '36px',
   },
   stepIndicatorItem: {
     display: 'flex',
     alignItems: 'center',
-    gap: '16px',
-    padding: '14px 16px',
+    gap: '12px',
+    padding: '12px 14px',
     borderRadius: '12px',
-    background: 'rgba(15, 23, 41, 0.5)',
-    border: '1px solid #334155',
-    opacity: 0.45,
+    background: 'rgba(255, 255, 255, 0.02)',
+    border: '1px solid rgba(255, 255, 255, 0.05)',
+    opacity: 0.4,
     transition: 'all 0.25s',
   },
   stepIndicatorItemActive: {
     opacity: 1,
-    borderColor: '#fbbf24',
-    background: 'rgba(251, 191, 36, 0.08)',
+    borderColor: '#c9a84c',
+    background: 'rgba(201, 168, 76, 0.06)',
   },
   stepIndicatorItemCompleted: {
     opacity: 1,
-    borderColor: '#22c55e',
-    background: 'rgba(34, 197, 94, 0.08)',
+    borderColor: '#10b981',
+    background: 'rgba(16, 185, 129, 0.06)',
   },
   stepNumber: {
-    width: '38px',
-    height: '38px',
+    width: '32px',
+    height: '32px',
     borderRadius: '50%',
-    background: '#334155',
+    background: '#1e293b',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: '15px',
+    fontSize: '13px',
     fontWeight: '700',
-    color: '#f1f5f9',
+    color: '#cbd5e1',
     flexShrink: 0,
     transition: 'all 0.25s',
   },
-  stepNumberActive: { background: '#fbbf24', color: '#0f1729' },
-  stepNumberCompleted: { background: '#22c55e', color: '#0f1729' },
-  stepInfo: { flex: 1 },
-  stepIndicatorTitle: { fontSize: '13px', fontWeight: '700', color: '#f1f5f9', marginBottom: '2px' },
-  stepIndicatorDescription: { fontSize: '12px', color: '#64748b' },
-  content: { marginBottom: '32px' },
+  stepNumberActive: { background: '#c9a84c', color: '#090e1a' },
+  stepNumberCompleted: { background: '#10b981', color: '#090e1a' },
+  stepInfo: { flex: 1, minWidth: 0 },
+  stepIndicatorTitle: { fontSize: '12px', fontWeight: '700', color: '#f1f5f9', marginBottom: '2px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' },
+  stepIndicatorDescription: { fontSize: '10px', color: '#64748b', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' },
+  content: { marginBottom: '36px' },
   stepContent: {},
-  stepTitle: { fontSize: '22px', fontWeight: '700', color: '#f1f5f9', margin: '0 0 6px 0' },
-  stepDescription: { fontSize: '14px', color: '#64748b', margin: '0 0 24px 0' },
-  levelsContainer: { display: 'grid', gap: '14px' },
+  stepTitle: { fontSize: '24px', fontWeight: '800', color: '#f1f5f9', margin: '0 0 8px 0', letterSpacing: '-0.5px' },
+  stepDescription: { fontSize: '14px', color: '#94a3b8', margin: '0 0 28px 0' },
+  levelsContainer: { display: 'flex', flexDirection: 'column', gap: '16px' },
   levelCard: {
-    padding: '20px',
-    borderRadius: '12px',
-    border: '2px solid #334155',
-    background: 'rgba(15, 23, 41, 0.5)',
+    padding: '24px',
+    borderRadius: '16px',
+    border: '2px solid rgba(255, 255, 255, 0.06)',
+    background: 'rgba(255, 255, 255, 0.02)',
     cursor: 'pointer',
     transition: 'all 0.2s',
   },
-  levelCardSelected: { borderColor: '#fbbf24', background: 'rgba(251, 191, 36, 0.1)' },
-  levelHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' },
-  levelNumber: { fontSize: '12px', fontWeight: '700', color: '#fbbf24' },
-  requiredBadge: {
-    fontSize: '10px', fontWeight: '700', color: '#22c55e',
-    background: 'rgba(34, 197, 94, 0.2)', padding: '3px 8px', borderRadius: '4px',
+  levelHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' },
+  levelNumber: { fontSize: '12px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px' },
+  badgePill: {
+    fontSize: '11px', fontWeight: '700',
+    padding: '4px 10px', borderRadius: '20px',
   },
-  levelName: { fontSize: '15px', fontWeight: '700', color: '#f1f5f9', margin: '0 0 6px 0' },
-  levelDescription: { fontSize: '13px', color: '#64748b', margin: 0 },
-  formSection: { display: 'flex', flexDirection: 'column', gap: '20px' },
-  formLabel: { display: 'block', fontSize: '13px', fontWeight: '600', color: '#f1f5f9', marginBottom: '8px' },
+  levelName: { fontSize: '18px', fontWeight: '700', color: '#f1f5f9', margin: '0 0 8px 0' },
+  levelDescription: { fontSize: '13px', color: '#94a3b8', margin: 0, lineHeight: '1.5' },
+  formSection: { display: 'flex', flexDirection: 'column', gap: '24px' },
+  formLabel: { display: 'block', fontSize: '13px', fontWeight: '600', color: '#cbd5e1', marginBottom: '8px' },
   select: {
-    width: '100%', padding: '12px 16px',
-    background: 'rgba(15, 23, 41, 0.6)', border: '1px solid #334155',
-    borderRadius: '8px', color: '#f1f5f9', fontSize: '14px',
+    width: '100%', padding: '14px 16px',
+    background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.1)',
+    borderRadius: '10px', color: '#f1f5f9', fontSize: '14px',
     outline: 'none', boxSizing: 'border-box',
   },
   input: {
-    width: '100%', padding: '12px 16px',
-    background: 'rgba(15, 23, 41, 0.6)', border: '1px solid #334155',
-    borderRadius: '8px', color: '#f1f5f9', fontSize: '14px',
+    width: '100%', padding: '14px 16px',
+    background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.1)',
+    borderRadius: '10px', color: '#f1f5f9', fontSize: '14px',
     outline: 'none', boxSizing: 'border-box',
   },
-  infoBox: {
-    display: 'flex', gap: '12px', padding: '12px 16px',
-    background: 'rgba(251, 191, 36, 0.08)', border: '1px solid rgba(251, 191, 36, 0.25)', borderRadius: '8px',
+  textarea: {
+    width: '100%', padding: '14px 16px',
+    background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.1)',
+    borderRadius: '10px', color: '#f1f5f9', fontSize: '14px',
+    outline: 'none', boxSizing: 'border-box', resize: 'vertical',
+    fontFamily: 'inherit', lineHeight: '1.5',
   },
-  infoIcon: { fontSize: '16px' },
-  infoText: { fontSize: '13px', color: '#fbbf24', flex: 1, lineHeight: 1.5 },
+  infoBox: {
+    display: 'flex', gap: '12px', padding: '16px',
+    background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '12px',
+  },
+  infoBoxGold: {
+    display: 'flex', gap: '12px', padding: '16px',
+    background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '12px',
+  },
+  infoIcon: { fontSize: '18px' },
+  infoText: { fontSize: '13px', color: '#93c5fd', flex: 1, lineHeight: 1.5 },
+  infoTextGold: { fontSize: '13px', color: '#fcd34d', flex: 1, lineHeight: 1.5 },
   errorBox: {
-    padding: '12px 16px', background: 'rgba(239, 68, 68, 0.1)',
-    border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px',
-    color: '#f87171', fontSize: '14px', marginBottom: '16px',
+    padding: '14px 16px', background: 'rgba(239, 68, 68, 0.1)',
+    border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '10px',
+    color: '#f87171', fontSize: '14px', marginBottom: '20px',
   },
   successBox: {
-    padding: '12px 16px', background: 'rgba(34, 197, 94, 0.1)',
-    border: '1px solid rgba(34, 197, 94, 0.3)', borderRadius: '8px',
-    color: '#4ade80', fontSize: '14px', marginBottom: '16px',
+    padding: '14px 16px', background: 'rgba(16, 185, 129, 0.1)',
+    border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '10px',
+    color: '#34d399', fontSize: '14px', marginBottom: '20px',
   },
   reviewSection: {
     display: 'flex', flexDirection: 'column',
-    padding: '20px', background: 'rgba(15, 23, 41, 0.5)',
-    borderRadius: '12px', border: '1px solid #334155',
+    padding: '24px', background: 'rgba(255, 255, 255, 0.02)',
+    borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.05)',
+  },
+  reviewParagraph: {
+    fontSize: '13px', color: '#cbd5e1', margin: 0, lineHeight: '1.6', background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: '8px', width: '100%', border: '1px solid rgba(255,255,255,0.05)'
   },
   reviewItem: {
     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-    padding: '10px 0', borderBottom: '1px solid #1e293b', gap: '12px',
+    padding: '12px 0', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', gap: '12px',
   },
-  reviewLabel: { fontSize: '13px', color: '#64748b' },
+  reviewLabel: { fontSize: '13px', color: '#94a3b8' },
   reviewValue: {
     fontSize: '13px', fontWeight: '600', color: '#f1f5f9',
-    textAlign: 'right', maxWidth: '55%', overflow: 'hidden',
+    textAlign: 'right', maxWidth: '60%', overflow: 'hidden',
     textOverflow: 'ellipsis', whiteSpace: 'nowrap',
   },
   reviewValueGreen: {
-    fontSize: '13px', fontWeight: '600', color: '#4ade80',
-    textAlign: 'right', maxWidth: '55%', overflow: 'hidden',
+    fontSize: '13px', fontWeight: '600', color: '#10b981',
+    textAlign: 'right', maxWidth: '60%', overflow: 'hidden',
     textOverflow: 'ellipsis', whiteSpace: 'nowrap',
   },
   termsBox: {
-    display: 'flex', alignItems: 'flex-start', gap: '12px', marginTop: '20px',
-    padding: '16px', background: 'rgba(15, 23, 41, 0.5)',
-    borderRadius: '8px', border: '1px solid #334155',
+    display: 'flex', alignItems: 'flex-start', gap: '12px', marginTop: '24px',
+    padding: '16px', background: 'rgba(255, 255, 255, 0.02)',
+    borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)',
   },
-  checkbox: { marginTop: '2px', cursor: 'pointer' },
+  checkbox: { marginTop: '3px', cursor: 'pointer' },
   termsLabel: { fontSize: '13px', color: '#94a3b8', cursor: 'pointer', lineHeight: '1.6' },
   navigation: { display: 'flex', justifyContent: 'space-between', gap: '16px' },
   backButton: {
-    padding: '12px 28px', background: 'rgba(15, 23, 41, 0.5)',
-    border: '1px solid #334155', borderRadius: '8px',
-    color: '#f1f5f9', fontSize: '14px', fontWeight: '600', cursor: 'pointer',
+    padding: '12px 28px', background: 'rgba(255, 255, 255, 0.05)',
+    border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '10px',
+    color: '#cbd5e1', fontSize: '14px', fontWeight: '600', cursor: 'pointer',
+    transition: 'all 0.2s',
   },
   nextButton: {
     padding: '12px 28px',
-    background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-    border: 'none', borderRadius: '8px',
-    color: '#0f1729', fontSize: '14px', fontWeight: '700', cursor: 'pointer',
+    background: 'linear-gradient(135deg, #c9a84c 0%, #a88832 100%)',
+    border: 'none', borderRadius: '10px',
+    color: '#090e1a', fontSize: '14px', fontWeight: '700', cursor: 'pointer',
+    transition: 'all 0.2s',
   },
   submitButton: {
     padding: '12px 28px',
-    background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-    border: 'none', borderRadius: '8px',
-    color: '#0f1729', fontSize: '14px', fontWeight: '700', cursor: 'pointer',
+    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+    border: 'none', borderRadius: '10px',
+    color: '#090e1a', fontSize: '14px', fontWeight: '700', cursor: 'pointer',
+    transition: 'all 0.2s',
   },
-  disabledBtn: { opacity: 0.4, cursor: 'not-allowed' },
+  disabledBtn: { opacity: 0.3, cursor: 'not-allowed' },
 };
 
 export default Verification;

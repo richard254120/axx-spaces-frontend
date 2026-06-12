@@ -8,6 +8,7 @@ import moversIcon from "/movers.png";
 import tourismIcon from "/tourism.png";
 import axxbiasharaIcon from "/axxbiashara.png";
 import SocialMediaLinks from "../components/SocialMediaLinks";
+import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
 
 /* ════════════════════════════════════════════════
    DESIGN SYSTEM  — Luxury Real Estate (from Listings.jsx)
@@ -1067,7 +1068,330 @@ option { background: #162233; color: #F0EAD8; }
   .cta-btn-gold, .cta-btn-ghost { width: 100%; max-width: 300px; }
   .footer-cols { gap: 36px; }
 }
+
+/* ── DEMOGRAPHICS DASHBOARD ── */
+.demo-section {
+  padding: 96px 28px;
+  background: #162233;
+  border-top: 1px solid rgba(201,168,76,0.1);
+  border-bottom: 1px solid rgba(201,168,76,0.1);
+}
+.demo-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+.demo-tabs-nav {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.demo-tab-btn {
+  padding: 10px 24px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 30px;
+  color: #B8AD96;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.demo-tab-btn:hover {
+  border-color: rgba(201,168,76,0.5);
+  color: #C9A84C;
+  background: rgba(201,168,76,0.05);
+}
+.demo-tab-btn.active {
+  background: linear-gradient(135deg, #C9A84C 0%, #E2C47A 100%);
+  border-color: #C9A84C;
+  color: #0D1B2A;
+  box-shadow: 0 4px 20px rgba(201,168,76,0.25);
+}
+.demo-content-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 28px;
+  min-height: 500px;
+}
+@media (max-width: 1024px) {
+  .demo-content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.demo-card {
+  background: rgba(22, 34, 51, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(201,168,76,0.14);
+  border-radius: 16px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+.demo-card-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #F0EAD8;
+  margin: 0 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.demo-map-wrap {
+  width: 100%;
+  height: 440px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(201,168,76,0.1);
+  position: relative;
+}
+.demo-chart-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  position: relative;
+  min-height: 280px;
+}
+.demo-legend-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+.demo-legend-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.demo-legend-item:hover {
+  background: rgba(201, 168, 76, 0.06);
+  border-color: rgba(201, 168, 76, 0.2);
+  transform: translateX(4px);
+}
+.demo-legend-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #F0EAD8;
+}
+.demo-legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+.demo-legend-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #B8AD96;
+}
+.donut-segment {
+  transition: stroke-width 0.3s, filter 0.3s;
+  cursor: pointer;
+}
+.donut-segment:hover {
+  stroke-width: 9;
+  filter: drop-shadow(0 0 6px rgba(201,168,76,0.5));
+}
+.demo-county-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  max-height: 380px;
+  padding-right: 8px;
+}
+.demo-county-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+  transition: all 0.2s;
+}
+.demo-county-item:hover {
+  background: rgba(201,168,76,0.04);
+  border-color: rgba(201,168,76,0.15);
+  transform: translateY(-2px);
+}
+.demo-county-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.demo-county-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #F0EAD8;
+}
+.demo-county-count {
+  font-size: 13px;
+  font-weight: 700;
+  color: #C9A84C;
+  background: rgba(201,168,76,0.1);
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(201,168,76,0.2);
+}
+.demo-county-bar-bg {
+  height: 6px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.demo-county-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #C9A84C, #E2C47A);
+  border-radius: 3px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.demo-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.demo-stat-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(201, 168, 76, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s;
+}
+.demo-stat-card:hover {
+  border-color: rgba(201, 168, 76, 0.3);
+  background: rgba(201, 168, 76, 0.04);
+  transform: translateY(-3px);
+}
+.demo-stat-num {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 38px;
+  font-weight: 700;
+  color: #C9A84C;
+  line-height: 1.1;
+  margin-bottom: 4px;
+  display: block;
+}
+.demo-stat-lbl {
+  font-size: 11px;
+  font-weight: 600;
+  color: #7A7260;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.demo-info-box {
+  padding: 16px;
+  background: rgba(96, 165, 250, 0.05);
+  border: 1px solid rgba(96, 165, 250, 0.15);
+  border-radius: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.demo-info-icon {
+  font-size: 20px;
+  color: #60A5FA;
+}
+.demo-info-text h5 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #60A5FA;
+  margin: 0 0 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.demo-info-text p {
+  font-size: 12px;
+  color: #B8AD96;
+  margin: 0;
+  font-weight: 300;
+}
 `;
+
+const COUNTY_COORDS = {
+  "Nairobi": [-1.286389, 36.817223],
+  "Nairobi City": [-1.286389, 36.817223],
+  "Mombasa": [-4.043477, 39.668206],
+  "Kisumu": [-0.091702, 34.767957],
+  "Nakuru": [-0.303099, 36.080026],
+  "Kiambu": [-1.1714, 36.8356],
+  "Machakos": [-1.5177, 37.2634],
+  "Kajiado": [-1.8500, 36.7833],
+  "Uasin Gishu": [0.5143, 35.2698],
+  "Eldoret": [0.5143, 35.2698],
+  "Nyeri": [-0.4201, 36.9476],
+  "Meru": [0.0515, 37.6456],
+  "Kilifi": [-3.6307, 39.8499],
+  "Kwale": [-4.1737, 39.4521],
+  "Laikipia": [0.3596, 36.7915],
+  "Kisii": [-0.6817, 34.7717],
+  "Kakamega": [0.2842, 34.7523],
+  "Kericho": [-0.3689, 35.2863],
+  "Bomet": [-0.7813, 35.3416],
+  "Bungoma": [0.5635, 34.5606],
+  "Busia": [0.4608, 34.1115],
+  "Elgeyo Marakwet": [0.8022, 35.5348],
+  "Embu": [-0.5388, 37.4596],
+  "Garissa": [-0.4532, 39.6461],
+  "Homa Bay": [-0.5273, 34.4571],
+  "Isiolo": [0.3546, 37.5833],
+  "Kirinyaga": [-0.4988, 37.3111],
+  "Kitui": [-1.3722, 38.0106],
+  "Lamu": [-2.2717, 40.9020],
+  "Makueni": [-1.8041, 37.6203],
+  "Mandera": [3.9367, 41.8569],
+  "Marsabit": [2.3284, 37.9922],
+  "Migori": [-0.9367, 34.4731],
+  "Murang'a": [-0.7211, 37.1511],
+  "Nandi": [0.1803, 35.1789],
+  "Narok": [-1.0781, 35.8601],
+  "Nyamira": [-0.5629, 34.9359],
+  "Nyandarua": [-0.3400, 36.3700],
+  "Samburu": [1.2000, 36.8000],
+  "Siaya": [-0.0607, 34.2881],
+  "Taita Taveta": [-3.3167, 38.4833],
+  "Tana River": [-1.5000, 40.0000],
+  "Tharaka Nithi": [-0.3000, 37.9000],
+  "Trans Nzoia": [1.0212, 34.9978],
+  "Turkana": [3.1167, 35.6000],
+  "Vihiga": [0.0801, 34.7231],
+  "Wajir": [1.7471, 40.0596],
+  "West Pokot": [1.5000, 35.2000],
+  "Baringo": [0.4833, 35.9667]
+};
+
+const getCountyCoords = (countyName) => {
+  if (!countyName) return null;
+  const normalized = countyName.trim().replace(/\s+city/gi, "").trim();
+  for (const key of Object.keys(COUNTY_COORDS)) {
+    if (key.toLowerCase() === normalized.toLowerCase()) {
+      return COUNTY_COORDS[key];
+    }
+  }
+  return null;
+};
 
 /* ═══════════════════════ COMPONENT ═══════════════════════ */
 export default function Home() {
@@ -1088,6 +1412,8 @@ export default function Home() {
   const [componentError, setComponentError] = useState(null);
   const [demographics, setDemographics] = useState(null);
   const [loadingDemographics, setLoadingDemographics] = useState(true);
+  const [demoTab, setDemoTab] = useState("map");
+  const [hoveredService, setHoveredService] = useState(null);
 
   const counties = [
     "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta",
@@ -1498,99 +1824,313 @@ export default function Home() {
       </section>
 
       {/* ── DEMOGRAPHICS SECTION ── */}
-      <section style={{ padding: "96px 28px", background: "#162233", borderTop: "1px solid rgba(201,168,76,0.1)" }}>
+      <section className="demo-section">
         <div className="section-hdr">
           <p className="section-eyebrow">Live Analytics</p>
           <h2 className="section-title">Platform Demographics</h2>
-          <p className="section-sub">Real-time data from across all 47 counties</p>
+          <p className="section-sub">Real-time engagement across Kenya's counties and services</p>
         </div>
 
-        {loadingDemographics ? (
-          <div style={{ textAlign: "center", padding: "60px 28px" }}>
-            <div className="spinner" style={{ fontSize: "40px", color: "#C9A84C", marginBottom: "20px" }}>⟳</div>
-            <p style={{ color: "#7A7260", fontSize: "14px" }}>Loading demographic data...</p>
+        <div className="demo-container">
+          {/* Navigation tabs */}
+          <div className="demo-tabs-nav">
+            <button
+              onClick={() => setDemoTab("map")}
+              className={`demo-tab-btn ${demoTab === "map" ? "active" : ""}`}
+            >
+              📍 Live Coverage Map
+            </button>
+            <button
+              onClick={() => setDemoTab("services")}
+              className={`demo-tab-btn ${demoTab === "services" ? "active" : ""}`}
+            >
+              📊 Service Popularity
+            </button>
+            <button
+              onClick={() => setDemoTab("counties")}
+              className={`demo-tab-btn ${demoTab === "counties" ? "active" : ""}`}
+            >
+              📈 Top Counties
+            </button>
           </div>
-        ) : demographics ? (
-          <div style={{ maxWidth: "1280px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))", gap: "24px" }}>
-            {/* County Distribution */}
-            <div style={{ background: "#1E3148", border: "1px solid rgba(201,168,76,0.14)", borderRadius: "12px", padding: "28px" }}>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", fontWeight: 700, color: "#F0EAD8", margin: "0 0 20px" }}>📍 Top Counties</h3>
-              {demographics.counties && demographics.counties.length > 0 ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                  {demographics.counties.slice(0, 5).map((item, idx) => {
-                    const maxCount = Math.max(...demographics.counties.map(c => c.count));
-                    const percentage = (item.count / maxCount) * 100;
-                    return (
-                      <div key={item.county} style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 600, color: "#F0EAD8" }}>{item.county}</span>
-                          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 700, color: "#C9A84C" }}>{item.count}</span>
-                        </div>
-                        <div style={{ height: "8px", background: "rgba(201,168,76,0.1)", borderRadius: "4px", overflow: "hidden" }}>
-                          <div style={{ height: "100%", background: "linear-gradient(90deg, #C9A84C, #E2C47A)", borderRadius: "4px", width: `${percentage}%`, transition: "width 0.5s ease" }} />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p style={{ color: "#7A7260", fontSize: "14px" }}>No county data available</p>
-              )}
-            </div>
 
-            {/* Service Popularity */}
-            <div style={{ background: "#1E3148", border: "1px solid rgba(201,168,76,0.14)", borderRadius: "12px", padding: "28px" }}>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", fontWeight: 700, color: "#F0EAD8", margin: "0 0 20px" }}>📊 Service Popularity</h3>
-              {demographics.services && demographics.services.length > 0 ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                  {demographics.services.map((item, idx) => {
-                    const maxCount = Math.max(...demographics.services.map(s => s.count));
-                    const percentage = (item.count / maxCount) * 100;
-                    const colors = ["#C9A84C", "#60A5FA", "#4CAF74", "#A78BFA", "#38BDF8"];
-                    return (
-                      <div key={item.service} style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 600, color: "#F0EAD8" }}>{item.service}</span>
-                          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 700, color: colors[idx % colors.length] }}>{item.count}</span>
-                        </div>
-                        <div style={{ height: "8px", background: "rgba(201,168,76,0.1)", borderRadius: "4px", overflow: "hidden" }}>
-                          <div style={{ height: "100%", background: colors[idx % colors.length], borderRadius: "4px", width: `${percentage}%`, transition: "width 0.5s ease" }} />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p style={{ color: "#7A7260", fontSize: "14px" }}>No service data available</p>
-              )}
+          {loadingDemographics ? (
+            <div style={{ textAlign: "center", padding: "80px 28px" }}>
+              <div className="spinner" style={{ fontSize: "44px", color: "#C9A84C", marginBottom: "20px" }}>⟳</div>
+              <p style={{ color: "#7A7260", fontSize: "15px", letterSpacing: "0.05em" }}>Loading interactive demographics dashboard...</p>
             </div>
+          ) : demographics ? (
+            <div className="demo-content-grid">
+              
+              {/* Left Panel: Selected Visual Dashboard Tab */}
+              {demoTab === "map" && (
+                <div className="demo-card">
+                  <h3 className="demo-card-title">📍 Live Platform Activity</h3>
+                  <div className="demo-map-wrap">
+                    <MapContainer
+                      center={[-0.303, 36.08]} // Centered on Nakuru/Central Kenya to fit the country nicely
+                      zoom={6.8}
+                      style={{ width: "100%", height: "100%" }}
+                      zoomControl={true}
+                    >
+                      <TileLayer
+                        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'
+                      />
+                      {demographics.counties && demographics.counties.map((item) => {
+                        const coords = getCountyCoords(item.county);
+                        if (!coords) return null;
 
-            {/* Summary Stats */}
-            <div style={{ background: "#1E3148", border: "1px solid rgba(201,168,76,0.14)", borderRadius: "12px", padding: "28px" }}>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", fontWeight: 700, color: "#F0EAD8", margin: "0 0 20px" }}>📈 Platform Overview</h3>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
-                <div style={{ background: "rgba(201,168,76,0.08)", padding: "20px", borderRadius: "8px", textAlign: "center" }}>
-                  <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "36px", fontWeight: 700, color: "#C9A84C", display: "block" }}>{demographics.totalListings || 0}</span>
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", fontWeight: 600, color: "#7A7260", textTransform: "uppercase", letterSpacing: "0.1em" }}>Total Listings</span>
+                        // Calculate visual radius scaling
+                        const maxCount = Math.max(...demographics.counties.map(c => c.count), 1);
+                        const radius = 10 + Math.sqrt(item.count / maxCount) * 20;
+
+                        return (
+                          <CircleMarker
+                            key={item.county}
+                            center={coords}
+                            radius={radius}
+                            fillColor="#C9A84C"
+                            color="#E2C47A"
+                            weight={1.5}
+                            opacity={0.8}
+                            fillOpacity={0.4}
+                            eventHandlers={{
+                              mouseover: (e) => {
+                                e.target.setStyle({ fillOpacity: 0.7, weight: 2.5 });
+                              },
+                              mouseout: (e) => {
+                                e.target.setStyle({ fillOpacity: 0.4, weight: 1.5 });
+                              }
+                            }}
+                          >
+                            <Popup>
+                              <div style={{ padding: '4px', minWidth: '160px' }}>
+                                <h4 style={{ margin: '0 0 6px', fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '16px', fontWeight: 700, color: '#C9A84C' }}>
+                                  📍 {item.county}
+                                </h4>
+                                <p style={{ margin: '0 0 10px', fontSize: '13px', color: '#f1f5f9', fontWeight: 500 }}>
+                                  Active Listings: <strong style={{ color: '#E2C47A' }}>{item.count}</strong>
+                                </p>
+                                <button
+                                  onClick={() => {
+                                    setSearchForm(prev => ({ ...prev, county: item.county }));
+                                    navigate(`/listings?county=${encodeURIComponent(item.county)}`);
+                                  }}
+                                  style={{
+                                    width: '100%',
+                                    padding: '7px 10px',
+                                    background: 'linear-gradient(135deg, #C9A84C 0%, #E2C47A 100%)',
+                                    color: '#0D1B2A',
+                                    border: 'none',
+                                    borderRadius: '5px',
+                                    fontSize: '11px',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.05em',
+                                    boxShadow: '0 4px 10px rgba(201,168,76,0.3)'
+                                  }}
+                                >
+                                  Browse Properties
+                                </button>
+                              </div>
+                            </Popup>
+                          </CircleMarker>
+                        );
+                      })}
+                    </MapContainer>
+                  </div>
                 </div>
-                <div style={{ background: "rgba(201,168,76,0.08)", padding: "20px", borderRadius: "8px", textAlign: "center" }}>
-                  <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "36px", fontWeight: 700, color: "#C9A84C", display: "block" }}>{demographics.totalUsers || 0}</span>
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", fontWeight: 600, color: "#7A7260", textTransform: "uppercase", letterSpacing: "0.1em" }}>Total Users</span>
+              )}
+
+              {demoTab === "services" && (
+                <div className="demo-card">
+                  <h3 className="demo-card-title">📊 Service Popularity</h3>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "28px", flex: 1, justifyContent: "center" }}>
+                    
+                    {/* SVG Pie Chart Container */}
+                    <div className="demo-chart-container">
+                      <svg width="220" height="220" viewBox="0 0 100 100">
+                        {(() => {
+                          const services = demographics.services || [];
+                          const total = services.reduce((sum, s) => sum + s.count, 0);
+                          const radius = 35;
+                          const circumference = 2 * Math.PI * radius; // ~219.91
+                          let accumulated = 0;
+                          const colors = ["#C9A84C", "#60A5FA", "#4CAF74", "#A78BFA", "#F59E0B"];
+
+                          return (
+                            <>
+                              <circle cx="50" cy="50" r={radius} fill="transparent" stroke="rgba(255,255,255,0.03)" strokeWidth="8" />
+                              {services.map((item, idx) => {
+                                const percentage = total > 0 ? (item.count / total) * 100 : 0;
+                                const strokeOffset = circumference - (item.count / total) * circumference;
+                                const angle = total > 0 ? (accumulated / total) * 360 : 0;
+                                accumulated += item.count;
+
+                                const isHovered = hoveredService === item.service;
+
+                                return (
+                                  <circle
+                                    key={item.service}
+                                    cx="50"
+                                    cy="50"
+                                    r={radius}
+                                    fill="transparent"
+                                    stroke={colors[idx % colors.length]}
+                                    strokeWidth={isHovered ? 10 : 8}
+                                    strokeDasharray={circumference}
+                                    strokeDashoffset={strokeOffset}
+                                    transform={`rotate(${angle - 90} 50 50)`}
+                                    className="donut-segment"
+                                    onMouseEnter={() => setHoveredService(item.service)}
+                                    onMouseLeave={() => setHoveredService(null)}
+                                  />
+                                );
+                              })}
+                              {/* Central Hover Tooltip display */}
+                              <circle cx="50" cy="50" r="26" fill="#162233" />
+                              <text x="50" y="47" textAnchor="middle" fill="#7A7260" fontSize="5" fontWeight="600" letterSpacing="0.05em">
+                                {hoveredService ? hoveredService.toUpperCase() : "TOTAL USERS & LISTS"}
+                              </text>
+                              <text x="50" y="58" textAnchor="middle" fill="#C9A84C" fontSize="10" fontWeight="700">
+                                {(() => {
+                                  if (hoveredService) {
+                                    const match = services.find(s => s.service === hoveredService);
+                                    return match ? match.count : 0;
+                                  }
+                                  return total;
+                                })()}
+                              </text>
+                            </>
+                          );
+                        })()}
+                      </svg>
+                    </div>
+
+                    {/* Legends & interactive triggers */}
+                    <div className="demo-legend-list">
+                      {demographics.services && demographics.services.map((item, idx) => {
+                        const colors = ["#C9A84C", "#60A5FA", "#4CAF74", "#A78BFA", "#F59E0B"];
+                        const total = demographics.services.reduce((sum, s) => sum + s.count, 0);
+                        const pct = total > 0 ? ((item.count / total) * 100).toFixed(1) : 0;
+                        const isHovered = hoveredService === item.service;
+
+                        return (
+                          <div
+                            key={item.service}
+                            className="demo-legend-item"
+                            style={isHovered ? { border: `1px solid ${colors[idx % colors.length]}`, background: "rgba(255,255,255,0.03)" } : {}}
+                            onMouseEnter={() => setHoveredService(item.service)}
+                            onMouseLeave={() => setHoveredService(null)}
+                          >
+                            <span className="demo-legend-label">
+                              <span className="demo-legend-color" style={{ background: colors[idx % colors.length] }} />
+                              {item.service}
+                            </span>
+                            <span className="demo-legend-value">
+                              {item.count} <span style={{ fontSize: '11px', color: '#7A7260', fontWeight: '400' }}>({pct}%)</span>
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
+              )}
+
+              {demoTab === "counties" && (
+                <div className="demo-card">
+                  <h3 className="demo-card-title">📈 Top Counties Rankings</h3>
+                  <div className="demo-county-list">
+                    {demographics.counties && demographics.counties.length > 0 ? (
+                      demographics.counties.slice(0, 10).map((item, idx) => {
+                        const maxCount = Math.max(...demographics.counties.map(c => c.count), 1);
+                        const percentage = (item.count / maxCount) * 100;
+                        return (
+                          <div key={item.county} className="demo-county-item">
+                            <div className="demo-county-header">
+                              <span className="demo-county-name">{idx + 1}. {item.county}</span>
+                              <span className="demo-county-count">{item.count} listings</span>
+                            </div>
+                            <div className="demo-county-bar-bg">
+                              <div
+                                className="demo-county-bar-fill"
+                                style={{ width: `${percentage}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <p style={{ color: "#7A7260", fontSize: "14px" }}>No county distribution data available</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Right Panel: Shared Summary Cards & Metrics Info */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+                
+                <div className="demo-card">
+                  <h3 className="demo-card-title">📈 Platform Overview</h3>
+                  <div className="demo-stats-grid">
+                    <div className="demo-stat-card">
+                      <span className="demo-stat-num">{demographics.totalListings || 0}</span>
+                      <span className="demo-stat-lbl">Total Listings</span>
+                    </div>
+                    <div className="demo-stat-card">
+                      <span className="demo-stat-num">{demographics.totalUsers || 0}</span>
+                      <span className="demo-stat-lbl">Total Users</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="demo-card">
+                  <h3 className="demo-card-title">📍 Live Coverage</h3>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ fontSize: "14px", color: "#B8AD96" }}>Active Counties reached:</span>
+                      <strong style={{ fontSize: "16px", color: "#C9A84C" }}>
+                        {demographics.counties ? demographics.counties.length : 0} / 47
+                      </strong>
+                    </div>
+                    <div className="demo-county-bar-bg" style={{ height: "8px" }}>
+                      <div
+                        className="demo-county-bar-fill"
+                        style={{
+                          width: `${((demographics.counties ? demographics.counties.length : 0) / 47) * 100}%`,
+                          background: "linear-gradient(90deg, #60A5FA, #38BDF8)"
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="demo-info-box">
+                  <span className="demo-info-icon">🔄</span>
+                  <div className="demo-info-text">
+                    <h5>Auto-Refreshing Analytics</h5>
+                    <p>Live stats recalculate automatically every 5 minutes.</p>
+                  </div>
+                </div>
+
               </div>
-              <div style={{ marginTop: "20px", padding: "16px", background: "rgba(96,165,250,0.08)", borderRadius: "8px", border: "1px solid rgba(96,165,250,0.2)" }}>
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#60A5FA", fontWeight: 600, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: "0.1em" }}>🔄 Auto-refreshing every 5 minutes</p>
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#B8AD96", margin: 0, fontWeight: 300 }}>Data updates automatically</p>
-              </div>
+
             </div>
-          </div>
-        ) : (
-          <div style={{ textAlign: "center", padding: "60px 28px" }}>
-            <span style={{ fontSize: "52px", marginBottom: "16px", display: "block" }}>📊</span>
-            <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#F0EAD8", marginBottom: "8px" }}>Demographics Unavailable</p>
-            <p style={{ color: "#7A7260", fontSize: "14px", marginBottom: "24px", fontWeight: 300 }}>Unable to load demographic data</p>
-          </div>
-        )}
+          ) : (
+            <div className="demo-card" style={{ textAlign: "center", padding: "80px 28px" }}>
+              <span style={{ fontSize: "56px", marginBottom: "16px", display: "block" }}>📊</span>
+              <h4 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "24px", fontWeight: 600, color: "#F0EAD8", marginBottom: "8px" }}>
+                Demographics Currently Unavailable
+              </h4>
+              <p style={{ color: "#7A7260", fontSize: "14px", fontWeight: 300 }}>
+                Unable to establish connection to the live analytics service. Please try again later.
+              </p>
+            </div>
+          )}
+        </div>
       </section>
 
       {/* ── SERVICE SPOTLIGHT STRIPS ── */}
