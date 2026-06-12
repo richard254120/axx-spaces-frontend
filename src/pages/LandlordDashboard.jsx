@@ -28,13 +28,9 @@ export default function LandlordDashboard() {
       return;
     }
     if (user) {
-      if (user.role !== "landlord") {
-        navigate(user.role === "mover" ? "/mover-dashboard" : "/");
-      } else {
-        setAuthLoading(false);
-        fetchMyProperties();
-        fetchAgents();
-      }
+      setAuthLoading(false);
+      fetchMyProperties();
+      fetchAgents();
     } else {
       const timeout = setTimeout(() => {
         if (!user) setAuthLoading(false);

@@ -19,6 +19,13 @@ export default function Navbar() {
   const dropdownRef = useRef(null);
   const accountRef = useRef(null);
 
+  const getDashboardLink = () => {
+    if (user?.role === "landlord") return "/dashboard";
+    if (user?.role === "seller") return "/seller-dashboard";
+    if (user?.role === "mover") return "/mover-dashboard";
+    return "/business-dashboard";
+  };
+
   const isActive = (path) => {
     if (path === "/") {
       return location.pathname === "/";
@@ -191,14 +198,9 @@ export default function Navbar() {
               <Link to="/upload" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
                 <span style={styles.dropdownIcon}>Upload Property</span>
               </Link>
-              <Link to="/business-dashboard" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                <span style={styles.dropdownIcon}>Business Dashboard</span>
+              <Link to={getDashboardLink()} style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+                <span style={styles.dropdownIcon}>Dashboard</span>
               </Link>
-              {user?.role === "landlord" && (
-                <Link to="/dashboard" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                  <span style={styles.dropdownIcon}>Dashboard</span>
-                </Link>
-              )}
               <Link to="/profile" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
                 <span style={styles.dropdownIcon}>Profile</span>
               </Link>
@@ -377,11 +379,9 @@ export default function Navbar() {
             <Link to="/upload" style={{ ...styles.navLink, ...(isActive("/upload") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
               Upload
             </Link>
-            {user?.role === "landlord" && (
-              <Link to="/dashboard" style={{ ...styles.navLink, ...(isActive("/dashboard") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
-                Dashboard
-              </Link>
-            )}
+            <Link to={getDashboardLink()} style={{ ...styles.navLink, ...(isActive(getDashboardLink()) && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
+              Dashboard
+            </Link>
             <div style={styles.userSection}>
               <NotificationBell />
               <div style={styles.userDropdownWrapper} ref={dropdownRef}>
@@ -403,7 +403,7 @@ export default function Navbar() {
                       📋 Payment History
                     </Link>
                     <Link
-                      to="/dashboard"
+                      to={getDashboardLink()}
                       style={styles.dropdownItem}
                       onClick={() => { setDropdownOpen(false); setMenuOpen(false); }}
                     >

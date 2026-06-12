@@ -45,6 +45,7 @@ export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // ── NOTIFICATION STATE ─────────────────────────────────────
   const [pendingBoosts, setPendingBoosts] = useState([]);
@@ -178,16 +179,25 @@ export default function AdminDashboard() {
 
   // ── reload items when tab or statusView changes ─────────────
   useEffect(() => {
-    if (activeTab !== "payment" && activeTab !== "sold" && activeTab !== "boosts" && activeTab !== "businesses") {
-      loadItems(activeTab, statusView);
-      loadViewStats(activeTab);
-      loadTopViewed(activeTab);
+    if (activeTab === "overview") {
+      loadStats();
+      loadViewStats();
+      loadTopViewed();
+      loadAllPending();
+    } else if (activeTab === "verification") {
+      loadPendingVerifications();
+    } else if (activeTab === "announcements") {
+      loadPendingAnnouncements();
     } else if (activeTab === "sold") {
       loadItems("sold", "sold");
     } else if (activeTab === "boosts") {
       loadAllBoosts();
     } else if (activeTab === "businesses") {
       loadPendingBusinesses();
+    } else if (activeTab !== "payment") {
+      loadItems(activeTab, statusView);
+      loadViewStats(activeTab);
+      loadTopViewed(activeTab);
     }
   }, [activeTab, statusView]);
 
@@ -549,7 +559,39 @@ export default function AdminDashboard() {
 
   // ── render ─────────────────────────────────────────────────
   return (
-    <div className="admin-dashboard">
+    <div className="admin-dashboard-container">
+      {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />}
+      <aside className={`admin-sidebar ${isSidebarOpen ? 'open' : ''}`}>
+        <div className="admin-sidebar-brand">
+          <span className="brand-emoji">🛡️</span> AXXSPACE ADMIN
+          <button className="btn-close-sidebar-mobile" onClick={() => setIsSidebarOpen(false)}>✕</button>
+        </div>
+        <div className="admin-sidebar-subtitle">Control Center</div>
+        <TabNavigation
+          tabs={TABS}
+          activeTab={activeTab}
+          setActiveTab={(tab) => {
+            setActiveTab(tab);
+            setIsSidebarOpen(false);
+            if (tab !== "sold" && tab !== "payment" && tab !== "boosts") setStatusView("pending");
+          }}
+          pendingCounts={{
+            allPending,
+            businesses: stats?.businesses,
+            announcements: pendingAnnouncements.length,
+            verification: pendingVerifications.length
+          }}
+          hasPendingBoosts={hasPendingBoosts}
+          pendingBoosts={pendingBoosts}
+        />
+      </aside>
+      <main className="admin-main-content">
+        <div className="mobile-header-bar">
+          <button className="btn-toggle-sidebar" onClick={() => setIsSidebarOpen(true)}>
+            ☰ Menu
+          </button>
+          <span className="mobile-logo-text">🛡️ AXXSPACE</span>
+        </div>
 
       {/* HEADER */}
       <AdminHeader>
@@ -581,7 +623,7 @@ export default function AdminDashboard() {
       </AdminHeader>
 
       {/* STATS */}
-      {stats && (
+      {activeTab === "overview" && stats && (
         <>
           <div className="stats-grid">
             {[
@@ -766,23 +808,7 @@ export default function AdminDashboard() {
         </>
       )}
 
-      {/* TABS */}
-      <TabNavigation
-        tabs={TABS}
-        activeTab={activeTab}
-        setActiveTab={(tab) => {
-          setActiveTab(tab);
-          if (tab !== "sold" && tab !== "payment" && tab !== "boosts") setStatusView("pending");
-        }}
-        pendingCounts={{
-          allPending,
-          businesses: stats?.businesses,
-          announcements: pendingAnnouncements.length,
-          verification: pendingVerifications.length
-        }}
-        hasPendingBoosts={hasPendingBoosts}
-        pendingBoosts={pendingBoosts}
-      />
+      {/* Tabs rendered in Sidebar */}
 
       {/* STATUS VIEW TOGGLE */}
       {activeTab !== "payment" && activeTab !== "sold" && activeTab !== "boosts" && (
@@ -838,7 +864,7 @@ export default function AdminDashboard() {
       )}
 
       {/* CONTENT */}
-      {activeTab === "boosts" ? (
+      {activeTab === "overview" ? null : activeTab === "boosts" ? (
         <PaymentNotifications
           pendingBoosts={pendingBoosts}
           allBoosts={allBoosts}
@@ -1162,6 +1188,7 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+      </main>
     </div>
   );
 }

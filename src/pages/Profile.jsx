@@ -319,8 +319,14 @@ export default function Profile() {
                   🏪 Seller Dashboard
                 </button>
               )}
-              <button style={styles.button} onClick={() => navigate("/business-dashboard")}>
-                🏪 Business Dashboard
+              <button style={styles.button} onClick={() => {
+                const role = displayProfile?.role;
+                if (role === "landlord") navigate("/dashboard");
+                else if (role === "seller") navigate("/seller-dashboard");
+                else if (role === "mover") navigate("/mover-dashboard");
+                else navigate("/business-dashboard");
+              }}>
+                📊 My Workspace Dashboard
               </button>
             </div>
           </div>

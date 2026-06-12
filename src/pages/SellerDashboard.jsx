@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 import { UserProfileEditor, ProfileAvatar } from "../features/profile";
 import VerificationStatus from "../components/VerificationStatus";
 
@@ -36,6 +37,7 @@ const resolveStatus = (material) => {
 
 export default function SellerDashboard() {
   const navigate = useNavigate();
+  const { token: ctxToken, user: ctxUser } = useContext(AuthContext);
   const [seller, setSeller] = useState(null);
   const [token, setToken] = useState(null);
   const [materials, setMaterials] = useState([]);
@@ -57,8 +59,8 @@ export default function SellerDashboard() {
   });
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("sellerToken");
-    const storedUser = localStorage.getItem("sellerUser");
+    const storedToken = localStorage.getItem("sellerToken") || ctxToken;
+    const storedUser = localStorage.getItem("sellerUser") || (ctxUser ? JSON.stringify(ctxUser) : null);
     if (!storedToken || !storedUser) {
       navigate("/seller-login");
       return;
@@ -66,7 +68,7 @@ export default function SellerDashboard() {
     setToken(storedToken);
     setSeller(JSON.parse(storedUser));
     fetchMyMaterials(storedToken);
-  }, []);
+  }, [ctxToken, ctxUser]);
 
   useEffect(() => {
     if (materials.length > 0) {
