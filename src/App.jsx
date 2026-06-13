@@ -176,7 +176,7 @@ function App() {
         path="/business/create"
         element={
           <PublicLayout>
-            <ProtectedRoute loginPath="/business-login" allowedRoles={["user", "seller"]} preferSeller>
+            <ProtectedRoute loginPath="/business-login" allowedRoles={["user", "seller"]}>
               <BusinessForm />
             </ProtectedRoute>
           </PublicLayout>
@@ -186,7 +186,7 @@ function App() {
         path="/business/edit/:id"
         element={
           <PublicLayout>
-            <ProtectedRoute loginPath="/business-login" allowedRoles={["user", "seller"]} preferSeller>
+            <ProtectedRoute loginPath="/business-login" allowedRoles={["user", "seller"]}>
               <BusinessForm />
             </ProtectedRoute>
           </PublicLayout>
