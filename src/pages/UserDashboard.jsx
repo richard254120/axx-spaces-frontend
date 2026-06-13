@@ -327,9 +327,11 @@ export default function UserDashboard() {
           <button style={{ ...s.navItem, ...(activeTab === "businesses" && s.navItemActive) }} onClick={() => { setActiveTab("businesses"); setSidebarOpen(false); }}>
             <span style={s.navIcon}>🏢</span> Directory Listings
           </button>
-          <button style={{ ...s.navItem, ...(activeTab === "properties" && s.navItemActive) }} onClick={() => { setActiveTab("properties"); setSidebarOpen(false); }}>
-            <span style={s.navIcon}>🏠</span> Rentals / Properties
-          </button>
+          {user?.role === "landlord" && (
+            <button style={{ ...s.navItem, ...(activeTab === "properties" && s.navItemActive) }} onClick={() => { setActiveTab("properties"); setSidebarOpen(false); }}>
+              <span style={s.navIcon}>🏠</span> Rentals / Properties
+            </button>
+          )}
           <button style={{ ...s.navItem, ...(activeTab === "materials" && s.navItemActive) }} onClick={() => { setActiveTab("materials"); setSidebarOpen(false); setMaterialView("list"); }}>
             <span style={s.navIcon}>🛒</span> QuickSales / Items
           </button>
@@ -385,20 +387,24 @@ export default function UserDashboard() {
                 <div style={s.statValue}>{businesses.length}</div>
                 <div style={s.statLabel}>Businesses (Directory)</div>
               </div>
-              <div style={s.statCard}>
-                <div style={s.statValue}>{properties.length}</div>
-                <div style={s.statLabel}>Properties (Rentals)</div>
-              </div>
+              {user?.role === "landlord" && (
+                <div style={s.statCard}>
+                  <div style={s.statValue}>{properties.length}</div>
+                  <div style={s.statLabel}>Properties (Rentals)</div>
+                </div>
+              )}
               <div style={s.statCard}>
                 <div style={s.statValue}>{materials.length}</div>
                 <div style={s.statLabel}>Materials (QuickSales)</div>
               </div>
             </div>
 
-            {/* KYC widget */}
-            <div style={s.kycContainer}>
-              <VerificationStatus />
-            </div>
+            {/* KYC widget - Landlord Only */}
+            {user?.role === "landlord" && (
+              <div style={s.kycContainer}>
+                <VerificationStatus />
+              </div>
+            )}
 
             {/* Quick Actions Panel */}
             <div style={s.panelCard}>
@@ -407,9 +413,11 @@ export default function UserDashboard() {
                 <button style={s.actionGridBtn} onClick={() => navigate("/business/create")}>
                   🏢 Register New Business
                 </button>
-                <button style={s.actionGridBtn} onClick={() => navigate("/upload")}>
-                  🏠 Upload Rental Property
-                </button>
+                {user?.role === "landlord" && (
+                  <button style={s.actionGridBtn} onClick={() => navigate("/upload")}>
+                    🏠 Upload Rental Property
+                  </button>
+                )}
                 <button style={s.actionGridBtn} onClick={() => { setActiveTab("materials"); setMaterialView("upload"); }}>
                   🛒 List Material/Item
                 </button>
@@ -463,8 +471,8 @@ export default function UserDashboard() {
           </div>
         )}
 
-        {/* PROPERTIES TAB */}
-        {activeTab === "properties" && (
+        {/* PROPERTIES TAB - Landlord Only */}
+        {activeTab === "properties" && user?.role === "landlord" && (
           <div style={s.panelCard}>
             <div style={s.panelFlexHeader}>
               <h2 style={s.tabTitle}>🏠 My Rental Listings</h2>
