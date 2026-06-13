@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -24,6 +25,15 @@ const CONDITIONS = ["Like New", "Excellent", "Good", "Fair", "For Parts"];
 export default function Marketplace() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { token, user } = useContext(AuthContext);
+
+  // Check for seller authentication
+  const [isSeller, setIsSeller] = useState(false);
+
+  useEffect(() => {
+    const sellerToken = localStorage.getItem("sellerToken");
+    setIsSeller(!!sellerToken);
+  }, []);
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -186,9 +196,16 @@ export default function Marketplace() {
           <h1 style={styles.heroTitle}>Smart Shopping, Smarter Prices</h1>
           <p style={styles.heroSubtitle}>Discover quality second-hand items, materials, furniture, electronics, and more from verified local sellers. Buy smart, save big, give items a second life.</p>
         </div>
-        <button onClick={handleSell} style={styles.heroUploadBtn}>
-          <span style={{ fontSize: "1.2rem", marginRight: "6px" }}>💰</span> Sell Your Item
-        </button>
+        <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+          {isSeller && (
+            <button onClick={() => navigate("/seller-dashboard")} style={{ ...styles.heroUploadBtn, background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)" }}>
+              <span style={{ fontSize: "1.2rem", marginRight: "6px" }}>📊</span> My Dashboard
+            </button>
+          )}
+          <button onClick={handleSell} style={styles.heroUploadBtn}>
+            <span style={{ fontSize: "1.2rem", marginRight: "6px" }}>💰</span> Sell Your Item
+          </button>
+        </div>
       </div>
 
       {/* FILTER BAR */}
