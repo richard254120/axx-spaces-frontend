@@ -196,11 +196,11 @@ function App() {
       <Route
         path="/business-dashboard"
         element={
-          <PublicLayout>
-            <ProtectedRoute loginPath="/business-login">
+          <DashboardLayout>
+            <ProtectedRoute loginPath="/business-login" allowedRoles={["user"]}>
               <UserDashboard />
             </ProtectedRoute>
-          </PublicLayout>
+          </DashboardLayout>
         }
       />
 
