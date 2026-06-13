@@ -1,6 +1,7 @@
 import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { kenyanUniversities, searchUniversities } from "../data/kenyanUniversities";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -54,6 +55,8 @@ export default function Upload() {
     lng: "",
     bookedUnits: 0,
     initiallyBooked: false,
+    university: "",
+    universityId: "",
   });
 
   const [images, setImages] = useState([]);
@@ -64,6 +67,7 @@ export default function Upload() {
   const [success, setSuccess] = useState("");
   const [activeSection, setActiveSection] = useState("basic");
   const [consent, setConsent] = useState(false);
+  const [universitySearch, setUniversitySearch] = useState("");
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -201,7 +205,7 @@ export default function Upload() {
         bedrooms: "", bathrooms: "", amenities: [], totalUnits: 1,
         furnished: false, leaseType: "monthly", availableFrom: "", rules: "",
         propertyType: "", county: "", lat: "", lng: "",
-        bookedUnits: 0, initiallyBooked: false,
+        bookedUnits: 0, initiallyBooked: false, university: "", universityId: "",
       });
       setImages([]);
       setImagePreviews([]);
@@ -290,6 +294,19 @@ export default function Upload() {
             <div style={styles.formGroup}>
               <label style={styles.label}>Location *</label>
               <input type="text" name="location" placeholder="e.g., Westlands" value={formData.location} onChange={handleChange} style={styles.input} required />
+            </div>
+
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Nearby University (Optional)</label>
+              <select name="university" value={formData.university} onChange={handleChange} style={styles.input}>
+                <option value="">Select University (if near campus)</option>
+                {kenyanUniversities.map((uni) => (
+                  <option key={uni.id} value={uni.name}>
+                    {uni.name} - {uni.location}
+                  </option>
+                ))}
+              </select>
+              <p style={styles.hint}>Select if your property is near a university for better visibility to students</p>
             </div>
 
             <div style={styles.formGroup}>
@@ -586,6 +603,12 @@ const styles = {
     color: "#cbd5e1",
     marginBottom: "6px",
     textTransform: "uppercase",
+  },
+  hint: {
+    fontSize: "11px",
+    color: "#64748b",
+    marginTop: "4px",
+    marginBottom: "0",
   },
   input: {
     width: "100%",

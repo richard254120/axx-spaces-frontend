@@ -7,7 +7,7 @@ import { UserProfileEditor, ProfileAvatar } from "../features/profile";
 import VerificationBadges from "../components/VerificationBadges";
 import AnalyticsDashboard from "../components/AnalyticsDashboard";
 
-const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
+import { getDashboardPath } from "../utils/dashboardRoutes";
 
 const COUNTIES = [
   "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta", "Garissa", "Wajir",
@@ -68,12 +68,16 @@ export default function UserDashboard() {
   // Load all dashboard content
   useEffect(() => {
     if (!token) {
-      navigate("/login");
+      navigate("/business-login");
+      return;
+    }
+    if (user && user.role !== "user") {
+      navigate(getDashboardPath(user.role));
       return;
     }
     loadAllData();
     fetchAgents();
-  }, [token]);
+  }, [token, user]);
 
   const loadAllData = async () => {
     setLoading(true);

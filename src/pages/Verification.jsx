@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { getDashboardPath } from '../utils/dashboardRoutes';
 import DocumentUpload from '../components/DocumentUpload';
 import SelfieCapture from '../components/SelfieCapture';
 
@@ -169,15 +170,8 @@ const Verification = () => {
 
       setSuccess('Verification submitted successfully! You will be notified once reviewed.');
 
-      // Redirect to appropriate dashboard based on user role
-      const userRole = user?.role || user?.userType || 'user';
-      let dashboardRoute = '/business-dashboard';
-
-      if (userRole === 'landlord') dashboardRoute = '/dashboard';
-      else if (userRole === 'seller') dashboardRoute = '/seller-dashboard';
-      else if (userRole === 'mover') dashboardRoute = '/mover-dashboard';
-
-      setTimeout(() => navigate(dashboardRoute), 2000);
+      const userRole = user?.role || user?.userType || "user";
+      setTimeout(() => navigate(getDashboardPath(userRole)), 2000);
     } catch (err) {
       setError(err.message || 'Failed to submit verification. Please try again.');
     } finally {

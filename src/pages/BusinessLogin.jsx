@@ -2,6 +2,7 @@ import { useState, useContext, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
+import { getDashboardPath } from "../utils/dashboardRoutes";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -257,7 +258,7 @@ export default function BusinessLogin() {
       setSuccess("✅ Google login successful! Redirecting...");
 
       setTimeout(() => {
-        navigate("/business-dashboard");
+        navigate(getDashboardPath(data.user?.role));
       }, 1000);
 
     } catch (err) {
@@ -281,7 +282,7 @@ export default function BusinessLogin() {
       setSuccess("✅ Login successful! Redirecting to your dashboard...");
 
       setTimeout(() => {
-        navigate("/business-dashboard");
+        navigate(getDashboardPath(user?.role));
       }, 1500);
     } catch (err) {
       setError(err.response?.data?.error || "Login failed. Please check your credentials.");

@@ -6,6 +6,8 @@ import VerificationBadges from "../components/VerificationBadges";
 import VerificationStatus from "../components/VerificationStatus";
 import AnalyticsDashboard from "../components/AnalyticsDashboard";
 
+import { getDashboardPath } from "../utils/dashboardRoutes";
+
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
 export default function LandlordDashboard() {
@@ -25,6 +27,10 @@ export default function LandlordDashboard() {
   useEffect(() => {
     if (!token) {
       navigate("/login");
+      return;
+    }
+    if (user && user.role !== "landlord") {
+      navigate(getDashboardPath(user.role));
       return;
     }
     if (user) {

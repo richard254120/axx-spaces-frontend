@@ -4,6 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import { ProfileAvatar } from "../features/profile";
 import AccountTypeSelector from "./AccountTypeSelector";
 import NotificationBell from "./NotificationSystem";
+import { getDashboardPath } from "../utils/dashboardRoutes";
 import logo from "../assets/image.png";
 
 export default function Navbar() {
@@ -16,15 +17,12 @@ export default function Navbar() {
   const [accountSelectorOpen, setAccountSelectorOpen] = useState(false);
   const [accountSelectorMode, setAccountSelectorMode] = useState("login");
   const [jobDropdownOpen, setJobDropdownOpen] = useState(null);
+  const [rentalsDropdownOpen, setRentalsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const accountRef = useRef(null);
+  const rentalsDropdownRef = useRef(null);
 
-  const getDashboardLink = () => {
-    if (user?.role === "landlord") return "/dashboard";
-    if (user?.role === "seller") return "/seller-dashboard";
-    if (user?.role === "mover") return "/mover-dashboard";
-    return "/business-dashboard";
-  };
+  const getDashboardLink = () => getDashboardPath(user?.role);
 
   const isActive = (path) => {
     if (path === "/") {
@@ -61,6 +59,9 @@ export default function Navbar() {
       }
       if (accountRef.current && !accountRef.current.contains(e.target)) {
         setAccountOpen(false);
+      }
+      if (rentalsDropdownRef.current && !rentalsDropdownRef.current.contains(e.target)) {
+        setRentalsDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -852,6 +853,35 @@ const styles = {
 
   // ─── RENTALS DROPDOWN STYLES ─────────────────────────────────────────────
 
+  rentalsDropdownWrapper: {
+    position: "relative",
+  },
+
+  rentalsDropdown: {
+    position: "absolute",
+    top: "calc(100% + 8px)",
+    left: 0,
+    background: "linear-gradient(180deg, rgba(30,41,59,0.98) 0%, rgba(15,23,41,0.98) 100%)",
+    border: "1px solid rgba(251,191,36,0.3)",
+    borderRadius: "12px",
+    minWidth: "180px",
+    zIndex: 1000,
+    overflow: "hidden",
+    boxShadow: "0 10px 40px rgba(0,0,0,0.4)",
+    backdropFilter: "blur(12px)",
+  },
+
+  rentalsDropdownItem: {
+    display: "block",
+    padding: "12px 16px",
+    color: "#cbd5e1",
+    fontSize: "13px",
+    fontWeight: 600,
+    textDecoration: "none",
+    transition: "all 0.2s ease",
+    borderBottom: "1px solid rgba(51,65,85,0.2)",
+  },
+
   rentalsDropdownHeader: {
     padding: "8px 14px 4px",
     fontSize: "10px",
@@ -859,19 +889,6 @@ const styles = {
     color: "#64748b",
     textTransform: "uppercase",
     letterSpacing: "1px",
-  },
-
-  rentalsDropdownItem: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-    padding: "9px 14px",
-    color: "#cbd5e1",
-    fontSize: "13px",
-    fontWeight: 600,
-    textDecoration: "none",
-    borderRadius: "8px",
-    transition: "background 0.15s",
   },
 
   rentalsDropdownDivider: {

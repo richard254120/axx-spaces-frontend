@@ -156,6 +156,7 @@ export default function BusinessRegister() {
         email: formData.email,
         phone: formData.phone,
         password: formData.password,
+        role: "user",
       });
 
       setSuccess("✅ Registration successful! Please check your email to verify your account, then login.");

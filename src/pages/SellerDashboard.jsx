@@ -4,6 +4,8 @@ import { AuthContext } from "../context/AuthContext";
 import { UserProfileEditor, ProfileAvatar } from "../features/profile";
 import VerificationStatus from "../components/VerificationStatus";
 
+import { getDashboardPath } from "../utils/dashboardRoutes";
+
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
 const COUNTIES = [
@@ -65,8 +67,13 @@ export default function SellerDashboard() {
       navigate("/seller-login");
       return;
     }
+    const parsed = JSON.parse(storedUser);
+    if (parsed?.role && parsed.role !== "seller") {
+      navigate(getDashboardPath(parsed.role));
+      return;
+    }
     setToken(storedToken);
-    setSeller(JSON.parse(storedUser));
+    setSeller(parsed);
     fetchMyMaterials(storedToken);
   }, [ctxToken, ctxUser]);
 

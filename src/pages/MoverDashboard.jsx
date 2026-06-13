@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import VerificationStatus from "../components/VerificationStatus";
 import { UserProfileEditor } from "../features/profile";
 
+import { getDashboardPath } from "../utils/dashboardRoutes";
+
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
 const VEHICLE_TYPES = ["Pickup", "Van", "Lorry", "Motorbike", "Truck"];
@@ -36,7 +38,7 @@ export default function MoverDashboard() {
 
   useEffect(() => {
     if (!user) { navigate("/login"); return; }
-    if (user?.role !== "mover") { navigate("/dashboard"); return; }
+    if (user?.role !== "mover") { navigate(getDashboardPath(user?.role)); return; }
     fetchAll();
   }, [user, token]);
 

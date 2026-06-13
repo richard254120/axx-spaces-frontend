@@ -1,7 +1,6 @@
 // App.jsx
 import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
-import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "./context/AuthContext";
+import { useEffect, useState } from "react";
 import { useDevToolsProtection } from "./hooks/useDevToolsProtection";
 
 import Navbar from "./components/Navbar";
@@ -85,26 +84,7 @@ function DashboardLayout({ children }) {
   return <>{children}</>;
 }
 
-// ─── Route guard ────────────────────────────────────────────────────────────
-
-const ProtectedRoute = ({ children, allowedRoles = [], businessRoute = false }) => {
-  const { token, user } = useContext(AuthContext);
-
-  if (!token) {
-    if (businessRoute) {
-      return <Navigate to="/business-login" replace />;
-    }
-    return <Navigate to="/login" replace />;
-  }
-
-  if (allowedRoles.length > 0 && user?.role && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/" replace />;
-  }
-
-  return children;
-};
-
-// ─── App ────────────────────────────────────────────────────────────────────
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   const navigate = useNavigate();
@@ -170,7 +150,7 @@ function App() {
         path="/tourism/dashboard"
         element={
           <DashboardLayout>
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["landlord"]}>
               <ProviderDashboard />
             </ProtectedRoute>
           </DashboardLayout>
@@ -180,7 +160,7 @@ function App() {
         path="/tourism/dashboard/property/:id"
         element={
           <DashboardLayout>
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["landlord"]}>
               <EditPropertyPage />
             </ProtectedRoute>
           </DashboardLayout>
@@ -196,7 +176,9 @@ function App() {
         path="/business/create"
         element={
           <DashboardLayout>
-            <ProtectedRoute businessRoute><BusinessForm /></ProtectedRoute>
+            <ProtectedRoute allowedRoles={["user"]} loginPath="/business-login">
+              <BusinessForm />
+            </ProtectedRoute>
           </DashboardLayout>
         }
       />
@@ -204,7 +186,7 @@ function App() {
         path="/business/edit/:id"
         element={
           <DashboardLayout>
-            <ProtectedRoute businessRoute>
+            <ProtectedRoute allowedRoles={["user"]} loginPath="/business-login">
               <BusinessForm />
             </ProtectedRoute>
           </DashboardLayout>
@@ -215,7 +197,7 @@ function App() {
         path="/business-dashboard"
         element={
           <DashboardLayout>
-            <ProtectedRoute businessRoute>
+            <ProtectedRoute allowedRoles={["user"]} loginPath="/business-login">
               <UserDashboard />
             </ProtectedRoute>
           </DashboardLayout>
@@ -225,7 +207,13 @@ function App() {
       {/* ── DASHBOARD ROUTES (no Navbar) ── */}
       <Route
         path="/seller-dashboard"
-        element={<DashboardLayout><SellerDashboard /></DashboardLayout>}
+        element={
+          <DashboardLayout>
+            <ProtectedRoute allowedRoles={["seller"]} loginPath="/seller-login" preferSeller>
+              <SellerDashboard />
+            </ProtectedRoute>
+          </DashboardLayout>
+        }
       />
       <Route
         path="/dashboard"
@@ -253,7 +241,9 @@ function App() {
         path="/upload"
         element={
           <PublicLayout>
-            <ProtectedRoute><Upload /></ProtectedRoute>
+            <ProtectedRoute allowedRoles={["landlord"]}>
+              <Upload />
+            </ProtectedRoute>
           </PublicLayout>
         }
       />
@@ -261,7 +251,9 @@ function App() {
         path="/premium-plans"
         element={
           <PublicLayout>
-            <ProtectedRoute><PremiumPlans /></ProtectedRoute>
+            <ProtectedRoute allowedRoles={["landlord"]}>
+              <PremiumPlans />
+            </ProtectedRoute>
           </PublicLayout>
         }
       />
@@ -269,7 +261,9 @@ function App() {
         path="/checkout"
         element={
           <PublicLayout>
-            <ProtectedRoute><Checkout /></ProtectedRoute>
+            <ProtectedRoute allowedRoles={["landlord"]}>
+              <Checkout />
+            </ProtectedRoute>
           </PublicLayout>
         }
       />
@@ -352,7 +346,9 @@ function App() {
         path="/admin/verification"
         element={
           <PublicLayout>
-            <ProtectedRoute><AdminVerification /></ProtectedRoute>
+            <ProtectedRoute allowedRoles={["admin", "team"]}>
+              <AdminVerification />
+            </ProtectedRoute>
           </PublicLayout>
         }
       />

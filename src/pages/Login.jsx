@@ -3,6 +3,8 @@ import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { COLORS, buttonStyles, inputStyles, pageStyles } from "../styles/theme";
 
+import { getDashboardPath } from "../utils/dashboardRoutes";
+
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
@@ -129,14 +131,7 @@ export default function Login() {
       setSuccess("✅ Google login successful! Redirecting...");
 
       setTimeout(() => {
-        const userRole = data.user?.role?.toLowerCase().trim();
-        if (userRole === "landlord") {
-          navigate("/dashboard");
-        } else if (userRole === "mover") {
-          navigate("/mover-dashboard");
-        } else {
-          navigate("/");
-        }
+        navigate(getDashboardPath(data.user?.role));
       }, 800);
 
     } catch (err) {
@@ -177,14 +172,7 @@ export default function Login() {
       setSuccess("✅ Login successful! Redirecting...");
 
       setTimeout(() => {
-        const userRole = data.user?.role?.toLowerCase().trim();
-        if (userRole === "landlord") {
-          navigate("/dashboard");
-        } else if (userRole === "mover") {
-          navigate("/mover-dashboard");
-        } else {
-          navigate("/");
-        }
+        navigate(getDashboardPath(data.user?.role));
       }, 800);
 
     } catch (err) {

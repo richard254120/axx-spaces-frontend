@@ -1,7 +1,10 @@
 import { useState, useContext, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import PhoneInput from "../components/PhoneInput";
 import { COLORS, buttonStyles, inputStyles, pageStyles } from "../styles/theme";
+
+import { getDashboardPath } from "../utils/dashboardRoutes";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -126,7 +129,7 @@ export default function Register() {
       setSuccess("✅ Google registration successful! Redirecting...");
 
       setTimeout(() => {
-        navigate("/dashboard");
+        navigate(getDashboardPath(data.user?.role));
       }, 1000);
 
     } catch (err) {
