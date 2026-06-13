@@ -181,9 +181,14 @@ export default function SellerDashboard() {
             <span>Vendor: <strong style={{ color: "#fbbf24" }}>{seller.name}</strong></span>
           </p>
         </div>
-        <button style={s.uploadBtn} onClick={() => setView(view === "listings" ? "upload" : "listings")}>
-          {view === "listings" ? "+ Upload Material" : "View Inventory"}
-        </button>
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+          <button style={{ ...s.uploadBtn, background: "linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)" }} onClick={() => navigate("/business/create")}>
+            🏢 Add Business
+          </button>
+          <button style={s.uploadBtn} onClick={() => setView(view === "listings" ? "upload" : "listings")}>
+            {view === "listings" ? "+ Upload Material" : "View Inventory"}
+          </button>
+        </div>
       </div>
 
       <div style={s.statsGrid}>
