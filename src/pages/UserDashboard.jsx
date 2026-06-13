@@ -71,10 +71,8 @@ export default function UserDashboard() {
       navigate("/business-login");
       return;
     }
-    if (user && user.role !== "user") {
-      navigate(getDashboardPath(user.role));
-      return;
-    }
+    // Allow business users (role: "user") to access this dashboard
+    // Don't redirect them away from their intended dashboard
     loadAllData();
     fetchAgents();
   }, [token, user]);
@@ -90,7 +88,7 @@ export default function UserDashboard() {
       ]);
 
       setBusinesses(bizRes.data?.businesses || []);
-      
+
       const processedProperties = (propRes.data || []).map(p => ({
         ...p,
         availableUnits: Math.max(0, (p.totalUnits || 1) - (p.bookedUnits || 0)),
@@ -709,7 +707,7 @@ export default function UserDashboard() {
         {activeTab === "mover" && user?.role === "mover" && (
           <div style={s.panelCard}>
             <h2 style={s.tabTitle}>🚚 Mover Job Bookings</h2>
-            
+
             {moverJobs.length === 0 ? (
               <div style={s.emptyState}>
                 <p>No moving job requests registered to your profile.</p>
@@ -725,7 +723,7 @@ export default function UserDashboard() {
                         <h3 style={s.itemCardTitle}>{job.serviceType || "Household Moving"}</h3>
                         <span style={s.moverJobStatusBadge}>{job.status?.toUpperCase()}</span>
                       </div>
-                      
+
                       <div style={{ margin: "12px 0" }}>
                         <p style={s.moverJobText}>👤 Client: {job.customerName || "Anonymous"}</p>
                         <p style={s.moverJobText}>📞 Phone: {isPending ? "🔒 Accept job to unlock" : job.customerPhone}</p>
@@ -767,7 +765,7 @@ export default function UserDashboard() {
                 }}
               />
             </div>
-            
+
             <div style={s.panelCard}>
               <h2 style={s.tabTitle}>🔐 Identity & Verification status</h2>
               <VerificationStatus />
