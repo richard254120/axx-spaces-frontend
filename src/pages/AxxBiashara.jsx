@@ -31,7 +31,7 @@ const BADGE_CONFIG = {
 export default function AxxBiashara() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { token } = useContext(AuthContext);
+  const { token, user } = useContext(AuthContext);
 
   const [businesses, setBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -505,6 +505,11 @@ export default function AxxBiashara() {
               </p>
             </div>
             <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+              {token && user?.role === "user" && (
+                <button className="cta-btn" style={{ background: "linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)", color: "#fff", border: "none" }} onClick={() => navigate("/business-dashboard")}>
+                  📊 My Dashboard
+                </button>
+              )}
               <button className="cta-primary cta-btn" onClick={() => navigate("/business/create")}>
                 + Add Business
               </button>
