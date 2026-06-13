@@ -20,6 +20,7 @@ export default function Register() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [landlordType, setLandlordType] = useState("general");
 
   // Google Sign-In button ref
   const googleButtonRef = useRef(null);
@@ -110,6 +111,7 @@ export default function Register() {
           email: googleUser.email,
           name: googleUser.name,
           picture: googleUser.picture,
+          landlordType,
         }),
       });
 
@@ -157,7 +159,8 @@ export default function Register() {
         email: formData.email,
         password: formData.password,
         phone: formData.phone,
-        role: "landlord", // Hardcoded to landlord
+        role: "landlord",
+        landlordType,
       };
 
       console.log("📤 Sending registration payload:", payload);
@@ -209,10 +212,31 @@ export default function Register() {
       <div style={styles.container}>
         <div style={styles.formBox}>
           <h1 style={styles.title}>Landlord Sign Up</h1>
-          <p style={styles.subtitle}>Start listing your properties on Axxspace</p>
+          <p style={styles.subtitle}>Choose how you list, then create your account</p>
 
           {error && <div style={styles.error}>{error}</div>}
           {success && <div style={styles.success}>{success}</div>}
+
+          <div style={styles.typeRow}>
+            <button
+              type="button"
+              style={{ ...styles.typeCard, ...(landlordType === "general" ? styles.typeCardActive : {}) }}
+              onClick={() => setLandlordType("general")}
+            >
+              <span style={styles.typeIcon}>🏘️</span>
+              <strong>General Landlord</strong>
+              <span style={styles.typeDesc}>List rentals anywhere in Kenya</span>
+            </button>
+            <button
+              type="button"
+              style={{ ...styles.typeCard, ...(landlordType === "university" ? styles.typeCardActive : {}) }}
+              onClick={() => setLandlordType("university")}
+            >
+              <span style={styles.typeIcon}>🎓</span>
+              <strong>Near University</strong>
+              <span style={styles.typeDesc}>List hostels/rooms near a campus — shown to students</span>
+            </button>
+          </div>
 
           <form onSubmit={handleSubmit} style={styles.form}>
             <div style={styles.formGroup}>
@@ -363,6 +387,38 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: "20px",
+  },
+  typeRow: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "12px",
+    marginBottom: "24px",
+  },
+  typeCard: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: "6px",
+    padding: "14px 12px",
+    background: COLORS.bgDark,
+    border: `1px solid ${COLORS.border}`,
+    borderRadius: "12px",
+    cursor: "pointer",
+    textAlign: "left",
+    color: COLORS.textLight,
+    fontSize: "13px",
+    transition: "border-color 0.2s, background 0.2s",
+  },
+  typeCardActive: {
+    borderColor: COLORS.primary,
+    background: "rgba(251, 191, 36, 0.08)",
+  },
+  typeIcon: { fontSize: "1.4rem" },
+  typeDesc: {
+    fontSize: "11px",
+    color: COLORS.textMutedLight,
+    lineHeight: 1.4,
+    fontWeight: 400,
   },
   formGroup: {
     display: "flex",

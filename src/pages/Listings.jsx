@@ -8,6 +8,7 @@ import ReviewRatingSystem from "../components/ReviewRatingSystem";
 import BookingCalendar from "../components/BookingCalendar";
 import { useAuth } from "../context/AuthContext";
 import PhoneInput from "../components/PhoneInput";
+import { kenyanUniversities, searchUniversities } from "../data/kenyanUniversities";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -51,6 +52,11 @@ export default function Listings() {
   const [savedSearches, setSavedSearches] = useState([]);
   const [showSavedSearches, setShowSavedSearches] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [showUniversityHostels, setShowUniversityHostels] = useState(false);
+  const [selectedUniversity, setSelectedUniversity] = useState(null);
+  const [universitySearch, setUniversitySearch] = useState("");
+  const [universityProperties, setUniversityProperties] = useState([]);
+  const [universityLoading, setUniversityLoading] = useState(false);
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -92,6 +98,42 @@ export default function Listings() {
     filtered = filtered.filter((p) => p.price >= filters.minPrice && p.price <= filters.maxPrice);
     setFilteredProperties(filtered);
   }, [filters, properties, favorites, showFavoritesOnly]);
+
+  useEffect(() => {
+    if (!showUniversityHostels || !selectedUniversity?.id) {
+      setUniversityProperties([]);
+      return;
+    }
+
+    const fetchUniversityProperties = async () => {
+      setUniversityLoading(true);
+      try {
+        const params = new URLSearchParams({
+          universityId: String(selectedUniversity.id),
+          available: "true",
+          limit: "200",
+        });
+        const response = await fetch(`${API_BASE}/properties?${params}`);
+        if (!response.ok) throw new Error("Failed to fetch university listings");
+        const data = await response.json();
+        const processed = data.map((prop) => ({
+          ...prop,
+          availableUnits: Math.max(0, (prop.totalUnits || 1) - (prop.bookedUnits || 0)),
+        }));
+        setUniversityProperties(processed.filter((p) => p.availableUnits > 0));
+      } catch (err) {
+        setError(err.message);
+        setUniversityProperties([]);
+      } finally {
+        setUniversityLoading(false);
+      }
+    };
+
+    fetchUniversityProperties();
+  }, [showUniversityHostels, selectedUniversity]);
+
+  const displayProperties =
+    showUniversityHostels && selectedUniversity ? universityProperties : filteredProperties;
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -201,6 +243,10 @@ export default function Listings() {
             <span style={S.heroTitleLine2}>Perfect Home</span>
           </h1>
           <p style={S.heroSub}>Curated rentals across Kenya's finest locations</p>
+          <div style={S.partnerNotice} className="partner-shimmer">
+            <span style={S.partnerIcon}>🤝</span>
+            <span>We are working with partners to bring a better experience soon</span>
+          </div>
 
           {!user && (
             <div style={S.heroButtons}>
@@ -217,45 +263,65 @@ export default function Listings() {
 
         {error && <div style={S.errorBar}>{error}</div>}
 
-        {/* ── SEARCH STRIP ── */}
-        <div style={S.searchStrip}>
-          <div style={S.searchStripInner}>
-            <div style={S.searchField}>
-              <span style={S.searchIcon}>⌖</span>
-              <input type="text" name="location" placeholder="Location or county…" value={filters.location} onChange={handleFilterChange} style={S.searchInput} className="search-inp" />
-            </div>
-            <div style={S.searchDivider} />
-            <div style={S.searchField}>
-              <span style={S.searchIcon}>⊞</span>
-              <select name="propertyType" value={filters.propertyType} onChange={handleFilterChange} style={S.searchSelect} className="search-inp">
-                <option value="">Property Type</option>
-                <option value="apartment">Apartment</option>
-                <option value="bedsitter">Bedsitter</option>
-                <option value="maisonette">Maisonette</option>
-                <option value="studio">Studio</option>
-                <option value="house">House</option>
-              </select>
-            </div>
-            <div style={S.searchDivider} />
-            <div style={S.searchField}>
-              <span style={S.searchIcon}>🛏</span>
-              <select name="bedrooms" value={filters.bedrooms} onChange={handleFilterChange} style={S.searchSelect} className="search-inp">
-                <option value="">Bedrooms</option>
-                <option value="1">1 Bedroom</option>
-                <option value="2">2 Bedrooms</option>
-                <option value="3">3 Bedrooms</option>
-                <option value="4">4+ Bedrooms</option>
-              </select>
-            </div>
-            <div style={S.searchDivider} />
-            <button className="btn-gold" style={{ ...S.btnGold, padding: "0 28px", fontSize: "0.85rem", borderRadius: "6px" }} onClick={() => setFiltersOpen(v => !v)}>
-              {filtersOpen ? "Close Filters" : "More Filters"}
-            </button>
-          </div>
+        {/* ── TABS SECTION ── */}
+        <div style={S.tabsSection}>
+          <button
+            className="tab-btn"
+            style={{ ...S.tabBtn, ...(!showUniversityHostels ? S.tabBtnActive : {}) }}
+            onClick={() => setShowUniversityHostels(false)}
+          >
+            All Rentals
+          </button>
+          <button
+            className="tab-btn"
+            style={{ ...S.tabBtn, ...(showUniversityHostels ? S.tabBtnActive : {}) }}
+            onClick={() => setShowUniversityHostels(true)}
+          >
+            🎓 University Hostels
+          </button>
         </div>
 
-        {/* ── EXPANDED FILTERS ── */}
-        {filtersOpen && (
+        {/* ── SEARCH STRIP (only show when NOT in university hostels mode) ── */}
+        {!showUniversityHostels && (
+          <div style={S.searchStrip}>
+            <div style={S.searchStripInner}>
+              <div style={S.searchField}>
+                <span style={S.searchIcon}>⌖</span>
+                <input type="text" name="location" placeholder="Location or county…" value={filters.location} onChange={handleFilterChange} style={S.searchInput} className="search-inp" />
+              </div>
+              <div style={S.searchDivider} />
+              <div style={S.searchField}>
+                <span style={S.searchIcon}>⊞</span>
+                <select name="propertyType" value={filters.propertyType} onChange={handleFilterChange} style={S.searchSelect} className="search-inp">
+                  <option value="">Property Type</option>
+                  <option value="apartment">Apartment</option>
+                  <option value="bedsitter">Bedsitter</option>
+                  <option value="maisonette">Maisonette</option>
+                  <option value="studio">Studio</option>
+                  <option value="house">House</option>
+                </select>
+              </div>
+              <div style={S.searchDivider} />
+              <div style={S.searchField}>
+                <span style={S.searchIcon}>🛏</span>
+                <select name="bedrooms" value={filters.bedrooms} onChange={handleFilterChange} style={S.searchSelect} className="search-inp">
+                  <option value="">Bedrooms</option>
+                  <option value="1">1 Bedroom</option>
+                  <option value="2">2 Bedrooms</option>
+                  <option value="3">3 Bedrooms</option>
+                  <option value="4">4+ Bedrooms</option>
+                </select>
+              </div>
+              <div style={S.searchDivider} />
+              <button className="btn-gold" style={{ ...S.btnGold, padding: "0 28px", fontSize: "0.85rem", borderRadius: "6px" }} onClick={() => setFiltersOpen(v => !v)}>
+                {filtersOpen ? "Close Filters" : "More Filters"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── EXPANDED FILTERS (only show when NOT in university hostels mode) ── */}
+        {!showUniversityHostels && filtersOpen && (
           <div style={S.filtersPanel} className="filters-panel">
             <div style={S.filtersGrid}>
               <div style={S.filterGroup}>
@@ -303,33 +369,100 @@ export default function Listings() {
           </div>
         )}
 
-        {/* ── TOOLBAR ── */}
-        <div style={S.toolbar}>
-          <p style={S.resultsText}>
-            <span style={S.resultsNum}>{filteredProperties.length}</span>
-            {filteredProperties.length === 1 ? " property found" : " properties found"}
-            {favorites.length > 0 && <span style={S.toolbarBit}> · ♥ {favorites.length} saved</span>}
-          </p>
-          <div style={S.toolbarActions}>
-            <button className="tool-btn" style={S.toolBtn} onClick={saveCurrentSearch}>🔖 Save Search</button>
-            {savedSearches.length > 0 && (
-              <button className="tool-btn" style={{ ...S.toolBtn, ...(showSavedSearches ? S.toolBtnActive : {}) }} onClick={() => setShowSavedSearches(!showSavedSearches)}>
-                Saved ({savedSearches.length})
+        {/* ── TOOLBAR (only show when NOT in university hostels mode) ── */}
+        {!showUniversityHostels && (
+          <div style={S.toolbar}>
+            <p style={S.resultsText}>
+              <span style={S.resultsNum}>{filteredProperties.length}</span>
+              {filteredProperties.length === 1 ? " property found" : " properties found"}
+              {favorites.length > 0 && <span style={S.toolbarBit}> · ♥ {favorites.length} saved</span>}
+            </p>
+            <div style={S.toolbarActions}>
+              <button className="tool-btn" style={S.toolBtn} onClick={saveCurrentSearch}>🔖 Save Search</button>
+              {savedSearches.length > 0 && (
+                <button className="tool-btn" style={{ ...S.toolBtn, ...(showSavedSearches ? S.toolBtnActive : {}) }} onClick={() => setShowSavedSearches(!showSavedSearches)}>
+                  Saved ({savedSearches.length})
+                </button>
+              )}
+              {favorites.length > 0 && (
+                <button className="tool-btn" style={{ ...S.toolBtn, ...(showFavoritesOnly ? S.toolBtnActive : {}) }} onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}>
+                  {showFavoritesOnly ? "Show All" : "♥ Favourites"}
+                </button>
+              )}
+              <button className="tool-btn" style={{ ...S.toolBtn, ...(showMap ? S.toolBtnActive : {}) }} onClick={() => setShowMap(v => !v)}>
+                {showMap ? "Hide Map" : "🗺 Map View"}
               </button>
-            )}
-            {favorites.length > 0 && (
-              <button className="tool-btn" style={{ ...S.toolBtn, ...(showFavoritesOnly ? S.toolBtnActive : {}) }} onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}>
-                {showFavoritesOnly ? "Show All" : "♥ Favourites"}
-              </button>
-            )}
-            <button className="tool-btn" style={{ ...S.toolBtn, ...(showMap ? S.toolBtnActive : {}) }} onClick={() => setShowMap(v => !v)}>
-              {showMap ? "Hide Map" : "🗺 Map View"}
-            </button>
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* ── SAVED SEARCHES ── */}
-        {showSavedSearches && savedSearches.length > 0 && (
+        {/* ── UNIVERSITY HOSTEL SECTION (only show when in university hostels mode) ── */}
+        {showUniversityHostels && (
+          <div style={S.universitySection}>
+            {/* Show university selection when no university is selected */}
+            {!selectedUniversity && (
+              <>
+                <div style={S.universityHeader}>
+                  <div style={S.universityBadge}>🎓 STUDENT HOUSING</div>
+                  <h2 style={S.universityTitle}>Find Hostels Near Your University</h2>
+                  <p style={S.universitySub}>Browse universities across all 47 counties in Kenya and discover affordable hostels nearby</p>
+                </div>
+
+                <div style={S.universitySearchBox}>
+                  <span style={S.searchIcon}>🔍</span>
+                  <input
+                    type="text"
+                    placeholder="Search your university (e.g., Nairobi, Kenyatta, JKUAT)..."
+                    value={universitySearch}
+                    onChange={(e) => setUniversitySearch(e.target.value)}
+                    style={S.universitySearchInput}
+                  />
+                </div>
+
+                <div style={S.universityGrid}>
+                  {(universitySearch ? searchUniversities(universitySearch) : kenyanUniversities).map((university) => (
+                    <div
+                      key={university.id}
+                      style={S.universityCard}
+                      onClick={() => setSelectedUniversity(university)}
+                    >
+                      <div style={S.universityCardIcon}>🏛️</div>
+                      <div style={S.universityCardName}>{university.name}</div>
+                      <div style={S.universityCardLocation}>
+                        <span>📍 {university.location}</span>
+                        <span style={S.universityCardCounty}>{university.county} County</span>
+                      </div>
+                      <div style={S.universityCardCode}>{university.code}</div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* Show selected university bar when a university is selected */}
+            {selectedUniversity && (
+              <div style={S.selectedUniversityBar}>
+                <div style={S.selectedUniversityInfo}>
+                  <span style={S.selectedUniversityLabel}>Showing hostels near:</span>
+                  <span style={S.selectedUniversityName}>{selectedUniversity.name}</span>
+                  <span style={S.selectedUniversityLocation}>📍 {selectedUniversity.location}, {selectedUniversity.county}</span>
+                </div>
+                <button
+                  style={S.clearUniversityBtn}
+                  onClick={() => {
+                    setSelectedUniversity(null);
+                    setUniversityProperties([]);
+                  }}
+                >
+                  ← Back to Universities
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── SAVED SEARCHES (only show when NOT in university hostels mode) ── */}
+        {!showUniversityHostels && showSavedSearches && savedSearches.length > 0 && (
           <div style={S.savedPanel}>
             <h3 style={S.savedTitle}>Saved Searches</h3>
             {savedSearches.map((s) => (
@@ -347,11 +480,14 @@ export default function Listings() {
           </div>
         )}
 
-        {showMap && <div style={S.mapWrap}><MapView properties={filteredProperties} /></div>}
+        {/* ── MAP VIEW (only show when NOT in university hostels mode) ── */}
+        {!showUniversityHostels && showMap && <div style={S.mapWrap}><MapView properties={filteredProperties} /></div>}
 
-        <RecentlyViewed onSelect={openModal} />
+        {/* ── RECENTLY VIEWED (only show when NOT in university hostels mode) ── */}
+        {!showUniversityHostels && <RecentlyViewed onSelect={openModal} />}
 
-        {filteredProperties.length === 0 && (
+        {/* ── EMPTY STATE (only show when NOT in university hostels mode) ── */}
+        {!showUniversityHostels && filteredProperties.length === 0 && (
           <div style={S.empty}>
             <div style={S.emptyIcon}>🔍</div>
             <p style={S.emptyTitle}>No properties match your search</p>
@@ -359,10 +495,25 @@ export default function Listings() {
           </div>
         )}
 
-        {/* ── PROPERTY GRID ── */}
-        {filteredProperties.length > 0 && (
+        {showUniversityHostels && selectedUniversity && universityLoading && (
+          <div style={S.empty}>
+            <p style={S.emptyTitle}>Loading listings near {selectedUniversity.name}...</p>
+          </div>
+        )}
+
+        {/* ── EMPTY STATE FOR UNIVERSITY HOSTELS (no hostels found) ── */}
+        {showUniversityHostels && selectedUniversity && !universityLoading && displayProperties.length === 0 && (
+          <div style={S.empty}>
+            <div style={S.emptyIcon}>🏠</div>
+            <p style={S.emptyTitle}>No hostels found near {selectedUniversity.name}</p>
+            <p style={S.emptySub}>Landlords near this campus can list here. Check back soon or try another university.</p>
+          </div>
+        )}
+
+        {/* ── PROPERTY GRID (show when NOT in university hostels mode, OR when university is selected) ── */}
+        {(!showUniversityHostels || selectedUniversity) && displayProperties.length > 0 && (
           <div style={S.grid}>
-            {filteredProperties.map((property, i) => (
+            {displayProperties.map((property, i) => (
               <article key={property._id} style={S.card} className="prop-card" onClick={() => openModal(property)}>
                 {/* Image */}
                 <div style={S.cardImg}>
@@ -681,6 +832,8 @@ const S = {
   heroTitleLine1: { display: "block", fontFamily: "'Cormorant Garamond', 'Georgia', serif", fontSize: "clamp(2.5rem, 6vw, 4.5rem)", fontWeight: 300, color: C.textMain, letterSpacing: "0.04em" },
   heroTitleLine2: { display: "block", fontFamily: "'Cormorant Garamond', 'Georgia', serif", fontSize: "clamp(2.5rem, 6vw, 4.5rem)", fontWeight: 700, color: C.gold, letterSpacing: "0.04em", fontStyle: "italic" },
   heroSub: { color: C.textMid, fontSize: "1.05rem", marginTop: "16px", letterSpacing: "0.06em" },
+  partnerNotice: { display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "10px", border: `1px solid ${C.border}`, borderRadius: "30px", padding: "8px 20px", marginTop: "20px", fontSize: "0.85rem", color: C.textMid, backdropFilter: "blur(8px)", letterSpacing: "0.02em" },
+  partnerIcon: { color: C.gold, fontSize: "1rem" },
   heroButtons: { display: "flex", gap: "14px", justifyContent: "center", marginTop: "36px" },
   heroDecor1: { position: "absolute", width: "400px", height: "400px", border: `1px solid rgba(201,168,76,0.06)`, borderRadius: "50%", top: "-150px", right: "-100px", pointerEvents: "none" },
   heroDecor2: { position: "absolute", width: "300px", height: "300px", border: `1px solid rgba(201,168,76,0.06)`, borderRadius: "50%", bottom: "-100px", left: "-80px", pointerEvents: "none" },
@@ -692,6 +845,11 @@ const S = {
   /* Main Body */
   mainBody: { maxWidth: "1280px", margin: "0 auto", padding: "0 28px 80px" },
   errorBar: { background: "rgba(224,82,82,0.12)", border: "1px solid rgba(224,82,82,0.3)", color: "#F28B8B", padding: "12px 18px", borderRadius: "8px", margin: "24px 0", textAlign: "center" },
+
+  /* Tabs Section */
+  tabsSection: { display: "flex", gap: "8px", marginBottom: "24px", borderBottom: `1px solid ${C.border}`, paddingBottom: "16px" },
+  tabBtn: { padding: "10px 20px", background: "transparent", border: `1px solid ${C.border}`, color: C.textMid, borderRadius: "8px", cursor: "pointer", fontSize: "0.9rem", fontWeight: 600, fontFamily: "'DM Sans', sans-serif", transition: "all 0.2s" },
+  tabBtnActive: { background: C.goldDim, borderColor: C.gold, color: C.gold },
 
   /* Search Strip */
   searchStrip: { background: C.navyMid, border: `1px solid ${C.border}`, borderRadius: "12px", margin: "-40px auto 36px", position: "relative", zIndex: 10, boxShadow: "0 20px 60px rgba(0,0,0,0.4)" },
@@ -726,6 +884,33 @@ const S = {
   savedDate: { color: C.textDim, margin: 0, fontSize: "0.78rem", marginTop: "3px" },
   savedApply: { padding: "6px 14px", background: C.goldDim, border: `1px solid ${C.gold}`, color: C.gold, borderRadius: "5px", cursor: "pointer", fontSize: "0.8rem", fontFamily: "'DM Sans', sans-serif" },
   savedDelete: { padding: "6px 14px", background: "rgba(224,82,82,0.1)", border: "1px solid rgba(224,82,82,0.3)", color: C.red, borderRadius: "5px", cursor: "pointer", fontSize: "0.8rem", fontFamily: "'DM Sans', sans-serif" },
+
+  /* University Section */
+  universitySection: { background: `linear-gradient(135deg, ${C.navyMid} 0%, ${C.navyLight} 50%, ${C.navyMid} 100%)`, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "32px 28px", marginBottom: "36px", position: "relative", overflow: "hidden" },
+  universityHeader: { textAlign: "center", marginBottom: "28px", position: "relative", zIndex: 2 },
+  universityBadge: { display: "inline-block", background: C.goldDim, border: `1px solid ${C.gold}`, color: C.gold, fontSize: "0.7rem", letterSpacing: "0.18em", padding: "6px 18px", borderRadius: "20px", marginBottom: "16px", textTransform: "uppercase", fontWeight: 700 },
+  universityTitle: { fontFamily: "'Cormorant Garamond', 'Georgia', serif", fontSize: "clamp(1.8rem, 3vw, 2.4rem)", fontWeight: 700, color: C.textMain, margin: "0 0 10px", letterSpacing: "0.02em" },
+  universitySub: { color: C.textMid, fontSize: "0.95rem", margin: 0, maxWidth: "500px", marginInline: "auto", lineHeight: 1.6 },
+  universitySearchBox: { display: "flex", alignItems: "center", gap: "12px", background: C.navy, border: `1px solid ${C.border}`, borderRadius: "10px", padding: "14px 18px", marginBottom: "28px", maxWidth: "600px", marginInline: "auto" },
+  universitySearchInput: { background: "transparent", border: "none", outline: "none", color: C.textMain, fontSize: "1rem", width: "100%", fontFamily: "'DM Sans', sans-serif" },
+  universityGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px", marginBottom: "24px" },
+  universityCard: { background: C.navy, border: `1px solid ${C.border}`, borderRadius: "12px", padding: "20px", cursor: "pointer", transition: "all 0.3s ease", position: "relative", overflow: "hidden" },
+  universityCardActive: { background: C.goldDim, borderColor: C.gold, transform: "translateY(-4px)", boxShadow: "0 12px 40px rgba(201,168,76,0.2)" },
+  universityCardIcon: { fontSize: "2rem", marginBottom: "12px" },
+  universityCardName: { fontFamily: "'Cormorant Garamond', 'Georgia', serif", fontSize: "1.1rem", fontWeight: 700, color: C.textMain, marginBottom: "8px", lineHeight: 1.3 },
+  universityCardLocation: { display: "flex", flexDirection: "column", gap: "4px", marginBottom: "12px" },
+  universityCardCounty: { fontSize: "0.8rem", color: C.textDim, fontWeight: 500 },
+  universityCardCode: { display: "inline-block", background: C.navyLight, border: `1px solid ${C.borderSoft}`, color: C.gold, padding: "4px 12px", borderRadius: "6px", fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.08em" },
+  selectedUniversityBar: { display: "flex", alignItems: "center", justifyContent: "space-between", background: C.goldDim, border: `1px solid ${C.gold}`, borderRadius: "10px", padding: "16px 20px", marginBottom: "20px", flexWrap: "wrap", gap: "12px" },
+  selectedUniversityInfo: { display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" },
+  selectedUniversityLabel: { color: C.textDim, fontSize: "0.85rem", fontWeight: 500 },
+  selectedUniversityName: { color: C.gold, fontSize: "1rem", fontWeight: 700, fontFamily: "'Cormorant Garamond', 'Georgia', serif" },
+  selectedUniversityLocation: { color: C.textMid, fontSize: "0.85rem" },
+  clearUniversityBtn: { padding: "8px 16px", background: "transparent", border: `1px solid ${C.gold}`, color: C.gold, borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem", fontWeight: 600, fontFamily: "'DM Sans', sans-serif", transition: "all 0.2s" },
+  universityFooter: { textAlign: "center", marginTop: "20px" },
+  toggleSectionBtn: { padding: "10px 20px", background: "transparent", border: `1px solid ${C.borderSoft}`, color: C.textDim, borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem", fontFamily: "'DM Sans', sans-serif", transition: "all 0.2s" },
+  showUniversityBar: { textAlign: "center", marginBottom: "28px" },
+  showUniversityBtn: { padding: "12px 24px", background: C.goldDim, border: `1px solid ${C.gold}`, color: C.gold, borderRadius: "8px", cursor: "pointer", fontSize: "0.9rem", fontWeight: 700, fontFamily: "'DM Sans', sans-serif", transition: "all 0.2s" },
 
   /* Map */
   mapWrap: { borderRadius: "12px", overflow: "hidden", marginBottom: "28px", border: `1px solid ${C.border}` },
@@ -872,6 +1057,15 @@ const css = `
   .filters-panel { animation: slideDown 0.25s ease; }
   @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
+  .partner-shimmer {
+    background: linear-gradient(120deg, rgba(201,168,76,0.05) 30%, rgba(201,168,76,0.18) 40%, rgba(201,168,76,0.18) 60%, rgba(201,168,76,0.05) 70%);
+    background-size: 200% auto;
+    animation: shine 4s linear infinite;
+  }
+  @keyframes shine {
+    to { background-position: 200% center; }
+  }
+
   .prop-card:hover { transform: translateY(-5px); box-shadow: 0 20px 50px rgba(0,0,0,0.35), 0 0 0 1px rgba(201,168,76,0.3); }
   .prop-card:hover .card-img-el { transform: scale(1.05); }
 
@@ -880,6 +1074,11 @@ const css = `
 
   .tool-btn:hover { background: rgba(201,168,76,0.08); border-color: rgba(201,168,76,0.4); color: #C9A84C; }
   .fav-btn:hover { transform: scale(1.15); background: rgba(201,168,76,0.15) !important; }
+
+  .university-card:hover { transform: translateY(-4px); border-color: rgba(201,168,76,0.5); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+  .clear-university-btn:hover { background: rgba(201,168,76,0.15); }
+  .toggle-section-btn:hover { border-color: rgba(201,168,76,0.4); color: #C9A84C; }
+  .show-university-btn:hover { background: rgba(201,168,76,0.2); transform: translateY(-2px); }
 
   .search-inp::placeholder { color: #7A7260; }
   .search-inp:focus { outline: none; }
