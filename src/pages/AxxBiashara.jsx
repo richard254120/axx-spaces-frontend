@@ -510,7 +510,13 @@ export default function AxxBiashara() {
                   📊 My Dashboard
                 </button>
               )}
-              <button className="cta-primary cta-btn" onClick={() => navigate("/business/create")}>
+              <button className="cta-primary cta-btn" onClick={() => {
+                if (token && user?.role === "user") {
+                  navigate("/business-dashboard");
+                } else {
+                  navigate("/business-login");
+                }
+              }}>
                 + Add Business
               </button>
               <button className="cta-green cta-btn" onClick={() => setShowAnnouncementForm(!showAnnouncementForm)}>

@@ -175,21 +175,21 @@ function App() {
       <Route
         path="/business/create"
         element={
-          <PublicLayout>
-            <ProtectedRoute loginPath="/business-login" allowedRoles={["user", "seller"]}>
+          <DashboardLayout>
+            <ProtectedRoute loginPath="/business-login" allowedRoles={["user"]}>
               <BusinessForm />
             </ProtectedRoute>
-          </PublicLayout>
+          </DashboardLayout>
         }
       />
       <Route
         path="/business/edit/:id"
         element={
-          <PublicLayout>
-            <ProtectedRoute loginPath="/business-login" allowedRoles={["user", "seller"]}>
+          <DashboardLayout>
+            <ProtectedRoute loginPath="/business-login" allowedRoles={["user"]}>
               <BusinessForm />
             </ProtectedRoute>
-          </PublicLayout>
+          </DashboardLayout>
         }
       />
       <Route path="/business/:id" element={<PublicLayout><BusinessDetail /></PublicLayout>} />
