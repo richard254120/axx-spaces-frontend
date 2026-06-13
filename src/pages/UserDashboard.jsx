@@ -71,8 +71,12 @@ export default function UserDashboard() {
       navigate("/business-login");
       return;
     }
+    // Check if user has the correct role for this dashboard
+    if (user && user.role !== "user") {
+      navigate(getDashboardPath(user.role));
+      return;
+    }
     // Allow business users (role: "user") to access this dashboard
-    // Don't redirect them away from their intended dashboard
     loadAllData();
     fetchAgents();
   }, [token, user]);
