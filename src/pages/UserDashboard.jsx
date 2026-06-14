@@ -49,21 +49,7 @@ export default function UserDashboard() {
 
   // Data lists
   const [businesses, setBusinesses] = useState([]);
-  const [properties, setProperties] = useState([]);
-  const [materials, setMaterials] = useState([]);
-  const [moverJobs, setMoverJobs] = useState([]);
-  const [agents, setAgents] = useState([]);
-  const [selectedAgents, setSelectedAgents] = useState({});
 
-  // Material upload sub-view inside the Sales tab
-  const [materialView, setMaterialView] = useState("list"); // "list" or "upload"
-  const [uploadLoading, setUploadLoading] = useState(false);
-  const [materialImages, setMaterialImages] = useState([]);
-  const [materialPreviews, setMaterialPreviews] = useState([]);
-  const [materialForm, setMaterialForm] = useState({
-    title: "", description: "", category: "", condition: "Good",
-    price: "", quantity: "", location: "", county: "", lat: "", lng: ""
-  });
 
   // Load all dashboard content
   useEffect(() => {
@@ -78,40 +64,14 @@ export default function UserDashboard() {
     }
     // Allow business users (role: "user") to access this dashboard
     loadAllData();
-    fetchAgents();
   }, [token, user]);
 
   const loadAllData = async () => {
     setLoading(true);
     setErrorMsg("");
     try {
-      const [bizRes, propRes, matRes] = await Promise.all([
-        API.get("/business/my").catch(() => ({ data: { businesses: [] } })),
-        API.get("/properties/my-properties/all").catch(() => ({ data: [] })),
-        API.get("/materials/seller/my-materials").catch(() => ({ data: [] }))
-      ]);
-
+      const bizRes = await API.get("/business/my").catch(() => ({ data: { businesses: [] } }));
       setBusinesses(bizRes.data?.businesses || []);
-
-      const processedProperties = (propRes.data || []).map(p => ({
-        ...p,
-        availableUnits: Math.max(0, (p.totalUnits || 1) - (p.bookedUnits || 0)),
-      }));
-      setProperties(processedProperties);
-
-      // Initialize property agent selection state
-      const agentMap = {};
-      processedProperties.forEach(p => {
-        if (p.assignedAgent) agentMap[p._id] = p.assignedAgent;
-      });
-      setSelectedAgents(agentMap);
-
-      setMaterials(matRes.data || []);
-
-      if (user?.role === "mover") {
-        const moverRes = await API.get("/jobs/mover").catch(() => ({ data: [] }));
-        setMoverJobs(moverRes.data || []);
-      }
     } catch (err) {
       console.error(err);
       setErrorMsg("Failed to load workspace data. Please refresh.");
@@ -120,14 +80,6 @@ export default function UserDashboard() {
     }
   };
 
-  const fetchAgents = async () => {
-    try {
-      const res = await API.get("/properties/agents/all");
-      setAgents(res.data || []);
-    } catch (err) {
-      console.log("Agents endpoints fail catch:", err.message);
-    }
-  };
 
   // Directory Listings Actions
   const handleEditBusiness = (id) => navigate(`/business/edit/${id}`);
@@ -139,137 +91,6 @@ export default function UserDashboard() {
       loadAllData();
     } catch (err) {
       showError("Failed to delete business listing");
-    }
-  };
-
-  // Property / Rentals Actions
-  const updateBookedUnits = async (propertyId, change) => {
-    try {
-      await API.patch(`/properties/${propertyId}/book`, { change });
-      showSuccess(change > 0 ? "Unit marked as booked" : "Unit marked as available");
-      loadAllData();
-    } catch (err) {
-      showError("Could not update units booking");
-    }
-  };
-
-  const handleAssignAgent = async (propertyId, agentId) => {
-    try {
-      await API.patch(`/properties/${propertyId}/assign-agent`, { agentId });
-      setSelectedAgents(prev => ({ ...prev, [propertyId]: agentId }));
-      showSuccess("Agent assigned successfully");
-      loadAllData();
-    } catch (err) {
-      showError("Failed to assign agent. (Endpoint simulation)");
-    }
-  };
-
-  const handleBoostProperty = (propertyId) => {
-    navigate(`/premium-plans?propertyId=${propertyId}`);
-  };
-
-  // QuickSales / Materials Actions
-  const handleMarkMaterialSold = async (id) => {
-    try {
-      await API.patch(`/materials/${id}/sold`);
-      showSuccess("Item marked as sold");
-      loadAllData();
-    } catch (err) {
-      showError("Could not mark item as sold");
-    }
-  };
-
-  const handleDeleteMaterial = async (id) => {
-    if (!window.confirm("Permanently delete this material listing?")) return;
-    try {
-      await API.delete(`/materials/${id}`);
-      showSuccess("Material listing deleted");
-      loadAllData();
-    } catch (err) {
-      showError("Failed to delete material listing");
-    }
-  };
-
-  // Mover Jobs Actions
-  const handleAcceptMoverJob = async (jobId) => {
-    try {
-      await API.put(`/jobs/${jobId}/accept`);
-      showSuccess("Job request accepted!");
-      loadAllData();
-    } catch (err) {
-      showError("Could not accept job");
-    }
-  };
-
-  const handleCompleteMoverJob = async (jobId) => {
-    if (!window.confirm("Mark this job as completed?")) return;
-    try {
-      await API.patch(`/jobs/${jobId}/complete`);
-      showSuccess("Job completed!");
-      loadAllData();
-    } catch (err) {
-      showError("Could not update job status");
-    }
-  };
-
-  // Sales Material Upload
-  const handleMaterialFormChange = (e) => {
-    const { name, value } = e.target;
-    setMaterialForm(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleMaterialImages = (e) => {
-    const files = Array.from(e.target.files);
-    setMaterialImages(files);
-    const newPreviews = files.map(file => URL.createObjectURL(file));
-    setMaterialPreviews(newPreviews);
-  };
-
-  const handleMaterialUploadSubmit = async (e) => {
-    e.preventDefault();
-    if (!materialForm.title || !materialForm.price || !materialForm.location || !materialForm.county) {
-      showError("Please fill out all required fields");
-      return;
-    }
-    if (materialImages.length === 0) {
-      showError("Please upload at least one image");
-      return;
-    }
-
-    setUploadLoading(true);
-    try {
-      const formDataToSend = new FormData();
-      Object.keys(materialForm).forEach(key => {
-        formDataToSend.append(key, materialForm[key]);
-      });
-      materialImages.forEach(img => {
-        formDataToSend.append("images", img);
-      });
-
-      const res = await fetch(`${API_BASE}/materials/create`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formDataToSend,
-      });
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.message || "Failed to upload material");
-      }
-
-      showSuccess("Material uploaded successfully! Pending approval.");
-      setMaterialForm({
-        title: "", description: "", category: "", condition: "Good",
-        price: "", quantity: "", location: "", county: "", lat: "", lng: ""
-      });
-      setMaterialImages([]);
-      setMaterialPreviews([]);
-      setMaterialView("list");
-      loadAllData();
-    } catch (err) {
-      showError(err.message || "Failed to list material");
-    } finally {
-      setUploadLoading(false);
     }
   };
 
@@ -285,7 +106,7 @@ export default function UserDashboard() {
   };
 
   // Total summary calculations
-  const totalListedCount = businesses.length + properties.length + materials.length;
+  const totalListedCount = businesses.length;
 
   if (loading) {
     return (
@@ -331,19 +152,6 @@ export default function UserDashboard() {
           <button style={{ ...s.navItem, ...(activeTab === "businesses" && s.navItemActive) }} onClick={() => { setActiveTab("businesses"); setSidebarOpen(false); }}>
             <span style={s.navIcon}>🏢</span> Directory Listings
           </button>
-          {user?.role === "landlord" && (
-            <button style={{ ...s.navItem, ...(activeTab === "properties" && s.navItemActive) }} onClick={() => { setActiveTab("properties"); setSidebarOpen(false); }}>
-              <span style={s.navIcon}>🏠</span> Rentals / Properties
-            </button>
-          )}
-          <button style={{ ...s.navItem, ...(activeTab === "materials" && s.navItemActive) }} onClick={() => { setActiveTab("materials"); setSidebarOpen(false); setMaterialView("list"); }}>
-            <span style={s.navIcon}>🛒</span> QuickSales / Items
-          </button>
-          {user?.role === "mover" && (
-            <button style={{ ...s.navItem, ...(activeTab === "mover" && s.navItemActive) }} onClick={() => { setActiveTab("mover"); setSidebarOpen(false); }}>
-              <span style={s.navIcon}>🚚</span> Mover Service
-            </button>
-          )}
           <button style={{ ...s.navItem, ...(activeTab === "profile" && s.navItemActive) }} onClick={() => { setActiveTab("profile"); setSidebarOpen(false); }}>
             <span style={s.navIcon}>👤</span> Profile & KYC
           </button>
@@ -391,24 +199,7 @@ export default function UserDashboard() {
                 <div style={s.statValue}>{businesses.length}</div>
                 <div style={s.statLabel}>Businesses (Directory)</div>
               </div>
-              {user?.role === "landlord" && (
-                <div style={s.statCard}>
-                  <div style={s.statValue}>{properties.length}</div>
-                  <div style={s.statLabel}>Properties (Rentals)</div>
-                </div>
-              )}
-              <div style={s.statCard}>
-                <div style={s.statValue}>{materials.length}</div>
-                <div style={s.statLabel}>Materials (QuickSales)</div>
-              </div>
             </div>
-
-            {/* KYC widget - Landlord Only */}
-            {user?.role === "landlord" && (
-              <div style={s.kycContainer}>
-                <VerificationStatus />
-              </div>
-            )}
 
             {/* Quick Actions Panel */}
             <div style={s.panelCard}>
@@ -416,14 +207,6 @@ export default function UserDashboard() {
               <div style={s.actionsGrid}>
                 <button style={s.actionGridBtn} onClick={() => navigate("/business/create")}>
                   🏢 Register New Business
-                </button>
-                {user?.role === "landlord" && (
-                  <button style={s.actionGridBtn} onClick={() => navigate("/upload")}>
-                    🏠 Upload Rental Property
-                  </button>
-                )}
-                <button style={s.actionGridBtn} onClick={() => { setActiveTab("materials"); setMaterialView("upload"); }}>
-                  🛒 List Material/Item
                 </button>
               </div>
             </div>
@@ -466,294 +249,6 @@ export default function UserDashboard() {
                       <div style={s.itemActions}>
                         <button style={s.btnEdit} onClick={() => handleEditBusiness(biz._id)}>Edit</button>
                         <button style={s.btnDelete} onClick={() => handleDeleteBusiness(biz._id)}>Delete</button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* PROPERTIES TAB - Landlord Only */}
-        {activeTab === "properties" && user?.role === "landlord" && (
-          <div style={s.panelCard}>
-            <div style={s.panelFlexHeader}>
-              <h2 style={s.tabTitle}>🏠 My Rental Listings</h2>
-              <button style={s.btnPrimary} onClick={() => navigate("/upload")}>+ Post Property</button>
-            </div>
-
-            {properties.length === 0 ? (
-              <div style={s.emptyState}>
-                <p>No rental properties uploaded yet.</p>
-                <button style={s.btnSecondary} onClick={() => navigate("/upload")}>Post Rental Space</button>
-              </div>
-            ) : (
-              <div style={s.cardGrid}>
-                {properties.map((property) => {
-                  const resolvedSt = property.status || "pending";
-                  const st = STATUS_COLORS[resolvedSt] || STATUS_COLORS.pending;
-                  const booked = property.bookedUnits || 0;
-                  const total = property.totalUnits || 1;
-                  const available = property.availableUnits ?? Math.max(0, total - booked);
-                  const fullyBooked = booked >= total;
-
-                  return (
-                    <div key={property._id} style={s.itemCard}>
-                      <div style={s.propertyImageContainer}>
-                        <img src={property.images?.[0] || "/placeholder.jpg"} alt={property.title} style={s.propertyImg} />
-                        <span style={{ ...s.statusBadge, position: "absolute", top: "10px", right: "10px", background: st.bg, color: st.color }}>
-                          {st.label}
-                        </span>
-                        {fullyBooked && <span style={s.fullyBookedOverlay}>🔴 FULLY BOOKED</span>}
-                      </div>
-
-                      <div style={{ padding: "16px" }}>
-                        <h3 style={s.itemCardTitle}>{property.title}</h3>
-                        <p style={s.itemCardDesc}>📍 {property.location}, {property.county}</p>
-                        <div style={s.propertyPriceText}>KSh {Number(property.price).toLocaleString()}/mo</div>
-
-                        {/* Units indicators */}
-                        <div style={s.unitsRow}>
-                          <div style={s.unitBox}>
-                            <span style={s.unitVal}>{total}</span>
-                            <span style={s.unitLbl}>Total Units</span>
-                          </div>
-                          <div style={s.unitBox}>
-                            <span style={{ ...s.unitVal, color: "#f87171" }}>{booked}</span>
-                            <span style={s.unitLbl}>Booked</span>
-                          </div>
-                          <div style={s.unitBox}>
-                            <span style={{ ...s.unitVal, color: "#4ade80" }}>{available}</span>
-                            <span style={s.unitLbl}>Available</span>
-                          </div>
-                        </div>
-
-                        {/* Progress Bar */}
-                        <div style={s.progressBar}>
-                          <div style={{ ...s.progressFill, width: `${(booked / total) * 100}%`, background: fullyBooked ? "#f87171" : "#4ade80" }}></div>
-                        </div>
-
-                        {/* Actions block */}
-                        {property.status === "approved" && (
-                          <div style={s.propertyActionsGrid}>
-                            <button style={s.unitActionBtn} onClick={() => updateBookedUnits(property._id, 1)} disabled={fullyBooked}>
-                              ✓ Book Unit
-                            </button>
-                            <button style={s.unitActionBtn} onClick={() => updateBookedUnits(property._id, -1)} disabled={booked === 0}>
-                              ✗ Free Unit
-                            </button>
-                            <button style={s.boostActionBtn} onClick={() => handleBoostProperty(property._id)}>
-                              ⭐ Boost Property
-                            </button>
-                            <div style={{ gridColumn: "1 / -1", marginTop: "10px" }}>
-                              <label style={s.labelMicro}>Assign Agent:</label>
-                              <select
-                                value={selectedAgents[property._id] || ""}
-                                onChange={(e) => handleAssignAgent(property._id, e.target.value)}
-                                style={s.agentSelectInput}
-                              >
-                                <option value="">No Agent Assigned</option>
-                                {agents.map(agent => (
-                                  <option key={agent._id} value={agent._id}>{agent.name} - {agent.phone}</option>
-                                ))}
-                              </select>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* MATERIAL / QUICK SALES TAB */}
-        {activeTab === "materials" && (
-          <div style={s.panelCard}>
-            <div style={s.panelFlexHeader}>
-              <h2 style={s.tabTitle}>🛒 QuickSales Inventory Listings</h2>
-              <button style={s.btnPrimary} onClick={() => setMaterialView(materialView === "list" ? "upload" : "list")}>
-                {materialView === "list" ? "+ List Material" : "View Inventory"}
-              </button>
-            </div>
-
-            {materialView === "upload" ? (
-              /* Inline material listing upload form */
-              <form onSubmit={handleMaterialUploadSubmit} style={s.uploadForm}>
-                <h3 style={s.formSubheading}>List a New Item/Material</h3>
-
-                <div style={s.formGrid}>
-                  <div style={s.formInputGroup}>
-                    <label style={s.formInputLabel}>Title *</label>
-                    <input name="title" value={materialForm.title} onChange={handleMaterialFormChange} style={s.formInputField} placeholder="e.g. Premium Cement Bags" required />
-                  </div>
-
-                  <div style={s.formInputGroup}>
-                    <label style={s.formInputLabel}>Category *</label>
-                    <select name="category" value={materialForm.category} onChange={handleMaterialFormChange} style={s.formInputField} required>
-                      <option value="">Select Category</option>
-                      {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                    </select>
-                  </div>
-
-                  <div style={s.formInputGroup}>
-                    <label style={s.formInputLabel}>Condition</label>
-                    <select name="condition" value={materialForm.condition} onChange={handleMaterialFormChange} style={s.formInputField}>
-                      {CONDITIONS.map(cond => <option key={cond} value={cond}>{cond}</option>)}
-                    </select>
-                  </div>
-
-                  <div style={s.formInputGroup}>
-                    <label style={s.formInputLabel}>Price (KES) *</label>
-                    <input name="price" type="number" value={materialForm.price} onChange={handleMaterialFormChange} style={s.formInputField} placeholder="1200" required />
-                  </div>
-
-                  <div style={s.formInputGroup}>
-                    <label style={s.formInputLabel}>Quantity *</label>
-                    <input name="quantity" type="number" value={materialForm.quantity} onChange={handleMaterialFormChange} style={s.formInputField} placeholder="1" required />
-                  </div>
-
-                  <div style={s.formInputGroup}>
-                    <label style={s.formInputLabel}>Area Location (e.g. Kilimani) *</label>
-                    <input name="location" value={materialForm.location} onChange={handleMaterialFormChange} style={s.formInputField} placeholder="Kilimani" required />
-                  </div>
-
-                  <div style={s.formInputGroup}>
-                    <label style={s.formInputLabel}>County *</label>
-                    <select name="county" value={materialForm.county} onChange={handleMaterialFormChange} style={s.formInputField} required>
-                      <option value="">Select County</option>
-                      {COUNTIES.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                  </div>
-
-                  <div style={s.formInputGroup}>
-                    <label style={s.formInputLabel}>Latitude (GPS Optional)</label>
-                    <input name="lat" type="number" step="any" value={materialForm.lat} onChange={handleMaterialFormChange} style={s.formInputField} placeholder="-1.286" />
-                  </div>
-
-                  <div style={s.formInputGroup}>
-                    <label style={s.formInputLabel}>Longitude (GPS Optional)</label>
-                    <input name="lng" type="number" step="any" value={materialForm.lng} onChange={handleMaterialFormChange} style={s.formInputField} placeholder="36.817" />
-                  </div>
-
-                  <div style={{ ...s.formInputGroup, gridColumn: "1 / -1" }}>
-                    <label style={s.formInputLabel}>Description</label>
-                    <textarea name="description" value={materialForm.description} onChange={handleMaterialFormChange} style={s.formTextAreaField} rows={4} placeholder="Describe the item details..."></textarea>
-                  </div>
-
-                  <div style={{ ...s.formInputGroup, gridColumn: "1 / -1" }}>
-                    <label style={s.formInputLabel}>Images (at least 1 required) *</label>
-                    <input type="file" multiple accept="image/*" onChange={handleMaterialImages} style={s.formInputField} required />
-                    {materialPreviews.length > 0 && (
-                      <div style={s.imagePreviewsGrid}>
-                        {materialPreviews.map((prev, index) => (
-                          <img key={index} src={prev} alt="Preview" style={s.imagePreviewThumb} />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div style={s.formActionsRow}>
-                  <button type="button" style={s.btnSecondary} onClick={() => setMaterialView("list")}>Cancel</button>
-                  <button type="submit" style={s.btnPrimary} disabled={uploadLoading}>
-                    {uploadLoading ? "Uploading..." : "Publish Material Listing"}
-                  </button>
-                </div>
-              </form>
-            ) : (
-              /* Materials Listing Stock */
-              materials.length === 0 ? (
-                <div style={s.emptyState}>
-                  <p>No materials listing in stock.</p>
-                  <button style={s.btnSecondary} onClick={() => setMaterialView("upload")}>Post First Material</button>
-                </div>
-              ) : (
-                <div style={s.cardGrid}>
-                  {materials.map((m) => {
-                    const resolvedSt = resolveStatus(m);
-                    const st = STATUS_COLORS[resolvedSt] || STATUS_COLORS.pending;
-                    return (
-                      <div key={m._id} style={s.itemCard}>
-                        <div style={s.propertyImageContainer}>
-                          {m.images?.[0] ? (
-                            <img src={m.images[0]} alt={m.title} style={s.propertyImg} />
-                          ) : (
-                            <div style={s.placeholderMaterialImg}>📷 No Image</div>
-                          )}
-                          <span style={{ ...s.statusBadge, position: "absolute", top: "10px", right: "10px", background: st.bg, color: st.color }}>
-                            {st.label}
-                          </span>
-                        </div>
-
-                        <div style={{ padding: "16px" }}>
-                          <h3 style={s.itemCardTitle}>{m.title}</h3>
-                          <div style={s.propertyPriceText}>KES {m.price?.toLocaleString()}</div>
-                          <p style={s.itemCardDesc}>Qty: {m.quantity} • {m.location}, {m.county}</p>
-
-                          <div style={s.engagementRow}>
-                            <span>👁️ {m.views || 0} views</span>
-                            <span>⭐ {m.rating ? m.rating.toFixed(1) : "—"} ({m.reviewCount || 0} reviews)</span>
-                          </div>
-
-                          <div style={s.itemActions}>
-                            {resolvedSt === "active" && (
-                              <button style={s.btnSold} onClick={() => handleMarkMaterialSold(m._id)}>Mark Sold</button>
-                            )}
-                            <button style={s.btnDelete} onClick={() => handleDeleteMaterial(m._id)}>Delete</button>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )
-            )}
-          </div>
-        )}
-
-        {/* MOVER SERVICES TAB */}
-        {activeTab === "mover" && user?.role === "mover" && (
-          <div style={s.panelCard}>
-            <h2 style={s.tabTitle}>🚚 Mover Job Bookings</h2>
-
-            {moverJobs.length === 0 ? (
-              <div style={s.emptyState}>
-                <p>No moving job requests registered to your profile.</p>
-              </div>
-            ) : (
-              <div style={s.cardGrid}>
-                {moverJobs.map((job) => {
-                  const isPending = job.status === "pending";
-                  const isAccepted = job.status === "accepted" || job.status === "active";
-                  return (
-                    <div key={job._id} style={s.itemCard}>
-                      <div style={s.itemCardHeader}>
-                        <h3 style={s.itemCardTitle}>{job.serviceType || "Household Moving"}</h3>
-                        <span style={s.moverJobStatusBadge}>{job.status?.toUpperCase()}</span>
-                      </div>
-
-                      <div style={{ margin: "12px 0" }}>
-                        <p style={s.moverJobText}>👤 Client: {job.customerName || "Anonymous"}</p>
-                        <p style={s.moverJobText}>📞 Phone: {isPending ? "🔒 Accept job to unlock" : job.customerPhone}</p>
-                        <p style={s.moverJobText}>📍 Pickup: {job.pickupLocation}</p>
-                        <p style={s.moverJobText}>🏁 Dropoff: {job.dropoffLocation}</p>
-                        <p style={s.moverJobText}>📅 Scheduled: {new Date(job.scheduledDate).toLocaleDateString()}</p>
-                        <p style={{ ...s.moverJobText, color: "#10b981", fontWeight: "700" }}>
-                          💰 Value: KES {(job.amount || 0).toLocaleString()}
-                        </p>
-                      </div>
-
-                      <div style={s.moverJobActions}>
-                        {isPending && (
-                          <button style={s.btnAcceptMover} onClick={() => handleAcceptMoverJob(job._id)}>Accept Job Request</button>
-                        )}
-                        {isAccepted && (
-                          <button style={s.btnCompleteMover} onClick={() => handleCompleteMoverJob(job._id)}>Mark Completed</button>
-                        )}
                       </div>
                     </div>
                   );
