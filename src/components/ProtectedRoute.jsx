@@ -19,7 +19,7 @@ export default function ProtectedRoute({
   preferSeller = false,
 }) {
   const auth = useContext(AuthContext);
-  const { loading } = auth;
+  const loading = auth?.loading ?? false;
 
   if (loading) {
     return (

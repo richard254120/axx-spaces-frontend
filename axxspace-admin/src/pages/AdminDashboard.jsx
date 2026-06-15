@@ -6,6 +6,7 @@ import AdminHeader from "../components/AdminHeader";
 import StatsCard from "../components/StatsCard";
 import TabNavigation from "../components/TabNavigation";
 import NotificationPanel from "../components/NotificationPanel";
+import { getPricelistUrl, openAdminFile, resolveMediaUrl } from "../utils/fileLinks";
 import "./AdminDashboard.css";
 
 // ── tiny helpers ──────────────────────────────────────────────
@@ -130,21 +131,17 @@ export default function AdminDashboard() {
   const loadVerificationDetails = async (verificationId) => {
     try {
       const res = await API.get(`/kyc-verification/admin/${verificationId}`);
-      const data = res.data?.data;
-      // Construct full URLs for documents and selfie
-      const baseUrl = API.defaults.baseURL?.replace('/api', '') || 'http://localhost:1000';
-      if (data?.documents) {
-        data.documents = data.documents.map(doc => ({
-          ...doc,
-          url: doc.url.startsWith('http') ? doc.url : `${baseUrl}${doc.url}`
-        }));
-      }
-      if (data?.selfie?.url) {
-        data.selfie.url = data.selfie.url.startsWith('http') ? data.selfie.url : `${baseUrl}${data.selfie.url}`;
-      }
-      setSelectedVerification(data);
+      setSelectedVerification(res.data?.data);
     } catch (err) {
       console.error("Failed to load verification details:", err);
+    }
+  };
+
+  const handleOpenFile = async (url) => {
+    try {
+      await openAdminFile(url);
+    } catch (err) {
+      alert(err.message || "Unable to open file");
     }
   };
 
@@ -903,6 +900,18 @@ export default function AdminDashboard() {
                   <p className="card-owner">👤 {business.submitterName || business.owner?.name || "Anonymous"}</p>
                   <p className="card-owner">📞 {business.contact.phone}</p>
                   <p className="card-owner">📸 {business.images && business.images.length > 0 ? `${business.images.length} photos` : "No photos"}</p>
+                  {business.pricelist?.url && (
+                    <p className="card-owner">
+                      <button
+                        type="button"
+                        className="doc-link"
+                        style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+                        onClick={() => window.open(getPricelistUrl(business.pricelist), "_blank", "noopener,noreferrer")}
+                      >
+                        📄 View pricelist
+                      </button>
+                    </p>
+                  )}
                   <div className="card-footer">
                     <span className="status-dot" style={{ background: business.status === "approved" ? "#22c55e" : business.status === "rejected" ? "#ef4444" : "#fbbf24" }}>
                       {business.status}
@@ -1030,12 +1039,13 @@ export default function AdminDashboard() {
                   {selectedVerification.documents.map((doc, idx) => (
                     <div key={idx} className="document-item">
                       <p className="doc-type">{doc.type.replace(/_/g, ' ')}</p>
-                      <a href={doc.url} target="_blank" rel="noopener noreferrer" className="doc-link" onClick={(e) => {
-                        e.preventDefault();
-                        window.open(doc.url, '_blank');
-                      }}>
-                        📄 View Document
-                      </a>
+                      <button
+                        type="button"
+                        className="doc-link"
+                        onClick={() => handleOpenFile(doc.url)}
+                      >
+                        📄 View / Download
+                      </button>
                       <p style={{ fontSize: 11, color: '#64748b' }}>Filename: {doc.filename}</p>
                     </div>
                   ))}
@@ -1045,14 +1055,22 @@ export default function AdminDashboard() {
                 <div className="detail-section">
                   <p className="detail-label">Selfie:</p>
                   <img
-                    src={selectedVerification.selfie.url}
+                    src={resolveMediaUrl(selectedVerification.selfie.url)}
                     alt="Selfie"
                     className="selfie-image"
                     onError={(e) => {
                       e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'block';
+                      if (e.target.nextSibling) e.target.nextSibling.style.display = 'block';
                     }}
                   />
+                  <button
+                    type="button"
+                    className="doc-link"
+                    style={{ marginTop: "8px" }}
+                    onClick={() => handleOpenFile(selectedVerification.selfie.url)}
+                  >
+                    📥 Download selfie
+                  </button>
                   <p style={{ fontSize: 12, color: '#ef4444', display: 'none' }}>
                     ⚠️ Selfie image not available (file may not exist on server)
                   </p>

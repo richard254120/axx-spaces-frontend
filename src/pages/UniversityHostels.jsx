@@ -83,28 +83,39 @@ export default function UniversityHostels() {
   const [universitySearch, setUniversitySearch] = useState("");
 
   useEffect(() => {
-    const fetchProperties = async () => {
+    if (!selectedUniversity?.id) {
+      setProperties([]);
+      setLoading(false);
+      return;
+    }
+
+    const fetchByUniversity = async () => {
+      setLoading(true);
       try {
-        const response = await fetch(`${API_BASE}/properties`);
+        const params = new URLSearchParams({
+          universityId: String(selectedUniversity.id),
+          available: "true",
+          limit: "200",
+        });
+        const response = await fetch(`${API_BASE}/properties?${params}`);
         if (!response.ok) throw new Error("Failed to fetch properties");
         const data = await response.json();
-        setProperties(data);
+        setProperties(data.filter((p) => {
+          const available = Math.max(0, (p.totalUnits || 1) - (p.bookedUnits || 0));
+          return available > 0;
+        }));
       } catch (error) {
         console.error("Error fetching properties:", error);
+        setProperties([]);
       } finally {
         setLoading(false);
       }
     };
-    fetchProperties();
-  }, []);
 
-  const filteredProperties = selectedUniversity
-    ? properties.filter(
-        (prop) =>
-          prop.location?.toLowerCase() === selectedUniversity.location.toLowerCase() ||
-          prop.county?.toLowerCase() === selectedUniversity.county.toLowerCase()
-      )
-    : [];
+    fetchByUniversity();
+  }, [selectedUniversity]);
+
+  const filteredProperties = properties;
 
   const handleUniversityClick = (university) => {
     setSelectedUniversity(university);

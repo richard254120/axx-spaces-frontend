@@ -1,6 +1,17 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useContext } from "react";
+import { clearSellerSession } from "../utils/dashboardRoutes";
 
-export const AuthContext = createContext();
+const defaultAuth = {
+  user: null,
+  token: null,
+  loading: true,
+  login: () => {},
+  logout: () => {},
+  updateUser: () => {},
+  isAuthenticated: false,
+};
+
+export const AuthContext = createContext(defaultAuth);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -24,6 +35,11 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (newToken, userData) => {
+    if (!newToken || !userData) {
+      console.error("Login called without token or user");
+      return;
+    }
+    clearSellerSession();
     setToken(newToken);
     setUser(userData);
     localStorage.setItem("token", newToken);
@@ -46,13 +62,6 @@ export const AuthProvider = ({ children }) => {
     window.location.href = redirectTo;
   };
 
-  // Optional: Make it harder for console attackers
-  useEffect(() => {
-    if (token) {
-      // You can add more protection logic here later
-    }
-  }, [token]);
-
   if (loading) {
     return (
       <div style={{
@@ -73,14 +82,15 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider value={{
       user,
       token,
+      loading: false,
       login,
       logout,
       updateUser,
-      isAuthenticated: !!token
+      isAuthenticated: !!token,
     }}>
       {children}
     </AuthContext.Provider>
   );
 };
-import { useContext } from "react";
+
 export const useAuth = () => useContext(AuthContext);

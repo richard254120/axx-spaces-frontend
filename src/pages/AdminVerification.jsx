@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { openProtectedFile, resolveMediaUrl } from '../utils/fileLinks';
 
 const AdminVerification = () => {
   const { token } = useContext(AuthContext);
@@ -256,14 +257,13 @@ const AdminVerification = () => {
                         <span style={styles.documentStatus}>Size: {(doc.size / 1024).toFixed(1)} KB</span>
                       </div>
                       {doc.url && (
-                        <a
-                          href={doc.url.startsWith('http') ? doc.url : `http://localhost:1000${doc.url}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={styles.documentLink}
+                        <button
+                          type="button"
+                          onClick={() => openProtectedFile(doc.url).catch((err) => alert(err.message))}
+                          style={{ ...styles.documentLink, background: "none", border: "none", cursor: "pointer" }}
                         >
-                          👁️ View File
-                        </a>
+                          👁️ View / Download
+                        </button>
                       )}
                     </div>
                   ))}
@@ -275,10 +275,17 @@ const AdminVerification = () => {
                 <div style={styles.detailGroup}>
                   <h3 style={styles.detailGroupTitle}>📸 Biometric Verification Selfie</h3>
                   <img
-                    src={selectedVerification.selfie.url.startsWith('http') ? selectedVerification.selfie.url : `http://localhost:1000${selectedVerification.selfie.url}`}
+                    src={resolveMediaUrl(selectedVerification.selfie.url)}
                     alt="Biometric Selfie"
                     style={styles.selfieImage}
                   />
+                  <button
+                    type="button"
+                    onClick={() => openProtectedFile(selectedVerification.selfie.url).catch((err) => alert(err.message))}
+                    style={{ ...styles.documentLink, marginTop: "8px", background: "none", border: "none", cursor: "pointer" }}
+                  >
+                    📥 Download selfie
+                  </button>
                   {selectedVerification.selfie.faceMatchScore !== undefined && (
                     <div style={styles.faceMatchScore}>
                       🤖 AI Face Match Similarity Score:{' '}

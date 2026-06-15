@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
+import PhoneInput from "../components/PhoneInput";
 
 export default function MoverRegister() {
   const navigate = useNavigate();

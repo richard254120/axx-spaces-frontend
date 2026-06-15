@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
+import { getPricelistUrl } from "../utils/fileLinks";
 
 export default function AdminDashboard() {
   const { token, user } = useContext(AuthContext);
@@ -924,8 +925,8 @@ export default function AdminDashboard() {
                     </td>
                     <td style={styles.td}>
                       {business.pricelist && business.pricelist.url ? (
-                        <a href={`/api/uploads/pricelist/${business.pricelist.publicId || business.pricelist.url.split('/').pop()}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: "12px", color: "#60a5fa", textDecoration: "none" }}>
-                          📄 View
+                        <a href={getPricelistUrl(business.pricelist)} target="_blank" rel="noopener noreferrer" style={{ fontSize: "12px", color: "#60a5fa", textDecoration: "none" }}>
+                          📄 View / Download
                         </a>
                       ) : (
                         <span style={{ fontSize: "12px", color: "#94a3b8" }}>None</span>

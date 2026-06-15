@@ -4,7 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import { ProfileAvatar } from "../features/profile";
 import AccountTypeSelector from "./AccountTypeSelector";
 import NotificationBell from "./NotificationSystem";
-import { getDashboardPath } from "../utils/dashboardRoutes";
+import { getDashboardPath, getAccountNav, getWorkspaceBrand, isWorkspaceUser } from "../utils/dashboardRoutes";
 import logo from "../assets/image.png";
 
 export default function Navbar() {
@@ -236,22 +236,25 @@ export default function Navbar() {
     </div>
   );
 
-  // ─── MOVER NAVBAR ─────────────────────────────────────────────────────────
-  if (user?.role === "mover") {
+  // ─── WORKSPACE NAVBAR (landlord, seller, mover, business, admin) ─────────
+  if (token && user && isWorkspaceUser(user.role)) {
+    const navItems = getAccountNav(user.role);
+    const dashboardPath = getDashboardPath(user.role);
+    const brand = getWorkspaceBrand(user.role);
+
     return (
       <nav style={styles.navbar}>
         <style>{css}</style>
 
         <div style={styles.topSection}>
-          <Link to="/mover-dashboard" style={styles.logoContainer}>
+          <Link to={dashboardPath} style={styles.logoContainer}>
             <img src={logo} alt="Axxspace" style={styles.logo} />
             <div style={styles.titleSection}>
-              <span style={styles.brandName}>Axx Movers</span>
+              <span style={styles.brandName}>{brand}</span>
             </div>
           </Link>
 
           <div style={styles.topRight}>
-            <HamburgerDropdown />
             <button
               style={styles.hamburger}
               onClick={() => setMenuOpen(!menuOpen)}
@@ -262,14 +265,21 @@ export default function Navbar() {
         </div>
 
         <div style={{ ...styles.navLinksContainer, ...(menuOpen && styles.navLinksContainerOpen) }}>
-          <Link to="/mover-dashboard" style={{ ...styles.navLink, ...(isActive("/mover-dashboard") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
-            Dashboard
-          </Link>
+          {navItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              style={{ ...styles.navLink, ...(isActive(item.path) && styles.navLinkActive) }}
+              onClick={() => setMenuOpen(false)}
+            >
+              {item.label}
+            </Link>
+          ))}
           <div style={styles.userSection}>
             <ProfileAvatar user={user} size={32} />
             <span style={styles.userName}>{user?.name}</span>
             <button style={styles.logoutBtn} onClick={handleLogout} title="Log out" aria-label="Log out">
-              🚪
+              Logout
             </button>
           </div>
         </div>
@@ -277,7 +287,7 @@ export default function Navbar() {
     );
   }
 
-  // ─── REGULAR NAVBAR ───────────────────────────────────────────────────────
+  // ─── REGULAR NAVBAR (guests & renters browsing the site) ─────────────────
   return (
     <nav style={styles.navbar}>
       <style>{css}</style>

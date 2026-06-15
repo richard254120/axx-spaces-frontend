@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import API from "../api/api";
+import { getPricelistUrl, resolveMediaUrl } from "../utils/fileLinks";
 
 const styles = {
   container: {
@@ -270,6 +271,40 @@ export default function BusinessDetail() {
           <div style={{ marginTop: "20px" }}>
             <span style={styles.infoLabel}>Description:</span>
             <p style={styles.infoValue}>{business.description}</p>
+          </div>
+        )}
+        {business.pricelist?.url && (
+          <div style={{ marginTop: "20px" }}>
+            <span style={styles.infoLabel}>Pricelist / Menu:</span>
+            <p style={styles.infoValue}>
+              <a href={getPricelistUrl(business.pricelist)} target="_blank" rel="noopener noreferrer" style={{ color: "#60a5fa" }}>
+                📄 View / Download {business.pricelist.name ? `(${business.pricelist.name})` : ""}
+              </a>
+            </p>
+          </div>
+        )}
+        {business.images?.length > 0 && (
+          <div style={{ marginTop: "20px" }}>
+            <span style={styles.infoLabel}>Photos:</span>
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "10px" }}>
+              {business.images.map((img, i) => (
+                <a key={i} href={resolveMediaUrl(img)} target="_blank" rel="noopener noreferrer">
+                  <img src={resolveMediaUrl(img)} alt={`${business.name} ${i + 1}`} style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "8px" }} />
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+        {business.documents?.length > 0 && (
+          <div style={{ marginTop: "20px" }}>
+            <span style={styles.infoLabel}>Business Documents:</span>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "8px" }}>
+              {business.documents.map((doc, i) => (
+                <a key={i} href={resolveMediaUrl(doc.url)} target="_blank" rel="noopener noreferrer" style={{ color: "#60a5fa" }}>
+                  📄 {doc.name || doc.type || `Document ${i + 1}`}
+                </a>
+              ))}
+            </div>
           </div>
         )}
       </div>

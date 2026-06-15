@@ -1,23 +1,62 @@
-import { useState, useEffect, createContext, useContext } from "react";
+import { useState, useEffect, createContext, useContext, useCallback } from "react";
+import { AuthContext } from "../context/AuthContext";
 
-const NotificationContext = createContext();
+const API_BASE =
+  import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
+
+const defaultNotifications = {
+  notifications: [],
+  unreadCount: 0,
+  addNotification: () => {},
+  markAsRead: () => {},
+  markAllAsRead: () => {},
+  deleteNotification: () => {},
+  clearAll: () => {},
+};
+
+const NotificationContext = createContext(defaultNotifications);
 
 export const NotificationProvider = ({ children }) => {
+  const auth = useContext(AuthContext);
+  const token = auth?.token;
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  useEffect(() => {
-    loadNotifications();
-  }, []);
+  const loadNotifications = useCallback(async () => {
+    // Prefer server notifications when logged in
+    if (token) {
+      try {
+        const res = await fetch(`${API_BASE}/notifications?limit=50`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to load notifications");
+        setNotifications(
+          (data.notifications || []).map((n) => ({
+            ...n,
+            id: n._id || n.id,
+            timestamp: n.createdAt || n.timestamp,
+          }))
+        );
+        setUnreadCount(data.unreadCount || 0);
+        return;
+      } catch (err) {
+        // fallback to local if API fails
+        console.error("Notifications API error:", err);
+      }
+    }
 
-  const loadNotifications = () => {
     const saved = localStorage.getItem("axxspace_notifications");
     if (saved) {
       const loaded = JSON.parse(saved);
       setNotifications(loaded);
-      setUnreadCount(loaded.filter(n => !n.read).length);
+      setUnreadCount(loaded.filter((n) => !n.read).length);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    loadNotifications();
+  }, [loadNotifications]);
 
   const addNotification = (notification) => {
     const newNotification = {
@@ -33,30 +72,68 @@ export const NotificationProvider = ({ children }) => {
     localStorage.setItem("axxspace_notifications", JSON.stringify(updated));
   };
 
-  const markAsRead = (notificationId) => {
-    const updated = notifications.map(n =>
+  const markAsRead = async (notificationId) => {
+    // server path
+    if (token && typeof notificationId === "string" && notificationId.length > 8) {
+      try {
+        await fetch(`${API_BASE}/notifications/${notificationId}/read`, {
+          method: "PATCH",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } catch {}
+      loadNotifications();
+      return;
+    }
+
+    // local path
+    const updated = notifications.map((n) =>
       n.id === notificationId ? { ...n, read: true } : n
     );
     setNotifications(updated);
-    setUnreadCount(updated.filter(n => !n.read).length);
+    setUnreadCount(updated.filter((n) => !n.read).length);
     localStorage.setItem("axxspace_notifications", JSON.stringify(updated));
   };
 
-  const markAllAsRead = () => {
-    const updated = notifications.map(n => ({ ...n, read: true }));
+  const markAllAsRead = async () => {
+    if (token) {
+      try {
+        await fetch(`${API_BASE}/notifications/read-all`, {
+          method: "PATCH",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } catch {}
+      loadNotifications();
+      return;
+    }
+    const updated = notifications.map((n) => ({ ...n, read: true }));
     setNotifications(updated);
     setUnreadCount(0);
     localStorage.setItem("axxspace_notifications", JSON.stringify(updated));
   };
 
-  const deleteNotification = (notificationId) => {
-    const updated = notifications.filter(n => n.id !== notificationId);
+  const deleteNotification = async (notificationId) => {
+    if (token && typeof notificationId === "string" && notificationId.length > 8) {
+      try {
+        await fetch(`${API_BASE}/notifications/${notificationId}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } catch {}
+      loadNotifications();
+      return;
+    }
+    const updated = notifications.filter((n) => n.id !== notificationId);
     setNotifications(updated);
-    setUnreadCount(updated.filter(n => !n.read).length);
+    setUnreadCount(updated.filter((n) => !n.read).length);
     localStorage.setItem("axxspace_notifications", JSON.stringify(updated));
   };
 
-  const clearAll = () => {
+  const clearAll = async () => {
+    if (token) {
+      // no "clear all" endpoint; mark all read and delete one-by-one is expensive.
+      await markAllAsRead();
+      return;
+    }
     setNotifications([]);
     setUnreadCount(0);
     localStorage.removeItem("axxspace_notifications");
@@ -79,7 +156,7 @@ export const NotificationProvider = ({ children }) => {
   );
 };
 
-export const useNotifications = () => useContext(NotificationContext);
+export const useNotifications = () => useContext(NotificationContext) ?? defaultNotifications;
 
 export default function NotificationBell() {
   const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, clearAll } = useNotifications();

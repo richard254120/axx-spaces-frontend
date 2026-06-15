@@ -12,6 +12,7 @@ import {
   setTourismSession,
   ErrorAlert,
 } from "../../features/tourism";
+import PhoneInput from "../../components/PhoneInput";
 
 const categories = PROPERTY_CATEGORIES;
 const counties = KENYA_COUNTIES;

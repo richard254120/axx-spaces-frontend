@@ -68,6 +68,9 @@ import "leaflet/dist/leaflet.css";
 
 // ─── Layouts ────────────────────────────────────────────────────────────────
 
+import ProtectedRoute from "./components/ProtectedRoute";
+import AccountLayout from "./components/AccountLayout";
+
 // Public pages get the Navbar + WhatsApp button
 function PublicLayout({ children }) {
   return (
@@ -79,12 +82,15 @@ function PublicLayout({ children }) {
   );
 }
 
-// Dashboard pages get NO Navbar and NO WhatsApp button
-function DashboardLayout({ children }) {
-  return <>{children}</>;
+// Dashboard / account pages — role-focused nav only, no public site links
+function DashboardLayout({ children, preferSeller = false }) {
+  return <AccountLayout preferSeller={preferSeller}>{children}</AccountLayout>;
 }
 
-import ProtectedRoute from "./components/ProtectedRoute";
+// Auth / standalone pages — no nav shell
+function BareLayout({ children }) {
+  return <>{children}</>;
+}
 
 function App() {
   const navigate = useNavigate();
@@ -170,8 +176,8 @@ function App() {
 
       {/* ── AXXBIASHARA BUSINESS DIRECTORY ROUTES (have Navbar) ── */}
       <Route path="/axxbiashara" element={<PublicLayout><AxxBiashara /></PublicLayout>} />
-      <Route path="/business-login" element={<DashboardLayout><BusinessLogin /></DashboardLayout>} />
-      <Route path="/business-register" element={<DashboardLayout><BusinessRegister /></DashboardLayout>} />
+      <Route path="/business-login" element={<BareLayout><BusinessLogin /></BareLayout>} />
+      <Route path="/business-register" element={<BareLayout><BusinessRegister /></BareLayout>} />
       <Route
         path="/business/create"
         element={
@@ -208,7 +214,7 @@ function App() {
       <Route
         path="/seller-dashboard"
         element={
-          <DashboardLayout>
+          <DashboardLayout preferSeller>
             <ProtectedRoute allowedRoles={["seller"]} loginPath="/seller-login" preferSeller>
               <SellerDashboard />
             </ProtectedRoute>
@@ -236,46 +242,46 @@ function App() {
         }
       />
 
-      {/* ── PROTECTED PUBLIC ROUTES (have Navbar) ── */}
+      {/* ── PROTECTED ACCOUNT ROUTES (role-focused nav only) ── */}
       <Route
         path="/upload"
         element={
-          <PublicLayout>
+          <DashboardLayout>
             <ProtectedRoute allowedRoles={["landlord"]}>
               <Upload />
             </ProtectedRoute>
-          </PublicLayout>
+          </DashboardLayout>
         }
       />
       <Route
         path="/premium-plans"
         element={
-          <PublicLayout>
+          <DashboardLayout>
             <ProtectedRoute allowedRoles={["landlord"]}>
               <PremiumPlans />
             </ProtectedRoute>
-          </PublicLayout>
+          </DashboardLayout>
         }
       />
       <Route
         path="/checkout"
         element={
-          <PublicLayout>
+          <DashboardLayout>
             <ProtectedRoute allowedRoles={["landlord"]}>
               <Checkout />
             </ProtectedRoute>
-          </PublicLayout>
+          </DashboardLayout>
         }
       />
       <Route path="/leave-review" element={<PublicLayout><LeaveReview /></PublicLayout>} />
 
-      {/* ── USER ACCOUNT ROUTES (have Navbar, require auth) ── */}
+      {/* ── USER ACCOUNT ROUTES (role-focused nav when logged in) ── */}
       <Route
         path="/profile"
         element={
-          <PublicLayout>
+          <DashboardLayout>
             <ProtectedRoute><ProfilePage /></ProtectedRoute>
-          </PublicLayout>
+          </DashboardLayout>
         }
       />
       <Route
@@ -289,9 +295,9 @@ function App() {
       <Route
         path="/wallet"
         element={
-          <PublicLayout>
+          <DashboardLayout>
             <ProtectedRoute><WalletPage /></ProtectedRoute>
-          </PublicLayout>
+          </DashboardLayout>
         }
       />
       <Route
@@ -313,43 +319,43 @@ function App() {
       <Route
         path="/saved"
         element={
-          <PublicLayout>
+          <DashboardLayout>
             <ProtectedRoute><SavedListingsPage /></ProtectedRoute>
-          </PublicLayout>
+          </DashboardLayout>
         }
       />
       <Route
         path="/messages"
         element={
-          <PublicLayout>
+          <DashboardLayout>
             <ProtectedRoute><MessagesPage /></ProtectedRoute>
-          </PublicLayout>
+          </DashboardLayout>
         }
       />
       <Route
         path="/notifications"
         element={
-          <PublicLayout>
+          <DashboardLayout>
             <ProtectedRoute><NotificationsPage /></ProtectedRoute>
-          </PublicLayout>
+          </DashboardLayout>
         }
       />
       <Route
         path="/payment-history"
         element={
-          <PublicLayout>
+          <DashboardLayout>
             <ProtectedRoute><PaymentHistory /></ProtectedRoute>
-          </PublicLayout>
+          </DashboardLayout>
         }
       />
       <Route
         path="/admin/verification"
         element={
-          <PublicLayout>
+          <DashboardLayout>
             <ProtectedRoute allowedRoles={["admin", "team"]}>
               <AdminVerification />
             </ProtectedRoute>
-          </PublicLayout>
+          </DashboardLayout>
         }
       />
 

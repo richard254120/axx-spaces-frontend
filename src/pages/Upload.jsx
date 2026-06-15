@@ -1,7 +1,9 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { kenyanUniversities, searchUniversities } from "../data/kenyanUniversities";
+import UniversityPicker from "../components/UniversityPicker";
+
+const HOSTEL_PROPERTY_TYPE = "Hostel Room";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -20,6 +22,56 @@ const PROPERTY_TYPES = [
   "Unfurnished Apartment", "Penthouse", "Duplex"
 ];
 
+const STEPS = [
+  { id: "basic", label: "Basic Info", icon: "📋" },
+  { id: "details", label: "Details", icon: "🏠" },
+  { id: "images", label: "Images", icon: "📷" },
+  { id: "amenities", label: "Amenities", icon: "✨" },
+];
+
+function needsUniversityLink(data, landlordType) {
+  return data.propertyType === HOSTEL_PROPERTY_TYPE || landlordType === "university";
+}
+
+function validateBasic(data, { universityRequired = false } = {}) {
+  const missing = [];
+  if (!data.title?.trim()) missing.push("Title");
+  if (!data.propertyType) missing.push("Property type");
+  if (!data.county) missing.push("County");
+  if (!data.location?.trim()) missing.push("Location");
+  if (!data.totalUnits || Number(data.totalUnits) < 1) missing.push("Number of units");
+  if (universityRequired && !data.universityId) missing.push("University");
+  return missing;
+}
+
+function validateDetails(data) {
+  const missing = [];
+  if (!data.description?.trim()) missing.push("Description");
+  if (!data.price || Number(data.price) <= 0) missing.push("Price");
+  if (data.bedrooms === "" || Number(data.bedrooms) < 0) missing.push("Bedrooms");
+  if (data.bathrooms === "" || Number(data.bathrooms) < 0) missing.push("Bathrooms");
+  if (data.bookedUnits > data.totalUnits) missing.push("Booked units cannot exceed total units");
+  return missing;
+}
+
+function validateImages(imageList) {
+  return imageList.length === 0 ? ["At least one image"] : [];
+}
+
+function validateAmenities(data, agreed) {
+  const missing = [];
+  if (data.amenities.length === 0) missing.push("At least one amenity");
+  if (!agreed) missing.push("Terms agreement");
+  return missing;
+}
+
+const STEP_VALIDATORS = [
+  null, // basic — validated in component (needs landlordType)
+  (data) => validateDetails(data),
+  (_data, images) => validateImages(images),
+  (data, _images, agreed) => validateAmenities(data, agreed),
+];
+
 const COUNTIES = [
   "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta",
   "Garissa", "Wajir", "Mandera", "Marsabit", "Isiolo", "Meru", "Tharaka Nithi",
@@ -32,8 +84,10 @@ const COUNTIES = [
 ];
 
 export default function Upload() {
-  const { token } = useContext(AuthContext);
+  const { token, user } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  const landlordType = user?.landlordType || "general";
 
   const [formData, setFormData] = useState({
     title: "",
@@ -65,15 +119,80 @@ export default function Upload() {
   const [locLoading, setLocLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [activeSection, setActiveSection] = useState("basic");
+  const [currentStep, setCurrentStep] = useState(0);
+  const [maxUnlockedStep, setMaxUnlockedStep] = useState(0);
+  const [stepErrors, setStepErrors] = useState([]);
   const [consent, setConsent] = useState(false);
-  const [universitySearch, setUniversitySearch] = useState("");
+  const [selectedUniversity, setSelectedUniversity] = useState(null);
+
+  const universityRequired = needsUniversityLink(formData, landlordType);
+
+  const runStepValidation = (stepIndex) => {
+    if (stepIndex === 0) {
+      return validateBasic(formData, { universityRequired });
+    }
+    const validator = STEP_VALIDATORS[stepIndex];
+    if (!validator) return [];
+    if (stepIndex === 2) return validator(formData, images);
+    if (stepIndex === 3) return validator(formData, images, consent);
+    return validator(formData);
+  };
+
+  const isStepComplete = (stepIndex) => runStepValidation(stepIndex).length === 0;
+
+  const goToStep = (stepIndex) => {
+    if (stepIndex > maxUnlockedStep) return;
+    setStepErrors([]);
+    setError("");
+    setCurrentStep(stepIndex);
+  };
+
+  const handleNextStep = () => {
+    const missing = runStepValidation(currentStep);
+    if (missing.length > 0) {
+      setStepErrors(missing);
+      setError(`Complete required fields: ${missing.join(", ")}`);
+      return;
+    }
+    setStepErrors([]);
+    setError("");
+    const next = currentStep + 1;
+    if (next < STEPS.length) {
+      setCurrentStep(next);
+      setMaxUnlockedStep((prev) => Math.max(prev, next));
+    }
+  };
+
+  const handlePrevStep = () => {
+    setStepErrors([]);
+    setError("");
+    setCurrentStep((prev) => Math.max(0, prev - 1));
+  };
+
+  const handleUniversityPick = (uni) => {
+    setSelectedUniversity(uni);
+    setFormData((prev) => ({
+      ...prev,
+      university: uni?.name || "",
+      universityId: uni ? String(uni.id) : "",
+    }));
+  };
+
+  useEffect(() => {
+    if (stepErrors.length > 0 && isStepComplete(currentStep)) {
+      setStepErrors([]);
+      setError("");
+    }
+  }, [formData, images, consent, currentStep]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
     if (name === "furnished" || name === "initiallyBooked") {
-      setFormData((prev) => ({ ...prev, [name]: checked }));
+      setFormData((prev) => ({
+        ...prev,
+        [name]: type === "checkbox" ? checked : value === "true",
+      }));
       return;
     }
 
@@ -147,25 +266,23 @@ export default function Upload() {
 
     if (!consent) {
       setError("Please agree to the terms and conditions");
+      setCurrentStep(3);
+      setStepErrors(["Terms agreement"]);
       return;
     }
 
-    if (!formData.title || !formData.description || !formData.location ||
-      !formData.price || !formData.bedrooms || !formData.bathrooms ||
-      !formData.propertyType || !formData.county) {
-      setError("Fill all required fields");
-      return;
-    }
-    if (images.length === 0) {
-      setError("Upload at least one image");
-      return;
-    }
-    if (formData.amenities.length === 0) {
-      setError("Select at least one amenity");
-      return;
-    }
-    if (formData.bookedUnits > formData.totalUnits) {
-      setError("Booked units cannot exceed total units");
+    const allMissing = [
+      ...validateBasic(formData, { universityRequired }),
+      ...validateDetails(formData),
+      ...validateImages(images),
+      ...validateAmenities(formData, consent),
+    ];
+    if (allMissing.length > 0) {
+      setError(`Complete all steps before submitting: ${allMissing.join(", ")}`);
+      if (!isStepComplete(0)) setCurrentStep(0);
+      else if (!isStepComplete(1)) setCurrentStep(1);
+      else if (!isStepComplete(2)) setCurrentStep(2);
+      else setCurrentStep(3);
       return;
     }
 
@@ -210,6 +327,10 @@ export default function Upload() {
       setImages([]);
       setImagePreviews([]);
       setConsent(false);
+      setSelectedUniversity(null);
+      setCurrentStep(0);
+      setMaxUnlockedStep(0);
+      setStepErrors([]);
 
       setTimeout(() => navigate("/dashboard"), 2800);
     } catch (err) {
@@ -243,28 +364,51 @@ export default function Upload() {
       {error && <div style={styles.errorBox}>{error}</div>}
       {success && <div style={styles.successBox}>{success}</div>}
 
-      {/* SECTION TABS */}
-      <div style={styles.sectionTabs}>
-        {["basic", "details", "images", "amenities"].map((section) => (
-          <button
-            key={section}
-            style={{ ...styles.sectionTab, ...(activeSection === section && styles.sectionTabActive) }}
-            onClick={() => setActiveSection(section)}
-          >
-            {section === "basic" && "📋"}
-            {section === "details" && "🏠"}
-            {section === "images" && "📷"}
-            {section === "amenities" && "✨"}
-          </button>
-        ))}
+      {/* STEP PROGRESS */}
+      <div style={styles.stepProgress} className="upload-step-progress">
+        {STEPS.map((step, index) => {
+          const unlocked = index <= maxUnlockedStep;
+          const complete = index < currentStep && isStepComplete(index);
+          const active = index === currentStep;
+          return (
+            <button
+              key={step.id}
+              type="button"
+              disabled={!unlocked}
+              onClick={() => goToStep(index)}
+              style={{
+                ...styles.stepItem,
+                ...(active && styles.stepItemActive),
+                ...(complete && styles.stepItemComplete),
+                ...(!unlocked && styles.stepItemLocked),
+              }}
+            >
+              <span style={styles.stepNumber}>
+                {complete ? "✓" : index + 1}
+              </span>
+              <span style={styles.stepLabel}>
+                {step.icon} {step.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={styles.stepHint}>
+        Step {currentStep + 1} of {STEPS.length} — complete this section to unlock the next
       </div>
 
       <form onSubmit={handleSubmit} style={styles.form}>
 
         {/* ── BASIC INFO ── */}
-        {activeSection === "basic" && (
+        {currentStep === 0 && (
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>Basic Info</h2>
+            {stepErrors.length > 0 && (
+              <div style={styles.stepErrorBox}>
+                Required: {stepErrors.join(", ")}
+              </div>
+            )}
 
             <div style={styles.formGroup}>
               <label style={styles.label}>Title *</label>
@@ -297,17 +441,29 @@ export default function Upload() {
             </div>
 
             <div style={styles.formGroup}>
-              <label style={styles.label}>Nearby University (Optional)</label>
-              <select name="university" value={formData.university} onChange={handleChange} style={styles.input}>
-                <option value="">Select University (if near campus)</option>
-                {kenyanUniversities.map((uni) => (
-                  <option key={uni.id} value={uni.name}>
-                    {uni.name} - {uni.location}
-                  </option>
-                ))}
-              </select>
-              <p style={styles.hint}>Select if your property is near a university for better visibility to students</p>
+              <UniversityPicker
+                value={selectedUniversity}
+                onChange={handleUniversityPick}
+                required={universityRequired}
+                label={universityRequired ? "Nearby University" : "Nearby University (Optional)"}
+                hint={
+                  universityRequired
+                    ? "Required — students browsing this university will see your listing after admin approval."
+                    : "Optional — link your property to a campus so students can find it under University Hostels."
+                }
+              />
             </div>
+
+            {universityRequired && (
+              <div style={styles.universityNotice}>
+                <strong>🎓 Campus listing</strong>
+                <p style={{ margin: "6px 0 0", lineHeight: 1.5 }}>
+                  {formData.propertyType === HOSTEL_PROPERTY_TYPE
+                    ? "Hostel listings must be linked to a university so students can find them when they select that campus."
+                    : "As a near-university landlord, every property must be linked to the campus you serve."}
+                </p>
+              </div>
+            )}
 
             <div style={styles.formGroup}>
               <label style={styles.label}>Number of Units *</label>
@@ -380,16 +536,30 @@ export default function Upload() {
               </p>
             </div>
 
-            <button type="button" onClick={() => setActiveSection("details")} style={styles.nextBtn}>
+            <button
+              type="button"
+              onClick={handleNextStep}
+              disabled={!isStepComplete(0)}
+              style={{
+                ...styles.nextBtn,
+                opacity: isStepComplete(0) ? 1 : 0.5,
+                cursor: isStepComplete(0) ? "pointer" : "not-allowed",
+              }}
+            >
               Next →
             </button>
           </div>
         )}
 
         {/* ── DETAILS ── */}
-        {activeSection === "details" && (
+        {currentStep === 1 && (
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>Details</h2>
+            {stepErrors.length > 0 && (
+              <div style={styles.stepErrorBox}>
+                Required: {stepErrors.join(", ")}
+              </div>
+            )}
 
             <div style={styles.formGroup}>
               <label style={styles.label}>Description *</label>
@@ -447,16 +617,32 @@ export default function Upload() {
             </div>
 
             <div style={styles.navBtns}>
-              <button type="button" onClick={() => setActiveSection("basic")} style={styles.prevBtn}>← Back</button>
-              <button type="button" onClick={() => setActiveSection("images")} style={styles.nextBtn}>Next →</button>
+              <button type="button" onClick={handlePrevStep} style={styles.prevBtn}>← Back</button>
+              <button
+                type="button"
+                onClick={handleNextStep}
+                disabled={!isStepComplete(1)}
+                style={{
+                  ...styles.nextBtn,
+                  opacity: isStepComplete(1) ? 1 : 0.5,
+                  cursor: isStepComplete(1) ? "pointer" : "not-allowed",
+                }}
+              >
+                Next →
+              </button>
             </div>
           </div>
         )}
 
         {/* ── IMAGES ── */}
-        {activeSection === "images" && (
+        {currentStep === 2 && (
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>Images</h2>
+            {stepErrors.length > 0 && (
+              <div style={styles.stepErrorBox}>
+                Required: {stepErrors.join(", ")}
+              </div>
+            )}
 
             <div style={styles.formGroup}>
               <label style={styles.label}>Upload Images ({images.length}/10) *</label>
@@ -481,16 +667,32 @@ export default function Upload() {
             </div>
 
             <div style={styles.navBtns}>
-              <button type="button" onClick={() => setActiveSection("details")} style={styles.prevBtn}>← Back</button>
-              <button type="button" onClick={() => setActiveSection("amenities")} style={styles.nextBtn}>Next →</button>
+              <button type="button" onClick={handlePrevStep} style={styles.prevBtn}>← Back</button>
+              <button
+                type="button"
+                onClick={handleNextStep}
+                disabled={!isStepComplete(2)}
+                style={{
+                  ...styles.nextBtn,
+                  opacity: isStepComplete(2) ? 1 : 0.5,
+                  cursor: isStepComplete(2) ? "pointer" : "not-allowed",
+                }}
+              >
+                Next →
+              </button>
             </div>
           </div>
         )}
 
         {/* ── AMENITIES ── */}
-        {activeSection === "amenities" && (
+        {currentStep === 3 && (
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>Amenities</h2>
+            {stepErrors.length > 0 && (
+              <div style={styles.stepErrorBox}>
+                Required: {stepErrors.join(", ")}
+              </div>
+            )}
 
             <div style={styles.formGroup}>
               <label style={styles.label}>Select Amenities * ({formData.amenities.length})</label>
@@ -522,10 +724,14 @@ export default function Upload() {
               </label>
             </div>
 
-            <button type="submit" disabled={loading || !consent} style={{
+            <div style={styles.navBtns}>
+              <button type="button" onClick={handlePrevStep} style={styles.prevBtn}>← Back</button>
+            </div>
+
+            <button type="submit" disabled={loading || !isStepComplete(3)} style={{
               ...styles.submitBtn,
-              opacity: (!consent || loading) ? 0.5 : 1,
-              cursor: (!consent || loading) ? "not-allowed" : "pointer",
+              opacity: (!isStepComplete(3) || loading) ? 0.5 : 1,
+              cursor: (!isStepComplete(3) || loading) ? "not-allowed" : "pointer",
             }}>
               {loading ? "Uploading Property..." : "Submit Property for Approval"}
             </button>
@@ -574,6 +780,74 @@ const styles = {
     padding: "12px",
     background: "#1e293b",
   },
+  stepProgress: {
+    display: "grid",
+    gridTemplateColumns: "repeat(4, 1fr)",
+    gap: "8px",
+    padding: "12px",
+    background: "#1e293b",
+  },
+  stepItem: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "4px",
+    padding: "10px 6px",
+    background: "#0f1729",
+    border: "1px solid #334155",
+    borderRadius: "8px",
+    color: "#94a3b8",
+    cursor: "pointer",
+    fontFamily: "inherit",
+    transition: "all 0.2s",
+  },
+  stepItemActive: {
+    background: "#fbbf24",
+    color: "#0f1729",
+    borderColor: "#fbbf24",
+    fontWeight: 700,
+  },
+  stepItemComplete: {
+    borderColor: "#22c55e",
+    color: "#86efac",
+  },
+  stepItemLocked: {
+    opacity: 0.45,
+    cursor: "not-allowed",
+  },
+  stepNumber: {
+    width: "24px",
+    height: "24px",
+    borderRadius: "50%",
+    background: "rgba(0,0,0,0.2)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "12px",
+    fontWeight: 800,
+  },
+  stepLabel: {
+    fontSize: "10px",
+    fontWeight: 600,
+    textAlign: "center",
+    lineHeight: 1.2,
+  },
+  stepHint: {
+    padding: "8px 16px",
+    fontSize: "12px",
+    color: "#64748b",
+    background: "#0f1729",
+    borderBottom: "1px solid #1e293b",
+  },
+  stepErrorBox: {
+    background: "rgba(239, 68, 68, 0.15)",
+    border: "1px solid #ef4444",
+    color: "#fca5a5",
+    padding: "10px 12px",
+    borderRadius: "8px",
+    fontSize: "13px",
+    marginBottom: "16px",
+  },
   sectionTab: {
     background: "#0f1729",
     border: "none",
@@ -609,6 +883,15 @@ const styles = {
     color: "#64748b",
     marginTop: "4px",
     marginBottom: "0",
+  },
+  universityNotice: {
+    background: "rgba(59, 130, 246, 0.12)",
+    border: "1px solid #3b82f6",
+    borderRadius: "10px",
+    padding: "14px 16px",
+    marginBottom: "16px",
+    fontSize: "13px",
+    color: "#93c5fd",
   },
   input: {
     width: "100%",
@@ -899,9 +1182,9 @@ const cssStyles = `
     to { opacity: 1; }
   }
 
-  @media (max-width: 480px) {
-    [style*="padding: 16px"] {
-      padding: 12px !important;
+  @media (max-width: 600px) {
+    .upload-step-progress {
+      grid-template-columns: repeat(2, 1fr) !important;
     }
   }
 `;
