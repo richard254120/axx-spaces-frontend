@@ -3,41 +3,196 @@ import { useState } from "react";
 const TABS = ["Terms of Service", "Privacy Policy"];
 
 const terms = `
-## 1. Acceptance of Terms
-By accessing or using Axxspace ("the Platform"), you agree to be bound by these Terms of Service. If you do not agree, please do not use the Platform.
+## 1. Introduction
+Axxspace Limited ("Axxspace," "we," "us," or "our") operates Kenya's premier property and services platform, connecting individuals and businesses across all 47 counties with rental properties, professional movers, tourism experiences, business services, and a general marketplace.
 
-## 2. Description of Service
-Axxspace is an online marketplace that connects landlords, tenants, movers, and merchants. We provide tools to list properties, discover rental accommodation, book moving services, and source packing materials. Axxspace does not own any properties and is not a party to any rental or service agreement between users.
+These Terms and Conditions ("Terms") govern your access to and use of the Axxspace website, mobile applications, and all associated services. They form a legally binding agreement between you ("User," "you," or "your") and Axxspace Limited, a company incorporated under the laws of the Republic of Kenya.
 
-## 3. User Accounts
-You must register an account to access certain features. You are responsible for keeping your credentials secure and for all activity that occurs under your account. You must provide accurate information and keep it up to date.
+## 2. Our Services
+Axxspace provides a multi-service platform designed to serve Kenyans across all 47 counties. The platform currently includes the following core services:
 
-## 4. Listings & Content
-Landlords are solely responsible for the accuracy of their listings. Axxspace reserves the right to remove listings that are fraudulent, misleading, or in violation of these terms. By uploading content (photos, descriptions) you grant Axxspace a non-exclusive licence to display it on the Platform.
+**🏢 RENTALS**
+Verified rental property listings — bedsitters, apartments, maisonettes — with GPS mapping and direct landlord contact.
 
-## 5. Prohibited Conduct
-You may not:
-- Post false, misleading, or fraudulent listings.
-- Harass, threaten, or abuse other users.
-- Use the Platform for any unlawful purpose.
-- Attempt to scrape, reverse-engineer, or disrupt the Platform.
+**🚛 MOVERS**
+Directory of vetted moving companies offering local and long-distance relocation services with transparent pricing.
 
-## 6. Payments & Transactions
-Axxspace does not process payments between users. All financial arrangements are made directly between landlords, tenants, movers, and merchants. Axxspace is not responsible for any payment disputes.
+**🏨 TOURISM**
+Hotels, lodges, safari packages, and unique Kenyan experiences available for direct booking across all counties.
 
-## 7. Limitation of Liability
-To the maximum extent permitted by law, Axxspace shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Platform, including but not limited to disputes between users, property damage, or loss of data.
+**💼 AXXBIASHARA**
+Professional business services including company registration, accounting, tax, legal support, and digital solutions.
 
-## 8. Termination
-We reserve the right to suspend or terminate your account at our discretion if you violate these terms.
+**🛍 MARKETPLACE**
+Buy-and-sell listings for new and used goods — electronics, furniture, fashion, vehicles, and more nationwide.
 
-## 9. Changes to Terms
-We may update these Terms at any time. Continued use of the Platform after changes constitutes acceptance of the new Terms. The date of last update is shown below.
+**📍 QUICKSALES**
+Fast-listing tools for sellers who need rapid exposure across the Axxspace network and partner channels.
 
-## 10. Governing Law
-These Terms are governed by the laws of Kenya. Any disputes shall be resolved in the courts of Nairobi, Kenya.
+Axxspace acts as a platform intermediary — we connect users with landlords, service providers, businesses, and sellers. We are not a party to any transaction or agreement made between users through the platform unless explicitly stated.
 
-**Last updated: May 2026**
+## 3. User Eligibility
+To use Axxspace services, you must meet all of the following eligibility requirements:
+
+- Be at least 18 years of age or the legal age of majority in your jurisdiction.
+- Have the legal capacity to enter into binding contracts under Kenyan law.
+- Not be prohibited from using our services under any applicable law, court order, or government regulation.
+- Provide accurate, truthful, and complete registration information when creating an account.
+- If registering on behalf of a business or legal entity, have the authority to bind that entity to these Terms.
+
+Axxspace reserves the right to verify user identity and eligibility at any time and to suspend or terminate accounts where eligibility requirements are not met.
+
+## 4. Account & Registration
+
+**CREATING AN ACCOUNT**
+Some features of Axxspace require you to register for an account. You agree to provide accurate, complete, and current information during registration and to update this information as necessary to keep it accurate and complete.
+
+**ACCOUNT SECURITY**
+You are solely responsible for maintaining the confidentiality of your account credentials (username and password).
+You are responsible for all activities that occur under your account, whether or not authorised by you.
+You must immediately notify Axxspace of any unauthorised access or use of your account at support@axxspace.com.
+Axxspace will not be liable for any loss or damage resulting from your failure to protect your account credentials.
+
+**ACCOUNT TYPES**
+Axxspace may offer different account tiers including standard user accounts, verified landlord/seller accounts, business provider accounts, and premium or boosted listing accounts. Each account type may have different privileges, obligations, and associated fees as outlined in our pricing schedule.
+
+## 5. Listings & Content
+
+**YOUR RESPONSIBILITY**
+When you post a listing, review, image, or any other content on Axxspace, you represent and warrant that:
+
+- The information you provide is accurate, truthful, and not misleading in any respect.
+- You own or have the necessary rights to share all content, including photographs and descriptions.
+- Your listing complies with all applicable Kenyan laws, including property, business, and consumer protection laws.
+- Your content does not infringe on the intellectual property or privacy rights of any third party.
+- You will promptly update or remove listings that are no longer available or accurate.
+
+**CONTENT LICENCE**
+By posting content on Axxspace, you grant us a non-exclusive, royalty-free, worldwide licence to display, reproduce, and promote your content on the Axxspace platform and in related marketing materials for the purpose of operating and growing the platform.
+
+**CONTENT MODERATION**
+Axxspace reserves the right to review, approve, edit, or remove any listing or content at our sole discretion if it violates these Terms, is fraudulent, misleading, or otherwise objectionable. We are not obligated to monitor all content but will act on valid reports.
+
+## 6. Prohibited Conduct
+The following activities are strictly prohibited on the Axxspace platform:
+
+- Posting false, misleading, or fraudulent listings, prices, or service descriptions.
+- Impersonating another person, business, or organisation.
+- Collecting or scraping user data, contact information, or listings without prior written permission.
+- Using the platform to facilitate illegal transactions, including money laundering or fraud.
+- Harassing, abusing, threatening, or discriminating against other users, landlords, or service providers.
+- Posting content that is pornographic, violent, hateful, or otherwise offensive.
+- Attempting to bypass our verification processes or manipulate platform ratings and reviews.
+- Using automated bots, scripts, or tools to access or interact with the platform without authorisation.
+- Reproducing or re-selling platform content, data, or listings on third-party channels without consent.
+- Engaging in any activity that disrupts the technical operation of the platform or harms other users.
+
+**Consequence:** Violations of these prohibitions may result in immediate account suspension or termination, removal of content, and where applicable, reporting to Kenyan law enforcement authorities. Axxspace reserves the right to pursue legal remedies for damages caused by prohibited conduct.
+
+## 7. Payments & Fees
+
+**PLATFORM FEES**
+Axxspace may charge fees for certain services, including premium listings, boosted visibility, verified badges, and business service packages. All fees are displayed clearly before purchase and are stated in Kenyan Shillings (KES) unless otherwise specified.
+
+**NO HIDDEN FEES**
+Consistent with our platform promise, Axxspace does not charge hidden fees to users for browsing listings, contacting landlords or sellers, or using basic platform features. Any fees that apply will be disclosed prior to any payment being processed.
+
+**THIRD-PARTY TRANSACTIONS**
+Axxspace is not a party to rental agreements, moving contracts, tourism bookings, or marketplace transactions between users and listed providers. Any payments made directly between users and landlords, movers, tourism operators, or sellers are governed by the terms agreed between those parties. Axxspace bears no liability for such transactions.
+
+**REFUNDS**
+Refund eligibility for Axxspace platform fees (e.g. listing fees, subscription fees) will be assessed on a case-by-case basis. Contact support@axxspace.com within 14 days of a charge to request a review. Refunds are not guaranteed and are subject to our internal refund policy.
+
+## 8. WhatsApp & Communication
+Axxspace integrates WhatsApp as a direct communication channel between users and listed landlords, businesses, and service providers. By using this feature, you acknowledge and agree that:
+
+- Communication via WhatsApp is a convenience feature — Axxspace is not a party to, and does not monitor, WhatsApp conversations.
+- You will not use WhatsApp connections obtained through Axxspace for spam, unsolicited marketing, harassment, or any unlawful purpose.
+- Axxspace is not responsible for the content of messages exchanged between users outside the platform.
+- You are responsible for verifying the identity of the person you are communicating with before making any payment or commitment.
+- Axxspace may suspend your access to WhatsApp-linked features if misuse is reported or detected.
+
+## 9. Verification & Listings Policy
+Axxspace strives to maintain a platform of verified and trusted listings. Our verification process includes checks on landlord identity, property existence, and business registration where applicable. However:
+
+- Verification does not constitute an endorsement or guarantee of any landlord, service provider, or listed property.
+- Users are advised to conduct their own due diligence before committing to any tenancy, service contract, or marketplace purchase.
+- GPS-mapped locations are provided as a guide and may not reflect real-time or precise property boundaries.
+- Axxspace does not guarantee the availability of any listed property or service at the time of enquiry.
+- Verified badges may be revoked at any time if a listing or provider is found to be in breach of our policies.
+
+## 10. Third-Party Services
+The Axxspace platform may contain links to, or integrations with, third-party websites, applications, or services (including GPS map providers, payment processors, and WhatsApp). These are provided for user convenience and do not constitute endorsement by Axxspace.
+
+Axxspace has no control over third-party services and is not responsible for their content, policies, or practices.
+Your use of third-party services is governed by those services' own terms and privacy policies.
+Axxspace shall not be liable for any loss or damage arising from your interaction with third-party services.
+
+## 11. Limitation of Liability
+To the fullest extent permitted by Kenyan law, Axxspace Limited and its directors, officers, employees, and agents shall not be liable for:
+
+- Any indirect, incidental, special, or consequential losses arising from your use of the platform.
+- Loss of data, income, profit, or business opportunity resulting from use or inability to use the platform.
+- Actions, omissions, or misconduct of landlords, movers, tourism operators, sellers, or business service providers listed on the platform.
+- Inaccuracies in listings, descriptions, prices, or availability of properties or services.
+- Any damage to your device or systems arising from accessing the Axxspace platform.
+
+Axxspace's total aggregate liability to you for any claim arising out of these Terms shall not exceed the amount paid by you to Axxspace in the three (3) months preceding the relevant claim.
+
+## 12. Intellectual Property
+All intellectual property on the Axxspace platform — including the brand name, logo, design, code, platform architecture, marketing materials, and original content — is owned by or licenced to Axxspace Limited.
+
+You may not copy, reproduce, distribute, or create derivative works from Axxspace's intellectual property without prior written consent.
+The Axxspace brand and all associated trademarks are the exclusive property of Axxspace Limited.
+Any feedback, suggestions, or ideas you submit to Axxspace may be used by us without compensation or attribution to you.
+
+## 13. Termination
+Axxspace reserves the right to suspend or permanently terminate your account and access to the platform at any time, with or without notice, for reasons including but not limited to:
+
+- Breach of any provision of these Terms and Conditions.
+- Fraudulent, abusive, or illegal activity conducted through or in connection with the platform.
+- Requests from law enforcement or regulatory authorities.
+- Extended inactivity of your account beyond a reasonable period.
+
+You may close your account at any time by contacting support@axxspace.com. Upon termination, your right to access the platform ceases immediately. Clauses relating to intellectual property, limitation of liability, and dispute resolution shall survive termination.
+
+## 14. Dispute Resolution
+In the event of a dispute arising from or relating to these Terms, or your use of the Axxspace platform, the following process applies:
+
+**Step 1 — Informal Resolution:** Contact us at support@axxspace.com. We will endeavour to resolve the matter within 14 business days.
+
+**Step 2 — Mediation:** If informal resolution fails, the parties agree to attempt mediation through a mutually agreed mediator in Nairobi, Kenya.
+
+**Step 3 — Arbitration:** Unresolved disputes shall be referred to binding arbitration under the Arbitration Act (Cap 49) of Kenya.
+
+**Governing Law:** These Terms are governed by and construed in accordance with the laws of the Republic of Kenya.
+Nothing in this clause prevents either party from seeking urgent injunctive or interim relief from the Kenyan courts where necessary to protect their rights.
+
+## 15. Amendments to These Terms
+Axxspace reserves the right to modify these Terms at any time. When we make material changes, we will:
+
+- Update the "Last Updated" date at the top of this document.
+- Post a notice on the Axxspace platform or send an email notification to registered users.
+- Where required by law, seek your affirmative consent before applying material changes.
+
+Your continued use of the Axxspace platform after the effective date of any amendment constitutes your acceptance of the updated Terms. We encourage you to review these Terms periodically.
+
+## 16. Contact Us
+If you have any questions, concerns, or requests relating to these Terms and Conditions, please contact us through any of the following channels:
+
+- **General Enquiries:** info@axxspace.com
+- **User Support:** support@axxspace.com
+- **Platform Administration:** admin@axxspace.com
+- **Registered Office:** Axxspace Limited, Nairobi, Kenya
+
+We aim to respond to all formal legal enquiries within 5 business days.
+
+**Effective Date:** 1 January 2026
+**Last Updated:** 1 June 2026
+**Jurisdiction:** Republic of Kenya
+**Company:** Axxspace Limited
+
+© 2026 Axxspace Limited · All Rights Reserved
 `;
 
 const privacy = `

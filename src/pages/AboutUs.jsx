@@ -57,18 +57,18 @@ export default function AboutPage() {
 
   const whatWeDo = [
     {
-      icon: "�",
+      icon: "💼",
       title: "AxxBiashara",
       color: "#fbbf24",
       desc: "Kenya's premier business directory connecting users with trusted businesses across all sectors. Features reviews, ratings, advanced search, business comparison, and premium listings.",
-      items: ["Reviews & Ratings", "Favorites & Bookmarks", "Business Analytics", "Events & Promotions", "Verification Badges"],
+      items: ["Reviews & Ratings", "Favorites & Bookmarks", "Business Analytics", "Events & Promotions", "Verification Badges", "Business Subscriptions"],
     },
     {
-      icon: "�",
+      icon: "🏠",
       title: "Rental Space",
       color: "#22c55e",
       desc: "We help users discover available rental houses and business spaces — compare pricing and locations, connect directly with landlords and caretakers, and access property information more conveniently.",
-      items: null,
+      items: ["GPS Mapping", "Direct Landlord Contact", "Premium Boost Plans", "University Hostels", "Property Verification"],
     },
     {
       icon: "🏢",
@@ -82,21 +82,28 @@ export default function AboutPage() {
       title: "Movers & Relocation",
       color: "#0ea5e9",
       desc: "Moving can be stressful and expensive. Axxspace connects users with movers and relocation service providers to make transitions easier and more organized.",
-      items: null,
+      items: ["Verified Movers", "Transparent Pricing", "Materials Marketplace", "Direct Booking", "Review System"],
     },
     {
       icon: "🏨",
       title: "Tourism & Hospitality",
       color: "#a855f7",
       desc: "Discover and book amazing hotels, resorts, lodges, and tourism experiences across Kenya. Property owners advertise their properties with flexible subscription packages.",
-      items: ["Beach Resorts", "Mountain Lodges", "Hotels", "Adventure Tours", "Spa & Wellness"],
+      items: ["Beach Resorts", "Mountain Lodges", "Hotels", "Adventure Tours", "Spa & Wellness", "Safari Packages"],
     },
     {
       icon: "🛍️",
-      title: "Second-Hand Marketplace",
+      title: "Marketplace",
       color: "#ec4899",
-      desc: "A platform where second-hand merchants showcase products to buyers looking for affordable and accessible options.",
-      items: ["Sustainability", "Affordable living", "Small-scale traders and local businesses"],
+      desc: "A buy-and-sell platform for new and used goods — electronics, furniture, fashion, vehicles, and more nationwide. Connect directly with sellers.",
+      items: ["Seller Dashboard", "Product Listings", "Direct Messaging", "Secure Transactions", "Premium Visibility"],
+    },
+    {
+      icon: "💳",
+      title: "AxxWallet",
+      color: "#f59e0b",
+      desc: "Your digital wallet for seamless transactions on the platform. Deposit funds, make payments for premium services, withdraw money, and transfer funds to other users.",
+      items: ["Secure Deposits", "Easy Withdrawals", "Payment History", "M-Pesa Integration", "Fund Transfers"],
     },
   ];
 
@@ -114,6 +121,8 @@ export default function AboutPage() {
     { icon: "", title: "24/7 Support", desc: "Got an issue? Contact us via WhatsApp, email, or phone. We're here to help." },
     { icon: "", title: "Data Privacy", desc: "Your personal data is encrypted and never shared without consent." },
     { icon: "", title: "Report Fake Listings", desc: "Spot a scam? Report it immediately. We remove fake listings within 24 hours." },
+    { icon: "", title: "Multi-Level Verification", desc: "Student, Standard, and Premium verification levels with document uploads and physical verification options." },
+    { icon: "", title: "Secure Messaging", desc: "In-platform messaging system for safe communication between users." },
   ];
 
   return (
@@ -233,6 +242,9 @@ export default function AboutPage() {
               { val: "500+", label: "Happy Tenants", icon: "" },
               { val: "150+", label: "Landlords Onboarded", icon: "" },
               { val: "100+", label: "Verified Businesses", icon: "" },
+              { val: "50+", label: "Verified Movers", icon: "" },
+              { val: "30+", label: "Tourism Properties", icon: "" },
+              { val: "200+", label: "Marketplace Sellers", icon: "" },
             ].map((s) => (
               <div key={s.label} style={styles.statCard} className="stat-card">
                 <div style={styles.statIcon}>{s.icon}</div>
