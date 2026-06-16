@@ -707,307 +707,302 @@ export default function AxxBiashara() {
             <p style={{ color: "#475569" }}>Try adjusting your filters or search terms</p>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "22px" }}>
-            {businesses.map((biz, idx) => (
-              <div
-                key={biz._id}
-                className="axx-card"
-                style={{ animationDelay: `${Math.min(idx * 0.06, 0.5)}s` }}
-                onClick={() => navigate(`/business/${biz._id}`)}
-                onMouseEnter={() => setHoveredCard(biz._id)}
-                onMouseLeave={() => setHoveredCard(null)}
-              >
-                {biz.featured && <div className="featured-tag">⭐ Featured</div>}
+          <>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "22px" }}>
+              {businesses.map((biz, idx) => (
+                <div
+                  key={biz._id}
+                  className="axx-card"
+                  style={{ animationDelay: `${Math.min(idx * 0.06, 0.5)}s` }}
+                  onClick={() => navigate(`/business/${biz._id}`)}
+                  onMouseEnter={() => setHoveredCard(biz._id)}
+                  onMouseLeave={() => setHoveredCard(null)}
+                >
+                  {biz.featured && <div className="featured-tag">⭐ Featured</div>}
 
-                {/* Image */}
-                {biz.images?.length > 0 ? (
-                  <div className="card-img-wrap">
-                    <img src={biz.images[0]} alt={biz.name} />
-                    <div className="card-img-overlay" />
-                    {biz.rating > 0 && (
-                      <div style={{ position: "absolute", bottom: "12px", left: "14px", background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)", borderRadius: "8px", padding: "4px 10px", fontSize: "12px", fontWeight: 700, color: "#fbbf24", zIndex: 2 }}>
-                        ★ {biz.rating?.toFixed(1)} · {biz.reviewCount || 0} reviews
+                  {/* Image */}
+                  {biz.images?.length > 0 ? (
+                    <div className="card-img-wrap">
+                      <img src={biz.images[0]} alt={biz.name} />
+                      <div className="card-img-overlay" />
+                      {biz.rating > 0 && (
+                        <div style={{ position: "absolute", bottom: "12px", left: "14px", background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)", borderRadius: "8px", padding: "4px 10px", fontSize: "12px", fontWeight: 700, color: "#fbbf24", zIndex: 2 }}>
+                          ★ {biz.rating?.toFixed(1)} · {biz.reviewCount || 0} reviews
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div style={{ height: "80px", background: "linear-gradient(135deg, rgba(56,189,248,0.06), rgba(16,185,129,0.04))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "32px" }}>🏪</div>
+                  )}
+
+                  {/* Body */}
+                  <div style={{ padding: "18px 20px 20px" }}>
+                    {/* Title row */}
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "6px" }}>
+                      <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#f1f5f9", lineHeight: 1.3, flex: 1, paddingRight: "8px" }}>{biz.name}</h3>
+                      <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
+                        <button className="icon-btn" onClick={e => toggleFavorite(biz._id, e)} title="Favourite">
+                          {isFavorite(biz._id) ? "❤️" : "🤍"}
+                        </button>
+                        <button
+                          className="icon-btn"
+                          onClick={e => toggleComparison(biz._id, e)}
+                          title="Compare"
+                          style={{
+                            background: comparisonList.includes(biz._id) ? "rgba(56,189,248,0.15)" : undefined,
+                            borderColor: comparisonList.includes(biz._id) ? "rgba(56,189,248,0.4)" : undefined,
+                          }}
+                        >
+                          {comparisonList.includes(biz._id) ? <span style={{ color: "#38bdf8", fontWeight: 700, fontSize: "13px" }}>✓</span> : "⚖"}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div style={{ fontSize: "12px", color: "#38bdf8", fontWeight: 600, marginBottom: "4px" }}>{biz.categories?.join(" · ")}</div>
+                    <div style={{ fontSize: "13px", color: "#64748b", marginBottom: "10px", display: "flex", alignItems: "center", gap: "4px" }}>
+                      <span>📍</span> {biz.location?.town}, {biz.location?.county}
+                    </div>
+
+                    <p style={{ fontSize: "13px", color: "#94a3b8", lineHeight: "1.55", marginBottom: "12px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                      {biz.description}
+                    </p>
+
+                    {/* Badges */}
+                    {biz.verificationBadges?.length > 0 && (
+                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "12px" }}>
+                        {biz.verificationBadges.map((badge, i) => {
+                          const cfg = BADGE_CONFIG[badge.type] || {};
+                          return (
+                            <span key={i} className="badge-pill" style={{ background: `${cfg.color}18`, color: cfg.color, border: `1px solid ${cfg.color}40` }}>
+                              {cfg.icon} {cfg.label || badge.type}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    <hr className="divider" />
+
+                    {/* Actions */}
+                    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: biz.socialMedia ? "10px" : "0" }}>
+                      {biz.contact?.phone && (
+                        <a href={`tel:${biz.contact.phone}`} className="action-btn action-btn-primary" onClick={e => e.stopPropagation()}>
+                          📞 Call
+                        </a>
+                      )}
+                      {biz.contact?.email && (
+                        <a href={`mailto:${biz.contact.email}`} className="action-btn action-btn-success" onClick={e => e.stopPropagation()}>
+                          ✉ Email
+                        </a>
+                      )}
+                      {biz.contact?.phone && (
+                        <a
+                          href={`https://wa.me/${biz.contact.phone}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="action-btn"
+                          style={{ background: "rgba(37,211,102,0.1)", color: "#25d366", border: "1px solid rgba(37,211,102,0.25)", display: "inline-flex", alignItems: "center", gap: "6px", padding: "8px 14px", borderRadius: "10px", fontSize: "13px", fontWeight: 600, textDecoration: "none" }}
+                          onClick={e => e.stopPropagation()}
+                        >
+                          💬 WhatsApp
+                        </a>
+                      )}
+                    </div>
+
+                    {/* Social icons */}
+                    {biz.socialMedia && (
+                      <div style={{ display: "flex", gap: "7px", flexWrap: "wrap" }}>
+                        {biz.socialMedia.facebook && <a href={biz.socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>f</a>}
+                        {biz.socialMedia.instagram && <a href={biz.socialMedia.instagram} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>📷</a>}
+                        {biz.socialMedia.twitter && <a href={biz.socialMedia.twitter} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>𝕏</a>}
+                        {biz.socialMedia.whatsapp && <a href={`https://wa.me/${biz.socialMedia.whatsapp}`} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>💬</a>}
+                        {biz.contact?.website && <a href={biz.contact.website} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>🔗</a>}
                       </div>
                     )}
                   </div>
-                ) : (
-                  <div style={{ height: "80px", background: "linear-gradient(135deg, rgba(56,189,248,0.06), rgba(16,185,129,0.04))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "32px" }}>🏪</div>
-                )}
-
-                {/* Body */}
-                <div style={{ padding: "18px 20px 20px" }}>
-                  {/* Title row */}
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "6px" }}>
-                    <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#f1f5f9", lineHeight: 1.3, flex: 1, paddingRight: "8px" }}>{biz.name}</h3>
-                    <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
-                      <button className="icon-btn" onClick={e => toggleFavorite(biz._id, e)} title="Favourite">
-                        {isFavorite(biz._id) ? "❤️" : "🤍"}
-                      </button>
-                      <button
-                        className="icon-btn"
-                        onClick={e => toggleComparison(biz._id, e)}
-                        title="Compare"
-                        style={{
-                          background: comparisonList.includes(biz._id) ? "rgba(56,189,248,0.15)" : undefined,
-                          borderColor: comparisonList.includes(biz._id) ? "rgba(56,189,248,0.4)" : undefined,
-                        }}
-                      >
-                        {comparisonList.includes(biz._id) ? <span style={{ color: "#38bdf8", fontWeight: 700, fontSize: "13px" }}>✓</span> : "⚖"}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div style={{ fontSize: "12px", color: "#38bdf8", fontWeight: 600, marginBottom: "4px" }}>{biz.categories?.join(" · ")}</div>
-                  <div style={{ fontSize: "13px", color: "#64748b", marginBottom: "10px", display: "flex", alignItems: "center", gap: "4px" }}>
-                    <span>📍</span> {biz.location?.town}, {biz.location?.county}
-                  </div>
-
-                  <p style={{ fontSize: "13px", color: "#94a3b8", lineHeight: "1.55", marginBottom: "12px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                    {biz.description}
-                  </p>
-
-                  {/* Badges */}
-                  {biz.verificationBadges?.length > 0 && (
-                    <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "12px" }}>
-                      {biz.verificationBadges.map((badge, i) => {
-                        const cfg = BADGE_CONFIG[badge.type] || {};
-                        return (
-                          <span key={i} className="badge-pill" style={{ background: `${cfg.color}18`, color: cfg.color, border: `1px solid ${cfg.color}40` }}>
-                            {cfg.icon} {cfg.label || badge.type}
-                          </span>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  <hr className="divider" />
-
-                  {/* Actions */}
-                  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: biz.socialMedia ? "10px" : "0" }}>
-                    {biz.contact?.phone && (
-                      <a href={`tel:${biz.contact.phone}`} className="action-btn action-btn-primary" onClick={e => e.stopPropagation()}>
-                        📞 Call
-                      </a>
-                    )}
-                    {biz.contact?.email && (
-                      <a href={`mailto:${biz.contact.email}`} className="action-btn action-btn-success" onClick={e => e.stopPropagation()}>
-                        ✉ Email
-                      </a>
-                    )}
-                    {biz.contact?.phone && (
-                      <a
-                        href={`https://wa.me/${biz.contact.phone}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="action-btn"
-                        style={{ background: "rgba(37,211,102,0.1)", color: "#25d366", border: "1px solid rgba(37,211,102,0.25)", display: "inline-flex", alignItems: "center", gap: "6px", padding: "8px 14px", borderRadius: "10px", fontSize: "13px", fontWeight: 600, textDecoration: "none" }}
-                        onClick={e => e.stopPropagation()}
-                      >
-                        💬 WhatsApp
-                      </a>
-                    )}
-                  </div>
-
-                  {/* Social icons */}
-                  {biz.socialMedia && (
-                    <div style={{ display: "flex", gap: "7px", flexWrap: "wrap" }}>
-                      {biz.socialMedia.facebook && <a href={biz.socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>f</a>}
-                      {biz.socialMedia.instagram && <a href={biz.socialMedia.instagram} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>📷</a>}
-                      {biz.socialMedia.twitter && <a href={biz.socialMedia.twitter} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>𝕏</a>}
-                      {biz.socialMedia.whatsapp && <a href={`https://wa.me/${biz.socialMedia.whatsapp}`} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>💬</a>}
-                      {biz.contact?.website && <a href={biz.contact.website} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>🔗</a>}
-                    </div>
-                  )}
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
 
-          {/* Pagination Controls */}
-        {totalBusinesses > itemsPerPage && (
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", marginTop: "32px", flexWrap: "wrap" }}>
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-              style={{
-                padding: "10px 16px",
-                background: currentPage === 1 ? "rgba(255,255,255,0.03)" : "rgba(56,189,248,0.15)",
-                border: currentPage === 1 ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(56,189,248,0.3)",
-                borderRadius: "10px",
-                color: currentPage === 1 ? "#475569" : "#38bdf8",
-                fontSize: "14px",
-                fontWeight: 600,
-                cursor: currentPage === 1 ? "not-allowed" : "pointer",
-                fontFamily: "inherit",
-                transition: "all 0.2s",
-              }}
-            >
-              ← Previous
-            </button>
-
-            {/* Page Numbers */}
-            {Array.from({ length: Math.min(5, Math.ceil(totalBusinesses / itemsPerPage)) }, (_, i) => {
-              const totalPages = Math.ceil(totalBusinesses / itemsPerPage);
-              let pageNum;
-
-              if (totalPages <= 5) {
-                pageNum = i + 1;
-              } else if (currentPage <= 3) {
-                pageNum = i + 1;
-              } else if (currentPage >= totalPages - 2) {
-                pageNum = totalPages - 4 + i;
-              } else {
-                pageNum = currentPage - 2 + i;
-              }
-
-              return (
+            {/* Pagination Controls */}
+            {totalBusinesses > itemsPerPage && (
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", marginTop: "32px", flexWrap: "wrap" }}>
                 <button
-                  key={pageNum}
-                  onClick={() => setCurrentPage(pageNum)}
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
                   style={{
-                    padding: "10px 14px",
-                    background: currentPage === pageNum ? "rgba(56,189,248,0.2)" : "rgba(255,255,255,0.04)",
-                    border: currentPage === pageNum ? "1px solid rgba(56,189,248,0.4)" : "1px solid rgba(255,255,255,0.08)",
+                    padding: "10px 16px",
+                    background: currentPage === 1 ? "rgba(255,255,255,0.03)" : "rgba(56,189,248,0.15)",
+                    border: currentPage === 1 ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(56,189,248,0.3)",
                     borderRadius: "10px",
-                    color: currentPage === pageNum ? "#38bdf8" : "#94a3b8",
+                    color: currentPage === 1 ? "#475569" : "#38bdf8",
                     fontSize: "14px",
                     fontWeight: 600,
-                    cursor: "pointer",
+                    cursor: currentPage === 1 ? "not-allowed" : "pointer",
                     fontFamily: "inherit",
                     transition: "all 0.2s",
-                    minWidth: "42px",
                   }}
                 >
-                  {pageNum}
+                  ← Previous
                 </button>
-              );
-            })}
 
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(Math.ceil(totalBusinesses / itemsPerPage), prev + 1))}
-              disabled={currentPage === Math.ceil(totalBusinesses / itemsPerPage)}
-              style={{
-                padding: "10px 16px",
-                background: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "rgba(255,255,255,0.03)" : "rgba(56,189,248,0.15)",
-                border: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(56,189,248,0.3)",
-                borderRadius: "10px",
-                color: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "#475569" : "#38bdf8",
-                fontSize: "14px",
-                fontWeight: 600,
-                cursor: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "not-allowed" : "pointer",
-                fontFamily: "inherit",
-                transition: "all 0.2s",
-              }}
-            >
-              Next →
-            </button>
-          </div>
-        )}
-      </>
-        )}
-    </div>
+                {/* Page Numbers */}
+                {Array.from({ length: Math.min(5, Math.ceil(totalBusinesses / itemsPerPage)) }, (_, i) => {
+                  const totalPages = Math.ceil(totalBusinesses / itemsPerPage);
+                  let pageNum;
 
-      {/* ── COMPARISON FLOATING BAR ── */ }
-  {
-    comparisonList.length > 0 && (
-      <div className="comparison-bar">
-        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-          <span style={{ width: "32px", height: "32px", borderRadius: "50%", background: "rgba(56,189,248,0.15)", border: "1px solid rgba(56,189,248,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px", fontWeight: 800, color: "#38bdf8" }}>{comparisonList.length}</span>
-          <span style={{ color: "#cbd5e1", fontSize: "14px", fontWeight: 500 }}>businesses to compare</span>
-        </div>
-        <button className="cta-primary cta-btn" style={{ padding: "8px 18px", fontSize: "13px" }} onClick={openComparison}>Compare Now</button>
-        <button onClick={() => setComparisonList([])} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: "8px", color: "#f87171", fontSize: "13px", fontWeight: 600, padding: "8px 14px", cursor: "pointer", fontFamily: "inherit" }}>Clear</button>
-      </div>
-    )
-  }
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
 
-  {/* ── ANNOUNCEMENT MODAL ── */ }
-  {
-    showAnnouncementModal && selectedAnnouncement && (
-      <div className="modal-overlay" onClick={() => setShowAnnouncementModal(false)}>
-        <div className="modal-box" style={{ maxWidth: "560px", width: "90%" }} onClick={e => e.stopPropagation()}>
-          <button onClick={() => setShowAnnouncementModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
-          <div style={{ fontSize: "11px", fontWeight: 700, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>📢 {selectedAnnouncement.businessName || "Announcement"}</div>
-          <h3 style={{ fontSize: "24px", fontWeight: 800, color: "#f1f5f9", marginBottom: "12px", lineHeight: "1.3" }}>{selectedAnnouncement.title}</h3>
-          <div style={{ fontSize: "13px", color: "#64748b", marginBottom: "20px" }}>
-            {selectedAnnouncement.submitterName && `👤 ${selectedAnnouncement.submitterName}`}
-            {selectedAnnouncement.organizationName && ` · 🏢 ${selectedAnnouncement.organizationName}`}
-            <span style={{ marginLeft: "10px" }}>📅 {new Date(selectedAnnouncement.createdAt).toLocaleDateString("en-KE", { weekday: "short", day: "numeric", month: "long", year: "numeric" })}</span>
-          </div>
-          <hr className="divider" />
-          <p style={{ fontSize: "15px", color: "#cbd5e1", lineHeight: "1.75", marginTop: "16px" }}>{selectedAnnouncement.content}</p>
-        </div>
-      </div>
-    )
-  }
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      style={{
+                        padding: "10px 14px",
+                        background: currentPage === pageNum ? "rgba(56,189,248,0.2)" : "rgba(255,255,255,0.04)",
+                        border: currentPage === pageNum ? "1px solid rgba(56,189,248,0.4)" : "1px solid rgba(255,255,255,0.08)",
+                        borderRadius: "10px",
+                        color: currentPage === pageNum ? "#38bdf8" : "#94a3b8",
+                        fontSize: "14px",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        fontFamily: "inherit",
+                        transition: "all 0.2s",
+                        minWidth: "42px",
+                      }}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
 
-  {/* ── COMPARISON MODAL ── */ }
-  {
-    showComparisonModal && (
-      <div className="modal-overlay" onClick={() => setShowComparisonModal(false)}>
-        <div className="modal-box" style={{ maxWidth: "860px", width: "95%" }} onClick={e => e.stopPropagation()}>
-          <button onClick={() => setShowComparisonModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
-          <div className="section-label" style={{ marginBottom: "6px" }}>Side by Side</div>
-          <h3 style={{ fontSize: "22px", fontWeight: 800, color: "#f1f5f9", marginBottom: "24px" }}>Business Comparison</h3>
-          <div style={{ display: "grid", gridTemplateColumns: `repeat(${comparisonData.length}, 1fr)`, gap: "16px" }}>
-            {comparisonData.map(biz => (
-              <div key={biz._id} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(56,189,248,0.12)", borderRadius: "14px", padding: "20px" }}>
-                <div style={{ fontSize: "16px", fontWeight: 800, color: "#38bdf8", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>{biz.name}</div>
-                {[
-                  ["Category", biz.categories?.join(", ")],
-                  ["Location", `${biz.location?.town}, ${biz.location?.county}`],
-                  ["Rating", biz.rating ? `★ ${biz.rating}` : "N/A"],
-                  ["Reviews", biz.reviewCount || 0],
-                  ["Price Range", biz.priceRange || "N/A"],
-                  ["Est.", biz.yearEstablished || "N/A"],
-                  ["Phone", biz.contact?.phone || "N/A"],
-                  ["Email", biz.contact?.email || "N/A"],
-                ].map(([label, val]) => (
-                  <div key={label} style={{ marginBottom: "10px" }}>
-                    <div style={{ fontSize: "11px", color: "#475569", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: "2px" }}>{label}</div>
-                    <div style={{ fontSize: "13px", color: "#cbd5e1" }}>{val}</div>
-                  </div>
-                ))}
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(Math.ceil(totalBusinesses / itemsPerPage), prev + 1))}
+                  disabled={currentPage === Math.ceil(totalBusinesses / itemsPerPage)}
+                  style={{
+                    padding: "10px 16px",
+                    background: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "rgba(255,255,255,0.03)" : "rgba(56,189,248,0.15)",
+                    border: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(56,189,248,0.3)",
+                    borderRadius: "10px",
+                    color: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "#475569" : "#38bdf8",
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    cursor: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "not-allowed" : "pointer",
+                    fontFamily: "inherit",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  Next →
+                </button>
               </div>
-            ))}
-          </div>
-        </div>
+            )}
+          </>
+        )}
       </div>
-    )
-  }
 
-  {/* ── FOOTER ── */ }
-  <footer style={{ background: "#06070d", borderTop: "1px solid rgba(255,255,255,0.06)", padding: "48px 24px 28px" }}>
-    <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "32px", marginBottom: "36px" }}>
-        <div>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
-            <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "linear-gradient(135deg,#0ea5e9,#38bdf8)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px" }}><img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "28px", height: "28px", objectFit: "cover", borderRadius: "6px" }} /></div>
-            <span style={{ fontSize: "18px", fontWeight: 800, color: "#f1f5f9" }}>AxxBiashara</span>
+      {/* ── COMPARISON FLOATING BAR ── */}
+      {comparisonList.length > 0 && (
+        <div className="comparison-bar">
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <span style={{ width: "32px", height: "32px", borderRadius: "50%", background: "rgba(56,189,248,0.15)", border: "1px solid rgba(56,189,248,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px", fontWeight: 800, color: "#38bdf8" }}>{comparisonList.length}</span>
+            <span style={{ color: "#cbd5e1", fontSize: "14px", fontWeight: 500 }}>businesses to compare</span>
           </div>
-          <p style={{ fontSize: "13px", color: "#475569", lineHeight: "1.6" }}>Kenya's premier verified business directory.</p>
+          <button className="cta-primary cta-btn" style={{ padding: "8px 18px", fontSize: "13px" }} onClick={openComparison}>Compare Now</button>
+          <button onClick={() => setComparisonList([])} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: "8px", color: "#f87171", fontSize: "13px", fontWeight: 600, padding: "8px 14px", cursor: "pointer", fontFamily: "inherit" }}>Clear</button>
         </div>
-        <div>
-          <div style={{ fontSize: "12px", fontWeight: 700, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "14px" }}>Support</div>
-          {["info@axxspace.com", "support@axxspace.com", "admin@axxspace.com"].map(e => (
-            <a
-              key={e}
-              href={`mailto:${e}`}
-              style={{ display: "block", fontSize: "13px", color: "#64748b", marginBottom: "8px", textDecoration: "none", transition: "color 0.2s" }}
-              onMouseEnter={ev => ev.target.style.color = "#38bdf8"}
-              onMouseLeave={ev => ev.target.style.color = "#64748b"}
-            >
-              📧 {e}
-            </a>
-          ))}
+      )}
+
+      {/* ── ANNOUNCEMENT MODAL ── */}
+      {showAnnouncementModal && selectedAnnouncement && (
+        <div className="modal-overlay" onClick={() => setShowAnnouncementModal(false)}>
+          <div className="modal-box" style={{ maxWidth: "560px", width: "90%" }} onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowAnnouncementModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+            <div style={{ fontSize: "11px", fontWeight: 700, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>📢 {selectedAnnouncement.businessName || "Announcement"}</div>
+            <h3 style={{ fontSize: "24px", fontWeight: 800, color: "#f1f5f9", marginBottom: "12px", lineHeight: "1.3" }}>{selectedAnnouncement.title}</h3>
+            <div style={{ fontSize: "13px", color: "#64748b", marginBottom: "20px" }}>
+              {selectedAnnouncement.submitterName && `👤 ${selectedAnnouncement.submitterName}`}
+              {selectedAnnouncement.organizationName && ` · 🏢 ${selectedAnnouncement.organizationName}`}
+              <span style={{ marginLeft: "10px" }}>📅 {new Date(selectedAnnouncement.createdAt).toLocaleDateString("en-KE", { weekday: "short", day: "numeric", month: "long", year: "numeric" })}</span>
+            </div>
+            <hr className="divider" />
+            <p style={{ fontSize: "15px", color: "#cbd5e1", lineHeight: "1.75", marginTop: "16px" }}>{selectedAnnouncement.content}</p>
+          </div>
         </div>
-      </div>
-      <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "20px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
-        <p style={{ fontSize: "12px", color: "#334155" }}>© 2026 Axxspace. All rights reserved.</p>
-        <p style={{ fontSize: "12px", color: "#1e3a5f" }}>Built for Kenya 🇰🇪</p>
-      </div>
-    </div>
-  </footer>
+      )}
+
+      {/* ── COMPARISON MODAL ── */}
+      {showComparisonModal && (
+        <div className="modal-overlay" onClick={() => setShowComparisonModal(false)}>
+          <div className="modal-box" style={{ maxWidth: "860px", width: "95%" }} onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowComparisonModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+            <div className="section-label" style={{ marginBottom: "6px" }}>Side by Side</div>
+            <h3 style={{ fontSize: "22px", fontWeight: 800, color: "#f1f5f9", marginBottom: "24px" }}>Business Comparison</h3>
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(${comparisonData.length}, 1fr)`, gap: "16px" }}>
+              {comparisonData.map(biz => (
+                <div key={biz._id} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(56,189,248,0.12)", borderRadius: "14px", padding: "20px" }}>
+                  <div style={{ fontSize: "16px", fontWeight: 800, color: "#38bdf8", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>{biz.name}</div>
+                  {[
+                    ["Category", biz.categories?.join(", ")],
+                    ["Location", `${biz.location?.town}, ${biz.location?.county}`],
+                    ["Rating", biz.rating ? `★ ${biz.rating}` : "N/A"],
+                    ["Reviews", biz.reviewCount || 0],
+                    ["Price Range", biz.priceRange || "N/A"],
+                    ["Est.", biz.yearEstablished || "N/A"],
+                    ["Phone", biz.contact?.phone || "N/A"],
+                    ["Email", biz.contact?.email || "N/A"],
+                  ].map(([label, val]) => (
+                    <div key={label} style={{ marginBottom: "10px" }}>
+                      <div style={{ fontSize: "11px", color: "#475569", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: "2px" }}>{label}</div>
+                      <div style={{ fontSize: "13px", color: "#cbd5e1" }}>{val}</div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── FOOTER ── */}
+      <footer style={{ background: "#06070d", borderTop: "1px solid rgba(255,255,255,0.06)", padding: "48px 24px 28px" }}>
+        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "32px", marginBottom: "36px" }}>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
+                <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "linear-gradient(135deg,#0ea5e9,#38bdf8)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px" }}><img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "28px", height: "28px", objectFit: "cover", borderRadius: "6px" }} /></div>
+                <span style={{ fontSize: "18px", fontWeight: 800, color: "#f1f5f9" }}>AxxBiashara</span>
+              </div>
+              <p style={{ fontSize: "13px", color: "#475569", lineHeight: "1.6" }}>Kenya's premier verified business directory.</p>
+            </div>
+            <div>
+              <div style={{ fontSize: "12px", fontWeight: 700, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "14px" }}>Support</div>
+              {["info@axxspace.com", "support@axxspace.com", "admin@axxspace.com"].map(e => (
+                <a
+                  key={e}
+                  href={`mailto:${e}`}
+                  style={{ display: "block", fontSize: "13px", color: "#64748b", marginBottom: "8px", textDecoration: "none", transition: "color 0.2s" }}
+                  onMouseEnter={ev => ev.target.style.color = "#38bdf8"}
+                  onMouseLeave={ev => ev.target.style.color = "#64748b"}
+                >
+                  📧 {e}
+                </a>
+              ))}
+            </div>
+          </div>
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "20px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+            <p style={{ fontSize: "12px", color: "#334155" }}>© 2026 Axxspace. All rights reserved.</p>
+            <p style={{ fontSize: "12px", color: "#1e3a5f" }}>Built for Kenya 🇰🇪</p>
+          </div>
+        </div>
+      </footer>
     </div >
   );
 }

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
-const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:1000";
+import API from "../api/api";
 
 export default function BoostNotification({ user, userType = "landlord" }) {
   const [showNotification, setShowNotification] = useState(false);
@@ -19,7 +18,7 @@ export default function BoostNotification({ user, userType = "landlord" }) {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      
+
       let endpoint;
       if (userType === "landlord") {
         endpoint = "/properties/my-listings";
@@ -29,10 +28,8 @@ export default function BoostNotification({ user, userType = "landlord" }) {
         endpoint = "/movers/profile";
       }
 
-      const response = await fetch(`${API_BASE}/api${endpoint}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await response.json();
+      const response = await API.get(endpoint, { headers: { Authorization: `Bearer ${token}` } });
+      const data = response.data;
 
       // Check if any items are boosted
       let boosted = false;
@@ -43,7 +40,7 @@ export default function BoostNotification({ user, userType = "landlord" }) {
       }
 
       setHasBoostedItems(boosted);
-      
+
       // Show notification if user has items but none are boosted
       if (!boosted && data.length > 0) {
         setShowNotification(true);
