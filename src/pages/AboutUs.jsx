@@ -275,6 +275,62 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* ── PLATFORM FEATURES ── */}
+      <section style={styles.trustSection}>
+        <div style={styles.trustInner}>
+          <div style={styles.sectionLabelDark}>Technology</div>
+          <h2 style={{ ...styles.sectionTitle, color: "#fbbf24" }}>Platform Features</h2>
+          <p style={{ ...styles.sectionSubtitle, color: "#94a3b8" }}>Built with modern technology for a seamless experience</p>
+
+          <div style={styles.trustGrid}>
+            {[
+              { icon: "🔐", title: "Secure Authentication", desc: "JWT-based authentication with role-based access control for different user types." },
+              { icon: "📱", title: "Mobile-First Design", desc: "Responsive design that works seamlessly on desktop, tablet, and mobile devices." },
+              { icon: "🗺️", title: "GPS Mapping", desc: "Interactive maps powered by Leaflet for precise property and business location." },
+              { icon: "💬", title: "Real-Time Messaging", desc: "In-platform messaging system for direct communication between users." },
+              { icon: "🔔", title: "Smart Notifications", desc: "Real-time notifications for messages, bookings, and important updates." },
+              { icon: "💾", title: "Cloud Storage", desc: "Secure cloud storage for images and documents using Cloudinary." },
+              { icon: "📊", title: "Analytics Dashboard", desc: "Comprehensive analytics for businesses and landlords to track performance." },
+              { icon: "🎯", title: "Advanced Search", desc: "Powerful search with filters for location, price, amenities, and more." },
+            ].map((feature) => (
+              <div key={feature.title} style={styles.trustCard} className="trust-card">
+                <div style={styles.trustIcon}>{feature.icon}</div>
+                <h3 style={styles.trustTitle}>{feature.title}</h3>
+                <p style={styles.trustDesc}>{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── USER ROLES ── */}
+      <section style={styles.valuesSection}>
+        <div style={styles.valuesInner}>
+          <div style={styles.sectionLabel}>User Types</div>
+          <h2 style={styles.sectionTitle}>Designed for Everyone</h2>
+          <p style={styles.sectionSubtitle}>Specialized dashboards and features for different user roles</p>
+
+          <div style={styles.valuesGrid}>
+            {[
+              { icon: "🏠", title: "Landlords", text: "List properties, manage bookings, track analytics, and boost visibility." },
+              { icon: "👤", title: "Tenants", text: "Search properties, save favorites, contact landlords, and leave reviews." },
+              { icon: "💼", title: "Business Owners", text: "List businesses, respond to inquiries, manage subscriptions, and view analytics." },
+              { icon: "🚚", title: "Movers", text: "Showcase services, manage bookings, build reputation through reviews." },
+              { icon: "🏨", title: "Tourism Providers", text: "List hotels/lodges, manage bookings, offer packages and promotions." },
+              { icon: "🛍️", title: "Sellers", text: "List products, manage inventory, communicate with buyers, track sales." },
+              { icon: "🎓", title: "Students", text: "Find university hostels, save favorites, contact landlords near campus." },
+              { icon: "🛡️", title: "Admins", text: "Verify users, moderate content, manage disputes, and ensure platform safety." },
+            ].map((role) => (
+              <div key={role.title} style={styles.valueCard} className="value-card">
+                <div style={styles.valueIcon}>{role.icon}</div>
+                <h3 style={styles.valueTitle}>{role.title}</h3>
+                <p style={styles.valueText}>{role.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── TEAM ── */}
       <section style={styles.teamSection}>
         <div style={styles.teamInner}>
