@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { UserProfileEditor, ProfileAvatar } from "../features/profile";
 import VerificationStatus from "../components/VerificationStatus";
+import BoostNotification from "../components/BoostNotification";
 
 import { getDashboardPath } from "../utils/dashboardRoutes";
 
@@ -173,6 +174,10 @@ export default function SellerDashboard() {
   return (
     <div style={s.page}>
       <style>{css}</style>
+
+      {/* BOOST NOTIFICATION */}
+      <BoostNotification user={seller} userType="seller" />
+
       <div style={s.topBar}>
         <div>
           <h1 style={s.topTitle}>🛒 Seller Dashboard</h1>

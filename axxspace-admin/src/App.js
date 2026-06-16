@@ -4,6 +4,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
 import BusinessDetail from "./pages/BusinessDetail";
+import BoostManagement from "./components/BoostManagement";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/business/:id" element={<BusinessDetail />} />
+          <Route path="/boost-management" element={<BoostManagement />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

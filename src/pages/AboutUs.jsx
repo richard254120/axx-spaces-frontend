@@ -11,6 +11,7 @@ import richardImg from "../assets/richard.jpg";
 import ianImg from "../assets/ian.jpg";
 import brianImg from "../assets/brian.jpg";
 import clareImg from "../assets/clare.jpg";
+import euniceImg from "../assets/eunice.jpg";
 
 export default function AboutPage() {
   const navigate = useNavigate();
@@ -52,6 +53,12 @@ export default function AboutPage() {
       image: brianImg,
       color: "#ec4899",
       bio: "Designs intuitive and engaging user experiences that make the platform easy to use.",
+    },
+    {
+      name: "Eunice",
+      image: euniceImg,
+      color: "#f97316",
+      bio: "Assistant developer supporting the technical team with coding, debugging, and feature implementation.",
     },
   ];
 
@@ -594,10 +601,14 @@ const styles = {
   teamSection: { padding: "72px 20px", background: COLORS.bgDarker },
   teamInner: { maxWidth: "900px", margin: "0 auto" },
   teamGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+    display: "flex",
+    flexDirection: "row",
     gap: "24px",
     marginTop: "44px",
+    overflowX: "auto",
+    paddingBottom: "20px",
+    scrollBehavior: "smooth",
+    WebkitOverflowScrolling: "touch",
   },
   teamCard: {
     background: COLORS.bgDark,
@@ -606,6 +617,8 @@ const styles = {
     textAlign: "center",
     border: `1px solid ${COLORS.border}`,
     transition: "all 0.25s",
+    flexShrink: 0,
+    width: "280px",
   },
   teamImage: {
     width: "110px",

@@ -5,6 +5,7 @@ import { UserProfileEditor } from "../features/profile";
 import VerificationBadges from "../components/VerificationBadges";
 import VerificationStatus from "../components/VerificationStatus";
 import AnalyticsDashboard from "../components/AnalyticsDashboard";
+import BoostNotification from "../components/BoostNotification";
 
 import { getDashboardPath, normalizeRole } from "../utils/dashboardRoutes";
 
@@ -164,6 +165,9 @@ export default function LandlordDashboard() {
   return (
     <div style={styles.container}>
       <style>{cssStyles}</style>
+
+      {/* BOOST NOTIFICATION */}
+      <BoostNotification user={user} userType="landlord" />
 
       {/* HEADER */}
       <div style={styles.header}>

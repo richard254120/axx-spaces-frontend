@@ -59,6 +59,9 @@ export default function AxxBiashara() {
   const [comparisonData, setComparisonData] = useState([]);
   const [hoveredCard, setHoveredCard] = useState(null);
   const [refreshBanner, setRefreshBanner] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
+  const [totalBusinesses, setTotalBusinesses] = useState(0);
 
   /* ── core data fetchers ── */
   const loadBusinesses = async () => {
@@ -819,104 +822,192 @@ export default function AxxBiashara() {
               </div>
             ))}
           </div>
-        )}
-      </div>
 
-      {/* ── COMPARISON FLOATING BAR ── */}
-      {comparisonList.length > 0 && (
-        <div className="comparison-bar">
-          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-            <span style={{ width: "32px", height: "32px", borderRadius: "50%", background: "rgba(56,189,248,0.15)", border: "1px solid rgba(56,189,248,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px", fontWeight: 800, color: "#38bdf8" }}>{comparisonList.length}</span>
-            <span style={{ color: "#cbd5e1", fontSize: "14px", fontWeight: 500 }}>businesses to compare</span>
-          </div>
-          <button className="cta-primary cta-btn" style={{ padding: "8px 18px", fontSize: "13px" }} onClick={openComparison}>Compare Now</button>
-          <button onClick={() => setComparisonList([])} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: "8px", color: "#f87171", fontSize: "13px", fontWeight: 600, padding: "8px 14px", cursor: "pointer", fontFamily: "inherit" }}>Clear</button>
-        </div>
-      )}
+          {/* Pagination Controls */}
+        {totalBusinesses > itemsPerPage && (
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", marginTop: "32px", flexWrap: "wrap" }}>
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              style={{
+                padding: "10px 16px",
+                background: currentPage === 1 ? "rgba(255,255,255,0.03)" : "rgba(56,189,248,0.15)",
+                border: currentPage === 1 ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(56,189,248,0.3)",
+                borderRadius: "10px",
+                color: currentPage === 1 ? "#475569" : "#38bdf8",
+                fontSize: "14px",
+                fontWeight: 600,
+                cursor: currentPage === 1 ? "not-allowed" : "pointer",
+                fontFamily: "inherit",
+                transition: "all 0.2s",
+              }}
+            >
+              ← Previous
+            </button>
 
-      {/* ── ANNOUNCEMENT MODAL ── */}
-      {showAnnouncementModal && selectedAnnouncement && (
-        <div className="modal-overlay" onClick={() => setShowAnnouncementModal(false)}>
-          <div className="modal-box" style={{ maxWidth: "560px", width: "90%" }} onClick={e => e.stopPropagation()}>
-            <button onClick={() => setShowAnnouncementModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
-            <div style={{ fontSize: "11px", fontWeight: 700, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>📢 {selectedAnnouncement.businessName || "Announcement"}</div>
-            <h3 style={{ fontSize: "24px", fontWeight: 800, color: "#f1f5f9", marginBottom: "12px", lineHeight: "1.3" }}>{selectedAnnouncement.title}</h3>
-            <div style={{ fontSize: "13px", color: "#64748b", marginBottom: "20px" }}>
-              {selectedAnnouncement.submitterName && `👤 ${selectedAnnouncement.submitterName}`}
-              {selectedAnnouncement.organizationName && ` · 🏢 ${selectedAnnouncement.organizationName}`}
-              <span style={{ marginLeft: "10px" }}>📅 {new Date(selectedAnnouncement.createdAt).toLocaleDateString("en-KE", { weekday: "short", day: "numeric", month: "long", year: "numeric" })}</span>
-            </div>
-            <hr className="divider" />
-            <p style={{ fontSize: "15px", color: "#cbd5e1", lineHeight: "1.75", marginTop: "16px" }}>{selectedAnnouncement.content}</p>
-          </div>
-        </div>
-      )}
+            {/* Page Numbers */}
+            {Array.from({ length: Math.min(5, Math.ceil(totalBusinesses / itemsPerPage)) }, (_, i) => {
+              const totalPages = Math.ceil(totalBusinesses / itemsPerPage);
+              let pageNum;
 
-      {/* ── COMPARISON MODAL ── */}
-      {showComparisonModal && (
-        <div className="modal-overlay" onClick={() => setShowComparisonModal(false)}>
-          <div className="modal-box" style={{ maxWidth: "860px", width: "95%" }} onClick={e => e.stopPropagation()}>
-            <button onClick={() => setShowComparisonModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
-            <div className="section-label" style={{ marginBottom: "6px" }}>Side by Side</div>
-            <h3 style={{ fontSize: "22px", fontWeight: 800, color: "#f1f5f9", marginBottom: "24px" }}>Business Comparison</h3>
-            <div style={{ display: "grid", gridTemplateColumns: `repeat(${comparisonData.length}, 1fr)`, gap: "16px" }}>
-              {comparisonData.map(biz => (
-                <div key={biz._id} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(56,189,248,0.12)", borderRadius: "14px", padding: "20px" }}>
-                  <div style={{ fontSize: "16px", fontWeight: 800, color: "#38bdf8", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>{biz.name}</div>
-                  {[
-                    ["Category", biz.categories?.join(", ")],
-                    ["Location", `${biz.location?.town}, ${biz.location?.county}`],
-                    ["Rating", biz.rating ? `★ ${biz.rating}` : "N/A"],
-                    ["Reviews", biz.reviewCount || 0],
-                    ["Price Range", biz.priceRange || "N/A"],
-                    ["Est.", biz.yearEstablished || "N/A"],
-                    ["Phone", biz.contact?.phone || "N/A"],
-                    ["Email", biz.contact?.email || "N/A"],
-                  ].map(([label, val]) => (
-                    <div key={label} style={{ marginBottom: "10px" }}>
-                      <div style={{ fontSize: "11px", color: "#475569", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: "2px" }}>{label}</div>
-                      <div style={{ fontSize: "13px", color: "#cbd5e1" }}>{val}</div>
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+              if (totalPages <= 5) {
+                pageNum = i + 1;
+              } else if (currentPage <= 3) {
+                pageNum = i + 1;
+              } else if (currentPage >= totalPages - 2) {
+                pageNum = totalPages - 4 + i;
+              } else {
+                pageNum = currentPage - 2 + i;
+              }
 
-      {/* ── FOOTER ── */}
-      <footer style={{ background: "#06070d", borderTop: "1px solid rgba(255,255,255,0.06)", padding: "48px 24px 28px" }}>
-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "32px", marginBottom: "36px" }}>
-            <div>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "linear-gradient(135deg,#0ea5e9,#38bdf8)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px" }}><img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "28px", height: "28px", objectFit: "cover", borderRadius: "6px" }} /></div>
-                <span style={{ fontSize: "18px", fontWeight: 800, color: "#f1f5f9" }}>AxxBiashara</span>
-              </div>
-              <p style={{ fontSize: "13px", color: "#475569", lineHeight: "1.6" }}>Kenya's premier verified business directory.</p>
-            </div>
-            <div>
-              <div style={{ fontSize: "12px", fontWeight: 700, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "14px" }}>Support</div>
-              {["info@axxspace.com", "support@axxspace.com", "admin@axxspace.com"].map(e => (
-                <a
-                  key={e}
-                  href={`mailto:${e}`}
-                  style={{ display: "block", fontSize: "13px", color: "#64748b", marginBottom: "8px", textDecoration: "none", transition: "color 0.2s" }}
-                  onMouseEnter={ev => ev.target.style.color = "#38bdf8"}
-                  onMouseLeave={ev => ev.target.style.color = "#64748b"}
+              return (
+                <button
+                  key={pageNum}
+                  onClick={() => setCurrentPage(pageNum)}
+                  style={{
+                    padding: "10px 14px",
+                    background: currentPage === pageNum ? "rgba(56,189,248,0.2)" : "rgba(255,255,255,0.04)",
+                    border: currentPage === pageNum ? "1px solid rgba(56,189,248,0.4)" : "1px solid rgba(255,255,255,0.08)",
+                    borderRadius: "10px",
+                    color: currentPage === pageNum ? "#38bdf8" : "#94a3b8",
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                    transition: "all 0.2s",
+                    minWidth: "42px",
+                  }}
                 >
-                  📧 {e}
-                </a>
-              ))}
-            </div>
+                  {pageNum}
+                </button>
+              );
+            })}
+
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(Math.ceil(totalBusinesses / itemsPerPage), prev + 1))}
+              disabled={currentPage === Math.ceil(totalBusinesses / itemsPerPage)}
+              style={{
+                padding: "10px 16px",
+                background: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "rgba(255,255,255,0.03)" : "rgba(56,189,248,0.15)",
+                border: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(56,189,248,0.3)",
+                borderRadius: "10px",
+                color: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "#475569" : "#38bdf8",
+                fontSize: "14px",
+                fontWeight: 600,
+                cursor: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "not-allowed" : "pointer",
+                fontFamily: "inherit",
+                transition: "all 0.2s",
+              }}
+            >
+              Next →
+            </button>
           </div>
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "20px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
-            <p style={{ fontSize: "12px", color: "#334155" }}>© 2026 Axxspace. All rights reserved.</p>
-            <p style={{ fontSize: "12px", color: "#1e3a5f" }}>Built for Kenya 🇰🇪</p>
+        )}
+      </>
+        )}
+    </div>
+
+      {/* ── COMPARISON FLOATING BAR ── */ }
+  {
+    comparisonList.length > 0 && (
+      <div className="comparison-bar">
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <span style={{ width: "32px", height: "32px", borderRadius: "50%", background: "rgba(56,189,248,0.15)", border: "1px solid rgba(56,189,248,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px", fontWeight: 800, color: "#38bdf8" }}>{comparisonList.length}</span>
+          <span style={{ color: "#cbd5e1", fontSize: "14px", fontWeight: 500 }}>businesses to compare</span>
+        </div>
+        <button className="cta-primary cta-btn" style={{ padding: "8px 18px", fontSize: "13px" }} onClick={openComparison}>Compare Now</button>
+        <button onClick={() => setComparisonList([])} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: "8px", color: "#f87171", fontSize: "13px", fontWeight: 600, padding: "8px 14px", cursor: "pointer", fontFamily: "inherit" }}>Clear</button>
+      </div>
+    )
+  }
+
+  {/* ── ANNOUNCEMENT MODAL ── */ }
+  {
+    showAnnouncementModal && selectedAnnouncement && (
+      <div className="modal-overlay" onClick={() => setShowAnnouncementModal(false)}>
+        <div className="modal-box" style={{ maxWidth: "560px", width: "90%" }} onClick={e => e.stopPropagation()}>
+          <button onClick={() => setShowAnnouncementModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+          <div style={{ fontSize: "11px", fontWeight: 700, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>📢 {selectedAnnouncement.businessName || "Announcement"}</div>
+          <h3 style={{ fontSize: "24px", fontWeight: 800, color: "#f1f5f9", marginBottom: "12px", lineHeight: "1.3" }}>{selectedAnnouncement.title}</h3>
+          <div style={{ fontSize: "13px", color: "#64748b", marginBottom: "20px" }}>
+            {selectedAnnouncement.submitterName && `👤 ${selectedAnnouncement.submitterName}`}
+            {selectedAnnouncement.organizationName && ` · 🏢 ${selectedAnnouncement.organizationName}`}
+            <span style={{ marginLeft: "10px" }}>📅 {new Date(selectedAnnouncement.createdAt).toLocaleDateString("en-KE", { weekday: "short", day: "numeric", month: "long", year: "numeric" })}</span>
+          </div>
+          <hr className="divider" />
+          <p style={{ fontSize: "15px", color: "#cbd5e1", lineHeight: "1.75", marginTop: "16px" }}>{selectedAnnouncement.content}</p>
+        </div>
+      </div>
+    )
+  }
+
+  {/* ── COMPARISON MODAL ── */ }
+  {
+    showComparisonModal && (
+      <div className="modal-overlay" onClick={() => setShowComparisonModal(false)}>
+        <div className="modal-box" style={{ maxWidth: "860px", width: "95%" }} onClick={e => e.stopPropagation()}>
+          <button onClick={() => setShowComparisonModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+          <div className="section-label" style={{ marginBottom: "6px" }}>Side by Side</div>
+          <h3 style={{ fontSize: "22px", fontWeight: 800, color: "#f1f5f9", marginBottom: "24px" }}>Business Comparison</h3>
+          <div style={{ display: "grid", gridTemplateColumns: `repeat(${comparisonData.length}, 1fr)`, gap: "16px" }}>
+            {comparisonData.map(biz => (
+              <div key={biz._id} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(56,189,248,0.12)", borderRadius: "14px", padding: "20px" }}>
+                <div style={{ fontSize: "16px", fontWeight: 800, color: "#38bdf8", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>{biz.name}</div>
+                {[
+                  ["Category", biz.categories?.join(", ")],
+                  ["Location", `${biz.location?.town}, ${biz.location?.county}`],
+                  ["Rating", biz.rating ? `★ ${biz.rating}` : "N/A"],
+                  ["Reviews", biz.reviewCount || 0],
+                  ["Price Range", biz.priceRange || "N/A"],
+                  ["Est.", biz.yearEstablished || "N/A"],
+                  ["Phone", biz.contact?.phone || "N/A"],
+                  ["Email", biz.contact?.email || "N/A"],
+                ].map(([label, val]) => (
+                  <div key={label} style={{ marginBottom: "10px" }}>
+                    <div style={{ fontSize: "11px", color: "#475569", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: "2px" }}>{label}</div>
+                    <div style={{ fontSize: "13px", color: "#cbd5e1" }}>{val}</div>
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
-      </footer>
+      </div>
+    )
+  }
+
+  {/* ── FOOTER ── */ }
+  <footer style={{ background: "#06070d", borderTop: "1px solid rgba(255,255,255,0.06)", padding: "48px 24px 28px" }}>
+    <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "32px", marginBottom: "36px" }}>
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
+            <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "linear-gradient(135deg,#0ea5e9,#38bdf8)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px" }}><img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "28px", height: "28px", objectFit: "cover", borderRadius: "6px" }} /></div>
+            <span style={{ fontSize: "18px", fontWeight: 800, color: "#f1f5f9" }}>AxxBiashara</span>
+          </div>
+          <p style={{ fontSize: "13px", color: "#475569", lineHeight: "1.6" }}>Kenya's premier verified business directory.</p>
+        </div>
+        <div>
+          <div style={{ fontSize: "12px", fontWeight: 700, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "14px" }}>Support</div>
+          {["info@axxspace.com", "support@axxspace.com", "admin@axxspace.com"].map(e => (
+            <a
+              key={e}
+              href={`mailto:${e}`}
+              style={{ display: "block", fontSize: "13px", color: "#64748b", marginBottom: "8px", textDecoration: "none", transition: "color 0.2s" }}
+              onMouseEnter={ev => ev.target.style.color = "#38bdf8"}
+              onMouseLeave={ev => ev.target.style.color = "#64748b"}
+            >
+              📧 {e}
+            </a>
+          ))}
+        </div>
+      </div>
+      <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "20px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+        <p style={{ fontSize: "12px", color: "#334155" }}>© 2026 Axxspace. All rights reserved.</p>
+        <p style={{ fontSize: "12px", color: "#1e3a5f" }}>Built for Kenya 🇰🇪</p>
+      </div>
     </div>
+  </footer>
+    </div >
   );
 }

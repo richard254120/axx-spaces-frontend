@@ -3,6 +3,7 @@ import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import VerificationStatus from "../components/VerificationStatus";
 import { UserProfileEditor } from "../features/profile";
+import BoostNotification from "../components/BoostNotification";
 
 import { getDashboardPath } from "../utils/dashboardRoutes";
 
@@ -203,6 +204,9 @@ export default function MoverDashboard() {
   return (
     <div style={styles.container}>
       <style>{mobileCss}</style>
+
+      {/* BOOST NOTIFICATION */}
+      <BoostNotification user={user} userType="mover" />
 
       {/* TOP HEADER */}
       <header style={styles.topBar}>
