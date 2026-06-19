@@ -290,7 +290,7 @@ export default function AdminDashboard() {
   // ── MARK NOTIFICATION AS READ (confirm payment) ─────────────
   const handleApproveBoost = async (notifId) => {
     try {
-      await API.put(`/payment/notifications/${notifId}/read`);
+      await API.put(`/payment/notifications/${notifId}/read`, { approve: true });
       setBoostMessage("✅ Payment confirmed!");
       loadPendingBoosts();
       loadAllBoosts();
@@ -303,8 +303,8 @@ export default function AdminDashboard() {
 
   const handleRejectBoost = async (notifId) => {
     try {
-      await API.put(`/payment/notifications/${notifId}/read`);
-      setBoostMessage("✅ Notification dismissed.");
+      await API.put(`/payment/notifications/${notifId}/read`, { approve: false });
+      setBoostMessage("✅ Notification rejected & dismissed.");
       loadPendingBoosts();
       loadAllBoosts();
     } catch (e) {
@@ -312,8 +312,6 @@ export default function AdminDashboard() {
     }
     setTimeout(() => setBoostMessage(""), 4000);
   };
-
-  // ── approve / reject listings ──────────────────────────────
   const handleApprove = async (type, id) => {
     try {
       await API.patch(`/admin/${type}/${id}/approve`);
@@ -519,14 +517,19 @@ export default function AdminDashboard() {
     return Array.isArray(imgs) ? imgs.filter(Boolean) : [];
   };
 
-  // ── notification helpers ───────────────────────────────────
   const getNotifTitle = (n) => {
-    if (n.isPayment) {
+    if (n.isPayment || ["property_booking", "material_purchase", "tourism_booking", "boost", "subscription"].includes(n.type)) {
       if (n.type === "property_booking") return n.propertyId?.title || "Property Booking";
       if (n.type === "material_purchase") return n.materialId?.title || "Material Purchase";
       if (n.type === "tourism_booking") return n.tourismId?.title || "Tourism Booking";
-      if (n.type === "boost") return "Listing Boost";
-      if (n.type === "subscription") return "Subscription Payment";
+      if (n.type === "boost") return n.plan ? `Listing Boost (${n.plan})` : "Listing Boost";
+      if (n.type === "subscription") {
+        if (n.plan && n.plan.startsWith("verification-")) {
+          const badgeLabel = n.subscriptionType ? n.subscriptionType.replace("_", " ").toUpperCase() : "Verification Badge";
+          return `Verification Sub: ${badgeLabel}`;
+        }
+        return `Subscription Payment (${n.subscriptionType || "Basic"})`;
+      }
       return "Payment";
     }
     // For approval notifications
@@ -543,7 +546,7 @@ export default function AdminDashboard() {
   };
 
   const getNotifIcon = (type, isPayment) => {
-    if (isPayment) {
+    if (isPayment || ["property_booking", "material_purchase", "tourism_booking", "boost", "subscription"].includes(type)) {
       const icons = { property_booking: "🏠", material_purchase: "🛍️", tourism_booking: "🏨", boost: "🚀", subscription: "📋" };
       return icons[type] || "💳";
     }

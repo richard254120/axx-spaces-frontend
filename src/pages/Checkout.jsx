@@ -1,26 +1,29 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 import PhoneInput from "../components/PhoneInput";
+import { getDashboardPath } from "../utils/dashboardRoutes";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:1000/api";
 
 export default function Checkout() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
 
   const propertyId = searchParams.get("propertyId");
   const plan = searchParams.get("plan");
   const amount = parseInt(searchParams.get("amount")) || 5000;
+  const subscriptionType = searchParams.get("subscriptionType");
+  const isVerification = plan && plan.startsWith("verification-");
 
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  // ── ADDED: bank transfer state ──
   const [paymentMethod, setPaymentMethod] = useState("mpesa");
   const [bankMessage, setBankMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  // ── END ADDED ──
 
   const handlePayment = async (e) => {
     e.preventDefault();
@@ -44,7 +47,8 @@ export default function Checkout() {
           phone,
           amount,
           propertyId,
-          plan
+          plan,
+          subscriptionType,
         }),
       });
 
@@ -52,9 +56,8 @@ export default function Checkout() {
 
       if (data.success) {
         setMessage("✅ Payment initiated successfully! Check your M-Pesa for prompt.");
-        // In real M-Pesa you would wait for callback, but for now we simulate success
         setTimeout(() => {
-          navigate("/dashboard");
+          navigate(getDashboardPath(user?.role));
         }, 2500);
       } else {
         setMessage("❌ " + (data.error || "Payment failed"));
@@ -67,7 +70,6 @@ export default function Checkout() {
     }
   };
 
-  // ── ADDED: bank transfer handler ──
   const handleBankTransfer = async (e) => {
     e.preventDefault();
     const trimmed = bankMessage.trim();
@@ -90,6 +92,7 @@ export default function Checkout() {
           amount,
           propertyId,
           plan,
+          subscriptionType,
           transactionRef,
           bankMessage: trimmed,
         }),
@@ -107,9 +110,7 @@ export default function Checkout() {
       setLoading(false);
     }
   };
-  // ── END ADDED ──
 
-  // ── ADDED: success screen after bank submission ──
   if (submitted) {
     return (
       <div style={styles.container}>
@@ -117,17 +118,17 @@ export default function Checkout() {
           <div style={{ textAlign: "center", fontSize: "3rem", marginBottom: "16px" }}>✅</div>
           <h2 style={{ textAlign: "center", fontSize: "1.5rem", color: "#22c55e", marginBottom: "12px" }}>Submitted for Review</h2>
           <p style={{ textAlign: "center", color: "#94a3b8", fontSize: "14px", lineHeight: "1.7", marginBottom: "28px" }}>
-            Your payment has been received and is pending admin verification.
-            Your listing will be promoted once confirmed — usually within a few hours.
+            {isVerification
+              ? "Your verification payment submission has been received and is pending admin verification. Your badge will be activated on your profile once confirmed — usually within a few hours."
+              : "Your payment has been received and is pending admin verification. Your listing will be promoted once confirmed — usually within a few hours."}
           </p>
-          <button onClick={() => navigate("/dashboard")} style={styles.payBtn}>
+          <button onClick={() => navigate(getDashboardPath(user?.role))} style={styles.payBtn}>
             Go to Dashboard
           </button>
         </div>
       </div>
     );
   }
-  // ── END ADDED ──
 
   return (
     <div style={styles.container}>
@@ -135,12 +136,13 @@ export default function Checkout() {
         <h1 style={styles.title}>💳 Complete Payment</h1>
 
         <div style={styles.planInfo}>
-          <p><strong>Plan:</strong> {plan ? plan.toUpperCase() : "Boost"} Plan</p>
+          <p><strong>Payment For:</strong> {isVerification ? "Verification Badge Subscription" : (plan ? plan.toUpperCase() : "Boost")}</p>
+          <p><strong>Badge/Plan:</strong> {isVerification ? (subscriptionType ? subscriptionType.replace("_", " ").toUpperCase() : "Verification Badge") : plan}</p>
           <p><strong>Amount:</strong> KSh {amount.toLocaleString()}</p>
-          <p><strong>Duration:</strong> 30 Days</p>
+          <p><strong>Billing:</strong> {isVerification ? (plan.endsWith("-semiannual") ? "Semi-Annual (6 Months)" : "Monthly") : "One-time Boost (30 Days)"}</p>
         </div>
 
-        {/* ADDED: payment method toggle */}
+        {/* payment method toggle */}
         <div style={styles.toggle}>
           <button
             onClick={() => { setPaymentMethod("mpesa"); setMessage(""); }}
@@ -155,9 +157,7 @@ export default function Checkout() {
             🏦 Pay via Paybill
           </button>
         </div>
-        {/* END ADDED */}
 
-        {/* ADDED: show original form only when mpesa selected */}
         {paymentMethod === "mpesa" && (
           <form onSubmit={handlePayment}>
             <label style={styles.label}>M-Pesa Phone Number</label>
@@ -173,9 +173,7 @@ export default function Checkout() {
             </button>
           </form>
         )}
-        {/* END ADDED */}
 
-        {/* ADDED: bank transfer section */}
         {paymentMethod === "bank" && (
           <div>
             <div style={styles.bankBox}>
@@ -229,7 +227,6 @@ export default function Checkout() {
             </form>
           </div>
         )}
-        {/* END ADDED */}
 
         {message && (
           <p style={{
@@ -240,18 +237,26 @@ export default function Checkout() {
           </p>
         )}
 
-        <button
-          onClick={() => navigate("/premium-plans?propertyId=" + propertyId)}
-          style={styles.backBtn}
-        >
-          ← Change Plan
-        </button>
+        {!isVerification && (
+          <button
+            onClick={() => navigate("/premium-plans?propertyId=" + propertyId)}
+            style={styles.backBtn}
+          >
+            ← Change Plan
+          </button>
+        )}
+        {isVerification && (
+          <button
+            onClick={() => navigate(-1)}
+            style={styles.backBtn}
+          >
+            ← Cancel & Go Back
+          </button>
+        )}
       </div>
     </div>
   );
-}
-
-const styles = {
+}const styles = {
   container: {
     minHeight: "100vh",
     background: "linear-gradient(135deg, #06101f 0%, #0f1729 100%)",

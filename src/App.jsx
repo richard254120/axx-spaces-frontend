@@ -242,7 +242,6 @@ function App() {
         }
       />
 
-      {/* ── PROTECTED ACCOUNT ROUTES (role-focused nav only) ── */}
       <Route
         path="/upload"
         element={
@@ -267,7 +266,7 @@ function App() {
         path="/checkout"
         element={
           <DashboardLayout>
-            <ProtectedRoute allowedRoles={["landlord"]}>
+            <ProtectedRoute allowedRoles={["landlord", "user", "seller", "mover"]}>
               <Checkout />
             </ProtectedRoute>
           </DashboardLayout>

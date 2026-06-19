@@ -6,6 +6,7 @@ const VerificationStatus = () => {
   const { token } = useContext(AuthContext);
   const [verificationData, setVerificationData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [billingCycle, setBillingCycle] = useState('monthly');
 
   const fetchVerificationStatus = async () => {
     try {
@@ -185,6 +186,140 @@ const VerificationStatus = () => {
             </div>
           );
         })}
+      </div>
+
+      {/* Verification Badge Pricing Plans */}
+      <div style={styles.badgePricingSection}>
+        <div style={styles.badgePricingHeader}>
+          <div>
+            <h3 style={styles.pricingTitle}>🎖️ Trust Badges & Verification Plans</h3>
+            <p style={styles.pricingSubtitle}>Boost your profile visibility and credibility. Select a badge subscription below.</p>
+          </div>
+          <div style={styles.cycleToggleContainer}>
+            <button
+              onClick={() => setBillingCycle('monthly')}
+              style={{
+                ...styles.cycleToggleBtn,
+                ...(billingCycle === 'monthly' ? styles.cycleToggleBtnActive : {})
+              }}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setBillingCycle('semiannual')}
+              style={{
+                ...styles.cycleToggleBtn,
+                ...(billingCycle === 'semiannual' ? styles.cycleToggleBtnActive : {})
+              }}
+            >
+              Semi-Annual
+            </button>
+          </div>
+        </div>
+
+        <div style={styles.pricingGrid}>
+          {Object.entries({
+            student_verified: {
+              name: "Student Verified",
+              emoji: "🎓",
+              color: "#3b82f6",
+              monthly: 20,
+              monthlyExact: 19.80,
+              semiannual: 99,
+              desc: "Perfect for active students. Unlocks student discounts & standard features."
+            },
+            online_verified: {
+              name: "Online Verified",
+              emoji: "🌐",
+              color: "#10b981",
+              monthly: 60,
+              monthlyExact: 59.80,
+              semiannual: 299,
+              desc: "For general users. Verifies email, phone & social profiles."
+            },
+            identity_verified: {
+              name: "Identity Verified",
+              emoji: "🆔",
+              color: "#6366f1",
+              monthly: 60,
+              monthlyExact: 59.80,
+              semiannual: 299,
+              desc: "Government ID validation. Greatly improves Trust Score."
+            },
+            location_verified: {
+              name: "Location Verified",
+              emoji: "📍",
+              color: "#a855f7",
+              monthly: 160,
+              monthlyExact: 159.80,
+              semiannual: 799,
+              desc: "Verifies address & residency. Essential for serious landlords/renters."
+            },
+            business_verified: {
+              name: "Business Verified",
+              emoji: "🏢",
+              color: "#06b6d4",
+              monthly: 400,
+              monthlyExact: 399.80,
+              semiannual: 1999,
+              desc: "Verified merchant/business license. Crucial for Biashara listings."
+            },
+            premium_verified: {
+              name: "Premium Verified",
+              emoji: "👑",
+              color: "#f59e0b",
+              monthly: 1400,
+              monthlyExact: 1400,
+              semiannual: 7000,
+              desc: "Ultimate trust tier. VIP support, in-person check & maximum visibility."
+            }
+          }).map(([key, plan]) => {
+            const isOwned = badges.includes(key);
+            const amount = billingCycle === 'monthly' ? plan.monthly : plan.semiannual;
+            const billingPeriod = billingCycle === 'monthly' ? '/month' : '/6mo';
+            const exactText = billingCycle === 'monthly' && plan.monthlyExact !== plan.monthly
+              ? `(KSh ${plan.monthlyExact.toFixed(2)})`
+              : '';
+
+            return (
+              <div key={key} style={{ ...styles.planCard, borderTop: `4px solid ${plan.color}` }}>
+                <div style={styles.planCardTop}>
+                  <div style={{ background: `${plan.color}15`, borderRadius: '12px', width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>
+                    {plan.emoji}
+                  </div>
+                  <div>
+                    <h4 style={styles.planName}>{plan.name}</h4>
+                    <span style={{ ...styles.planStatusTag, color: isOwned ? '#10b981' : '#64748b', background: isOwned ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.05)' }}>
+                      {isOwned ? '✓ Active' : 'Not Subscribed'}
+                    </span>
+                  </div>
+                </div>
+
+                <p style={styles.planDesc}>{plan.desc}</p>
+
+                <div style={styles.priceContainer}>
+                  <span style={styles.priceSymbol}>KSh</span>
+                  <span style={styles.priceAmount}>{amount.toLocaleString()}</span>
+                  <span style={styles.pricePeriod}>{billingPeriod}</span>
+                  {exactText && <span style={styles.exactText}>{exactText}</span>}
+                </div>
+
+                {isOwned ? (
+                  <button disabled style={{ ...styles.subscribeBtn, background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', cursor: 'not-allowed' }}>
+                    ✓ Badge Awarded
+                  </button>
+                ) : (
+                  <Link
+                    to={`/checkout?plan=verification-${key}-${billingCycle}&amount=${amount}&subscriptionType=${key}`}
+                    style={{ ...styles.subscribeBtn, background: `linear-gradient(135deg, ${plan.color}d0 0%, ${plan.color} 100%)`, color: '#fff' }}
+                  >
+                    Get Verified
+                  </Link>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -378,6 +513,137 @@ const styles = {
   },
   approvedText: {
     lineHeight: '1.4',
+  },
+  badgePricingSection: {
+    marginTop: '40px',
+    borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+    paddingTop: '32px',
+  },
+  badgePricingHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: '20px',
+    marginBottom: '28px',
+  },
+  pricingTitle: {
+    fontSize: '20px',
+    fontWeight: '800',
+    color: '#fbbf24',
+    margin: '0 0 6px 0',
+  },
+  pricingSubtitle: {
+    fontSize: '13px',
+    color: '#94a3b8',
+    margin: 0,
+  },
+  cycleToggleContainer: {
+    display: 'flex',
+    background: '#090e1a',
+    borderRadius: '10px',
+    padding: '4px',
+    border: '1px solid rgba(255, 255, 255, 0.06)',
+  },
+  cycleToggleBtn: {
+    padding: '8px 16px',
+    border: 'none',
+    background: 'transparent',
+    color: '#64748b',
+    borderRadius: '8px',
+    fontSize: '12px',
+    fontWeight: '700',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  cycleToggleBtnActive: {
+    background: 'rgba(251, 191, 36, 0.12)',
+    color: '#fbbf24',
+    border: '1px solid rgba(251, 191, 36, 0.2)',
+  },
+  pricingGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+    gap: '20px',
+  },
+  planCard: {
+    background: 'rgba(255, 255, 255, 0.02)',
+    border: '1px solid rgba(255, 255, 255, 0.05)',
+    borderRadius: '16px',
+    padding: '24px',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    minHeight: '260px',
+    transition: 'all 0.3s ease',
+  },
+  planCardTop: {
+    display: 'flex',
+    gap: '16px',
+    alignItems: 'center',
+    marginBottom: '16px',
+  },
+  planName: {
+    fontSize: '16px',
+    fontWeight: '700',
+    color: '#f1f5f9',
+    margin: '0 0 4px 0',
+  },
+  planStatusTag: {
+    fontSize: '10px',
+    fontWeight: '700',
+    padding: '2px 8px',
+    borderRadius: '4px',
+    textTransform: 'uppercase',
+  },
+  planDesc: {
+    fontSize: '12px',
+    color: '#94a3b8',
+    lineHeight: '1.6',
+    margin: '0 0 20px 0',
+    flexGrow: 1,
+  },
+  priceContainer: {
+    display: 'flex',
+    alignItems: 'baseline',
+    gap: '4px',
+    marginBottom: '20px',
+    flexWrap: 'wrap',
+  },
+  priceSymbol: {
+    fontSize: '14px',
+    fontWeight: '700',
+    color: '#94a3b8',
+  },
+  priceAmount: {
+    fontSize: '28px',
+    fontWeight: '800',
+    color: '#f1f5f9',
+  },
+  pricePeriod: {
+    fontSize: '12px',
+    color: '#64748b',
+    fontWeight: '600',
+  },
+  exactText: {
+    fontSize: '11px',
+    color: '#64748b',
+    marginLeft: '6px',
+    fontStyle: 'italic',
+  },
+  subscribeBtn: {
+    display: 'block',
+    width: '100%',
+    padding: '12px',
+    textAlign: 'center',
+    borderRadius: '10px',
+    fontSize: '13px',
+    fontWeight: '700',
+    textDecoration: 'none',
+    border: 'none',
+    boxSizing: 'border-box',
+    transition: 'transform 0.2s, opacity 0.2s',
+    cursor: 'pointer',
   },
 };
 
