@@ -171,6 +171,7 @@ export default function BusinessLogin() {
           email: googleUser.email,
           name: googleUser.name,
           picture: googleUser.picture,
+          role: "user",
         }),
       });
 
@@ -201,7 +202,7 @@ export default function BusinessLogin() {
     setSuccess("");
 
     try {
-      const res = await API.post("/auth/login", formData);
+      const res = await API.post("/auth/login", { ...formData, role: "user" });
       const { token, user } = res.data;
 
       login(token, user);
@@ -229,7 +230,7 @@ export default function BusinessLogin() {
     setForgotLoading(true);
 
     try {
-      const res = await API.post("/auth/forgot-password", { email: forgotEmail });
+      const res = await API.post("/auth/forgot-password", { email: forgotEmail, role: "user" });
       setForgotMsg(res.data.message || "✅ Reset link sent! Check your inbox.");
     } catch (err) {
       setForgotMsg("❌ Failed to send reset email. Try again.");

@@ -4,6 +4,7 @@ import { AuthContext } from "../../context/AuthContext";
 import { tourismLogin } from "../../api/tourism";
 import { UserProfileEditor, ProfileAvatar } from "../../features/profile";
 import VerificationStatus from "../../components/VerificationStatus";
+import AnalyticsDashboard from "../../components/AnalyticsDashboard";
 import {
   useOwnerProfile,
   StatusBadge,
@@ -172,6 +173,10 @@ export default function ProviderDashboard() {
 
             <div style={{ marginBottom: '24px' }}>
               <VerificationStatus />
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
+              <AnalyticsDashboard userType="landlord" userId={user?._id || user?.id || authUser?._id || authUser?.id} />
             </div>
 
             <h2 style={{ ...sectionHead, marginTop: "28px" }}>Your properties</h2>

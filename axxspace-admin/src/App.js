@@ -15,6 +15,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/business/:id" element={<BusinessDetail />} />
+          <Route path="/business/create" element={<BusinessDetail />} />
           <Route path="/boost-management" element={<BoostManagement />} />
         </Routes>
       </BrowserRouter>

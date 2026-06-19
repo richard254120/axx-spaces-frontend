@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import VerificationStatus from "../components/VerificationStatus";
 import { UserProfileEditor } from "../features/profile";
 import BoostNotification from "../components/BoostNotification";
+import AnalyticsDashboard from "../components/AnalyticsDashboard";
 
 import { getDashboardPath } from "../utils/dashboardRoutes";
 
@@ -271,6 +272,10 @@ export default function MoverDashboard() {
 
             <div style={{ marginBottom: '24px' }}>
               <VerificationStatus />
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
+              <AnalyticsDashboard userType="mover" userId={user?._id || user?.id} />
             </div>
 
             {jobs.filter(j => j.status === "pending").length > 0 && (

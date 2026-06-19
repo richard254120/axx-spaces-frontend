@@ -122,6 +122,7 @@ export default function SellerLogin() {
           email: googleUser.email,
           name: googleUser.name,
           picture: googleUser.picture,
+          role: "seller",
         }),
       });
 
@@ -204,7 +205,7 @@ export default function SellerLogin() {
       const res = await fetch(`${API_BASE}/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: forgotEmail }),
+        body: JSON.stringify({ email: forgotEmail, role: "seller" }),
       });
 
       const data = await res.json();

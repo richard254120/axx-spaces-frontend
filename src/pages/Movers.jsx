@@ -494,7 +494,7 @@ export default function Movers() {
   const onLogin = async (e) => {
     e.preventDefault(); setLoginError(""); setLoginSuccess(""); setLoading(true);
     try {
-      const res = await API.post("/auth/login", loginData);
+      const res = await API.post("/auth/login", { ...loginData, role: "mover" });
       if (res.data.user.role !== "mover") { setLoginError("❌ This portal is for mover accounts only."); return; }
       login(res.data.token, res.data.user);
       setLoginSuccess("✅ Login successful! Redirecting...");
@@ -508,7 +508,7 @@ export default function Movers() {
     if (!forgotEmail) { setForgotMsg("❌ Please enter your email."); return; }
     setForgotLoading(true);
     try {
-      const res = await API.post("/auth/forgot-password", { email: forgotEmail });
+      const res = await API.post("/auth/forgot-password", { email: forgotEmail, role: "mover" });
       setForgotMsg(res.data?.message || "✅ Reset link sent!");
     } catch { setForgotMsg("❌ Failed to send reset email."); }
     finally { setForgotLoading(false); }
@@ -541,7 +541,7 @@ export default function Movers() {
       const payload = JSON.parse(decodeURIComponent(atob(response.credential.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")).split("").map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)).join("")));
       const res = await fetch(`${API_BASE}/auth/google`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ googleId: payload.sub, email: payload.email, name: payload.name, picture: payload.picture }),
+        body: JSON.stringify({ googleId: payload.sub, email: payload.email, name: payload.name, picture: payload.picture, role: "mover" }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Google authentication failed");

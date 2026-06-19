@@ -21,7 +21,7 @@ export default function Login() {
     setLoading(true);
     setError("");
     try {
-      const res = await API.post("/auth/login", { email, password });
+      const res = await API.post("/auth/login", { email, password, role: "admin" });
       const { token, user } = res.data;
       if (user.role !== "admin") {
         setError("❌ Access denied. Admins only.");
@@ -48,7 +48,7 @@ export default function Login() {
     setForgotLoading(true);
 
     try {
-      const res = await API.post("/auth/forgot-password", { email: forgotEmail });
+      const res = await API.post("/auth/forgot-password", { email: forgotEmail, role: "admin" });
       setForgotMsg(res.data.message || "✅ Reset link sent! Check your inbox.");
     } catch (err) {
       setForgotMsg("❌ Failed to send reset email. Try again.");

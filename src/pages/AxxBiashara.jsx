@@ -190,22 +190,22 @@ export default function AxxBiashara() {
      RENDER
   ════════════════════════════════════════════ */
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(160deg, #1a0a0a 0%, #2d1010 30%, #06070d 100%)", color: "#e8eaf0", fontFamily: "'Sora', 'DM Sans', sans-serif", overflowX: "hidden" }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(185deg, #090d16 0%, #0d1220 50%, #07090f 100%)", color: "#f1f5f9", fontFamily: "'Sora', 'DM Sans', sans-serif", overflowX: "hidden" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0d0f1a; }
-        ::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 3px; }
+        ::-webkit-scrollbar-track { background: #07090f; }
+        ::-webkit-scrollbar-thumb { background: #fbbf2450; border-radius: 3px; }
 
         @keyframes marquee {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
         @keyframes fadeSlideUp {
-          from { opacity: 0; transform: translateY(28px); }
+          from { opacity: 0; transform: translateY(24px); }
           to   { opacity: 1; transform: translateY(0); }
         }
         @keyframes shimmer {
@@ -213,9 +213,9 @@ export default function AxxBiashara() {
           100% { background-position:  400px 0; }
         }
         @keyframes pulse-ring {
-          0%   { box-shadow: 0 0 0 0   rgba(56,189,248,0.4); }
-          70%  { box-shadow: 0 0 0 12px rgba(56,189,248,0);   }
-          100% { box-shadow: 0 0 0 0   rgba(56,189,248,0);   }
+          0%   { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4); }
+          70%  { box-shadow: 0 0 0 10px rgba(251, 191, 36, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); }
         }
         @keyframes float {
           0%, 100% { transform: translateX(-50%) translateY(0px); }
@@ -227,108 +227,122 @@ export default function AxxBiashara() {
         }
 
         .axx-card {
-          animation: fadeSlideUp 0.5s ease both;
-          transition: transform 0.3s cubic-bezier(.22,.68,0,1.2), box-shadow 0.3s ease;
+          animation: fadeSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+          transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease, border-color 0.35s;
           cursor: pointer;
           position: relative;
-          background: linear-gradient(145deg, #0e1629 0%, #111827 100%);
+          background: rgba(17, 24, 39, 0.55);
           border-radius: 20px;
-          border: 1px solid rgba(56,189,248,0.08);
+          border: 1px solid rgba(255, 255, 255, 0.05);
           overflow: hidden;
+          backdrop-filter: blur(12px);
         }
         .axx-card:hover {
-          transform: translateY(-8px) scale(1.01);
-          box-shadow: 0 28px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(56,189,248,0.2);
-        }
-        .axx-card::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(135deg, rgba(56,189,248,0.03) 0%, transparent 60%);
-          pointer-events: none;
+          transform: translateY(-6px);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.55), 0 0 25px rgba(251, 191, 36, 0.08);
+          border-color: rgba(251, 191, 36, 0.35);
         }
 
-        .card-img-wrap { position: relative; overflow: hidden; height: 200px; }
-        .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block; }
-        .axx-card:hover .card-img-wrap img { transform: scale(1.06); }
+        .card-img-wrap { position: relative; overflow: hidden; height: 190px; }
+        .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); display: block; }
+        .axx-card:hover .card-img-wrap img { transform: scale(1.05); }
         .card-img-overlay {
           position: absolute; inset: 0;
-          background: linear-gradient(to top, rgba(6,7,13,0.85) 0%, transparent 55%);
+          background: linear-gradient(to top, rgba(9, 13, 22, 0.9) 0%, transparent 60%);
         }
 
         .badge-pill {
           display: inline-flex; align-items: center; gap: 4px;
-          padding: 3px 10px; border-radius: 20px;
-          font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
+          padding: 4px 10px; border-radius: 20px;
+          font-size: 10px; font-weight: 700; letter-spacing: 0.03em;
+          text-transform: uppercase;
         }
 
         .action-btn {
           display: inline-flex; align-items: center; gap: 6px;
-          padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 600;
-          border: none; cursor: pointer; transition: all 0.2s ease; text-decoration: none;
+          padding: 9px 18px; border-radius: 12px; font-size: 12.5px; font-weight: 700;
+          border: none; cursor: pointer; transition: all 0.25s ease; text-decoration: none;
         }
-        .action-btn-primary { background: rgba(56,189,248,0.15); color: #38bdf8; border: 1px solid rgba(56,189,248,0.3); }
-        .action-btn-primary:hover { background: #38bdf8; color: #06070d; }
-        .action-btn-success { background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
-        .action-btn-success:hover { background: #10b981; color: #06070d; }
+        .action-btn-primary { 
+          background: rgba(251, 191, 36, 0.1); 
+          color: #fbbf24; 
+          border: 1px solid rgba(251, 191, 36, 0.25); 
+        }
+        .action-btn-primary:hover { 
+          background: #fbbf24; 
+          color: #090d16; 
+          box-shadow: 0 4px 15px rgba(251, 191, 36, 0.25);
+        }
+        .action-btn-success { 
+          background: rgba(20, 184, 166, 0.1); 
+          color: #14b8a6; 
+          border: 1px solid rgba(20, 184, 166, 0.25); 
+        }
+        .action-btn-success:hover { 
+          background: #14b8a6; 
+          color: #090d16; 
+          box-shadow: 0 4px 15px rgba(20, 184, 166, 0.25);
+        }
 
         .icon-btn {
-          width: 34px; height: 34px; border-radius: 50%;
+          width: 36px; height: 36px; border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
-          background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-          cursor: pointer; font-size: 15px; transition: all 0.2s;
+          background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
+          cursor: pointer; font-size: 14px; transition: all 0.25s;
         }
-        .icon-btn:hover { background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.4); }
+        .icon-btn:hover { background: rgba(251, 191, 36, 0.15); border-color: rgba(251, 191, 36, 0.3); }
 
         .filter-select {
-          padding: 10px 14px;
-          background: #1a0f0f;
-          border: 1px solid rgba(239,68,68,0.15);
-          border-radius: 10px;
-          color: #cbd5e1;
-          font-size: 13px;
+          padding: 12px 16px;
+          background: rgba(17, 24, 39, 0.8);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 12px;
+          color: #e2e8f0;
+          font-size: 13.5px;
           font-family: inherit;
           cursor: pointer;
           outline: none;
-          transition: border-color 0.2s;
-          min-width: 180px;
+          transition: all 0.25s;
+          min-width: 170px;
           appearance: none;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23ef4444' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23fbbf24' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
           background-repeat: no-repeat;
-          background-position: right 12px center;
-          padding-right: 32px;
+          background-position: right 14px center;
+          padding-right: 36px;
         }
-        .filter-select:focus, .filter-select:hover { border-color: rgba(239,68,68,0.4); }
+        .filter-select:focus, .filter-select:hover { border-color: rgba(251, 191, 36, 0.4); }
 
         .search-input {
-          width: 100%; padding: 14px 14px 14px 48px;
-          background: #0e1629;
-          border: 1px solid rgba(56,189,248,0.2);
-          border-radius: 14px;
-          color: #f1f5f9;
-          font-size: 15px;
+          width: 100%; padding: 16px 16px 16px 54px;
+          background: rgba(17, 24, 39, 0.6);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 16px;
+          color: #f8fafc;
+          font-size: 15.5px;
           font-family: inherit;
           outline: none;
-          transition: border-color 0.3s, box-shadow 0.3s;
+          transition: all 0.3s;
         }
         .search-input:focus {
-          border-color: rgba(56,189,248,0.5);
-          box-shadow: 0 0 0 3px rgba(56,189,248,0.08);
+          border-color: rgba(251, 191, 36, 0.5);
+          box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.08);
+          background: rgba(17, 24, 39, 0.8);
         }
-        .search-input::placeholder { color: #475569; }
+        .search-input::placeholder { color: #64748b; }
 
         .ann-card {
-          background: linear-gradient(135deg, rgba(251,191,36,0.08) 0%, rgba(245,158,11,0.05) 50%, rgba(217,119,6,0.08) 100%);
-          border: 1px solid rgba(251,191,36,0.25);
+          background: rgba(251, 191, 36, 0.03);
+          border: 1px solid rgba(251, 191, 36, 0.15);
           border-radius: 14px;
-          padding: 18px 20px;
-          min-width: 260px;
-          max-width: 290px;
+          padding: 16px 20px;
+          min-width: 270px;
+          max-width: 300px;
           flex-shrink: 0;
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: all 0.25s ease;
           position: relative;
           overflow: hidden;
+          backdrop-filter: blur(8px);
         }
         .ann-card::before {
           content: '';
@@ -343,174 +357,185 @@ export default function AxxBiashara() {
         }
         .ann-card:hover {
           transform: translateY(-4px);
-          border-color: rgba(251,191,36,0.5);
-          box-shadow: 0 12px 32px rgba(251,191,36,0.2), 0 0 0 1px rgba(251,191,36,0.1);
+          border-color: rgba(251, 191, 36, 0.45);
+          box-shadow: 0 10px 25px rgba(251, 191, 36, 0.15);
+          background: rgba(251, 191, 36, 0.06);
         }
 
         .modal-overlay {
           position: fixed; inset: 0;
-          background: rgba(0,0,0,0.85);
-          backdrop-filter: blur(6px);
+          background: rgba(5, 8, 15, 0.8);
+          backdrop-filter: blur(10px);
           display: flex; align-items: center; justify-content: center;
           z-index: 9999;
-          animation: fadeSlideUp 0.2s ease;
+          animation: fadeSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .modal-box {
-          background: #0e1629;
-          border: 1px solid rgba(56,189,248,0.2);
+          background: #0d1220;
+          border: 1px solid rgba(251, 191, 36, 0.25);
           border-radius: 24px;
           padding: 40px;
           position: relative;
           max-height: 85vh;
           overflow-y: auto;
+          box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
         }
 
         .shimmer-card {
-          background: linear-gradient(90deg, #1a0f0f 25%, #2d1515 50%, #1a0f0f 75%);
+          background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 75%);
           background-size: 400px 100%;
-          animation: shimmer 1.4s infinite;
+          animation: shimmer 1.5s infinite;
           border-radius: 20px;
           height: 340px;
         }
 
         .cta-btn {
           display: inline-flex; align-items: center; gap: 8px;
-          padding: 12px 24px; border-radius: 12px;
+          padding: 12px 24px; border-radius: 14px;
           font-size: 14px; font-weight: 700;
           border: none; cursor: pointer;
           transition: all 0.25s ease; font-family: inherit;
           text-decoration: none;
         }
         .cta-primary {
-          background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
-          color: #06070d;
-          box-shadow: 0 4px 20px rgba(239,68,68,0.3);
+          background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+          color: #090d16;
+          box-shadow: 0 4px 18px rgba(251, 191, 36, 0.25);
         }
-        .cta-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(239,68,68,0.45); }
+        .cta-primary:hover { 
+          transform: translateY(-2px); 
+          box-shadow: 0 8px 24px rgba(251, 191, 36, 0.4); 
+        }
         .cta-green {
-          background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-          color: #fff;
-          box-shadow: 0 4px 16px rgba(16,185,129,0.25);
+          background: rgba(255, 255, 255, 0.05);
+          color: #f1f5f9;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        .cta-green:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(16,185,129,0.4); }
+        .cta-green:hover { 
+          background: rgba(255, 255, 255, 0.09);
+          border-color: rgba(255, 255, 255, 0.2);
+          transform: translateY(-2px); 
+        }
 
         .comparison-bar {
           position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-          background: rgba(14,22,41,0.96);
-          border: 1px solid rgba(56,189,248,0.3);
-          border-radius: 16px; padding: 14px 24px;
-          display: flex; align-items: center; gap: 16px;
-          box-shadow: 0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(56,189,248,0.1);
-          z-index: 1000; backdrop-filter: blur(10px);
+          background: rgba(13, 18, 32, 0.95);
+          border: 1px solid rgba(251, 191, 36, 0.3);
+          border-radius: 20px; padding: 14px 28px;
+          display: flex; align-items: center; gap: 20px;
+          box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+          z-index: 1000; backdrop-filter: blur(16px);
           animation: float 3s ease-in-out infinite;
         }
 
         .section-label {
-          font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
-          text-transform: uppercase; color: #ef4444;
+          font-size: 11px; font-weight: 800; letter-spacing: 0.15em;
+          text-transform: uppercase; color: #fbbf24;
         }
         .section-title {
           font-size: 28px; font-weight: 800;
-          background: linear-gradient(135deg, #f1f5f9 30%, #94a3b8 100%);
+          background: linear-gradient(135deg, #f8fafc 30%, #94a3b8 100%);
           -webkit-background-clip: text; -webkit-text-fill-color: transparent;
           background-clip: text;
         }
 
         .no-results {
           text-align: center; padding: 80px 20px;
-          color: #475569; font-size: 16px;
+          color: #64748b; font-size: 16px;
         }
-        .no-results-icon { font-size: 56px; margin-bottom: 16px; opacity: 0.5; }
+        .no-results-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.6; }
 
         .form-input {
           width: 100%; padding: 12px 16px;
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(239,68,68,0.15);
-          border-radius: 10px; color: #f1f5f9;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 12px; color: #f1f5f9;
           font-size: 14px; font-family: inherit;
-          outline: none; transition: border-color 0.2s;
+          outline: none; transition: border-color 0.25s;
           margin-bottom: 12px;
         }
-        .form-input:focus { border-color: rgba(239,68,68,0.45); }
+        .form-input:focus { border-color: rgba(251, 191, 36, 0.45); }
         .form-input::placeholder { color: #475569; }
 
         .social-dot {
-          width: 30px; height: 30px; border-radius: 50%;
-          background: rgba(255,255,255,0.06);
+          width: 32px; height: 32px; border-radius: 50%;
+          background: rgba(255, 255, 255, 0.04);
           display: flex; align-items: center; justify-content: center;
-          font-size: 13px; text-decoration: none;
-          border: 1px solid rgba(255,255,255,0.08);
-          transition: all 0.2s;
+          font-size: 12px; text-decoration: none;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          transition: all 0.2s ease;
+          color: #cbd5e1;
         }
-        .social-dot:hover { background: rgba(56,189,248,0.2); border-color: rgba(56,189,248,0.4); transform: scale(1.15); }
+        .social-dot:hover { background: rgba(251, 191, 36, 0.15); border-color: rgba(251, 191, 36, 0.4); transform: scale(1.1); color: #fbbf24; }
 
         .featured-tag {
           position: absolute; top: 12px; left: 12px;
-          background: linear-gradient(135deg, #f59e0b, #fbbf24);
-          color: #06070d; padding: 4px 12px; border-radius: 20px;
-          font-size: 11px; font-weight: 800; letter-spacing: 0.05em;
+          background: linear-gradient(135deg, #fbbf24, #f59e0b);
+          color: #090d16; padding: 4px 12px; border-radius: 20px;
+          font-size: 10px; font-weight: 800; letter-spacing: 0.05em;
           text-transform: uppercase; z-index: 2;
         }
 
         .stat-chip {
-          display: inline-flex; align-items: center; gap: 5px;
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.07);
-          border-radius: 8px; padding: 4px 10px;
+          display: inline-flex; align-items: center; gap: 6px;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          border-radius: 10px; padding: 6px 14px;
           font-size: 12px; color: #94a3b8;
         }
-        .stat-chip strong { color: #e2e8f0; font-weight: 600; }
+        .stat-chip strong { color: #fbbf24; font-weight: 700; }
 
-        .divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 14px 0; }
+        .divider { border: none; border-top: 1px solid rgba(255, 255, 255, 0.08); margin: 16px 0; }
 
         .refresh-banner {
           animation: slideDown 0.35s ease;
-          background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(56,189,248,0.1));
-          border: 1px solid rgba(16,185,129,0.35);
-          color: #10b981;
-          padding: 12px 20px;
-          border-radius: 12px;
+          background: rgba(20, 184, 166, 0.1);
+          border: 1px solid rgba(20, 184, 166, 0.3);
+          color: #14b8a6;
+          padding: 14px 22px;
+          border-radius: 14px;
           font-size: 14px;
           font-weight: 600;
           display: flex;
           align-items: center;
           gap: 10px;
-          margin-bottom: 20px;
+          margin-bottom: 24px;
         }
       `}</style>
 
       {/* ── HERO HEADER ── */}
       <div style={{
-        background: "linear-gradient(160deg, #2d0a0a 0%, #1a0a0a 40%, #0d0a0a 100%)",
-        borderBottom: "1px solid rgba(239,68,68,0.15)",
-        padding: "48px 24px 36px",
+        background: "radial-gradient(circle at top right, rgba(251, 191, 36, 0.05) 0%, transparent 60%), linear-gradient(180deg, #0d1322 0%, #090d16 100%)",
+        borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+        padding: "72px 24px 56px",
         position: "relative", overflow: "hidden",
       }}>
-        {/* Decorative orbs */}
-        <div style={{ position: "absolute", top: "-80px", right: "-60px", width: "340px", height: "340px", borderRadius: "50%", background: "radial-gradient(circle, rgba(239,68,68,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: "-60px", left: "10%", width: "240px", height: "240px", borderRadius: "50%", background: "radial-gradient(circle, rgba(220,38,38,0.06) 0%, transparent 70%)", pointerEvents: "none" }} />
+        {/* Decorative backdrop blobs */}
+        <div style={{ position: "absolute", top: "-100px", right: "-100px", width: "400px", height: "400px", borderRadius: "50%", background: "radial-gradient(circle, rgba(251, 191, 36, 0.06) 0%, transparent 70%)", pointerEvents: "none", filter: "blur(40px)" }} />
+        <div style={{ position: "absolute", bottom: "-120px", left: "5%", width: "300px", height: "300px", borderRadius: "50%", background: "radial-gradient(circle, rgba(20, 184, 166, 0.04) 0%, transparent 70%)", pointerEvents: "none", filter: "blur(40px)" }} />
 
         <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
           {/* Top bar */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "20px", marginBottom: "36px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "30px", marginBottom: "42px" }}>
             <div>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" }}>
-                <img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "42px", height: "42px", borderRadius: "12px", objectFit: "cover", boxShadow: "0 4px 16px rgba(56,189,248,0.3)" }} />
+              <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "14px" }}>
+                <img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "48px", height: "48px", borderRadius: "14px", objectFit: "cover", boxShadow: "0 6px 20px rgba(251, 191, 36, 0.25)" }} />
                 <div>
                   <div className="section-label">Kenya Business Directory</div>
-                  <h1 style={{ fontSize: "clamp(28px,5vw,44px)", fontWeight: 800, background: "linear-gradient(135deg, #f8fafc 0%, #ef4444 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", lineHeight: 1.1 }}>
+                  <h1 style={{ fontSize: "clamp(32px, 6vw, 48px)", fontWeight: 800, background: "linear-gradient(135deg, #ffffff 0%, #fbbf24 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", lineHeight: 1.1, letterSpacing: "-0.02em" }}>
                     AxxBiashara
                   </h1>
                 </div>
               </div>
-              <p style={{ color: "#64748b", fontSize: "15px", maxWidth: "420px", lineHeight: "1.6" }}>
-                Discover and connect with verified businesses across all 47 counties of Kenya.
+              <p style={{ color: "#94a3b8", fontSize: "15.5px", maxWidth: "480px", lineHeight: "1.6", fontWeight: 500 }}>
+                Discover, compare, and connect with premier verified local businesses and services across all 47 counties of Kenya.
               </p>
             </div>
-            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
               {token && user?.role === "user" && (
-                <button className="cta-btn" style={{ background: "linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)", color: "#fff", border: "none" }} onClick={() => navigate("/business-dashboard")}>
-                  📊 My Dashboard
+                <button className="cta-btn" style={{ background: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#f1f5f9" }} onClick={() => navigate("/business-dashboard")}>
+                  Dashboard
                 </button>
               )}
               <button className="cta-primary cta-btn" onClick={() => {
@@ -520,21 +545,21 @@ export default function AxxBiashara() {
                   navigate("/business-login");
                 }
               }}>
-                + Add Business
+                Add Business
               </button>
               <button className="cta-green cta-btn" onClick={() => setShowAnnouncementForm(!showAnnouncementForm)}>
-                {showAnnouncementForm ? "✕ Cancel" : "📢 Announce"}
+                {showAnnouncementForm ? "Cancel" : "Announce"}
               </button>
             </div>
           </div>
 
           {/* Stats strip */}
-          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "28px" }}>
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "36px" }}>
             {[
-              { label: "Businesses", value: businesses.length },
-              { label: "Counties", value: "47" },
-              { label: "Categories", value: BUSINESS_CATEGORIES.length },
-              { label: "Verified", value: businesses.filter(b => b.verificationBadges?.length).length },
+              { label: "Registered Businesses", value: businesses.length },
+              { label: "Counties Covered", value: "47" },
+              { label: "Industry Categories", value: BUSINESS_CATEGORIES.length },
+              { label: "Verified Partners", value: businesses.filter(b => b.verificationBadges?.length).length },
             ].map(s => (
               <div key={s.label} className="stat-chip"><strong>{s.value}</strong> {s.label}</div>
             ))}
@@ -543,41 +568,41 @@ export default function AxxBiashara() {
           {/* ── REFRESH BANNER — shown after a business update ── */}
           {refreshBanner && (
             <div className="refresh-banner">
-              <span style={{ fontSize: "18px" }}>✅</span>
-              Business updated successfully! The directory has been refreshed with your latest changes.
+              <span style={{ fontSize: "18px" }}>✓</span>
+              Directory updated successfully! The business records have been reloaded.
             </div>
           )}
 
           {/* Success message (announcement) */}
           {announcementSuccess && (
-            <div style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.3)", color: "#10b981", padding: "12px 18px", borderRadius: "10px", marginBottom: "20px", fontSize: "14px", fontWeight: 600 }}>
-              ✓ {announcementSuccess}
+            <div style={{ background: "rgba(20, 184, 166, 0.1)", border: "1px solid rgba(20, 184, 166, 0.3)", color: "#14b8a6", padding: "14px 20px", borderRadius: "14px", marginBottom: "24px", fontSize: "14.5px", fontWeight: 600 }}>
+              {announcementSuccess}
             </div>
           )}
 
           {/* Announcement form */}
           {showAnnouncementForm && (
-            <div style={{ background: "rgba(14,22,41,0.8)", border: "1px solid rgba(56,189,248,0.15)", borderRadius: "18px", padding: "28px", marginBottom: "28px" }}>
-              <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#38bdf8", marginBottom: "18px" }}>Create Announcement</h3>
+            <div style={{ background: "rgba(17, 24, 39, 0.45)", border: "1px solid rgba(251, 191, 36, 0.2)", borderRadius: "20px", padding: "32px", marginBottom: "36px", backdropFilter: "blur(12px)" }}>
+              <h3 style={{ fontSize: "19px", fontWeight: 700, color: "#fbbf24", marginBottom: "20px" }}>Create General Announcement</h3>
               <form onSubmit={handleAddAnnouncement}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "0" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "0" }}>
                   <input className="form-input" type="text" placeholder="Your Name *" value={submitterName} onChange={e => setSubmitterName(e.target.value)} required style={{ marginBottom: 0 }} />
                   <input className="form-input" type="text" placeholder="Organisation (optional)" value={organizationName} onChange={e => setOrganizationName(e.target.value)} style={{ marginBottom: 0 }} />
                 </div>
-                <div style={{ height: 12 }} />
+                <div style={{ height: 16 }} />
                 <input className="form-input" type="text" placeholder="Announcement Title *" value={announcementTitle} onChange={e => setAnnouncementTitle(e.target.value)} required />
                 <textarea className="form-input" placeholder="Content *" value={announcementContent} onChange={e => setAnnouncementContent(e.target.value)} required rows={4} style={{ resize: "vertical" }} />
-                <button type="submit" className="cta-primary cta-btn" style={{ width: "100%", justifyContent: "center", marginTop: "4px" }}>Submit for Approval</button>
+                <button type="submit" className="cta-primary cta-btn" style={{ width: "100%", justifyContent: "center", marginTop: "4px" }}>Submit Announcement</button>
               </form>
             </div>
           )}
 
           {/* Announcements ticker */}
           {announcements.length > 0 && (
-            <div style={{ background: "rgba(26,15,15,0.6)", border: "1px solid rgba(239,68,68,0.1)", borderRadius: "16px", padding: "20px 22px" }}>
+            <div style={{ background: "rgba(17, 24, 39, 0.35)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "20px", padding: "20px 24px", backdropFilter: "blur(8px)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
-                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#38bdf8", boxShadow: "0 0 8px #38bdf8", animation: "pulse-ring 2s infinite", display: "inline-block" }} />
-                <span style={{ fontSize: "13px", fontWeight: 700, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.1em" }}>Live Announcements</span>
+                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#fbbf24", boxShadow: "0 0 8px #fbbf24", animation: "pulse-ring 2s infinite", display: "inline-block" }} />
+                <span style={{ fontSize: "12px", fontWeight: 800, color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.12em" }}>Live Board</span>
               </div>
               <div style={{ overflow: "hidden" }} onMouseEnter={() => setIsMarqueePaused(true)} onMouseLeave={() => setIsMarqueePaused(false)}>
                 <div style={{ display: "flex", gap: "16px", animation: "marquee 50s linear infinite", animationPlayState: isMarqueePaused ? "paused" : "running" }}>
@@ -585,11 +610,11 @@ export default function AxxBiashara() {
                     <div key={`${i}-${a._id}`} className="ann-card" onClick={() => { setSelectedAnnouncement(a); setShowAnnouncementModal(true); }}>
                       <div style={{ fontSize: "11px", color: "#fbbf24", fontWeight: 700, marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.06em" }}>{a.businessName || "General"}</div>
                       <div style={{ fontSize: "14px", fontWeight: 600, color: "#f1f5f9", marginBottom: "8px", lineHeight: "1.4" }}>{a.title}</div>
-                      <div style={{ fontSize: "11px", color: "#64748b" }}>
-                        {a.submitterName && `👤 ${a.submitterName}`}
+                      <div style={{ fontSize: "11px", color: "#94a3b8" }}>
+                        {a.submitterName && `${a.submitterName}`}
                         {a.organizationName && ` · ${a.organizationName}`}
                       </div>
-                      <div style={{ fontSize: "11px", color: "#475569", marginTop: "6px" }}>{new Date(a.createdAt).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" })}</div>
+                      <div style={{ fontSize: "10px", color: "#64748b", marginTop: "6px", fontWeight: 600 }}>{new Date(a.createdAt).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" })}</div>
                     </div>
                   ))}
                 </div>
@@ -599,26 +624,26 @@ export default function AxxBiashara() {
         </div>
       </div>
 
-      {/* ── FILTERS ── */}
-      <div style={{ background: "#120a0a", borderBottom: "1px solid rgba(239,68,68,0.1)", padding: "20px 24px", position: "sticky", top: 0, zIndex: 100, backdropFilter: "blur(12px)" }}>
+      {/* ── FILTERS BAR ── */}
+      <div style={{ background: "rgba(9, 13, 22, 0.8)", borderBottom: "1px solid rgba(255, 255, 255, 0.05)", padding: "20px 24px", position: "sticky", top: 0, zIndex: 100, backdropFilter: "blur(16px)" }}>
         <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-          {/* Search */}
-          <div style={{ position: "relative", marginBottom: "14px" }}>
-            <span style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", fontSize: "18px", color: "#475569" }}>🔍</span>
+          {/* Search bar wrapper */}
+          <div style={{ position: "relative", marginBottom: "16px" }}>
+            <span style={{ position: "absolute", left: "18px", top: "50%", transform: "translateY(-50%)", fontSize: "18px", color: "#fbbf24" }}>🔍</span>
             <input
               className="search-input"
               type="text"
-              placeholder="Search businesses by name, category, or location…"
+              placeholder="Search businesses by name, category, or town…"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
             />
             {searchQuery && (
-              <button onClick={() => setSearchQuery("")} style={{ position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: "16px" }}>✕</button>
+              <button onClick={() => setSearchQuery("")} style={{ position: "absolute", right: "16px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: "16px" }}>✕</button>
             )}
           </div>
 
-          {/* Filter row */}
-          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
+          {/* Filters Row */}
+          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
             <select className="filter-select" value={selectedCategory || ""} onChange={e => setSelectedCategory(e.target.value || null)}>
               <option value="">All Categories</option>
               {BUSINESS_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
@@ -628,7 +653,7 @@ export default function AxxBiashara() {
               {KENYA_COUNTIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
             <select className="filter-select" value={sortBy} onChange={e => setSortBy(e.target.value)}>
-              <option value="verified">⭐ Verified First</option>
+              <option value="verified">Verified First</option>
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
               <option value="rating">Top Rated</option>
@@ -638,24 +663,24 @@ export default function AxxBiashara() {
             </select>
             <button
               onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-              style={{ padding: "10px 16px", background: showAdvancedFilters ? "rgba(56,189,248,0.15)" : "rgba(255,255,255,0.04)", border: `1px solid ${showAdvancedFilters ? "rgba(56,189,248,0.4)" : "rgba(255,255,255,0.1)"}`, borderRadius: "10px", color: showAdvancedFilters ? "#38bdf8" : "#94a3b8", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }}
+              style={{ padding: "12px 18px", background: showAdvancedFilters ? "rgba(251,191,36,0.1)" : "rgba(255,255,255,0.03)", border: `1px solid ${showAdvancedFilters ? "rgba(251,191,36,0.35)" : "rgba(255,255,255,0.08)"}`, borderRadius: "12px", color: showAdvancedFilters ? "#fbbf24" : "#94a3b8", fontSize: "13.5px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.25s" }}
             >
-              ⚙ Filters {showAdvancedFilters ? "▲" : "▼"}
+              Filters {showAdvancedFilters ? "▲" : "▼"}
             </button>
 
             {(selectedCategory || selectedCounty || searchQuery || openNow || minRating || verification) && (
               <button
                 onClick={() => { setSelectedCategory(null); setSelectedCounty(null); setSearchQuery(""); setOpenNow(false); setMinRating(""); setVerification(""); }}
-                style={{ padding: "10px 14px", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: "10px", color: "#f87171", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+                style={{ padding: "12px 18px", background: "rgba(239, 68, 68, 0.08)", border: "1px solid rgba(239, 68, 68, 0.2)", borderRadius: "12px", color: "#fca5a5", fontSize: "13.5px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }}
               >
                 Clear All
               </button>
             )}
           </div>
 
-          {/* Advanced */}
+          {/* Advanced Panel */}
           {showAdvancedFilters && (
-            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "12px", paddingTop: "12px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginTop: "16px", paddingTop: "16px", borderTop: "1px solid rgba(255,255,255,0.06)", animation: "slideDown 0.25s ease-out" }}>
               <select className="filter-select" value={minRating} onChange={e => setMinRating(e.target.value)}>
                 <option value="">Min Rating</option>
                 {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}+ Stars</option>)}
@@ -666,8 +691,8 @@ export default function AxxBiashara() {
                 <option value="location_verified">Location Verified</option>
                 <option value="premium_verified">Premium</option>
               </select>
-              <label style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 14px", background: openNow ? "rgba(16,185,129,0.1)" : "rgba(255,255,255,0.03)", border: `1px solid ${openNow ? "rgba(16,185,129,0.35)" : "rgba(255,255,255,0.08)"}`, borderRadius: "10px", color: openNow ? "#10b981" : "#94a3b8", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
-                <input type="checkbox" checked={openNow} onChange={e => setOpenNow(e.target.checked)} style={{ accentColor: "#10b981" }} />
+              <label style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px 18px", background: openNow ? "rgba(20, 184, 166, 0.08)" : "rgba(255,255,255,0.02)", border: `1px solid ${openNow ? "rgba(20, 184, 166, 0.3)" : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", color: openNow ? "#14b8a6" : "#94a3b8", fontSize: "13.5px", fontWeight: 700, cursor: "pointer", transition: "all 0.25s" }}>
+                <input type="checkbox" checked={openNow} onChange={e => setOpenNow(e.target.checked)} style={{ accentColor: "#14b8a6" }} />
                 Open Now
               </label>
             </div>
@@ -675,73 +700,79 @@ export default function AxxBiashara() {
         </div>
       </div>
 
-      {/* ── MAIN CONTENT ── */}
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "36px 24px 80px" }}>
+      {/* ── MAIN CONTENT AREA ── */}
+      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "40px 24px 80px" }}>
 
-        {/* Results header */}
+        {/* Results title */}
         {!loading && (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px", flexWrap: "wrap", gap: "12px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px", flexWrap: "wrap", gap: "16px" }}>
             <div>
-              <div className="section-label" style={{ marginBottom: "4px" }}>Results</div>
-              <div className="section-title" style={{ fontSize: "22px" }}>
-                {businesses.length} {businesses.length === 1 ? "Business" : "Businesses"} Found
+              <div className="section-label" style={{ marginBottom: "6px" }}>Directory Records</div>
+              <div className="section-title" style={{ fontSize: "24px" }}>
+                {businesses.length} {businesses.length === 1 ? "Business" : "Businesses"} Available
               </div>
             </div>
             {comparisonList.length > 0 && (
-              <div style={{ fontSize: "13px", color: "#38bdf8", fontWeight: 600 }}>
-                {comparisonList.length}/3 selected for comparison
+              <div style={{ fontSize: "13.5px", color: "#fbbf24", fontWeight: 700 }}>
+                {comparisonList.length}/3 selected for compare
               </div>
             )}
           </div>
         )}
 
-        {/* Grid */}
+        {/* Directory Grid */}
         {loading ? (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "22px" }}>
-            {[...Array(6)].map((_, i) => <div key={i} className="shimmer-card" style={{ animationDelay: `${i * 0.1}s` }} />)}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "24px" }}>
+            {[...Array(6)].map((_, i) => <div key={i} className="shimmer-card" style={{ animationDelay: `${i * 0.08}s` }} />)}
           </div>
         ) : businesses.length === 0 ? (
           <div className="no-results">
-            <div className="no-results-icon">🔭</div>
-            <p style={{ fontSize: "18px", fontWeight: 600, color: "#334155", marginBottom: "8px" }}>No businesses found</p>
-            <p style={{ color: "#475569" }}>Try adjusting your filters or search terms</p>
+            <div className="no-results-icon">🔍</div>
+            <p style={{ fontSize: "19px", fontWeight: 700, color: "#94a3b8", marginBottom: "8px" }}>No matching businesses</p>
+            <p style={{ color: "#475569" }}>Try broadening your search query or selecting a different category/county.</p>
           </div>
         ) : (
           <>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "22px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "24px" }}>
               {businesses.map((biz, idx) => (
                 <div
                   key={biz._id}
                   className="axx-card"
-                  style={{ animationDelay: `${Math.min(idx * 0.06, 0.5)}s` }}
+                  style={{ 
+                    animationDelay: `${Math.min(idx * 0.05, 0.4)}s`,
+                    border: biz.featured ? "1px solid rgba(251, 191, 36, 0.35)" : undefined,
+                    boxShadow: biz.featured ? "0 0 15px rgba(251, 191, 36, 0.04)" : undefined,
+                  }}
                   onClick={() => navigate(`/business/${biz._id}`)}
                   onMouseEnter={() => setHoveredCard(biz._id)}
                   onMouseLeave={() => setHoveredCard(null)}
                 >
-                  {biz.featured && <div className="featured-tag">⭐ Featured</div>}
+                  {biz.featured && <div className="featured-tag">Featured</div>}
 
-                  {/* Image */}
+                  {/* Visual Header */}
                   {biz.images?.length > 0 ? (
                     <div className="card-img-wrap">
                       <img src={biz.images[0]} alt={biz.name} />
                       <div className="card-img-overlay" />
                       {biz.rating > 0 && (
-                        <div style={{ position: "absolute", bottom: "12px", left: "14px", background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)", borderRadius: "8px", padding: "4px 10px", fontSize: "12px", fontWeight: 700, color: "#fbbf24", zIndex: 2 }}>
+                        <div style={{ position: "absolute", bottom: "12px", left: "14px", background: "rgba(9, 13, 22, 0.8)", backdropFilter: "blur(4px)", borderRadius: "8px", padding: "4px 10px", fontSize: "11px", fontWeight: 800, color: "#fbbf24", zIndex: 2, border: "1px solid rgba(255,255,255,0.08)" }}>
                           ★ {biz.rating?.toFixed(1)} · {biz.reviewCount || 0} reviews
                         </div>
                       )}
                     </div>
                   ) : (
-                    <div style={{ height: "80px", background: "linear-gradient(135deg, rgba(56,189,248,0.06), rgba(16,185,129,0.04))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "32px" }}>🏪</div>
+                    <div style={{ height: "120px", background: "linear-gradient(135deg, rgba(251,191,36,0.05) 0%, rgba(20,184,166,0.03) 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "32px", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                      🏪
+                    </div>
                   )}
 
-                  {/* Body */}
-                  <div style={{ padding: "18px 20px 20px" }}>
-                    {/* Title row */}
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "6px" }}>
-                      <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#f1f5f9", lineHeight: 1.3, flex: 1, paddingRight: "8px" }}>{biz.name}</h3>
-                      <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
-                        <button className="icon-btn" onClick={e => toggleFavorite(biz._id, e)} title="Favourite">
+                  {/* Body Content */}
+                  <div style={{ padding: "20px 22px 24px" }}>
+                    {/* Header line */}
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
+                      <h3 style={{ fontSize: "18px", fontWeight: 800, color: "#f8fafc", lineHeight: 1.3, flex: 1, paddingRight: "10px" }}>{biz.name}</h3>
+                      <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
+                        <button className="icon-btn" onClick={e => toggleFavorite(biz._id, e)} title="Favorite">
                           {isFavorite(biz._id) ? "❤️" : "🤍"}
                         </button>
                         <button
@@ -749,31 +780,32 @@ export default function AxxBiashara() {
                           onClick={e => toggleComparison(biz._id, e)}
                           title="Compare"
                           style={{
-                            background: comparisonList.includes(biz._id) ? "rgba(56,189,248,0.15)" : undefined,
-                            borderColor: comparisonList.includes(biz._id) ? "rgba(56,189,248,0.4)" : undefined,
+                            background: comparisonList.includes(biz._id) ? "rgba(251, 191, 36, 0.15)" : undefined,
+                            borderColor: comparisonList.includes(biz._id) ? "rgba(251, 191, 36, 0.45)" : undefined,
                           }}
                         >
-                          {comparisonList.includes(biz._id) ? <span style={{ color: "#38bdf8", fontWeight: 700, fontSize: "13px" }}>✓</span> : "⚖"}
+                          {comparisonList.includes(biz._id) ? <span style={{ color: "#fbbf24", fontWeight: 800, fontSize: "12px" }}>✓</span> : "⚖"}
                         </button>
                       </div>
                     </div>
 
-                    <div style={{ fontSize: "12px", color: "#38bdf8", fontWeight: 600, marginBottom: "4px" }}>{biz.categories?.join(" · ")}</div>
-                    <div style={{ fontSize: "13px", color: "#64748b", marginBottom: "10px", display: "flex", alignItems: "center", gap: "4px" }}>
+                    <div style={{ fontSize: "11.5px", color: "#fbbf24", fontWeight: 700, marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>{biz.categories?.join(" · ")}</div>
+                    
+                    <div style={{ fontSize: "13px", color: "#94a3b8", marginBottom: "14px", display: "flex", alignItems: "center", gap: "6px", fontWeight: 500 }}>
                       <span>📍</span> {biz.location?.town}, {biz.location?.county}
                     </div>
 
-                    <p style={{ fontSize: "13px", color: "#94a3b8", lineHeight: "1.55", marginBottom: "12px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                    <p style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.6", marginBottom: "16px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
                       {biz.description}
                     </p>
 
-                    {/* Badges */}
+                    {/* Verification Indicators */}
                     {biz.verificationBadges?.length > 0 && (
-                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "12px" }}>
+                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "16px" }}>
                         {biz.verificationBadges.map((badge, i) => {
                           const cfg = BADGE_CONFIG[badge.type] || {};
                           return (
-                            <span key={i} className="badge-pill" style={{ background: `${cfg.color}18`, color: cfg.color, border: `1px solid ${cfg.color}40` }}>
+                            <span key={i} className="badge-pill" style={{ background: `${cfg.color}15`, color: cfg.color, border: `1px solid ${cfg.color}35` }}>
                               {cfg.icon} {cfg.label || badge.type}
                             </span>
                           );
@@ -784,15 +816,15 @@ export default function AxxBiashara() {
                     <hr className="divider" />
 
                     {/* Actions */}
-                    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: biz.socialMedia ? "10px" : "0" }}>
+                    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: biz.socialMedia ? "14px" : "0" }}>
                       {biz.contact?.phone && (
                         <a href={`tel:${biz.contact.phone}`} className="action-btn action-btn-primary" onClick={e => e.stopPropagation()}>
-                          📞 Call
+                          Call Business
                         </a>
                       )}
                       {biz.contact?.email && (
                         <a href={`mailto:${biz.contact.email}`} className="action-btn action-btn-success" onClick={e => e.stopPropagation()}>
-                          ✉ Email
+                          Send Email
                         </a>
                       )}
                       {biz.contact?.phone && (
@@ -801,17 +833,17 @@ export default function AxxBiashara() {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="action-btn"
-                          style={{ background: "rgba(37,211,102,0.1)", color: "#25d366", border: "1px solid rgba(37,211,102,0.25)", display: "inline-flex", alignItems: "center", gap: "6px", padding: "8px 14px", borderRadius: "10px", fontSize: "13px", fontWeight: 600, textDecoration: "none" }}
+                          style={{ background: "rgba(37,211,102,0.08)", color: "#25d366", border: "1px solid rgba(37,211,102,0.2)", display: "inline-flex", alignItems: "center", gap: "6px", padding: "9px 16px", borderRadius: "12px", fontSize: "12.5px", fontWeight: 700, textDecoration: "none" }}
                           onClick={e => e.stopPropagation()}
                         >
-                          💬 WhatsApp
+                          WhatsApp
                         </a>
                       )}
                     </div>
 
-                    {/* Social icons */}
+                    {/* Social links */}
                     {biz.socialMedia && (
-                      <div style={{ display: "flex", gap: "7px", flexWrap: "wrap" }}>
+                      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", borderTop: "1px dashed rgba(255,255,255,0.05)", paddingTop: "12px" }}>
                         {biz.socialMedia.facebook && <a href={biz.socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>f</a>}
                         {biz.socialMedia.instagram && <a href={biz.socialMedia.instagram} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>📷</a>}
                         {biz.socialMedia.twitter && <a href={biz.socialMedia.twitter} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>𝕏</a>}
@@ -824,29 +856,28 @@ export default function AxxBiashara() {
               ))}
             </div>
 
-            {/* Pagination Controls */}
+            {/* Pagination controls */}
             {totalBusinesses > itemsPerPage && (
-              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", marginTop: "32px", flexWrap: "wrap" }}>
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px", marginTop: "42px", flexWrap: "wrap" }}>
                 <button
                   onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                   disabled={currentPage === 1}
                   style={{
-                    padding: "10px 16px",
-                    background: currentPage === 1 ? "rgba(255,255,255,0.03)" : "rgba(56,189,248,0.15)",
-                    border: currentPage === 1 ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(56,189,248,0.3)",
-                    borderRadius: "10px",
-                    color: currentPage === 1 ? "#475569" : "#38bdf8",
+                    padding: "10px 18px",
+                    background: currentPage === 1 ? "rgba(255,255,255,0.02)" : "rgba(251,191,36,0.1)",
+                    border: currentPage === 1 ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(251,191,36,0.25)",
+                    borderRadius: "12px",
+                    color: currentPage === 1 ? "#475569" : "#fbbf24",
                     fontSize: "14px",
-                    fontWeight: 600,
+                    fontWeight: 700,
                     cursor: currentPage === 1 ? "not-allowed" : "pointer",
                     fontFamily: "inherit",
-                    transition: "all 0.2s",
+                    transition: "all 0.25s",
                   }}
                 >
                   ← Previous
                 </button>
 
-                {/* Page Numbers */}
                 {Array.from({ length: Math.min(5, Math.ceil(totalBusinesses / itemsPerPage)) }, (_, i) => {
                   const totalPages = Math.ceil(totalBusinesses / itemsPerPage);
                   let pageNum;
@@ -867,16 +898,16 @@ export default function AxxBiashara() {
                       onClick={() => setCurrentPage(pageNum)}
                       style={{
                         padding: "10px 14px",
-                        background: currentPage === pageNum ? "rgba(56,189,248,0.2)" : "rgba(255,255,255,0.04)",
-                        border: currentPage === pageNum ? "1px solid rgba(56,189,248,0.4)" : "1px solid rgba(255,255,255,0.08)",
-                        borderRadius: "10px",
-                        color: currentPage === pageNum ? "#38bdf8" : "#94a3b8",
+                        background: currentPage === pageNum ? "rgba(251, 191, 36, 0.15)" : "rgba(255,255,255,0.03)",
+                        border: currentPage === pageNum ? "1px solid rgba(251, 191, 36, 0.4)" : "1px solid rgba(255,255,255,0.06)",
+                        borderRadius: "12px",
+                        color: currentPage === pageNum ? "#fbbf24" : "#94a3b8",
                         fontSize: "14px",
-                        fontWeight: 600,
+                        fontWeight: 700,
                         cursor: "pointer",
                         fontFamily: "inherit",
                         transition: "all 0.2s",
-                        minWidth: "42px",
+                        minWidth: "44px",
                       }}
                     >
                       {pageNum}
@@ -888,16 +919,16 @@ export default function AxxBiashara() {
                   onClick={() => setCurrentPage(prev => Math.min(Math.ceil(totalBusinesses / itemsPerPage), prev + 1))}
                   disabled={currentPage === Math.ceil(totalBusinesses / itemsPerPage)}
                   style={{
-                    padding: "10px 16px",
-                    background: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "rgba(255,255,255,0.03)" : "rgba(56,189,248,0.15)",
-                    border: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(56,189,248,0.3)",
-                    borderRadius: "10px",
-                    color: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "#475569" : "#38bdf8",
+                    padding: "10px 18px",
+                    background: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "rgba(255,255,255,0.02)" : "rgba(251,191,36,0.1)",
+                    border: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(251,191,36,0.25)",
+                    borderRadius: "12px",
+                    color: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "#475569" : "#fbbf24",
                     fontSize: "14px",
-                    fontWeight: 600,
+                    fontWeight: 700,
                     cursor: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "not-allowed" : "pointer",
                     fontFamily: "inherit",
-                    transition: "all 0.2s",
+                    transition: "all 0.25s",
                   }}
                 >
                   Next →
@@ -908,60 +939,60 @@ export default function AxxBiashara() {
         )}
       </div>
 
-      {/* ── COMPARISON FLOATING BAR ── */}
+      {/* ── FLOATING COMPARE BAR ── */}
       {comparisonList.length > 0 && (
         <div className="comparison-bar">
-          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-            <span style={{ width: "32px", height: "32px", borderRadius: "50%", background: "rgba(56,189,248,0.15)", border: "1px solid rgba(56,189,248,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px", fontWeight: 800, color: "#38bdf8" }}>{comparisonList.length}</span>
-            <span style={{ color: "#cbd5e1", fontSize: "14px", fontWeight: 500 }}>businesses to compare</span>
+          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+            <span style={{ width: "32px", height: "32px", borderRadius: "50%", background: "rgba(251,191,36,0.15)", border: "1px solid rgba(251,191,36,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: 800, color: "#fbbf24" }}>{comparisonList.length}</span>
+            <span style={{ color: "#cbd5e1", fontSize: "13.5px", fontWeight: 600 }}>selected businesses</span>
           </div>
-          <button className="cta-primary cta-btn" style={{ padding: "8px 18px", fontSize: "13px" }} onClick={openComparison}>Compare Now</button>
-          <button onClick={() => setComparisonList([])} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: "8px", color: "#f87171", fontSize: "13px", fontWeight: 600, padding: "8px 14px", cursor: "pointer", fontFamily: "inherit" }}>Clear</button>
+          <button className="cta-primary cta-btn" style={{ padding: "8px 18px", fontSize: "12.5px" }} onClick={openComparison}>Compare</button>
+          <button onClick={() => setComparisonList([])} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", color: "#cbd5e1", fontSize: "12.5px", fontWeight: 600, padding: "8px 14px", cursor: "pointer", fontFamily: "inherit" }}>Clear</button>
         </div>
       )}
 
-      {/* ── ANNOUNCEMENT MODAL ── */}
+      {/* ── ANNOUNCEMENT VIEW MODAL ── */}
       {showAnnouncementModal && selectedAnnouncement && (
         <div className="modal-overlay" onClick={() => setShowAnnouncementModal(false)}>
           <div className="modal-box" style={{ maxWidth: "560px", width: "90%" }} onClick={e => e.stopPropagation()}>
-            <button onClick={() => setShowAnnouncementModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
-            <div style={{ fontSize: "11px", fontWeight: 700, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>📢 {selectedAnnouncement.businessName || "Announcement"}</div>
-            <h3 style={{ fontSize: "24px", fontWeight: 800, color: "#f1f5f9", marginBottom: "12px", lineHeight: "1.3" }}>{selectedAnnouncement.title}</h3>
-            <div style={{ fontSize: "13px", color: "#64748b", marginBottom: "20px" }}>
-              {selectedAnnouncement.submitterName && `👤 ${selectedAnnouncement.submitterName}`}
-              {selectedAnnouncement.organizationName && ` · 🏢 ${selectedAnnouncement.organizationName}`}
-              <span style={{ marginLeft: "10px" }}>📅 {new Date(selectedAnnouncement.createdAt).toLocaleDateString("en-KE", { weekday: "short", day: "numeric", month: "long", year: "numeric" })}</span>
+            <button onClick={() => setShowAnnouncementModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justify: "center", transition: "all 0.2s" }} onMouseEnter={e => e.target.style.background = "rgba(255,255,255,0.1)"} onMouseLeave={e => e.target.style.background = "rgba(255,255,255,0.04)"}>✕</button>
+            <div style={{ fontSize: "11px", fontWeight: 800, color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>📢 {selectedAnnouncement.businessName || "Announcement"}</div>
+            <h3 style={{ fontSize: "22px", fontWeight: 800, color: "#f8fafc", marginBottom: "12px", lineHeight: "1.3" }}>{selectedAnnouncement.title}</h3>
+            <div style={{ fontSize: "12.5px", color: "#64748b", marginBottom: "20px" }}>
+              {selectedAnnouncement.submitterName && `${selectedAnnouncement.submitterName}`}
+              {selectedAnnouncement.organizationName && ` · ${selectedAnnouncement.organizationName}`}
+              <span style={{ marginLeft: "12px" }}>{new Date(selectedAnnouncement.createdAt).toLocaleDateString("en-KE", { day: "numeric", month: "long", year: "numeric" })}</span>
             </div>
-            <hr className="divider" />
-            <p style={{ fontSize: "15px", color: "#cbd5e1", lineHeight: "1.75", marginTop: "16px" }}>{selectedAnnouncement.content}</p>
+            <hr className="divider" style={{ marginBottom: "20px" }} />
+            <p style={{ fontSize: "14.5px", color: "#e2e8f0", lineHeight: "1.7", marginTop: "12px" }}>{selectedAnnouncement.content}</p>
           </div>
         </div>
       )}
 
-      {/* ── COMPARISON MODAL ── */}
+      {/* ── SIDE BY SIDE COMPARISON MODAL ── */}
       {showComparisonModal && (
         <div className="modal-overlay" onClick={() => setShowComparisonModal(false)}>
           <div className="modal-box" style={{ maxWidth: "860px", width: "95%" }} onClick={e => e.stopPropagation()}>
-            <button onClick={() => setShowComparisonModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
-            <div className="section-label" style={{ marginBottom: "6px" }}>Side by Side</div>
-            <h3 style={{ fontSize: "22px", fontWeight: 800, color: "#f1f5f9", marginBottom: "24px" }}>Business Comparison</h3>
+            <button onClick={() => setShowComparisonModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justify: "center" }}>✕</button>
+            <div className="section-label" style={{ marginBottom: "6px" }}>Side-by-Side Review</div>
+            <h3 style={{ fontSize: "22px", fontWeight: 800, color: "#f8fafc", marginBottom: "24px" }}>Business Comparison</h3>
             <div style={{ display: "grid", gridTemplateColumns: `repeat(${comparisonData.length}, 1fr)`, gap: "16px" }}>
               {comparisonData.map(biz => (
-                <div key={biz._id} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(56,189,248,0.12)", borderRadius: "14px", padding: "20px" }}>
-                  <div style={{ fontSize: "16px", fontWeight: 800, color: "#38bdf8", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>{biz.name}</div>
+                <div key={biz._id} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(251, 191, 36, 0.15)", borderRadius: "16px", padding: "20px" }}>
+                  <div style={{ fontSize: "16px", fontWeight: 800, color: "#fbbf24", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{biz.name}</div>
                   {[
                     ["Category", biz.categories?.join(", ")],
                     ["Location", `${biz.location?.town}, ${biz.location?.county}`],
-                    ["Rating", biz.rating ? `★ ${biz.rating}` : "N/A"],
-                    ["Reviews", biz.reviewCount || 0],
-                    ["Price Range", biz.priceRange || "N/A"],
-                    ["Est.", biz.yearEstablished || "N/A"],
-                    ["Phone", biz.contact?.phone || "N/A"],
-                    ["Email", biz.contact?.email || "N/A"],
+                    ["Rating", biz.rating ? `★ ${biz.rating}` : "No rating"],
+                    ["Reviews count", biz.reviewCount || 0],
+                    ["Price Guide", biz.priceRange || "N/A"],
+                    ["Founded Year", biz.yearEstablished || "N/A"],
+                    ["Contact Phone", biz.contact?.phone || "N/A"],
+                    ["Contact Email", biz.contact?.email || "N/A"],
                   ].map(([label, val]) => (
-                    <div key={label} style={{ marginBottom: "10px" }}>
-                      <div style={{ fontSize: "11px", color: "#475569", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: "2px" }}>{label}</div>
-                      <div style={{ fontSize: "13px", color: "#cbd5e1" }}>{val}</div>
+                    <div key={label} style={{ marginBottom: "12px" }}>
+                      <div style={{ fontSize: "10.5px", color: "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "2px" }}>{label}</div>
+                      <div style={{ fontSize: "13px", color: "#e2e8f0" }}>{val}</div>
                     </div>
                   ))}
                 </div>
@@ -971,35 +1002,35 @@ export default function AxxBiashara() {
         </div>
       )}
 
-      {/* ── FOOTER ── */}
-      <footer style={{ background: "#06070d", borderTop: "1px solid rgba(255,255,255,0.06)", padding: "48px 24px 28px" }}>
+      {/* ── DIRECTORY FOOTER ── */}
+      <footer style={{ background: "#07090f", borderTop: "1px solid rgba(255,255,255,0.05)", padding: "56px 24px 32px" }}>
         <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "32px", marginBottom: "36px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "32px", marginBottom: "40px" }}>
             <div>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "linear-gradient(135deg,#0ea5e9,#38bdf8)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px" }}><img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "28px", height: "28px", objectFit: "cover", borderRadius: "6px" }} /></div>
-                <span style={{ fontSize: "18px", fontWeight: 800, color: "#f1f5f9" }}>AxxBiashara</span>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
+                <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(251,191,36,0.1)", display: "flex", alignItems: "center", justify: "center" }}><img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "24px", height: "24px", objectFit: "cover", borderRadius: "6px" }} /></div>
+                <span style={{ fontSize: "18px", fontWeight: 800, color: "#f8fafc" }}>AxxBiashara</span>
               </div>
-              <p style={{ fontSize: "13px", color: "#475569", lineHeight: "1.6" }}>Kenya's premier verified business directory.</p>
+              <p style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.6" }}>Kenya's premier verified business directory connecting users to counties.</p>
             </div>
             <div>
-              <div style={{ fontSize: "12px", fontWeight: 700, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "14px" }}>Support</div>
-              {["info@axxspace.com", "support@axxspace.com", "admin@axxspace.com"].map(e => (
+              <div style={{ fontSize: "11px", fontWeight: 800, color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "16px" }}>Directory Contacts</div>
+              {["info@axxspace.com", "support@axxspace.com"].map(e => (
                 <a
                   key={e}
                   href={`mailto:${e}`}
                   style={{ display: "block", fontSize: "13px", color: "#64748b", marginBottom: "8px", textDecoration: "none", transition: "color 0.2s" }}
-                  onMouseEnter={ev => ev.target.style.color = "#38bdf8"}
+                  onMouseEnter={ev => ev.target.style.color = "#fbbf24"}
                   onMouseLeave={ev => ev.target.style.color = "#64748b"}
                 >
-                  📧 {e}
+                  ✉ {e}
                 </a>
               ))}
             </div>
           </div>
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "20px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
-            <p style={{ fontSize: "12px", color: "#334155" }}>© 2026 Axxspace. All rights reserved.</p>
-            <p style={{ fontSize: "12px", color: "#1e3a5f" }}>Built for Kenya 🇰🇪</p>
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "24px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
+            <p style={{ fontSize: "12px", color: "#475569" }}>© 2026 Axxspace. All rights reserved.</p>
+            <p style={{ fontSize: "12.5px", color: "#fbbf24", fontWeight: 700 }}>Built for Kenya 🇰🇪</p>
           </div>
         </div>
       </footer>

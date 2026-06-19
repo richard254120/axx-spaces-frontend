@@ -211,7 +211,7 @@ export default function BusinessDetail() {
     <div style={styles.container}>
       <div style={styles.header}>
         <h1 style={styles.title}>Business Details</h1>
-        <button style={styles.backButton} onClick={() => navigate("/admin")}>
+        <button style={styles.backButton} onClick={() => navigate("/")}>
           ← Back to Dashboard
         </button>
       </div>

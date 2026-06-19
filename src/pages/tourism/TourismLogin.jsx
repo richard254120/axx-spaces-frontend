@@ -257,6 +257,7 @@ export default function TourismLogin() {
           email: googleUser.email,
           name: googleUser.name,
           picture: googleUser.picture,
+          role: "landlord",
         }),
       });
 
@@ -266,7 +267,7 @@ export default function TourismLogin() {
         throw new Error(data.error || "Google authentication failed");
       }
 
-      if (data.user.role !== "tourism_provider") {
+      if (data.user.role !== "landlord") {
         throw new Error("This login is for tourism providers only");
       }
 
@@ -307,7 +308,7 @@ export default function TourismLogin() {
       const response = await fetch(`${import.meta.env.VITE_API_BASE}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, role: "landlord" }),
       });
 
       const data = await response.json();
@@ -316,7 +317,7 @@ export default function TourismLogin() {
         throw new Error(data.error || "Login failed");
       }
 
-      if (data.user.role !== "tourism_provider") {
+      if (data.user.role !== "landlord") {
         throw new Error("This login is for tourism providers only");
       }
 
@@ -354,7 +355,7 @@ export default function TourismLogin() {
       const response = await fetch(`${import.meta.env.VITE_API_BASE}/api/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: forgotEmail }),
+        body: JSON.stringify({ email: forgotEmail, role: "landlord" }),
       });
 
       const data = await response.json();

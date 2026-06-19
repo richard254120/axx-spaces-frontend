@@ -4,6 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import { UserProfileEditor, ProfileAvatar } from "../features/profile";
 import VerificationStatus from "../components/VerificationStatus";
 import BoostNotification from "../components/BoostNotification";
+import AnalyticsDashboard from "../components/AnalyticsDashboard";
 
 import { getDashboardPath } from "../utils/dashboardRoutes";
 
@@ -206,6 +207,12 @@ export default function SellerDashboard() {
       <div style={{ marginBottom: '24px' }}>
         <VerificationStatus />
       </div>
+
+      {view === "listings" && (
+        <div style={{ marginBottom: '24px' }}>
+          <AnalyticsDashboard userType="seller" userId={seller?._id || seller?.id} />
+        </div>
+      )}
 
       <div style={s.controlsRow}>
         <div style={s.tabs}>

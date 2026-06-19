@@ -30,7 +30,7 @@ export default function MoverRegister() {
     setMessage("");
 
     try {
-      const res = await API.post("/auth/register", formData);
+      const res = await API.post("/auth/register", { ...formData, role: "mover" });
 
       setMessage("✅ Mover registration successful! Please check your email to verify your account.");
       setTimeout(() => {

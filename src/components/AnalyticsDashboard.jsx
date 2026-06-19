@@ -13,43 +13,76 @@ export default function AnalyticsDashboard({ userType = "landlord", userId = nul
     setLoading(true);
     // Simulate loading analytics data
     setTimeout(() => {
-      const mockData = generateMockAnalytics(userType, timeRange);
+      const mockData = generateMockAnalytics(userType, timeRange, userId);
       setAnalytics(mockData);
       setLoading(false);
     }, 500);
   };
 
-  const generateMockAnalytics = (type, range) => {
+  const getSeedFromString = (str) => {
+    let hash = 0;
+    if (!str) return 12345;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return Math.abs(hash);
+  };
+
+  const getSeededRandom = (seed) => {
+    const x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  };
+
+  const generateMockAnalytics = (type, range, uid) => {
+    const seedBase = getSeedFromString(uid || userId || "demo-user");
     const multiplier = range === "7d" ? 1 : range === "30d" ? 4 : 12;
-    
+
+    const r1 = getSeededRandom(seedBase + 1);
+    const r2 = getSeededRandom(seedBase + 2);
+    const r3 = getSeededRandom(seedBase + 3);
+    const r4 = getSeededRandom(seedBase + 4);
+    const r5 = getSeededRandom(seedBase + 5);
+
+    const views = Math.floor(r1 * 400 * multiplier) + 80;
+    const inquiries = Math.floor(r2 * 45 * multiplier) + 8;
+    const bookings = Math.max(1, Math.floor(r3 * 15 * multiplier));
+    const revenue = Math.floor(r4 * 80000 * multiplier) + 5000;
+    const conversionRate = (r5 * 8 + 2).toFixed(1);
+
     const baseData = {
-      views: Math.floor(Math.random() * 500 * multiplier) + 100,
-      inquiries: Math.floor(Math.random() * 50 * multiplier) + 10,
-      bookings: Math.floor(Math.random() * 20 * multiplier) + 2,
-      revenue: Math.floor(Math.random() * 100000 * multiplier) + 10000,
-      conversionRate: (Math.random() * 10 + 2).toFixed(1),
+      views,
+      inquiries,
+      bookings,
+      revenue,
+      conversionRate,
     };
 
     if (type === "landlord") {
+      const r6 = getSeededRandom(seedBase + 6);
+      const r7 = getSeededRandom(seedBase + 7);
       return {
         ...baseData,
-        propertiesListed: Math.floor(Math.random() * 10) + 1,
-        averageResponseTime: Math.floor(Math.random() * 60) + 15,
-        topProperty: "Nairobi Apartment",
+        propertiesListed: Math.floor(r6 * 6) + 1,
+        averageResponseTime: Math.floor(r7 * 40) + 10,
+        topProperty: "Axx Space Premier",
       };
     } else if (type === "mover") {
+      const r6 = getSeededRandom(seedBase + 6);
+      const r7 = getSeededRandom(seedBase + 7);
       return {
         ...baseData,
-        jobsCompleted: Math.floor(Math.random() * 30 * multiplier) + 5,
-        averageRating: (Math.random() * 2 + 3).toFixed(1),
-        repeatCustomers: Math.floor(Math.random() * 20) + 5,
+        jobsCompleted: Math.max(1, Math.floor(r6 * 20 * multiplier)),
+        averageRating: (r7 * 1.2 + 3.8).toFixed(1),
+        repeatCustomers: Math.floor(r7 * 20) + 5,
       };
     } else if (type === "seller") {
+      const r6 = getSeededRandom(seedBase + 6);
+      const r7 = getSeededRandom(seedBase + 7);
       return {
         ...baseData,
-        itemsSold: Math.floor(Math.random() * 50 * multiplier) + 10,
-        averageOrderValue: Math.floor(Math.random() * 5000) + 1000,
-        totalListings: Math.floor(Math.random() * 20) + 5,
+        itemsSold: Math.floor(r6 * 35 * multiplier) + 5,
+        averageOrderValue: Math.floor(r7 * 4000) + 800,
+        totalListings: Math.floor(r6 * 12) + 2,
       };
     }
 
@@ -127,7 +160,7 @@ export default function AnalyticsDashboard({ userType = "landlord", userId = nul
       <div style={styles.chartsSection}>
         <div style={styles.chartCard}>
           <h3 style={styles.chartTitle}>Performance Over Time</h3>
-          <SimpleLineChart data={generateChartData(timeRange)} />
+          <SimpleLineChart data={generateChartData(timeRange, userId)} />
         </div>
 
         <div style={styles.chartCard}>
@@ -209,23 +242,46 @@ function MetricCard({ icon, label, value, change, positive }) {
 }
 
 function SimpleLineChart({ data }) {
-  const maxValue = Math.max(...data.map(d => d.value));
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+  const maxValue = Math.max(...data.map(d => d.value), 1);
   
   return (
     <div style={styles.chartContainer}>
       <div style={styles.chartBars}>
-        {data.map((point, index) => (
-          <div key={index} style={styles.chartBarWrapper}>
-            <div
-              style={{
-                ...styles.chartBar,
-                height: `${(point.value / maxValue) * 100}%`,
-                background: `linear-gradient(180deg, #3b82f6, #2563eb)`,
-              }}
-            />
-            <span style={styles.chartLabel}>{point.label}</span>
-          </div>
-        ))}
+        {data.map((point, index) => {
+          const heightPercent = (point.value / maxValue) * 100;
+          const isHovered = hoveredIndex === index;
+          return (
+            <div 
+              key={index} 
+              style={styles.chartBarWrapper}
+              onMouseEnter={() => setHoveredIndex(index)}
+              onMouseLeave={() => setHoveredIndex(null)}
+            >
+              {isHovered && (
+                <div style={styles.tooltip}>
+                  <div style={styles.tooltipValue}>{point.value} views</div>
+                </div>
+              )}
+              <div
+                style={{
+                  ...styles.chartBar,
+                  height: `${heightPercent}%`,
+                  background: isHovered 
+                    ? "linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%)" 
+                    : "linear-gradient(180deg, #3b82f6 0%, #2563eb 100%)",
+                  boxShadow: isHovered ? "0 0 12px rgba(251, 191, 36, 0.5)" : "none",
+                  transform: isHovered ? "scaleX(1.15)" : "none",
+                }}
+              />
+              <span style={{
+                ...styles.chartLabel,
+                color: isHovered ? "#fbbf24" : "#64748b",
+                fontWeight: isHovered ? "bold" : "normal"
+              }}>{point.label}</span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -270,7 +326,22 @@ function ConversionFunnel({ analytics }) {
   );
 }
 
-function generateChartData(range) {
+function generateChartData(range, userId) {
+  const getSeedFromString = (str) => {
+    let hash = 0;
+    if (!str) return 12345;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return Math.abs(hash);
+  };
+
+  const getSeededRandom = (seed) => {
+    const x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  };
+
+  const seedBase = getSeedFromString(userId || "demo-user");
   const days = range === "7d" ? 7 : range === "30d" ? 30 : 90;
   const data = [];
   const labels = range === "7d" 
@@ -280,9 +351,13 @@ function generateChartData(range) {
     : Array.from({ length: 90 }, (_, i) => `Day ${i + 1}`);
 
   for (let i = 0; i < days; i++) {
+    const randValue = getSeededRandom(seedBase + i);
+    const cycle = Math.sin((i / 7) * 2 * Math.PI) * 12;
+    const baseVal = range === "7d" ? 25 : range === "30d" ? 45 : 70;
+    const value = Math.max(4, Math.floor(baseVal + cycle + (randValue * 30)));
     data.push({
       label: labels[i] || `Day ${i + 1}`,
-      value: Math.floor(Math.random() * 100) + 20,
+      value,
     });
   }
 
@@ -415,11 +490,32 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
+    position: "relative",
+    height: "100%",
+    justifyContent: "flex-end",
+  },
+  tooltip: {
+    position: "absolute",
+    bottom: "calc(100% + 8px)",
+    background: "#0f172a",
+    border: "1px solid #334155",
+    color: "#f1f5f9",
+    padding: "4px 8px",
+    borderRadius: "4px",
+    fontSize: "0.75rem",
+    fontWeight: "bold",
+    whiteSpace: "nowrap",
+    zIndex: 10,
+    pointerEvents: "none",
+    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+  },
+  tooltipValue: {
+    color: "#fbbf24",
   },
   chartBar: {
     width: "100%",
     borderRadius: "4px 4px 0 0",
-    transition: "height 0.3s ease",
+    transition: "all 0.25s ease",
     minHeight: "4px",
   },
   chartLabel: {

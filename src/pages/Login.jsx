@@ -39,6 +39,7 @@ export default function Login() {
           email: googleUser.email,
           name: googleUser.name,
           picture: googleUser.picture,
+          role: loginType === "mover" ? "mover" : "landlord",
         }),
       });
 
@@ -81,7 +82,7 @@ export default function Login() {
       const response = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, role: loginType === "mover" ? "mover" : "landlord" }),
       });
 
       const data = await response.json();
@@ -122,7 +123,7 @@ export default function Login() {
       const response = await fetch(`${API_BASE}/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: forgotEmail }),
+        body: JSON.stringify({ email: forgotEmail, role: loginType === "mover" ? "mover" : "landlord" }),
       });
 
       const data = await response.json();
