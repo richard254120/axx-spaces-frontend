@@ -39,16 +39,58 @@ export default function PropertyCard({ property: p, onOpen }) {
 
         {/* Verification Badges */}
         {p.owner?.verificationBadges && p.owner.verificationBadges.length > 0 && (
-          <div style={{ display: "flex", gap: "6px", marginTop: "8px", flexWrap: "wrap" }}>
-            {p.owner.verificationBadges.map((badgeId) => (
-              <img
-                key={badgeId}
-                src={BADGE_IMAGES[badgeId]}
-                alt={badgeId}
-                style={{ width: "24px", height: "24px", objectFit: "contain", borderRadius: "4px" }}
-                title={badgeId.replace(/_/g, ' ').toUpperCase()}
-              />
-            ))}
+          <div style={{
+            marginTop: "10px",
+            padding: "8px",
+            background: "linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(14, 165, 233, 0.02) 100%)",
+            borderRadius: "8px",
+            border: "1px solid rgba(14, 165, 233, 0.2)"
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+              <span style={{ fontSize: 11 }}>✅</span>
+              <span style={{ fontSize: 10, fontWeight: 600, color: "#0ea5e9" }}>Verified Owner</span>
+            </div>
+            <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+              {p.owner.verificationBadges.map((badgeId) => (
+                <div key={badgeId} style={{ position: "relative", display: "inline-block" }}>
+                  <img
+                    src={BADGE_IMAGES[badgeId]}
+                    alt={badgeId}
+                    style={{
+                      width: "28px",
+                      height: "28px",
+                      objectFit: "contain",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                      transition: "transform 0.2s"
+                    }}
+                    title={badgeId.replace(/_/g, ' ').toUpperCase()}
+                  />
+                  <div style={{
+                    position: "absolute",
+                    bottom: "100%",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    background: "#1e293b",
+                    color: "#f1f5f9",
+                    padding: "4px 8px",
+                    borderRadius: "4px",
+                    fontSize: "9px",
+                    fontWeight: 600,
+                    whiteSpace: "nowrap",
+                    opacity: 0,
+                    visibility: "hidden",
+                    transition: "all 0.2s",
+                    marginBottom: "4px",
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+                    zIndex: 10,
+                    pointerEvents: "none"
+                  }}>
+                    {badgeId.replace(/_/g, ' ').toUpperCase()}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

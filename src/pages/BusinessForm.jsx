@@ -632,7 +632,11 @@ const styles = {
 const BUSINESS_CATEGORIES = [
   "Restaurants", "Retail", "Services", "Technology", "Healthcare", "Education",
   "Entertainment", "Professional Services", "Manufacturing", "Agriculture",
-  "Construction", "Transportation", "Other",
+  "Construction", "Transportation", "Fashions", "Beauty & Wellness", "Automotive",
+  "Real Estate", "Financial Services", "Hospitality", "Sports & Fitness",
+  "Arts & Crafts", "Food & Beverage", "Home Services", "Legal Services",
+  "Media & Communications", "Non-Profit", "Pet Services", "Travel & Tourism",
+  "Wholesale", "E-commerce", "Other",
 ];
 
 const KENYA_COUNTIES = [

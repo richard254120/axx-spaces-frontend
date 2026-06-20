@@ -1341,39 +1341,76 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
 
                 {!notif.read && (
                   <>
-                    <div style={{ marginTop: 16, padding: "12px", background: "rgba(251, 191, 36, 0.1)", borderRadius: "8px", border: "1px solid rgba(251, 191, 36, 0.3)" }}>
-                      <label style={{ fontSize: 12, fontWeight: 700, color: "#fbbf24", marginBottom: 8, display: "block" }}>
-                        🏅 Issue Verification Badge (Optional)
-                      </label>
-                      <select
-                        style={{
-                          width: "100%",
-                          padding: "8px 12px",
-                          background: "#0f1729",
-                          border: "1px solid rgba(255, 255, 255, 0.2)",
-                          borderRadius: "6px",
-                          color: "#f1f5f9",
-                          fontSize: 12,
-                          cursor: "pointer"
-                        }}
-                        value={selectedBadges[notif._id] || ""}
-                        onChange={(e) => setSelectedBadges(prev => ({ ...prev, [notif._id]: e.target.value }))}
-                      >
-                        <option value="">No Badge</option>
+                    <div style={{ marginTop: 16, padding: "16px", background: "linear-gradient(135deg, rgba(251, 191, 36, 0.08) 0%, rgba(251, 191, 36, 0.02) 100%)", borderRadius: "12px", border: "1px solid rgba(251, 191, 36, 0.25)" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                        <span style={{ fontSize: 16 }}>🏅</span>
+                        <label style={{ fontSize: 13, fontWeight: 700, color: "#fbbf24", letterSpacing: "0.5px" }}>
+                          ISSUE VERIFICATION BADGE
+                        </label>
+                      </div>
+
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))", gap: 8, marginBottom: 12 }}>
+                        <div
+                          onClick={() => setSelectedBadges(prev => ({ ...prev, [notif._id]: "" }))}
+                          style={{
+                            padding: "10px 8px",
+                            background: selectedBadges[notif._id] === "" ? "rgba(251, 191, 36, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                            border: selectedBadges[notif._id] === "" ? "2px solid #fbbf24" : "1px solid rgba(255, 255, 255, 0.1)",
+                            borderRadius: "8px",
+                            cursor: "pointer",
+                            textAlign: "center",
+                            transition: "all 0.2s"
+                          }}
+                        >
+                          <div style={{ fontSize: 20, marginBottom: 4 }}>❌</div>
+                          <div style={{ fontSize: 10, color: "#94a3b8" }}>No Badge</div>
+                        </div>
                         {VERIFICATION_BADGES.map(badge => (
-                          <option key={badge.id} value={badge.id}>{badge.name}</option>
+                          <div
+                            key={badge.id}
+                            onClick={() => setSelectedBadges(prev => ({ ...prev, [notif._id]: badge.id }))}
+                            style={{
+                              padding: "10px 8px",
+                              background: selectedBadges[notif._id] === badge.id ? "rgba(251, 191, 36, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                              border: selectedBadges[notif._id] === badge.id ? "2px solid #fbbf24" : "1px solid rgba(255, 255, 255, 0.1)",
+                              borderRadius: "8px",
+                              cursor: "pointer",
+                              textAlign: "center",
+                              transition: "all 0.2s"
+                            }}
+                          >
+                            <img
+                              src={badge.image}
+                              alt={badge.name}
+                              style={{ width: 32, height: 32, objectFit: "contain", marginBottom: 4 }}
+                            />
+                            <div style={{ fontSize: 9, color: "#94a3b8", lineHeight: 1.2 }}>{badge.name}</div>
+                          </div>
                         ))}
-                      </select>
+                      </div>
+
                       {selectedBadges[notif._id] && (
-                        <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8 }}>
-                          <img
-                            src={VERIFICATION_BADGES.find(b => b.id === selectedBadges[notif._id])?.image}
-                            alt="Badge Preview"
-                            style={{ width: 40, height: 40, objectFit: "contain" }}
-                          />
-                          <span style={{ fontSize: 11, color: "#94a3b8" }}>
-                            {VERIFICATION_BADGES.find(b => b.id === selectedBadges[notif._id])?.name}
-                          </span>
+                        <div style={{
+                          padding: "10px",
+                          background: "rgba(251, 191, 36, 0.15)",
+                          borderRadius: "8px",
+                          border: "1px solid rgba(251, 191, 36, 0.3)"
+                        }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                            <img
+                              src={VERIFICATION_BADGES.find(b => b.id === selectedBadges[notif._id])?.image}
+                              alt="Badge Preview"
+                              style={{ width: 48, height: 48, objectFit: "contain" }}
+                            />
+                            <div>
+                              <div style={{ fontSize: 12, fontWeight: 700, color: "#fbbf24" }}>
+                                {VERIFICATION_BADGES.find(b => b.id === selectedBadges[notif._id])?.name}
+                              </div>
+                              <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>
+                                Badge will be awarded to user upon payment confirmation
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>

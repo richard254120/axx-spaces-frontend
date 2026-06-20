@@ -111,6 +111,36 @@ export default function ProfilePage() {
           <Link to="/settings" style={styles.editBtn}>Edit Profile</Link>
         </div>
 
+        {/* Verification Badges Section */}
+        <div style={styles.badgeSection}>
+          <h3 style={styles.sectionTitle}>🏅 Verification Badges</h3>
+          {profile?.verificationBadges && profile.verificationBadges.length > 0 ? (
+            <div style={styles.badgeGrid}>
+              {profile.verificationBadges.map((badgeId) => (
+                <div key={badgeId} style={styles.badgeCard}>
+                  <img
+                    src={`/${badgeId.replace(/_/g, ' ')}.png`}
+                    alt={badgeId}
+                    style={styles.badgeImage}
+                  />
+                  <div style={styles.badgeName}>
+                    {badgeId.replace(/_/g, ' ').toUpperCase()}
+                  </div>
+                  <div style={styles.badgeStatus}>✓ Active</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={styles.noBadges}>
+              <span style={styles.noBadgesIcon}>🏅</span>
+              <div style={styles.noBadgesText}>No verification badges yet</div>
+              <div style={styles.noBadgesSubtext}>
+                Complete payments and get verified by admins to earn badges
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Quick Stats */}
         <div style={styles.statsGrid}>
           <Link to="/wallet" style={styles.statCard}>
@@ -310,6 +340,65 @@ const styles = {
     borderRadius: 16,
     padding: 24,
     marginBottom: 24,
+  },
+  badgeSection: {
+    background: "rgba(30,41,59,0.8)",
+    border: "1px solid rgba(255,255,255,0.1)",
+    borderRadius: 16,
+    padding: 24,
+    marginBottom: 24,
+  },
+  badgeGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+    gap: 16,
+  },
+  badgeCard: {
+    background: "rgba(15,23,42,0.5)",
+    border: "1px solid rgba(251,191,36,0.2)",
+    borderRadius: 12,
+    padding: 16,
+    textAlign: "center",
+    transition: "all 0.2s",
+  },
+  badgeImage: {
+    width: 64,
+    height: 64,
+    objectFit: "contain",
+    marginBottom: 12,
+  },
+  badgeName: {
+    color: "#f1f5f9",
+    fontSize: "0.85rem",
+    fontWeight: 600,
+    marginBottom: 6,
+  },
+  badgeStatus: {
+    color: "#22c55e",
+    fontSize: "0.75rem",
+    fontWeight: 700,
+  },
+  noBadges: {
+    textAlign: "center",
+    padding: "40px 20px",
+    background: "rgba(15,23,42,0.3)",
+    borderRadius: 12,
+    border: "1px dashed rgba(255,255,255,0.1)",
+  },
+  noBadgesIcon: {
+    fontSize: "3rem",
+    marginBottom: 12,
+    display: "block",
+  },
+  noBadgesText: {
+    color: "#f1f5f9",
+    fontSize: "1rem",
+    fontWeight: 600,
+    marginBottom: 6,
+  },
+  noBadgesSubtext: {
+    color: "#94a3b8",
+    fontSize: "0.85rem",
   },
 };
 

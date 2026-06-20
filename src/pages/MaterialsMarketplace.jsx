@@ -468,16 +468,26 @@ export default function MaterialsMarketplace() {
 
                     {/* Verification Badges */}
                     {material.seller?.verificationBadges && material.seller.verificationBadges.length > 0 && (
-                      <div style={styles.badgeContainer}>
-                        {material.seller.verificationBadges.map((badgeId) => (
-                          <img
-                            key={badgeId}
-                            src={`/${badgeId.replace(/_/g, ' ')}.png`}
-                            alt={badgeId}
-                            style={styles.badgeImage}
-                            title={badgeId.replace(/_/g, ' ').toUpperCase()}
-                          />
-                        ))}
+                      <div style={styles.badgeSection}>
+                        <div style={styles.badgeSectionLabel}>
+                          <span style={{ fontSize: 12 }}>✅</span>
+                          <span style={{ fontSize: 11, fontWeight: 600, color: "#0ea5e9" }}>Verified Seller</span>
+                        </div>
+                        <div style={styles.badgeContainer}>
+                          {material.seller.verificationBadges.map((badgeId) => (
+                            <div key={badgeId} style={styles.badgeWrapper}>
+                              <img
+                                src={`/${badgeId.replace(/_/g, ' ')}.png`}
+                                alt={badgeId}
+                                style={styles.badgeImage}
+                                title={badgeId.replace(/_/g, ' ').toUpperCase()}
+                              />
+                              <div style={styles.badgeTooltip}>
+                                {badgeId.replace(/_/g, ' ').toUpperCase()}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
 
@@ -1071,17 +1081,62 @@ const styles = {
     fontSize: "13px",
     color: COLORS.accent,
   },
+  badgeSection: {
+    marginTop: "12px",
+    padding: "10px",
+    background: "linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(14, 165, 233, 0.02) 100%)",
+    borderRadius: "8px",
+    border: "1px solid rgba(14, 165, 233, 0.2)",
+  },
+  badgeSectionLabel: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    marginBottom: "8px",
+  },
   badgeContainer: {
     display: "flex",
     gap: "6px",
-    marginTop: "8px",
     flexWrap: "wrap",
   },
+  badgeWrapper: {
+    position: "relative",
+    display: "inline-block",
+  },
+  "badgeWrapper:hover .badgeTooltip": {
+    opacity: 1,
+    visibility: "visible",
+  },
+  "badgeWrapper:hover .badgeImage": {
+    transform: "scale(1.1)",
+  },
   badgeImage: {
-    width: "28px",
-    height: "28px",
+    width: "32px",
+    height: "32px",
     objectFit: "contain",
-    borderRadius: "4px",
+    borderRadius: "6px",
+    cursor: "pointer",
+    transition: "transform 0.2s",
+  },
+  badgeTooltip: {
+    position: "absolute",
+    bottom: "100%",
+    left: "50%",
+    transform: "translateX(-50%)",
+    background: "#1e293b",
+    color: "#f1f5f9",
+    padding: "6px 10px",
+    borderRadius: "6px",
+    fontSize: "10px",
+    fontWeight: 600,
+    whiteSpace: "nowrap",
+    opacity: 0,
+    visibility: "hidden",
+    transition: "all 0.2s",
+    marginBottom: "4px",
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+    zIndex: 10,
+    pointerEvents: "none",
   },
   engagementStats: {
     display: "flex",
