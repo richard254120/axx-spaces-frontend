@@ -2,6 +2,15 @@ export default function PropertyCard({ property, isOwner = false, onDelete }) {
   const status = property.status || "pending";
   const isApproved = status === "approved";
 
+  const BADGE_IMAGES = {
+    student_verified: "/Student Verified.png",
+    business_verified: "/Business Verified.png",
+    identity_verified: "/Identity Verified.png",
+    location_verified: "/Locationn Verified.png",
+    online_verified: "/Online Verified.png",
+    premium_verified: "/Premium Verified.png",
+  };
+
   return (
     <div style={styles.card}>
       {/* ✅ FIXED: Image Gallery - Shows ALL images! */}
@@ -25,6 +34,21 @@ export default function PropertyCard({ property, isOwner = false, onDelete }) {
         {property.area}, {property.county}
       </p>
       <h4 style={styles.price}>KSh {Number(property.price).toLocaleString()}</h4>
+
+      {/* Verification Badges */}
+      {property.owner?.verificationBadges && property.owner.verificationBadges.length > 0 && (
+        <div style={styles.badgeContainer}>
+          {property.owner.verificationBadges.map((badgeId) => (
+            <img
+              key={badgeId}
+              src={BADGE_IMAGES[badgeId]}
+              alt={badgeId}
+              style={styles.badgeImage}
+              title={badgeId.replace(/_/g, ' ').toUpperCase()}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Status Display */}
       <div style={{
@@ -61,7 +85,7 @@ const styles = {
     marginBottom: "20px",
     border: "1px solid #222",
   },
-  
+
   // ✅ NEW: Image Gallery Container
   imageGallery: {
     display: "grid",
@@ -69,7 +93,7 @@ const styles = {
     gap: "8px",
     marginBottom: "12px",
   },
-  
+
   image: {
     width: "100%",
     height: "120px",  // ✅ Reduced height for multiple images
@@ -78,7 +102,7 @@ const styles = {
     cursor: "pointer",
     transition: "transform 0.2s",
   },
-  
+
   noImage: {
     width: "100%",
     height: "120px",
@@ -91,7 +115,7 @@ const styles = {
     color: "#666",
     fontSize: "14px",
   },
-  
+
   title: {
     margin: "10px 0 6px 0",
     color: "#fff",
@@ -114,6 +138,18 @@ const styles = {
     fontSize: "14px",
     fontWeight: "bold",
     marginTop: "8px",
+  },
+  badgeContainer: {
+    display: "flex",
+    gap: "8px",
+    marginTop: "8px",
+    flexWrap: "wrap",
+  },
+  badgeImage: {
+    width: "32px",
+    height: "32px",
+    objectFit: "contain",
+    borderRadius: "4px",
   },
   imageCount: {
     color: "#0a84ff",

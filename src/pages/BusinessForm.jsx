@@ -3,6 +3,84 @@ import { useNavigate, useParams } from "react-router-dom";
 import API from "../api/api";
 import PhoneInput from "../components/PhoneInput";
 
+/* ── Multi-select dropdown component ── */
+function MultiSelectDropdown({ options, selected, onChange, label }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [hoveredOption, setHoveredOption] = useState(null);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const toggleOption = (option) => {
+    if (selected.includes(option)) {
+      onChange(selected.filter(item => item !== option));
+    } else {
+      onChange([...selected, option]);
+    }
+  };
+
+  return (
+    <div style={styles.multiSelectContainer} ref={dropdownRef}>
+      <div
+        style={styles.multiSelectButton}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <div style={styles.selectedCategoriesDisplay}>
+          {selected.length === 0 ? (
+            <span style={styles.multiSelectButtonPlaceholder}>Select categories...</span>
+          ) : (
+            selected.map(cat => (
+              <span key={cat} style={styles.selectedCategoryTag}>{cat}</span>
+            ))
+          )}
+        </div>
+        <span style={{
+          ...styles.dropdownArrow,
+          ...(isOpen ? styles.dropdownArrowOpen : {})
+        }}>
+          ▼
+        </span>
+      </div>
+
+      {isOpen && (
+        <div style={styles.multiSelectDropdown}>
+          {options.map(option => (
+            <div
+              key={option}
+              style={{
+                ...styles.multiSelectOption,
+                ...(selected.includes(option) ? styles.multiSelectOptionSelected : {}),
+                ...(hoveredOption === option ? styles.multiSelectOptionHover : {}),
+              }}
+              onClick={() => toggleOption(option)}
+              onMouseEnter={() => setHoveredOption(option)}
+              onMouseLeave={() => setHoveredOption(null)}
+            >
+              <input
+                type="checkbox"
+                checked={selected.includes(option)}
+                onChange={() => toggleOption(option)}
+                style={styles.multiSelectCheckbox}
+                onClick={(e) => e.stopPropagation()}
+              />
+              {option}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const styles = {
   container: {
     minHeight: "100vh",
@@ -101,6 +179,124 @@ const styles = {
     background: "#60a5fa",
     color: "#0f172a",
     border: "1px solid #60a5fa",
+  },
+  /* ── Multi-select dropdown styles ── */
+  multiSelectContainer: {
+    position: "relative",
+    marginBottom: "15px",
+  },
+  multiSelectButton: {
+    width: "100%",
+    padding: "12px 16px",
+    background: "rgba(15, 23, 42, 0.5)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    borderRadius: "10px",
+    color: "#f1f5f9",
+    fontSize: "16px",
+    cursor: "pointer",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    minHeight: "48px",
+    boxSizing: "border-box",
+  },
+  multiSelectButtonPlaceholder: {
+    color: "#94a3b8",
+  },
+  multiSelectDropdown: {
+    position: "absolute",
+    top: "100%",
+    left: 0,
+    right: 0,
+    background: "rgba(30, 41, 59, 0.95)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    borderRadius: "10px",
+    marginTop: "8px",
+    maxHeight: "300px",
+    overflowY: "auto",
+    zIndex: 1000,
+    boxShadow: "0 10px 40px rgba(0, 0, 0, 0.3)",
+  },
+  multiSelectOption: {
+    padding: "12px 16px",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    transition: "background 0.2s",
+    borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+  },
+  multiSelectOptionHover: {
+    background: "rgba(96, 165, 250, 0.1)",
+  },
+  multiSelectOptionSelected: {
+    background: "rgba(96, 165, 250, 0.2)",
+  },
+  multiSelectCheckbox: {
+    width: "18px",
+    height: "18px",
+    accentColor: "#60a5fa",
+  },
+  selectedCategoriesDisplay: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "6px",
+    maxWidth: "calc(100% - 30px)",
+  },
+  selectedCategoryTag: {
+    background: "#60a5fa",
+    color: "#0f172a",
+    padding: "4px 10px",
+    borderRadius: "12px",
+    fontSize: "13px",
+    fontWeight: 600,
+  },
+  dropdownArrow: {
+    transition: "transform 0.3s",
+  },
+  dropdownArrowOpen: {
+    transform: "rotate(180deg)",
+  },
+  /* ── Upload progress styles ── */
+  uploadProgressContainer: {
+    background: "rgba(15, 23, 42, 0.5)",
+    border: "1px solid rgba(96, 165, 250, 0.3)",
+    borderRadius: "10px",
+    padding: "16px",
+    marginBottom: "16px",
+  },
+  uploadProgressHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "12px",
+  },
+  uploadProgressTitle: {
+    fontSize: "14px",
+    fontWeight: 600,
+    color: "#60a5fa",
+  },
+  uploadProgressCount: {
+    fontSize: "13px",
+    color: "#94a3b8",
+  },
+  uploadProgressBar: {
+    height: "8px",
+    background: "rgba(255, 255, 255, 0.1)",
+    borderRadius: "4px",
+    overflow: "hidden",
+    marginBottom: "8px",
+  },
+  uploadProgressFill: {
+    height: "100%",
+    background: "linear-gradient(90deg, #60a5fa, #3b82f6)",
+    borderRadius: "4px",
+    transition: "width 0.3s ease",
+  },
+  uploadProgressText: {
+    fontSize: "12px",
+    color: "#94a3b8",
+    textAlign: "center",
   },
   button: {
     width: "100%",
@@ -501,6 +697,8 @@ export default function BusinessForm() {
   const [uploading, setUploading] = useState({ logo: false, photos: false, product: false, pricelist: false });
   const [businessPhotos, setBusinessPhotos] = useState([]);
   const [currentStep, setCurrentStep] = useState(1);
+  const [uploadProgress, setUploadProgress] = useState({ photos: 0, current: 0, total: 0 });
+  const [isUploading, setIsUploading] = useState(false);
 
   const STEPS = [
     { id: 1, title: "Basic Info" },
@@ -542,14 +740,43 @@ export default function BusinessForm() {
     }
   };
 
-  /* ── Category toggle ── */
-  const toggleCategory = (category) => {
-    setFormData(prev => ({
-      ...prev,
-      categories: prev.categories.includes(category)
-        ? prev.categories.filter(c => c !== category)
-        : [...prev.categories, category],
-    }));
+  /* ── Image compression helper ── */
+  const compressImage = (file, maxWidth = 1920, maxHeight = 1080, quality = 0.8) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+          if (height > maxHeight) {
+            width = (width * maxHeight) / height;
+            height = maxHeight;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob(
+            (blob) => {
+              resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
+            },
+            'image/jpeg',
+            quality
+          );
+        };
+      };
+    });
   };
 
   /* ── Upload handlers ── */
@@ -557,9 +784,10 @@ export default function BusinessForm() {
     const file = e.target.files[0];
     if (!file) return;
     setUploading(prev => ({ ...prev, logo: true }));
-    const fd = new FormData();
-    fd.append("logo", file);
     try {
+      const compressedFile = await compressImage(file, 800, 800, 0.85);
+      const fd = new FormData();
+      fd.append("logo", compressedFile);
       const res = await API.post("/uploads/logo", fd, { headers: { "Content-Type": "multipart/form-data" } });
       setFormData(prev => ({ ...prev, logo: res.data.url }));
     } catch {
@@ -572,9 +800,10 @@ export default function BusinessForm() {
   const uploadProductImage = async (file) => {
     if (!file) return "";
     setUploading(prev => ({ ...prev, product: true }));
-    const fd = new FormData();
-    fd.append("image", file);
     try {
+      const compressedFile = await compressImage(file, 600, 600, 0.85);
+      const fd = new FormData();
+      fd.append("image", compressedFile);
       const res = await API.post("/uploads/product-image", fd, { headers: { "Content-Type": "multipart/form-data" } });
       return res.data.url || "";
     } catch {
@@ -611,17 +840,61 @@ export default function BusinessForm() {
       setError("You can upload a maximum of 18 photos");
       return;
     }
+
+    setIsUploading(true);
+    setUploadProgress({ photos: 0, current: 0, total: files.length });
     setUploading(prev => ({ ...prev, photos: true }));
-    const fd = new FormData();
-    files.forEach(f => fd.append("photos", f));
+
     try {
-      const res = await API.post("/uploads/business-photos", fd, { headers: { "Content-Type": "multipart/form-data" } });
-      setBusinessPhotos(prev => [...prev, ...res.data.urls]);
-      setFormData(prev => ({ ...prev, images: [...(prev.images || []), ...res.data.urls] }));
-    } catch {
-      setError("Failed to upload photos");
+      const uploadPromises = files.map(async (file, index) => {
+        try {
+          const compressedFile = await compressImage(file, 1920, 1080, 0.8);
+          const fd = new FormData();
+          fd.append("photo", compressedFile);
+
+          const res = await API.post("/uploads/business-photo", fd, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+
+          setUploadProgress(prev => ({
+            ...prev,
+            current: index + 1,
+            photos: Math.round(((index + 1) / files.length) * 100),
+          }));
+
+          return res.data.url;
+        } catch (error) {
+          console.error(`Failed to upload ${file.name}:`, error);
+          return null;
+        }
+      });
+
+      const uploadedUrls = await Promise.all(uploadPromises);
+      const successfulUrls = uploadedUrls.filter(url => url !== null);
+
+      if (successfulUrls.length === 0) {
+        setError("Failed to upload any photos. Please try again.");
+        return;
+      }
+
+      if (successfulUrls.length < files.length) {
+        setError(`${files.length - successfulUrls.length} photo(s) failed to upload. ${successfulUrls.length} uploaded successfully.`);
+      }
+
+      setBusinessPhotos(prev => [...prev, ...successfulUrls]);
+      setFormData(prev => ({ ...prev, images: [...(prev.images || []), ...successfulUrls] }));
+
+      if (successfulUrls.length === files.length) {
+        setSuccess(`${successfulUrls.length} photo(s) uploaded successfully!`);
+        setTimeout(() => setSuccess(""), 3000);
+      }
+    } catch (error) {
+      setError("Failed to upload photos. Please try again.");
+      console.error("Upload error:", error);
     } finally {
       setUploading(prev => ({ ...prev, photos: false }));
+      setIsUploading(false);
+      setUploadProgress({ photos: 0, current: 0, total: 0 });
     }
   };
 
@@ -678,6 +951,12 @@ export default function BusinessForm() {
 
   /* ── Step navigation ── */
   const validateStep = (step) => {
+    // Prevent navigation if images are still uploading
+    if (isUploading) {
+      setError("Please wait for image uploads to complete before proceeding");
+      return false;
+    }
+
     switch (step) {
       case 1:
         return formData.name && formData.description && formData.categories.length > 0 && formData.submitterName;
@@ -724,6 +1003,19 @@ export default function BusinessForm() {
   /* ── Submit ── */
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Prevent submission if images are still uploading
+    if (isUploading) {
+      setError("Please wait for image uploads to complete before submitting");
+      return;
+    }
+
+    // Validate that at least one image was uploaded if user attempted to upload
+    if (businessPhotos.length === 0 && formData.images && formData.images.length > 0) {
+      setError("Image upload failed. Please try uploading your photos again or remove them from the form.");
+      return;
+    }
+
     setLoading(true);
     setError("");
     setSuccess("");
@@ -913,24 +1205,11 @@ export default function BusinessForm() {
             </select>
 
             <label style={styles.label}>Categories (Select multiple) *</label>
-            <div style={styles.checkboxGroup}>
-              {BUSINESS_CATEGORIES.map(category => (
-                <label
-                  key={category}
-                  style={{
-                    ...styles.checkboxLabel,
-                    ...(formData.categories.includes(category) ? styles.checkboxLabelSelected : {}),
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={formData.categories.includes(category)}
-                    onChange={() => toggleCategory(category)}
-                  />
-                  {category}
-                </label>
-              ))}
-            </div>
+            <MultiSelectDropdown
+              options={BUSINESS_CATEGORIES}
+              selected={formData.categories}
+              onChange={(categories) => setFormData(prev => ({ ...prev, categories }))}
+            />
           </div>
         ) : null}
 
@@ -1097,7 +1376,25 @@ export default function BusinessForm() {
                 onChange={handleBusinessPhotosUpload}
                 disabled={uploading.photos}
               />
-              {uploading.photos && <p style={{ fontSize: "12px", color: "#fbbf24", marginBottom: "8px" }}>Uploading photos...</p>}
+
+              {isUploading && (
+                <div style={styles.uploadProgressContainer}>
+                  <div style={styles.uploadProgressHeader}>
+                    <span style={styles.uploadProgressTitle}>Uploading Photos...</span>
+                    <span style={styles.uploadProgressCount}>{uploadProgress.current} / {uploadProgress.total}</span>
+                  </div>
+                  <div style={styles.uploadProgressBar}>
+                    <div style={{
+                      ...styles.uploadProgressFill,
+                      width: `${uploadProgress.photos}%`,
+                    }} />
+                  </div>
+                  <div style={styles.uploadProgressText}>
+                    {uploadProgress.photos}% complete
+                  </div>
+                </div>
+              )}
+
               <p style={{ fontSize: "12px", color: "#94a3b8" }}>{businessPhotos.length} / 18 photos uploaded</p>
               {businessPhotos.length > 0 && (
                 <div style={{

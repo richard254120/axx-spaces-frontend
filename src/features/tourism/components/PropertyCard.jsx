@@ -1,4 +1,13 @@
 export default function PropertyCard({ property: p, onOpen }) {
+  const BADGE_IMAGES = {
+    student_verified: "/Student Verified.png",
+    business_verified: "/Business Verified.png",
+    identity_verified: "/Identity Verified.png",
+    location_verified: "/Locationn Verified.png",
+    online_verified: "/Online Verified.png",
+    premium_verified: "/Premium Verified.png",
+  };
+
   return (
     <div className="prop-card" onClick={() => onOpen(p.id)} style={{ cursor: "pointer" }}>
       <div style={{
@@ -27,6 +36,22 @@ export default function PropertyCard({ property: p, onOpen }) {
         <div style={{ fontSize: "10px", color: "#6b7280", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.08em", marginBottom: "4px" }}>{p.category}</div>
         <h3 style={{ fontSize: "14px", fontWeight: 800, color: "#1f2937", margin: "0 0 4px", lineHeight: 1.3 }}>{p.name}</h3>
         <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "8px" }}>📍 {p.location}</div>
+
+        {/* Verification Badges */}
+        {p.owner?.verificationBadges && p.owner.verificationBadges.length > 0 && (
+          <div style={{ display: "flex", gap: "6px", marginTop: "8px", flexWrap: "wrap" }}>
+            {p.owner.verificationBadges.map((badgeId) => (
+              <img
+                key={badgeId}
+                src={BADGE_IMAGES[badgeId]}
+                alt={badgeId}
+                style={{ width: "24px", height: "24px", objectFit: "contain", borderRadius: "4px" }}
+                title={badgeId.replace(/_/g, ' ').toUpperCase()}
+              />
+            ))}
+          </div>
+        )}
+
         {(p.amenities || []).slice(0, 4).map((a) => (
           <span key={a} style={{ background: "#f3f4f6", color: "#6b7280", fontSize: "10px", padding: "2px 7px", borderRadius: "20px", marginRight: "4px" }}>
             {a}

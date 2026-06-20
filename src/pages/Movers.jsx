@@ -222,6 +222,21 @@ function MoverCard({ m, onBook, featured }) {
         </div>
       </div>
 
+      {/* Verification Badges */}
+      {m.verificationBadges && m.verificationBadges.length > 0 && (
+        <div style={{ display: "flex", gap: "6px", marginBottom: "10px", flexWrap: "wrap" }}>
+          {m.verificationBadges.map((badgeId) => (
+            <img
+              key={badgeId}
+              src={`/${badgeId.replace(/_/g, ' ')}.png`}
+              alt={badgeId}
+              style={{ width: "24px", height: "24px", objectFit: "contain", borderRadius: "4px" }}
+              title={badgeId.replace(/_/g, ' ').toUpperCase()}
+            />
+          ))}
+        </div>
+      )}
+
       {/* Pills */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 10 }}>
         <Pill featured={featured}>🚗 {m.vehicleType || "Pickup"}</Pill>

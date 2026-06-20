@@ -466,6 +466,21 @@ export default function MaterialsMarketplace() {
                       )}
                     </div>
 
+                    {/* Verification Badges */}
+                    {material.seller?.verificationBadges && material.seller.verificationBadges.length > 0 && (
+                      <div style={styles.badgeContainer}>
+                        {material.seller.verificationBadges.map((badgeId) => (
+                          <img
+                            key={badgeId}
+                            src={`/${badgeId.replace(/_/g, ' ')}.png`}
+                            alt={badgeId}
+                            style={styles.badgeImage}
+                            title={badgeId.replace(/_/g, ' ').toUpperCase()}
+                          />
+                        ))}
+                      </div>
+                    )}
+
                     {/* Views and Rating */}
                     <div style={styles.engagementStats}>
                       <span style={styles.engagementItem}>
@@ -1055,6 +1070,18 @@ const styles = {
   sellerRating: {
     fontSize: "13px",
     color: COLORS.accent,
+  },
+  badgeContainer: {
+    display: "flex",
+    gap: "6px",
+    marginTop: "8px",
+    flexWrap: "wrap",
+  },
+  badgeImage: {
+    width: "28px",
+    height: "28px",
+    objectFit: "contain",
+    borderRadius: "4px",
   },
   engagementStats: {
     display: "flex",
