@@ -3,12 +3,12 @@ import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "./AdminHeader.css";
 
-export default function AdminHeader({ 
-  showNotifPanel, 
-  setShowNotifPanel, 
-  notificationCount, 
+export default function AdminHeader({
+  showNotifPanel,
+  setShowNotifPanel,
+  notificationCount,
   notifRef,
-  children 
+  children
 }) {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -27,14 +27,13 @@ export default function AdminHeader({
       </div>
 
       <div className="admin-header-actions">
-        {children}
-
-        <button 
-          className="btn-logout" 
+        <button
+          className="btn-logout"
           onClick={handleLogout}
         >
           🚪 Logout
         </button>
+        {children}
       </div>
     </header>
   );

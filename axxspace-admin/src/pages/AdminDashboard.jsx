@@ -288,10 +288,14 @@ export default function AdminDashboard() {
   };
 
   // ── MARK NOTIFICATION AS READ (confirm payment) ─────────────
-  const handleApproveBoost = async (notifId) => {
+  const handleApproveBoost = async (notifId, badgeId = null) => {
     try {
-      await API.put(`/payment/notifications/${notifId}/read`, { approve: true });
-      setBoostMessage("✅ Payment confirmed!");
+      const payload = { approve: true };
+      if (badgeId) {
+        payload.badgeId = badgeId;
+      }
+      await API.put(`/payment/notifications/${notifId}/read`, payload);
+      setBoostMessage(badgeId ? "✅ Payment confirmed & badge issued!" : "✅ Payment confirmed!");
       loadPendingBoosts();
       loadAllBoosts();
       loadStats();
@@ -593,622 +597,622 @@ export default function AdminDashboard() {
           <span className="mobile-logo-text">🛡️ AXXSPACE</span>
         </div>
 
-      {/* HEADER */}
-      <AdminHeader>
-        <NotificationPanel
-          showNotifPanel={showNotifPanel}
-          setShowNotifPanel={setShowNotifPanel}
-          notifications={allNotifications}
-          onApprove={handleApproveBoost}
-          onReject={handleRejectBoost}
-          onReview={(notif) => {
-            if (notif) {
-              const tabMap = {
-                property: "properties",
-                material: "materials",
-                tourism: "tourism",
-                mover: "movers",
-                seller: "sellers",
-                business: "businesses",
-                announcement: "announcements"
-              };
-              setActiveTab(tabMap[notif.type] || "properties");
-              setStatusView("pending");
-            } else {
-              setActiveTab("properties");
-              setStatusView("pending");
-            }
-          }}
-        />
-      </AdminHeader>
+        {/* HEADER */}
+        <AdminHeader>
+          <NotificationPanel
+            showNotifPanel={showNotifPanel}
+            setShowNotifPanel={setShowNotifPanel}
+            notifications={allNotifications}
+            onApprove={handleApproveBoost}
+            onReject={handleRejectBoost}
+            onReview={(notif) => {
+              if (notif) {
+                const tabMap = {
+                  property: "properties",
+                  material: "materials",
+                  tourism: "tourism",
+                  mover: "movers",
+                  seller: "sellers",
+                  business: "businesses",
+                  announcement: "announcements"
+                };
+                setActiveTab(tabMap[notif.type] || "properties");
+                setStatusView("pending");
+              } else {
+                setActiveTab("properties");
+                setStatusView("pending");
+              }
+            }}
+          />
+        </AdminHeader>
 
-      {/* STATS */}
-      {activeTab === "overview" && stats && (
-        <>
-          <div className="stats-grid">
-            {[
-              { label: "🏢 Properties", total: stats.properties.total, pending: stats.properties.pending, color: "#3b82f6" },
-              { label: "🛍️ Materials", total: stats.materials.total, pending: stats.materials.pending, color: "#22c55e" },
-              { label: "🚛 Movers", total: stats.movers.total, pending: stats.movers.pending, color: "#f59e0b" },
-              { label: "🏨 Tourism", total: stats.tourism.total, pending: stats.tourism.pending, color: "#8b5cf6" },
-              { label: "📋 Sellers", total: stats.sellers.total, pending: stats.sellers.pending, color: "#ec4899" },
-              { label: "💳 Payments", total: allBoosts.length, pending: pendingBoosts.length, color: "#fbbf24", isPulse: pendingBoosts.length > 0 },
-            ].map(s => (
-              <StatsCard
-                key={s.label}
-                label={s.label}
-                total={s.total}
-                pending={s.pending}
-                color={s.color}
-                isPulse={s.isPulse}
-              />
+        {/* STATS */}
+        {activeTab === "overview" && stats && (
+          <>
+            <div className="stats-grid">
+              {[
+                { label: "🏢 Properties", total: stats.properties.total, pending: stats.properties.pending, color: "#3b82f6" },
+                { label: "🛍️ Materials", total: stats.materials.total, pending: stats.materials.pending, color: "#22c55e" },
+                { label: "🚛 Movers", total: stats.movers.total, pending: stats.movers.pending, color: "#f59e0b" },
+                { label: "🏨 Tourism", total: stats.tourism.total, pending: stats.tourism.pending, color: "#8b5cf6" },
+                { label: "📋 Sellers", total: stats.sellers.total, pending: stats.sellers.pending, color: "#ec4899" },
+                { label: "💳 Payments", total: allBoosts.length, pending: pendingBoosts.length, color: "#fbbf24", isPulse: pendingBoosts.length > 0 },
+              ].map(s => (
+                <StatsCard
+                  key={s.label}
+                  label={s.label}
+                  total={s.total}
+                  pending={s.pending}
+                  color={s.color}
+                  isPulse={s.isPulse}
+                />
+              ))}
+            </div>
+
+            {/* VIEW STATISTICS */}
+            {viewStats && (
+              <div className="chart-container">
+                <h3 className="chart-title">👁️ View Statistics by Category</h3>
+                <div className="view-stats-grid">
+                  {viewStats.properties && viewStats.properties.length > 0 && (
+                    <div className="view-stat-section">
+                      <h4 className="view-stat-title">🏠 Properties</h4>
+                      {viewStats.properties.map(stat => (
+                        <div key={stat._id} className="view-stat-item">
+                          <span className="view-stat-label">{stat._id}</span>
+                          <span className="view-stat-value">{stat.totalViews.toLocaleString()} views</span>
+                          <span className="view-stat-meta">({stat.totalItems} items, avg {Math.round(stat.avgViews)} views)</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {viewStats.materials && viewStats.materials.length > 0 && (
+                    <div className="view-stat-section">
+                      <h4 className="view-stat-title">🛍️ Materials</h4>
+                      {viewStats.materials.map(stat => (
+                        <div key={stat._id} className="view-stat-item">
+                          <span className="view-stat-label">{stat._id}</span>
+                          <span className="view-stat-value">{stat.totalViews.toLocaleString()} views</span>
+                          <span className="view-stat-meta">({stat.totalItems} items, avg {Math.round(stat.avgViews)} views)</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {viewStats.tourism && viewStats.tourism.length > 0 && (
+                    <div className="view-stat-section">
+                      <h4 className="view-stat-title">🏨 Tourism</h4>
+                      {viewStats.tourism.map(stat => (
+                        <div key={stat._id} className="view-stat-item">
+                          <span className="view-stat-label">{stat._id}</span>
+                          <span className="view-stat-value">{stat.totalViews.toLocaleString()} views</span>
+                          <span className="view-stat-meta">({stat.totalItems} items, avg {Math.round(stat.avgViews)} views)</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* TOP VIEWED ITEMS */}
+            {topViewed && (
+              <div className="chart-container">
+                <h3 className="chart-title">🔥 Top Viewed Items</h3>
+                <div className="top-viewed-grid">
+                  {topViewed.properties && topViewed.properties.length > 0 && (
+                    <div className="view-stat-section">
+                      <h4 className="view-stat-title">🏠 Properties</h4>
+                      {topViewed.properties.map(item => (
+                        <div key={item._id} className="top-view-item">
+                          <span className="top-view-title">{item.title}</span>
+                          <span className="top-view-meta">{item.location} · {item.propertyType}</span>
+                          <span className="top-view-value">{item.views.toLocaleString()} views</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {topViewed.materials && topViewed.materials.length > 0 && (
+                    <div className="view-stat-section">
+                      <h4 className="view-stat-title">🛍️ Materials</h4>
+                      {topViewed.materials.map(item => (
+                        <div key={item._id} className="top-view-item">
+                          <span className="top-view-title">{item.title}</span>
+                          <span className="top-view-meta">{item.category} · {item.condition}</span>
+                          <span className="top-view-value">{item.views.toLocaleString()} views</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {topViewed.tourism && topViewed.tourism.length > 0 && (
+                    <div className="view-stat-section">
+                      <h4 className="view-stat-title">🏨 Tourism</h4>
+                      {topViewed.tourism.map(item => (
+                        <div key={item._id} className="top-view-item">
+                          <span className="top-view-title">{item.title}</span>
+                          <span className="top-view-meta">{item.location} · {item.category}</span>
+                          <span className="top-view-value">{item.views.toLocaleString()} views</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* ACTIVITY CHART */}
+            <div className="chart-container">
+              <h3 className="chart-title">📊 Overview Distribution</h3>
+              <div className="chart-bars">
+                {[
+                  { label: "Properties", total: stats.properties.total, pending: stats.properties.pending, color: "#3b82f6" },
+                  { label: "Materials", total: stats.materials.total, pending: stats.materials.pending, color: "#22c55e" },
+                  { label: "Movers", total: stats.movers.total, pending: stats.movers.pending, color: "#f59e0b" },
+                  { label: "Tourism", total: stats.tourism.total, pending: stats.tourism.pending, color: "#8b5cf6" },
+                  { label: "Sellers", total: stats.sellers.total, pending: stats.sellers.pending, color: "#ec4899" },
+                  { label: "Businesses", total: stats.businesses?.total || 0, pending: stats.businesses?.pending || 0, color: "#fbbf24" },
+                ].map(s => {
+                  const maxTotal = Math.max(...[stats.properties.total, stats.materials.total, stats.movers.total, stats.tourism.total, stats.sellers.total, stats.businesses?.total || 0]);
+                  const barWidth = maxTotal > 0 ? (s.total / maxTotal) * 100 : 0;
+                  const pendingWidth = maxTotal > 0 ? (s.pending / maxTotal) * 100 : 0;
+                  return (
+                    <div key={s.label} className="chart-bar">
+                      <div className="chart-label">{s.label}</div>
+                      <div className="chart-bar-track">
+                        <div className="chart-bar-fill" style={{ width: `${barWidth}%`, background: s.color }} />
+                        {s.pending > 0 && <div className="chart-bar-pending" style={{ width: `${pendingWidth}%` }} />}
+                      </div>
+                      <div className="chart-values">
+                        <span className="chart-total">{s.total}</span>
+                        {s.pending > 0 && <span className="chart-pending">{s.pending} pending</span>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* QUICK ACTIONS */}
+            <div className="quick-actions">
+              <h3 className="quick-actions-title">⚡ Quick Actions</h3>
+              <div className="quick-actions-grid">
+                <button className="btn-quick-action" onClick={() => { setActiveTab("properties"); setStatusView("pending"); }}>
+                  <span className="quick-action-icon">🏠</span>
+                  <span className="quick-action-text">Review Properties</span>
+                  {stats?.properties?.pending > 0 && <span className="quick-action-badge">{stats.properties.pending}</span>}
+                </button>
+                <button className="btn-quick-action" onClick={() => { setActiveTab("materials"); setStatusView("pending"); }}>
+                  <span className="quick-action-icon">🛍️</span>
+                  <span className="quick-action-text">Review Materials</span>
+                  {stats?.materials?.pending > 0 && <span className="quick-action-badge">{stats.materials.pending}</span>}
+                </button>
+                <button className="btn-quick-action" onClick={() => { setActiveTab("tourism"); setStatusView("pending"); }}>
+                  <span className="quick-action-icon">🏨</span>
+                  <span className="quick-action-text">Review Tourism</span>
+                  {stats?.tourism?.pending > 0 && <span className="quick-action-badge">{stats.tourism.pending}</span>}
+                </button>
+                <button className="btn-quick-action" onClick={() => { setActiveTab("businesses"); setStatusView("pending"); }}>
+                  <span className="quick-action-icon">🏪</span>
+                  <span className="quick-action-text">Review Businesses</span>
+                  {stats?.businesses?.pending > 0 && <span className="quick-action-badge">{stats.businesses.pending}</span>}
+                </button>
+                <button
+                  className="btn-quick-action"
+                  style={hasPendingBoosts ? { borderColor: "#ef4444", boxShadow: "0 0 12px rgba(239,68,68,0.3)" } : {}}
+                  onClick={() => setActiveTab("boosts")}>
+                  <span className="quick-action-icon">💳</span>
+                  <span className="quick-action-text">Review Payments</span>
+                  {hasPendingBoosts && <span className="quick-action-badge" style={{ background: "#ef4444" }}>{pendingBoosts.length}</span>}
+                </button>
+                <button className="btn-quick-action" onClick={() => setActiveTab("sold")}>
+                  <span className="quick-action-icon">💰</span>
+                  <span className="quick-action-text">View Sold Items</span>
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Tabs rendered in Sidebar */}
+
+        {/* STATUS VIEW TOGGLE */}
+        {activeTab !== "payment" && activeTab !== "sold" && activeTab !== "boosts" && (
+          <div className="status-toggle">
+            {STATUS_VIEWS.map(v => (
+              <button key={v}
+                className={`btn-status ${statusView === v ? 'active' : ''}`}
+                onClick={() => setStatusView(v)}>
+                {v === "pending" ? "⏳ Pending" : v === "approved" ? "✅ Approved" : "❌ Rejected"}
+              </button>
             ))}
           </div>
+        )}
 
-          {/* VIEW STATISTICS */}
-          {viewStats && (
-            <div className="chart-container">
-              <h3 className="chart-title">👁️ View Statistics by Category</h3>
-              <div className="view-stats-grid">
-                {viewStats.properties && viewStats.properties.length > 0 && (
-                  <div className="view-stat-section">
-                    <h4 className="view-stat-title">🏠 Properties</h4>
-                    {viewStats.properties.map(stat => (
-                      <div key={stat._id} className="view-stat-item">
-                        <span className="view-stat-label">{stat._id}</span>
-                        <span className="view-stat-value">{stat.totalViews.toLocaleString()} views</span>
-                        <span className="view-stat-meta">({stat.totalItems} items, avg {Math.round(stat.avgViews)} views)</span>
+        {/* SEARCH AND FILTER BAR */}
+        {activeTab !== "payment" && activeTab !== "boosts" && activeTab !== "businesses" && activeTab !== "verification" && (
+          <div className="search-bar">
+            <div className="search-input-wrapper">
+              <span className="search-icon">🔍</span>
+              <input
+                className="search-input"
+                placeholder="Search by title, owner, or contact..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && <button className="btn-clear-search" onClick={() => setSearchQuery("")}>✕</button>}
+            </div>
+            {(activeTab === "materials" || activeTab === "tourism" || activeTab === "properties") && (
+              <select className="filter-select" value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+                <option value="">All Categories</option>
+                {activeTab === "materials" && ["Construction Materials", "Furniture", "Appliances", "Electronics", "Tools", "Other"].map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                {activeTab === "properties" && ["Apartment", "House", "Office", "Land", "Warehouse"].map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                {activeTab === "tourism" && ["Hotel", "Resort", "Airbnb", "Lodge", "Camping"].map(cat => <option key={cat} value={cat}>{cat}</option>)}
+              </select>
+            )}
+            <button className="btn-export" onClick={exportData}>📥 Export CSV</button>
+          </div>
+        )}
+
+        {/* RESULTS COUNT */}
+        {activeTab !== "payment" && activeTab !== "boosts" && !loading && filteredItems.length > 0 && (
+          <div className="results-count">
+            Showing <strong>{filteredItems.length}</strong> of <strong>{displayItems.length}</strong> {activeTab}
+            {(searchQuery || filterCategory) && <span className="filter-tag"> (filtered)</span>}
+          </div>
+        )}
+
+        {/* BOOST / PAYMENT MESSAGE TOAST */}
+        {boostMessage && (
+          <div className={`boost-toast ${boostMessage.startsWith("✅") ? 'success' : 'error'}`}>
+            {boostMessage}
+          </div>
+        )}
+
+        {/* CONTENT */}
+        {activeTab === "overview" ? null : activeTab === "boosts" ? (
+          <PaymentNotifications
+            pendingBoosts={pendingBoosts}
+            allBoosts={allBoosts}
+            boostLoading={boostLoading}
+            onApprove={handleApproveBoost}
+            onReject={handleRejectBoost}
+            getNotifTitle={getNotifTitle}
+            getNotifIcon={getNotifIcon}
+          />
+        ) : activeTab === "payment" ? (
+          <PaymentSettings
+            mpesaConfig={mpesaConfig} setMpesaConfig={setMpesaConfig}
+            configSaving={configSaving} configMessage={configMessage}
+            handleSave={handleSaveMpesaConfig} />
+        ) : activeTab === "businesses" ? (
+          businessesLoading ? (
+            <div className="loader">
+              <div className="spinner"></div>
+              <p>⏳ Loading pending businesses...</p>
+            </div>
+          ) : pendingBusinesses.length === 0 ? (
+            <div className="empty">
+              <p className="empty-text">✅ No pending businesses found.</p>
+            </div>
+          ) : (
+            <div className="grid">
+              {pendingBusinesses.map(business => (
+                <div key={business._id} className="card admin-card">
+                  {business.images && business.images.length > 0 && (
+                    <div className="card-image" style={{ backgroundImage: `url(${business.images[0]})` }} />
+                  )}
+                  <div className="card-body">
+                    <p className="card-title">{business.name}</p>
+                    <p className="card-subtitle">{business.categories.join(", ")}</p>
+                    <p className="card-owner">📍 {business.location.town}, {business.location.county}</p>
+                    <p className="card-owner">👤 {business.submitterName || business.owner?.name || "Anonymous"}</p>
+                    <p className="card-owner">📞 {business.contact.phone}</p>
+                    <p className="card-owner">📸 {business.images && business.images.length > 0 ? `${business.images.length} photos` : "No photos"}</p>
+                    {business.pricelist?.url && (
+                      <p className="card-owner">
+                        <button
+                          type="button"
+                          className="doc-link"
+                          style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+                          onClick={() => window.open(getPricelistUrl(business.pricelist), "_blank", "noopener,noreferrer")}
+                        >
+                          📄 View pricelist
+                        </button>
+                      </p>
+                    )}
+                    <div className="card-footer">
+                      <span className="status-dot" style={{ background: business.status === "approved" ? "#22c55e" : business.status === "rejected" ? "#ef4444" : "#fbbf24" }}>
+                        {business.status}
+                      </span>
+                    </div>
+                    <div className="card-buttons">
+                      <button className="btn-approve" onClick={() => handleBusinessStatus(business._id, "approved")}>✅ Approve</button>
+                      <button className="btn-reject" onClick={() => handleBusinessStatus(business._id, "rejected")}>❌ Reject</button>
+                    </div>
+                    <select
+                      className="filter-select"
+                      style={{ marginTop: "10px", padding: "8px", fontSize: "12px" }}
+                      onChange={(e) => handleAddBadge(business._id, e.target.value)}
+                      defaultValue=""
+                    >
+                      <option value="">Add Badge</option>
+                      <option value="student_verified">🟢 Student</option>
+                      <option value="identity_verified">🟢 Identity</option>
+                      <option value="business_verified">🔵 Business</option>
+                      <option value="online_verified">🔵 Online</option>
+                      <option value="location_verified">🟣 Location</option>
+                      <option value="premium_verified">⭐ Premium</option>
+                    </select>
+                    <button
+                      className="btn-view"
+                      style={{ marginTop: "10px", width: "100%" }}
+                      onClick={() => navigate(`/business/${business._id}`)}
+                    >
+                      👁️ View Details & Reviews
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )
+        ) : activeTab === "announcements" ? (
+          announcementsLoading ? (
+            <div className="loader">
+              <div className="spinner"></div>
+              <p>⏳ Loading announcements...</p>
+            </div>
+          ) : pendingAnnouncements.length === 0 ? (
+            <div className="empty">
+              <p className="empty-text">✅ No announcements found.</p>
+            </div>
+          ) : (
+            <div className="grid">
+              {pendingAnnouncements.map(announcement => (
+                <div key={announcement.announcementId} className="card admin-card">
+                  <div className="card-body">
+                    <p className="card-title">{announcement.title}</p>
+                    <p className="card-subtitle">📢 {announcement.businessName}</p>
+                    <p className="card-owner">👤 Submitted by: {announcement.submitterName || "Unknown"}</p>
+                    {announcement.organizationName && (
+                      <p className="card-owner">🏢 Organization: {announcement.organizationName}</p>
+                    )}
+                    <p className="card-owner">📅 {new Date(announcement.createdAt).toLocaleDateString()}</p>
+                    <p className="card-owner" style={{ color: announcement.status === "approved" ? "#22c55e" : announcement.status === "rejected" ? "#ef4444" : "#fbbf24" }}>
+                      Status: {announcement.status.toUpperCase()}
+                    </p>
+                    <p className="card-owner">{announcement.content}</p>
+                    <div className="card-buttons">
+                      {announcement.status === "pending" && (
+                        <>
+                          <button className="btn-approve" onClick={() => handleAnnouncementStatus(announcement.businessId, announcement.announcementId, "approved")}>✅ Approve</button>
+                          <button className="btn-reject" onClick={() => handleAnnouncementStatus(announcement.businessId, announcement.announcementId, "rejected")}>❌ Reject</button>
+                        </>
+                      )}
+                      <button className="btn-delete" onClick={() => handleDeleteAnnouncement(announcement.businessId, announcement.announcementId)}>🗑️ Delete</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )
+        ) : activeTab === "verification" ? (
+          selectedVerification ? (
+            <div className="verification-detail">
+              <button className="btn-back" onClick={() => setSelectedVerification(null)}>← Back to List</button>
+              <div className="detail-card">
+                <h2 className="detail-title">Verification Details</h2>
+                <div className="detail-section">
+                  <p className="detail-label">User ID:</p>
+                  <p className="detail-value">{selectedVerification.user?._id || selectedVerification.user}</p>
+                </div>
+                <div className="detail-section">
+                  <p className="detail-label">Verification Level:</p>
+                  <p className="detail-value">Level {selectedVerification.verificationLevel}</p>
+                </div>
+                <div className="detail-section">
+                  <p className="detail-label">Status:</p>
+                  <p className="detail-value" style={{ color: selectedVerification.status === 'approved' ? '#22c55e' : selectedVerification.status === 'rejected' ? '#ef4444' : '#fbbf24' }}>
+                    {selectedVerification.status.toUpperCase()}
+                  </p>
+                </div>
+                {selectedVerification.idType && (
+                  <div className="detail-section">
+                    <p className="detail-label">ID Type:</p>
+                    <p className="detail-value">{selectedVerification.idType.replace(/_/g, ' ')}</p>
+                  </div>
+                )}
+                {selectedVerification.businessName && (
+                  <div className="detail-section">
+                    <p className="detail-label">Business Name:</p>
+                    <p className="detail-value">{selectedVerification.businessName}</p>
+                  </div>
+                )}
+                {selectedVerification.taxId && (
+                  <div className="detail-section">
+                    <p className="detail-label">Tax ID:</p>
+                    <p className="detail-value">{selectedVerification.taxId}</p>
+                  </div>
+                )}
+                {selectedVerification.physicalDetails && (
+                  <div className="detail-section">
+                    <p className="detail-label">Physical Address & Visitation Details:</p>
+                    <p className="detail-value" style={{ whiteSpace: 'pre-wrap', background: 'rgba(0,0,0,0.15)', padding: '10px', borderRadius: '6px' }}>
+                      {selectedVerification.physicalDetails}
+                    </p>
+                  </div>
+                )}
+                {selectedVerification.documents && selectedVerification.documents.length > 0 && (
+                  <div className="detail-section">
+                    <p className="detail-label">Documents:</p>
+                    {selectedVerification.documents.map((doc, idx) => (
+                      <div key={idx} className="document-item">
+                        <p className="doc-type">{doc.type.replace(/_/g, ' ')}</p>
+                        <button
+                          type="button"
+                          className="doc-link"
+                          onClick={() => handleOpenFile(doc.url)}
+                        >
+                          📄 View / Download
+                        </button>
+                        <p style={{ fontSize: 11, color: '#64748b' }}>Filename: {doc.filename}</p>
                       </div>
                     ))}
                   </div>
                 )}
-                {viewStats.materials && viewStats.materials.length > 0 && (
-                  <div className="view-stat-section">
-                    <h4 className="view-stat-title">🛍️ Materials</h4>
-                    {viewStats.materials.map(stat => (
-                      <div key={stat._id} className="view-stat-item">
-                        <span className="view-stat-label">{stat._id}</span>
-                        <span className="view-stat-value">{stat.totalViews.toLocaleString()} views</span>
-                        <span className="view-stat-meta">({stat.totalItems} items, avg {Math.round(stat.avgViews)} views)</span>
-                      </div>
-                    ))}
+                {selectedVerification.selfie && selectedVerification.selfie.url && (
+                  <div className="detail-section">
+                    <p className="detail-label">Selfie:</p>
+                    <img
+                      src={resolveMediaUrl(selectedVerification.selfie.url)}
+                      alt="Selfie"
+                      className="selfie-image"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        if (e.target.nextSibling) e.target.nextSibling.style.display = 'block';
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className="doc-link"
+                      style={{ marginTop: "8px" }}
+                      onClick={() => handleOpenFile(selectedVerification.selfie.url)}
+                    >
+                      📥 Download selfie
+                    </button>
+                    <p style={{ fontSize: 12, color: '#ef4444', display: 'none' }}>
+                      ⚠️ Selfie image not available (file may not exist on server)
+                    </p>
+                    <p style={{ fontSize: 11, color: '#64748b', marginTop: '8px' }}>
+                      Filename: {selectedVerification.selfie.filename}
+                    </p>
                   </div>
                 )}
-                {viewStats.tourism && viewStats.tourism.length > 0 && (
-                  <div className="view-stat-section">
-                    <h4 className="view-stat-title">🏨 Tourism</h4>
-                    {viewStats.tourism.map(stat => (
-                      <div key={stat._id} className="view-stat-item">
-                        <span className="view-stat-label">{stat._id}</span>
-                        <span className="view-stat-value">{stat.totalViews.toLocaleString()} views</span>
-                        <span className="view-stat-meta">({stat.totalItems} items, avg {Math.round(stat.avgViews)} views)</span>
-                      </div>
-                    ))}
+                {selectedVerification.status === 'pending' && (
+                  <div className="action-buttons">
+                    <button className="btn-approve" onClick={() => handleApproveVerification(selectedVerification._id)}>
+                      ✅ Approve
+                    </button>
+                    <div className="reject-section">
+                      <textarea
+                        className="reject-input"
+                        placeholder="Enter rejection reason..."
+                        value={rejectionReason}
+                        onChange={(e) => setRejectionReason(e.target.value)}
+                      />
+                      <button className="btn-reject" onClick={() => handleRejectVerification(selectedVerification._id)}>
+                        ❌ Reject
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
             </div>
-          )}
-
-          {/* TOP VIEWED ITEMS */}
-          {topViewed && (
-            <div className="chart-container">
-              <h3 className="chart-title">🔥 Top Viewed Items</h3>
-              <div className="top-viewed-grid">
-                {topViewed.properties && topViewed.properties.length > 0 && (
-                  <div className="view-stat-section">
-                    <h4 className="view-stat-title">🏠 Properties</h4>
-                    {topViewed.properties.map(item => (
-                      <div key={item._id} className="top-view-item">
-                        <span className="top-view-title">{item.title}</span>
-                        <span className="top-view-meta">{item.location} · {item.propertyType}</span>
-                        <span className="top-view-value">{item.views.toLocaleString()} views</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {topViewed.materials && topViewed.materials.length > 0 && (
-                  <div className="view-stat-section">
-                    <h4 className="view-stat-title">🛍️ Materials</h4>
-                    {topViewed.materials.map(item => (
-                      <div key={item._id} className="top-view-item">
-                        <span className="top-view-title">{item.title}</span>
-                        <span className="top-view-meta">{item.category} · {item.condition}</span>
-                        <span className="top-view-value">{item.views.toLocaleString()} views</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {topViewed.tourism && topViewed.tourism.length > 0 && (
-                  <div className="view-stat-section">
-                    <h4 className="view-stat-title">🏨 Tourism</h4>
-                    {topViewed.tourism.map(item => (
-                      <div key={item._id} className="top-view-item">
-                        <span className="top-view-title">{item.title}</span>
-                        <span className="top-view-meta">{item.location} · {item.category}</span>
-                        <span className="top-view-value">{item.views.toLocaleString()} views</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+          ) : verificationLoading ? (
+            <div className="loader">
+              <div className="spinner"></div>
+              <p>⏳ Loading verifications...</p>
             </div>
-          )}
-
-          {/* ACTIVITY CHART */}
-          <div className="chart-container">
-            <h3 className="chart-title">📊 Overview Distribution</h3>
-            <div className="chart-bars">
-              {[
-                { label: "Properties", total: stats.properties.total, pending: stats.properties.pending, color: "#3b82f6" },
-                { label: "Materials", total: stats.materials.total, pending: stats.materials.pending, color: "#22c55e" },
-                { label: "Movers", total: stats.movers.total, pending: stats.movers.pending, color: "#f59e0b" },
-                { label: "Tourism", total: stats.tourism.total, pending: stats.tourism.pending, color: "#8b5cf6" },
-                { label: "Sellers", total: stats.sellers.total, pending: stats.sellers.pending, color: "#ec4899" },
-                { label: "Businesses", total: stats.businesses?.total || 0, pending: stats.businesses?.pending || 0, color: "#fbbf24" },
-              ].map(s => {
-                const maxTotal = Math.max(...[stats.properties.total, stats.materials.total, stats.movers.total, stats.tourism.total, stats.sellers.total, stats.businesses?.total || 0]);
-                const barWidth = maxTotal > 0 ? (s.total / maxTotal) * 100 : 0;
-                const pendingWidth = maxTotal > 0 ? (s.pending / maxTotal) * 100 : 0;
-                return (
-                  <div key={s.label} className="chart-bar">
-                    <div className="chart-label">{s.label}</div>
-                    <div className="chart-bar-track">
-                      <div className="chart-bar-fill" style={{ width: `${barWidth}%`, background: s.color }} />
-                      {s.pending > 0 && <div className="chart-bar-pending" style={{ width: `${pendingWidth}%` }} />}
-                    </div>
-                    <div className="chart-values">
-                      <span className="chart-total">{s.total}</span>
-                      {s.pending > 0 && <span className="chart-pending">{s.pending} pending</span>}
+          ) : pendingVerifications.length === 0 ? (
+            <div className="empty">
+              <p className="empty-text">✅ No pending verifications found.</p>
+            </div>
+          ) : (
+            <div className="grid">
+              {pendingVerifications.map(verification => (
+                <div key={verification._id} className="card admin-card">
+                  <div className="card-body">
+                    <p className="card-title">Level {verification.verificationLevel} Verification</p>
+                    <p className="card-subtitle">👤 User: {verification.user?.name || verification.user?.email || 'Unknown'}</p>
+                    <p className="card-owner">📅 Submitted: {new Date(verification.submittedAt).toLocaleDateString()}</p>
+                    <p className="card-owner" style={{ color: '#fbbf24' }}>
+                      Status: {verification.status.toUpperCase()}
+                    </p>
+                    <div className="card-buttons">
+                      <button className="btn-view" onClick={() => loadVerificationDetails(verification._id)}>
+                        👁️ Review Verification
+                      </button>
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
-          </div>
-
-          {/* QUICK ACTIONS */}
-          <div className="quick-actions">
-            <h3 className="quick-actions-title">⚡ Quick Actions</h3>
-            <div className="quick-actions-grid">
-              <button className="btn-quick-action" onClick={() => { setActiveTab("properties"); setStatusView("pending"); }}>
-                <span className="quick-action-icon">🏠</span>
-                <span className="quick-action-text">Review Properties</span>
-                {stats?.properties?.pending > 0 && <span className="quick-action-badge">{stats.properties.pending}</span>}
-              </button>
-              <button className="btn-quick-action" onClick={() => { setActiveTab("materials"); setStatusView("pending"); }}>
-                <span className="quick-action-icon">🛍️</span>
-                <span className="quick-action-text">Review Materials</span>
-                {stats?.materials?.pending > 0 && <span className="quick-action-badge">{stats.materials.pending}</span>}
-              </button>
-              <button className="btn-quick-action" onClick={() => { setActiveTab("tourism"); setStatusView("pending"); }}>
-                <span className="quick-action-icon">🏨</span>
-                <span className="quick-action-text">Review Tourism</span>
-                {stats?.tourism?.pending > 0 && <span className="quick-action-badge">{stats.tourism.pending}</span>}
-              </button>
-              <button className="btn-quick-action" onClick={() => { setActiveTab("businesses"); setStatusView("pending"); }}>
-                <span className="quick-action-icon">🏪</span>
-                <span className="quick-action-text">Review Businesses</span>
-                {stats?.businesses?.pending > 0 && <span className="quick-action-badge">{stats.businesses.pending}</span>}
-              </button>
-              <button
-                className="btn-quick-action"
-                style={hasPendingBoosts ? { borderColor: "#ef4444", boxShadow: "0 0 12px rgba(239,68,68,0.3)" } : {}}
-                onClick={() => setActiveTab("boosts")}>
-                <span className="quick-action-icon">💳</span>
-                <span className="quick-action-text">Review Payments</span>
-                {hasPendingBoosts && <span className="quick-action-badge" style={{ background: "#ef4444" }}>{pendingBoosts.length}</span>}
-              </button>
-              <button className="btn-quick-action" onClick={() => setActiveTab("sold")}>
-                <span className="quick-action-icon">💰</span>
-                <span className="quick-action-text">View Sold Items</span>
-              </button>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* Tabs rendered in Sidebar */}
-
-      {/* STATUS VIEW TOGGLE */}
-      {activeTab !== "payment" && activeTab !== "sold" && activeTab !== "boosts" && (
-        <div className="status-toggle">
-          {STATUS_VIEWS.map(v => (
-            <button key={v}
-              className={`btn-status ${statusView === v ? 'active' : ''}`}
-              onClick={() => setStatusView(v)}>
-              {v === "pending" ? "⏳ Pending" : v === "approved" ? "✅ Approved" : "❌ Rejected"}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* SEARCH AND FILTER BAR */}
-      {activeTab !== "payment" && activeTab !== "boosts" && activeTab !== "businesses" && activeTab !== "verification" && (
-        <div className="search-bar">
-          <div className="search-input-wrapper">
-            <span className="search-icon">🔍</span>
-            <input
-              className="search-input"
-              placeholder="Search by title, owner, or contact..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            {searchQuery && <button className="btn-clear-search" onClick={() => setSearchQuery("")}>✕</button>}
-          </div>
-          {(activeTab === "materials" || activeTab === "tourism" || activeTab === "properties") && (
-            <select className="filter-select" value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
-              <option value="">All Categories</option>
-              {activeTab === "materials" && ["Construction Materials", "Furniture", "Appliances", "Electronics", "Tools", "Other"].map(cat => <option key={cat} value={cat}>{cat}</option>)}
-              {activeTab === "properties" && ["Apartment", "House", "Office", "Land", "Warehouse"].map(cat => <option key={cat} value={cat}>{cat}</option>)}
-              {activeTab === "tourism" && ["Hotel", "Resort", "Airbnb", "Lodge", "Camping"].map(cat => <option key={cat} value={cat}>{cat}</option>)}
-            </select>
-          )}
-          <button className="btn-export" onClick={exportData}>📥 Export CSV</button>
-        </div>
-      )}
-
-      {/* RESULTS COUNT */}
-      {activeTab !== "payment" && activeTab !== "boosts" && !loading && filteredItems.length > 0 && (
-        <div className="results-count">
-          Showing <strong>{filteredItems.length}</strong> of <strong>{displayItems.length}</strong> {activeTab}
-          {(searchQuery || filterCategory) && <span className="filter-tag"> (filtered)</span>}
-        </div>
-      )}
-
-      {/* BOOST / PAYMENT MESSAGE TOAST */}
-      {boostMessage && (
-        <div className={`boost-toast ${boostMessage.startsWith("✅") ? 'success' : 'error'}`}>
-          {boostMessage}
-        </div>
-      )}
-
-      {/* CONTENT */}
-      {activeTab === "overview" ? null : activeTab === "boosts" ? (
-        <PaymentNotifications
-          pendingBoosts={pendingBoosts}
-          allBoosts={allBoosts}
-          boostLoading={boostLoading}
-          onApprove={handleApproveBoost}
-          onReject={handleRejectBoost}
-          getNotifTitle={getNotifTitle}
-          getNotifIcon={getNotifIcon}
-        />
-      ) : activeTab === "payment" ? (
-        <PaymentSettings
-          mpesaConfig={mpesaConfig} setMpesaConfig={setMpesaConfig}
-          configSaving={configSaving} configMessage={configMessage}
-          handleSave={handleSaveMpesaConfig} />
-      ) : activeTab === "businesses" ? (
-        businessesLoading ? (
+          )
+        ) : loading ? (
           <div className="loader">
             <div className="spinner"></div>
-            <p>⏳ Loading pending businesses...</p>
+            <p>⏳ Loading {activeTab === "sold" ? "sold" : statusView} {activeTab}...</p>
           </div>
-        ) : pendingBusinesses.length === 0 ? (
+        ) : filteredItems.length === 0 ? (
           <div className="empty">
-            <p className="empty-text">✅ No pending businesses found.</p>
+            <p className="empty-text">✅ No {activeTab === "sold" ? "sold" : statusView} {activeTab} found.</p>
+            {(searchQuery || filterCategory) && (
+              <button className="btn-reset" onClick={() => { setSearchQuery(""); setFilterCategory(""); }}>
+                Clear Filters
+              </button>
+            )}
           </div>
         ) : (
           <div className="grid">
-            {pendingBusinesses.map(business => (
-              <div key={business._id} className="card admin-card">
-                {business.images && business.images.length > 0 && (
-                  <div className="card-image" style={{ backgroundImage: `url(${business.images[0]})` }} />
+            {filteredItems.map(item => (
+              <div key={item._id} className={`card admin-card ${item.isFeatured ? 'featured' : ''}`} onClick={() => setSelected(item)}>
+                {item.isFeatured && <div className="featured-banner">⭐ FEATURED</div>}
+                {getImages(item)[0] && (
+                  <div className="card-image" style={{ backgroundImage: `url(${getImages(item)[0]})` }} />
                 )}
                 <div className="card-body">
-                  <p className="card-title">{business.name}</p>
-                  <p className="card-subtitle">{business.categories.join(", ")}</p>
-                  <p className="card-owner">📍 {business.location.town}, {business.location.county}</p>
-                  <p className="card-owner">👤 {business.submitterName || business.owner?.name || "Anonymous"}</p>
-                  <p className="card-owner">📞 {business.contact.phone}</p>
-                  <p className="card-owner">📸 {business.images && business.images.length > 0 ? `${business.images.length} photos` : "No photos"}</p>
-                  {business.pricelist?.url && (
-                    <p className="card-owner">
-                      <button
-                        type="button"
-                        className="doc-link"
-                        style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
-                        onClick={() => window.open(getPricelistUrl(business.pricelist), "_blank", "noopener,noreferrer")}
-                      >
-                        📄 View pricelist
-                      </button>
-                    </p>
-                  )}
+                  <p className="card-title">{getTitle(item)}</p>
+                  <p className="card-subtitle">{getSub(item)}</p>
+                  <p className="card-owner">👤 {getOwner(item)} · {getContact(item)}</p>
                   <div className="card-footer">
-                    <span className="status-dot" style={{ background: business.status === "approved" ? "#22c55e" : business.status === "rejected" ? "#ef4444" : "#fbbf24" }}>
-                      {business.status}
+                    <span className="price-badge">{getPrice(item)}</span>
+                    <span className="status-dot" style={{ background: item.status === "approved" || item.isApproved ? "#22c55e" : item.status === "rejected" ? "#ef4444" : "#fbbf24" }}>
+                      {item.status || (item.isApproved ? "approved" : "pending")}
                     </span>
                   </div>
-                  <div className="card-buttons">
-                    <button className="btn-approve" onClick={() => handleBusinessStatus(business._id, "approved")}>✅ Approve</button>
-                    <button className="btn-reject" onClick={() => handleBusinessStatus(business._id, "rejected")}>❌ Reject</button>
-                  </div>
-                  <select
-                    className="filter-select"
-                    style={{ marginTop: "10px", padding: "8px", fontSize: "12px" }}
-                    onChange={(e) => handleAddBadge(business._id, e.target.value)}
-                    defaultValue=""
-                  >
-                    <option value="">Add Badge</option>
-                    <option value="student_verified">🟢 Student</option>
-                    <option value="identity_verified">🟢 Identity</option>
-                    <option value="business_verified">🔵 Business</option>
-                    <option value="online_verified">🔵 Online</option>
-                    <option value="location_verified">🟣 Location</option>
-                    <option value="premium_verified">⭐ Premium</option>
-                  </select>
-                  <button
-                    className="btn-view"
-                    style={{ marginTop: "10px", width: "100%" }}
-                    onClick={() => navigate(`/business/${business._id}`)}
-                  >
-                    👁️ View Details & Reviews
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )
-      ) : activeTab === "announcements" ? (
-        announcementsLoading ? (
-          <div className="loader">
-            <div className="spinner"></div>
-            <p>⏳ Loading announcements...</p>
-          </div>
-        ) : pendingAnnouncements.length === 0 ? (
-          <div className="empty">
-            <p className="empty-text">✅ No announcements found.</p>
-          </div>
-        ) : (
-          <div className="grid">
-            {pendingAnnouncements.map(announcement => (
-              <div key={announcement.announcementId} className="card admin-card">
-                <div className="card-body">
-                  <p className="card-title">{announcement.title}</p>
-                  <p className="card-subtitle">📢 {announcement.businessName}</p>
-                  <p className="card-owner">👤 Submitted by: {announcement.submitterName || "Unknown"}</p>
-                  {announcement.organizationName && (
-                    <p className="card-owner">🏢 Organization: {announcement.organizationName}</p>
-                  )}
-                  <p className="card-owner">📅 {new Date(announcement.createdAt).toLocaleDateString()}</p>
-                  <p className="card-owner" style={{ color: announcement.status === "approved" ? "#22c55e" : announcement.status === "rejected" ? "#ef4444" : "#fbbf24" }}>
-                    Status: {announcement.status.toUpperCase()}
-                  </p>
-                  <p className="card-owner">{announcement.content}</p>
-                  <div className="card-buttons">
-                    {announcement.status === "pending" && (
-                      <>
-                        <button className="btn-approve" onClick={() => handleAnnouncementStatus(announcement.businessId, announcement.announcementId, "approved")}>✅ Approve</button>
-                        <button className="btn-reject" onClick={() => handleAnnouncementStatus(announcement.businessId, announcement.announcementId, "rejected")}>❌ Reject</button>
-                      </>
-                    )}
-                    <button className="btn-delete" onClick={() => handleDeleteAnnouncement(announcement.businessId, announcement.announcementId)}>🗑️ Delete</button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )
-      ) : activeTab === "verification" ? (
-        selectedVerification ? (
-          <div className="verification-detail">
-            <button className="btn-back" onClick={() => setSelectedVerification(null)}>← Back to List</button>
-            <div className="detail-card">
-              <h2 className="detail-title">Verification Details</h2>
-              <div className="detail-section">
-                <p className="detail-label">User ID:</p>
-                <p className="detail-value">{selectedVerification.user?._id || selectedVerification.user}</p>
-              </div>
-              <div className="detail-section">
-                <p className="detail-label">Verification Level:</p>
-                <p className="detail-value">Level {selectedVerification.verificationLevel}</p>
-              </div>
-              <div className="detail-section">
-                <p className="detail-label">Status:</p>
-                <p className="detail-value" style={{ color: selectedVerification.status === 'approved' ? '#22c55e' : selectedVerification.status === 'rejected' ? '#ef4444' : '#fbbf24' }}>
-                  {selectedVerification.status.toUpperCase()}
-                </p>
-              </div>
-              {selectedVerification.idType && (
-                <div className="detail-section">
-                  <p className="detail-label">ID Type:</p>
-                  <p className="detail-value">{selectedVerification.idType.replace(/_/g, ' ')}</p>
-                </div>
-              )}
-              {selectedVerification.businessName && (
-                <div className="detail-section">
-                  <p className="detail-label">Business Name:</p>
-                  <p className="detail-value">{selectedVerification.businessName}</p>
-                </div>
-              )}
-              {selectedVerification.taxId && (
-                <div className="detail-section">
-                  <p className="detail-label">Tax ID:</p>
-                  <p className="detail-value">{selectedVerification.taxId}</p>
-                </div>
-              )}
-              {selectedVerification.physicalDetails && (
-                <div className="detail-section">
-                  <p className="detail-label">Physical Address & Visitation Details:</p>
-                  <p className="detail-value" style={{ whiteSpace: 'pre-wrap', background: 'rgba(0,0,0,0.15)', padding: '10px', borderRadius: '6px' }}>
-                    {selectedVerification.physicalDetails}
-                  </p>
-                </div>
-              )}
-              {selectedVerification.documents && selectedVerification.documents.length > 0 && (
-                <div className="detail-section">
-                  <p className="detail-label">Documents:</p>
-                  {selectedVerification.documents.map((doc, idx) => (
-                    <div key={idx} className="document-item">
-                      <p className="doc-type">{doc.type.replace(/_/g, ' ')}</p>
-                      <button
-                        type="button"
-                        className="doc-link"
-                        onClick={() => handleOpenFile(doc.url)}
-                      >
-                        📄 View / Download
-                      </button>
-                      <p style={{ fontSize: 11, color: '#64748b' }}>Filename: {doc.filename}</p>
+                  {statusView === "pending" && activeTab !== "sold" && (
+                    <div className="card-buttons" onClick={e => e.stopPropagation()}>
+                      <button className="btn-approve" onClick={() => handleApprove(activeTab, item._id)}>✅ Approve</button>
+                      <button className="btn-reject" onClick={() => handleReject(activeTab, item._id)}>❌ Reject</button>
                     </div>
-                  ))}
-                </div>
-              )}
-              {selectedVerification.selfie && selectedVerification.selfie.url && (
-                <div className="detail-section">
-                  <p className="detail-label">Selfie:</p>
-                  <img
-                    src={resolveMediaUrl(selectedVerification.selfie.url)}
-                    alt="Selfie"
-                    className="selfie-image"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      if (e.target.nextSibling) e.target.nextSibling.style.display = 'block';
-                    }}
-                  />
-                  <button
-                    type="button"
-                    className="doc-link"
-                    style={{ marginTop: "8px" }}
-                    onClick={() => handleOpenFile(selectedVerification.selfie.url)}
-                  >
-                    📥 Download selfie
-                  </button>
-                  <p style={{ fontSize: 12, color: '#ef4444', display: 'none' }}>
-                    ⚠️ Selfie image not available (file may not exist on server)
-                  </p>
-                  <p style={{ fontSize: 11, color: '#64748b', marginTop: '8px' }}>
-                    Filename: {selectedVerification.selfie.filename}
-                  </p>
-                </div>
-              )}
-              {selectedVerification.status === 'pending' && (
-                <div className="action-buttons">
-                  <button className="btn-approve" onClick={() => handleApproveVerification(selectedVerification._id)}>
-                    ✅ Approve
-                  </button>
-                  <div className="reject-section">
-                    <textarea
-                      className="reject-input"
-                      placeholder="Enter rejection reason..."
-                      value={rejectionReason}
-                      onChange={(e) => setRejectionReason(e.target.value)}
-                    />
-                    <button className="btn-reject" onClick={() => handleRejectVerification(selectedVerification._id)}>
-                      ❌ Reject
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        ) : verificationLoading ? (
-          <div className="loader">
-            <div className="spinner"></div>
-            <p>⏳ Loading verifications...</p>
-          </div>
-        ) : pendingVerifications.length === 0 ? (
-          <div className="empty">
-            <p className="empty-text">✅ No pending verifications found.</p>
-          </div>
-        ) : (
-          <div className="grid">
-            {pendingVerifications.map(verification => (
-              <div key={verification._id} className="card admin-card">
-                <div className="card-body">
-                  <p className="card-title">Level {verification.verificationLevel} Verification</p>
-                  <p className="card-subtitle">👤 User: {verification.user?.name || verification.user?.email || 'Unknown'}</p>
-                  <p className="card-owner">📅 Submitted: {new Date(verification.submittedAt).toLocaleDateString()}</p>
-                  <p className="card-owner" style={{ color: '#fbbf24' }}>
-                    Status: {verification.status.toUpperCase()}
-                  </p>
-                  <div className="card-buttons">
-                    <button className="btn-view" onClick={() => loadVerificationDetails(verification._id)}>
-                      👁️ Review Verification
-                    </button>
-                  </div>
+                  )}
+                  <button className="btn-delete" onClick={(e) => { e.stopPropagation(); confirmDelete(activeTab, item._id, getTitle(item)); }}>🗑️</button>
                 </div>
               </div>
             ))}
           </div>
-        )
-      ) : loading ? (
-        <div className="loader">
-          <div className="spinner"></div>
-          <p>⏳ Loading {activeTab === "sold" ? "sold" : statusView} {activeTab}...</p>
-        </div>
-      ) : filteredItems.length === 0 ? (
-        <div className="empty">
-          <p className="empty-text">✅ No {activeTab === "sold" ? "sold" : statusView} {activeTab} found.</p>
-          {(searchQuery || filterCategory) && (
-            <button className="btn-reset" onClick={() => { setSearchQuery(""); setFilterCategory(""); }}>
-              Clear Filters
-            </button>
-          )}
-        </div>
-      ) : (
-        <div className="grid">
-          {filteredItems.map(item => (
-            <div key={item._id} className={`card admin-card ${item.isFeatured ? 'featured' : ''}`} onClick={() => setSelected(item)}>
-              {item.isFeatured && <div className="featured-banner">⭐ FEATURED</div>}
-              {getImages(item)[0] && (
-                <div className="card-image" style={{ backgroundImage: `url(${getImages(item)[0]})` }} />
-              )}
-              <div className="card-body">
-                <p className="card-title">{getTitle(item)}</p>
-                <p className="card-subtitle">{getSub(item)}</p>
-                <p className="card-owner">👤 {getOwner(item)} · {getContact(item)}</p>
-                <div className="card-footer">
-                  <span className="price-badge">{getPrice(item)}</span>
-                  <span className="status-dot" style={{ background: item.status === "approved" || item.isApproved ? "#22c55e" : item.status === "rejected" ? "#ef4444" : "#fbbf24" }}>
-                    {item.status || (item.isApproved ? "approved" : "pending")}
-                  </span>
-                </div>
-                {statusView === "pending" && activeTab !== "sold" && (
-                  <div className="card-buttons" onClick={e => e.stopPropagation()}>
-                    <button className="btn-approve" onClick={() => handleApprove(activeTab, item._id)}>✅ Approve</button>
-                    <button className="btn-reject" onClick={() => handleReject(activeTab, item._id)}>❌ Reject</button>
-                  </div>
-                )}
-                <button className="btn-delete" onClick={(e) => { e.stopPropagation(); confirmDelete(activeTab, item._id, getTitle(item)); }}>🗑️</button>
+        )}
+
+        {/* DETAIL MODAL */}
+        {selected && (
+          <DetailModal
+            item={selected} tab={activeTab} statusView={statusView}
+            onClose={() => { setSelected(null); setEditMode(false); }}
+            onApprove={() => handleApprove(activeTab, selected._id)}
+            onReject={() => handleReject(activeTab, selected._id)}
+            editMode={editMode} editData={editData} setEditData={setEditData}
+            onEdit={() => openEdit(selected)} onSave={saveEdit} saving={saving}
+            onCancelEdit={() => setEditMode(false)}
+            onDelete={confirmDelete}
+            getImages={getImages} getTitle={getTitle} getOwner={getOwner} getContact={getContact}
+          />
+        )}
+
+        {/* DELETE CONFIRMATION MODAL */}
+        {deleteConfirm && (
+          <div className="modal-overlay" onClick={() => setDeleteConfirm(null)}>
+            <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+              <h3 className="confirm-title">⚠️ Confirm Delete</h3>
+              <p className="confirm-text">
+                Are you sure you want to delete <strong>{deleteConfirm.title}</strong>?
+                <br />
+                <span style={{ fontSize: 12, color: "#ef4444" }}>This action cannot be undone.</span>
+              </p>
+              <div className="confirm-buttons">
+                <button className="btn-cancel" onClick={() => setDeleteConfirm(null)}>Cancel</button>
+                <button className="btn-confirm-delete" onClick={executeDelete}>🗑️ Delete</button>
               </div>
             </div>
-          ))}
-        </div>
-      )}
-
-      {/* DETAIL MODAL */}
-      {selected && (
-        <DetailModal
-          item={selected} tab={activeTab} statusView={statusView}
-          onClose={() => { setSelected(null); setEditMode(false); }}
-          onApprove={() => handleApprove(activeTab, selected._id)}
-          onReject={() => handleReject(activeTab, selected._id)}
-          editMode={editMode} editData={editData} setEditData={setEditData}
-          onEdit={() => openEdit(selected)} onSave={saveEdit} saving={saving}
-          onCancelEdit={() => setEditMode(false)}
-          onDelete={confirmDelete}
-          getImages={getImages} getTitle={getTitle} getOwner={getOwner} getContact={getContact}
-        />
-      )}
-
-      {/* DELETE CONFIRMATION MODAL */}
-      {deleteConfirm && (
-        <div className="modal-overlay" onClick={() => setDeleteConfirm(null)}>
-          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
-            <h3 className="confirm-title">⚠️ Confirm Delete</h3>
-            <p className="confirm-text">
-              Are you sure you want to delete <strong>{deleteConfirm.title}</strong>?
-              <br />
-              <span style={{ fontSize: 12, color: "#ef4444" }}>This action cannot be undone.</span>
-            </p>
-            <div className="confirm-buttons">
-              <button className="btn-cancel" onClick={() => setDeleteConfirm(null)}>Cancel</button>
-              <button className="btn-confirm-delete" onClick={executeDelete}>🗑️ Delete</button>
-            </div>
           </div>
-        </div>
-      )}
+        )}
       </main>
     </div>
   );
@@ -1217,7 +1221,17 @@ export default function AdminDashboard() {
 // ── PAYMENT NOTIFICATIONS TAB ─────────────────────────────────
 function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprove, onReject, getNotifTitle, getNotifIcon }) {
   const [viewMode, setViewMode] = useState("pending");
+  const [selectedBadges, setSelectedBadges] = useState({});
   const displayed = viewMode === "pending" ? pendingBoosts : allBoosts;
+
+  const VERIFICATION_BADGES = [
+    { id: "student_verified", name: "Student Verified", image: "/Student Verified.png" },
+    { id: "business_verified", name: "Business Verified", image: "/Business Verified.png" },
+    { id: "identity_verified", name: "Identity Verified", image: "/Identity Verified.png" },
+    { id: "location_verified", name: "Location Verified", image: "/Locationn Verified.png" },
+    { id: "online_verified", name: "Online Verified", image: "/Online Verified.png" },
+    { id: "premium_verified", name: "Premium Verified", image: "/Premium Verified.png" },
+  ];
 
   const typeLabel = (type) => {
     const labels = { property_booking: "Property Booking", material_purchase: "Material Purchase", tourism_booking: "Tourism Booking", boost: "Listing Boost", subscription: "Subscription" };
@@ -1326,14 +1340,52 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
                 </div>
 
                 {!notif.read && (
-                  <div className="boost-actions">
-                    <button className="btn-boost-approve" onClick={() => onApprove(notif._id)}>
-                      ✅ Mark as Confirmed
-                    </button>
-                    <button className="btn-boost-reject" onClick={() => onReject(notif._id)}>
-                      ✕ Dismiss
-                    </button>
-                  </div>
+                  <>
+                    <div style={{ marginTop: 16, padding: "12px", background: "rgba(251, 191, 36, 0.1)", borderRadius: "8px", border: "1px solid rgba(251, 191, 36, 0.3)" }}>
+                      <label style={{ fontSize: 12, fontWeight: 700, color: "#fbbf24", marginBottom: 8, display: "block" }}>
+                        🏅 Issue Verification Badge (Optional)
+                      </label>
+                      <select
+                        style={{
+                          width: "100%",
+                          padding: "8px 12px",
+                          background: "#0f1729",
+                          border: "1px solid rgba(255, 255, 255, 0.2)",
+                          borderRadius: "6px",
+                          color: "#f1f5f9",
+                          fontSize: 12,
+                          cursor: "pointer"
+                        }}
+                        value={selectedBadges[notif._id] || ""}
+                        onChange={(e) => setSelectedBadges(prev => ({ ...prev, [notif._id]: e.target.value }))}
+                      >
+                        <option value="">No Badge</option>
+                        {VERIFICATION_BADGES.map(badge => (
+                          <option key={badge.id} value={badge.id}>{badge.name}</option>
+                        ))}
+                      </select>
+                      {selectedBadges[notif._id] && (
+                        <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8 }}>
+                          <img
+                            src={VERIFICATION_BADGES.find(b => b.id === selectedBadges[notif._id])?.image}
+                            alt="Badge Preview"
+                            style={{ width: 40, height: 40, objectFit: "contain" }}
+                          />
+                          <span style={{ fontSize: 11, color: "#94a3b8" }}>
+                            {VERIFICATION_BADGES.find(b => b.id === selectedBadges[notif._id])?.name}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="boost-actions" style={{ marginTop: 12 }}>
+                      <button className="btn-boost-approve" onClick={() => onApprove(notif._id, selectedBadges[notif._id])}>
+                        ✅ Mark as Confirmed
+                      </button>
+                      <button className="btn-boost-reject" onClick={() => onReject(notif._id)}>
+                        ✕ Dismiss
+                      </button>
+                    </div>
+                  </>
                 )}
                 {notif.read && (
                   <div style={{ padding: "10px 0", color: "#22c55e", fontWeight: 600, fontSize: 13 }}>
