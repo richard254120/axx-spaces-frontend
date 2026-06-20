@@ -4,6 +4,7 @@ import { AuthContext } from "../../context/AuthContext";
 import { tourismLogin } from "../../api/tourism";
 import { UserProfileEditor, ProfileAvatar } from "../../features/profile";
 import VerificationStatus from "../../components/VerificationStatus";
+import VerificationBadges from "../../components/VerificationBadges";
 import AnalyticsDashboard from "../../components/AnalyticsDashboard";
 import {
   useOwnerProfile,
@@ -149,6 +150,8 @@ export default function ProviderDashboard() {
           <LoadingBlock message="Loading your profile…" />
         ) : user ? (
           <>
+            <VerificationBadges userId={user?._id || user?.id} userType="tourism" />
+            <AnalyticsDashboard userType="tourism" userId={user?._id || user?.id} />
             <UserProfileEditor
               token={token || getTourismToken()}
               user={user}

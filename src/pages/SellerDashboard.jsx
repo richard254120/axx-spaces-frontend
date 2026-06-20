@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { UserProfileEditor, ProfileAvatar } from "../features/profile";
 import VerificationStatus from "../components/VerificationStatus";
+import VerificationBadges from "../components/VerificationBadges";
 import BoostNotification from "../components/BoostNotification";
 import AnalyticsDashboard from "../components/AnalyticsDashboard";
 
@@ -242,12 +243,16 @@ export default function SellerDashboard() {
       </div>
 
       {view === "profile" ? (
-        <UserProfileEditor
-          token={token}
-          user={seller}
-          accentColor="#fbbf24"
-          onUpdated={(u) => u && setSeller(u)}
-        />
+        <div>
+          <VerificationBadges userId={seller?._id || seller?.id} userType="seller" />
+          <AnalyticsDashboard userType="seller" userId={seller?._id || seller?.id} />
+          <UserProfileEditor
+            token={token}
+            user={seller}
+            accentColor="#fbbf24"
+            onUpdated={(u) => u && setSeller(u)}
+          />
+        </div>
       ) : view === "listings" ? (
         loading ? (
           <div style={s.loadingBox}>
