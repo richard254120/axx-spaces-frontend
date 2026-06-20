@@ -287,7 +287,7 @@ export default function UserDashboard() {
 const s = {
   loaderContainer: {
     minHeight: "100vh",
-    background: "#080c14",
+    background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -303,10 +303,10 @@ const s = {
   },
   dashboardContainer: {
     minHeight: "100vh",
-    background: "#080c14",
+    background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
     color: "#f1f5f9",
     display: "flex",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'DM Sans', sans-serif",
   },
   mobileHeader: {
     display: "none",
@@ -488,32 +488,34 @@ const s = {
     fontWeight: "600",
   },
   welcomeBanner: {
-    background: "linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.8) 100%)",
-    border: "1px solid rgba(255, 255, 255, 0.08)",
-    borderRadius: "16px",
-    padding: "24px",
+    background: "linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%)",
+    border: "1px solid rgba(251, 191, 36, 0.2)",
+    borderRadius: "20px",
+    padding: "32px",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: "32px",
     flexWrap: "wrap",
-    gap: "20px",
+    gap: "24px",
+    boxShadow: "0 4px 20px rgba(251, 191, 36, 0.1)",
   },
   bannerLeft: {
     flex: 1,
     minWidth: "280px",
   },
   bannerTitle: {
-    margin: "0 0 8px 0",
-    fontSize: "28px",
+    margin: "0 0 12px 0",
+    fontSize: "32px",
     fontWeight: "800",
     color: "#fbbf24",
+    letterSpacing: "-0.5px",
   },
   bannerSubtitle: {
     margin: 0,
-    fontSize: "14px",
+    fontSize: "15px",
     color: "#94a3b8",
-    lineHeight: "1.5",
+    lineHeight: "1.6",
   },
   badgeCard: {
     display: "flex",
@@ -521,39 +523,42 @@ const s = {
   },
   statsGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-    gap: "16px",
+    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+    gap: "20px",
     marginBottom: "32px",
   },
   statCard: {
-    background: "rgba(22, 28, 45, 0.4)",
-    border: "1px solid rgba(255, 255, 255, 0.05)",
-    borderRadius: "14px",
-    padding: "24px",
-    transition: "transform 0.2s",
+    background: "linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderRadius: "16px",
+    padding: "28px",
+    transition: "all 0.3s ease",
+    cursor: "pointer",
   },
   statValue: {
-    fontSize: "36px",
+    fontSize: "42px",
     fontWeight: "800",
     color: "#fbbf24",
-    marginBottom: "4px",
+    marginBottom: "8px",
+    letterSpacing: "-1px",
   },
   statLabel: {
-    fontSize: "12px",
-    color: "#64748b",
-    fontWeight: "700",
+    fontSize: "13px",
+    color: "#94a3b8",
+    fontWeight: "600",
     textTransform: "uppercase",
-    letterSpacing: "1px",
+    letterSpacing: "1.5px",
   },
   kycContainer: {
     marginBottom: "32px",
   },
   panelCard: {
-    background: "rgba(22, 28, 45, 0.4)",
-    border: "1px solid rgba(255, 255, 255, 0.05)",
-    borderRadius: "16px",
-    padding: "24px",
-    marginBottom: "24px",
+    background: "linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.7) 100%)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderRadius: "20px",
+    padding: "28px",
+    marginBottom: "28px",
+    boxShadow: "0 4px 16px rgba(0, 0, 0, 0.2)",
   },
   panelHeading: {
     margin: "0 0 16px 0",
@@ -567,16 +572,17 @@ const s = {
     gap: "12px",
   },
   actionGridBtn: {
-    background: "rgba(255,255,255,0.03)",
-    border: "1px solid rgba(255, 255, 255, 0.08)",
-    borderRadius: "12px",
+    background: "linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(251, 191, 36, 0.05) 100%)",
+    border: "1px solid rgba(251, 191, 36, 0.3)",
+    borderRadius: "14px",
     color: "#fbbf24",
-    padding: "16px",
-    fontSize: "14px",
+    padding: "20px",
+    fontSize: "15px",
     fontWeight: "700",
     cursor: "pointer",
     textAlign: "center",
-    transition: "all 0.2s ease",
+    transition: "all 0.3s ease",
+    letterSpacing: "0.3px",
   },
   panelFlexHeader: {
     display: "flex",
@@ -588,20 +594,22 @@ const s = {
   },
   tabTitle: {
     margin: 0,
-    fontSize: "22px",
+    fontSize: "26px",
     fontWeight: "800",
     color: "#fbbf24",
+    letterSpacing: "-0.5px",
   },
   btnPrimary: {
     background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
     color: "#080c14",
     border: "none",
-    borderRadius: "8px",
-    padding: "10px 20px",
+    borderRadius: "12px",
+    padding: "12px 24px",
     fontSize: "14px",
     fontWeight: "700",
     cursor: "pointer",
-    transition: "all 0.2s",
+    transition: "all 0.3s ease",
+    boxShadow: "0 4px 12px rgba(251, 191, 36, 0.3)",
   },
   btnSecondary: {
     background: "rgba(255, 255, 255, 0.08)",
@@ -625,16 +633,18 @@ const s = {
   },
   cardGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-    gap: "20px",
+    gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
+    gap: "24px",
   },
   itemCard: {
-    background: "rgba(15, 23, 42, 0.4)",
-    border: "1px solid rgba(255, 255, 255, 0.06)",
-    borderRadius: "14px",
+    background: "linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderRadius: "18px",
     overflow: "hidden",
     display: "flex",
     flexDirection: "column",
+    transition: "all 0.3s ease",
+    boxShadow: "0 4px 16px rgba(0, 0, 0, 0.15)",
   },
   itemCardHeader: {
     padding: "16px 16px 8px 16px",
@@ -644,9 +654,10 @@ const s = {
   },
   itemCardTitle: {
     margin: 0,
-    fontSize: "16px",
-    fontWeight: "700",
+    fontSize: "18px",
+    fontWeight: "800",
     color: "#f1f5f9",
+    letterSpacing: "-0.3px",
   },
   itemCardDesc: {
     margin: "0 16px 12px 16px",
@@ -968,6 +979,20 @@ const customStyles = `
   }
   button:hover:not(:disabled) {
     opacity: 0.9;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+  .stat-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(251, 191, 36, 0.3);
+    box-shadow: 0 8px 24px rgba(251, 191, 36, 0.15);
+  }
+  .item-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(251, 191, 36, 0.2);
+  }
+  .action-grid-btn:hover {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.25) 0%, rgba(251, 191, 36, 0.15) 100%);
+    transform: translateY(-2px);
   }
 `;

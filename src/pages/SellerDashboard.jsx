@@ -366,55 +366,61 @@ export default function SellerDashboard() {
 }
 
 const s = {
-  page: { maxWidth: "1200px", margin: "0 auto", padding: "24px", background: "#0f172a", minHeight: "100vh", fontFamily: "sans-serif", color: "#f8fafc" },
-  topBar: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "32px", flexWrap: "wrap", gap: "12px" },
-  topTitle: { margin: 0, color: "#fbbf24" },
-  topSub: { margin: "4px 0 0 0", color: "#94a3b8" },
-  uploadBtn: { padding: "10px 20px", background: "#fbbf24", color: "#0f172a", border: "none", borderRadius: "6px", fontWeight: "bold", cursor: "pointer" },
-  statsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "16px", marginBottom: "32px" },
-  statCard: { display: "flex", alignItems: "center", gap: "16px", padding: "20px", background: "#1e293b", border: "1px solid #334155", borderRadius: "8px" },
-  statIcon: { fontSize: "1.5rem" },
-  statLabel: { color: "#94a3b8", fontSize: "0.8rem" },
-  statVal: { fontSize: "1.2rem", fontWeight: "bold", marginTop: "2px" },
-  controlsRow: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", flexWrap: "wrap", gap: "12px" },
-  tabs: { display: "flex" },
-  tab: { padding: "8px 16px", background: "transparent", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: "0.95rem" },
-  activeTab: { color: "#fbbf24", fontWeight: "bold" },
-  filterGroup: { display: "flex", gap: "8px", flexWrap: "wrap" },
-  searchBar: { padding: "8px 12px", background: "#1e293b", border: "1px solid #334155", borderRadius: "6px", color: "#fff" },
-  statusDropdown: { padding: "8px 12px", background: "#1e293b", border: "1px solid #334155", borderRadius: "6px", color: "#fff" },
-  refreshBtn: { padding: "8px 12px", background: "rgba(59,130,246,0.2)", color: "#60a5fa", border: "1px solid #2563eb", borderRadius: "6px", cursor: "pointer" },
-  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "24px" },
-  card: { background: "#1e293b", border: "1px solid #334155", borderRadius: "8px", overflow: "hidden" },
-  cardImg: { position: "relative", height: "160px", background: "#0f172a" },
+  page: { maxWidth: "1400px", margin: "0 auto", padding: "28px", background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)", minHeight: "100vh", fontFamily: "'Inter', 'DM Sans', sans-serif", color: "#f8fafc" },
+  topBar: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "36px", flexWrap: "wrap", gap: "16px" },
+  topTitle: { margin: 0, color: "#fbbf24", fontSize: "28px", fontWeight: 800, letterSpacing: "-0.5px" },
+  topSub: { margin: "8px 0 0 0", color: "#94a3b8", fontSize: "14px", lineHeight: "1.5" },
+  uploadBtn: { padding: "12px 24px", background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)", color: "#0f172a", border: "none", borderRadius: "12px", fontWeight: "bold", cursor: "pointer", boxShadow: "0 4px 12px rgba(251, 191, 36, 0.3)", transition: "all 0.3s ease" },
+  statsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "20px", marginBottom: "36px" },
+  statCard: { display: "flex", alignItems: "center", gap: "18px", padding: "24px", background: "linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "16px", transition: "all 0.3s ease", cursor: "pointer" },
+  statIcon: { fontSize: "2rem" },
+  statLabel: { color: "#94a3b8", fontSize: "0.85rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "1px" },
+  statVal: { fontSize: "1.5rem", fontWeight: 800, marginTop: "4px", letterSpacing: "-0.5px" },
+  controlsRow: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "28px", flexWrap: "wrap", gap: "16px" },
+  tabs: { display: "flex", gap: "8px" },
+  tab: { padding: "12px 20px", background: "transparent", border: "1px solid rgba(255, 255, 255, 0.08)", color: "#94a3b8", cursor: "pointer", fontSize: "0.95rem", borderRadius: "10px", transition: "all 0.3s ease", fontWeight: 600 },
+  activeTab: { color: "#fbbf24", fontWeight: "bold", borderColor: "rgba(251, 191, 36, 0.3)", background: "rgba(251, 191, 36, 0.1)" },
+  filterGroup: { display: "flex", gap: "10px", flexWrap: "wrap" },
+  searchBar: { padding: "12px 16px", background: "rgba(30, 41, 59, 0.8)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px", color: "#fff", fontSize: "14px", minWidth: "200px" },
+  statusDropdown: { padding: "12px 16px", background: "rgba(30, 41, 59, 0.8)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px", color: "#fff", fontSize: "14px", fontWeight: 600 },
+  refreshBtn: { padding: "12px 16px", background: "rgba(59,130,246,0.2)", color: "#60a5fa", border: "1px solid #2563eb", borderRadius: "10px", cursor: "pointer", fontSize: "14px", fontWeight: 600, transition: "all 0.3s ease" },
+  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "28px" },
+  card: { background: "linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "18px", overflow: "hidden", transition: "all 0.3s ease", boxShadow: "0 4px 16px rgba(0, 0, 0, 0.15)" },
+  cardImg: { position: "relative", height: "180px", background: "#0f172a" },
   img: { width: "100%", height: "100%", objectFit: "cover" },
-  noImg: { height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569", fontSize: "2rem" },
-  statusBadge: { position: "absolute", top: "8px", left: "8px", padding: "4px 8px", borderRadius: "4px", fontSize: "0.75rem", fontWeight: "bold" },
-  cardBody: { padding: "16px" },
-  cardTitle: { margin: "0 0 8px 0", fontSize: "1rem" },
-  cardPrice: { color: "#fbbf24", fontWeight: "bold", fontSize: "1.1rem", margin: "0 0 4px 0" },
-  cardMeta: { color: "#94a3b8", fontSize: "0.85rem", margin: 0 },
-  engagementStats: { display: "flex", alignItems: "center", gap: "8px", marginTop: "8px", fontSize: "0.8rem", color: "#94a3b8" },
+  noImg: { height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569", fontSize: "2.5rem" },
+  statusBadge: { position: "absolute", top: "12px", left: "12px", padding: "6px 12px", borderRadius: "8px", fontSize: "0.8rem", fontWeight: "bold", backdropFilter: "blur(10px)" },
+  cardBody: { padding: "20px" },
+  cardTitle: { margin: "0 0 12px 0", fontSize: "1.1rem", fontWeight: 800, letterSpacing: "-0.3px" },
+  cardPrice: { color: "#fbbf24", fontWeight: "bold", fontSize: "1.3rem", margin: "0 0 8px 0", letterSpacing: "-0.5px" },
+  cardMeta: { color: "#94a3b8", fontSize: "0.9rem", margin: 0, lineHeight: "1.5" },
+  engagementStats: { display: "flex", alignItems: "center", gap: "10px", marginTop: "12px", fontSize: "0.85rem", color: "#94a3b8", fontWeight: 500 },
   engagementItem: { display: "flex", alignItems: "center", gap: "4px" },
-  engagementSeparator: { color: "#94a3b8" },
-  cardBtns: { display: "flex", gap: "8px", marginTop: "16px" },
-  soldBtn: { flex: 1, padding: "6px", background: "rgba(34,197,94,0.2)", color: "#4ade80", border: "1px solid #22c55e", borderRadius: "4px", cursor: "pointer" },
-  deleteBtn: { flex: 1, padding: "6px", background: "rgba(239,68,68,0.2)", color: "#f87171", border: "1px solid #ef4444", borderRadius: "4px", cursor: "pointer" },
-  formBox: { background: "#1e293b", padding: "24px", borderRadius: "8px", border: "1px solid #334155" },
-  formGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "20px" },
-  input: { width: "100%", padding: "10px", background: "#0f172a", border: "1px solid #334155", borderRadius: "6px", color: "#fff", boxSizing: "border-box", fontFamily: "sans-serif" },
-  submitBtn: { padding: "10px 24px", background: "#fbbf24", color: "#0f172a", border: "none", borderRadius: "6px", fontWeight: "bold", cursor: "pointer", fontSize: "1rem" },
-  errorMsg: { background: "rgba(239,68,68,0.2)", padding: "10px", borderRadius: "6px", color: "#f87171", marginBottom: "16px" },
-  successMsg: { background: "rgba(34,197,94,0.2)", padding: "10px", borderRadius: "6px", color: "#4ade80", marginBottom: "16px" },
-  loadingBox: { display: "flex", flexDirection: "column", alignItems: "center", padding: "60px 20px" },
-  emptyBox: { textAlign: "center", padding: "60px 20px" },
-  previews: { display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "12px" },
-  previewImg: { width: "80px", height: "80px", objectFit: "cover", borderRadius: "6px", border: "1px solid #334155" },
+  engagementSeparator: { color: "#64748b" },
+  cardBtns: { display: "flex", gap: "10px", marginTop: "20px" },
+  soldBtn: { flex: 1, padding: "10px", background: "rgba(34,197,94,0.2)", color: "#4ade80", border: "1px solid #22c55e", borderRadius: "8px", cursor: "pointer", fontWeight: 700, fontSize: "13px", transition: "all 0.3s ease" },
+  deleteBtn: { flex: 1, padding: "10px", background: "rgba(239,68,68,0.2)", color: "#f87171", border: "1px solid #ef4444", borderRadius: "8px", cursor: "pointer", fontWeight: 700, fontSize: "13px", transition: "all 0.3s ease" },
+  formBox: { background: "linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)", padding: "28px", borderRadius: "20px", border: "1px solid rgba(255, 255, 255, 0.08)", boxShadow: "0 4px 16px rgba(0, 0, 0, 0.15)" },
+  formGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "24px" },
+  input: { width: "100%", padding: "14px", background: "rgba(15, 23, 42, 0.8)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px", color: "#fff", boxSizing: "border-box", fontFamily: "inherit", fontSize: "14px" },
+  submitBtn: { padding: "14px 32px", background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)", color: "#0f172a", border: "none", borderRadius: "12px", fontWeight: "bold", cursor: "pointer", fontSize: "1rem", boxShadow: "0 4px 12px rgba(251, 191, 36, 0.3)", transition: "all 0.3s ease" },
+  errorMsg: { background: "rgba(239,68,68,0.2)", padding: "16px 20px", borderRadius: "12px", color: "#f87171", marginBottom: "20px", fontSize: "14px", fontWeight: 600, border: "1px solid rgba(239, 68, 68, 0.3)" },
+  successMsg: { background: "rgba(34,197,94,0.2)", padding: "16px 20px", borderRadius: "12px", color: "#4ade80", marginBottom: "20px", fontSize: "14px", fontWeight: 600, border: "1px solid rgba(34, 197, 94, 0.3)" },
+  loadingBox: { display: "flex", flexDirection: "column", alignItems: "center", padding: "80px 20px" },
+  emptyBox: { textAlign: "center", padding: "80px 20px", background: "rgba(30, 41, 59, 0.4)", borderRadius: "20px", border: "2px dashed rgba(255, 255, 255, 0.1)" },
+  previews: { display: "flex", gap: "12px", flexWrap: "wrap", marginTop: "16px" },
+  previewImg: { width: "100px", height: "100px", objectFit: "cover", borderRadius: "12px", border: "2px solid rgba(255, 255, 255, 0.1)" },
 };
 
 const css = `
   @keyframes spin { to { transform: rotate(360deg); } }
-  .spinner { width: 36px; height: 36px; border: 3px solid #334155; border-top-color: #fbbf24; border-radius: 50%; animation: spin 0.8s linear infinite; }
-  input:focus, select:focus, textarea:focus { border-color: #fbbf24 !important; outline: none; }
-  button:hover:not(:disabled) { opacity: 0.85; }
+  .spinner { width: 40px; height: 40px; border: 4px solid rgba(255, 255, 255, 0.1); border-top-color: #fbbf24; border-radius: 50%; animation: spin 0.8s linear infinite; }
+  input:focus, select:focus, textarea:focus { border-color: #fbbf24 !important; outline: none; box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1); }
+  button:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); }
+  .stat-card:hover { transform: translateY(-4px); border-color: rgba(251, 191, 36, 0.3); box-shadow: 0 8px 24px rgba(251, 191, 36, 0.15); }
+  .card:hover { transform: translateY(-4px); border-color: rgba(251, 191, 36, 0.2); }
+  .upload-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(251, 191, 36, 0.4); }
+  .tab:hover { background: rgba(255, 255, 255, 0.05); }
+  .sold-btn:hover { background: rgba(34, 197, 94, 0.3); transform: translateY(-1px); }
+  .delete-btn:hover { background: rgba(239, 68, 68, 0.3); transform: translateY(-1px); }
 `;

@@ -240,7 +240,7 @@ export default function Profile() {
               <button style={styles.button} onClick={() => navigate("/settings")}>
                 ⚙️ Account Settings
               </button>
-              <button style={{ ...styles.button, ...styles.buttonSecondary }} onClick={() => logout()}>
+              <button style={{ ...styles.button, ...styles.buttonSecondary }} onClick={() => logout("/login")}>
                 🚪 Logout
               </button>
             </div>
@@ -253,7 +253,7 @@ export default function Profile() {
               KES {displayProfile?.walletBalance?.toLocaleString() || "0"}
             </div>
             <p style={styles.walletLabel}>Available for bookings and purchases</p>
-            
+
             <div style={{ marginTop: "24px" }}>
               <button style={styles.button} onClick={() => navigate("/wallet")}>
                 💳 View Wallet

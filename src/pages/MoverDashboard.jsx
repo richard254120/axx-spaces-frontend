@@ -190,7 +190,7 @@ export default function MoverDashboard() {
     accepted: "🔵 Accepted", pending: "⏳ Pending",
   }[status] || status);
 
-  const handleLogout = () => { logout(); navigate("/"); };
+  const handleLogout = () => { logout("/"); };
 
   if (loading) {
     return (
@@ -555,18 +555,18 @@ function JobCard({ job, actionLoading, onAccept, onComplete, getStatusColor, get
 
 const styles = {
   container: {
-    background: "#f4f7f6", minHeight: "100vh",
-    paddingBottom: "100px", fontFamily: "'DM Sans', sans-serif",
+    background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)", minHeight: "100vh",
+    paddingBottom: "100px", fontFamily: "'Inter', 'DM Sans', sans-serif",
   },
   topBar: {
     background: "linear-gradient(135deg, #1f2937 0%, #0f1729 100%)",
-    color: "white", padding: "16px 20px",
+    color: "white", padding: "18px 24px",
     display: "flex", justifyContent: "space-between", alignItems: "center",
     position: "sticky", top: 0, zIndex: 100,
-    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
   },
-  logoSection: { display: "flex", alignItems: "center", gap: "8px" },
-  logoText: { fontWeight: 800, fontSize: "16px", color: "#fbbf24", letterSpacing: "0.5px" },
+  logoSection: { display: "flex", alignItems: "center", gap: "10px" },
+  logoText: { fontWeight: 800, fontSize: "18px", color: "#fbbf24", letterSpacing: "0.5px" },
   logoutIcon: { background: "none", border: "none", fontSize: "22px", cursor: "pointer" },
   settingsIcon: { background: "none", border: "none", fontSize: "20px", cursor: "pointer" },
   refreshBtn: { background: "none", border: "none", fontSize: "18px", cursor: "pointer", marginRight: "10px" },
@@ -593,51 +593,52 @@ const styles = {
   content: { padding: "20px" },
   welcomeCard: {
     background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-    color: "white", padding: "24px", borderRadius: "16px", marginBottom: "24px",
+    color: "white", padding: "28px", borderRadius: "20px", marginBottom: "28px",
     display: "flex", justifyContent: "space-between", alignItems: "center",
+    boxShadow: "0 8px 24px rgba(59, 130, 246, 0.25)",
   },
-  welcomeTitle: { fontSize: "20px", fontWeight: 800, margin: "0 0 4px" },
-  welcomeSubtitle: { fontSize: "13px", opacity: 0.9, margin: 0 },
+  welcomeTitle: { fontSize: "24px", fontWeight: 800, margin: "0 0 8px", letterSpacing: "-0.5px" },
+  welcomeSubtitle: { fontSize: "14px", opacity: 0.95, margin: 0, lineHeight: "1.5" },
   statusBadge: {
-    background: "rgba(255,255,255,0.2)", padding: "8px 12px",
-    borderRadius: "8px", fontSize: "12px", fontWeight: 600,
+    background: "rgba(255,255,255,0.25)", padding: "10px 16px",
+    borderRadius: "12px", fontSize: "13px", fontWeight: 700, backdropFilter: "blur(10px)",
   },
-  statsGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "24px" },
+  statsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "16px", marginBottom: "28px" },
   statCard: {
-    background: "white", padding: "16px", borderRadius: "12px",
-    display: "flex", gap: "12px", alignItems: "center",
-    border: "1px solid #e5e7eb",
+    background: "white", padding: "20px", borderRadius: "16px",
+    display: "flex", gap: "14px", alignItems: "center",
+    border: "1px solid #e5e7eb", boxShadow: "0 2px 8px rgba(0,0,0,0.06)", transition: "all 0.3s ease",
   },
-  statIcon: { fontSize: "28px" },
-  statLabel: { fontSize: "11px", color: "#6b7280", margin: "0 0 4px", fontWeight: 700, textTransform: "uppercase" },
-  statNumber: { fontSize: "18px", fontWeight: 800, color: "#1f2937", margin: 0 },
-  sectionTitle: { fontSize: "15px", fontWeight: 700, color: "#1f2937", marginBottom: "12px", marginTop: "4px" },
-  jobsList: { display: "flex", flexDirection: "column", gap: "12px" },
+  statIcon: { fontSize: "32px" },
+  statLabel: { fontSize: "12px", color: "#6b7280", margin: "0 0 6px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" },
+  statNumber: { fontSize: "22px", fontWeight: 800, color: "#1f2937", margin: 0, letterSpacing: "-0.5px" },
+  sectionTitle: { fontSize: "18px", fontWeight: 800, color: "#1f2937", marginBottom: "16px", marginTop: "8px", letterSpacing: "-0.3px" },
+  jobsList: { display: "flex", flexDirection: "column", gap: "16px" },
   jobCard: {
-    background: "white", padding: "16px", borderRadius: "12px",
-    border: "1px solid #e5e7eb", boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+    background: "white", padding: "20px", borderRadius: "16px",
+    border: "1px solid #e5e7eb", boxShadow: "0 2px 12px rgba(0,0,0,0.08)", transition: "all 0.3s ease",
   },
-  jobHeader: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px", gap: "8px" },
-  jobTitle: { fontSize: "15px", fontWeight: 700, color: "#1f2937", margin: "0 0 4px" },
-  jobCustomer: { fontSize: "12px", color: "#6b7280", margin: 0 },
+  jobHeader: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "16px", gap: "12px" },
+  jobTitle: { fontSize: "17px", fontWeight: 800, color: "#1f2937", margin: "0 0 6px", letterSpacing: "-0.3px" },
+  jobCustomer: { fontSize: "13px", color: "#6b7280", margin: 0 },
   maskedPhone: {
     background: "#f3f4f6", color: "#9ca3af",
     padding: "2px 6px", borderRadius: "4px", fontSize: "11px", fontStyle: "italic",
   },
   jobStatus: {
-    padding: "4px 8px", borderRadius: "6px", border: "2px solid",
-    fontSize: "11px", fontWeight: 600, whiteSpace: "nowrap", flexShrink: 0,
+    padding: "6px 12px", borderRadius: "8px", border: "2px solid",
+    fontSize: "12px", fontWeight: 700, whiteSpace: "nowrap", flexShrink: 0,
   },
-  jobDetails: { display: "flex", flexDirection: "column", gap: "6px", marginBottom: "12px" },
-  jobDetail: { fontSize: "13px", color: "#4b5563", margin: 0 },
+  jobDetails: { display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" },
+  jobDetail: { fontSize: "14px", color: "#4b5563", margin: 0, lineHeight: "1.5" },
   actionBtn: {
-    width: "100%", padding: "12px", color: "white",
-    border: "none", borderRadius: "8px",
-    fontSize: "13px", fontWeight: 700, cursor: "pointer",
+    width: "100%", padding: "14px", color: "white",
+    border: "none", borderRadius: "12px",
+    fontSize: "14px", fontWeight: 700, cursor: "pointer", transition: "all 0.3s ease",
   },
   emptyBox: {
-    background: "white", padding: "40px 20px", textAlign: "center",
-    borderRadius: "12px", color: "#9ca3af", border: "1px dashed #d1d5db",
+    background: "white", padding: "48px 24px", textAlign: "center",
+    borderRadius: "16px", color: "#9ca3af", border: "2px dashed #d1d5db",
   },
   profilePage: {
     textAlign: "center", background: "white",
@@ -677,39 +678,41 @@ const styles = {
   },
   earningsCard: {
     background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
-    color: "white", borderRadius: "16px",
-    padding: "32px 20px", textAlign: "center", marginBottom: "24px",
+    color: "white", borderRadius: "20px",
+    padding: "40px 24px", textAlign: "center", marginBottom: "28px",
+    boxShadow: "0 8px 24px rgba(34, 197, 94, 0.25)",
   },
-  earningsLabel: { fontSize: "14px", opacity: 0.9, margin: "0 0 8px" },
-  earningsAmount: { fontSize: "32px", fontWeight: 800, margin: 0 },
-  earningsList: { display: "flex", flexDirection: "column", gap: "12px" },
+  earningsLabel: { fontSize: "15px", opacity: 0.95, margin: "0 0 12px", fontWeight: 600 },
+  earningsAmount: { fontSize: "42px", fontWeight: 800, margin: 0, letterSpacing: "-2px" },
+  earningsList: { display: "flex", flexDirection: "column", gap: "16px" },
   earningsRow: {
-    background: "white", padding: "16px", borderRadius: "12px",
+    background: "white", padding: "20px", borderRadius: "16px",
     display: "flex", justifyContent: "space-between", alignItems: "center",
-    border: "1px solid #e5e7eb",
+    border: "1px solid #e5e7eb", boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
   },
-  earningService: { fontSize: "14px", fontWeight: 700, color: "#1f2937", margin: "0 0 4px" },
-  earningDate: { fontSize: "12px", color: "#6b7280", margin: "0 0 2px" },
-  earningAmount: { fontSize: "16px", fontWeight: 700, color: "#22c55e", whiteSpace: "nowrap" },
+  earningService: { fontSize: "15px", fontWeight: 700, color: "#1f2937", margin: "0 0 6px" },
+  earningDate: { fontSize: "13px", color: "#6b7280", margin: "0 0 4px" },
+  earningAmount: { fontSize: "18px", fontWeight: 800, color: "#22c55e", whiteSpace: "nowrap", letterSpacing: "-0.5px" },
   bottomNav: {
     position: "fixed", bottom: 0, width: "100%",
     background: "white", display: "flex", justifyContent: "space-around",
-    padding: "8px 0", borderTop: "1px solid #e5e7eb", zIndex: 99,
+    padding: "12px 0", borderTop: "1px solid #e5e7eb", zIndex: 99,
+    boxShadow: "0 -4px 20px rgba(0,0,0,0.08)",
   },
   navBtn: {
     border: "none", background: "none",
     display: "flex", flexDirection: "column", alignItems: "center",
-    gap: "4px", color: "#9ca3af", fontSize: "12px",
-    padding: "8px 12px", cursor: "pointer",
+    gap: "6px", color: "#9ca3af", fontSize: "12px",
+    padding: "10px 16px", cursor: "pointer", transition: "all 0.3s ease",
   },
   navBtnActive: {
     border: "none", background: "none",
     display: "flex", flexDirection: "column", alignItems: "center",
-    gap: "4px", color: "#3b82f6", fontSize: "12px",
-    padding: "8px 12px", cursor: "pointer", fontWeight: 700,
+    gap: "6px", color: "#3b82f6", fontSize: "12px",
+    padding: "10px 16px", cursor: "pointer", fontWeight: 700,
   },
-  navIcon: { fontSize: "20px" },
-  navLabel: { fontSize: "11px" },
+  navIcon: { fontSize: "22px" },
+  navLabel: { fontSize: "11px", fontWeight: 600 },
   navBadgeIndex: {
     position: "absolute", top: "-6px", right: "-10px",
     background: "#ef4444", color: "white",
@@ -720,7 +723,7 @@ const styles = {
 };
 
 const mobileCss = `
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
   body { margin: 0; padding: 0; }
   h1,h2,h3,h4 { margin: 0; }
   input:focus, select:focus, textarea:focus {
@@ -733,5 +736,17 @@ const mobileCss = `
     [style*="grid-template-columns: 1fr 1fr"] {
       grid-template-columns: 1fr !important;
     }
+  }
+  .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  }
+  .job-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  }
+  .action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
   }
 `;

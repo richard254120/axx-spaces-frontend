@@ -10,13 +10,11 @@ export default function AdminHeader({
   notifRef,
   children
 }) {
-  const { user } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login");
+    logout("/login");
   };
 
   return (

@@ -242,8 +242,7 @@ export default function Settings() {
     setLoading(true);
     try {
       await API.delete("/auth/account");
-      logout();
-      navigate("/");
+      logout("/");
     } catch (err) {
       setMessage({ type: "error", text: err.response?.data?.error || "Failed to delete account" });
       setLoading(false);

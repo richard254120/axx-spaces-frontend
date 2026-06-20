@@ -191,7 +191,7 @@ export default function LandlordDashboard() {
           <button style={styles.menuActionBtn} onClick={() => { navigate("/settings"); setMobileMenuOpen(false); }}>
             ⚙️ Settings
           </button>
-          <button style={styles.logoutBtn} onClick={() => { logout(); setMobileMenuOpen(false); }}>
+          <button style={styles.logoutBtn} onClick={() => { logout("/login"); setMobileMenuOpen(false); }}>
             Logout
           </button>
         </div>
@@ -404,21 +404,21 @@ export default function LandlordDashboard() {
 
 const styles = {
   container: {
-    background: "#06101f",
+    background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
     minHeight: "100vh",
     color: "#fff",
-    fontFamily: "'DM Sans', sans-serif",
-    padding: "16px",
+    fontFamily: "'Inter', 'DM Sans', sans-serif",
+    padding: "20px",
   },
   header: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: "20px",
-    paddingBottom: "16px",
-    borderBottom: "1px solid #1e293b",
+    marginBottom: "28px",
+    paddingBottom: "20px",
+    borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
   },
-  headerTitle: { margin: 0, fontSize: "24px", fontWeight: 800, color: "#fbbf24" },
+  headerTitle: { margin: 0, fontSize: "28px", fontWeight: 800, color: "#fbbf24", letterSpacing: "-0.5px" },
   menuBtn: {
     background: "#1e293b", border: "none", color: "#fbbf24",
     fontSize: "24px", padding: "8px 12px", borderRadius: "8px", cursor: "pointer",
@@ -439,18 +439,21 @@ const styles = {
     color: "#fbbf24", fontSize: "14px", fontWeight: 600, cursor: "pointer",
     marginBottom: "12px", transition: "all 0.2s",
   },
-  statsContainer: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px", marginBottom: "20px" },
+  statsContainer: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", marginBottom: "28px" },
   statCard: {
-    background: "#1e293b", border: "1px solid #334155",
-    borderRadius: "12px", padding: "16px", textAlign: "center",
+    background: "linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderRadius: "16px", padding: "24px", textAlign: "center",
+    transition: "all 0.3s ease", cursor: "pointer",
   },
-  statValue: { fontSize: "24px", fontWeight: 800, color: "#fbbf24", marginBottom: "4px" },
-  statName: { fontSize: "12px", color: "#94a3b8", fontWeight: 600 },
+  statValue: { fontSize: "36px", fontWeight: 800, color: "#fbbf24", marginBottom: "8px", letterSpacing: "-1px" },
+  statName: { fontSize: "13px", color: "#94a3b8", fontWeight: 600, textTransform: "uppercase", letterSpacing: "1px" },
   uploadBtn: {
-    width: "100%", padding: "14px",
+    width: "100%", padding: "16px",
     background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
-    color: "white", border: "none", borderRadius: "10px",
-    fontSize: "15px", fontWeight: 700, cursor: "pointer", marginBottom: "20px",
+    color: "white", border: "none", borderRadius: "14px",
+    fontSize: "15px", fontWeight: 700, cursor: "pointer", marginBottom: "24px",
+    boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)", transition: "all 0.3s ease",
   },
   successMsg: {
     background: "rgba(34, 197, 94, 0.2)", border: "1px solid #22c55e",
@@ -467,16 +470,18 @@ const styles = {
     marginBottom: "20px", paddingBottom: "8px", scrollBehavior: "smooth",
   },
   tabBtn: {
-    background: "#1e293b", border: "1px solid #334155", color: "#94a3b8",
-    padding: "10px 12px", borderRadius: "8px", fontSize: "11px",
-    fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.2s",
+    background: "rgba(30, 41, 59, 0.6)", border: "1px solid rgba(255, 255, 255, 0.08)", color: "#94a3b8",
+    padding: "12px 16px", borderRadius: "10px", fontSize: "12px",
+    fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.3s ease",
   },
-  tabBtnActive: { background: "#fbbf24", color: "#0f1729", border: "1px solid #fbbf24" },
+  tabBtnActive: { background: "#fbbf24", color: "#0f1729", border: "1px solid #fbbf24", boxShadow: "0 4px 12px rgba(251, 191, 36, 0.3)" },
   tabCount: { fontSize: "10px", display: "block" },
   propertiesList: { display: "flex", flexDirection: "column", gap: "16px" },
   propertyCard: {
-    background: "#1e293b", border: "1px solid #334155",
-    borderRadius: "12px", overflow: "hidden",
+    background: "linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderRadius: "18px", overflow: "hidden",
+    transition: "all 0.3s ease", boxShadow: "0 4px 16px rgba(0, 0, 0, 0.15)",
   },
   propertyImage: { position: "relative", height: "180px", width: "100%" },
   image: { width: "100%", height: "100%", objectFit: "cover" },
@@ -491,10 +496,10 @@ const styles = {
     padding: "4px 10px", borderRadius: "8px",
     fontSize: "11px", fontWeight: 800, letterSpacing: "0.05em",
   },
-  propertyContent: { padding: "16px" },
-  propertyTitle: { margin: "0 0 6px", fontSize: "15px", fontWeight: 700, color: "#f1f5f9" },
-  propertyLocation: { margin: "0 0 4px", fontSize: "13px", color: "#94a3b8" },
-  propertyPrice: { margin: "6px 0 12px", fontSize: "16px", fontWeight: 800, color: "#fbbf24" },
+  propertyContent: { padding: "20px" },
+  propertyTitle: { margin: "0 0 8px", fontSize: "18px", fontWeight: 800, color: "#f1f5f9", letterSpacing: "-0.3px" },
+  propertyLocation: { margin: "0 0 6px", fontSize: "14px", color: "#94a3b8" },
+  propertyPrice: { margin: "8px 0 16px", fontSize: "20px", fontWeight: 800, color: "#fbbf24", letterSpacing: "-0.5px" },
 
   /* Units row */
   unitsRow: {
@@ -502,12 +507,12 @@ const styles = {
     gap: "8px", marginBottom: "10px",
   },
   unitBox: {
-    background: "rgba(255,255,255,0.04)", borderRadius: "8px",
-    padding: "8px 4px", textAlign: "center",
-    border: "1px solid #334155",
+    background: "rgba(255,255,255,0.05)", borderRadius: "10px",
+    padding: "12px 6px", textAlign: "center",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
   },
-  unitNum: { display: "block", fontSize: "20px", fontWeight: 800, color: "#fbbf24" },
-  unitLbl: { display: "block", fontSize: "10px", color: "#64748b", marginTop: "2px", fontWeight: 600 },
+  unitNum: { display: "block", fontSize: "24px", fontWeight: 800, color: "#fbbf24", letterSpacing: "-1px" },
+  unitLbl: { display: "block", fontSize: "11px", color: "#94a3b8", marginTop: "4px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" },
 
   /* Progress bar */
   progressBar: {
@@ -522,15 +527,15 @@ const styles = {
     gap: "10px", marginTop: "12px",
   },
   actionBtn: {
-    padding: "10px", background: "#334155", color: "#f1f5f9",
-    border: "none", borderRadius: "8px", fontSize: "12px",
-    fontWeight: 700, cursor: "pointer", transition: "all 0.2s",
+    padding: "12px", background: "rgba(51, 65, 85, 0.8)", color: "#f1f5f9",
+    border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px", fontSize: "13px",
+    fontWeight: 700, cursor: "pointer", transition: "all 0.3s ease",
   },
-  boostActionBtn: { background: "#fbbf24", color: "#0f1729" },
+  boostActionBtn: { background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)", color: "#0f1729", boxShadow: "0 4px 12px rgba(251, 191, 36, 0.3)" },
   agentSelect: {
-    width: "100%", padding: "10px", background: "#1e293b",
-    color: "#f1f5f9", border: "1px solid #334155", borderRadius: "8px",
-    fontSize: "12px", fontWeight: 600, cursor: "pointer",
+    width: "100%", padding: "12px", background: "rgba(30, 41, 59, 0.8)",
+    color: "#f1f5f9", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px",
+    fontSize: "13px", fontWeight: 600, cursor: "pointer",
   },
   logoutBtn: {
     width: "100%", padding: "12px", background: "#ef4444", color: "white",
@@ -545,16 +550,16 @@ const styles = {
   profileSection: {
     display: "flex",
     flexDirection: "column",
-    gap: "24px",
+    gap: "28px",
   },
 };
 
 const cssStyles = `
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
   button:hover:not(:disabled) {
     opacity: 0.9;
     transform: translateY(-2px);
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
   }
   div[style*="overflowX: auto"] {
     scrollbar-width: thin;
@@ -563,4 +568,17 @@ const cssStyles = `
   div[style*="overflowX: auto"]::-webkit-scrollbar { height: 4px; }
   div[style*="overflowX: auto"]::-webkit-scrollbar-track { background: #1e293b; }
   div[style*="overflowX: auto"]::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+  .stat-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(251, 191, 36, 0.3);
+    box-shadow: 0 8px 24px rgba(251, 191, 36, 0.15);
+  }
+  .property-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(251, 191, 36, 0.2);
+  }
+  .upload-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+  }
 `;

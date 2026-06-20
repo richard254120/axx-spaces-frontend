@@ -44,8 +44,7 @@ export default function Navbar() {
   };
 
   const handleLogout = () => {
-    logout();
-    navigate("/");
+    logout("/");
     setMenuOpen(false);
     setDropdownOpen(false);
     setAccountOpen(false);
