@@ -354,41 +354,6 @@ const styles = {
     color: "#cbd5e1",
     lineHeight: "1.8",
   },
-  hoursGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-    gap: "20px",
-    marginBottom: "20px",
-  },
-  hoursItem: {
-    background: "rgba(30, 41, 59, 0.8)",
-    padding: "20px",
-    borderRadius: "12px",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
-  },
-  hoursLabel: {
-    fontSize: "16px",
-    fontWeight: 700,
-    color: "#fbbf24",
-    marginBottom: "12px",
-    textTransform: "capitalize",
-  },
-  hoursInputs: {
-    display: "flex",
-    gap: "12px",
-    alignItems: "center",
-    flexWrap: "wrap",
-  },
-  hoursInput: {
-    flex: 1,
-    minWidth: "120px",
-    padding: "10px 14px",
-    background: "rgba(15, 23, 42, 0.5)",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
-    borderRadius: "8px",
-    color: "#f1f5f9",
-    fontSize: "14px",
-  },
   redirectBar: {
     marginTop: "12px",
     background: "rgba(56,189,248,0.08)",
@@ -666,15 +631,6 @@ export default function BusinessForm() {
     employeeCount: "",
     priceRange: "",
     submitterName: "",
-    businessHours: {
-      monday: { open: "", close: "", closed: false },
-      tuesday: { open: "", close: "", closed: false },
-      wednesday: { open: "", close: "", closed: false },
-      thursday: { open: "", close: "", closed: false },
-      friday: { open: "", close: "", closed: false },
-      saturday: { open: "", close: "", closed: false },
-      sunday: { open: "", close: "", closed: false },
-    },
     socialMedia: { facebook: "", instagram: "", twitter: "", linkedin: "", tiktok: "", whatsapp: "" },
     images: [],
     logo: "",
@@ -708,11 +664,10 @@ export default function BusinessForm() {
     { id: 1, title: "Basic Info" },
     { id: 2, title: "Location" },
     { id: 3, title: "Contact" },
-    { id: 4, title: "Hours" },
-    { id: 5, title: "Logo & Photos" },
-    { id: 6, title: "Products" },
-    { id: 7, title: "Pricelist" },
-    { id: 8, title: "Review" },
+    { id: 4, title: "Logo & Photos" },
+    { id: 5, title: "Products" },
+    { id: 6, title: "Pricelist" },
+    { id: 7, title: "Review" },
   ];
 
   /* ── Load existing business when editing ── */
@@ -907,17 +862,6 @@ export default function BusinessForm() {
     setFormData(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }));
   };
 
-  /* ── Hours helper ── */
-  const updateHours = (day, field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      businessHours: {
-        ...prev.businessHours,
-        [day]: { ...prev.businessHours[day], [field]: value },
-      },
-    }));
-  };
-
   const handleAddProduct = async () => {
     if (!newProduct.name.trim()) {
       setError("Product name is required");
@@ -969,14 +913,12 @@ export default function BusinessForm() {
       case 3:
         return formData.contact.phone;
       case 4:
-        return true; // Business hours are optional
-      case 5:
         return true; // Logo and photos are optional
-      case 6:
+      case 5:
         return true; // Products are optional
-      case 7:
+      case 6:
         return true; // Pricelist is optional
-      case 8:
+      case 7:
         return true; // Review step
       default:
         return true;
@@ -1064,7 +1006,6 @@ export default function BusinessForm() {
             <ul style={styles.instructionsList}>
               <li>Fill in your business details to list on AxxBiashara</li>
               <li>Select multiple categories that describe your business</li>
-              <li>Add your business hours for each day of the week</li>
               <li>Social media links can be added later in your dashboard</li>
               <li>Your business will be reviewed and approved by admin before appearing</li>
             </ul>
@@ -1304,47 +1245,8 @@ export default function BusinessForm() {
           </div>
         ) : null}
 
-        {/* ── STEP 4: BUSINESS HOURS ── */}
+        {/* ── STEP 4: LOGO & PHOTOS ── */}
         {(!isEditing && currentStep === 4) || isEditing ? (
-          <div style={styles.section}>
-            <h2 style={styles.sectionTitle}>Business Hours</h2>
-            <div style={styles.hoursGrid}>
-              {["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"].map(day => (
-                <div key={day} style={styles.hoursItem}>
-                  <label style={styles.hoursLabel}>{day.charAt(0).toUpperCase() + day.slice(1)}</label>
-                  <div style={styles.hoursInputs}>
-                    <input
-                      type="time"
-                      style={styles.hoursInput}
-                      value={formData.businessHours[day]?.open || ""}
-                      onChange={e => updateHours(day, "open", e.target.value)}
-                      disabled={formData.businessHours[day]?.closed}
-                    />
-                    <span>-</span>
-                    <input
-                      type="time"
-                      style={styles.hoursInput}
-                      value={formData.businessHours[day]?.close || ""}
-                      onChange={e => updateHours(day, "close", e.target.value)}
-                      disabled={formData.businessHours[day]?.closed}
-                    />
-                    <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "#94a3b8", cursor: "pointer" }}>
-                      <input
-                        type="checkbox"
-                        checked={formData.businessHours[day]?.closed || false}
-                        onChange={e => updateHours(day, "closed", e.target.checked)}
-                      />
-                      Closed
-                    </label>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : null}
-
-        {/* ── STEP 5: LOGO & PHOTOS ── */}
-        {(!isEditing && currentStep === 5) || isEditing ? (
           <>
             <div style={styles.section}>
               <h2 style={styles.sectionTitle}>Business Logo</h2>
@@ -1432,8 +1334,8 @@ export default function BusinessForm() {
           </>
         ) : null}
 
-        {/* ── STEP 6: PRODUCTS & SERVICES ── */}
-        {(!isEditing && currentStep === 6) || isEditing ? (
+        {/* ── STEP 5: PRODUCTS & SERVICES ── */}
+        {(!isEditing && currentStep === 5) || isEditing ? (
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>Products & Services</h2>
 
@@ -1547,8 +1449,8 @@ export default function BusinessForm() {
           </div>
         ) : null}
 
-        {/* ── STEP 7: PRICELIST ── */}
-        {(!isEditing && currentStep === 7) || isEditing ? (
+        {/* ── STEP 6: PRICELIST ── */}
+        {(!isEditing && currentStep === 6) || isEditing ? (
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>Pricelist / Menu</h2>
             <label style={styles.label}>Upload Pricelist/Menu</label>
@@ -1568,8 +1470,8 @@ export default function BusinessForm() {
           </div>
         ) : null}
 
-        {/* ── STEP 8: REVIEW ── */}
-        {!isEditing && currentStep === 8 ? (
+        {/* ── STEP 7: REVIEW ── */}
+        {!isEditing && currentStep === 7 ? (
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>Review Your Business</h2>
 

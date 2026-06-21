@@ -1321,21 +1321,6 @@ export default function BusinessDetail() {
 
       <div className="bd-divider" />
 
-      {/* ── Hours ── */}
-      <div className="bd-section">
-        <p className="bd-section-title">Business Hours</p>
-        <div className="bd-hours-grid">
-          {Object.entries(b.businessHours || {}).map(([day, hrs]) => (
-            <div key={day} className="bd-hours-item">
-              <span className="bd-hours-day">{day.charAt(0).toUpperCase() + day.slice(1, 3)}</span>
-              <span className={`bd-hours-time ${hrs.closed ? "bd-hours-closed" : ""}`}>
-                {hrs.closed ? "Closed" : `${formatTime(hrs.open)}–${formatTime(hrs.close)}`}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* ── Promotions ── */}
       {activePromos.length > 0 && (
         <>
