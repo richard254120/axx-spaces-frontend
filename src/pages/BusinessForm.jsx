@@ -1555,7 +1555,7 @@ export default function BusinessForm() {
             <input
               type="file"
               style={styles.input}
-              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+              accept=".pdf,.doc,.docx,.txt"
               onChange={handlePricelistUpload}
               disabled={uploading.pricelist}
             />
