@@ -55,11 +55,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = (redirectTo = "/axxbiashara") => {
-    setToken(null);
-    setUser(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    window.location.href = redirectTo;
+    window.location.replace(redirectTo);
   };
 
   if (loading) {
