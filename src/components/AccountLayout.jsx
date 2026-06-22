@@ -30,8 +30,7 @@ export default function AccountLayout({ children, preferSeller = false }) {
 
   const handleLogout = () => {
     clearSellerSession();
-    const redirect = getLoginPath(user?.role);
-    if (logout) logout(redirect);
+    if (logout) logout("/");
   };
 
   return (

@@ -53,7 +53,7 @@ export default function ProviderDashboard() {
 
   const handleLogout = () => {
     clearTourismSession();
-    authLogout("/tourism");
+    authLogout("/");
   };
 
   const displayName = getDisplayName(user || authUser);
