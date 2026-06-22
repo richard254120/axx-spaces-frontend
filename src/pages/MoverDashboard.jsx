@@ -20,6 +20,14 @@ const SERVICE_OPTIONS = [
 export default function MoverDashboard() {
   const { user, token, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 17) return "Good afternoon";
+    if (hour < 22) return "Good evening";
+    return "Hello";
+  };
   const [activeTab, setActiveTab] = useState("overview");
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
@@ -264,7 +272,7 @@ export default function MoverDashboard() {
           <section>
             <div style={styles.welcomeCard}>
               <div>
-                <h2 style={styles.welcomeTitle}>Hello, {user?.name?.split(" ")[0] || "Partner"}! 👋</h2>
+                <h2 style={styles.welcomeTitle}>{getGreeting()}, {user?.name?.split(" ")[0] || "Partner"}! 👋</h2>
                 <p style={styles.welcomeSubtitle}>📍 {user?.county || "Kenya"}</p>
               </div>
               <div style={styles.statusBadge}>🟢 Active</div>

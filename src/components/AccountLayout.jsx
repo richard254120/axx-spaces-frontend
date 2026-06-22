@@ -19,6 +19,14 @@ export default function AccountLayout({ children, preferSeller = false }) {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "☀️ Good morning";
+    if (hour < 17) return "🌤️ Good afternoon";
+    if (hour < 22) return "🌙 Good evening";
+    return "✨ Hello";
+  };
+
   const dashboardPath = getDashboardPath(user?.role);
   const navItems = getAccountNav(user?.role);
   const brand = getWorkspaceBrand(user?.role);
@@ -74,8 +82,11 @@ export default function AccountLayout({ children, preferSeller = false }) {
         </nav>
 
         <div className="account-user" style={styles.userSection}>
+          <div style={styles.userInfo}>
+            <span style={styles.greetingText}>{getGreeting()}</span>
+            <span style={styles.userName}>{user?.name}</span>
+          </div>
           <ProfileAvatar user={user} size={32} />
-          <span style={styles.userName}>{user?.name}</span>
           <button type="button" style={styles.logoutBtn} onClick={handleLogout}>
             Logout
           </button>
@@ -160,13 +171,26 @@ const styles = {
     marginLeft: "auto",
   },
   userName: {
-    color: "#f1f5f9",
+    color: "#fbbf24",
     fontSize: "14px",
-    fontWeight: 600,
+    fontWeight: 700,
     maxWidth: "140px",
     overflow: "hidden",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
+  },
+  userInfo: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-end",
+    textAlign: "right",
+  },
+  greetingText: {
+    color: "#94a3b8",
+    fontSize: "10px",
+    fontWeight: 700,
+    textTransform: "uppercase",
+    letterSpacing: "0.05em",
   },
   logoutBtn: {
     background: "transparent",

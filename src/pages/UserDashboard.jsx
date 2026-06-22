@@ -40,6 +40,14 @@ export default function UserDashboard() {
   const { user, token, logout, login } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 17) return "Good afternoon";
+    if (hour < 22) return "Good evening";
+    return "Hello";
+  };
+
   // Navigation and ui states
   const [activeTab, setActiveTab] = useState("overview");
   const [loading, setLoading] = useState(true);
@@ -155,7 +163,9 @@ export default function UserDashboard() {
           <div>
             <div style={s.welcomeBanner}>
               <div style={s.bannerLeft}>
-                <h1 style={s.bannerTitle}>Workspace Console 👋</h1>
+                <h1 style={s.bannerTitle}>
+                  {getGreeting()}, {user?.name?.split(" ")[0] || "User"}! 👋
+                </h1>
                 <p style={s.bannerSubtitle}>Monitor your listings, active items, and KYC verification tier from one unified space.</p>
               </div>
               <div style={s.bannerRight}>

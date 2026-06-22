@@ -56,6 +56,14 @@ export default function ProviderDashboard() {
     authLogout("/");
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "☀️ Good morning";
+    if (hour < 17) return "🌤️ Good afternoon";
+    if (hour < 22) return "🌙 Good evening";
+    return "✨ Hello";
+  };
+
   const displayName = getDisplayName(user || authUser);
   const avatarUser = user || authUser;
 
@@ -131,7 +139,7 @@ export default function ProviderDashboard() {
         <div style={mainHeader}>
           <div>
             <h1 style={{ fontSize: "28px", fontWeight: 800, color: tourismTheme.text, marginBottom: "8px" }}>
-              Owner dashboard
+              {getGreeting()}, {displayName.split(" ")[0]}!
             </h1>
             <p style={{ color: tourismTheme.muted, fontSize: "14px" }}>
               Your profile, property statuses, and listing editor.
