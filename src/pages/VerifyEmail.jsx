@@ -7,6 +7,7 @@ export default function VerifyEmail() {
   const navigate = useNavigate();
   const [status, setStatus] = useState("loading");
   const [message, setMessage] = useState("");
+  const [userRole, setUserRole] = useState("");
 
   useEffect(() => {
     const verifyEmail = async () => {
@@ -14,6 +15,7 @@ export default function VerifyEmail() {
         const res = await API.post(`/auth/verify-email/${token}`);
         setStatus("success");
         setMessage(res.data.message);
+        setUserRole(res.data.role || "");
       } catch (err) {
         setStatus("error");
         setMessage(err.response?.data?.error || "Verification failed. The link may be invalid or expired.");
@@ -59,7 +61,17 @@ export default function VerifyEmail() {
             </h2>
             <p style={{ color: "#6b7280", marginBottom: "24px" }}>{message}</p>
             <button
-              onClick={() => navigate("/login")}
+              onClick={() => {
+                if (userRole === "user") {
+                  navigate("/business-login");
+                } else if (userRole === "seller") {
+                  navigate("/seller-login");
+                } else if (userRole === "mover") {
+                  navigate("/movers?tab=login");
+                } else {
+                  navigate("/login");
+                }
+              }}
               style={{
                 background: "#fbbf24",
                 color: "#0B2140",
