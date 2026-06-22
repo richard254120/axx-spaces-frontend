@@ -4,7 +4,7 @@ import API from "../api/api";
 import PhoneInput from "../components/PhoneInput";
 
 /* ── Multi-select dropdown component ── */
-function MultiSelectDropdown({ options, selected, onChange, label }) {
+function MultiSelectDropdown({ options, selected, onChange }) {
   const [isOpen, setIsOpen] = useState(false);
   const [hoveredOption, setHoveredOption] = useState(null);
   const dropdownRef = useRef(null);
@@ -659,6 +659,8 @@ export default function BusinessForm() {
   const [currentStep, setCurrentStep] = useState(1);
   const [uploadProgress, setUploadProgress] = useState({ photos: 0, current: 0, total: 0 });
   const [isUploading, setIsUploading] = useState(false);
+  const [logoPreview, setLogoPreview] = useState("");
+  const [productUploadCount, setProductUploadCount] = useState(0);
 
   const STEPS = [
     { id: 1, title: "Basic Info" },
@@ -672,8 +674,21 @@ export default function BusinessForm() {
 
   /* ── Load existing business when editing ── */
   useEffect(() => {
+    const loadBusiness = async () => {
+      try {
+        const res = await API.get(`/business/${id}`);
+        const biz = res.data.business;
+        setFormData(biz);
+        if (biz.images?.length) {
+          setBusinessPhotos(biz.images);
+        }
+      } catch {
+        setError("Failed to load business");
+      }
+    };
+
     if (isEditing) loadBusiness();
-  }, [id]);
+  }, [id, isEditing]);
 
   /* ── Countdown timer after successful edit ── */
   useEffect(() => {
@@ -686,21 +701,8 @@ export default function BusinessForm() {
     return () => clearTimeout(t);
   }, [countdown]);
 
-  const loadBusiness = async () => {
-    try {
-      const res = await API.get(`/business/${id}`);
-      const biz = res.data.business;
-      setFormData(biz);
-      if (biz.images?.length) {
-        setBusinessPhotos(biz.images);
-      }
-    } catch (err) {
-      setError("Failed to load business");
-    }
-  };
-
   /* ── Image compression helper ── */
-  const compressImage = (file, maxWidth = 1920, maxHeight = 1080, quality = 0.8) => {
+  const compressImage = (file, maxWidth = 1200, maxHeight = 900, quality = 0.7) => {
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -742,25 +744,36 @@ export default function BusinessForm() {
   const handleLogoUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    const localUrl = URL.createObjectURL(file);
+    setLogoPreview(localUrl);
     setUploading(prev => ({ ...prev, logo: true }));
+
     try {
-      const compressedFile = await compressImage(file, 800, 800, 0.85);
+      const compressedFile = await compressImage(file, 400, 400, 0.7);
       const fd = new FormData();
       fd.append("logo", compressedFile);
       const res = await API.post("/uploads/logo", fd, { headers: { "Content-Type": "multipart/form-data" } });
       setFormData(prev => ({ ...prev, logo: res.data.url }));
     } catch {
       setError("Failed to upload logo");
+      setLogoPreview("");
     } finally {
       setUploading(prev => ({ ...prev, logo: false }));
+      try {
+        URL.revokeObjectURL(localUrl);
+      } catch (e) {
+        console.error(e);
+      }
     }
   };
 
   const uploadProductImage = async (file) => {
     if (!file) return "";
+    setProductUploadCount(prev => prev + 1);
     setUploading(prev => ({ ...prev, product: true }));
     try {
-      const compressedFile = await compressImage(file, 600, 600, 0.85);
+      const compressedFile = await compressImage(file, 500, 500, 0.7);
       const fd = new FormData();
       fd.append("image", compressedFile);
       const res = await API.post("/uploads/product-image", fd, { headers: { "Content-Type": "multipart/form-data" } });
@@ -769,7 +782,13 @@ export default function BusinessForm() {
       setError("Failed to upload product image");
       return "";
     } finally {
-      setUploading(prev => ({ ...prev, product: false }));
+      setProductUploadCount(prev => {
+        const nextVal = Math.max(0, prev - 1);
+        if (nextVal === 0) {
+          setUploading(u => ({ ...u, product: false }));
+        }
+        return nextVal;
+      });
     }
   };
 
@@ -800,56 +819,89 @@ export default function BusinessForm() {
       return;
     }
 
+    // 1. Create local URLs and display them instantly
+    const localUrls = files.map(file => URL.createObjectURL(file));
+    setBusinessPhotos(prev => [...prev, ...localUrls]);
+
     setIsUploading(true);
     setUploadProgress({ photos: 0, current: 0, total: files.length });
     setUploading(prev => ({ ...prev, photos: true }));
 
     try {
-      const uploadPromises = files.map(async (file, index) => {
-        try {
-          const compressedFile = await compressImage(file, 1920, 1080, 0.8);
-          const fd = new FormData();
-          fd.append("photo", compressedFile);
+      // 2. Compress files in parallel with optimized resolution and quality
+      const compressedFiles = await Promise.all(
+        files.map(file => compressImage(file, 1200, 900, 0.7))
+      );
 
-          const res = await API.post("/uploads/business-photo", fd, {
-            headers: { "Content-Type": "multipart/form-data" },
+      // 3. Prepare FormData for single-request batch upload
+      const fd = new FormData();
+      compressedFiles.forEach(file => {
+        fd.append("photos", file);
+      });
+
+      // 4. Perform batch upload to /uploads/business-photos (plural)
+      const res = await API.post("/uploads/business-photos", fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setUploadProgress({
+            photos: percentCompleted,
+            current: files.length,
+            total: files.length,
           });
-
-          setUploadProgress(prev => ({
-            ...prev,
-            current: index + 1,
-            photos: Math.round(((index + 1) / files.length) * 100),
-          }));
-
-          return res.data.url;
-        } catch (error) {
-          console.error(`Failed to upload ${file.name}:`, error);
-          return null;
         }
       });
 
-      const uploadedUrls = await Promise.all(uploadPromises);
-      const successfulUrls = uploadedUrls.filter(url => url !== null);
+      const uploadedUrls = res.data.urls || [];
 
-      if (successfulUrls.length === 0) {
-        setError("Failed to upload any photos. Please try again.");
-        return;
+      if (uploadedUrls.length === 0) {
+        throw new Error("No URLs returned from upload");
       }
 
-      if (successfulUrls.length < files.length) {
-        setError(`${files.length - successfulUrls.length} photo(s) failed to upload. ${successfulUrls.length} uploaded successfully.`);
-      }
+      // 5. Replace local blob URLs in businessPhotos preview list with Cloudinary URLs
+      setBusinessPhotos(prev => {
+        const updated = [...prev];
+        let remoteIndex = 0;
+        for (let i = 0; i < updated.length; i++) {
+          if (updated[i].startsWith("blob:")) {
+            if (remoteIndex < uploadedUrls.length) {
+              updated[i] = uploadedUrls[remoteIndex++];
+            }
+          }
+        }
+        return updated;
+      });
 
-      setBusinessPhotos(prev => [...prev, ...successfulUrls]);
-      setFormData(prev => ({ ...prev, images: [...(prev.images || []), ...successfulUrls] }));
+      // 6. Update formData.images (excluding any temporary blobs, appending Cloudinary URLs)
+      setFormData(prev => {
+        const currentImages = (prev.images || []).filter(url => !url.startsWith("blob:"));
+        return {
+          ...prev,
+          images: [...currentImages, ...uploadedUrls]
+        };
+      });
 
-      if (successfulUrls.length === files.length) {
-        setSuccess(`${successfulUrls.length} photo(s) uploaded successfully!`);
-        setTimeout(() => setSuccess(""), 3000);
-      }
+      setSuccess(`${uploadedUrls.length} photo(s) uploaded successfully!`);
+      setTimeout(() => setSuccess(""), 3000);
+
+      // Clean up local URLs
+      localUrls.forEach(url => {
+        try {
+          URL.revokeObjectURL(url);
+        } catch (e) {
+          console.error("Revoke error:", e);
+        }
+      });
     } catch (error) {
       setError("Failed to upload photos. Please try again.");
       console.error("Upload error:", error);
+
+      // Remove the temporary local blob URLs on error
+      setBusinessPhotos(prev => prev.filter(url => !url.startsWith("blob:")));
+      setFormData(prev => ({
+        ...prev,
+        images: (prev.images || []).filter(url => !url.startsWith("blob:"))
+      }));
     } finally {
       setUploading(prev => ({ ...prev, photos: false }));
       setIsUploading(false);
@@ -862,23 +914,23 @@ export default function BusinessForm() {
     setFormData(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }));
   };
 
-  const handleAddProduct = async () => {
+  const handleAddProduct = () => {
     if (!newProduct.name.trim()) {
       setError("Product name is required");
       return;
     }
 
-    let imageUrl = "";
-    if (productImageFile) {
-      imageUrl = await uploadProductImage(productImageFile);
-    }
+    // 1. Generate local preview URL instantly
+    const localUrl = productImageFile ? URL.createObjectURL(productImageFile) : "";
+    const tempIndex = formData.products.length;
 
+    // 2. Add product to state immediately using the local preview URL
     const productToAdd = {
       name: newProduct.name.trim(),
       description: newProduct.description.trim(),
       price: newProduct.price ? parseFloat(newProduct.price) : 0,
       category: newProduct.category.trim(),
-      imageUrl,
+      imageUrl: localUrl,
     };
 
     setFormData(prev => ({
@@ -886,8 +938,42 @@ export default function BusinessForm() {
       products: [...prev.products, productToAdd],
     }));
 
+    // 3. Clear new product input fields instantly
     setNewProduct({ name: "", description: "", price: "", category: "", imageUrl: "" });
+    const currentFile = productImageFile;
     setProductImageFile(null);
+
+    // 4. Perform upload in the background if a file was selected
+    if (currentFile) {
+      uploadProductImage(currentFile).then(uploadedUrl => {
+        setFormData(prev => {
+          const updatedProducts = [...prev.products];
+          if (updatedProducts[tempIndex]) {
+            updatedProducts[tempIndex].imageUrl = uploadedUrl;
+          }
+          return { ...prev, products: updatedProducts };
+        });
+        try {
+          URL.revokeObjectURL(localUrl);
+        } catch (e) {
+          console.error(e);
+        }
+      }).catch(err => {
+        console.error("Background product upload error:", err);
+        setFormData(prev => {
+          const updatedProducts = [...prev.products];
+          if (updatedProducts[tempIndex]) {
+            updatedProducts[tempIndex].imageUrl = "";
+          }
+          return { ...prev, products: updatedProducts };
+        });
+        try {
+          URL.revokeObjectURL(localUrl);
+        } catch (e) {
+          console.error(e);
+        }
+      });
+    }
   };
 
   const handleRemoveProduct = (index) => {
@@ -899,9 +985,10 @@ export default function BusinessForm() {
 
   /* ── Step navigation ── */
   const validateStep = (step) => {
-    // Prevent navigation if images are still uploading
-    if (isUploading) {
-      setError("Please wait for image uploads to complete before proceeding");
+    // Prevent navigation if uploads are still active
+    const activeUpload = isUploading || uploading.logo || uploading.photos || uploading.product || uploading.pricelist || productUploadCount > 0;
+    if (activeUpload) {
+      setError("Please wait for all uploads to complete before proceeding");
       return false;
     }
 
@@ -950,9 +1037,10 @@ export default function BusinessForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Prevent submission if images are still uploading
-    if (isUploading) {
-      setError("Please wait for image uploads to complete before submitting");
+    // Prevent submission if uploads are still active
+    const activeUpload = isUploading || uploading.logo || uploading.photos || uploading.product || uploading.pricelist || productUploadCount > 0;
+    if (activeUpload) {
+      setError("Please wait for all uploads to complete before submitting");
       return;
     }
 
@@ -1023,7 +1111,7 @@ export default function BusinessForm() {
                 ...styles.progressLineFilled,
                 width: `${((currentStep - 1) / (STEPS.length - 1)) * 100}%`,
               }}></div>
-              {STEPS.map((step, index) => (
+              {STEPS.map((step) => (
                 <div
                   key={step.id}
                   style={styles.step}
@@ -1258,15 +1346,25 @@ export default function BusinessForm() {
                 onChange={handleLogoUpload}
                 disabled={uploading.logo}
               />
-              {uploading.logo && <p style={{ fontSize: "12px", color: "#fbbf24", marginBottom: "8px" }}>Uploading logo...</p>}
-              {formData.logo && (
+              {(logoPreview || formData.logo) && (
                 <div style={{ marginTop: "10px" }}>
                   <img
-                    src={formData.logo}
+                    src={logoPreview || formData.logo}
                     alt="Logo preview"
-                    style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "10px" }}
+                    style={{
+                      width: "100px",
+                      height: "100px",
+                      objectFit: "cover",
+                      borderRadius: "10px",
+                      opacity: logoPreview ? 0.6 : 1,
+                      transition: "opacity 0.3s"
+                    }}
                   />
-                  <p style={{ fontSize: "12px", color: "#4ade80", marginTop: "6px" }}>✅ Logo uploaded successfully</p>
+                  {logoPreview ? (
+                    <p style={{ fontSize: "12px", color: "#fbbf24", marginTop: "6px" }}>⚡ Uploading logo...</p>
+                  ) : (
+                    <p style={{ fontSize: "12px", color: "#4ade80", marginTop: "6px" }}>✅ Logo uploaded successfully</p>
+                  )}
                 </div>
               )}
             </div>
@@ -1309,25 +1407,47 @@ export default function BusinessForm() {
                   gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
                   gap: "10px",
                 }}>
-                  {businessPhotos.map((photo, index) => (
-                    <div key={index} style={{ position: "relative" }}>
-                      <img
-                        src={photo}
-                        alt={`Business photo ${index + 1}`}
-                        style={{ width: "100%", height: "100px", objectFit: "cover", borderRadius: "8px" }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removePhoto(index)}
-                        style={{
-                          position: "absolute", top: "5px", right: "5px",
-                          background: "#ef4444", color: "white", border: "none",
-                          borderRadius: "50%", width: "24px", height: "24px",
-                          cursor: "pointer", fontSize: "12px", fontWeight: "bold",
-                        }}
-                      >×</button>
-                    </div>
-                  ))}
+                  {businessPhotos.map((photo, index) => {
+                    const isBlob = photo.startsWith("blob:");
+                    return (
+                      <div key={index} style={{ position: "relative" }}>
+                        <img
+                          src={photo}
+                          alt={`Business photo ${index + 1}`}
+                          style={{
+                            width: "100%",
+                            height: "100px",
+                            objectFit: "cover",
+                            borderRadius: "8px",
+                            opacity: isBlob ? 0.6 : 1,
+                            transition: "opacity 0.3s"
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => !isBlob && removePhoto(index)}
+                          disabled={isBlob}
+                          style={{
+                            position: "absolute", top: "5px", right: "5px",
+                            background: isBlob ? "#64748b" : "#ef4444", color: "white", border: "none",
+                            borderRadius: "50%", width: "24px", height: "24px",
+                            cursor: isBlob ? "not-allowed" : "pointer", fontSize: "12px", fontWeight: "bold",
+                            opacity: isBlob ? 0.5 : 1
+                          }}
+                        >×</button>
+                        {isBlob && (
+                          <div style={{
+                            position: "absolute", bottom: "5px", left: "5px",
+                            background: "rgba(15, 23, 42, 0.85)", color: "#60a5fa",
+                            fontSize: "10px", padding: "2px 6px", borderRadius: "4px",
+                            border: "1px solid rgba(96, 165, 250, 0.3)", fontWeight: "bold"
+                          }}>
+                            Uploading...
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -1398,9 +1518,8 @@ export default function BusinessForm() {
                 type="button"
                 style={styles.addProductBtn}
                 onClick={handleAddProduct}
-                disabled={uploading.product}
               >
-                {uploading.product ? "Uploading image…" : "+ Add Product / Service"}
+                + Add Product / Service
               </button>
             </div>
 
@@ -1409,35 +1528,58 @@ export default function BusinessForm() {
                 <p style={{ fontSize: "13px", fontWeight: 700, color: "#94a3b8", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
                   {formData.products.length} {formData.products.length === 1 ? "Product" : "Products"} Added
                 </p>
-                {formData.products.map((product, index) => (
-                  <div key={index} style={styles.productCard}>
-                    <div style={styles.productCardLeft}>
-                      {product.imageUrl
-                        ? <img src={product.imageUrl} alt={product.name} style={styles.productThumb} />
-                        : <div style={styles.productThumbPlaceholder}>🛍</div>
-                      }
-                      <div style={{ minWidth: 0 }}>
-                        <div style={styles.productName}>{product.name}</div>
-                        <div style={styles.productMeta}>
-                          {product.price ? `KES ${Number(product.price).toLocaleString()}` : "No price set"}
-                          {product.category ? ` · ${product.category}` : ""}
-                        </div>
-                        {product.description && (
-                          <div style={{ ...styles.productMeta, marginTop: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "260px" }}>
-                            {product.description}
+                {formData.products.map((product, index) => {
+                  const isBlob = product.imageUrl && product.imageUrl.startsWith("blob:");
+                  return (
+                    <div key={index} style={styles.productCard}>
+                      <div style={styles.productCardLeft}>
+                        {product.imageUrl ? (
+                          <div style={{ position: "relative", flexShrink: 0 }}>
+                            <img
+                              src={product.imageUrl}
+                              alt={product.name}
+                              style={{
+                                ...styles.productThumb,
+                                opacity: isBlob ? 0.6 : 1
+                              }}
+                            />
+                            {isBlob && (
+                              <div style={{
+                                position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+                                background: "rgba(15, 23, 42, 0.5)", display: "flex",
+                                alignItems: "center", justifyContent: "center", borderRadius: "8px"
+                              }}>
+                                <span style={{ fontSize: "12px", color: "#60a5fa" }}>⏳</span>
+                              </div>
+                            )}
                           </div>
+                        ) : (
+                          <div style={styles.productThumbPlaceholder}>🛍</div>
                         )}
+                        <div style={{ minWidth: 0 }}>
+                          <div style={styles.productName}>{product.name}</div>
+                          <div style={styles.productMeta}>
+                            {product.price ? `KES ${Number(product.price).toLocaleString()}` : "No price set"}
+                            {product.category ? ` · ${product.category}` : ""}
+                            {isBlob && <span style={{ color: "#fbbf24", marginLeft: "8px", fontSize: "11px", fontWeight: "bold" }}>(Uploading...)</span>}
+                          </div>
+                          {product.description && (
+                            <div style={{ ...styles.productMeta, marginTop: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "260px" }}>
+                              {product.description}
+                            </div>
+                          )}
+                        </div>
                       </div>
+                      <button
+                        type="button"
+                        style={styles.removeBtn}
+                        onClick={() => handleRemoveProduct(index)}
+                      >
+                        Remove
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      style={styles.removeBtn}
-                      onClick={() => handleRemoveProduct(index)}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
 
