@@ -149,6 +149,13 @@ export default function BusinessRegister() {
       setLoading(false);
       return;
     }
+    const hasLetter = /[a-zA-Z]/.test(formData.password);
+    const hasNumber = /[0-9]/.test(formData.password);
+    if (!hasLetter || !hasNumber) {
+      setError("Password must contain a mixture of both letters and numbers.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const res = await API.post("/auth/register", {
@@ -219,9 +226,14 @@ export default function BusinessRegister() {
             style={styles.input}
             value={formData.password}
             onChange={handleChange}
-            placeholder="••••••••"
+            placeholder="Min 6 chars, letters & numbers"
             required
           />
+          {formData.password && (formData.password.length < 6 || !/[a-zA-Z]/.test(formData.password) || !/[0-9]/.test(formData.password)) && (
+            <div style={{ color: "#fca5a5", fontSize: "11px", marginTop: "-12px", marginBottom: "12px" }}>
+              ⚠️ Password must contain both letters and numbers.
+            </div>
+          )}
 
           <label style={styles.label}>Confirm Password</label>
           <input

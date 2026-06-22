@@ -42,7 +42,10 @@ export default function RegisterPropertyPage() {
   const removeRoom = (i) => setForm((f) => ({ ...f, roomTypes: f.roomTypes.filter((_, idx) => idx !== i) }));
 
   const canNext = () => {
-    if (step === 0) return form.ownerName && form.ownerEmail && form.ownerPhone && form.password && form.selectedPackage;
+    if (step === 0) {
+      const isPasswordMixed = form.password && form.password.length >= 6 && /[a-zA-Z]/.test(form.password) && /[0-9]/.test(form.password);
+      return form.ownerName && form.ownerEmail && form.ownerPhone && isPasswordMixed && form.selectedPackage;
+    }
     if (step === 1) return form.name && form.category && form.description;
     if (step === 2) return form.county && form.town;
     if (step === 3) return form.amenities.length > 0;
@@ -166,7 +169,12 @@ export default function RegisterPropertyPage() {
                 </div>
                 <div style={s.field}>
                   <label style={s.label}>Create Password *</label>
-                  <input style={s.input} type="password" placeholder="Minimum 8 characters" value={form.password} onChange={(e) => update("password", e.target.value)} />
+                  <input style={s.input} type="password" placeholder="Min 6 chars with letters & numbers" value={form.password} onChange={(e) => update("password", e.target.value)} />
+                  {form.password && (form.password.length < 6 || !/[a-zA-Z]/.test(form.password) || !/[0-9]/.test(form.password)) && (
+                    <div style={{ color: "#dc2626", fontSize: "11px", marginTop: "4px" }}>
+                      ⚠️ Password must be at least 6 characters and contain a mixture of both letters and numbers.
+                    </div>
+                  )}
                 </div>
 
                 {/* PACKAGE SELECTION */}

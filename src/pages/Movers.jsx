@@ -543,12 +543,23 @@ export default function Movers() {
     }));
 
   const onRegister = async (e) => {
-    e.preventDefault(); setLoading(true);
+    e.preventDefault();
+    if (registerData.password.length < 6) {
+      alert("❌ Password must be at least 6 characters.");
+      return;
+    }
+    const hasLetter = /[a-zA-Z]/.test(registerData.password);
+    const hasNumber = /[0-9]/.test(registerData.password);
+    if (!hasLetter || !hasNumber) {
+      alert("❌ Password must contain a mixture of both letters and numbers.");
+      return;
+    }
+    setLoading(true);
     try {
       await API.post("/auth/register", { ...registerData, role: "mover" });
       alert("✅ Application submitted! Once admin approves, you can log in.");
       setActiveTab("login");
-    } catch (err) { alert(`❌ ${err.response?.data?.message || "Registration failed."}`); }
+    } catch (err) { alert(`❌ ${err.response?.data?.message || err.response?.data?.error || "Registration failed."}`); }
     finally { setLoading(false); }
   };
 
@@ -819,7 +830,15 @@ export default function Movers() {
                 <div><label style={labelBase}>Email Address *</label><input style={inputBase} required type="email" placeholder="you@example.com" value={registerData.email} onChange={rChange("email")} onFocus={fIn} onBlur={fOut} /></div>
               </div>
               <div className="two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 12 }}>
-                <div><label style={labelBase}>Password *</label><input style={inputBase} required type="password" placeholder="Min. 8 characters" value={registerData.password} onChange={rChange("password")} onFocus={fIn} onBlur={fOut} /></div>
+                <div>
+                  <label style={labelBase}>Password *</label>
+                  <input style={inputBase} required type="password" placeholder="Min 6 chars, letters & numbers" value={registerData.password} onChange={rChange("password")} onFocus={fIn} onBlur={fOut} />
+                  {registerData.password && (registerData.password.length < 6 || !/[a-zA-Z]/.test(registerData.password) || !/[0-9]/.test(registerData.password)) && (
+                    <div style={{ color: "#dc2626", fontSize: "11px", marginTop: "4px" }}>
+                      ⚠️ Password must contain both letters and numbers.
+                    </div>
+                  )}
+                </div>
                 <div><label style={labelBase}>WhatsApp Number *</label><input style={inputBase} required placeholder="254712345678" value={registerData.phone} onChange={rChange("phone")} onFocus={fIn} onBlur={fOut} /></div>
               </div>
 

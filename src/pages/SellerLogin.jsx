@@ -177,6 +177,22 @@ export default function SellerLogin() {
   };
 
   const handleSubmit = async () => {
+    if (mode === "register") {
+      if (!form.name || !form.email || !form.password || !form.phone || !form.county) {
+        setError("Please fill in all fields.");
+        return;
+      }
+      if (form.password.length < 6) {
+        setError("Password must be at least 6 characters.");
+        return;
+      }
+      const hasLetter = /[a-zA-Z]/.test(form.password);
+      const hasNumber = /[0-9]/.test(form.password);
+      if (!hasLetter || !hasNumber) {
+        setError("Password must contain a mixture of both letters and numbers.");
+        return;
+      }
+    }
     setLoading(true);
     setError("");
     setSuccess("");
@@ -365,8 +381,13 @@ export default function SellerLogin() {
 
               <input name="email" type="email" placeholder="Email Address" value={form.email}
                 onChange={handleChange} style={s.input} />
-              <input name="password" type="password" placeholder="Password" value={form.password}
+              <input name="password" type="password" placeholder={mode === "register" ? "Password (Min 6 chars, letters & numbers)" : "Password"} value={form.password}
                 onChange={handleChange} style={s.input} />
+              {mode === "register" && form.password && (form.password.length < 6 || !/[a-zA-Z]/.test(form.password) || !/[0-9]/.test(form.password)) && (
+                <div style={{ color: "#fca5a5", fontSize: "11px", marginTop: "-12px", marginBottom: "12px", textAlign: "left" }}>
+                  ⚠️ Password must contain both letters and numbers.
+                </div>
+              )}
 
               {mode === "login" && (
                 <div style={{ textAlign: "right", fontSize: "13px" }}>

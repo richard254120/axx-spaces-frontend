@@ -77,6 +77,12 @@ export default function Register() {
       setError("❌ Password must be at least 6 characters");
       return;
     }
+    const hasLetter = /[a-zA-Z]/.test(formData.password);
+    const hasNumber = /[0-9]/.test(formData.password);
+    if (!hasLetter || !hasNumber) {
+      setError("❌ Password must contain a mixture of both letters and numbers.");
+      return;
+    }
 
     setLoading(true);
 
@@ -208,12 +214,17 @@ export default function Register() {
               <input
                 type="password"
                 name="password"
-                placeholder="Min 6 characters"
+                placeholder="Min 6 chars with letters & numbers"
                 value={formData.password}
                 onChange={handleChange}
                 style={styles.input}
                 required
               />
+              {formData.password && (formData.password.length < 6 || !/[a-zA-Z]/.test(formData.password) || !/[0-9]/.test(formData.password)) && (
+                <div style={{ color: "#fca5a5", fontSize: "11px", marginTop: "4px" }}>
+                  ⚠️ Password must contain both letters and numbers.
+                </div>
+              )}
             </div>
 
             <button
