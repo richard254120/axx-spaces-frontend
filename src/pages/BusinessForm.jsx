@@ -814,8 +814,8 @@ export default function BusinessForm() {
   const handleBusinessPhotosUpload = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
-    if (businessPhotos.length + files.length > 18) {
-      setError("You can upload a maximum of 18 photos");
+    if (businessPhotos.length + files.length > 30) {
+      setError("You can upload a maximum of 30 photos");
       return;
     }
 
@@ -1370,7 +1370,7 @@ export default function BusinessForm() {
             </div>
 
             <div style={styles.section}>
-              <h2 style={styles.sectionTitle}>Business Photos (Up to 18)</h2>
+              <h2 style={styles.sectionTitle}>Business Photos (Up to 30)</h2>
               <label style={styles.label}>Upload Photos</label>
               <input
                 type="file"
@@ -1399,7 +1399,7 @@ export default function BusinessForm() {
                 </div>
               )}
 
-              <p style={{ fontSize: "12px", color: "#94a3b8" }}>{businessPhotos.length} / 18 photos uploaded</p>
+              <p style={{ fontSize: "12px", color: "#94a3b8" }}>{businessPhotos.length} / 30 photos uploaded</p>
               {businessPhotos.length > 0 && (
                 <div style={{
                   marginTop: "15px",
