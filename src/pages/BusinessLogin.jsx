@@ -150,6 +150,10 @@ export default function BusinessLogin() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const [showResend, setShowResend] = useState(false);
+  const [resendEmail, setResendEmail] = useState("");
+  const [resendLoading, setResendLoading] = useState(false);
+
   // Forgot password state
   const [showForgot, setShowForgot] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
@@ -195,11 +199,28 @@ export default function BusinessLogin() {
     onError: handleGoogleError,
   });
 
+  const handleResendVerification = async () => {
+    setResendLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const res = await API.post("/auth/resend-verification", { email: resendEmail, role: "user" });
+      setSuccess("✅ " + (res.data.message || "Verification email sent successfully! Please check your inbox."));
+      setShowResend(false);
+    } catch (err) {
+      setError("❌ " + (err.response?.data?.error || "Failed to resend verification email. Please try again."));
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     setSuccess("");
+    setShowResend(false);
 
     try {
       const res = await API.post("/auth/login", { ...formData, role: "user" });
@@ -212,6 +233,10 @@ export default function BusinessLogin() {
         navigate(getDashboardPath(user?.role));
       }, 1500);
     } catch (err) {
+      if (err.response?.data?.requiresVerification) {
+        setShowResend(true);
+        setResendEmail(err.response.data.email || formData.email);
+      }
       setError(err.response?.data?.error || "Login failed. Please check your credentials.");
     } finally {
       setLoading(false);
@@ -290,6 +315,30 @@ export default function BusinessLogin() {
 
             {error && <div style={styles.error}>{error}</div>}
             {success && <div style={styles.success}>{success}</div>}
+
+            {showResend && (
+              <div style={{ textAlign: "center", marginBottom: "20px" }}>
+                <button
+                  type="button"
+                  onClick={handleResendVerification}
+                  disabled={resendLoading}
+                  style={{
+                    background: "rgba(96, 165, 250, 0.15)",
+                    color: "#60a5fa",
+                    border: "1px solid rgba(96, 165, 250, 0.3)",
+                    borderRadius: "10px",
+                    padding: "12px 18px",
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    width: "100%",
+                    transition: "all 0.2s"
+                  }}
+                >
+                  {resendLoading ? "⏳ Sending..." : "📧 Resend Verification Email"}
+                </button>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit}>
               <label style={styles.label}>Email Address</label>

@@ -498,6 +498,10 @@ export default function Movers() {
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotMsg, setForgotMsg] = useState("");
 
+  const [showResend, setShowResend] = useState(false);
+  const [resendEmail, setResendEmail] = useState("");
+  const [resendLoading, setResendLoading] = useState(false);
+
   useEffect(() => {
     const params = new URLSearchParams(search);
     const tab = params.get("tab");
@@ -548,15 +552,38 @@ export default function Movers() {
     finally { setLoading(false); }
   };
 
+  const handleResendVerification = async () => {
+    setResendLoading(true);
+    setLoginError("");
+    setLoginSuccess("");
+
+    try {
+      const res = await API.post("/auth/resend-verification", { email: resendEmail, role: "mover" });
+      setLoginSuccess("✅ " + (res.data.message || "Verification email sent successfully! Please check your inbox."));
+      setShowResend(false);
+    } catch (err) {
+      setLoginError("❌ " + (err.response?.data?.error || "Failed to resend verification email. Please try again."));
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   const onLogin = async (e) => {
-    e.preventDefault(); setLoginError(""); setLoginSuccess(""); setLoading(true);
+    e.preventDefault(); setLoginError(""); setLoginSuccess(""); setLoading(true); setShowResend(false);
     try {
       const res = await API.post("/auth/login", { ...loginData, role: "mover" });
       if (res.data.user.role !== "mover") { setLoginError("❌ This portal is for mover accounts only."); return; }
       login(res.data.token, res.data.user);
       setLoginSuccess("✅ Login successful! Redirecting...");
       setTimeout(() => navigate("/mover-dashboard"), 1000);
-    } catch { setLoginError("❌ Invalid credentials. Please try again."); }
+    } catch (err) {
+      const errData = err.response?.data;
+      if (errData?.requiresVerification) {
+        setShowResend(true);
+        setResendEmail(errData.email || loginData.email);
+      }
+      setLoginError(errData?.error || "❌ Invalid credentials. Please try again.");
+    }
     finally { setLoading(false); }
   };
 
@@ -886,6 +913,30 @@ export default function Movers() {
                 {loginError && <Alert type="error">{loginError}</Alert>}
                 {loginSuccess && <Alert type="success">{loginSuccess}</Alert>}
                 {googleError && <Alert type="error">{googleError}</Alert>}
+
+                {showResend && (
+                  <div style={{ textAlign: "center", marginBottom: "20px" }}>
+                    <button
+                      type="button"
+                      onClick={handleResendVerification}
+                      disabled={resendLoading}
+                      style={{
+                        background: "rgba(12, 68, 124, 0.15)",
+                        color: "#0c447c",
+                        border: "1px solid rgba(12, 68, 124, 0.3)",
+                        borderRadius: "8px",
+                        padding: "10px 18px",
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        width: "100%",
+                        transition: "all 0.2s"
+                      }}
+                    >
+                      {resendLoading ? "⏳ Sending..." : "📧 Resend Verification Email"}
+                    </button>
+                  </div>
+                )}
 
                 {GOOGLE_CLIENT_ID && (
                   <>

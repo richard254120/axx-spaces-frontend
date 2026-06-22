@@ -23,6 +23,10 @@ export default function SellerLogin() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const [showResend, setShowResend] = useState(false);
+  const [resendEmail, setResendEmail] = useState("");
+  const [resendLoading, setResendLoading] = useState(false);
+
   const [form, setForm] = useState({
     name: "", email: "", password: "", phone: "", county: "",
   });
@@ -146,10 +150,37 @@ export default function SellerLogin() {
     }
   };
 
+  const handleResendVerification = async () => {
+    setResendLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const res = await fetch(`${API_BASE}/auth/resend-verification`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: resendEmail, role: "seller" }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to resend verification email");
+      }
+
+      setSuccess("✅ " + (data.message || "Verification email sent successfully! Please check your inbox."));
+      setShowResend(false);
+    } catch (err) {
+      setError("❌ " + (err.message || "Failed to resend verification email. Please try again."));
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
     setError("");
     setSuccess("");
+    setShowResend(false);
 
     try {
       const url = mode === "login"
@@ -169,6 +200,10 @@ export default function SellerLogin() {
       const data = await res.json();
 
       if (!res.ok) {
+        if (data.requiresVerification) {
+          setShowResend(true);
+          setResendEmail(data.email || form.email);
+        }
         setError(data.error || "Something went wrong");
         return;
       }
@@ -288,6 +323,30 @@ export default function SellerLogin() {
             {/* Alerts */}
             {error && <div style={s.error}>{error}</div>}
             {success && <div style={s.successMsg}>{success}</div>}
+
+            {showResend && (
+              <div style={{ textAlign: "center", marginBottom: "20px" }}>
+                <button
+                  type="button"
+                  onClick={handleResendVerification}
+                  disabled={resendLoading}
+                  style={{
+                    background: "rgba(251, 191, 36, 0.15)",
+                    color: "#fbbf24",
+                    border: "1px solid rgba(251, 191, 36, 0.3)",
+                    borderRadius: "8px",
+                    padding: "10px 18px",
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    width: "100%",
+                    transition: "all 0.2s"
+                  }}
+                >
+                  {resendLoading ? "⏳ Sending..." : "📧 Resend Verification Email"}
+                </button>
+              </div>
+            )}
 
             {/* Form */}
             <div style={s.form}>

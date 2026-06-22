@@ -167,6 +167,10 @@ export default function TourismLogin() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const [showResend, setShowResend] = useState(false);
+  const [resendEmail, setResendEmail] = useState("");
+  const [resendLoading, setResendLoading] = useState(false);
+
   // Forgot password state
   const [showForgot, setShowForgot] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
@@ -294,6 +298,32 @@ export default function TourismLogin() {
     }
   };
 
+  const handleResendVerification = async () => {
+    setResendLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE}/api/auth/resend-verification`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: resendEmail, role: "landlord" }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to resend verification email");
+      }
+
+      setSuccess("✅ " + (data.message || "Verification email sent successfully! Please check your inbox."));
+      setShowResend(false);
+    } catch (err) {
+      setError("❌ " + (err.message || "Failed to resend verification email. Please try again."));
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) {
@@ -303,6 +333,7 @@ export default function TourismLogin() {
 
     setLoading(true);
     setError("");
+    setShowResend(false);
 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_BASE}/api/auth/login`, {
@@ -314,6 +345,10 @@ export default function TourismLogin() {
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.requiresVerification) {
+          setShowResend(true);
+          setResendEmail(data.email || email);
+        }
         throw new Error(data.error || "Login failed");
       }
 
@@ -428,6 +463,30 @@ export default function TourismLogin() {
 
             {error && <div style={styles.error}>{error}</div>}
             {success && <div style={{ ...styles.error, background: "#f0fdf4", borderColor: "#22c55e", color: "#16a34a" }}>{success}</div>}
+
+            {showResend && (
+              <div style={{ textAlign: "center", marginBottom: "20px" }}>
+                <button
+                  type="button"
+                  onClick={handleResendVerification}
+                  disabled={resendLoading}
+                  style={{
+                    background: "rgba(251, 191, 36, 0.15)",
+                    color: "#fbbf24",
+                    border: "1px solid rgba(251, 191, 36, 0.3)",
+                    borderRadius: "10px",
+                    padding: "10px 18px",
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    width: "100%",
+                    transition: "all 0.2s"
+                  }}
+                >
+                  {resendLoading ? "⏳ Sending..." : "📧 Resend Verification Email"}
+                </button>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} style={styles.form}>
               <div>
