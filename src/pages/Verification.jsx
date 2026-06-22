@@ -40,21 +40,48 @@ const Verification = () => {
       name: 'Student Verification',
       description: 'Upload your Student ID to verify enrollment. Grants the academic Student Badge.',
       badge: '🎓 Student Badge',
-      color: '#3b82f6'
+      color: '#3b82f6',
+      requirements: [
+        'Valid Student ID Card showing clear expiration date',
+        'Official university email or enrollment document'
+      ],
+      benefits: [
+        'Unlock special student pricing & exclusive discounts',
+        'Gain peer trust when matching with roommates'
+      ]
     },
     {
       level: 2,
       name: 'Standard Verification',
       description: 'Upload ID document, Proof of Address (utility bill), and Selfie to get verified.',
       badge: '✓ Verified Standard Badge',
-      color: '#10b981'
+      color: '#10b981',
+      requirements: [
+        'Government ID (National ID, Passport, or License)',
+        'Biometric selfie match matching ID document photo',
+        'Utility bill or bank statement (< 3 months old)'
+      ],
+      benefits: [
+        'Required to list properties & items on Axx Biashara',
+        'Required to book rentals & finalize room reservations',
+        'Reduces security escrow hold times on checkouts'
+      ]
     },
     {
       level: 3,
       name: 'Premium Verification',
       description: 'Request physical, in-person verification by AxxSpace staff at your location.',
       badge: '👑 Premium Verified Gold Badge',
-      color: '#f59e0b'
+      color: '#f59e0b',
+      requirements: [
+        'Detailed physical address and location coordinates',
+        'Appointment scheduling with a visitation agent'
+      ],
+      benefits: [
+        'Display the VIP Premium Gold Badge on all listings',
+        'Top organic ranking boost on maps and search results',
+        '24/7 priority customer support with zero payment holds'
+      ]
     }
   ];
 
@@ -235,6 +262,25 @@ const Verification = () => {
                   </div>
                   <h3 style={styles.levelName}>{lvl.name}</h3>
                   <p style={styles.levelDescription}>{lvl.description}</p>
+                  
+                  <div style={styles.detailsGrid}>
+                    <div style={styles.detailsColumn}>
+                      <div style={styles.detailsColumnTitle}>📋 Requirements:</div>
+                      <ul style={styles.detailsList}>
+                        {lvl.requirements.map((req, idx) => (
+                          <li key={idx} style={styles.detailsListItem}>• {req}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div style={styles.detailsColumn}>
+                      <div style={styles.detailsColumnTitle}>✨ Unlocks / Benefits:</div>
+                      <ul style={styles.detailsList}>
+                        {lvl.benefits.map((ben, idx) => (
+                          <li key={idx} style={{ ...styles.detailsListItem, color: '#fbbf24', fontWeight: 500 }}>★ {ben}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -685,6 +731,39 @@ const styles = {
     transition: 'all 0.2s',
   },
   disabledBtn: { opacity: 0.3, cursor: 'not-allowed' },
+  detailsGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+    gap: '16px',
+    marginTop: '16px',
+    paddingTop: '16px',
+    borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+  },
+  detailsColumn: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '6px',
+  },
+  detailsColumnTitle: {
+    fontSize: '12px',
+    fontWeight: '700',
+    color: '#cbd5e1',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+  },
+  detailsList: {
+    listStyleType: 'none',
+    padding: 0,
+    margin: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '6px',
+  },
+  detailsListItem: {
+    fontSize: '12px',
+    color: '#94a3b8',
+    lineHeight: '1.4',
+  },
 };
 
 export default Verification;

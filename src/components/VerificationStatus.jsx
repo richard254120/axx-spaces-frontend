@@ -50,9 +50,17 @@ const VerificationStatus = () => {
       statusField: 'studentVerificationStatus',
       badgeName: 'student_verified',
       badgeText: '🎓 Student Badge',
-      description: 'Verifies you are an active student',
+      description: 'Verifies you are currently enrolled in a college or university.',
       color: '#3b82f6',
       details: verificationData?.levels?.student,
+      requirements: [
+        'Valid Student ID Card showing clear expiration date',
+        'Official university email or enrollment document'
+      ],
+      benefits: [
+        'Unlock special student pricing & exclusive discounts',
+        'Gain peer trust when matching with roommates'
+      ]
     },
     {
       level: 2,
@@ -60,9 +68,19 @@ const VerificationStatus = () => {
       statusField: 'standardVerificationStatus',
       badgeName: 'standard_verified',
       badgeText: '✓ Standard Verified Badge',
-      description: 'Verifies National ID, Selfie & Utility Bill',
+      description: 'Verifies your legal identity and physical residency.',
       color: '#10b981',
       details: verificationData?.levels?.standard,
+      requirements: [
+        'Government-issued ID (National ID, Passport, or License)',
+        'Biometric selfie match matching ID document photo',
+        'Utility bill or bank statement (< 3 months old)'
+      ],
+      benefits: [
+        'Required to list properties & items on Axx Biashara',
+        'Required to book rentals & finalize room reservations',
+        'Reduces security escrow hold times on checkouts'
+      ]
     },
     {
       level: 3,
@@ -70,9 +88,18 @@ const VerificationStatus = () => {
       statusField: 'premiumVerificationStatus',
       badgeName: 'premium_verified',
       badgeText: '👑 Premium Verified Gold Badge',
-      description: 'Physical inspection completed in-person',
+      description: 'On-site physical inspection of your business premises or rental unit by AxxSpace staff.',
       color: '#f59e0b',
       details: verificationData?.levels?.premium,
+      requirements: [
+        'Detailed physical address and location coordinates',
+        'Appointment scheduling with a visitation agent'
+      ],
+      benefits: [
+        'Display the VIP Premium Gold Badge on all listings',
+        'Top organic ranking boost on maps and search results',
+        '24/7 priority customer support with zero payment holds'
+      ]
     },
   ];
 
@@ -156,6 +183,25 @@ const VerificationStatus = () => {
                 </span>
               </div>
 
+              <div style={styles.detailsGrid}>
+                <div style={styles.detailsColumn}>
+                  <div style={styles.detailsColumnTitle}>📋 Requirements:</div>
+                  <ul style={styles.detailsList}>
+                    {lvl.requirements.map((req, idx) => (
+                      <li key={idx} style={styles.detailsListItem}>• {req}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div style={styles.detailsColumn}>
+                  <div style={styles.detailsColumnTitle}>✨ Unlocks / Benefits:</div>
+                  <ul style={styles.detailsList}>
+                    {lvl.benefits.map((ben, idx) => (
+                      <li key={idx} style={{ ...styles.detailsListItem, color: '#fbbf24', fontWeight: 500 }}>★ {ben}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
               {status === 'rejected' && details?.rejectionReason && (
                 <div style={styles.rejectionBox}>
                   <span style={styles.rejectionTitle}>❌ Rejection Reason:</span>
@@ -226,7 +272,12 @@ const VerificationStatus = () => {
               monthly: 20,
               monthlyExact: 19.80,
               semiannual: 99,
-              desc: "Perfect for active students. Unlocks student discounts & standard features."
+              desc: "Perfect for active students. Unlocks student discounts & standard features.",
+              benefits: [
+                "Unlock special student rate discounts",
+                "Display Academic Student Badge on profile",
+                "Direct connection to campus roommates"
+              ]
             },
             online_verified: {
               name: "Online Verified",
@@ -235,7 +286,12 @@ const VerificationStatus = () => {
               monthly: 60,
               monthlyExact: 59.80,
               semiannual: 299,
-              desc: "For general users. Verifies email, phone & social profiles."
+              desc: "For general users. Verifies email, phone & social profiles.",
+              benefits: [
+                "Boost profile search weight by +10%",
+                "Verify email, phone, and social handles",
+                "Access secure user-to-user chat networks"
+              ]
             },
             identity_verified: {
               name: "Identity Verified",
@@ -244,7 +300,12 @@ const VerificationStatus = () => {
               monthly: 60,
               monthlyExact: 59.80,
               semiannual: 299,
-              desc: "Government ID validation. Greatly improves Trust Score."
+              desc: "Government ID validation. Greatly improves Trust Score.",
+              benefits: [
+                "Required pathway to book room rentals",
+                "Required pathway to create property listings",
+                "Build maximum immediate platform credibility"
+              ]
             },
             location_verified: {
               name: "Location Verified",
@@ -253,7 +314,12 @@ const VerificationStatus = () => {
               monthly: 160,
               monthlyExact: 159.80,
               semiannual: 799,
-              desc: "Verifies address & residency. Essential for serious landlords/renters."
+              desc: "Verifies address & residency. Essential for serious landlords/renters.",
+              benefits: [
+                "Utility bill residency verification badge",
+                "Highly prioritized rental request queues",
+                "Increase daily marketplace query quotas"
+              ]
             },
             business_verified: {
               name: "Business Verified",
@@ -262,7 +328,12 @@ const VerificationStatus = () => {
               monthly: 400,
               monthlyExact: 399.80,
               semiannual: 1999,
-              desc: "Verified merchant/business license. Crucial for Biashara listings."
+              desc: "Verified merchant/business license. Crucial for Biashara listings.",
+              benefits: [
+                "Post unlimited items on Axx Biashara portal",
+                "Merchant Trust checkmark displayed on store",
+                "Substantially lower transaction escrow fees"
+              ]
             },
             premium_verified: {
               name: "Premium Verified",
@@ -271,7 +342,12 @@ const VerificationStatus = () => {
               monthly: 1400,
               monthlyExact: 1400,
               semiannual: 7000,
-              desc: "Ultimate trust tier. VIP support, in-person check & maximum visibility."
+              desc: "Ultimate trust tier. VIP support, in-person check & maximum visibility.",
+              benefits: [
+                "Up to 5x boost in listing search positions",
+                "In-person check & Premium Gold badge",
+                "24/7 direct VIP account helpline manager"
+              ]
             }
           }).map(([key, plan]) => {
             const isOwned = badges.includes(key);
@@ -296,6 +372,15 @@ const VerificationStatus = () => {
                 </div>
 
                 <p style={styles.planDesc}>{plan.desc}</p>
+
+                <ul style={styles.planBenefitsList}>
+                  {plan.benefits.map((ben, idx) => (
+                    <li key={idx} style={styles.planBenefitItem}>
+                      <span style={{ color: plan.color, marginRight: '6px', fontWeight: 'bold' }}>✓</span>
+                      {ben}
+                    </li>
+                  ))}
+                </ul>
 
                 <div style={styles.priceContainer}>
                   <span style={styles.priceSymbol}>KSh</span>
@@ -644,6 +729,56 @@ const styles = {
     boxSizing: 'border-box',
     transition: 'transform 0.2s, opacity 0.2s',
     cursor: 'pointer',
+  },
+  detailsGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+    gap: '16px',
+    marginTop: '12px',
+    paddingTop: '12px',
+    borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+  },
+  detailsColumn: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '6px',
+  },
+  detailsColumnTitle: {
+    fontSize: '12px',
+    fontWeight: '700',
+    color: '#cbd5e1',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+  },
+  detailsList: {
+    listStyleType: 'none',
+    padding: 0,
+    margin: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '6px',
+  },
+  detailsListItem: {
+    fontSize: '12px',
+    color: '#94a3b8',
+    lineHeight: '1.4',
+  },
+  planBenefitsList: {
+    listStyleType: 'none',
+    padding: 0,
+    margin: '0 0 16px 0',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '6px',
+    borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+    paddingTop: '12px',
+  },
+  planBenefitItem: {
+    fontSize: '12px',
+    color: '#cbd5e1',
+    lineHeight: '1.4',
+    display: 'flex',
+    alignItems: 'center',
   },
 };
 
