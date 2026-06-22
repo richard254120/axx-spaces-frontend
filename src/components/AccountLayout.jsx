@@ -14,7 +14,8 @@ import logo from "../assets/image.png";
 
 export default function AccountLayout({ children, preferSeller = false }) {
   const authContext = useContext(AuthContext);
-  const { user, logout } = resolveAuth(authContext, { preferSeller });
+  const { user } = resolveAuth(authContext, { preferSeller });
+  const logout = authContext?.logout;
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -30,7 +31,11 @@ export default function AccountLayout({ children, preferSeller = false }) {
 
   const handleLogout = () => {
     clearSellerSession();
-    if (logout) logout("/");
+    if (logout) {
+      logout("/");
+    } else {
+      window.location.href = "/";
+    }
   };
 
   return (

@@ -54,9 +54,10 @@ export function getSellerSession() {
 /** Resolve active session — seller token takes precedence on seller routes */
 export function resolveAuth(authContext, { preferSeller = false } = {}) {
   const seller = getSellerSession();
+  const logout = authContext?.logout;
 
   if (preferSeller && seller) {
-    return { token: seller.token, user: seller.user, source: "seller" };
+    return { token: seller.token, user: seller.user, source: "seller", logout };
   }
 
   if (authContext?.token && authContext?.user) {
@@ -64,14 +65,15 @@ export function resolveAuth(authContext, { preferSeller = false } = {}) {
       token: authContext.token,
       user: authContext.user,
       source: "main",
+      logout,
     };
   }
 
   if (seller) {
-    return { token: seller.token, user: seller.user, source: "seller" };
+    return { token: seller.token, user: seller.user, source: "seller", logout };
   }
 
-  return { token: null, user: null, source: null };
+  return { token: null, user: null, source: null, logout };
 }
 
 export function roleIsAllowed(userRole, allowedRoles = []) {
