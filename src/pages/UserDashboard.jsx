@@ -42,7 +42,6 @@ export default function UserDashboard() {
 
   // Navigation and ui states
   const [activeTab, setActiveTab] = useState("overview");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -121,50 +120,27 @@ export default function UserDashboard() {
     <div style={s.dashboardContainer}>
       <style>{customStyles}</style>
 
-      {/* TOP HEADER MENU BAR FOR MOBILE */}
-      <header style={s.mobileHeader}>
-        <button style={s.menuToggleBtn} onClick={() => setSidebarOpen(!sidebarOpen)}>
-          {sidebarOpen ? "✕ Menu" : "☰ Menu"}
+      {/* HORIZONTAL TAB SELECTOR */}
+      <div style={s.tabsScroll}>
+        <button
+          style={{ ...s.tabBtn, ...(activeTab === "overview" && s.tabBtnActive) }}
+          onClick={() => setActiveTab("overview")}
+        >
+          📊 Overview
         </button>
-        <span style={s.headerBranding}>AxxSpace Workspace</span>
-        <ProfileAvatar user={user} size={32} />
-      </header>
-
-      {/* SIDEBAR WRAPPER */}
-      <aside style={{ ...s.sidebar, transform: sidebarOpen ? "translateX(0)" : "" }}>
-        <div style={s.sidebarBrand}>
-          <span style={s.brandGold}>AXXSPACE</span>
-          <span style={s.brandSub}>Client Panel</span>
-        </div>
-
-        <div style={s.sidebarUserProfile}>
-          <ProfileAvatar user={user} size={50} />
-          <div style={s.userMetaInfo}>
-            <div style={s.userName}>{user?.name || "Member Account"}</div>
-            <div style={s.userRole}>{user?.role?.toUpperCase() || "USER"}</div>
-          </div>
-        </div>
-
-        <nav style={s.sidebarNav}>
-          <button style={{ ...s.navItem, ...(activeTab === "overview" && s.navItemActive) }} onClick={() => { setActiveTab("overview"); setSidebarOpen(false); }}>
-            <span style={s.navIcon}>📊</span> Overview
-          </button>
-          <button style={{ ...s.navItem, ...(activeTab === "businesses" && s.navItemActive) }} onClick={() => { setActiveTab("businesses"); setSidebarOpen(false); }}>
-            <span style={s.navIcon}>🏢</span> Directory Listings
-          </button>
-          <button style={{ ...s.navItem, ...(activeTab === "profile" && s.navItemActive) }} onClick={() => { setActiveTab("profile"); setSidebarOpen(false); }}>
-            <span style={s.navIcon}>👤</span> Profile & KYC
-          </button>
-        </nav>
-
-        <div style={s.sidebarFooter}>
-          <button style={s.footerBtn} onClick={() => navigate("/settings")}>⚙️ Settings</button>
-          <button style={{ ...s.footerBtn, ...s.logoutColor }} onClick={() => logout("/login")}>Logout</button>
-        </div>
-      </aside>
-
-      {/* OVERLAY FOR BACKDROP ON MOBILE SIDEBAR OPEN */}
-      {sidebarOpen && <div style={s.sidebarOverlay} onClick={() => setSidebarOpen(false)}></div>}
+        <button
+          style={{ ...s.tabBtn, ...(activeTab === "businesses" && s.tabBtnActive) }}
+          onClick={() => setActiveTab("businesses")}
+        >
+          🏢 Directory Listings
+        </button>
+        <button
+          style={{ ...s.tabBtn, ...(activeTab === "profile" && s.tabBtnActive) }}
+          onClick={() => setActiveTab("profile")}
+        >
+          👤 Profile & KYC
+        </button>
+      </div>
 
       {/* MAIN CONTENT AREA */}
       <main style={s.mainContent}>
@@ -203,7 +179,7 @@ export default function UserDashboard() {
 
             {/* Quick Actions Panel */}
             <div style={s.panelCard}>
-              <h3 style={s.panelHeading}>⚡ Quick Listing Creation</h3>
+              <h3 style={s.panelHeading}>⚡ Quick Actions</h3>
               <div style={s.actionsGrid}>
                 <button style={s.actionGridBtn} onClick={() => navigate("/business/create")}>
                   🏢 Register New Business
@@ -305,167 +281,38 @@ const s = {
     minHeight: "100vh",
     background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
     color: "#f1f5f9",
-    display: "flex",
     fontFamily: "'Inter', 'DM Sans', sans-serif",
+    padding: "24px 20px",
   },
-  mobileHeader: {
-    display: "none",
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "60px",
-    background: "#0f172a",
-    borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
-    padding: "0 16px",
-    boxSizing: "border-box",
-    alignItems: "center",
-    justifyContent: "space-between",
-    zIndex: 1001,
-  },
-  menuToggleBtn: {
-    background: "rgba(251, 191, 36, 0.15)",
-    border: "1px solid rgba(251, 191, 36, 0.3)",
-    borderRadius: "6px",
-    color: "#fbbf24",
-    padding: "6px 12px",
-    cursor: "pointer",
-    fontSize: "13px",
-    fontWeight: "700",
-  },
-  headerBranding: {
-    fontWeight: "900",
-    color: "#fbbf24",
-    fontSize: "16px",
-    letterSpacing: "0.5px",
-  },
-  sidebarOverlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100vw",
-    height: "100vh",
-    background: "rgba(0,0,0,0.5)",
-    backdropFilter: "blur(4px)",
-    zIndex: 1000,
-  },
-  sidebar: {
-    width: "280px",
-    background: "linear-gradient(180deg, #0f172a 0%, #070d19 100%)",
-    borderRight: "1px solid rgba(255, 255, 255, 0.08)",
+  tabsScroll: {
     display: "flex",
-    flexDirection: "column",
-    padding: "24px 16px",
-    boxSizing: "border-box",
-    flexShrink: 0,
-    position: "sticky",
-    top: 0,
-    height: "100vh",
-    zIndex: 1002,
-    transition: "transform 0.3s ease",
-  },
-  sidebarBrand: {
-    marginBottom: "32px",
-    display: "flex",
-    flexDirection: "column",
-  },
-  brandGold: {
-    fontSize: "20px",
-    fontWeight: "900",
-    color: "#fbbf24",
-    letterSpacing: "1px",
-  },
-  brandSub: {
-    fontSize: "11px",
-    color: "#64748b",
-    textTransform: "uppercase",
-    letterSpacing: "2px",
-    marginTop: "2px",
-  },
-  sidebarUserProfile: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    background: "rgba(255, 255, 255, 0.03)",
-    padding: "12px",
-    borderRadius: "12px",
-    border: "1px solid rgba(255, 255, 255, 0.05)",
-    marginBottom: "24px",
-  },
-  userMetaInfo: {
-    display: "flex",
-    flexDirection: "column",
-  },
-  userName: {
-    fontSize: "14px",
-    fontWeight: "700",
-    color: "#f1f5f9",
-  },
-  userRole: {
-    fontSize: "10px",
-    fontWeight: "700",
-    color: "#fbbf24",
-    letterSpacing: "0.5px",
-    marginTop: "2px",
-  },
-  sidebarNav: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "6px",
-    flex: 1,
-  },
-  navItem: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    background: "transparent",
-    border: "none",
-    borderRadius: "10px",
-    padding: "12px 16px",
-    color: "#94a3b8",
-    fontSize: "14px",
-    fontWeight: "600",
-    cursor: "pointer",
-    textAlign: "left",
-    transition: "all 0.2s ease",
-  },
-  navItemActive: {
-    background: "rgba(251, 191, 36, 0.12)",
-    color: "#fbbf24",
-    borderLeft: "4px solid #fbbf24",
-  },
-  navIcon: {
-    fontSize: "16px",
-  },
-  sidebarFooter: {
-    borderTop: "1px solid rgba(255, 255, 255, 0.08)",
-    paddingTop: "16px",
-    display: "flex",
-    flexDirection: "column",
     gap: "8px",
+    overflowX: "auto",
+    marginBottom: "24px",
+    paddingBottom: "8px",
+    scrollBehavior: "smooth",
+    borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
   },
-  footerBtn: {
-    background: "rgba(255,255,255,0.03)",
-    border: "1px solid rgba(255,255,255,0.05)",
-    borderRadius: "8px",
+  tabBtn: {
+    background: "rgba(30, 41, 59, 0.6)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
     color: "#94a3b8",
-    padding: "10px",
+    padding: "12px 20px",
+    borderRadius: "10px",
     fontSize: "13px",
-    fontWeight: "600",
+    fontWeight: 600,
     cursor: "pointer",
-    transition: "all 0.2s",
+    whiteSpace: "nowrap",
+    transition: "all 0.3s ease",
   },
-  logoutColor: {
-    background: "rgba(239, 68, 68, 0.08)",
-    border: "1px solid rgba(239, 68, 68, 0.2)",
-    color: "#fca5a5",
+  tabBtnActive: {
+    background: "#fbbf24",
+    color: "#0f1729",
+    border: "1px solid #fbbf24",
+    boxShadow: "0 4px 12px rgba(251, 191, 36, 0.3)",
   },
   mainContent: {
-    flex: 1,
-    padding: "32px",
-    boxSizing: "border-box",
-    overflowY: "auto",
-    maxHeight: "100vh",
+    padding: "12px 0",
   },
   toastSuccess: {
     background: "rgba(16, 185, 129, 0.12)",

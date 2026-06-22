@@ -190,7 +190,7 @@ export default function MoverDashboard() {
     accepted: "🔵 Accepted", pending: "⏳ Pending",
   }[status] || status);
 
-  const handleLogout = () => { logout("/"); };
+
 
   if (loading) {
     return (
@@ -210,17 +210,33 @@ export default function MoverDashboard() {
       {/* BOOST NOTIFICATION */}
       <BoostNotification user={user} userType="mover" />
 
-      {/* TOP HEADER */}
-      <header style={styles.topBar}>
-        <div style={styles.logoSection}>
-          <span style={styles.logoText}>🚚 AXX Movers Dashboard</span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <button onClick={fetchAll} style={styles.refreshBtn} title="Refresh Data">refresh</button>
-          <button onClick={() => navigate("/settings")} style={styles.settingsIcon} title="Settings">⚙️</button>
-          <button onClick={handleLogout} style={styles.logoutIcon} title="Logout">logout</button>
-        </div>
-      </header>
+      {/* TABS SCROLL */}
+      <div style={styles.tabsScroll}>
+        <button
+          style={{ ...styles.tabBtn, ...(activeTab === "overview" && styles.tabBtnActive) }}
+          onClick={() => setActiveTab("overview")}
+        >
+          📊 Overview
+        </button>
+        <button
+          style={{ ...styles.tabBtn, ...(activeTab === "jobs" && styles.tabBtnActive) }}
+          onClick={() => setActiveTab("jobs")}
+        >
+          📦 Jobs {pendingJobsCount > 0 && <span style={styles.tabBadge}>{pendingJobsCount}</span>}
+        </button>
+        <button
+          style={{ ...styles.tabBtn, ...(activeTab === "earnings" && styles.tabBtnActive) }}
+          onClick={() => setActiveTab("earnings")}
+        >
+          💰 Earnings
+        </button>
+        <button
+          style={{ ...styles.tabBtn, ...(activeTab === "profile" && styles.tabBtnActive) }}
+          onClick={() => setActiveTab("profile")}
+        >
+          👤 Profile
+        </button>
+      </div>
 
       {/* FEEDBACK TOASTS */}
       {error && <div style={styles.errorToast}>{error}</div>}
@@ -370,28 +386,6 @@ export default function MoverDashboard() {
           </section>
         )}
       </main>
-
-      {/* BOTTOM NAV */}
-      <nav style={styles.bottomNav}>
-        {[
-          { tab: "overview", icon: "📊", label: "Overview", badge: 0 },
-          { tab: "jobs", icon: "📦", label: "Jobs", badge: pendingJobsCount },
-          { tab: "earnings", icon: "💰", label: "Earnings", badge: 0 },
-          { tab: "profile", icon: "👤", label: "Profile", badge: 0 },
-        ].map(({ tab, icon, label, badge }) => (
-          <button
-            key={tab}
-            style={activeTab === tab ? styles.navBtnActive : styles.navBtn}
-            onClick={() => setActiveTab(tab)}
-          >
-            <div style={{ position: "relative" }}>
-              <span style={styles.navIcon}>{icon}</span>
-              {badge > 0 && <span style={styles.navBadgeIndex}>{badge}</span>}
-            </div>
-            <span style={styles.navLabel}>{label}</span>
-          </button>
-        ))}
-      </nav>
     </div>
   );
 }
@@ -555,74 +549,78 @@ function JobCard({ job, actionLoading, onAccept, onComplete, getStatusColor, get
 
 const styles = {
   container: {
-    background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)", minHeight: "100vh",
-    paddingBottom: "100px", fontFamily: "'Inter', 'DM Sans', sans-serif",
+    background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)", minHeight: "100vh",
+    color: "#f8fafc", fontFamily: "'Inter', 'DM Sans', sans-serif",
+    padding: "24px 20px",
   },
-  topBar: {
-    background: "linear-gradient(135deg, #1f2937 0%, #0f1729 100%)",
-    color: "white", padding: "18px 24px",
-    display: "flex", justifyContent: "space-between", alignItems: "center",
-    position: "sticky", top: 0, zIndex: 100,
-    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+  tabsScroll: {
+    display: "flex", gap: "8px", overflowX: "auto",
+    marginBottom: "24px", paddingBottom: "8px", scrollBehavior: "smooth",
+    borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
   },
-  logoSection: { display: "flex", alignItems: "center", gap: "10px" },
-  logoText: { fontWeight: 800, fontSize: "18px", color: "#fbbf24", letterSpacing: "0.5px" },
-  logoutIcon: { background: "none", border: "none", fontSize: "22px", cursor: "pointer" },
-  settingsIcon: { background: "none", border: "none", fontSize: "20px", cursor: "pointer" },
-  refreshBtn: { background: "none", border: "none", fontSize: "18px", cursor: "pointer", marginRight: "10px" },
+  tabBtn: {
+    background: "rgba(30, 41, 59, 0.6)", border: "1px solid rgba(255, 255, 255, 0.08)", color: "#94a3b8",
+    padding: "12px 20px", borderRadius: "10px", fontSize: "13px",
+    fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.3s ease", display: "flex", alignItems: "center", gap: "6px"
+  },
+  tabBtnActive: { background: "#fbbf24", color: "#0f1729", border: "1px solid #fbbf24", boxShadow: "0 4px 12px rgba(251, 191, 36, 0.3)" },
+  tabBadge: {
+    background: "#ef4444", color: "white", padding: "1px 6px", borderRadius: "10px", fontSize: "10px", fontWeight: 700
+  },
   notificationBanner: {
     display: "flex", alignItems: "center", gap: "12px",
-    background: "#fef2f2", borderBottom: "2px solid #fca5a5",
-    padding: "12px 20px", color: "#991b1b", cursor: "pointer",
+    background: "rgba(239, 68, 68, 0.15)", border: "1px solid rgba(239, 68, 68, 0.3)",
+    padding: "12px 20px", color: "#fca5a5", cursor: "pointer", borderRadius: "12px", marginBottom: "20px"
   },
   bannerBadge: {
     background: "#ef4444", color: "white",
-    padding: "4px 8px", borderRadius: "12px",
+    padding: "4px 12px", borderRadius: "12px",
     fontSize: "11px", fontWeight: 700, whiteSpace: "nowrap",
   },
   errorToast: {
-    background: "#fef2f2", border: "1px solid #fecaca", color: "#dc2626",
+    background: "rgba(239, 68, 68, 0.12)", border: "1px solid rgba(239, 68, 68, 0.3)", color: "#f87171",
     padding: "12px 16px", fontSize: "13px", fontWeight: 600,
-    position: "sticky", top: "60px", zIndex: 99,
+    borderRadius: "10px", marginBottom: "16px"
   },
   successToast: {
-    background: "#f0fdf4", border: "1px solid #bbf7d0", color: "#16a34a",
+    background: "rgba(16, 185, 129, 0.12)", border: "1px solid rgba(16, 185, 129, 0.3)", color: "#34d399",
     padding: "12px 16px", fontSize: "13px", fontWeight: 600,
-    position: "sticky", top: "60px", zIndex: 99,
+    borderRadius: "10px", marginBottom: "16px"
   },
-  content: { padding: "20px" },
+  content: { padding: "12px 0" },
   welcomeCard: {
-    background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+    background: "linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(29, 78, 216, 0.05) 100%)",
+    border: "1px solid rgba(59, 130, 246, 0.3)",
     color: "white", padding: "28px", borderRadius: "20px", marginBottom: "28px",
     display: "flex", justifyContent: "space-between", alignItems: "center",
-    boxShadow: "0 8px 24px rgba(59, 130, 246, 0.25)",
+    boxShadow: "0 8px 24px rgba(59, 130, 246, 0.1)",
   },
-  welcomeTitle: { fontSize: "24px", fontWeight: 800, margin: "0 0 8px", letterSpacing: "-0.5px" },
-  welcomeSubtitle: { fontSize: "14px", opacity: 0.95, margin: 0, lineHeight: "1.5" },
+  welcomeTitle: { fontSize: "24px", fontWeight: 800, margin: "0 0 8px", letterSpacing: "-0.5px", color: "#fbbf24" },
+  welcomeSubtitle: { fontSize: "14px", opacity: 0.95, margin: 0, lineHeight: "1.5", color: "#94a3b8" },
   statusBadge: {
-    background: "rgba(255,255,255,0.25)", padding: "10px 16px",
+    background: "rgba(34, 197, 94, 0.15)", color: "#22c55e", border: "1px solid rgba(34, 197, 94, 0.3)", padding: "10px 16px",
     borderRadius: "12px", fontSize: "13px", fontWeight: 700, backdropFilter: "blur(10px)",
   },
   statsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "16px", marginBottom: "28px" },
   statCard: {
-    background: "white", padding: "20px", borderRadius: "16px",
+    background: "linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)", padding: "20px", borderRadius: "16px",
     display: "flex", gap: "14px", alignItems: "center",
-    border: "1px solid #e5e7eb", boxShadow: "0 2px 8px rgba(0,0,0,0.06)", transition: "all 0.3s ease",
+    border: "1px solid rgba(255, 255, 255, 0.08)", transition: "all 0.3s ease",
   },
   statIcon: { fontSize: "32px" },
-  statLabel: { fontSize: "12px", color: "#6b7280", margin: "0 0 6px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" },
-  statNumber: { fontSize: "22px", fontWeight: 800, color: "#1f2937", margin: 0, letterSpacing: "-0.5px" },
-  sectionTitle: { fontSize: "18px", fontWeight: 800, color: "#1f2937", marginBottom: "16px", marginTop: "8px", letterSpacing: "-0.3px" },
+  statLabel: { fontSize: "11px", color: "#94a3b8", margin: "0 0 6px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" },
+  statNumber: { fontSize: "22px", fontWeight: 800, color: "#fbbf24", margin: 0, letterSpacing: "-0.5px" },
+  sectionTitle: { fontSize: "18px", fontWeight: 800, color: "#fbbf24", marginBottom: "16px", marginTop: "8px", letterSpacing: "-0.3px" },
   jobsList: { display: "flex", flexDirection: "column", gap: "16px" },
   jobCard: {
-    background: "white", padding: "20px", borderRadius: "16px",
-    border: "1px solid #e5e7eb", boxShadow: "0 2px 12px rgba(0,0,0,0.08)", transition: "all 0.3s ease",
+    background: "linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)", padding: "20px", borderRadius: "16px",
+    border: "1px solid rgba(255, 255, 255, 0.08)", transition: "all 0.3s ease",
   },
   jobHeader: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "16px", gap: "12px" },
-  jobTitle: { fontSize: "17px", fontWeight: 800, color: "#1f2937", margin: "0 0 6px", letterSpacing: "-0.3px" },
-  jobCustomer: { fontSize: "13px", color: "#6b7280", margin: 0 },
+  jobTitle: { fontSize: "17px", fontWeight: 800, color: "#f1f5f9", margin: "0 0 6px", letterSpacing: "-0.3px" },
+  jobCustomer: { fontSize: "13px", color: "#94a3b8", margin: 0 },
   maskedPhone: {
-    background: "#f3f4f6", color: "#9ca3af",
+    background: "rgba(255, 255, 255, 0.05)", color: "#64748b",
     padding: "2px 6px", borderRadius: "4px", fontSize: "11px", fontStyle: "italic",
   },
   jobStatus: {
@@ -630,96 +628,70 @@ const styles = {
     fontSize: "12px", fontWeight: 700, whiteSpace: "nowrap", flexShrink: 0,
   },
   jobDetails: { display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" },
-  jobDetail: { fontSize: "14px", color: "#4b5563", margin: 0, lineHeight: "1.5" },
+  jobDetail: { fontSize: "14px", color: "#cbd5e1", margin: 0, lineHeight: "1.5" },
   actionBtn: {
     width: "100%", padding: "14px", color: "white",
     border: "none", borderRadius: "12px",
     fontSize: "14px", fontWeight: 700, cursor: "pointer", transition: "all 0.3s ease",
   },
   emptyBox: {
-    background: "white", padding: "48px 24px", textAlign: "center",
-    borderRadius: "16px", color: "#9ca3af", border: "2px dashed #d1d5db",
+    background: "rgba(30, 41, 59, 0.4)", padding: "48px 24px", textAlign: "center",
+    borderRadius: "16px", color: "#94a3b8", border: "2px dashed rgba(255, 255, 255, 0.1)",
   },
   profilePage: {
-    textAlign: "center", background: "white",
-    padding: "30px 20px", borderRadius: "16px", border: "1px solid #e5e7eb",
+    textAlign: "center", background: "linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)",
+    padding: "30px 20px", borderRadius: "16px", border: "1px solid rgba(255, 255, 255, 0.08)",
   },
   avatarLarge: { fontSize: "60px", marginBottom: "12px" },
-  profileName: { fontSize: "20px", fontWeight: 800, color: "#1f2937", margin: "0 0 4px" },
-  userEmail: { color: "#6b7280", margin: "0 0 20px", fontSize: "14px" },
+  profileName: { fontSize: "20px", fontWeight: 800, color: "#f1f5f9", margin: "0 0 4px" },
+  userEmail: { color: "#94a3b8", margin: "0 0 20px", fontSize: "14px" },
   profileInfo: { textAlign: "left", margin: "20px 0" },
   infoRow: {
     display: "flex", justifyContent: "space-between",
-    padding: "12px 0", borderBottom: "1px solid #f3f4f6", fontSize: "14px",
+    padding: "12px 0", borderBottom: "1px solid rgba(255, 255, 255, 0.05)", fontSize: "14px",
   },
-  infoLabel: { fontWeight: 600, color: "#6b7280" },
-  infoValue: { color: "#1f2937", fontWeight: 500 },
+  infoLabel: { fontWeight: 600, color: "#94a3b8" },
+  infoValue: { color: "#f1f5f9", fontWeight: 500 },
   servicesDisplay: { display: "flex", flexWrap: "wrap", gap: "6px", justifyContent: "flex-end" },
   serviceBadge: {
-    background: "#dbeafe", color: "#0c4a6e",
+    background: "rgba(59, 130, 246, 0.15)", color: "#60a5fa", border: "1px solid rgba(59, 130, 246, 0.3)",
     padding: "4px 10px", borderRadius: "6px", fontSize: "12px", fontWeight: 600,
   },
   editBtn: {
     marginTop: "20px", width: "100%", padding: "12px",
     borderRadius: "8px", border: "none",
     background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
-    color: "white", fontWeight: 700, cursor: "pointer",
+    color: "#0f172a", fontWeight: 700, cursor: "pointer",
   },
   cancelBtn: {
     flex: 1, padding: "10px", borderRadius: "6px",
-    border: "1px solid #d1d5db", background: "white",
-    color: "#6b7280", fontWeight: 600, cursor: "pointer",
+    border: "1px solid rgba(255, 255, 255, 0.08)", background: "rgba(255,255,255,0.02)",
+    color: "#94a3b8", fontWeight: 600, cursor: "pointer",
   },
-  formLabel: { fontSize: "13px", fontWeight: 700, color: "#374151", marginBottom: "2px" },
+  formLabel: { fontSize: "13px", fontWeight: 700, color: "#cbd5e1", marginBottom: "2px" },
   formInput: {
     width: "100%", padding: "10px 12px", borderRadius: "8px",
-    border: "1px solid #d1d5db", fontSize: "14px",
-    color: "#1f2937", background: "white", boxSizing: "border-box",
+    border: "1px solid rgba(255, 255, 255, 0.08)", fontSize: "14px",
+    color: "white", background: "rgba(15, 23, 42, 0.8)", boxSizing: "border-box",
   },
   earningsCard: {
-    background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
+    background: "linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.05) 100%)",
+    border: "1px solid rgba(34, 197, 94, 0.3)",
     color: "white", borderRadius: "20px",
     padding: "40px 24px", textAlign: "center", marginBottom: "28px",
-    boxShadow: "0 8px 24px rgba(34, 197, 94, 0.25)",
+    boxShadow: "0 8px 24px rgba(34, 197, 94, 0.1)",
   },
-  earningsLabel: { fontSize: "15px", opacity: 0.95, margin: "0 0 12px", fontWeight: 600 },
-  earningsAmount: { fontSize: "42px", fontWeight: 800, margin: 0, letterSpacing: "-2px" },
+  earningsLabel: { fontSize: "15px", opacity: 0.95, margin: "0 0 12px", fontWeight: 600, color: "#94a3b8" },
+  earningsAmount: { fontSize: "42px", fontWeight: 800, margin: 0, letterSpacing: "-2px", color: "#22c55e" },
   earningsList: { display: "flex", flexDirection: "column", gap: "16px" },
   earningsRow: {
-    background: "white", padding: "20px", borderRadius: "16px",
+    background: "linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)", padding: "20px", borderRadius: "16px",
     display: "flex", justifyContent: "space-between", alignItems: "center",
-    border: "1px solid #e5e7eb", boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
   },
-  earningService: { fontSize: "15px", fontWeight: 700, color: "#1f2937", margin: "0 0 6px" },
-  earningDate: { fontSize: "13px", color: "#6b7280", margin: "0 0 4px" },
+  earningService: { fontSize: "15px", fontWeight: 700, color: "#f1f5f9", margin: "0 0 6px" },
+  earningDate: { fontSize: "13px", color: "#94a3b8", margin: "0 0 4px" },
   earningAmount: { fontSize: "18px", fontWeight: 800, color: "#22c55e", whiteSpace: "nowrap", letterSpacing: "-0.5px" },
-  bottomNav: {
-    position: "fixed", bottom: 0, width: "100%",
-    background: "white", display: "flex", justifyContent: "space-around",
-    padding: "12px 0", borderTop: "1px solid #e5e7eb", zIndex: 99,
-    boxShadow: "0 -4px 20px rgba(0,0,0,0.08)",
-  },
-  navBtn: {
-    border: "none", background: "none",
-    display: "flex", flexDirection: "column", alignItems: "center",
-    gap: "6px", color: "#9ca3af", fontSize: "12px",
-    padding: "10px 16px", cursor: "pointer", transition: "all 0.3s ease",
-  },
-  navBtnActive: {
-    border: "none", background: "none",
-    display: "flex", flexDirection: "column", alignItems: "center",
-    gap: "6px", color: "#3b82f6", fontSize: "12px",
-    padding: "10px 16px", cursor: "pointer", fontWeight: 700,
-  },
-  navIcon: { fontSize: "22px" },
-  navLabel: { fontSize: "11px", fontWeight: 600 },
-  navBadgeIndex: {
-    position: "absolute", top: "-6px", right: "-10px",
-    background: "#ef4444", color: "white",
-    borderRadius: "10px", padding: "1px 6px",
-    fontSize: "10px", fontWeight: 700,
-    minWidth: "12px", textAlign: "center",
-  },
 };
 
 const mobileCss = `

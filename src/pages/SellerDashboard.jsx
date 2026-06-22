@@ -180,29 +180,58 @@ export default function SellerDashboard() {
       {/* BOOST NOTIFICATION */}
       <BoostNotification user={seller} userType="seller" />
 
-      <div style={s.topBar}>
-        <div>
-          <h1 style={s.topTitle}>🛒 Seller Dashboard</h1>
-          <p style={{ ...s.topSub, display: "flex", alignItems: "center", gap: "10px" }}>
-            <ProfileAvatar user={seller} size={36} />
-            <span>Vendor: <strong style={{ color: "#fbbf24" }}>{seller.name}</strong></span>
-          </p>
-        </div>
-        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-          <button style={{ ...s.uploadBtn, background: "linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)" }} onClick={() => navigate("/business/create")}>
-            🏢 Add Business
-          </button>
-          <button style={s.uploadBtn} onClick={() => setView(view === "listings" ? "upload" : "listings")}>
-            {view === "listings" ? "+ Upload Material" : "View Inventory"}
-          </button>
-        </div>
+      {/* TABS SCROLL */}
+      <div style={s.tabsScroll}>
+        <button
+          style={{ ...s.tabBtn, ...(view === "listings" && s.tabBtnActive) }}
+          onClick={() => setView("listings")}
+        >
+          📦 My Stock
+        </button>
+        <button
+          style={{ ...s.tabBtn, ...(view === "upload" && s.tabBtnActive) }}
+          onClick={() => setView("upload")}
+        >
+          ➕ Upload Material
+        </button>
+        <button
+          style={{ ...s.tabBtn, ...(view === "profile" && s.tabBtnActive) }}
+          onClick={() => setView("profile")}
+        >
+          👤 Profile
+        </button>
       </div>
 
+      {/* STATS */}
       <div style={s.statsGrid}>
-        <div style={s.statCard}><span style={s.statIcon}>💰</span><div><div style={s.statLabel}>Revenue</div><div style={s.statVal}>KES {stats.totalEarnings.toLocaleString()}</div></div></div>
-        <div style={s.statCard}><span style={s.statIcon}>🌐</span><div><div style={s.statLabel}>Live Listings</div><div style={s.statVal}>{stats.liveItems}</div></div></div>
-        <div style={s.statCard}><span style={s.statIcon}>⏳</span><div><div style={s.statLabel}>Pending</div><div style={s.statVal}>{stats.pendingReview}</div></div></div>
-        <div style={s.statCard}><span style={s.statIcon}>👁️</span><div><div style={s.statLabel}>Views</div><div style={s.statVal}>{stats.totalViews}</div></div></div>
+        <div style={s.statCard}>
+          <span style={s.statIcon}>💰</span>
+          <div>
+            <div style={s.statLabel}>Revenue</div>
+            <div style={s.statVal}>KES {stats.totalEarnings.toLocaleString()}</div>
+          </div>
+        </div>
+        <div style={s.statCard}>
+          <span style={s.statIcon}>🌐</span>
+          <div>
+            <div style={s.statLabel}>Live Listings</div>
+            <div style={s.statVal}>{stats.liveItems}</div>
+          </div>
+        </div>
+        <div style={s.statCard}>
+          <span style={s.statIcon}>⏳</span>
+          <div>
+            <div style={s.statLabel}>Pending</div>
+            <div style={s.statVal}>{stats.pendingReview}</div>
+          </div>
+        </div>
+        <div style={s.statCard}>
+          <span style={s.statIcon}>👁️</span>
+          <div>
+            <div style={s.statLabel}>Views</div>
+            <div style={s.statVal}>{stats.totalViews}</div>
+          </div>
+        </div>
       </div>
 
       <div style={{ marginBottom: '24px' }}>
@@ -215,12 +244,15 @@ export default function SellerDashboard() {
         </div>
       )}
 
-      <div style={s.controlsRow}>
-        <div style={s.tabs}>
-          <button style={{ ...s.tab, ...(view === "listings" ? s.activeTab : {}) }} onClick={() => setView("listings")}>My Stock</button>
-          <button style={{ ...s.tab, ...(view === "profile" ? s.activeTab : {}) }} onClick={() => setView("profile")}>👤 Profile</button>
-        </div>
-        {view === "listings" && (
+      {/* CONTROLS (Only visible in listings view) */}
+      {view === "listings" && (
+        <div style={s.controlsRow}>
+          <button
+            style={{ ...s.uploadBtn, background: "linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)", margin: 0 }}
+            onClick={() => navigate("/business/create")}
+          >
+            🏢 Add Business
+          </button>
           <div style={s.filterGroup}>
             <input
               type="text"
@@ -229,7 +261,6 @@ export default function SellerDashboard() {
               onChange={(e) => setSearchQuery(e.target.value)}
               style={s.searchBar}
             />
-            {/* ✅ FIXED: dropdown values now match resolveStatus() output ("active" not "approved") */}
             <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} style={s.statusDropdown}>
               <option value="all">All</option>
               <option value="active">Live</option>
@@ -239,8 +270,8 @@ export default function SellerDashboard() {
             </select>
             <button style={s.refreshBtn} onClick={() => fetchMyMaterials(token)}>🔄 Refresh Status</button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {view === "profile" ? (
         <div>
@@ -366,10 +397,10 @@ export default function SellerDashboard() {
 }
 
 const s = {
-  page: { maxWidth: "1400px", margin: "0 auto", padding: "28px", background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)", minHeight: "100vh", fontFamily: "'Inter', 'DM Sans', sans-serif", color: "#f8fafc" },
-  topBar: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "36px", flexWrap: "wrap", gap: "16px" },
-  topTitle: { margin: 0, color: "#fbbf24", fontSize: "28px", fontWeight: 800, letterSpacing: "-0.5px" },
-  topSub: { margin: "8px 0 0 0", color: "#94a3b8", fontSize: "14px", lineHeight: "1.5" },
+  page: { maxWidth: "1400px", margin: "0 auto", padding: "24px 20px", background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)", minHeight: "100vh", fontFamily: "'Inter', 'DM Sans', sans-serif", color: "#f8fafc" },
+  tabsScroll: { display: "flex", gap: "8px", overflowX: "auto", marginBottom: "24px", paddingBottom: "8px", scrollBehavior: "smooth", borderBottom: "1px solid rgba(255, 255, 255, 0.08)" },
+  tabBtn: { background: "rgba(30, 41, 59, 0.6)", border: "1px solid rgba(255, 255, 255, 0.08)", color: "#94a3b8", padding: "12px 20px", borderRadius: "10px", fontSize: "13px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.3s ease" },
+  tabBtnActive: { background: "#fbbf24", color: "#0f1729", border: "1px solid #fbbf24", boxShadow: "0 4px 12px rgba(251, 191, 36, 0.3)" },
   uploadBtn: { padding: "12px 24px", background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)", color: "#0f172a", border: "none", borderRadius: "12px", fontWeight: "bold", cursor: "pointer", boxShadow: "0 4px 12px rgba(251, 191, 36, 0.3)", transition: "all 0.3s ease" },
   statsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "20px", marginBottom: "36px" },
   statCard: { display: "flex", alignItems: "center", gap: "18px", padding: "24px", background: "linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "16px", transition: "all 0.3s ease", cursor: "pointer" },
@@ -377,9 +408,6 @@ const s = {
   statLabel: { color: "#94a3b8", fontSize: "0.85rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "1px" },
   statVal: { fontSize: "1.5rem", fontWeight: 800, marginTop: "4px", letterSpacing: "-0.5px" },
   controlsRow: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "28px", flexWrap: "wrap", gap: "16px" },
-  tabs: { display: "flex", gap: "8px" },
-  tab: { padding: "12px 20px", background: "transparent", border: "1px solid rgba(255, 255, 255, 0.08)", color: "#94a3b8", cursor: "pointer", fontSize: "0.95rem", borderRadius: "10px", transition: "all 0.3s ease", fontWeight: 600 },
-  activeTab: { color: "#fbbf24", fontWeight: "bold", borderColor: "rgba(251, 191, 36, 0.3)", background: "rgba(251, 191, 36, 0.1)" },
   filterGroup: { display: "flex", gap: "10px", flexWrap: "wrap" },
   searchBar: { padding: "12px 16px", background: "rgba(30, 41, 59, 0.8)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px", color: "#fff", fontSize: "14px", minWidth: "200px" },
   statusDropdown: { padding: "12px 16px", background: "rgba(30, 41, 59, 0.8)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px", color: "#fff", fontSize: "14px", fontWeight: 600 },

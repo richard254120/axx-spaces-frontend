@@ -124,8 +124,31 @@ const AdminVerification = () => {
     );
   }
 
+  const customStyles = `
+    .verification-card {
+      transition: all 0.25s ease;
+    }
+    .verification-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(251, 191, 36, 0.3) !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    button {
+      transition: all 0.2s ease;
+    }
+    button:hover:not(:disabled) {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+    textarea:focus {
+      border-color: #fbbf24 !important;
+      box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
+    }
+  `;
+
   return (
     <div style={styles.container}>
+      <style>{customStyles}</style>
       <h1 style={styles.title}>🛡️ KYC Verification Workflows</h1>
       <p style={styles.subtitle}>Review user submissions for Student, Standard, and Premium tiers</p>
 
@@ -142,6 +165,7 @@ const AdminVerification = () => {
               {verifications.map((verification) => (
                 <div
                   key={verification._id}
+                  className="verification-card"
                   style={{
                     ...styles.verificationCard,
                     ...(selectedVerification?._id === verification._id && styles.verificationCardSelected)
@@ -344,21 +368,21 @@ const AdminVerification = () => {
 const styles = {
   container: {
     minHeight: '100vh',
-    background: 'linear-gradient(135deg, #090e1a 0%, #151c2c 100%)',
-    padding: '40px 20px',
-    fontFamily: "'DM Sans', sans-serif",
+    background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+    padding: '24px 20px',
+    fontFamily: "'Inter', 'DM Sans', sans-serif",
   },
   title: {
     fontSize: '28px',
     fontWeight: '800',
-    color: '#f1f5f9',
+    color: '#fbbf24',
     marginBottom: '6px',
     letterSpacing: '-0.5px',
   },
   subtitle: {
     fontSize: '14px',
     color: '#94a3b8',
-    marginBottom: '32px',
+    marginBottom: '24px',
   },
   loading: {
     textAlign: 'center',
@@ -416,8 +440,8 @@ const styles = {
     transition: 'all 0.25s',
   },
   verificationCardSelected: {
-    borderColor: '#c9a84c',
-    background: 'rgba(201, 168, 76, 0.06)',
+    borderColor: '#fbbf24',
+    background: 'rgba(251, 191, 36, 0.06)',
   },
   cardHeader: {
     display: 'flex',

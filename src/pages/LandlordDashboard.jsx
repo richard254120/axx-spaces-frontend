@@ -21,7 +21,6 @@ export default function LandlordDashboard() {
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [successMessage, setSuccessMessage] = useState("");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [agents, setAgents] = useState([]);
   const [selectedAgents, setSelectedAgents] = useState({});
 
@@ -168,34 +167,6 @@ export default function LandlordDashboard() {
 
       {/* BOOST NOTIFICATION */}
       <BoostNotification user={user} userType="landlord" />
-
-      {/* HEADER */}
-      <div style={styles.header}>
-        <h1 style={styles.headerTitle}>My Properties</h1>
-        <button style={styles.menuBtn} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-          {mobileMenuOpen ? "✕" : "☰"}
-        </button>
-      </div>
-
-      {/* MOBILE MENU */}
-      {mobileMenuOpen && (
-        <div style={styles.mobileMenu}>
-          <div style={styles.menuItem}>
-            <span style={styles.menuLabel}>Name:</span>
-            <span style={styles.menuValue}>{user?.name || "Landlord"}</span>
-          </div>
-          <div style={styles.menuItem}>
-            <span style={styles.menuLabel}>Email:</span>
-            <span style={styles.menuValue}>{user?.email}</span>
-          </div>
-          <button style={styles.menuActionBtn} onClick={() => { navigate("/settings"); setMobileMenuOpen(false); }}>
-            ⚙️ Settings
-          </button>
-          <button style={styles.logoutBtn} onClick={() => { logout("/login"); setMobileMenuOpen(false); }}>
-            Logout
-          </button>
-        </div>
-      )}
 
       {/* STATS */}
       <div style={styles.statsContainer}>
@@ -409,35 +380,6 @@ const styles = {
     color: "#fff",
     fontFamily: "'Inter', 'DM Sans', sans-serif",
     padding: "20px",
-  },
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "28px",
-    paddingBottom: "20px",
-    borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
-  },
-  headerTitle: { margin: 0, fontSize: "28px", fontWeight: 800, color: "#fbbf24", letterSpacing: "-0.5px" },
-  menuBtn: {
-    background: "#1e293b", border: "none", color: "#fbbf24",
-    fontSize: "24px", padding: "8px 12px", borderRadius: "8px", cursor: "pointer",
-  },
-  mobileMenu: {
-    background: "#1e293b", borderRadius: "12px", padding: "16px",
-    marginBottom: "20px", border: "1px solid #334155",
-  },
-  menuItem: {
-    display: "flex", justifyContent: "space-between", alignItems: "center",
-    paddingBottom: "12px", borderBottom: "1px solid #334155", marginBottom: "12px",
-  },
-  menuLabel: { color: "#94a3b8", fontSize: "13px", fontWeight: 600 },
-  menuValue: { color: "#fbbf24", fontSize: "14px", fontWeight: 600 },
-  menuActionBtn: {
-    width: "100%", padding: "12px", background: "rgba(251, 191, 36, 0.15)",
-    border: "1px solid rgba(251, 191, 36, 0.3)", borderRadius: "8px",
-    color: "#fbbf24", fontSize: "14px", fontWeight: 600, cursor: "pointer",
-    marginBottom: "12px", transition: "all 0.2s",
   },
   statsContainer: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", marginBottom: "28px" },
   statCard: {
