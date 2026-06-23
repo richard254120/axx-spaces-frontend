@@ -742,7 +742,7 @@ export default function Movers() {
                 <div style={{ width: 3, height: 18, background: C.amberMid, borderRadius: 2 }} />
                 <span style={{ fontSize: 15, fontWeight: 700, color: C.textPrimary }}>⭐ Featured Movers</span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(270px,1fr))", gap: 14 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14 }}>
                 {featuredMovers.map((m, i) => (
                   <div key={m._id} className="fade-up" style={{ animationDelay: `${i * 0.07}s` }}>
                     <MoverCard m={m} onBook={setBookingMover} featured />
@@ -793,7 +793,7 @@ export default function Movers() {
                   {selectedCounty === "all" ? "All Movers" : `Movers in ${selectedCounty}`}
                 </span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(270px,1fr))", gap: 14 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14 }}>
                 {movers.map((m, i) => (
                   <div key={m._id} className="fade-up" style={{ animationDelay: `${i * 0.05}s` }}>
                     <MoverCard m={m} onBook={setBookingMover} />

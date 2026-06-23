@@ -955,7 +955,7 @@ const styles = {
   },
   materialsGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+    gridTemplateColumns: "repeat(2, 1fr)",
     gap: "28px",
   },
   materialCard: {
@@ -1446,7 +1446,7 @@ const styles = {
     borderRadius: "6px",
     cursor: "pointer",
     fontSize: "14px",
-    fontWeight: 600",
+    fontWeight: 600,
     marginRight: "8px",
   },
   reviewCancelBtn: {

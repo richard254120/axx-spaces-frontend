@@ -1554,7 +1554,7 @@ export default function Home() {
     { label: "Trusted Moving", accent: "Services" },
     { label: "Hotels & Tourism", accent: "Experiences" },
     { label: "AxxBiashara", accent: "Business Services" },
-    { label: "Marketplace for", accent: "All Your Needs" },
+    { label: "QuickSAles for", accent: "All Your Needs" },
     { label: "Verified Listings —", accent: "Zero Hidden Fees" },
     { label: "Connect via", accent: "WhatsApp" },
     { label: "GPS Maps for", accent: "Every Listing" },
@@ -1597,10 +1597,10 @@ export default function Home() {
     },
     {
       id: "marketplace", icon: "🏪", iconType: "emoji",
-      title: "Marketplace", tagline: "Buy & sell anything",
-      description: "The ultimate marketplace for buying and selling new and used items. From electronics to furniture, fashion to cars.",
+      title: "QuickSAles", tagline: "Buy & sell anything",
+      description: "The ultimate QuickSAles for buying and selling new and used items. From electronics to furniture, fashion to cars.",
       features: ["New & used items", "Secure transactions", "Nationwide delivery", "Direct seller contact"],
-      cta: "Browse Marketplace", route: "/materials",
+      cta: "Browse QuickSAles", route: "/materials",
       color: "#38BDF8", iconBg: "linear-gradient(135deg,#0C2A3A,#103A4F)",
     },
   ];
@@ -1749,7 +1749,7 @@ export default function Home() {
             <span className="hero-title-line2">Under One Roof</span>
           </h1>
           <p className="hero-sub">
-            Rentals · Movers · Tourism · AxxBiashara · Marketplace<br />Verified across all 47 counties
+            Rentals · Movers · Tourism · AxxBiashara · QuickSAles<br />Verified across all 47 counties
           </p>
 
           {/* TABS */}
@@ -1986,7 +1986,7 @@ export default function Home() {
             </div>
           ) : demographics ? (
             <div className="demo-content-grid">
-              
+
               {/* Left Panel: Selected Visual Dashboard Tab */}
               {demoTab === "map" && (
                 <div className="demo-card">
@@ -2073,7 +2073,7 @@ export default function Home() {
                 <div className="demo-card">
                   <h3 className="demo-card-title">📊 Service Popularity</h3>
                   <div style={{ display: "flex", flexDirection: "column", gap: "28px", flex: 1, justifyContent: "center" }}>
-                    
+
                     {/* SVG Pie Chart Container */}
                     <div className="demo-chart-container">
                       <svg width="220" height="220" viewBox="0 0 100 100">
@@ -2197,7 +2197,7 @@ export default function Home() {
 
               {/* Right Panel: Shared Summary Cards & Metrics Info */}
               <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-                
+
                 <div className="demo-card">
                   <h3 className="demo-card-title">📈 Platform Overview</h3>
                   <div className="demo-stats-grid">
@@ -2357,18 +2357,18 @@ export default function Home() {
         </div>
         <div className="strip-divider"></div>
 
-        {/* Marketplace */}
+        {/* QuickSAles */}
         <div className="spotlight-strip reverse">
           <div className="spot-text">
-            <span className="spot-badge">🏪 Marketplace</span>
+            <span className="spot-badge">🏪 QuickSAles</span>
             <h3 className="spot-title">Buy &amp; Sell Anything</h3>
-            <p className="spot-desc">The ultimate marketplace for buying and selling new and used items. From electronics to furniture, fashion to cars — find great deals.</p>
+            <p className="spot-desc">The ultimate QuickSAles for buying and selling new and used items. From electronics to furniture, fashion to cars — find great deals.</p>
             <div className="spot-features">
               {["New & used items", "Secure transactions", "Nationwide delivery", "Direct seller contact"].map(f => (
                 <span key={f} className="spot-feat"><span style={{ color: C.gold }}>✓</span> {f}</span>
               ))}
             </div>
-            <button className="spot-btn" onClick={() => navigate("/materials")}>Browse Marketplace →</button>
+            <button className="spot-btn" onClick={() => navigate("/materials")}>Browse QuickSAles →</button>
           </div>
           <div className="spot-visual">
             <div className="spot-icon-box" style={{ background: "rgba(12,42,58,0.8)", fontSize: "64px", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -2519,7 +2519,7 @@ export default function Home() {
               {[
                 { icon: "🏠", title: "Landlord / Rentals", desc: "List rental properties and boost your listings", bg: `linear-gradient(135deg,${C.gold},${C.goldLight})`, route: "/login" },
                 { icon: "🚛", title: "Mover / Moving Company", desc: "Offer moving services across Kenya", bg: "linear-gradient(135deg,#1E3A5F,#2D5080)", route: "/login?type=mover" },
-                { icon: "🛍️", title: "Seller / Marketplace", desc: "Sell items in the materials marketplace", bg: "linear-gradient(135deg,#0C2A3A,#103A4F)", route: "/seller-login" },
+                { icon: "🛍️", title: "Seller / QuickSAles", desc: "Sell items in the materials QuickSAles", bg: "linear-gradient(135deg,#0C2A3A,#103A4F)", route: "/seller-login" },
                 { icon: "🏨", title: "Tourism Provider", desc: "List hotels, lodges, and tourism experiences", bg: "linear-gradient(135deg,#1B3A2A,#264D38)", route: "/tourism/login" },
                 { icon: "💼", title: "Business / AxxBiashara", desc: "List professional business services", bg: "linear-gradient(135deg,#2E1B4A,#3D2566)", route: "/business-login" },
               ].map(svc => (

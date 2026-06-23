@@ -15,7 +15,7 @@ import {
 const listingsCss = `
   .page-body { max-width: 1400px; margin: 0 auto; padding: 20px 16px; display: grid; grid-template-columns: 260px 1fr; gap: 24px; }
   .desktop-sidebar { background: white; border-radius: 14px; padding: 20px; border: 1px solid #e5e7eb; position: sticky; top: 80px; height: fit-content; }
-  .prop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .prop-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
   .prop-card { background: white; border-radius: 14px; border: 1px solid #e5e7eb; overflow: hidden; transition: box-shadow 0.2s; }
   .prop-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
   .mobile-drawer { display: none; }

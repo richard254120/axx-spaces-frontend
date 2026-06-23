@@ -922,7 +922,7 @@ const S = {
   emptySub: { color: C.textMid, fontSize: "0.9rem", margin: 0 },
 
   /* Property Grid */
-  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(310px, 1fr))", gap: "24px" },
+  grid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" },
   card: { background: C.navyMid, border: `1px solid ${C.border}`, borderRadius: "14px", overflow: "hidden", cursor: "pointer", transition: "all 0.3s ease", display: "flex", flexDirection: "column" },
 
   cardImg: { position: "relative", height: "220px", overflow: "hidden", background: C.navyLight, flexShrink: 0 },

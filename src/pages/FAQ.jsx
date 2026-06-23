@@ -82,10 +82,10 @@ const faqs = [
     ],
   },
   {
-    category: "Marketplace & Sellers",
+    category: "QuickSAles & Sellers",
     items: [
       {
-        q: "What is the Marketplace?",
+        q: "What is the QuickSAles?",
         a: "A buy-and-sell platform for new and used goods — electronics, furniture, fashion, vehicles, and more nationwide. Connect directly with sellers.",
       },
       {
@@ -93,7 +93,7 @@ const faqs = [
         a: "Register a seller account through our Seller Login, complete verification, and start listing your products. You'll have access to a dedicated seller dashboard.",
       },
       {
-        q: "Are there fees for selling on the Marketplace?",
+        q: "Are there fees for selling on the QuickSAles?",
         a: "Basic listings are free. We offer premium listing options for increased visibility. Transaction fees may apply for certain features.",
       },
     ],
@@ -116,10 +116,10 @@ const faqs = [
     ],
   },
   {
-    category: "Materials Marketplace",
+    category: "Materials QuickSAles",
     items: [
       {
-        q: "What is the Materials Marketplace?",
+        q: "What is the Materials QuickSAles?",
         a: "A dedicated section for moving materials — boxes, tape, bubble wrap, packing supplies, and more. Connect with suppliers directly.",
       },
       {

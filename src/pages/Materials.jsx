@@ -22,7 +22,7 @@ const CATEGORIES = [
 
 const CONDITIONS = ["Like New", "Excellent", "Good", "Fair", "For Parts"];
 
-export default function Marketplace() {
+export default function QuickSAles() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { token, user } = useContext(AuthContext);
@@ -42,7 +42,7 @@ export default function Marketplace() {
   const [currentImage, setCurrentImage] = useState(0);
 
   const [favorites, setFavorites] = useState(() => {
-    const saved = localStorage.getItem("fav_marketplace");
+    const saved = localStorage.getItem("fav_quicksales");
     return saved ? JSON.parse(saved) : [];
   });
   const [copiedId, setCopiedId] = useState(null);
@@ -60,7 +60,7 @@ export default function Marketplace() {
   const debounceTimer = useRef(null);
 
   useEffect(() => {
-    localStorage.setItem("fav_marketplace", JSON.stringify(favorites));
+    localStorage.setItem("fav_quicksales", JSON.stringify(favorites));
   }, [favorites]);
 
   useEffect(() => {
@@ -106,7 +106,7 @@ export default function Marketplace() {
       }
       setError("");
     } catch (err) {
-      setError("Failed to load marketplace items");
+      setError("Failed to load QuickSAles items");
     } finally {
       setLoading(false);
     }
@@ -253,7 +253,7 @@ export default function Marketplace() {
       {loading ? (
         <div style={{ textAlign: "center", padding: "80px 20px" }}>
           <div style={styles.spinner}></div>
-          <p style={{ color: "#6b7280", marginTop: "16px", fontSize: "16px" }}>Loading marketplace...</p>
+          <p style={{ color: "#6b7280", marginTop: "16px", fontSize: "16px" }}>Loading QuickSAles...</p>
         </div>
       ) : items.length === 0 ? (
         <div style={styles.emptyState}>
@@ -466,7 +466,7 @@ const styles = {
   emptyResetBtn: { background: "white", border: "1px solid #e5e7eb", borderRadius: "8px", color: "#0B2140", padding: "12px 20px", cursor: "pointer", fontWeight: 600, fontSize: "14px" },
   emptySellBtn: { background: "#E31B1B", border: "none", borderRadius: "8px", color: "white", padding: "12px 24px", cursor: "pointer", fontWeight: 700, fontSize: "14px" },
 
-  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "24px" },
+  grid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" },
 
   card: { background: "white", border: "1px solid #e5e7eb", borderRadius: "12px", overflow: "hidden", cursor: "pointer", transition: "all 0.3s ease" },
 
