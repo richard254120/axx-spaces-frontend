@@ -923,9 +923,9 @@ const S = {
 
   /* Property Grid */
   grid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" },
-  card: { background: C.navyMid, border: `1px solid ${C.border}`, borderRadius: "14px", overflow: "hidden", cursor: "pointer", transition: "all 0.3s ease", display: "flex", flexDirection: "column" },
+  card: { background: C.navyMid, border: `1px solid ${C.border}`, borderRadius: "14px", overflow: "hidden", cursor: "pointer", transition: "all 0.3s ease", display: "flex", flexDirection: "column", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" },
 
-  cardImg: { position: "relative", height: "220px", overflow: "hidden", background: C.navyLight, flexShrink: 0 },
+  cardImg: { position: "relative", aspectRatio: "1/1", overflow: "hidden", background: C.navyLight, flexShrink: 0 },
   cardImgEl: { width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.5s ease" },
   cardImgFallback: { display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: C.textDim, fontSize: "0.9rem" },
   cardImgGrad: { position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(13,27,42,0.7) 0%, transparent 50%)", pointerEvents: "none" },

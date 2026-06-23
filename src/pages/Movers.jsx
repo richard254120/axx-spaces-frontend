@@ -209,7 +209,7 @@ function MoverCard({ m, onBook, featured }) {
 
       {/* Header */}
       <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 12 }}>
-        <Avatar name={m.name} size={42} featured={featured} />
+        <Avatar name={m.name} size={56} featured={featured} />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 4, marginBottom: 2 }}>
             <span style={{ fontSize: 15, fontWeight: 700, color: featured ? "#fff" : C.textPrimary }}>{m.name}</span>

@@ -414,7 +414,7 @@ const s = {
   refreshBtn: { padding: "12px 16px", background: "rgba(59,130,246,0.2)", color: "#60a5fa", border: "1px solid #2563eb", borderRadius: "10px", cursor: "pointer", fontSize: "14px", fontWeight: 600, transition: "all 0.3s ease" },
   grid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "28px" },
   card: { background: "linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "18px", overflow: "hidden", transition: "all 0.3s ease", boxShadow: "0 4px 16px rgba(0, 0, 0, 0.15)" },
-  cardImg: { position: "relative", height: "180px", background: "#0f172a" },
+  cardImg: { position: "relative", aspectRatio: "1/1", background: "#0f172a" },
   img: { width: "100%", height: "100%", objectFit: "cover" },
   noImg: { height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569", fontSize: "2.5rem" },
   statusBadge: { position: "absolute", top: "12px", left: "12px", padding: "6px 12px", borderRadius: "8px", fontSize: "0.8rem", fontWeight: "bold", backdropFilter: "blur(10px)" },

@@ -243,7 +243,7 @@ export default function AxxBiashara() {
           border-color: rgba(251, 191, 36, 0.35);
         }
 
-        .card-img-wrap { position: relative; overflow: hidden; height: 190px; }
+        .card-img-wrap { position: relative; overflow: hidden; aspect-ratio: 1/1; }
         .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); display: block; }
         .axx-card:hover .card-img-wrap img { transform: scale(1.05); }
         .card-img-overlay {

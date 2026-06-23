@@ -468,9 +468,9 @@ const styles = {
 
   grid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" },
 
-  card: { background: "white", border: "1px solid #e5e7eb", borderRadius: "12px", overflow: "hidden", cursor: "pointer", transition: "all 0.3s ease" },
+  card: { background: "white", border: "1px solid #e5e7eb", borderRadius: "16px", overflow: "hidden", cursor: "pointer", transition: "all 0.3s ease", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" },
 
-  imageWrapper: { position: "relative", height: "220px", overflow: "hidden", background: "#f3f4f6" },
+  imageWrapper: { position: "relative", aspectRatio: "1/1", overflow: "hidden", background: "#f3f4f6" },
   itemImage: { width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.4s ease" },
 
   badgeStack: { position: "absolute", top: "12px", left: "12px", display: "flex", flexDirection: "column", gap: "6px" },
@@ -485,12 +485,12 @@ const styles = {
   photoCount: { position: "absolute", bottom: "12px", right: "12px", background: "rgba(0, 0, 0, 0.6)", color: "white", padding: "4px 10px", borderRadius: "6px", fontSize: "12px", fontWeight: 600 },
 
   cardContent: { padding: "16px" },
-  itemTitle: { margin: "0 0 4px 0", fontSize: "15px", fontWeight: 700, color: "#0B2140", lineHeight: 1.3 },
+  itemTitle: { margin: "0 0 8px 0", fontSize: "16px", fontWeight: 700, color: "#0B2140", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" },
   categoryIcon: { fontSize: "20px", flexShrink: 0 },
-  itemLocation: { margin: "0 0 10px 0", fontSize: "12px", color: "#6b7280" },
+  itemLocation: { margin: "0 0 12px 0", fontSize: "13px", color: "#6b7280" },
 
   priceSection: { display: "flex", justifyContent: "space-between", alignItems: "center", margin: "12px 0" },
-  price: { margin: 0, fontSize: "18px", fontWeight: 800, color: "#E31B1B" },
+  price: { margin: 0, fontSize: "20px", fontWeight: 800, color: "#E31B1B" },
   dealBadge: { fontSize: "11px", background: "#d1fae5", color: "#065f46", padding: "3px 8px", borderRadius: "4px", fontWeight: 700 },
 
   infoGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", background: "#f9fafb", padding: "10px", borderRadius: "8px", margin: "10px 0" },

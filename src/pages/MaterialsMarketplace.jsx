@@ -964,10 +964,11 @@ const styles = {
     borderRadius: "16px",
     overflow: "hidden",
     transition: "all 0.3s",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
   },
   imageWrapper: {
     position: "relative",
-    height: "220px",
+    aspectRatio: "1/1",
     background: COLORS.bgDark,
   },
   materialImage: {
