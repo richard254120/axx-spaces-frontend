@@ -733,12 +733,12 @@ export default function AxxBiashara() {
           </div>
         ) : (
           <>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "24px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" }}>
               {businesses.map((biz, idx) => (
                 <div
                   key={biz._id}
                   className="axx-card"
-                  style={{ 
+                  style={{
                     animationDelay: `${Math.min(idx * 0.05, 0.4)}s`,
                     border: biz.featured ? "1px solid rgba(251, 191, 36, 0.35)" : undefined,
                     boxShadow: biz.featured ? "0 0 15px rgba(251, 191, 36, 0.04)" : undefined,
@@ -790,7 +790,7 @@ export default function AxxBiashara() {
                     </div>
 
                     <div style={{ fontSize: "11.5px", color: "#fbbf24", fontWeight: 700, marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>{biz.categories?.join(" · ")}</div>
-                    
+
                     <div style={{ fontSize: "13px", color: "#94a3b8", marginBottom: "14px", display: "flex", alignItems: "center", gap: "6px", fontWeight: 500 }}>
                       <span>📍</span> {biz.location?.town}, {biz.location?.county}
                     </div>
