@@ -25,6 +25,15 @@ const listingsCss = `
     .desktop-sidebar { display: none; }
     .mobile-drawer.drawer-open { display: block; position: fixed; inset: 0; top: 120px; background: white; z-index: 200; padding: 20px; overflow-y: auto; border-top: 1px solid #e5e7eb; }
   }
+  @media (max-width: 768px) {
+    .prop-grid { gap: 12px; }
+  }
+  @media (max-width: 480px) {
+    .prop-grid { gap: 8px; }
+  }
+  @media (max-width: 380px) {
+    .prop-grid { gap: 6px; }
+  }
 `;
 
 export default function TourismListingsPage() {

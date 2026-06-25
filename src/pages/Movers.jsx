@@ -681,6 +681,10 @@ export default function Movers() {
           .chk-grid { grid-template-columns: 1fr !important; }
           .card-actions { flex-wrap: wrap; }
         }
+        .movers-grid { gap: 14px; }
+        @media (max-width: 768px) { .movers-grid { gap: 12px; } }
+        @media (max-width: 480px) { .movers-grid { gap: 8px; } }
+        @media (max-width: 380px) { .movers-grid { gap: 6px; } }
       `}</style>
 
       {bookingMover && (
@@ -742,7 +746,7 @@ export default function Movers() {
                 <div style={{ width: 3, height: 18, background: C.amberMid, borderRadius: 2 }} />
                 <span style={{ fontSize: 15, fontWeight: 700, color: C.textPrimary }}>⭐ Featured Movers</span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14 }} className="movers-grid">
                 {featuredMovers.map((m, i) => (
                   <div key={m._id} className="fade-up" style={{ animationDelay: `${i * 0.07}s` }}>
                     <MoverCard m={m} onBook={setBookingMover} featured />
@@ -793,7 +797,7 @@ export default function Movers() {
                   {selectedCounty === "all" ? "All Movers" : `Movers in ${selectedCounty}`}
                 </span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14 }} className="movers-grid">
                 {movers.map((m, i) => (
                   <div key={m._id} className="fade-up" style={{ animationDelay: `${i * 0.05}s` }}>
                     <MoverCard m={m} onBook={setBookingMover} />

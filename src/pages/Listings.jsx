@@ -923,6 +923,9 @@ const S = {
 
   /* Property Grid */
   grid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" },
+  "@media (max-width: 768px)": { grid: { gap: "16px" } },
+  "@media (max-width: 480px)": { grid: { gap: "12px" } },
+  "@media (max-width: 380px)": { grid: { gap: "8px" } },
   card: { background: C.navyMid, border: `1px solid ${C.border}`, borderRadius: "14px", overflow: "hidden", cursor: "pointer", transition: "all 0.3s ease", display: "flex", flexDirection: "column", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" },
 
   cardImg: { position: "relative", aspectRatio: "1/1", overflow: "hidden", background: C.navyLight, flexShrink: 0 },

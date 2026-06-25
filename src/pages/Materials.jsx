@@ -467,8 +467,12 @@ const styles = {
   emptySellBtn: { background: "#E31B1B", border: "none", borderRadius: "8px", color: "white", padding: "12px 24px", cursor: "pointer", fontWeight: 700, fontSize: "14px" },
 
   grid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" },
+  "@media (max-width: 768px)": { grid: { gridTemplateColumns: "repeat(2, 1fr)", gap: "12px" } },
+  "@media (max-width: 480px)": { grid: { gridTemplateColumns: "repeat(2, 1fr)", gap: "8px" } },
+  "@media (max-width: 380px)": { grid: { gridTemplateColumns: "repeat(2, 1fr)", gap: "6px" } },
 
   card: { background: "white", border: "1px solid #e5e7eb", borderRadius: "16px", overflow: "hidden", cursor: "pointer", transition: "all 0.3s ease", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" },
+  "@media (max-width: 768px)": { card: { borderRadius: "12px" } },
 
   imageWrapper: { position: "relative", aspectRatio: "1/1", overflow: "hidden", background: "#f3f4f6" },
   itemImage: { width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.4s ease" },
@@ -485,18 +489,27 @@ const styles = {
   photoCount: { position: "absolute", bottom: "12px", right: "12px", background: "rgba(0, 0, 0, 0.6)", color: "white", padding: "4px 10px", borderRadius: "6px", fontSize: "12px", fontWeight: 600 },
 
   cardContent: { padding: "16px" },
+  "@media (max-width: 768px)": { cardContent: { padding: "12px" } },
   itemTitle: { margin: "0 0 8px 0", fontSize: "16px", fontWeight: 700, color: "#0B2140", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" },
+  "@media (max-width: 768px)": { itemTitle: { fontSize: "14px" } },
   categoryIcon: { fontSize: "20px", flexShrink: 0 },
+  "@media (max-width: 768px)": { categoryIcon: { fontSize: "16px" } },
   itemLocation: { margin: "0 0 12px 0", fontSize: "13px", color: "#6b7280" },
+  "@media (max-width: 768px)": { itemLocation: { fontSize: "11px", marginBottom: "8px" } },
 
   priceSection: { display: "flex", justifyContent: "space-between", alignItems: "center", margin: "12px 0" },
+  "@media (max-width: 768px)": { priceSection: { margin: "8px 0" } },
   price: { margin: 0, fontSize: "20px", fontWeight: 800, color: "#E31B1B" },
+  "@media (max-width: 768px)": { price: { fontSize: "16px" } },
   dealBadge: { fontSize: "11px", background: "#d1fae5", color: "#065f46", padding: "3px 8px", borderRadius: "4px", fontWeight: 700 },
 
   infoGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", background: "#f9fafb", padding: "10px", borderRadius: "8px", margin: "10px 0" },
+  "@media (max-width: 768px)": { infoGrid: { gap: "8px", padding: "8px", margin: "8px 0" } },
   infoValue: { margin: "4px 0 0 0", fontWeight: 700, color: "#0B2140", fontSize: "13px" },
+  "@media (max-width: 768px)": { infoValue: { fontSize: "12px" } },
 
   viewBtn: { width: "100%", padding: "12px", background: "#0B2140", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "14px", fontWeight: 700, marginTop: "10px" },
+  "@media (max-width: 768px)": { viewBtn: { padding: "10px", fontSize: "13px", marginTop: "8px" } },
 
   modal: { position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000, padding: "20px" },
   modalBox: { background: "white", borderRadius: "16px", maxWidth: "650px", width: "100%", maxHeight: "90vh", overflowY: "auto", position: "relative" },

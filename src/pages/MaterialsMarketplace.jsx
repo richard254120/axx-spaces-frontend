@@ -958,6 +958,9 @@ const styles = {
     gridTemplateColumns: "repeat(2, 1fr)",
     gap: "28px",
   },
+  "@media (max-width: 768px)": { materialsGrid: { gap: "16px" } },
+  "@media (max-width: 480px)": { materialsGrid: { gap: "12px" } },
+  "@media (max-width: 380px)": { materialsGrid: { gap: "8px" } },
   materialCard: {
     background: COLORS.bgLight,
     border: `1px solid ${COLORS.border}`,

@@ -244,6 +244,10 @@ export default function AxxBiashara() {
         }
 
         .card-img-wrap { position: relative; overflow: hidden; aspect-ratio: 1/1; }
+        .business-grid { gap: 24px; }
+        @media (max-width: 768px) { .business-grid { gap: 16px; } }
+        @media (max-width: 480px) { .business-grid { gap: 12px; } }
+        @media (max-width: 380px) { .business-grid { gap: 8px; } }
         .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); display: block; }
         .axx-card:hover .card-img-wrap img { transform: scale(1.05); }
         .card-img-overlay {
@@ -733,7 +737,7 @@ export default function AxxBiashara() {
           </div>
         ) : (
           <>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" }} className="business-grid">
               {businesses.map((biz, idx) => (
                 <div
                   key={biz._id}
