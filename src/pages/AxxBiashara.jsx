@@ -760,284 +760,220 @@ export default function AxxBiashara() {
                       <div className="card-img-overlay" />
                       {biz.rating > 0 && (
                         <div style={{ position: "absolute", bottom: "12px", left: "14px", background: "rgba(9, 13, 22, 0.8)", backdropFilter: "blur(4px)", borderRadius: "8px", padding: "4px 10px", fontSize: "11px", fontWeight: 800, color: "#fbbf24", zIndex: 2, border: "1px solid rgba(255,255,255,0.08)" }}>
-                          ★ {biz.rating?.toFixed(1)} · {biz.reviewCount || 0} reviews
+                          ★ {biz.rating?.toFixed(1)}
                         </div>
                       )}
+                      <div style={{ position: "absolute", top: "12px", right: "12px", display: "flex", gap: "8px", zIndex: 2 }}>
+                        <button className="icon-btn" onClick={e => toggleFavorite(biz._id, e)} title="Favorite" style={{ padding: "8px", width: "32px", height: "32px" }}>
+                          {isFavorite(biz._id) ? "❤️" : "🤍"}
+                        </button>
+                      </div>
                     </div>
                   ) : (
-                    <div style={{ height: "120px", background: "linear-gradient(135deg, rgba(251,191,36,0.05) 0%, rgba(20,184,166,0.03) 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "32px", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <div style={{ aspectRatio: "1/1", background: "linear-gradient(135deg, rgba(251,191,36,0.05) 0%, rgba(20,184,166,0.03) 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "32px", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                       🏪
                     </div>
                   )}
 
-                  {/* Body Content */}
-                  <div style={{ padding: "20px 22px 24px" }}>
-                    {/* Header line */}
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
-                      <h3 style={{ fontSize: "18px", fontWeight: 800, color: "#f8fafc", lineHeight: 1.3, flex: 1, paddingRight: "10px" }}>{biz.name}</h3>
-                      <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
-                        <button className="icon-btn" onClick={e => toggleFavorite(biz._id, e)} title="Favorite">
-                          {isFavorite(biz._id) ? "❤️" : "🤍"}
-                        </button>
-                        <button
-                          className="icon-btn"
-                          onClick={e => toggleComparison(biz._id, e)}
-                          title="Compare"
-                          style={{
-                            background: comparisonList.includes(biz._id) ? "rgba(251, 191, 36, 0.15)" : undefined,
-                            borderColor: comparisonList.includes(biz._id) ? "rgba(251, 191, 36, 0.45)" : undefined,
-                          }}
-                        >
-                          {comparisonList.includes(biz._id) ? <span style={{ color: "#fbbf24", fontWeight: 800, fontSize: "12px" }}>✓</span> : "⚖"}
-                        </button>
-                      </div>
-                    </div>
-
-                    <div style={{ fontSize: "11.5px", color: "#fbbf24", fontWeight: 700, marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>{biz.categories?.join(" · ")}</div>
-
-                    <div style={{ fontSize: "13px", color: "#94a3b8", marginBottom: "14px", display: "flex", alignItems: "center", gap: "6px", fontWeight: 500 }}>
+                  {/* Body Content - Simplified */}
+                  <div style={{ padding: "16px" }}>
+                    <h3 style={{ fontSize: "16px", fontWeight: 800, color: "#f8fafc", lineHeight: 1.3, marginBottom: "8px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{biz.name}</h3>
+                    <div style={{ fontSize: "12px", color: "#94a3b8", display: "flex", alignItems: "center", gap: "6px", fontWeight: 500 }}>
                       <span>📍</span> {biz.location?.town}, {biz.location?.county}
                     </div>
-
-                    <p style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.6", marginBottom: "16px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                      {biz.description}
-                    </p>
-
-                    {/* Verification Indicators */}
-                    {biz.verificationBadges?.length > 0 && (
-                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "16px" }}>
-                        {biz.verificationBadges.map((badge, i) => {
-                          const cfg = BADGE_CONFIG[badge.type] || {};
-                          return (
-                            <span key={i} className="badge-pill" style={{ background: `${cfg.color}15`, color: cfg.color, border: `1px solid ${cfg.color}35` }}>
-                              {cfg.icon} {cfg.label || badge.type}
-                            </span>
-                          );
-                        })}
-                      </div>
-                    )}
-
-                    <hr className="divider" />
-
-                    {/* Actions */}
-                    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: biz.socialMedia ? "14px" : "0" }}>
-                      {biz.contact?.phone && (
-                        <a href={`tel:${biz.contact.phone}`} className="action-btn action-btn-primary" onClick={e => e.stopPropagation()}>
-                          Call Business
-                        </a>
-                      )}
-                      {biz.contact?.email && (
-                        <a href={`mailto:${biz.contact.email}`} className="action-btn action-btn-success" onClick={e => e.stopPropagation()}>
-                          Send Email
-                        </a>
-                      )}
-                      {biz.contact?.phone && (
-                        <a
-                          href={`https://wa.me/${biz.contact.phone}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="action-btn"
-                          style={{ background: "rgba(37,211,102,0.08)", color: "#25d366", border: "1px solid rgba(37,211,102,0.2)", display: "inline-flex", alignItems: "center", gap: "6px", padding: "9px 16px", borderRadius: "12px", fontSize: "12.5px", fontWeight: 700, textDecoration: "none" }}
-                          onClick={e => e.stopPropagation()}
-                        >
-                          WhatsApp
-                        </a>
-                      )}
-                    </div>
-
-                    {/* Social links */}
-                    {biz.socialMedia && (
-                      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", borderTop: "1px dashed rgba(255,255,255,0.05)", paddingTop: "12px" }}>
-                        {biz.socialMedia.facebook && <a href={biz.socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>f</a>}
-                        {biz.socialMedia.instagram && <a href={biz.socialMedia.instagram} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>📷</a>}
-                        {biz.socialMedia.twitter && <a href={biz.socialMedia.twitter} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>𝕏</a>}
-                        {biz.socialMedia.whatsapp && <a href={`https://wa.me/${biz.socialMedia.whatsapp}`} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>💬</a>}
-                        {biz.contact?.website && <a href={biz.contact.website} target="_blank" rel="noopener noreferrer" className="social-dot" onClick={e => e.stopPropagation()}>🔗</a>}
-                      </div>
-                    )}
                   </div>
                 </div>
               ))}
             </div>
-
-            {/* Pagination controls */}
-            {totalBusinesses > itemsPerPage && (
-              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px", marginTop: "42px", flexWrap: "wrap" }}>
-                <button
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                  disabled={currentPage === 1}
-                  style={{
-                    padding: "10px 18px",
-                    background: currentPage === 1 ? "rgba(255,255,255,0.02)" : "rgba(251,191,36,0.1)",
-                    border: currentPage === 1 ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(251,191,36,0.25)",
-                    borderRadius: "12px",
-                    color: currentPage === 1 ? "#475569" : "#fbbf24",
-                    fontSize: "14px",
-                    fontWeight: 700,
-                    cursor: currentPage === 1 ? "not-allowed" : "pointer",
-                    fontFamily: "inherit",
-                    transition: "all 0.25s",
-                  }}
-                >
-                  ← Previous
-                </button>
-
-                {Array.from({ length: Math.min(5, Math.ceil(totalBusinesses / itemsPerPage)) }, (_, i) => {
-                  const totalPages = Math.ceil(totalBusinesses / itemsPerPage);
-                  let pageNum;
-
-                  if (totalPages <= 5) {
-                    pageNum = i + 1;
-                  } else if (currentPage <= 3) {
-                    pageNum = i + 1;
-                  } else if (currentPage >= totalPages - 2) {
-                    pageNum = totalPages - 4 + i;
-                  } else {
-                    pageNum = currentPage - 2 + i;
-                  }
-
-                  return (
-                    <button
-                      key={pageNum}
-                      onClick={() => setCurrentPage(pageNum)}
-                      style={{
-                        padding: "10px 14px",
-                        background: currentPage === pageNum ? "rgba(251, 191, 36, 0.15)" : "rgba(255,255,255,0.03)",
-                        border: currentPage === pageNum ? "1px solid rgba(251, 191, 36, 0.4)" : "1px solid rgba(255,255,255,0.06)",
-                        borderRadius: "12px",
-                        color: currentPage === pageNum ? "#fbbf24" : "#94a3b8",
-                        fontSize: "14px",
-                        fontWeight: 700,
-                        cursor: "pointer",
-                        fontFamily: "inherit",
-                        transition: "all 0.2s",
-                        minWidth: "44px",
-                      }}
-                    >
-                      {pageNum}
-                    </button>
-                  );
-                })}
-
-                <button
-                  onClick={() => setCurrentPage(prev => Math.min(Math.ceil(totalBusinesses / itemsPerPage), prev + 1))}
-                  disabled={currentPage === Math.ceil(totalBusinesses / itemsPerPage)}
-                  style={{
-                    padding: "10px 18px",
-                    background: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "rgba(255,255,255,0.02)" : "rgba(251,191,36,0.1)",
-                    border: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(251,191,36,0.25)",
-                    borderRadius: "12px",
-                    color: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "#475569" : "#fbbf24",
-                    fontSize: "14px",
-                    fontWeight: 700,
-                    cursor: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "not-allowed" : "pointer",
-                    fontFamily: "inherit",
-                    transition: "all 0.25s",
-                  }}
-                >
-                  Next →
-                </button>
-              </div>
-            )}
           </>
         )}
       </div>
 
-      {/* ── FLOATING COMPARE BAR ── */}
-      {comparisonList.length > 0 && (
-        <div className="comparison-bar">
-          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-            <span style={{ width: "32px", height: "32px", borderRadius: "50%", background: "rgba(251,191,36,0.15)", border: "1px solid rgba(251,191,36,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: 800, color: "#fbbf24" }}>{comparisonList.length}</span>
-            <span style={{ color: "#cbd5e1", fontSize: "13.5px", fontWeight: 600 }}>selected businesses</span>
-          </div>
-          <button className="cta-primary cta-btn" style={{ padding: "8px 18px", fontSize: "12.5px" }} onClick={openComparison}>Compare</button>
-          <button onClick={() => setComparisonList([])} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", color: "#cbd5e1", fontSize: "12.5px", fontWeight: 600, padding: "8px 14px", cursor: "pointer", fontFamily: "inherit" }}>Clear</button>
+      {/* Pagination controls */}
+      {totalBusinesses > itemsPerPage && (
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px", marginTop: "42px", flexWrap: "wrap" }}>
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+            style={{
+              padding: "10px 18px",
+              background: currentPage === 1 ? "rgba(255,255,255,0.02)" : "rgba(251,191,36,0.1)",
+              border: currentPage === 1 ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(251,191,36,0.25)",
+              borderRadius: "12px",
+              color: currentPage === 1 ? "#475569" : "#fbbf24",
+              fontSize: "14px",
+              fontWeight: 700,
+              cursor: currentPage === 1 ? "not-allowed" : "pointer",
+              fontFamily: "inherit",
+              transition: "all 0.25s",
+            }}
+          >
+            ← Previous
+          </button>
+
+          {Array.from({ length: Math.min(5, Math.ceil(totalBusinesses / itemsPerPage)) }, (_, i) => {
+            const totalPages = Math.ceil(totalBusinesses / itemsPerPage);
+            let pageNum;
+
+            if (totalPages <= 5) {
+              pageNum = i + 1;
+            } else if (currentPage <= 3) {
+              pageNum = i + 1;
+            } else if (currentPage >= totalPages - 2) {
+              pageNum = totalPages - 4 + i;
+            } else {
+              pageNum = currentPage - 2 + i;
+            }
+
+            return (
+              <button
+                key={pageNum}
+                onClick={() => setCurrentPage(pageNum)}
+                style={{
+                  padding: "10px 14px",
+                  background: currentPage === pageNum ? "rgba(251, 191, 36, 0.15)" : "rgba(255,255,255,0.03)",
+                  border: currentPage === pageNum ? "1px solid rgba(251, 191, 36, 0.4)" : "1px solid rgba(255,255,255,0.06)",
+                  borderRadius: "12px",
+                  color: currentPage === pageNum ? "#fbbf24" : "#94a3b8",
+                  fontSize: "14px",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                  transition: "all 0.2s",
+                  minWidth: "44px",
+                }}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
+
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(Math.ceil(totalBusinesses / itemsPerPage), prev + 1))}
+            disabled={currentPage === Math.ceil(totalBusinesses / itemsPerPage)}
+            style={{
+              padding: "10px 18px",
+              background: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "rgba(255,255,255,0.02)" : "rgba(251,191,36,0.1)",
+              border: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(251,191,36,0.25)",
+              borderRadius: "12px",
+              color: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "#475569" : "#fbbf24",
+              fontSize: "14px",
+              fontWeight: 700,
+              cursor: currentPage === Math.ceil(totalBusinesses / itemsPerPage) ? "not-allowed" : "pointer",
+              fontFamily: "inherit",
+              transition: "all 0.25s",
+            }}
+          >
+            Next →
+          </button>
         </div>
       )}
+    </>
+  )
+}
+      </div >
 
-      {/* ── ANNOUNCEMENT VIEW MODAL ── */}
-      {showAnnouncementModal && selectedAnnouncement && (
-        <div className="modal-overlay" onClick={() => setShowAnnouncementModal(false)}>
-          <div className="modal-box" style={{ maxWidth: "560px", width: "90%" }} onClick={e => e.stopPropagation()}>
-            <button onClick={() => setShowAnnouncementModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justify: "center", transition: "all 0.2s" }} onMouseEnter={e => e.target.style.background = "rgba(255,255,255,0.1)"} onMouseLeave={e => e.target.style.background = "rgba(255,255,255,0.04)"}>✕</button>
-            <div style={{ fontSize: "11px", fontWeight: 800, color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>📢 {selectedAnnouncement.businessName || "Announcement"}</div>
-            <h3 style={{ fontSize: "22px", fontWeight: 800, color: "#f8fafc", marginBottom: "12px", lineHeight: "1.3" }}>{selectedAnnouncement.title}</h3>
-            <div style={{ fontSize: "12.5px", color: "#64748b", marginBottom: "20px" }}>
-              {selectedAnnouncement.submitterName && `${selectedAnnouncement.submitterName}`}
-              {selectedAnnouncement.organizationName && ` · ${selectedAnnouncement.organizationName}`}
-              <span style={{ marginLeft: "12px" }}>{new Date(selectedAnnouncement.createdAt).toLocaleDateString("en-KE", { day: "numeric", month: "long", year: "numeric" })}</span>
-            </div>
-            <hr className="divider" style={{ marginBottom: "20px" }} />
-            <p style={{ fontSize: "14.5px", color: "#e2e8f0", lineHeight: "1.7", marginTop: "12px" }}>{selectedAnnouncement.content}</p>
-          </div>
+  {/* ── FLOATING COMPARE BAR ── */ }
+{
+  comparisonList.length > 0 && (
+    <div className="comparison-bar">
+      <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+        <span style={{ width: "32px", height: "32px", borderRadius: "50%", background: "rgba(251,191,36,0.15)", border: "1px solid rgba(251,191,36,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: 800, color: "#fbbf24" }}>{comparisonList.length}</span>
+        <span style={{ color: "#cbd5e1", fontSize: "13.5px", fontWeight: 600 }}>selected businesses</span>
+      </div>
+      <button className="cta-primary cta-btn" style={{ padding: "8px 18px", fontSize: "12.5px" }} onClick={openComparison}>Compare</button>
+      <button onClick={() => setComparisonList([])} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", color: "#cbd5e1", fontSize: "12.5px", fontWeight: 600, padding: "8px 14px", cursor: "pointer", fontFamily: "inherit" }}>Clear</button>
+    </div>
+  )
+}
+
+{/* ── ANNOUNCEMENT VIEW MODAL ── */ }
+{
+  showAnnouncementModal && selectedAnnouncement && (
+    <div className="modal-overlay" onClick={() => setShowAnnouncementModal(false)}>
+      <div className="modal-box" style={{ maxWidth: "560px", width: "90%" }} onClick={e => e.stopPropagation()}>
+        <button onClick={() => setShowAnnouncementModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justify: "center", transition: "all 0.2s" }} onMouseEnter={e => e.target.style.background = "rgba(255,255,255,0.1)"} onMouseLeave={e => e.target.style.background = "rgba(255,255,255,0.04)"}>✕</button>
+        <div style={{ fontSize: "11px", fontWeight: 800, color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>📢 {selectedAnnouncement.businessName || "Announcement"}</div>
+        <h3 style={{ fontSize: "22px", fontWeight: 800, color: "#f8fafc", marginBottom: "12px", lineHeight: "1.3" }}>{selectedAnnouncement.title}</h3>
+        <div style={{ fontSize: "12.5px", color: "#64748b", marginBottom: "20px" }}>
+          {selectedAnnouncement.submitterName && `${selectedAnnouncement.submitterName}`}
+          {selectedAnnouncement.organizationName && ` · ${selectedAnnouncement.organizationName}`}
+          <span style={{ marginLeft: "12px" }}>{new Date(selectedAnnouncement.createdAt).toLocaleDateString("en-KE", { day: "numeric", month: "long", year: "numeric" })}</span>
         </div>
-      )}
+        <hr className="divider" style={{ marginBottom: "20px" }} />
+        <p style={{ fontSize: "14.5px", color: "#e2e8f0", lineHeight: "1.7", marginTop: "12px" }}>{selectedAnnouncement.content}</p>
+      </div>
+    </div>
+  )
+}
 
-      {/* ── SIDE BY SIDE COMPARISON MODAL ── */}
-      {showComparisonModal && (
-        <div className="modal-overlay" onClick={() => setShowComparisonModal(false)}>
-          <div className="modal-box" style={{ maxWidth: "860px", width: "95%" }} onClick={e => e.stopPropagation()}>
-            <button onClick={() => setShowComparisonModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justify: "center" }}>✕</button>
-            <div className="section-label" style={{ marginBottom: "6px" }}>Side-by-Side Review</div>
-            <h3 style={{ fontSize: "22px", fontWeight: 800, color: "#f8fafc", marginBottom: "24px" }}>Business Comparison</h3>
-            <div style={{ display: "grid", gridTemplateColumns: `repeat(${comparisonData.length}, 1fr)`, gap: "16px" }}>
-              {comparisonData.map(biz => (
-                <div key={biz._id} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(251, 191, 36, 0.15)", borderRadius: "16px", padding: "20px" }}>
-                  <div style={{ fontSize: "16px", fontWeight: 800, color: "#fbbf24", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{biz.name}</div>
-                  {[
-                    ["Category", biz.categories?.join(", ")],
-                    ["Location", `${biz.location?.town}, ${biz.location?.county}`],
-                    ["Rating", biz.rating ? `★ ${biz.rating}` : "No rating"],
-                    ["Reviews count", biz.reviewCount || 0],
-                    ["Price Guide", biz.priceRange || "N/A"],
-                    ["Founded Year", biz.yearEstablished || "N/A"],
-                    ["Contact Phone", biz.contact?.phone || "N/A"],
-                    ["Contact Email", biz.contact?.email || "N/A"],
-                  ].map(([label, val]) => (
-                    <div key={label} style={{ marginBottom: "12px" }}>
-                      <div style={{ fontSize: "10.5px", color: "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "2px" }}>{label}</div>
-                      <div style={{ fontSize: "13px", color: "#e2e8f0" }}>{val}</div>
-                    </div>
-                  ))}
+{/* ── SIDE BY SIDE COMPARISON MODAL ── */ }
+{
+  showComparisonModal && (
+    <div className="modal-overlay" onClick={() => setShowComparisonModal(false)}>
+      <div className="modal-box" style={{ maxWidth: "860px", width: "95%" }} onClick={e => e.stopPropagation()}>
+        <button onClick={() => setShowComparisonModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justify: "center" }}>✕</button>
+        <div className="section-label" style={{ marginBottom: "6px" }}>Side-by-Side Review</div>
+        <h3 style={{ fontSize: "22px", fontWeight: 800, color: "#f8fafc", marginBottom: "24px" }}>Business Comparison</h3>
+        <div style={{ display: "grid", gridTemplateColumns: `repeat(${comparisonData.length}, 1fr)`, gap: "16px" }}>
+          {comparisonData.map(biz => (
+            <div key={biz._id} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(251, 191, 36, 0.15)", borderRadius: "16px", padding: "20px" }}>
+              <div style={{ fontSize: "16px", fontWeight: 800, color: "#fbbf24", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{biz.name}</div>
+              {[
+                ["Category", biz.categories?.join(", ")],
+                ["Location", `${biz.location?.town}, ${biz.location?.county}`],
+                ["Rating", biz.rating ? `★ ${biz.rating}` : "No rating"],
+                ["Reviews count", biz.reviewCount || 0],
+                ["Price Guide", biz.priceRange || "N/A"],
+                ["Founded Year", biz.yearEstablished || "N/A"],
+                ["Contact Phone", biz.contact?.phone || "N/A"],
+                ["Contact Email", biz.contact?.email || "N/A"],
+              ].map(([label, val]) => (
+                <div key={label} style={{ marginBottom: "12px" }}>
+                  <div style={{ fontSize: "10.5px", color: "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "2px" }}>{label}</div>
+                  <div style={{ fontSize: "13px", color: "#e2e8f0" }}>{val}</div>
                 </div>
               ))}
             </div>
-          </div>
+          ))}
         </div>
-      )}
+      </div>
+    </div>
+  )
+}
 
-      {/* ── DIRECTORY FOOTER ── */}
-      <footer style={{ background: "#07090f", borderTop: "1px solid rgba(255,255,255,0.05)", padding: "56px 24px 32px" }}>
-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "32px", marginBottom: "40px" }}>
-            <div>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
-                <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(251,191,36,0.1)", display: "flex", alignItems: "center", justify: "center" }}><img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "24px", height: "24px", objectFit: "cover", borderRadius: "6px" }} /></div>
-                <span style={{ fontSize: "18px", fontWeight: 800, color: "#f8fafc" }}>AxxBiashara</span>
-              </div>
-              <p style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.6" }}>Kenya's premier verified business directory connecting users to counties.</p>
-            </div>
-            <div>
-              <div style={{ fontSize: "11px", fontWeight: 800, color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "16px" }}>Directory Contacts</div>
-              {["info@axxspace.com", "support@axxspace.com"].map(e => (
-                <a
-                  key={e}
-                  href={`mailto:${e}`}
-                  style={{ display: "block", fontSize: "13px", color: "#64748b", marginBottom: "8px", textDecoration: "none", transition: "color 0.2s" }}
-                  onMouseEnter={ev => ev.target.style.color = "#fbbf24"}
-                  onMouseLeave={ev => ev.target.style.color = "#64748b"}
-                >
-                  ✉ {e}
-                </a>
-              ))}
-            </div>
-          </div>
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "24px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
-            <p style={{ fontSize: "12px", color: "#475569" }}>© 2026 Axxspace. All rights reserved.</p>
-            <p style={{ fontSize: "12.5px", color: "#fbbf24", fontWeight: 700 }}>Built for Kenya 🇰🇪</p>
-          </div>
+{/* ── DIRECTORY FOOTER ── */ }
+<footer style={{ background: "#07090f", borderTop: "1px solid rgba(255,255,255,0.05)", padding: "56px 24px 32px" }}>
+  <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "32px", marginBottom: "40px" }}>
+      <div>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
+          <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(251,191,36,0.1)", display: "flex", alignItems: "center", justify: "center" }}><img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "24px", height: "24px", objectFit: "cover", borderRadius: "6px" }} /></div>
+          <span style={{ fontSize: "18px", fontWeight: 800, color: "#f8fafc" }}>AxxBiashara</span>
         </div>
-      </footer>
+        <p style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.6" }}>Kenya's premier verified business directory connecting users to counties.</p>
+      </div>
+      <div>
+        <div style={{ fontSize: "11px", fontWeight: 800, color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "16px" }}>Directory Contacts</div>
+        {["info@axxspace.com", "support@axxspace.com"].map(e => (
+          <a
+            key={e}
+            href={`mailto:${e}`}
+            style={{ display: "block", fontSize: "13px", color: "#64748b", marginBottom: "8px", textDecoration: "none", transition: "color 0.2s" }}
+            onMouseEnter={ev => ev.target.style.color = "#fbbf24"}
+            onMouseLeave={ev => ev.target.style.color = "#64748b"}
+          >
+            ✉ {e}
+          </a>
+        ))}
+      </div>
+    </div>
+    <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "24px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
+      <p style={{ fontSize: "12px", color: "#475569" }}>© 2026 Axxspace. All rights reserved.</p>
+      <p style={{ fontSize: "12.5px", color: "#fbbf24", fontWeight: 700 }}>Built for Kenya 🇰🇪</p>
+    </div>
+  </div>
+</footer>
     </div >
   );
 }
