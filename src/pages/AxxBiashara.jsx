@@ -868,112 +868,101 @@ export default function AxxBiashara() {
           </button>
         </div>
       )}
-    </>
-  )
-}
-      </div >
 
-  {/* ── FLOATING COMPARE BAR ── */ }
-{
-  comparisonList.length > 0 && (
-    <div className="comparison-bar">
-      <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-        <span style={{ width: "32px", height: "32px", borderRadius: "50%", background: "rgba(251,191,36,0.15)", border: "1px solid rgba(251,191,36,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: 800, color: "#fbbf24" }}>{comparisonList.length}</span>
-        <span style={{ color: "#cbd5e1", fontSize: "13.5px", fontWeight: 600 }}>selected businesses</span>
-      </div>
-      <button className="cta-primary cta-btn" style={{ padding: "8px 18px", fontSize: "12.5px" }} onClick={openComparison}>Compare</button>
-      <button onClick={() => setComparisonList([])} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", color: "#cbd5e1", fontSize: "12.5px", fontWeight: 600, padding: "8px 14px", cursor: "pointer", fontFamily: "inherit" }}>Clear</button>
-    </div>
-  )
-}
-
-{/* ── ANNOUNCEMENT VIEW MODAL ── */ }
-{
-  showAnnouncementModal && selectedAnnouncement && (
-    <div className="modal-overlay" onClick={() => setShowAnnouncementModal(false)}>
-      <div className="modal-box" style={{ maxWidth: "560px", width: "90%" }} onClick={e => e.stopPropagation()}>
-        <button onClick={() => setShowAnnouncementModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justify: "center", transition: "all 0.2s" }} onMouseEnter={e => e.target.style.background = "rgba(255,255,255,0.1)"} onMouseLeave={e => e.target.style.background = "rgba(255,255,255,0.04)"}>✕</button>
-        <div style={{ fontSize: "11px", fontWeight: 800, color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>📢 {selectedAnnouncement.businessName || "Announcement"}</div>
-        <h3 style={{ fontSize: "22px", fontWeight: 800, color: "#f8fafc", marginBottom: "12px", lineHeight: "1.3" }}>{selectedAnnouncement.title}</h3>
-        <div style={{ fontSize: "12.5px", color: "#64748b", marginBottom: "20px" }}>
-          {selectedAnnouncement.submitterName && `${selectedAnnouncement.submitterName}`}
-          {selectedAnnouncement.organizationName && ` · ${selectedAnnouncement.organizationName}`}
-          <span style={{ marginLeft: "12px" }}>{new Date(selectedAnnouncement.createdAt).toLocaleDateString("en-KE", { day: "numeric", month: "long", year: "numeric" })}</span>
+      {/* ── FLOATING COMPARE BAR ── */}
+      {comparisonList.length > 0 && (
+        <div className="comparison-bar">
+          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+            <span style={{ width: "32px", height: "32px", borderRadius: "50%", background: "rgba(251,191,36,0.15)", border: "1px solid rgba(251,191,36,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: 800, color: "#fbbf24" }}>{comparisonList.length}</span>
+            <span style={{ color: "#cbd5e1", fontSize: "13.5px", fontWeight: 600 }}>selected businesses</span>
+          </div>
+          <button className="cta-primary cta-btn" style={{ padding: "8px 18px", fontSize: "12.5px" }} onClick={openComparison}>Compare</button>
+          <button onClick={() => setComparisonList([])} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", color: "#cbd5e1", fontSize: "12.5px", fontWeight: 600, padding: "8px 14px", cursor: "pointer", fontFamily: "inherit" }}>Clear</button>
         </div>
-        <hr className="divider" style={{ marginBottom: "20px" }} />
-        <p style={{ fontSize: "14.5px", color: "#e2e8f0", lineHeight: "1.7", marginTop: "12px" }}>{selectedAnnouncement.content}</p>
-      </div>
-    </div>
-  )
-}
+      )}
 
-{/* ── SIDE BY SIDE COMPARISON MODAL ── */ }
-{
-  showComparisonModal && (
-    <div className="modal-overlay" onClick={() => setShowComparisonModal(false)}>
-      <div className="modal-box" style={{ maxWidth: "860px", width: "95%" }} onClick={e => e.stopPropagation()}>
-        <button onClick={() => setShowComparisonModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justify: "center" }}>✕</button>
-        <div className="section-label" style={{ marginBottom: "6px" }}>Side-by-Side Review</div>
-        <h3 style={{ fontSize: "22px", fontWeight: 800, color: "#f8fafc", marginBottom: "24px" }}>Business Comparison</h3>
-        <div style={{ display: "grid", gridTemplateColumns: `repeat(${comparisonData.length}, 1fr)`, gap: "16px" }}>
-          {comparisonData.map(biz => (
-            <div key={biz._id} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(251, 191, 36, 0.15)", borderRadius: "16px", padding: "20px" }}>
-              <div style={{ fontSize: "16px", fontWeight: 800, color: "#fbbf24", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{biz.name}</div>
-              {[
-                ["Category", biz.categories?.join(", ")],
-                ["Location", `${biz.location?.town}, ${biz.location?.county}`],
-                ["Rating", biz.rating ? `★ ${biz.rating}` : "No rating"],
-                ["Reviews count", biz.reviewCount || 0],
-                ["Price Guide", biz.priceRange || "N/A"],
-                ["Founded Year", biz.yearEstablished || "N/A"],
-                ["Contact Phone", biz.contact?.phone || "N/A"],
-                ["Contact Email", biz.contact?.email || "N/A"],
-              ].map(([label, val]) => (
-                <div key={label} style={{ marginBottom: "12px" }}>
-                  <div style={{ fontSize: "10.5px", color: "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "2px" }}>{label}</div>
-                  <div style={{ fontSize: "13px", color: "#e2e8f0" }}>{val}</div>
+      {/* ── ANNOUNCEMENT VIEW MODAL ── */}
+      {showAnnouncementModal && selectedAnnouncement && (
+        <div className="modal-overlay" onClick={() => setShowAnnouncementModal(false)}>
+          <div className="modal-box" style={{ maxWidth: "560px", width: "90%" }} onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowAnnouncementModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justify: "center", transition: "all 0.2s" }} onMouseEnter={e => e.target.style.background = "rgba(255,255,255,0.1)"} onMouseLeave={e => e.target.style.background = "rgba(255,255,255,0.04)"}>✕</button>
+            <div style={{ fontSize: "11px", fontWeight: 800, color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>📢 {selectedAnnouncement.businessName || "Announcement"}</div>
+            <h3 style={{ fontSize: "22px", fontWeight: 800, color: "#f8fafc", marginBottom: "12px", lineHeight: 1.3 }}>{selectedAnnouncement.title}</h3>
+            <div style={{ fontSize: "12.5px", color: "#64748b", marginBottom: "20px" }}>
+              {selectedAnnouncement.submitterName && `${selectedAnnouncement.submitterName}`}
+              {selectedAnnouncement.organizationName && ` · ${selectedAnnouncement.organizationName}`}
+              <span style={{ marginLeft: "12px" }}>{new Date(selectedAnnouncement.createdAt).toLocaleDateString("en-KE", { day: "numeric", month: "long", year: "numeric" })}</span>
+            </div>
+            <hr className="divider" style={{ marginBottom: "20px" }} />
+            <p style={{ fontSize: "14.5px", color: "#e2e8f0", lineHeight: 1.7, marginTop: "12px" }}>{selectedAnnouncement.content}</p>
+          </div>
+        </div>
+      )}
+
+      {/* ── SIDE BY SIDE COMPARISON MODAL ── */}
+      {showComparisonModal && (
+        <div className="modal-overlay" onClick={() => setShowComparisonModal(false)}>
+          <div className="modal-box" style={{ maxWidth: "860px", width: "95%" }} onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowComparisonModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justify: "center" }}>✕</button>
+            <div className="section-label" style={{ marginBottom: "6px" }}>Side-by-Side Review</div>
+            <h3 style={{ fontSize: "22px", fontWeight: 800, color: "#f8fafc", marginBottom: "24px" }}>Business Comparison</h3>
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(${comparisonData.length}, 1fr)`, gap: "16px" }}>
+              {comparisonData.map(biz => (
+                <div key={biz._id} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(251, 191, 36, 0.15)", borderRadius: "16px", padding: "20px" }}>
+                  <div style={{ fontSize: "16px", fontWeight: 800, color: "#fbbf24", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{biz.name}</div>
+                  {[
+                    ["Category", biz.categories?.join(", ")],
+                    ["Location", `${biz.location?.town}, ${biz.location?.county}`],
+                    ["Rating", biz.rating ? `★ ${biz.rating}` : "No rating"],
+                    ["Reviews count", biz.reviewCount || 0],
+                    ["Price Guide", biz.priceRange || "N/A"],
+                    ["Founded Year", biz.yearEstablished || "N/A"],
+                    ["Contact Phone", biz.contact?.phone || "N/A"],
+                    ["Contact Email", biz.contact?.email || "N/A"],
+                  ].map(([label, val]) => (
+                    <div key={label} style={{ marginBottom: "12px" }}>
+                      <div style={{ fontSize: "10.5px", color: "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "2px" }}>{label}</div>
+                      <div style={{ fontSize: "13px", color: "#e2e8f0" }}>{val}</div>
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
-          ))}
+          </div>
         </div>
-      </div>
-    </div>
-  )
-}
+      )}
 
-{/* ── DIRECTORY FOOTER ── */ }
-<footer style={{ background: "#07090f", borderTop: "1px solid rgba(255,255,255,0.05)", padding: "56px 24px 32px" }}>
-  <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "32px", marginBottom: "40px" }}>
-      <div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
-          <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(251,191,36,0.1)", display: "flex", alignItems: "center", justify: "center" }}><img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "24px", height: "24px", objectFit: "cover", borderRadius: "6px" }} /></div>
-          <span style={{ fontSize: "18px", fontWeight: 800, color: "#f8fafc" }}>AxxBiashara</span>
+      {/* ── DIRECTORY FOOTER ── */}
+      <footer style={{ background: "#07090f", borderTop: "1px solid rgba(255,255,255,0.05)", padding: "56px 24px 32px" }}>
+        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "32px", marginBottom: "40px" }}>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
+                <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(251,191,36,0.1)", display: "flex", alignItems: "center", justify: "center" }}><img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "24px", height: "24px", objectFit: "cover", borderRadius: "6px" }} /></div>
+                <span style={{ fontSize: "18px", fontWeight: 800, color: "#f8fafc" }}>AxxBiashara</span>
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: "11px", fontWeight: 800, color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "16px" }}>Directory Contacts</div>
+              {["info@axxspace.com", "support@axxspace.com"].map(e => (
+                <a
+                  key={e}
+                  href={`mailto:${e}`}
+                  style={{ display: "block", fontSize: "13px", color: "#64748b", marginBottom: "8px", textDecoration: "none", transition: "color 0.2s" }}
+                  onMouseEnter={ev => ev.target.style.color = "#fbbf24"}
+                  onMouseLeave={ev => ev.target.style.color = "#64748b"}
+                >
+                  {e}
+                </a>
+              ))}
+            </div>
+          </div>
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "24px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
+            <p style={{ fontSize: "12px", color: "#475569" }}>Copyright 2026 Axxspace.</p>
+            <p style={{ fontSize: "12.5px", color: "#fbbf24", fontWeight: 700 }}>Built for Kenya</p>
+          </div>
         </div>
-        <p style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.6" }}>Kenya's premier verified business directory connecting users to counties.</p>
-      </div>
-      <div>
-        <div style={{ fontSize: "11px", fontWeight: 800, color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "16px" }}>Directory Contacts</div>
-        {["info@axxspace.com", "support@axxspace.com"].map(e => (
-          <a
-            key={e}
-            href={`mailto:${e}`}
-            style={{ display: "block", fontSize: "13px", color: "#64748b", marginBottom: "8px", textDecoration: "none", transition: "color 0.2s" }}
-            onMouseEnter={ev => ev.target.style.color = "#fbbf24"}
-            onMouseLeave={ev => ev.target.style.color = "#64748b"}
-          >
-            ✉ {e}
-          </a>
-        ))}
-      </div>
+      </footer>
     </div>
-    <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "24px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
-      <p style={{ fontSize: "12px", color: "#475569" }}>© 2026 Axxspace. All rights reserved.</p>
-      <p style={{ fontSize: "12.5px", color: "#fbbf24", fontWeight: 700 }}>Built for Kenya 🇰🇪</p>
-    </div>
-  </div>
-</footer>
-    </div >
   );
 }
