@@ -75,9 +75,18 @@ export default function TourismDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { property, roomTypes, loading, error } = useTourismProperty(id);
+  const { user, token } = useAuth();
 
   const [selectedRoom, setSelectedRoom] = useState(0);
   const [bookingOpen, setBookingOpen] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentPhone, setPaymentPhone] = useState("");
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentError, setPaymentError] = useState("");
+  const [paymentSuccess, setPaymentSuccess] = useState("");
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
 
   if (loading) {
     return (
@@ -102,15 +111,6 @@ export default function TourismDetailPage() {
   }
 
   const roomPrice = roomTypes[selectedRoom]?.price ?? property.price;
-  const { user, token } = useAuth();
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [paymentPhone, setPaymentPhone] = useState("");
-  const [paymentAmount, setPaymentAmount] = useState("");
-  const [paymentLoading, setPaymentLoading] = useState(false);
-  const [paymentError, setPaymentError] = useState("");
-  const [paymentSuccess, setPaymentSuccess] = useState("");
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
 
   // If property has its own booking URL, redirect there; otherwise handle internally
   const handleBook = () => {
