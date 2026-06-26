@@ -68,6 +68,8 @@ export default function VerifyEmail() {
                   navigate("/seller-login");
                 } else if (userRole === "mover") {
                   navigate("/movers?tab=login");
+                } else if (userRole === "landlord") {
+                  navigate("/tourism/login");
                 } else {
                   navigate("/login");
                 }

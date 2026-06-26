@@ -56,6 +56,7 @@ import TourismRegister from "./pages/tourism/TourismRegister";
 import RegisterPropertyPage from "./pages/tourism/RegisterPropertyPage";
 import ProviderDashboard from "./pages/tourism/ProviderDashboard";
 import EditPropertyPage from "./pages/tourism/EditPropertyPage";
+import TourismDashboardLayout from "./components/TourismDashboardLayout";
 
 // ─── AxxBiashara Business Directory Pages ─────────────────────────────────────
 import AxxBiashara from "./pages/AxxBiashara";
@@ -157,21 +158,21 @@ function App() {
       <Route
         path="/tourism/dashboard"
         element={
-          <DashboardLayout>
+          <TourismDashboardLayout>
             <ProtectedRoute allowedRoles={["landlord"]}>
               <ProviderDashboard />
             </ProtectedRoute>
-          </DashboardLayout>
+          </TourismDashboardLayout>
         }
       />
       <Route
         path="/tourism/dashboard/property/:id"
         element={
-          <DashboardLayout>
+          <TourismDashboardLayout>
             <ProtectedRoute allowedRoles={["landlord"]}>
               <EditPropertyPage />
             </ProtectedRoute>
-          </DashboardLayout>
+          </TourismDashboardLayout>
         }
       />
       <Route path="/tourism/:id" element={<PublicLayout><TourismDetailPage /></PublicLayout>} />
