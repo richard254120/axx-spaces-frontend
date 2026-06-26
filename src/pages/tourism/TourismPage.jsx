@@ -49,8 +49,8 @@ export default function TourismPage() {
               </>
             ) : (
               <>
-                <button style={s.navLink} onClick={() => navigate("/login?type=landlord")}>Sign In</button>
-                <button style={s.navBtnPrimary} onClick={() => navigate("/register")}>
+                <button style={s.navLink} onClick={() => navigate("/tourism/login")}>Sign In</button>
+                <button style={s.navBtnPrimary} onClick={() => navigate("/tourism/register")}>
                   List Your Property
                 </button>
               </>
@@ -61,7 +61,7 @@ export default function TourismPage() {
             {user ? (
               <button style={s.navBtnPrimary} onClick={() => navigate("/tourism/dashboard")}>Dashboard</button>
             ) : (
-              <button style={s.navBtnPrimary} onClick={() => navigate("/register")}>
+              <button style={s.navBtnPrimary} onClick={() => navigate("/tourism/register")}>
                 List Property
               </button>
             )}
