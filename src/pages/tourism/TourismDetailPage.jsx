@@ -211,7 +211,7 @@ export default function TourismDetailPage() {
           📱 Pay with M-Pesa
         </button>
       </div>
-      {property.bookingUrl && <div style={s.bookNote}>You'll be redirected to {new URL(property.bookingUrl).hostname}</div>}
+      {property.bookingUrl && <div style={s.bookNote}>You'll be redirected to the property's official booking site</div>}
     </div>
   );
 
