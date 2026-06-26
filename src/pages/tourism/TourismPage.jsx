@@ -294,16 +294,16 @@ const s = {
 
   // Nav
   nav: { background: "white", borderBottom: "1px solid #e5e7eb", position: "sticky", top: 0, zIndex: 100 },
-  navInner: { maxWidth: "1400px", margin: "0 auto", padding: "14px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" },
-  logo: { display: "flex", alignItems: "center", gap: "4px", flexShrink: 0 },
-  logoAccent: { fontSize: "20px", fontWeight: 900, color: "#fbbf24", letterSpacing: "-0.5px" },
-  logoSub: { fontSize: "20px", fontWeight: 900, color: "#1f2937", letterSpacing: "-0.5px" },
-  logoDivider: { color: "#e5e7eb", margin: "0 8px", fontSize: "18px" },
-  logoLabel: { fontSize: "13px", fontWeight: 600, color: "#6b7280" },
-  navLinks: { display: "flex", alignItems: "center", gap: "4px" },
-  navLink: { background: "transparent", border: "none", padding: "8px 14px", fontSize: "14px", fontWeight: 600, color: "#4b5563", cursor: "pointer", fontFamily: "inherit", borderRadius: "8px" },
-  navBtnPrimary: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "8px", padding: "9px 16px", fontSize: "13px", fontWeight: 800, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" },
-  userChip: { background: "#f3f4f6", borderRadius: "20px", padding: "6px 14px", fontSize: "13px", fontWeight: 700, color: "#1f2937" },
+  navInner: { maxWidth: "1400px", margin: "0 auto", padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" },
+  logo: { display: "flex", alignItems: "center", gap: "2px", flexShrink: 0 },
+  logoAccent: { fontSize: "16px", fontWeight: 900, color: "#fbbf24", letterSpacing: "-0.5px" },
+  logoSub: { fontSize: "16px", fontWeight: 900, color: "#1f2937", letterSpacing: "-0.5px" },
+  logoDivider: { color: "#e5e7eb", margin: "0 6px", fontSize: "14px" },
+  logoLabel: { fontSize: "11px", fontWeight: 600, color: "#6b7280" },
+  navLinks: { display: "flex", alignItems: "center", gap: "2px" },
+  navLink: { background: "transparent", border: "none", padding: "6px 10px", fontSize: "12px", fontWeight: 600, color: "#4b5563", cursor: "pointer", fontFamily: "inherit", borderRadius: "6px" },
+  navBtnPrimary: { background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "6px", padding: "6px 12px", fontSize: "11px", fontWeight: 800, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" },
+  userChip: { background: "#f3f4f6", borderRadius: "16px", padding: "4px 10px", fontSize: "11px", fontWeight: 700, color: "#1f2937" },
 
   // Hero
   hero: { background: "linear-gradient(135deg, #065f46 0%, #047857 50%, #059669 100%)", position: "relative", overflow: "hidden", padding: "100px 20px 80px" },
@@ -455,7 +455,16 @@ const css = `
   }
   @media (max-width: 600px) {
     .how-grid { grid-template-columns: 1fr; }
-    .cat-grid { grid-template-columns: repeat(4, 1fr); }
+    .cat-grid { grid-template-columns: repeat(2, 1fr); }
     .prop-grid { grid-template-columns: 1fr; }
+    .nav-links { display: none !important; }
+    .nav-mobile-btns { display: flex !important; }
+  }
+  @media (max-width: 480px) {
+    .logoAccent { font-size: 14px !important; }
+    .logoSub { font-size: 14px !important; }
+    .logoDivider { font-size: 12px !important; margin: 0 4px; }
+    .logoLabel { font-size: 10px !important; }
+    .nav-mobile-btns button { font-size: 10px !important; padding: 6px 10px !important; }
   }
 `;
