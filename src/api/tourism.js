@@ -60,34 +60,14 @@ export async function tourismLogin(email, password) {
 
 // ─── Provider ─────────────────────────────────────────────────────────
 
-export async function registerTourismProperty(form) {
-  return request("/tourism/register", {
+export async function registerTourismProperty(formData) {
+  const res = await fetch(`${API_BASE}/tourism/register`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      ownerName: form.ownerName,
-      ownerEmail: form.ownerEmail,
-      ownerPhone: form.ownerPhone,
-      password: form.password,
-      selectedPackage: form.selectedPackage,
-      name: form.name,
-      category: form.category,
-      description: form.description,
-      county: form.county,
-      town: form.town,
-      address: form.address,
-      mapLink: form.mapLink,
-      amenities: form.amenities,
-      basePrice: form.basePrice,
-      weekendPrice: form.weekendPrice,
-      peakPrice: form.peakPrice,
-      roomTypes: form.roomTypes,
-      checkIn: form.checkIn,
-      checkOut: form.checkOut,
-      cancellation: form.cancellation,
-      bookingUrl: form.bookingUrl,
-    }),
+    body: formData,
   });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "Failed to register property");
+  return data;
 }
 
 export async function fetchMyTourismListings(token) {

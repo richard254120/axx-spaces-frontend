@@ -29,6 +29,8 @@ export default function RegisterPropertyPage() {
   const [submitError, setSubmitError] = useState("");
 
   const [form, setForm] = useState({ ...INITIAL_REGISTER_FORM });
+  const [newImages, setNewImages] = useState([]);
+  const [newVideos, setNewVideos] = useState([]);
 
   const update = (field, value) => setForm((f) => ({ ...f, [field]: value }));
   const toggleAmenity = (a) => setForm((f) => ({
@@ -48,8 +50,9 @@ export default function RegisterPropertyPage() {
     }
     if (step === 1) return form.name && form.category && form.description;
     if (step === 2) return form.county && form.town;
-    if (step === 3) return form.amenities.length > 0;
-    if (step === 4) return form.basePrice;
+    if (step === 3) return true; // Media upload is optional
+    if (step === 4) return form.amenities.length > 0;
+    if (step === 5) return form.basePrice;
     return true;
   };
 
@@ -58,7 +61,16 @@ export default function RegisterPropertyPage() {
     setSubmitting(true);
     setSubmitError("");
     try {
-      const result = await registerTourismProperty(form);
+      const fd = new FormData();
+      Object.entries(form).forEach(([k, v]) => {
+        if (k === "amenities") fd.append("amenities", JSON.stringify(v));
+        else if (Array.isArray(v)) return;
+        else if (v !== undefined && v !== null) fd.append(k, v);
+      });
+      newImages.forEach((file) => fd.append("images", file));
+      newVideos.forEach((file) => fd.append("videos", file));
+
+      const result = await registerTourismProperty(fd);
       if (result.token) {
         setTourismSession(result.token, result.user);
         authLogin(result.token, {
@@ -267,8 +279,68 @@ export default function RegisterPropertyPage() {
               </div>
             )}
 
-            {/* STEP 3 — AMENITIES */}
+            {/* STEP 3 — MEDIA UPLOAD */}
             {step === 3 && (
+              <div>
+                <h2 style={s.formTitle}>📷 Photos & Videos</h2>
+                <p style={s.formSub}>Upload photos and videos of your property to attract more guests. You can upload up to 50 photos and 10 videos.</p>
+
+                <div style={{ marginBottom: "20px" }}>
+                  <label style={s.label}>Photos (up to 50)</label>
+                  <div style={s.uploadBox}>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => setNewImages([...newImages, ...Array.from(e.target.files)])}
+                      style={{ display: "none" }}
+                      id="image-upload"
+                    />
+                    <label htmlFor="image-upload" style={s.uploadBtn}>
+                      <span style={{ fontSize: "32px", marginBottom: "8px" }}>📷</span>
+                      <span style={{ fontWeight: 700 }}>Click to add photos</span>
+                      <span style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>or drag and drop</span>
+                    </label>
+                  </div>
+                  {newImages.length > 0 && (
+                    <div style={{ marginTop: "12px", fontSize: "13px", color: "#16a34a" }}>
+                      ✓ {newImages.length} photo(s) selected
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ marginBottom: "20px" }}>
+                  <label style={s.label}>Videos (up to 10)</label>
+                  <div style={s.uploadBox}>
+                    <input
+                      type="file"
+                      accept="video/*"
+                      multiple
+                      onChange={(e) => setNewVideos([...newVideos, ...Array.from(e.target.files)])}
+                      style={{ display: "none" }}
+                      id="video-upload"
+                    />
+                    <label htmlFor="video-upload" style={s.uploadBtn}>
+                      <span style={{ fontSize: "32px", marginBottom: "8px" }}>🎬</span>
+                      <span style={{ fontWeight: 700 }}>Click to add videos</span>
+                      <span style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>or drag and drop</span>
+                    </label>
+                  </div>
+                  {newVideos.length > 0 && (
+                    <div style={{ marginTop: "12px", fontSize: "13px", color: "#16a34a" }}>
+                      ✓ {newVideos.length} video(s) selected
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "10px", padding: "12px", fontSize: "12px", color: "#166534" }}>
+                  💡 Tip: You can also upload photos and videos later from your dashboard after submitting your property.
+                </div>
+              </div>
+            )}
+
+            {/* STEP 4 — AMENITIES */}
+            {step === 4 && (
               <div>
                 <h2 style={s.formTitle}>✨ Amenities & Features</h2>
                 <p style={s.formSub}>Select everything your property offers — this helps guests discover you</p>
@@ -291,8 +363,8 @@ export default function RegisterPropertyPage() {
               </div>
             )}
 
-            {/* STEP 4 — PRICING & BOOKING URL */}
-            {step === 4 && (
+            {/* STEP 5 — PRICING & BOOKING URL */}
+            {step === 5 && (
               <div>
                 <h2 style={s.formTitle}>💰 Pricing, Rooms & Booking</h2>
                 <p style={s.formSub}>Set your rates and add your existing booking site link</p>
@@ -370,8 +442,8 @@ export default function RegisterPropertyPage() {
               </div>
             )}
 
-            {/* STEP 5 — REVIEW */}
-            {step === 5 && (
+            {/* STEP 6 — REVIEW */}
+            {step === 6 && (
               <div>
                 <h2 style={s.formTitle}>✅ Review & Submit</h2>
                 <p style={s.formSub}>Confirm your details before going live</p>
@@ -473,6 +545,8 @@ const s = {
   amenityBtn: { border: "1px solid #e5e7eb", background: "white", borderRadius: "8px", padding: "10px 12px", fontSize: "13px", cursor: "pointer", fontFamily: "inherit", color: "#4b5563", transition: "all 0.15s", textAlign: "left" },
   amenityActive: { background: "#fef9c3", borderColor: "#fbbf24", color: "#92400e", fontWeight: 700 },
   validationHint: { fontSize: "12px", color: "#dc2626", background: "#fee2e2", padding: "8px 12px", borderRadius: "8px", border: "1px solid #fecaca", marginTop: "8px" },
+  uploadBox: { border: "2px dashed #fbbf24", borderRadius: "12px", padding: "24px", textAlign: "center", background: "#fffbeb", cursor: "pointer" },
+  uploadBtn: { display: "flex", flexDirection: "column", alignItems: "center", cursor: "pointer", color: "#92400e" },
 
   bookingUrlBox: { background: "#f0fdf4", border: "2px solid #bbf7d0", borderRadius: "14px", padding: "18px", marginBottom: "20px" },
   bookingUrlTitle: { fontSize: "14px", fontWeight: 800, color: "#166534", marginBottom: "8px" },

@@ -149,7 +149,7 @@ function App() {
       {/* ── TOURISM ROUTES (have Navbar) ── */}
       {/* IMPORTANT: specific /tourism/* paths must come before /tourism/:id */}
       <Route path="/tourism" element={<PublicLayout><TourismPage /></PublicLayout>} />
-      <Route path="/tourism/login" element={<PublicLayout><TourismLogin /></PublicLayout>} />
+      <Route path="/tourism/login" element={<PublicLayout><Login /></PublicLayout>} />
       <Route path="/tourism/listings" element={<PublicLayout><TourismListingsPage /></PublicLayout>} />
       <Route path="/tourism/register-property" element={<PublicLayout><RegisterPropertyPage /></PublicLayout>} />
       <Route

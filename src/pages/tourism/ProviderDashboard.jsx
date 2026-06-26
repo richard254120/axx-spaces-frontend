@@ -1,7 +1,6 @@
-import { useState, useContext } from "react";
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import { tourismLogin } from "../../api/tourism";
 import { UserProfileEditor, ProfileAvatar } from "../../features/profile";
 import VerificationStatus from "../../components/VerificationStatus";
 import VerificationBadges from "../../components/VerificationBadges";
@@ -13,46 +12,19 @@ import {
   ErrorAlert,
   TOURISM_FONT_CSS,
   tourismTheme,
-  setTourismSession,
-  clearTourismSession,
-  getTourismToken,
   getDisplayName,
 } from "../../features/tourism";
 
 export default function ProviderDashboard() {
   const navigate = useNavigate();
-  const { user: authUser, token, login: authLogin, logout: authLogout } = useContext(AuthContext);
+  const { user: authUser, token, logout: authLogout } = useContext(AuthContext);
   const { profile, loading, error, reload } = useOwnerProfile();
 
-  const [showLogin, setShowLogin] = useState(false);
-  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
-  const [loginLoading, setLoginLoading] = useState(false);
-  const [loginErr, setLoginErr] = useState("");
-
-  const loggedIn = Boolean(token || getTourismToken());
   const user = profile?.user;
   const stats = profile?.stats;
   const listings = profile?.listings || [];
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoginLoading(true);
-    setLoginErr("");
-    try {
-      const res = await tourismLogin(loginForm.email, loginForm.password);
-      setTourismSession(res.token, res.user);
-      authLogin(res.token, res.user);
-      setShowLogin(false);
-      reload();
-    } catch (err) {
-      setLoginErr(err.message);
-    } finally {
-      setLoginLoading(false);
-    }
-  };
-
   const handleLogout = () => {
-    clearTourismSession();
     authLogout("/");
   };
 
@@ -66,6 +38,7 @@ export default function ProviderDashboard() {
 
   const displayName = getDisplayName(user || authUser);
   const avatarUser = user || authUser;
+  const loggedIn = Boolean(token);
 
   return (
     <div style={{ fontFamily: "'DM Sans', sans-serif", display: "flex", minHeight: "100vh", background: tourismTheme.bg }}>
@@ -88,7 +61,7 @@ export default function ProviderDashboard() {
                 </button>
               </>
             ) : (
-              <button type="button" style={iconBtn} onClick={() => setShowLogin(true)} title="Log in" aria-label="Log in">
+              <button type="button" style={iconBtn} onClick={() => navigate("/login?type=landlord")} title="Log in" aria-label="Log in">
                 🔑
               </button>
             )}
@@ -128,7 +101,7 @@ export default function ProviderDashboard() {
               </button>
             </>
           ) : (
-            <button type="button" style={loginLink} onClick={() => setShowLogin(true)}>
+            <button type="button" style={loginLink} onClick={() => navigate("/login?type=landlord")}>
               <span aria-hidden>🔑</span> Log in
             </button>
           )}
@@ -250,57 +223,13 @@ export default function ProviderDashboard() {
         ) : !loggedIn ? (
           <div style={statCard}>
             <p style={{ marginBottom: "16px", color: tourismTheme.muted }}>Sign in to manage your tourism properties.</p>
-            <button type="button" style={primaryBtn} onClick={() => setShowLogin(true)}>🔑 Log in</button>
+            <button type="button" style={primaryBtn} onClick={() => navigate("/login?type=landlord")}>🔑 Log in</button>
             <button type="button" style={{ ...secondaryBtn, marginLeft: "10px" }} onClick={() => navigate("/tourism/register-property")}>
               Register property
             </button>
           </div>
         ) : null}
       </main>
-
-      {showLogin && (
-        <div style={overlay} onClick={() => setShowLogin(false)} role="presentation">
-          <div style={modal} onClick={(e) => e.stopPropagation()} role="dialog" aria-labelledby="login-title">
-            <button type="button" style={modalClose} onClick={() => setShowLogin(false)} aria-label="Close">✕</button>
-            <h2 id="login-title" style={{ fontSize: "20px", fontWeight: 800, marginBottom: "8px" }}>🔑 Log in</h2>
-            <p style={{ fontSize: "13px", color: tourismTheme.muted, marginBottom: "20px" }}>
-              Access your owner dashboard and property listings.
-            </p>
-            <form onSubmit={handleLogin}>
-              <label style={fieldWrap}>
-                <span style={fieldLabel}>Email</span>
-                <input
-                  style={fieldInput}
-                  type="email"
-                  value={loginForm.email}
-                  onChange={(e) => setLoginForm((f) => ({ ...f, email: e.target.value }))}
-                  required
-                />
-              </label>
-              <label style={{ ...fieldWrap, marginTop: "12px" }}>
-                <span style={fieldLabel}>Password</span>
-                <input
-                  style={fieldInput}
-                  type="password"
-                  value={loginForm.password}
-                  onChange={(e) => setLoginForm((f) => ({ ...f, password: e.target.value }))}
-                  required
-                />
-              </label>
-              {loginErr && <p style={{ color: "#dc2626", fontSize: "13px", marginTop: "12px" }}>{loginErr}</p>}
-              <button type="submit" style={{ ...primaryBtn, width: "100%", marginTop: "20px" }} disabled={loginLoading}>
-                {loginLoading ? "Signing in…" : "Sign in"}
-              </button>
-            </form>
-            <p style={{ fontSize: "12px", color: tourismTheme.muted, marginTop: "16px", textAlign: "center" }}>
-              New here?{" "}
-              <button type="button" style={textLink} onClick={() => { setShowLogin(false); navigate("/tourism/register-property"); }}>
-                Register a property
-              </button>
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

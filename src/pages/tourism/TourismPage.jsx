@@ -1,15 +1,10 @@
-import { useState, useContext } from "react";
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import { tourismLogin } from "../../api/tourism";
 import {
   useTourismHome,
   ADVERTISING_PACKAGES,
   DEFAULT_CATEGORIES,
-  setTourismSession,
-  getDisplayName,
-  isTourismLoggedIn,
-  getTourismUser,
 } from "../../features/tourism";
 import SocialMediaLinks from "../../components/SocialMediaLinks";
 
@@ -22,49 +17,11 @@ const categories = DEFAULT_CATEGORIES;
 
 export default function TourismPage() {
   const navigate = useNavigate();
-  const { login: authLogin } = useContext(AuthContext);
-  const [authModal, setAuthModal] = useState(null); // "login" | "register" | "packages"
-  const [authTab, setAuthTab] = useState("login");
-  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
-  const [regForm, setRegForm] = useState({ name: "", email: "", phone: "", password: "", businessName: "" });
-  const [loggedIn, setLoggedIn] = useState(isTourismLoggedIn());
-  const [userName, setUserName] = useState(getDisplayName(getTourismUser()));
-  const [authError, setAuthError] = useState("");
-  const [authLoading, setAuthLoading] = useState(false);
-  const [selectedPkg, setSelectedPkg] = useState(null);
+  const { user } = useContext(AuthContext);
   const [search, setSearch] = useState("");
   const { featured: featuredList, stats: heroStats } = useTourismHome();
 
-  const handleLogin = async () => {
-    if (!loginForm.email || !loginForm.password) return;
-    setAuthLoading(true);
-    setAuthError("");
-    try {
-      const res = await tourismLogin(loginForm.email, loginForm.password);
-      const user = res.user || { name: res.name, email: loginForm.email };
-      setTourismSession(res.token, user);
-      authLogin(res.token, res.user);
-      setLoggedIn(true);
-      setUserName(getDisplayName(user));
-      setAuthModal(null);
-    } catch (err) {
-      setAuthError(err.message);
-    } finally {
-      setAuthLoading(false);
-    }
-  };
-
-  const handleRegister = () => {
-    if (regForm.name && regForm.email && regForm.phone && regForm.password) {
-      setLoggedIn(true);
-      setUserName(regForm.name.split(" ")[0]);
-      setAuthModal("packages");
-    }
-  };
-
   const handleSelectPackage = (pkg) => {
-    setSelectedPkg(pkg);
-    setAuthModal(null);
     navigate("/tourism/register-property");
   };
 
@@ -84,16 +41,16 @@ export default function TourismPage() {
           </div>
           <div style={s.navLinks} className="nav-links">
             <button style={s.navLink} onClick={() => navigate("/tourism/listings")}>Explore</button>
-            <button style={s.navLink} onClick={() => setAuthModal("packages")}>Pricing</button>
-            {loggedIn ? (
+            <button style={s.navLink} onClick={() => navigate("/tourism/listings")}>Pricing</button>
+            {user ? (
               <>
                 <button style={s.navLink} onClick={() => navigate("/tourism/dashboard")}>Dashboard</button>
-                <div style={s.userChip}>👤 {userName}</div>
+                <div style={s.userChip}>👤 {user.name?.split(" ")[0]}</div>
               </>
             ) : (
               <>
-                <button style={s.navLink} onClick={() => { setAuthModal("auth"); setAuthTab("login"); }}>Sign In</button>
-                <button style={s.navBtnPrimary} onClick={() => { setAuthModal("auth"); setAuthTab("register"); }}>
+                <button style={s.navLink} onClick={() => navigate("/login?type=landlord")}>Sign In</button>
+                <button style={s.navBtnPrimary} onClick={() => navigate("/register")}>
                   List Your Property
                 </button>
               </>
@@ -101,10 +58,10 @@ export default function TourismPage() {
           </div>
           {/* Mobile menu */}
           <div className="nav-mobile-btns">
-            {loggedIn ? (
+            {user ? (
               <button style={s.navBtnPrimary} onClick={() => navigate("/tourism/dashboard")}>Dashboard</button>
             ) : (
-              <button style={s.navBtnPrimary} onClick={() => { setAuthModal("auth"); setAuthTab("register"); }}>
+              <button style={s.navBtnPrimary} onClick={() => navigate("/register")}>
                 List Property
               </button>
             )}
@@ -277,7 +234,7 @@ export default function TourismPage() {
             Join 200+ properties already benefiting from AXXSpace's tourism QuickSAles. Start attracting guests today.
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
-            <button style={s.ctaBtn} onClick={() => loggedIn ? navigate("/tourism/register-property") : (setAuthModal("auth"), setAuthTab("register"))}>
+            <button style={s.ctaBtn} onClick={() => user ? navigate("/tourism/register-property") : navigate("/register")}>
               🚀 List Your Property
             </button>
             <button style={s.ctaBtnSecondary} onClick={() => navigate("/tourism/listings")}>
@@ -328,107 +285,6 @@ export default function TourismPage() {
           <span>Nairobi, Kenya 🇰🇪</span>
         </div>
       </footer>
-
-      {/* ── AUTH MODAL ── */}
-      {authModal === "auth" && (
-        <div style={s.modalOverlay} onClick={() => setAuthModal(null)}>
-          <div style={s.modal} onClick={(e) => e.stopPropagation()}>
-            <button style={s.modalClose} onClick={() => setAuthModal(null)}>✕</button>
-            <div style={s.modalLogo}>
-              <span style={s.logoAccent}>AXX</span><span style={{ fontWeight: 800, fontSize: "18px", color: "#1f2937" }}>SPACE</span>
-            </div>
-            <div style={s.authTabs}>
-              <button style={{ ...s.authTab, ...(authTab === "login" ? s.authTabActive : {}) }} onClick={() => setAuthTab("login")}>Sign In</button>
-              <button style={{ ...s.authTab, ...(authTab === "register" ? s.authTabActive : {}) }} onClick={() => setAuthTab("register")}>Create Account</button>
-            </div>
-
-            {authTab === "login" ? (
-              <div>
-                <p style={s.authSub}>Welcome back to AXXSpace Tourism</p>
-                <div style={s.field}>
-                  <label style={s.label}>Email Address</label>
-                  <input style={s.input} type="email" placeholder="you@example.com" value={loginForm.email} onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })} />
-                </div>
-                <div style={s.field}>
-                  <label style={s.label}>Password</label>
-                  <input style={s.input} type="password" placeholder="••••••••" value={loginForm.password} onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })} />
-                </div>
-                {authError && <p style={{ color: "#dc2626", fontSize: "13px", marginBottom: "10px" }}>{authError}</p>}
-                <button style={s.authBtn} onClick={handleLogin} disabled={authLoading}>
-                  {authLoading ? "Signing in…" : "Sign In →"}
-                </button>
-                <p style={s.authSwitch}>No account? <span style={{ color: "#fbbf24", cursor: "pointer", fontWeight: 700 }} onClick={() => setAuthTab("register")}>Register free</span></p>
-              </div>
-            ) : (
-              <div>
-                <p style={s.authSub}>Join Kenya's #1 tourism QuickSAles</p>
-                <div style={s.field}>
-                  <label style={s.label}>Full Name</label>
-                  <input style={s.input} placeholder="Your full name" value={regForm.name} onChange={(e) => setRegForm({ ...regForm, name: e.target.value })} />
-                </div>
-                <div style={s.field}>
-                  <label style={s.label}>Business / Property Name</label>
-                  <input style={s.input} placeholder="e.g. Sunrise Beach Hotel" value={regForm.businessName} onChange={(e) => setRegForm({ ...regForm, businessName: e.target.value })} />
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                  <div style={s.field}>
-                    <label style={s.label}>Email</label>
-                    <input style={s.input} type="email" placeholder="you@example.com" value={regForm.email} onChange={(e) => setRegForm({ ...regForm, email: e.target.value })} />
-                  </div>
-                  <div style={s.field}>
-                    <label style={s.label}>Phone / WhatsApp</label>
-                    <input style={s.input} placeholder="+254 7XX XXX XXX" value={regForm.phone} onChange={(e) => setRegForm({ ...regForm, phone: e.target.value })} />
-                  </div>
-                </div>
-                <div style={s.field}>
-                  <label style={s.label}>Password</label>
-                  <input style={s.input} type="password" placeholder="Create a password" value={regForm.password} onChange={(e) => setRegForm({ ...regForm, password: e.target.value })} />
-                </div>
-                <button style={s.authBtn} onClick={handleRegister}>Create Account & Choose Plan →</button>
-                <p style={s.authSwitch}>Already have an account? <span style={{ color: "#fbbf24", cursor: "pointer", fontWeight: 700 }} onClick={() => setAuthTab("login")}>Sign in</span></p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ── PACKAGES MODAL (post-register) ── */}
-      {authModal === "packages" && (
-        <div style={s.modalOverlay} onClick={() => setAuthModal(null)}>
-          <div style={{ ...s.modal, maxWidth: "780px", padding: "28px 24px" }} onClick={(e) => e.stopPropagation()}>
-            <button style={s.modalClose} onClick={() => setAuthModal(null)}>✕</button>
-            <h2 style={{ fontSize: "20px", fontWeight: 800, color: "#1f2937", marginBottom: "6px" }}>
-              🎉 Account Created! Choose Your Plan
-            </h2>
-            <p style={{ fontSize: "13px", color: "#6b7280", marginBottom: "24px" }}>
-              Select an advertising package to start listing your property on AXXSpace.
-            </p>
-            <div className="pkg-grid-modal">
-              {packages.map((pkg) => (
-                <div key={pkg.name} style={{ ...s.pkgCard, background: "#f9fafb", border: `2px solid ${selectedPkg?.name === pkg.name ? pkg.color : "#e5e7eb"}` }}>
-                  {pkg.popular && <div style={{ ...s.pkgBadge, background: "#fbbf24", color: "#1f2937" }}>⭐ Most Popular</div>}
-                  <div style={{ ...s.pkgName, color: pkg.color }}>{pkg.name}</div>
-                  <div style={s.pkgDuration}>{pkg.duration}</div>
-                  <div style={{ ...s.pkgPriceVal, fontSize: "20px", fontWeight: 800, color: "#1f2937", marginBottom: "12px" }}>
-                    KSh {pkg.price.toLocaleString()}
-                  </div>
-                  {pkg.features.slice(0, 3).map((f) => (
-                    <div key={f} style={{ ...s.pkgFeature, color: "#4b5563" }}>
-                      <span style={{ color: pkg.color, fontWeight: 700, marginRight: "6px" }}>✓</span>{f}
-                    </div>
-                  ))}
-                  <button
-                    style={{ ...s.pkgBtn, marginTop: "14px", background: pkg.color, color: "white", border: "none" }}
-                    onClick={() => handleSelectPackage(pkg)}
-                  >
-                    Select {pkg.name}
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

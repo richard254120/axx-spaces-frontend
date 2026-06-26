@@ -42,7 +42,8 @@ export default function MoverDashboard() {
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileData, setProfileData] = useState({
     county: "", services: [], vehicleType: "", experienceYears: "",
-    phone: "", bio: "",
+    phone: "", bio: "", portfolioImages: [], pricing: {}, insurance: {},
+    teamInfo: {}, specialties: [], serviceAreas: [],
   });
 
   const pendingJobsCount = jobs.filter(j => j.status === "pending").length;
@@ -89,6 +90,12 @@ export default function MoverDashboard() {
       experienceYears: data.experienceYears || user?.experienceYears || "",
       phone: data.phone || user?.phone || "",
       bio: data.bio || "",
+      portfolioImages: data.portfolioImages || [],
+      pricing: data.pricing || { baseRate: 0, rateType: "per_job", minCharge: 0, additionalServices: [] },
+      insurance: data.insurance || { hasInsurance: false, provider: "", coverageAmount: 0, expiryDate: null },
+      teamInfo: data.teamInfo || { teamSize: 1, teamMembers: [] },
+      specialties: data.specialties || [],
+      serviceAreas: data.serviceAreas || [],
     });
   };
 
@@ -167,6 +174,65 @@ export default function MoverDashboard() {
       showError(err.message || "Could not save profile. Try again.");
     } finally {
       setProfileSaving(false);
+    }
+  };
+
+  const handlePortfolioUpload = async (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append("images", files[i]);
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/movers/portfolio`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || "Failed to upload portfolio images");
+      }
+
+      const data = await res.json();
+      setProfileData(prev => ({
+        ...prev,
+        portfolioImages: data.portfolioImages
+      }));
+      showSuccess("Portfolio images uploaded successfully!");
+    } catch (err) {
+      showError(err.message || "Could not upload portfolio images. Try again.");
+    }
+  };
+
+  const handleDeletePortfolioImage = async (index) => {
+    try {
+      const res = await fetch(`${API_BASE}/movers/portfolio/${index}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || "Failed to delete portfolio image");
+      }
+
+      const data = await res.json();
+      setProfileData(prev => ({
+        ...prev,
+        portfolioImages: data.portfolioImages
+      }));
+      showSuccess("Portfolio image deleted successfully!");
+    } catch (err) {
+      showError(err.message || "Could not delete portfolio image. Try again.");
     }
   };
 
@@ -384,6 +450,190 @@ export default function MoverDashboard() {
           <section>
             <VerificationBadges userId={user?._id || user?.id} userType="mover" />
             <AnalyticsDashboard userType="mover" userId={user?._id || user?.id} />
+
+            {/* Portfolio Management */}
+            <div style={styles.profileSection}>
+              <h3 style={styles.sectionTitle}>📸 Portfolio Gallery</h3>
+              <div style={styles.portfolioGrid}>
+                {profileData.portfolioImages && profileData.portfolioImages.length > 0 ? (
+                  profileData.portfolioImages.map((img, index) => (
+                    <div key={index} style={styles.portfolioItem}>
+                      <img src={img} alt={`Portfolio ${index + 1}`} style={styles.portfolioImage} />
+                      <button
+                        onClick={() => handleDeletePortfolioImage(index)}
+                        style={styles.deleteBtn}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <div style={styles.emptyPortfolio}>
+                    <p>No portfolio images yet</p>
+                  </div>
+                )}
+              </div>
+              {profileData.portfolioImages && profileData.portfolioImages.length < 10 && (
+                <div style={styles.uploadSection}>
+                  <input
+                    type="file"
+                    id="portfolio-upload"
+                    multiple
+                    accept="image/*"
+                    onChange={handlePortfolioUpload}
+                    style={{ display: "none" }}
+                  />
+                  <label htmlFor="portfolio-upload" style={styles.uploadBtn}>
+                    + Add Portfolio Images
+                  </label>
+                </div>
+              )}
+            </div>
+
+            {/* Enhanced Profile Fields */}
+            <div style={styles.profileSection}>
+              <h3 style={styles.sectionTitle}>💰 Pricing Information</h3>
+              <div style={styles.fieldGroup}>
+                <label style={styles.fieldLabel}>Base Rate (KES)</label>
+                <input
+                  type="number"
+                  value={profileData.pricing?.baseRate || ""}
+                  onChange={(e) => setProfileData(prev => ({
+                    ...prev,
+                    pricing: { ...prev.pricing, baseRate: parseFloat(e.target.value) || 0 }
+                  }))}
+                  style={styles.fieldInput}
+                />
+              </div>
+              <div style={styles.fieldGroup}>
+                <label style={styles.fieldLabel}>Rate Type</label>
+                <select
+                  value={profileData.pricing?.rateType || "per_job"}
+                  onChange={(e) => setProfileData(prev => ({
+                    ...prev,
+                    pricing: { ...prev.pricing, rateType: e.target.value }
+                  }))}
+                  style={styles.fieldInput}
+                >
+                  <option value="per_job">Per Job</option>
+                  <option value="hourly">Hourly</option>
+                  <option value="per_km">Per Kilometer</option>
+                  <option value="fixed">Fixed Price</option>
+                </select>
+              </div>
+              <div style={styles.fieldGroup}>
+                <label style={styles.fieldLabel}>Minimum Charge (KES)</label>
+                <input
+                  type="number"
+                  value={profileData.pricing?.minCharge || ""}
+                  onChange={(e) => setProfileData(prev => ({
+                    ...prev,
+                    pricing: { ...prev.pricing, minCharge: parseFloat(e.target.value) || 0 }
+                  }))}
+                  style={styles.fieldInput}
+                />
+              </div>
+            </div>
+
+            {/* Insurance Information */}
+            <div style={styles.profileSection}>
+              <h3 style={styles.sectionTitle}>🛡️ Insurance Information</h3>
+              <div style={styles.fieldGroup}>
+                <label style={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={profileData.insurance?.hasInsurance || false}
+                    onChange={(e) => setProfileData(prev => ({
+                      ...prev,
+                      insurance: { ...prev.insurance, hasInsurance: e.target.checked }
+                    }))}
+                    style={styles.checkbox}
+                  />
+                  <span>I have insurance coverage</span>
+                </label>
+              </div>
+              {profileData.insurance?.hasInsurance && (
+                <>
+                  <div style={styles.fieldGroup}>
+                    <label style={styles.fieldLabel}>Insurance Provider</label>
+                    <input
+                      type="text"
+                      value={profileData.insurance?.provider || ""}
+                      onChange={(e) => setProfileData(prev => ({
+                        ...prev,
+                        insurance: { ...prev.insurance, provider: e.target.value }
+                      }))}
+                      style={styles.fieldInput}
+                    />
+                  </div>
+                  <div style={styles.fieldGroup}>
+                    <label style={styles.fieldLabel}>Coverage Amount (KES)</label>
+                    <input
+                      type="number"
+                      value={profileData.insurance?.coverageAmount || ""}
+                      onChange={(e) => setProfileData(prev => ({
+                        ...prev,
+                        insurance: { ...prev.insurance, coverageAmount: parseFloat(e.target.value) || 0 }
+                      }))}
+                      style={styles.fieldInput}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Team Information */}
+            <div style={styles.profileSection}>
+              <h3 style={styles.sectionTitle}>👥 Team Information</h3>
+              <div style={styles.fieldGroup}>
+                <label style={styles.fieldLabel}>Team Size</label>
+                <input
+                  type="number"
+                  value={profileData.teamInfo?.teamSize || 1}
+                  onChange={(e) => setProfileData(prev => ({
+                    ...prev,
+                    teamInfo: { ...prev.teamInfo, teamSize: parseInt(e.target.value) || 1 }
+                  }))}
+                  style={styles.fieldInput}
+                  min="1"
+                />
+              </div>
+            </div>
+
+            {/* Specialties */}
+            <div style={styles.profileSection}>
+              <h3 style={styles.sectionTitle}>⭐ Specialties</h3>
+              <div style={styles.fieldGroup}>
+                <label style={styles.fieldLabel}>Specialties (comma-separated)</label>
+                <textarea
+                  value={(profileData.specialties || []).join(", ")}
+                  onChange={(e) => setProfileData(prev => ({
+                    ...prev,
+                    specialties: e.target.value.split(',').map(s => s.trim()).filter(s => s)
+                  }))}
+                  style={styles.textareaInput}
+                  placeholder="e.g. Piano Moving, Fragile Items, Heavy Lifting"
+                />
+              </div>
+            </div>
+
+            {/* Service Areas */}
+            <div style={styles.profileSection}>
+              <h3 style={styles.sectionTitle}>📍 Service Areas</h3>
+              <div style={styles.fieldGroup}>
+                <label style={styles.fieldLabel}>Service Areas (comma-separated)</label>
+                <textarea
+                  value={(profileData.serviceAreas || []).join(", ")}
+                  onChange={(e) => setProfileData(prev => ({
+                    ...prev,
+                    serviceAreas: e.target.value.split(',').map(s => s.trim()).filter(s => s)
+                  }))}
+                  style={styles.textareaInput}
+                  placeholder="e.g. Nairobi, Kiambu, Nakuru"
+                />
+              </div>
+            </div>
+
             <UserProfileEditor
               token={token}
               user={user}
@@ -391,6 +641,10 @@ export default function MoverDashboard() {
               accentColor="#3b82f6"
               onUpdated={() => fetchProfile()}
             />
+
+            <button onClick={handleSaveProfile} disabled={profileSaving} style={styles.saveBtn}>
+              {profileSaving ? "Saving..." : "💾 Save All Changes"}
+            </button>
           </section>
         )}
       </main>
@@ -700,6 +954,125 @@ const styles = {
   earningService: { fontSize: "15px", fontWeight: 700, color: "#f1f5f9", margin: "0 0 6px" },
   earningDate: { fontSize: "13px", color: "#94a3b8", margin: "0 0 4px" },
   earningAmount: { fontSize: "18px", fontWeight: 800, color: "#22c55e", whiteSpace: "nowrap", letterSpacing: "-0.5px" },
+  profileSection: {
+    background: "linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)",
+    padding: "20px",
+    borderRadius: "16px",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    marginBottom: "20px",
+  },
+  portfolioGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))",
+    gap: "12px",
+    marginBottom: "16px",
+  },
+  portfolioItem: {
+    position: "relative",
+    aspectRatio: "1",
+    borderRadius: "8px",
+    overflow: "hidden",
+  },
+  portfolioImage: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+  },
+  deleteBtn: {
+    position: "absolute",
+    top: "4px",
+    right: "4px",
+    background: "rgba(239, 68, 68, 0.9)",
+    color: "white",
+    border: "none",
+    borderRadius: "50%",
+    width: "24px",
+    height: "24px",
+    cursor: "pointer",
+    fontSize: "12px",
+    fontWeight: "700",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emptyPortfolio: {
+    background: "rgba(15, 23, 42, 0.5)",
+    padding: "40px",
+    borderRadius: "8px",
+    textAlign: "center",
+    color: "#94a3b8",
+    border: "2px dashed rgba(255, 255, 255, 0.1)",
+  },
+  uploadSection: {
+    marginTop: "16px",
+  },
+  uploadBtn: {
+    display: "inline-block",
+    padding: "10px 20px",
+    background: "#3b82f6",
+    color: "white",
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontSize: "14px",
+    fontWeight: "600",
+    border: "none",
+    transition: "all 0.3s ease",
+  },
+  fieldGroup: {
+    marginBottom: "16px",
+  },
+  fieldLabel: {
+    display: "block",
+    fontSize: "12px",
+    fontWeight: "600",
+    color: "#cbd5e1",
+    marginBottom: "6px",
+  },
+  fieldInput: {
+    width: "100%",
+    padding: "10px 12px",
+    background: "rgba(15, 23, 42, 0.8)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderRadius: "8px",
+    color: "white",
+    fontSize: "14px",
+  },
+  textareaInput: {
+    width: "100%",
+    padding: "10px 12px",
+    background: "rgba(15, 23, 42, 0.8)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderRadius: "8px",
+    color: "white",
+    fontSize: "14px",
+    minHeight: "80px",
+    resize: "vertical",
+    fontFamily: "inherit",
+  },
+  checkboxLabel: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    color: "#cbd5e1",
+    cursor: "pointer",
+  },
+  checkbox: {
+    width: "18px",
+    height: "18px",
+    cursor: "pointer",
+  },
+  saveBtn: {
+    width: "100%",
+    padding: "14px",
+    background: "#22c55e",
+    color: "white",
+    border: "none",
+    borderRadius: "10px",
+    fontWeight: "700",
+    cursor: "pointer",
+    marginTop: "20px",
+    fontSize: "16px",
+  },
 };
 
 const mobileCss = `

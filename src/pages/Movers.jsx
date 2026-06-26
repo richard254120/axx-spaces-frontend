@@ -283,7 +283,86 @@ function MoverCard({ m, onBook, featured }) {
       <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 10 }}>
         <Pill featured={featured}>🚗 {m.vehicleType || "Pickup"}</Pill>
         <Pill featured={featured}>⏱ {m.experienceYears || m.experience || 0} yrs</Pill>
+        {m.teamInfo?.teamSize && <Pill featured={featured}>👥 {m.teamInfo.teamSize} team</Pill>}
       </div>
+
+      {/* Pricing Information */}
+      {m.pricing?.baseRate && (
+        <div style={{
+          marginBottom: 10,
+          padding: "8px 12px",
+          background: featured ? "rgba(250, 199, 117, 0.15)" : "rgba(250, 199, 117, 0.08)",
+          borderRadius: "8px",
+          border: featured ? "1px solid rgba(250, 199, 117, 0.4)" : "1px solid rgba(250, 199, 117, 0.2)"
+        }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: featured ? C.amberDark : C.amberMid, marginBottom: 4 }}>
+            💰 Pricing
+          </div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: featured ? "#fff" : C.textPrimary }}>
+            KES {m.pricing.baseRate.toLocaleString()}
+            <span style={{ fontSize: 11, fontWeight: 400, color: featured ? C.navyText : C.textHint, marginLeft: 4 }}>
+              /{m.pricing.rateType?.replace('_', ' ') || 'job'}
+            </span>
+          </div>
+          {m.pricing.minCharge > 0 && (
+            <div style={{ fontSize: 11, color: featured ? C.navyText : C.textHint, marginTop: 2 }}>
+              Min: KES {m.pricing.minCharge.toLocaleString()}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Insurance Badge */}
+      {m.insurance?.hasInsurance && (
+        <div style={{
+          marginBottom: 10,
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "6px 10px",
+          background: featured ? "rgba(29, 158, 117, 0.15)" : "rgba(29, 158, 117, 0.08)",
+          borderRadius: "6px",
+          border: featured ? "1px solid rgba(29, 158, 117, 0.4)" : "1px solid rgba(29, 158, 117, 0.2)"
+        }}>
+          <span style={{ fontSize: 12 }}>🛡️</span>
+          <span style={{ fontSize: 10, fontWeight: 600, color: featured ? C.tealBorder : C.tealDark }}>
+            Insured
+          </span>
+          {m.insurance.provider && (
+            <span style={{ fontSize: 10, color: featured ? C.navyText : C.textHint }}>
+              ({m.insurance.provider})
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Specialties */}
+      {m.specialties && m.specialties.length > 0 && (
+        <div style={{ marginBottom: 10 }}>
+          <div style={{ fontSize: 10, fontWeight: 600, color: featured ? C.navyText : C.textHint, marginBottom: 4 }}>
+            ⭐ Specialties
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+            {m.specialties.slice(0, 3).map(s => (
+              <span key={s} style={{
+                fontSize: 10,
+                padding: "2px 8px",
+                background: featured ? "rgba(251, 191, 36, 0.15)" : "rgba(251, 191, 36, 0.08)",
+                color: featured ? C.amberDark : C.amberMid,
+                borderRadius: "4px",
+                fontWeight: 500
+              }}>
+                {s}
+              </span>
+            ))}
+            {m.specialties.length > 3 && (
+              <span style={{ fontSize: 10, color: featured ? C.navyText : C.textHint }}>
+                +{m.specialties.length - 3} more
+              </span>
+            )}
+          </div>
+        </div>
+      )}
 
       {m.bio && (
         <p style={{ fontSize: 12, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 10px", color: featured ? C.navyText : C.textHint }}>
@@ -295,6 +374,49 @@ function MoverCard({ m, onBook, featured }) {
         <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 14 }}>
           {m.services.slice(0, 3).map(s => <Pill key={s} featured={featured}>{s}</Pill>)}
           {m.services.length > 3 && <Pill featured={featured}>+{m.services.length - 3} more</Pill>}
+        </div>
+      )}
+
+      {/* Portfolio Preview */}
+      {m.portfolioImages && m.portfolioImages.length > 0 && (
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 10, fontWeight: 600, color: featured ? C.navyText : C.textHint, marginBottom: 6 }}>
+            📸 Portfolio
+          </div>
+          <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 4 }}>
+            {m.portfolioImages.slice(0, 3).map((img, idx) => (
+              <img
+                key={idx}
+                src={img}
+                alt={`Portfolio ${idx + 1}`}
+                style={{
+                  width: "60px",
+                  height: "60px",
+                  borderRadius: "6px",
+                  objectFit: "cover",
+                  flexShrink: 0,
+                  border: featured ? "1px solid rgba(255,255,255,0.2)" : "1px solid #E8E6E0"
+                }}
+              />
+            ))}
+            {m.portfolioImages.length > 3 && (
+              <div style={{
+                width: "60px",
+                height: "60px",
+                borderRadius: "6px",
+                background: featured ? "rgba(255,255,255,0.1)" : "#F1EFE8",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 11,
+                fontWeight: 600,
+                color: featured ? C.navyText : C.textHint,
+                flexShrink: 0
+              }}>
+                +{m.portfolioImages.length - 3}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
