@@ -239,16 +239,31 @@ export default function TourismDetailPage() {
           {/* HERO / MEDIA */}
           {(property.images?.length > 0 || property.videos?.length > 0) ? (
             <div style={{ marginBottom: "16px" }}>
-              {property.images?.length > 0 && (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "10px", marginBottom: property.videos?.length ? "12px" : 0 }}>
-                  {property.images.map((url) => (
-                    <img key={url} src={url} alt={property.name} style={{ width: "100%", height: "200px", objectFit: "cover", borderRadius: "12px", border: `1px solid ${property.color}25` }} />
+              {property.videos?.length > 0 && (
+                <div style={{ marginBottom: "16px" }}>
+                  <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#374151", marginBottom: "8px" }}>🎬 Videos</h3>
+                  {property.videos.map((url, idx) => (
+                    <div key={url} style={{ marginBottom: "12px" }}>
+                      <video
+                        src={url}
+                        controls
+                        preload="metadata"
+                        style={{ width: "100%", borderRadius: "12px", maxHeight: "400px", background: "#000" }}
+                      />
+                    </div>
                   ))}
                 </div>
               )}
-              {property.videos?.map((url) => (
-                <video key={url} src={url} controls style={{ width: "100%", maxHeight: "360px", borderRadius: "12px", marginBottom: "8px" }} />
-              ))}
+              {property.images?.length > 0 && (
+                <div>
+                  <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#374151", marginBottom: "8px" }}>📷 Photos</h3>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "10px" }}>
+                    {property.images.map((url) => (
+                      <img key={url} src={url} alt={property.name} style={{ width: "100%", height: "200px", objectFit: "cover", borderRadius: "12px", border: `1px solid ${property.color}25`, cursor: "pointer" }} />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div style={{ ...s.heroImg, background: `linear-gradient(135deg, ${property.color}30, ${property.color}10)`, border: `1px solid ${property.color}25` }}>
