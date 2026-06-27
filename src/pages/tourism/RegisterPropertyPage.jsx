@@ -283,10 +283,10 @@ export default function RegisterPropertyPage() {
             {step === 3 && (
               <div>
                 <h2 style={s.formTitle}>📷 Photos & Videos</h2>
-                <p style={s.formSub}>Upload photos and videos of your property to attract more guests. You can upload up to 50 photos and 10 videos.</p>
+                <p style={s.formSub}>Upload photos and videos of your property to attract more guests. You can upload up to 20 photos and 10 videos.</p>
 
                 <div style={{ marginBottom: "20px" }}>
-                  <label style={s.label}>Photos (up to 50)</label>
+                  <label style={s.label}>Photos (up to 20)</label>
                   <div style={s.uploadBox}>
                     <input
                       type="file"

@@ -336,13 +336,20 @@ export default function TourismLogin() {
     setShowResend(false);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE}/api/auth/login`, {
+      const response = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, role: "landlord" }),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        // If JSON parsing fails, try to get text
+        const text = await response.text();
+        throw new Error(text || "Server returned an invalid response");
+      }
 
       if (!response.ok) {
         if (data.requiresVerification) {

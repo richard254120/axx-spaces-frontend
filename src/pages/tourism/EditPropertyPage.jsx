@@ -159,7 +159,7 @@ export default function EditPropertyPage() {
 
       <form onSubmit={handleSave} style={formCard}>
         <h2 style={sectionTitle}>Photos & videos</h2>
-        <p style={hint}>Upload photos and short videos of your property. Removing media saves when you click Save changes.</p>
+        <p style={hint}>Upload photos and short videos of your property. You can upload up to 20 photos and 10 videos. Removing media saves when you click Save changes.</p>
 
         {currentImages.length > 0 && (
           <div style={mediaGrid}>

@@ -242,16 +242,39 @@ export default function TourismDetailPage() {
               {property.videos?.length > 0 && (
                 <div style={{ marginBottom: "16px" }}>
                   <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#374151", marginBottom: "8px" }}>🎬 Videos</h3>
-                  {property.videos.map((url, idx) => (
-                    <div key={url} style={{ marginBottom: "12px" }}>
-                      <video
-                        src={url}
-                        controls
-                        preload="metadata"
-                        style={{ width: "100%", borderRadius: "12px", maxHeight: "400px", background: "#000" }}
-                      />
-                    </div>
-                  ))}
+                  {property.videos.map((url, idx) => {
+                    // Ensure proper Cloudinary video URL format
+                    let videoUrl = url;
+                    if (url.includes('cloudinary')) {
+                      // Remove any existing transformations and add video-specific ones
+                      const baseUrl = url.split('/upload/')[0] + '/upload/';
+                      const publicId = url.split('/upload/')[1];
+                      videoUrl = baseUrl + 'f_mp4,vc_auto,q_auto/' + publicId;
+                      // Ensure .mp4 extension
+                      if (!videoUrl.endsWith('.mp4')) {
+                        videoUrl += '.mp4';
+                      }
+                    }
+                    return (
+                      <div key={url} style={{ marginBottom: "12px" }}>
+                        <video
+                          key={url}
+                          src={videoUrl}
+                          controls
+                          controlsList="nodownload"
+                          preload="metadata"
+                          playsInline
+                          style={{ width: "100%", borderRadius: "12px", maxHeight: "400px", background: "#000" }}
+                          onError={(e) => {
+                            console.error('Video failed to load:', videoUrl);
+                            e.target.style.display = 'none';
+                          }}
+                        >
+                          Your browser does not support the video tag.
+                        </video>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
               {property.images?.length > 0 && (
