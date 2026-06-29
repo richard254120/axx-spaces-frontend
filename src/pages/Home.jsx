@@ -1520,6 +1520,58 @@ export default function Home() {
   const [fetchError, setFetchError] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [animatedStats, setAnimatedStats] = useState({ listings: 0, counties: 0, tenants: 0 });
+
+  // Mock featured businesses for demo
+  const mockFeaturedBusinesses = [
+    {
+      _id: "mock-1",
+      title: "SwiftMove Movers Kenya",
+      type: "Mover",
+      propertyType: "Professional Moving",
+      images: ["https://images.unsplash.com/photo-1600518464441-9154a4dea21b?w=800&auto=format&fit=crop"],
+      area: "Westlands",
+      county: "Nairobi City",
+      bedrooms: null,
+      bathrooms: null,
+      price: 15000,
+      rating: 4.8,
+      reviews: 124,
+      description: "Professional moving services with 10+ years experience",
+      isBusiness: true
+    },
+    {
+      _id: "mock-2",
+      title: "Safari Lodge Kenya",
+      type: "Tourism",
+      propertyType: "Luxury Accommodation",
+      images: ["https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop"],
+      area: "Maasai Mara",
+      county: "Narok",
+      bedrooms: 4,
+      bathrooms: 3,
+      price: 45000,
+      rating: 4.9,
+      reviews: 89,
+      description: "Luxury safari lodge with stunning views",
+      isBusiness: true
+    },
+    {
+      _id: "mock-3",
+      title: "Prestige Properties Ltd",
+      type: "Real Estate",
+      propertyType: "Property Management",
+      images: ["https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop"],
+      area: "Karen",
+      county: "Nairobi City",
+      bedrooms: null,
+      bathrooms: null,
+      price: 25000,
+      rating: 4.7,
+      reviews: 156,
+      description: "Premium property management services",
+      isBusiness: true
+    }
+  ];
   const [activeCategoryTab, setActiveCategoryTab] = useState("rentals");
   const [reviews, setReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
@@ -1870,81 +1922,52 @@ export default function Home() {
       <section className="featured-section">
         <div className="featured-header">
           <p className="section-eyebrow">Premium Listings</p>
-          <h2 className="section-title">Featured Properties</h2>
-          <p className="section-sub">Verified & boosted properties from trusted landlords</p>
+          <h2 className="section-title">Featured Businesses</h2>
+          <p className="section-sub">Top-rated businesses and services across Kenya</p>
         </div>
 
-        {loadingFeatured ? (
-          <div className="cards-track-wrap">
-            <div className="cards-track" style={{ animation: "none" }}>
-              {[1, 2, 3, 4, 5].map(i => (
-                <div key={i} className="skel-card">
-                  <div className="skel-img"></div>
-                  <div className="skel-body">
-                    <div className="skel-line" style={{ width: "65%" }}></div>
-                    <div className="skel-line" style={{ width: "45%" }}></div>
-                    <div className="skel-line" style={{ width: "55%", height: "18px" }}></div>
-                  </div>
+        <div className="cards-track-wrap">
+          <div className="cards-track">
+            {[...mockFeaturedBusinesses, ...mockFeaturedBusinesses].map((business, idx) => (
+              <div key={`${business._id}-${idx}`} className="feat-card">
+                <div className="feat-img-wrap">
+                  <img
+                    src={business.images?.[0] || ""}
+                    alt={business.title || "Business"}
+                    className="feat-img"
+                    onError={e => { e.target.style.display = "none"; }}
+                  />
+                  <div className="feat-boosted">★ Featured</div>
+                  <div className="feat-type">{business.type}</div>
+                  <div className="feat-img-grad"></div>
                 </div>
-              ))}
-            </div>
-          </div>
-        ) : fetchError ? (
-          <div className="no-feat-wrap">
-            <span className="no-feat-icon">⚠️</span>
-            <p className="no-feat-title">Could Not Load Featured Listings</p>
-            <p className="no-feat-sub">Please refresh in a moment.</p>
-            <button onClick={() => window.location.reload()} className="no-feat-btn">Retry</button>
-          </div>
-        ) : featuredProperties.length > 0 ? (
-          <>
-            <div className="cards-track-wrap">
-              <div className="cards-track">
-                {[...featuredProperties, ...featuredProperties].map((property, idx) => (
-                  <div key={`${property._id}-${idx}`} className="feat-card">
-                    <div className="feat-img-wrap">
-                      <img
-                        src={property.images?.[0] || ""}
-                        alt={property.title || "Property"}
-                        className="feat-img"
-                        onError={e => { e.target.style.display = "none"; }}
-                      />
-                      <div className="feat-boosted">★ Featured</div>
-                      <div className="feat-type">{property.type || "Rental"}</div>
-                      <div className="feat-img-grad"></div>
-                    </div>
-                    <div className="feat-body">
-                      <p className="feat-type-label">{property.propertyType || "Rental"}</p>
-                      <h3 className="feat-title">{property.title}</h3>
-                      <p className="feat-loc">📍 {property.area}, {property.county}</p>
-                      <div className="feat-meta">
-                        {property.bedrooms && <span className="feat-tag">🛏 {property.bedrooms} Bed</span>}
-                        {property.bathrooms && <span className="feat-tag">🚿 {property.bathrooms} Bath</span>}
-                      </div>
-                      <p className="feat-price">
-                        KES {Number(property.price).toLocaleString()}
-                        <span> / month</span>
-                      </p>
-                      <button onClick={() => navigate(`/listings?highlight=${property._id}`)} className="feat-view-btn magical-btn">
-                        View Property →
-                      </button>
-                    </div>
+                <div className="feat-body">
+                  <p className="feat-type-label">{business.propertyType}</p>
+                  <h3 className="feat-title">{business.title}</h3>
+                  <p className="feat-loc">📍 {business.area}, {business.county}</p>
+                  <div className="feat-meta">
+                    {business.rating && <span className="feat-tag">⭐ {business.rating}</span>}
+                    {business.reviews && <span className="feat-tag">� {business.reviews} reviews</span>}
                   </div>
-                ))}
+                  <p className="feat-price">
+                    KES {Number(business.price).toLocaleString()}
+                    <span> / starting</span>
+                  </p>
+                  <button onClick={() => {
+                    if (business.type === "Mover") navigate("/movers");
+                    else if (business.type === "Tourism") navigate("/tourism");
+                    else navigate("/listings");
+                  }} className="feat-view-btn magical-btn">
+                    View {business.type} →
+                  </button>
+                </div>
               </div>
-            </div>
-            <div className="view-all-wrap">
-              <button onClick={() => navigate("/listings")} className="view-all-btn magical-btn">View All Listings →</button>
-            </div>
-          </>
-        ) : (
-          <div className="no-feat-wrap">
-            <span className="no-feat-icon">🏡</span>
-            <p className="no-feat-title">No Featured Listings Yet</p>
-            <p className="no-feat-sub">Boost your property to appear here and reach thousands of tenants!</p>
-            <button onClick={handleListProperty} className="no-feat-btn magical-btn">🚀 Boost Your Property</button>
+            ))}
           </div>
-        )}
+        </div>
+        <div className="view-all-wrap">
+          <button onClick={() => navigate("/listings")} className="view-all-btn magical-btn">View All Listings →</button>
+        </div>
       </section>
 
       {/* ── DEMOGRAPHICS SECTION ── */}
