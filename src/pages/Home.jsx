@@ -1521,55 +1521,41 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [animatedStats, setAnimatedStats] = useState({ listings: 0, counties: 0, tenants: 0 });
 
-  // Mock featured businesses for demo
+  // Mock featured businesses for demo (from AxxBiashara)
   const mockFeaturedBusinesses = [
     {
-      _id: "mock-1",
-      title: "SwiftMove Movers Kenya",
-      type: "Mover",
-      propertyType: "Professional Moving",
-      images: ["https://images.unsplash.com/photo-1600518464441-9154a4dea21b?w=800&auto=format&fit=crop"],
+      _id: "biashara-1",
+      title: "Nairobi Kitchen Restaurant",
+      type: "Business",
+      propertyType: "Restaurants",
+      images: ["https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop"],
       area: "Westlands",
+      county: "Nairobi City",
+      bedrooms: null,
+      bathrooms: null,
+      price: 2500,
+      rating: 4.9,
+      reviews: 342,
+      description: "Authentic Kenyan cuisine with modern twist",
+      isBusiness: true,
+      category: "Restaurants"
+    },
+    {
+      _id: "biashara-2",
+      title: "TechHub Kenya Solutions",
+      type: "Business",
+      propertyType: "Technology",
+      images: ["https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&auto=format&fit=crop"],
+      area: "Upper Hill",
       county: "Nairobi City",
       bedrooms: null,
       bathrooms: null,
       price: 15000,
       rating: 4.8,
-      reviews: 124,
-      description: "Professional moving services with 10+ years experience",
-      isBusiness: true
-    },
-    {
-      _id: "mock-2",
-      title: "Safari Lodge Kenya",
-      type: "Tourism",
-      propertyType: "Luxury Accommodation",
-      images: ["https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop"],
-      area: "Maasai Mara",
-      county: "Narok",
-      bedrooms: 4,
-      bathrooms: 3,
-      price: 45000,
-      rating: 4.9,
-      reviews: 89,
-      description: "Luxury safari lodge with stunning views",
-      isBusiness: true
-    },
-    {
-      _id: "mock-3",
-      title: "Prestige Properties Ltd",
-      type: "Real Estate",
-      propertyType: "Property Management",
-      images: ["https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop"],
-      area: "Karen",
-      county: "Nairobi City",
-      bedrooms: null,
-      bathrooms: null,
-      price: 25000,
-      rating: 4.7,
       reviews: 156,
-      description: "Premium property management services",
-      isBusiness: true
+      description: "IT solutions and digital transformation services",
+      isBusiness: true,
+      category: "Technology"
     }
   ];
   const [activeCategoryTab, setActiveCategoryTab] = useState("rentals");
@@ -1938,27 +1924,23 @@ export default function Home() {
                     onError={e => { e.target.style.display = "none"; }}
                   />
                   <div className="feat-boosted">★ Featured</div>
-                  <div className="feat-type">{business.type}</div>
+                  <div className="feat-type">{business.category || business.propertyType}</div>
                   <div className="feat-img-grad"></div>
                 </div>
                 <div className="feat-body">
-                  <p className="feat-type-label">{business.propertyType}</p>
+                  <p className="feat-type-label">{business.category || business.propertyType}</p>
                   <h3 className="feat-title">{business.title}</h3>
                   <p className="feat-loc">📍 {business.area}, {business.county}</p>
                   <div className="feat-meta">
                     {business.rating && <span className="feat-tag">⭐ {business.rating}</span>}
-                    {business.reviews && <span className="feat-tag">� {business.reviews} reviews</span>}
+                    {business.reviews && <span className="feat-tag">📝 {business.reviews} reviews</span>}
                   </div>
                   <p className="feat-price">
                     KES {Number(business.price).toLocaleString()}
                     <span> / starting</span>
                   </p>
-                  <button onClick={() => {
-                    if (business.type === "Mover") navigate("/movers");
-                    else if (business.type === "Tourism") navigate("/tourism");
-                    else navigate("/listings");
-                  }} className="feat-view-btn magical-btn">
-                    View {business.type} →
+                  <button onClick={() => navigate("/axxbiashara")} className="feat-view-btn magical-btn">
+                    View Business →
                   </button>
                 </div>
               </div>
@@ -1966,7 +1948,7 @@ export default function Home() {
           </div>
         </div>
         <div className="view-all-wrap">
-          <button onClick={() => navigate("/listings")} className="view-all-btn magical-btn">View All Listings →</button>
+          <button onClick={() => navigate("/axxbiashara")} className="view-all-btn magical-btn">View All Businesses →</button>
         </div>
       </section>
 

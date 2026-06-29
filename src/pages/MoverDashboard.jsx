@@ -1105,7 +1105,7 @@ const styles = {
     padding: "4px 8px",
     borderRadius: "4px",
     fontSize: "10px",
-    fontWeight: 700",
+    fontWeight: 700,
     textTransform: "uppercase",
   },
   portfolioDescription: {
