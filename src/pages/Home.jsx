@@ -1516,48 +1516,12 @@ export default function Home() {
 
   const [searchForm, setSearchForm] = useState({ county: "", type: "" });
   const [featuredProperties, setFeaturedProperties] = useState([]);
+  const [featuredBusinesses, setFeaturedBusinesses] = useState([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
+  const [loadingBusinesses, setLoadingBusinesses] = useState(true);
   const [fetchError, setFetchError] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [animatedStats, setAnimatedStats] = useState({ listings: 0, counties: 0, tenants: 0 });
-
-  // Mock featured businesses for demo (from AxxBiashara)
-  const mockFeaturedBusinesses = [
-    {
-      _id: "biashara-1",
-      title: "Nairobi Kitchen Restaurant",
-      type: "Business",
-      propertyType: "Restaurants",
-      images: ["https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop"],
-      area: "Westlands",
-      county: "Nairobi City",
-      bedrooms: null,
-      bathrooms: null,
-      price: 2500,
-      rating: 4.9,
-      reviews: 342,
-      description: "Authentic Kenyan cuisine with modern twist",
-      isBusiness: true,
-      category: "Restaurants"
-    },
-    {
-      _id: "biashara-2",
-      title: "TechHub Kenya Solutions",
-      type: "Business",
-      propertyType: "Technology",
-      images: ["https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&auto=format&fit=crop"],
-      area: "Upper Hill",
-      county: "Nairobi City",
-      bedrooms: null,
-      bathrooms: null,
-      price: 15000,
-      rating: 4.8,
-      reviews: 156,
-      description: "IT solutions and digital transformation services",
-      isBusiness: true,
-      category: "Technology"
-    }
-  ];
   const [activeCategoryTab, setActiveCategoryTab] = useState("rentals");
   const [reviews, setReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
@@ -1687,6 +1651,24 @@ export default function Home() {
       } finally { setLoadingFeatured(false); }
     };
     fetchFeatured().catch(() => setComponentError("Failed to load featured properties"));
+  }, []);
+
+  useEffect(() => {
+    const fetchFeaturedBusinesses = async () => {
+      try {
+        const res = await API.get("/business?featured=true&limit=4&sort=rating", { timeout: 15000 });
+        const data = res?.data;
+        if (data && Array.isArray(data.businesses)) {
+          setFeaturedBusinesses(data.businesses);
+        } else {
+          setFeaturedBusinesses([]);
+        }
+      } catch (err) {
+        console.error("Failed to load featured businesses:", err?.message || err);
+        setFeaturedBusinesses([]);
+      } finally { setLoadingBusinesses(false); }
+    };
+    fetchFeaturedBusinesses();
   }, []);
 
   useEffect(() => {
@@ -1912,41 +1894,63 @@ export default function Home() {
           <p className="section-sub">Top-rated businesses and services across Kenya</p>
         </div>
 
-        <div className="cards-track-wrap">
-          <div className="cards-track">
-            {[...mockFeaturedBusinesses, ...mockFeaturedBusinesses].map((business, idx) => (
-              <div key={`${business._id}-${idx}`} className="feat-card">
-                <div className="feat-img-wrap">
-                  <img
-                    src={business.images?.[0] || ""}
-                    alt={business.title || "Business"}
-                    className="feat-img"
-                    onError={e => { e.target.style.display = "none"; }}
-                  />
-                  <div className="feat-boosted">★ Featured</div>
-                  <div className="feat-type">{business.category || business.propertyType}</div>
-                  <div className="feat-img-grad"></div>
-                </div>
-                <div className="feat-body">
-                  <p className="feat-type-label">{business.category || business.propertyType}</p>
-                  <h3 className="feat-title">{business.title}</h3>
-                  <p className="feat-loc">📍 {business.area}, {business.county}</p>
-                  <div className="feat-meta">
-                    {business.rating && <span className="feat-tag">⭐ {business.rating}</span>}
-                    {business.reviews && <span className="feat-tag">📝 {business.reviews} reviews</span>}
+        {loadingBusinesses ? (
+          <div className="cards-track-wrap">
+            <div className="cards-track" style={{ animation: "none" }}>
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="skel-card">
+                  <div className="skel-img"></div>
+                  <div className="skel-body">
+                    <div className="skel-line" style={{ width: "65%" }}></div>
+                    <div className="skel-line" style={{ width: "45%" }}></div>
+                    <div className="skel-line" style={{ width: "55%", height: "18px" }}></div>
                   </div>
-                  <p className="feat-price">
-                    KES {Number(business.price).toLocaleString()}
-                    <span> / starting</span>
-                  </p>
-                  <button onClick={() => navigate("/axxbiashara")} className="feat-view-btn magical-btn">
-                    View Business →
-                  </button>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        ) : featuredBusinesses.length > 0 ? (
+          <div className="cards-track-wrap">
+            <div className="cards-track">
+              {[...featuredBusinesses, ...featuredBusinesses].map((business, idx) => (
+                <div key={`${business._id}-${idx}`} className="feat-card">
+                  <div className="feat-img-wrap">
+                    <img
+                      src={business.images?.[0] || business.logo || ""}
+                      alt={business.name || "Business"}
+                      className="feat-img"
+                      onError={e => { e.target.style.display = "none"; }}
+                    />
+                    <div className="feat-boosted">★ Featured</div>
+                    <div className="feat-type">{business.categories?.[0] || "Business"}</div>
+                    <div className="feat-img-grad"></div>
+                  </div>
+                  <div className="feat-body">
+                    <p className="feat-type-label">{business.categories?.[0] || "Business"}</p>
+                    <h3 className="feat-title">{business.name}</h3>
+                    <p className="feat-loc">📍 {business.location?.town}, {business.location?.county}</p>
+                    <div className="feat-meta">
+                      {business.rating && <span className="feat-tag">⭐ {business.rating}</span>}
+                      {business.reviewCount && <span className="feat-tag">📝 {business.reviewCount} reviews</span>}
+                    </div>
+                    <p className="feat-price">
+                      {business.priceRange ? business.priceRange : "Contact for pricing"}
+                    </p>
+                    <button onClick={() => navigate(`/axxbiashara?business=${business._id}`)} className="feat-view-btn magical-btn">
+                      View Business →
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="no-feat-wrap">
+            <span className="no-feat-icon">🏪</span>
+            <p className="no-feat-title">No Featured Businesses Yet</p>
+            <p className="no-feat-sub">Businesses approved by admin will appear here</p>
+          </div>
+        )}
         <div className="view-all-wrap">
           <button onClick={() => navigate("/axxbiashara")} className="view-all-btn magical-btn">View All Businesses →</button>
         </div>

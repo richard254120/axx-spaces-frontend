@@ -68,6 +68,9 @@ export default function AdminDashboard() {
   // ── BUSINESSES STATE ───────────────────────────────────────
   const [pendingBusinesses, setPendingBusinesses] = useState([]);
   const [businessesLoading, setBusinessesLoading] = useState(false);
+  const [showFeatureModal, setShowFeatureModal] = useState(false);
+  const [selectedBusinessForFeature, setSelectedBusinessForFeature] = useState(null);
+  const [featureDuration, setFeatureDuration] = useState(30);
 
   // ── ANNOUNCEMENTS STATE ────────────────────────────────────
   const [pendingAnnouncements, setPendingAnnouncements] = useState([]);
@@ -405,6 +408,32 @@ export default function AdminDashboard() {
       alert("✅ Verification badge added successfully");
     } catch (err) {
       alert("❌ Failed to add verification badge");
+    }
+  };
+
+  const handleFeatureBusiness = async () => {
+    try {
+      const featuredUntil = new Date(Date.now() + featureDuration * 24 * 60 * 60 * 1000);
+      await API.patch(`/business/admin/${selectedBusinessForFeature._id}/feature`, {
+        featured: true,
+        featuredUntil
+      });
+      setShowFeatureModal(false);
+      setSelectedBusinessForFeature(null);
+      loadPendingBusinesses();
+      alert("✅ Business featured successfully");
+    } catch (err) {
+      alert("❌ Failed to feature business");
+    }
+  };
+
+  const handleUnfeatureBusiness = async (businessId) => {
+    try {
+      await API.patch(`/business/admin/${businessId}/feature`, { featured: false });
+      loadPendingBusinesses();
+      alert("✅ Business unfeatured successfully");
+    } catch (err) {
+      alert("❌ Failed to unfeature business");
     }
   };
 
@@ -928,6 +957,22 @@ export default function AdminDashboard() {
                       <button className="btn-approve" onClick={() => handleBusinessStatus(business._id, "approved")}>✅ Approve</button>
                       <button className="btn-reject" onClick={() => handleBusinessStatus(business._id, "rejected")}>❌ Reject</button>
                     </div>
+                    {business.status === "approved" && (
+                      <button
+                        className="btn-view"
+                        style={{ marginTop: "10px", width: "100%", background: business.featured ? "#ef4444" : "#fbbf24", color: "#0f1729" }}
+                        onClick={() => {
+                          if (business.featured) {
+                            handleUnfeatureBusiness(business._id);
+                          } else {
+                            setSelectedBusinessForFeature(business);
+                            setShowFeatureModal(true);
+                          }
+                        }}
+                      >
+                        {business.featured ? "🚫 Unfeature" : "⭐ Feature Business"}
+                      </button>
+                    )}
                     <select
                       className="filter-select"
                       style={{ marginTop: "10px", padding: "8px", fontSize: "12px" }}
@@ -1432,6 +1477,76 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* FEATURE BUSINESS MODAL */}
+      {showFeatureModal && selectedBusinessForFeature && (
+        <div className="modal-overlay" onClick={() => setShowFeatureModal(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="modal-title">⭐ Feature Business</h2>
+              <button className="btn-close-modal" onClick={() => setShowFeatureModal(false)}>✕</button>
+            </div>
+            <div className="modal-body">
+              <p style={{ marginBottom: "20px" }}>
+                Feature <strong>{selectedBusinessForFeature.name}</strong> on the homepage?
+              </p>
+              <div style={{ marginBottom: "20px" }}>
+                <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>
+                  Feature Duration (days):
+                </label>
+                <select
+                  value={featureDuration}
+                  onChange={(e) => setFeatureDuration(parseInt(e.target.value))}
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    borderRadius: "8px",
+                    border: "1px solid #e2e8f0",
+                    fontSize: "14px"
+                  }}
+                >
+                  <option value={7}>7 days</option>
+                  <option value={14}>14 days</option>
+                  <option value={30}>30 days</option>
+                  <option value={60}>60 days</option>
+                  <option value={90}>90 days</option>
+                </select>
+              </div>
+              <p style={{ fontSize: "12px", color: "#64748b", marginBottom: "20px" }}>
+                This business will appear in the featured section on the homepage until {new Date(Date.now() + featureDuration * 24 * 60 * 60 * 1000).toLocaleDateString()}
+              </p>
+              <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+                <button
+                  onClick={() => setShowFeatureModal(false)}
+                  style={{
+                    padding: "10px 20px",
+                    borderRadius: "8px",
+                    border: "1px solid #e2e8f0",
+                    background: "white",
+                    cursor: "pointer"
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleFeatureBusiness}
+                  style={{
+                    padding: "10px 20px",
+                    borderRadius: "8px",
+                    border: "none",
+                    background: "#fbbf24",
+                    color: "#0f1729",
+                    fontWeight: "600",
+                    cursor: "pointer"
+                  }}
+                >
+                  ⭐ Feature Business
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
