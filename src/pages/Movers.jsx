@@ -293,13 +293,8 @@ function MoverCard({ m, onBook, featured }) {
       </div>
 
       {/* Availability & Languages */}
-      {(m.availability || (m.languages && m.languages.length > 0)) && (
+      {(m.languages && m.languages.length > 0) && (
         <div style={{ marginBottom: 10 }}>
-          {m.availability && (
-            <div style={{ fontSize: 10, color: featured ? C.navyText : C.textHint, marginBottom: 4 }}>
-              📅 {m.availability}
-            </div>
-          )}
           {m.languages && m.languages.length > 0 && (
             <div style={{ fontSize: 10, color: featured ? C.navyText : C.textHint }}>
               🌐 {m.languages.slice(0, 2).join(', ')}{m.languages.length > 2 ? '...' : ''}
