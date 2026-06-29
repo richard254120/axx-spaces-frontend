@@ -44,6 +44,8 @@ export default function MoverDashboard() {
     county: "", services: [], vehicleType: "", experienceYears: "",
     phone: "", bio: "", portfolioImages: [], pricing: {}, insurance: {},
     teamInfo: {}, specialties: [], serviceAreas: [],
+    equipment: "", workHours: "", uniform: false, safetyGear: false, loadingEquipment: "",
+    portfolioDetails: []
   });
 
   const pendingJobsCount = jobs.filter(j => j.status === "pending").length;
@@ -96,6 +98,12 @@ export default function MoverDashboard() {
       teamInfo: data.teamInfo || { teamSize: 1, teamMembers: [] },
       specialties: data.specialties || [],
       serviceAreas: data.serviceAreas || [],
+      equipment: data.equipment || "",
+      workHours: data.workHours || "",
+      uniform: data.uniform || false,
+      safetyGear: data.safetyGear || false,
+      loadingEquipment: data.loadingEquipment || "",
+      portfolioDetails: data.portfolioDetails || [],
     });
   };
 
@@ -177,6 +185,9 @@ export default function MoverDashboard() {
     }
   };
 
+  const [newPhotoDescriptions, setNewPhotoDescriptions] = useState([]);
+  const [newPhotoCategories, setNewPhotoCategories] = useState([]);
+
   const handlePortfolioUpload = async (e) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -184,6 +195,8 @@ export default function MoverDashboard() {
     const formData = new FormData();
     for (let i = 0; i < files.length; i++) {
       formData.append("images", files[i]);
+      formData.append(`description_${i}`, newPhotoDescriptions[i] || "");
+      formData.append(`category_${i}`, newPhotoCategories[i] || "general");
     }
 
     try {
@@ -203,8 +216,11 @@ export default function MoverDashboard() {
       const data = await res.json();
       setProfileData(prev => ({
         ...prev,
-        portfolioImages: data.portfolioImages
+        portfolioImages: data.portfolioImages,
+        portfolioDetails: data.portfolioDetails || prev.portfolioDetails
       }));
+      setNewPhotoDescriptions([]);
+      setNewPhotoCategories([]);
       showSuccess("Portfolio images uploaded successfully!");
     } catch (err) {
       showError(err.message || "Could not upload portfolio images. Try again.");
@@ -454,19 +470,35 @@ export default function MoverDashboard() {
             {/* Portfolio Management */}
             <div style={styles.profileSection}>
               <h3 style={styles.sectionTitle}>📸 Portfolio Gallery</h3>
+              <p style={{ ...styles.fieldLabel, marginBottom: "12px", fontSize: "12px", color: "#94a3b8" }}>
+                Upload photos of you doing moving activities to build trust with customers
+              </p>
               <div style={styles.portfolioGrid}>
                 {profileData.portfolioImages && profileData.portfolioImages.length > 0 ? (
-                  profileData.portfolioImages.map((img, index) => (
-                    <div key={index} style={styles.portfolioItem}>
-                      <img src={img} alt={`Portfolio ${index + 1}`} style={styles.portfolioImage} />
-                      <button
-                        onClick={() => handleDeletePortfolioImage(index)}
-                        style={styles.deleteBtn}
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ))
+                  profileData.portfolioImages.map((img, index) => {
+                    const detail = profileData.portfolioDetails?.[index] || {};
+                    return (
+                      <div key={index} style={styles.portfolioItemWithDetails}>
+                        <img src={img} alt={`Portfolio ${index + 1}`} style={styles.portfolioImage} />
+                        <button
+                          onClick={() => handleDeletePortfolioImage(index)}
+                          style={styles.deleteBtn}
+                        >
+                          ✕
+                        </button>
+                        {detail.category && (
+                          <div style={styles.portfolioCategory}>
+                            {detail.category.replace('_', ' ').toUpperCase()}
+                          </div>
+                        )}
+                        {detail.description && (
+                          <div style={styles.portfolioDescription}>
+                            {detail.description}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
                 ) : (
                   <div style={styles.emptyPortfolio}>
                     <p>No portfolio images yet</p>
@@ -480,7 +512,14 @@ export default function MoverDashboard() {
                     id="portfolio-upload"
                     multiple
                     accept="image/*"
-                    onChange={handlePortfolioUpload}
+                    onChange={(e) => {
+                      const files = e.target.files;
+                      if (files && files.length > 0) {
+                        setNewPhotoDescriptions(new Array(files.length).fill(""));
+                        setNewPhotoCategories(new Array(files.length).fill("general"));
+                        handlePortfolioUpload(e);
+                      }
+                    }}
                     style={{ display: "none" }}
                   />
                   <label htmlFor="portfolio-upload" style={styles.uploadBtn}>
@@ -631,6 +670,61 @@ export default function MoverDashboard() {
                   style={styles.textareaInput}
                   placeholder="e.g. Nairobi, Kiambu, Nakuru"
                 />
+              </div>
+            </div>
+
+            {/* Equipment & Safety */}
+            <div style={styles.profileSection}>
+              <h3 style={styles.sectionTitle}>🔧 Equipment & Safety</h3>
+              <div style={styles.fieldGroup}>
+                <label style={styles.fieldLabel}>Equipment</label>
+                <textarea
+                  value={profileData.equipment || ""}
+                  onChange={(e) => setProfileData(prev => ({ ...prev, equipment: e.target.value }))}
+                  style={styles.textareaInput}
+                  placeholder="e.g. Dollies, Ramps, Straps, Blankets, Tool Kit"
+                />
+              </div>
+              <div style={styles.fieldGroup}>
+                <label style={styles.fieldLabel}>Loading/Unloading Equipment</label>
+                <textarea
+                  value={profileData.loadingEquipment || ""}
+                  onChange={(e) => setProfileData(prev => ({ ...prev, loadingEquipment: e.target.value }))}
+                  style={styles.textareaInput}
+                  placeholder="e.g. Forklift, Crane, Hand Truck"
+                />
+              </div>
+              <div style={styles.fieldGroup}>
+                <label style={styles.fieldLabel}>Working Hours</label>
+                <input
+                  type="text"
+                  value={profileData.workHours || ""}
+                  onChange={(e) => setProfileData(prev => ({ ...prev, workHours: e.target.value }))}
+                  style={styles.fieldInput}
+                  placeholder="e.g. 6:00 AM - 8:00 PM"
+                />
+              </div>
+              <div style={styles.fieldGroup}>
+                <label style={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={profileData.uniform || false}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, uniform: e.target.checked }))}
+                    style={styles.checkbox}
+                  />
+                  <span>We wear professional uniforms</span>
+                </label>
+              </div>
+              <div style={styles.fieldGroup}>
+                <label style={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={profileData.safetyGear || false}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, safetyGear: e.target.checked }))}
+                    style={styles.checkbox}
+                  />
+                  <span>We use safety gear (gloves, helmets, vests)</span>
+                </label>
               </div>
             </div>
 
@@ -994,6 +1088,36 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+  },
+  portfolioItemWithDetails: {
+    position: "relative",
+    aspectRatio: "1",
+    borderRadius: "8px",
+    overflow: "hidden",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+  },
+  portfolioCategory: {
+    position: "absolute",
+    top: "8px",
+    left: "8px",
+    background: "rgba(251, 191, 36, 0.9)",
+    color: "#0f1729",
+    padding: "4px 8px",
+    borderRadius: "4px",
+    fontSize: "10px",
+    fontWeight: 700",
+    textTransform: "uppercase",
+  },
+  portfolioDescription: {
+    position: "absolute",
+    bottom: "0",
+    left: "0",
+    right: "0",
+    background: "rgba(15, 23, 42, 0.9)",
+    color: "#f1f5f9",
+    padding: "8px",
+    fontSize: "11px",
+    lineHeight: "1.4",
   },
   emptyPortfolio: {
     background: "rgba(15, 23, 42, 0.5)",

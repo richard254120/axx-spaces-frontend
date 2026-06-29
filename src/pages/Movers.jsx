@@ -331,28 +331,47 @@ function MoverCard({ m, onBook, featured }) {
         </div>
       )}
 
-      {/* Work Photos */}
+      {/* Work Photos with Details */}
       {m.workPhotos && m.workPhotos.length > 0 && (
         <div style={{ marginBottom: 10 }}>
           <div style={{ fontSize: 10, fontWeight: 600, color: featured ? C.navyText : C.textHint, marginBottom: 4 }}>
             📷 Work Photos ({m.workPhotos.length})
           </div>
           <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 4 }}>
-            {m.workPhotos.slice(0, 3).map((photo, idx) => (
-              <img
-                key={idx}
-                src={photo}
-                alt={`Work ${idx + 1}`}
-                style={{
-                  width: 60,
-                  height: 60,
-                  objectFit: "cover",
-                  borderRadius: 6,
-                  border: `1px solid ${featured ? "rgba(133,183,235,0.3)" : C.border}`,
-                  flexShrink: 0
-                }}
-              />
-            ))}
+            {m.workPhotos.slice(0, 3).map((photo, idx) => {
+              const photoDetail = m.portfolioDetails?.[idx] || {};
+              return (
+                <div key={idx} style={{ position: "relative", flexShrink: 0 }}>
+                  <img
+                    src={typeof photo === 'string' ? photo : photo.url}
+                    alt={`Work ${idx + 1}`}
+                    style={{
+                      width: 60,
+                      height: 60,
+                      objectFit: "cover",
+                      borderRadius: 6,
+                      border: `1px solid ${featured ? "rgba(133,183,235,0.3)" : C.border}`,
+                    }}
+                  />
+                  {photoDetail.category && (
+                    <div style={{
+                      position: "absolute",
+                      top: 2,
+                      left: 2,
+                      background: featured ? C.amber : C.amberMid,
+                      color: featured ? C.amberDark : "#fff",
+                      fontSize: 8,
+                      fontWeight: 700,
+                      padding: "2px 4px",
+                      borderRadius: 3,
+                      textTransform: "uppercase"
+                    }}>
+                      {photoDetail.category.replace('_', ' ')}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
             {m.workPhotos.length > 3 && (
               <div style={{
                 width: 60,
@@ -421,6 +440,59 @@ function MoverCard({ m, onBook, featured }) {
               ({m.insurance.provider})
             </span>
           )}
+        </div>
+      )}
+
+      {/* Equipment & Safety Badges */}
+      {(m.uniform || m.safetyGear || m.equipment) && (
+        <div style={{ marginBottom: 10 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+            {m.uniform && (
+              <span style={{
+                fontSize: 10,
+                padding: "3px 8px",
+                background: featured ? "rgba(59, 130, 246, 0.15)" : "rgba(59, 130, 246, 0.08)",
+                color: featured ? C.navyText : "#3b82f6",
+                borderRadius: "4px",
+                fontWeight: 600
+              }}>
+                👔 Uniform
+              </span>
+            )}
+            {m.safetyGear && (
+              <span style={{
+                fontSize: 10,
+                padding: "3px 8px",
+                background: featured ? "rgba(34, 197, 94, 0.15)" : "rgba(34, 197, 94, 0.08)",
+                color: featured ? C.tealBorder : C.tealDark,
+                borderRadius: "4px",
+                fontWeight: 600
+              }}>
+                ⛑️ Safety Gear
+              </span>
+            )}
+            {m.equipment && (
+              <span style={{
+                fontSize: 10,
+                padding: "3px 8px",
+                background: featured ? "rgba(251, 191, 36, 0.15)" : "rgba(251, 191, 36, 0.08)",
+                color: featured ? C.amberDark : C.amberMid,
+                borderRadius: "4px",
+                fontWeight: 600
+              }}>
+                🔧 Equipment
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Work Hours */}
+      {m.workHours && (
+        <div style={{ marginBottom: 10 }}>
+          <div style={{ fontSize: 10, color: featured ? C.navyText : C.textHint }}>
+            ⏰ {m.workHours}
+          </div>
         </div>
       )}
 

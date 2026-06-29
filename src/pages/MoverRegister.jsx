@@ -30,7 +30,13 @@ export default function MoverRegister() {
     responseTime: "",
     languages: "",
     certifications: "",
-    workPhotos: []
+    workPhotos: [],
+    equipment: "",
+    workHours: "",
+    uniform: false,
+    safetyGear: false,
+    loadingEquipment: "",
+    photoDescriptions: []
   });
 
   const [loading, setLoading] = useState(false);
@@ -46,16 +52,41 @@ export default function MoverRegister() {
 
   const handlePhotoUpload = (e) => {
     const files = Array.from(e.target.files);
+    const newPhotos = files.map(file => ({
+      file,
+      description: "",
+      category: "general"
+    }));
     setFormData({
       ...formData,
-      workPhotos: [...formData.workPhotos, ...files]
+      workPhotos: [...formData.workPhotos, ...newPhotos],
+      photoDescriptions: [...formData.photoDescriptions, ...new Array(files.length).fill("")]
     });
   };
 
   const removePhoto = (index) => {
     setFormData({
       ...formData,
-      workPhotos: formData.workPhotos.filter((_, i) => i !== index)
+      workPhotos: formData.workPhotos.filter((_, i) => i !== index),
+      photoDescriptions: formData.photoDescriptions.filter((_, i) => i !== index)
+    });
+  };
+
+  const handlePhotoDescriptionChange = (index, description) => {
+    const newDescriptions = [...formData.photoDescriptions];
+    newDescriptions[index] = description;
+    setFormData({
+      ...formData,
+      photoDescriptions: newDescriptions
+    });
+  };
+
+  const handlePhotoCategoryChange = (index, category) => {
+    const newPhotos = [...formData.workPhotos];
+    newPhotos[index] = { ...newPhotos[index], category };
+    setFormData({
+      ...formData,
+      workPhotos: newPhotos
     });
   };
 
@@ -91,10 +122,17 @@ export default function MoverRegister() {
       submissionData.append("responseTime", formData.responseTime);
       submissionData.append("languages", formData.languages);
       submissionData.append("certifications", formData.certifications);
+      submissionData.append("equipment", formData.equipment);
+      submissionData.append("workHours", formData.workHours);
+      submissionData.append("uniform", formData.uniform);
+      submissionData.append("safetyGear", formData.safetyGear);
+      submissionData.append("loadingEquipment", formData.loadingEquipment);
 
-      // Append work photos
-      formData.workPhotos.forEach((photo) => {
-        submissionData.append("workPhotos", photo);
+      // Append work photos with descriptions
+      formData.workPhotos.forEach((photo, index) => {
+        submissionData.append("workPhotos", photo.file || photo);
+        submissionData.append(`photoDescription_${index}`, formData.photoDescriptions[index] || "");
+        submissionData.append(`photoCategory_${index}`, photo.category || "general");
       });
 
       const res = await API.post("/auth/register", submissionData, {
@@ -351,6 +389,15 @@ export default function MoverRegister() {
 
             <input
               type="text"
+              name="workHours"
+              placeholder="Working Hours (e.g. 6:00 AM - 8:00 PM)"
+              value={formData.workHours}
+              onChange={handleChange}
+              style={styles.input}
+            />
+
+            <input
+              type="text"
               name="responseTime"
               placeholder="Response Time (e.g. Within 1 hour)"
               value={formData.responseTime}
@@ -376,10 +423,52 @@ export default function MoverRegister() {
             />
           </div>
 
+          {/* Equipment & Safety */}
+          <div style={styles.section}>
+            <h3 style={styles.sectionTitle}>🔧 Equipment & Safety</h3>
+            <textarea
+              name="equipment"
+              placeholder="Equipment you have (e.g. Dollies, Ramps, Straps, Blankets, Tool Kit)"
+              value={formData.equipment}
+              onChange={handleChange}
+              style={styles.textarea}
+            />
+
+            <textarea
+              name="loadingEquipment"
+              placeholder="Loading/Unloading Equipment (e.g. Forklift, Crane, Hand Truck)"
+              value={formData.loadingEquipment}
+              onChange={handleChange}
+              style={styles.textarea}
+            />
+
+            <label style={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                name="uniform"
+                checked={formData.uniform}
+                onChange={handleChange}
+                style={styles.checkbox}
+              />
+              <span>We wear professional uniforms</span>
+            </label>
+
+            <label style={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                name="safetyGear"
+                checked={formData.safetyGear}
+                onChange={handleChange}
+                style={styles.checkbox}
+              />
+              <span>We use safety gear (gloves, helmets, vests)</span>
+            </label>
+          </div>
+
           {/* Proof of Work */}
           <div style={styles.section}>
-            <h3 style={styles.sectionTitle}>Proof of Work</h3>
-            <p style={styles.hint}>Upload photos of your work to build trust with customers (up to 10 photos)</p>
+            <h3 style={styles.sectionTitle}>📷 Proof of Work</h3>
+            <p style={styles.hint}>Upload photos of you doing moving activities to build trust with customers (up to 10 photos)</p>
 
             <input
               type="file"
@@ -392,9 +481,9 @@ export default function MoverRegister() {
             {formData.workPhotos.length > 0 && (
               <div style={styles.photoPreview}>
                 {formData.workPhotos.map((photo, index) => (
-                  <div key={index} style={styles.photoItem}>
+                  <div key={index} style={styles.photoItemWithDetails}>
                     <img
-                      src={URL.createObjectURL(photo)}
+                      src={URL.createObjectURL(photo.file || photo)}
                       alt={`Work photo ${index + 1}`}
                       style={styles.photoImg}
                     />
@@ -405,6 +494,27 @@ export default function MoverRegister() {
                     >
                       ✕
                     </button>
+                    <div style={styles.photoDetails}>
+                      <select
+                        value={photo.category || "general"}
+                        onChange={(e) => handlePhotoCategoryChange(index, e.target.value)}
+                        style={styles.photoCategorySelect}
+                      >
+                        <option value="general">General Work</option>
+                        <option value="moving">Moving Activity</option>
+                        <option value="team">Team in Action</option>
+                        <option value="equipment">Equipment</option>
+                        <option value="before_after">Before/After</option>
+                        <option value="vehicle">Vehicle</option>
+                      </select>
+                      <input
+                        type="text"
+                        placeholder="Describe this photo..."
+                        value={formData.photoDescriptions[index] || ""}
+                        onChange={(e) => handlePhotoDescriptionChange(index, e.target.value)}
+                        style={styles.photoDescriptionInput}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -568,5 +678,37 @@ const styles = {
     justifyContent: "center",
     fontSize: "14px",
     fontWeight: "bold"
+  },
+  photoItemWithDetails: {
+    position: "relative",
+    width: "100%",
+    borderRadius: "8px",
+    overflow: "hidden",
+    border: "1px solid #475569",
+    marginBottom: "10px"
+  },
+  photoDetails: {
+    padding: "10px",
+    background: "#0f1729",
+    borderTop: "1px solid #475569"
+  },
+  photoCategorySelect: {
+    width: "100%",
+    padding: "8px",
+    marginBottom: "8px",
+    background: "#1e293b",
+    border: "1px solid #475569",
+    borderRadius: "6px",
+    color: "white",
+    fontSize: "12px"
+  },
+  photoDescriptionInput: {
+    width: "100%",
+    padding: "8px",
+    background: "#1e293b",
+    border: "1px solid #475569",
+    borderRadius: "6px",
+    color: "white",
+    fontSize: "12px"
   }
 };
