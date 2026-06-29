@@ -25,7 +25,12 @@ export default function MoverRegister() {
     coverageAmount: "",
     teamSize: "1",
     specialties: "",
-    serviceAreas: ""
+    serviceAreas: "",
+    availability: "",
+    responseTime: "",
+    languages: "",
+    certifications: "",
+    workPhotos: []
   });
 
   const [loading, setLoading] = useState(false);
@@ -39,6 +44,21 @@ export default function MoverRegister() {
     });
   };
 
+  const handlePhotoUpload = (e) => {
+    const files = Array.from(e.target.files);
+    setFormData({
+      ...formData,
+      workPhotos: [...formData.workPhotos, ...files]
+    });
+  };
+
+  const removePhoto = (index) => {
+    setFormData({
+      ...formData,
+      workPhotos: formData.workPhotos.filter((_, i) => i !== index)
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -46,32 +66,40 @@ export default function MoverRegister() {
 
     try {
       // Prepare the data for submission
-      const submissionData = {
-        ...formData,
-        role: "mover",
-        experienceYears: parseInt(formData.experience) || 0,
-        services: formData.services.split(',').map(s => s.trim()).filter(s => s),
-        pricing: {
-          baseRate: parseFloat(formData.baseRate) || 0,
-          rateType: formData.rateType,
-          minCharge: parseFloat(formData.minCharge) || 0,
-          additionalServices: []
-        },
-        insurance: {
-          hasInsurance: formData.hasInsurance,
-          provider: formData.insuranceProvider,
-          coverageAmount: parseFloat(formData.coverageAmount) || 0,
-          expiryDate: null
-        },
-        teamInfo: {
-          teamSize: parseInt(formData.teamSize) || 1,
-          teamMembers: []
-        },
-        specialties: formData.specialties.split(',').map(s => s.trim()).filter(s => s),
-        serviceAreas: formData.serviceAreas.split(',').map(s => s.trim()).filter(s => s)
-      };
+      const submissionData = new FormData();
+      submissionData.append("role", "mover");
+      submissionData.append("name", formData.name);
+      submissionData.append("email", formData.email);
+      submissionData.append("password", formData.password);
+      submissionData.append("phone", formData.phone);
+      submissionData.append("county", formData.county);
+      submissionData.append("services", formData.services);
+      submissionData.append("experience", formData.experience);
+      submissionData.append("company", formData.company);
+      submissionData.append("description", formData.description);
+      submissionData.append("vehicleType", formData.vehicleType);
+      submissionData.append("baseRate", formData.baseRate);
+      submissionData.append("rateType", formData.rateType);
+      submissionData.append("minCharge", formData.minCharge);
+      submissionData.append("hasInsurance", formData.hasInsurance);
+      submissionData.append("insuranceProvider", formData.insuranceProvider);
+      submissionData.append("coverageAmount", formData.coverageAmount);
+      submissionData.append("teamSize", formData.teamSize);
+      submissionData.append("specialties", formData.specialties);
+      submissionData.append("serviceAreas", formData.serviceAreas);
+      submissionData.append("availability", formData.availability);
+      submissionData.append("responseTime", formData.responseTime);
+      submissionData.append("languages", formData.languages);
+      submissionData.append("certifications", formData.certifications);
 
-      const res = await API.post("/auth/register", submissionData);
+      // Append work photos
+      formData.workPhotos.forEach((photo) => {
+        submissionData.append("workPhotos", photo);
+      });
+
+      const res = await API.post("/auth/register", submissionData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
 
       setMessage("✅ Mover registration successful! Please check your email to verify your account.");
       setTimeout(() => {
@@ -309,6 +337,80 @@ export default function MoverRegister() {
             />
           </div>
 
+          {/* Additional Information */}
+          <div style={styles.section}>
+            <h3 style={styles.sectionTitle}>Additional Information</h3>
+            <input
+              type="text"
+              name="availability"
+              placeholder="Availability (e.g. Mon-Sat, 8AM-6PM)"
+              value={formData.availability}
+              onChange={handleChange}
+              style={styles.input}
+            />
+
+            <input
+              type="text"
+              name="responseTime"
+              placeholder="Response Time (e.g. Within 1 hour)"
+              value={formData.responseTime}
+              onChange={handleChange}
+              style={styles.input}
+            />
+
+            <input
+              type="text"
+              name="languages"
+              placeholder="Languages Spoken (comma-separated)"
+              value={formData.languages}
+              onChange={handleChange}
+              style={styles.input}
+            />
+
+            <textarea
+              name="certifications"
+              placeholder="Certifications & Training (comma-separated)"
+              value={formData.certifications}
+              onChange={handleChange}
+              style={styles.textarea}
+            />
+          </div>
+
+          {/* Proof of Work */}
+          <div style={styles.section}>
+            <h3 style={styles.sectionTitle}>Proof of Work</h3>
+            <p style={styles.hint}>Upload photos of your work to build trust with customers (up to 10 photos)</p>
+
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handlePhotoUpload}
+              style={styles.fileInput}
+            />
+
+            {formData.workPhotos.length > 0 && (
+              <div style={styles.photoPreview}>
+                {formData.workPhotos.map((photo, index) => (
+                  <div key={index} style={styles.photoItem}>
+                    <img
+                      src={URL.createObjectURL(photo)}
+                      alt={`Work photo ${index + 1}`}
+                      style={styles.photoImg}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removePhoto(index)}
+                      style={styles.removePhotoBtn}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           <button type="submit" disabled={loading} style={styles.submitBtn}>
             {loading ? "Registering..." : "Register as Mover"}
           </button>
@@ -412,5 +514,59 @@ const styles = {
     padding: "12px",
     borderRadius: "8px",
     fontWeight: "600"
+  },
+  hint: {
+    color: "#94a3b8",
+    fontSize: "0.9rem",
+    marginBottom: "10px"
+  },
+  fileInput: {
+    width: "100%",
+    padding: "12px",
+    margin: "10px 0",
+    background: "#0f1729",
+    border: "1px dashed #475569",
+    borderRadius: "8px",
+    color: "#94a3b8",
+    cursor: "pointer"
+  },
+  photoPreview: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
+    gap: "10px",
+    marginTop: "15px"
+  },
+  photoItem: {
+    position: "relative",
+    width: "100%",
+    paddingBottom: "100%",
+    borderRadius: "8px",
+    overflow: "hidden",
+    border: "1px solid #475569"
+  },
+  photoImg: {
+    position: "absolute",
+    top: "0",
+    left: "0",
+    width: "100%",
+    height: "100%",
+    objectFit: "cover"
+  },
+  removePhotoBtn: {
+    position: "absolute",
+    top: "5px",
+    right: "5px",
+    background: "rgba(220, 38, 38, 0.9)",
+    color: "white",
+    border: "none",
+    borderRadius: "50%",
+    width: "24px",
+    height: "24px",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "14px",
+    fontWeight: "bold"
   }
 };

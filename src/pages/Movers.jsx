@@ -215,6 +215,11 @@ function MoverCard({ m, onBook, featured }) {
             <span style={{ fontSize: 15, fontWeight: 700, color: featured ? "#fff" : C.textPrimary }}>{m.name}</span>
             <VerifiedBadge featured={featured} />
           </div>
+          {m.company && (
+            <div style={{ fontSize: 11, color: featured ? C.navyText : C.textHint, marginBottom: 2 }}>
+              🏢 {m.company}
+            </div>
+          )}
           <div style={{ fontSize: 12, color: featured ? C.navyText : C.textHint, marginBottom: 4 }}>
             📍 {m.county}
           </div>
@@ -284,7 +289,95 @@ function MoverCard({ m, onBook, featured }) {
         <Pill featured={featured}>🚗 {m.vehicleType || "Pickup"}</Pill>
         <Pill featured={featured}>⏱ {m.experienceYears || m.experience || 0} yrs</Pill>
         {m.teamInfo?.teamSize && <Pill featured={featured}>👥 {m.teamInfo.teamSize} team</Pill>}
+        {m.responseTime && <Pill featured={featured}>⚡ {m.responseTime}</Pill>}
       </div>
+
+      {/* Availability & Languages */}
+      {(m.availability || (m.languages && m.languages.length > 0)) && (
+        <div style={{ marginBottom: 10 }}>
+          {m.availability && (
+            <div style={{ fontSize: 10, color: featured ? C.navyText : C.textHint, marginBottom: 4 }}>
+              📅 {m.availability}
+            </div>
+          )}
+          {m.languages && m.languages.length > 0 && (
+            <div style={{ fontSize: 10, color: featured ? C.navyText : C.textHint }}>
+              🌐 {m.languages.slice(0, 2).join(', ')}{m.languages.length > 2 ? '...' : ''}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Certifications */}
+      {m.certifications && m.certifications.length > 0 && (
+        <div style={{ marginBottom: 10 }}>
+          <div style={{ fontSize: 10, fontWeight: 600, color: featured ? C.navyText : C.textHint, marginBottom: 4 }}>
+            📜 Certifications
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+            {m.certifications.slice(0, 2).map((cert, idx) => (
+              <span key={idx} style={{
+                fontSize: 10,
+                padding: "2px 8px",
+                background: featured ? "rgba(29, 158, 117, 0.15)" : "rgba(29, 158, 117, 0.08)",
+                color: featured ? C.tealBorder : C.tealDark,
+                borderRadius: "4px",
+                fontWeight: 500
+              }}>
+                {typeof cert === 'string' ? cert : cert.name}
+              </span>
+            ))}
+            {m.certifications.length > 2 && (
+              <span style={{ fontSize: 10, color: featured ? C.navyText : C.textHint }}>
+                +{m.certifications.length - 2} more
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Work Photos */}
+      {m.workPhotos && m.workPhotos.length > 0 && (
+        <div style={{ marginBottom: 10 }}>
+          <div style={{ fontSize: 10, fontWeight: 600, color: featured ? C.navyText : C.textHint, marginBottom: 4 }}>
+            📷 Work Photos ({m.workPhotos.length})
+          </div>
+          <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 4 }}>
+            {m.workPhotos.slice(0, 3).map((photo, idx) => (
+              <img
+                key={idx}
+                src={photo}
+                alt={`Work ${idx + 1}`}
+                style={{
+                  width: 60,
+                  height: 60,
+                  objectFit: "cover",
+                  borderRadius: 6,
+                  border: `1px solid ${featured ? "rgba(133,183,235,0.3)" : C.border}`,
+                  flexShrink: 0
+                }}
+              />
+            ))}
+            {m.workPhotos.length > 3 && (
+              <div style={{
+                width: 60,
+                height: 60,
+                borderRadius: 6,
+                background: featured ? "rgba(133,183,235,0.15)" : C.page,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 11,
+                color: featured ? C.navyText : C.textHint,
+                flexShrink: 0,
+                border: `1px solid ${featured ? "rgba(133,183,235,0.3)" : C.border}`
+              }}>
+                +{m.workPhotos.length - 3}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Pricing Information */}
       {m.pricing?.baseRate && (

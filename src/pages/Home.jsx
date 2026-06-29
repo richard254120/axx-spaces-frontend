@@ -8,7 +8,6 @@ import moversIcon from "/movers.png";
 import tourismIcon from "/tourism.png";
 import axxbiasharaIcon from "/axxbiashara.png";
 import SocialMediaLinks from "../components/SocialMediaLinks";
-import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
 
 /* ════════════════════════════════════════════════
    DESIGN SYSTEM  — Luxury Real Estate (from Listings.jsx)
@@ -1529,7 +1528,7 @@ export default function Home() {
   const [componentError, setComponentError] = useState(null);
   const [demographics, setDemographics] = useState(null);
   const [loadingDemographics, setLoadingDemographics] = useState(true);
-  const [demoTab, setDemoTab] = useState("map");
+  const [demoTab, setDemoTab] = useState("services");
   const [hoveredService, setHoveredService] = useState(null);
 
   const counties = [
@@ -1960,12 +1959,6 @@ export default function Home() {
           {/* Navigation tabs */}
           <div className="demo-tabs-nav">
             <button
-              onClick={() => setDemoTab("map")}
-              className={`demo-tab-btn ${demoTab === "map" ? "active" : ""}`}
-            >
-              📍 Live Coverage Map
-            </button>
-            <button
               onClick={() => setDemoTab("services")}
               className={`demo-tab-btn ${demoTab === "services" ? "active" : ""}`}
             >
@@ -1986,88 +1979,6 @@ export default function Home() {
             </div>
           ) : demographics ? (
             <div className="demo-content-grid">
-
-              {/* Left Panel: Selected Visual Dashboard Tab */}
-              {demoTab === "map" && (
-                <div className="demo-card">
-                  <h3 className="demo-card-title">📍 Live Platform Activity</h3>
-                  <div className="demo-map-wrap">
-                    <MapContainer
-                      center={[-0.303, 36.08]} // Centered on Nakuru/Central Kenya to fit the country nicely
-                      zoom={6.8}
-                      style={{ width: "100%", height: "100%" }}
-                      zoomControl={true}
-                    >
-                      <TileLayer
-                        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'
-                      />
-                      {demographics.counties && demographics.counties.map((item) => {
-                        const coords = getCountyCoords(item.county);
-                        if (!coords) return null;
-
-                        // Calculate visual radius scaling
-                        const maxCount = Math.max(...demographics.counties.map(c => c.count), 1);
-                        const radius = 10 + Math.sqrt(item.count / maxCount) * 20;
-
-                        return (
-                          <CircleMarker
-                            key={item.county}
-                            center={coords}
-                            radius={radius}
-                            fillColor="#C9A84C"
-                            color="#E2C47A"
-                            weight={1.5}
-                            opacity={0.8}
-                            fillOpacity={0.4}
-                            eventHandlers={{
-                              mouseover: (e) => {
-                                e.target.setStyle({ fillOpacity: 0.7, weight: 2.5 });
-                              },
-                              mouseout: (e) => {
-                                e.target.setStyle({ fillOpacity: 0.4, weight: 1.5 });
-                              }
-                            }}
-                          >
-                            <Popup>
-                              <div style={{ padding: '4px', minWidth: '160px' }}>
-                                <h4 style={{ margin: '0 0 6px', fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '16px', fontWeight: 700, color: '#C9A84C' }}>
-                                  📍 {item.county}
-                                </h4>
-                                <p style={{ margin: '0 0 10px', fontSize: '13px', color: '#f1f5f9', fontWeight: 500 }}>
-                                  Active Listings: <strong style={{ color: '#E2C47A' }}>{item.count}</strong>
-                                </p>
-                                <button
-                                  onClick={() => {
-                                    setSearchForm(prev => ({ ...prev, county: item.county }));
-                                    navigate(`/listings?county=${encodeURIComponent(item.county)}`);
-                                  }}
-                                  style={{
-                                    width: '100%',
-                                    padding: '7px 10px',
-                                    background: 'linear-gradient(135deg, #C9A84C 0%, #E2C47A 100%)',
-                                    color: '#0D1B2A',
-                                    border: 'none',
-                                    borderRadius: '5px',
-                                    fontSize: '11px',
-                                    fontWeight: 700,
-                                    cursor: 'pointer',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.05em',
-                                    boxShadow: '0 4px 10px rgba(201,168,76,0.3)'
-                                  }}
-                                >
-                                  Browse Properties
-                                </button>
-                              </div>
-                            </Popup>
-                          </CircleMarker>
-                        );
-                      })}
-                    </MapContainer>
-                  </div>
-                </div>
-              )}
 
               {demoTab === "services" && (
                 <div className="demo-card">
@@ -2243,7 +2154,7 @@ export default function Home() {
 
               </div>
 
-            </div>
+            </div >
           ) : (
             <div className="demo-card" style={{ textAlign: "center", padding: "80px 28px" }}>
               <span style={{ fontSize: "56px", marginBottom: "16px", display: "block" }}>📊</span>
@@ -2255,14 +2166,14 @@ export default function Home() {
               </p>
             </div>
           )}
-        </div>
-      </section>
+        </div >
+      </section >
 
       {/* ── SERVICE SPOTLIGHT STRIPS ── */}
-      <section className="spotlight-section">
+      < section className="spotlight-section" >
 
         {/* Movers */}
-        <div className="spotlight-strip">
+        < div className="spotlight-strip" >
           <div className="spot-text">
             <span className="spot-badge">
               <img src={moversIcon} alt="Movers" style={{ width: "13px", height: "13px", marginRight: "4px", verticalAlign: "middle" }} />
@@ -2290,7 +2201,7 @@ export default function Home() {
               ))}
             </div>
           </div>
-        </div>
+        </div >
         <div className="strip-divider"></div>
 
         {/* Tourism */}
@@ -2384,10 +2295,10 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </section >
 
       {/* ── TESTIMONIALS ── */}
-      <section className="test-section">
+      < section className="test-section" >
         <div className="section-hdr">
           <p className="section-eyebrow">Social Proof</p>
           <h2 className="section-title">What Our Users Say</h2>
@@ -2435,10 +2346,10 @@ export default function Home() {
         <div style={{ textAlign: "center" }}>
           <button onClick={() => navigate("/leave-review")} className="review-btn">✍️ Leave a Review</button>
         </div>
-      </section>
+      </section >
 
       {/* ── FINAL CTA ── */}
-      <section className="cta-section">
+      < section className="cta-section" >
         <div className="cta-inner">
           <div className="cta-badge">Start Your Journey Today</div>
           <h2 className="cta-title">
@@ -2466,10 +2377,10 @@ export default function Home() {
           </button>
           {!token && <p className="cta-hint">Free to Join — No Credit Card Required</p>}
         </div>
-      </section>
+      </section >
 
       {/* ── FOOTER ── */}
-      <footer className="footer">
+      < footer className="footer" >
         <div className="footer-inner">
           <div className="footer-top">
             <div className="footer-brand">Axx<span>space</span></div>
@@ -2506,36 +2417,38 @@ export default function Home() {
           </div>
           <p className="footer-copy">© 2026 Axxspace · All Rights Reserved</p>
         </div>
-      </footer>
+      </footer >
 
       {/* ── BOOST / SERVICE SELECTION MODAL ── */}
-      {showBoostModal && (
-        <div className="modal-overlay" onClick={() => setShowBoostModal(false)}>
-          <div className="modal-box" onClick={e => e.stopPropagation()}>
-            <button className="modal-close" onClick={() => setShowBoostModal(false)}>✕</button>
-            <h2 className="modal-title">Choose Your Service</h2>
-            <p className="modal-sub">Select the type of service you want to list or boost on Axxspace</p>
-            <div className="modal-services">
-              {[
-                { icon: "🏠", title: "Landlord / Rentals", desc: "List rental properties and boost your listings", bg: `linear-gradient(135deg,${C.gold},${C.goldLight})`, route: "/login" },
-                { icon: "🚛", title: "Mover / Moving Company", desc: "Offer moving services across Kenya", bg: "linear-gradient(135deg,#1E3A5F,#2D5080)", route: "/login?type=mover" },
-                { icon: "🛍️", title: "Seller / QuickSAles", desc: "Sell items in the materials QuickSAles", bg: "linear-gradient(135deg,#0C2A3A,#103A4F)", route: "/seller-login" },
-                { icon: "🏨", title: "Tourism Provider", desc: "List hotels, lodges, and tourism experiences", bg: "linear-gradient(135deg,#1B3A2A,#264D38)", route: "/tourism/login" },
-                { icon: "💼", title: "Business / AxxBiashara", desc: "List professional business services", bg: "linear-gradient(135deg,#2E1B4A,#3D2566)", route: "/business-login" },
-              ].map(svc => (
-                <div key={svc.title} className="modal-svc-card" onClick={() => { setShowBoostModal(false); navigate(svc.route); }}>
-                  <div className="modal-svc-icon" style={{ background: svc.bg }}>{svc.icon}</div>
-                  <div>
-                    <p className="modal-svc-title">{svc.title}</p>
-                    <p className="modal-svc-desc">{svc.desc}</p>
+      {
+        showBoostModal && (
+          <div className="modal-overlay" onClick={() => setShowBoostModal(false)}>
+            <div className="modal-box" onClick={e => e.stopPropagation()}>
+              <button className="modal-close" onClick={() => setShowBoostModal(false)}>✕</button>
+              <h2 className="modal-title">Choose Your Service</h2>
+              <p className="modal-sub">Select the type of service you want to list or boost on Axxspace</p>
+              <div className="modal-services">
+                {[
+                  { icon: "🏠", title: "Landlord / Rentals", desc: "List rental properties and boost your listings", bg: `linear-gradient(135deg,${C.gold},${C.goldLight})`, route: "/login" },
+                  { icon: "🚛", title: "Mover / Moving Company", desc: "Offer moving services across Kenya", bg: "linear-gradient(135deg,#1E3A5F,#2D5080)", route: "/login?type=mover" },
+                  { icon: "🛍️", title: "Seller / QuickSAles", desc: "Sell items in the materials QuickSAles", bg: "linear-gradient(135deg,#0C2A3A,#103A4F)", route: "/seller-login" },
+                  { icon: "🏨", title: "Tourism Provider", desc: "List hotels, lodges, and tourism experiences", bg: "linear-gradient(135deg,#1B3A2A,#264D38)", route: "/tourism/login" },
+                  { icon: "💼", title: "Business / AxxBiashara", desc: "List professional business services", bg: "linear-gradient(135deg,#2E1B4A,#3D2566)", route: "/business-login" },
+                ].map(svc => (
+                  <div key={svc.title} className="modal-svc-card" onClick={() => { setShowBoostModal(false); navigate(svc.route); }}>
+                    <div className="modal-svc-icon" style={{ background: svc.bg }}>{svc.icon}</div>
+                    <div>
+                      <p className="modal-svc-title">{svc.title}</p>
+                      <p className="modal-svc-desc">{svc.desc}</p>
+                    </div>
+                    <span className="modal-arrow">→</span>
                   </div>
-                  <span className="modal-arrow">→</span>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    </div >
   );
 }
