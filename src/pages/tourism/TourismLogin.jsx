@@ -363,10 +363,6 @@ export default function TourismLogin() {
         throw new Error("This login is for tourism providers only");
       }
 
-      if (!data.user.isApproved) {
-        throw new Error("Your account is pending admin approval. Approval typically takes less than 5 hours. Please wait for approval email before logging in.");
-      }
-
       login(data.token, {
         _id: data.user._id,
         name: data.user.name,
