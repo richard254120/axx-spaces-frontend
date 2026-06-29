@@ -413,27 +413,36 @@ export default function AdminDashboard() {
 
   const handleFeatureBusiness = async () => {
     try {
+      console.log("handleFeatureBusiness called");
+      console.log("Selected business:", selectedBusinessForFeature);
+      console.log("Feature duration:", featureDuration);
       const featuredUntil = new Date(Date.now() + featureDuration * 24 * 60 * 60 * 1000);
-      await API.patch(`/business/admin/${selectedBusinessForFeature._id}/feature`, {
+      console.log("Featured until:", featuredUntil);
+      const response = await API.patch(`/business/admin/${selectedBusinessForFeature._id}/feature`, {
         featured: true,
         featuredUntil
       });
+      console.log("Feature response:", response);
       setShowFeatureModal(false);
       setSelectedBusinessForFeature(null);
       loadPendingBusinesses();
       alert("✅ Business featured successfully");
     } catch (err) {
-      alert("❌ Failed to feature business");
+      console.error("Feature error:", err);
+      alert("❌ Failed to feature business: " + (err.response?.data?.error || err.message));
     }
   };
 
   const handleUnfeatureBusiness = async (businessId) => {
     try {
-      await API.patch(`/business/admin/${businessId}/feature`, { featured: false });
+      console.log("handleUnfeatureBusiness called for:", businessId);
+      const response = await API.patch(`/business/admin/${businessId}/feature`, { featured: false });
+      console.log("Unfeature response:", response);
       loadPendingBusinesses();
       alert("✅ Business unfeatured successfully");
     } catch (err) {
-      alert("❌ Failed to unfeature business");
+      console.error("Unfeature error:", err);
+      alert("❌ Failed to unfeature business: " + (err.response?.data?.error || err.message));
     }
   };
 
@@ -960,11 +969,27 @@ export default function AdminDashboard() {
                     {business.status === "approved" && (
                       <button
                         className="btn-view"
-                        style={{ marginTop: "10px", width: "100%", background: business.featured ? "#ef4444" : "#fbbf24", color: "#0f1729" }}
-                        onClick={() => {
+                        style={{
+                          marginTop: "10px",
+                          width: "100%",
+                          background: business.featured ? "#ef4444" : "#fbbf24",
+                          color: "#0f1729",
+                          cursor: "pointer",
+                          pointerEvents: "auto",
+                          zIndex: 10,
+                          position: "relative"
+                        }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          console.log("Feature button clicked for business:", business.name, business._id);
+                          console.log("Business status:", business.status);
+                          console.log("Business featured:", business.featured);
                           if (business.featured) {
+                            console.log("Unfeaturing business");
                             handleUnfeatureBusiness(business._id);
                           } else {
+                            console.log("Opening feature modal");
                             setSelectedBusinessForFeature(business);
                             setShowFeatureModal(true);
                           }
