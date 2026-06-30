@@ -1330,6 +1330,65 @@ export default function BusinessForm() {
               onChange={e => setFormData(prev => ({ ...prev, contact: { ...prev.contact, website: e.target.value } }))}
               placeholder="https://example.com"
             />
+
+            <h2 style={{ ...styles.sectionTitle, marginTop: "30px" }}>Social Media Accounts</h2>
+            <p style={{ fontSize: "13px", color: "#94a3b8", marginBottom: "20px" }}>
+              Add your social media links to help customers connect with your business
+            </p>
+
+            <label style={styles.label}>Facebook</label>
+            <input
+              type="url"
+              style={styles.input}
+              value={formData.socialMedia.facebook}
+              onChange={e => setFormData(prev => ({ ...prev, socialMedia: { ...prev.socialMedia, facebook: e.target.value } }))}
+              placeholder="https://facebook.com/yourbusiness"
+            />
+
+            <label style={styles.label}>Instagram</label>
+            <input
+              type="url"
+              style={styles.input}
+              value={formData.socialMedia.instagram}
+              onChange={e => setFormData(prev => ({ ...prev, socialMedia: { ...prev.socialMedia, instagram: e.target.value } }))}
+              placeholder="https://instagram.com/yourbusiness"
+            />
+
+            <label style={styles.label}>Twitter/X</label>
+            <input
+              type="url"
+              style={styles.input}
+              value={formData.socialMedia.twitter}
+              onChange={e => setFormData(prev => ({ ...prev, socialMedia: { ...prev.socialMedia, twitter: e.target.value } }))}
+              placeholder="https://twitter.com/yourbusiness"
+            />
+
+            <label style={styles.label}>LinkedIn</label>
+            <input
+              type="url"
+              style={styles.input}
+              value={formData.socialMedia.linkedin}
+              onChange={e => setFormData(prev => ({ ...prev, socialMedia: { ...prev.socialMedia, linkedin: e.target.value } }))}
+              placeholder="https://linkedin.com/company/yourbusiness"
+            />
+
+            <label style={styles.label}>TikTok</label>
+            <input
+              type="url"
+              style={styles.input}
+              value={formData.socialMedia.tiktok}
+              onChange={e => setFormData(prev => ({ ...prev, socialMedia: { ...prev.socialMedia, tiktok: e.target.value } }))}
+              placeholder="https://tiktok.com/@yourbusiness"
+            />
+
+            <label style={styles.label}>WhatsApp</label>
+            <input
+              type="url"
+              style={styles.input}
+              value={formData.socialMedia.whatsapp}
+              onChange={e => setFormData(prev => ({ ...prev, socialMedia: { ...prev.socialMedia, whatsapp: e.target.value } }))}
+              placeholder="https://wa.me/254XXXXXXXXXX"
+            />
           </div>
         ) : null}
 
@@ -1675,6 +1734,53 @@ export default function BusinessForm() {
                 <span style={styles.reviewLabel}>Website:</span>
                 <span style={styles.reviewValue}>{formData.contact.website || "Not specified"}</span>
               </div>
+            </div>
+
+            <div style={styles.reviewSection}>
+              <p style={styles.reviewTitle}>Social Media</p>
+              {formData.socialMedia.facebook && (
+                <div style={styles.reviewItem}>
+                  <span style={styles.reviewLabel}>Facebook:</span>
+                  <span style={styles.reviewValue}>✅ Added</span>
+                </div>
+              )}
+              {formData.socialMedia.instagram && (
+                <div style={styles.reviewItem}>
+                  <span style={styles.reviewLabel}>Instagram:</span>
+                  <span style={styles.reviewValue}>✅ Added</span>
+                </div>
+              )}
+              {formData.socialMedia.twitter && (
+                <div style={styles.reviewItem}>
+                  <span style={styles.reviewLabel}>Twitter:</span>
+                  <span style={styles.reviewValue}>✅ Added</span>
+                </div>
+              )}
+              {formData.socialMedia.linkedin && (
+                <div style={styles.reviewItem}>
+                  <span style={styles.reviewLabel}>LinkedIn:</span>
+                  <span style={styles.reviewValue}>✅ Added</span>
+                </div>
+              )}
+              {formData.socialMedia.tiktok && (
+                <div style={styles.reviewItem}>
+                  <span style={styles.reviewLabel}>TikTok:</span>
+                  <span style={styles.reviewValue}>✅ Added</span>
+                </div>
+              )}
+              {formData.socialMedia.whatsapp && (
+                <div style={styles.reviewItem}>
+                  <span style={styles.reviewLabel}>WhatsApp:</span>
+                  <span style={styles.reviewValue}>✅ Added</span>
+                </div>
+              )}
+              {!formData.socialMedia.facebook && !formData.socialMedia.instagram && !formData.socialMedia.twitter &&
+                !formData.socialMedia.linkedin && !formData.socialMedia.tiktok && !formData.socialMedia.whatsapp && (
+                  <div style={styles.reviewItem}>
+                    <span style={styles.reviewLabel}>Social Media:</span>
+                    <span style={styles.reviewValue}>Not specified</span>
+                  </div>
+                )}
             </div>
 
             <div style={styles.reviewSection}>
