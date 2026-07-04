@@ -2000,7 +2000,7 @@ export default function Home() {
                       <span className="feat-tag">🚿 {property.bathrooms} bath</span>
                     </div>
                     <p className="feat-price">KES {property.price?.toLocaleString()}/month</p>
-                    <button onClick={() => navigate(`/listings/${property._id}`)} className="feat-view-btn magical-btn">
+                    <button onClick={() => navigate(`/listings?property=${property._id}`)} className="feat-view-btn magical-btn">
                       View Details →
                     </button>
                   </div>
@@ -2046,7 +2046,7 @@ export default function Home() {
                       <span className="feat-tag">👁️ {material.views || 0} views</span>
                     </div>
                     <p className="feat-price">KES {material.price?.toLocaleString()}</p>
-                    <button onClick={() => navigate(`/materials/${material._id}`)} className="feat-view-btn magical-btn">
+                    <button onClick={() => navigate(`/materials?material=${material._id}`)} className="feat-view-btn magical-btn">
                       View Details →
                     </button>
                   </div>
@@ -2120,8 +2120,8 @@ export default function Home() {
                 <div key={`${mover._id}-${idx}`} className="feat-card">
                   <div className="feat-img-wrap">
                     <img
-                      src={mover.workPhotos?.[0] || mover.profileImage || ""}
-                      alt={mover.name || "Mover"}
+                      src={mover.portfolioImages?.[0] || mover.workPhotos?.[0] || mover.profileImage || ""}
+                      alt={`${mover.name} - Work Photo`}
                       className="feat-img"
                       onError={e => { e.target.style.display = "none"; }}
                     />
@@ -2133,14 +2133,70 @@ export default function Home() {
                     <p className="feat-type-label">Moving Service</p>
                     <h3 className="feat-title">{mover.name}</h3>
                     <p className="feat-loc">📍 {mover.county}</p>
+
+                    {/* Key Features */}
                     <div className="feat-meta">
                       <span className="feat-tag">🚚 {mover.vehicleType || "Various"}</span>
                       <span className="feat-tag">⭐ {mover.experienceYears || 0} years exp</span>
+                      {mover.teamInfo?.teamSize && (
+                        <span className="feat-tag">👥 {mover.teamInfo.teamSize} team</span>
+                      )}
+                      {mover.responseTime && (
+                        <span className="feat-tag">⚡ {mover.responseTime}</span>
+                      )}
                     </div>
+
+                    {/* Safety & Professionalism */}
+                    {(mover.insurance?.hasInsurance || mover.uniform || mover.safetyGear) && (
+                      <div className="feat-meta" style={{ marginTop: "8px" }}>
+                        {mover.insurance?.hasInsurance && (
+                          <span className="feat-tag" style={{ background: "rgba(34, 197, 94, 0.15)", color: "#22c55e", borderColor: "rgba(34, 197, 94, 0.3)" }}>
+                            🛡️ Insured
+                          </span>
+                        )}
+                        {mover.uniform && (
+                          <span className="feat-tag">👔 Uniform</span>
+                        )}
+                        {mover.safetyGear && (
+                          <span className="feat-tag">⛑️ Safety Gear</span>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Specialties */}
+                    {mover.specialties && mover.specialties.length > 0 && (
+                      <div className="feat-meta" style={{ marginTop: "8px" }}>
+                        {mover.specialties.slice(0, 2).map(specialty => (
+                          <span key={specialty} className="feat-tag" style={{ fontSize: "10px" }}>
+                            ⭐ {specialty}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Languages */}
+                    {mover.languages && mover.languages.length > 0 && (
+                      <div style={{ fontSize: "11px", color: "#7A7260", marginTop: "8px" }}>
+                        🌐 {mover.languages.slice(0, 2).join(', ')}{mover.languages.length > 2 ? '...' : ''}
+                      </div>
+                    )}
+
+                    {/* Working Hours */}
+                    {mover.workHours && (
+                      <div style={{ fontSize: "11px", color: "#7A7260", marginTop: "4px" }}>
+                        ⏰ {mover.workHours}
+                      </div>
+                    )}
+
                     <p className="feat-price">
                       {mover.pricing?.baseRate ? `KES ${mover.pricing.baseRate.toLocaleString()}` : "Contact for pricing"}
+                      {mover.pricing?.rateType && (
+                        <span style={{ fontSize: "12px", color: "#7A7260", marginLeft: "4px" }}>
+                          /{mover.pricing.rateType.replace('_', ' ')}
+                        </span>
+                      )}
                     </p>
-                    <button onClick={() => navigate(`/movers/${mover._id}`)} className="feat-view-btn magical-btn">
+                    <button onClick={() => navigate(`/movers?mover=${mover._id}`)} className="feat-view-btn magical-btn">
                       View Details →
                     </button>
                   </div>

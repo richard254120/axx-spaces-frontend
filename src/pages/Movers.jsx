@@ -331,8 +331,70 @@ function MoverCard({ m, onBook, featured }) {
         </div>
       )}
 
-      {/* Work Photos with Details */}
-      {m.workPhotos && m.workPhotos.length > 0 && (
+      {/* Work Photos with Details - Prioritize portfolioImages */}
+      {(m.portfolioImages && m.portfolioImages.length > 0) && (
+        <div style={{ marginBottom: 10 }}>
+          <div style={{ fontSize: 10, fontWeight: 600, color: featured ? C.navyText : C.textHint, marginBottom: 4 }}>
+            📷 Work Photos ({m.portfolioImages.length})
+          </div>
+          <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 4 }}>
+            {m.portfolioImages.slice(0, 3).map((photo, idx) => {
+              const photoDetail = m.portfolioDetails?.[idx] || {};
+              return (
+                <div key={idx} style={{ position: "relative", flexShrink: 0 }}>
+                  <img
+                    src={photo}
+                    alt={`Work ${idx + 1}`}
+                    style={{
+                      width: 60,
+                      height: 60,
+                      objectFit: "cover",
+                      borderRadius: 6,
+                      border: `1px solid ${featured ? "rgba(133,183,235,0.3)" : C.border}`,
+                    }}
+                  />
+                  {photoDetail.category && (
+                    <div style={{
+                      position: "absolute",
+                      top: 2,
+                      left: 2,
+                      background: featured ? C.amber : C.amberMid,
+                      color: featured ? C.amberDark : "#fff",
+                      fontSize: 8,
+                      fontWeight: 700,
+                      padding: "2px 4px",
+                      borderRadius: 3,
+                      textTransform: "uppercase"
+                    }}>
+                      {photoDetail.category.replace('_', ' ')}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            {m.portfolioImages.length > 3 && (
+              <div style={{
+                width: 60,
+                height: 60,
+                borderRadius: 6,
+                background: featured ? "rgba(133,183,235,0.15)" : C.page,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 11,
+                color: featured ? C.navyText : C.textHint,
+                flexShrink: 0,
+                border: `1px solid ${featured ? "rgba(133,183,235,0.3)" : C.border}`
+              }}>
+                +{m.portfolioImages.length - 3}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Fallback to workPhotos if no portfolioImages */}
+      {(!m.portfolioImages || m.portfolioImages.length === 0) && m.workPhotos && m.workPhotos.length > 0 && (
         <div style={{ marginBottom: 10 }}>
           <div style={{ fontSize: 10, fontWeight: 600, color: featured ? C.navyText : C.textHint, marginBottom: 4 }}>
             📷 Work Photos ({m.workPhotos.length})
