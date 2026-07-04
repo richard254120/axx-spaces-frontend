@@ -8,6 +8,7 @@ import moversIcon from "/movers.png";
 import tourismIcon from "/tourism.png";
 import axxbiasharaIcon from "/axxbiashara.png";
 import SocialMediaLinks from "../components/SocialMediaLinks";
+import RequestItemModal from "../components/RequestItemModal";
 
 /* ════════════════════════════════════════════════
    DESIGN SYSTEM  — Luxury Real Estate (from Listings.jsx)
@@ -1523,6 +1524,7 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [animatedStats, setAnimatedStats] = useState({ listings: 0, counties: 0, tenants: 0 });
   const [activeCategoryTab, setActiveCategoryTab] = useState("rentals");
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [showBoostModal, setShowBoostModal] = useState(false);
@@ -1604,6 +1606,14 @@ export default function Home() {
       cta: "Browse QuickSAles", route: "/materials",
       color: "#38BDF8", iconBg: "linear-gradient(135deg,#0C2A3A,#103A4F)",
     },
+    {
+      id: "requests", icon: "🙋", iconType: "emoji",
+      title: "Requests", tagline: "Can't find what you need?",
+      description: "Submit a custom request. Our administrators and verified providers will search across all of AxxSpace to locate it for you!",
+      features: ["Search assistance", "All services covered", "Admin review", "Verified responses"],
+      cta: "Submit Request", route: "#request",
+      color: "#fbbf24", iconBg: "linear-gradient(135deg,#7C5E0D,#B08A27)",
+    },
   ];
 
   const categoryStats = {
@@ -1613,6 +1623,7 @@ export default function Home() {
     tourism: [{ val: "200+", label: "Hotels & Lodges" }, { val: "47", label: "Counties" }, { val: "3,000+", label: "Happy Guests" }],
     axxbiashara: [{ val: "100+", label: "Service Providers" }, { val: "47", label: "Counties" }, { val: "2,000+", label: "Businesses Served" }],
     marketplace: [{ val: "10,000+", label: "Active Listings" }, { val: "47", label: "Counties" }, { val: "5,000+", label: "Happy Users" }],
+    requests: [{ val: "24/7", label: "Admin Assistance" }, { val: "100%", label: "Response Rate" }, { val: "All", label: "Services" }],
   };
 
   /* ── DATA FETCHING ── */
@@ -1817,7 +1828,13 @@ export default function Home() {
           ) : (
             <div style={{ maxWidth: "480px", margin: "0 auto 20px", textAlign: "center" }}>
               <p className="cat-cta-desc">{activeCategory?.description}</p>
-              <button className="cat-cta-btn magical-btn" onClick={() => navigate(activeCategory?.route)}>
+              <button className="cat-cta-btn magical-btn" onClick={() => {
+                if (activeCategoryTab === "requests") {
+                  setIsRequestModalOpen(true);
+                } else {
+                  navigate(activeCategory?.route);
+                }
+              }}>
                 {activeCategory?.cta} →
               </button>
             </div>
@@ -1855,7 +1872,13 @@ export default function Home() {
               key={cat.id}
               className="cat-card"
               style={{ borderTopColor: cat.color, '--glow-color': cat.color === C.gold ? 'rgba(201,168,76,0.22)' : cat.color + '33' }}
-              onClick={() => navigate(cat.route)}
+              onClick={() => {
+                if (cat.id === "requests") {
+                  setIsRequestModalOpen(true);
+                } else {
+                  navigate(cat.route);
+                }
+              }}
             >
               <div className="cat-icon-wrap" style={{ background: cat.iconBg }}>
                 {cat.iconType === "image"
@@ -1876,7 +1899,14 @@ export default function Home() {
               <button
                 className="cat-btn magical-btn"
                 style={{ background: `linear-gradient(135deg,${cat.color},${cat.color}cc)`, color: "#0D1B2A" }}
-                onClick={e => { e.stopPropagation(); navigate(cat.route); }}
+                onClick={e => {
+                  e.stopPropagation();
+                  if (cat.id === "requests") {
+                    setIsRequestModalOpen(true);
+                  } else {
+                    navigate(cat.route);
+                  }
+                }}
               >
 
                 {cat.cta} →
@@ -2458,6 +2488,7 @@ export default function Home() {
           </div>
         )
       }
+      <RequestItemModal isOpen={isRequestModalOpen} onClose={() => setIsRequestModalOpen(false)} />
     </div >
   );
 }

@@ -10,7 +10,7 @@ import { getPricelistUrl, openAdminFile, resolveMediaUrl } from "../utils/fileLi
 import "./AdminDashboard.css";
 
 // ── tiny helpers ──────────────────────────────────────────────
-const TABS = ["overview", "properties", "materials", "tourism", "movers", "sellers", "sold", "payment", "boosts", "businesses", "announcements", "verification"];
+const TABS = ["overview", "properties", "materials", "tourism", "movers", "sellers", "sold", "payment", "boosts", "businesses", "announcements", "verification", "requests"];
 const TAB_LABELS = {
   overview: "📊 Dashboard Overview",
   properties: "🏠 Properties",
@@ -23,7 +23,8 @@ const TAB_LABELS = {
   boosts: "🚀 Payments",
   businesses: "🏪 Businesses",
   announcements: "📢 Announcements",
-  verification: "✓ KYC Verification"
+  verification: "✓ KYC Verification",
+  requests: "🙋 User Requests"
 };
 const STATUS_VIEWS = ["pending", "approved", "rejected"];
 
@@ -82,6 +83,10 @@ export default function AdminDashboard() {
   const [verificationLoading, setVerificationLoading] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
 
+  // ── REQUESTS STATE ──────────────────────────────────────────
+  const [requests, setRequests] = useState([]);
+  const [requestsLoading, setRequestsLoading] = useState(false);
+
   // ── auth guard ─────────────────────────────────────────────
   useEffect(() => {
     if (user?.role !== "admin") { navigate("/login"); return; }
@@ -93,6 +98,7 @@ export default function AdminDashboard() {
     loadPendingBoosts();
     loadAllBoosts();
     loadAllNotifications();
+    loadRequests();
   }, [user, navigate]);
 
   // ── load pending announcements when tab changes ─────────────
@@ -194,6 +200,8 @@ export default function AdminDashboard() {
       loadAllBoosts();
     } else if (activeTab === "businesses") {
       loadPendingBusinesses();
+    } else if (activeTab === "requests") {
+      loadRequests();
     } else if (activeTab !== "payment") {
       loadItems(activeTab, statusView);
       loadViewStats(activeTab);
@@ -484,6 +492,31 @@ export default function AdminDashboard() {
     }
   };
 
+  const loadRequests = async () => {
+    setRequestsLoading(true);
+    try {
+      console.log("Loading user requests...");
+      const res = await API.get("/item-requests/admin");
+      setRequests(res.data.requests || []);
+    } catch (err) {
+      console.error("Failed to load requests:", err);
+    } finally {
+      setRequestsLoading(false);
+    }
+  };
+
+  const handleRequestStatus = async (requestId, status) => {
+    try {
+      await API.patch(`/item-requests/admin/${requestId}/status`, { status });
+      setRequests((prev) =>
+        prev.map((r) => (r._id === requestId ? { ...r, status } : r))
+      );
+      alert(`✅ Request status updated to ${status}`);
+    } catch (err) {
+      alert("❌ Failed to update request status");
+    }
+  };
+
   // ── edit / save ────────────────────────────────────────────
   const openEdit = (item) => { setEditData({ ...item }); setEditMode(true); };
   const saveEdit = async () => {
@@ -621,7 +654,8 @@ export default function AdminDashboard() {
             allPending,
             businesses: stats?.businesses,
             announcements: pendingAnnouncements.length,
-            verification: pendingVerifications.length
+            verification: pendingVerifications.length,
+            requests: requests.length
           }}
           hasPendingBoosts={hasPendingBoosts}
           pendingBoosts={pendingBoosts}
@@ -1206,6 +1240,131 @@ export default function AdminDashboard() {
               ))}
             </div>
           )
+        ) : activeTab === "requests" ? (
+          requestsLoading ? (
+            <div className="loader">
+              <div className="spinner"></div>
+              <p>⏳ Fetching user requests...</p>
+            </div>
+          ) : requests.length === 0 ? (
+            <div className="empty">
+              <p className="empty-text">✅ No custom service requests submitted yet.</p>
+            </div>
+          ) : (
+            <div style={{ width: "100%", overflowX: "auto", background: "rgba(15, 23, 42, 0.8)", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.05)" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", color: "#f1f5f9" }}>
+                <thead>
+                  <tr style={{ background: "rgba(251, 191, 36, 0.1)" }}>
+                    <th style={{ padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" }}>Requester Info</th>
+                    <th style={{ padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" }}>Category</th>
+                    <th style={{ padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" }}>Search Query</th>
+                    <th style={{ padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" }}>Details & Requirements</th>
+                    <th style={{ padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" }}>Status</th>
+                    <th style={{ padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {requests.map((req) => (
+                    <tr key={req._id} style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                      <td style={{ padding: "18px" }}>
+                        <div style={{ fontWeight: 700, fontSize: "16px", marginBottom: "4px" }}>{req.name}</div>
+                        <div style={{ fontSize: "13px", color: "#94a3b8" }}>{req.email}</div>
+                        {req.phone && <div style={{ fontSize: "12px", color: "#94a3b8" }}>📞 {req.phone}</div>}
+                      </td>
+                      <td style={{ padding: "18px" }}>
+                        <span style={{
+                          padding: "4px 8px",
+                          borderRadius: "4px",
+                          fontSize: "12px",
+                          fontWeight: 600,
+                          textTransform: "uppercase",
+                          background: req.serviceType === "rental" ? "rgba(251, 191, 36, 0.15)" : "rgba(30,41,59,0.8)",
+                          color: req.serviceType === "rental" ? "#fbbf24" : "#94a3b8",
+                          border: req.serviceType === "rental" ? "1px solid #fbbf24" : "1px solid #334155"
+                        }}>
+                          {req.serviceType}
+                        </span>
+                      </td>
+                      <td style={{ padding: "18px" }}>
+                        <strong style={{ color: "#f1f5f9" }}>"{req.searchQuery}"</strong>
+                      </td>
+                      <td style={{ padding: "18px" }}>
+                        <div style={{ maxWidth: "300px", whiteSpace: "normal", wordBreak: "break-word", fontSize: "13px", color: "#94a3b8" }}>
+                          {req.details}
+                        </div>
+                      </td>
+                      <td style={{ padding: "18px" }}>
+                        <span style={{
+                          padding: "4px 8px",
+                          borderRadius: "4px",
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          textTransform: "uppercase",
+                          background: req.status === "resolved" ? "rgba(34,197,94,0.15)" : req.status === "contacted" ? "rgba(251,191,36,0.15)" : "rgba(239,68,68,0.15)",
+                          color: req.status === "resolved" ? "#22c55e" : req.status === "contacted" ? "#fbbf24" : "#ef4444",
+                        }}>
+                          {req.status}
+                        </span>
+                      </td>
+                      <td style={{ padding: "18px" }}>
+                        <div style={{ display: "flex", gap: "10px" }}>
+                          {req.status === "pending" && (
+                            <button
+                              onClick={() => handleRequestStatus(req._id, "contacted")}
+                              style={{
+                                background: "#fbbf24",
+                                color: "#000",
+                                border: "none",
+                                padding: "8px 16px",
+                                borderRadius: "8px",
+                                fontWeight: 700,
+                                cursor: "pointer"
+                              }}
+                            >
+                              Contacted
+                            </button>
+                          )}
+                          {req.status !== "resolved" && (
+                            <button
+                              onClick={() => handleRequestStatus(req._id, "resolved")}
+                              style={{
+                                background: "#22c55e",
+                                color: "white",
+                                border: "none",
+                                padding: "8px 16px",
+                                borderRadius: "8px",
+                                fontWeight: 700,
+                                cursor: "pointer"
+                              }}
+                            >
+                              Resolve
+                            </button>
+                          )}
+                          <a
+                            href={`mailto:${req.email}?subject=AxxSpace Request regarding: ${encodeURIComponent(req.searchQuery)}`}
+                            style={{
+                              display: "inline-block",
+                              padding: "8px 16px",
+                              background: "transparent",
+                              color: "#fbbf24",
+                              border: "1px solid #fbbf24",
+                              borderRadius: "8px",
+                              fontSize: "12px",
+                              fontWeight: 700,
+                              textDecoration: "none",
+                              textAlign: "center"
+                            }}
+                          >
+                            ✉️ Email
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )
         ) : loading ? (
           <div className="loader">
             <div className="spinner"></div>
@@ -1279,6 +1438,76 @@ export default function AdminDashboard() {
               <div className="confirm-buttons">
                 <button className="btn-cancel" onClick={() => setDeleteConfirm(null)}>Cancel</button>
                 <button className="btn-confirm-delete" onClick={executeDelete}>🗑️ Delete</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* FEATURE BUSINESS MODAL */}
+        {showFeatureModal && selectedBusinessForFeature && (
+          <div className="modal-overlay" onClick={() => setShowFeatureModal(false)}>
+            <div className="modal" onClick={e => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2 className="modal-title">⭐ Feature Business</h2>
+                <button className="btn-close-modal" onClick={() => setShowFeatureModal(false)}>✕</button>
+              </div>
+              <div className="modal-body">
+                <p style={{ marginBottom: "20px" }}>
+                  Feature <strong>{selectedBusinessForFeature.name}</strong> on the homepage?
+                </p>
+                <div style={{ marginBottom: "20px" }}>
+                  <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>
+                    Feature Duration (days):
+                  </label>
+                  <select
+                    value={featureDuration}
+                    onChange={(e) => setFeatureDuration(parseInt(e.target.value))}
+                    style={{
+                      width: "100%",
+                      padding: "10px",
+                      borderRadius: "8px",
+                      border: "1px solid #e2e8f0",
+                      fontSize: "14px"
+                    }}
+                  >
+                    <option value={7}>7 days</option>
+                    <option value={14}>14 days</option>
+                    <option value={30}>30 days</option>
+                    <option value={60}>60 days</option>
+                    <option value={90}>90 days</option>
+                  </select>
+                </div>
+                <p style={{ fontSize: "12px", color: "#64748b", marginBottom: "20px" }}>
+                  This business will appear in the featured section on the homepage until {new Date(Date.now() + featureDuration * 24 * 60 * 60 * 1000).toLocaleDateString()}
+                </p>
+                <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+                  <button
+                    onClick={() => setShowFeatureModal(false)}
+                    style={{
+                      padding: "10px 20px",
+                      borderRadius: "8px",
+                      border: "1px solid #e2e8f0",
+                      background: "white",
+                      cursor: "pointer"
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleFeatureBusiness}
+                    style={{
+                      padding: "10px 20px",
+                      borderRadius: "8px",
+                      border: "none",
+                      background: "#fbbf24",
+                      color: "#0f1729",
+                      fontWeight: "600",
+                      cursor: "pointer"
+                    }}
+                  >
+                    ⭐ Feature Business
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -1502,76 +1731,6 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
               </div>
             </div>
           ))}
-        </div>
-      )}
-
-      {/* FEATURE BUSINESS MODAL */}
-      {showFeatureModal && selectedBusinessForFeature && (
-        <div className="modal-overlay" onClick={() => setShowFeatureModal(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2 className="modal-title">⭐ Feature Business</h2>
-              <button className="btn-close-modal" onClick={() => setShowFeatureModal(false)}>✕</button>
-            </div>
-            <div className="modal-body">
-              <p style={{ marginBottom: "20px" }}>
-                Feature <strong>{selectedBusinessForFeature.name}</strong> on the homepage?
-              </p>
-              <div style={{ marginBottom: "20px" }}>
-                <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>
-                  Feature Duration (days):
-                </label>
-                <select
-                  value={featureDuration}
-                  onChange={(e) => setFeatureDuration(parseInt(e.target.value))}
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #e2e8f0",
-                    fontSize: "14px"
-                  }}
-                >
-                  <option value={7}>7 days</option>
-                  <option value={14}>14 days</option>
-                  <option value={30}>30 days</option>
-                  <option value={60}>60 days</option>
-                  <option value={90}>90 days</option>
-                </select>
-              </div>
-              <p style={{ fontSize: "12px", color: "#64748b", marginBottom: "20px" }}>
-                This business will appear in the featured section on the homepage until {new Date(Date.now() + featureDuration * 24 * 60 * 60 * 1000).toLocaleDateString()}
-              </p>
-              <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
-                <button
-                  onClick={() => setShowFeatureModal(false)}
-                  style={{
-                    padding: "10px 20px",
-                    borderRadius: "8px",
-                    border: "1px solid #e2e8f0",
-                    background: "white",
-                    cursor: "pointer"
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleFeatureBusiness}
-                  style={{
-                    padding: "10px 20px",
-                    borderRadius: "8px",
-                    border: "none",
-                    background: "#fbbf24",
-                    color: "#0f1729",
-                    fontWeight: "600",
-                    cursor: "pointer"
-                  }}
-                >
-                  ⭐ Feature Business
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
       )}
     </div>

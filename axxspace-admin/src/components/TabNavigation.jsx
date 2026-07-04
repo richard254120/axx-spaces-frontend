@@ -11,7 +11,8 @@ export default function TabNavigation({ tabs, activeTab, setActiveTab, pendingCo
     boosts: "🚀 Payments",
     businesses: "🏪 Businesses",
     announcements: "📢 Announcements",
-    verification: "✓ KYC Verification"
+    verification: "✓ KYC Verification",
+    requests: "🙋 User Requests"
   };
 
   const getPendingCount = (tab) => {
@@ -23,6 +24,9 @@ export default function TabNavigation({ tabs, activeTab, setActiveTab, pendingCo
     }
     if (tab === "verification") {
       return pendingCounts?.verification > 0 ? ` (${pendingCounts.verification})` : "";
+    }
+    if (tab === "requests") {
+      return pendingCounts?.requests > 0 ? ` (${pendingCounts.requests})` : "";
     }
     if (!pendingCounts?.allPending) return "";
     const map = { properties: "properties", materials: "materials", tourism: "tourism", movers: "movers", sellers: "sellers" };

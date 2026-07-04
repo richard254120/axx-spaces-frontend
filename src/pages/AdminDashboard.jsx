@@ -43,6 +43,10 @@ export default function AdminDashboard() {
   const [usersLoading, setUsersLoading] = useState(false);
   // END ADDED
 
+  // ADDED: requests tab state
+  const [requests, setRequests] = useState([]);
+  const [requestsLoading, setRequestsLoading] = useState(false);
+
   useEffect(() => {
     // Security check: ensure only admins can stay on this page
     if (user?.role !== "admin") {
@@ -52,6 +56,7 @@ export default function AdminDashboard() {
     loadStats();
     loadAllPending();
     loadMpesaConfig();
+    loadRequests();
   }, []);
 
   // ADDED: load pending payments when tab is selected
@@ -81,6 +86,13 @@ export default function AdminDashboard() {
     if (activeTab === "users") {
       console.log("Loading users...");
       loadUsers();
+    }
+  }, [activeTab]);
+
+  // ADDED: load requests when tab is selected
+  useEffect(() => {
+    if (activeTab === "requests") {
+      loadRequests();
     }
   }, [activeTab]);
 
@@ -216,6 +228,31 @@ export default function AdminDashboard() {
     }
   };
   // END ADDED
+
+  const loadRequests = async () => {
+    setRequestsLoading(true);
+    try {
+      console.log("Loading user requests...");
+      const res = await API.get("/item-requests/admin");
+      setRequests(res.data.requests || []);
+    } catch (err) {
+      console.error("Failed to load requests:", err);
+    } finally {
+      setRequestsLoading(false);
+    }
+  };
+
+  const handleRequestStatus = async (requestId, status) => {
+    try {
+      await API.patch(`/item-requests/admin/${requestId}/status`, { status });
+      setRequests((prev) =>
+        prev.map((r) => (r._id === requestId ? { ...r, status } : r))
+      );
+      alert(`✅ Request status updated to ${status}`);
+    } catch (err) {
+      alert("❌ Failed to update request status");
+    }
+  };
 
   const loadMpesaConfig = async () => {
     try {
@@ -446,6 +483,13 @@ export default function AdminDashboard() {
           👥 Users {users.length > 0 ? `(${users.length})` : ""}
         </button>
         {/* END ADDED */}
+        {/* ADDED: Requests tab button */}
+        <button
+          style={{ ...styles.tab, ...(activeTab === "requests" ? styles.tabActive : {}) }}
+          onClick={() => setActiveTab("requests")}
+        >
+          🙋 Requests {requests.length > 0 ? `(${requests.length})` : ""}
+        </button>
         {/* Verification tab button */}
         <button
           style={{ ...styles.tab, ...(activeTab === "verification" ? styles.tabActive : {}) }}
@@ -1118,6 +1162,117 @@ export default function AdminDashboard() {
           </div>
         )
         // END ADDED
+      ) : activeTab === "requests" ? (
+        requestsLoading ? (
+          <div style={styles.loader}>⏳ Fetching user requests...</div>
+        ) : requests.length === 0 ? (
+          <div style={styles.emptyCard}>
+            <p style={styles.emptyText}>✅ No custom service requests submitted yet.</p>
+          </div>
+        ) : (
+          <div style={styles.tableContainer}>
+            <table style={styles.table}>
+              <thead>
+                <tr style={styles.theadRow}>
+                  <th style={styles.th}>Requester Info</th>
+                  <th style={styles.th}>Category</th>
+                  <th style={styles.th}>Search Query</th>
+                  <th style={styles.th}>Details & Requirements</th>
+                  <th style={styles.th}>Status</th>
+                  <th style={styles.th}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {requests.map((req) => (
+                  <tr key={req._id} style={styles.tr}>
+                    <td style={styles.td}>
+                      <div style={styles.propTitle}>{req.name}</div>
+                      <div style={styles.propLoc}>{req.email}</div>
+                      {req.phone && <div style={{ fontSize: "12px", color: "#94a3b8" }}>📞 {req.phone}</div>}
+                    </td>
+                    <td style={styles.td}>
+                      <span style={{
+                        padding: "4px 8px",
+                        borderRadius: "4px",
+                        fontSize: "12px",
+                        fontWeight: 600,
+                        textTransform: "uppercase",
+                        background: req.serviceType === "rental" ? "rgba(251, 191, 36, 0.15)" : "rgba(30,41,59,0.8)",
+                        color: req.serviceType === "rental" ? "#fbbf24" : "#94a3b8",
+                        border: req.serviceType === "rental" ? "1px solid #fbbf24" : "1px solid #334155"
+                      }}>
+                        {req.serviceType}
+                      </span>
+                    </td>
+                    <td style={styles.td}>
+                      <strong style={{ color: "#f1f5f9" }}>"{req.searchQuery}"</strong>
+                    </td>
+                    <td style={styles.td}>
+                      <div style={{ maxWidth: "300px", whiteSpace: "normal", wordBreak: "break-word", fontSize: "13px", color: "#94a3b8" }}>
+                        {req.details}
+                      </div>
+                    </td>
+                    <td style={styles.td}>
+                      <span style={{
+                        padding: "4px 8px",
+                        borderRadius: "4px",
+                        fontSize: "11px",
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        background: req.status === "resolved" ? "rgba(34,197,94,0.15)" : req.status === "contacted" ? "rgba(251,191,36,0.15)" : "rgba(239,68,68,0.15)",
+                        color: req.status === "resolved" ? "#22c55e" : req.status === "contacted" ? "#fbbf24" : "#ef4444",
+                      }}>
+                        {req.status}
+                      </span>
+                    </td>
+                    <td style={styles.td}>
+                      <div style={styles.btnGroup}>
+                        {req.status === "pending" && (
+                          <button
+                            onClick={() => handleRequestStatus(req._id, "contacted")}
+                            style={{
+                              ...styles.approveBtn,
+                              background: "#fbbf24",
+                              color: "#000",
+                              borderColor: "#fbbf24"
+                            }}
+                          >
+                            Contacted
+                          </button>
+                        )}
+                        {req.status !== "resolved" && (
+                          <button
+                            onClick={() => handleRequestStatus(req._id, "resolved")}
+                            style={styles.approveBtn}
+                          >
+                            Resolve
+                          </button>
+                        )}
+                        <a
+                          href={`mailto:${req.email}?subject=AxxSpace Request regarding: ${encodeURIComponent(req.searchQuery)}`}
+                          style={{
+                            display: "inline-block",
+                            padding: "8px 16px",
+                            background: "transparent",
+                            color: "#fbbf24",
+                            border: "1px solid #fbbf24",
+                            borderRadius: "8px",
+                            fontSize: "12px",
+                            fontWeight: 700,
+                            textDecoration: "none",
+                            textAlign: "center"
+                          }}
+                        >
+                          ✉️ Email
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
       ) : null}
     </div>
   );

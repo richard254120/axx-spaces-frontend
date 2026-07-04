@@ -4,6 +4,7 @@ import API from "../api/api";
 import { COLORS, buttonStyles, inputStyles, pageStyles, cardStyles } from "../styles/theme";
 import { useAuth } from "../context/AuthContext";
 import PhoneInput from "../components/PhoneInput";
+import RequestItemModal from "../components/RequestItemModal";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -31,6 +32,9 @@ const COUNTIES = [
 export default function MaterialsMarketplace() {
   const navigate = useNavigate();
   const { user, token } = useAuth();
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+  const [modalQuery, setModalQuery] = useState("");
+  const [modalService, setModalService] = useState("material");
 
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -395,9 +399,28 @@ export default function MaterialsMarketplace() {
             <p style={styles.emptyText}>
               Try adjusting your filters or check back later for new listings
             </p>
-            <button onClick={clearFilters} style={styles.clearBtn}>
-              Clear Filters
-            </button>
+            <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "16px" }}>
+              <button onClick={clearFilters} style={styles.clearBtn}>
+                Clear Filters
+              </button>
+              <button
+                onClick={() => {
+                  setModalQuery(filters.search || "");
+                  setModalService("material");
+                  setIsRequestModalOpen(true);
+                }}
+                style={{
+                  ...buttonStyles.primary,
+                  padding: "10px 20px",
+                  borderRadius: "8px",
+                  fontWeight: 700,
+                  fontSize: "14px",
+                  cursor: "pointer",
+                }}
+              >
+                🙋 Submit Custom Request
+              </button>
+            </div>
           </div>
         ) : (
           <>
@@ -720,7 +743,12 @@ export default function MaterialsMarketplace() {
             </div>
           </div>
         </div>
-      )}
+      <RequestItemModal
+        isOpen={isRequestModalOpen}
+        onClose={() => setIsRequestModalOpen(false)}
+        initialQuery={modalQuery}
+        defaultService={modalService}
+      />
     </div>
   );
 }

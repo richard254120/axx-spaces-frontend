@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import ReviewsSection from "../components/ReviewsSection";
 import RecentlyViewed, { trackView } from "../components/RecentlyViewed";
+import RequestItemModal from "../components/RequestItemModal";
 import ShareProperty from "../components/ShareProperty";
 import MapView from "../components/MapView";
 import MessagingSystem from "../components/MessagingSystem";
@@ -22,6 +23,9 @@ const formatKenyaPhone = (phone) => {
 
 export default function Listings() {
   const { user, token } = useAuth();
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+  const [modalQuery, setModalQuery] = useState("");
+  const [modalService, setModalService] = useState("rental");
   const [properties, setProperties] = useState([]);
   const [filteredProperties, setFilteredProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -492,6 +496,30 @@ export default function Listings() {
             <div style={S.emptyIcon}>🔍</div>
             <p style={S.emptyTitle}>No properties match your search</p>
             <p style={S.emptySub}>Try adjusting your filters to broaden your results</p>
+            <button
+              onClick={() => {
+                setModalQuery(filters.location || "");
+                setModalService("rental");
+                setIsRequestModalOpen(true);
+              }}
+              style={{
+                marginTop: "16px",
+                padding: "12px 24px",
+                background: "linear-gradient(135deg, #C9A84C 0%, #E2C47A 100%)",
+                border: "none",
+                borderRadius: "6px",
+                color: "#0D1B2A",
+                fontWeight: 700,
+                fontSize: "13px",
+                cursor: "pointer",
+                textTransform: "uppercase",
+                letterSpacing: "0.06em",
+                boxShadow: "0 4px 15px rgba(201, 168, 76, 0.25)",
+                transition: "all 0.2s",
+              }}
+            >
+              🙋 Submit Custom Request
+            </button>
           </div>
         )}
 
@@ -512,7 +540,7 @@ export default function Listings() {
 
         {/* ── PROPERTY GRID (show when NOT in university hostels mode, OR when university is selected) ── */}
         {(!showUniversityHostels || selectedUniversity) && displayProperties.length > 0 && (
-          <div style={S.grid}>
+          <div className="properties-grid">
             {displayProperties.map((property, i) => (
               <article key={property._id} style={S.card} className="prop-card" onClick={() => openModal(property)}>
                 {/* Image */}
@@ -786,6 +814,13 @@ export default function Listings() {
           </div>
         </div>
       )}
+
+      <RequestItemModal
+        isOpen={isRequestModalOpen}
+        onClose={() => setIsRequestModalOpen(false)}
+        initialQuery={modalQuery}
+        defaultService={modalService}
+      />
     </div>
   );
 }
@@ -922,20 +957,27 @@ const S = {
   emptySub: { color: C.textMid, fontSize: "0.9rem", margin: 0 },
 
   /* Property Grid */
-  grid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" },
-  "@media (max-width: 768px)": { grid: { gap: "16px" } },
-  "@media (max-width: 480px)": { grid: { gap: "12px" } },
-  "@media (max-width: 380px)": { grid: { gap: "8px" } },
-  card: { background: C.navyMid, border: `1px solid ${C.border}`, borderRadius: "14px", overflow: "hidden", cursor: "pointer", transition: "all 0.3s ease", display: "flex", flexDirection: "column", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" },
+  card: {
+    background: "rgba(22, 34, 51, 0.45)",
+    border: `1px solid ${C.border}`,
+    borderRadius: "16px",
+    overflow: "hidden",
+    cursor: "pointer",
+    transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+    display: "flex",
+    flexDirection: "column",
+    boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
+    backdropFilter: "blur(12px)",
+  },
 
   cardImg: { position: "relative", aspectRatio: "1/1", overflow: "hidden", background: C.navyLight, flexShrink: 0 },
-  cardImgEl: { width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.5s ease" },
+  cardImgEl: { width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)" },
   cardImgFallback: { display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: C.textDim, fontSize: "0.9rem" },
   cardImgGrad: { position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(13,27,42,0.7) 0%, transparent 50%)", pointerEvents: "none" },
 
-  availBadge: { position: "absolute", top: "14px", left: "14px", padding: "5px 12px", borderRadius: "20px", fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.04em" },
-  availBadgeGreen: { background: "rgba(76,175,116,0.9)", color: "#fff" },
-  availBadgeRed: { background: "rgba(224,82,82,0.9)", color: "#fff" },
+  availBadge: { position: "absolute", top: "14px", left: "14px", padding: "6px 14px", borderRadius: "20px", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.04em", backdropFilter: "blur(6px)", boxShadow: "0 4px 12px rgba(0,0,0,0.15)" },
+  availBadgeGreen: { background: "rgba(76,175,116,0.85)", color: "#fff", border: "1px solid rgba(76,175,116,0.2)" },
+  availBadgeRed: { background: "rgba(224,82,82,0.85)", color: "#fff", border: "1px solid rgba(224,82,82,0.2)" },
   photoBadge: { position: "absolute", bottom: "12px", right: "12px", background: "rgba(13,27,42,0.75)", color: C.textMid, padding: "4px 10px", borderRadius: "5px", fontSize: "0.75rem", backdropFilter: "blur(6px)" },
   favBtn: { position: "absolute", top: "14px", right: "14px", background: "rgba(13,27,42,0.7)", border: "none", color: C.gold, width: "36px", height: "36px", borderRadius: "50%", cursor: "pointer", fontSize: "1.1rem", display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(6px)", transition: "all 0.2s" },
 
@@ -1069,8 +1111,35 @@ const css = `
     to { background-position: 200% center; }
   }
 
-  .prop-card:hover { transform: translateY(-5px); box-shadow: 0 20px 50px rgba(0,0,0,0.35), 0 0 0 1px rgba(201,168,76,0.3); }
-  .prop-card:hover .card-img-el { transform: scale(1.05); }
+  .properties-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+    margin-top: 10px;
+  }
+  @media (max-width: 768px) {
+    .properties-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+  }
+  @media (max-width: 580px) {
+    .properties-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+  }
+
+  .prop-card {
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .prop-card:hover {
+    transform: translateY(-8px) !important;
+    background: rgba(22, 34, 51, 0.7) !important;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(201, 168, 76, 0.35) !important;
+  }
+  .prop-card:hover .card-img-el { transform: scale(1.06) !important; }
 
   .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,0.35); filter: brightness(1.05); }
   .btn-ghost:hover { border-color: rgba(201,168,76,0.5); color: #C9A84C; }

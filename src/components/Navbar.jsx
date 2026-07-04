@@ -6,9 +6,11 @@ import AccountTypeSelector from "./AccountTypeSelector";
 import NotificationBell from "./NotificationSystem";
 import { getDashboardPath, getAccountNav, getWorkspaceBrand, isWorkspaceUser } from "../utils/dashboardRoutes";
 import logo from "../assets/image.png";
+import RequestItemModal from "./RequestItemModal";
 
 export default function Navbar() {
   const { token, user, logout } = useContext(AuthContext);
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -100,6 +102,25 @@ export default function Navbar() {
           <Link to="/tourism" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>Tourism</span>
           </Link>
+          <button
+            style={{
+              ...styles.dropdownItem,
+              background: "rgba(251, 191, 36, 0.08)",
+              border: "none",
+              borderLeft: "3px solid #fbbf24",
+              width: "100%",
+              textAlign: "left",
+              color: "#fbbf24",
+              fontWeight: 700,
+              cursor: "pointer"
+            }}
+            onClick={() => {
+              setDropdownOpen(false);
+              setIsRequestModalOpen(true);
+            }}
+          >
+            <span style={styles.dropdownIcon}>🙋 Custom Requests</span>
+          </button>
           <Link to="/about" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>About</span>
           </Link>
@@ -288,7 +309,8 @@ export default function Navbar() {
 
   // ─── REGULAR NAVBAR (guests & renters browsing the site) ─────────────────
   return (
-    <nav style={styles.navbar}>
+    <>
+      <nav style={styles.navbar}>
       <style>{css}</style>
 
       <div style={styles.topSection}>
@@ -377,6 +399,29 @@ export default function Navbar() {
         <Link to="/tourism" style={{ ...styles.navLink, ...(isActive("/tourism") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
           Tourism
         </Link>
+        <button
+          style={{
+            ...styles.navLink,
+            background: "rgba(251, 191, 36, 0.1)",
+            border: "1px solid rgba(251, 191, 36, 0.3)",
+            color: "#fbbf24",
+            padding: "5px 12px",
+            borderRadius: "8px",
+            fontWeight: 700,
+            cursor: "pointer",
+            outline: "none",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "4px",
+            transition: "all 0.2s ease"
+          }}
+          onClick={() => {
+            setMenuOpen(false);
+            setIsRequestModalOpen(true);
+          }}
+        >
+          🙋 Requests
+        </button>
 
         {token && user && (
           <Link to="/settings" style={{ ...styles.navLink, ...(isActive("/settings") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
@@ -432,7 +477,9 @@ export default function Navbar() {
           </>
         )}
       </div>
-    </nav>
+      </nav>
+      <RequestItemModal isOpen={isRequestModalOpen} onClose={() => setIsRequestModalOpen(false)} />
+    </>
   );
 }
 

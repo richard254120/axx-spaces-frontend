@@ -1054,7 +1054,25 @@ export default function BusinessForm() {
     setError("");
     setSuccess("");
 
-    const payload = formDataRef.current; // always latest, never stale
+    const basePayload = formDataRef.current; // always latest, never stale
+    
+    // Clean optional fields to avoid sending empty strings for enums/numbers
+    const payload = {
+      ...basePayload,
+      employeeCount: basePayload.employeeCount === "" ? undefined : basePayload.employeeCount,
+      priceRange: basePayload.priceRange === "" ? undefined : basePayload.priceRange,
+      yearEstablished: basePayload.yearEstablished === "" ? undefined : basePayload.yearEstablished,
+    };
+
+    if (payload.location) {
+      payload.location = {
+        ...payload.location,
+        coordinates: payload.location.coordinates ? {
+          lat: payload.location.coordinates.lat === "" ? undefined : payload.location.coordinates.lat,
+          lng: payload.location.coordinates.lng === "" ? undefined : payload.location.coordinates.lng,
+        } : undefined
+      };
+    }
 
     try {
       if (isEditing) {
