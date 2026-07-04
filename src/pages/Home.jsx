@@ -1918,62 +1918,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-      {/* ── CATEGORIES SHOWCASE ── */}
-      <section className="cats-section">
-        <div className="section-hdr">
-          <p className="section-eyebrow">What We Offer</p>
-          <h2 className="section-title">Everything on One Platform</h2>
-          <p className="section-sub">From finding a home to settling in — Axxspace has you covered</p>
-        </div>
-        <div className="cats-grid">
-          {platformCategories.map(cat => (
-            <div
-              key={cat.id}
-              className="cat-card"
-              style={{ borderTopColor: cat.color, '--glow-color': cat.color === C.gold ? 'rgba(201,168,76,0.22)' : cat.color + '33' }}
-              onClick={() => {
-                if (cat.id === "requests") {
-                  setIsRequestModalOpen(true);
-                } else {
-                  navigate(cat.route);
-                }
-              }}
-            >
-              <div className="cat-icon-wrap" style={{ background: cat.iconBg }}>
-                {cat.iconType === "image"
-                  ? <img src={cat.icon} alt={cat.title} style={{ width: "30px", height: "30px", objectFit: "contain" }} />
-                  : <span style={{ fontSize: "26px" }}>{cat.icon}</span>
-                }
-              </div>
-              <h3 className="cat-card-title" style={{ color: cat.color }}>{cat.title}</h3>
-              <p className="cat-card-tagline">{cat.tagline}</p>
-              <p className="cat-card-desc">{cat.description}</p>
-              <ul className="cat-feature-list">
-                {cat.features.map(f => (
-                  <li key={f} className="cat-feature-item">
-                    <span style={{ color: cat.color, fontWeight: 800 }}>✓</span> {f}
-                  </li>
-                ))}
-              </ul>
-              <button
-                className="cat-btn magical-btn"
-                style={{ background: `linear-gradient(135deg,${cat.color},${cat.color}cc)`, color: "#0D1B2A" }}
-                onClick={e => {
-                  e.stopPropagation();
-                  if (cat.id === "requests") {
-                    setIsRequestModalOpen(true);
-                  } else {
-                    navigate(cat.route);
-                  }
-                }}
-              >
-
-                {cat.cta} →
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
 
       {/* ── FEATURED LISTINGS ── */}
       <section className="featured-section">
@@ -2272,6 +2216,63 @@ export default function Home() {
         )}
         <div className="view-all-wrap">
           <button onClick={() => navigate("/movers")} className="view-all-btn magical-btn">View All Movers →</button>
+        </div>
+      </section>
+
+      {/* ── CATEGORIES SHOWCASE ── */}
+      <section className="cats-section">
+        <div className="section-hdr">
+          <p className="section-eyebrow">What We Offer</p>
+          <h2 className="section-title">Everything on One Platform</h2>
+          <p className="section-sub">From finding a home to settling in — Axxspace has you covered</p>
+        </div>
+        <div className="cats-grid">
+          {platformCategories.map(cat => (
+            <div
+              key={cat.id}
+              className="cat-card"
+              style={{ borderTopColor: cat.color, '--glow-color': cat.color === C.gold ? 'rgba(201,168,76,0.22)' : cat.color + '33' }}
+              onClick={() => {
+                if (cat.id === "requests") {
+                  setIsRequestModalOpen(true);
+                } else {
+                  navigate(cat.route);
+                }
+              }}
+            >
+              <div className="cat-icon-wrap" style={{ background: cat.iconBg }}>
+                {cat.iconType === "image"
+                  ? <img src={cat.icon} alt={cat.title} style={{ width: "30px", height: "30px", objectFit: "contain" }} />
+                  : <span style={{ fontSize: "26px" }}>{cat.icon}</span>
+                }
+              </div>
+              <h3 className="cat-card-title" style={{ color: cat.color }}>{cat.title}</h3>
+              <p className="cat-card-tagline">{cat.tagline}</p>
+              <p className="cat-card-desc">{cat.description}</p>
+              <ul className="cat-feature-list">
+                {cat.features.map(f => (
+                  <li key={f} className="cat-feature-item">
+                    <span style={{ color: cat.color, fontWeight: 800 }}>✓</span> {f}
+                  </li>
+                ))}
+              </ul>
+              <button
+                className="cat-btn magical-btn"
+                style={{ background: `linear-gradient(135deg,${cat.color},${cat.color}cc)`, color: "#0D1B2A" }}
+                onClick={e => {
+                  e.stopPropagation();
+                  if (cat.id === "requests") {
+                    setIsRequestModalOpen(true);
+                  } else {
+                    navigate(cat.route);
+                  }
+                }}
+              >
+
+                {cat.cta} →
+              </button>
+            </div>
+          ))}
         </div>
       </section>
 
