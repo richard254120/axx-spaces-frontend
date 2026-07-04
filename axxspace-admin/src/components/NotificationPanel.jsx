@@ -1,13 +1,13 @@
 import { useRef, useEffect } from "react";
 import "./NotificationPanel.css";
 
-export default function NotificationPanel({ 
-  showNotifPanel, 
-  setShowNotifPanel, 
-  notifications, 
-  onApprove, 
+export default function NotificationPanel({
+  showNotifPanel,
+  setShowNotifPanel,
+  notifications,
+  onApprove,
   onReject,
-  onReview 
+  onReview
 }) {
   const notifRef = useRef(null);
 
@@ -23,23 +23,24 @@ export default function NotificationPanel({
 
   const getNotifIcon = (type, isPayment) => {
     if (isPayment) {
-      const icons = { 
-        property_booking: "🏠", 
-        material_purchase: "🛍️", 
-        tourism_booking: "🏨", 
-        boost: "🚀", 
-        subscription: "📋" 
+      const icons = {
+        property_booking: "🏠",
+        material_purchase: "🛍️",
+        tourism_booking: "🏨",
+        boost: "🚀",
+        subscription: "📋"
       };
       return icons[type] || "💳";
     }
-    const icons = { 
-      property: "🏠", 
-      material: "🛍️", 
-      tourism: "🏨", 
-      mover: "🚛", 
-      seller: "📋", 
-      business: "🏪", 
-      announcement: "📢" 
+    const icons = {
+      property: "🏠",
+      material: "🛍️",
+      tourism: "🏨",
+      mover: "🚛",
+      seller: "📋",
+      business: "🏪",
+      announcement: "📢",
+      item_request: "🔍"
     };
     return icons[type] || "📄";
   };
@@ -60,7 +61,8 @@ export default function NotificationPanel({
       mover: "Mover",
       seller: "Seller Verification",
       business: "Business",
-      announcement: "Announcement"
+      announcement: "Announcement",
+      item_request: "Custom Request"
     };
     return n.title || typeLabels[n.type] || "Upload";
   };
@@ -170,8 +172,8 @@ export default function NotificationPanel({
           )}
 
           <div className="notification-footer">
-            <button 
-              className="btn-view-all-notifications" 
+            <button
+              className="btn-view-all-notifications"
               onClick={() => { onReview(null); setShowNotifPanel(false); }}
             >
               Review All Pending →

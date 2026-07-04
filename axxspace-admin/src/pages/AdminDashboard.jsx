@@ -6,11 +6,13 @@ import AdminHeader from "../components/AdminHeader";
 import StatsCard from "../components/StatsCard";
 import TabNavigation from "../components/TabNavigation";
 import NotificationPanel from "../components/NotificationPanel";
+import BadgeManagement from "../components/BadgeManagement";
+import UserBadgeManagement from "../components/UserBadgeManagement";
 import { getPricelistUrl, openAdminFile, resolveMediaUrl } from "../utils/fileLinks";
 import "./AdminDashboard.css";
 
 // ── tiny helpers ──────────────────────────────────────────────
-const TABS = ["overview", "properties", "materials", "tourism", "movers", "sellers", "sold", "payment", "boosts", "businesses", "announcements", "verification", "requests"];
+const TABS = ["overview", "properties", "materials", "tourism", "movers", "sellers", "sold", "payment", "boosts", "businesses", "announcements", "verification", "requests", "listings-badges", "user-badges"];
 const TAB_LABELS = {
   overview: "📊 Dashboard Overview",
   properties: "🏠 Properties",
@@ -24,7 +26,9 @@ const TAB_LABELS = {
   businesses: "🏪 Businesses",
   announcements: "📢 Announcements",
   verification: "✓ KYC Verification",
-  requests: "🙋 User Requests"
+  requests: "🙋 User Requests",
+  "listings-badges": "🏅 Listing Badges",
+  "user-badges": "👤 User Badges"
 };
 const STATUS_VIEWS = ["pending", "approved", "rejected"];
 
@@ -1365,6 +1369,10 @@ export default function AdminDashboard() {
               </table>
             </div>
           )
+        ) : activeTab === "listings-badges" ? (
+          <BadgeManagement />
+        ) : activeTab === "user-badges" ? (
+          <UserBadgeManagement />
         ) : loading ? (
           <div className="loader">
             <div className="spinner"></div>
