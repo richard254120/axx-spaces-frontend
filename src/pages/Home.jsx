@@ -2045,6 +2045,63 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── FEATURED PROPERTIES SECTION ── */}
+      <section className="feat-section">
+        <div className="section-hdr">
+          <p className="section-eyebrow">⭐ Featured Rentals</p>
+          <h2 className="section-title">Featured Properties & Rentals</h2>
+          <p className="section-sub">Premium rental properties across Kenya</p>
+        </div>
+        {loadingFeatured ? (
+          <div className="loader-wrap">
+            <div className="spinner">⟳</div>
+            <p>Loading featured properties...</p>
+          </div>
+        ) : featuredProperties.length > 0 ? (
+          <div className="cards-track-wrap">
+            <div className="cards-track">
+              {[...featuredProperties, ...featuredProperties].map((property, idx) => (
+                <div key={`${property._id}-${idx}`} className="feat-card">
+                  <div className="feat-img-wrap">
+                    <img
+                      src={property.images?.[0] || ""}
+                      alt={property.title || "Property"}
+                      className="feat-img"
+                      onError={e => { e.target.style.display = "none"; }}
+                    />
+                    <div className="feat-boosted">★ Featured</div>
+                    <div className="feat-type">{property.propertyType || "Rental"}</div>
+                    <div className="feat-img-grad"></div>
+                  </div>
+                  <div className="feat-body">
+                    <p className="feat-type-label">{property.propertyType || "Rental"}</p>
+                    <h3 className="feat-title">{property.title}</h3>
+                    <p className="feat-loc">📍 {property.location}, {property.county}</p>
+                    <div className="feat-meta">
+                      <span className="feat-tag">🛏️ {property.bedrooms} bed</span>
+                      <span className="feat-tag">🚿 {property.bathrooms} bath</span>
+                    </div>
+                    <p className="feat-price">KES {property.price?.toLocaleString()}/month</p>
+                    <button onClick={() => navigate(`/listings/${property._id}`)} className="feat-view-btn magical-btn">
+                      View Details →
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="no-feat-wrap">
+            <span className="no-feat-icon">🏠</span>
+            <p className="no-feat-title">No Featured Properties Yet</p>
+            <p className="no-feat-sub">Properties approved by admin will appear here</p>
+          </div>
+        )}
+        <div className="view-all-wrap">
+          <button onClick={() => navigate("/listings")} className="view-all-btn magical-btn">View All Properties →</button>
+        </div>
+      </section>
+
       {/* ── FEATURED MATERIALS SECTION ── */}
       <section className="feat-section">
         <div className="section-hdr">
