@@ -166,7 +166,8 @@ export default function AdminDashboard() {
       loadPendingVerifications();
       setSelectedVerification(null);
     } catch (err) {
-      alert("❌ Failed to approve verification");
+      console.error("Verification approval error:", err);
+      alert("❌ Failed to approve verification: " + (err.response?.data?.message || err.message));
     }
   };
 
@@ -469,11 +470,11 @@ export default function AdminDashboard() {
       });
       alert(`✅ Item ${featured ? 'featured' : 'unfeatured'} successfully`);
       // Reload current data based on active tab
-      if (activeTab === 'properties') loadAllItems();
-      else if (activeTab === 'materials') loadAllItems();
-      else if (activeTab === 'tourism') loadAllItems();
-      else if (activeTab === 'businesses') loadPendingBusinesses();
-      else if (activeTab === 'movers') loadAllItems();
+      if (activeTab === 'businesses') {
+        loadPendingBusinesses();
+      } else {
+        loadItems(activeTab, statusView);
+      }
     } catch (err) {
       console.error("Feature error:", err);
       alert(`❌ Failed to ${featured ? 'feature' : 'unfeature'} item: ` + (err.response?.data?.error || err.message));
@@ -1428,7 +1429,13 @@ export default function AdminDashboard() {
                       className="btn-feature"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleFeatureItem(activeTab === "materials" ? "material" : activeTab.slice(0, -1), item._id, !item.isFeatured);
+                        let itemType;
+                        if (activeTab === "materials") itemType = "material";
+                        else if (activeTab === "properties") itemType = "property";
+                        else if (activeTab === "tourism") itemType = "tourism";
+                        else if (activeTab === "movers") itemType = "mover";
+                        else itemType = activeTab.slice(0, -1);
+                        handleFeatureItem(itemType, item._id, !item.isFeatured);
                       }}
                       style={{
                         marginTop: "10px",
