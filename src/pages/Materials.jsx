@@ -91,11 +91,18 @@ export default function QuickSAles() {
       if (item) {
         setSelected(item);
         setCurrentImage(0);
-        // Scroll to item details
+        // Scroll to material card and highlight it
         setTimeout(() => {
-          const itemDetails = document.getElementById('item-details');
-          if (itemDetails) {
-            itemDetails.scrollIntoView({ behavior: 'smooth' });
+          const materialCard = document.querySelector(`[data-material-id="${materialId}"]`);
+          if (materialCard) {
+            materialCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Highlight the card
+            materialCard.style.boxShadow = "0 0 20px rgba(201, 168, 76, 0.5)";
+            materialCard.style.transform = "scale(1.02)";
+            setTimeout(() => {
+              materialCard.style.boxShadow = "";
+              materialCard.style.transform = "";
+            }, 2000);
           }
         }, 100);
       }

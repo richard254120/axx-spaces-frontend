@@ -98,11 +98,18 @@ export default function Listings() {
       if (property) {
         setSelectedProperty(property);
         setCurrentImageIndex(0);
-        // Scroll to property details
+        // Scroll to property card and highlight it
         setTimeout(() => {
-          const propertyDetails = document.getElementById('property-details');
-          if (propertyDetails) {
-            propertyDetails.scrollIntoView({ behavior: 'smooth' });
+          const propertyCard = document.querySelector(`[data-property-id="${propertyId}"]`);
+          if (propertyCard) {
+            propertyCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Highlight the card
+            propertyCard.style.boxShadow = "0 0 20px rgba(201, 168, 76, 0.5)";
+            propertyCard.style.transform = "scale(1.02)";
+            setTimeout(() => {
+              propertyCard.style.boxShadow = "";
+              propertyCard.style.transform = "";
+            }, 2000);
           }
         }, 100);
       }
