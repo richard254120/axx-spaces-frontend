@@ -1920,29 +1920,14 @@ export default function Home() {
       </section>
 
       {/* ── FEATURED LISTINGS ── */}
-      <section className="featured-section">
-        <div className="featured-header">
-          <p className="section-eyebrow">Premium Listings</p>
-          <h2 className="section-title">Featured Businesses</h2>
-          <p className="section-sub">Top-rated businesses and services across Kenya</p>
-        </div>
-
-        {loadingBusinesses ? (
-          <div className="cards-track-wrap">
-            <div className="cards-track" style={{ animation: "none" }}>
-              {[1, 2, 3, 4].map(i => (
-                <div key={i} className="skel-card">
-                  <div className="skel-img"></div>
-                  <div className="skel-body">
-                    <div className="skel-line" style={{ width: "65%" }}></div>
-                    <div className="skel-line" style={{ width: "45%" }}></div>
-                    <div className="skel-line" style={{ width: "55%", height: "18px" }}></div>
-                  </div>
-                </div>
-              ))}
-            </div>
+      {!loadingBusinesses && featuredBusinesses.length > 0 && (
+        <section className="featured-section">
+          <div className="featured-header">
+            <p className="section-eyebrow">Premium Listings</p>
+            <h2 className="section-title">Featured Businesses</h2>
+            <p className="section-sub">Top-rated businesses and services across Kenya</p>
           </div>
-        ) : featuredBusinesses.length > 0 ? (
+
           <div className="cards-track-wrap">
             <div className="cards-track">
               {[...featuredBusinesses, ...featuredBusinesses].map((business, idx) => (
@@ -1977,31 +1962,20 @@ export default function Home() {
               ))}
             </div>
           </div>
-        ) : (
-          <div className="no-feat-wrap">
-            <span className="no-feat-icon">🏪</span>
-            <p className="no-feat-title">No Featured Businesses Yet</p>
-            <p className="no-feat-sub">Businesses approved by admin will appear here</p>
+          <div className="view-all-wrap">
+            <button onClick={() => navigate("/axxbiashara")} className="view-all-btn magical-btn">View All Businesses →</button>
           </div>
-        )}
-        <div className="view-all-wrap">
-          <button onClick={() => navigate("/axxbiashara")} className="view-all-btn magical-btn">View All Businesses →</button>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── FEATURED PROPERTIES SECTION ── */}
-      <section className="feat-section">
-        <div className="section-hdr">
-          <p className="section-eyebrow">⭐ Featured Rentals</p>
-          <h2 className="section-title">Featured Properties & Rentals</h2>
-          <p className="section-sub">Premium rental properties across Kenya</p>
-        </div>
-        {loadingFeatured ? (
-          <div className="loader-wrap">
-            <div className="spinner">⟳</div>
-            <p>Loading featured properties...</p>
+      {!loadingFeatured && featuredProperties.length > 0 && (
+        <section className="feat-section">
+          <div className="section-hdr">
+            <p className="section-eyebrow">⭐ Featured Rentals</p>
+            <h2 className="section-title">Featured Properties & Rentals</h2>
+            <p className="section-sub">Premium rental properties across Kenya</p>
           </div>
-        ) : featuredProperties.length > 0 ? (
           <div className="cards-track-wrap">
             <div className="cards-track">
               {[...featuredProperties, ...featuredProperties].map((property, idx) => (
@@ -2034,31 +2008,20 @@ export default function Home() {
               ))}
             </div>
           </div>
-        ) : (
-          <div className="no-feat-wrap">
-            <span className="no-feat-icon">🏠</span>
-            <p className="no-feat-title">No Featured Properties Yet</p>
-            <p className="no-feat-sub">Properties approved by admin will appear here</p>
+          <div className="view-all-wrap">
+            <button onClick={() => navigate("/listings")} className="view-all-btn magical-btn">View All Properties →</button>
           </div>
-        )}
-        <div className="view-all-wrap">
-          <button onClick={() => navigate("/listings")} className="view-all-btn magical-btn">View All Properties →</button>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── FEATURED MATERIALS SECTION ── */}
-      <section className="feat-section">
-        <div className="section-hdr">
-          <p className="section-eyebrow">⭐ Featured QuickSales</p>
-          <h2 className="section-title">Featured Materials & Products</h2>
-          <p className="section-sub">Handpicked materials and products from verified sellers</p>
-        </div>
-        {loadingMaterials ? (
-          <div className="loader-wrap">
-            <div className="spinner">⟳</div>
-            <p>Loading featured materials...</p>
+      {!loadingMaterials && featuredMaterials.length > 0 && (
+        <section className="feat-section">
+          <div className="section-hdr">
+            <p className="section-eyebrow">⭐ Featured QuickSales</p>
+            <h2 className="section-title">Featured Materials & Products</h2>
+            <p className="section-sub">Handpicked materials and products from verified sellers</p>
           </div>
-        ) : featuredMaterials.length > 0 ? (
           <div className="cards-track-wrap">
             <div className="cards-track">
               {[...featuredMaterials, ...featuredMaterials].map((material, idx) => (
@@ -2091,31 +2054,20 @@ export default function Home() {
               ))}
             </div>
           </div>
-        ) : (
-          <div className="no-feat-wrap">
-            <span className="no-feat-icon">🛍️</span>
-            <p className="no-feat-title">No Featured Materials Yet</p>
-            <p className="no-feat-sub">Materials approved by admin will appear here</p>
+          <div className="view-all-wrap">
+            <button onClick={() => navigate("/materials")} className="view-all-btn magical-btn">View All Materials →</button>
           </div>
-        )}
-        <div className="view-all-wrap">
-          <button onClick={() => navigate("/materials")} className="view-all-btn magical-btn">View All Materials →</button>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── FEATURED TOURISM SECTION ── */}
-      <section className="feat-section">
-        <div className="section-hdr">
-          <p className="section-eyebrow">⭐ Featured Tourism</p>
-          <h2 className="section-title">Featured Hotels & Experiences</h2>
-          <p className="section-sub">Top-rated tourism destinations across Kenya</p>
-        </div>
-        {loadingTourism ? (
-          <div className="loader-wrap">
-            <div className="spinner">⟳</div>
-            <p>Loading featured tourism...</p>
+      {!loadingTourism && featuredTourism.length > 0 && (
+        <section className="feat-section">
+          <div className="section-hdr">
+            <p className="section-eyebrow">⭐ Featured Tourism</p>
+            <h2 className="section-title">Featured Hotels & Experiences</h2>
+            <p className="section-sub">Top-rated tourism destinations across Kenya</p>
           </div>
-        ) : featuredTourism.length > 0 ? (
           <div className="cards-track-wrap">
             <div className="cards-track">
               {[...featuredTourism, ...featuredTourism].map((tourism, idx) => (
@@ -2148,31 +2100,20 @@ export default function Home() {
               ))}
             </div>
           </div>
-        ) : (
-          <div className="no-feat-wrap">
-            <span className="no-feat-icon">🏨</span>
-            <p className="no-feat-title">No Featured Tourism Yet</p>
-            <p className="no-feat-sub">Tourism listings approved by admin will appear here</p>
+          <div className="view-all-wrap">
+            <button onClick={() => navigate("/tourism")} className="view-all-btn magical-btn">View All Tourism →</button>
           </div>
-        )}
-        <div className="view-all-wrap">
-          <button onClick={() => navigate("/tourism")} className="view-all-btn magical-btn">View All Tourism →</button>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── FEATURED MOVERS SECTION ── */}
-      <section className="feat-section">
-        <div className="section-hdr">
-          <p className="section-eyebrow">⭐ Featured Movers</p>
-          <h2 className="section-title">Featured Moving Services</h2>
-          <p className="section-sub">Trusted moving companies with excellent ratings</p>
-        </div>
-        {loadingMovers ? (
-          <div className="loader-wrap">
-            <div className="spinner">⟳</div>
-            <p>Loading featured movers...</p>
+      {!loadingMovers && featuredMovers.length > 0 && (
+        <section className="feat-section">
+          <div className="section-hdr">
+            <p className="section-eyebrow">⭐ Featured Movers</p>
+            <h2 className="section-title">Featured Moving Services</h2>
+            <p className="section-sub">Trusted moving companies with excellent ratings</p>
           </div>
-        ) : featuredMovers.length > 0 ? (
           <div className="cards-track-wrap">
             <div className="cards-track">
               {[...featuredMovers, ...featuredMovers].map((mover, idx) => (
@@ -2207,17 +2148,11 @@ export default function Home() {
               ))}
             </div>
           </div>
-        ) : (
-          <div className="no-feat-wrap">
-            <span className="no-feat-icon">🚚</span>
-            <p className="no-feat-title">No Featured Movers Yet</p>
-            <p className="no-feat-sub">Movers approved by admin will appear here</p>
+          <div className="view-all-wrap">
+            <button onClick={() => navigate("/movers")} className="view-all-btn magical-btn">View All Movers →</button>
           </div>
-        )}
-        <div className="view-all-wrap">
-          <button onClick={() => navigate("/movers")} className="view-all-btn magical-btn">View All Movers →</button>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── CATEGORIES SHOWCASE ── */}
       <section className="cats-section">
