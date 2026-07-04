@@ -3,7 +3,7 @@ import axios from "axios";
 const API = axios.create({
   baseURL:
     import.meta.env.VITE_API_URL ||
-    "http://localhost:1000/api",
+    "http://localhost:1001/api",
   timeout: 30000, // Add timeout to prevent hanging
 });
 
