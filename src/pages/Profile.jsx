@@ -142,6 +142,51 @@ const styles = {
     border: "1px solid rgba(34, 197, 94, 0.3)",
     marginLeft: "10px",
   },
+  badgesSection: {
+    marginTop: "24px",
+    paddingTop: "20px",
+    borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+  },
+  badgesTitle: {
+    fontSize: "14px",
+    fontWeight: 700,
+    color: "#94a3b8",
+    marginBottom: "12px",
+    textTransform: "uppercase",
+  },
+  badgesContainer: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "10px",
+  },
+  badgeItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "8px 12px",
+    borderRadius: "8px",
+    background: "rgba(255, 255, 255, 0.05)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+  },
+  badgeImage: {
+    width: "32px",
+    height: "32px",
+    objectFit: "contain",
+  },
+  badgeName: {
+    fontSize: "12px",
+    fontWeight: 600,
+    color: "#f1f5f9",
+  },
+  badgeDate: {
+    fontSize: "10px",
+    color: "#94a3b8",
+  },
+  noBadges: {
+    fontSize: "13px",
+    color: "#64748b",
+    fontStyle: "italic",
+  },
 };
 
 export default function Profile() {
@@ -180,6 +225,15 @@ export default function Profile() {
   }
 
   const displayProfile = profile || user;
+
+  const badgeTypes = {
+    premium_verified: { label: "Premium Verified", icon: "⭐", image: "Premium Verified.png" },
+    student_verified: { label: "Student Verified", icon: "🎓", image: "Student Verified.png" },
+    business_verified: { label: "Business Verified", icon: "🏢", image: "Business Verified.png" },
+    identity_verified: { label: "Identity Verified", icon: "🪪", image: "Identity Verified.png" },
+    location_verified: { label: "Location Verified", icon: "📍", image: "Locationn Verified.png" },
+    online_verified: { label: "Online Verified", icon: "🌐", image: "Online Verified.png" },
+  };
 
   return (
     <div style={styles.container}>
@@ -243,6 +297,39 @@ export default function Profile() {
               <button style={{ ...styles.button, ...styles.buttonSecondary }} onClick={() => logout("/login")}>
                 🚪 Logout
               </button>
+            </div>
+
+            {/* Verification Badges Section */}
+            <div style={styles.badgesSection}>
+              <div style={styles.badgesTitle}>Verification Badges</div>
+              {displayProfile?.verificationBadges && displayProfile.verificationBadges.length > 0 ? (
+                <div style={styles.badgesContainer}>
+                  {displayProfile.verificationBadges.map((badge, index) => {
+                    const badgeInfo = badgeTypes[badge.type] || { label: badge.type, icon: "🏅", image: null };
+                    return (
+                      <div key={index} style={styles.badgeItem}>
+                        {badgeInfo.image && (
+                          <img
+                            src={`/${badgeInfo.image}`}
+                            alt={badgeInfo.label}
+                            style={styles.badgeImage}
+                          />
+                        )}
+                        <div>
+                          <div style={styles.badgeName}>
+                            {badgeInfo.icon} {badgeInfo.label}
+                          </div>
+                          <div style={styles.badgeDate}>
+                            Issued: {new Date(badge.verifiedAt).toLocaleDateString()}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div style={styles.noBadges}>No verification badges earned yet</div>
+              )}
             </div>
           </div>
 

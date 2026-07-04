@@ -458,6 +458,28 @@ export default function AdminDashboard() {
     }
   };
 
+  // ── Unified Feature Handler for All Services ────────────────────────
+  const handleFeatureItem = async (itemType, itemId, featured, featuredUntil = null) => {
+    try {
+      const response = await API.post('/admin/feature-item', {
+        itemType,
+        itemId,
+        featured,
+        featuredUntil
+      });
+      alert(`✅ Item ${featured ? 'featured' : 'unfeatured'} successfully`);
+      // Reload current data based on active tab
+      if (activeTab === 'properties') loadAllItems();
+      else if (activeTab === 'materials') loadAllItems();
+      else if (activeTab === 'tourism') loadAllItems();
+      else if (activeTab === 'businesses') loadPendingBusinesses();
+      else if (activeTab === 'movers') loadAllItems();
+    } catch (err) {
+      console.error("Feature error:", err);
+      alert(`❌ Failed to ${featured ? 'feature' : 'unfeature'} item: ` + (err.response?.data?.error || err.message));
+    }
+  };
+
   // ── load all announcements ────────────────────────────────
   const loadPendingAnnouncements = async () => {
     setAnnouncementsLoading(true);
@@ -1020,20 +1042,10 @@ export default function AdminDashboard() {
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          console.log("Feature button clicked for business:", business.name, business._id);
-                          console.log("Business status:", business.status);
-                          console.log("Business featured:", business.featured);
-                          if (business.featured) {
-                            console.log("Unfeaturing business");
-                            handleUnfeatureBusiness(business._id);
-                          } else {
-                            console.log("Opening feature modal");
-                            setSelectedBusinessForFeature(business);
-                            setShowFeatureModal(true);
-                          }
+                          handleFeatureItem("business", business._id, !business.featured);
                         }}
                       >
-                        {business.featured ? "🚫 Unfeature" : "⭐ Feature Business"}
+                        {business.featured ? "🚫 Unfeature" : "⭐ Feature"}
                       </button>
                     )}
                     <select
@@ -1411,117 +1423,142 @@ export default function AdminDashboard() {
                       <button className="btn-reject" onClick={() => handleReject(activeTab, item._id)}>❌ Reject</button>
                     </div>
                   )}
+                  {(statusView === "approved" || item.status === "approved" || item.isApproved) && (
+                    <button
+                      className="btn-feature"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleFeatureItem(activeTab === "materials" ? "material" : activeTab.slice(0, -1), item._id, !item.isFeatured);
+                      }}
+                      style={{
+                        marginTop: "10px",
+                        width: "100%",
+                        background: item.isFeatured ? "#ef4444" : "#fbbf24",
+                        color: "#0f1729",
+                        cursor: "pointer"
+                      }}
+                    >
+                      {item.isFeatured ? "🚫 Unfeature" : "⭐ Feature"}
+                    </button>
+                  )}
                   <button className="btn-delete" onClick={(e) => { e.stopPropagation(); confirmDelete(activeTab, item._id, getTitle(item)); }}>🗑️</button>
                 </div>
               </div>
             ))}
           </div>
-        )}
+        )
+        }
 
         {/* DETAIL MODAL */}
-        {selected && (
-          <DetailModal
-            item={selected} tab={activeTab} statusView={statusView}
-            onClose={() => { setSelected(null); setEditMode(false); }}
-            onApprove={() => handleApprove(activeTab, selected._id)}
-            onReject={() => handleReject(activeTab, selected._id)}
-            editMode={editMode} editData={editData} setEditData={setEditData}
-            onEdit={() => openEdit(selected)} onSave={saveEdit} saving={saving}
-            onCancelEdit={() => setEditMode(false)}
-            onDelete={confirmDelete}
-            getImages={getImages} getTitle={getTitle} getOwner={getOwner} getContact={getContact}
-          />
-        )}
+        {
+          selected && (
+            <DetailModal
+              item={selected} tab={activeTab} statusView={statusView}
+              onClose={() => { setSelected(null); setEditMode(false); }}
+              onApprove={() => handleApprove(activeTab, selected._id)}
+              onReject={() => handleReject(activeTab, selected._id)}
+              editMode={editMode} editData={editData} setEditData={setEditData}
+              onEdit={() => openEdit(selected)} onSave={saveEdit} saving={saving}
+              onCancelEdit={() => setEditMode(false)}
+              onDelete={confirmDelete}
+              getImages={getImages} getTitle={getTitle} getOwner={getOwner} getContact={getContact}
+            />
+          )
+        }
 
         {/* DELETE CONFIRMATION MODAL */}
-        {deleteConfirm && (
-          <div className="modal-overlay" onClick={() => setDeleteConfirm(null)}>
-            <div className="confirm-modal" onClick={e => e.stopPropagation()}>
-              <h3 className="confirm-title">⚠️ Confirm Delete</h3>
-              <p className="confirm-text">
-                Are you sure you want to delete <strong>{deleteConfirm.title}</strong>?
-                <br />
-                <span style={{ fontSize: 12, color: "#ef4444" }}>This action cannot be undone.</span>
-              </p>
-              <div className="confirm-buttons">
-                <button className="btn-cancel" onClick={() => setDeleteConfirm(null)}>Cancel</button>
-                <button className="btn-confirm-delete" onClick={executeDelete}>🗑️ Delete</button>
+        {
+          deleteConfirm && (
+            <div className="modal-overlay" onClick={() => setDeleteConfirm(null)}>
+              <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+                <h3 className="confirm-title">⚠️ Confirm Delete</h3>
+                <p className="confirm-text">
+                  Are you sure you want to delete <strong>{deleteConfirm.title}</strong>?
+                  <br />
+                  <span style={{ fontSize: 12, color: "#ef4444" }}>This action cannot be undone.</span>
+                </p>
+                <div className="confirm-buttons">
+                  <button className="btn-cancel" onClick={() => setDeleteConfirm(null)}>Cancel</button>
+                  <button className="btn-confirm-delete" onClick={executeDelete}>🗑️ Delete</button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )
+        }
 
         {/* FEATURE BUSINESS MODAL */}
-        {showFeatureModal && selectedBusinessForFeature && (
-          <div className="modal-overlay" onClick={() => setShowFeatureModal(false)}>
-            <div className="modal" onClick={e => e.stopPropagation()}>
-              <div className="modal-header">
-                <h2 className="modal-title">⭐ Feature Business</h2>
-                <button className="btn-close-modal" onClick={() => setShowFeatureModal(false)}>✕</button>
-              </div>
-              <div className="modal-body">
-                <p style={{ marginBottom: "20px" }}>
-                  Feature <strong>{selectedBusinessForFeature.name}</strong> on the homepage?
-                </p>
-                <div style={{ marginBottom: "20px" }}>
-                  <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>
-                    Feature Duration (days):
-                  </label>
-                  <select
-                    value={featureDuration}
-                    onChange={(e) => setFeatureDuration(parseInt(e.target.value))}
-                    style={{
-                      width: "100%",
-                      padding: "10px",
-                      borderRadius: "8px",
-                      border: "1px solid #e2e8f0",
-                      fontSize: "14px"
-                    }}
-                  >
-                    <option value={7}>7 days</option>
-                    <option value={14}>14 days</option>
-                    <option value={30}>30 days</option>
-                    <option value={60}>60 days</option>
-                    <option value={90}>90 days</option>
-                  </select>
+        {
+          showFeatureModal && selectedBusinessForFeature && (
+            <div className="modal-overlay" onClick={() => setShowFeatureModal(false)}>
+              <div className="modal" onClick={e => e.stopPropagation()}>
+                <div className="modal-header">
+                  <h2 className="modal-title">⭐ Feature Business</h2>
+                  <button className="btn-close-modal" onClick={() => setShowFeatureModal(false)}>✕</button>
                 </div>
-                <p style={{ fontSize: "12px", color: "#64748b", marginBottom: "20px" }}>
-                  This business will appear in the featured section on the homepage until {new Date(Date.now() + featureDuration * 24 * 60 * 60 * 1000).toLocaleDateString()}
-                </p>
-                <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
-                  <button
-                    onClick={() => setShowFeatureModal(false)}
-                    style={{
-                      padding: "10px 20px",
-                      borderRadius: "8px",
-                      border: "1px solid #e2e8f0",
-                      background: "white",
-                      cursor: "pointer"
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleFeatureBusiness}
-                    style={{
-                      padding: "10px 20px",
-                      borderRadius: "8px",
-                      border: "none",
-                      background: "#fbbf24",
-                      color: "#0f1729",
-                      fontWeight: "600",
-                      cursor: "pointer"
-                    }}
-                  >
-                    ⭐ Feature Business
-                  </button>
+                <div className="modal-body">
+                  <p style={{ marginBottom: "20px" }}>
+                    Feature <strong>{selectedBusinessForFeature.name}</strong> on the homepage?
+                  </p>
+                  <div style={{ marginBottom: "20px" }}>
+                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>
+                      Feature Duration (days):
+                    </label>
+                    <select
+                      value={featureDuration}
+                      onChange={(e) => setFeatureDuration(parseInt(e.target.value))}
+                      style={{
+                        width: "100%",
+                        padding: "10px",
+                        borderRadius: "8px",
+                        border: "1px solid #e2e8f0",
+                        fontSize: "14px"
+                      }}
+                    >
+                      <option value={7}>7 days</option>
+                      <option value={14}>14 days</option>
+                      <option value={30}>30 days</option>
+                      <option value={60}>60 days</option>
+                      <option value={90}>90 days</option>
+                    </select>
+                  </div>
+                  <p style={{ fontSize: "12px", color: "#64748b", marginBottom: "20px" }}>
+                    This business will appear in the featured section on the homepage until {new Date(Date.now() + featureDuration * 24 * 60 * 60 * 1000).toLocaleDateString()}
+                  </p>
+                  <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+                    <button
+                      onClick={() => setShowFeatureModal(false)}
+                      style={{
+                        padding: "10px 20px",
+                        borderRadius: "8px",
+                        border: "1px solid #e2e8f0",
+                        background: "white",
+                        cursor: "pointer"
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleFeatureBusiness}
+                      style={{
+                        padding: "10px 20px",
+                        borderRadius: "8px",
+                        border: "none",
+                        background: "#fbbf24",
+                        color: "#0f1729",
+                        fontWeight: "600",
+                        cursor: "pointer"
+                      }}
+                    >
+                      ⭐ Feature Business
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
-      </main>
-    </div>
+          )
+        }
+      </main >
+    </div >
   );
 }
 

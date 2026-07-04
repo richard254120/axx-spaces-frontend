@@ -1518,8 +1518,14 @@ export default function Home() {
   const [searchForm, setSearchForm] = useState({ county: "", type: "" });
   const [featuredProperties, setFeaturedProperties] = useState([]);
   const [featuredBusinesses, setFeaturedBusinesses] = useState([]);
+  const [featuredMaterials, setFeaturedMaterials] = useState([]);
+  const [featuredTourism, setFeaturedTourism] = useState([]);
+  const [featuredMovers, setFeaturedMovers] = useState([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
   const [loadingBusinesses, setLoadingBusinesses] = useState(true);
+  const [loadingMaterials, setLoadingMaterials] = useState(true);
+  const [loadingTourism, setLoadingTourism] = useState(true);
+  const [loadingMovers, setLoadingMovers] = useState(true);
   const [fetchError, setFetchError] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [animatedStats, setAnimatedStats] = useState({ listings: 0, counties: 0, tenants: 0 });
@@ -1650,10 +1656,9 @@ export default function Home() {
     const fetchFeatured = async () => {
       try {
         setFetchError(false);
-        const res = await API.get("/payment/featured", { timeout: 15000 });
+        const res = await API.get("/properties?featured=true&limit=4", { timeout: 15000 });
         const data = res?.data;
         if (Array.isArray(data)) setFeaturedProperties(data);
-        else if (data && Array.isArray(data.properties)) setFeaturedProperties(data.properties);
         else setFeaturedProperties([]);
       } catch (err) {
         console.error("Failed to load featured properties:", err?.message || err);
@@ -1680,6 +1685,60 @@ export default function Home() {
       } finally { setLoadingBusinesses(false); }
     };
     fetchFeaturedBusinesses();
+  }, []);
+
+  useEffect(() => {
+    const fetchFeaturedMaterials = async () => {
+      try {
+        const res = await API.get("/materials?featured=true&limit=4", { timeout: 15000 });
+        const data = res?.data;
+        if (Array.isArray(data)) {
+          setFeaturedMaterials(data);
+        } else {
+          setFeaturedMaterials([]);
+        }
+      } catch (err) {
+        console.error("Failed to load featured materials:", err?.message || err);
+        setFeaturedMaterials([]);
+      } finally { setLoadingMaterials(false); }
+    };
+    fetchFeaturedMaterials();
+  }, []);
+
+  useEffect(() => {
+    const fetchFeaturedTourism = async () => {
+      try {
+        const res = await API.get("/tourism?featured=true&limit=4", { timeout: 15000 });
+        const data = res?.data;
+        if (Array.isArray(data)) {
+          setFeaturedTourism(data);
+        } else {
+          setFeaturedTourism([]);
+        }
+      } catch (err) {
+        console.error("Failed to load featured tourism:", err?.message || err);
+        setFeaturedTourism([]);
+      } finally { setLoadingTourism(false); }
+    };
+    fetchFeaturedTourism();
+  }, []);
+
+  useEffect(() => {
+    const fetchFeaturedMovers = async () => {
+      try {
+        const res = await API.get("/movers?featured=true&limit=4", { timeout: 15000 });
+        const data = res?.data;
+        if (Array.isArray(data)) {
+          setFeaturedMovers(data);
+        } else {
+          setFeaturedMovers([]);
+        }
+      } catch (err) {
+        console.error("Failed to load featured movers:", err?.message || err);
+        setFeaturedMovers([]);
+      } finally { setLoadingMovers(false); }
+    };
+    fetchFeaturedMovers();
   }, []);
 
   useEffect(() => {
@@ -1983,6 +2042,179 @@ export default function Home() {
         )}
         <div className="view-all-wrap">
           <button onClick={() => navigate("/axxbiashara")} className="view-all-btn magical-btn">View All Businesses →</button>
+        </div>
+      </section>
+
+      {/* ── FEATURED MATERIALS SECTION ── */}
+      <section className="feat-section">
+        <div className="section-hdr">
+          <p className="section-eyebrow">⭐ Featured QuickSales</p>
+          <h2 className="section-title">Featured Materials & Products</h2>
+          <p className="section-sub">Handpicked materials and products from verified sellers</p>
+        </div>
+        {loadingMaterials ? (
+          <div className="loader-wrap">
+            <div className="spinner">⟳</div>
+            <p>Loading featured materials...</p>
+          </div>
+        ) : featuredMaterials.length > 0 ? (
+          <div className="cards-track-wrap">
+            <div className="cards-track">
+              {[...featuredMaterials, ...featuredMaterials].map((material, idx) => (
+                <div key={`${material._id}-${idx}`} className="feat-card">
+                  <div className="feat-img-wrap">
+                    <img
+                      src={material.images?.[0] || ""}
+                      alt={material.title || "Material"}
+                      className="feat-img"
+                      onError={e => { e.target.style.display = "none"; }}
+                    />
+                    <div className="feat-boosted">★ Featured</div>
+                    <div className="feat-type">{material.category || "Material"}</div>
+                    <div className="feat-img-grad"></div>
+                  </div>
+                  <div className="feat-body">
+                    <p className="feat-type-label">{material.category || "Material"}</p>
+                    <h3 className="feat-title">{material.title}</h3>
+                    <p className="feat-loc">📍 {material.location}, {material.county}</p>
+                    <div className="feat-meta">
+                      <span className="feat-tag">📦 {material.condition}</span>
+                      <span className="feat-tag">👁️ {material.views || 0} views</span>
+                    </div>
+                    <p className="feat-price">KES {material.price?.toLocaleString()}</p>
+                    <button onClick={() => navigate(`/materials/${material._id}`)} className="feat-view-btn magical-btn">
+                      View Details →
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="no-feat-wrap">
+            <span className="no-feat-icon">🛍️</span>
+            <p className="no-feat-title">No Featured Materials Yet</p>
+            <p className="no-feat-sub">Materials approved by admin will appear here</p>
+          </div>
+        )}
+        <div className="view-all-wrap">
+          <button onClick={() => navigate("/materials")} className="view-all-btn magical-btn">View All Materials →</button>
+        </div>
+      </section>
+
+      {/* ── FEATURED TOURISM SECTION ── */}
+      <section className="feat-section">
+        <div className="section-hdr">
+          <p className="section-eyebrow">⭐ Featured Tourism</p>
+          <h2 className="section-title">Featured Hotels & Experiences</h2>
+          <p className="section-sub">Top-rated tourism destinations across Kenya</p>
+        </div>
+        {loadingTourism ? (
+          <div className="loader-wrap">
+            <div className="spinner">⟳</div>
+            <p>Loading featured tourism...</p>
+          </div>
+        ) : featuredTourism.length > 0 ? (
+          <div className="cards-track-wrap">
+            <div className="cards-track">
+              {[...featuredTourism, ...featuredTourism].map((tourism, idx) => (
+                <div key={`${tourism._id}-${idx}`} className="feat-card">
+                  <div className="feat-img-wrap">
+                    <img
+                      src={tourism.images?.[0] || ""}
+                      alt={tourism.name || "Tourism"}
+                      className="feat-img"
+                      onError={e => { e.target.style.display = "none"; }}
+                    />
+                    <div className="feat-boosted">★ Featured</div>
+                    <div className="feat-type">{tourism.category || "Tourism"}</div>
+                    <div className="feat-img-grad"></div>
+                  </div>
+                  <div className="feat-body">
+                    <p className="feat-type-label">{tourism.category || "Tourism"}</p>
+                    <h3 className="feat-title">{tourism.name}</h3>
+                    <p className="feat-loc">📍 {tourism.location}, {tourism.county}</p>
+                    <div className="feat-meta">
+                      <span className="feat-tag">👁️ {tourism.views || 0} views</span>
+                      <span className="feat-tag">⭐ {tourism.reviews?.length || 0} reviews</span>
+                    </div>
+                    <p className="feat-price">KES {tourism.price?.toLocaleString()}/night</p>
+                    <button onClick={() => navigate(`/tourism/${tourism._id}`)} className="feat-view-btn magical-btn">
+                      View Details →
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="no-feat-wrap">
+            <span className="no-feat-icon">🏨</span>
+            <p className="no-feat-title">No Featured Tourism Yet</p>
+            <p className="no-feat-sub">Tourism listings approved by admin will appear here</p>
+          </div>
+        )}
+        <div className="view-all-wrap">
+          <button onClick={() => navigate("/tourism")} className="view-all-btn magical-btn">View All Tourism →</button>
+        </div>
+      </section>
+
+      {/* ── FEATURED MOVERS SECTION ── */}
+      <section className="feat-section">
+        <div className="section-hdr">
+          <p className="section-eyebrow">⭐ Featured Movers</p>
+          <h2 className="section-title">Featured Moving Services</h2>
+          <p className="section-sub">Trusted moving companies with excellent ratings</p>
+        </div>
+        {loadingMovers ? (
+          <div className="loader-wrap">
+            <div className="spinner">⟳</div>
+            <p>Loading featured movers...</p>
+          </div>
+        ) : featuredMovers.length > 0 ? (
+          <div className="cards-track-wrap">
+            <div className="cards-track">
+              {[...featuredMovers, ...featuredMovers].map((mover, idx) => (
+                <div key={`${mover._id}-${idx}`} className="feat-card">
+                  <div className="feat-img-wrap">
+                    <img
+                      src={mover.workPhotos?.[0] || mover.profileImage || ""}
+                      alt={mover.name || "Mover"}
+                      className="feat-img"
+                      onError={e => { e.target.style.display = "none"; }}
+                    />
+                    <div className="feat-boosted">★ Featured</div>
+                    <div className="feat-type">Moving Service</div>
+                    <div className="feat-img-grad"></div>
+                  </div>
+                  <div className="feat-body">
+                    <p className="feat-type-label">Moving Service</p>
+                    <h3 className="feat-title">{mover.name}</h3>
+                    <p className="feat-loc">📍 {mover.county}</p>
+                    <div className="feat-meta">
+                      <span className="feat-tag">🚚 {mover.vehicleType || "Various"}</span>
+                      <span className="feat-tag">⭐ {mover.experienceYears || 0} years exp</span>
+                    </div>
+                    <p className="feat-price">
+                      {mover.pricing?.baseRate ? `KES ${mover.pricing.baseRate.toLocaleString()}` : "Contact for pricing"}
+                    </p>
+                    <button onClick={() => navigate(`/movers/${mover._id}`)} className="feat-view-btn magical-btn">
+                      View Details →
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="no-feat-wrap">
+            <span className="no-feat-icon">🚚</span>
+            <p className="no-feat-title">No Featured Movers Yet</p>
+            <p className="no-feat-sub">Movers approved by admin will appear here</p>
+          </div>
+        )}
+        <div className="view-all-wrap">
+          <button onClick={() => navigate("/movers")} className="view-all-btn magical-btn">View All Movers →</button>
         </div>
       </section>
 
