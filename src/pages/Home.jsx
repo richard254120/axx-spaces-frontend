@@ -2000,7 +2000,7 @@ export default function Home() {
                       <span className="feat-tag">🚿 {property.bathrooms} bath</span>
                     </div>
                     <p className="feat-price">KES {property.price?.toLocaleString()}/month</p>
-                    <button onClick={() => navigate(`/listings?property=${property._id}`)} className="feat-view-btn magical-btn">
+                    <button onClick={() => navigate(`/listings/${property._id}`)} className="feat-view-btn magical-btn">
                       View Details →
                     </button>
                   </div>
@@ -2046,7 +2046,7 @@ export default function Home() {
                       <span className="feat-tag">👁️ {material.views || 0} views</span>
                     </div>
                     <p className="feat-price">KES {material.price?.toLocaleString()}</p>
-                    <button onClick={() => navigate(`/materials?material=${material._id}`)} className="feat-view-btn magical-btn">
+                    <button onClick={() => navigate(`/materials/${material._id}`)} className="feat-view-btn magical-btn">
                       View Details →
                     </button>
                   </div>
@@ -2196,7 +2196,7 @@ export default function Home() {
                         </span>
                       )}
                     </p>
-                    <button onClick={() => navigate(`/movers?mover=${mover._id}`)} className="feat-view-btn magical-btn">
+                    <button onClick={() => navigate(`/movers/${mover._id}`)} className="feat-view-btn magical-btn">
                       View Details →
                     </button>
                   </div>

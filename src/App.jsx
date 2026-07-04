@@ -9,12 +9,14 @@ import SplashScreen from "./components/SplashScreen";
 
 import Home from "./pages/Home";
 import Listings from "./pages/Listings";
+import PropertyDetailPage from "./pages/PropertyDetailPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Upload from "./pages/Upload";
 import LandlordDashboard from "./pages/LandlordDashboard";
 import MoverDashboard from "./pages/MoverDashboard";
 import Movers from "./pages/Movers";
+import MoverDetailPage from "./pages/MoverDetailPage";
 import ResetPassword from "./pages/ResetPassword";
 import AboutUs from "./pages/AboutUs";
 import SellerLogin from "./pages/SellerLogin";
@@ -22,6 +24,7 @@ import SellerDashboard from "./pages/SellerDashboard";
 import PremiumPlans from "./pages/PremiumPlans";
 import Checkout from "./pages/Checkout";
 import Materials from "./pages/Materials";
+import MaterialDetailPage from "./pages/MaterialDetailPage";
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
 import TermsAndPrivacy from "./pages/TermsAndPrivacy";
@@ -135,7 +138,9 @@ function App() {
       {/* ── PUBLIC ROUTES (have Navbar) ── */}
       <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
       <Route path="/listings" element={<PublicLayout><Listings /></PublicLayout>} />
+      <Route path="/listings/:id" element={<PublicLayout><PropertyDetailPage /></PublicLayout>} />
       <Route path="/movers" element={<PublicLayout><Movers /></PublicLayout>} />
+      <Route path="/movers/:id" element={<PublicLayout><MoverDetailPage /></PublicLayout>} />
       <Route path="/login" element={<PublicLayout><Login /></PublicLayout>} />
       <Route path="/register" element={<PublicLayout><Register /></PublicLayout>} />
       <Route path="/about" element={<PublicLayout><AboutUs /></PublicLayout>} />
@@ -143,6 +148,7 @@ function App() {
       <Route path="/verify-email/:token" element={<PublicLayout><VerifyEmail /></PublicLayout>} />
       <Route path="/seller-login" element={<PublicLayout><SellerLogin /></PublicLayout>} />
       <Route path="/materials" element={<PublicLayout><Materials /></PublicLayout>} />
+      <Route path="/materials/:id" element={<PublicLayout><MaterialDetailPage /></PublicLayout>} />
       <Route path="/faq" element={<PublicLayout><FAQ /></PublicLayout>} />
       <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
       <Route path="/terms" element={<PublicLayout><TermsAndPrivacy /></PublicLayout>} />
