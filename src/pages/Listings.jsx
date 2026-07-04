@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import ReviewsSection from "../components/ReviewsSection";
 import RecentlyViewed, { trackView } from "../components/RecentlyViewed";
 import RequestItemModal from "../components/RequestItemModal";
@@ -23,6 +24,7 @@ const formatKenyaPhone = (phone) => {
 
 export default function Listings() {
   const { user, token } = useAuth();
+  const [searchParams] = useSearchParams();
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [modalQuery, setModalQuery] = useState("");
   const [modalService, setModalService] = useState("rental");
@@ -87,6 +89,25 @@ export default function Listings() {
     const savedSearchesData = localStorage.getItem("axxspace_saved_searches");
     if (savedSearchesData) setSavedSearches(JSON.parse(savedSearchesData));
   }, []);
+
+  // Handle property query parameter to select specific property
+  useEffect(() => {
+    const propertyId = searchParams.get('property');
+    if (propertyId && properties.length > 0) {
+      const property = properties.find(p => p._id === propertyId);
+      if (property) {
+        setSelectedProperty(property);
+        setCurrentImageIndex(0);
+        // Scroll to property details
+        setTimeout(() => {
+          const propertyDetails = document.getElementById('property-details');
+          if (propertyDetails) {
+            propertyDetails.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 100);
+      }
+    }
+  }, [searchParams, properties]);
 
   useEffect(() => {
     let filtered = properties.filter(p => p.availableUnits > 0);
@@ -542,7 +563,7 @@ export default function Listings() {
         {(!showUniversityHostels || selectedUniversity) && displayProperties.length > 0 && (
           <div className="properties-grid">
             {displayProperties.map((property, i) => (
-              <article key={property._id} style={S.card} className="prop-card" onClick={() => openModal(property)}>
+              <article key={property._id} data-property-id={property._id} style={S.card} className="prop-card" onClick={() => openModal(property)}>
                 {/* Image */}
                 <div style={S.cardImg}>
                   {property.images?.length > 0

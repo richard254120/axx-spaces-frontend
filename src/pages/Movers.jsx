@@ -181,6 +181,7 @@ function MoverCard({ m, onBook, featured }) {
   const [hov, setHov] = useState(false);
   return (
     <div
+      data-mover-id={m._id}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
@@ -851,6 +852,31 @@ export default function Movers() {
     const tab = params.get("tab");
     if (tab === "login" || tab === "register") setActiveTab(tab);
   }, [search]);
+
+  // Handle mover query parameter to select specific mover
+  useEffect(() => {
+    const params = new URLSearchParams(search);
+    const moverId = params.get('mover');
+    if (moverId && movers.length > 0) {
+      const mover = movers.find(m => m._id === moverId);
+      if (mover) {
+        setBookingMover(mover);
+        setActiveTab("search");
+        // Scroll to mover details
+        setTimeout(() => {
+          const moverCard = document.querySelector(`[data-mover-id="${moverId}"]`);
+          if (moverCard) {
+            moverCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Highlight the card
+            moverCard.style.boxShadow = "0 0 20px rgba(59, 130, 246, 0.5)";
+            setTimeout(() => {
+              moverCard.style.boxShadow = "";
+            }, 2000);
+          }
+        }, 100);
+      }
+    }
+  }, [search, movers]);
 
   const counties = [
     "Baringo", "Bomet", "Bungoma", "Busia", "Elgeyo Marakwet", "Embu", "Garissa",

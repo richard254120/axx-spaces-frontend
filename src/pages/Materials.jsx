@@ -83,6 +83,25 @@ export default function QuickSAles() {
     return () => { if (debounceTimer.current) clearTimeout(debounceTimer.current); };
   }, [searchInput]);
 
+  // Handle material query parameter to select specific material
+  useEffect(() => {
+    const materialId = searchParams.get('material');
+    if (materialId && items.length > 0) {
+      const item = items.find(i => i._id === materialId);
+      if (item) {
+        setSelected(item);
+        setCurrentImage(0);
+        // Scroll to item details
+        setTimeout(() => {
+          const itemDetails = document.getElementById('item-details');
+          if (itemDetails) {
+            itemDetails.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 100);
+      }
+    }
+  }, [searchParams, items]);
+
   const fetchItems = async () => {
     setLoading(true);
     try {
@@ -273,7 +292,7 @@ export default function QuickSAles() {
             const isNewItem = item.createdAt && (Date.now() - new Date(item.createdAt).getTime() < 172800000);
 
             return (
-              <div key={item._id} style={styles.card} className="item-card" onClick={() => openModal(item)}>
+              <div key={item._id} data-material-id={item._id} style={styles.card} className="item-card" onClick={() => openModal(item)}>
                 <div style={styles.imageWrapper}>
                   <img src={item.images?.[0] || "/placeholder.jpg"} alt={item.title} style={styles.itemImage} />
 
