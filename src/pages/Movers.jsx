@@ -245,7 +245,7 @@ function MoverCard({ m, onBook, featured }) {
             {m.verificationBadges.map((badgeId) => (
               <div key={badgeId} style={{ position: "relative", display: "inline-block" }}>
                 <img
-                  src={`/${badgeId.replace(/_/g, ' ')}.png`}
+                  src={`/${typeof badgeId === 'string' ? badgeId.replace(/_/g, ' ') : badgeId}.png`}
                   alt={badgeId}
                   style={{
                     width: "28px",
@@ -255,7 +255,7 @@ function MoverCard({ m, onBook, featured }) {
                     cursor: "pointer",
                     transition: "transform 0.2s"
                   }}
-                  title={badgeId.replace(/_/g, ' ').toUpperCase()}
+                  title={typeof badgeId === 'string' ? badgeId.replace(/_/g, ' ').toUpperCase() : String(badgeId).toUpperCase()}
                 />
                 <div style={{
                   position: "absolute",
@@ -277,7 +277,7 @@ function MoverCard({ m, onBook, featured }) {
                   zIndex: 10,
                   pointerEvents: "none"
                 }}>
-                  {badgeId.replace(/_/g, ' ').toUpperCase()}
+                  {typeof badgeId === 'string' ? badgeId.replace(/_/g, ' ').toUpperCase() : String(badgeId).toUpperCase()}
                 </div>
               </div>
             ))}
@@ -367,7 +367,7 @@ function MoverCard({ m, onBook, featured }) {
                       borderRadius: 3,
                       textTransform: "uppercase"
                     }}>
-                      {photoDetail.category.replace('_', ' ')}
+                      {typeof photoDetail.category === 'string' ? photoDetail.category.replace('_', ' ') : String(photoDetail.category)}
                     </div>
                   )}
                 </div>
@@ -429,7 +429,7 @@ function MoverCard({ m, onBook, featured }) {
                       borderRadius: 3,
                       textTransform: "uppercase"
                     }}>
-                      {photoDetail.category.replace('_', ' ')}
+                      {typeof photoDetail.category === 'string' ? photoDetail.category.replace('_', ' ') : String(photoDetail.category)}
                     </div>
                   )}
                 </div>
@@ -471,7 +471,7 @@ function MoverCard({ m, onBook, featured }) {
           <div style={{ fontSize: 13, fontWeight: 700, color: featured ? "#fff" : C.textPrimary }}>
             KES {m.pricing.baseRate.toLocaleString()}
             <span style={{ fontSize: 11, fontWeight: 400, color: featured ? C.navyText : C.textHint, marginLeft: 4 }}>
-              /{m.pricing.rateType?.replace('_', ' ') || 'job'}
+              /{typeof m.pricing.rateType === 'string' ? m.pricing.rateType.replace('_', ' ') : String(m.pricing.rateType || 'job')}
             </span>
           </div>
           {m.pricing.minCharge > 0 && (
@@ -1003,7 +1003,8 @@ export default function Movers() {
 
   const handleGoogleCredential = async (response) => {
     try {
-      const payload = JSON.parse(decodeURIComponent(atob(response.credential.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")).split("").map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)).join("")));
+      const credential = typeof response.credential === 'string' ? response.credential : String(response.credential);
+      const payload = JSON.parse(decodeURIComponent(atob(credential.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")).split("").map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)).join("")));
       const res = await fetch(`${API_BASE}/auth/google`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ googleId: payload.sub, email: payload.email, name: payload.name, picture: payload.picture, role: "mover" }),
