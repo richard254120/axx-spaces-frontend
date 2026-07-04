@@ -832,6 +832,8 @@ export default function Movers() {
   const [registerData, setRegisterData] = useState({
     name: "", email: "", password: "", phone: "", county: "",
     experience: "", vehicleType: "Pickup", services: [],
+    workPhotos: [],
+    photoDescriptions: []
   });
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [loginError, setLoginError] = useState("");
@@ -912,6 +914,46 @@ export default function Movers() {
       ...p, services: p.services.includes(s) ? p.services.filter(x => x !== s) : [...p.services, s],
     }));
 
+  const handlePhotoUpload = (e) => {
+    const files = Array.from(e.target.files);
+    const newPhotos = files.map(file => ({
+      file,
+      description: "",
+      category: "general"
+    }));
+    setRegisterData({
+      ...registerData,
+      workPhotos: [...registerData.workPhotos, ...newPhotos],
+      photoDescriptions: [...registerData.photoDescriptions, ...new Array(files.length).fill("")]
+    });
+  };
+
+  const removePhoto = (index) => {
+    setRegisterData({
+      ...registerData,
+      workPhotos: registerData.workPhotos.filter((_, i) => i !== index),
+      photoDescriptions: registerData.photoDescriptions.filter((_, i) => i !== index)
+    });
+  };
+
+  const handlePhotoDescriptionChange = (index, description) => {
+    const newDescriptions = [...registerData.photoDescriptions];
+    newDescriptions[index] = description;
+    setRegisterData({
+      ...registerData,
+      photoDescriptions: newDescriptions
+    });
+  };
+
+  const handlePhotoCategoryChange = (index, category) => {
+    const newPhotos = [...registerData.workPhotos];
+    newPhotos[index] = { ...newPhotos[index], category };
+    setRegisterData({
+      ...registerData,
+      workPhotos: newPhotos
+    });
+  };
+
   const onRegister = async (e) => {
     e.preventDefault();
     if (registerData.password.length < 6) {
@@ -926,9 +968,37 @@ export default function Movers() {
     }
     setLoading(true);
     try {
-      await API.post("/auth/register", { ...registerData, role: "mover" });
+      // Prepare FormData for file upload
+      const submissionData = new FormData();
+      submissionData.append("role", "mover");
+      submissionData.append("name", registerData.name);
+      submissionData.append("email", registerData.email);
+      submissionData.append("password", registerData.password);
+      submissionData.append("phone", registerData.phone);
+      submissionData.append("county", registerData.county);
+      submissionData.append("experience", registerData.experience);
+      submissionData.append("vehicleType", registerData.vehicleType);
+      submissionData.append("services", registerData.services.join(","));
+
+      // Append work photos with descriptions
+      registerData.workPhotos.forEach((photo, index) => {
+        submissionData.append("workPhotos", photo.file || photo);
+        submissionData.append(`photoDescription_${index}`, registerData.photoDescriptions[index] || "");
+        submissionData.append(`photoCategory_${index}`, photo.category || "general");
+      });
+
+      await API.post("/auth/register", submissionData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
       alert("✅ Application submitted! Once admin approves, you can log in.");
       setActiveTab("login");
+      // Reset form
+      setRegisterData({
+        name: "", email: "", password: "", phone: "", county: "",
+        experience: "", vehicleType: "Pickup", services: [],
+        workPhotos: [],
+        photoDescriptions: []
+      });
     } catch (err) { alert(`❌ ${err.response?.data?.message || err.response?.data?.error || "Registration failed."}`); }
     finally { setLoading(false); }
   };
@@ -1247,6 +1317,104 @@ export default function Movers() {
                     {s}
                   </label>
                 ))}
+              </div>
+
+              <Divider label="📷 Work Photos" />
+              <div style={{ marginBottom: 20 }}>
+                <p style={{ color: C.textHint, fontSize: 12, marginBottom: 12 }}>Upload photos of your work to build trust with customers (up to 10 photos)</p>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handlePhotoUpload}
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    background: C.page,
+                    border: `1px solid ${C.border}`,
+                    borderRadius: 8,
+                    fontSize: 13,
+                    color: C.textPrimary,
+                    cursor: "pointer",
+                  }}
+                />
+                {registerData.workPhotos.length > 0 && (
+                  <div style={{ marginTop: 16, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: 12 }}>
+                    {registerData.workPhotos.map((photo, index) => (
+                      <div key={index} style={{ position: "relative" }}>
+                        <img
+                          src={URL.createObjectURL(photo.file || photo)}
+                          alt={`Work photo ${index + 1}`}
+                          style={{
+                            width: "100%",
+                            height: "100px",
+                            objectFit: "cover",
+                            borderRadius: 8,
+                            border: `1px solid ${C.border}`,
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removePhoto(index)}
+                          style={{
+                            position: "absolute",
+                            top: 4,
+                            right: 4,
+                            background: "rgba(239, 68, 68, 0.9)",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "50%",
+                            width: "24px",
+                            height: "24px",
+                            cursor: "pointer",
+                            fontSize: 12,
+                            fontWeight: "bold",
+                          }}
+                        >
+                          ✕
+                        </button>
+                        <div style={{ marginTop: 8 }}>
+                          <select
+                            value={photo.category || "general"}
+                            onChange={(e) => handlePhotoCategoryChange(index, e.target.value)}
+                            style={{
+                              width: "100%",
+                              padding: "6px",
+                              fontSize: 11,
+                              background: C.page,
+                              border: `1px solid ${C.border}`,
+                              borderRadius: 4,
+                              color: C.textPrimary,
+                            }}
+                          >
+                            <option value="general">General</option>
+                            <option value="moving">Moving Activity</option>
+                            <option value="team">Team in Action</option>
+                            <option value="equipment">Equipment</option>
+                            <option value="before_after">Before/After</option>
+                            <option value="vehicle">Vehicle</option>
+                          </select>
+                          <input
+                            type="text"
+                            placeholder="Describe this photo..."
+                            value={registerData.photoDescriptions[index] || ""}
+                            onChange={(e) => handlePhotoDescriptionChange(index, e.target.value)}
+                            style={{
+                              width: "100%",
+                              padding: "6px",
+                              marginTop: 4,
+                              fontSize: 11,
+                              background: C.page,
+                              border: `1px solid ${C.border}`,
+                              borderRadius: 4,
+                              color: C.textPrimary,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <button type="submit" disabled={loading} style={{
