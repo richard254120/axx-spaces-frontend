@@ -605,7 +605,7 @@ option { background: #162233; color: #F0EAD8; }
 .cards-track {
   display: flex; align-items: stretch;
   width: max-content;
-  animation: cardsScroll 12s linear infinite;
+  animation: cardsScroll 10s linear infinite;
   padding: 8px 0 24px;
 }
 .cards-track:hover { animation-play-state: paused; }
