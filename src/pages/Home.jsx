@@ -605,7 +605,7 @@ option { background: #162233; color: #F0EAD8; }
 .cards-track {
   display: flex; align-items: stretch;
   width: max-content;
-  animation: cardsScroll 34s linear infinite;
+  animation: cardsScroll 12s linear infinite;
   padding: 8px 0 24px;
 }
 .cards-track:hover { animation-play-state: paused; }
@@ -1661,7 +1661,7 @@ export default function Home() {
     const fetchAllFeatured = async () => {
       try {
         setFetchError(false);
-        const timeout = 8000; // Reduced from 15s to 8s for faster response
+        const timeout = 5000; // Reduced to 5s for faster response
 
         const [
           propertiesRes,
