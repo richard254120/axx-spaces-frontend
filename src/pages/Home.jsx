@@ -80,6 +80,10 @@ option { background: #162233; color: #F0EAD8; }
   0%   { background-position: -400px 0; }
   100% { background-position:  400px 0; }
 }
+@keyframes skeleton-loading {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
 @keyframes floatY {
   0%, 100% { transform: translateY(0px); }
   50%       { transform: translateY(-12px); }
@@ -1652,108 +1656,79 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
+  // Parallel loading of all featured items for better performance
   useEffect(() => {
-    const fetchFeatured = async () => {
+    const fetchAllFeatured = async () => {
       try {
         setFetchError(false);
-        const res = await API.get("/properties?featured=true&limit=4", { timeout: 15000 });
-        const data = res?.data;
-        if (Array.isArray(data)) setFeaturedProperties(data);
+        const timeout = 8000; // Reduced from 15s to 8s for faster response
+
+        const [
+          propertiesRes,
+          businessesRes,
+          materialsRes,
+          tourismRes,
+          moversRes,
+          reviewsRes
+        ] = await Promise.all([
+          API.get("/properties?featured=true&limit=4", { timeout }).catch(() => ({ data: [] })),
+          API.get("/business?featured=true&limit=4&sort=rating", { timeout }).catch(() => ({ data: { businesses: [] } })),
+          API.get("/materials?featured=true&limit=4", { timeout }).catch(() => ({ data: [] })),
+          API.get("/tourism?featured=true&limit=4", { timeout }).catch(() => ({ data: [] })),
+          API.get("/movers?featured=true&limit=4", { timeout }).catch(() => ({ data: [] })),
+          API.get("/reviews", { timeout }).catch(() => ({ data: [] }))
+        ]);
+
+        // Process properties
+        const propData = propertiesRes?.data;
+        if (Array.isArray(propData)) setFeaturedProperties(propData);
         else setFeaturedProperties([]);
+
+        // Process businesses
+        const busData = businessesRes?.data;
+        if (busData && Array.isArray(busData.businesses)) setFeaturedBusinesses(busData.businesses);
+        else setFeaturedBusinesses([]);
+
+        // Process materials
+        const matData = materialsRes?.data;
+        if (Array.isArray(matData)) setFeaturedMaterials(matData);
+        else setFeaturedMaterials([]);
+
+        // Process tourism
+        const tourData = tourismRes?.data;
+        if (Array.isArray(tourData)) setFeaturedTourism(tourData);
+        else setFeaturedTourism([]);
+
+        // Process movers
+        const moverData = moversRes?.data;
+        if (Array.isArray(moverData)) setFeaturedMovers(moverData);
+        else setFeaturedMovers([]);
+
+        // Process reviews
+        const revData = reviewsRes?.data;
+        if (Array.isArray(revData)) setReviews(revData.slice(0, 4));
+        else setReviews([]);
+
       } catch (err) {
-        console.error("Failed to load featured properties:", err?.message || err);
+        console.error("Failed to load featured items:", err?.message || err);
         setFetchError(true);
         setFeaturedProperties([]);
-      } finally { setLoadingFeatured(false); }
-    };
-    fetchFeatured().catch(() => setComponentError("Failed to load featured properties"));
-  }, []);
-
-  useEffect(() => {
-    const fetchFeaturedBusinesses = async () => {
-      try {
-        const res = await API.get("/business?featured=true&limit=4&sort=rating", { timeout: 15000 });
-        const data = res?.data;
-        if (data && Array.isArray(data.businesses)) {
-          setFeaturedBusinesses(data.businesses);
-        } else {
-          setFeaturedBusinesses([]);
-        }
-      } catch (err) {
-        console.error("Failed to load featured businesses:", err?.message || err);
         setFeaturedBusinesses([]);
-      } finally { setLoadingBusinesses(false); }
-    };
-    fetchFeaturedBusinesses();
-  }, []);
-
-  useEffect(() => {
-    const fetchFeaturedMaterials = async () => {
-      try {
-        const res = await API.get("/materials?featured=true&limit=4", { timeout: 15000 });
-        const data = res?.data;
-        if (Array.isArray(data)) {
-          setFeaturedMaterials(data);
-        } else {
-          setFeaturedMaterials([]);
-        }
-      } catch (err) {
-        console.error("Failed to load featured materials:", err?.message || err);
         setFeaturedMaterials([]);
-      } finally { setLoadingMaterials(false); }
-    };
-    fetchFeaturedMaterials();
-  }, []);
-
-  useEffect(() => {
-    const fetchFeaturedTourism = async () => {
-      try {
-        const res = await API.get("/tourism?featured=true&limit=4", { timeout: 15000 });
-        const data = res?.data;
-        if (Array.isArray(data)) {
-          setFeaturedTourism(data);
-        } else {
-          setFeaturedTourism([]);
-        }
-      } catch (err) {
-        console.error("Failed to load featured tourism:", err?.message || err);
         setFeaturedTourism([]);
-      } finally { setLoadingTourism(false); }
-    };
-    fetchFeaturedTourism();
-  }, []);
-
-  useEffect(() => {
-    const fetchFeaturedMovers = async () => {
-      try {
-        const res = await API.get("/movers?featured=true&limit=4", { timeout: 15000 });
-        const data = res?.data;
-        if (Array.isArray(data)) {
-          setFeaturedMovers(data);
-        } else {
-          setFeaturedMovers([]);
-        }
-      } catch (err) {
-        console.error("Failed to load featured movers:", err?.message || err);
         setFeaturedMovers([]);
-      } finally { setLoadingMovers(false); }
-    };
-    fetchFeaturedMovers();
-  }, []);
-
-  useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const res = await API.get("/reviews", { timeout: 15000 });
-        const data = res?.data;
-        if (Array.isArray(data)) setReviews(data.slice(0, 4));
-        else setReviews([]);
-      } catch (err) {
-        console.error("Failed to load reviews:", err?.message || err);
         setReviews([]);
-      } finally { setLoadingReviews(false); }
+      } finally {
+        setLoadingFeatured(false);
+        setLoadingBusinesses(false);
+        setLoadingMaterials(false);
+        setLoadingTourism(false);
+        setLoadingMovers(false);
+        setLoadingReviews(false);
+      }
     };
-    fetchReviews().catch(() => { });
+
+    fetchAllFeatured().catch(() => setComponentError("Failed to load featured items"));
   }, []);
 
   useEffect(() => {
@@ -1920,7 +1895,33 @@ export default function Home() {
       </section>
 
       {/* ── FEATURED LISTINGS ── */}
-      {!loadingBusinesses && featuredBusinesses.length > 0 && (
+      {loadingBusinesses ? (
+        <section className="featured-section">
+          <div className="featured-header">
+            <p className="section-eyebrow">Premium Listings</p>
+            <h2 className="section-title">Featured Businesses</h2>
+            <p className="section-sub">Top-rated businesses and services across Kenya</p>
+          </div>
+          <div className="cards-track-wrap">
+            <div className="cards-track">
+              {[1, 2, 3, 4].map((_, idx) => (
+                <div key={`skeleton-business-${idx}`} className="feat-card">
+                  <div className="feat-img-wrap" style={{ background: "#e2e8f0", height: "200px" }}>
+                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%)", backgroundSize: "200% 100%", animation: "skeleton-loading 1.5s infinite" }}></div>
+                  </div>
+                  <div className="feat-body">
+                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "60%" }}></div>
+                    <div style={{ height: "24px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "80%" }}></div>
+                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "12px", width: "50%" }}></div>
+                    <div style={{ height: "20px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "16px", width: "40%" }}></div>
+                    <div style={{ height: "40px", background: "#e2e8f0", borderRadius: "8px", width: "100%" }}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : featuredBusinesses.length > 0 && (
         <section className="featured-section">
           <div className="featured-header">
             <p className="section-eyebrow">Premium Listings</p>
@@ -1937,6 +1938,7 @@ export default function Home() {
                       src={business.images?.[0] || business.logo || ""}
                       alt={business.name || "Business"}
                       className="feat-img"
+                      loading="lazy"
                       onError={e => { e.target.style.display = "none"; }}
                     />
                     <div className="feat-boosted">★ Featured</div>
@@ -1969,7 +1971,33 @@ export default function Home() {
       )}
 
       {/* ── FEATURED PROPERTIES SECTION ── */}
-      {!loadingFeatured && featuredProperties.length > 0 && (
+      {loadingFeatured ? (
+        <section className="feat-section">
+          <div className="section-hdr">
+            <p className="section-eyebrow">⭐ Featured Rentals</p>
+            <h2 className="section-title">Featured Properties & Rentals</h2>
+            <p className="section-sub">Premium rental properties across Kenya</p>
+          </div>
+          <div className="cards-track-wrap">
+            <div className="cards-track">
+              {[1, 2, 3, 4].map((_, idx) => (
+                <div key={`skeleton-property-${idx}`} className="feat-card">
+                  <div className="feat-img-wrap" style={{ background: "#e2e8f0", height: "200px" }}>
+                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%)", backgroundSize: "200% 100%", animation: "skeleton-loading 1.5s infinite" }}></div>
+                  </div>
+                  <div className="feat-body">
+                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "50%" }}></div>
+                    <div style={{ height: "24px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "80%" }}></div>
+                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "12px", width: "60%" }}></div>
+                    <div style={{ height: "20px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "16px", width: "40%" }}></div>
+                    <div style={{ height: "40px", background: "#e2e8f0", borderRadius: "8px", width: "100%" }}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : featuredProperties.length > 0 && (
         <section className="feat-section">
           <div className="section-hdr">
             <p className="section-eyebrow">⭐ Featured Rentals</p>
@@ -1985,6 +2013,7 @@ export default function Home() {
                       src={property.images?.[0] || ""}
                       alt={property.title || "Property"}
                       className="feat-img"
+                      loading="lazy"
                       onError={e => { e.target.style.display = "none"; }}
                     />
                     <div className="feat-boosted">★ Featured</div>
@@ -2015,7 +2044,33 @@ export default function Home() {
       )}
 
       {/* ── FEATURED MATERIALS SECTION ── */}
-      {!loadingMaterials && featuredMaterials.length > 0 && (
+      {loadingMaterials ? (
+        <section className="feat-section">
+          <div className="section-hdr">
+            <p className="section-eyebrow">⭐ Featured QuickSales</p>
+            <h2 className="section-title">Featured Materials & Products</h2>
+            <p className="section-sub">Handpicked materials and products from verified sellers</p>
+          </div>
+          <div className="cards-track-wrap">
+            <div className="cards-track">
+              {[1, 2, 3, 4].map((_, idx) => (
+                <div key={`skeleton-material-${idx}`} className="feat-card">
+                  <div className="feat-img-wrap" style={{ background: "#e2e8f0", height: "200px" }}>
+                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%)", backgroundSize: "200% 100%", animation: "skeleton-loading 1.5s infinite" }}></div>
+                  </div>
+                  <div className="feat-body">
+                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "50%" }}></div>
+                    <div style={{ height: "24px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "80%" }}></div>
+                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "12px", width: "60%" }}></div>
+                    <div style={{ height: "20px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "16px", width: "40%" }}></div>
+                    <div style={{ height: "40px", background: "#e2e8f0", borderRadius: "8px", width: "100%" }}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : featuredMaterials.length > 0 && (
         <section className="feat-section">
           <div className="section-hdr">
             <p className="section-eyebrow">⭐ Featured QuickSales</p>
@@ -2031,6 +2086,7 @@ export default function Home() {
                       src={material.images?.[0] || ""}
                       alt={material.title || "Material"}
                       className="feat-img"
+                      loading="lazy"
                       onError={e => { e.target.style.display = "none"; }}
                     />
                     <div className="feat-boosted">★ Featured</div>
@@ -2061,7 +2117,33 @@ export default function Home() {
       )}
 
       {/* ── FEATURED TOURISM SECTION ── */}
-      {!loadingTourism && featuredTourism.length > 0 && (
+      {loadingTourism ? (
+        <section className="feat-section">
+          <div className="section-hdr">
+            <p className="section-eyebrow">⭐ Featured Tourism</p>
+            <h2 className="section-title">Featured Hotels & Experiences</h2>
+            <p className="section-sub">Top-rated tourism destinations across Kenya</p>
+          </div>
+          <div className="cards-track-wrap">
+            <div className="cards-track">
+              {[1, 2, 3, 4].map((_, idx) => (
+                <div key={`skeleton-tourism-${idx}`} className="feat-card">
+                  <div className="feat-img-wrap" style={{ background: "#e2e8f0", height: "200px" }}>
+                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%)", backgroundSize: "200% 100%", animation: "skeleton-loading 1.5s infinite" }}></div>
+                  </div>
+                  <div className="feat-body">
+                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "50%" }}></div>
+                    <div style={{ height: "24px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "80%" }}></div>
+                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "12px", width: "60%" }}></div>
+                    <div style={{ height: "20px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "16px", width: "40%" }}></div>
+                    <div style={{ height: "40px", background: "#e2e8f0", borderRadius: "8px", width: "100%" }}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : featuredTourism.length > 0 && (
         <section className="feat-section">
           <div className="section-hdr">
             <p className="section-eyebrow">⭐ Featured Tourism</p>
@@ -2077,6 +2159,7 @@ export default function Home() {
                       src={tourism.images?.[0] || ""}
                       alt={tourism.name || "Tourism"}
                       className="feat-img"
+                      loading="lazy"
                       onError={e => { e.target.style.display = "none"; }}
                     />
                     <div className="feat-boosted">★ Featured</div>
@@ -2107,7 +2190,33 @@ export default function Home() {
       )}
 
       {/* ── FEATURED MOVERS SECTION ── */}
-      {!loadingMovers && featuredMovers.length > 0 && (
+      {loadingMovers ? (
+        <section className="feat-section">
+          <div className="section-hdr">
+            <p className="section-eyebrow">⭐ Featured Movers</p>
+            <h2 className="section-title">Featured Moving Services</h2>
+            <p className="section-sub">Trusted moving companies with excellent ratings</p>
+          </div>
+          <div className="cards-track-wrap">
+            <div className="cards-track">
+              {[1, 2, 3, 4].map((_, idx) => (
+                <div key={`skeleton-mover-${idx}`} className="feat-card">
+                  <div className="feat-img-wrap" style={{ background: "#e2e8f0", height: "200px" }}>
+                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%)", backgroundSize: "200% 100%", animation: "skeleton-loading 1.5s infinite" }}></div>
+                  </div>
+                  <div className="feat-body">
+                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "50%" }}></div>
+                    <div style={{ height: "24px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "80%" }}></div>
+                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "12px", width: "60%" }}></div>
+                    <div style={{ height: "20px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "16px", width: "40%" }}></div>
+                    <div style={{ height: "40px", background: "#e2e8f0", borderRadius: "8px", width: "100%" }}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : featuredMovers.length > 0 && (
         <section className="feat-section">
           <div className="section-hdr">
             <p className="section-eyebrow">⭐ Featured Movers</p>
@@ -2123,6 +2232,7 @@ export default function Home() {
                       src={mover.portfolioImages?.[0] || mover.workPhotos?.[0] || mover.profileImage || ""}
                       alt={`${mover.name} - Work Photo`}
                       className="feat-img"
+                      loading="lazy"
                       onError={e => { e.target.style.display = "none"; }}
                     />
                     <div className="feat-boosted">★ Featured</div>
