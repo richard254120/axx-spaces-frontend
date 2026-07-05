@@ -130,7 +130,7 @@ export default function PropertyDetailPage() {
       <Navbar />
       <div style={{ minHeight: "100vh", background: "#f8fafc", paddingBottom: "60px" }}>
         {/* Image Gallery */}
-        <div style={{ position: "relative", height: "500px", background: "#e2e8f0" }}>
+        <div style={{ position: "relative", height: "300px", background: "#e2e8f0" }}>
           {property.images?.length > 0 ? (
             <>
               <img
@@ -144,17 +144,17 @@ export default function PropertyDetailPage() {
                     onClick={() => setCurrentImageIndex((i) => (i - 1 + property.images.length) % property.images.length)}
                     style={{
                       position: "absolute",
-                      left: "20px",
+                      left: "10px",
                       top: "50%",
                       transform: "translateY(-50%)",
                       background: "rgba(0,0,0,0.5)",
                       color: "white",
                       border: "none",
                       borderRadius: "50%",
-                      width: "50px",
-                      height: "50px",
+                      width: "40px",
+                      height: "40px",
                       cursor: "pointer",
-                      fontSize: "24px",
+                      fontSize: "20px",
                     }}
                   >
                     ❮
@@ -163,17 +163,17 @@ export default function PropertyDetailPage() {
                     onClick={() => setCurrentImageIndex((i) => (i + 1) % property.images.length)}
                     style={{
                       position: "absolute",
-                      right: "20px",
+                      right: "10px",
                       top: "50%",
                       transform: "translateY(-50%)",
                       background: "rgba(0,0,0,0.5)",
                       color: "white",
                       border: "none",
                       borderRadius: "50%",
-                      width: "50px",
-                      height: "50px",
+                      width: "40px",
+                      height: "40px",
                       cursor: "pointer",
-                      fontSize: "24px",
+                      fontSize: "20px",
                     }}
                   >
                     ❯
@@ -181,14 +181,14 @@ export default function PropertyDetailPage() {
                   <div
                     style={{
                       position: "absolute",
-                      bottom: "20px",
+                      bottom: "15px",
                       left: "50%",
                       transform: "translateX(-50%)",
                       background: "rgba(0,0,0,0.7)",
                       color: "white",
-                      padding: "8px 16px",
+                      padding: "6px 12px",
                       borderRadius: "20px",
-                      fontSize: "14px",
+                      fontSize: "12px",
                     }}
                   >
                     {currentImageIndex + 1} / {property.images.length}
@@ -197,53 +197,53 @@ export default function PropertyDetailPage() {
               )}
             </>
           ) : (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#94a3b8", fontSize: "24px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#94a3b8", fontSize: "18px" }}>
               No Photos
             </div>
           )}
         </div>
 
         {/* Content */}
-        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "40px 20px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "40px" }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "24px 16px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "24px" }}>
             {/* Main Content */}
             <div>
-              <div style={{ marginBottom: "20px" }}>
-                <span style={{ background: "#3b82f6", color: "white", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", fontWeight: 600, textTransform: "uppercase" }}>
+              <div style={{ marginBottom: "16px" }}>
+                <span style={{ background: "#3b82f6", color: "white", padding: "4px 10px", borderRadius: "6px", fontSize: "11px", fontWeight: 600, textTransform: "uppercase" }}>
                   {property.propertyType || "Rental"}
                 </span>
               </div>
-              <h1 style={{ fontSize: "32px", fontWeight: 700, color: "#1e293b", marginBottom: "12px" }}>{property.title}</h1>
-              <p style={{ fontSize: "16px", color: "#64748b", marginBottom: "24px" }}>
+              <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#1e293b", marginBottom: "8px", lineHeight: "1.3" }}>{property.title}</h1>
+              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "20px" }}>
                 📍 {property.location}, {property.county}
               </p>
 
-              <div style={{ display: "flex", gap: "20px", marginBottom: "32px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span style={{ fontSize: "24px" }}>🛏️</span>
-                  <span style={{ fontSize: "18px", fontWeight: 600, color: "#1e293b" }}>{property.bedrooms} Bedrooms</span>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", marginBottom: "24px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span style={{ fontSize: "20px" }}>🛏️</span>
+                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#1e293b" }}>{property.bedrooms} Bedrooms</span>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span style={{ fontSize: "24px" }}>🚿</span>
-                  <span style={{ fontSize: "18px", fontWeight: 600, color: "#1e293b" }}>{property.bathrooms} Bathrooms</span>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span style={{ fontSize: "20px" }}>🚿</span>
+                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#1e293b" }}>{property.bathrooms} Bathrooms</span>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span style={{ fontSize: "24px" }}>📐</span>
-                  <span style={{ fontSize: "18px", fontWeight: 600, color: "#1e293b" }}>{property.furnished ? "Furnished" : "Unfurnished"}</span>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span style={{ fontSize: "20px" }}>📐</span>
+                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#1e293b" }}>{property.furnished ? "Furnished" : "Unfurnished"}</span>
                 </div>
               </div>
 
-              <div style={{ marginBottom: "32px" }}>
-                <h2 style={{ fontSize: "24px", fontWeight: 700, color: "#1e293b", marginBottom: "16px" }}>Description</h2>
-                <p style={{ fontSize: "16px", color: "#475569", lineHeight: "1.8" }}>{property.description || "No description provided."}</p>
+              <div style={{ marginBottom: "24px" }}>
+                <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b", marginBottom: "12px" }}>Description</h2>
+                <p style={{ fontSize: "14px", color: "#475569", lineHeight: "1.7" }}>{property.description || "No description provided."}</p>
               </div>
 
               {property.amenities?.length > 0 && (
-                <div style={{ marginBottom: "32px" }}>
-                  <h2 style={{ fontSize: "24px", fontWeight: 700, color: "#1e293b", marginBottom: "16px" }}>Amenities</h2>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}>
+                <div style={{ marginBottom: "24px" }}>
+                  <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b", marginBottom: "12px" }}>Amenities</h2>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
                     {property.amenities.map((amenity, idx) => (
-                      <span key={idx} style={{ background: "#f1f5f9", padding: "8px 16px", borderRadius: "8px", fontSize: "14px", color: "#475569" }}>
+                      <span key={idx} style={{ background: "#f1f5f9", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", color: "#475569" }}>
                         ✓ {amenity}
                       </span>
                     ))}
@@ -252,24 +252,24 @@ export default function PropertyDetailPage() {
               )}
 
               {property.houseRules && (
-                <div style={{ marginBottom: "32px" }}>
-                  <h2 style={{ fontSize: "24px", fontWeight: 700, color: "#1e293b", marginBottom: "16px" }}>House Rules</h2>
-                  <p style={{ fontSize: "16px", color: "#475569", lineHeight: "1.8" }}>{property.houseRules}</p>
+                <div style={{ marginBottom: "24px" }}>
+                  <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b", marginBottom: "12px" }}>House Rules</h2>
+                  <p style={{ fontSize: "14px", color: "#475569", lineHeight: "1.7" }}>{property.houseRules}</p>
                 </div>
               )}
             </div>
 
             {/* Sidebar */}
             <div>
-              <div style={{ background: "white", borderRadius: "12px", padding: "24px", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", position: "sticky", top: "100px" }}>
-                <div style={{ marginBottom: "20px" }}>
-                  <div style={{ fontSize: "32px", fontWeight: 700, color: "#1e293b" }}>KES {property.price?.toLocaleString()}</div>
-                  <div style={{ fontSize: "14px", color: "#64748b" }}>per month</div>
+              <div style={{ background: "white", borderRadius: "12px", padding: "20px", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", position: "sticky", top: "80px" }}>
+                <div style={{ marginBottom: "16px" }}>
+                  <div style={{ fontSize: "28px", fontWeight: 700, color: "#1e293b" }}>KES {property.price?.toLocaleString()}</div>
+                  <div style={{ fontSize: "13px", color: "#64748b" }}>per month</div>
                 </div>
 
-                <div style={{ marginBottom: "20px" }}>
-                  <div style={{ fontSize: "14px", color: "#64748b", marginBottom: "8px" }}>Availability</div>
-                  <div style={{ fontSize: "16px", fontWeight: 600, color: property.availableUnits > 0 ? "#22c55e" : "#ef4444" }}>
+                <div style={{ marginBottom: "16px" }}>
+                  <div style={{ fontSize: "13px", color: "#64748b", marginBottom: "6px" }}>Availability</div>
+                  <div style={{ fontSize: "14px", fontWeight: 600, color: property.availableUnits > 0 ? "#22c55e" : "#ef4444" }}>
                     {property.availableUnits > 0 ? `${property.availableUnits} units available` : "Fully Booked"}
                   </div>
                 </div>
@@ -280,15 +280,15 @@ export default function PropertyDetailPage() {
                       onClick={() => setShowBookingModal(true)}
                       style={{
                         width: "100%",
-                        padding: "16px",
+                        padding: "14px",
                         background: "#3b82f6",
                         color: "white",
                         border: "none",
                         borderRadius: "8px",
                         fontWeight: 700,
-                        fontSize: "16px",
+                        fontSize: "14px",
                         cursor: "pointer",
-                        marginBottom: "12px",
+                        marginBottom: "10px",
                       }}
                     >
                       Book Now
@@ -297,15 +297,15 @@ export default function PropertyDetailPage() {
                       onClick={handleWhatsApp}
                       style={{
                         width: "100%",
-                        padding: "16px",
+                        padding: "14px",
                         background: "#25d366",
                         color: "white",
                         border: "none",
                         borderRadius: "8px",
                         fontWeight: 700,
-                        fontSize: "16px",
+                        fontSize: "14px",
                         cursor: "pointer",
-                        marginBottom: "12px",
+                        marginBottom: "10px",
                       }}
                     >
                       WhatsApp
@@ -314,13 +314,13 @@ export default function PropertyDetailPage() {
                       onClick={handleCall}
                       style={{
                         width: "100%",
-                        padding: "16px",
+                        padding: "14px",
                         background: "#f1f5f9",
                         color: "#1e293b",
                         border: "1px solid #e2e8f0",
                         borderRadius: "8px",
                         fontWeight: 700,
-                        fontSize: "16px",
+                        fontSize: "14px",
                         cursor: "pointer",
                       }}
                     >
@@ -337,62 +337,62 @@ export default function PropertyDetailPage() {
 
       {/* Booking Modal */}
       {showBookingModal && (
-        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
-          <div style={{ background: "white", borderRadius: "12px", padding: "32px", maxWidth: "500px", width: "90%" }}>
-            <h2 style={{ fontSize: "24px", fontWeight: 700, color: "#1e293b", marginBottom: "24px" }}>Book This Property</h2>
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "16px" }}>
+          <div style={{ background: "white", borderRadius: "12px", padding: "24px", maxWidth: "500px", width: "100%", maxHeight: "90vh", overflowY: "auto" }}>
+            <h2 style={{ fontSize: "20px", fontWeight: 700, color: "#1e293b", marginBottom: "20px" }}>Book This Property</h2>
             {bookingSuccess && <div style={{ background: "#dcfce7", color: "#166534", padding: "12px", borderRadius: "8px", marginBottom: "16px" }}>{bookingSuccess}</div>}
             <form onSubmit={handleBookingSubmit}>
-              <div style={{ marginBottom: "16px" }}>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#1e293b", marginBottom: "8px" }}>Full Name</label>
+              <div style={{ marginBottom: "14px" }}>
+                <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#1e293b", marginBottom: "6px" }}>Full Name</label>
                 <input
                   type="text"
                   required
                   value={bookingData.name}
                   onChange={(e) => setBookingData({ ...bookingData, name: e.target.value })}
-                  style={{ width: "100%", padding: "12px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "16px" }}
+                  style={{ width: "100%", padding: "10px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "14px" }}
                 />
               </div>
-              <div style={{ marginBottom: "16px" }}>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#1e293b", marginBottom: "8px" }}>Phone Number</label>
+              <div style={{ marginBottom: "14px" }}>
+                <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#1e293b", marginBottom: "6px" }}>Phone Number</label>
                 <input
                   type="tel"
                   required
                   value={bookingData.phone}
                   onChange={(e) => setBookingData({ ...bookingData, phone: e.target.value })}
-                  style={{ width: "100%", padding: "12px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "16px" }}
+                  style={{ width: "100%", padding: "10px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "14px" }}
                 />
               </div>
-              <div style={{ marginBottom: "16px" }}>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#1e293b", marginBottom: "8px" }}>Move-in Date</label>
+              <div style={{ marginBottom: "14px" }}>
+                <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#1e293b", marginBottom: "6px" }}>Move-in Date</label>
                 <input
                   type="date"
                   required
                   value={bookingData.moveInDate}
                   onChange={(e) => setBookingData({ ...bookingData, moveInDate: e.target.value })}
-                  style={{ width: "100%", padding: "12px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "16px" }}
+                  style={{ width: "100%", padding: "10px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "14px" }}
                 />
               </div>
-              <div style={{ marginBottom: "24px" }}>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#1e293b", marginBottom: "8px" }}>Message</label>
+              <div style={{ marginBottom: "20px" }}>
+                <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#1e293b", marginBottom: "6px" }}>Message</label>
                 <textarea
                   value={bookingData.message}
                   onChange={(e) => setBookingData({ ...bookingData, message: e.target.value })}
-                  style={{ width: "100%", padding: "12px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "16px", minHeight: "100px" }}
+                  style={{ width: "100%", padding: "10px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "14px", minHeight: "80px" }}
                   placeholder="Any additional information..."
                 />
               </div>
-              <div style={{ display: "flex", gap: "12px" }}>
+              <div style={{ display: "flex", gap: "10px", flexDirection: "column" }}>
                 <button
                   type="button"
                   onClick={() => setShowBookingModal(false)}
-                  style={{ flex: 1, padding: "12px", background: "#f1f5f9", color: "#1e293b", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer" }}
+                  style={{ padding: "12px", background: "#f1f5f9", color: "#1e293b", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer" }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={bookingLoading}
-                  style={{ flex: 2, padding: "12px", background: "#3b82f6", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: bookingLoading ? "not-allowed" : "pointer" }}
+                  style={{ padding: "12px", background: "#3b82f6", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: bookingLoading ? "not-allowed" : "pointer" }}
                 >
                   {bookingLoading ? "Sending..." : "Submit Booking"}
                 </button>

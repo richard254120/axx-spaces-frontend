@@ -122,7 +122,7 @@ export default function MaterialDetailPage() {
       <Navbar />
       <div style={{ minHeight: "100vh", background: "#f8fafc", paddingBottom: "60px" }}>
         {/* Image Gallery */}
-        <div style={{ position: "relative", height: "500px", background: "#e2e8f0" }}>
+        <div style={{ position: "relative", height: "300px", background: "#e2e8f0" }}>
           {item.images?.length > 0 ? (
             <>
               <img
@@ -136,17 +136,17 @@ export default function MaterialDetailPage() {
                     onClick={() => setCurrentImageIndex((i) => (i - 1 + item.images.length) % item.images.length)}
                     style={{
                       position: "absolute",
-                      left: "20px",
+                      left: "10px",
                       top: "50%",
                       transform: "translateY(-50%)",
                       background: "rgba(0,0,0,0.5)",
                       color: "white",
                       border: "none",
                       borderRadius: "50%",
-                      width: "50px",
-                      height: "50px",
+                      width: "40px",
+                      height: "40px",
                       cursor: "pointer",
-                      fontSize: "24px",
+                      fontSize: "20px",
                     }}
                   >
                     ❮
@@ -155,17 +155,17 @@ export default function MaterialDetailPage() {
                     onClick={() => setCurrentImageIndex((i) => (i + 1) % item.images.length)}
                     style={{
                       position: "absolute",
-                      right: "20px",
+                      right: "10px",
                       top: "50%",
                       transform: "translateY(-50%)",
                       background: "rgba(0,0,0,0.5)",
                       color: "white",
                       border: "none",
                       borderRadius: "50%",
-                      width: "50px",
-                      height: "50px",
+                      width: "40px",
+                      height: "40px",
                       cursor: "pointer",
-                      fontSize: "24px",
+                      fontSize: "20px",
                     }}
                   >
                     ❯
@@ -173,14 +173,14 @@ export default function MaterialDetailPage() {
                   <div
                     style={{
                       position: "absolute",
-                      bottom: "20px",
+                      bottom: "15px",
                       left: "50%",
                       transform: "translateX(-50%)",
                       background: "rgba(0,0,0,0.7)",
                       color: "white",
-                      padding: "8px 16px",
+                      padding: "6px 12px",
                       borderRadius: "20px",
-                      fontSize: "14px",
+                      fontSize: "12px",
                     }}
                   >
                     {currentImageIndex + 1} / {item.images.length}
@@ -192,16 +192,16 @@ export default function MaterialDetailPage() {
                 onClick={handleToggleFavorite}
                 style={{
                   position: "absolute",
-                  top: "20px",
-                  right: "20px",
+                  top: "15px",
+                  right: "15px",
                   background: "rgba(255,255,255,0.9)",
                   color: isFavorite ? "#ef4444" : "#9ca3af",
                   border: "none",
                   borderRadius: "50%",
-                  width: "50px",
-                  height: "50px",
+                  width: "40px",
+                  height: "40px",
                   cursor: "pointer",
-                  fontSize: "24px",
+                  fontSize: "20px",
                   boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
                 }}
               >
@@ -209,83 +209,83 @@ export default function MaterialDetailPage() {
               </button>
             </>
           ) : (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#94a3b8", fontSize: "24px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#94a3b8", fontSize: "18px" }}>
               No Photos
             </div>
           )}
         </div>
 
         {/* Content */}
-        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "40px 20px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "40px" }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "24px 16px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "24px" }}>
             {/* Main Content */}
             <div>
-              <div style={{ marginBottom: "20px" }}>
-                <span style={{ background: "#3b82f6", color: "white", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", fontWeight: 600, textTransform: "uppercase" }}>
+              <div style={{ marginBottom: "16px" }}>
+                <span style={{ background: "#3b82f6", color: "white", padding: "4px 10px", borderRadius: "6px", fontSize: "11px", fontWeight: 600, textTransform: "uppercase" }}>
                   {item.category || "General"}
                 </span>
-                <span style={{ background: "#22c55e", color: "white", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", fontWeight: 600, marginLeft: "8px" }}>
+                <span style={{ background: "#22c55e", color: "white", padding: "4px 10px", borderRadius: "6px", fontSize: "11px", fontWeight: 600, marginLeft: "6px" }}>
                   {item.condition || "Good"}
                 </span>
               </div>
-              <h1 style={{ fontSize: "32px", fontWeight: 700, color: "#1e293b", marginBottom: "12px" }}>{item.title}</h1>
-              <p style={{ fontSize: "16px", color: "#64748b", marginBottom: "24px" }}>
+              <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#1e293b", marginBottom: "8px", lineHeight: "1.3" }}>{item.title}</h1>
+              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "20px" }}>
                 📍 {item.location}, {item.county}
               </p>
 
-              <div style={{ display: "flex", gap: "20px", marginBottom: "32px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span style={{ fontSize: "24px" }}>{getCategoryEmoji(item.category)}</span>
-                  <span style={{ fontSize: "18px", fontWeight: 600, color: "#1e293b" }}>{item.category}</span>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", marginBottom: "24px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span style={{ fontSize: "20px" }}>{getCategoryEmoji(item.category)}</span>
+                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#1e293b" }}>{item.category}</span>
                 </div>
                 {item.quantity && (
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <span style={{ fontSize: "24px" }}>📦</span>
-                    <span style={{ fontSize: "18px", fontWeight: 600, color: "#1e293b" }}>{item.quantity} available</span>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span style={{ fontSize: "20px" }}>📦</span>
+                    <span style={{ fontSize: "14px", fontWeight: 600, color: "#1e293b" }}>{item.quantity} available</span>
                   </div>
                 )}
               </div>
 
-              <div style={{ marginBottom: "32px" }}>
-                <h2 style={{ fontSize: "24px", fontWeight: 700, color: "#1e293b", marginBottom: "16px" }}>Description</h2>
-                <p style={{ fontSize: "16px", color: "#475569", lineHeight: "1.8" }}>{item.description || "No description provided."}</p>
+              <div style={{ marginBottom: "24px" }}>
+                <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b", marginBottom: "12px" }}>Description</h2>
+                <p style={{ fontSize: "14px", color: "#475569", lineHeight: "1.7" }}>{item.description || "No description provided."}</p>
               </div>
 
               {item.specifications && (
-                <div style={{ marginBottom: "32px" }}>
-                  <h2 style={{ fontSize: "24px", fontWeight: 700, color: "#1e293b", marginBottom: "16px" }}>Specifications</h2>
-                  <p style={{ fontSize: "16px", color: "#475569", lineHeight: "1.8" }}>{item.specifications}</p>
+                <div style={{ marginBottom: "24px" }}>
+                  <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b", marginBottom: "12px" }}>Specifications</h2>
+                  <p style={{ fontSize: "14px", color: "#475569", lineHeight: "1.7" }}>{item.specifications}</p>
                 </div>
               )}
             </div>
 
             {/* Sidebar */}
             <div>
-              <div style={{ background: "white", borderRadius: "12px", padding: "24px", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", position: "sticky", top: "100px" }}>
-                <div style={{ marginBottom: "20px" }}>
-                  <div style={{ fontSize: "32px", fontWeight: 700, color: "#1e293b" }}>KES {Number(item.price).toLocaleString()}</div>
-                  <div style={{ fontSize: "14px", color: "#64748b" }}>Fixed price</div>
+              <div style={{ background: "white", borderRadius: "12px", padding: "20px", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", position: "sticky", top: "80px" }}>
+                <div style={{ marginBottom: "16px" }}>
+                  <div style={{ fontSize: "28px", fontWeight: 700, color: "#1e293b" }}>KES {Number(item.price).toLocaleString()}</div>
+                  <div style={{ fontSize: "13px", color: "#64748b" }}>Fixed price</div>
                 </div>
 
-                <div style={{ marginBottom: "20px", padding: "16px", background: "#f1f5f9", borderRadius: "8px" }}>
-                  <div style={{ fontSize: "14px", color: "#64748b", marginBottom: "8px" }}>Seller</div>
-                  <div style={{ fontSize: "16px", fontWeight: 600, color: "#1e293b" }}>{item.sellerName}</div>
-                  <div style={{ fontSize: "14px", color: "#64748b", marginTop: "4px" }}>📍 {item.county}</div>
+                <div style={{ marginBottom: "16px", padding: "14px", background: "#f1f5f9", borderRadius: "8px" }}>
+                  <div style={{ fontSize: "13px", color: "#64748b", marginBottom: "6px" }}>Seller</div>
+                  <div style={{ fontSize: "15px", fontWeight: 600, color: "#1e293b" }}>{item.sellerName}</div>
+                  <div style={{ fontSize: "13px", color: "#64748b", marginTop: "4px" }}>📍 {item.county}</div>
                 </div>
 
                 <button
                   onClick={handleWhatsApp}
                   style={{
                     width: "100%",
-                    padding: "16px",
+                    padding: "14px",
                     background: "#25d366",
                     color: "white",
                     border: "none",
                     borderRadius: "8px",
                     fontWeight: 700,
-                    fontSize: "16px",
+                    fontSize: "14px",
                     cursor: "pointer",
-                    marginBottom: "12px",
+                    marginBottom: "10px",
                   }}
                 >
                   WhatsApp Seller
@@ -294,13 +294,13 @@ export default function MaterialDetailPage() {
                   onClick={handleCall}
                   style={{
                     width: "100%",
-                    padding: "16px",
+                    padding: "14px",
                     background: "#f1f5f9",
                     color: "#1e293b",
                     border: "1px solid #e2e8f0",
                     borderRadius: "8px",
                     fontWeight: 700,
-                    fontSize: "16px",
+                    fontSize: "14px",
                     cursor: "pointer",
                   }}
                 >
@@ -310,7 +310,7 @@ export default function MaterialDetailPage() {
             </div>
           </div>
         </div>
-      </div>
+      </div >
       <FloatingWhatsApp />
     </>
   );
