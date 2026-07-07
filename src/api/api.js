@@ -14,7 +14,7 @@ API.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`, config.data);
+    console.log(`🟢 Main Frontend API Request: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`, config.data);
     return config;
   },
   (error) => {
@@ -26,11 +26,11 @@ API.interceptors.request.use(
 // Add response interceptor for debugging
 API.interceptors.response.use(
   (response) => {
-    console.log(`API Response: ${response.config.url}`, response.data);
+    console.log(`🟢 Main Frontend API Response: ${response.config.url}`, response.data);
     return response;
   },
   (error) => {
-    console.error("API Response Error:", error);
+    console.error("🔴 Main Frontend API Response Error:", error);
     if (error.response) {
       console.error("Error status:", error.response.status);
       console.error("Error data:", error.response.data);
