@@ -727,69 +727,80 @@ export default function AxxBiashara() {
         )}
 
         {/* Directory Grid */}
-        {loading ? (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "24px" }}>
-            {[...Array(6)].map((_, i) => <div key={i} className="shimmer-card" style={{ animationDelay: `${i * 0.08}s` }} />)}
-          </div>
-        ) : businesses.length === 0 ? (
-          <div className="no-results">
-            <div className="no-results-icon">🔍</div>
-            <p style={{ fontSize: "19px", fontWeight: 700, color: "#94a3b8", marginBottom: "8px" }}>No matching businesses</p>
-            <p style={{ color: "#475569" }}>Try broadening your search query or selecting a different category/county.</p>
-          </div>
-        ) : (
-          <>
-            {console.log("🎨 Rendering businesses grid, count:", businesses.length)}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" }} className="business-grid">
-              {businesses.map((biz, idx) => (
-                <div
-                  key={biz._id}
-                  className="axx-card"
-                  style={{
-                    animationDelay: `${Math.min(idx * 0.05, 0.4)}s`,
-                    border: biz.featured ? "1px solid rgba(251, 191, 36, 0.35)" : undefined,
-                    boxShadow: biz.featured ? "0 0 15px rgba(251, 191, 36, 0.04)" : undefined,
-                  }}
-                  onClick={() => navigate(`/business/${biz._id}`)}
-                  onMouseEnter={() => setHoveredCard(biz._id)}
-                  onMouseLeave={() => setHoveredCard(null)}
-                >
-                  {biz.featured && <div className="featured-tag">Featured</div>}
+        {(() => {
+          console.log("🔍 Conditional check - loading:", loading, "businesses.length:", businesses.length);
+          if (loading) {
+            console.log("⏳ Showing loading state");
+            return (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "24px" }}>
+                {[...Array(6)].map((_, i) => <div key={i} className="shimmer-card" style={{ animationDelay: `${i * 0.08}s` }} />)}
+              </div>
+            );
+          } else if (businesses.length === 0) {
+            console.log("❌ Showing no results state");
+            return (
+              <div className="no-results">
+                <div className="no-results-icon">🔍</div>
+                <p style={{ fontSize: "19px", fontWeight: 700, color: "#94a3b8", marginBottom: "8px" }}>No matching businesses</p>
+                <p style={{ color: "#475569" }}>Try broadening your search query or selecting a different category/county.</p>
+              </div>
+            );
+          } else {
+            console.log("✅ Showing businesses grid, count:", businesses.length);
+            return (
+              <>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" }} className="business-grid">
+                  {businesses.map((biz, idx) => (
+                    <div
+                      key={biz._id}
+                      className="axx-card"
+                      style={{
+                        animationDelay: `${Math.min(idx * 0.05, 0.4)}s`,
+                        border: biz.featured ? "1px solid rgba(251, 191, 36, 0.35)" : undefined,
+                        boxShadow: biz.featured ? "0 0 15px rgba(251, 191, 36, 0.04)" : undefined,
+                      }}
+                      onClick={() => navigate(`/business/${biz._id}`)}
+                      onMouseEnter={() => setHoveredCard(biz._id)}
+                      onMouseLeave={() => setHoveredCard(null)}
+                    >
+                      {biz.featured && <div className="featured-tag">Featured</div>}
 
-                  {/* Visual Header */}
-                  {biz.images?.length > 0 ? (
-                    <div className="card-img-wrap">
-                      <img src={biz.images[0]} alt={biz.name} />
-                      <div className="card-img-overlay" />
-                      {biz.rating > 0 && (
-                        <div style={{ position: "absolute", bottom: "12px", left: "14px", background: "rgba(9, 13, 22, 0.8)", backdropFilter: "blur(4px)", borderRadius: "8px", padding: "4px 10px", fontSize: "11px", fontWeight: 800, color: "#fbbf24", zIndex: 2, border: "1px solid rgba(255,255,255,0.08)" }}>
-                          ★ {biz.rating?.toFixed(1)}
+                      {/* Visual Header */}
+                      {biz.images?.length > 0 ? (
+                        <div className="card-img-wrap">
+                          <img src={biz.images[0]} alt={biz.name} />
+                          <div className="card-img-overlay" />
+                          {biz.rating > 0 && (
+                            <div style={{ position: "absolute", bottom: "12px", left: "14px", background: "rgba(9, 13, 22, 0.8)", backdropFilter: "blur(4px)", borderRadius: "8px", padding: "4px 10px", fontSize: "11px", fontWeight: 800, color: "#fbbf24", zIndex: 2, border: "1px solid rgba(255,255,255,0.08)" }}>
+                              ★ {biz.rating?.toFixed(1)}
+                            </div>
+                          )}
+                          <div style={{ position: "absolute", top: "12px", right: "12px", display: "flex", gap: "8px", zIndex: 2 }}>
+                            <button className="icon-btn" onClick={e => toggleFavorite(biz._id, e)} title="Favorite" style={{ padding: "8px", width: "32px", height: "32px" }}>
+                              {isFavorite(biz._id) ? "❤️" : "🤍"}
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div style={{ aspectRatio: "1/1", background: "linear-gradient(135deg, rgba(251,191,36,0.05) 0%, rgba(20,184,166,0.03) 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "32px", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                          🏪
                         </div>
                       )}
-                      <div style={{ position: "absolute", top: "12px", right: "12px", display: "flex", gap: "8px", zIndex: 2 }}>
-                        <button className="icon-btn" onClick={e => toggleFavorite(biz._id, e)} title="Favorite" style={{ padding: "8px", width: "32px", height: "32px" }}>
-                          {isFavorite(biz._id) ? "❤️" : "🤍"}
-                        </button>
+
+                      {/* Body Content - Simplified */}
+                      <div style={{ padding: "16px" }}>
+                        <h3 style={{ fontSize: "16px", fontWeight: 800, color: "#f8fafc", lineHeight: 1.3, marginBottom: "8px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{biz.name}</h3>
+                        <div style={{ fontSize: "12px", color: "#94a3b8", display: "flex", alignItems: "center", gap: "6px", fontWeight: 500 }}>
+                          <span>📍</span> {biz.location?.town}, {biz.location?.county}
+                        </div>
                       </div>
                     </div>
-                  ) : (
-                    <div style={{ aspectRatio: "1/1", background: "linear-gradient(135deg, rgba(251,191,36,0.05) 0%, rgba(20,184,166,0.03) 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "32px", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                      🏪
-                    </div>
-                  )}
-
-                  {/* Body Content - Simplified */}
-                  <div style={{ padding: "16px" }}>
-                    <h3 style={{ fontSize: "16px", fontWeight: 800, color: "#f8fafc", lineHeight: 1.3, marginBottom: "8px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{biz.name}</h3>
-                    <div style={{ fontSize: "12px", color: "#94a3b8", display: "flex", alignItems: "center", gap: "6px", fontWeight: 500 }}>
-                      <span>📍</span> {biz.location?.town}, {biz.location?.county}
-                    </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </>
-        )}
+              </>
+            );
+          }
+        })()}
       </div>
 
       {/* Pagination controls */}
