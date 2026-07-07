@@ -76,6 +76,8 @@ export default function AxxBiashara() {
       if (openNow) params.openNow = "true";
       if (verification) params.verification = verification;
       const res = await API.get("/business", { params });
+      console.log("🔍 Frontend received businesses:", res.data.businesses?.length);
+      console.log("🔍 Setting businesses state:", res.data.businesses);
       setBusinesses(res.data.businesses || []);
     } catch (err) {
       console.error("Failed to load businesses:", err);
