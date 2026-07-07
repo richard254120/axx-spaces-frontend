@@ -749,15 +749,19 @@ export default function AxxBiashara() {
             console.log("✅ Showing businesses grid, count:", businesses.length);
             return (
               <>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" }} className="business-grid">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px", minHeight: "400px", background: "rgba(255,0,0,0.1)" }} className="business-grid">
                   {businesses.map((biz, idx) => (
                     <div
                       key={biz._id}
                       className="axx-card"
                       style={{
                         animationDelay: `${Math.min(idx * 0.05, 0.4)}s`,
-                        border: biz.featured ? "1px solid rgba(251, 191, 36, 0.35)" : undefined,
-                        boxShadow: biz.featured ? "0 0 15px rgba(251, 191, 36, 0.04)" : undefined,
+                        border: biz.featured ? "1px solid rgba(251, 191, 36, 0.35)" : "1px solid rgba(255,255,255,0.1)",
+                        boxShadow: biz.featured ? "0 0 15px rgba(251, 191, 36, 0.04)" : "0 4px 6px rgba(0,0,0,0.1)",
+                        background: "rgba(255,255,255,0.05)",
+                        borderRadius: "12px",
+                        padding: "16px",
+                        minHeight: "200px",
                       }}
                       onClick={() => navigate(`/business/${biz._id}`)}
                       onMouseEnter={() => setHoveredCard(biz._id)}
