@@ -739,6 +739,7 @@ export default function AxxBiashara() {
           </div>
         ) : (
           <>
+            {console.log("🎨 Rendering businesses grid, count:", businesses.length)}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" }} className="business-grid">
               {businesses.map((biz, idx) => (
                 <div
