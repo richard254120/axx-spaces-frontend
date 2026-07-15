@@ -73,7 +73,7 @@ export default function TourismPage() {
       <section style={s.hero}>
         <div style={s.heroOverlay} />
         <div style={s.heroContent}>
-          <div style={s.heroBadge}>🇰🇪 Kenya's Premier Tourism QuickSAles</div>
+          <div style={s.heroBadge}>🇰🇪 Kenya's Premier Tourism QuickSales</div>
           <h1 style={s.heroTitle}>
             Discover Kenya's
             <br />
@@ -231,7 +231,7 @@ export default function TourismPage() {
             Ready to List Your Property?
           </h2>
           <p style={{ fontSize: "14px", color: "#78350f", marginBottom: "24px", lineHeight: 1.7 }}>
-            Join 200+ properties already benefiting from AXXSpace's tourism QuickSAles. Start attracting guests today.
+            Join 200+ properties already benefiting from AXXSpace's tourism QuickSales. Start attracting guests today.
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
             <button style={s.ctaBtn} onClick={() => user ? navigate("/tourism/register-property") : navigate("/register")}>

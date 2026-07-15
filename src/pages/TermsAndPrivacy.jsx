@@ -4,7 +4,7 @@ const TABS = ["Terms of Service", "Privacy Policy"];
 
 const terms = `
 ## 1. Introduction
-Axxspace Limited ("Axxspace," "we," "us," or "our") operates Kenya's premier property and services platform, connecting individuals and businesses across all 47 counties with rental properties, professional movers, tourism experiences, business services, and a general QuickSAles.
+Axxspace Limited ("Axxspace," "we," "us," or "our") operates Kenya's premier property and services platform, connecting individuals and businesses across all 47 counties with rental properties, professional movers, tourism experiences, business services, and a general QuickSales.
 
 These Terms and Conditions ("Terms") govern your access to and use of the Axxspace website, mobile applications, and all associated services. They form a legally binding agreement between you ("User," "you," or "your") and Axxspace Limited, a company incorporated under the laws of the Republic of Kenya.
 

@@ -1449,6 +1449,42 @@ option { background: #162233; color: #F0EAD8; }
   margin: 0;
   font-weight: 300;
 }
+
+/* ── FEATURED SWITCHER TABS ── */
+.feat-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+.feat-tab-btn {
+  padding: 10px 24px;
+  background: rgba(22, 34, 51, 0.45);
+  border: 1px solid rgba(201,168,76,0.18);
+  border-radius: 30px;
+  color: #B8AD96;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.feat-tab-btn:hover {
+  border-color: rgba(201,168,76,0.5);
+  color: #C9A84C;
+  background: rgba(201,168,76,0.08);
+}
+.feat-tab-btn.active {
+  background: linear-gradient(135deg, #C9A84C 0%, #E2C47A 100%);
+  border-color: #C9A84C;
+  color: #0D1B2A;
+  box-shadow: 0 4px 20px rgba(201,168,76,0.25);
+  font-weight: 700;
+}
 `;
 
 const COUNTY_COORDS = {
@@ -1534,6 +1570,7 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [animatedStats, setAnimatedStats] = useState({ listings: 0, counties: 0, tenants: 0 });
   const [activeCategoryTab, setActiveCategoryTab] = useState("rentals");
+  const [activeFeaturedTab, setActiveFeaturedTab] = useState("properties");
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
@@ -1567,7 +1604,7 @@ export default function Home() {
     { label: "Trusted Moving", accent: "Services" },
     { label: "Hotels & Tourism", accent: "Experiences" },
     { label: "AxxBiashara", accent: "Business Services" },
-    { label: "QuickSAles for", accent: "All Your Needs" },
+    { label: "QuickSales for", accent: "All Your Needs" },
     { label: "Verified Listings —", accent: "Zero Hidden Fees" },
     { label: "Connect via", accent: "WhatsApp" },
     { label: "GPS Maps for", accent: "Every Listing" },
@@ -1610,10 +1647,10 @@ export default function Home() {
     },
     {
       id: "marketplace", icon: "🏪", iconType: "emoji",
-      title: "QuickSAles", tagline: "Buy & sell anything",
-      description: "The ultimate QuickSAles for buying and selling new and used items. From electronics to furniture, fashion to cars.",
+      title: "QuickSales", tagline: "Buy & sell anything",
+      description: "The ultimate QuickSales for buying and selling new and used items. From electronics to furniture, fashion to cars.",
       features: ["New & used items", "Secure transactions", "Nationwide delivery", "Direct seller contact"],
-      cta: "Browse QuickSAles", route: "/materials",
+      cta: "Browse QuickSales", route: "/materials",
       color: "#38BDF8", iconBg: "linear-gradient(135deg,#0C2A3A,#103A4F)",
     },
     {
@@ -1813,7 +1850,7 @@ export default function Home() {
             <span className="hero-title-line2">Under One Roof</span>
           </h1>
           <p className="hero-sub">
-            Rentals · Movers · Tourism · AxxBiashara · QuickSAles<br />Verified across all 47 counties
+            Rentals · Movers · Tourism · AxxBiashara · QuickSales<br />Verified across all 47 counties
           </p>
 
           {/* TABS */}
@@ -1894,431 +1931,300 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── FEATURED LISTINGS ── */}
-      {loadingBusinesses ? (
-        <section className="featured-section">
-          <div className="featured-header">
-            <p className="section-eyebrow">Premium Listings</p>
-            <h2 className="section-title">Featured Businesses</h2>
-            <p className="section-sub">Top-rated businesses and services across Kenya</p>
-          </div>
-          <div className="cards-track-wrap">
-            <div className="cards-track">
-              {[1, 2, 3, 4].map((_, idx) => (
-                <div key={`skeleton-business-${idx}`} className="feat-card">
-                  <div className="feat-img-wrap" style={{ background: "#e2e8f0", height: "200px" }}>
-                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%)", backgroundSize: "200% 100%", animation: "skeleton-loading 1.5s infinite" }}></div>
-                  </div>
-                  <div className="feat-body">
-                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "60%" }}></div>
-                    <div style={{ height: "24px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "80%" }}></div>
-                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "12px", width: "50%" }}></div>
-                    <div style={{ height: "20px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "16px", width: "40%" }}></div>
-                    <div style={{ height: "40px", background: "#e2e8f0", borderRadius: "8px", width: "100%" }}></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      ) : featuredBusinesses.length > 0 && (
-        <section className="featured-section">
-          <div className="featured-header">
-            <p className="section-eyebrow">Premium Listings</p>
-            <h2 className="section-title">Featured Businesses</h2>
-            <p className="section-sub">Top-rated businesses and services across Kenya</p>
-          </div>
+      {/* ── UNIFIED FEATURED SHOWCASE ── */}
+      <section className="featured-section">
+        <div className="featured-header">
+          <p className="section-eyebrow">Premium Offerings</p>
+          <h2 className="section-title">Explore Featured Listings</h2>
+          <p className="section-sub">Discover top-rated services and verified listings handpicked for you</p>
+        </div>
 
-          <div className="cards-track-wrap">
-            <div className="cards-track">
-              {[...featuredBusinesses, ...featuredBusinesses].map((business, idx) => (
-                <div key={`${business._id}-${idx}`} className="feat-card">
-                  <div className="feat-img-wrap">
-                    <img
-                      src={business.images?.[0] || business.logo || ""}
-                      alt={business.name || "Business"}
-                      className="feat-img"
-                      loading="lazy"
-                      onError={e => { e.target.style.display = "none"; }}
-                    />
-                    <div className="feat-boosted">★ Featured</div>
-                    <div className="feat-type">{business.categories?.[0] || "Business"}</div>
-                    <div className="feat-img-grad"></div>
-                  </div>
-                  <div className="feat-body">
-                    <p className="feat-type-label">{business.categories?.[0] || "Business"}</p>
-                    <h3 className="feat-title">{business.name}</h3>
-                    <p className="feat-loc">📍 {business.location?.town}, {business.location?.county}</p>
-                    <div className="feat-meta">
-                      {business.rating && <span className="feat-tag">⭐ {business.rating}</span>}
-                      {business.reviewCount && <span className="feat-tag">📝 {business.reviewCount} reviews</span>}
-                    </div>
-                    <p className="feat-price">
-                      {business.priceRange ? business.priceRange : "Contact for pricing"}
-                    </p>
-                    <button onClick={() => navigate(`/axxbiashara?business=${business._id}`)} className="feat-view-btn magical-btn">
-                      View Business →
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="view-all-wrap">
-            <button onClick={() => navigate("/axxbiashara")} className="view-all-btn magical-btn">View All Businesses →</button>
-          </div>
-        </section>
-      )}
+        {/* TABS FOR SWITCHING */}
+        <div className="feat-tabs">
+          {[
+            { id: "properties", label: "Properties", icon: "🏡" },
+            { id: "businesses", label: "Businesses", icon: "💼" },
+            { id: "materials", label: "QuickSales", icon: "🏪" },
+            { id: "tourism", label: "Tourism", icon: "🏨" },
+            { id: "movers", label: "Movers", icon: "🚚" },
+          ].map(tab => (
+            <button
+              key={tab.id}
+              className={`feat-tab-btn ${activeFeaturedTab === tab.id ? "active" : ""}`}
+              onClick={() => setActiveFeaturedTab(tab.id)}
+            >
+              <span>{tab.icon}</span> {tab.label}
+            </button>
+          ))}
+        </div>
 
-      {/* ── FEATURED PROPERTIES SECTION ── */}
-      {loadingFeatured ? (
-        <section className="feat-section">
-          <div className="section-hdr">
-            <p className="section-eyebrow">⭐ Featured Rentals</p>
-            <h2 className="section-title">Featured Properties & Rentals</h2>
-            <p className="section-sub">Premium rental properties across Kenya</p>
-          </div>
-          <div className="cards-track-wrap">
-            <div className="cards-track">
-              {[1, 2, 3, 4].map((_, idx) => (
-                <div key={`skeleton-property-${idx}`} className="feat-card">
-                  <div className="feat-img-wrap" style={{ background: "#e2e8f0", height: "200px" }}>
-                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%)", backgroundSize: "200% 100%", animation: "skeleton-loading 1.5s infinite" }}></div>
-                  </div>
-                  <div className="feat-body">
-                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "50%" }}></div>
-                    <div style={{ height: "24px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "80%" }}></div>
-                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "12px", width: "60%" }}></div>
-                    <div style={{ height: "20px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "16px", width: "40%" }}></div>
-                    <div style={{ height: "40px", background: "#e2e8f0", borderRadius: "8px", width: "100%" }}></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      ) : featuredProperties.length > 0 && (
-        <section className="feat-section">
-          <div className="section-hdr">
-            <p className="section-eyebrow">⭐ Featured Rentals</p>
-            <h2 className="section-title">Featured Properties & Rentals</h2>
-            <p className="section-sub">Premium rental properties across Kenya</p>
-          </div>
-          <div className="cards-track-wrap">
-            <div className="cards-track">
-              {[...featuredProperties, ...featuredProperties].map((property, idx) => (
-                <div key={`${property._id}-${idx}`} className="feat-card">
-                  <div className="feat-img-wrap">
-                    <img
-                      src={property.images?.[0] || ""}
-                      alt={property.title || "Property"}
-                      className="feat-img"
-                      loading="lazy"
-                      onError={e => { e.target.style.display = "none"; }}
-                    />
-                    <div className="feat-boosted">★ Featured</div>
-                    <div className="feat-type">{property.propertyType || "Rental"}</div>
-                    <div className="feat-img-grad"></div>
-                  </div>
-                  <div className="feat-body">
-                    <p className="feat-type-label">{property.propertyType || "Rental"}</p>
-                    <h3 className="feat-title">{property.title}</h3>
-                    <p className="feat-loc">📍 {property.location}, {property.county}</p>
-                    <div className="feat-meta">
-                      <span className="feat-tag">🛏️ {property.bedrooms} bed</span>
-                      <span className="feat-tag">🚿 {property.bathrooms} bath</span>
-                    </div>
-                    <p className="feat-price">KES {property.price?.toLocaleString()}/month</p>
-                    <button onClick={() => navigate(`/listings/${property._id}`)} className="feat-view-btn magical-btn">
-                      View Details →
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="view-all-wrap">
-            <button onClick={() => navigate("/listings")} className="view-all-btn magical-btn">View All Properties →</button>
-          </div>
-        </section>
-      )}
+        {/* CARDS TRACK */}
+        {(() => {
+          let isLoading = false;
+          let dataList = [];
+          let renderCards = null;
+          let viewAllPath = "/listings";
+          let viewAllText = "View All Properties";
 
-      {/* ── FEATURED MATERIALS SECTION ── */}
-      {loadingMaterials ? (
-        <section className="feat-section">
-          <div className="section-hdr">
-            <p className="section-eyebrow">⭐ Featured QuickSales</p>
-            <h2 className="section-title">Featured Materials & Products</h2>
-            <p className="section-sub">Handpicked materials and products from verified sellers</p>
-          </div>
-          <div className="cards-track-wrap">
-            <div className="cards-track">
-              {[1, 2, 3, 4].map((_, idx) => (
-                <div key={`skeleton-material-${idx}`} className="feat-card">
-                  <div className="feat-img-wrap" style={{ background: "#e2e8f0", height: "200px" }}>
-                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%)", backgroundSize: "200% 100%", animation: "skeleton-loading 1.5s infinite" }}></div>
-                  </div>
-                  <div className="feat-body">
-                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "50%" }}></div>
-                    <div style={{ height: "24px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "80%" }}></div>
-                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "12px", width: "60%" }}></div>
-                    <div style={{ height: "20px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "16px", width: "40%" }}></div>
-                    <div style={{ height: "40px", background: "#e2e8f0", borderRadius: "8px", width: "100%" }}></div>
-                  </div>
+          if (activeFeaturedTab === "properties") {
+            isLoading = loadingFeatured;
+            dataList = featuredProperties;
+            viewAllPath = "/listings";
+            viewAllText = "View All Properties";
+            renderCards = () => [...featuredProperties, ...featuredProperties].map((property, idx) => (
+              <div key={`${property._id}-${idx}`} className="feat-card">
+                <div className="feat-img-wrap">
+                  <img
+                    src={property.images?.[0] || ""}
+                    alt={property.title || "Property"}
+                    className="feat-img"
+                    loading="lazy"
+                    onError={e => { e.target.style.display = "none"; }}
+                  />
+                  <div className="feat-boosted">★ Featured</div>
+                  <div className="feat-type">{property.propertyType || "Rental"}</div>
+                  <div className="feat-img-grad"></div>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      ) : featuredMaterials.length > 0 && (
-        <section className="feat-section">
-          <div className="section-hdr">
-            <p className="section-eyebrow">⭐ Featured QuickSales</p>
-            <h2 className="section-title">Featured Materials & Products</h2>
-            <p className="section-sub">Handpicked materials and products from verified sellers</p>
-          </div>
-          <div className="cards-track-wrap">
-            <div className="cards-track">
-              {[...featuredMaterials, ...featuredMaterials].map((material, idx) => (
-                <div key={`${material._id}-${idx}`} className="feat-card">
-                  <div className="feat-img-wrap">
-                    <img
-                      src={material.images?.[0] || ""}
-                      alt={material.title || "Material"}
-                      className="feat-img"
-                      loading="lazy"
-                      onError={e => { e.target.style.display = "none"; }}
-                    />
-                    <div className="feat-boosted">★ Featured</div>
-                    <div className="feat-type">{material.category || "Material"}</div>
-                    <div className="feat-img-grad"></div>
+                <div className="feat-body">
+                  <p className="feat-type-label">{property.propertyType || "Rental"}</p>
+                  <h3 className="feat-title">{property.title}</h3>
+                  <p className="feat-loc">📍 {property.location}, {property.county}</p>
+                  <div className="feat-meta">
+                    <span className="feat-tag">🛏️ {property.bedrooms} bed</span>
+                    <span className="feat-tag">🚿 {property.bathrooms} bath</span>
                   </div>
-                  <div className="feat-body">
-                    <p className="feat-type-label">{material.category || "Material"}</p>
-                    <h3 className="feat-title">{material.title}</h3>
-                    <p className="feat-loc">📍 {material.location}, {material.county}</p>
-                    <div className="feat-meta">
-                      <span className="feat-tag">📦 {material.condition}</span>
-                      <span className="feat-tag">👁️ {material.views || 0} views</span>
-                    </div>
-                    <p className="feat-price">KES {material.price?.toLocaleString()}</p>
-                    <button onClick={() => navigate(`/materials/${material._id}`)} className="feat-view-btn magical-btn">
-                      View Details →
-                    </button>
-                  </div>
+                  <p className="feat-price">KES {property.price?.toLocaleString()}/month</p>
+                  <button onClick={() => navigate(`/listings/${property._id}`)} className="feat-view-btn magical-btn">
+                    View Details →
+                  </button>
                 </div>
-              ))}
-            </div>
-          </div>
-          <div className="view-all-wrap">
-            <button onClick={() => navigate("/materials")} className="view-all-btn magical-btn">View All Materials →</button>
-          </div>
-        </section>
-      )}
-
-      {/* ── FEATURED TOURISM SECTION ── */}
-      {loadingTourism ? (
-        <section className="feat-section">
-          <div className="section-hdr">
-            <p className="section-eyebrow">⭐ Featured Tourism</p>
-            <h2 className="section-title">Featured Hotels & Experiences</h2>
-            <p className="section-sub">Top-rated tourism destinations across Kenya</p>
-          </div>
-          <div className="cards-track-wrap">
-            <div className="cards-track">
-              {[1, 2, 3, 4].map((_, idx) => (
-                <div key={`skeleton-tourism-${idx}`} className="feat-card">
-                  <div className="feat-img-wrap" style={{ background: "#e2e8f0", height: "200px" }}>
-                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%)", backgroundSize: "200% 100%", animation: "skeleton-loading 1.5s infinite" }}></div>
-                  </div>
-                  <div className="feat-body">
-                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "50%" }}></div>
-                    <div style={{ height: "24px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "80%" }}></div>
-                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "12px", width: "60%" }}></div>
-                    <div style={{ height: "20px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "16px", width: "40%" }}></div>
-                    <div style={{ height: "40px", background: "#e2e8f0", borderRadius: "8px", width: "100%" }}></div>
-                  </div>
+              </div>
+            ));
+          } else if (activeFeaturedTab === "businesses") {
+            isLoading = loadingBusinesses;
+            dataList = featuredBusinesses;
+            viewAllPath = "/axxbiashara";
+            viewAllText = "View All Businesses";
+            renderCards = () => [...featuredBusinesses, ...featuredBusinesses].map((business, idx) => (
+              <div key={`${business._id}-${idx}`} className="feat-card">
+                <div className="feat-img-wrap">
+                  <img
+                    src={business.images?.[0] || business.logo || ""}
+                    alt={business.name || "Business"}
+                    className="feat-img"
+                    loading="lazy"
+                    onError={e => { e.target.style.display = "none"; }}
+                  />
+                  <div className="feat-boosted">★ Featured</div>
+                  <div className="feat-type">{business.categories?.[0] || "Business"}</div>
+                  <div className="feat-img-grad"></div>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      ) : featuredTourism.length > 0 && (
-        <section className="feat-section">
-          <div className="section-hdr">
-            <p className="section-eyebrow">⭐ Featured Tourism</p>
-            <h2 className="section-title">Featured Hotels & Experiences</h2>
-            <p className="section-sub">Top-rated tourism destinations across Kenya</p>
-          </div>
-          <div className="cards-track-wrap">
-            <div className="cards-track">
-              {[...featuredTourism, ...featuredTourism].map((tourism, idx) => (
-                <div key={`${tourism._id}-${idx}`} className="feat-card">
-                  <div className="feat-img-wrap">
-                    <img
-                      src={tourism.images?.[0] || ""}
-                      alt={tourism.name || "Tourism"}
-                      className="feat-img"
-                      loading="lazy"
-                      onError={e => { e.target.style.display = "none"; }}
-                    />
-                    <div className="feat-boosted">★ Featured</div>
-                    <div className="feat-type">{tourism.category || "Tourism"}</div>
-                    <div className="feat-img-grad"></div>
+                <div className="feat-body">
+                  <p className="feat-type-label">{business.categories?.[0] || "Business"}</p>
+                  <h3 className="feat-title">{business.name}</h3>
+                  <p className="feat-loc">📍 {business.location?.town}, {business.location?.county}</p>
+                  <div className="feat-meta">
+                    {business.rating && <span className="feat-tag">⭐ {business.rating}</span>}
+                    {business.reviewCount && <span className="feat-tag">📝 {business.reviewCount} reviews</span>}
                   </div>
-                  <div className="feat-body">
-                    <p className="feat-type-label">{tourism.category || "Tourism"}</p>
-                    <h3 className="feat-title">{tourism.name}</h3>
-                    <p className="feat-loc">📍 {tourism.location}, {tourism.county}</p>
-                    <div className="feat-meta">
-                      <span className="feat-tag">👁️ {tourism.views || 0} views</span>
-                      <span className="feat-tag">⭐ {tourism.reviews?.length || 0} reviews</span>
-                    </div>
-                    <p className="feat-price">KES {tourism.price?.toLocaleString()}/night</p>
-                    <button onClick={() => navigate(`/tourism/${tourism._id}`)} className="feat-view-btn magical-btn">
-                      View Details →
-                    </button>
-                  </div>
+                  <p className="feat-price">
+                    {business.priceRange ? business.priceRange : "Contact for pricing"}
+                  </p>
+                  <button onClick={() => navigate(`/axxbiashara?business=${business._id}`)} className="feat-view-btn magical-btn">
+                    View Business →
+                  </button>
                 </div>
-              ))}
-            </div>
-          </div>
-          <div className="view-all-wrap">
-            <button onClick={() => navigate("/tourism")} className="view-all-btn magical-btn">View All Tourism →</button>
-          </div>
-        </section>
-      )}
-
-      {/* ── FEATURED MOVERS SECTION ── */}
-      {loadingMovers ? (
-        <section className="feat-section">
-          <div className="section-hdr">
-            <p className="section-eyebrow">⭐ Featured Movers</p>
-            <h2 className="section-title">Featured Moving Services</h2>
-            <p className="section-sub">Trusted moving companies with excellent ratings</p>
-          </div>
-          <div className="cards-track-wrap">
-            <div className="cards-track">
-              {[1, 2, 3, 4].map((_, idx) => (
-                <div key={`skeleton-mover-${idx}`} className="feat-card">
-                  <div className="feat-img-wrap" style={{ background: "#e2e8f0", height: "200px" }}>
-                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%)", backgroundSize: "200% 100%", animation: "skeleton-loading 1.5s infinite" }}></div>
-                  </div>
-                  <div className="feat-body">
-                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "50%" }}></div>
-                    <div style={{ height: "24px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "80%" }}></div>
-                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "12px", width: "60%" }}></div>
-                    <div style={{ height: "20px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "16px", width: "40%" }}></div>
-                    <div style={{ height: "40px", background: "#e2e8f0", borderRadius: "8px", width: "100%" }}></div>
-                  </div>
+              </div>
+            ));
+          } else if (activeFeaturedTab === "materials") {
+            isLoading = loadingMaterials;
+            dataList = featuredMaterials;
+            viewAllPath = "/materials";
+            viewAllText = "View All QuickSales";
+            renderCards = () => [...featuredMaterials, ...featuredMaterials].map((material, idx) => (
+              <div key={`${material._id}-${idx}`} className="feat-card">
+                <div className="feat-img-wrap">
+                  <img
+                    src={material.images?.[0] || ""}
+                    alt={material.title || "Material"}
+                    className="feat-img"
+                    loading="lazy"
+                    onError={e => { e.target.style.display = "none"; }}
+                  />
+                  <div className="feat-boosted">★ Featured</div>
+                  <div className="feat-type">{material.category || "Material"}</div>
+                  <div className="feat-img-grad"></div>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      ) : featuredMovers.length > 0 && (
-        <section className="feat-section">
-          <div className="section-hdr">
-            <p className="section-eyebrow">⭐ Featured Movers</p>
-            <h2 className="section-title">Featured Moving Services</h2>
-            <p className="section-sub">Trusted moving companies with excellent ratings</p>
-          </div>
-          <div className="cards-track-wrap">
-            <div className="cards-track">
-              {[...featuredMovers, ...featuredMovers].map((mover, idx) => (
-                <div key={`${mover._id}-${idx}`} className="feat-card">
-                  <div className="feat-img-wrap">
-                    <img
-                      src={mover.portfolioImages?.[0] || mover.workPhotos?.[0] || mover.profileImage || ""}
-                      alt={`${mover.name} - Work Photo`}
-                      className="feat-img"
-                      loading="lazy"
-                      onError={e => { e.target.style.display = "none"; }}
-                    />
-                    <div className="feat-boosted">★ Featured</div>
-                    <div className="feat-type">Moving Service</div>
-                    <div className="feat-img-grad"></div>
+                <div className="feat-body">
+                  <p className="feat-type-label">{material.category || "Material"}</p>
+                  <h3 className="feat-title">{material.title}</h3>
+                  <p className="feat-loc">📍 {material.location}, {material.county}</p>
+                  <div className="feat-meta">
+                    <span className="feat-tag">📦 {material.condition}</span>
+                    <span className="feat-tag">👁️ {material.views || 0} views</span>
                   </div>
-                  <div className="feat-body">
-                    <p className="feat-type-label">Moving Service</p>
-                    <h3 className="feat-title">{mover.name}</h3>
-                    <p className="feat-loc">📍 {mover.county}</p>
-
-                    {/* Key Features */}
-                    <div className="feat-meta">
-                      <span className="feat-tag">🚚 {mover.vehicleType || "Various"}</span>
-                      <span className="feat-tag">⭐ {mover.experienceYears || 0} years exp</span>
-                      {mover.teamInfo?.teamSize && (
-                        <span className="feat-tag">👥 {mover.teamInfo.teamSize} team</span>
-                      )}
-                      {mover.responseTime && (
-                        <span className="feat-tag">⚡ {mover.responseTime}</span>
-                      )}
-                    </div>
-
-                    {/* Safety & Professionalism */}
-                    {(mover.insurance?.hasInsurance || mover.uniform || mover.safetyGear) && (
-                      <div className="feat-meta" style={{ marginTop: "8px" }}>
-                        {mover.insurance?.hasInsurance && (
-                          <span className="feat-tag" style={{ background: "rgba(34, 197, 94, 0.15)", color: "#22c55e", borderColor: "rgba(34, 197, 94, 0.3)" }}>
-                            🛡️ Insured
-                          </span>
-                        )}
-                        {mover.uniform && (
-                          <span className="feat-tag">👔 Uniform</span>
-                        )}
-                        {mover.safetyGear && (
-                          <span className="feat-tag">⛑️ Safety Gear</span>
-                        )}
-                      </div>
+                  <p className="feat-price">KES {material.price?.toLocaleString()}</p>
+                  <button onClick={() => navigate(`/materials/${material._id}`)} className="feat-view-btn magical-btn">
+                    View Details →
+                  </button>
+                </div>
+              </div>
+            ));
+          } else if (activeFeaturedTab === "tourism") {
+            isLoading = loadingTourism;
+            dataList = featuredTourism;
+            viewAllPath = "/tourism";
+            viewAllText = "View All Tourism";
+            renderCards = () => [...featuredTourism, ...featuredTourism].map((tourism, idx) => (
+              <div key={`${tourism._id}-${idx}`} className="feat-card">
+                <div className="feat-img-wrap">
+                  <img
+                    src={tourism.images?.[0] || ""}
+                    alt={tourism.name || "Tourism"}
+                    className="feat-img"
+                    loading="lazy"
+                    onError={e => { e.target.style.display = "none"; }}
+                  />
+                  <div className="feat-boosted">★ Featured</div>
+                  <div className="feat-type">{tourism.category || "Tourism"}</div>
+                  <div className="feat-img-grad"></div>
+                </div>
+                <div className="feat-body">
+                  <p className="feat-type-label">{tourism.category || "Tourism"}</p>
+                  <h3 className="feat-title">{tourism.name}</h3>
+                  <p className="feat-loc">📍 {tourism.location}, {tourism.county}</p>
+                  <div className="feat-meta">
+                    <span className="feat-tag">👁️ {tourism.views || 0} views</span>
+                    <span className="feat-tag">⭐ {tourism.reviews?.length || 0} reviews</span>
+                  </div>
+                  <p className="feat-price">KES {tourism.price?.toLocaleString()}/night</p>
+                  <button onClick={() => navigate(`/tourism/${tourism._id}`)} className="feat-view-btn magical-btn">
+                    View Details →
+                  </button>
+                </div>
+              </div>
+            ));
+          } else if (activeFeaturedTab === "movers") {
+            isLoading = loadingMovers;
+            dataList = featuredMovers;
+            viewAllPath = "/movers";
+            viewAllText = "View All Movers";
+            renderCards = () => [...featuredMovers, ...featuredMovers].map((mover, idx) => (
+              <div key={`${mover._id}-${idx}`} className="feat-card">
+                <div className="feat-img-wrap">
+                  <img
+                    src={mover.portfolioImages?.[0] || mover.workPhotos?.[0] || mover.profileImage || ""}
+                    alt={`${mover.name} - Work Photo`}
+                    className="feat-img"
+                    loading="lazy"
+                    onError={e => { e.target.style.display = "none"; }}
+                  />
+                  <div className="feat-boosted">★ Featured</div>
+                  <div className="feat-type">Moving Service</div>
+                  <div className="feat-img-grad"></div>
+                </div>
+                <div className="feat-body">
+                  <p className="feat-type-label">Moving Service</p>
+                  <h3 className="feat-title">{mover.name}</h3>
+                  <p className="feat-loc">📍 {mover.county}</p>
+                  <div className="feat-meta">
+                    <span className="feat-tag">🚚 {mover.vehicleType || "Various"}</span>
+                    <span className="feat-tag">⭐ {mover.experienceYears || 0} years exp</span>
+                    {mover.teamInfo?.teamSize && (
+                      <span className="feat-tag">👥 {mover.teamInfo.teamSize} team</span>
                     )}
-
-                    {/* Specialties */}
-                    {mover.specialties && mover.specialties.length > 0 && (
-                      <div className="feat-meta" style={{ marginTop: "8px" }}>
-                        {mover.specialties.slice(0, 2).map(specialty => (
-                          <span key={specialty} className="feat-tag" style={{ fontSize: "10px" }}>
-                            ⭐ {specialty}
-                          </span>
-                        ))}
-                      </div>
+                    {mover.responseTime && (
+                      <span className="feat-tag">⚡ {mover.responseTime}</span>
                     )}
-
-                    {/* Languages */}
-                    {mover.languages && mover.languages.length > 0 && (
-                      <div style={{ fontSize: "11px", color: "#7A7260", marginTop: "8px" }}>
-                        🌐 {mover.languages.slice(0, 2).join(', ')}{mover.languages.length > 2 ? '...' : ''}
-                      </div>
-                    )}
-
-                    {/* Working Hours */}
-                    {mover.workHours && (
-                      <div style={{ fontSize: "11px", color: "#7A7260", marginTop: "4px" }}>
-                        ⏰ {mover.workHours}
-                      </div>
-                    )}
-
-                    <p className="feat-price">
-                      {mover.pricing?.baseRate ? `KES ${mover.pricing.baseRate.toLocaleString()}` : "Contact for pricing"}
-                      {mover.pricing?.rateType && (
-                        <span style={{ fontSize: "12px", color: "#7A7260", marginLeft: "4px" }}>
-                          /{mover.pricing.rateType.replace('_', ' ')}
+                  </div>
+                  {(mover.insurance?.hasInsurance || mover.uniform || mover.safetyGear) && (
+                    <div className="feat-meta" style={{ marginTop: "8px" }}>
+                      {mover.insurance?.hasInsurance && (
+                        <span className="feat-tag" style={{ background: "rgba(34, 197, 94, 0.15)", color: "#22c55e", borderColor: "rgba(34, 197, 94, 0.3)" }}>
+                          🛡️ Insured
                         </span>
                       )}
-                    </p>
-                    <button onClick={() => navigate(`/movers/${mover._id}`)} className="feat-view-btn magical-btn">
-                      View Details →
-                    </button>
-                  </div>
+                      {mover.uniform && <span className="feat-tag">👔 Uniform</span>}
+                      {mover.safetyGear && <span className="feat-tag">⛑️ Safety Gear</span>}
+                    </div>
+                  )}
+                  {mover.specialties && mover.specialties.length > 0 && (
+                    <div className="feat-meta" style={{ marginTop: "8px" }}>
+                      {mover.specialties.slice(0, 2).map(specialty => (
+                        <span key={specialty} className="feat-tag" style={{ fontSize: "10px" }}>
+                          ⭐ {specialty}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <p className="feat-price">
+                    {mover.pricing?.baseRate ? `KES ${mover.pricing.baseRate.toLocaleString()}` : "Contact for pricing"}
+                    {mover.pricing?.rateType && (
+                      <span style={{ fontSize: "12px", color: "#7A7260", marginLeft: "4px" }}>
+                        /{mover.pricing.rateType.replace('_', ' ')}
+                      </span>
+                    )}
+                  </p>
+                  <button onClick={() => navigate(`/movers/${mover._id}`)} className="feat-view-btn magical-btn">
+                    View Details →
+                  </button>
                 </div>
-              ))}
-            </div>
-          </div>
-          <div className="view-all-wrap">
-            <button onClick={() => navigate("/movers")} className="view-all-btn magical-btn">View All Movers →</button>
-          </div>
-        </section>
-      )}
+              </div>
+            ));
+          }
+
+          if (isLoading) {
+            return (
+              <div className="cards-track-wrap">
+                <div className="cards-track">
+                  {[1, 2, 3, 4].map((_, idx) => (
+                    <div key={`skeleton-${idx}`} className="feat-card">
+                      <div className="feat-img-wrap" style={{ background: "#e2e8f0", height: "185px" }}>
+                        <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%)", backgroundSize: "200% 100%", animation: "skeleton-loading 1.5s infinite" }}></div>
+                      </div>
+                      <div className="feat-body">
+                        <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "60%" }}></div>
+                        <div style={{ height: "24px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "80%" }}></div>
+                        <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "12px", width: "50%" }}></div>
+                        <div style={{ height: "20px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "16px", width: "40%" }}></div>
+                        <div style={{ height: "40px", background: "#e2e8f0", borderRadius: "8px", width: "100%" }}></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          }
+
+          if (dataList.length === 0) {
+            return (
+              <div className="no-feat-wrap">
+                <span className="no-feat-icon">✨</span>
+                <h4 className="no-feat-title">No Featured Items Found</h4>
+                <p className="no-feat-sub">We couldn't find any active featured listings in this category right now.</p>
+                <button onClick={() => navigate(viewAllPath)} className="no-feat-btn">
+                  Explore All Listings
+                </button>
+              </div>
+            );
+          }
+
+          return (
+            <>
+              <div className="cards-track-wrap">
+                <div className="cards-track">
+                  {renderCards()}
+                </div>
+              </div>
+              <div className="view-all-wrap">
+                <button onClick={() => navigate(viewAllPath)} className="view-all-btn magical-btn">
+                  {viewAllText} →
+                </button>
+              </div>
+            </>
+          );
+        })()}
+      </section>
 
       {/* ── CATEGORIES SHOWCASE ── */}
       <section className="cats-section">
@@ -2599,133 +2505,40 @@ export default function Home() {
         </div >
       </section >
 
-      {/* ── SERVICE SPOTLIGHT STRIPS ── */}
-      < section className="spotlight-section" >
-
-        {/* Movers */}
-        < div className="spotlight-strip" >
-          <div className="spot-text">
-            <span className="spot-badge">
-              <img src={moversIcon} alt="Movers" style={{ width: "13px", height: "13px", marginRight: "4px", verticalAlign: "middle" }} />
-              Movers
-            </span>
-            <h3 className="spot-title">Planning a Move?</h3>
-            <p className="spot-desc">Connect with 60+ vetted moving companies across Kenya. Get instant quotes, compare prices, and book your move — local or long-distance.</p>
-            <div className="spot-features">
-              {["Insured cargo", "Trained crews", "Transparent quotes", "Available 24/7"].map(f => (
-                <span key={f} className="spot-feat"><span style={{ color: C.gold }}>✓</span> {f}</span>
-              ))}
-            </div>
-            <button className="spot-btn" onClick={() => navigate("/movers")}>Find a Mover →</button>
+      {/* ── HOW IT WORKS ── */}
+      <section className="how-section">
+        <div className="section-hdr">
+          <p className="section-eyebrow">Direct & transparent</p>
+          <h2 className="section-title">How Axxspace Works</h2>
+          <p className="section-sub">Simple, secure steps to get exactly what you need with zero middleman commission</p>
+        </div>
+        <div className="steps-grid">
+          <div className="step-card">
+            <span className="step-num">01</span>
+            <span className="step-icon">🔍</span>
+            <h3 className="step-title">Search & Discover</h3>
+            <p className="step-text">
+              Browse through verified listings across rentals, movers, tourism, quick sales, or business services.
+            </p>
           </div>
-          <div className="spot-visual">
-            <div className="spot-icon-box" style={{ background: "rgba(30,49,72,0.8)" }}>
-              <img src={moversIcon} alt="Movers" style={{ width: "72px", height: "72px", objectFit: "contain" }} />
-            </div>
-            <div className="spot-stats">
-              {[["60+", "Companies"], ["47", "Counties"], ["1,200+", "Moves Done"]].map(([v, l]) => (
-                <div key={l} className="spot-stat">
-                  <span className="spot-stat-val">{v}</span>
-                  <span className="spot-stat-label">{l}</span>
-                </div>
-              ))}
-            </div>
+          <div className="step-card">
+            <span className="step-num">02</span>
+            <span className="step-icon">💬</span>
+            <h3 className="step-title">Connect Directly</h3>
+            <p className="step-text">
+              Reach landlords, sellers, or professional service providers instantly via WhatsApp or direct phone calls.
+            </p>
           </div>
-        </div >
-        <div className="strip-divider"></div>
-
-        {/* Tourism */}
-        <div className="spotlight-strip reverse">
-          <div className="spot-text">
-            <span className="spot-badge">
-              <img src={tourismIcon} alt="Tourism" style={{ width: "13px", height: "13px", marginRight: "4px", verticalAlign: "middle" }} />
-              Tourism
-            </span>
-            <h3 className="spot-title">Explore Kenya Like Never Before</h3>
-            <p className="spot-desc">Discover hotels, beach resorts, safari lodges, and unique experiences across Kenya's 47 counties. Book directly — no commission fees.</p>
-            <div className="spot-features">
-              {["Hotels & resorts", "Safari packages", "Beach getaways", "City escapes"].map(f => (
-                <span key={f} className="spot-feat"><span style={{ color: C.gold }}>✓</span> {f}</span>
-              ))}
-            </div>
-            <button className="spot-btn" onClick={() => navigate("/tourism")}>Explore Tourism →</button>
-          </div>
-          <div className="spot-visual">
-            <div className="spot-icon-box" style={{ background: "rgba(27,58,42,0.8)" }}>
-              <img src={tourismIcon} alt="Tourism" style={{ width: "72px", height: "72px", objectFit: "contain" }} />
-            </div>
-            <div className="spot-stats">
-              {[["200+", "Hotels"], ["47", "Counties"], ["3,000+", "Guests"]].map(([v, l]) => (
-                <div key={l} className="spot-stat">
-                  <span className="spot-stat-val">{v}</span>
-                  <span className="spot-stat-label">{l}</span>
-                </div>
-              ))}
-            </div>
+          <div className="step-card">
+            <span className="step-num">03</span>
+            <span className="step-icon">🤝</span>
+            <h3 className="step-title">Close the Deal</h3>
+            <p className="step-text">
+              Transact safely and securely with verified ratings, reviews, and direct communication. No broker fees.
+            </p>
           </div>
         </div>
-        <div className="strip-divider"></div>
-
-        {/* AxxBiashara */}
-        <div className="spotlight-strip">
-          <div className="spot-text">
-            <span className="spot-badge">
-              <img src={axxbiasharaIcon} alt="AxxBiashara" style={{ width: "13px", height: "13px", marginRight: "4px", verticalAlign: "middle" }} />
-              AxxBiashara
-            </span>
-            <h3 className="spot-title">Grow Your Business</h3>
-            <p className="spot-desc">Access professional business services across Kenya. From company registration to accounting, legal support, and digital solutions.</p>
-            <div className="spot-features">
-              {["Business registration", "Accounting & tax", "Legal services", "Digital solutions"].map(f => (
-                <span key={f} className="spot-feat"><span style={{ color: C.gold }}>✓</span> {f}</span>
-              ))}
-            </div>
-            <button className="spot-btn" onClick={() => navigate("/axxbiashara")}>Explore Services →</button>
-          </div>
-          <div className="spot-visual">
-            <div className="spot-icon-box" style={{ background: "rgba(46,27,74,0.8)" }}>
-              <img src={axxbiasharaIcon} alt="AxxBiashara" style={{ width: "72px", height: "72px", objectFit: "contain" }} />
-            </div>
-            <div className="spot-stats">
-              {[["100+", "Providers"], ["47", "Counties"], ["2,000+", "Businesses"]].map(([v, l]) => (
-                <div key={l} className="spot-stat">
-                  <span className="spot-stat-val">{v}</span>
-                  <span className="spot-stat-label">{l}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="strip-divider"></div>
-
-        {/* QuickSAles */}
-        <div className="spotlight-strip reverse">
-          <div className="spot-text">
-            <span className="spot-badge">🏪 QuickSAles</span>
-            <h3 className="spot-title">Buy &amp; Sell Anything</h3>
-            <p className="spot-desc">The ultimate QuickSAles for buying and selling new and used items. From electronics to furniture, fashion to cars — find great deals.</p>
-            <div className="spot-features">
-              {["New & used items", "Secure transactions", "Nationwide delivery", "Direct seller contact"].map(f => (
-                <span key={f} className="spot-feat"><span style={{ color: C.gold }}>✓</span> {f}</span>
-              ))}
-            </div>
-            <button className="spot-btn" onClick={() => navigate("/materials")}>Browse QuickSAles →</button>
-          </div>
-          <div className="spot-visual">
-            <div className="spot-icon-box" style={{ background: "rgba(12,42,58,0.8)", fontSize: "64px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              🏪
-            </div>
-            <div className="spot-stats">
-              {[["10K+", "Listings"], ["47", "Counties"], ["5,000+", "Users"]].map(([v, l]) => (
-                <div key={l} className="spot-stat">
-                  <span className="spot-stat-val">{v}</span>
-                  <span className="spot-stat-label">{l}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section >
+      </section>
 
       {/* ── TESTIMONIALS ── */}
       < section className="test-section" >
@@ -2861,7 +2674,7 @@ export default function Home() {
                 {[
                   { icon: "🏠", title: "Landlord / Rentals", desc: "List rental properties and boost your listings", bg: `linear-gradient(135deg,${C.gold},${C.goldLight})`, route: "/login" },
                   { icon: "🚛", title: "Mover / Moving Company", desc: "Offer moving services across Kenya", bg: "linear-gradient(135deg,#1E3A5F,#2D5080)", route: "/login?type=mover" },
-                  { icon: "🛍️", title: "Seller / QuickSAles", desc: "Sell items in the materials QuickSAles", bg: "linear-gradient(135deg,#0C2A3A,#103A4F)", route: "/seller-login" },
+                  { icon: "🛍️", title: "Seller / QuickSales", desc: "Sell items in the materials QuickSales", bg: "linear-gradient(135deg,#0C2A3A,#103A4F)", route: "/seller-login" },
                   { icon: "🏨", title: "Tourism Provider", desc: "List hotels, lodges, and tourism experiences", bg: "linear-gradient(135deg,#1B3A2A,#264D38)", route: "/tourism/login" },
                   { icon: "💼", title: "Business / AxxBiashara", desc: "List professional business services", bg: "linear-gradient(135deg,#2E1B4A,#3D2566)", route: "/business-login" },
                 ].map(svc => (

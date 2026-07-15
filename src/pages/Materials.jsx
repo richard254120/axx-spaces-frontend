@@ -22,7 +22,7 @@ const CATEGORIES = [
 
 const CONDITIONS = ["Like New", "Excellent", "Good", "Fair", "For Parts"];
 
-export default function QuickSAles() {
+export default function QuickSales() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { token, user } = useContext(AuthContext);
@@ -132,7 +132,7 @@ export default function QuickSAles() {
       }
       setError("");
     } catch (err) {
-      setError("Failed to load QuickSAles items");
+      setError("Failed to load QuickSales items");
     } finally {
       setLoading(false);
     }
@@ -279,7 +279,7 @@ export default function QuickSAles() {
       {loading ? (
         <div style={{ textAlign: "center", padding: "80px 20px" }}>
           <div style={styles.spinner}></div>
-          <p style={{ color: "#6b7280", marginTop: "16px", fontSize: "16px" }}>Loading QuickSAles...</p>
+          <p style={{ color: "#6b7280", marginTop: "16px", fontSize: "16px" }}>Loading QuickSales...</p>
         </div>
       ) : items.length === 0 ? (
         <div style={styles.emptyState}>

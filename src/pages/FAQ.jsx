@@ -82,10 +82,10 @@ const faqs = [
     ],
   },
   {
-    category: "QuickSAles & Sellers",
+    category: "QuickSales & Sellers",
     items: [
       {
-        q: "What is the QuickSAles?",
+        q: "What is the QuickSales?",
         a: "A buy-and-sell platform for new and used goods — electronics, furniture, fashion, vehicles, and more nationwide. Connect directly with sellers.",
       },
       {
@@ -93,7 +93,7 @@ const faqs = [
         a: "Register a seller account through our Seller Login, complete verification, and start listing your products. You'll have access to a dedicated seller dashboard.",
       },
       {
-        q: "Are there fees for selling on the QuickSAles?",
+        q: "Are there fees for selling on the QuickSales?",
         a: "Basic listings are free. We offer premium listing options for increased visibility. Transaction fees may apply for certain features.",
       },
     ],
@@ -116,10 +116,10 @@ const faqs = [
     ],
   },
   {
-    category: "Materials QuickSAles",
+    category: "Materials QuickSales",
     items: [
       {
-        q: "What is the Materials QuickSAles?",
+        q: "What is the Materials QuickSales?",
         a: "A dedicated section for moving materials — boxes, tape, bubble wrap, packing supplies, and more. Connect with suppliers directly.",
       },
       {
