@@ -278,14 +278,180 @@ export default function AxxBiashara() {
           grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
           gap: 28px;
         }
-        @media (max-width: 768px) { .business-grid { gap: 20px; } }
-        @media (max-width: 480px) { .business-grid { gap: 16px; } }
-        @media (max-width: 380px) { .business-grid { gap: 12px; } }
         .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); display: block; }
         .axx-card:hover .card-img-wrap img { transform: scale(1.06); }
         .card-img-overlay {
           position: absolute; inset: 0;
           background: linear-gradient(to top, rgba(9, 13, 22, 0.8) 0%, transparent 60%);
+        }
+
+        /* Redesigned Card Sub-components */
+        .card-body {
+          padding: 20px;
+          display: flex;
+          flex-direction: column;
+          flex-grow: 1;
+        }
+        .card-meta-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 10px;
+        }
+        .card-category-tag {
+          font-size: 10px;
+          font-weight: 700;
+          color: #fbbf24;
+          background: rgba(251, 191, 36, 0.1);
+          padding: 3px 8px;
+          border-radius: 6px;
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
+        }
+        .card-title {
+          font-size: 17px;
+          font-weight: 700;
+          color: #f8fafc;
+          margin-bottom: 8px;
+          line-height: 1.3;
+          display: -webkit-box;
+          -webkit-line-clamp: 1;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .card-rating-row {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-bottom: 10px;
+          font-size: 12px;
+          color: #e2e8f0;
+        }
+        .card-description {
+          font-size: 13px;
+          color: #94a3b8;
+          line-height: 1.5;
+          margin-bottom: 14px;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .card-badges {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin-bottom: 14px;
+        }
+        .card-location {
+          font-size: 12.5px;
+          color: #94a3b8;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-bottom: 16px;
+          font-weight: 500;
+          margin-top: auto;
+        }
+        .card-footer {
+          padding-top: 14px;
+          border-top: 1px solid rgba(255, 255, 255, 0.05);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+        }
+        .card-profile-link {
+          font-size: 13px;
+          font-weight: 700;
+          color: #fbbf24;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        /* Mobile View: Fits 4 business cards in view (2 columns) */
+        @media (max-width: 600px) {
+          .business-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 12px !important;
+          }
+          .axx-card {
+            border-radius: 12px !important;
+          }
+          .card-body {
+            padding: 10px !important;
+          }
+          .card-meta-row {
+            margin-bottom: 6px !important;
+          }
+          .card-category-tag {
+            font-size: 8px !important;
+            padding: 2px 6px !important;
+            border-radius: 4px !important;
+          }
+          .card-meta-row div, .card-meta-row span {
+            font-size: 8.5px !important;
+          }
+          .card-title {
+            font-size: 13px !important;
+            margin-bottom: 4px !important;
+          }
+          .card-rating-row {
+            font-size: 9.5px !important;
+            margin-bottom: 6px !important;
+            gap: 3px !important;
+          }
+          .card-description {
+            font-size: 10.5px !important;
+            line-height: 1.35 !important;
+            margin-bottom: 8px !important;
+          }
+          .card-badges {
+            gap: 4px !important;
+            margin-bottom: 8px !important;
+          }
+          .card-badges span {
+            font-size: 7.5px !important;
+            padding: 2px 4px !important;
+            border-radius: 4px !important;
+          }
+          .card-location {
+            font-size: 9.5px !important;
+            margin-bottom: 8px !important;
+            gap: 3px !important;
+          }
+          .card-footer {
+            padding-top: 8px !important;
+            gap: 4px !important;
+          }
+          .card-profile-link {
+            font-size: 11px !important;
+          }
+          .card-footer a {
+            width: 26px !important;
+            height: 26px !important;
+            border-radius: 6px !important;
+          }
+          .card-footer a svg {
+            width: 11px !important;
+            height: 11px !important;
+          }
+          /* Overlay buttons on image */
+          .card-img-wrap .icon-btn,
+          div[style*="aspectRatio"] .icon-btn {
+            width: 24px !important;
+            height: 24px !important;
+            border-radius: 6px !important;
+            font-size: 10px !important;
+          }
+          .card-img-wrap div[style*="bottom"] {
+            font-size: 9px !important;
+            padding: 2px 6px !important;
+            bottom: 8px !important;
+            left: 8px !important;
+          }
         }
 
         .badge-pill {
@@ -905,73 +1071,45 @@ export default function AxxBiashara() {
                       )}
 
                       {/* Body Content */}
-                      <div style={{ padding: "20px", display: "flex", flexDirection: "column", flexGrow: 1 }}>
+                      <div className="card-body">
                         
                         {/* Meta Category Row */}
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
-                          <span style={{
-                            fontSize: "10px",
-                            fontWeight: 700,
-                            color: "#fbbf24",
-                            background: "rgba(251, 191, 36, 0.1)",
-                            padding: "3px 8px",
-                            borderRadius: "6px",
-                            textTransform: "uppercase",
-                            letterSpacing: "0.03em"
-                          }}>
+                        <div className="card-meta-row">
+                          <span className="card-category-tag">
                             {biz.categories?.[0] || biz.category || "Business"}
                           </span>
-                          <div style={{ display: "flex", gap: "6px", fontSize: "11px", color: "#64748b" }}>
+                          <div style={{ display: "flex", gap: "6px", color: "#64748b" }}>
                             {biz.priceRange && <span style={{ color: "#fbbf24", fontWeight: 700 }}>{biz.priceRange}</span>}
                             {biz.yearEstablished && <span>Est. {biz.yearEstablished}</span>}
                           </div>
                         </div>
 
                         {/* Title */}
-                        <h3 style={{
-                          fontSize: "17px",
-                          fontWeight: 700,
-                          color: "#f8fafc",
-                          marginBottom: "8px",
-                          lineHeight: 1.3,
-                          display: "-webkit-box",
-                          WebkitLineClamp: 1,
-                          WebkitBoxOrient: "vertical",
-                          overflow: "hidden"
-                        }}>
+                        <h3 className="card-title">
                           {biz.name}
                         </h3>
 
                         {/* Rating Row */}
-                        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "10px", fontSize: "12px" }}>
+                        <div className="card-rating-row">
                           {biz.rating > 0 ? (
                             <>
                               <span style={{ color: "#fbbf24" }}>★</span>
-                              <span style={{ color: "#e2e8f0", fontWeight: 700 }}>{biz.rating?.toFixed(1)}</span>
-                              <span style={{ color: "#64748b" }}>({biz.reviewCount || 0} {biz.reviewCount === 1 ? "review" : "reviews"})</span>
+                              <span style={{ fontWeight: 700 }}>{biz.rating?.toFixed(1)}</span>
+                              <span style={{ color: "#64748b" }}>({biz.reviewCount || 0})</span>
                             </>
                           ) : (
-                            <span style={{ color: "#64748b" }}>No reviews yet</span>
+                            <span style={{ color: "#64748b" }}>No reviews</span>
                           )}
                         </div>
 
                         {/* Description snippet */}
-                        <p style={{
-                          fontSize: "13px",
-                          color: "#94a3b8",
-                          lineHeight: 1.5,
-                          marginBottom: "14px",
-                          display: "-webkit-box",
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: "vertical",
-                          overflow: "hidden"
-                        }}>
+                        <p className="card-description">
                           {biz.description}
                         </p>
 
                         {/* Verification Badges */}
                         {biz.verificationBadges?.length > 0 && (
-                          <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "14px" }}>
+                          <div className="card-badges">
                             {biz.verificationBadges.map((badge, bIdx) => {
                               const config = BADGE_CONFIG[badge.type] || { label: badge.type, color: "#64748b", icon: "◈" };
                               return (
@@ -1001,37 +1139,14 @@ export default function AxxBiashara() {
                         )}
 
                         {/* Location */}
-                        <div style={{
-                          fontSize: "12.5px",
-                          color: "#94a3b8",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "6px",
-                          marginBottom: "16px",
-                          fontWeight: 500,
-                          marginTop: "auto"
-                        }}>
+                        <div className="card-location">
                           <span style={{ color: "#fbbf24" }}>📍</span>
                           <span>{biz.location?.town}, {biz.location?.county}</span>
                         </div>
 
                         {/* Footer Quick Shortcuts */}
-                        <div style={{
-                          paddingTop: "14px",
-                          borderTop: "1px solid rgba(255, 255, 255, 0.05)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          gap: "8px"
-                        }}>
-                          <span style={{
-                            fontSize: "13px",
-                            fontWeight: 700,
-                            color: "#fbbf24",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "4px"
-                          }}>
+                        <div className="card-footer">
+                          <span className="card-profile-link">
                             View Profile <span style={{ transition: "transform 0.2s" }} className="profile-arrow">→</span>
                           </span>
 
