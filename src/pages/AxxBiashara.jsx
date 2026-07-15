@@ -9,6 +9,22 @@ const BUSINESS_CATEGORIES = [
   "Construction", "Transportation", "Other",
 ];
 
+const CATEGORY_EMOJIS = {
+  "Restaurants": "🍔",
+  "Retail": "🛍️",
+  "Services": "🛠️",
+  "Technology": "💻",
+  "Healthcare": "🏥",
+  "Education": "🎓",
+  "Entertainment": "🎬",
+  "Professional Services": "💼",
+  "Manufacturing": "🏭",
+  "Agriculture": "🌾",
+  "Construction": "🏗️",
+  "Transportation": "🚛",
+  "Other": "🏪"
+};
+
 const KENYA_COUNTIES = [
   "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta", "Garissa", "Wajir",
   "Mandera", "Marsabit", "Isiolo", "Meru", "Tharaka Nithi", "Embu", "Kitui", "Machakos",
@@ -230,31 +246,46 @@ export default function AxxBiashara() {
 
         .axx-card {
           animation: fadeSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-          transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease, border-color 0.35s;
+          transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
           cursor: pointer;
           position: relative;
-          background: rgba(17, 24, 39, 0.55);
+          background: rgba(15, 23, 42, 0.55);
           border-radius: 20px;
           border: 1px solid rgba(255, 255, 255, 0.05);
           overflow: hidden;
           backdrop-filter: blur(12px);
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+        }
+        .axx-card.featured-card {
+          border: 1px solid rgba(251, 191, 36, 0.3);
+          box-shadow: 0 0 20px rgba(251, 191, 36, 0.03);
         }
         .axx-card:hover {
           transform: translateY(-6px);
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.55), 0 0 25px rgba(251, 191, 36, 0.08);
-          border-color: rgba(251, 191, 36, 0.35);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.55), 0 0 30px rgba(251, 191, 36, 0.12);
+          border-color: rgba(251, 191, 36, 0.45);
+          background: rgba(15, 23, 42, 0.65);
+        }
+        .axx-card.featured-card:hover {
+          border-color: rgba(251, 191, 36, 0.75);
         }
 
-        .card-img-wrap { position: relative; overflow: hidden; aspect-ratio: 1/1; }
-        .business-grid { gap: 24px; }
-        @media (max-width: 768px) { .business-grid { gap: 16px; } }
-        @media (max-width: 480px) { .business-grid { gap: 12px; } }
-        @media (max-width: 380px) { .business-grid { gap: 8px; } }
+        .card-img-wrap { position: relative; overflow: hidden; aspect-ratio: 16/10; width: 100%; background: #0f172a; }
+        .business-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+          gap: 28px;
+        }
+        @media (max-width: 768px) { .business-grid { gap: 20px; } }
+        @media (max-width: 480px) { .business-grid { gap: 16px; } }
+        @media (max-width: 380px) { .business-grid { gap: 12px; } }
         .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); display: block; }
-        .axx-card:hover .card-img-wrap img { transform: scale(1.05); }
+        .axx-card:hover .card-img-wrap img { transform: scale(1.06); }
         .card-img-overlay {
           position: absolute; inset: 0;
-          background: linear-gradient(to top, rgba(9, 13, 22, 0.9) 0%, transparent 60%);
+          background: linear-gradient(to top, rgba(9, 13, 22, 0.8) 0%, transparent 60%);
         }
 
         .badge-pill {
@@ -748,20 +779,13 @@ export default function AxxBiashara() {
           } else {
             console.log("✅ Showing businesses grid, count:", businesses.length);
             return (
-              <>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px", minHeight: "400px" }} className="business-grid">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "24px" }} className="business-grid">
                   {businesses.map((biz, idx) => (
                     <div
                       key={biz._id}
-                      className="axx-card"
+                      className={`axx-card ${biz.featured ? "featured-card" : ""}`}
                       style={{
                         animationDelay: `${Math.min(idx * 0.05, 0.4)}s`,
-                        border: biz.featured ? "1px solid rgba(251, 191, 36, 0.35)" : "1px solid rgba(255,255,255,0.1)",
-                        boxShadow: biz.featured ? "0 0 15px rgba(251, 191, 36, 0.04)" : "0 4px 6px rgba(0,0,0,0.1)",
-                        background: "rgba(255,255,255,0.05)",
-                        borderRadius: "12px",
-                        padding: "16px",
-                        minHeight: "200px",
                       }}
                       onClick={() => navigate(`/business/${biz._id}`)}
                       onMouseEnter={() => setHoveredCard(biz._id)}
@@ -774,34 +798,282 @@ export default function AxxBiashara() {
                         <div className="card-img-wrap">
                           <img src={biz.images[0]} alt={biz.name} />
                           <div className="card-img-overlay" />
+                          
+                          {/* Rating Badge on Image */}
                           {biz.rating > 0 && (
                             <div style={{ position: "absolute", bottom: "12px", left: "14px", background: "rgba(9, 13, 22, 0.8)", backdropFilter: "blur(4px)", borderRadius: "8px", padding: "4px 10px", fontSize: "11px", fontWeight: 800, color: "#fbbf24", zIndex: 2, border: "1px solid rgba(255,255,255,0.08)" }}>
                               ★ {biz.rating?.toFixed(1)}
                             </div>
                           )}
+
+                          {/* Action Buttons Overlay */}
                           <div style={{ position: "absolute", top: "12px", right: "12px", display: "flex", gap: "8px", zIndex: 2 }}>
-                            <button className="icon-btn" onClick={e => toggleFavorite(biz._id, e)} title="Favorite" style={{ padding: "8px", width: "32px", height: "32px" }}>
+                            {/* Compare Toggle */}
+                            <button
+                              className="icon-btn"
+                              onClick={e => toggleComparison(biz._id, e)}
+                              title={comparisonList.includes(biz._id) ? "Remove from Compare" : "Compare Business"}
+                              style={{
+                                width: "32px",
+                                height: "32px",
+                                borderRadius: "8px",
+                                background: comparisonList.includes(biz._id) ? "#fbbf24" : "rgba(9, 13, 22, 0.75)",
+                                border: "1px solid rgba(255,255,255,0.08)",
+                                color: comparisonList.includes(biz._id) ? "#090d16" : "#f1f5f9",
+                                fontSize: "12px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                transition: "all 0.2s"
+                              }}
+                            >
+                              📊
+                            </button>
+                            {/* Favorite Button */}
+                            <button
+                              className="icon-btn"
+                              onClick={e => toggleFavorite(biz._id, e)}
+                              title={isFavorite(biz._id) ? "Remove from Favorites" : "Add to Favorites"}
+                              style={{
+                                width: "32px",
+                                height: "32px",
+                                borderRadius: "8px",
+                                background: isFavorite(biz._id) ? "rgba(239, 68, 68, 0.15)" : "rgba(9, 13, 22, 0.75)",
+                                border: `1px solid ${isFavorite(biz._id) ? "rgba(239, 68, 68, 0.3)" : "rgba(255, 255, 255, 0.08)"}`,
+                                color: isFavorite(biz._id) ? "#ef4444" : "#f1f5f9",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                transition: "all 0.2s"
+                              }}
+                            >
                               {isFavorite(biz._id) ? "❤️" : "🤍"}
                             </button>
                           </div>
                         </div>
                       ) : (
-                        <div style={{ aspectRatio: "1/1", background: "linear-gradient(135deg, rgba(251,191,36,0.05) 0%, rgba(20,184,166,0.03) 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "32px", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                          🏪
+                        <div style={{ width: "100%", aspectRatio: "16/10", background: "linear-gradient(135deg, rgba(251,191,36,0.08) 0%, rgba(20,184,166,0.05) 100%)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                          <span style={{ fontSize: "38px" }}>
+                            {CATEGORY_EMOJIS[biz.categories?.[0]] || CATEGORY_EMOJIS[biz.category] || "🏪"}
+                          </span>
+                          
+                          {/* Action Buttons Overlay */}
+                          <div style={{ position: "absolute", top: "12px", right: "12px", display: "flex", gap: "8px", zIndex: 2 }}>
+                            {/* Compare Toggle */}
+                            <button
+                              className="icon-btn"
+                              onClick={e => toggleComparison(biz._id, e)}
+                              title={comparisonList.includes(biz._id) ? "Remove from Compare" : "Compare Business"}
+                              style={{
+                                width: "32px",
+                                height: "32px",
+                                borderRadius: "8px",
+                                background: comparisonList.includes(biz._id) ? "#fbbf24" : "rgba(9, 13, 22, 0.75)",
+                                border: "1px solid rgba(255,255,255,0.08)",
+                                color: comparisonList.includes(biz._id) ? "#090d16" : "#f1f5f9",
+                                fontSize: "12px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                transition: "all 0.2s"
+                              }}
+                            >
+                              📊
+                            </button>
+                            {/* Favorite Button */}
+                            <button
+                              className="icon-btn"
+                              onClick={e => toggleFavorite(biz._id, e)}
+                              title={isFavorite(biz._id) ? "Remove from Favorites" : "Add to Favorites"}
+                              style={{
+                                width: "32px",
+                                height: "32px",
+                                borderRadius: "8px",
+                                background: isFavorite(biz._id) ? "rgba(239, 68, 68, 0.15)" : "rgba(9, 13, 22, 0.75)",
+                                border: `1px solid ${isFavorite(biz._id) ? "rgba(239, 68, 68, 0.3)" : "rgba(255, 255, 255, 0.08)"}`,
+                                color: isFavorite(biz._id) ? "#ef4444" : "#f1f5f9",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                transition: "all 0.2s"
+                              }}
+                            >
+                              {isFavorite(biz._id) ? "❤️" : "🤍"}
+                            </button>
+                          </div>
                         </div>
                       )}
 
-                      {/* Body Content - Simplified */}
-                      <div style={{ padding: "16px" }}>
-                        <h3 style={{ fontSize: "16px", fontWeight: 800, color: "#f8fafc", lineHeight: 1.3, marginBottom: "8px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{biz.name}</h3>
-                        <div style={{ fontSize: "12px", color: "#94a3b8", display: "flex", alignItems: "center", gap: "6px", fontWeight: 500 }}>
-                          <span>📍</span> {biz.location?.town}, {biz.location?.county}
+                      {/* Body Content */}
+                      <div style={{ padding: "20px", display: "flex", flexDirection: "column", flexGrow: 1 }}>
+                        
+                        {/* Meta Category Row */}
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
+                          <span style={{
+                            fontSize: "10px",
+                            fontWeight: 700,
+                            color: "#fbbf24",
+                            background: "rgba(251, 191, 36, 0.1)",
+                            padding: "3px 8px",
+                            borderRadius: "6px",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.03em"
+                          }}>
+                            {biz.categories?.[0] || biz.category || "Business"}
+                          </span>
+                          <div style={{ display: "flex", gap: "6px", fontSize: "11px", color: "#64748b" }}>
+                            {biz.priceRange && <span style={{ color: "#fbbf24", fontWeight: 700 }}>{biz.priceRange}</span>}
+                            {biz.yearEstablished && <span>Est. {biz.yearEstablished}</span>}
+                          </div>
                         </div>
+
+                        {/* Title */}
+                        <h3 style={{
+                          fontSize: "17px",
+                          fontWeight: 700,
+                          color: "#f8fafc",
+                          marginBottom: "8px",
+                          lineHeight: 1.3,
+                          display: "-webkit-box",
+                          WebkitLineClamp: 1,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden"
+                        }}>
+                          {biz.name}
+                        </h3>
+
+                        {/* Rating Row */}
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "10px", fontSize: "12px" }}>
+                          {biz.rating > 0 ? (
+                            <>
+                              <span style={{ color: "#fbbf24" }}>★</span>
+                              <span style={{ color: "#e2e8f0", fontWeight: 700 }}>{biz.rating?.toFixed(1)}</span>
+                              <span style={{ color: "#64748b" }}>({biz.reviewCount || 0} {biz.reviewCount === 1 ? "review" : "reviews"})</span>
+                            </>
+                          ) : (
+                            <span style={{ color: "#64748b" }}>No reviews yet</span>
+                          )}
+                        </div>
+
+                        {/* Description snippet */}
+                        <p style={{
+                          fontSize: "13px",
+                          color: "#94a3b8",
+                          lineHeight: 1.5,
+                          marginBottom: "14px",
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden"
+                        }}>
+                          {biz.description}
+                        </p>
+
+                        {/* Verification Badges */}
+                        {biz.verificationBadges?.length > 0 && (
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "14px" }}>
+                            {biz.verificationBadges.map((badge, bIdx) => {
+                              const config = BADGE_CONFIG[badge.type] || { label: badge.type, color: "#64748b", icon: "◈" };
+                              return (
+                                <span
+                                  key={bIdx}
+                                  style={{
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    gap: "3px",
+                                    padding: "3px 6px",
+                                    borderRadius: "6px",
+                                    background: `${config.color}15`,
+                                    border: `1px solid ${config.color}25`,
+                                    color: config.color,
+                                    fontSize: "9.5px",
+                                    fontWeight: 700,
+                                    textTransform: "uppercase",
+                                    letterSpacing: "0.02em"
+                                  }}
+                                >
+                                  <span>{config.icon}</span>
+                                  <span>{config.label}</span>
+                                </span>
+                              );
+                            })}
+                          </div>
+                        )}
+
+                        {/* Location */}
+                        <div style={{
+                          fontSize: "12.5px",
+                          color: "#94a3b8",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          marginBottom: "16px",
+                          fontWeight: 500,
+                          marginTop: "auto"
+                        }}>
+                          <span style={{ color: "#fbbf24" }}>📍</span>
+                          <span>{biz.location?.town}, {biz.location?.county}</span>
+                        </div>
+
+                        {/* Footer Quick Shortcuts */}
+                        <div style={{
+                          paddingTop: "14px",
+                          borderTop: "1px solid rgba(255, 255, 255, 0.05)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: "8px"
+                        }}>
+                          <span style={{
+                            fontSize: "13px",
+                            fontWeight: 700,
+                            color: "#fbbf24",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "4px"
+                          }}>
+                            View Profile <span style={{ transition: "transform 0.2s" }} className="profile-arrow">→</span>
+                          </span>
+
+                          {(biz.socialMedia?.whatsapp || biz.contact?.phone) && (
+                            <a
+                              href={`https://wa.me/${(biz.socialMedia?.whatsapp || biz.contact?.phone).replace(/[^0-9]/g, "")}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={e => e.stopPropagation()}
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                width: "36px",
+                                height: "36px",
+                                borderRadius: "10px",
+                                background: "rgba(34, 197, 94, 0.1)",
+                                border: "1px solid rgba(34, 197, 94, 0.25)",
+                                color: "#22c55e",
+                                transition: "all 0.2s"
+                              }}
+                              onMouseEnter={e => {
+                                e.currentTarget.style.background = "#22c55e";
+                                e.currentTarget.style.color = "#090d16";
+                              }}
+                              onMouseLeave={e => {
+                                e.currentTarget.style.background = "rgba(34, 197, 94, 0.1)";
+                                e.currentTarget.style.color = "#22c55e";
+                              }}
+                              title="Chat on WhatsApp"
+                            >
+                              <svg style={{ width: "16px", height: "16px" }} viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.625 1.451 5.403.002 9.803-4.394 9.805-9.801.002-2.618-1.01-5.078-2.856-6.927C16.378 1.986 13.93 1.902 12.01 1.9c-5.412 0-9.817 4.404-9.82 9.812-.002 1.549.431 3.064 1.249 4.385l-.974 3.565 3.69-.967-.008.006z"/>
+                              </svg>
+                            </a>
+                          )}
+                        </div>
+
                       </div>
                     </div>
                   ))}
                 </div>
-              </>
             );
           }
         })()}
