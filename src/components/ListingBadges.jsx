@@ -26,7 +26,12 @@ const badgeConfig = {
     bgColor: "rgba(34, 197, 94, 0.15)",
   },
   location_verified: {
-    icon: "📍",
+    icon: (
+      <svg viewBox="0 0 24 24" width="1em" height="1em" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ display: "inline-block", verticalAlign: "middle" }}>
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+        <circle cx="12" cy="10" r="3"></circle>
+      </svg>
+    ),
     label: "Location Verified",
     color: "#ef4444",
     bgColor: "rgba(239, 68, 68, 0.15)",

@@ -79,7 +79,10 @@ export default function UniversityPicker({
       {value?.id && (
         <div style={styles.selectedChip}>
           <span>{value.name}</span>
-          <span style={styles.chipMeta}>📍 {value.location}, {value.county}</span>
+          <span style={{ ...styles.chipMeta, display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <span>{value.location}, {value.county}</span>
+          </span>
         </div>
       )}
 
