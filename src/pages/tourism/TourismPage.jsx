@@ -143,7 +143,10 @@ export default function TourismPage() {
                 <div style={s.propBody}>
                   <div style={s.propCat}>{p.category}</div>
                   <h3 style={s.propName}>{p.name}</h3>
-                  <div style={s.propLoc}>📍 {p.location}</div>
+                  <div style={{ ...s.propLoc, display: "flex", alignItems: "center", gap: "4px" }}>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span>{p.location}</span>
+                  </div>
                   <p style={s.propDesc}>{p.shortDesc}</p>
                   <div style={s.propFooter}>
                     <div>

@@ -303,7 +303,10 @@ export default function TourismDetailPage() {
             <div style={s.catBadge}>{property.category}</div>
             <h1 style={s.propName}>{property.name}</h1>
             <div style={s.propMeta}>
-              <span>📍 {property.location}, {property.county} County</span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span>{property.location}, {property.county} County</span>
+              </span>
               <span style={{ color: property.color, fontWeight: 700 }}>⭐ {property.rating} ({property.reviews} reviews)</span>
             </div>
             <p style={s.description}>{property.description}</p>
@@ -312,7 +315,10 @@ export default function TourismDetailPage() {
           {/* GPS LOCATION */}
           {property.coordinates?.lat && property.coordinates?.lng && (
             <div style={s.card}>
-              <h2 style={s.cardTitle}>📍 Exact Location</h2>
+              <h2 style={{ ...s.cardTitle, display: "flex", alignItems: "center", gap: "4px" }}>
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span>Exact Location</span>
+              </h2>
               <div style={s.locationBox}>
                 <div style={s.coordsDisplay}>
                   <div style={s.coordItem}>

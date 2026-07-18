@@ -222,8 +222,9 @@ export default function Saved() {
                   <h3 style={styles.cardTitle}>
                     {item.name || item.title || item.propertyName}
                   </h3>
-                  <p style={styles.cardLocation}>
-                    📍 {item.location?.town || item.location || "Location not specified"}
+                  <p style={{ ...styles.cardLocation, display: "flex", alignItems: "center", gap: "4px" }}>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span>{item.location?.town || item.location || "Location not specified"}</span>
                   </p>
                   {item.price && (
                     <div style={styles.cardPrice}>

@@ -171,8 +171,9 @@ export default function UniversityHostels() {
                 >
                   <div style={S.universityCardIcon}>🏛️</div>
                   <div style={S.universityCardName}>{university.name}</div>
-                  <div style={S.universityCardLocation}>
-                    <span>📍 {university.location}</span>
+                  <div style={{ ...S.universityCardLocation, display: "flex", alignItems: "center", gap: "4px" }}>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span>{university.location}</span>
                     <span style={S.universityCardCounty}>{university.county} County</span>
                   </div>
                   <div style={S.universityCardCode}>{university.code}</div>
@@ -191,7 +192,10 @@ export default function UniversityHostels() {
               <div style={S.selectedUniversityInfo}>
                 <span style={S.selectedUniversityLabel}>Showing hostels near:</span>
                 <span style={S.selectedUniversityName}>{selectedUniversity.name}</span>
-                <span style={S.selectedUniversityLocation}>📍 {selectedUniversity.location}, {selectedUniversity.county}</span>
+                <span style={{ ...S.selectedUniversityLocation, display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                  <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  <span>{selectedUniversity.location}, {selectedUniversity.county}</span>
+                </span>
               </div>
               <button style={S.clearUniversityBtn} onClick={handleClearSelection}>
                 Change University ✕
@@ -226,7 +230,8 @@ export default function UniversityHostels() {
                     <div style={S.cardBody}>
                       <h3 style={S.cardTitle}>{property.title}</h3>
                       <p style={S.cardLocation}>
-                        📍 {property.location || property.county}
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>{property.location || property.county}</span>
                       </p>
                       <div style={S.cardPrice}>
                         KES {property.price?.toLocaleString()}

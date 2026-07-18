@@ -229,7 +229,10 @@ export default function UserDashboard() {
                       </div>
                       <p style={s.itemCardDesc}>{biz.description?.substring(0, 120)}...</p>
                       <div style={s.itemCardMeta}>
-                        <div>📍 {biz.location?.town}, {biz.location?.county}</div>
+                        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                          <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                          <span>{biz.location?.town}, {biz.location?.county}</span>
+                        </div>
                         <div>📂 {biz.categories?.join(", ")}</div>
                       </div>
                       <div style={s.itemActions}>

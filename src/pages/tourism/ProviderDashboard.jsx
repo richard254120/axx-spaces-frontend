@@ -99,8 +99,10 @@ export default function ProviderDashboard() {
                         <h3 style={{ fontSize: "16px", fontWeight: 800 }}>{l.name}</h3>
                         <StatusBadge status={l.status} />
                       </div>
-                      <p style={{ fontSize: "13px", color: tourismTheme.muted, marginTop: "4px" }}>
-                        {l.category} · 📍 {l.location} · KSh {l.price?.toLocaleString()}/night
+                      <p style={{ fontSize: "13px", color: tourismTheme.muted, marginTop: "4px", display: "flex", alignItems: "center", gap: "4px" }}>
+                        <span>{l.category} ·</span>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>{l.location} · KSh {l.price?.toLocaleString()}/night</span>
                       </p>
                       <p style={{ fontSize: "12px", color: tourismTheme.muted, marginTop: "6px" }}>
                         📷 {(l.images?.length || 0)} photo(s) · 🎬 {(l.videos?.length || 0)} video(s) · 👁 {l.views || 0} views

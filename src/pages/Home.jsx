@@ -1988,7 +1988,10 @@ export default function Home() {
                 <div className="feat-body">
                   <p className="feat-type-label">{property.propertyType || "Rental"}</p>
                   <h3 className="feat-title">{property.title}</h3>
-                  <p className="feat-loc">📍 {property.location}, {property.county}</p>
+                  <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span>{property.location}, {property.county}</span>
+                  </p>
                   <div className="feat-meta">
                     <span className="feat-tag">🛏️ {property.bedrooms} bed</span>
                     <span className="feat-tag">🚿 {property.bathrooms} bath</span>
@@ -2022,7 +2025,10 @@ export default function Home() {
                 <div className="feat-body">
                   <p className="feat-type-label">{business.categories?.[0] || "Business"}</p>
                   <h3 className="feat-title">{business.name}</h3>
-                  <p className="feat-loc">📍 {business.location?.town}, {business.location?.county}</p>
+                  <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span>{business.location?.town}, {business.location?.county}</span>
+                  </p>
                   <div className="feat-meta">
                     {business.rating && <span className="feat-tag">⭐ {business.rating}</span>}
                     {business.reviewCount && <span className="feat-tag">📝 {business.reviewCount} reviews</span>}
@@ -2058,7 +2064,10 @@ export default function Home() {
                 <div className="feat-body">
                   <p className="feat-type-label">{material.category || "Material"}</p>
                   <h3 className="feat-title">{material.title}</h3>
-                  <p className="feat-loc">📍 {material.location}, {material.county}</p>
+                  <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span>{material.location}, {material.county}</span>
+                  </p>
                   <div className="feat-meta">
                     <span className="feat-tag">👁️ {material.views || 0} views</span>
                   </div>
@@ -2091,7 +2100,10 @@ export default function Home() {
                 <div className="feat-body">
                   <p className="feat-type-label">{tourism.category || "Tourism"}</p>
                   <h3 className="feat-title">{tourism.name}</h3>
-                  <p className="feat-loc">📍 {tourism.location}, {tourism.county}</p>
+                  <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span>{tourism.location}, {tourism.county}</span>
+                  </p>
                   <div className="feat-meta">
                     <span className="feat-tag">👁️ {tourism.views || 0} views</span>
                     <span className="feat-tag">⭐ {tourism.reviews?.length || 0} reviews</span>
@@ -2125,7 +2137,10 @@ export default function Home() {
                 <div className="feat-body">
                   <p className="feat-type-label">Moving Service</p>
                   <h3 className="feat-title">{mover.name}</h3>
-                  <p className="feat-loc">📍 {mover.county}</p>
+                  <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span>{mover.county}</span>
+                  </p>
                   <div className="feat-meta">
                     <span className="feat-tag">🚚 {mover.vehicleType || "Various"}</span>
                     <span className="feat-tag">⭐ {mover.experienceYears || 0} years exp</span>

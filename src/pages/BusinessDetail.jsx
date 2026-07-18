@@ -1425,7 +1425,9 @@ export default function BusinessDetail() {
         )}
         {b.location.address && (
           <div className="bd-contact-item">
-            <span className="bd-contact-icon">📍</span>
+            <span className="bd-contact-icon" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            </span>
             {b.location.address}
           </div>
         )}

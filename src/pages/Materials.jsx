@@ -363,7 +363,10 @@ export default function QuickSales() {
                     <span style={styles.categoryIcon}>{getCategoryEmoji(item.category)}</span>
                   </div>
 
-                  <p style={styles.itemLocation}>📍 {item.location}, {item.county}</p>
+                  <p style={styles.itemLocation}>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "4px", marginTop: "-2px" }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    {item.location}, {item.county}
+                  </p>
 
                   <div style={styles.priceSection}>
                     <p style={styles.price}>KES {Number(item.price).toLocaleString()}</p>
@@ -436,7 +439,10 @@ export default function QuickSales() {
                   </button>
                 </div>
                 <h2 style={styles.modalTitle}>{selected.title}</h2>
-                <p style={styles.modalSubtitle}>📍 {selected.location}, {selected.county}</p>
+                <p style={styles.modalSubtitle}>
+                  <svg viewBox="0 0 24 24" width="13" height="13" stroke="#E31B1B" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "4px", marginTop: "-2px" }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  {selected.location}, {selected.county}
+                </p>
               </div>
 
               {/* CATEGORY BADGES */}

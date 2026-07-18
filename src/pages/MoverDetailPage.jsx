@@ -242,8 +242,9 @@ export default function MoverDetailPage() {
               </div>
               <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#1e293b", marginBottom: "8px", lineHeight: "1.3" }}>{mover.name}</h1>
               {mover.company && <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "6px" }}>🏢 {mover.company}</p>}
-              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "20px" }}>
-                📍 {mover.county}
+              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "20px", display: "flex", alignItems: "center", gap: "4px" }}>
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span>{mover.county}</span>
               </p>
 
               {/* Key Features */}

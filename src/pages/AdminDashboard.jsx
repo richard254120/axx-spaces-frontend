@@ -522,7 +522,10 @@ export default function AdminDashboard() {
                   <tr key={item._id} style={styles.tr}>
                     <td style={styles.td}>
                       <div style={styles.propTitle}>{item.title}</div>
-                      <div style={styles.propLoc}>📍 {item.location || `${item.area}, ${item.county}`}</div>
+                      <div style={{ ...styles.propLoc, display: "flex", alignItems: "center", gap: "4px" }}>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>{item.location || `${item.area}, ${item.county}`}</span>
+                      </div>
                     </td>
                     <td style={styles.td}>
                       <div style={styles.ownerName}>{item.owner?.name || "Member"}</div>
@@ -669,7 +672,10 @@ export default function AdminDashboard() {
                   <tr key={item._id} style={styles.tr}>
                     <td style={styles.td}>
                       <div style={styles.propTitle}>{item.name}</div>
-                      <div style={styles.propLoc}>📍 {item.county}</div>
+                      <div style={{ ...styles.propLoc, display: "flex", alignItems: "center", gap: "4px" }}>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>{item.county}</span>
+                      </div>
                     </td>
                     <td style={styles.td}>
                       <div style={styles.ownerName}>{item.email}</div>
