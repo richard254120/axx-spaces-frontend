@@ -149,7 +149,7 @@ option { background: #162233; color: #F0EAD8; }
 /* ── HERO ── */
 .hero {
   position: relative;
-  min-height: 100dvh;
+  min-height: 70dvh;
   display: flex;
   align-items: center;
   justify-content: center;
