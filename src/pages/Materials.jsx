@@ -276,10 +276,6 @@ export default function QuickSales() {
         </div>
 
         <div style={{ display: "flex", gap: "6px", alignItems: "center", flexShrink: 0, marginBottom: "6px" }}>
-          <select name="condition" value={filters.condition} onChange={handleFilterChange} style={{ padding: "4px 20px 4px 8px", fontSize: "12px", height: "30px", minWidth: "110px", background: "white", border: "1px solid #e5e7eb", borderRadius: "8px" }}>
-            <option value="">All Conditions</option>
-            {CONDITIONS.map((c) => <option key={c} value={c}>{c}</option>)}
-          </select>
 
           <select name="county" value={filters.county} onChange={handleFilterChange} style={{ padding: "4px 20px 4px 8px", fontSize: "12px", height: "30px", minWidth: "110px", background: "white", border: "1px solid #e5e7eb", borderRadius: "8px" }}>
             <option value="">All Counties</option>
@@ -337,7 +333,6 @@ export default function QuickSales() {
 
                   {/* BADGES */}
                   <div style={styles.badgeStack}>
-                    <span style={styles.conditionBadge}>{item.condition}</span>
                     {isLowStock && <span style={styles.lowStockBadge}>⚠️ Only {item.quantity}</span>}
                     {isNewItem && <span style={styles.newItemBadge}>🆕 New</span>}
                   </div>
@@ -444,9 +439,8 @@ export default function QuickSales() {
                 <p style={styles.modalSubtitle}>📍 {selected.location}, {selected.county}</p>
               </div>
 
-              {/* CONDITION & CATEGORY BADGES */}
+              {/* CATEGORY BADGES */}
               <div style={styles.badgesRow}>
-                <span style={styles.modalConditionBadge}>{selected.condition}</span>
                 <span style={styles.modalCategoryBadge}>{getCategoryEmoji(selected.category)} {selected.category}</span>
                 {selected.quantity <= 2 && <span style={styles.urgentTag}>⚠️ Limited Stock</span>}
               </div>
