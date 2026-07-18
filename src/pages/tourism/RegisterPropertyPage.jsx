@@ -240,7 +240,10 @@ export default function RegisterPropertyPage() {
             {/* STEP 2 — LOCATION */}
             {step === 2 && (
               <div>
-                <h2 style={s.formTitle}>📍 Location Details</h2>
+                <h2 style={{ ...s.formTitle, display: "flex", alignItems: "center", gap: "8px" }}>
+                  <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  <span>Location Details</span>
+                </h2>
                 <p style={s.formSub}>Help guests find you</p>
                 <div className="two-col-form">
                   <div style={s.field}>

@@ -355,7 +355,10 @@ export default function MoverDashboard() {
             <div style={styles.welcomeCard}>
               <div>
                 <h2 style={styles.welcomeTitle}>{getGreeting()}, {user?.name?.split(" ")[0] || "Partner"}! 👋</h2>
-                <p style={styles.welcomeSubtitle}>📍 {user?.county || "Kenya"}</p>
+                <p style={{ ...styles.welcomeSubtitle, display: "flex", alignItems: "center", gap: "4px" }}>
+                  <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  <span>{user?.county || "Kenya"}</span>
+                </p>
               </div>
               <div style={styles.statusBadge}>🟢 Active</div>
             </div>
@@ -444,7 +447,10 @@ export default function MoverDashboard() {
                   <div key={job._id || job.id} style={styles.earningsRow}>
                     <div>
                       <p style={styles.earningService}>{job.serviceType || "Moving Job"}</p>
-                      <p style={styles.earningDate}>📍 {job.pickupLocation} → {job.dropoffLocation}</p>
+                      <p style={{ ...styles.earningDate, display: "flex", alignItems: "center", gap: "4px" }}>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>{job.pickupLocation} → {job.dropoffLocation}</span>
+                      </p>
                       <p style={styles.earningDate}>
                         📅 {new Date(job.scheduledDate || job.createdAt).toLocaleDateString("en-KE", {
                           year: "numeric", month: "short", day: "numeric"
@@ -658,7 +664,10 @@ export default function MoverDashboard() {
 
             {/* Service Areas */}
             <div style={styles.profileSection}>
-              <h3 style={styles.sectionTitle}>📍 Service Areas</h3>
+              <h3 style={{ ...styles.sectionTitle, display: "flex", alignItems: "center", gap: "6px" }}>
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span>Service Areas</span>
+              </h3>
               <div style={styles.fieldGroup}>
                 <label style={styles.fieldLabel}>Service Areas (comma-separated)</label>
                 <textarea
@@ -852,7 +861,10 @@ function JobCard({ job, actionLoading, onAccept, onComplete, getStatusColor, get
 
       <div style={styles.jobDetails}>
         {job.pickupLocation && (
-          <p style={styles.jobDetail}>📍 <strong>Pickup:</strong> {job.pickupLocation}</p>
+          <p style={{ ...styles.jobDetail, display: "flex", alignItems: "center", gap: "4px" }}>
+            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <span><strong>Pickup:</strong> {job.pickupLocation}</span>
+          </p>
         )}
         {job.dropoffLocation && (
           <p style={styles.jobDetail}>🏁 <strong>Dropoff:</strong> {job.dropoffLocation}</p>

@@ -221,8 +221,9 @@ function MoverCard({ m, onBook, featured }) {
               🏢 {m.company}
             </div>
           )}
-          <div style={{ fontSize: 12, color: featured ? C.navyText : C.textHint, marginBottom: 4 }}>
-            📍 {m.county}
+          <div style={{ fontSize: 12, color: featured ? C.navyText : C.textHint, marginBottom: 4, display: "flex", alignItems: "center", gap: "4px" }}>
+            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <span>{m.county}</span>
           </div>
           <StarRating value={m.rating || 4.5} featured={featured} />
         </div>
@@ -733,7 +734,10 @@ function BookingModal({ mover, onClose, availableServices }) {
             <Avatar name={mover.name} size={38} />
             <div>
               <div style={{ fontSize: 15, fontWeight: 700, color: C.textPrimary }}>Book {mover.name}</div>
-              <div style={{ fontSize: 12, color: C.textHint }}>📍 {mover.county}</div>
+              <div style={{ fontSize: 12, color: C.textHint, display: "flex", alignItems: "center", gap: "4px" }}>
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span>{mover.county}</span>
+              </div>
             </div>
           </div>
           <button onClick={onClose} style={{

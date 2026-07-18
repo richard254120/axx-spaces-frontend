@@ -261,7 +261,10 @@ const AdminVerification = () => {
               {/* Physical Details (Level 3) */}
               {selectedVerification.physicalDetails && (
                 <div style={styles.detailGroup}>
-                  <h3 style={styles.detailGroupTitle}>📍 Physical Location & Scheduling Notes</h3>
+                  <h3 style={{ ...styles.detailGroupTitle, display: "flex", alignItems: "center", gap: "6px" }}>
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span>Physical Location & Scheduling Notes</span>
+                  </h3>
                   <div style={{ padding: '12px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
                     <p style={{ fontSize: '13px', color: '#cbd5e1', lineHeight: '1.6', margin: 0, whiteSpace: 'pre-wrap' }}>
                       {selectedVerification.physicalDetails}

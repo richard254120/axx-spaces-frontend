@@ -231,7 +231,7 @@ export default function Profile() {
     student_verified: { label: "Student Verified", icon: "🎓", image: "Student Verified.png" },
     business_verified: { label: "Business Verified", icon: "🏢", image: "Business Verified.png" },
     identity_verified: { label: "Identity Verified", icon: "🪪", image: "Identity Verified.png" },
-    location_verified: { label: "Location Verified", icon: "📍", image: "Locationn Verified.png" },
+    location_verified: { label: "Location Verified", icon: <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, display: "inline-block", marginRight: "4px", verticalAlign: "middle" }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>, image: "Locationn Verified.png" },
     online_verified: { label: "Online Verified", icon: "🌐", image: "Online Verified.png" },
   };
 
