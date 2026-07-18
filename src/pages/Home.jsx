@@ -149,7 +149,7 @@ option { background: #162233; color: #F0EAD8; }
 /* ── HERO ── */
 .hero {
   position: relative;
-  min-height: 70dvh;
+  min-height: 55dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -271,7 +271,7 @@ option { background: #162233; color: #F0EAD8; }
 .hero-content {
   position: relative; z-index: 3;
   max-width: 900px;
-  padding: 80px 28px 70px;
+  padding: 40px 28px 30px;
   animation: fadeUp 1s ease both;
 }
 .hero-badge {
@@ -595,12 +595,12 @@ option { background: #162233; color: #F0EAD8; }
 
 /* ── FEATURED LISTINGS ── */
 .featured-section {
-  padding: 80px 0;
+  padding: 40px 0;
   background: #0D1B2A;
   overflow: hidden;
   border-top: 1px solid rgba(201,168,76,0.1);
 }
-.featured-header { padding: 0 28px; text-align: center; margin-bottom: 44px; }
+.featured-header { padding: 0 28px; text-align: center; margin-bottom: 24px; }
 .cards-track-wrap { overflow: hidden; width: 100%; }
 .cards-track {
   display: flex; align-items: stretch;
