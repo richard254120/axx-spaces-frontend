@@ -271,7 +271,7 @@ option { background: #162233; color: #F0EAD8; }
 .hero-content {
   position: relative; z-index: 3;
   max-width: 900px;
-  padding: 80px 28px 70px;
+  padding: 120px 28px 70px;
   animation: fadeUp 1s ease both;
 }
 .hero-badge {
