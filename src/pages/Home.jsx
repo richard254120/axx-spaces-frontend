@@ -1872,303 +1872,265 @@ export default function Home() {
           <p className="section-sub">Discover top-rated services and verified listings handpicked for you</p>
         </div>
 
-        {/* TABS FOR SWITCHING */}
-        <div className="feat-tabs">
-          {[
-            { id: "properties", label: "Properties", icon: "🏡" },
-            { id: "businesses", label: "Businesses", icon: "💼" },
-            { id: "materials", label: "QuickSales", icon: "🏪" },
-            { id: "tourism", label: "Tourism", icon: "🏨" },
-            { id: "movers", label: "Movers", icon: "🚚" },
-          ].map(tab => (
-            <button
-              key={tab.id}
-              className={`feat-tab-btn ${activeFeaturedTab === tab.id ? "active" : ""}`}
-              onClick={() => setActiveFeaturedTab(tab.id)}
-            >
-              <span>{tab.icon}</span> {tab.label}
-            </button>
+        {/* ALL FEATURED CATEGORIES GRID */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px', padding: '0 28px' }}>
+          {/* Properties */}
+          {featuredProperties.map((property) => (
+            <div key={property._id} className="feat-card">
+              <div className="feat-img-wrap">
+                <img
+                  src={property.images?.[0] || ""}
+                  alt={property.title || "Property"}
+                  className="feat-img"
+                  loading="lazy"
+                  onError={e => { e.target.style.display = "none"; }}
+                />
+                <div className="feat-boosted">★ Featured</div>
+                <div className="feat-type">Property</div>
+                <div className="feat-img-grad"></div>
+              </div>
+              <div className="feat-body">
+                <p className="feat-type-label">{property.propertyType || "Rental"}</p>
+                <h3 className="feat-title">{property.title}</h3>
+                <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                  <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  <span>{property.location}, {property.county}</span>
+                </p>
+                <div className="feat-meta">
+                  <span className="feat-tag">🛏️ {property.bedrooms} bed</span>
+                  <span className="feat-tag">🚿 {property.bathrooms} bath</span>
+                </div>
+                <p className="feat-price">KES {property.price?.toLocaleString()}/month</p>
+                <button onClick={() => navigate(`/listings/${property._id}`)} className="feat-view-btn magical-btn">
+                  View Details →
+                </button>
+              </div>
+            </div>
           ))}
-        </div>
 
-        {/* CARDS TRACK */}
-        {(() => {
-          let isLoading = false;
-          let dataList = [];
-          let renderCards = null;
-          let viewAllPath = "/listings";
-          let viewAllText = "View All Properties";
+          {/* Businesses */}
+          {featuredBusinesses.map((business) => (
+            <div key={business._id} className="feat-card">
+              <div className="feat-img-wrap">
+                <img
+                  src={business.images?.[0] || business.logo || ""}
+                  alt={business.name || "Business"}
+                  className="feat-img"
+                  loading="lazy"
+                  onError={e => { e.target.style.display = "none"; }}
+                />
+                <div className="feat-boosted">★ Featured</div>
+                <div className="feat-type">Business</div>
+                <div className="feat-img-grad"></div>
+              </div>
+              <div className="feat-body">
+                <p className="feat-type-label">{business.categories?.[0] || "Business"}</p>
+                <h3 className="feat-title">{business.name}</h3>
+                <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                  <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  <span>{business.location?.town}, {business.location?.county}</span>
+                </p>
+                <div className="feat-meta">
+                  {business.rating && <span className="feat-tag">⭐ {business.rating}</span>}
+                  {business.reviewCount && <span className="feat-tag">📝 {business.reviewCount} reviews</span>}
+                </div>
+                <p className="feat-price">
+                  {business.priceRange ? business.priceRange : "Contact for pricing"}
+                </p>
+                <button onClick={() => navigate(`/axxbiashara?business=${business._id}`)} className="feat-view-btn magical-btn">
+                  View Business →
+                </button>
+              </div>
+            </div>
+          ))}
 
-          if (activeFeaturedTab === "properties") {
-            isLoading = loadingFeatured;
-            dataList = featuredProperties;
-            viewAllPath = "/listings";
-            viewAllText = "View All Properties";
-            renderCards = () => [...featuredProperties, ...featuredProperties].map((property, idx) => (
-              <div key={`${property._id}-${idx}`} className="feat-card">
-                <div className="feat-img-wrap">
-                  <img
-                    src={property.images?.[0] || ""}
-                    alt={property.title || "Property"}
-                    className="feat-img"
-                    loading="lazy"
-                    onError={e => { e.target.style.display = "none"; }}
-                  />
-                  <div className="feat-boosted">★ Featured</div>
-                  <div className="feat-type">{property.propertyType || "Rental"}</div>
-                  <div className="feat-img-grad"></div>
-                </div>
-                <div className="feat-body">
-                  <p className="feat-type-label">{property.propertyType || "Rental"}</p>
-                  <h3 className="feat-title">{property.title}</h3>
-                  <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                    <span>{property.location}, {property.county}</span>
-                  </p>
-                  <div className="feat-meta">
-                    <span className="feat-tag">🛏️ {property.bedrooms} bed</span>
-                    <span className="feat-tag">🚿 {property.bathrooms} bath</span>
-                  </div>
-                  <p className="feat-price">KES {property.price?.toLocaleString()}/month</p>
-                  <button onClick={() => navigate(`/listings/${property._id}`)} className="feat-view-btn magical-btn">
-                    View Details →
-                  </button>
-                </div>
+          {/* Materials */}
+          {featuredMaterials.map((material) => (
+            <div key={material._id} className="feat-card">
+              <div className="feat-img-wrap">
+                <img
+                  src={material.images?.[0] || ""}
+                  alt={material.title || "Material"}
+                  className="feat-img"
+                  loading="lazy"
+                  onError={e => { e.target.style.display = "none"; }}
+                />
+                <div className="feat-boosted">★ Featured</div>
+                <div className="feat-type">QuickSale</div>
+                <div className="feat-img-grad"></div>
               </div>
-            ));
-          } else if (activeFeaturedTab === "businesses") {
-            isLoading = loadingBusinesses;
-            dataList = featuredBusinesses;
-            viewAllPath = "/axxbiashara";
-            viewAllText = "View All Businesses";
-            renderCards = () => [...featuredBusinesses, ...featuredBusinesses].map((business, idx) => (
-              <div key={`${business._id}-${idx}`} className="feat-card">
-                <div className="feat-img-wrap">
-                  <img
-                    src={business.images?.[0] || business.logo || ""}
-                    alt={business.name || "Business"}
-                    className="feat-img"
-                    loading="lazy"
-                    onError={e => { e.target.style.display = "none"; }}
-                  />
-                  <div className="feat-boosted">★ Featured</div>
-                  <div className="feat-type">{business.categories?.[0] || "Business"}</div>
-                  <div className="feat-img-grad"></div>
+              <div className="feat-body">
+                <p className="feat-type-label">{material.category || "Material"}</p>
+                <h3 className="feat-title">{material.title}</h3>
+                <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                  <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  <span>{material.location}, {material.county}</span>
+                </p>
+                <div className="feat-meta">
+                  <span className="feat-tag">👁️ {material.views || 0} views</span>
                 </div>
-                <div className="feat-body">
-                  <p className="feat-type-label">{business.categories?.[0] || "Business"}</p>
-                  <h3 className="feat-title">{business.name}</h3>
-                  <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                    <span>{business.location?.town}, {business.location?.county}</span>
-                  </p>
-                  <div className="feat-meta">
-                    {business.rating && <span className="feat-tag">⭐ {business.rating}</span>}
-                    {business.reviewCount && <span className="feat-tag">📝 {business.reviewCount} reviews</span>}
-                  </div>
-                  <p className="feat-price">
-                    {business.priceRange ? business.priceRange : "Contact for pricing"}
-                  </p>
-                  <button onClick={() => navigate(`/axxbiashara?business=${business._id}`)} className="feat-view-btn magical-btn">
-                    View Business →
-                  </button>
-                </div>
+                <p className="feat-price">KES {material.price?.toLocaleString()}</p>
+                <button onClick={() => navigate(`/materials/${material._id}`)} className="feat-view-btn magical-btn">
+                  View Details →
+                </button>
               </div>
-            ));
-          } else if (activeFeaturedTab === "materials") {
-            isLoading = loadingMaterials;
-            dataList = featuredMaterials;
-            viewAllPath = "/materials";
-            viewAllText = "View All QuickSales";
-            renderCards = () => [...featuredMaterials, ...featuredMaterials].map((material, idx) => (
-              <div key={`${material._id}-${idx}`} className="feat-card">
-                <div className="feat-img-wrap">
-                  <img
-                    src={material.images?.[0] || ""}
-                    alt={material.title || "Material"}
-                    className="feat-img"
-                    loading="lazy"
-                    onError={e => { e.target.style.display = "none"; }}
-                  />
-                  <div className="feat-boosted">★ Featured</div>
-                  <div className="feat-type">{material.category || "Material"}</div>
-                  <div className="feat-img-grad"></div>
-                </div>
-                <div className="feat-body">
-                  <p className="feat-type-label">{material.category || "Material"}</p>
-                  <h3 className="feat-title">{material.title}</h3>
-                  <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                    <span>{material.location}, {material.county}</span>
-                  </p>
-                  <div className="feat-meta">
-                    <span className="feat-tag">👁️ {material.views || 0} views</span>
-                  </div>
-                  <p className="feat-price">KES {material.price?.toLocaleString()}</p>
-                  <button onClick={() => navigate(`/materials/${material._id}`)} className="feat-view-btn magical-btn">
-                    View Details →
-                  </button>
-                </div>
+            </div>
+          ))}
+
+          {/* Tourism */}
+          {featuredTourism.map((tourism) => (
+            <div key={tourism._id} className="feat-card">
+              <div className="feat-img-wrap">
+                <img
+                  src={tourism.images?.[0] || ""}
+                  alt={tourism.name || "Tourism"}
+                  className="feat-img"
+                  loading="lazy"
+                  onError={e => { e.target.style.display = "none"; }}
+                />
+                <div className="feat-boosted">★ Featured</div>
+                <div className="feat-type">Tourism</div>
+                <div className="feat-img-grad"></div>
               </div>
-            ));
-          } else if (activeFeaturedTab === "tourism") {
-            isLoading = loadingTourism;
-            dataList = featuredTourism;
-            viewAllPath = "/tourism";
-            viewAllText = "View All Tourism";
-            renderCards = () => [...featuredTourism, ...featuredTourism].map((tourism, idx) => (
-              <div key={`${tourism._id}-${idx}`} className="feat-card">
-                <div className="feat-img-wrap">
-                  <img
-                    src={tourism.images?.[0] || ""}
-                    alt={tourism.name || "Tourism"}
-                    className="feat-img"
-                    loading="lazy"
-                    onError={e => { e.target.style.display = "none"; }}
-                  />
-                  <div className="feat-boosted">★ Featured</div>
-                  <div className="feat-type">{tourism.category || "Tourism"}</div>
-                  <div className="feat-img-grad"></div>
+              <div className="feat-body">
+                <p className="feat-type-label">{tourism.category || "Tourism"}</p>
+                <h3 className="feat-title">{tourism.name}</h3>
+                <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                  <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  <span>{tourism.location}, {tourism.county}</span>
+                </p>
+                <div className="feat-meta">
+                  <span className="feat-tag">👁️ {tourism.views || 0} views</span>
+                  <span className="feat-tag">⭐ {tourism.reviews?.length || 0} reviews</span>
                 </div>
-                <div className="feat-body">
-                  <p className="feat-type-label">{tourism.category || "Tourism"}</p>
-                  <h3 className="feat-title">{tourism.name}</h3>
-                  <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                    <span>{tourism.location}, {tourism.county}</span>
-                  </p>
-                  <div className="feat-meta">
-                    <span className="feat-tag">👁️ {tourism.views || 0} views</span>
-                    <span className="feat-tag">⭐ {tourism.reviews?.length || 0} reviews</span>
-                  </div>
-                  <p className="feat-price">KES {tourism.price?.toLocaleString()}/night</p>
-                  <button onClick={() => navigate(`/tourism/${tourism._id}`)} className="feat-view-btn magical-btn">
-                    View Details →
-                  </button>
-                </div>
+                <p className="feat-price">KES {tourism.price?.toLocaleString()}/night</p>
+                <button onClick={() => navigate(`/tourism/${tourism._id}`)} className="feat-view-btn magical-btn">
+                  View Details →
+                </button>
               </div>
-            ));
+            </div>
+          ));
           } else if (activeFeaturedTab === "movers") {
             isLoading = loadingMovers;
-            dataList = featuredMovers;
-            viewAllPath = "/movers";
-            viewAllText = "View All Movers";
+          dataList = featuredMovers;
+          viewAllPath = "/movers";
+          viewAllText = "View All Movers";
             renderCards = () => [...featuredMovers, ...featuredMovers].map((mover, idx) => (
-              <div key={`${mover._id}-${idx}`} className="feat-card">
-                <div className="feat-img-wrap">
-                  <img
-                    src={mover.portfolioImages?.[0] || mover.workPhotos?.[0] || mover.profileImage || ""}
-                    alt={`${mover.name} - Work Photo`}
-                    className="feat-img"
-                    loading="lazy"
-                    onError={e => { e.target.style.display = "none"; }}
-                  />
-                  <div className="feat-boosted">★ Featured</div>
-                  <div className="feat-type">Moving Service</div>
-                  <div className="feat-img-grad"></div>
-                </div>
-                <div className="feat-body">
-                  <p className="feat-type-label">Moving Service</p>
-                  <h3 className="feat-title">{mover.name}</h3>
-                  <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                    <span>{mover.county}</span>
-                  </p>
-                  <div className="feat-meta">
-                    <span className="feat-tag">🚚 {mover.vehicleType || "Various"}</span>
-                    <span className="feat-tag">⭐ {mover.experienceYears || 0} years exp</span>
-                    {mover.teamInfo?.teamSize && (
-                      <span className="feat-tag">👥 {mover.teamInfo.teamSize} team</span>
-                    )}
-                    {mover.responseTime && (
-                      <span className="feat-tag">⚡ {mover.responseTime}</span>
-                    )}
-                  </div>
-                  {(mover.insurance?.hasInsurance || mover.uniform || mover.safetyGear) && (
-                    <div className="feat-meta" style={{ marginTop: "8px" }}>
-                      {mover.insurance?.hasInsurance && (
-                        <span className="feat-tag" style={{ background: "rgba(34, 197, 94, 0.15)", color: "#22c55e", borderColor: "rgba(34, 197, 94, 0.3)" }}>
-                          🛡️ Insured
-                        </span>
-                      )}
-                      {mover.uniform && <span className="feat-tag">👔 Uniform</span>}
-                      {mover.safetyGear && <span className="feat-tag">⛑️ Safety Gear</span>}
-                    </div>
-                  )}
-                  {mover.specialties && mover.specialties.length > 0 && (
-                    <div className="feat-meta" style={{ marginTop: "8px" }}>
-                      {mover.specialties.slice(0, 2).map(specialty => (
-                        <span key={specialty} className="feat-tag" style={{ fontSize: "10px" }}>
-                          ⭐ {specialty}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  <p className="feat-price">
-                    {mover.pricing?.baseRate ? `KES ${mover.pricing.baseRate.toLocaleString()}` : "Contact for pricing"}
-                    {mover.pricing?.rateType && (
-                      <span style={{ fontSize: "12px", color: "#7A7260", marginLeft: "4px" }}>
-                        /{mover.pricing.rateType.replace('_', ' ')}
-                      </span>
-                    )}
-                  </p>
-                  <button onClick={() => navigate(`/movers/${mover._id}`)} className="feat-view-btn magical-btn">
-                    View Details →
-                  </button>
-                </div>
+          <div key={`${mover._id}-${idx}`} className="feat-card">
+            <div className="feat-img-wrap">
+              <img
+                src={mover.portfolioImages?.[0] || mover.workPhotos?.[0] || mover.profileImage || ""}
+                alt={`${mover.name} - Work Photo`}
+                className="feat-img"
+                loading="lazy"
+                onError={e => { e.target.style.display = "none"; }}
+              />
+              <div className="feat-boosted">★ Featured</div>
+              <div className="feat-type">Moving Service</div>
+              <div className="feat-img-grad"></div>
+            </div>
+            <div className="feat-body">
+              <p className="feat-type-label">Moving Service</p>
+              <h3 className="feat-title">{mover.name}</h3>
+              <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span>{mover.county}</span>
+              </p>
+              <div className="feat-meta">
+                <span className="feat-tag">🚚 {mover.vehicleType || "Various"}</span>
+                <span className="feat-tag">⭐ {mover.experienceYears || 0} years exp</span>
+                {mover.teamInfo?.teamSize && (
+                  <span className="feat-tag">👥 {mover.teamInfo.teamSize} team</span>
+                )}
+                {mover.responseTime && (
+                  <span className="feat-tag">⚡ {mover.responseTime}</span>
+                )}
               </div>
-            ));
+              {(mover.insurance?.hasInsurance || mover.uniform || mover.safetyGear) && (
+                <div className="feat-meta" style={{ marginTop: "8px" }}>
+                  {mover.insurance?.hasInsurance && (
+                    <span className="feat-tag" style={{ background: "rgba(34, 197, 94, 0.15)", color: "#22c55e", borderColor: "rgba(34, 197, 94, 0.3)" }}>
+                      🛡️ Insured
+                    </span>
+                  )}
+                  {mover.uniform && <span className="feat-tag">👔 Uniform</span>}
+                  {mover.safetyGear && <span className="feat-tag">⛑️ Safety Gear</span>}
+                </div>
+              )}
+              {mover.specialties && mover.specialties.length > 0 && (
+                <div className="feat-meta" style={{ marginTop: "8px" }}>
+                  {mover.specialties.slice(0, 2).map(specialty => (
+                    <span key={specialty} className="feat-tag" style={{ fontSize: "10px" }}>
+                      ⭐ {specialty}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <p className="feat-price">
+                {mover.pricing?.baseRate ? `KES ${mover.pricing.baseRate.toLocaleString()}` : "Contact for pricing"}
+                {mover.pricing?.rateType && (
+                  <span style={{ fontSize: "12px", color: "#7A7260", marginLeft: "4px" }}>
+                    /{mover.pricing.rateType.replace('_', ' ')}
+                  </span>
+                )}
+              </p>
+              <button onClick={() => navigate(`/movers/${mover._id}`)} className="feat-view-btn magical-btn">
+                View Details →
+              </button>
+            </div>
+          </div>
+          ));
           }
 
           if (isLoading) {
             return (
-              <div className="cards-track-wrap">
-                <div className="cards-track">
-                  {[1, 2, 3, 4].map((_, idx) => (
-                    <div key={`skeleton-${idx}`} className="feat-card">
-                      <div className="feat-img-wrap" style={{ background: "#e2e8f0", height: "185px" }}>
-                        <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%)", backgroundSize: "200% 100%", animation: "skeleton-loading 1.5s infinite" }}></div>
-                      </div>
-                      <div className="feat-body">
-                        <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "60%" }}></div>
-                        <div style={{ height: "24px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "80%" }}></div>
-                        <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "12px", width: "50%" }}></div>
-                        <div style={{ height: "20px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "16px", width: "40%" }}></div>
-                        <div style={{ height: "40px", background: "#e2e8f0", borderRadius: "8px", width: "100%" }}></div>
-                      </div>
-                    </div>
-                  ))}
+          <div className="cards-track-wrap">
+            <div className="cards-track">
+              {[1, 2, 3, 4].map((_, idx) => (
+                <div key={`skeleton-${idx}`} className="feat-card">
+                  <div className="feat-img-wrap" style={{ background: "#e2e8f0", height: "185px" }}>
+                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%)", backgroundSize: "200% 100%", animation: "skeleton-loading 1.5s infinite" }}></div>
+                  </div>
+                  <div className="feat-body">
+                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "60%" }}></div>
+                    <div style={{ height: "24px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "80%" }}></div>
+                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "12px", width: "50%" }}></div>
+                    <div style={{ height: "20px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "16px", width: "40%" }}></div>
+                    <div style={{ height: "40px", background: "#e2e8f0", borderRadius: "8px", width: "100%" }}></div>
+                  </div>
                 </div>
-              </div>
-            );
+              ))}
+            </div>
+          </div>
+          );
           }
 
           if (dataList.length === 0) {
             return (
-              <div className="no-feat-wrap">
-                <span className="no-feat-icon">✨</span>
-                <h4 className="no-feat-title">No Featured Items Found</h4>
-                <p className="no-feat-sub">We couldn't find any active featured listings in this category right now.</p>
-                <button onClick={() => navigate(viewAllPath)} className="no-feat-btn">
-                  Explore All Listings
-                </button>
-              </div>
-            );
+          <div className="no-feat-wrap">
+            <span className="no-feat-icon">✨</span>
+            <h4 className="no-feat-title">No Featured Items Found</h4>
+            <p className="no-feat-sub">We couldn't find any active featured listings in this category right now.</p>
+            <button onClick={() => navigate(viewAllPath)} className="no-feat-btn">
+              Explore All Listings
+            </button>
+          </div>
+          );
           }
 
           return (
-            <>
-              <div className="cards-track-wrap">
-                <div className="cards-track">
-                  {renderCards()}
-                </div>
+          <>
+            <div className="cards-track-wrap">
+              <div className="cards-track">
+                {renderCards()}
               </div>
-              <div className="view-all-wrap">
-                <button onClick={() => navigate(viewAllPath)} className="view-all-btn magical-btn">
-                  {viewAllText} →
-                </button>
-              </div>
-            </>
+            </div>
+            <div className="view-all-wrap">
+              <button onClick={() => navigate(viewAllPath)} className="view-all-btn magical-btn">
+                {viewAllText} →
+              </button>
+            </div>
+          </>
           );
         })()}
       </section>
