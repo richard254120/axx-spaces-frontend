@@ -215,51 +215,88 @@ export default function QuickSales() {
     <div style={styles.container}>
       <style>{css}</style>
 
-      {/* HERO BANNER */}
-      <div style={styles.heroSection}>
-        <div style={{ maxWidth: "700px" }}>
-          <span style={styles.taglineBadge}>✨ Pre-Loved & New Items</span>
-          <h1 style={styles.heroTitle}>Smart Shopping, Smarter Prices</h1>
-          <p style={styles.heroSubtitle}>Discover quality second-hand items, materials, furniture, electronics, and more from verified local sellers. Buy smart, save big, give items a second life.</p>
+      {/* ── ULTRA-COMPACT HEADER & CATEGORIES ── */}
+      {/* Row 1: Logo & Title | Search Bar | Action Buttons */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", marginBottom: "8px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span style={{ fontSize: "20px" }}>🛍️</span>
+          <h1 style={{ fontSize: "20px", fontWeight: 800, background: "linear-gradient(135deg, #0B2140 0%, #E31B1B 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", margin: 0, lineHeight: 1 }}>
+            QuickSales
+          </h1>
         </div>
-        <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+        
+        <div style={{ position: "relative", flexGrow: 1, maxWidth: "450px", minWidth: "200px" }}>
+          <span style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", fontSize: "14px", color: "#E31B1B" }}>🔍</span>
+          <input
+            className="search-input"
+            type="text"
+            placeholder="Search for furniture, electronics, tools..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            style={{ padding: "8px 12px 8px 36px", fontSize: "13px", borderRadius: "10px", height: "36px", margin: 0, width: "100%", border: "1px solid #e5e7eb" }}
+          />
+          {searchInput && (
+            <button onClick={() => setSearchInput("")} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: "12px" }}>✕</button>
+          )}
+        </div>
+
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
           {isSeller && (
-            <button onClick={() => navigate("/seller-dashboard")} style={{ ...styles.heroUploadBtn, background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)" }}>
-              <span style={{ fontSize: "1.2rem", marginRight: "6px" }}>📊</span> My Dashboard
+            <button onClick={() => navigate("/seller-dashboard")} style={{ padding: "6px 12px", background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)", color: "white", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: 700, cursor: "pointer", height: "36px" }}>
+              My Dashboard
             </button>
           )}
-          <button onClick={handleSell} style={styles.heroUploadBtn}>
-            <span style={{ fontSize: "1.2rem", marginRight: "6px" }}>💰</span> Sell Your Item
+          <button onClick={handleSell} style={{ padding: "6px 14px", background: "#E31B1B", color: "white", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: 700, cursor: "pointer", height: "36px" }}>
+            Sell Your Item
           </button>
         </div>
       </div>
 
-      {/* FILTER BAR */}
-      <div style={styles.filterContainer}>
-        <h3 style={styles.filterTitle}>🔍 Find What You're Looking For</h3>
-        <div style={styles.filterGrid}>
-          <input
-            type="text"
-            name="search"
-            placeholder="Search for furniture, electronics, tools..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            style={{ ...styles.filterInput, gridColumn: "span 2" }}
-          />
-          <select name="category" value={filters.category} onChange={handleFilterChange} style={styles.filterInput}>
-            <option value="">All Categories</option>
-            {CATEGORIES.map((c) => <option key={c} value={c}>{getCategoryEmoji(c)} {c}</option>)}
-          </select>
-          <select name="condition" value={filters.condition} onChange={handleFilterChange} style={styles.filterInput}>
+      {/* Row 2: Categories Pills Scrolling | Small Dropdown Filters */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px", marginBottom: "4px" }}>
+        <div className="categories-container" style={{ margin: 0, padding: "2px 0 6px", flexGrow: 1, overflowX: "auto" }}>
+          <button 
+            className={`category-pill ${filters.category === "" ? "active" : ""}`}
+            onClick={() => setFilters(prev => ({ ...prev, category: "" }))}
+            style={{ padding: "6px 12px", fontSize: "12px", borderRadius: "8px" }}
+          >
+            All Categories
+          </button>
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat}
+              className={`category-pill ${filters.category === cat ? "active" : ""}`}
+              onClick={() => setFilters(prev => ({ ...prev, category: cat }))}
+              style={{ padding: "6px 12px", fontSize: "12px", borderRadius: "8px" }}
+            >
+              <span>{getCategoryEmoji(cat)}</span>
+              <span>{cat}</span>
+            </button>
+          ))}
+        </div>
+
+        <div style={{ display: "flex", gap: "6px", alignItems: "center", flexShrink: 0, marginBottom: "6px" }}>
+          <select name="condition" value={filters.condition} onChange={handleFilterChange} style={{ padding: "4px 20px 4px 8px", fontSize: "12px", height: "30px", minWidth: "110px", background: "white", border: "1px solid #e5e7eb", borderRadius: "8px" }}>
             <option value="">All Conditions</option>
             {CONDITIONS.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
-          <select name="county" value={filters.county} onChange={handleFilterChange} style={styles.filterInput}>
+
+          <select name="county" value={filters.county} onChange={handleFilterChange} style={{ padding: "4px 20px 4px 8px", fontSize: "12px", height: "30px", minWidth: "110px", background: "white", border: "1px solid #e5e7eb", borderRadius: "8px" }}>
             <option value="">All Counties</option>
             {COUNTIES.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
-          <input type="number" name="minPrice" placeholder="Min Price (KES)" value={filters.minPrice} onChange={handleFilterChange} style={styles.filterInput} />
-          <input type="number" name="maxPrice" placeholder="Max Price (KES)" value={filters.maxPrice} onChange={handleFilterChange} style={styles.filterInput} />
+
+          <input type="number" name="minPrice" placeholder="Min Price" value={filters.minPrice} onChange={handleFilterChange} style={{ padding: "4px 8px", fontSize: "12px", height: "30px", maxWidth: "90px", background: "white", border: "1px solid #e5e7eb", borderRadius: "8px" }} />
+          <input type="number" name="maxPrice" placeholder="Max Price" value={filters.maxPrice} onChange={handleFilterChange} style={{ padding: "4px 8px", fontSize: "12px", height: "30px", maxWidth: "90px", background: "white", border: "1px solid #e5e7eb", borderRadius: "8px" }} />
+
+          {hasActiveFilters && (
+            <button
+              onClick={handleResetFilters}
+              style={{ padding: "4px 10px", background: "rgba(227, 27, 27, 0.08)", border: "1px solid rgba(227, 27, 27, 0.2)", borderRadius: "8px", color: "#E31B1B", fontSize: "12px", fontWeight: 700, cursor: "pointer", transition: "all 0.2s", height: "30px" }}
+            >
+              Clear
+            </button>
+          )}
         </div>
       </div>
 
@@ -267,11 +304,6 @@ export default function QuickSales() {
         <div style={styles.resultsCount}>
           Found <strong style={{ color: "#E31B1B" }}>{items.length}</strong> items available
         </div>
-        {hasActiveFilters && (
-          <button onClick={handleResetFilters} style={styles.resetBtn}>
-            🔄 Reset
-          </button>
-        )}
       </div>
 
       {error && <div style={styles.error}>{error}</div>}
@@ -469,73 +501,62 @@ export default function QuickSales() {
 }
 
 const styles = {
-  container: { background: "#ffffff", minHeight: "100vh", padding: "20px", fontFamily: "'DM Sans', sans-serif", color: "#0B2140", maxWidth: "1200px", margin: "0 auto" },
+  container: { background: "#ffffff", minHeight: "100vh", padding: "12px 24px 0px", fontFamily: "'DM Sans', sans-serif", color: "#0B2140", maxWidth: "1200px", margin: "0 auto" },
 
-  heroSection: { background: "linear-gradient(135deg, #0B2140 0%, #152B4A 100%)", borderRadius: "16px", padding: "48px 36px", marginBottom: "32px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "32px", flexWrap: "wrap", color: "white" },
-  taglineBadge: { background: "rgba(227, 27, 27, 0.15)", color: "#E31B1B", padding: "8px 14px", borderRadius: "20px", fontSize: "0.8rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", display: "inline-block", marginBottom: "12px" },
-  heroTitle: { margin: 0, fontSize: "2.5rem", fontWeight: 900, letterSpacing: "-0.5px", marginBottom: "8px" },
-  heroSubtitle: { margin: "0 0 0 0", fontSize: "1.05rem", lineHeight: 1.6, opacity: 0.95 },
-  heroUploadBtn: { padding: "14px 28px", background: "#E31B1B", color: "white", border: "none", borderRadius: "10px", fontSize: "1rem", fontWeight: 800, cursor: "pointer", whiteSpace: "nowrap" },
+  resultsRow: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" },
+  resultsCount: { color: "#6b7280", fontSize: "12px", fontWeight: 500 },
+  resetBtn: { background: "none", border: "none", color: "#E31B1B", cursor: "pointer", fontSize: "12px", fontWeight: 700, padding: 0 },
 
-  filterContainer: { background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: "12px", padding: "24px", marginBottom: "24px" },
-  filterTitle: { margin: "0 0 16px 0", fontSize: "15px", fontWeight: 700, color: "#0B2140" },
-  filterGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "12px" },
-  filterInput: { padding: "12px 14px", background: "white", border: "1px solid #e5e7eb", borderRadius: "8px", color: "#0B2140", fontSize: "14px", fontFamily: "inherit" },
+  error: { background: "#fee2e2", border: "1px solid #fecaca", color: "#dc2626", padding: "8px 12px", borderRadius: "8px", marginBottom: "12px", fontSize: "13px" },
 
-  resultsRow: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" },
-  resultsCount: { color: "#6b7280", fontSize: "14px", fontWeight: 500 },
-  resetBtn: { background: "none", border: "none", color: "#E31B1B", cursor: "pointer", fontSize: "14px", fontWeight: 700, padding: 0 },
+  emptyState: { textAlign: "center", padding: "60px 20px", background: "#f9fafb", borderRadius: "12px", border: "2px dashed #e5e7eb" },
+  emptyResetBtn: { background: "white", border: "1px solid #e5e7eb", borderRadius: "8px", color: "#0B2140", padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: "13px" },
+  emptySellBtn: { background: "#E31B1B", border: "none", borderRadius: "8px", color: "white", padding: "10px 20px", cursor: "pointer", fontWeight: 700, fontSize: "13px" },
 
-  error: { background: "#fee2e2", border: "1px solid #fecaca", color: "#dc2626", padding: "12px 16px", borderRadius: "8px", marginBottom: "20px", fontSize: "14px" },
+  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "14px" },
+  "@media (max-width: 768px)": { grid: { gridTemplateColumns: "repeat(2, 1fr)", gap: "10px" } },
+  "@media (max-width: 480px)": { grid: { gridTemplateColumns: "repeat(2, 1fr)", gap: "6px" } },
+  "@media (max-width: 380px)": { grid: { gridTemplateColumns: "repeat(2, 1fr)", gap: "4px" } },
 
-  emptyState: { textAlign: "center", padding: "80px 20px", background: "#f9fafb", borderRadius: "12px", border: "2px dashed #e5e7eb" },
-  emptyResetBtn: { background: "white", border: "1px solid #e5e7eb", borderRadius: "8px", color: "#0B2140", padding: "12px 20px", cursor: "pointer", fontWeight: 600, fontSize: "14px" },
-  emptySellBtn: { background: "#E31B1B", border: "none", borderRadius: "8px", color: "white", padding: "12px 24px", cursor: "pointer", fontWeight: 700, fontSize: "14px" },
+  card: { background: "white", border: "1px solid #e5e7eb", borderRadius: "12px", overflow: "hidden", cursor: "pointer", transition: "all 0.3s ease", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" },
+  "@media (max-width: 768px)": { card: { borderRadius: "10px" } },
 
-  grid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" },
-  "@media (max-width: 768px)": { grid: { gridTemplateColumns: "repeat(2, 1fr)", gap: "12px" } },
-  "@media (max-width: 480px)": { grid: { gridTemplateColumns: "repeat(2, 1fr)", gap: "8px" } },
-  "@media (max-width: 380px)": { grid: { gridTemplateColumns: "repeat(2, 1fr)", gap: "6px" } },
-
-  card: { background: "white", border: "1px solid #e5e7eb", borderRadius: "16px", overflow: "hidden", cursor: "pointer", transition: "all 0.3s ease", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" },
-  "@media (max-width: 768px)": { card: { borderRadius: "12px" } },
-
-  imageWrapper: { position: "relative", aspectRatio: "1/1", overflow: "hidden", background: "#f3f4f6" },
+  imageWrapper: { position: "relative", aspectRatio: "16/10", overflow: "hidden", background: "#f3f4f6" },
   itemImage: { width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.4s ease" },
 
-  badgeStack: { position: "absolute", top: "12px", left: "12px", display: "flex", flexDirection: "column", gap: "6px" },
-  conditionBadge: { background: "#3b82f6", color: "white", padding: "4px 10px", borderRadius: "6px", fontSize: "0.75rem", fontWeight: 700 },
-  lowStockBadge: { background: "#dc2626", color: "white", padding: "4px 10px", borderRadius: "6px", fontSize: "0.75rem", fontWeight: 700 },
-  newItemBadge: { background: "#10b981", color: "white", padding: "4px 10px", borderRadius: "6px", fontSize: "0.75rem", fontWeight: 700 },
+  badgeStack: { position: "absolute", top: "8px", left: "8px", display: "flex", flexDirection: "column", gap: "4px" },
+  conditionBadge: { background: "#3b82f6", color: "white", padding: "2px 6px", borderRadius: "4px", fontSize: "0.65rem", fontWeight: 700 },
+  lowStockBadge: { background: "#dc2626", color: "white", padding: "2px 6px", borderRadius: "4px", fontSize: "0.65rem", fontWeight: 700 },
+  newItemBadge: { background: "#10b981", color: "white", padding: "2px 6px", borderRadius: "4px", fontSize: "0.65rem", fontWeight: 700 },
 
-  actionBtn: { position: "absolute", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255, 255, 255, 0.9)", border: "1px solid #e5e7eb", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 5, fontSize: "18px", padding: 0 },
-  favBtn: { top: "12px", right: "12px" },
-  shareBtn: { top: "52px", right: "12px" },
+  actionBtn: { position: "absolute", width: "28px", height: "28px", borderRadius: "50%", background: "rgba(255, 255, 255, 0.9)", border: "1px solid #e5e7eb", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 5, fontSize: "14px", padding: 0 },
+  favBtn: { top: "8px", right: "8px" },
+  shareBtn: { top: "40px", right: "8px" },
 
-  photoCount: { position: "absolute", bottom: "12px", right: "12px", background: "rgba(0, 0, 0, 0.6)", color: "white", padding: "4px 10px", borderRadius: "6px", fontSize: "12px", fontWeight: 600 },
+  photoCount: { position: "absolute", bottom: "8px", right: "8px", background: "rgba(0, 0, 0, 0.6)", color: "white", padding: "2px 6px", borderRadius: "4px", fontSize: "10px", fontWeight: 600 },
 
-  cardContent: { padding: "16px" },
-  "@media (max-width: 768px)": { cardContent: { padding: "12px" } },
-  itemTitle: { margin: "0 0 8px 0", fontSize: "16px", fontWeight: 700, color: "#0B2140", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" },
-  "@media (max-width: 768px)": { itemTitle: { fontSize: "14px" } },
-  categoryIcon: { fontSize: "20px", flexShrink: 0 },
-  "@media (max-width: 768px)": { categoryIcon: { fontSize: "16px" } },
-  itemLocation: { margin: "0 0 12px 0", fontSize: "13px", color: "#6b7280" },
-  "@media (max-width: 768px)": { itemLocation: { fontSize: "11px", marginBottom: "8px" } },
+  cardContent: { padding: "10px" },
+  "@media (max-width: 768px)": { cardContent: { padding: "8px" } },
+  itemTitle: { margin: "0 0 4px 0", fontSize: "14px", fontWeight: 700, color: "#0B2140", lineHeight: 1.15, display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden" },
+  "@media (max-width: 768px)": { itemTitle: { fontSize: "13px" } },
+  categoryIcon: { fontSize: "16px", flexShrink: 0 },
+  "@media (max-width: 768px)": { categoryIcon: { fontSize: "14px" } },
+  itemLocation: { margin: "0 0 6px 0", fontSize: "11px", color: "#6b7280" },
+  "@media (max-width: 768px)": { itemLocation: { fontSize: "10px", marginBottom: "4px" } },
 
-  priceSection: { display: "flex", justifyContent: "space-between", alignItems: "center", margin: "12px 0" },
-  "@media (max-width: 768px)": { priceSection: { margin: "8px 0" } },
-  price: { margin: 0, fontSize: "20px", fontWeight: 800, color: "#E31B1B" },
-  "@media (max-width: 768px)": { price: { fontSize: "16px" } },
-  dealBadge: { fontSize: "11px", background: "#d1fae5", color: "#065f46", padding: "3px 8px", borderRadius: "4px", fontWeight: 700 },
+  priceSection: { display: "flex", justifyContent: "space-between", alignItems: "center", margin: "6px 0" },
+  "@media (max-width: 768px)": { priceSection: { margin: "4px 0" } },
+  price: { margin: 0, fontSize: "15px", fontWeight: 800, color: "#E31B1B" },
+  "@media (max-width: 768px)": { price: { fontSize: "14px" } },
+  dealBadge: { fontSize: "9px", background: "#d1fae5", color: "#065f46", padding: "2px 6px", borderRadius: "4px", fontWeight: 700 },
 
-  infoGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", background: "#f9fafb", padding: "10px", borderRadius: "8px", margin: "10px 0" },
-  "@media (max-width: 768px)": { infoGrid: { gap: "8px", padding: "8px", margin: "8px 0" } },
-  infoValue: { margin: "4px 0 0 0", fontWeight: 700, color: "#0B2140", fontSize: "13px" },
-  "@media (max-width: 768px)": { infoValue: { fontSize: "12px" } },
+  infoGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", background: "#f9fafb", padding: "6px", borderRadius: "6px", margin: "6px 0" },
+  "@media (max-width: 768px)": { infoGrid: { gap: "4px", padding: "4px", margin: "4px 0" } },
+  infoValue: { margin: "2px 0 0 0", fontWeight: 700, color: "#0B2140", fontSize: "11px" },
+  "@media (max-width: 768px)": { infoValue: { fontSize: "10px" } },
 
-  viewBtn: { width: "100%", padding: "12px", background: "#0B2140", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "14px", fontWeight: 700, marginTop: "10px" },
-  "@media (max-width: 768px)": { viewBtn: { padding: "10px", fontSize: "13px", marginTop: "8px" } },
+  viewBtn: { width: "100%", padding: "8px", background: "#0B2140", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "12px", fontWeight: 700, marginTop: "6px" },
+  "@media (max-width: 768px)": { viewBtn: { padding: "8px", fontSize: "11px", marginTop: "6px" } },
 
   modal: { position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000, padding: "20px" },
   modalBox: { background: "white", borderRadius: "16px", maxWidth: "650px", width: "100%", maxHeight: "90vh", overflowY: "auto", position: "relative" },
@@ -588,17 +609,17 @@ const css = `
   }
   
   .item-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 32px rgba(227, 27, 27, 0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(227, 27, 27, 0.12);
     border-color: #E31B1B !important;
   }
   
   .item-card:hover img {
-    transform: scale(1.05);
+    transform: scale(1.03);
   }
   
   button:not(:disabled):hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
   }
   
   input:focus, select:focus {
@@ -614,5 +635,46 @@ const css = `
     .contactBtns {
       grid-template-columns: 1fr !important;
     }
+  }
+
+  /* Scrolling Category Pills styling */
+  .categories-container {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 4px 10px;
+    margin-bottom: 8px;
+    scrollbar-width: none; /* Firefox */
+  }
+  .categories-container::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
+  .category-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    color: #4b5563;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+    font-family: inherit;
+  }
+  .category-pill:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #dc2626;
+    transform: translateY(-1px);
+  }
+  .category-pill.active {
+    background: linear-gradient(135deg, #fee2e2 0%, rgba(227, 27, 27, 0.1) 100%);
+    border-color: #E31B1B;
+    color: #E31B1B;
+    box-shadow: 0 4px 12px rgba(227, 27, 27, 0.1);
   }
 `;
