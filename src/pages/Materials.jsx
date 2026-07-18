@@ -324,7 +324,7 @@ export default function QuickSales() {
           </div>
         </div>
       ) : (
-        <div style={styles.grid}>
+        <div style={styles.grid} className="quicksales-grid">
           {items.map((item) => {
             const isFavorite = favorites.includes(item._id);
             const isLowStock = item.quantity && item.quantity <= 2;
@@ -629,8 +629,12 @@ const css = `
   }
   
   @media (max-width: 768px) {
-    [style*="gridTemplateColumns: repeat"] {
+    [style*="gridTemplateColumns: repeat"]:not(.quicksales-grid) {
       grid-template-columns: 1fr !important;
+    }
+    .quicksales-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 10px !important;
     }
     .contactBtns {
       grid-template-columns: 1fr !important;
