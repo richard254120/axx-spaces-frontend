@@ -224,9 +224,6 @@ export default function MaterialDetailPage() {
                 <span style={{ background: "#3b82f6", color: "white", padding: "4px 10px", borderRadius: "6px", fontSize: "11px", fontWeight: 600, textTransform: "uppercase" }}>
                   {item.category || "General"}
                 </span>
-                <span style={{ background: "#22c55e", color: "white", padding: "4px 10px", borderRadius: "6px", fontSize: "11px", fontWeight: 600, marginLeft: "6px" }}>
-                  {item.condition || "Good"}
-                </span>
               </div>
               <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#1e293b", marginBottom: "8px", lineHeight: "1.3" }}>{item.title}</h1>
               <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "20px" }}>

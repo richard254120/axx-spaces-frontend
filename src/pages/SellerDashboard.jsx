@@ -59,7 +59,7 @@ export default function SellerDashboard() {
   const [stats, setStats] = useState({ totalEarnings: 0, liveItems: 0, pendingReview: 0, totalViews: 0 });
 
   const [form, setForm] = useState({
-    title: "", description: "", category: "", condition: "Good",
+    title: "", description: "", category: "", condition: "",
     price: "", quantity: "", location: "", county: "", lat: "", lng: ""
   });
 
@@ -142,7 +142,7 @@ export default function SellerDashboard() {
 
       if (!res.ok) { setError("Failed to submit"); return; }
       setSuccess("✅ Upload completed successfully!");
-      setForm({ title: "", description: "", category: "", condition: "Good", price: "", quantity: "", location: "", county: "", lat: "", lng: "" });
+      setForm({ title: "", description: "", category: "", condition: "", price: "", quantity: "", location: "", county: "", lat: "", lng: "" });
       setImages([]); setPreviews([]); setView("listings");
       fetchMyMaterials(token);
     } catch (err) {
@@ -353,9 +353,7 @@ export default function SellerDashboard() {
               <option value="">Select Category</option>
               {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
-            <select name="condition" value={form.condition} onChange={handleChange} style={s.input}>
-              {CONDITIONS.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
+
             <input name="price" type="number" placeholder="Price (KES)" value={form.price} onChange={handleChange} style={s.input} />
             <input name="quantity" type="number" placeholder="Quantity" value={form.quantity} onChange={handleChange} style={s.input} />
             <input name="location" placeholder="Specific Area (e.g. Westlands)" value={form.location} onChange={handleChange} style={s.input} />

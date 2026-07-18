@@ -2060,7 +2060,6 @@ export default function Home() {
                   <h3 className="feat-title">{material.title}</h3>
                   <p className="feat-loc">📍 {material.location}, {material.county}</p>
                   <div className="feat-meta">
-                    <span className="feat-tag">📦 {material.condition}</span>
                     <span className="feat-tag">👁️ {material.views || 0} views</span>
                   </div>
                   <p className="feat-price">KES {material.price?.toLocaleString()}</p>
