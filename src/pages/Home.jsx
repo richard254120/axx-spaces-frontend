@@ -269,12 +269,9 @@ option { background: #162233; color: #F0EAD8; }
 }
 
 .hero-content {
-  position: absolute; z-index: 3;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
+  position: relative; z-index: 3;
   max-width: 900px;
-  padding: 28px;
-  text-align: center;
+  padding: 80px 28px 70px;
   animation: fadeUp 1s ease both;
 }
 .hero-badge {
