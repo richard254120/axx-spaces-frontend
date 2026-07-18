@@ -705,200 +705,154 @@ export default function AxxBiashara() {
           gap: 10px;
           margin-bottom: 24px;
         }
+
+        /* Scrolling Category Pills styling */
+        .categories-container {
+          display: flex;
+          gap: 12px;
+          overflow-x: auto;
+          padding: 8px 4px 16px;
+          margin-bottom: 24px;
+          scrollbar-width: none; /* Firefox */
+        }
+        .categories-container::-webkit-scrollbar {
+          display: none; /* Safari and Chrome */
+        }
+        .category-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 10px 20px;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 14px;
+          color: #94a3b8;
+          font-size: 13.5px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          white-space: nowrap;
+          backdrop-filter: blur(8px);
+          font-family: inherit;
+        }
+        .category-pill:hover {
+          background: rgba(251, 191, 36, 0.08);
+          border-color: rgba(251, 191, 36, 0.35);
+          color: #fbbf24;
+          transform: translateY(-1px);
+        }
+        .category-pill.active {
+          background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.1) 100%);
+          border-color: #fbbf24;
+          color: #fbbf24;
+          box-shadow: 0 4px 15px rgba(251, 191, 36, 0.15);
+        }
       `}</style>
 
-      {/* ── HERO HEADER ── */}
-      <div style={{
-        background: "radial-gradient(circle at top right, rgba(251, 191, 36, 0.05) 0%, transparent 60%), linear-gradient(180deg, #0d1322 0%, #090d16 100%)",
-        borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
-        padding: "72px 24px 56px",
-        position: "relative", overflow: "hidden",
-      }}>
-        {/* Decorative backdrop blobs */}
-        <div style={{ position: "absolute", top: "-100px", right: "-100px", width: "400px", height: "400px", borderRadius: "50%", background: "radial-gradient(circle, rgba(251, 191, 36, 0.06) 0%, transparent 70%)", pointerEvents: "none", filter: "blur(40px)" }} />
-        <div style={{ position: "absolute", bottom: "-120px", left: "5%", width: "300px", height: "300px", borderRadius: "50%", background: "radial-gradient(circle, rgba(20, 184, 166, 0.04) 0%, transparent 70%)", pointerEvents: "none", filter: "blur(40px)" }} />
-
-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-          {/* Top bar */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "30px", marginBottom: "42px" }}>
-            <div>
-              <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "14px" }}>
-                <img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "48px", height: "48px", borderRadius: "14px", objectFit: "cover", boxShadow: "0 6px 20px rgba(251, 191, 36, 0.25)" }} />
-                <div>
-                  <div className="section-label">Kenya Business Directory</div>
-                  <h1 style={{ fontSize: "clamp(32px, 6vw, 48px)", fontWeight: 800, background: "linear-gradient(135deg, #ffffff 0%, #fbbf24 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", lineHeight: 1.1, letterSpacing: "-0.02em" }}>
-                    AxxBiashara
-                  </h1>
-                </div>
+      {/* ── COMPACT HEADER & CATEGORIES ── */}
+      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "40px 24px 10px" }}>
+        
+        {/* Top bar with Branding and Add Business option */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "20px", marginBottom: "32px" }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "38px", height: "38px", borderRadius: "10px", objectFit: "cover" }} />
+              <div>
+                <h1 style={{ fontSize: "28px", fontWeight: 800, background: "linear-gradient(135deg, #ffffff 0%, #fbbf24 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", lineHeight: 1.1, letterSpacing: "-0.02em" }}>
+                  AxxBiashara
+                </h1>
+                <p style={{ color: "#64748b", fontSize: "12px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginTop: "2px" }}>
+                  Kenya Business Directory
+                </p>
               </div>
-              <p style={{ color: "#94a3b8", fontSize: "15.5px", maxWidth: "480px", lineHeight: "1.6", fontWeight: 500 }}>
-                Discover, compare, and connect with premier verified local businesses and services across all 47 counties of Kenya.
-              </p>
-            </div>
-            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-              {token && user?.role === "user" && (
-                <button className="cta-btn" style={{ background: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#f1f5f9" }} onClick={() => navigate("/business-dashboard")}>
-                  Dashboard
-                </button>
-              )}
-              <button className="cta-primary cta-btn" onClick={() => {
-                if (token && user?.role === "user") {
-                  navigate("/business-dashboard");
-                } else {
-                  navigate("/business-login");
-                }
-              }}>
-                Add Business
-              </button>
-              <button className="cta-green cta-btn" onClick={() => setShowAnnouncementForm(!showAnnouncementForm)}>
-                {showAnnouncementForm ? "Cancel" : "Announce"}
-              </button>
             </div>
           </div>
-
-          {/* Stats strip */}
-          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "36px" }}>
-            {[
-              { label: "Registered Businesses", value: businesses.length },
-              { label: "Counties Covered", value: "47" },
-              { label: "Industry Categories", value: BUSINESS_CATEGORIES.length },
-              { label: "Verified Partners", value: businesses.filter(b => b.verificationBadges?.length).length },
-            ].map(s => (
-              <div key={s.label} className="stat-chip"><strong>{s.value}</strong> {s.label}</div>
-            ))}
+          
+          <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+            {token && user?.role === "user" && (
+              <button className="cta-btn" style={{ background: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#f1f5f9", padding: "10px 20px" }} onClick={() => navigate("/business-dashboard")}>
+                Dashboard
+              </button>
+            )}
+            <button className="cta-primary cta-btn" style={{ padding: "10px 20px" }} onClick={() => {
+              if (token && user?.role === "user") {
+                navigate("/business-dashboard");
+              } else {
+                navigate("/business-login");
+              }
+            }}>
+              Add Business
+            </button>
           </div>
-
-          {/* ── REFRESH BANNER — shown after a business update ── */}
-          {refreshBanner && (
-            <div className="refresh-banner">
-              <span style={{ fontSize: "18px" }}>✓</span>
-              Directory updated successfully! The business records have been reloaded.
-            </div>
-          )}
-
-          {/* Success message (announcement) */}
-          {announcementSuccess && (
-            <div style={{ background: "rgba(20, 184, 166, 0.1)", border: "1px solid rgba(20, 184, 166, 0.3)", color: "#14b8a6", padding: "14px 20px", borderRadius: "14px", marginBottom: "24px", fontSize: "14.5px", fontWeight: 600 }}>
-              {announcementSuccess}
-            </div>
-          )}
-
-          {/* Announcement form */}
-          {showAnnouncementForm && (
-            <div style={{ background: "rgba(17, 24, 39, 0.45)", border: "1px solid rgba(251, 191, 36, 0.2)", borderRadius: "20px", padding: "32px", marginBottom: "36px", backdropFilter: "blur(12px)" }}>
-              <h3 style={{ fontSize: "19px", fontWeight: 700, color: "#fbbf24", marginBottom: "20px" }}>Create General Announcement</h3>
-              <form onSubmit={handleAddAnnouncement}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "0" }}>
-                  <input className="form-input" type="text" placeholder="Your Name *" value={submitterName} onChange={e => setSubmitterName(e.target.value)} required style={{ marginBottom: 0 }} />
-                  <input className="form-input" type="text" placeholder="Organisation (optional)" value={organizationName} onChange={e => setOrganizationName(e.target.value)} style={{ marginBottom: 0 }} />
-                </div>
-                <div style={{ height: 16 }} />
-                <input className="form-input" type="text" placeholder="Announcement Title *" value={announcementTitle} onChange={e => setAnnouncementTitle(e.target.value)} required />
-                <textarea className="form-input" placeholder="Content *" value={announcementContent} onChange={e => setAnnouncementContent(e.target.value)} required rows={4} style={{ resize: "vertical" }} />
-                <button type="submit" className="cta-primary cta-btn" style={{ width: "100%", justifyContent: "center", marginTop: "4px" }}>Submit Announcement</button>
-              </form>
-            </div>
-          )}
-
-          {/* Announcements ticker */}
-          {announcements.length > 0 && (
-            <div style={{ background: "rgba(17, 24, 39, 0.35)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "20px", padding: "20px 24px", backdropFilter: "blur(8px)" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
-                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#fbbf24", boxShadow: "0 0 8px #fbbf24", animation: "pulse-ring 2s infinite", display: "inline-block" }} />
-                <span style={{ fontSize: "12px", fontWeight: 800, color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.12em" }}>Live Board</span>
-              </div>
-              <div style={{ overflow: "hidden" }} onMouseEnter={() => setIsMarqueePaused(true)} onMouseLeave={() => setIsMarqueePaused(false)}>
-                <div style={{ display: "flex", gap: "16px", animation: "marquee 50s linear infinite", animationPlayState: isMarqueePaused ? "paused" : "running" }}>
-                  {[...announcements.slice(0, 10), ...announcements.slice(0, 10)].map((a, i) => (
-                    <div key={`${i}-${a._id}`} className="ann-card" onClick={() => { setSelectedAnnouncement(a); setShowAnnouncementModal(true); }}>
-                      <div style={{ fontSize: "11px", color: "#fbbf24", fontWeight: 700, marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.06em" }}>{a.businessName || "General"}</div>
-                      <div style={{ fontSize: "14px", fontWeight: 600, color: "#f1f5f9", marginBottom: "8px", lineHeight: "1.4" }}>{a.title}</div>
-                      <div style={{ fontSize: "11px", color: "#94a3b8" }}>
-                        {a.submitterName && `${a.submitterName}`}
-                        {a.organizationName && ` · ${a.organizationName}`}
-                      </div>
-                      <div style={{ fontSize: "10px", color: "#64748b", marginTop: "6px", fontWeight: 600 }}>{new Date(a.createdAt).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" })}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
-      </div>
 
-      {/* ── FILTERS BAR ── */}
-      <div style={{ background: "rgba(9, 13, 22, 0.8)", borderBottom: "1px solid rgba(255, 255, 255, 0.05)", padding: "20px 24px", position: "sticky", top: 0, zIndex: 100, backdropFilter: "blur(16px)" }}>
-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-          {/* Search bar wrapper */}
-          <div style={{ position: "relative", marginBottom: "16px" }}>
-            <span style={{ position: "absolute", left: "18px", top: "50%", transform: "translateY(-50%)", fontSize: "18px", color: "#fbbf24" }}>🔍</span>
+        {/* ── REFRESH BANNER — shown after a business update ── */}
+        {refreshBanner && (
+          <div className="refresh-banner">
+            <span style={{ fontSize: "18px" }}>✓</span>
+            Directory updated successfully! The business records have been reloaded.
+          </div>
+        )}
+
+        {/* Horizontal Category Selector */}
+        <div className="categories-container">
+          <button 
+            className={`category-pill ${selectedCategory === null ? "active" : ""}`}
+            onClick={() => setSelectedCategory(null)}
+          >
+            🏪 All Categories
+          </button>
+          {BUSINESS_CATEGORIES.map(cat => (
+            <button
+              key={cat}
+              className={`category-pill ${selectedCategory === cat ? "active" : ""}`}
+              onClick={() => setSelectedCategory(cat)}
+            >
+              <span>{CATEGORY_EMOJIS[cat] || "🏪"}</span>
+              <span>{cat}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Search bar & Small Filters */}
+        <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center", marginBottom: "20px" }}>
+          <div style={{ position: "relative", flexGrow: 1, minWidth: "260px" }}>
+            <span style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", fontSize: "16px", color: "#fbbf24" }}>🔍</span>
             <input
               className="search-input"
               type="text"
-              placeholder="Search businesses by name, category, or town…"
+              placeholder="Search by name, category, or town…"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
+              style={{ padding: "12px 16px 12px 46px", fontSize: "14px", borderRadius: "12px" }}
             />
             {searchQuery && (
-              <button onClick={() => setSearchQuery("")} style={{ position: "absolute", right: "16px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: "16px" }}>✕</button>
+              <button onClick={() => setSearchQuery("")} style={{ position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: "14px" }}>✕</button>
             )}
           </div>
+          
+          <select className="filter-select" value={selectedCounty || ""} onChange={e => setSelectedCounty(e.target.value || null)} style={{ padding: "10px 32px 10px 14px", fontSize: "13px", height: "42px", minWidth: "140px" }}>
+            <option value="">All Counties</option>
+            {KENYA_COUNTIES.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
 
-          {/* Filters Row */}
-          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
-            <select className="filter-select" value={selectedCategory || ""} onChange={e => setSelectedCategory(e.target.value || null)}>
-              <option value="">All Categories</option>
-              {BUSINESS_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-            <select className="filter-select" value={selectedCounty || ""} onChange={e => setSelectedCounty(e.target.value || null)}>
-              <option value="">All Counties</option>
-              {KENYA_COUNTIES.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-            <select className="filter-select" value={sortBy} onChange={e => setSortBy(e.target.value)}>
-              <option value="verified">Verified First</option>
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="rating">Top Rated</option>
-              <option value="views">Most Viewed</option>
-              <option value="reviews">Most Reviews</option>
-              <option value="name">Name A–Z</option>
-            </select>
+          <select className="filter-select" value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ padding: "10px 32px 10px 14px", fontSize: "13px", height: "42px", minWidth: "140px" }}>
+            <option value="verified">Verified First</option>
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="rating">Top Rated</option>
+            <option value="views">Most Viewed</option>
+            <option value="reviews">Most Reviews</option>
+            <option value="name">Name A–Z</option>
+          </select>
+
+          {(selectedCategory || selectedCounty || searchQuery) && (
             <button
-              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-              style={{ padding: "12px 18px", background: showAdvancedFilters ? "rgba(251,191,36,0.1)" : "rgba(255,255,255,0.03)", border: `1px solid ${showAdvancedFilters ? "rgba(251,191,36,0.35)" : "rgba(255,255,255,0.08)"}`, borderRadius: "12px", color: showAdvancedFilters ? "#fbbf24" : "#94a3b8", fontSize: "13.5px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.25s" }}
+              onClick={() => { setSelectedCategory(null); setSelectedCounty(null); setSearchQuery(""); }}
+              style={{ padding: "10px 16px", background: "rgba(239, 68, 68, 0.08)", border: "1px solid rgba(239, 68, 68, 0.2)", borderRadius: "12px", color: "#fca5a5", fontSize: "13px", fontWeight: 700, cursor: "pointer", transition: "all 0.2s", height: "42px" }}
             >
-              Filters {showAdvancedFilters ? "▲" : "▼"}
+              Clear
             </button>
-
-            {(selectedCategory || selectedCounty || searchQuery || openNow || minRating || verification) && (
-              <button
-                onClick={() => { setSelectedCategory(null); setSelectedCounty(null); setSearchQuery(""); setOpenNow(false); setMinRating(""); setVerification(""); }}
-                style={{ padding: "12px 18px", background: "rgba(239, 68, 68, 0.08)", border: "1px solid rgba(239, 68, 68, 0.2)", borderRadius: "12px", color: "#fca5a5", fontSize: "13.5px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }}
-              >
-                Clear All
-              </button>
-            )}
-          </div>
-
-          {/* Advanced Panel */}
-          {showAdvancedFilters && (
-            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginTop: "16px", paddingTop: "16px", borderTop: "1px solid rgba(255,255,255,0.06)", animation: "slideDown 0.25s ease-out" }}>
-              <select className="filter-select" value={minRating} onChange={e => setMinRating(e.target.value)}>
-                <option value="">Min Rating</option>
-                {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}+ Stars</option>)}
-              </select>
-              <select className="filter-select" value={verification} onChange={e => setVerification(e.target.value)}>
-                <option value="">Any Verification</option>
-                <option value="business_verified">Business Verified</option>
-                <option value="location_verified">Location Verified</option>
-                <option value="premium_verified">Premium</option>
-              </select>
-              <label style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px 18px", background: openNow ? "rgba(20, 184, 166, 0.08)" : "rgba(255,255,255,0.02)", border: `1px solid ${openNow ? "rgba(20, 184, 166, 0.3)" : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", color: openNow ? "#14b8a6" : "#94a3b8", fontSize: "13.5px", fontWeight: 700, cursor: "pointer", transition: "all 0.25s" }}>
-                <input type="checkbox" checked={openNow} onChange={e => setOpenNow(e.target.checked)} style={{ accentColor: "#14b8a6" }} />
-                Open Now
-              </label>
-            </div>
           )}
         </div>
       </div>
