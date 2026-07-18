@@ -250,7 +250,7 @@ export default function AxxBiashara() {
           cursor: pointer;
           position: relative;
           background: rgba(15, 23, 42, 0.55);
-          border-radius: 20px;
+          border-radius: 14px;
           border: 1px solid rgba(255, 255, 255, 0.05);
           overflow: hidden;
           backdrop-filter: blur(12px);
@@ -263,31 +263,31 @@ export default function AxxBiashara() {
           box-shadow: 0 0 20px rgba(251, 191, 36, 0.03);
         }
         .axx-card:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.55), 0 0 30px rgba(251, 191, 36, 0.12);
-          border-color: rgba(251, 191, 36, 0.45);
-          background: rgba(15, 23, 42, 0.65);
+          transform: translateY(-4px);
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45), 0 0 20px rgba(251, 191, 36, 0.15);
+          border-color: rgba(251, 191, 36, 0.4);
+          background: rgba(15, 23, 42, 0.6);
         }
         .axx-card.featured-card:hover {
-          border-color: rgba(251, 191, 36, 0.75);
+          border-color: rgba(251, 191, 36, 0.7);
         }
 
-        .card-img-wrap { position: relative; overflow: hidden; aspect-ratio: 16/10; width: 100%; background: #0f172a; }
+        .card-img-wrap { position: relative; overflow: hidden; aspect-ratio: 16/9; width: 100%; background: #0f172a; }
         .business-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-          gap: 28px;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          gap: 16px;
         }
         .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); display: block; }
-        .axx-card:hover .card-img-wrap img { transform: scale(1.06); }
+        .axx-card:hover .card-img-wrap img { transform: scale(1.04); }
         .card-img-overlay {
           position: absolute; inset: 0;
           background: linear-gradient(to top, rgba(9, 13, 22, 0.8) 0%, transparent 60%);
         }
 
-        /* Redesigned Card Sub-components */
+        /* Redesigned Card Sub-components (Compressed) */
         .card-body {
-          padding: 20px;
+          padding: 14px;
           display: flex;
           flex-direction: column;
           flex-grow: 1;
@@ -296,25 +296,25 @@ export default function AxxBiashara() {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          gap: 10px;
-          margin-bottom: 10px;
+          gap: 8px;
+          margin-bottom: 6px;
         }
         .card-category-tag {
-          font-size: 10px;
+          font-size: 9px;
           font-weight: 700;
           color: #fbbf24;
           background: rgba(251, 191, 36, 0.1);
-          padding: 3px 8px;
-          border-radius: 6px;
+          padding: 2px 6px;
+          border-radius: 4px;
           text-transform: uppercase;
-          letter-spacing: 0.03em;
+          letter-spacing: 0.02em;
         }
         .card-title {
-          font-size: 17px;
+          font-size: 15px;
           font-weight: 700;
           color: #f8fafc;
-          margin-bottom: 8px;
-          line-height: 1.3;
+          margin-bottom: 4px;
+          line-height: 1.15;
           display: -webkit-box;
           -webkit-line-clamp: 1;
           -webkit-box-orient: vertical;
@@ -323,16 +323,16 @@ export default function AxxBiashara() {
         .card-rating-row {
           display: flex;
           align-items: center;
-          gap: 6px;
-          margin-bottom: 10px;
-          font-size: 12px;
+          gap: 4px;
+          margin-bottom: 6px;
+          font-size: 11px;
           color: #e2e8f0;
         }
         .card-description {
-          font-size: 13px;
+          font-size: 12px;
           color: #94a3b8;
-          line-height: 1.5;
-          margin-bottom: 14px;
+          line-height: 1.25;
+          margin-bottom: 8px;
           display: -webkit-box;
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
@@ -341,34 +341,34 @@ export default function AxxBiashara() {
         .card-badges {
           display: flex;
           flex-wrap: wrap;
-          gap: 6px;
-          margin-bottom: 14px;
+          gap: 4px;
+          margin-bottom: 8px;
         }
         .card-location {
-          font-size: 12.5px;
+          font-size: 11.5px;
           color: #94a3b8;
           display: flex;
           align-items: center;
-          gap: 6px;
-          margin-bottom: 16px;
+          gap: 4px;
+          margin-bottom: 10px;
           font-weight: 500;
           margin-top: auto;
         }
         .card-footer {
-          padding-top: 14px;
+          padding-top: 10px;
           border-top: 1px solid rgba(255, 255, 255, 0.05);
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 8px;
+          gap: 6px;
         }
         .card-profile-link {
-          font-size: 13px;
+          font-size: 12px;
           font-weight: 700;
           color: #fbbf24;
           display: flex;
           align-items: center;
-          gap: 4px;
+          gap: 3px;
         }
 
         /* Mobile View: Fits 4 business cards in view (2 columns) */
@@ -709,10 +709,10 @@ export default function AxxBiashara() {
         /* Scrolling Category Pills styling */
         .categories-container {
           display: flex;
-          gap: 12px;
+          gap: 10px;
           overflow-x: auto;
-          padding: 8px 4px 16px;
-          margin-bottom: 24px;
+          padding: 4px 4px 10px;
+          margin-bottom: 16px;
           scrollbar-width: none; /* Firefox */
         }
         .categories-container::-webkit-scrollbar {
@@ -721,13 +721,13 @@ export default function AxxBiashara() {
         .category-pill {
           display: inline-flex;
           align-items: center;
-          gap: 8px;
-          padding: 10px 20px;
+          gap: 6px;
+          padding: 8px 14px;
           background: rgba(255, 255, 255, 0.03);
           border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 14px;
+          border-radius: 10px;
           color: #94a3b8;
-          font-size: 13.5px;
+          font-size: 12.5px;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.25s ease;
@@ -750,10 +750,10 @@ export default function AxxBiashara() {
       `}</style>
 
       {/* ── COMPACT HEADER & CATEGORIES ── */}
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "40px 24px 10px" }}>
+      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "20px 24px 0px" }}>
         
         {/* Top bar with Branding and Add Business option */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "20px", marginBottom: "32px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px", marginBottom: "20px" }}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "38px", height: "38px", borderRadius: "10px", objectFit: "cover" }} />
@@ -815,7 +815,7 @@ export default function AxxBiashara() {
         </div>
 
         {/* Search bar & Small Filters */}
-        <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center", marginBottom: "20px" }}>
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center", marginBottom: "12px" }}>
           <div style={{ position: "relative", flexGrow: 1, minWidth: "260px" }}>
             <span style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", fontSize: "16px", color: "#fbbf24" }}>🔍</span>
             <input
@@ -858,11 +858,11 @@ export default function AxxBiashara() {
       </div>
 
       {/* ── MAIN CONTENT AREA ── */}
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "40px 24px 80px" }}>
+      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "16px 24px 60px" }}>
 
         {/* Results title */}
         {!loading && (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px", flexWrap: "wrap", gap: "16px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px", flexWrap: "wrap", gap: "12px" }}>
             <div>
               <div className="section-label" style={{ marginBottom: "6px" }}>Directory Records</div>
               <div className="section-title" style={{ fontSize: "24px" }}>
