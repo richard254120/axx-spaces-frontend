@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import ReviewsSection from "../components/ReviewsSection";
-import RecentlyViewed, { trackView } from "../components/RecentlyViewed";
+
 import RequestItemModal from "../components/RequestItemModal";
 import ShareProperty from "../components/ShareProperty";
 import MapView from "../components/MapView";
@@ -172,7 +172,7 @@ export default function Listings() {
     setFilters((prev) => ({ ...prev, [name]: name === "minPrice" || name === "maxPrice" ? parseFloat(value) || 0 : value }));
   };
 
-  const openModal = (property) => { setSelectedProperty(property); setCurrentImageIndex(0); trackView(property); };
+  const openModal = (property) => { setSelectedProperty(property); setCurrentImageIndex(0); };
   const closeModal = () => { setSelectedProperty(null); setCurrentImageIndex(0); };
   const nextImage = () => { if (selectedProperty?.images?.length > 0) setCurrentImageIndex((prev) => (prev + 1) % selectedProperty.images.length); };
   const prevImage = () => { if (selectedProperty?.images?.length > 0) setCurrentImageIndex((prev) => (prev - 1 + selectedProperty.images.length) % selectedProperty.images.length); };
@@ -265,31 +265,30 @@ export default function Listings() {
     <div style={S.page}>
       <style>{css}</style>
 
-      {/* ── HERO HEADER ── */}
-      <header style={S.hero}>
-        <div style={S.heroOverlay} />
-        <div style={S.heroInner}>
-          <div style={S.heroBadge}>KENYA'S PREMIER RENTAL PLATFORM</div>
-          <h1 style={S.heroTitle}>
-            <span style={S.heroTitleLine1}>Discover Your</span>
-            <span style={S.heroTitleLine2}>Perfect Home</span>
-          </h1>
-          <p style={S.heroSub}>Curated rentals across Kenya's finest locations</p>
-          <div style={S.partnerNotice} className="partner-shimmer">
-            <span style={S.partnerIcon}>🤝</span>
-            <span>We are working with partners to bring a better experience soon</span>
+      {/* ── COMPACT HEADER ── */}
+      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "24px 28px 12px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
+          <div>
+            <h1 style={{ fontSize: "26px", fontWeight: 800, color: C.gold, margin: 0, fontFamily: "'Cormorant Garamond', 'Georgia', serif", letterSpacing: "0.02em" }}>
+              AxxSpace Rentals
+            </h1>
+            <p style={{ color: C.textMid, fontSize: "0.85rem", margin: "4px 0 0" }}>Curated rentals across Kenya's finest locations</p>
           </div>
 
-          {!user && (
-            <div style={S.heroButtons}>
-              <button className="btn-ghost" style={S.btnGhost} onClick={() => window.location.href = "/login"}>Sign In</button>
-              <button className="btn-gold" style={S.btnGold} onClick={() => window.location.href = "/register"}>List Your Property</button>
+          {!user ? (
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button className="btn-ghost" style={{ ...S.btnGhost, padding: "8px 18px", fontSize: "0.8rem" }} onClick={() => window.location.href = "/login"}>Sign In</button>
+              <button className="btn-gold" style={{ ...S.btnGold, padding: "8px 18px", fontSize: "0.8rem" }} onClick={() => window.location.href = "/register"}>List Your Property</button>
+            </div>
+          ) : (
+            <div style={{ display: "flex", gap: "10px" }}>
+              {user.role === "landlord" && (
+                <button className="btn-gold" style={{ ...S.btnGold, padding: "8px 18px", fontSize: "0.8rem" }} onClick={() => window.location.href = "/dashboard"}>Landlord Dashboard</button>
+              )}
             </div>
           )}
         </div>
-        <div style={S.heroDecor1} />
-        <div style={S.heroDecor2} />
-      </header>
+      </div>
 
       <div style={S.mainBody}>
 
@@ -519,8 +518,7 @@ export default function Listings() {
         {/* ── MAP VIEW (only show when NOT in university hostels mode) ── */}
         {!showUniversityHostels && showMap && <div style={S.mapWrap}><MapView properties={filteredProperties} /></div>}
 
-        {/* ── RECENTLY VIEWED (only show when NOT in university hostels mode) ── */}
-        {!showUniversityHostels && <RecentlyViewed onSelect={openModal} />}
+
 
         {/* ── EMPTY STATE (only show when NOT in university hostels mode) ── */}
         {!showUniversityHostels && filteredProperties.length === 0 && (
@@ -925,7 +923,7 @@ const S = {
   tabBtnActive: { background: C.goldDim, borderColor: C.gold, color: C.gold },
 
   /* Search Strip */
-  searchStrip: { background: C.navyMid, border: `1px solid ${C.border}`, borderRadius: "12px", margin: "-40px auto 36px", position: "relative", zIndex: 10, boxShadow: "0 20px 60px rgba(0,0,0,0.4)" },
+  searchStrip: { background: C.navyMid, border: `1px solid ${C.border}`, borderRadius: "12px", margin: "0 auto 24px", position: "relative", zIndex: 10, boxShadow: "0 20px 60px rgba(0,0,0,0.4)" },
   searchStripInner: { display: "flex", alignItems: "center", padding: "6px 12px", flexWrap: "wrap", gap: "4px" },
   searchField: { display: "flex", alignItems: "center", gap: "10px", flex: 1, minWidth: "160px", padding: "10px 12px" },
   searchIcon: { color: C.gold, fontSize: "1.1rem", flexShrink: 0 },
