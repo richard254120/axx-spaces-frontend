@@ -750,31 +750,39 @@ export default function AxxBiashara() {
       `}</style>
 
       {/* ── COMPACT HEADER & CATEGORIES ── */}
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "20px 24px 0px" }}>
+      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "12px 24px 0px" }}>
         
-        {/* Top bar with Branding and Add Business option */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px", marginBottom: "20px" }}>
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "38px", height: "38px", borderRadius: "10px", objectFit: "cover" }} />
-              <div>
-                <h1 style={{ fontSize: "28px", fontWeight: 800, background: "linear-gradient(135deg, #ffffff 0%, #fbbf24 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", lineHeight: 1.1, letterSpacing: "-0.02em" }}>
-                  AxxBiashara
-                </h1>
-                <p style={{ color: "#64748b", fontSize: "12px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginTop: "2px" }}>
-                  Kenya Business Directory
-                </p>
-              </div>
-            </div>
+        {/* Row 1: Logo & Title | Search Bar | Action Buttons */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", marginBottom: "8px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "30px", height: "30px", borderRadius: "8px", objectFit: "cover" }} />
+            <h1 style={{ fontSize: "20px", fontWeight: 800, background: "linear-gradient(135deg, #ffffff 0%, #fbbf24 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", margin: 0, lineHeight: 1 }}>
+              AxxBiashara
+            </h1>
           </div>
           
-          <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+          <div style={{ position: "relative", flexGrow: 1, maxWidth: "450px", minWidth: "200px" }}>
+            <span style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", fontSize: "14px", color: "#fbbf24" }}>🔍</span>
+            <input
+              className="search-input"
+              type="text"
+              placeholder="Search by name, category, or town…"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              style={{ padding: "8px 12px 8px 36px", fontSize: "13px", borderRadius: "10px", height: "36px", margin: 0 }}
+            />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery("")} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: "12px" }}>✕</button>
+            )}
+          </div>
+
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
             {token && user?.role === "user" && (
-              <button className="cta-btn" style={{ background: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#f1f5f9", padding: "10px 20px" }} onClick={() => navigate("/business-dashboard")}>
+              <button className="cta-btn" style={{ background: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#f1f5f9", padding: "6px 12px", fontSize: "12px", height: "36px" }} onClick={() => navigate("/business-dashboard")}>
                 Dashboard
               </button>
             )}
-            <button className="cta-primary cta-btn" style={{ padding: "10px 20px" }} onClick={() => {
+            <button className="cta-primary cta-btn" style={{ padding: "6px 14px", fontSize: "12px", height: "36px" }} onClick={() => {
               if (token && user?.role === "user") {
                 navigate("/business-dashboard");
               } else {
@@ -788,81 +796,69 @@ export default function AxxBiashara() {
 
         {/* ── REFRESH BANNER — shown after a business update ── */}
         {refreshBanner && (
-          <div className="refresh-banner">
-            <span style={{ fontSize: "18px" }}>✓</span>
-            Directory updated successfully! The business records have been reloaded.
+          <div className="refresh-banner" style={{ margin: "4px 0 8px", padding: "10px 16px" }}>
+            <span style={{ fontSize: "16px" }}>✓</span>
+            Directory updated successfully!
           </div>
         )}
 
-        {/* Horizontal Category Selector */}
-        <div className="categories-container">
-          <button 
-            className={`category-pill ${selectedCategory === null ? "active" : ""}`}
-            onClick={() => setSelectedCategory(null)}
-          >
-            🏪 All Categories
-          </button>
-          {BUSINESS_CATEGORIES.map(cat => (
-            <button
-              key={cat}
-              className={`category-pill ${selectedCategory === cat ? "active" : ""}`}
-              onClick={() => setSelectedCategory(cat)}
+        {/* Row 2: Categories Pills Scrolling | Small Dropdown Filters */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px", marginBottom: "4px" }}>
+          <div className="categories-container" style={{ margin: 0, padding: "2px 0 6px", flexGrow: 1, overflowX: "auto" }}>
+            <button 
+              className={`category-pill ${selectedCategory === null ? "active" : ""}`}
+              onClick={() => setSelectedCategory(null)}
+              style={{ padding: "6px 12px", fontSize: "12px", borderRadius: "8px" }}
             >
-              <span>{CATEGORY_EMOJIS[cat] || "🏪"}</span>
-              <span>{cat}</span>
+              🏪 All Categories
             </button>
-          ))}
-        </div>
+            {BUSINESS_CATEGORIES.map(cat => (
+              <button
+                key={cat}
+                className={`category-pill ${selectedCategory === cat ? "active" : ""}`}
+                onClick={() => setSelectedCategory(cat)}
+                style={{ padding: "6px 12px", fontSize: "12px", borderRadius: "8px" }}
+              >
+                <span>{CATEGORY_EMOJIS[cat] || "🏪"}</span>
+                <span>{cat}</span>
+              </button>
+            ))}
+          </div>
 
-        {/* Search bar & Small Filters */}
-        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center", marginBottom: "12px" }}>
-          <div style={{ position: "relative", flexGrow: 1, minWidth: "260px" }}>
-            <span style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", fontSize: "16px", color: "#fbbf24" }}>🔍</span>
-            <input
-              className="search-input"
-              type="text"
-              placeholder="Search by name, category, or town…"
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              style={{ padding: "12px 16px 12px 46px", fontSize: "14px", borderRadius: "12px" }}
-            />
-            {searchQuery && (
-              <button onClick={() => setSearchQuery("")} style={{ position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: "14px" }}>✕</button>
+          <div style={{ display: "flex", gap: "6px", alignItems: "center", flexShrink: 0, marginBottom: "6px" }}>
+            <select className="filter-select" value={selectedCounty || ""} onChange={e => setSelectedCounty(e.target.value || null)} style={{ padding: "4px 20px 4px 8px", fontSize: "12px", height: "30px", minWidth: "110px" }}>
+              <option value="">All Counties</option>
+              {KENYA_COUNTIES.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+
+            <select className="filter-select" value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ padding: "4px 20px 4px 8px", fontSize: "12px", height: "30px", minWidth: "110px" }}>
+              <option value="verified">Verified First</option>
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="rating">Top Rated</option>
+              <option value="views">Most Viewed</option>
+              <option value="reviews">Most Reviews</option>
+              <option value="name">Name A–Z</option>
+            </select>
+
+            {(selectedCategory || selectedCounty || searchQuery) && (
+              <button
+                onClick={() => { setSelectedCategory(null); setSelectedCounty(null); setSearchQuery(""); }}
+                style={{ padding: "4px 10px", background: "rgba(239, 68, 68, 0.08)", border: "1px solid rgba(239, 68, 68, 0.2)", borderRadius: "8px", color: "#fca5a5", fontSize: "12px", fontWeight: 700, cursor: "pointer", transition: "all 0.2s", height: "30px" }}
+              >
+                Clear
+              </button>
             )}
           </div>
-          
-          <select className="filter-select" value={selectedCounty || ""} onChange={e => setSelectedCounty(e.target.value || null)} style={{ padding: "10px 32px 10px 14px", fontSize: "13px", height: "42px", minWidth: "140px" }}>
-            <option value="">All Counties</option>
-            {KENYA_COUNTIES.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
-
-          <select className="filter-select" value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ padding: "10px 32px 10px 14px", fontSize: "13px", height: "42px", minWidth: "140px" }}>
-            <option value="verified">Verified First</option>
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-            <option value="rating">Top Rated</option>
-            <option value="views">Most Viewed</option>
-            <option value="reviews">Most Reviews</option>
-            <option value="name">Name A–Z</option>
-          </select>
-
-          {(selectedCategory || selectedCounty || searchQuery) && (
-            <button
-              onClick={() => { setSelectedCategory(null); setSelectedCounty(null); setSearchQuery(""); }}
-              style={{ padding: "10px 16px", background: "rgba(239, 68, 68, 0.08)", border: "1px solid rgba(239, 68, 68, 0.2)", borderRadius: "12px", color: "#fca5a5", fontSize: "13px", fontWeight: 700, cursor: "pointer", transition: "all 0.2s", height: "42px" }}
-            >
-              Clear
-            </button>
-          )}
         </div>
       </div>
 
       {/* ── MAIN CONTENT AREA ── */}
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "16px 24px 60px" }}>
+      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "4px 24px 40px" }}>
 
         {/* Results title */}
         {!loading && (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px", flexWrap: "wrap", gap: "12px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px", flexWrap: "wrap", gap: "8px" }}>
             <div>
               <div className="section-label" style={{ marginBottom: "6px" }}>Directory Records</div>
               <div className="section-title" style={{ fontSize: "24px" }}>
