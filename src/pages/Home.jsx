@@ -601,6 +601,42 @@ option { background: #162233; color: #F0EAD8; }
   border-top: 1px solid rgba(201,168,76,0.1);
 }
 .featured-header { padding: 0 28px; text-align: center; margin-bottom: 24px; }
+.feat-tabs-bar {
+  display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
+  margin-bottom: 32px; padding: 0 28px;
+}
+.feat-tab-btn {
+  padding: 10px 20px; border-radius: 30px;
+  font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 13px;
+  cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex; align-items: center; gap: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(30,41,59,0.3);
+  color: #94a3b8;
+}
+.feat-tab-btn:hover {
+  background: rgba(201,168,76,0.08);
+  border-color: rgba(201,168,76,0.25);
+  color: #F0EAD8;
+  transform: translateY(-2px);
+}
+.feat-tab-btn.active {
+  border-color: #C9A84C;
+  background: linear-gradient(135deg, rgba(201,168,76,0.15) 0%, rgba(201,168,76,0.05) 100%);
+  color: #C9A84C;
+  box-shadow: 0 0 15px rgba(201,168,76,0.15);
+}
+.feat-tab-count {
+  padding: 2px 6px; border-radius: 10px;
+  font-size: 10px; font-weight: 700;
+  background: rgba(255,255,255,0.1);
+  color: #94a3b8;
+  transition: all 0.3s ease;
+}
+.feat-tab-btn.active .feat-tab-count {
+  background: #C9A84C;
+  color: #0D1B2A;
+}
 .cards-track-wrap { overflow: hidden; width: 100%; }
 .cards-track {
   display: flex; align-items: stretch;
@@ -1808,53 +1844,64 @@ export default function Home() {
     );
   }
 
-  const allFeaturedListings = [
-    ...featuredProperties.map(p => ({
-      ...p,
-      typeText: 'Property',
-      detailPath: `/listings/${p._id}`,
-      subtitleText: `${p.location}, ${p.county}`,
-      priceText: `KES ${p.price?.toLocaleString()}/month`,
-      typeLabel: p.propertyType || "Rental",
-      tags: [`🛏️ ${p.bedrooms} bed`, `🚿 ${p.bathrooms} bath`].filter(Boolean)
-    })),
-    ...featuredBusinesses.map(b => ({
-      ...b,
-      typeText: 'Business',
-      detailPath: `/axxbiashara?business=${b._id}`,
-      subtitleText: `${b.location?.town || "Various"}, ${b.location?.county || ""}`,
-      priceText: b.priceRange || "Contact for pricing",
-      typeLabel: b.categories?.[0] || "Business",
-      tags: [b.rating ? `⭐ ${b.rating}` : "", b.reviewCount ? `📝 ${b.reviewCount} reviews` : ""].filter(Boolean)
-    })),
-    ...featuredMaterials.map(m => ({
-      ...m,
-      typeText: 'QuickSale',
-      detailPath: `/materials/${m._id}`,
-      subtitleText: `${m.location}, ${m.county}`,
-      priceText: `KES ${m.price?.toLocaleString()}`,
-      typeLabel: m.category || "Material",
-      tags: [`👁️ ${m.views || 0} views`].filter(Boolean)
-    })),
-    ...featuredTourism.map(t => ({
-      ...t,
-      typeText: 'Tourism',
-      detailPath: `/tourism/${t._id}`,
-      subtitleText: `${t.location}, ${t.county}`,
-      priceText: `KES ${t.price?.toLocaleString()}/night`,
-      typeLabel: t.category || "Tourism",
-      tags: [`👁️ ${t.views || 0} views`, t.reviews?.length ? `⭐ ${t.reviews.length} reviews` : ""].filter(Boolean)
-    })),
-    ...featuredMovers.map(v => ({
-      ...v,
-      typeText: 'Moving Service',
-      detailPath: `/movers/${v._id}`,
-      subtitleText: `${v.county}`,
-      priceText: `${v.pricing?.baseRate ? `KES ${v.pricing.baseRate.toLocaleString()}` : "Contact for pricing"}${v.pricing?.rateType ? `/${v.pricing.rateType.replace('_', ' ')}` : ""}`,
-      typeLabel: "Moving Service",
-      tags: [`🚚 ${v.vehicleType || "Various"}`, `⭐ ${v.experienceYears || 0} yrs exp`].filter(Boolean)
-    }))
-  ];
+  const getFilteredListings = () => {
+    switch (activeFeaturedTab) {
+      case "properties":
+        return featuredProperties.map(p => ({
+          ...p,
+          typeText: 'Property',
+          detailPath: `/listings/${p._id}`,
+          subtitleText: `${p.location}, ${p.county}`,
+          priceText: `KES ${p.price?.toLocaleString()}/month`,
+          typeLabel: p.propertyType || "Rental",
+          tags: [`🛏️ ${p.bedrooms} bed`, `🚿 ${p.bathrooms} bath`].filter(Boolean)
+        }));
+      case "businesses":
+        return featuredBusinesses.map(b => ({
+          ...b,
+          typeText: 'Business',
+          detailPath: `/axxbiashara?business=${b._id}`,
+          subtitleText: `${b.location?.town || "Various"}, ${b.location?.county || ""}`,
+          priceText: b.priceRange || "Contact for pricing",
+          typeLabel: b.categories?.[0] || "Business",
+          tags: [b.rating ? `⭐ ${b.rating}` : "", b.reviewCount ? `📝 ${b.reviewCount} reviews` : ""].filter(Boolean)
+        }));
+      case "materials":
+        return featuredMaterials.map(m => ({
+          ...m,
+          typeText: 'QuickSale',
+          detailPath: `/materials/${m._id}`,
+          subtitleText: `${m.location}, ${m.county}`,
+          priceText: `KES ${m.price?.toLocaleString()}`,
+          typeLabel: m.category || "Material",
+          tags: [`👁️ ${m.views || 0} views`].filter(Boolean)
+        }));
+      case "tourism":
+        return featuredTourism.map(t => ({
+          ...t,
+          typeText: 'Tourism',
+          detailPath: `/tourism/${t._id}`,
+          subtitleText: `${t.location}, ${t.county}`,
+          priceText: `KES ${t.price?.toLocaleString()}/night`,
+          typeLabel: t.category || "Tourism",
+          tags: [`👁️ ${t.views || 0} views`, t.reviews?.length ? `⭐ ${t.reviews.length} reviews` : ""].filter(Boolean)
+        }));
+      case "movers":
+        return featuredMovers.map(v => ({
+          ...v,
+          typeText: 'Moving Service',
+          detailPath: `/movers/${v._id}`,
+          subtitleText: `${v.county}`,
+          priceText: `${v.pricing?.baseRate ? `KES ${v.pricing.baseRate.toLocaleString()}` : "Contact for pricing"}${v.pricing?.rateType ? `/${v.pricing.rateType.replace('_', ' ')}` : ""}`,
+          typeLabel: "Moving Service",
+          tags: [`🚚 ${v.vehicleType || "Various"}`, `⭐ ${v.experienceYears || 0} yrs exp`].filter(Boolean)
+        }));
+      default:
+        return [];
+    }
+  };
+
+  const allFeaturedListings = getFilteredListings();
 
   const getListingImage = (item) => {
     if (item.typeText === 'Moving Service') {
@@ -1930,6 +1977,30 @@ export default function Home() {
           <p className="section-sub">Discover top-rated services and verified listings handpicked for you</p>
         </div>
 
+        {/* CATEGORY TABS SELECTOR */}
+        <div className="feat-tabs-bar">
+          {[
+            { id: "properties", label: "🏠 Rentals", count: featuredProperties.length },
+            { id: "businesses", label: "🏪 Businesses", count: featuredBusinesses.length },
+            { id: "materials", label: "📦 QuickSales", count: featuredMaterials.length },
+            { id: "tourism", label: "🏨 Tourism", count: featuredTourism.length },
+            { id: "movers", label: "🚚 Movers", count: featuredMovers.length }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveFeaturedTab(tab.id)}
+              className={`feat-tab-btn ${activeFeaturedTab === tab.id ? 'active' : ''}`}
+            >
+              <span>{tab.label}</span>
+              {tab.count > 0 && (
+                <span className="feat-tab-count">
+                  {tab.count}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+
         {allFeaturedListings.length === 0 ? (
           <div className="no-feat-wrap" style={{ textAlign: 'center', padding: '40px 28px' }}>
             <span className="no-feat-icon" style={{ fontSize: '32px' }}>✨</span>
@@ -1938,7 +2009,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="cards-track-wrap">
-            <div className="cards-track" style={{ animationDuration: `${Math.max(30, allFeaturedListings.length * 8)}s` }}>
+            <div key={activeFeaturedTab} className="cards-track" style={{ animationDuration: `${Math.max(30, allFeaturedListings.length * 8)}s` }}>
               {/* First group */}
               {allFeaturedListings.map((item, idx) => (
                 <div key={`${item._id}-${idx}`} className="feat-card">
