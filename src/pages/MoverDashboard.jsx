@@ -6,6 +6,7 @@ import { UserProfileEditor } from "../features/profile";
 import VerificationBadges from "../components/VerificationBadges";
 import BoostNotification from "../components/BoostNotification";
 import AnalyticsDashboard from "../components/AnalyticsDashboard";
+import QuickBoostModal from "../components/QuickBoostModal";
 
 import { getDashboardPath } from "../utils/dashboardRoutes";
 
@@ -47,6 +48,8 @@ export default function MoverDashboard() {
     equipment: "", workHours: "", uniform: false, safetyGear: false, loadingEquipment: "",
     portfolioDetails: []
   });
+
+  const [boostModalOpen, setBoostModalOpen] = useState(false);
 
   const pendingJobsCount = jobs.filter(j => j.status === "pending").length;
 
@@ -360,7 +363,26 @@ export default function MoverDashboard() {
                   <span>{user?.county || "Kenya"}</span>
                 </p>
               </div>
-              <div style={styles.statusBadge}>🟢 Active</div>
+              <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                <button
+                  onClick={() => setBoostModalOpen(true)}
+                  style={{
+                    padding: "8px 16px",
+                    background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
+                    color: "#0f1729",
+                    border: "none",
+                    borderRadius: "8px",
+                    fontSize: "13px",
+                    fontWeight: "700",
+                    cursor: "pointer",
+                    boxShadow: "0 4px 12px rgba(251, 191, 36, 0.3)",
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  ⭐ Boost Profile
+                </button>
+                <div style={styles.statusBadge}>🟢 Active</div>
+              </div>
             </div>
 
             <div style={styles.statsGrid}>
@@ -751,6 +773,18 @@ export default function MoverDashboard() {
           </section>
         )}
       </main>
+
+      {/* QUICK BOOST MODAL */}
+      {user && (
+        <QuickBoostModal
+          isOpen={boostModalOpen}
+          onClose={() => setBoostModalOpen(false)}
+          itemType="mover"
+          itemId={user?._id || user?.id}
+          itemName={user?.name}
+          onSuccess={fetchAll}
+        />
+      )}
     </div>
   );
 }

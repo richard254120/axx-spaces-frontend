@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
 import VerificationStatus from "../components/VerificationStatus";
+import QuickBoostModal from "../components/QuickBoostModal";
 import { UserProfileEditor, ProfileAvatar } from "../features/profile";
 import VerificationBadges from "../components/VerificationBadges";
 import AnalyticsDashboard from "../components/AnalyticsDashboard";
@@ -53,6 +54,13 @@ export default function UserDashboard() {
   const [loading, setLoading] = useState(true);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [boostModalOpen, setBoostModalOpen] = useState(false);
+  const [selectedBusinessForBoost, setSelectedBusinessForBoost] = useState(null);
+
+  const handleBoost = (biz) => {
+    setSelectedBusinessForBoost(biz);
+    setBoostModalOpen(true);
+  };
 
   // Data lists
   const [businesses, setBusinesses] = useState([]);
@@ -239,6 +247,27 @@ export default function UserDashboard() {
                         <button style={s.btnEdit} onClick={() => handleEditBusiness(biz._id)}>Edit</button>
                         <button style={s.btnDelete} onClick={() => handleDeleteBusiness(biz._id)}>Delete</button>
                       </div>
+                      {(biz.status === "approved" || biz.status === "active") && (
+                        <button
+                          style={{
+                            width: "100%",
+                            marginTop: "10px",
+                            padding: "8px 12px",
+                            fontSize: "12px",
+                            background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
+                            color: "#0f172a",
+                            border: "none",
+                            borderRadius: "6px",
+                            fontWeight: "bold",
+                            cursor: "pointer",
+                            transition: "all 0.3s ease",
+                            boxShadow: "0 4px 12px rgba(251, 191, 36, 0.2)",
+                          }}
+                          onClick={() => handleBoost(biz)}
+                        >
+                          ⭐ Boost Business
+                        </button>
+                      )}
                     </div>
                   );
                 })}
@@ -269,6 +298,21 @@ export default function UserDashboard() {
           </div>
         )}
       </main>
+
+      {/* QUICK BOOST MODAL */}
+      {selectedBusinessForBoost && (
+        <QuickBoostModal
+          isOpen={boostModalOpen}
+          onClose={() => {
+            setBoostModalOpen(false);
+            setSelectedBusinessForBoost(null);
+          }}
+          itemType="business"
+          itemId={selectedBusinessForBoost._id}
+          itemName={selectedBusinessForBoost.name}
+          onSuccess={loadAllData}
+        />
+      )}
     </div>
   );
 }

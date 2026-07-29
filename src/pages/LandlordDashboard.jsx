@@ -6,6 +6,7 @@ import VerificationBadges from "../components/VerificationBadges";
 import VerificationStatus from "../components/VerificationStatus";
 import AnalyticsDashboard from "../components/AnalyticsDashboard";
 import BoostNotification from "../components/BoostNotification";
+import QuickBoostModal from "../components/QuickBoostModal";
 
 import { getDashboardPath, normalizeRole } from "../utils/dashboardRoutes";
 
@@ -16,6 +17,8 @@ export default function LandlordDashboard() {
   const navigate = useNavigate();
 
   const [properties, setProperties] = useState([]);
+  const [boostModalOpen, setBoostModalOpen] = useState(false);
+  const [selectedPropertyForBoost, setSelectedPropertyForBoost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [authLoading, setAuthLoading] = useState(true);
   const [error, setError] = useState("");
@@ -107,8 +110,9 @@ export default function LandlordDashboard() {
     }
   };
 
-  const handleBoost = (propertyId) => {
-    navigate(`/premium-plans?propertyId=${propertyId}`);
+  const handleBoost = (property) => {
+    setSelectedPropertyForBoost(property);
+    setBoostModalOpen(true);
   };
 
   const handleAssignAgent = async (propertyId, agentId) => {
@@ -342,7 +346,7 @@ export default function LandlordDashboard() {
 
                       {/* BOOST — full width */}
                       <button
-                        onClick={() => handleBoost(property._id)}
+                        onClick={() => handleBoost(property)}
                         style={{ ...styles.actionBtn, ...styles.boostActionBtn, gridColumn: "1 / -1" }}
                       >
                         ⭐ Boost Property
@@ -372,6 +376,21 @@ export default function LandlordDashboard() {
           })}
         </div>
       ) : null}
+
+      {/* QUICK BOOST MODAL */}
+      {selectedPropertyForBoost && (
+        <QuickBoostModal
+          isOpen={boostModalOpen}
+          onClose={() => {
+            setBoostModalOpen(false);
+            setSelectedPropertyForBoost(null);
+          }}
+          itemType="property"
+          itemId={selectedPropertyForBoost._id}
+          itemName={selectedPropertyForBoost.title}
+          onSuccess={fetchMyProperties}
+        />
+      )}
     </div>
   );
 }

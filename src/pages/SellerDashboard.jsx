@@ -6,6 +6,7 @@ import VerificationStatus from "../components/VerificationStatus";
 import VerificationBadges from "../components/VerificationBadges";
 import BoostNotification from "../components/BoostNotification";
 import AnalyticsDashboard from "../components/AnalyticsDashboard";
+import QuickBoostModal from "../components/QuickBoostModal";
 
 import { getDashboardPath } from "../utils/dashboardRoutes";
 
@@ -62,6 +63,14 @@ export default function SellerDashboard() {
     title: "", description: "", category: "", condition: "",
     price: "", quantity: "", location: "", county: "", lat: "", lng: ""
   });
+
+  const [boostModalOpen, setBoostModalOpen] = useState(false);
+  const [selectedMaterialForBoost, setSelectedMaterialForBoost] = useState(null);
+
+  const handleBoost = (material) => {
+    setSelectedMaterialForBoost(material);
+    setBoostModalOpen(true);
+  };
 
   useEffect(() => {
     const storedToken = localStorage.getItem("sellerToken") || ctxToken;
@@ -336,6 +345,27 @@ export default function SellerDashboard() {
                         Delete
                       </button>
                     </div>
+                    {currentStatus === "active" && (
+                      <button
+                        style={{
+                          width: "100%",
+                          marginTop: "10px",
+                          padding: "10px",
+                          fontSize: "13px",
+                          background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
+                          color: "#0f172a",
+                          border: "none",
+                          borderRadius: "8px",
+                          fontWeight: "bold",
+                          cursor: "pointer",
+                          transition: "all 0.3s ease",
+                          boxShadow: "0 4px 12px rgba(251, 191, 36, 0.2)",
+                        }}
+                        onClick={() => handleBoost(m)}
+                      >
+                        ⭐ Boost Item
+                      </button>
+                    )}
                   </div>
                 </div>
               );
@@ -389,6 +419,21 @@ export default function SellerDashboard() {
             {submitLoading ? "Publishing..." : "Publish Material"}
           </button>
         </div>
+      )}
+
+      {/* QUICK BOOST MODAL */}
+      {selectedMaterialForBoost && (
+        <QuickBoostModal
+          isOpen={boostModalOpen}
+          onClose={() => {
+            setBoostModalOpen(false);
+            setSelectedMaterialForBoost(null);
+          }}
+          itemType="material"
+          itemId={selectedMaterialForBoost._id}
+          itemName={selectedMaterialForBoost.title}
+          onSuccess={fetchMaterials}
+        />
       )}
     </div>
   );
