@@ -368,10 +368,14 @@ export default function Navbar() {
             </div>
           ) : (
             <button
-              style={styles.guestAccountBtn}
+              className="guest-signin-btn"
               onClick={() => setAccountSelectorOpen(true)}
             >
-              Sign In
+              <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" className="guest-signin-icon">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              <span>Sign In</span>
             </button>
           )}
           <button
@@ -1010,6 +1014,42 @@ const styles = {
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
+  .guest-signin-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.12) 0%, rgba(245, 158, 11, 0.05) 100%) !important;
+    border: 1px solid rgba(251, 191, 36, 0.35) !important;
+    border-radius: 30px !important;
+    color: #fbbf24 !important;
+    font-size: 13px !important;
+    fontWeight: 700 !important;
+    font-family: 'DM Sans', sans-serif !important;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    outline: none !important;
+  }
+
+  .guest-signin-btn:hover {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.25) 0%, rgba(245, 158, 11, 0.15) 100%) !important;
+    border-color: #fbbf24 !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 20px rgba(251, 191, 36, 0.25) !important;
+    transform: translateY(-2px) !important;
+  }
+
+  .guest-signin-icon {
+    font-size: 14px;
+    transition: transform 0.3s ease !important;
+    flex-shrink: 0;
+  }
+
+  .guest-signin-btn:hover .guest-signin-icon {
+    transform: scale(1.15) !important;
+  }
 
   a[style*="color: #cbd5e1"]:hover {
     background: rgba(251, 191, 36, 0.1) !important;
