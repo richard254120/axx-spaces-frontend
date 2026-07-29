@@ -70,11 +70,11 @@ export default function BoostNotification({ user, userType = "landlord" }) {
           style={styles.boostButton}
           onClick={() => {
             if (userType === "landlord") {
-              navigate("/listings");
+              navigate("/dashboard");
             } else if (userType === "seller") {
-              navigate("/materials");
+              navigate("/seller-dashboard");
             } else if (userType === "mover") {
-              navigate("/movers/dashboard");
+              navigate("/mover-dashboard");
             }
           }}
         >
