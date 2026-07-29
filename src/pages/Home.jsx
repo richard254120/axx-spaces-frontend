@@ -2009,7 +2009,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="cards-track-wrap">
-            <div key={activeFeaturedTab} className="cards-track" style={{ animationDuration: `${Math.max(30, allFeaturedListings.length * 8)}s` }}>
+            <div key={activeFeaturedTab} className="cards-track" style={{ animationDuration: '20s' }}>
               {/* First group */}
               {allFeaturedListings.map((item, idx) => (
                 <div key={`${item._id}-${idx}`} className="feat-card">
