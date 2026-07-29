@@ -942,7 +942,7 @@ export default function AdminDashboard() {
             {(activeTab === "materials" || activeTab === "tourism" || activeTab === "properties") && (
               <select className="filter-select" value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
                 <option value="">All Categories</option>
-                {activeTab === "materials" && ["Construction Materials", "Furniture", "Appliances", "Electronics", "Tools", "Other"].map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                {activeTab === "materials" && ["Furniture", "Electronics", "Appliances", "Tools", "Clothing", "Books", "Sports & Outdoors", "Home & Garden", "Beauty & Personal Care", "Toys & Games", "Construction Materials", "Vehicles & Parts", "Other"].map(cat => <option key={cat} value={cat}>{cat}</option>)}
                 {activeTab === "properties" && ["Apartment", "House", "Office", "Land", "Warehouse"].map(cat => <option key={cat} value={cat}>{cat}</option>)}
                 {activeTab === "tourism" && ["Hotel", "Resort", "Airbnb", "Lodge", "Camping"].map(cat => <option key={cat} value={cat}>{cat}</option>)}
               </select>

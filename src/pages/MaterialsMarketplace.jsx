@@ -9,12 +9,19 @@ import RequestItemModal from "../components/RequestItemModal";
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
 const CATEGORIES = [
-  "Construction Materials",
   "Furniture",
-  "Appliances",
   "Electronics",
+  "Appliances",
   "Tools",
-  "Other",
+  "Clothing",
+  "Books",
+  "Sports & Outdoors",
+  "Home & Garden",
+  "Beauty & Personal Care",
+  "Toys & Games",
+  "Construction Materials",
+  "Vehicles & Parts",
+  "Other"
 ];
 
 const CONDITIONS = ["Like New", "Good", "Fair", "Poor"];

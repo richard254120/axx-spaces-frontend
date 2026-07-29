@@ -19,7 +19,21 @@ const COUNTIES = [
   "Siaya", "Kisumu", "Homa Bay", "Migori", "Kisii", "Nyamira", "Nairobi City"
 ];
 
-const CATEGORIES = ["Construction Materials", "Furniture", "Appliances", "Electronics", "Tools", "Other"];
+const CATEGORIES = [
+  "Furniture",
+  "Electronics",
+  "Appliances",
+  "Tools",
+  "Clothing",
+  "Books",
+  "Sports & Outdoors",
+  "Home & Garden",
+  "Beauty & Personal Care",
+  "Toys & Games",
+  "Construction Materials",
+  "Vehicles & Parts",
+  "Other"
+];
 const CONDITIONS = ["Like New", "Good", "Fair", "Poor"];
 
 const STATUS_COLORS = {

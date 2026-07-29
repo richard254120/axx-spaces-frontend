@@ -2009,130 +2009,74 @@ export default function Home() {
                 </button>
               </div>
             </div>
-          ));
-          } else if (activeFeaturedTab === "movers") {
-            isLoading = loadingMovers;
-          dataList = featuredMovers;
-          viewAllPath = "/movers";
-          viewAllText = "View All Movers";
-            renderCards = () => [...featuredMovers, ...featuredMovers].map((mover, idx) => (
-          <div key={`${mover._id}-${idx}`} className="feat-card">
-            <div className="feat-img-wrap">
-              <img
-                src={mover.portfolioImages?.[0] || mover.workPhotos?.[0] || mover.profileImage || ""}
-                alt={`${mover.name} - Work Photo`}
-                className="feat-img"
-                loading="lazy"
-                onError={e => { e.target.style.display = "none"; }}
-              />
-              <div className="feat-boosted">★ Featured</div>
-              <div className="feat-type">Moving Service</div>
-              <div className="feat-img-grad"></div>
-            </div>
-            <div className="feat-body">
-              <p className="feat-type-label">Moving Service</p>
-              <h3 className="feat-title">{mover.name}</h3>
-              <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                <span>{mover.county}</span>
-              </p>
-              <div className="feat-meta">
-                <span className="feat-tag">🚚 {mover.vehicleType || "Various"}</span>
-                <span className="feat-tag">⭐ {mover.experienceYears || 0} years exp</span>
-                {mover.teamInfo?.teamSize && (
-                  <span className="feat-tag">👥 {mover.teamInfo.teamSize} team</span>
-                )}
-                {mover.responseTime && (
-                  <span className="feat-tag">⚡ {mover.responseTime}</span>
-                )}
+          ))}
+          {/* Movers */}
+          {featuredMovers.map((mover) => (
+            <div key={mover._id} className="feat-card">
+              <div className="feat-img-wrap">
+                <img
+                  src={mover.portfolioImages?.[0] || mover.workPhotos?.[0] || mover.profileImage || ""}
+                  alt={`${mover.name} - Work Photo`}
+                  className="feat-img"
+                  loading="lazy"
+                  onError={e => { e.target.style.display = "none"; }}
+                />
+                <div className="feat-boosted">★ Featured</div>
+                <div className="feat-type">Moving Service</div>
+                <div className="feat-img-grad"></div>
               </div>
-              {(mover.insurance?.hasInsurance || mover.uniform || mover.safetyGear) && (
-                <div className="feat-meta" style={{ marginTop: "8px" }}>
-                  {mover.insurance?.hasInsurance && (
-                    <span className="feat-tag" style={{ background: "rgba(34, 197, 94, 0.15)", color: "#22c55e", borderColor: "rgba(34, 197, 94, 0.3)" }}>
-                      🛡️ Insured
+              <div className="feat-body">
+                <p className="feat-type-label">Moving Service</p>
+                <h3 className="feat-title">{mover.name}</h3>
+                <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                  <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  <span>{mover.county}</span>
+                </p>
+                <div className="feat-meta">
+                  <span className="feat-tag">🚚 {mover.vehicleType || "Various"}</span>
+                  <span className="feat-tag">⭐ {mover.experienceYears || 0} years exp</span>
+                  {mover.teamInfo?.teamSize && (
+                    <span className="feat-tag">👥 {mover.teamInfo.teamSize} team</span>
+                  )}
+                  {mover.responseTime && (
+                    <span className="feat-tag">⚡ {mover.responseTime}</span>
+                  )}
+                </div>
+                {(mover.insurance?.hasInsurance || mover.uniform || mover.safetyGear) && (
+                  <div className="feat-meta" style={{ marginTop: "8px" }}>
+                    {mover.insurance?.hasInsurance && (
+                      <span className="feat-tag" style={{ background: "rgba(34, 197, 94, 0.15)", color: "#22c55e", borderColor: "rgba(34, 197, 94, 0.3)" }}>
+                        🛡️ Insured
+                      </span>
+                    )}
+                    {mover.uniform && <span className="feat-tag">👔 Uniform</span>}
+                    {mover.safetyGear && <span className="feat-tag">⛑️ Safety Gear</span>}
+                  </div>
+                )}
+                {mover.specialties && mover.specialties.length > 0 && (
+                  <div className="feat-meta" style={{ marginTop: "8px" }}>
+                    {mover.specialties.slice(0, 2).map(specialty => (
+                      <span key={specialty} className="feat-tag" style={{ fontSize: "10px" }}>
+                        ⭐ {specialty}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <p className="feat-price">
+                  {mover.pricing?.baseRate ? `KES ${mover.pricing.baseRate.toLocaleString()}` : "Contact for pricing"}
+                  {mover.pricing?.rateType && (
+                    <span style={{ fontSize: "12px", color: "#7A7260", marginLeft: "4px" }}>
+                      /{mover.pricing.rateType.replace('_', ' ')}
                     </span>
                   )}
-                  {mover.uniform && <span className="feat-tag">👔 Uniform</span>}
-                  {mover.safetyGear && <span className="feat-tag">⛑️ Safety Gear</span>}
-                </div>
-              )}
-              {mover.specialties && mover.specialties.length > 0 && (
-                <div className="feat-meta" style={{ marginTop: "8px" }}>
-                  {mover.specialties.slice(0, 2).map(specialty => (
-                    <span key={specialty} className="feat-tag" style={{ fontSize: "10px" }}>
-                      ⭐ {specialty}
-                    </span>
-                  ))}
-                </div>
-              )}
-              <p className="feat-price">
-                {mover.pricing?.baseRate ? `KES ${mover.pricing.baseRate.toLocaleString()}` : "Contact for pricing"}
-                {mover.pricing?.rateType && (
-                  <span style={{ fontSize: "12px", color: "#7A7260", marginLeft: "4px" }}>
-                    /{mover.pricing.rateType.replace('_', ' ')}
-                  </span>
-                )}
-              </p>
-              <button onClick={() => navigate(`/movers/${mover._id}`)} className="feat-view-btn magical-btn">
-                View Details →
-              </button>
-            </div>
-          </div>
-          ));
-          }
-
-          if (isLoading) {
-            return (
-          <div className="cards-track-wrap">
-            <div className="cards-track">
-              {[1, 2, 3, 4].map((_, idx) => (
-                <div key={`skeleton-${idx}`} className="feat-card">
-                  <div className="feat-img-wrap" style={{ background: "#e2e8f0", height: "185px" }}>
-                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%)", backgroundSize: "200% 100%", animation: "skeleton-loading 1.5s infinite" }}></div>
-                  </div>
-                  <div className="feat-body">
-                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "60%" }}></div>
-                    <div style={{ height: "24px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "8px", width: "80%" }}></div>
-                    <div style={{ height: "16px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "12px", width: "50%" }}></div>
-                    <div style={{ height: "20px", background: "#e2e8f0", borderRadius: "4px", marginBottom: "16px", width: "40%" }}></div>
-                    <div style={{ height: "40px", background: "#e2e8f0", borderRadius: "8px", width: "100%" }}></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          );
-          }
-
-          if (dataList.length === 0) {
-            return (
-          <div className="no-feat-wrap">
-            <span className="no-feat-icon">✨</span>
-            <h4 className="no-feat-title">No Featured Items Found</h4>
-            <p className="no-feat-sub">We couldn't find any active featured listings in this category right now.</p>
-            <button onClick={() => navigate(viewAllPath)} className="no-feat-btn">
-              Explore All Listings
-            </button>
-          </div>
-          );
-          }
-
-          return (
-          <>
-            <div className="cards-track-wrap">
-              <div className="cards-track">
-                {renderCards()}
+                </p>
+                <button onClick={() => navigate(`/movers/${mover._id}`)} className="feat-view-btn magical-btn">
+                  View Details →
+                </button>
               </div>
             </div>
-            <div className="view-all-wrap">
-              <button onClick={() => navigate(viewAllPath)} className="view-all-btn magical-btn">
-                {viewAllText} →
-              </button>
-            </div>
-          </>
-          );
-        })()}
+          ))}
+        </div>
       </section>
 
       {/* ── CATEGORIES SHOWCASE ── */}
