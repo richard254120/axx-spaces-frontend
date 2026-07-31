@@ -29,6 +29,12 @@ export default defineConfig({
     }
   },
 
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.js',
+  },
+
   // Define global constants
   define: {
     'import.meta.env.VITE_APP_NAME': JSON.stringify('axx-spaces'),
