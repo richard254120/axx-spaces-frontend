@@ -526,6 +526,26 @@ export default function AdminDashboard() {
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                         <span>{item.location || `${item.area}, ${item.county}`}</span>
                       </div>
+                      {/* ✅ FULLY-BOOKED BADGE: Admin can see which properties are hidden from the public */}
+                      {(() => {
+                        const available = Math.max(0, (item.totalUnits || 1) - (item.bookedUnits || 0));
+                        const isFullyBooked = available === 0;
+                        return (
+                          <div style={{ marginTop: "6px", display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+                            <span style={{
+                              fontSize: "11px",
+                              padding: "2px 8px",
+                              borderRadius: "4px",
+                              fontWeight: 600,
+                              background: isFullyBooked ? "rgba(239,68,68,0.12)" : "rgba(34,197,94,0.12)",
+                              color: isFullyBooked ? "#ef4444" : "#22c55e",
+                              border: `1px solid ${isFullyBooked ? "rgba(239,68,68,0.3)" : "rgba(34,197,94,0.3)"}`,
+                            }}>
+                              {isFullyBooked ? "🔴 Fully Booked — Hidden from Public" : `🟢 ${available}/${item.totalUnits || 1} units available`}
+                            </span>
+                          </div>
+                        );
+                      })()}
                     </td>
                     <td style={styles.td}>
                       <div style={styles.ownerName}>{item.owner?.name || "Member"}</div>
