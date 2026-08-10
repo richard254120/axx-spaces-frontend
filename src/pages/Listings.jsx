@@ -74,9 +74,9 @@ export default function Listings() {
           ...prop,
           availableUnits: Math.max(0, (prop.totalUnits || 1) - (prop.bookedUnits || 0))
         }));
-        const availableProperties = processedProperties.filter((prop) => prop.availableUnits > 0);
+        // Include ALL properties (including fully booked) — landlord info is hidden in the modal
         setProperties(processedProperties);
-        setFilteredProperties(availableProperties);
+        setFilteredProperties(processedProperties);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -117,7 +117,8 @@ export default function Listings() {
   }, [searchParams, properties]);
 
   useEffect(() => {
-    let filtered = properties.filter(p => p.availableUnits > 0);
+    // Include all properties (fully booked ones show without landlord info)
+    let filtered = [...properties];
     if (filters.location) filtered = filtered.filter((p) => (p.location + " " + (p.county || "")).toLowerCase().includes(filters.location.toLowerCase()));
     if (filters.bedrooms) filtered = filtered.filter((p) => p.bedrooms === parseInt(filters.bedrooms));
     if (filters.bathrooms) filtered = filtered.filter((p) => p.bathrooms === parseInt(filters.bathrooms));
@@ -801,35 +802,47 @@ export default function Listings() {
                 </div>
               </div>
 
-              {/* Landlord */}
-              <div style={S.contactCard}>
-                <div style={S.contactCardLabel}>Listed by</div>
-                <div style={S.contactCardName}>{selectedProperty.owner?.name || "—"}</div>
-                <div style={S.contactCardPhone}>{selectedProperty.owner?.phone || "—"}</div>
-              </div>
-
-              {/* Agent */}
-              {selectedProperty.assignedAgent && (
-                <div style={{ ...S.contactCard, borderColor: "rgba(180,150,80,0.3)" }}>
-                  <div style={S.contactCardLabel}>Property Agent</div>
-                  <div style={S.contactCardName}>{selectedProperty.assignedAgent?.name || "—"}</div>
-                  <div style={S.contactCardPhone}>{selectedProperty.assignedAgent?.phone || "—"}</div>
-                  <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
-                    <button style={S.agentWaBtn} onClick={() => { const ph = formatKenyaPhone(selectedProperty.assignedAgent?.phone || ""); const n = selectedProperty.assignedAgent?.name || "Agent"; window.open(`https://wa.me/${ph}?text=${encodeURIComponent(`Hi ${n}, I'm interested in "${selectedProperty.title}".`)}`, "_blank"); }}>WhatsApp Agent</button>
-                    <button style={S.agentCallBtn} onClick={() => window.open(`tel:+254${selectedProperty.assignedAgent?.phone || ""}`)}>Call Agent</button>
+              {/* Landlord & Agent info + CTA — only when units are available */}
+              {selectedProperty.availableUnits > 0 ? (
+                <>
+                  {/* Landlord */}
+                  <div style={S.contactCard}>
+                    <div style={S.contactCardLabel}>Listed by</div>
+                    <div style={S.contactCardName}>{selectedProperty.owner?.name || "—"}</div>
+                    <div style={S.contactCardPhone}>{selectedProperty.owner?.phone || "—"}</div>
                   </div>
+
+                  {/* Agent */}
+                  {selectedProperty.assignedAgent && (
+                    <div style={{ ...S.contactCard, borderColor: "rgba(180,150,80,0.3)" }}>
+                      <div style={S.contactCardLabel}>Property Agent</div>
+                      <div style={S.contactCardName}>{selectedProperty.assignedAgent?.name || "—"}</div>
+                      <div style={S.contactCardPhone}>{selectedProperty.assignedAgent?.phone || "—"}</div>
+                      <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
+                        <button style={S.agentWaBtn} onClick={() => { const ph = formatKenyaPhone(selectedProperty.assignedAgent?.phone || ""); const n = selectedProperty.assignedAgent?.name || "Agent"; window.open(`https://wa.me/${ph}?text=${encodeURIComponent(`Hi ${n}, I'm interested in "${selectedProperty.title}".`)}`, "_blank"); }}>WhatsApp Agent</button>
+                        <button style={S.agentCallBtn} onClick={() => window.open(`tel:+254${selectedProperty.assignedAgent?.phone || ""}`)}>Call Agent</button>
+                      </div>
+                    </div>
+                  )}
+
+                  <ShareProperty property={selectedProperty} />
+
+                  {/* CTA Buttons */}
+                  <div style={S.ctaGrid}>
+                    <button style={{ ...S.ctaBtn, ...S.ctaWa }} onClick={() => handleContactLandlord(selectedProperty)}>WhatsApp</button>
+                    <button style={{ ...S.ctaBtn, ...S.ctaCall }} onClick={() => window.open(`tel:${selectedProperty.owner?.phone || selectedProperty.phone}`)}>📞 Call</button>
+                    <button style={{ ...S.ctaBtn, ...S.ctaSms }} onClick={() => handleSendSMS(selectedProperty)}>SMS</button>
+                    <button style={{ ...S.ctaBtn, ...S.ctaBook }} onClick={() => handleBookNow(selectedProperty)}>Book Now</button>
+                  </div>
+                </>
+              ) : (
+                /* Fully Booked notice — no contact info shown */
+                <div style={{ background: "rgba(224,82,82,0.1)", border: "1px solid rgba(224,82,82,0.25)", borderRadius: "10px", padding: "18px 20px", textAlign: "center" }}>
+                  <div style={{ fontSize: "1.6rem", marginBottom: "8px" }}>🔒</div>
+                  <div style={{ color: "#F28B8B", fontWeight: 700, fontSize: "1rem", marginBottom: "4px" }}>Fully Booked</div>
+                  <div style={{ color: "#B8AD96", fontSize: "0.88rem" }}>All units are currently occupied. Check back later for availability.</div>
                 </div>
               )}
-
-              <ShareProperty property={selectedProperty} />
-
-              {/* CTA Buttons */}
-              <div style={S.ctaGrid}>
-                <button style={{ ...S.ctaBtn, ...S.ctaWa, ...(selectedProperty.availableUnits === 0 ? S.ctaDisabled : {}) }} onClick={() => handleContactLandlord(selectedProperty)} disabled={selectedProperty.availableUnits === 0}>WhatsApp</button>
-                <button style={{ ...S.ctaBtn, ...S.ctaCall }} onClick={() => window.open(`tel:${selectedProperty.owner?.phone || selectedProperty.phone}`)}>📞 Call</button>
-                <button style={{ ...S.ctaBtn, ...S.ctaSms }} onClick={() => handleSendSMS(selectedProperty)}>SMS</button>
-                <button style={{ ...S.ctaBtn, ...S.ctaBook }} onClick={() => handleBookNow(selectedProperty)}>Book Now</button>
-              </div>
 
               {/* Booking Calendar */}
               <div style={S.section}>
@@ -837,8 +850,8 @@ export default function Listings() {
                 <BookingCalendar propertyId={selectedProperty._id} availableUnits={selectedProperty.availableUnits} />
               </div>
 
-              {/* Messaging */}
-              {user && (
+              {/* Messaging — only when units are available */}
+              {user && selectedProperty.availableUnits > 0 && (
                 <div style={S.section}>
                   <h4 style={S.sectionHead}>Message Landlord</h4>
                   <MessagingSystem recipientId={selectedProperty.owner?._id || selectedProperty.owner?.id} recipientName={selectedProperty.owner?.name || "Landlord"} recipientType="landlord" propertyId={selectedProperty._id} propertyTitle={selectedProperty.title} />
