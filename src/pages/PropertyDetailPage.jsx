@@ -39,17 +39,62 @@ export default function PropertyDetailPage() {
         if (!response.ok) throw new Error("Property not found");
         const data = await response.json();
         setProperty(data);
+
+        // Check if user landed from a physical QR code poster scan
+        const searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.get("ref") === "qr") {
+          const source = searchParams.get("source") || "generic";
+          logQRScan(source);
+        }
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
+
+    const logQRScan = async (source) => {
+      try {
+        const response = await fetch(`${API_BASE}/properties/${id}/scan`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            source,
+            userAgent: navigator.userAgent,
+          }),
+        });
+        if (response.ok) {
+          const resData = await response.json();
+          if (resData.scanId) {
+            sessionStorage.setItem(`axx_qr_scan_id_${id}`, resData.scanId);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to log QR scan:", err);
+      }
+    };
+
     fetchProperty();
   }, [id]);
 
+  const recordQRConversion = async (inquiryType) => {
+    const scanId = sessionStorage.getItem(`axx_qr_scan_id_${id}`);
+    if (!scanId) return;
+
+    try {
+      await fetch(`${API_BASE}/properties/${id}/scan/inquiry`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scanId, inquiryType }),
+      });
+    } catch (err) {
+      console.error("Failed to record QR conversion:", err);
+    }
+  };
+
   const handleWhatsApp = () => {
     if (!property) return;
+    recordQRConversion("whatsapp");
     const phone = formatKenyaPhone(property.landlordPhone);
     const msg = `Hi, I'm interested in your property "${property.title}" on Axxspace. Is it still available?`;
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
@@ -57,6 +102,7 @@ export default function PropertyDetailPage() {
 
   const handleCall = () => {
     if (!property) return;
+    recordQRConversion("call");
     window.open(`tel:${property.landlordPhone}`, "_blank");
   };
 
@@ -79,6 +125,10 @@ export default function PropertyDetailPage() {
       });
 
       if (!response.ok) throw new Error("Booking failed");
+      
+      // Log QR conversion to booking if applicable
+      recordQRConversion("booking");
+
       setBookingSuccess("✅ Booking request sent successfully!");
       setTimeout(() => {
         setShowBookingModal(false);

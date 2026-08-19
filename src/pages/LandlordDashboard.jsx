@@ -7,6 +7,8 @@ import VerificationStatus from "../components/VerificationStatus";
 import AnalyticsDashboard from "../components/AnalyticsDashboard";
 import BoostNotification from "../components/BoostNotification";
 import QuickBoostModal from "../components/QuickBoostModal";
+import QRGeneratorModal from "../components/QRGeneratorModal";
+import QRStatsModal from "../components/QRStatsModal";
 
 import { getDashboardPath, normalizeRole } from "../utils/dashboardRoutes";
 
@@ -26,6 +28,10 @@ export default function LandlordDashboard() {
   const [successMessage, setSuccessMessage] = useState("");
   const [agents, setAgents] = useState([]);
   const [selectedAgents, setSelectedAgents] = useState({});
+  const [selectedPropertyForQR, setSelectedPropertyForQR] = useState(null);
+  const [qrModalOpen, setQrModalOpen] = useState(false);
+  const [selectedPropertyForStats, setSelectedPropertyForStats] = useState(null);
+  const [statsModalOpen, setStatsModalOpen] = useState(false);
 
   useEffect(() => {
     if (!token) {
@@ -352,6 +358,37 @@ export default function LandlordDashboard() {
                         ⭐ Boost Property
                       </button>
 
+                      {/* PHYSICAL VAQR SYSTEM BUTTONS */}
+                      <button
+                        onClick={() => {
+                          setSelectedPropertyForQR(property);
+                          setQrModalOpen(true);
+                        }}
+                        style={{
+                          ...styles.actionBtn,
+                          background: "rgba(59, 130, 246, 0.15)",
+                          color: "#60a5fa",
+                          border: "1px solid rgba(59, 130, 246, 0.3)",
+                        }}
+                      >
+                        🖨️ Poster / QR
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setSelectedPropertyForStats(property);
+                          setStatsModalOpen(true);
+                        }}
+                        style={{
+                          ...styles.actionBtn,
+                          background: "rgba(251, 191, 36, 0.15)",
+                          color: "#fbbf24",
+                          border: "1px solid rgba(251, 191, 36, 0.3)",
+                        }}
+                      >
+                        📊 QR Stats
+                      </button>
+
                       {/* ASSIGN AGENT — full width */}
                       <div style={{ gridColumn: "1 / -1", marginTop: "8px" }}>
                         <label style={{ ...styles.unitLbl, marginBottom: "4px" }}>Assign Agent:</label>
@@ -389,6 +426,30 @@ export default function LandlordDashboard() {
           itemId={selectedPropertyForBoost._id}
           itemName={selectedPropertyForBoost.title}
           onSuccess={fetchMyProperties}
+        />
+      )}
+
+      {/* QR GENERATOR MODAL */}
+      {selectedPropertyForQR && (
+        <QRGeneratorModal
+          isOpen={qrModalOpen}
+          onClose={() => {
+            setQrModalOpen(false);
+            setSelectedPropertyForQR(null);
+          }}
+          property={selectedPropertyForQR}
+        />
+      )}
+
+      {/* QR STATS MODAL */}
+      {selectedPropertyForStats && (
+        <QRStatsModal
+          isOpen={statsModalOpen}
+          onClose={() => {
+            setStatsModalOpen(false);
+            setSelectedPropertyForStats(null);
+          }}
+          property={selectedPropertyForStats}
         />
       )}
     </div>
@@ -544,5 +605,30 @@ const cssStyles = `
   .upload-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+  }
+  @media print {
+    body * {
+      visibility: hidden !important;
+    }
+    .print-poster-only, .print-poster-only * {
+      visibility: visible !important;
+    }
+    .print-poster-only {
+      position: absolute !important;
+      left: 0 !important;
+      top: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      background: white !important;
+      color: black !important;
+      z-index: 999999 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      box-sizing: border-box !important;
+    }
   }
 `;

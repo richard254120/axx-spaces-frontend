@@ -59,6 +59,10 @@ export default function AnalyticsDashboard({ userType = "landlord", userId = nul
     const revenue = Math.floor(r4 * 80000 * multiplier) + 5000;
     const conversionRate = (r5 * 8 + 2).toFixed(1);
 
+    // Mock QR scans and inquiries
+    const qrScans = Math.floor(r1 * 80 * multiplier) + 5;
+    const qrInquiries = Math.floor(r2 * 12 * multiplier) + 1;
+
     const baseData = {
       views,
       inquiries,
@@ -75,6 +79,8 @@ export default function AnalyticsDashboard({ userType = "landlord", userId = nul
         propertiesListed: Math.floor(r6 * 6) + 1,
         averageResponseTime: Math.floor(r7 * 40) + 10,
         topProperty: "Axx Space Premier",
+        qrScans,
+        qrInquiries,
       };
     } else if (type === "mover") {
       const r6 = getSeededRandom(seedBase + 6);
@@ -200,6 +206,20 @@ export default function AnalyticsDashboard({ userType = "landlord", userId = nul
               <h4 style={styles.metricTitle}>Avg Response Time</h4>
               <div style={styles.metricValue}>{analytics.averageResponseTime} min</div>
               <p style={styles.metricDescription}>Time to reply</p>
+            </div>
+            <div style={styles.metricCard}>
+              <h4 style={styles.metricTitle}>Physical QR Scans</h4>
+              <div style={{ ...styles.metricValue, color: "#fbbf24" }}>
+                {analytics.qrScans?.toLocaleString() || 0}
+              </div>
+              <p style={styles.metricDescription}>Physical poster traffic</p>
+            </div>
+            <div style={styles.metricCard}>
+              <h4 style={styles.metricTitle}>QR Inquiries</h4>
+              <div style={{ ...styles.metricValue, color: "#10b981" }}>
+                {analytics.qrInquiries?.toLocaleString() || 0}
+              </div>
+              <p style={styles.metricDescription}>QR conversion leads</p>
             </div>
           </>
         )}
