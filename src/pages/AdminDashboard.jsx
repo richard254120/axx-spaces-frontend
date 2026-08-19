@@ -376,7 +376,7 @@ export default function AdminDashboard() {
 
   return (
     <div style={styles.container}>
-      <style>{cssStyles}></style>
+      <style dangerouslySetInnerHTML={{ __html: cssStyles }} />
 
       <div style={styles.header}>
         <h1 style={styles.title}>🛡️ Admin Review Panel</h1>
@@ -556,6 +556,13 @@ export default function AdminDashboard() {
                     </td>
                     <td style={styles.td}>
                       <div style={styles.btnGroup}>
+                        <button
+                          onClick={() => navigate(`/property/edit/${item._id}`)}
+                          style={{
+                            background: "#3b82f6", color: "white", border: "none",
+                            padding: "8px 16px", borderRadius: "8px", fontWeight: 700, cursor: "pointer"
+                          }}
+                        >Edit</button>
                         <button
                           onClick={() => handleStatusUpdate(item._id, "approved")}
                           style={styles.approveBtn}

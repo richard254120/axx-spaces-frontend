@@ -1,7 +1,8 @@
 import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import UniversityPicker from "../components/UniversityPicker";
+import { resolveMediaUrl } from "../utils/fileLinks";
 
 const HOSTEL_PROPERTY_TYPE = "Hostel Room";
 
@@ -125,6 +126,69 @@ export default function Upload() {
   const [consent, setConsent] = useState(false);
   const [selectedUniversity, setSelectedUniversity] = useState(null);
 
+  const { id } = useParams();
+  const isEditMode = !!id;
+  const [existingImages, setExistingImages] = useState([]);
+
+  useEffect(() => {
+    if (isEditMode && token) {
+      const fetchProperty = async () => {
+        try {
+          setLoading(true);
+          const response = await fetch(`${API_BASE}/properties/${id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (!response.ok) throw new Error("Failed to fetch property details");
+          const data = await response.json();
+          
+          setFormData({
+            title: data.title || "",
+            description: data.description || "",
+            location: data.location || "",
+            price: data.price || "",
+            deposit: data.deposit || "",
+            bedrooms: data.bedrooms !== undefined ? data.bedrooms : "",
+            bathrooms: data.bathrooms !== undefined ? data.bathrooms : "",
+            amenities: data.amenities || [],
+            totalUnits: data.totalUnits || 1,
+            furnished: data.furnished || false,
+            leaseType: data.leaseType || "monthly",
+            availableFrom: data.availableFrom ? new Date(data.availableFrom).toISOString().split('T')[0] : "",
+            rules: data.rules || "",
+            propertyType: data.propertyType || "",
+            county: data.county || "",
+            lat: data.lat || "",
+            lng: data.lng || "",
+            bookedUnits: data.bookedUnits || 0,
+            initiallyBooked: data.bookedUnits > 0,
+            university: data.university || "",
+            universityId: data.universityId || "",
+          });
+
+          if (data.universityId && data.university) {
+            setSelectedUniversity({
+              id: data.universityId,
+              name: data.university
+            });
+          }
+
+          setExistingImages(data.images || []);
+          setImagePreviews(data.images || []);
+          setConsent(true); // already agreed on upload
+          
+          // In edit mode, unlock all steps immediately
+          setMaxUnlockedStep(3);
+          
+        } catch (err) {
+          setError(err.message || "Error loading property for editing");
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchProperty();
+    }
+  }, [id, token, isEditMode]);
+
   const universityRequired = needsUniversityLink(formData, landlordType);
 
   const runStepValidation = (stepIndex) => {
@@ -133,7 +197,7 @@ export default function Upload() {
     }
     const validator = STEP_VALIDATORS[stepIndex];
     if (!validator) return [];
-    if (stepIndex === 2) return validator(formData, images);
+        if (stepIndex === 2) return (existingImages.length + images.length === 0) ? ["At least one image"] : [];
     if (stepIndex === 3) return validator(formData, images, consent);
     return validator(formData);
   };
@@ -222,7 +286,7 @@ export default function Upload() {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    if (files.length + images.length > 10) {
+    if (files.length + images.length + existingImages.length > 10) {
       setError("Maximum 10 images allowed");
       return;
     }
@@ -232,7 +296,14 @@ export default function Upload() {
   };
 
   const removeImage = (index) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
+    if (index < existingImages.length) {
+      // Removing an existing image
+      setExistingImages((prev) => prev.filter((_, i) => i !== index));
+    } else {
+      // Removing a newly added image file
+      const newFileIndex = index - existingImages.length;
+      setImages((prev) => prev.filter((_, i) => i !== newFileIndex));
+    }
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -271,10 +342,11 @@ export default function Upload() {
       return;
     }
 
+    const imageCheck = (existingImages.length + images.length === 0) ? ["At least one image"] : [];
     const allMissing = [
       ...validateBasic(formData, { universityRequired }),
       ...validateDetails(formData),
-      ...validateImages(images),
+      ...imageCheck,
       ...validateAmenities(formData, consent),
     ];
     if (allMissing.length > 0) {
@@ -303,38 +375,49 @@ export default function Upload() {
         }
       });
 
+      if (isEditMode) {
+        formDataToSend.append("remainingImages", JSON.stringify(existingImages));
+      }
+
       images.forEach((image) => formDataToSend.append("images", image));
 
-      const response = await fetch(`${API_BASE}/properties`, {
-        method: "POST",
+      const url = isEditMode ? `${API_BASE}/properties/${id}` : `${API_BASE}/properties`;
+      const method = isEditMode ? "PATCH" : "POST";
+
+      const response = await fetch(url, {
+        method: method,
         headers: { Authorization: `Bearer ${token}` },
         body: formDataToSend,
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || errorData.error || "Upload failed");
+        throw new Error(errorData.message || errorData.error || "Submission failed");
       }
 
-      setSuccess("Property submitted! Pending admin approval.");
-      setFormData({
-        title: "", description: "", location: "", price: "", deposit: "",
-        bedrooms: "", bathrooms: "", amenities: [], totalUnits: 1,
-        furnished: false, leaseType: "monthly", availableFrom: "", rules: "",
-        propertyType: "", county: "", lat: "", lng: "",
-        bookedUnits: 0, initiallyBooked: false, university: "", universityId: "",
-      });
-      setImages([]);
-      setImagePreviews([]);
-      setConsent(false);
-      setSelectedUniversity(null);
-      setCurrentStep(0);
-      setMaxUnlockedStep(0);
-      setStepErrors([]);
+      setSuccess(isEditMode ? "Property updated successfully!" : "Property submitted! Pending admin approval.");
+      
+      if (!isEditMode) {
+        setFormData({
+          title: "", description: "", location: "", price: "", deposit: "",
+          bedrooms: "", bathrooms: "", amenities: [], totalUnits: 1,
+          furnished: false, leaseType: "monthly", availableFrom: "", rules: "",
+          propertyType: "", county: "", lat: "", lng: "",
+          bookedUnits: 0, initiallyBooked: false, university: "", universityId: "",
+        });
+        setImages([]);
+        setImagePreviews([]);
+        setConsent(false);
+        setSelectedUniversity(null);
+        setCurrentStep(0);
+        setMaxUnlockedStep(0);
+        setStepErrors([]);
+      }
 
-      setTimeout(() => navigate("/dashboard"), 2800);
+      const redirectPath = user?.role === "admin" ? "/admin/dashboard" : "/dashboard";
+      setTimeout(() => navigate(redirectPath), 2800);
     } catch (err) {
-      setError(err.message || "Error uploading property");
+      setError(err.message || "Error submitting property");
     } finally {
       setLoading(false);
     }
@@ -357,8 +440,8 @@ export default function Upload() {
       <style>{cssStyles}</style>
 
       <div style={styles.header}>
-        <h1 style={styles.heading}>Upload Property</h1>
-        <button style={styles.backBtn} onClick={() => navigate("/dashboard")}>←</button>
+        <h1 style={styles.heading}>{isEditMode ? "Edit Property" : "Upload Property"}</h1>
+        <button style={styles.backBtn} onClick={() => navigate(user?.role === "admin" ? "/admin/dashboard" : "/dashboard")}>←</button>
       </div>
 
       {error && <div style={styles.errorBox}>{error}</div>}
@@ -656,12 +739,17 @@ export default function Upload() {
 
               {imagePreviews.length > 0 && (
                 <div style={styles.previewContainer}>
-                  {imagePreviews.map((preview, index) => (
-                    <div key={index} style={styles.previewBox}>
-                      <img src={preview} alt={`Preview ${index + 1}`} style={styles.previewImg} />
-                      <button type="button" onClick={() => removeImage(index)} style={styles.removeBtn}>✕</button>
-                    </div>
-                  ))}
+                  {imagePreviews.map((preview, index) => {
+                    const src = (String(preview).startsWith("blob:") || String(preview).startsWith("data:"))
+                      ? preview
+                      : resolveMediaUrl(preview);
+                    return (
+                      <div key={index} style={styles.previewBox}>
+                        <img src={src} alt={`Preview ${index + 1}`} style={styles.previewImg} />
+                        <button type="button" onClick={() => removeImage(index)} style={styles.removeBtn}>✕</button>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>

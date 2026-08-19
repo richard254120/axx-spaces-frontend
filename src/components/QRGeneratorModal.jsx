@@ -12,6 +12,22 @@ const SOURCES = [
   { value: "vacancy_sign", label: "Vacancy Signboard" }
 ];
 
+const PROPERTY_TYPES_LIST = [
+  "4+ Bedroom",
+  "Maisonette",
+  "Bungalow",
+  "Townhouse",
+  "Apartment Block",
+  "Single Room",
+  "Shared Room",
+  "Hostel Room",
+  "Commercial Office",
+  "Shop / Retail Space",
+  "Warehouse",
+  "Plot / Land",
+  "Furnished"
+];
+
 // SVG Icons
 const GenuineIcon = () => (
   <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -249,12 +265,38 @@ function VacancyPoster({ property, qrCodeDataUrl, sourceLabel }) {
           </div>
         </div>
 
-        {/* Right Side: Building Image & Scan Circle */}
-        <div style={posterStyles.imageCol}>
-          <div style={posterStyles.imageFrame}>
-            <img src={propImg} alt="Property building" style={posterStyles.buildingImg} />
+        {/* Right Side: Property Types list & Scan Circle */}
+        <div style={posterStyles.typesCardCol}>
+          <div style={posterStyles.typesCard}>
+            {PROPERTY_TYPES_LIST.map((item) => {
+              let isChecked = false;
+              if (item === "Furnished") {
+                isChecked = property.furnished === true || property.furnished === "true";
+              } else {
+                const pType = String(property.propertyType || "").toLowerCase().trim();
+                const itemNorm = item.toLowerCase().trim();
+                if (pType === itemNorm) {
+                  isChecked = true;
+                } else if (itemNorm === "4+ bedroom" && (pType.includes("4 bedroom") || pType.includes("4+ bedroom") || pType.includes("5 bedroom"))) {
+                  isChecked = true;
+                }
+              }
+
+              return (
+                <div key={item} style={posterStyles.typeRow}>
+                  <span style={posterStyles.typeLabel}>{item}</span>
+                  <div style={isChecked ? posterStyles.checkCircleActive : posterStyles.checkCircle}>
+                    {isChecked && (
+                      <svg viewBox="0 0 24 24" width="7" height="7" fill="none" stroke="#081A34" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
-          <div style={posterStyles.scanBadgeCircle}>
+          <div style={posterStyles.scanBadgeCircleOverlapping}>
             <PhoneScanIcon />
             <span style={posterStyles.scanBadgeTitle}>SCAN NOW</span>
             <span style={posterStyles.scanBadgeDesc}>Find your next space today!</span>
@@ -508,91 +550,353 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
     qrCtx.fillStyle = "#64748b";
     qrCtx.fillText("Scan to view property details", 175, 395);
 
-    // ── High-Res Poster Canvas (800x1130) ──
-    posterCtx.fillStyle = "#ffffff";
-    posterCtx.fillRect(0, 0, posterCanvas.width, posterCanvas.height);
+    const logoImg = new Image();
+    logoImg.src = logo;
+    logoImg.onload = () => {
+      // ── High-Res Poster Canvas (800x1130) ──
+      posterCtx.fillStyle = "#ffffff";
+      posterCtx.fillRect(0, 0, posterCanvas.width, posterCanvas.height);
 
-    posterCtx.fillStyle = "#081A34";
-    posterCtx.textAlign = "center";
-    posterCtx.font = "800 36px 'Inter', sans-serif";
-    posterCtx.fillText("ROOM / HOUSE", posterCanvas.width / 2, 85);
-    posterCtx.fillStyle = "#d9383a";
-    posterCtx.font = "900 52px 'Inter', sans-serif";
-    posterCtx.fillText("AVAILABLE", posterCanvas.width / 2, 135);
+      // Draw top-left logo image
+      posterCtx.drawImage(logoImg, 40, 24, 48, 48);
+      
+      // Brand name
+      posterCtx.fillStyle = "#081A34";
+      posterCtx.font = "900 24px 'Inter', sans-serif";
+      posterCtx.textAlign = "left";
+      posterCtx.fillText("AXXSPACE", 98, 46);
+      
+      // Tagline
+      posterCtx.fillStyle = "#64748b";
+      posterCtx.font = "700 9px 'Inter', sans-serif";
+      posterCtx.fillText("Space hunting bila stress.", 98, 59);
 
-    posterCtx.fillStyle = "#C5A059";
-    posterCtx.fillRect(40, 155, 720, 2);
-    posterCtx.fillStyle = "#081A34";
-    posterCtx.font = "800 12px 'Inter', sans-serif";
-    posterCtx.fillText("SCAN TO VIEW DETAILS & CONTACT", posterCanvas.width / 2, 172);
+      // Draw listed on AXXSPACE ribbon (Top right)
+      const ribX = 675;
+      const ribY = 0;
+      const ribW = 85;
+      const ribH = 85;
+      
+      // Draw navy background
+      posterCtx.fillStyle = "#081A34";
+      posterCtx.beginPath();
+      posterCtx.moveTo(ribX, ribY);
+      posterCtx.lineTo(ribX + ribW, ribY);
+      posterCtx.lineTo(ribX + ribW, ribY + ribH - 12);
+      posterCtx.quadraticCurveTo(ribX + ribW, ribY + ribH, ribX + ribW - 12, ribY + ribH);
+      posterCtx.lineTo(ribX + 12, ribY + ribH);
+      posterCtx.quadraticCurveTo(ribX, ribY + ribH, ribX, ribY + ribH - 12);
+      posterCtx.closePath();
+      posterCtx.fill();
+      
+      // Gold border
+      posterCtx.strokeStyle = "#C5A059";
+      posterCtx.lineWidth = 2.5;
+      posterCtx.beginPath();
+      posterCtx.moveTo(ribX, ribY);
+      posterCtx.lineTo(ribX, ribY + ribH - 12);
+      posterCtx.quadraticCurveTo(ribX, ribY + ribH, ribX + 12, ribY + ribH);
+      posterCtx.lineTo(ribX + ribW - 12, ribY + ribH);
+      posterCtx.quadraticCurveTo(ribX + ribW, ribY + ribH, ribX + ribW, ribY + ribH - 12);
+      posterCtx.lineTo(ribX + ribW, ribY);
+      posterCtx.stroke();
+      
+      // Draw small gold house icon inside ribbon
+      posterCtx.strokeStyle = "#C5A059";
+      posterCtx.lineWidth = 1.5;
+      const rx = ribX + ribW / 2;
+      const ry = ribY + 28;
+      posterCtx.beginPath();
+      posterCtx.moveTo(rx - 7, ry + 5);
+      posterCtx.lineTo(rx - 7, ry - 3);
+      posterCtx.lineTo(rx, ry - 9);
+      posterCtx.lineTo(rx + 7, ry - 3);
+      posterCtx.lineTo(rx + 7, ry + 5);
+      posterCtx.closePath();
+      posterCtx.stroke();
+      
+      // Text inside ribbon
+      posterCtx.fillStyle = "#94a3b8";
+      posterCtx.font = "bold 8px 'Inter', sans-serif";
+      posterCtx.textAlign = "center";
+      posterCtx.fillText("LISTED ON", rx, ry + 18);
+      
+      posterCtx.fillStyle = "#ffffff";
+      posterCtx.font = "900 9.5px 'Inter', sans-serif";
+      posterCtx.fillText("AXXSPACE", rx, ry + 30);
 
-    posterCtx.fillStyle = "#ffffff";
-    posterCtx.strokeStyle = "#C5A059";
-    posterCtx.lineWidth = 8;
-    const drawRoundRect = (ctx, x, y, width, height, radius) => {
-      ctx.beginPath();
-      ctx.moveTo(x + radius, y);
-      ctx.lineTo(x + width - radius, y);
-      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-      ctx.lineTo(x + width, y + height - radius);
-      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-      ctx.lineTo(x + radius, y + height);
-      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-      ctx.lineTo(x, y + radius);
-      ctx.quadraticCurveTo(x, y, x + radius, y);
-      ctx.closePath();
-      ctx.stroke();
+      // Main Header Text
+      posterCtx.fillStyle = "#081A34";
+      posterCtx.textAlign = "center";
+      posterCtx.font = "800 36px 'Inter', sans-serif";
+      posterCtx.fillText("ROOM / HOUSE", posterCanvas.width / 2, 85);
+      posterCtx.fillStyle = "#d9383a";
+      posterCtx.font = "900 52px 'Inter', sans-serif";
+      posterCtx.fillText("AVAILABLE", posterCanvas.width / 2, 135);
+
+      posterCtx.fillStyle = "#C5A059";
+      posterCtx.fillRect(40, 155, 720, 2);
+      posterCtx.fillStyle = "#081A34";
+      posterCtx.font = "800 12px 'Inter', sans-serif";
+      posterCtx.fillText("SCAN TO VIEW DETAILS & CONTACT", posterCanvas.width / 2, 172);
+
+      // Draw features (Left side)
+      const featX = 40;
+      const featYStart = 200;
+      const featGap = 100;
+      
+      const FEATURES = [
+        { title: "GENUINE LISTINGS", desc: "Verified landlords & properties." },
+        { title: "SAFE & SECURE", desc: "Your security is our priority." },
+        { title: "EASY CONTACT", desc: "Connect directly with landlord." }
+      ];
+      
+      FEATURES.forEach((feat, index) => {
+        const currY = featYStart + index * featGap;
+        
+        // Draw gold circle
+        const circX = featX + 75;
+        const circY = currY + 25;
+        posterCtx.strokeStyle = "#C5A059";
+        posterCtx.lineWidth = 2.5;
+        posterCtx.beginPath();
+        posterCtx.arc(circX, circY, 20, 0, Math.PI * 2);
+        posterCtx.stroke();
+        
+        // Draw icon
+        posterCtx.strokeStyle = "#C5A059";
+        posterCtx.lineWidth = 2;
+        if (index === 0) {
+          // House
+          posterCtx.beginPath();
+          posterCtx.moveTo(circX - 7, circY + 5);
+          posterCtx.lineTo(circX - 7, circY - 3);
+          posterCtx.lineTo(circX, circY - 9);
+          posterCtx.lineTo(circX + 7, circY - 3);
+          posterCtx.lineTo(circX + 7, circY + 5);
+          posterCtx.closePath();
+          posterCtx.stroke();
+        } else if (index === 1) {
+          // Shield check
+          posterCtx.beginPath();
+          posterCtx.moveTo(circX - 6, circY - 6);
+          posterCtx.lineTo(circX + 6, circY - 6);
+          posterCtx.lineTo(circX + 6, circY);
+          posterCtx.quadraticCurveTo(circX + 6, circY + 6, circX, circY + 9);
+          posterCtx.quadraticCurveTo(circX - 6, circY + 6, circX - 6, circY);
+          posterCtx.closePath();
+          posterCtx.stroke();
+        } else {
+          // Headset
+          posterCtx.beginPath();
+          posterCtx.arc(circX, circY, 8, Math.PI, 0);
+          posterCtx.stroke();
+          posterCtx.fillStyle = "#C5A059";
+          posterCtx.fillRect(circX - 10, circY, 3, 5);
+          posterCtx.fillRect(circX + 7, circY, 3, 5);
+        }
+        
+        // Text
+        posterCtx.fillStyle = "#081A34";
+        posterCtx.font = "bold 11px 'Inter', sans-serif";
+        posterCtx.textAlign = "center";
+        posterCtx.fillText(feat.title, circX, circY + 34);
+        
+        posterCtx.fillStyle = "#475569";
+        posterCtx.font = "500 8.5px 'Inter', sans-serif";
+        posterCtx.fillText(feat.desc, circX, circY + 46);
+        
+        if (index < 2) {
+          posterCtx.strokeStyle = "#e2e8f0";
+          posterCtx.lineWidth = 1;
+          posterCtx.beginPath();
+          posterCtx.moveTo(circX - 30, circY + 58);
+          posterCtx.lineTo(circX + 30, circY + 58);
+          posterCtx.stroke();
+        }
+      });
+
+      // Center QR code frame
+      posterCtx.fillStyle = "#ffffff";
+      posterCtx.strokeStyle = "#C5A059";
+      posterCtx.lineWidth = 8;
+      const drawRoundRect = (ctx, x, y, width, height, radius) => {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+        ctx.stroke();
+      };
+      drawRoundRect(posterCtx, 252, 210, 296, 296, 32);
+      posterCtx.drawImage(qrCanvas, 270, 228, 260, 260);
+
+      // Draw Property Type Card (Right side)
+      const cardX = 575;
+      const cardY = 195;
+      const cardW = 185;
+      const cardH = 295;
+      
+      // Card background
+      posterCtx.fillStyle = "#081A34";
+      const drawRoundRectFilled = (ctx, x, y, width, height, radius) => {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+        ctx.fill();
+      };
+      drawRoundRectFilled(posterCtx, cardX, cardY, cardW, cardH, 16);
+      
+      // Draw items inside card
+      PROPERTY_TYPES_LIST.forEach((item, index) => {
+        const itemY = cardY + 12 + index * 20;
+        
+        let isChecked = false;
+        if (item === "Furnished") {
+          isChecked = property.furnished === true || property.furnished === "true";
+        } else {
+          const pType = String(property.propertyType || "").toLowerCase().trim();
+          const itemNorm = item.toLowerCase().trim();
+          if (pType === itemNorm) {
+            isChecked = true;
+          } else if (itemNorm === "4+ bedroom" && (pType.includes("4 bedroom") || pType.includes("4+ bedroom") || pType.includes("5 bedroom"))) {
+            isChecked = true;
+          }
+        }
+        
+        // Draw text
+        posterCtx.fillStyle = "#ffffff";
+        posterCtx.font = "bold 9px 'Inter', sans-serif";
+        posterCtx.textAlign = "left";
+        posterCtx.fillText(item, cardX + 12, itemY + 8);
+        
+        // Checkbox circle
+        const circleX = cardX + cardW - 20;
+        const circleY = itemY + 4;
+        const radius = 5;
+        
+        if (isChecked) {
+          posterCtx.fillStyle = "#C5A059";
+          posterCtx.beginPath();
+          posterCtx.arc(circleX, circleY, radius, 0, Math.PI * 2);
+          posterCtx.fill();
+          
+          posterCtx.strokeStyle = "#081A34";
+          posterCtx.lineWidth = 1.5;
+          posterCtx.beginPath();
+          posterCtx.moveTo(circleX - 2.5, circleY);
+          posterCtx.lineTo(circleX - 0.5, circleY + 2);
+          posterCtx.lineTo(circleX + 2.5, circleY - 1.5);
+          posterCtx.stroke();
+        } else {
+          posterCtx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+          posterCtx.lineWidth = 1;
+          posterCtx.beginPath();
+          posterCtx.arc(circleX, circleY, radius, 0, Math.PI * 2);
+          posterCtx.stroke();
+        }
+      });
+
+      // Draw overlapping scan badge
+      const badgeX = cardX + cardW / 2;
+      const badgeY = cardY + cardH;
+      const badgeRadius = 38;
+      
+      posterCtx.fillStyle = "#081A34";
+      posterCtx.beginPath();
+      posterCtx.arc(badgeX, badgeY, badgeRadius, 0, Math.PI * 2);
+      posterCtx.fill();
+      
+      posterCtx.strokeStyle = "#C5A059";
+      posterCtx.lineWidth = 2;
+      posterCtx.beginPath();
+      posterCtx.arc(badgeX, badgeY, badgeRadius - 1, 0, Math.PI * 2);
+      posterCtx.stroke();
+      
+      posterCtx.fillStyle = "#ffffff";
+      posterCtx.textAlign = "center";
+      posterCtx.font = "bold 9px 'Inter', sans-serif";
+      posterCtx.fillText("SCAN NOW", badgeX, badgeY - 5);
+      
+      posterCtx.fillStyle = "#C5A059";
+      posterCtx.font = "500 6.5px 'Inter', sans-serif";
+      posterCtx.fillText("Find your next", badgeX, badgeY + 6);
+      posterCtx.fillText("space today!", badgeX, badgeY + 14);
+
+      // Info Banner
+      posterCtx.fillStyle = "#081A34";
+      posterCtx.fillRect(40, 560, 720, 50);
+
+      posterCtx.fillStyle = "#ffffff";
+      posterCtx.font = "800 14px 'Inter', sans-serif";
+      posterCtx.textAlign = "left";
+      posterCtx.fillText("Or visit: www.axxspace.com", 60, 590);
+      
+      posterCtx.textAlign = "right";
+      const displayId = property._id ? property._id.slice(-6).toUpperCase() : "AXXSPC";
+      posterCtx.fillText(`Search Property ID: ${displayId}`, 740, 590);
+
+      // Why choose section
+      posterCtx.fillStyle = "#081A34";
+      posterCtx.textAlign = "center";
+      posterCtx.font = "800 16px 'Inter', sans-serif";
+      posterCtx.fillText("WHY CHOOSE AXXSPACE?", posterCanvas.width / 2, 660);
+
+      posterCtx.fillStyle = "#C5A059";
+      posterCtx.fillRect(350, 675, 100, 2);
+
+      // Footers
+      posterCtx.fillStyle = "#081A34";
+      posterCtx.fillRect(0, 990, 800, 50);
+      posterCtx.fillStyle = "#d9383a";
+      posterCtx.fillRect(0, 1040, 800, 50);
+
+      // Navy footer content
+      posterCtx.drawImage(logoImg, 40, 1000, 30, 30);
+      
+      posterCtx.fillStyle = "#ffffff";
+      posterCtx.textAlign = "left";
+      posterCtx.font = "900 16px 'Inter', sans-serif";
+      posterCtx.fillText("AXXSPACE", 80, 1020);
+      
+      posterCtx.fillStyle = "#94a3b8";
+      posterCtx.font = "700 9px 'Inter', sans-serif";
+      posterCtx.fillText("Space hunting bila stress.", 175, 1020);
+      
+      posterCtx.textAlign = "right";
+      posterCtx.font = "800 12px 'Inter', sans-serif";
+      posterCtx.fillText("Kenya's smart rental marketplace", 760, 1020);
+
+      // Red footer content
+      posterCtx.textAlign = "left";
+      posterCtx.fillStyle = "#ffffff";
+      posterCtx.font = "900 14px 'Inter', sans-serif";
+      posterCtx.fillText("TO LANDLORDS:", 40, 1070);
+
+      posterCtx.textAlign = "right";
+      posterCtx.font = "800 10px 'Inter', sans-serif";
+      posterCtx.fillText("1. LIST PROPERTY  >  2. GENERATE QR  >  3. PRINT & DISPLAY  >  4. GET TENANTS", 760, 1070);
+
+      // Thank you
+      posterCtx.fillStyle = "#475569";
+      posterCtx.textAlign = "center";
+      posterCtx.font = "700 10px 'Inter', sans-serif";
+      posterCtx.fillText("Thank you for choosing Axxspace. | Together, we make space hunting easy.", posterCanvas.width / 2, 1110);
     };
-    drawRoundRect(posterCtx, 252, 230, 296, 296, 32);
-    posterCtx.drawImage(qrCanvas, 270, 248, 260, 260);
-
-    posterCtx.fillStyle = "#081A34";
-    posterCtx.fillRect(40, 560, 720, 50);
-
-    posterCtx.fillStyle = "#ffffff";
-    posterCtx.font = "800 14px 'Inter', sans-serif";
-    posterCtx.textAlign = "left";
-    posterCtx.fillText("Or visit: www.axxspace.com", 60, 590);
-    
-    posterCtx.textAlign = "right";
-    const displayId = property._id ? property._id.slice(-6).toUpperCase() : "AXXSPC";
-    posterCtx.fillText(`Search Property ID: ${displayId}`, 740, 590);
-
-    posterCtx.fillStyle = "#081A34";
-    posterCtx.textAlign = "center";
-    posterCtx.font = "800 16px 'Inter', sans-serif";
-    posterCtx.fillText("WHY CHOOSE AXXSPACE?", posterCanvas.width / 2, 660);
-
-    posterCtx.fillStyle = "#C5A059";
-    posterCtx.fillRect(350, 675, 100, 2);
-
-    posterCtx.fillStyle = "#081A34";
-    posterCtx.fillRect(0, 990, 800, 50);
-    posterCtx.fillStyle = "#d9383a";
-    posterCtx.fillRect(0, 1040, 800, 50);
-
-    posterCtx.fillStyle = "#ffffff";
-    posterCtx.textAlign = "left";
-    posterCtx.font = "900 16px 'Inter', sans-serif";
-    posterCtx.fillText("AXXSPACE", 40, 1020);
-    
-    posterCtx.textAlign = "right";
-    posterCtx.font = "800 12px 'Inter', sans-serif";
-    posterCtx.fillText("Kenya's smart rental marketplace", 760, 1020);
-
-    posterCtx.textAlign = "left";
-    posterCtx.font = "900 14px 'Inter', sans-serif";
-    posterCtx.fillText("TO LANDLORDS:", 40, 1070);
-
-    posterCtx.fillStyle = "#ffffff";
-    posterCtx.textAlign = "right";
-    posterCtx.font = "800 10px 'Inter', sans-serif";
-    posterCtx.fillText("1. LIST PROPERTY  >  2. GENERATE QR  >  3. PRINT & DISPLAY  >  4. GET TENANTS", 760, 1070);
-
-    posterCtx.fillStyle = "#475569";
-    posterCtx.textAlign = "center";
-    posterCtx.font = "700 10px 'Inter', sans-serif";
-    posterCtx.fillText("Thank you for choosing Axxspace. | Together, we make space hunting easy.", posterCanvas.width / 2, 1110);
   };
 
   const downloadQR = () => {
@@ -1091,29 +1395,62 @@ const posterStyles = {
     color: "#64748b",
     fontWeight: "600",
   },
-  imageCol: {
+  typesCardCol: {
     position: "relative",
     height: "100%",
     width: "100%",
     display: "flex",
+    flexDirection: "column",
     alignItems: "center",
   },
-  imageFrame: {
+  typesCard: {
     width: "100%",
     height: "90%",
+    backgroundColor: "#081A34",
     borderRadius: "20px",
-    overflow: "hidden",
-    border: "2px solid #e2e8f0",
-    boxShadow: "0 6px 16px rgba(0,0,0,0.08)",
+    padding: "16px 14px",
+    boxSizing: "border-box",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    border: "1px solid rgba(255,255,255,0.08)",
+    boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
   },
-  buildingImg: {
+  typeRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
     width: "100%",
-    height: "100%",
-    objectFit: "cover",
   },
-  scanBadgeCircle: {
+  typeLabel: {
+    color: "#ffffff",
+    fontSize: "9px",
+    fontWeight: "700",
+    fontFamily: "'Inter', sans-serif",
+  },
+  checkCircle: {
+    width: "11px",
+    height: "11px",
+    borderRadius: "50%",
+    border: "1px solid rgba(255,255,255,0.3)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "transparent",
+  },
+  checkCircleActive: {
+    width: "11px",
+    height: "11px",
+    borderRadius: "50%",
+    backgroundColor: "#C5A059",
+    border: "1px solid #C5A059",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  scanBadgeCircleOverlapping: {
     position: "absolute",
-    bottom: "0",
+    bottom: "-5px",
     left: "50%",
     transform: "translateX(-50%)",
     width: "80px",
@@ -1128,6 +1465,7 @@ const posterStyles = {
     color: "#ffffff",
     textAlign: "center",
     boxShadow: "0 8px 20px rgba(8, 26, 52, 0.35)",
+    zIndex: 10,
   },
   scanBadgeTitle: {
     fontSize: "9px",

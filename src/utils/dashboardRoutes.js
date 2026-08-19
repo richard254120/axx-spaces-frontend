@@ -4,7 +4,7 @@ export const DASHBOARD_BY_ROLE = {
   seller: "/seller-dashboard",
   mover: "/mover-dashboard",
   user: "/business-dashboard",
-  admin: "/admin/verification",
+  admin: "/admin/dashboard",
   team: "/admin/verification",
 };
 
@@ -108,6 +108,7 @@ export const ACCOUNT_NAV_BY_ROLE = {
     { label: "Settings", path: "/settings" },
   ],
   admin: [
+    { label: "Dashboard", path: "/admin/dashboard" },
     { label: "Verification", path: "/admin/verification" },
     { label: "Settings", path: "/settings" },
   ],

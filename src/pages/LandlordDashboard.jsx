@@ -801,6 +801,26 @@ export default function LandlordDashboard() {
                             </div>
                           </div>
                         )}
+                        
+                        <div style={{ marginTop: "12px" }}>
+                          <button
+                            onClick={() => navigate(`/property/edit/${property._id}`)}
+                            style={{
+                              ...styles.actionGridBtn,
+                              background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
+                              color: "white",
+                              width: "100%",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              gap: "6px",
+                              boxShadow: "0 4px 12px rgba(59, 130, 246, 0.2)",
+                              border: "none"
+                            }}
+                          >
+                            ✏️ Edit Details & Images
+                          </button>
+                        </div>
                       </div>
                     </div>
                   );

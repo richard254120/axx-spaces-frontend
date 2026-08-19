@@ -34,6 +34,7 @@ import PaymentHistory from "./pages/PaymentHistory";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Wallet from "./pages/Wallet";
+import AdminDashboard from "./pages/AdminDashboard";
 import AdminVerification from "./pages/AdminVerification";
 import Saved from "./pages/Saved";
 import Messages from "./pages/Messages";
@@ -262,6 +263,16 @@ function App() {
         }
       />
       <Route
+        path="/property/edit/:id"
+        element={
+          <DashboardLayout>
+            <ProtectedRoute allowedRoles={["landlord", "admin"]}>
+              <Upload />
+            </ProtectedRoute>
+          </DashboardLayout>
+        }
+      />
+      <Route
         path="/premium-plans"
         element={
           <DashboardLayout>
@@ -353,6 +364,16 @@ function App() {
         element={
           <DashboardLayout>
             <ProtectedRoute><PaymentHistory /></ProtectedRoute>
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/admin/dashboard"
+        element={
+          <DashboardLayout>
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminDashboard />
+            </ProtectedRoute>
           </DashboardLayout>
         }
       />
