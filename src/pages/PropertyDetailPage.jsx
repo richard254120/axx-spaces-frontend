@@ -111,30 +111,43 @@ export default function PropertyDetailPage() {
     setBookingSuccess("");
 
     try {
-      const response = await fetch(`${API_BASE}/bookings`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          propertyId: id,
-          ...bookingData,
-        }),
-      });
-
-      if (!response.ok) throw new Error("Booking failed");
-      
-      // Log QR conversion to booking if applicable
+      // 1. Record QR conversion to booking
       recordQRConversion("booking");
 
-      setBookingSuccess("✅ Booking request sent successfully!");
+      // 2. Try to post to DB if logged in (optional, don't crash on failure)
+      if (token) {
+        try {
+          await fetch(`${API_BASE}/bookings`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              propertyId: id,
+              ...bookingData,
+            }),
+          });
+        } catch (dbErr) {
+          console.error("Optional booking database save failed:", dbErr);
+        }
+      }
+
+      // 3. Construct WhatsApp message and open link
+      const phone = formatKenyaPhone(property.landlordPhone);
+      const msg = `Hi, my name is ${bookingData.name} (Phone: ${bookingData.phone}). I would like to book your property "${property.title}" on Axxspace.\n\n` +
+                  `📅 Proposed Move-in Date: ${bookingData.moveInDate}\n` +
+                  `💬 Message: ${bookingData.message || "No additional message"}`;
+      
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
+
+      setBookingSuccess("✅ Booking prepared! Redirecting to WhatsApp...");
       setTimeout(() => {
         setShowBookingModal(false);
         setBookingData({ name: "", phone: "", moveInDate: "", message: "" });
       }, 2000);
     } catch (err) {
-      setError(err.message);
+      alert("Redirect to WhatsApp failed: " + err.message);
     } finally {
       setBookingLoading(false);
     }
