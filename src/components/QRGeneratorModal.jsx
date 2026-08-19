@@ -12,16 +12,397 @@ const SOURCES = [
   { value: "vacancy_sign", label: "Vacancy Signboard" }
 ];
 
+// SVG Icons
+const GenuineIcon = () => (
+  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+    <polyline points="9 22 9 12 15 12 15 22" />
+  </svg>
+);
+
+const SecureIcon = () => (
+  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    <polyline points="9 11 11 13 15 9" />
+  </svg>
+);
+
+const ContactIcon = () => (
+  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
+    <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
+  </svg>
+);
+
+const GlobeIcon = () => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#C5A059" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <line x1="2" y1="12" x2="22" y2="12" />
+    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+  </svg>
+);
+
+const SearchIcon = () => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#C5A059" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="11" cy="11" r="8" />
+    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+  </svg>
+);
+
+const PhoneScanIcon = () => (
+  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#C5A059" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+    <line x1="12" y1="18" x2="12.01" y2="18" />
+    <path d="M9 6h6" />
+    <path d="M9 10h6" />
+  </svg>
+);
+
+const EyeIcon = () => (
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#d9383a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+const MobileIcon = () => (
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#d9383a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+    <line x1="12" y1="18" x2="12.01" y2="18" />
+  </svg>
+);
+
+const TrendIcon = () => (
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#d9383a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="20" x2="18" y2="10" />
+    <line x1="12" y1="20" x2="12" y2="4" />
+    <line x1="6" y1="20" x2="6" y2="14" />
+  </svg>
+);
+
+const UsersIcon = () => (
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#d9383a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+  </svg>
+);
+
+const ShieldCheckIcon = () => (
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#d9383a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    <polyline points="9 11 11 13 15 9" />
+  </svg>
+);
+
+const RibbonHouseIcon = () => (
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#C5A059" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+    <polyline points="9 22 9 12 15 12 15 22" />
+  </svg>
+);
+
+const PencilIcon = () => (
+  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#d9383a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+    <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4z" />
+  </svg>
+);
+
+const PrintIcon = () => (
+  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#d9383a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="6 9 6 2 18 2 18 9" />
+    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+    <rect x="6" y="14" width="12" height="8" />
+  </svg>
+);
+
+const QrIcon = () => (
+  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#d9383a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="7" height="7" />
+    <rect x="14" y="3" width="7" height="7" />
+    <rect x="14" y="14" width="7" height="7" />
+    <rect x="3" y="14" width="7" height="7" />
+  </svg>
+);
+
+const TenantsIcon = () => (
+  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#d9383a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+  </svg>
+);
+
+const FacebookIcon = () => (
+  <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+  </svg>
+);
+
+const InstagramIcon = () => (
+  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+  </svg>
+);
+
+const XIcon = () => (
+  <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+  </svg>
+);
+
+const TikTokIcon = () => (
+  <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
+    <path d="M12.525.02c1.31.02 2.61.35 3.75 1 .1-.8.4-1.56.9-2.2H12.85v14.1c0 2.26-1.89 4.1-4.22 4.1-2.33 0-4.22-1.84-4.22-4.1 0-2.26 1.89-4.1 4.22-4.1.47 0 .92.08 1.34.22V6.02c-5 .52-8.84 4.77-8.84 9.98 0 5.52 4.48 10 10 10s10-4.48 10-10V4.82c1.47.88 3.2 1.38 5.02 1.38v-3c-2.33 0-4.38-1.22-5.5-3.08a7.88 7.88 0 0 1-5.18-.1M10.125 15.02c-.93 0-1.68.75-1.68 1.68s.75 1.68 1.68 1.68 1.68-.75 1.68-1.68-.75-1.68-1.68-1.68"/>
+  </svg>
+);
+
+// High-fidelity VacancyPoster Component
+function VacancyPoster({ property, qrCodeDataUrl, sourceLabel }) {
+  const propImg = (property.images && property.images.length > 0) 
+    ? property.images[0] 
+    : "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80";
+
+  const displayId = property._id ? property._id.slice(-6).toUpperCase() : "AXXSPC";
+
+  return (
+    <div style={posterStyles.posterContainer} className="axx-vacancy-poster">
+      {/* HEADER ROW */}
+      <div style={posterStyles.headerRow}>
+        {/* Left Logo */}
+        <div style={posterStyles.headerLeft}>
+          <div style={posterStyles.logoWrapper}>
+            <img src={logo} alt="Axxspace Logo" style={posterStyles.logoImg} />
+            <div style={posterStyles.logoTextContainer}>
+              <span style={posterStyles.logoBrand}>AXXSPACE</span>
+              <span style={posterStyles.logoTagline}>Space hunting bila stress.</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Center Title */}
+        <div style={posterStyles.headerCenter}>
+          <div style={posterStyles.mainTitleRow1}>ROOM / HOUSE</div>
+          <div style={posterStyles.mainTitleRow2}>AVAILABLE</div>
+          <div style={posterStyles.scanIndicator}>
+            <div style={posterStyles.indicatorLine}></div>
+            <span style={posterStyles.indicatorText}>SCAN TO VIEW DETAILS & CONTACT</span>
+            <div style={posterStyles.indicatorLine}></div>
+          </div>
+        </div>
+
+        {/* Right Ribbon Badge */}
+        <div style={posterStyles.headerRight}>
+          <div style={posterStyles.ribbon}>
+            <RibbonHouseIcon />
+            <span style={posterStyles.ribbonListed}>LISTED ON</span>
+            <span style={posterStyles.ribbonBrand}>AXXSPACE</span>
+          </div>
+        </div>
+      </div>
+
+      {/* MAIN TWO-COLUMN SECTION */}
+      <div style={posterStyles.mainSection}>
+        {/* Left Side: 3 Features */}
+        <div style={posterStyles.featuresCol}>
+          {/* Feature 1 */}
+          <div style={posterStyles.featureCard}>
+            <div style={posterStyles.featureIconCircle}>
+              <GenuineIcon />
+            </div>
+            <div style={posterStyles.featureTitle}>Genuine Listings</div>
+            <div style={posterStyles.featureDesc}>Verified landlords & properties.</div>
+          </div>
+          <div style={posterStyles.featureDivider}></div>
+
+          {/* Feature 2 */}
+          <div style={posterStyles.featureCard}>
+            <div style={posterStyles.featureIconCircle}>
+              <SecureIcon />
+            </div>
+            <div style={posterStyles.featureTitle}>Safe & Secure</div>
+            <div style={posterStyles.featureDesc}>Your security is our priority.</div>
+          </div>
+          <div style={posterStyles.featureDivider}></div>
+
+          {/* Feature 3 */}
+          <div style={posterStyles.featureCard}>
+            <div style={posterStyles.featureIconCircle}>
+              <ContactIcon />
+            </div>
+            <div style={posterStyles.featureTitle}>Easy Contact</div>
+            <div style={posterStyles.featureDesc}>Connect directly with landlord.</div>
+          </div>
+        </div>
+
+        {/* Center Side: QR Code in Gold Frame */}
+        <div style={posterStyles.qrCol}>
+          <div style={posterStyles.qrGoldFrame}>
+            {qrCodeDataUrl ? (
+              <img src={qrCodeDataUrl} alt="Property QR Code" style={posterStyles.qrCodeImg} />
+            ) : (
+              <div style={posterStyles.qrPlaceholder}>Generating QR...</div>
+            )}
+          </div>
+        </div>
+
+        {/* Right Side: Building Image & Scan Circle */}
+        <div style={posterStyles.imageCol}>
+          <div style={posterStyles.imageFrame}>
+            <img src={propImg} alt="Property building" style={posterStyles.buildingImg} />
+          </div>
+          <div style={posterStyles.scanBadgeCircle}>
+            <PhoneScanIcon />
+            <span style={posterStyles.scanBadgeTitle}>SCAN NOW</span>
+            <span style={posterStyles.scanBadgeDesc}>Find your next space today!</span>
+          </div>
+        </div>
+      </div>
+
+      {/* INFORMATION BANNER ROW */}
+      <div style={posterStyles.infoBanner}>
+        <div style={posterStyles.infoLeft}>
+          <GlobeIcon />
+          <span style={posterStyles.infoTextLabel}>Or visit:</span>
+          <span style={posterStyles.infoTextValue}>www.axxspace.com</span>
+        </div>
+        <div style={posterStyles.infoDivider}></div>
+        <div style={posterStyles.infoRight}>
+          <SearchIcon />
+          <span style={posterStyles.infoTextLabel}>Search property ID:</span>
+          <div style={posterStyles.infoIdBox}>{displayId}</div>
+        </div>
+      </div>
+
+      {/* WHY CHOOSE AXXSPACE? */}
+      <div style={posterStyles.whySection}>
+        <div style={posterStyles.whyTitle}>WHY CHOOSE AXXSPACE?</div>
+        <div style={posterStyles.whyGoldLine}></div>
+        <div style={posterStyles.whyGrid}>
+          {/* Benefit 1 */}
+          <div style={posterStyles.whyCol}>
+            <EyeIcon />
+            <span style={posterStyles.whyColLabel}>More Visibility</span>
+            <span style={posterStyles.whyColDesc}>Reach more potential tenants online & offline.</span>
+            <div style={posterStyles.whyColDivider}></div>
+          </div>
+          {/* Benefit 2 */}
+          <div style={posterStyles.whyCol}>
+            <MobileIcon />
+            <span style={posterStyles.whyColLabel}>Easy Access</span>
+            <span style={posterStyles.whyColDesc}>Tenants can scan and view details instantly.</span>
+            <div style={posterStyles.whyColDivider}></div>
+          </div>
+          {/* Benefit 3 */}
+          <div style={posterStyles.whyCol}>
+            <TrendIcon />
+            <span style={posterStyles.whyColLabel}>Track Performance</span>
+            <span style={posterStyles.whyColDesc}>Monitor views & enquiries in real-time.</span>
+            <div style={posterStyles.whyColDivider}></div>
+          </div>
+          {/* Benefit 4 */}
+          <div style={posterStyles.whyCol}>
+            <UsersIcon />
+            <span style={posterStyles.whyColLabel}>More Enquiries</span>
+            <span style={posterStyles.whyColDesc}>Get more genuine leads and serious tenants.</span>
+            <div style={posterStyles.whyColDivider}></div>
+          </div>
+          {/* Benefit 5 */}
+          <div style={posterStyles.whyCol}>
+            <ShieldCheckIcon />
+            <span style={posterStyles.whyColLabel}>Trusted Platform</span>
+            <span style={posterStyles.whyColDesc}>A professional system built for users.</span>
+          </div>
+        </div>
+      </div>
+
+      {/* FOOTER BARS */}
+      <div style={posterStyles.footerContainer}>
+        {/* Navy Bar */}
+        <div style={posterStyles.navyFooter}>
+          <div style={posterStyles.navyFooterLeft}>
+            <img src={logo} alt="Axxspace Logo" style={posterStyles.navyLogo} />
+            <span style={posterStyles.navyBrandName}>AXXSPACE</span>
+            <span style={posterStyles.navyTagline}>Space hunting bila stress.</span>
+          </div>
+          <div style={posterStyles.navyFooterCenter}>
+            List. Discover. Connect. &nbsp;|&nbsp; Kenya's smart rental marketplace.
+          </div>
+          <div style={posterStyles.navyFooterRight}>
+            <FacebookIcon />
+            <InstagramIcon />
+            <XIcon />
+            <TikTokIcon />
+            <span style={posterStyles.socialHandle}>@axxspace</span>
+          </div>
+        </div>
+
+        {/* Red Landlord Workflow Bar */}
+        <div style={posterStyles.redFooter}>
+          <div style={posterStyles.redFooterLeft}>TO LANDLORDS:</div>
+          <div style={posterStyles.redFooterSteps}>
+            <div style={posterStyles.stepItem}>
+              <div style={posterStyles.stepCircle}>1</div>
+              <div style={posterStyles.stepTextWrapper}>
+                <span style={posterStyles.stepTitle}>List Property</span>
+                <span style={posterStyles.stepDesc}>Add details on Axxspace.</span>
+              </div>
+            </div>
+            <div style={posterStyles.stepArrow}>&gt;</div>
+
+            <div style={posterStyles.stepItem}>
+              <div style={posterStyles.stepCircle}>2</div>
+              <div style={posterStyles.stepTextWrapper}>
+                <span style={posterStyles.stepTitle}>Generate QR</span>
+                <span style={posterStyles.stepDesc}>Get unique property QR.</span>
+              </div>
+            </div>
+            <div style={posterStyles.stepArrow}>&gt;</div>
+
+            <div style={posterStyles.stepItem}>
+              <div style={posterStyles.stepCircle}>3</div>
+              <div style={posterStyles.stepTextWrapper}>
+                <span style={posterStyles.stepCircleIcon}><PrintIcon /></span>
+                <div style={posterStyles.stepTextWrapperInner}>
+                  <span style={posterStyles.stepTitle}>Print & Display</span>
+                  <span style={posterStyles.stepDesc}>Display at your property.</span>
+                </div>
+              </div>
+            </div>
+            <div style={posterStyles.stepArrow}>&gt;</div>
+
+            <div style={posterStyles.stepItem}>
+              <div style={posterStyles.stepCircle}>4</div>
+              <div style={posterStyles.stepTextWrapper}>
+                <span style={posterStyles.stepTitle}>Get Tenants</span>
+                <span style={posterStyles.stepDesc}>Attract more enquiries.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Thank You message */}
+        <div style={posterStyles.thankYouText}>
+          Thank you for choosing Axxspace. &nbsp;|&nbsp; Together, we make space hunting easy.
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function QRGeneratorModal({ isOpen, onClose, property }) {
   const [source, setSource] = useState("generic");
   const [qrLoaded, setQrLoaded] = useState(false);
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState("");
   const qrCanvasRef = useRef(null);
   const downloadQrCanvasRef = useRef(null);
   const posterCanvasRef = useRef(null);
 
   useEffect(() => {
     if (isOpen && property) {
-      // Small timeout to ensure DOM has rendered canvas elements
       const timer = setTimeout(() => {
         generateQR();
       }, 100);
@@ -46,13 +427,12 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
 
     const url = getQrUrl();
 
-    // 1. Generate the base QR code on the visible preview canvas (300x300)
     QRCode.toCanvas(qrCanvas, url, {
       width: 300,
       margin: 1.5,
       errorCorrectionLevel: "H",
       color: {
-        dark: "#0f172a", // Slate-900
+        dark: "#081A34",
         light: "#ffffff"
       }
     }, (error) => {
@@ -61,22 +441,46 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
         return;
       }
 
-      // Draw the Axxspace logo in the center of the QR code
       const ctx = qrCanvas.getContext("2d");
       const logoImg = new Image();
       logoImg.src = logo;
       logoImg.onload = () => {
-        const logoSize = 60;
-        const x = (qrCanvas.width - logoSize) / 2;
-        const y = (qrCanvas.height - logoSize) / 2;
+        const cardSize = 90;
+        const x = (qrCanvas.width - cardSize) / 2;
+        const y = (qrCanvas.height - cardSize) / 2;
 
-        // White background card under logo
         ctx.fillStyle = "#ffffff";
-        ctx.fillRect(x - 4, y - 4, logoSize + 8, logoSize + 8);
-        // Draw the image
-        ctx.drawImage(logoImg, x, y, logoSize, logoSize);
+        ctx.beginPath();
+        const radius = 8;
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + cardSize - radius, y);
+        ctx.quadraticCurveTo(x + cardSize, y, x + cardSize, y + radius);
+        ctx.lineTo(x + cardSize, y + cardSize - radius);
+        ctx.quadraticCurveTo(x + cardSize, y + cardSize, x + cardSize - radius, y + cardSize);
+        ctx.lineTo(x + radius, y + cardSize);
+        ctx.quadraticCurveTo(x, y + cardSize, x, y + cardSize - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+        ctx.fill();
 
-        // Generate other canvases once the base is loaded
+        const logoSize = 34;
+        const logoX = x + (cardSize - logoSize) / 2;
+        const logoY = y + 10;
+        ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
+
+        ctx.font = "bold 9px 'Inter', sans-serif";
+        ctx.fillStyle = "#d9383a";
+        ctx.textAlign = "center";
+        ctx.fillText("AXXSPACE", x + cardSize / 2, y + 56);
+
+        ctx.font = "500 5px 'Inter', sans-serif";
+        ctx.fillStyle = "#475569";
+        ctx.fillText("Space hunting bila stress.", x + cardSize / 2, y + 68);
+
+        const dataUrl = qrCanvas.toDataURL("image/png");
+        setQrCodeDataUrl(dataUrl);
+
         setQrLoaded(true);
         drawDownloadableCanvases();
       };
@@ -92,94 +496,108 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
     const qrCtx = dlQrCanvas.getContext("2d");
     const posterCtx = posterCanvas.getContext("2d");
 
-    // ── Draw Downloadable QR Code Canvas (350x450) ──
-    // Clear and background
+    // ── Downloadable QR Code Canvas ──
     qrCtx.fillStyle = "#ffffff";
     qrCtx.fillRect(0, 0, dlQrCanvas.width, dlQrCanvas.height);
-    // Draw QR
     qrCtx.drawImage(qrCanvas, 25, 20);
-    // Draw "Axxspace" Text
     qrCtx.font = "bold 26px 'Inter', system-ui, sans-serif";
-    qrCtx.fillStyle = "#3b82f6"; // Axxspace blue
+    qrCtx.fillStyle = "#081A34";
     qrCtx.textAlign = "center";
     qrCtx.fillText("Axxspace", 175, 365);
-    // Draw Subtext
     qrCtx.font = "600 13px 'Inter', system-ui, sans-serif";
     qrCtx.fillStyle = "#64748b";
     qrCtx.fillText("Scan to view property details", 175, 395);
 
-    // ── Draw High-Res Poster Canvas (800x1130 - A4 Ratio) ──
-    // Clear & fill background
+    // ── High-Res Poster Canvas (800x1130) ──
     posterCtx.fillStyle = "#ffffff";
     posterCtx.fillRect(0, 0, posterCanvas.width, posterCanvas.height);
 
-    // Outer double border
-    posterCtx.strokeStyle = "#0f172a"; // Navy
-    posterCtx.lineWidth = 10;
-    posterCtx.strokeRect(20, 20, posterCanvas.width - 40, posterCanvas.height - 40);
-    posterCtx.lineWidth = 2;
-    posterCtx.strokeRect(36, 36, posterCanvas.width - 72, posterCanvas.height - 72);
-
-    // Top Header
-    posterCtx.fillStyle = "#0f172a";
+    posterCtx.fillStyle = "#081A34";
     posterCtx.textAlign = "center";
-    posterCtx.font = "800 48px 'Inter', system-ui, sans-serif";
-    posterCtx.fillText("ROOM / HOUSE AVAILABLE", posterCanvas.width / 2, 120);
+    posterCtx.font = "800 36px 'Inter', sans-serif";
+    posterCtx.fillText("ROOM / HOUSE", posterCanvas.width / 2, 85);
+    posterCtx.fillStyle = "#d9383a";
+    posterCtx.font = "900 52px 'Inter', sans-serif";
+    posterCtx.fillText("AVAILABLE", posterCanvas.width / 2, 135);
 
-    // Property Title & Location
-    posterCtx.font = "700 24px 'Inter', system-ui, sans-serif";
-    posterCtx.fillStyle = "#2563eb"; // Accent blue
-    const maxTitleLen = 45;
-    const titleText = property.title.length > maxTitleLen ? property.title.substring(0, maxTitleLen) + "..." : property.title;
-    posterCtx.fillText(titleText, posterCanvas.width / 2, 175);
-    
-    posterCtx.font = "600 18px 'Inter', system-ui, sans-serif";
-    posterCtx.fillStyle = "#64748b"; // Location subtext
-    posterCtx.fillText(`📍 ${property.location}, ${property.county}`, posterCanvas.width / 2, 215);
+    posterCtx.fillStyle = "#C5A059";
+    posterCtx.fillRect(40, 155, 720, 2);
+    posterCtx.fillStyle = "#081A34";
+    posterCtx.font = "800 12px 'Inter', sans-serif";
+    posterCtx.fillText("SCAN TO VIEW DETAILS & CONTACT", posterCanvas.width / 2, 172);
 
-    // Price & Lease Info
-    posterCtx.font = "800 28px 'Inter', system-ui, sans-serif";
-    posterCtx.fillStyle = "#0f172a";
-    posterCtx.fillText(`KES ${Number(property.price).toLocaleString()} / Month`, posterCanvas.width / 2, 270);
-
-    // Call-to-action
-    posterCtx.font = "700 24px 'Inter', system-ui, sans-serif";
-    posterCtx.fillStyle = "#1e293b";
-    posterCtx.fillText("Scan to view details & contact", posterCanvas.width / 2, 345);
-
-    // Draw the QR Code scaled (420x420)
-    const qrTargetSize = 420;
-    const qrX = (posterCanvas.width - qrTargetSize) / 2;
-    const qrY = 400;
-    posterCtx.drawImage(qrCanvas, qrX, qrY, qrTargetSize, qrTargetSize);
-
-    // Brand Footer
-    const logoImg = new Image();
-    logoImg.src = logo;
-    logoImg.onload = () => {
-      // Draw Logo
-      const logoW = 75;
-      const logoH = 75;
-      const logoX = (posterCanvas.width - logoW) / 2;
-      const logoY = 880;
-      posterCtx.drawImage(logoImg, logoX, logoY, logoW, logoH);
-
-      // Logo Name
-      posterCtx.font = "800 42px 'Inter', system-ui, sans-serif";
-      posterCtx.fillStyle = "#0f172a";
-      posterCtx.fillText("Axxspace", posterCanvas.width / 2, 1000);
-
-      // Slogan
-      posterCtx.font = "italic 700 22px 'Inter', system-ui, sans-serif";
-      posterCtx.fillStyle = "#d97706"; // Amber-600
-      posterCtx.fillText("Space hunting bila stress.", posterCanvas.width / 2, 1045);
+    posterCtx.fillStyle = "#ffffff";
+    posterCtx.strokeStyle = "#C5A059";
+    posterCtx.lineWidth = 8;
+    const drawRoundRect = (ctx, x, y, width, height, radius) => {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+      ctx.stroke();
     };
+    drawRoundRect(posterCtx, 252, 230, 296, 296, 32);
+    posterCtx.drawImage(qrCanvas, 270, 248, 260, 260);
+
+    posterCtx.fillStyle = "#081A34";
+    posterCtx.fillRect(40, 560, 720, 50);
+
+    posterCtx.fillStyle = "#ffffff";
+    posterCtx.font = "800 14px 'Inter', sans-serif";
+    posterCtx.textAlign = "left";
+    posterCtx.fillText("Or visit: www.axxspace.com", 60, 590);
+    
+    posterCtx.textAlign = "right";
+    const displayId = property._id ? property._id.slice(-6).toUpperCase() : "AXXSPC";
+    posterCtx.fillText(`Search Property ID: ${displayId}`, 740, 590);
+
+    posterCtx.fillStyle = "#081A34";
+    posterCtx.textAlign = "center";
+    posterCtx.font = "800 16px 'Inter', sans-serif";
+    posterCtx.fillText("WHY CHOOSE AXXSPACE?", posterCanvas.width / 2, 660);
+
+    posterCtx.fillStyle = "#C5A059";
+    posterCtx.fillRect(350, 675, 100, 2);
+
+    posterCtx.fillStyle = "#081A34";
+    posterCtx.fillRect(0, 990, 800, 50);
+    posterCtx.fillStyle = "#d9383a";
+    posterCtx.fillRect(0, 1040, 800, 50);
+
+    posterCtx.fillStyle = "#ffffff";
+    posterCtx.textAlign = "left";
+    posterCtx.font = "900 16px 'Inter', sans-serif";
+    posterCtx.fillText("AXXSPACE", 40, 1020);
+    
+    posterCtx.textAlign = "right";
+    posterCtx.font = "800 12px 'Inter', sans-serif";
+    posterCtx.fillText("Kenya's smart rental marketplace", 760, 1020);
+
+    posterCtx.textAlign = "left";
+    posterCtx.font = "900 14px 'Inter', sans-serif";
+    posterCtx.fillText("TO LANDLORDS:", 40, 1070);
+
+    posterCtx.fillStyle = "#ffffff";
+    posterCtx.textAlign = "right";
+    posterCtx.font = "800 10px 'Inter', sans-serif";
+    posterCtx.fillText("1. LIST PROPERTY  >  2. GENERATE QR  >  3. PRINT & DISPLAY  >  4. GET TENANTS", 760, 1070);
+
+    posterCtx.fillStyle = "#475569";
+    posterCtx.textAlign = "center";
+    posterCtx.font = "700 10px 'Inter', sans-serif";
+    posterCtx.fillText("Thank you for choosing Axxspace. | Together, we make space hunting easy.", posterCanvas.width / 2, 1110);
   };
 
   const downloadQR = () => {
     const canvas = downloadQrCanvasRef.current;
     if (!canvas) return;
-
     const link = document.createElement("a");
     link.download = `axxspace_qr_${property.title.replace(/\s+/g, "_").toLowerCase()}_${source}.png`;
     link.href = canvas.toDataURL("image/png");
@@ -189,7 +607,6 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
   const downloadPoster = () => {
     const canvas = posterCanvasRef.current;
     if (!canvas) return;
-
     const link = document.createElement("a");
     link.download = `axxspace_poster_${property.title.replace(/\s+/g, "_").toLowerCase()}_${source}.png`;
     link.href = canvas.toDataURL("image/png");
@@ -197,7 +614,6 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
   };
 
   const printPoster = () => {
-    // We trigger window.print(). The stylesheet handles displaying the print-only view.
     window.print();
   };
 
@@ -234,64 +650,40 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
             {/* Visual HTML Preview of the Poster */}
             <div style={styles.previewBox}>
               <h4 style={styles.previewHeader}>Live Poster Preview ({getSourceLabel(source)})</h4>
-              <div style={styles.posterHtmlPreview}>
-                <div style={styles.posterHtmlBorder}>
-                  <div style={styles.posterHtmlContent}>
-                    <div style={styles.posterTitle}>ROOM / HOUSE AVAILABLE</div>
-                    <div style={styles.posterPropName}>{property.title}</div>
-                    <div style={styles.posterLoc}>📍 {property.location}, {property.county}</div>
-                    <div style={styles.posterPrice}>KES {Number(property.price).toLocaleString()} / mo</div>
-                    
-                    <div style={styles.posterScanCta}>Scan to view details & contact</div>
-                    
-                    {/* Centered QR Canvas */}
-                    <div style={styles.qrContainer}>
-                      <canvas ref={qrCanvasRef} width={300} height={300} style={styles.previewQrCanvas} />
-                    </div>
-
-                    <div style={styles.brandRow}>
-                      <img src={logo} alt="Axxspace Logo" style={styles.brandLogo} />
-                      <div style={styles.brandName}>Axxspace</div>
-                    </div>
-                    <div style={styles.brandSlogan}>Space hunting bila stress.</div>
-                  </div>
+              <div style={{
+                width: "397px",
+                height: "561px",
+                overflow: "hidden",
+                position: "relative",
+                border: "1px solid rgba(255,255,255,0.1)",
+                borderRadius: "12px",
+                backgroundColor: "#ffffff",
+                boxShadow: "0 10px 25px rgba(0,0,0,0.3)"
+              }}>
+                <div style={{
+                  width: "794px",
+                  height: "1123px",
+                  transform: "scale(0.5)",
+                  transformOrigin: "top left",
+                  position: "absolute",
+                  left: 0,
+                  top: 0
+                }}>
+                  <VacancyPoster property={property} qrCodeDataUrl={qrCodeDataUrl} sourceLabel={getSourceLabel(source)} />
                 </div>
               </div>
             </div>
 
-            {/* Downloader templates (Hidden from UI but used for rendering exports) */}
+            {/* Hidden elements used for rendering exports */}
             <div style={{ display: "none" }}>
+              <canvas ref={qrCanvasRef} width={300} height={300} />
               <canvas ref={downloadQrCanvasRef} width={350} height={450} />
               <canvas ref={posterCanvasRef} width={800} height={1130} />
             </div>
 
             {/* Print Only Representation: This is visible only in CSS print mode */}
             <div className="print-poster-only" style={{ display: "none" }}>
-              <div style={printStyles.printBorderOuter}>
-                <div style={printStyles.printBorderInner}>
-                  <div style={printStyles.printHeader}>ROOM / HOUSE AVAILABLE</div>
-                  <div style={printStyles.printPropName}>{property.title}</div>
-                  <div style={printStyles.printLoc}>📍 {property.location}, {property.county}</div>
-                  <div style={printStyles.printPrice}>KES {Number(property.price).toLocaleString()} / Month</div>
-                  
-                  <div style={printStyles.printScanCta}>Scan to view details & contact</div>
-                  
-                  <div style={printStyles.printQrContainer}>
-                    {/* We clone the visible QR canvas to the print container using ref/DOM during print or let the print engine read the base64 */}
-                    <img 
-                      src={qrCanvasRef.current ? qrCanvasRef.current.toDataURL("image/png") : ""} 
-                      alt="Property QR Code" 
-                      style={printStyles.printQrImage} 
-                    />
-                  </div>
-
-                  <div style={printStyles.printBrandContainer}>
-                    <img src={logo} alt="Axxspace Logo" style={printStyles.printBrandLogo} />
-                    <div style={printStyles.printBrandName}>Axxspace</div>
-                  </div>
-                  <div style={printStyles.printBrandSlogan}>Space hunting bila stress.</div>
-                </div>
-              </div>
+              <VacancyPoster property={property} qrCodeDataUrl={qrCodeDataUrl} sourceLabel={getSourceLabel(source)} />
             </div>
           </div>
         </div>
@@ -328,6 +720,7 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
   );
 }
 
+// Inline Styles for modal layout
 const styles = {
   backdrop: {
     position: "fixed",
@@ -348,7 +741,7 @@ const styles = {
     border: "1px solid rgba(255,255,255,0.1)",
     borderRadius: "20px",
     width: "100%",
-    maxWidth: "850px",
+    maxWidth: "500px",
     maxHeight: "90vh",
     overflowY: "auto",
     color: "#fff",
@@ -440,101 +833,6 @@ const styles = {
     marginBottom: "12px",
     textAlign: "center",
   },
-  posterHtmlPreview: {
-    width: "100%",
-    aspectRatio: "1 / 1.414", // A4 aspect ratio
-    backgroundColor: "#ffffff",
-    color: "#0f172a",
-    padding: "16px",
-    boxShadow: "0 10px 25px rgba(0,0,0,0.3)",
-    fontFamily: "system-ui, sans-serif",
-    display: "flex",
-    flexDirection: "column",
-  },
-  posterHtmlBorder: {
-    border: "4px double #0f172a",
-    height: "100%",
-    padding: "12px",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-  },
-  posterHtmlContent: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    height: "100%",
-    justifyContent: "space-between",
-  },
-  posterTitle: {
-    fontSize: "18px",
-    fontWeight: 900,
-    color: "#0f172a",
-    textAlign: "center",
-    marginTop: "4px",
-  },
-  posterPropName: {
-    fontSize: "12px",
-    fontWeight: 800,
-    color: "#2563eb",
-    textAlign: "center",
-    marginTop: "2px",
-  },
-  posterLoc: {
-    fontSize: "9px",
-    color: "#64748b",
-    fontWeight: 600,
-    textAlign: "center",
-  },
-  posterPrice: {
-    fontSize: "12px",
-    fontWeight: 800,
-    color: "#0f172a",
-    textAlign: "center",
-    marginTop: "1px",
-  },
-  posterScanCta: {
-    fontSize: "10px",
-    fontWeight: 700,
-    color: "#1e293b",
-    textAlign: "center",
-  },
-  qrContainer: {
-    width: "140px",
-    height: "140px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    margin: "4px 0",
-  },
-  previewQrCanvas: {
-    width: "100% !important",
-    height: "100% !important",
-  },
-  brandRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: "6px",
-    marginTop: "2px",
-  },
-  brandLogo: {
-    width: "24px",
-    height: "24px",
-    objectFit: "contain",
-  },
-  brandName: {
-    fontSize: "14px",
-    fontWeight: 900,
-    color: "#0f172a",
-  },
-  brandSlogan: {
-    fontSize: "9px",
-    fontStyle: "italic",
-    fontWeight: 700,
-    color: "#d97706",
-    textAlign: "center",
-    marginBottom: "4px",
-  },
   footer: {
     padding: "20px 24px",
     borderTop: "1px solid rgba(255,255,255,0.06)",
@@ -569,7 +867,6 @@ const styles = {
     fontSize: "13px",
     cursor: "pointer",
     transition: "all 0.2s",
-    "&:hover": { backgroundColor: "rgba(59, 130, 246, 0.25)" }
   },
   printBtn: {
     padding: "10px 16px",
@@ -582,118 +879,515 @@ const styles = {
     cursor: "pointer",
     boxShadow: "0 4px 12px rgba(251, 191, 36, 0.2)",
     transition: "all 0.2s",
-    "&:hover": { opacity: 0.9 }
   }
 };
 
-// Styles for the @media print layout (High res full scale layout)
-const printStyles = {
-  printBorderOuter: {
-    border: "20px double #000000",
-    height: "100%",
-    padding: "30px",
+// High-fidelity Poster design stylesheet values
+const posterStyles = {
+  posterContainer: {
+    width: "794px",
+    height: "1123px",
+    backgroundColor: "#ffffff",
+    color: "#081A34",
+    fontFamily: "'Inter', 'DM Sans', sans-serif",
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
-    alignItems: "center",
     boxSizing: "border-box",
+    padding: "0",
+    position: "relative",
   },
-  printBorderInner: {
-    border: "2px solid #000000",
-    height: "100%",
-    width: "100%",
-    padding: "40px",
+  headerRow: {
     display: "flex",
-    flexDirection: "column",
     justifyContent: "space-between",
-    alignItems: "center",
-    boxSizing: "border-box",
+    alignItems: "flex-start",
+    padding: "24px 36px 0 36px",
+    height: "120px",
   },
-  printHeader: {
-    fontSize: "44px",
-    fontWeight: "900",
-    color: "#000",
-    textAlign: "center",
-    fontFamily: "'Inter', sans-serif",
-    textTransform: "uppercase",
-    letterSpacing: "1px",
-  },
-  printPropName: {
-    fontSize: "26px",
-    fontWeight: "800",
-    color: "#0f172a",
-    textAlign: "center",
-    fontFamily: "'Inter', sans-serif",
-    marginTop: "20px",
-  },
-  printLoc: {
-    fontSize: "20px",
-    color: "#475569",
-    fontWeight: "600",
-    textAlign: "center",
-    fontFamily: "'Inter', sans-serif",
-    marginTop: "10px",
-  },
-  printPrice: {
-    fontSize: "28px",
-    fontWeight: "900",
-    color: "#000000",
-    textAlign: "center",
-    fontFamily: "'Inter', sans-serif",
-    marginTop: "15px",
-    borderBottom: "3px solid #000",
-    paddingBottom: "10px",
-    width: "80%",
-  },
-  printScanCta: {
-    fontSize: "22px",
-    fontWeight: "700",
-    color: "#000",
-    textAlign: "center",
-    fontFamily: "'Inter', sans-serif",
-    marginTop: "30px",
-  },
-  printQrContainer: {
-    width: "350px",
-    height: "350px",
+  headerLeft: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
-    margin: "30px 0",
-    border: "1px solid #e2e8f0",
-    padding: "10px",
-    backgroundColor: "#fff",
+    width: "220px",
   },
-  printQrImage: {
-    width: "100%",
-    height: "100%",
-  },
-  printBrandContainer: {
+  logoWrapper: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
-    gap: "14px",
-    marginTop: "20px",
+    gap: "10px",
   },
-  printBrandLogo: {
-    width: "60px",
-    height: "60px",
+  logoImg: {
+    width: "48px",
+    height: "48px",
     objectFit: "contain",
   },
-  printBrandName: {
-    fontSize: "36px",
-    fontWeight: "900",
-    color: "#000",
-    fontFamily: "'Inter', sans-serif",
+  logoTextContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
   },
-  printBrandSlogan: {
-    fontSize: "20px",
-    fontStyle: "italic",
+  logoBrand: {
+    fontSize: "24px",
+    fontWeight: "900",
+    color: "#081A34",
+    letterSpacing: "-1px",
+    lineHeight: "1",
+  },
+  logoTagline: {
+    fontSize: "9px",
     fontWeight: "700",
-    color: "#000",
-    fontFamily: "'Inter', sans-serif",
+    color: "#64748b",
+    marginTop: "2px",
+  },
+  headerCenter: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
     textAlign: "center",
-    marginTop: "10px",
-    marginBottom: "20px",
+    flex: "1",
+  },
+  mainTitleRow1: {
+    fontSize: "28px",
+    fontWeight: "800",
+    color: "#081A34",
+    lineHeight: "1",
+    letterSpacing: "-0.5px",
+  },
+  mainTitleRow2: {
+    fontSize: "44px",
+    fontWeight: "900",
+    color: "#d9383a",
+    lineHeight: "0.95",
+    letterSpacing: "-1px",
+    marginTop: "2px",
+  },
+  scanIndicator: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "8px",
+    marginTop: "8px",
+    width: "100%",
+  },
+  indicatorLine: {
+    height: "1.5px",
+    flex: "1",
+    backgroundColor: "#C5A059",
+  },
+  indicatorText: {
+    fontSize: "9.5px",
+    fontWeight: "900",
+    color: "#081A34",
+    letterSpacing: "0.8px",
+    whiteSpace: "nowrap",
+  },
+  headerRight: {
+    width: "220px",
+    display: "flex",
+    justifyContent: "flex-end",
+  },
+  ribbon: {
+    width: "90px",
+    height: "90px",
+    backgroundColor: "#081A34",
+    border: "2.5px solid #C5A059",
+    borderTop: "none",
+    borderRadius: "0 0 12px 12px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.12)",
+  },
+  ribbonListed: {
+    fontSize: "8px",
+    color: "#94a3b8",
+    fontWeight: "800",
+    letterSpacing: "0.5px",
+    marginTop: "4px",
+  },
+  ribbonBrand: {
+    fontSize: "10px",
+    color: "#ffffff",
+    fontWeight: "900",
+    letterSpacing: "0.5px",
+    marginTop: "2px",
+  },
+  mainSection: {
+    display: "grid",
+    gridTemplateColumns: "185px 304px 185px",
+    gap: "20px",
+    padding: "10px 40px",
+    alignItems: "center",
+    height: "380px",
+  },
+  featuresCol: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    height: "100%",
+    padding: "15px 0",
+  },
+  featureCard: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    textAlign: "center",
+  },
+  featureIconCircle: {
+    width: "44px",
+    height: "44px",
+    borderRadius: "50%",
+    border: "2px solid #C5A059",
+    backgroundColor: "rgba(197, 160, 89, 0.05)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#C5A059",
+  },
+  featureTitle: {
+    fontSize: "11.5px",
+    fontWeight: "800",
+    color: "#081A34",
+    marginTop: "8px",
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
+  },
+  featureDesc: {
+    fontSize: "9px",
+    color: "#475569",
+    marginTop: "2px",
+    fontWeight: "600",
+    lineHeight: "1.2",
+  },
+  featureDivider: {
+    width: "40px",
+    height: "1px",
+    backgroundColor: "#e2e8f0",
+    alignSelf: "center",
+  },
+  qrCol: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  qrGoldFrame: {
+    border: "6px solid #C5A059",
+    borderRadius: "28px",
+    padding: "14px",
+    backgroundColor: "#ffffff",
+    boxShadow: "0 10px 25px rgba(0,0,0,0.05)",
+  },
+  qrCodeImg: {
+    width: "210px",
+    height: "210px",
+    display: "block",
+  },
+  qrPlaceholder: {
+    width: "210px",
+    height: "210px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "12px",
+    color: "#64748b",
+    fontWeight: "600",
+  },
+  imageCol: {
+    position: "relative",
+    height: "100%",
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+  },
+  imageFrame: {
+    width: "100%",
+    height: "90%",
+    borderRadius: "20px",
+    overflow: "hidden",
+    border: "2px solid #e2e8f0",
+    boxShadow: "0 6px 16px rgba(0,0,0,0.08)",
+  },
+  buildingImg: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+  },
+  scanBadgeCircle: {
+    position: "absolute",
+    bottom: "0",
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: "80px",
+    height: "80px",
+    borderRadius: "50%",
+    backgroundColor: "#081A34",
+    border: "2.5px solid #C5A059",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#ffffff",
+    textAlign: "center",
+    boxShadow: "0 8px 20px rgba(8, 26, 52, 0.35)",
+  },
+  scanBadgeTitle: {
+    fontSize: "9px",
+    fontWeight: "800",
+    color: "#ffffff",
+    marginTop: "2px",
+    letterSpacing: "0.5px",
+  },
+  scanBadgeDesc: {
+    fontSize: "6.5px",
+    color: "#94a3b8",
+    lineHeight: "1.1",
+    width: "65px",
+    marginTop: "1.5px",
+    fontWeight: "600",
+  },
+  infoBanner: {
+    margin: "0 40px",
+    height: "46px",
+    backgroundColor: "#081A34",
+    borderRadius: "10px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "0 24px",
+    color: "#ffffff",
+    boxShadow: "0 4px 10px rgba(8, 26, 52, 0.15)",
+  },
+  infoLeft: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+  },
+  infoTextLabel: {
+    fontSize: "11px",
+    color: "#94a3b8",
+    fontWeight: "600",
+  },
+  infoTextValue: {
+    fontSize: "13px",
+    color: "#ffffff",
+    fontWeight: "800",
+    textDecoration: "underline",
+    textDecorationColor: "#C5A059",
+  },
+  infoDivider: {
+    width: "1px",
+    height: "18px",
+    backgroundColor: "rgba(255,255,255,0.15)",
+  },
+  infoRight: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+  },
+  infoIdBox: {
+    backgroundColor: "#ffffff",
+    color: "#081A34",
+    fontWeight: "900",
+    fontSize: "13px",
+    padding: "3px 10px",
+    borderRadius: "5px",
+    border: "1px solid #e2e8f0",
+    letterSpacing: "0.5px",
+    minWidth: "70px",
+    textAlign: "center",
+  },
+  whySection: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    padding: "0 40px",
+    marginTop: "15px",
+  },
+  whyTitle: {
+    fontSize: "12px",
+    fontWeight: "900",
+    color: "#081A34",
+    letterSpacing: "1.2px",
+  },
+  whyGoldLine: {
+    height: "2px",
+    width: "50px",
+    backgroundColor: "#C5A059",
+    margin: "4px auto 10px",
+  },
+  whyGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(5, 1fr)",
+    width: "100%",
+  },
+  whyCol: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    textAlign: "center",
+    padding: "0 8px",
+    position: "relative",
+  },
+  whyColLabel: {
+    fontSize: "8.5px",
+    fontWeight: "800",
+    color: "#081A34",
+    marginTop: "5px",
+    textTransform: "uppercase",
+    letterSpacing: "0.3px",
+  },
+  whyColDesc: {
+    fontSize: "7px",
+    color: "#475569",
+    marginTop: "3px",
+    lineHeight: "1.2",
+    fontWeight: "600",
+  },
+  whyColDivider: {
+    position: "absolute",
+    right: "0",
+    top: "8px",
+    height: "35px",
+    width: "1px",
+    backgroundColor: "#e2e8f0",
+  },
+  footerContainer: {
+    marginTop: "auto",
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
+  },
+  navyFooter: {
+    height: "44px",
+    backgroundColor: "#081A34",
+    borderTop: "3.5px solid #C5A059",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "0 36px",
+    color: "#ffffff",
+  },
+  navyFooterLeft: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    width: "230px",
+  },
+  navyLogo: {
+    width: "24px",
+    height: "24px",
+    objectFit: "contain",
+  },
+  navyBrandName: {
+    fontSize: "13px",
+    fontWeight: "900",
+    letterSpacing: "-0.5px",
+  },
+  navyTagline: {
+    fontSize: "8px",
+    color: "#94a3b8",
+    fontWeight: "600",
+  },
+  navyFooterCenter: {
+    fontSize: "9.5px",
+    color: "#94a3b8",
+    fontWeight: "600",
+  },
+  navyFooterRight: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    fontSize: "9.5px",
+    width: "230px",
+    justifyContent: "flex-end",
+  },
+  socialHandle: {
+    color: "#C5A059",
+    fontWeight: "700",
+    marginLeft: "2px",
+  },
+  redFooter: {
+    height: "46px",
+    backgroundColor: "#d9383a",
+    display: "flex",
+    alignItems: "center",
+    padding: "0 36px",
+    justifyContent: "space-between",
+    color: "#ffffff",
+  },
+  redFooterLeft: {
+    fontSize: "12px",
+    fontWeight: "900",
+    letterSpacing: "0.5px",
+  },
+  redFooterSteps: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    flex: "1",
+    justifyContent: "flex-end",
+    marginLeft: "15px",
+  },
+  stepItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "5px",
+  },
+  stepCircle: {
+    width: "16px",
+    height: "16px",
+    borderRadius: "50%",
+    backgroundColor: "#ffffff",
+    color: "#d9383a",
+    fontSize: "9px",
+    fontWeight: "900",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  stepCircleIcon: {
+    width: "16px",
+    height: "16px",
+    borderRadius: "50%",
+    backgroundColor: "#ffffff",
+    color: "#d9383a",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  stepTextWrapper: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+  },
+  stepTextWrapperInner: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+  },
+  stepTitle: {
+    fontSize: "8.5px",
+    fontWeight: "800",
+    lineHeight: "1",
+    textTransform: "uppercase",
+  },
+  stepDesc: {
+    fontSize: "6.5px",
+    color: "rgba(255,255,255,0.85)",
+    lineHeight: "1",
+    marginTop: "1.5px",
+    fontWeight: "500",
+  },
+  stepArrow: {
+    fontSize: "10px",
+    color: "rgba(255,255,255,0.5)",
+    fontWeight: "750",
+  },
+  thankYouText: {
+    textAlign: "center",
+    fontSize: "8.5px",
+    fontWeight: "700",
+    color: "#475569",
+    padding: "6px 0",
+    backgroundColor: "#f8fafc",
   }
 };
