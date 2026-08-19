@@ -704,7 +704,7 @@ export default function AdminDashboard() {
             notifications={allNotifications}
             onApprove={handleApproveBoost}
             onReject={handleRejectBoost}
-            onReview={(notif) => {
+            onReview={async (notif) => {
               if (notif) {
                 const tabMap = {
                   property: "properties",
@@ -713,10 +713,21 @@ export default function AdminDashboard() {
                   mover: "movers",
                   seller: "sellers",
                   business: "businesses",
-                  announcement: "announcements"
+                  announcement: "announcements",
+                  item_request: "requests"
                 };
                 setActiveTab(tabMap[notif.type] || "properties");
                 setStatusView("pending");
+
+                // Mark the notification as read if it is a database-backed item_request notification
+                if (notif.type === "item_request" && notif._id) {
+                  try {
+                    await API.put(`/payment/notifications/${notif._id}/read`, { approve: true });
+                    loadAllNotifications();
+                  } catch (err) {
+                    console.error("Failed to mark notification as read:", err);
+                  }
+                }
               } else {
                 setActiveTab("properties");
                 setStatusView("pending");
