@@ -176,6 +176,12 @@ const TikTokIcon = () => (
   </svg>
 );
 
+const WhatsAppIcon = () => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style={{ color: "#081A34" }}>
+    <path d="M12.012 2c-5.506 0-9.988 4.482-9.988 9.988 0 1.761.459 3.475 1.33 4.988l-1.417 5.176 5.297-1.39a9.939 9.939 0 0 0 4.778 1.214h.004c5.506 0 9.988-4.482 9.988-9.988.001-2.66-1.034-5.161-2.92-7.052A9.92 9.92 0 0 0 12.012 2zm5.727 13.916c-.244.686-1.22 1.262-1.682 1.344-.462.081-.926.156-3.033-.674-2.529-.993-4.148-3.565-4.274-3.732-.127-.168-.946-1.258-.946-2.398 0-1.14.597-1.705.809-1.928.212-.224.462-.28.618-.28h.442c.112 0 .262-.042.411.319.15.362.511 1.25.555 1.34.043.089.073.193.013.31-.06.117-.089.192-.178.297-.09.104-.188.232-.269.31-.089.088-.182.183-.078.36.104.178.461.76.99 1.23.681.605 1.254.793 1.43.882.176.088.277.074.379-.044.103-.118.441-.518.56-.695.118-.178.238-.148.397-.089.159.059 1.011.477 1.184.566.173.089.288.134.332.208.044.074.044.431-.2.116z" />
+  </svg>
+);
+
 // Helper to draw rosette path
 const getScallopPath = (cx, cy, r, numScallops, depth) => {
   let path = "";
@@ -319,9 +325,7 @@ function VacancyPoster({ property, qrCodeDataUrl, sourceLabel }) {
         </div>
 
         <div style={posterStyles.contactItem}>
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#081A34" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-          </svg>
+          <WhatsAppIcon />
           <span>+254 745 689 773</span>
         </div>
 
@@ -421,8 +425,8 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
         ctx.closePath();
         ctx.fill();
 
-        ctx.strokeStyle = "#e2e8f0";
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = "#d9383a";
+        ctx.lineWidth = 2.5;
         ctx.stroke();
 
         const logoSize = 38;
@@ -516,13 +520,24 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
         }
       };
 
-      // Draw top-left accent
+      // Draw background waves watermark (faint gray)
+      posterCtx.strokeStyle = "#f1f5f9";
+      posterCtx.lineWidth = 1.5;
+      for (let yOffset = 0; yOffset < 1200; yOffset += 200) {
+        posterCtx.beginPath();
+        posterCtx.moveTo(-100, yOffset + 200);
+        posterCtx.quadraticCurveTo(200, yOffset + 100, 400, yOffset + 300);
+        posterCtx.quadraticCurveTo(600, yOffset + 500, 900, yOffset + 200);
+        posterCtx.stroke();
+      }
+
+      // Draw top slanted accent spanning full width (35px left, 14px right)
       posterCtx.fillStyle = "#081A34";
       posterCtx.beginPath();
       posterCtx.moveTo(0, 0);
-      posterCtx.lineTo(280, 0);
-      posterCtx.lineTo(220, 30);
-      posterCtx.lineTo(0, 30);
+      posterCtx.lineTo(posterCanvas.width, 0);
+      posterCtx.lineTo(posterCanvas.width, 14);
+      posterCtx.lineTo(0, 35);
       posterCtx.closePath();
       posterCtx.fill();
 
@@ -584,32 +599,32 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
 
       // Roof
       posterCtx.beginPath();
-      posterCtx.moveTo(badgeX - 18, badgeY - 8);
-      posterCtx.lineTo(badgeX, badgeY - 24);
-      posterCtx.lineTo(badgeX + 18, badgeY - 8);
+      posterCtx.moveTo(badgeX - 17, badgeY - 12);
+      posterCtx.lineTo(badgeX, badgeY - 27);
+      posterCtx.lineTo(badgeX + 17, badgeY - 12);
       posterCtx.stroke();
 
       // House body
       posterCtx.beginPath();
-      posterCtx.moveTo(badgeX - 12, badgeY - 8);
-      posterCtx.lineTo(badgeX - 12, badgeY + 8);
-      posterCtx.lineTo(badgeX + 12, badgeY + 8);
-      posterCtx.lineTo(badgeX + 12, badgeY - 8);
+      posterCtx.moveTo(badgeX - 11, badgeY - 12);
+      posterCtx.lineTo(badgeX - 11, badgeY + 3);
+      posterCtx.lineTo(badgeX + 11, badgeY + 3);
+      posterCtx.lineTo(badgeX + 11, badgeY - 12);
       posterCtx.stroke();
 
       // Door
       posterCtx.fillStyle = "#ffffff";
-      posterCtx.fillRect(badgeX - 4, badgeY, 8, 8);
+      posterCtx.fillRect(badgeX - 4, badgeY - 7, 8, 10);
 
       // Text inside badge
       posterCtx.fillStyle = "#ffffff";
       posterCtx.textAlign = "center";
 
       posterCtx.font = "bold 8px 'Inter', sans-serif";
-      posterCtx.fillText("Listed On", badgeX, badgeY + 20);
+      posterCtx.fillText("Listed On", badgeX, badgeY + 15);
 
       posterCtx.font = "900 9.5px 'Inter', sans-serif";
-      posterCtx.fillText("AXXSPACE", badgeX, badgeY + 31);
+      posterCtx.fillText("AXXSPACE", badgeX, badgeY + 26);
 
       // Scan Call to Action text
       posterCtx.fillStyle = "#081A34";
@@ -691,10 +706,10 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
       posterCtx.textAlign = "left";
       posterCtx.font = "800 15px 'Inter', sans-serif";
 
-      // Block 1: info@axxspace.com
+      // Block 1: info@axxspace.com (Envelope icon)
       const b1X = 80;
       posterCtx.strokeStyle = "#081A34";
-      posterCtx.lineWidth = 2;
+      posterCtx.lineWidth = 1.5;
       posterCtx.strokeRect(b1X, contactY - 12, 18, 12);
       posterCtx.beginPath();
       posterCtx.moveTo(b1X, contactY - 12);
@@ -703,44 +718,81 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
       posterCtx.stroke();
       posterCtx.fillText("info@axxspace.com", b1X + 26, contactY - 1);
 
-      // Block 2: +254 745 689 773
+      // Block 2: +254 745 689 773 (WhatsApp icon)
       const b2X = 330;
+      posterCtx.fillStyle = "#081A34";
       posterCtx.strokeStyle = "#081A34";
-      posterCtx.lineWidth = 2;
+      posterCtx.lineWidth = 1.5;
+
       posterCtx.beginPath();
-      posterCtx.arc(b2X + 8, contactY - 6, 6, 0, Math.PI * 2);
+      posterCtx.arc(b2X + 8, contactY - 6, 6, 0.15 * Math.PI, 1.85 * Math.PI);
+      posterCtx.lineTo(b2X + 1, contactY - 1);
+      posterCtx.closePath();
       posterCtx.stroke();
+
       posterCtx.beginPath();
-      posterCtx.arc(b2X + 8, contactY - 6, 2, 0, Math.PI * 2);
+      posterCtx.arc(b2X + 8, contactY - 6, 3, 0.7 * Math.PI, 1.3 * Math.PI);
       posterCtx.stroke();
       posterCtx.fillText("+254 745 689 773", b2X + 26, contactY - 1);
 
-      // Block 3: axx.space
+      // Block 3: axx.space (Social icons: Instagram, TikTok, X)
       const b3X = 590;
       posterCtx.strokeStyle = "#081A34";
-      posterCtx.lineWidth = 2;
-      posterCtx.strokeRect(b3X, contactY - 12, 14, 14);
-      posterCtx.beginPath();
-      posterCtx.arc(b3X + 7, contactY - 5, 3, 0, Math.PI * 2);
-      posterCtx.stroke();
-      posterCtx.fillText("axx.space", b3X + 26, contactY - 1);
+      posterCtx.lineWidth = 1.5;
 
-      // Bottom accents
-      // Red bottom-left
+      // Instagram icon
+      drawRoundRect(posterCtx, b3X, contactY - 12, 12, 12, 3, false, true, "#081A34", 1.5);
+      posterCtx.beginPath();
+      posterCtx.arc(b3X + 6, contactY - 6, 2.5, 0, Math.PI * 2);
+      posterCtx.stroke();
+      posterCtx.beginPath();
+      posterCtx.arc(b3X + 9, contactY - 9, 0.5, 0, Math.PI * 2);
+      posterCtx.fillStyle = "#081A34";
+      posterCtx.fill();
+
+      // TikTok icon
+      posterCtx.beginPath();
+      posterCtx.moveTo(b3X + 22, contactY - 12);
+      posterCtx.lineTo(b3X + 22, contactY - 4);
+      posterCtx.quadraticCurveTo(b3X + 22, contactY - 1, b3X + 19, contactY - 1);
+      posterCtx.quadraticCurveTo(b3X + 16, contactY - 1, b3X + 16, contactY - 4);
+      posterCtx.quadraticCurveTo(b3X + 16, contactY - 7, b3X + 19, contactY - 7);
+      posterCtx.lineTo(b3X + 19, contactY - 4);
+      posterCtx.stroke();
+      // TikTok flag
+      posterCtx.beginPath();
+      posterCtx.moveTo(b3X + 22, contactY - 9);
+      posterCtx.quadraticCurveTo(b3X + 25, contactY - 9, b3X + 26, contactY - 12);
+      posterCtx.stroke();
+
+      // X icon
+      posterCtx.lineWidth = 1.8;
+      posterCtx.beginPath();
+      posterCtx.moveTo(b3X + 32, contactY - 12);
+      posterCtx.lineTo(b3X + 42, contactY);
+      posterCtx.moveTo(b3X + 42, contactY - 12);
+      posterCtx.lineTo(b3X + 32, contactY);
+      posterCtx.stroke();
+
+      posterCtx.fillStyle = "#081A34";
+      posterCtx.fillText("axx.space", b3X + 48, contactY - 1);
+
+      // Bottom accents: meeting at x=240, slanting up to 35px high on outer edges, no white gap
+      // Red bottom-left triangle
       posterCtx.fillStyle = "#d9383a";
       posterCtx.beginPath();
-      posterCtx.moveTo(0, 1080);
-      posterCtx.lineTo(180, 1130);
-      posterCtx.lineTo(0, 1130);
+      posterCtx.moveTo(0, posterCanvas.height - 35);
+      posterCtx.lineTo(240, posterCanvas.height);
+      posterCtx.lineTo(0, posterCanvas.height);
       posterCtx.closePath();
       posterCtx.fill();
 
-      // Navy bottom-right
+      // Navy bottom-right triangle
       posterCtx.fillStyle = "#081A34";
       posterCtx.beginPath();
-      posterCtx.moveTo(800, 1080);
-      posterCtx.lineTo(800, 1130);
-      posterCtx.lineTo(580, 1130);
+      posterCtx.moveTo(240, posterCanvas.height);
+      posterCtx.lineTo(posterCanvas.width, posterCanvas.height - 35);
+      posterCtx.lineTo(posterCanvas.width, posterCanvas.height);
       posterCtx.closePath();
       posterCtx.fill();
     };
@@ -1039,6 +1091,7 @@ const posterStyles = {
     width: "794px",
     height: "1123px",
     backgroundColor: "#ffffff",
+    backgroundImage: `url("data:image/svg+xml,%3Csvg width='800' height='1200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M-100,200 Q200,100 400,300 T900,200 M-100,400 Q200,300 400,500 T900,400 M-100,600 Q200,500 400,700 T900,600 M-100,800 Q200,700 400,900 T900,800' fill='none' stroke='%23f1f5f9' stroke-width='1.5'/%3E%3C/svg%3E")`,
     color: "#081A34",
     fontFamily: "'Inter', sans-serif",
     display: "flex",
@@ -1053,10 +1106,10 @@ const posterStyles = {
     position: "absolute",
     top: 0,
     left: 0,
-    width: "280px",
-    height: "30px",
+    width: "100%",
+    height: "35px",
     backgroundColor: "#081A34",
-    clipPath: "polygon(0 0, 100% 0, 85% 100%, 0 100%)",
+    clipPath: "polygon(0 0, 100% 0, 100% 40%, 0 100%)",
   },
   logoSection: {
     display: "flex",
@@ -1209,18 +1262,18 @@ const posterStyles = {
     position: "absolute",
     bottom: 0,
     left: 0,
-    width: "180px",
+    width: "240px",
     height: "35px",
     backgroundColor: "#d9383a",
-    clipPath: "polygon(0 40%, 100% 100%, 0 100%)",
+    clipPath: "polygon(0 0, 100% 100%, 0 100%)",
   },
   bottomAccentRight: {
     position: "absolute",
     bottom: 0,
     right: 0,
-    width: "240px",
+    width: "554px", // 794 - 240
     height: "35px",
     backgroundColor: "#081A34",
-    clipPath: "polygon(100% 40%, 100% 100%, 0 100%)",
+    clipPath: "polygon(0 100%, 100% 0, 100% 100%)",
   },
 };
