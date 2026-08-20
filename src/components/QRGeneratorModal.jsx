@@ -176,266 +176,176 @@ const TikTokIcon = () => (
   </svg>
 );
 
+// Helper to draw rosette path
+const getScallopPath = (cx, cy, r, numScallops, depth) => {
+  let path = "";
+  for (let i = 0; i <= 360; i++) {
+    const angle = (i * Math.PI) / 180;
+    const currentR = r + Math.sin(angle * numScallops) * depth;
+    const x = cx + currentR * Math.cos(angle);
+    const y = cy + currentR * Math.sin(angle);
+    if (i === 0) {
+      path += `M ${x} ${y}`;
+    } else {
+      path += ` L ${x} ${y}`;
+    }
+  }
+  path += " Z";
+  return path;
+};
+
+// Rosette Badge Component
+const ScallopBadge = () => {
+  const path = getScallopPath(55, 55, 43, 18, 4);
+  return (
+    <svg width="110" height="110" viewBox="0 0 110 110" style={{ overflow: "visible" }}>
+      <path d={path} fill="#081A34" stroke="#d9383a" strokeWidth="2.5" />
+      {/* House Icon */}
+      <path
+        d="M44 42 L44 58 L66 58 L66 42 Z"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M38 43 L55 28 L72 43"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Door */}
+      <rect x="51" y="48" width="8" height="10" fill="#ffffff" />
+      {/* Texts */}
+      <text
+        x="55"
+        y="70"
+        fill="#ffffff"
+        fontSize="7.5"
+        fontWeight="bold"
+        textAnchor="middle"
+        fontFamily="'Inter', sans-serif"
+        letterSpacing="0.2px"
+      >
+        Listed On
+      </text>
+      <text
+        x="55"
+        y="81"
+        fill="#ffffff"
+        fontSize="9"
+        fontWeight="900"
+        textAnchor="middle"
+        fontFamily="'Inter', sans-serif"
+        letterSpacing="0.5px"
+      >
+        AXXSPACE
+      </text>
+    </svg>
+  );
+};
+
 // High-fidelity VacancyPoster Component
 function VacancyPoster({ property, qrCodeDataUrl, sourceLabel }) {
-  const propImg = (property.images && property.images.length > 0)
-    ? property.images[0]
-    : "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80";
-
-  const displayId = property._id ? property._id.slice(-6).toUpperCase() : "AXXSPC";
-
   return (
     <div style={posterStyles.posterContainer} className="axx-vacancy-poster">
-      {/* HEADER ROW */}
-      <div style={posterStyles.headerRow}>
-        {/* Left Logo */}
-        <div style={posterStyles.headerLeft}>
-          <div style={posterStyles.logoWrapper}>
-            <img src={logo} alt="Axxspace Logo" style={posterStyles.logoImg} />
-            <div style={posterStyles.logoTextContainer}>
-              <span style={posterStyles.logoBrand}>AXXSPACE</span>
-              <span style={posterStyles.logoTagline}>Space hunting bila stress.</span>
-            </div>
-          </div>
-        </div>
+      {/* Top slanted accent */}
+      <div style={posterStyles.topAccentLeft} />
 
-        {/* Center Title */}
-        <div style={posterStyles.headerCenter}>
-          <div style={posterStyles.mainTitleRow1}>ROOM / HOUSE</div>
-          <div style={posterStyles.mainTitleRow2}>AVAILABLE</div>
-          <div style={posterStyles.scanIndicator}>
-            <div style={posterStyles.indicatorLine}></div>
-            <span style={posterStyles.indicatorText}>SCAN TO VIEW DETAILS & CONTACT</span>
-            <div style={posterStyles.indicatorLine}></div>
-          </div>
+      {/* Brand logo & tagline */}
+      <div style={posterStyles.logoSection}>
+        <img src={logo} alt="Axxspace Logo" style={posterStyles.logoImg} />
+        <div style={posterStyles.logoTextContainer}>
+          <span style={{ color: "#d9383a" }}>AXX</span>
+          <span style={{ color: "#081A34", marginLeft: "6px" }}>SPACE</span>
         </div>
+        <div style={posterStyles.logoTagline}>Space hunting bila stress</div>
+        <div style={posterStyles.redSeparator} />
+      </div>
 
-        {/* Right Ribbon Badge */}
-        <div style={posterStyles.headerRight}>
-          <div style={posterStyles.ribbon}>
-            <RibbonHouseIcon />
-            <span style={posterStyles.ribbonListed}>LISTED ON</span>
-            <span style={posterStyles.ribbonBrand}>AXXSPACE</span>
-          </div>
+      {/* Main Title & Stamp */}
+      <div style={posterStyles.titleSection}>
+        <div style={posterStyles.titleTextContainer}>
+          <div style={posterStyles.titleRow1}>ROOM/HOUSE</div>
+          <div style={posterStyles.titleRow2}>AVAILABLE</div>
+        </div>
+        <div style={posterStyles.badgeContainer}>
+          <ScallopBadge />
         </div>
       </div>
 
-      {/* MAIN TWO-COLUMN SECTION */}
-      <div style={posterStyles.mainSection}>
-        {/* Left Side: 3 Features */}
-        <div style={posterStyles.featuresCol}>
-          {/* Feature 1 */}
-          <div style={posterStyles.featureCard}>
-            <div style={posterStyles.featureIconCircle}>
-              <GenuineIcon />
-            </div>
-            <div style={posterStyles.featureTitle}>Genuine Listings</div>
-            <div style={posterStyles.featureDesc}>Verified landlords & properties.</div>
-          </div>
-          <div style={posterStyles.featureDivider}></div>
+      {/* Scan instruction */}
+      <div style={posterStyles.scanInstruction}>
+        SCAN TO VIEW HOUSE DETAILS AND CONTACTS
+      </div>
 
-          {/* Feature 2 */}
-          <div style={posterStyles.featureCard}>
-            <div style={posterStyles.featureIconCircle}>
-              <SecureIcon />
-            </div>
-            <div style={posterStyles.featureTitle}>Safe & Secure</div>
-            <div style={posterStyles.featureDesc}>Your security is our priority.</div>
-          </div>
-          <div style={posterStyles.featureDivider}></div>
-
-          {/* Feature 3 */}
-          <div style={posterStyles.featureCard}>
-            <div style={posterStyles.featureIconCircle}>
-              <ContactIcon />
-            </div>
-            <div style={posterStyles.featureTitle}>Easy Contact</div>
-            <div style={posterStyles.featureDesc}>Connect directly with landlord.</div>
-          </div>
-        </div>
-
-        {/* Center Side: QR Code in Gold Frame */}
-        <div style={posterStyles.qrCol}>
-          <div style={posterStyles.qrGoldFrame}>
-            {qrCodeDataUrl ? (
-              <img src={qrCodeDataUrl} alt="Property QR Code" style={posterStyles.qrCodeImg} />
-            ) : (
-              <div style={posterStyles.qrPlaceholder}>Generating QR...</div>
-            )}
-          </div>
-        </div>
-
-        {/* Right Side: Property Types list & Scan Circle */}
-        <div style={posterStyles.typesCardCol}>
-          <div style={posterStyles.typesCard}>
-            {PROPERTY_TYPES_LIST.map((item) => {
-              let isChecked = false;
-              if (item === "Furnished") {
-                isChecked = property.furnished === true || property.furnished === "true";
-              } else {
-                const pType = String(property.propertyType || "").toLowerCase().trim();
-                const itemNorm = item.toLowerCase().trim();
-                if (pType === itemNorm) {
-                  isChecked = true;
-                } else if (itemNorm === "4+ bedroom" && (pType.includes("4 bedroom") || pType.includes("4+ bedroom") || pType.includes("5 bedroom"))) {
-                  isChecked = true;
-                }
-              }
-
-              return (
-                <div key={item} style={posterStyles.typeRow}>
-                  <span style={posterStyles.typeLabel}>{item}</span>
-                  <div style={isChecked ? posterStyles.checkCircleActive : posterStyles.checkCircle}>
-                    {isChecked && (
-                      <svg viewBox="0 0 24 24" width="7" height="7" fill="none" stroke="#081A34" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          <div style={posterStyles.scanBadgeCircleOverlapping}>
-            <PhoneScanIcon />
-            <span style={posterStyles.scanBadgeTitle}>SCAN NOW</span>
-            <span style={posterStyles.scanBadgeDesc}>Find your next space today!</span>
-          </div>
+      {/* QR Code Container */}
+      <div style={posterStyles.qrContainer}>
+        <div style={posterStyles.qrBox}>
+          {qrCodeDataUrl ? (
+            <img src={qrCodeDataUrl} alt="Property QR Code" style={posterStyles.qrCodeImg} />
+          ) : (
+            <div style={posterStyles.qrPlaceholder}>Generating QR...</div>
+          )}
         </div>
       </div>
 
-      {/* INFORMATION BANNER ROW */}
-      <div style={posterStyles.infoBanner}>
-        <div style={posterStyles.infoLeft}>
-          <GlobeIcon />
-          <span style={posterStyles.infoTextLabel}>Or visit:</span>
-          <span style={posterStyles.infoTextValue}>www.axxspace.com</span>
-        </div>
-        <div style={posterStyles.infoDivider}></div>
-        <div style={posterStyles.infoCenter}>
-          <span style={posterStyles.infoTextLabel}>Email:</span>
-          <span style={posterStyles.infoTextValue}>info@axxspace.com</span>
-        </div>
-        <div style={posterStyles.infoDivider}></div>
-        <div style={posterStyles.infoRight}>
-          <SearchIcon />
-          <span style={posterStyles.infoTextLabel}>Search property ID:</span>
-          <div style={posterStyles.infoIdBox}>{displayId}</div>
+      {/* Visit section */}
+      <div style={posterStyles.visitSection}>
+        <div style={posterStyles.orVisitText}>OR VISIT</div>
+        <div style={posterStyles.visitPill}>
+          <div style={posterStyles.globeCircle}>
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#ffffff" strokeWidth="2.5">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="2" y1="12" x2="22" y2="12" />
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            </svg>
+          </div>
+          <span style={posterStyles.visitUrl}>www.axxspace.com</span>
         </div>
       </div>
 
-      {/* WHY CHOOSE AXXSPACE? */}
-      <div style={posterStyles.whySection}>
-        <div style={posterStyles.whyTitle}>WHY CHOOSE AXXSPACE?</div>
-        <div style={posterStyles.whyGoldLine}></div>
-        <div style={posterStyles.whyGrid}>
-          {/* Benefit 1 */}
-          <div style={posterStyles.whyCol}>
-            <EyeIcon />
-            <span style={posterStyles.whyColLabel}>More Visibility</span>
-            <span style={posterStyles.whyColDesc}>Reach more potential tenants online & offline.</span>
-            <div style={posterStyles.whyColDivider}></div>
+      {/* Contact Footer */}
+      <div style={posterStyles.contactFooter}>
+        <div style={posterStyles.contactItem}>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#081A34" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+          </svg>
+          <span>info@axxspace.com</span>
+        </div>
+
+        <div style={posterStyles.contactItem}>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#081A34" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+          </svg>
+          <span>+254 745 689 773</span>
+        </div>
+
+        <div style={posterStyles.contactItem}>
+          <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#081A34" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+            </svg>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#081A34" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+            </svg>
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style={{ color: "#081A34" }}>
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
           </div>
-          {/* Benefit 2 */}
-          <div style={posterStyles.whyCol}>
-            <MobileIcon />
-            <span style={posterStyles.whyColLabel}>Easy Access</span>
-            <span style={posterStyles.whyColDesc}>Tenants can scan and view details instantly.</span>
-            <div style={posterStyles.whyColDivider}></div>
-          </div>
-          {/* Benefit 3 */}
-          <div style={posterStyles.whyCol}>
-            <TrendIcon />
-            <span style={posterStyles.whyColLabel}>Track Performance</span>
-            <span style={posterStyles.whyColDesc}>Monitor views & enquiries in real-time.</span>
-            <div style={posterStyles.whyColDivider}></div>
-          </div>
-          {/* Benefit 4 */}
-          <div style={posterStyles.whyCol}>
-            <UsersIcon />
-            <span style={posterStyles.whyColLabel}>More Enquiries</span>
-            <span style={posterStyles.whyColDesc}>Get more genuine leads and serious tenants.</span>
-            <div style={posterStyles.whyColDivider}></div>
-          </div>
-          {/* Benefit 5 */}
-          <div style={posterStyles.whyCol}>
-            <ShieldCheckIcon />
-            <span style={posterStyles.whyColLabel}>Trusted Platform</span>
-            <span style={posterStyles.whyColDesc}>A professional system built for users.</span>
-          </div>
+          <span>axx.space</span>
         </div>
       </div>
 
-      {/* FOOTER BARS */}
-      <div style={posterStyles.footerContainer}>
-        {/* Navy Bar */}
-        <div style={posterStyles.navyFooter}>
-          <div style={posterStyles.navyFooterLeft}>
-            <img src={logo} alt="Axxspace Logo" style={posterStyles.navyLogo} />
-            <span style={posterStyles.navyBrandName}>AXXSPACE</span>
-            <span style={posterStyles.navyTagline}>Space hunting bila stress.</span>
-          </div>
-          <div style={posterStyles.navyFooterCenter}>
-            List. Discover. Connect. &nbsp;|&nbsp; Kenya's smart rental marketplace.
-          </div>
-          <div style={posterStyles.navyFooterRight}>
-            <FacebookIcon />
-            <InstagramIcon />
-            <XIcon />
-            <TikTokIcon />
-            <span style={posterStyles.socialHandle}>@axxspace</span>
-          </div>
-        </div>
-
-        {/* Red Landlord Workflow Bar */}
-        <div style={posterStyles.redFooter}>
-          <div style={posterStyles.redFooterLeft}>TO LANDLORDS:</div>
-          <div style={posterStyles.redFooterSteps}>
-            <div style={posterStyles.stepItem}>
-              <div style={posterStyles.stepCircle}>1</div>
-              <div style={posterStyles.stepTextWrapper}>
-                <span style={posterStyles.stepTitle}>List Property</span>
-                <span style={posterStyles.stepDesc}>Add details on Axxspace.</span>
-              </div>
-            </div>
-            <div style={posterStyles.stepArrow}>&gt;</div>
-
-            <div style={posterStyles.stepItem}>
-              <div style={posterStyles.stepCircle}>2</div>
-              <div style={posterStyles.stepTextWrapper}>
-                <span style={posterStyles.stepTitle}>Generate QR</span>
-                <span style={posterStyles.stepDesc}>Get unique property QR.</span>
-              </div>
-            </div>
-            <div style={posterStyles.stepArrow}>&gt;</div>
-
-            <div style={posterStyles.stepItem}>
-              <div style={posterStyles.stepCircle}>3</div>
-              <div style={posterStyles.stepTextWrapper}>
-                <span style={posterStyles.stepCircleIcon}><PrintIcon /></span>
-                <div style={posterStyles.stepTextWrapperInner}>
-                  <span style={posterStyles.stepTitle}>Print & Display</span>
-                  <span style={posterStyles.stepDesc}>Display at your property.</span>
-                </div>
-              </div>
-            </div>
-            <div style={posterStyles.stepArrow}>&gt;</div>
-
-            <div style={posterStyles.stepItem}>
-              <div style={posterStyles.stepCircle}>4</div>
-              <div style={posterStyles.stepTextWrapper}>
-                <span style={posterStyles.stepTitle}>Get Tenants</span>
-                <span style={posterStyles.stepDesc}>Attract more enquiries.</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Thank You message */}
-        <div style={posterStyles.thankYouText}>
-          Thank you for choosing Axxspace. &nbsp;|&nbsp; Together, we make space hunting easy.
-        </div>
-      </div>
+      {/* Bottom slanted accents */}
+      <div style={posterStyles.bottomAccentLeft} />
+      <div style={posterStyles.bottomAccentRight} />
     </div>
   );
 }
@@ -492,13 +402,13 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
       const logoImg = new Image();
       logoImg.src = logo;
       logoImg.onload = () => {
-        const cardSize = 90;
+        const cardSize = 56;
         const x = (qrCanvas.width - cardSize) / 2;
         const y = (qrCanvas.height - cardSize) / 2;
 
         ctx.fillStyle = "#ffffff";
         ctx.beginPath();
-        const radius = 8;
+        const radius = 6;
         ctx.moveTo(x + radius, y);
         ctx.lineTo(x + cardSize - radius, y);
         ctx.quadraticCurveTo(x + cardSize, y, x + cardSize, y + radius);
@@ -511,19 +421,14 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
         ctx.closePath();
         ctx.fill();
 
-        const logoSize = 34;
+        ctx.strokeStyle = "#e2e8f0";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        const logoSize = 38;
         const logoX = x + (cardSize - logoSize) / 2;
-        const logoY = y + 10;
+        const logoY = y + (cardSize - logoSize) / 2;
         ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
-
-        ctx.font = "bold 9px 'Inter', sans-serif";
-        ctx.fillStyle = "#d9383a";
-        ctx.textAlign = "center";
-        ctx.fillText("AXXSPACE", x + cardSize / 2, y + 56);
-
-        ctx.font = "500 5px 'Inter', sans-serif";
-        ctx.fillStyle = "#475569";
-        ctx.fillText("Space hunting bila stress.", x + cardSize / 2, y + 68);
 
         const dataUrl = qrCanvas.toDataURL("image/png");
         setQrCodeDataUrl(dataUrl);
@@ -562,170 +467,8 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
       posterCtx.fillStyle = "#ffffff";
       posterCtx.fillRect(0, 0, posterCanvas.width, posterCanvas.height);
 
-      // Draw top-left logo image
-      posterCtx.drawImage(logoImg, 40, 24, 48, 48);
-
-      // Brand name
-      posterCtx.fillStyle = "#081A34";
-      posterCtx.font = "900 24px 'Inter', sans-serif";
-      posterCtx.textAlign = "left";
-      posterCtx.fillText("AXXSPACE", 98, 46);
-
-      // Tagline
-      posterCtx.fillStyle = "#64748b";
-      posterCtx.font = "700 9px 'Inter', sans-serif";
-      posterCtx.fillText("Space hunting bila stress.", 98, 59);
-
-      // Draw listed on AXXSPACE ribbon (Top right)
-      const ribX = 675;
-      const ribY = 0;
-      const ribW = 85;
-      const ribH = 85;
-
-      // Draw navy background
-      posterCtx.fillStyle = "#081A34";
-      posterCtx.beginPath();
-      posterCtx.moveTo(ribX, ribY);
-      posterCtx.lineTo(ribX + ribW, ribY);
-      posterCtx.lineTo(ribX + ribW, ribY + ribH - 12);
-      posterCtx.quadraticCurveTo(ribX + ribW, ribY + ribH, ribX + ribW - 12, ribY + ribH);
-      posterCtx.lineTo(ribX + 12, ribY + ribH);
-      posterCtx.quadraticCurveTo(ribX, ribY + ribH, ribX, ribY + ribH - 12);
-      posterCtx.closePath();
-      posterCtx.fill();
-
-      // Gold border
-      posterCtx.strokeStyle = "#C5A059";
-      posterCtx.lineWidth = 2.5;
-      posterCtx.beginPath();
-      posterCtx.moveTo(ribX, ribY);
-      posterCtx.lineTo(ribX, ribY + ribH - 12);
-      posterCtx.quadraticCurveTo(ribX, ribY + ribH, ribX + 12, ribY + ribH);
-      posterCtx.lineTo(ribX + ribW - 12, ribY + ribH);
-      posterCtx.quadraticCurveTo(ribX + ribW, ribY + ribH, ribX + ribW, ribY + ribH - 12);
-      posterCtx.lineTo(ribX + ribW, ribY);
-      posterCtx.stroke();
-
-      // Draw small gold house icon inside ribbon
-      posterCtx.strokeStyle = "#C5A059";
-      posterCtx.lineWidth = 1.5;
-      const rx = ribX + ribW / 2;
-      const ry = ribY + 28;
-      posterCtx.beginPath();
-      posterCtx.moveTo(rx - 7, ry + 5);
-      posterCtx.lineTo(rx - 7, ry - 3);
-      posterCtx.lineTo(rx, ry - 9);
-      posterCtx.lineTo(rx + 7, ry - 3);
-      posterCtx.lineTo(rx + 7, ry + 5);
-      posterCtx.closePath();
-      posterCtx.stroke();
-
-      // Text inside ribbon
-      posterCtx.fillStyle = "#94a3b8";
-      posterCtx.font = "bold 8px 'Inter', sans-serif";
-      posterCtx.textAlign = "center";
-      posterCtx.fillText("LISTED ON", rx, ry + 18);
-
-      posterCtx.fillStyle = "#ffffff";
-      posterCtx.font = "900 9.5px 'Inter', sans-serif";
-      posterCtx.fillText("AXXSPACE", rx, ry + 30);
-
-      // Main Header Text
-      posterCtx.fillStyle = "#081A34";
-      posterCtx.textAlign = "center";
-      posterCtx.font = "800 36px 'Inter', sans-serif";
-      posterCtx.fillText("ROOM / HOUSE", posterCanvas.width / 2, 85);
-      posterCtx.fillStyle = "#d9383a";
-      posterCtx.font = "900 52px 'Inter', sans-serif";
-      posterCtx.fillText("AVAILABLE", posterCanvas.width / 2, 135);
-
-      posterCtx.fillStyle = "#C5A059";
-      posterCtx.fillRect(40, 155, 720, 2);
-      posterCtx.fillStyle = "#081A34";
-      posterCtx.font = "800 12px 'Inter', sans-serif";
-      posterCtx.fillText("SCAN TO VIEW DETAILS & CONTACT", posterCanvas.width / 2, 172);
-
-      // Draw features (Left side)
-      const featX = 40;
-      const featYStart = 200;
-      const featGap = 100;
-
-      const FEATURES = [
-        { title: "GENUINE LISTINGS", desc: "Verified landlords & properties." },
-        { title: "SAFE & SECURE", desc: "Your security is our priority." },
-        { title: "EASY CONTACT", desc: "Connect directly with landlord." }
-      ];
-
-      FEATURES.forEach((feat, index) => {
-        const currY = featYStart + index * featGap;
-
-        // Draw gold circle
-        const circX = featX + 75;
-        const circY = currY + 25;
-        posterCtx.strokeStyle = "#C5A059";
-        posterCtx.lineWidth = 2.5;
-        posterCtx.beginPath();
-        posterCtx.arc(circX, circY, 20, 0, Math.PI * 2);
-        posterCtx.stroke();
-
-        // Draw icon
-        posterCtx.strokeStyle = "#C5A059";
-        posterCtx.lineWidth = 2;
-        if (index === 0) {
-          // House
-          posterCtx.beginPath();
-          posterCtx.moveTo(circX - 7, circY + 5);
-          posterCtx.lineTo(circX - 7, circY - 3);
-          posterCtx.lineTo(circX, circY - 9);
-          posterCtx.lineTo(circX + 7, circY - 3);
-          posterCtx.lineTo(circX + 7, circY + 5);
-          posterCtx.closePath();
-          posterCtx.stroke();
-        } else if (index === 1) {
-          // Shield check
-          posterCtx.beginPath();
-          posterCtx.moveTo(circX - 6, circY - 6);
-          posterCtx.lineTo(circX + 6, circY - 6);
-          posterCtx.lineTo(circX + 6, circY);
-          posterCtx.quadraticCurveTo(circX + 6, circY + 6, circX, circY + 9);
-          posterCtx.quadraticCurveTo(circX - 6, circY + 6, circX - 6, circY);
-          posterCtx.closePath();
-          posterCtx.stroke();
-        } else {
-          // Headset
-          posterCtx.beginPath();
-          posterCtx.arc(circX, circY, 8, Math.PI, 0);
-          posterCtx.stroke();
-          posterCtx.fillStyle = "#C5A059";
-          posterCtx.fillRect(circX - 10, circY, 3, 5);
-          posterCtx.fillRect(circX + 7, circY, 3, 5);
-        }
-
-        // Text
-        posterCtx.fillStyle = "#081A34";
-        posterCtx.font = "bold 11px 'Inter', sans-serif";
-        posterCtx.textAlign = "center";
-        posterCtx.fillText(feat.title, circX, circY + 34);
-
-        posterCtx.fillStyle = "#475569";
-        posterCtx.font = "500 8.5px 'Inter', sans-serif";
-        posterCtx.fillText(feat.desc, circX, circY + 46);
-
-        if (index < 2) {
-          posterCtx.strokeStyle = "#e2e8f0";
-          posterCtx.lineWidth = 1;
-          posterCtx.beginPath();
-          posterCtx.moveTo(circX - 30, circY + 58);
-          posterCtx.lineTo(circX + 30, circY + 58);
-          posterCtx.stroke();
-        }
-      });
-
-      // Center QR code frame
-      posterCtx.fillStyle = "#ffffff";
-      posterCtx.strokeStyle = "#C5A059";
-      posterCtx.lineWidth = 8;
-      const drawRoundRect = (ctx, x, y, width, height, radius) => {
+      // Helper function to draw round rects
+      const drawRoundRect = (ctx, x, y, width, height, radius, fill, stroke, strokeColor, strokeWidth) => {
         ctx.beginPath();
         ctx.moveTo(x + radius, y);
         ctx.lineTo(x + width - radius, y);
@@ -737,328 +480,269 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
         ctx.lineTo(x, y + radius);
         ctx.quadraticCurveTo(x, y, x + radius, y);
         ctx.closePath();
-        ctx.stroke();
+        if (fill) {
+          ctx.fill();
+        }
+        if (stroke) {
+          ctx.strokeStyle = strokeColor;
+          ctx.lineWidth = strokeWidth;
+          ctx.stroke();
+        }
       };
-      drawRoundRect(posterCtx, 252, 210, 296, 296, 32);
-      posterCtx.drawImage(qrCanvas, 270, 228, 260, 260);
 
-      // Draw Property Type Card (Right side)
-      const cardX = 575;
-      const cardY = 195;
-      const cardW = 185;
-      const cardH = 295;
-
-      // Card background
-      posterCtx.fillStyle = "#081A34";
-      const drawRoundRectFilled = (ctx, x, y, width, height, radius) => {
+      // Helper function to draw scallop badge
+      const drawScallopBadge = (ctx, cx, cy, r, numScallops, depth, fillColor, strokeColor, strokeWidth) => {
         ctx.beginPath();
-        ctx.moveTo(x + radius, y);
-        ctx.lineTo(x + width - radius, y);
-        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-        ctx.lineTo(x + width, y + height - radius);
-        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-        ctx.lineTo(x + radius, y + height);
-        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-        ctx.lineTo(x, y + radius);
-        ctx.quadraticCurveTo(x, y, x + radius, y);
-        ctx.closePath();
-        ctx.fill();
-      };
-      drawRoundRectFilled(posterCtx, cardX, cardY, cardW, cardH, 16);
-
-      // Draw items inside card
-      PROPERTY_TYPES_LIST.forEach((item, index) => {
-        const itemY = cardY + 12 + index * 20;
-
-        let isChecked = false;
-        if (item === "Furnished") {
-          isChecked = property.furnished === true || property.furnished === "true";
-        } else {
-          const pType = String(property.propertyType || "").toLowerCase().trim();
-          const itemNorm = item.toLowerCase().trim();
-          if (pType === itemNorm) {
-            isChecked = true;
-          } else if (itemNorm === "4+ bedroom" && (pType.includes("4 bedroom") || pType.includes("4+ bedroom") || pType.includes("5 bedroom"))) {
-            isChecked = true;
+        for (let i = 0; i <= 360; i++) {
+          const angle = (i * Math.PI) / 180;
+          const currentR = r + Math.sin(angle * numScallops) * depth;
+          const x = cx + currentR * Math.cos(angle);
+          const y = cy + currentR * Math.sin(angle);
+          if (i === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
           }
         }
-
-        // Draw text
-        posterCtx.fillStyle = "#ffffff";
-        posterCtx.font = "bold 9px 'Inter', sans-serif";
-        posterCtx.textAlign = "left";
-        posterCtx.fillText(item, cardX + 12, itemY + 8);
-
-        // Checkbox circle
-        const circleX = cardX + cardW - 20;
-        const circleY = itemY + 4;
-        const radius = 5;
-
-        if (isChecked) {
-          posterCtx.fillStyle = "#C5A059";
-          posterCtx.beginPath();
-          posterCtx.arc(circleX, circleY, radius, 0, Math.PI * 2);
-          posterCtx.fill();
-
-          posterCtx.strokeStyle = "#081A34";
-          posterCtx.lineWidth = 1.5;
-          posterCtx.beginPath();
-          posterCtx.moveTo(circleX - 2.5, circleY);
-          posterCtx.lineTo(circleX - 0.5, circleY + 2);
-          posterCtx.lineTo(circleX + 2.5, circleY - 1.5);
-          posterCtx.stroke();
-        } else {
-          posterCtx.strokeStyle = "rgba(255, 255, 255, 0.3)";
-          posterCtx.lineWidth = 1;
-          posterCtx.beginPath();
-          posterCtx.arc(circleX, circleY, radius, 0, Math.PI * 2);
-          posterCtx.stroke();
+        ctx.closePath();
+        if (fillColor) {
+          ctx.fillStyle = fillColor;
+          ctx.fill();
         }
-      });
+        if (strokeColor) {
+          ctx.strokeStyle = strokeColor;
+          ctx.lineWidth = strokeWidth;
+          ctx.stroke();
+        }
+      };
 
-      // Draw overlapping scan badge
-      const badgeX = cardX + cardW / 2;
-      const badgeY = cardY + cardH;
-      const badgeRadius = 38;
-
+      // Draw top-left accent
       posterCtx.fillStyle = "#081A34";
       posterCtx.beginPath();
-      posterCtx.arc(badgeX, badgeY, badgeRadius, 0, Math.PI * 2);
+      posterCtx.moveTo(0, 0);
+      posterCtx.lineTo(280, 0);
+      posterCtx.lineTo(220, 30);
+      posterCtx.lineTo(0, 30);
+      posterCtx.closePath();
       posterCtx.fill();
 
-      posterCtx.strokeStyle = "#C5A059";
-      posterCtx.lineWidth = 2;
+      // Logo Section (Centered)
+      const logoW = 100;
+      const logoH = 100;
+      const logoX = (posterCanvas.width - logoW) / 2;
+      const logoY = 50;
+      posterCtx.drawImage(logoImg, logoX, logoY, logoW, logoH);
+
+      // Brand name
+      posterCtx.font = "900 42px 'Inter', sans-serif";
+      const brandY = 195;
+      const text1 = "AXX ";
+      const text2 = "SPACE";
+      const w1 = posterCtx.measureText(text1).width;
+      const w2 = posterCtx.measureText(text2).width;
+      const startX = (posterCanvas.width - (w1 + w2)) / 2;
+
+      posterCtx.textAlign = "left";
+      posterCtx.fillStyle = "#d9383a";
+      posterCtx.fillText(text1, startX, brandY);
+
+      posterCtx.fillStyle = "#081A34";
+      posterCtx.fillText(text2, startX + w1, brandY);
+
+      // Tagline
+      posterCtx.textAlign = "center";
+      posterCtx.fillStyle = "#475569";
+      posterCtx.font = "500 16px 'Inter', sans-serif";
+      posterCtx.fillText("Space hunting bila stress", posterCanvas.width / 2, 222);
+
+      // Red separator line
+      posterCtx.fillStyle = "#d9383a";
+      posterCtx.fillRect(40, 240, 720, 4);
+
+      // Main title: "ROOM/HOUSE AVAILABLE"
+      posterCtx.textAlign = "center";
+      posterCtx.fillStyle = "#081A34";
+      posterCtx.font = "900 60px 'Inter', sans-serif";
+      posterCtx.fillText("ROOM/HOUSE", posterCanvas.width / 2, 330);
+
+      posterCtx.fillStyle = "#d9383a";
+      posterCtx.font = "900 85px 'Inter', sans-serif";
+      posterCtx.fillText("AVAILABLE", posterCanvas.width / 2, 420);
+
+      // Draw scalloped stamp badge (Listed On AXXSPACE)
+      const badgeX = 650;
+      const badgeY = 350;
+      const badgeRadius = 45;
+
+      drawScallopBadge(posterCtx, badgeX, badgeY, badgeRadius, 18, 4, "#081A34", "#d9383a", 3);
+
+      // Draw house icon inside the badge
+      posterCtx.strokeStyle = "#ffffff";
+      posterCtx.lineWidth = 2.5;
+      posterCtx.lineCap = "round";
+      posterCtx.lineJoin = "round";
+
+      // Roof
       posterCtx.beginPath();
-      posterCtx.arc(badgeX, badgeY, badgeRadius - 1, 0, Math.PI * 2);
+      posterCtx.moveTo(badgeX - 18, badgeY - 8);
+      posterCtx.lineTo(badgeX, badgeY - 24);
+      posterCtx.lineTo(badgeX + 18, badgeY - 8);
       posterCtx.stroke();
 
+      // House body
+      posterCtx.beginPath();
+      posterCtx.moveTo(badgeX - 12, badgeY - 8);
+      posterCtx.lineTo(badgeX - 12, badgeY + 8);
+      posterCtx.lineTo(badgeX + 12, badgeY + 8);
+      posterCtx.lineTo(badgeX + 12, badgeY - 8);
+      posterCtx.stroke();
+
+      // Door
+      posterCtx.fillStyle = "#ffffff";
+      posterCtx.fillRect(badgeX - 4, badgeY, 8, 8);
+
+      // Text inside badge
       posterCtx.fillStyle = "#ffffff";
       posterCtx.textAlign = "center";
-      posterCtx.font = "bold 9px 'Inter', sans-serif";
-      posterCtx.fillText("SCAN NOW", badgeX, badgeY - 5);
 
-      posterCtx.fillStyle = "#C5A059";
-      posterCtx.font = "500 6.5px 'Inter', sans-serif";
-      posterCtx.fillText("Find your next", badgeX, badgeY + 6);
-      posterCtx.fillText("space today!", badgeX, badgeY + 14);
+      posterCtx.font = "bold 8px 'Inter', sans-serif";
+      posterCtx.fillText("Listed On", badgeX, badgeY + 20);
 
-      // Info Banner
+      posterCtx.font = "900 9.5px 'Inter', sans-serif";
+      posterCtx.fillText("AXXSPACE", badgeX, badgeY + 31);
+
+      // Scan Call to Action text
       posterCtx.fillStyle = "#081A34";
-      posterCtx.fillRect(40, 560, 720, 50);
-
-      posterCtx.fillStyle = "#ffffff";
-      posterCtx.font = "800 14px 'Inter', sans-serif";
-      posterCtx.textAlign = "left";
-      posterCtx.fillText("Or visit: www.axxspace.com", 60, 590);
-
       posterCtx.textAlign = "center";
-      posterCtx.fillText("Email: info@axxspace.com", posterCanvas.width / 2, 590);
+      posterCtx.font = "800 20px 'Inter', sans-serif";
+      posterCtx.fillText("SCAN TO VIEW HOUSE DETAILS AND CONTACTS", posterCanvas.width / 2, 480);
 
-      posterCtx.textAlign = "right";
-      const displayId = property._id ? property._id.slice(-6).toUpperCase() : "AXXSPC";
-      posterCtx.fillText(`Search Property ID: ${displayId}`, 740, 590);
+      // QR Code Box with red border
+      const qrBoxW = 296;
+      const qrBoxH = 296;
+      const qrBoxX = (posterCanvas.width - qrBoxW) / 2;
+      const qrBoxY = 515;
+      const qrBoxR = 10;
 
-      // Why choose section
+      // Fill white round rect
+      posterCtx.fillStyle = "#ffffff";
+      drawRoundRect(posterCtx, qrBoxX, qrBoxY, qrBoxW, qrBoxH, qrBoxR, true, true, "#d9383a", 4);
+
+      // Draw QR Code inside
+      posterCtx.drawImage(qrCanvas, qrBoxX + 16, qrBoxY + 16, 264, 264);
+
+      // OR VISIT
       posterCtx.fillStyle = "#081A34";
       posterCtx.textAlign = "center";
       posterCtx.font = "800 16px 'Inter', sans-serif";
-      posterCtx.fillText("WHY CHOOSE AXXSPACE?", posterCanvas.width / 2, 660);
+      posterCtx.fillText("OR VISIT", posterCanvas.width / 2, 850);
 
-      posterCtx.fillStyle = "#C5A059";
-      posterCtx.fillRect(350, 675, 100, 2);
+      // www.axxspace.com Pill
+      const pillW = 280;
+      const pillH = 44;
+      const pillX = (posterCanvas.width - pillW) / 2;
+      const pillY = 870;
+      const pillR = 22;
 
-      // Why choose columns
-      const benefits = [
-        {
-          label: "MORE VISIBILITY",
-          desc1: "Reach more potential",
-          desc2: "tenants online & offline.",
-          drawIcon: (cx, cy) => {
-            posterCtx.strokeStyle = "#081A34";
-            posterCtx.lineWidth = 1.5;
-            posterCtx.beginPath();
-            posterCtx.moveTo(cx - 12, cy);
-            posterCtx.quadraticCurveTo(cx, cy - 8, cx + 12, cy);
-            posterCtx.quadraticCurveTo(cx, cy + 8, cx - 12, cy);
-            posterCtx.stroke();
-            posterCtx.beginPath();
-            posterCtx.arc(cx, cy, 3, 0, Math.PI * 2);
-            posterCtx.fillStyle = "#C5A059";
-            posterCtx.fill();
-          }
-        },
-        {
-          label: "EASY ACCESS",
-          desc1: "Tenants can scan and",
-          desc2: "view details instantly.",
-          drawIcon: (cx, cy) => {
-            posterCtx.strokeStyle = "#081A34";
-            posterCtx.lineWidth = 1.5;
-            posterCtx.beginPath();
-            const pw = 12;
-            const ph = 20;
-            const px = cx - pw / 2;
-            const py = cy - ph / 2;
-            const r = 2;
-            posterCtx.moveTo(px + r, py);
-            posterCtx.lineTo(px + pw - r, py);
-            posterCtx.quadraticCurveTo(px + pw, py, px + pw, py + r);
-            posterCtx.lineTo(px + pw, py + ph - r);
-            posterCtx.quadraticCurveTo(px + pw, py + ph, px + pw - r, py + ph);
-            posterCtx.lineTo(px + r, py + ph);
-            posterCtx.quadraticCurveTo(px, py + ph, px, py + ph - r);
-            posterCtx.lineTo(px, py + r);
-            posterCtx.quadraticCurveTo(px, py, px + r, py);
-            posterCtx.closePath();
-            posterCtx.stroke();
-            posterCtx.beginPath();
-            posterCtx.moveTo(cx - 2, cy + ph / 2 - 3);
-            posterCtx.lineTo(cx + 2, cy + ph / 2 - 3);
-            posterCtx.stroke();
-          }
-        },
-        {
-          label: "TRACK PERFORMANCE",
-          desc1: "Monitor views &",
-          desc2: "enquiries in real-time.",
-          drawIcon: (cx, cy) => {
-            posterCtx.strokeStyle = "#081A34";
-            posterCtx.lineWidth = 2;
-            posterCtx.beginPath();
-            posterCtx.moveTo(cx - 10, cy + 6);
-            posterCtx.lineTo(cx - 3, cy);
-            posterCtx.lineTo(cx + 2, cy + 5);
-            posterCtx.lineTo(cx + 9, cy - 6);
-            posterCtx.stroke();
-            posterCtx.beginPath();
-            posterCtx.moveTo(cx + 4, cy - 6);
-            posterCtx.lineTo(cx + 9, cy - 6);
-            posterCtx.lineTo(cx + 9, cy - 1);
-            posterCtx.stroke();
-          }
-        },
-        {
-          label: "MORE ENQUIRIES",
-          desc1: "Get more genuine",
-          desc2: "leads and serious tenants.",
-          drawIcon: (cx, cy) => {
-            posterCtx.strokeStyle = "#081A34";
-            posterCtx.lineWidth = 1.5;
-            posterCtx.beginPath();
-            posterCtx.arc(cx - 4, cy - 2, 3, 0, Math.PI * 2);
-            posterCtx.stroke();
-            posterCtx.beginPath();
-            posterCtx.arc(cx - 4, cy + 7, 5, Math.PI, 0);
-            posterCtx.stroke();
-            posterCtx.fillStyle = "#ffffff";
-            posterCtx.beginPath();
-            posterCtx.arc(cx + 4, cy - 2, 3.5, 0, Math.PI * 2);
-            posterCtx.fill();
-            posterCtx.stroke();
-            posterCtx.beginPath();
-            posterCtx.arc(cx + 4, cy + 7, 5.5, Math.PI, 0);
-            posterCtx.fill();
-            posterCtx.stroke();
-          }
-        },
-        {
-          label: "TRUSTED PLATFORM",
-          desc1: "A professional",
-          desc2: "system built for users.",
-          drawIcon: (cx, cy) => {
-            posterCtx.strokeStyle = "#081A34";
-            posterCtx.lineWidth = 1.5;
-            posterCtx.beginPath();
-            posterCtx.moveTo(cx - 7, cy - 8);
-            posterCtx.lineTo(cx + 7, cy - 8);
-            posterCtx.lineTo(cx + 7, cy - 1);
-            posterCtx.quadraticCurveTo(cx + 7, cy + 5, cx, cy + 9);
-            posterCtx.quadraticCurveTo(cx - 7, cy + 5, cx - 7, cy - 1);
-            posterCtx.closePath();
-            posterCtx.stroke();
-            posterCtx.strokeStyle = "#C5A059";
-            posterCtx.lineWidth = 1.5;
-            posterCtx.beginPath();
-            posterCtx.moveTo(cx - 3, cy);
-            posterCtx.lineTo(cx - 1, cy + 2);
-            posterCtx.lineTo(cx + 3, cy - 2);
-            posterCtx.stroke();
-          }
-        }
-      ];
+      // Fill white round rect with navy border
+      posterCtx.fillStyle = "#ffffff";
+      drawRoundRect(posterCtx, pillX, pillY, pillW, pillH, pillR, true, true, "#081A34", 2);
 
-      benefits.forEach((b, index) => {
-        const colW = 144;
-        const cx = 40 + colW / 2 + index * colW;
-        const cyIcon = 720;
+      // Globe Icon inside pill
+      const globeX = pillX + 22;
+      const globeY = pillY + 22;
 
-        // Draw icon
-        b.drawIcon(cx, cyIcon);
-
-        // Draw label
-        posterCtx.fillStyle = "#081A34";
-        posterCtx.textAlign = "center";
-        posterCtx.font = "800 10.5px 'Inter', sans-serif";
-        posterCtx.fillText(b.label, cx, 752);
-
-        // Draw description line 1
-        posterCtx.fillStyle = "#475569";
-        posterCtx.font = "600 8.5px 'Inter', sans-serif";
-        posterCtx.fillText(b.desc1, cx, 770);
-
-        // Draw description line 2
-        posterCtx.fillText(b.desc2, cx, 784);
-
-        // Draw column divider (except last column)
-        if (index < 4) {
-          const divX = 40 + (index + 1) * colW;
-          posterCtx.strokeStyle = "#e2e8f0";
-          posterCtx.lineWidth = 1;
-          posterCtx.beginPath();
-          posterCtx.moveTo(divX, 715);
-          posterCtx.lineTo(divX, 780);
-          posterCtx.stroke();
-        }
-      });
-
-
-      // Footers
       posterCtx.fillStyle = "#081A34";
-      posterCtx.fillRect(0, 990, 800, 50);
+      posterCtx.beginPath();
+      posterCtx.arc(globeX, globeY, 12, 0, Math.PI * 2);
+      posterCtx.fill();
+
+      posterCtx.strokeStyle = "#ffffff";
+      posterCtx.lineWidth = 1.5;
+
+      // Draw white globe lines inside the circle
+      posterCtx.beginPath();
+      posterCtx.arc(globeX, globeY, 10, 0, Math.PI * 2);
+      posterCtx.stroke();
+
+      posterCtx.beginPath();
+      posterCtx.moveTo(globeX - 10, globeY);
+      posterCtx.lineTo(globeX + 10, globeY);
+      posterCtx.stroke();
+
+      posterCtx.beginPath();
+      posterCtx.moveTo(globeX, globeY - 10);
+      posterCtx.lineTo(globeX, globeY + 10);
+      posterCtx.stroke();
+
+      // Globe vertical ellipse
+      posterCtx.beginPath();
+      posterCtx.ellipse ? posterCtx.ellipse(globeX, globeY, 5, 10, 0, 0, Math.PI * 2) : posterCtx.arc(globeX, globeY, 5, 0, Math.PI * 2);
+      posterCtx.stroke();
+
+      // Text inside pill
+      posterCtx.fillStyle = "#081A34";
+      posterCtx.textAlign = "left";
+      posterCtx.font = "800 18px 'Inter', sans-serif";
+      posterCtx.fillText("www.axxspace.com", pillX + 44, pillY + 28);
+
+      // Contact Footer row
+      const contactY = 960;
+      posterCtx.textAlign = "left";
+      posterCtx.font = "800 15px 'Inter', sans-serif";
+
+      // Block 1: info@axxspace.com
+      const b1X = 80;
+      posterCtx.strokeStyle = "#081A34";
+      posterCtx.lineWidth = 2;
+      posterCtx.strokeRect(b1X, contactY - 12, 18, 12);
+      posterCtx.beginPath();
+      posterCtx.moveTo(b1X, contactY - 12);
+      posterCtx.lineTo(b1X + 9, contactY - 6);
+      posterCtx.lineTo(b1X + 18, contactY - 12);
+      posterCtx.stroke();
+      posterCtx.fillText("info@axxspace.com", b1X + 26, contactY - 1);
+
+      // Block 2: +254 745 689 773
+      const b2X = 330;
+      posterCtx.strokeStyle = "#081A34";
+      posterCtx.lineWidth = 2;
+      posterCtx.beginPath();
+      posterCtx.arc(b2X + 8, contactY - 6, 6, 0, Math.PI * 2);
+      posterCtx.stroke();
+      posterCtx.beginPath();
+      posterCtx.arc(b2X + 8, contactY - 6, 2, 0, Math.PI * 2);
+      posterCtx.stroke();
+      posterCtx.fillText("+254 745 689 773", b2X + 26, contactY - 1);
+
+      // Block 3: axx.space
+      const b3X = 590;
+      posterCtx.strokeStyle = "#081A34";
+      posterCtx.lineWidth = 2;
+      posterCtx.strokeRect(b3X, contactY - 12, 14, 14);
+      posterCtx.beginPath();
+      posterCtx.arc(b3X + 7, contactY - 5, 3, 0, Math.PI * 2);
+      posterCtx.stroke();
+      posterCtx.fillText("axx.space", b3X + 26, contactY - 1);
+
+      // Bottom accents
+      // Red bottom-left
       posterCtx.fillStyle = "#d9383a";
-      posterCtx.fillRect(0, 1040, 800, 50);
+      posterCtx.beginPath();
+      posterCtx.moveTo(0, 1080);
+      posterCtx.lineTo(180, 1130);
+      posterCtx.lineTo(0, 1130);
+      posterCtx.closePath();
+      posterCtx.fill();
 
-      // Navy footer content
-      posterCtx.drawImage(logoImg, 40, 1000, 30, 30);
-
-      posterCtx.fillStyle = "#ffffff";
-      posterCtx.textAlign = "left";
-      posterCtx.font = "900 16px 'Inter', sans-serif";
-      posterCtx.fillText("AXXSPACE", 80, 1020);
-
-      posterCtx.fillStyle = "#94a3b8";
-      posterCtx.font = "700 9px 'Inter', sans-serif";
-      posterCtx.fillText("Space hunting bila stress.", 175, 1020);
-
-      posterCtx.textAlign = "right";
-      posterCtx.font = "800 12px 'Inter', sans-serif";
-      posterCtx.fillText("Kenya's smart rental marketplace", 760, 1020);
-
-      // Red footer content
-      posterCtx.textAlign = "left";
-      posterCtx.fillStyle = "#ffffff";
-      posterCtx.font = "900 14px 'Inter', sans-serif";
-      posterCtx.fillText("TO LANDLORDS:", 40, 1070);
-
-      posterCtx.textAlign = "right";
-      posterCtx.font = "800 10px 'Inter', sans-serif";
-      posterCtx.fillText("1. LIST PROPERTY  >  2. GENERATE QR  >  3. PRINT & DISPLAY  >  4. GET TENANTS", 760, 1070);
-
-      // Thank you
-      posterCtx.fillStyle = "#475569";
-      posterCtx.textAlign = "center";
-      posterCtx.font = "700 10px 'Inter', sans-serif";
-      posterCtx.fillText("Thank you for choosing Axxspace. | Together, we make space hunting easy.", posterCanvas.width / 2, 1110);
+      // Navy bottom-right
+      posterCtx.fillStyle = "#081A34";
+      posterCtx.beginPath();
+      posterCtx.moveTo(800, 1080);
+      posterCtx.lineTo(800, 1130);
+      posterCtx.lineTo(580, 1130);
+      posterCtx.closePath();
+      posterCtx.fill();
     };
   };
 
@@ -1356,539 +1040,187 @@ const posterStyles = {
     height: "1123px",
     backgroundColor: "#ffffff",
     color: "#081A34",
-    fontFamily: "'Inter', 'DM Sans', sans-serif",
+    fontFamily: "'Inter', sans-serif",
     display: "flex",
     flexDirection: "column",
-    justifyContent: "space-between",
+    alignItems: "center",
     boxSizing: "border-box",
     padding: "0",
     position: "relative",
+    overflow: "hidden",
   },
-  headerRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    padding: "24px 36px 0 36px",
-    height: "120px",
+  topAccentLeft: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "280px",
+    height: "30px",
+    backgroundColor: "#081A34",
+    clipPath: "polygon(0 0, 100% 0, 85% 100%, 0 100%)",
   },
-  headerLeft: {
+  logoSection: {
     display: "flex",
+    flexDirection: "column",
     alignItems: "center",
-    width: "220px",
-  },
-  logoWrapper: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
+    marginTop: "50px",
+    width: "100%",
   },
   logoImg: {
-    width: "48px",
-    height: "48px",
+    width: "100px",
+    height: "100px",
     objectFit: "contain",
   },
   logoTextContainer: {
     display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-  },
-  logoBrand: {
-    fontSize: "24px",
+    fontSize: "40px",
     fontWeight: "900",
-    color: "#081A34",
     letterSpacing: "-1px",
-    lineHeight: "1",
+    marginTop: "10px",
   },
   logoTagline: {
-    fontSize: "9px",
-    fontWeight: "700",
-    color: "#64748b",
-    marginTop: "2px",
-  },
-  headerCenter: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    textAlign: "center",
-    flex: "1",
-  },
-  mainTitleRow1: {
-    fontSize: "28px",
-    fontWeight: "800",
-    color: "#081A34",
-    lineHeight: "1",
-    letterSpacing: "-0.5px",
-  },
-  mainTitleRow2: {
-    fontSize: "44px",
-    fontWeight: "900",
-    color: "#d9383a",
-    lineHeight: "0.95",
-    letterSpacing: "-1px",
-    marginTop: "2px",
-  },
-  scanIndicator: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "8px",
-    marginTop: "8px",
-    width: "100%",
-  },
-  indicatorLine: {
-    height: "1.5px",
-    flex: "1",
-    backgroundColor: "#C5A059",
-  },
-  indicatorText: {
-    fontSize: "9.5px",
-    fontWeight: "900",
-    color: "#081A34",
-    letterSpacing: "0.8px",
-    whiteSpace: "nowrap",
-  },
-  headerRight: {
-    width: "220px",
-    display: "flex",
-    justifyContent: "flex-end",
-  },
-  ribbon: {
-    width: "90px",
-    height: "90px",
-    backgroundColor: "#081A34",
-    border: "2.5px solid #C5A059",
-    borderTop: "none",
-    borderRadius: "0 0 12px 12px",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.12)",
-  },
-  ribbonListed: {
-    fontSize: "8px",
-    color: "#94a3b8",
-    fontWeight: "800",
-    letterSpacing: "0.5px",
+    fontSize: "16px",
+    color: "#475569",
+    fontWeight: "500",
     marginTop: "4px",
   },
-  ribbonBrand: {
-    fontSize: "10px",
-    color: "#ffffff",
-    fontWeight: "900",
-    letterSpacing: "0.5px",
-    marginTop: "2px",
+  redSeparator: {
+    width: "90%",
+    height: "4px",
+    backgroundColor: "#d9383a",
+    marginTop: "20px",
   },
-  mainSection: {
-    display: "grid",
-    gridTemplateColumns: "185px 304px 185px",
-    gap: "20px",
-    padding: "10px 40px",
-    alignItems: "center",
-    height: "380px",
-  },
-  featuresCol: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    height: "100%",
-    padding: "15px 0",
-  },
-  featureCard: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
+  titleSection: {
+    position: "relative",
+    width: "100%",
     textAlign: "center",
+    marginTop: "35px",
   },
-  featureIconCircle: {
-    width: "44px",
-    height: "44px",
-    borderRadius: "50%",
-    border: "2px solid #C5A059",
-    backgroundColor: "rgba(197, 160, 89, 0.05)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "#C5A059",
+  titleTextContainer: {
+    display: "inline-block",
   },
-  featureTitle: {
-    fontSize: "11.5px",
+  titleRow1: {
+    fontSize: "60px",
+    fontWeight: "900",
+    color: "#081A34",
+    lineHeight: "1",
+    letterSpacing: "1px",
+  },
+  titleRow2: {
+    fontSize: "85px",
+    fontWeight: "900",
+    color: "#d9383a",
+    lineHeight: "1",
+    letterSpacing: "2px",
+  },
+  badgeContainer: {
+    position: "absolute",
+    right: "40px",
+    top: "50%",
+    transform: "translateY(-50%)",
+  },
+  scanInstruction: {
+    fontSize: "18px",
     fontWeight: "800",
     color: "#081A34",
-    marginTop: "8px",
-    textTransform: "uppercase",
+    marginTop: "20px",
+    textAlign: "center",
     letterSpacing: "0.5px",
   },
-  featureDesc: {
-    fontSize: "9px",
-    color: "#475569",
-    marginTop: "2px",
-    fontWeight: "600",
-    lineHeight: "1.2",
-  },
-  featureDivider: {
-    width: "40px",
-    height: "1px",
-    backgroundColor: "#e2e8f0",
-    alignSelf: "center",
-  },
-  qrCol: {
+  qrContainer: {
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
+    marginTop: "25px",
   },
-  qrGoldFrame: {
-    border: "6px solid #C5A059",
-    borderRadius: "28px",
-    padding: "14px",
+  qrBox: {
+    border: "4px solid #d9383a",
+    borderRadius: "10px",
+    padding: "16px",
     backgroundColor: "#ffffff",
     boxShadow: "0 10px 25px rgba(0,0,0,0.05)",
+    display: "inline-block",
   },
   qrCodeImg: {
-    width: "210px",
-    height: "210px",
+    width: "260px",
+    height: "260px",
     display: "block",
   },
   qrPlaceholder: {
-    width: "210px",
-    height: "210px",
+    width: "260px",
+    height: "260px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: "12px",
+    fontSize: "14px",
     color: "#64748b",
-    fontWeight: "600",
   },
-  typesCardCol: {
-    position: "relative",
-    height: "100%",
-    width: "100%",
+  visitSection: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
+    marginTop: "20px",
   },
-  typesCard: {
-    width: "100%",
-    height: "90%",
-    backgroundColor: "#081A34",
-    borderRadius: "20px",
-    padding: "16px 14px",
-    boxSizing: "border-box",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    border: "1px solid rgba(255,255,255,0.08)",
-    boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-  },
-  typeRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
-  },
-  typeLabel: {
-    color: "#ffffff",
-    fontSize: "9px",
-    fontWeight: "700",
-    fontFamily: "'Inter', sans-serif",
-  },
-  checkCircle: {
-    width: "11px",
-    height: "11px",
-    borderRadius: "50%",
-    border: "1px solid rgba(255,255,255,0.3)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "transparent",
-  },
-  checkCircleActive: {
-    width: "11px",
-    height: "11px",
-    borderRadius: "50%",
-    backgroundColor: "#C5A059",
-    border: "1px solid #C5A059",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  scanBadgeCircleOverlapping: {
-    position: "absolute",
-    bottom: "-5px",
-    left: "50%",
-    transform: "translateX(-50%)",
-    width: "80px",
-    height: "80px",
-    borderRadius: "50%",
-    backgroundColor: "#081A34",
-    border: "2.5px solid #C5A059",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "#ffffff",
-    textAlign: "center",
-    boxShadow: "0 8px 20px rgba(8, 26, 52, 0.35)",
-    zIndex: 10,
-  },
-  scanBadgeTitle: {
-    fontSize: "9px",
+  orVisitText: {
+    fontSize: "14px",
     fontWeight: "800",
-    color: "#ffffff",
-    marginTop: "2px",
-    letterSpacing: "0.5px",
+    color: "#081A34",
+    letterSpacing: "1px",
   },
-  scanBadgeDesc: {
-    fontSize: "6.5px",
-    color: "#94a3b8",
-    lineHeight: "1.1",
-    width: "65px",
-    marginTop: "1.5px",
-    fontWeight: "600",
-  },
-  infoBanner: {
-    margin: "0 40px",
-    height: "46px",
-    backgroundColor: "#081A34",
-    borderRadius: "10px",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "0 24px",
-    color: "#ffffff",
-    boxShadow: "0 4px 10px rgba(8, 26, 52, 0.15)",
-  },
-  infoLeft: {
+  visitPill: {
     display: "flex",
     alignItems: "center",
-    gap: "8px",
-  },
-  infoTextLabel: {
-    fontSize: "11px",
-    color: "#94a3b8",
-    fontWeight: "600",
-  },
-  infoTextValue: {
-    fontSize: "13px",
-    color: "#ffffff",
-    fontWeight: "800",
-    textDecoration: "underline",
-    textDecorationColor: "#C5A059",
-  },
-  infoDivider: {
-    width: "1px",
-    height: "18px",
-    backgroundColor: "rgba(255,255,255,0.15)",
-  },
-  infoRight: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-  },
-  infoIdBox: {
+    gap: "10px",
+    border: "2px solid #081A34",
+    borderRadius: "30px",
+    padding: "6px 20px",
     backgroundColor: "#ffffff",
-    color: "#081A34",
-    fontWeight: "900",
-    fontSize: "13px",
-    padding: "3px 10px",
-    borderRadius: "5px",
-    border: "1px solid #e2e8f0",
-    letterSpacing: "0.5px",
-    minWidth: "70px",
-    textAlign: "center",
+    marginTop: "8px",
   },
-  whySection: {
+  globeCircle: {
+    width: "24px",
+    height: "24px",
+    borderRadius: "50%",
+    backgroundColor: "#081A34",
     display: "flex",
-    flexDirection: "column",
     alignItems: "center",
-    padding: "0 40px",
-    marginTop: "15px",
+    justifyContent: "center",
   },
-  whyTitle: {
-    fontSize: "12px",
-    fontWeight: "900",
-    color: "#081A34",
-    letterSpacing: "1.2px",
-  },
-  whyGoldLine: {
-    height: "2px",
-    width: "50px",
-    backgroundColor: "#C5A059",
-    margin: "4px auto 10px",
-  },
-  whyGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(5, 1fr)",
-    width: "100%",
-  },
-  whyCol: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    textAlign: "center",
-    padding: "0 8px",
-    position: "relative",
-  },
-  whyColLabel: {
-    fontSize: "8.5px",
+  visitUrl: {
+    fontSize: "18px",
     fontWeight: "800",
     color: "#081A34",
-    marginTop: "5px",
-    textTransform: "uppercase",
-    letterSpacing: "0.3px",
   },
-  whyColDesc: {
-    fontSize: "7px",
-    color: "#475569",
-    marginTop: "3px",
-    lineHeight: "1.2",
-    fontWeight: "600",
-  },
-  whyColDivider: {
-    position: "absolute",
-    right: "0",
-    top: "8px",
-    height: "35px",
-    width: "1px",
-    backgroundColor: "#e2e8f0",
-  },
-  footerContainer: {
-    marginTop: "auto",
+  contactFooter: {
     display: "flex",
-    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "24px",
+    marginTop: "30px",
     width: "100%",
   },
-  navyFooter: {
-    height: "44px",
-    backgroundColor: "#081A34",
-    borderTop: "3.5px solid #C5A059",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "0 36px",
-    color: "#ffffff",
-  },
-  navyFooterLeft: {
+  contactItem: {
     display: "flex",
     alignItems: "center",
     gap: "6px",
-    width: "230px",
-  },
-  navyLogo: {
-    width: "24px",
-    height: "24px",
-    objectFit: "contain",
-  },
-  navyBrandName: {
-    fontSize: "13px",
-    fontWeight: "900",
-    letterSpacing: "-0.5px",
-  },
-  navyTagline: {
-    fontSize: "8px",
-    color: "#94a3b8",
-    fontWeight: "600",
-  },
-  navyFooterCenter: {
-    fontSize: "9.5px",
-    color: "#94a3b8",
-    fontWeight: "600",
-  },
-  navyFooterRight: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-    fontSize: "9.5px",
-    width: "230px",
-    justifyContent: "flex-end",
-  },
-  socialHandle: {
-    color: "#C5A059",
+    color: "#081A34",
+    fontSize: "14px",
     fontWeight: "700",
-    marginLeft: "2px",
   },
-  redFooter: {
-    height: "46px",
+  bottomAccentLeft: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    width: "180px",
+    height: "35px",
     backgroundColor: "#d9383a",
-    display: "flex",
-    alignItems: "center",
-    padding: "0 36px",
-    justifyContent: "space-between",
-    color: "#ffffff",
+    clipPath: "polygon(0 40%, 100% 100%, 0 100%)",
   },
-  redFooterLeft: {
-    fontSize: "12px",
-    fontWeight: "900",
-    letterSpacing: "0.5px",
+  bottomAccentRight: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    width: "240px",
+    height: "35px",
+    backgroundColor: "#081A34",
+    clipPath: "polygon(100% 40%, 100% 100%, 0 100%)",
   },
-  redFooterSteps: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-    flex: "1",
-    justifyContent: "flex-end",
-    marginLeft: "15px",
-  },
-  stepItem: {
-    display: "flex",
-    alignItems: "center",
-    gap: "5px",
-  },
-  stepCircle: {
-    width: "16px",
-    height: "16px",
-    borderRadius: "50%",
-    backgroundColor: "#ffffff",
-    color: "#d9383a",
-    fontSize: "9px",
-    fontWeight: "900",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  stepCircleIcon: {
-    width: "16px",
-    height: "16px",
-    borderRadius: "50%",
-    backgroundColor: "#ffffff",
-    color: "#d9383a",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  stepTextWrapper: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-  },
-  stepTextWrapperInner: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-  },
-  stepTitle: {
-    fontSize: "8.5px",
-    fontWeight: "800",
-    lineHeight: "1",
-    textTransform: "uppercase",
-  },
-  stepDesc: {
-    fontSize: "6.5px",
-    color: "rgba(255,255,255,0.85)",
-    lineHeight: "1",
-    marginTop: "1.5px",
-    fontWeight: "500",
-  },
-  stepArrow: {
-    fontSize: "10px",
-    color: "rgba(255,255,255,0.5)",
-    fontWeight: "750",
-  },
-  thankYouText: {
-    textAlign: "center",
-    fontSize: "8.5px",
-    fontWeight: "700",
-    color: "#475569",
-    padding: "6px 0",
-    backgroundColor: "#f8fafc",
-  }
 };
