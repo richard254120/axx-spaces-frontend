@@ -152,7 +152,7 @@ const TenantsIcon = () => (
 
 const FacebookIcon = () => (
   <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
-    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
   </svg>
 );
 
@@ -166,20 +166,20 @@ const InstagramIcon = () => (
 
 const XIcon = () => (
   <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
-    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
   </svg>
 );
 
 const TikTokIcon = () => (
   <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
-    <path d="M12.525.02c1.31.02 2.61.35 3.75 1 .1-.8.4-1.56.9-2.2H12.85v14.1c0 2.26-1.89 4.1-4.22 4.1-2.33 0-4.22-1.84-4.22-4.1 0-2.26 1.89-4.1 4.22-4.1.47 0 .92.08 1.34.22V6.02c-5 .52-8.84 4.77-8.84 9.98 0 5.52 4.48 10 10 10s10-4.48 10-10V4.82c1.47.88 3.2 1.38 5.02 1.38v-3c-2.33 0-4.38-1.22-5.5-3.08a7.88 7.88 0 0 1-5.18-.1M10.125 15.02c-.93 0-1.68.75-1.68 1.68s.75 1.68 1.68 1.68 1.68-.75 1.68-1.68-.75-1.68-1.68-1.68"/>
+    <path d="M12.525.02c1.31.02 2.61.35 3.75 1 .1-.8.4-1.56.9-2.2H12.85v14.1c0 2.26-1.89 4.1-4.22 4.1-2.33 0-4.22-1.84-4.22-4.1 0-2.26 1.89-4.1 4.22-4.1.47 0 .92.08 1.34.22V6.02c-5 .52-8.84 4.77-8.84 9.98 0 5.52 4.48 10 10 10s10-4.48 10-10V4.82c1.47.88 3.2 1.38 5.02 1.38v-3c-2.33 0-4.38-1.22-5.5-3.08a7.88 7.88 0 0 1-5.18-.1M10.125 15.02c-.93 0-1.68.75-1.68 1.68s.75 1.68 1.68 1.68 1.68-.75 1.68-1.68-.75-1.68-1.68-1.68" />
   </svg>
 );
 
 // High-fidelity VacancyPoster Component
 function VacancyPoster({ property, qrCodeDataUrl, sourceLabel }) {
-  const propImg = (property.images && property.images.length > 0) 
-    ? property.images[0] 
+  const propImg = (property.images && property.images.length > 0)
+    ? property.images[0]
     : "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80";
 
   const displayId = property._id ? property._id.slice(-6).toUpperCase() : "AXXSPC";
@@ -310,6 +310,11 @@ function VacancyPoster({ property, qrCodeDataUrl, sourceLabel }) {
           <GlobeIcon />
           <span style={posterStyles.infoTextLabel}>Or visit:</span>
           <span style={posterStyles.infoTextValue}>www.axxspace.com</span>
+        </div>
+        <div style={posterStyles.infoDivider}></div>
+        <div style={posterStyles.infoCenter}>
+          <span style={posterStyles.infoTextLabel}>Email:</span>
+          <span style={posterStyles.infoTextValue}>info@axxspace.com</span>
         </div>
         <div style={posterStyles.infoDivider}></div>
         <div style={posterStyles.infoRight}>
@@ -559,13 +564,13 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
 
       // Draw top-left logo image
       posterCtx.drawImage(logoImg, 40, 24, 48, 48);
-      
+
       // Brand name
       posterCtx.fillStyle = "#081A34";
       posterCtx.font = "900 24px 'Inter', sans-serif";
       posterCtx.textAlign = "left";
       posterCtx.fillText("AXXSPACE", 98, 46);
-      
+
       // Tagline
       posterCtx.fillStyle = "#64748b";
       posterCtx.font = "700 9px 'Inter', sans-serif";
@@ -576,7 +581,7 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
       const ribY = 0;
       const ribW = 85;
       const ribH = 85;
-      
+
       // Draw navy background
       posterCtx.fillStyle = "#081A34";
       posterCtx.beginPath();
@@ -588,7 +593,7 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
       posterCtx.quadraticCurveTo(ribX, ribY + ribH, ribX, ribY + ribH - 12);
       posterCtx.closePath();
       posterCtx.fill();
-      
+
       // Gold border
       posterCtx.strokeStyle = "#C5A059";
       posterCtx.lineWidth = 2.5;
@@ -600,7 +605,7 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
       posterCtx.quadraticCurveTo(ribX + ribW, ribY + ribH, ribX + ribW, ribY + ribH - 12);
       posterCtx.lineTo(ribX + ribW, ribY);
       posterCtx.stroke();
-      
+
       // Draw small gold house icon inside ribbon
       posterCtx.strokeStyle = "#C5A059";
       posterCtx.lineWidth = 1.5;
@@ -614,13 +619,13 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
       posterCtx.lineTo(rx + 7, ry + 5);
       posterCtx.closePath();
       posterCtx.stroke();
-      
+
       // Text inside ribbon
       posterCtx.fillStyle = "#94a3b8";
       posterCtx.font = "bold 8px 'Inter', sans-serif";
       posterCtx.textAlign = "center";
       posterCtx.fillText("LISTED ON", rx, ry + 18);
-      
+
       posterCtx.fillStyle = "#ffffff";
       posterCtx.font = "900 9.5px 'Inter', sans-serif";
       posterCtx.fillText("AXXSPACE", rx, ry + 30);
@@ -644,16 +649,16 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
       const featX = 40;
       const featYStart = 200;
       const featGap = 100;
-      
+
       const FEATURES = [
         { title: "GENUINE LISTINGS", desc: "Verified landlords & properties." },
         { title: "SAFE & SECURE", desc: "Your security is our priority." },
         { title: "EASY CONTACT", desc: "Connect directly with landlord." }
       ];
-      
+
       FEATURES.forEach((feat, index) => {
         const currY = featYStart + index * featGap;
-        
+
         // Draw gold circle
         const circX = featX + 75;
         const circY = currY + 25;
@@ -662,7 +667,7 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
         posterCtx.beginPath();
         posterCtx.arc(circX, circY, 20, 0, Math.PI * 2);
         posterCtx.stroke();
-        
+
         // Draw icon
         posterCtx.strokeStyle = "#C5A059";
         posterCtx.lineWidth = 2;
@@ -695,17 +700,17 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
           posterCtx.fillRect(circX - 10, circY, 3, 5);
           posterCtx.fillRect(circX + 7, circY, 3, 5);
         }
-        
+
         // Text
         posterCtx.fillStyle = "#081A34";
         posterCtx.font = "bold 11px 'Inter', sans-serif";
         posterCtx.textAlign = "center";
         posterCtx.fillText(feat.title, circX, circY + 34);
-        
+
         posterCtx.fillStyle = "#475569";
         posterCtx.font = "500 8.5px 'Inter', sans-serif";
         posterCtx.fillText(feat.desc, circX, circY + 46);
-        
+
         if (index < 2) {
           posterCtx.strokeStyle = "#e2e8f0";
           posterCtx.lineWidth = 1;
@@ -742,7 +747,7 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
       const cardY = 195;
       const cardW = 185;
       const cardH = 295;
-      
+
       // Card background
       posterCtx.fillStyle = "#081A34";
       const drawRoundRectFilled = (ctx, x, y, width, height, radius) => {
@@ -760,11 +765,11 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
         ctx.fill();
       };
       drawRoundRectFilled(posterCtx, cardX, cardY, cardW, cardH, 16);
-      
+
       // Draw items inside card
       PROPERTY_TYPES_LIST.forEach((item, index) => {
         const itemY = cardY + 12 + index * 20;
-        
+
         let isChecked = false;
         if (item === "Furnished") {
           isChecked = property.furnished === true || property.furnished === "true";
@@ -777,24 +782,24 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
             isChecked = true;
           }
         }
-        
+
         // Draw text
         posterCtx.fillStyle = "#ffffff";
         posterCtx.font = "bold 9px 'Inter', sans-serif";
         posterCtx.textAlign = "left";
         posterCtx.fillText(item, cardX + 12, itemY + 8);
-        
+
         // Checkbox circle
         const circleX = cardX + cardW - 20;
         const circleY = itemY + 4;
         const radius = 5;
-        
+
         if (isChecked) {
           posterCtx.fillStyle = "#C5A059";
           posterCtx.beginPath();
           posterCtx.arc(circleX, circleY, radius, 0, Math.PI * 2);
           posterCtx.fill();
-          
+
           posterCtx.strokeStyle = "#081A34";
           posterCtx.lineWidth = 1.5;
           posterCtx.beginPath();
@@ -815,23 +820,23 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
       const badgeX = cardX + cardW / 2;
       const badgeY = cardY + cardH;
       const badgeRadius = 38;
-      
+
       posterCtx.fillStyle = "#081A34";
       posterCtx.beginPath();
       posterCtx.arc(badgeX, badgeY, badgeRadius, 0, Math.PI * 2);
       posterCtx.fill();
-      
+
       posterCtx.strokeStyle = "#C5A059";
       posterCtx.lineWidth = 2;
       posterCtx.beginPath();
       posterCtx.arc(badgeX, badgeY, badgeRadius - 1, 0, Math.PI * 2);
       posterCtx.stroke();
-      
+
       posterCtx.fillStyle = "#ffffff";
       posterCtx.textAlign = "center";
       posterCtx.font = "bold 9px 'Inter', sans-serif";
       posterCtx.fillText("SCAN NOW", badgeX, badgeY - 5);
-      
+
       posterCtx.fillStyle = "#C5A059";
       posterCtx.font = "500 6.5px 'Inter', sans-serif";
       posterCtx.fillText("Find your next", badgeX, badgeY + 6);
@@ -845,7 +850,10 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
       posterCtx.font = "800 14px 'Inter', sans-serif";
       posterCtx.textAlign = "left";
       posterCtx.fillText("Or visit: www.axxspace.com", 60, 590);
-      
+
+      posterCtx.textAlign = "center";
+      posterCtx.fillText("Email: info@axxspace.com", posterCanvas.width / 2, 590);
+
       posterCtx.textAlign = "right";
       const displayId = property._id ? property._id.slice(-6).toUpperCase() : "AXXSPC";
       posterCtx.fillText(`Search Property ID: ${displayId}`, 740, 590);
@@ -983,24 +991,24 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
         const colW = 144;
         const cx = 40 + colW / 2 + index * colW;
         const cyIcon = 720;
-        
+
         // Draw icon
         b.drawIcon(cx, cyIcon);
-        
+
         // Draw label
         posterCtx.fillStyle = "#081A34";
         posterCtx.textAlign = "center";
         posterCtx.font = "800 10.5px 'Inter', sans-serif";
         posterCtx.fillText(b.label, cx, 752);
-        
+
         // Draw description line 1
         posterCtx.fillStyle = "#475569";
         posterCtx.font = "600 8.5px 'Inter', sans-serif";
         posterCtx.fillText(b.desc1, cx, 770);
-        
+
         // Draw description line 2
         posterCtx.fillText(b.desc2, cx, 784);
-        
+
         // Draw column divider (except last column)
         if (index < 4) {
           const divX = 40 + (index + 1) * colW;
@@ -1022,16 +1030,16 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
 
       // Navy footer content
       posterCtx.drawImage(logoImg, 40, 1000, 30, 30);
-      
+
       posterCtx.fillStyle = "#ffffff";
       posterCtx.textAlign = "left";
       posterCtx.font = "900 16px 'Inter', sans-serif";
       posterCtx.fillText("AXXSPACE", 80, 1020);
-      
+
       posterCtx.fillStyle = "#94a3b8";
       posterCtx.font = "700 9px 'Inter', sans-serif";
       posterCtx.fillText("Space hunting bila stress.", 175, 1020);
-      
+
       posterCtx.textAlign = "right";
       posterCtx.font = "800 12px 'Inter', sans-serif";
       posterCtx.fillText("Kenya's smart rental marketplace", 760, 1020);
@@ -1091,9 +1099,9 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
           {/* Controls */}
           <div style={styles.controlGroup}>
             <label style={styles.label}>Where are you placing this poster?</label>
-            <select 
-              value={source} 
-              onChange={(e) => setSource(e.target.value)} 
+            <select
+              value={source}
+              onChange={(e) => setSource(e.target.value)}
               style={styles.select}
             >
               {SOURCES.map(s => (
@@ -1149,28 +1157,28 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
 
         <div style={styles.footer}>
           <button style={styles.cancelBtn} onClick={onClose}>Close</button>
-          
+
           <div style={styles.actionButtons}>
-            <button 
-              style={styles.downloadBtn} 
+            <button
+              style={styles.downloadBtn}
               onClick={downloadQR}
               disabled={!qrLoaded}
             >
-               Download QR (PNG)
+              Download QR (PNG)
             </button>
-            <button 
-              style={styles.downloadBtn} 
+            <button
+              style={styles.downloadBtn}
               onClick={downloadPoster}
               disabled={!qrLoaded}
             >
-               Download Poster (PNG)
+              Download Poster (PNG)
             </button>
-            <button 
-              style={styles.printBtn} 
+            <button
+              style={styles.printBtn}
               onClick={printPoster}
               disabled={!qrLoaded}
             >
-               Print Poster (A4 PDF)
+              Print Poster (A4 PDF)
             </button>
           </div>
         </div>
