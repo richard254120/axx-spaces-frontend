@@ -333,27 +333,51 @@ export default function QuickSales() {
 
                   {/* BADGES */}
                   <div style={styles.badgeStack}>
-                    {isLowStock && <span style={styles.lowStockBadge}> Only {item.quantity}</span>}
-                    {isNewItem && <span style={styles.newItemBadge}> New</span>}
+                    {isLowStock && (
+                      <span style={styles.lowStockBadge}>
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "3px", marginTop: "-2px" }}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        Only {item.quantity}
+                      </span>
+                    )}
+                    {isNewItem && (
+                      <span style={styles.newItemBadge}>
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "3px", marginTop: "-2px" }}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        New
+                      </span>
+                    )}
                   </div>
 
                   {/* ACTION BUTTONS */}
                   <button
-                    style={{ ...styles.actionBtn, ...styles.favBtn, color: isFavorite ? "#ef4444" : "#9ca3af" }}
+                    style={{ ...styles.actionBtn, ...styles.favBtn }}
                     onClick={(e) => handleToggleFavorite(e, item._id)}
                   >
-                    
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill={isFavorite ? "#ef4444" : "none"} stroke={isFavorite ? "#ef4444" : "#6b7280"} strokeWidth="2.5">
+                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
                   </button>
 
                   <button
                     style={{ ...styles.actionBtn, ...styles.shareBtn }}
                     onClick={(e) => handleShareListing(e, item)}
                   >
-                    {copiedId === item._id ? "" : ""}
+                    {copiedId === item._id ? (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    ) : (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                      </svg>
+                    )}
                   </button>
 
                   {item.images?.length > 1 && (
-                    <span style={styles.photoCount}> {item.images.length}</span>
+                    <span style={styles.photoCount}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "3px", marginTop: "-2px" }}><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                      {item.images.length}
+                    </span>
                   )}
                 </div>
 
@@ -417,12 +441,11 @@ export default function QuickSales() {
                 <div style={styles.noImagePlaceholder}></div>
               )}
             </div>
-
             {/* THUMBNAILS */}
             {selected.images?.length > 1 && (
               <div style={styles.thumbnailRow}>
                 {selected.images.map((img, idx) => (
-                  <img key={idx} src={img} alt={`thumb`}
+                  <img key={idx} src={img} alt="thumb"
                     style={{ ...styles.thumbnail, ...(idx === currentImage ? styles.activeThumbnail : {}) }}
                     onClick={() => setCurrentImage(idx)} />
                 ))}
@@ -435,7 +458,17 @@ export default function QuickSales() {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", gap: "12px", marginBottom: "8px" }}>
                   <span style={styles.verifiedBadge}>✓ Verified Listing</span>
                   <button style={styles.shareLinkBtn} onClick={(e) => handleShareListing(e, selected)}>
-                    {copiedId === selected._id ? " Copied" : " Share"}
+                    {copiedId === selected._id ? (
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: "#10b981" }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Copied
+                      </span>
+                    ) : (
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        Share
+                      </span>
+                    )}
                   </button>
                 </div>
                 <h2 style={styles.modalTitle}>{selected.title}</h2>
@@ -448,7 +481,12 @@ export default function QuickSales() {
               {/* CATEGORY BADGES */}
               <div style={styles.badgesRow}>
                 <span style={styles.modalCategoryBadge}>{getCategoryEmoji(selected.category)} {selected.category}</span>
-                {selected.quantity <= 2 && <span style={styles.urgentTag}> Limited Stock</span>}
+                {selected.quantity <= 2 && (
+                  <span style={styles.urgentTag}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "4px", marginTop: "-2px" }}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    Limited Stock
+                  </span>
+                )}
               </div>
 
               {/* PRICE & STOCK */}
@@ -471,7 +509,10 @@ export default function QuickSales() {
 
               {/* SELLER INFO */}
               <div style={styles.sellerSection}>
-                <h4 style={{ margin: "0 0 12px 0", color: "#0B2140", fontWeight: 700 }}> Seller Information</h4>
+                <h4 style={{ margin: "0 0 12px 0", color: "#0B2140", fontWeight: 700 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "6px", marginTop: "-2px" }}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                  Seller Information
+                </h4>
                 <div style={{ background: "#f3f4f6", padding: "12px", borderRadius: "8px", marginBottom: "12px" }}>
                   <p style={{ margin: "6px 0", fontSize: "14px", color: "#0B2140" }}><strong>{selected.sellerName}</strong></p>
                   <p style={{ margin: "6px 0", fontSize: "13px", color: "#6b7280" }}>{selected.location}, {selected.county}</p>
@@ -482,10 +523,12 @@ export default function QuickSales() {
               {/* CONTACT BUTTONS */}
               <div style={styles.contactBtns}>
                 <button style={styles.whatsappBtn} onClick={() => handleWhatsApp(selected)}>
-                   Chat on WhatsApp
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "6px", marginTop: "-2px" }}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                  Chat on WhatsApp
                 </button>
                 <button style={styles.callBtn} onClick={() => handleCall(selected)}>
-                   Call Seller
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "6px", marginTop: "-2px" }}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                  Call Seller
                 </button>
               </div>
 
