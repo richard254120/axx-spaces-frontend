@@ -100,7 +100,7 @@ export default function SavedListingsPage() {
 
       {filteredFavorites.length === 0 ? (
         <div style={styles.emptyState}>
-          <div style={styles.emptyIcon}>❤️</div>
+          <div style={styles.emptyIcon}></div>
           <h2 style={styles.emptyTitle}>No Saved Listings</h2>
           <p style={styles.emptyText}>
             {filter === "all"

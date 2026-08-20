@@ -219,7 +219,7 @@ export default function Profile() {
   if (loading) {
     return (
       <div style={styles.container}>
-        <div style={styles.loading}>⏳ Loading profile...</div>
+        <div style={styles.loading}> Loading profile...</div>
       </div>
     );
   }
@@ -227,12 +227,12 @@ export default function Profile() {
   const displayProfile = profile || user;
 
   const badgeTypes = {
-    premium_verified: { label: "Premium Verified", icon: "⭐", image: "Premium Verified.png" },
-    student_verified: { label: "Student Verified", icon: "🎓", image: "Student Verified.png" },
-    business_verified: { label: "Business Verified", icon: "🏢", image: "Business Verified.png" },
-    identity_verified: { label: "Identity Verified", icon: "🪪", image: "Identity Verified.png" },
+    premium_verified: { label: "Premium Verified", icon: "", image: "Premium Verified.png" },
+    student_verified: { label: "Student Verified", icon: "", image: "Student Verified.png" },
+    business_verified: { label: "Business Verified", icon: "", image: "Business Verified.png" },
+    identity_verified: { label: "Identity Verified", icon: "", image: "Identity Verified.png" },
     location_verified: { label: "Location Verified", icon: <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, display: "inline-block", marginRight: "4px", verticalAlign: "middle" }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>, image: "Locationn Verified.png" },
-    online_verified: { label: "Online Verified", icon: "🌐", image: "Online Verified.png" },
+    online_verified: { label: "Online Verified", icon: "", image: "Online Verified.png" },
   };
 
   return (
@@ -292,10 +292,10 @@ export default function Profile() {
 
             <div style={{ marginTop: "24px" }}>
               <button style={styles.button} onClick={() => navigate("/settings")}>
-                ⚙️ Account Settings
+                 Account Settings
               </button>
               <button style={{ ...styles.button, ...styles.buttonSecondary }} onClick={() => logout("/login")}>
-                🚪 Logout
+                 Logout
               </button>
             </div>
 
@@ -305,7 +305,7 @@ export default function Profile() {
               {displayProfile?.verificationBadges && displayProfile.verificationBadges.length > 0 ? (
                 <div style={styles.badgesContainer}>
                   {displayProfile.verificationBadges.map((badge, index) => {
-                    const badgeInfo = badgeTypes[badge.type] || { label: badge.type, icon: "🏅", image: null };
+                    const badgeInfo = badgeTypes[badge.type] || { label: badge.type, icon: "", image: null };
                     return (
                       <div key={index} style={styles.badgeItem}>
                         {badgeInfo.image && (
@@ -343,10 +343,10 @@ export default function Profile() {
 
             <div style={{ marginTop: "24px" }}>
               <button style={styles.button} onClick={() => navigate("/wallet")}>
-                💳 View Wallet
+                 View Wallet
               </button>
               <button style={{ ...styles.button, ...styles.buttonSecondary }} onClick={() => navigate("/payment-history")}>
-                📊 Payment History
+                 Payment History
               </button>
             </div>
 
@@ -383,27 +383,27 @@ export default function Profile() {
             <h2 style={styles.cardTitle}>Quick Actions</h2>
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               <button style={styles.button} onClick={() => navigate("/saved")}>
-                ❤️ Saved Listings
+                 Saved Listings
               </button>
               <button style={styles.button} onClick={() => navigate("/messages")}>
-                💬 Messages
+                 Messages
               </button>
               <button style={styles.button} onClick={() => navigate("/notifications")}>
-                🔔 Notifications
+                 Notifications
               </button>
               {displayProfile?.role === "landlord" && (
                 <button style={styles.button} onClick={() => navigate("/dashboard")}>
-                  📊 Landlord Dashboard
+                   Landlord Dashboard
                 </button>
               )}
               {displayProfile?.role === "mover" && (
                 <button style={styles.button} onClick={() => navigate("/mover-dashboard")}>
-                  🚛 Mover Dashboard
+                   Mover Dashboard
                 </button>
               )}
               {displayProfile?.role === "seller" && (
                 <button style={styles.button} onClick={() => navigate("/seller-dashboard")}>
-                  🏪 Seller Dashboard
+                   Seller Dashboard
                 </button>
               )}
               <button style={styles.button} onClick={() => {
@@ -413,7 +413,7 @@ export default function Profile() {
                 else if (role === "mover") navigate("/mover-dashboard");
                 else navigate("/business-dashboard");
               }}>
-                📊 My Workspace Dashboard
+                 My Workspace Dashboard
               </button>
             </div>
           </div>

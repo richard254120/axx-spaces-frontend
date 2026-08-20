@@ -50,7 +50,7 @@ function applyTo(app) {
   app.use(xss());
   app.use(hpp());
 
-  console.log("🔒 [security.js] All security middleware applied successfully");
+  console.log(" [security.js] All security middleware applied successfully");
 }
 
 export default {

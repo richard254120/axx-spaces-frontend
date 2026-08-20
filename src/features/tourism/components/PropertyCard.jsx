@@ -37,14 +37,14 @@ export default function PropertyCard({ property: p, onOpen }) {
         )}
         {p.bookingUrl && (
           <div style={{ position: "absolute", top: "10px", right: "10px", background: "rgba(255,255,255,0.9)", color: "#6b7280", fontSize: "9px", fontWeight: 700, padding: "2px 7px", borderRadius: "20px", zIndex: 1 }}>
-            🔗 Book online
+             Book online
           </div>
         )}
       </div>
       <div style={{ padding: "14px" }}>
         <div style={{ fontSize: "10px", color: "#6b7280", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.08em", marginBottom: "4px" }}>{p.category}</div>
         <h3 style={{ fontSize: "14px", fontWeight: 800, color: "#1f2937", margin: "0 0 4px", lineHeight: 1.3 }}>{p.name}</h3>
-        <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "8px" }}>📍 {p.location}</div>
+        <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "8px" }}> {p.location}</div>
 
         {/* Verification Badges */}
         {p.owner?.verificationBadges && p.owner.verificationBadges.length > 0 && (
@@ -56,7 +56,7 @@ export default function PropertyCard({ property: p, onOpen }) {
             border: "1px solid rgba(14, 165, 233, 0.2)"
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
-              <span style={{ fontSize: 11 }}>✅</span>
+              <span style={{ fontSize: 11 }}></span>
               <span style={{ fontSize: 10, fontWeight: 600, color: "#0ea5e9" }}>Verified Owner</span>
             </div>
             <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
@@ -113,7 +113,7 @@ export default function PropertyCard({ property: p, onOpen }) {
             <span style={{ fontSize: "16px", fontWeight: 800, color: p.color }}>KSh {p.price?.toLocaleString()}</span>
             <span style={{ fontSize: "11px", color: "#9ca3af" }}>/night</span>
           </div>
-          <div style={{ fontSize: "12px", color: "#fbbf24", fontWeight: 700 }}>⭐ {p.rating} ({p.reviews})</div>
+          <div style={{ fontSize: "12px", color: "#fbbf24", fontWeight: 700 }}> {p.rating} ({p.reviews})</div>
         </div>
         <button
           type="button"

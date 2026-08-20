@@ -24,10 +24,10 @@ const PROPERTY_TYPES = [
 ];
 
 const STEPS = [
-  { id: "basic", label: "Basic Info", icon: "📋" },
-  { id: "details", label: "Details", icon: "🏠" },
-  { id: "images", label: "Images", icon: "📷" },
-  { id: "amenities", label: "Amenities", icon: "✨" },
+  { id: "basic", label: "Basic Info", icon: "" },
+  { id: "details", label: "Details", icon: "" },
+  { id: "images", label: "Images", icon: "" },
+  { id: "amenities", label: "Amenities", icon: "" },
 ];
 
 function needsUniversityLink(data, landlordType) {
@@ -539,7 +539,7 @@ export default function Upload() {
 
             {universityRequired && (
               <div style={styles.universityNotice}>
-                <strong>🎓 Campus listing</strong>
+                <strong> Campus listing</strong>
                 <p style={{ margin: "6px 0 0", lineHeight: 1.5 }}>
                   {formData.propertyType === HOSTEL_PROPERTY_TYPE
                     ? "Hostel listings must be linked to a university so students can find them when they select that campus."
@@ -556,7 +556,7 @@ export default function Upload() {
             {/* ── GPS COORDINATES ── */}
             <div style={styles.gpsCard}>
               <div style={styles.gpsHeader}>
-                <span style={styles.gpsTitle}>📍 GPS Coordinates</span>
+                <span style={styles.gpsTitle}> GPS Coordinates</span>
                 <span style={styles.gpsBadge}>Recommended</span>
               </div>
               <p style={styles.gpsHint}>
@@ -569,12 +569,12 @@ export default function Upload() {
                 disabled={locLoading}
                 style={styles.gpsBtn}
               >
-                {locLoading ? "📡 Detecting..." : "📍 Use My Current Location"}
+                {locLoading ? " Detecting..." : " Use My Current Location"}
               </button>
 
               {(formData.lat || formData.lng) && (
                 <div style={styles.coordsDisplay}>
-                  ✅ {formData.lat}, {formData.lng}
+                   {formData.lat}, {formData.lng}
                   <button
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, lat: "", lng: "" }))}
@@ -615,7 +615,7 @@ export default function Upload() {
               </div>
 
               <p style={styles.gpsTip}>
-                💡 Not sure? Open Google Maps, long-press your property location, and copy the coordinates shown.
+                 Not sure? Open Google Maps, long-press your property location, and copy the coordinates shown.
               </p>
             </div>
 
@@ -732,7 +732,7 @@ export default function Upload() {
               <div style={styles.imageUploadBox}>
                 <input type="file" multiple accept="image/*" onChange={handleImageChange} style={styles.fileInput} id="imageInput" />
                 <label htmlFor="imageInput" style={styles.fileLabel}>
-                  <div style={styles.uploadIcon}>📷</div>
+                  <div style={styles.uploadIcon}></div>
                   <p>Tap to select images</p>
                 </label>
               </div>

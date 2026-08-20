@@ -192,10 +192,10 @@ export default function BusinessDetail() {
       await API.delete(`/business-reviews/${reviewId}`);
       setReviews(reviews.filter(r => r._id !== reviewId));
       loadBusiness(); // Reload business to update rating
-      alert("✅ Review deleted successfully");
+      alert(" Review deleted successfully");
     } catch (err) {
       console.error("Failed to delete review:", err);
-      alert("❌ Failed to delete review");
+      alert(" Failed to delete review");
     }
   };
 
@@ -218,7 +218,7 @@ export default function BusinessDetail() {
 
       {/* Business Information */}
       <div style={styles.section}>
-        <h2 style={styles.sectionTitle}>📋 Business Information</h2>
+        <h2 style={styles.sectionTitle}> Business Information</h2>
         <div style={styles.infoGrid}>
           <div style={styles.infoItem}>
             <span style={styles.infoLabel}>Name</span>
@@ -238,7 +238,7 @@ export default function BusinessDetail() {
           </div>
           <div style={styles.infoItem}>
             <span style={styles.infoLabel}>Rating</span>
-            <span style={styles.infoValue}>{business.rating || "N/A"} ⭐ ({business.reviewCount || 0} reviews)</span>
+            <span style={styles.infoValue}>{business.rating || "N/A"}  ({business.reviewCount || 0} reviews)</span>
           </div>
           <div style={styles.infoItem}>
             <span style={styles.infoLabel}>Status</span>
@@ -278,7 +278,7 @@ export default function BusinessDetail() {
             <span style={styles.infoLabel}>Pricelist / Menu:</span>
             <p style={styles.infoValue}>
               <a href={getPricelistUrl(business.pricelist)} target="_blank" rel="noopener noreferrer" style={{ color: "#60a5fa" }}>
-                📄 View / Download {business.pricelist.name ? `(${business.pricelist.name})` : ""}
+                 View / Download {business.pricelist.name ? `(${business.pricelist.name})` : ""}
               </a>
             </p>
           </div>
@@ -301,7 +301,7 @@ export default function BusinessDetail() {
             <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "8px" }}>
               {business.documents.map((doc, i) => (
                 <a key={i} href={resolveMediaUrl(doc.url)} target="_blank" rel="noopener noreferrer" style={{ color: "#60a5fa" }}>
-                  📄 {doc.name || doc.type || `Document ${i + 1}`}
+                   {doc.name || doc.type || `Document ${i + 1}`}
                 </a>
               ))}
             </div>
@@ -311,7 +311,7 @@ export default function BusinessDetail() {
 
       {/* Reviews Section */}
       <div style={styles.section}>
-        <h2 style={styles.sectionTitle}>⭐ Reviews ({reviews.length})</h2>
+        <h2 style={styles.sectionTitle}> Reviews ({reviews.length})</h2>
         {reviews.length === 0 ? (
           <div style={styles.empty}>No reviews yet</div>
         ) : (
@@ -327,7 +327,7 @@ export default function BusinessDetail() {
                     style={styles.deleteButton}
                     onClick={() => handleDeleteReview(review._id)}
                   >
-                    🗑️ Delete
+                     Delete
                   </button>
                 </div>
                 {review.title && <div style={styles.reviewTitle}>{review.title}</div>}

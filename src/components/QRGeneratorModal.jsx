@@ -926,7 +926,7 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
       <div style={styles.modal}>
         <div style={styles.header}>
           <div>
-            <h2 style={styles.title}>🖨️ Poster & QR Generator</h2>
+            <h2 style={styles.title}> Poster & QR Generator</h2>
             <p style={styles.subtitle}>{property.title}</p>
           </div>
           <button style={styles.closeBtn} onClick={onClose}>&times;</button>
@@ -1001,21 +1001,21 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
               onClick={downloadQR}
               disabled={!qrLoaded}
             >
-              📥 Download QR (PNG)
+               Download QR (PNG)
             </button>
             <button 
               style={styles.downloadBtn} 
               onClick={downloadPoster}
               disabled={!qrLoaded}
             >
-              📥 Download Poster (PNG)
+               Download Poster (PNG)
             </button>
             <button 
               style={styles.printBtn} 
               onClick={printPoster}
               disabled={!qrLoaded}
             >
-              🖨️ Print Poster (A4 PDF)
+               Print Poster (A4 PDF)
             </button>
           </div>
         </div>

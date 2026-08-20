@@ -179,7 +179,7 @@ export default function Saved() {
   if (loading) {
     return (
       <div style={styles.container}>
-        <div style={styles.loading}>⏳ Loading saved items...</div>
+        <div style={styles.loading}> Loading saved items...</div>
       </div>
     );
   }
@@ -194,7 +194,7 @@ export default function Saved() {
 
         {savedItems.length === 0 ? (
           <div style={styles.empty}>
-            <div style={styles.emptyIcon}>❤️</div>
+            <div style={styles.emptyIcon}></div>
             <div style={styles.emptyTitle}>No saved items yet</div>
             <p style={styles.emptyText}>
               Start exploring and save your favorite properties and businesses
@@ -215,7 +215,7 @@ export default function Saved() {
                   />
                 ) : (
                   <div style={{ ...styles.image, background: "rgba(30, 41, 59, 0.8)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "48px" }}>
-                    🏠
+                    
                   </div>
                 )}
                 <div style={styles.cardContent}>

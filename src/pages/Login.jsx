@@ -52,7 +52,7 @@ export default function Login() {
       if (!data.token || !data.user) throw new Error("Invalid login response from server");
 
       login(data.token, data.user);
-      setSuccess("✅ Google login successful! Redirecting...");
+      setSuccess(" Google login successful! Redirecting...");
       navigate(getDashboardPath(data.user.role), { replace: true });
     } catch (err) {
       setGoogleError(err.message || "Google authentication failed. Please try again.");
@@ -85,16 +85,16 @@ export default function Login() {
         throw new Error(data.error || "Failed to resend verification email");
       }
 
-      setSuccess("✅ " + (data.message || "Verification email sent successfully! Please check your inbox."));
+      setSuccess(" " + (data.message || "Verification email sent successfully! Please check your inbox."));
       setShowResend(false);
     } catch (err) {
-      setError("❌ " + (err.message || "Failed to resend verification email. Please try again."));
+      setError(" " + (err.message || "Failed to resend verification email. Please try again."));
     } finally {
       setResendLoading(false);
     }
   };
 
-  // ✅ Email/Password Login
+  //  Email/Password Login
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -103,7 +103,7 @@ export default function Login() {
     setShowResend(false);
 
     if (!formData.email || !formData.password) {
-      setError("❌ Email and password are required");
+      setError(" Email and password are required");
       return;
     }
 
@@ -131,24 +131,24 @@ export default function Login() {
       }
 
       login(data.token, data.user);
-      setSuccess("✅ Login successful! Redirecting...");
+      setSuccess(" Login successful! Redirecting...");
 
       navigate(getDashboardPath(data.user.role), { replace: true });
 
     } catch (err) {
-      setError(err.message || "❌ Login failed. Please try again.");
+      setError(err.message || " Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ Handle forgot password
+  //  Handle forgot password
   const handleForgotPassword = async (e) => {
     e.preventDefault();
     setForgotMsg("");
 
     if (!forgotEmail) {
-      setForgotMsg("❌ Please enter your email address.");
+      setForgotMsg(" Please enter your email address.");
       return;
     }
 
@@ -162,8 +162,8 @@ export default function Login() {
       });
 
       const data = await response.json();
-      setForgotMsg(data.message || "✅ Reset link sent! Check your inbox.");
-      if (data.message?.includes("✅")) {
+      setForgotMsg(data.message || " Reset link sent! Check your inbox.");
+      if (data.message?.includes("")) {
         setTimeout(() => {
           setShowForgot(false);
           setForgotEmail("");
@@ -171,7 +171,7 @@ export default function Login() {
         }, 2000);
       }
     } catch (err) {
-      setForgotMsg("❌ Failed to send reset email. Try again.");
+      setForgotMsg(" Failed to send reset email. Try again.");
     } finally {
       setForgotLoading(false);
     }
@@ -183,14 +183,14 @@ export default function Login() {
       <div style={styles.container}>
         <div style={styles.formBox}>
 
-          {/* ✅ FORGOT PASSWORD FORM */}
+          {/*  FORGOT PASSWORD FORM */}
           {showForgot ? (
             <>
-              <h1 style={styles.title}>🔐 Reset Password</h1>
+              <h1 style={styles.title}> Reset Password</h1>
               <p style={styles.subtitle}>Enter your email to receive a reset link</p>
 
               {forgotMsg && (
-                <div style={forgotMsg.includes("❌") ? styles.error : styles.success}>
+                <div style={forgotMsg.includes("") ? styles.error : styles.success}>
                   {forgotMsg}
                 </div>
               )}
@@ -217,7 +217,7 @@ export default function Login() {
                     cursor: forgotLoading ? "not-allowed" : "pointer",
                   }}
                 >
-                  {forgotLoading ? "⏳ Sending..." : "📧 Send Reset Link"}
+                  {forgotLoading ? " Sending..." : " Send Reset Link"}
                 </button>
               </form>
 
@@ -238,8 +238,8 @@ export default function Login() {
             </>
           ) : (
             <>
-              {/* ✅ LOGIN FORM */}
-              <h1 style={styles.title}>{loginType === "mover" ? "🚛 Mover Portal" : "🏠 Landlord Portal"}</h1>
+              {/*  LOGIN FORM */}
+              <h1 style={styles.title}>{loginType === "mover" ? " Mover Portal" : " Landlord Portal"}</h1>
               <p style={styles.subtitle}>{loginType === "mover" ? "Manage your moving services and jobs" : "Manage your properties and tenants"}</p>
 
               {error && <div style={styles.error}>{error}</div>}
@@ -265,7 +265,7 @@ export default function Login() {
                       transition: "all 0.2s"
                     }}
                   >
-                    {resendLoading ? "⏳ Sending..." : "📧 Resend Verification Email"}
+                    {resendLoading ? " Sending..." : " Resend Verification Email"}
                   </button>
                 </div>
               )}
@@ -278,7 +278,7 @@ export default function Login() {
                 </div>
               ) : (
                 <div style={styles.warningBox}>
-                  ⚠️ Google Sign-In not configured. Check your .env file.
+                   Google Sign-In not configured. Check your .env file.
                 </div>
               )}
 
@@ -310,7 +310,7 @@ export default function Login() {
                     style={styles.input}
                     required
                   />
-                  {/* ✅ FORGOT PASSWORD LINK */}
+                  {/*  FORGOT PASSWORD LINK */}
                   <span
                     onClick={() => {
                       setShowForgot(true);
@@ -331,7 +331,7 @@ export default function Login() {
                     cursor: loading ? "not-allowed" : "pointer",
                   }}
                 >
-                  {loading ? "⏳ Verifying..." : "🚀 Login to Dashboard"}
+                  {loading ? " Verifying..." : " Login to Dashboard"}
                 </button>
               </form>
 

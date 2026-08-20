@@ -41,7 +41,7 @@ export default function PremiumPlans() {
 
   const handleSelectPlan = (plan) => {
     if (!propertyId) {
-      alert("❌ Property ID is missing. Go back to dashboard.");
+      alert(" Property ID is missing. Go back to dashboard.");
       return;
     }
     setSelectedPlan(plan);
@@ -51,7 +51,7 @@ export default function PremiumPlans() {
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <h1 style={styles.title}>⭐ Boost Your Listing</h1>
+        <h1 style={styles.title}> Boost Your Listing</h1>
         <p style={styles.subtitle}>Get more visibility and faster bookings</p>
       </div>
 

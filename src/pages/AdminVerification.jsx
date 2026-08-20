@@ -54,7 +54,7 @@ const AdminVerification = () => {
       if (data.success) {
         setVerifications(verifications.filter(v => v._id !== verificationId));
         setSelectedVerification(null);
-        alert('✅ Verification approved successfully');
+        alert(' Verification approved successfully');
       } else {
         setError(data.message || 'Failed to approve verification');
       }
@@ -87,7 +87,7 @@ const AdminVerification = () => {
       if (data.success) {
         setVerifications(verifications.filter(v => v._id !== verificationId));
         setSelectedVerification(null);
-        alert('❌ Verification rejected successfully');
+        alert(' Verification rejected successfully');
       } else {
         setError(data.message || 'Failed to reject verification');
       }
@@ -119,7 +119,7 @@ const AdminVerification = () => {
   if (loading) {
     return (
       <div style={styles.container}>
-        <div style={styles.loading}>⏳ Loading verification requests...</div>
+        <div style={styles.loading}> Loading verification requests...</div>
       </div>
     );
   }
@@ -149,7 +149,7 @@ const AdminVerification = () => {
   return (
     <div style={styles.container}>
       <style>{customStyles}</style>
-      <h1 style={styles.title}>🛡️ KYC Verification Workflows</h1>
+      <h1 style={styles.title}> KYC Verification Workflows</h1>
       <p style={styles.subtitle}>Review user submissions for Student, Standard, and Premium tiers</p>
 
       {error && <div style={styles.error}>{error}</div>}
@@ -159,7 +159,7 @@ const AdminVerification = () => {
           <h2 style={styles.sectionTitle}>Pending Verification Requests ({verifications.length})</h2>
           
           {verifications.length === 0 ? (
-            <div style={styles.empty}>🎉 No pending verifications to review.</div>
+            <div style={styles.empty}> No pending verifications to review.</div>
           ) : (
             <div style={styles.verificationList}>
               {verifications.map((verification) => (
@@ -213,7 +213,7 @@ const AdminVerification = () => {
 
             <div style={styles.detailContent}>
               <div style={styles.detailGroup}>
-                <h3 style={styles.detailGroupTitle}>👤 User Information</h3>
+                <h3 style={styles.detailGroupTitle}> User Information</h3>
                 <div style={styles.detailItem}>
                   <span style={styles.detailLabel}>Full Name:</span>
                   <span style={styles.detailValue}>{selectedVerification.user?.name || 'N/A'}</span>
@@ -229,7 +229,7 @@ const AdminVerification = () => {
               </div>
 
               <div style={styles.detailGroup}>
-                <h3 style={styles.detailGroupTitle}>📋 Verification Status</h3>
+                <h3 style={styles.detailGroupTitle}> Verification Status</h3>
                 <div style={styles.detailItem}>
                   <span style={styles.detailLabel}>Requested Level:</span>
                   <span style={{ ...styles.detailValue, color: getLevelColor(selectedVerification.verificationLevel), fontWeight: '700' }}>
@@ -250,7 +250,7 @@ const AdminVerification = () => {
 
               {selectedVerification.idType && (
                 <div style={styles.detailGroup}>
-                  <h3 style={styles.detailGroupTitle}>📄 Government Document Details</h3>
+                  <h3 style={styles.detailGroupTitle}> Government Document Details</h3>
                   <div style={styles.detailItem}>
                     <span style={styles.detailLabel}>Document Type:</span>
                     <span style={styles.detailValue}>{selectedVerification.idType.toUpperCase().replace(/_/g, ' ')}</span>
@@ -276,7 +276,7 @@ const AdminVerification = () => {
               {/* Documents List */}
               {selectedVerification.documents && selectedVerification.documents.length > 0 && (
                 <div style={styles.detailGroup}>
-                  <h3 style={styles.detailGroupTitle}>📁 Uploaded Documents</h3>
+                  <h3 style={styles.detailGroupTitle}> Uploaded Documents</h3>
                   {selectedVerification.documents.map((doc, index) => (
                     <div key={index} style={styles.documentItem}>
                       <div style={styles.documentInfo}>
@@ -289,7 +289,7 @@ const AdminVerification = () => {
                           onClick={() => openProtectedFile(doc.url).catch((err) => alert(err.message))}
                           style={{ ...styles.documentLink, background: "none", border: "none", cursor: "pointer" }}
                         >
-                          👁️ View / Download
+                           View / Download
                         </button>
                       )}
                     </div>
@@ -300,7 +300,7 @@ const AdminVerification = () => {
               {/* Selfie & Face Match */}
               {selectedVerification.selfie && selectedVerification.selfie.url && (
                 <div style={styles.detailGroup}>
-                  <h3 style={styles.detailGroupTitle}>📸 Biometric Verification Selfie</h3>
+                  <h3 style={styles.detailGroupTitle}> Biometric Verification Selfie</h3>
                   <img
                     src={resolveMediaUrl(selectedVerification.selfie.url)}
                     alt="Biometric Selfie"
@@ -311,11 +311,11 @@ const AdminVerification = () => {
                     onClick={() => openProtectedFile(selectedVerification.selfie.url).catch((err) => alert(err.message))}
                     style={{ ...styles.documentLink, marginTop: "8px", background: "none", border: "none", cursor: "pointer" }}
                   >
-                    📥 Download selfie
+                     Download selfie
                   </button>
                   {selectedVerification.selfie.faceMatchScore !== undefined && (
                     <div style={styles.faceMatchScore}>
-                      🤖 AI Face Match Similarity Score:{' '}
+                       AI Face Match Similarity Score:{' '}
                       <strong style={{ color: selectedVerification.selfie.faceMatchScore >= 80 ? '#10b981' : '#f59e0b', fontSize: '14px' }}>
                         {selectedVerification.selfie.faceMatchScore}%
                       </strong>
@@ -358,7 +358,7 @@ const AdminVerification = () => {
           </div>
         ) : (
           <div style={styles.noSelectionCard}>
-            <div style={styles.noSelectionIcon}>🛡️</div>
+            <div style={styles.noSelectionIcon}></div>
             <h3>No Submission Selected</h3>
             <p>Choose a pending request from the left sidebar to review details and take actions.</p>
           </div>

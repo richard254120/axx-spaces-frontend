@@ -29,7 +29,7 @@ export default function Checkout() {
     e.preventDefault();
 
     if (!phone || phone.length < 9) {
-      setMessage("❌ Please enter a valid M-Pesa phone number");
+      setMessage(" Please enter a valid M-Pesa phone number");
       return;
     }
 
@@ -55,16 +55,16 @@ export default function Checkout() {
       const data = await response.json();
 
       if (data.success) {
-        setMessage("✅ Payment initiated successfully! Check your M-Pesa for prompt.");
+        setMessage(" Payment initiated successfully! Check your M-Pesa for prompt.");
         setTimeout(() => {
           navigate(getDashboardPath(user?.role));
         }, 2500);
       } else {
-        setMessage("❌ " + (data.error || "Payment failed"));
+        setMessage(" " + (data.error || "Payment failed"));
       }
     } catch (err) {
       console.error(err);
-      setMessage("❌ Connection error. Please try again.");
+      setMessage(" Connection error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -74,7 +74,7 @@ export default function Checkout() {
     e.preventDefault();
     const trimmed = bankMessage.trim();
     if (!trimmed || trimmed.length < 10) {
-      setMessage("❌ Please paste the full M-Pesa confirmation message");
+      setMessage(" Please paste the full M-Pesa confirmation message");
       return;
     }
     const codeMatch = trimmed.match(/([A-Z0-9]{10,12})\s+confirmed/i);
@@ -101,11 +101,11 @@ export default function Checkout() {
       if (data.success) {
         setSubmitted(true);
       } else {
-        setMessage("❌ " + (data.error || "Submission failed. Please try again."));
+        setMessage(" " + (data.error || "Submission failed. Please try again."));
       }
     } catch (err) {
       console.error(err);
-      setMessage("❌ Connection error. Please try again.");
+      setMessage(" Connection error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -115,7 +115,7 @@ export default function Checkout() {
     return (
       <div style={styles.container}>
         <div style={styles.card}>
-          <div style={{ textAlign: "center", fontSize: "3rem", marginBottom: "16px" }}>✅</div>
+          <div style={{ textAlign: "center", fontSize: "3rem", marginBottom: "16px" }}></div>
           <h2 style={{ textAlign: "center", fontSize: "1.5rem", color: "#22c55e", marginBottom: "12px" }}>Submitted for Review</h2>
           <p style={{ textAlign: "center", color: "#94a3b8", fontSize: "14px", lineHeight: "1.7", marginBottom: "28px" }}>
             {isVerification
@@ -133,7 +133,7 @@ export default function Checkout() {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h1 style={styles.title}>💳 Complete Payment</h1>
+        <h1 style={styles.title}> Complete Payment</h1>
 
         <div style={styles.planInfo}>
           <p><strong>Payment For:</strong> {isVerification ? "Verification Badge Subscription" : (plan ? plan.toUpperCase() : "Boost")}</p>
@@ -148,13 +148,13 @@ export default function Checkout() {
             onClick={() => { setPaymentMethod("mpesa"); setMessage(""); }}
             style={{ ...styles.toggleBtn, ...(paymentMethod === "mpesa" ? styles.toggleActive : {}) }}
           >
-            📱 M-Pesa STK Push
+             M-Pesa STK Push
           </button>
           <button
             onClick={() => { setPaymentMethod("bank"); setMessage(""); }}
             style={{ ...styles.toggleBtn, ...(paymentMethod === "bank" ? styles.toggleActive : {}) }}
           >
-            🏦 Pay via Paybill
+             Pay via Paybill
           </button>
         </div>
 
@@ -220,7 +220,7 @@ export default function Checkout() {
                 rows={5}
                 required
               />
-              <p style={styles.hint}>💡 Copy and paste the full SMS exactly as received from M-Pesa</p>
+              <p style={styles.hint}> Copy and paste the full SMS exactly as received from M-Pesa</p>
               <button type="submit" disabled={loading} style={styles.payBtn}>
                 {loading ? "Submitting..." : "Submit for Verification"}
               </button>
@@ -231,7 +231,7 @@ export default function Checkout() {
         {message && (
           <p style={{
             ...styles.message,
-            color: message.includes("✅") ? "#22c55e" : "#ef4444"
+            color: message.includes("") ? "#22c55e" : "#ef4444"
           }}>
             {message}
           </p>

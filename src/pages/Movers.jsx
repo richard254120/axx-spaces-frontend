@@ -218,7 +218,7 @@ function MoverCard({ m, onBook, featured }) {
           </div>
           {m.company && (
             <div style={{ fontSize: 11, color: featured ? C.navyText : C.textHint, marginBottom: 2 }}>
-              🏢 {m.company}
+               {m.company}
             </div>
           )}
           <div style={{ fontSize: 12, color: featured ? C.navyText : C.textHint, marginBottom: 4, display: "flex", alignItems: "center", gap: "4px" }}>
@@ -239,7 +239,7 @@ function MoverCard({ m, onBook, featured }) {
           border: featured ? "1px solid rgba(14, 165, 233, 0.4)" : "1px solid rgba(14, 165, 233, 0.2)"
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
-            <span style={{ fontSize: 11 }}>✅</span>
+            <span style={{ fontSize: 11 }}></span>
             <span style={{ fontSize: 10, fontWeight: 600, color: featured ? C.navyText : "#0ea5e9" }}>Verified Mover</span>
           </div>
           <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
@@ -288,10 +288,10 @@ function MoverCard({ m, onBook, featured }) {
 
       {/* Pills */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 10 }}>
-        <Pill featured={featured}>🚗 {m.vehicleType || "Pickup"}</Pill>
-        <Pill featured={featured}>⏱ {m.experienceYears || m.experience || 0} yrs</Pill>
-        {m.teamInfo?.teamSize && <Pill featured={featured}>👥 {m.teamInfo.teamSize} team</Pill>}
-        {m.responseTime && <Pill featured={featured}>⚡ {m.responseTime}</Pill>}
+        <Pill featured={featured}> {m.vehicleType || "Pickup"}</Pill>
+        <Pill featured={featured}> {m.experienceYears || m.experience || 0} yrs</Pill>
+        {m.teamInfo?.teamSize && <Pill featured={featured}> {m.teamInfo.teamSize} team</Pill>}
+        {m.responseTime && <Pill featured={featured}> {m.responseTime}</Pill>}
       </div>
 
       {/* Availability & Languages */}
@@ -299,7 +299,7 @@ function MoverCard({ m, onBook, featured }) {
         <div style={{ marginBottom: 10 }}>
           {m.languages && m.languages.length > 0 && (
             <div style={{ fontSize: 10, color: featured ? C.navyText : C.textHint }}>
-              🌐 {m.languages.slice(0, 2).join(', ')}{m.languages.length > 2 ? '...' : ''}
+               {m.languages.slice(0, 2).join(', ')}{m.languages.length > 2 ? '...' : ''}
             </div>
           )}
         </div>
@@ -309,7 +309,7 @@ function MoverCard({ m, onBook, featured }) {
       {m.certifications && m.certifications.length > 0 && (
         <div style={{ marginBottom: 10 }}>
           <div style={{ fontSize: 10, fontWeight: 600, color: featured ? C.navyText : C.textHint, marginBottom: 4 }}>
-            📜 Certifications
+             Certifications
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
             {m.certifications.slice(0, 2).map((cert, idx) => (
@@ -337,7 +337,7 @@ function MoverCard({ m, onBook, featured }) {
       {(m.portfolioImages && m.portfolioImages.length > 0) && (
         <div style={{ marginBottom: 10 }}>
           <div style={{ fontSize: 10, fontWeight: 600, color: featured ? C.navyText : C.textHint, marginBottom: 4 }}>
-            📷 Work Photos ({m.portfolioImages.length})
+             Work Photos ({m.portfolioImages.length})
           </div>
           <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 4 }}>
             {m.portfolioImages.slice(0, 3).map((photo, idx) => {
@@ -399,7 +399,7 @@ function MoverCard({ m, onBook, featured }) {
       {(!m.portfolioImages || m.portfolioImages.length === 0) && m.workPhotos && m.workPhotos.length > 0 && (
         <div style={{ marginBottom: 10 }}>
           <div style={{ fontSize: 10, fontWeight: 600, color: featured ? C.navyText : C.textHint, marginBottom: 4 }}>
-            📷 Work Photos ({m.workPhotos.length})
+             Work Photos ({m.workPhotos.length})
           </div>
           <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 4 }}>
             {m.workPhotos.slice(0, 3).map((photo, idx) => {
@@ -467,7 +467,7 @@ function MoverCard({ m, onBook, featured }) {
           border: featured ? "1px solid rgba(250, 199, 117, 0.4)" : "1px solid rgba(250, 199, 117, 0.2)"
         }}>
           <div style={{ fontSize: 11, fontWeight: 600, color: featured ? C.amberDark : C.amberMid, marginBottom: 4 }}>
-            💰 Pricing
+             Pricing
           </div>
           <div style={{ fontSize: 13, fontWeight: 700, color: featured ? "#fff" : C.textPrimary }}>
             KES {m.pricing.baseRate.toLocaleString()}
@@ -495,7 +495,7 @@ function MoverCard({ m, onBook, featured }) {
           borderRadius: "6px",
           border: featured ? "1px solid rgba(29, 158, 117, 0.4)" : "1px solid rgba(29, 158, 117, 0.2)"
         }}>
-          <span style={{ fontSize: 12 }}>🛡️</span>
+          <span style={{ fontSize: 12 }}></span>
           <span style={{ fontSize: 10, fontWeight: 600, color: featured ? C.tealBorder : C.tealDark }}>
             Insured
           </span>
@@ -520,7 +520,7 @@ function MoverCard({ m, onBook, featured }) {
                 borderRadius: "4px",
                 fontWeight: 600
               }}>
-                👔 Uniform
+                 Uniform
               </span>
             )}
             {m.safetyGear && (
@@ -532,7 +532,7 @@ function MoverCard({ m, onBook, featured }) {
                 borderRadius: "4px",
                 fontWeight: 600
               }}>
-                ⛑️ Safety Gear
+                 Safety Gear
               </span>
             )}
             {m.equipment && (
@@ -544,7 +544,7 @@ function MoverCard({ m, onBook, featured }) {
                 borderRadius: "4px",
                 fontWeight: 600
               }}>
-                🔧 Equipment
+                 Equipment
               </span>
             )}
           </div>
@@ -555,7 +555,7 @@ function MoverCard({ m, onBook, featured }) {
       {m.workHours && (
         <div style={{ marginBottom: 10 }}>
           <div style={{ fontSize: 10, color: featured ? C.navyText : C.textHint }}>
-            ⏰ {m.workHours}
+             {m.workHours}
           </div>
         </div>
       )}
@@ -564,7 +564,7 @@ function MoverCard({ m, onBook, featured }) {
       {m.specialties && m.specialties.length > 0 && (
         <div style={{ marginBottom: 10 }}>
           <div style={{ fontSize: 10, fontWeight: 600, color: featured ? C.navyText : C.textHint, marginBottom: 4 }}>
-            ⭐ Specialties
+             Specialties
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
             {m.specialties.slice(0, 3).map(s => (
@@ -605,7 +605,7 @@ function MoverCard({ m, onBook, featured }) {
       {m.portfolioImages && m.portfolioImages.length > 0 && (
         <div style={{ marginBottom: 14 }}>
           <div style={{ fontSize: 10, fontWeight: 600, color: featured ? C.navyText : C.textHint, marginBottom: 6 }}>
-            📸 Portfolio
+             Portfolio
           </div>
           <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 4 }}>
             {m.portfolioImages.slice(0, 3).map((img, idx) => (
@@ -655,7 +655,7 @@ function MoverCard({ m, onBook, featured }) {
           border: "none", borderRadius: 8,
           fontWeight: 700, cursor: "pointer",
           fontSize: 13, fontFamily: font, transition: ".15s",
-        }}>📋 Book Now</button>
+        }}> Book Now</button>
 
         <button onClick={() => window.open(`tel:${m.phone}`)} style={{
           flex: 1, padding: 9, borderRadius: 8, cursor: "pointer",
@@ -663,7 +663,7 @@ function MoverCard({ m, onBook, featured }) {
           background: featured ? "rgba(255,255,255,0.10)" : C.navyDim,
           color: featured ? C.navyText : C.navyLight,
           border: `1px solid ${featured ? "rgba(133,183,235,0.3)" : C.navyBorder}`,
-        }}>📞</button>
+        }}></button>
 
         <button onClick={() => window.open(`https://wa.me/${m.phone}`, "_blank")} style={{
           flex: 1, padding: 9, borderRadius: 8, cursor: "pointer",
@@ -671,7 +671,7 @@ function MoverCard({ m, onBook, featured }) {
           background: featured ? C.tealMid : C.tealLight,
           color: featured ? C.tealBorder : C.tealDark,
           border: `1px solid ${featured ? C.tealDark : C.tealBorder}`,
-        }}>💬</button>
+        }}></button>
       </div>
     </div>
   );
@@ -749,7 +749,7 @@ function BookingModal({ mover, onClose, availableServices }) {
 
         {success ? (
           <div style={{ textAlign: "center", padding: "24px 0" }}>
-            <div style={{ fontSize: 48, marginBottom: 14 }}>🎉</div>
+            <div style={{ fontSize: 48, marginBottom: 14 }}></div>
             <h3 style={{ color: C.textPrimary, margin: "0 0 10px", fontSize: 18 }}>Booking Sent!</h3>
             <p style={{ color: C.textHint, fontSize: 13, lineHeight: 1.7, margin: "0 0 24px" }}>{success}</p>
             <button onClick={onClose} style={{
@@ -794,7 +794,7 @@ function BookingModal({ mover, onClose, availableServices }) {
               borderRadius: 8, padding: "10px 13px",
               fontSize: 12, color: C.navy, lineHeight: 1.6, marginBottom: 18,
             }}>
-              ℹ️ Your request goes directly to <strong>{mover.name}'s</strong> dashboard. They'll call you once they accept. No account needed.
+               Your request goes directly to <strong>{mover.name}'s</strong> dashboard. They'll call you once they accept. No account needed.
             </div>
 
             <div style={{ display: "flex", gap: 8 }}>
@@ -810,7 +810,7 @@ function BookingModal({ mover, onClose, availableServices }) {
                 fontWeight: 700, cursor: loading ? "not-allowed" : "pointer",
                 fontSize: 14, fontFamily: font,
               }}>
-                {loading ? "Sending..." : "📤 Send Booking Request"}
+                {loading ? "Sending..." : " Send Booking Request"}
               </button>
             </div>
           </form>
@@ -961,13 +961,13 @@ export default function Movers() {
   const onRegister = async (e) => {
     e.preventDefault();
     if (registerData.password.length < 6) {
-      alert("❌ Password must be at least 6 characters.");
+      alert(" Password must be at least 6 characters.");
       return;
     }
     const hasLetter = /[a-zA-Z]/.test(registerData.password);
     const hasNumber = /[0-9]/.test(registerData.password);
     if (!hasLetter || !hasNumber) {
-      alert("❌ Password must contain a mixture of both letters and numbers.");
+      alert(" Password must contain a mixture of both letters and numbers.");
       return;
     }
     setLoading(true);
@@ -994,7 +994,7 @@ export default function Movers() {
       await API.post("/auth/register", submissionData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
-      alert("✅ Application submitted! Once admin approves, you can log in.");
+      alert(" Application submitted! Once admin approves, you can log in.");
       setActiveTab("login");
       // Reset form
       setRegisterData({
@@ -1003,7 +1003,7 @@ export default function Movers() {
         workPhotos: [],
         photoDescriptions: []
       });
-    } catch (err) { alert(`❌ ${err.response?.data?.message || err.response?.data?.error || "Registration failed."}`); }
+    } catch (err) { alert(` ${err.response?.data?.message || err.response?.data?.error || "Registration failed."}`); }
     finally { setLoading(false); }
   };
 
@@ -1014,10 +1014,10 @@ export default function Movers() {
 
     try {
       const res = await API.post("/auth/resend-verification", { email: resendEmail, role: "mover" });
-      setLoginSuccess("✅ " + (res.data.message || "Verification email sent successfully! Please check your inbox."));
+      setLoginSuccess(" " + (res.data.message || "Verification email sent successfully! Please check your inbox."));
       setShowResend(false);
     } catch (err) {
-      setLoginError("❌ " + (err.response?.data?.error || "Failed to resend verification email. Please try again."));
+      setLoginError(" " + (err.response?.data?.error || "Failed to resend verification email. Please try again."));
     } finally {
       setResendLoading(false);
     }
@@ -1027,9 +1027,9 @@ export default function Movers() {
     e.preventDefault(); setLoginError(""); setLoginSuccess(""); setLoading(true); setShowResend(false);
     try {
       const res = await API.post("/auth/login", { ...loginData, role: "mover" });
-      if (res.data.user.role !== "mover") { setLoginError("❌ This portal is for mover accounts only."); return; }
+      if (res.data.user.role !== "mover") { setLoginError(" This portal is for mover accounts only."); return; }
       login(res.data.token, res.data.user);
-      setLoginSuccess("✅ Login successful! Redirecting...");
+      setLoginSuccess(" Login successful! Redirecting...");
       setTimeout(() => navigate("/mover-dashboard"), 1000);
     } catch (err) {
       const errData = err.response?.data;
@@ -1037,19 +1037,19 @@ export default function Movers() {
         setShowResend(true);
         setResendEmail(errData.email || loginData.email);
       }
-      setLoginError(errData?.error || "❌ Invalid credentials. Please try again.");
+      setLoginError(errData?.error || " Invalid credentials. Please try again.");
     }
     finally { setLoading(false); }
   };
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
-    if (!forgotEmail) { setForgotMsg("❌ Please enter your email."); return; }
+    if (!forgotEmail) { setForgotMsg(" Please enter your email."); return; }
     setForgotLoading(true);
     try {
       const res = await API.post("/auth/forgot-password", { email: forgotEmail, role: "mover" });
-      setForgotMsg(res.data?.message || "✅ Reset link sent!");
-    } catch { setForgotMsg("❌ Failed to send reset email."); }
+      setForgotMsg(res.data?.message || " Reset link sent!");
+    } catch { setForgotMsg(" Failed to send reset email."); }
     finally { setForgotLoading(false); }
   };
 
@@ -1087,7 +1087,7 @@ export default function Movers() {
       if (!res.ok) throw new Error(data.error || "Google authentication failed");
       if (data.user.role !== "mover") throw new Error("This login is for mover accounts only");
       login(data.token, data.user);
-      setLoginSuccess("✅ Google login successful! Redirecting...");
+      setLoginSuccess(" Google login successful! Redirecting...");
       setTimeout(() => navigate("/mover-dashboard"), 1000);
     } catch (err) { setGoogleError(err.message || "Google authentication failed."); }
     finally { setGoogleLoading(false); }
@@ -1107,9 +1107,9 @@ export default function Movers() {
   const fOut = e => { e.target.style.borderColor = C.border; e.target.style.boxShadow = "none"; };
 
   const tabs = [
-    { id: "search", label: "🔍  Find a Mover" },
-    { id: "register", label: "📝  Join as Mover" },
-    { id: "login", label: "🔑  Mover Login" },
+    { id: "search", label: "  Find a Mover" },
+    { id: "register", label: "  Join as Mover" },
+    { id: "login", label: "  Mover Login" },
   ];
 
   return (
@@ -1159,7 +1159,7 @@ export default function Movers() {
               background: C.teal, color: C.tealLight,
               fontSize: 10, fontWeight: 700,
               padding: "4px 12px", borderRadius: 20, letterSpacing: 0.3,
-            }}>🇰🇪 47 Counties</span>
+            }}> 47 Counties</span>
           </div>
         </div>
 
@@ -1189,7 +1189,7 @@ export default function Movers() {
             <div style={{ marginBottom: 32 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
                 <div style={{ width: 3, height: 18, background: C.amberMid, borderRadius: 2 }} />
-                <span style={{ fontSize: 15, fontWeight: 700, color: C.textPrimary }}>⭐ Featured Movers</span>
+                <span style={{ fontSize: 15, fontWeight: 700, color: C.textPrimary }}> Featured Movers</span>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14 }} className="movers-grid">
                 {featuredMovers.map((m, i) => (
@@ -1231,7 +1231,7 @@ export default function Movers() {
 
           {loading ? (
             <div style={{ textAlign: "center", padding: "60px 0" }}>
-              <div style={{ fontSize: 36, marginBottom: 12 }}>⏳</div>
+              <div style={{ fontSize: 36, marginBottom: 12 }}></div>
               <p style={{ color: C.textHint, fontSize: 14 }}>Searching for movers...</p>
             </div>
           ) : movers.length > 0 ? (
@@ -1252,7 +1252,7 @@ export default function Movers() {
             </>
           ) : (
             <div style={{ textAlign: "center", padding: "80px 20px" }}>
-              <div style={{ fontSize: 48, marginBottom: 14 }}>🔍</div>
+              <div style={{ fontSize: 48, marginBottom: 14 }}></div>
               <h3 style={{ color: C.textMuted, margin: "0 0 8px", fontSize: 17 }}>No movers found</h3>
               <p style={{ color: C.textHint, fontSize: 13 }}>
                 {selectedCounty === "all" ? "No approved movers yet." : `No approved movers in ${selectedCounty} yet.`}
@@ -1267,7 +1267,7 @@ export default function Movers() {
         <div style={{ maxWidth: 620, margin: "0 auto", padding: "32px 20px 80px" }} className="fade-up">
           <div style={{ background: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, padding: "28px 28px" }}>
             <div style={{ textAlign: "center", marginBottom: 22 }}>
-              <div style={{ width: 46, height: 46, borderRadius: "50%", background: C.navyDim, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", fontSize: 22 }}>🚛</div>
+              <div style={{ width: 46, height: 46, borderRadius: "50%", background: C.navyDim, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", fontSize: 22 }}></div>
               <h2 style={{ color: C.textPrimary, margin: "0 0 6px", fontSize: 20, fontWeight: 700 }}>Join as a Mover</h2>
               <p style={{ color: C.textHint, margin: 0, fontSize: 13 }}>Register your moving business and reach customers across Kenya</p>
             </div>
@@ -1284,7 +1284,7 @@ export default function Movers() {
                   <input style={inputBase} required type="password" placeholder="Min 6 chars, letters & numbers" value={registerData.password} onChange={rChange("password")} onFocus={fIn} onBlur={fOut} />
                   {registerData.password && (registerData.password.length < 6 || !/[a-zA-Z]/.test(registerData.password) || !/[0-9]/.test(registerData.password)) && (
                     <div style={{ color: "#dc2626", fontSize: "11px", marginTop: "4px" }}>
-                      ⚠️ Password must contain both letters and numbers.
+                       Password must contain both letters and numbers.
                     </div>
                   )}
                 </div>
@@ -1323,7 +1323,7 @@ export default function Movers() {
                 ))}
               </div>
 
-              <Divider label="📷 Work Photos" />
+              <Divider label=" Work Photos" />
               <div style={{ marginBottom: 20 }}>
                 <p style={{ color: C.textHint, fontSize: 12, marginBottom: 12 }}>Upload photos of your work to build trust with customers (up to 10 photos)</p>
                 <input
@@ -1427,7 +1427,7 @@ export default function Movers() {
                 color: "#fff", border: "none", borderRadius: 8,
                 fontWeight: 700, cursor: loading ? "not-allowed" : "pointer",
                 fontSize: 14, fontFamily: font,
-              }}>{loading ? "Submitting..." : "📤 Submit Application"}</button>
+              }}>{loading ? "Submitting..." : " Submit Application"}</button>
               <div onClick={() => setActiveTab("login")} style={{ textAlign: "center", color: C.navyLight, marginTop: 16, cursor: "pointer", fontSize: 13, fontWeight: 500 }}>
                 Already registered? Login here →
               </div>
@@ -1444,11 +1444,11 @@ export default function Movers() {
             {showForgot ? (
               <form onSubmit={handleForgotPassword}>
                 <div style={{ textAlign: "center", marginBottom: 22 }}>
-                  <div style={{ fontSize: 36, marginBottom: 10 }}>🔏</div>
+                  <div style={{ fontSize: 36, marginBottom: 10 }}></div>
                   <h2 style={{ color: C.textPrimary, margin: "0 0 6px", fontSize: 20, fontWeight: 700 }}>Reset Password</h2>
                   <p style={{ color: C.textHint, margin: 0, fontSize: 13 }}>Enter your email to receive a reset link</p>
                 </div>
-                {forgotMsg && <Alert type={forgotMsg.includes("❌") ? "error" : "success"}>{forgotMsg}</Alert>}
+                {forgotMsg && <Alert type={forgotMsg.includes("") ? "error" : "success"}>{forgotMsg}</Alert>}
                 <div style={{ marginBottom: 14 }}>
                   <label style={labelBase}>Registered Email *</label>
                   <input style={inputBase} required type="email" placeholder="you@example.com" value={forgotEmail} onChange={e => setForgotEmail(e.target.value)} onFocus={fIn} onBlur={fOut} />
@@ -1458,7 +1458,7 @@ export default function Movers() {
                   color: "#fff", border: "none", borderRadius: 8,
                   fontWeight: 700, cursor: "pointer", fontSize: 14, fontFamily: font,
                   opacity: forgotLoading ? 0.6 : 1,
-                }}>{forgotLoading ? "Sending..." : "📧 Send Reset Link"}</button>
+                }}>{forgotLoading ? "Sending..." : " Send Reset Link"}</button>
                 <div onClick={() => { setShowForgot(false); setForgotMsg(""); setForgotEmail(""); }}
                   style={{ textAlign: "center", color: C.navyLight, marginTop: 16, cursor: "pointer", fontSize: 13, fontWeight: 500 }}>
                   ← Back to Login
@@ -1471,7 +1471,7 @@ export default function Movers() {
                     width: 46, height: 46, borderRadius: "50%",
                     background: C.navy, display: "flex", alignItems: "center", justifyContent: "center",
                     margin: "0 auto 12px", fontSize: 20, color: C.navyText,
-                  }}>🔐</div>
+                  }}></div>
                   <h2 style={{ color: C.textPrimary, margin: "0 0 6px", fontSize: 20, fontWeight: 700 }}>Mover Login</h2>
                   <p style={{ color: C.textHint, margin: 0, fontSize: 13 }}>Access your mover dashboard</p>
                 </div>
@@ -1499,7 +1499,7 @@ export default function Movers() {
                         transition: "all 0.2s"
                       }}
                     >
-                      {resendLoading ? "⏳ Sending..." : "📧 Resend Verification Email"}
+                      {resendLoading ? " Sending..." : " Resend Verification Email"}
                     </button>
                   </div>
                 )}
@@ -1540,7 +1540,7 @@ export default function Movers() {
                   color: "#fff", border: "none", borderRadius: 8,
                   fontWeight: 700, cursor: loading ? "not-allowed" : "pointer",
                   fontSize: 14, fontFamily: font,
-                }}>{loading ? "Verifying..." : "🚀 Access Dashboard"}</button>
+                }}>{loading ? "Verifying..." : " Access Dashboard"}</button>
 
                 <div onClick={() => setActiveTab("register")}
                   style={{ textAlign: "center", color: C.navyLight, marginTop: 16, cursor: "pointer", fontSize: 13, fontWeight: 500 }}>

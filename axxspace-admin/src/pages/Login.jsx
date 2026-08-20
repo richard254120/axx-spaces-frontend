@@ -24,13 +24,13 @@ export default function Login() {
       const res = await API.post("/auth/login", { email, password, role: "admin" });
       const { token, user } = res.data;
       if (user.role !== "admin") {
-        setError("❌ Access denied. Admins only.");
+        setError(" Access denied. Admins only.");
         return;
       }
       login(token, user);
       navigate("/");
     } catch (err) {
-      setError("❌ Invalid email or password.");
+      setError(" Invalid email or password.");
     } finally {
       setLoading(false);
     }
@@ -41,7 +41,7 @@ export default function Login() {
     setForgotMsg("");
 
     if (!forgotEmail) {
-      setForgotMsg("❌ Please enter your email address.");
+      setForgotMsg(" Please enter your email address.");
       return;
     }
 
@@ -49,9 +49,9 @@ export default function Login() {
 
     try {
       const res = await API.post("/auth/forgot-password", { email: forgotEmail, role: "admin" });
-      setForgotMsg(res.data.message || "✅ Reset link sent! Check your inbox.");
+      setForgotMsg(res.data.message || " Reset link sent! Check your inbox.");
     } catch (err) {
-      setForgotMsg("❌ Failed to send reset email. Try again.");
+      setForgotMsg(" Failed to send reset email. Try again.");
     } finally {
       setForgotLoading(false);
     }
@@ -62,10 +62,10 @@ export default function Login() {
       <div style={styles.card}>
         {showForgot ? (
           <>
-            <h1 style={styles.title}>🔐 Reset Password</h1>
+            <h1 style={styles.title}> Reset Password</h1>
             <p style={styles.subtitle}>Enter your email to receive a reset link</p>
             {forgotMsg && (
-              <div style={forgotMsg.includes("❌") ? styles.error : { ...styles.error, background: "rgba(34,197,94,0.1)", color: "#22c55e", borderColor: "#22c55e" }}>
+              <div style={forgotMsg.includes("") ? styles.error : { ...styles.error, background: "rgba(34,197,94,0.1)", color: "#22c55e", borderColor: "#22c55e" }}>
                 {forgotMsg}
               </div>
             )}
@@ -75,7 +75,7 @@ export default function Login() {
                 <input type="email" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} placeholder="Enter your registered email" style={styles.input} />
               </div>
               <button onClick={handleForgotPassword} disabled={forgotLoading} style={styles.btn}>
-                {forgotLoading ? "Sending..." : "📧 Send Reset Link"}
+                {forgotLoading ? "Sending..." : " Send Reset Link"}
               </button>
             </div>
             <div style={{ textAlign: "center", marginTop: "20px" }}>
@@ -86,7 +86,7 @@ export default function Login() {
           </>
         ) : (
           <>
-            <h1 style={styles.title}>🛡️ Axxspace Admin</h1>
+            <h1 style={styles.title}> Axxspace Admin</h1>
             <p style={styles.subtitle}>Sign in to access the admin panel</p>
             {error && <div style={styles.error}>{error}</div>}
             <div style={styles.form}>

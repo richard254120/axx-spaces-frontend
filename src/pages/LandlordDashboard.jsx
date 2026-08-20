@@ -241,7 +241,7 @@ export default function LandlordDashboard() {
       });
       if (!response.ok) throw new Error("Failed to update units");
       fetchMyProperties();
-      setSuccessMessage(change > 0 ? "✅ 1 Unit Marked as Booked" : "✅ 1 Unit Freed Up");
+      setSuccessMessage(change > 0 ? " 1 Unit Marked as Booked" : " 1 Unit Freed Up");
       setTimeout(() => setSuccessMessage(""), 2500);
     } catch (err) {
       setError(err.message);
@@ -266,7 +266,7 @@ export default function LandlordDashboard() {
       });
       if (!response.ok) throw new Error("Failed to assign agent");
       setSelectedAgents(prev => ({ ...prev, [propertyId]: agentId }));
-      setSuccessMessage("✅ Agent assigned successfully");
+      setSuccessMessage(" Agent assigned successfully");
       setTimeout(() => setSuccessMessage(""), 2500);
       fetchMyProperties();
     } catch (err) {
@@ -290,9 +290,9 @@ export default function LandlordDashboard() {
   });
 
   const statusConfig = {
-    approved: { bg: "#22c55e", label: "✅ Approved" },
-    pending: { bg: "#f59e0b", label: "⏳ Pending" },
-    rejected: { bg: "#ef4444", label: "❌ Rejected" },
+    approved: { bg: "#22c55e", label: " Approved" },
+    pending: { bg: "#f59e0b", label: " Pending" },
+    rejected: { bg: "#ef4444", label: " Rejected" },
   };
 
   if (authLoading && !user) {
@@ -450,9 +450,9 @@ export default function LandlordDashboard() {
               />
               <div style={styles.promoPropInfo}>
                 <h4 style={styles.promoPropTitle}>{selectedProperty.title}</h4>
-                <p style={styles.promoPropLoc}>📍 {selectedProperty.location}</p>
+                <p style={styles.promoPropLoc}> {selectedProperty.location}</p>
                 <a href={`/listings/${selectedProperty._id}`} target="_blank" rel="noreferrer" style={styles.promoPropLink}>
-                  View Property ↗
+                  View Property 
                 </a>
               </div>
             </div>
@@ -504,13 +504,13 @@ export default function LandlordDashboard() {
               disabled={!qrLoaded} 
               style={styles.promoRedBtn}
             >
-              📥 Download QR Code
+               Download QR Code
             </button>
 
             <div style={styles.promoFormatText}>PNG &nbsp;|&nbsp; PDF</div>
 
             <div style={styles.promoteTipBox}>
-              <div style={styles.tipIcon}>ℹ️</div>
+              <div style={styles.tipIcon}></div>
               <div style={styles.tipText}>
                 Print and display this QR code to get more views and enquiries for your property.
               </div>
@@ -628,7 +628,7 @@ export default function LandlordDashboard() {
                 <p style={styles.contentSubtitle}>Manage your listed rentals, assign agents, and adjust vacancy levels.</p>
               </div>
               <button onClick={() => navigate("/upload")} style={styles.addPropHeaderBtn}>
-                ➕ Add Property
+                 Add Property
               </button>
             </div>
 
@@ -648,7 +648,7 @@ export default function LandlordDashboard() {
 
             {/* Loading */}
             {loading ? (
-              <p style={styles.loading}>⏳ Loading properties...</p>
+              <p style={styles.loading}> Loading properties...</p>
             ) : filteredProperties.length === 0 ? (
               <div style={styles.empty}>
                 <p>No properties matching "{propertyFilter}" found.</p>
@@ -678,7 +678,7 @@ export default function LandlordDashboard() {
                           {status.label}
                         </div>
                         {fullyBooked && (
-                          <div style={styles.fullyBookedBadge}>🔴 FULLY BOOKED</div>
+                          <div style={styles.fullyBookedBadge}> FULLY BOOKED</div>
                         )}
                       </div>
 
@@ -721,8 +721,8 @@ export default function LandlordDashboard() {
                         </div>
                         <p style={styles.progressLabel}>
                           {fullyBooked
-                            ? "🔴 All units booked — hidden from searches"
-                            : `🟢 ${available} of ${total} units active to rent`}
+                            ? " All units booked — hidden from searches"
+                            : ` ${available} of ${total} units active to rent`}
                         </p>
 
                         {/* Actions block */}
@@ -760,7 +760,7 @@ export default function LandlordDashboard() {
                               onClick={() => handleBoost(property)}
                               style={{ ...styles.actionGridBtn, ...styles.boostBtnGrid, gridColumn: "1 / -1" }}
                             >
-                              ⭐ Boost Property
+                               Boost Property
                             </button>
 
                             <button
@@ -770,7 +770,7 @@ export default function LandlordDashboard() {
                               }}
                               style={styles.qrGridBtn}
                             >
-                              🖨️ Poster / QR
+                               Poster / QR
                             </button>
 
                             <button
@@ -780,7 +780,7 @@ export default function LandlordDashboard() {
                               }}
                               style={styles.statsGridBtn}
                             >
-                              📊 QR Stats
+                               QR Stats
                             </button>
 
                             {/* Assign Agent Selector */}
@@ -818,7 +818,7 @@ export default function LandlordDashboard() {
                               border: "none"
                             }}
                           >
-                            ✏️ Edit Details & Images
+                             Edit Details & Images
                           </button>
                         </div>
                       </div>
@@ -839,7 +839,7 @@ export default function LandlordDashboard() {
             </div>
 
             {enquiriesLoading ? (
-              <p style={styles.loading}>⏳ Aggregating scan reports...</p>
+              <p style={styles.loading}> Aggregating scan reports...</p>
             ) : enquiriesData.length === 0 ? (
               <div style={styles.empty}>
                 <p>No offline QR scans recorded yet. Deploy posters to begin collecting conversions!</p>
@@ -977,7 +977,7 @@ export default function LandlordDashboard() {
             </div>
 
             <div style={styles.empty}>
-              <p style={{ fontSize: "16px", color: "#fbbf24", fontWeight: "700" }}>📅 Booking Manager Active</p>
+              <p style={{ fontSize: "16px", color: "#fbbf24", fontWeight: "700" }}> Booking Manager Active</p>
               <p style={{ marginTop: "8px" }}>
                 Total occupied units: <strong>{counts.booked} units</strong> across {counts.all} listings.
               </p>

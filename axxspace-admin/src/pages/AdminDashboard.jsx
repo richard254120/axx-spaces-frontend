@@ -14,21 +14,21 @@ import "./AdminDashboard.css";
 // ── tiny helpers ──────────────────────────────────────────────
 const TABS = ["overview", "properties", "materials", "tourism", "movers", "sellers", "sold", "payment", "boosts", "businesses", "announcements", "verification", "requests", "listings-badges", "user-badges"];
 const TAB_LABELS = {
-  overview: "📊 Dashboard Overview",
-  properties: "🏠 Properties",
-  materials: "🛍️ Materials",
-  tourism: "🏨 Tourism",
-  movers: "🚛 Movers",
-  sellers: "📋 Sellers",
-  sold: "💰 Sold",
-  payment: "💳 Payment",
-  boosts: "🚀 Payments",
-  businesses: "🏪 Businesses",
-  announcements: "📢 Announcements",
+  overview: " Dashboard Overview",
+  properties: " Properties",
+  materials: " Materials",
+  tourism: " Tourism",
+  movers: " Movers",
+  sellers: " Sellers",
+  sold: " Sold",
+  payment: " Payment",
+  boosts: " Payments",
+  businesses: " Businesses",
+  announcements: " Announcements",
   verification: "✓ KYC Verification",
-  requests: "🙋 User Requests",
-  "listings-badges": "🏅 Listing Badges",
-  "user-badges": "👤 User Badges"
+  requests: " User Requests",
+  "listings-badges": " Listing Badges",
+  "user-badges": " User Badges"
 };
 const STATUS_VIEWS = ["pending", "approved", "rejected"];
 
@@ -162,12 +162,12 @@ export default function AdminDashboard() {
     if (!window.confirm("Are you sure you want to approve this verification?")) return;
     try {
       await API.put(`/kyc-verification/admin/${verificationId}/approve`);
-      alert("✅ Verification approved successfully");
+      alert(" Verification approved successfully");
       loadPendingVerifications();
       setSelectedVerification(null);
     } catch (err) {
       console.error("Verification approval error:", err);
-      alert("❌ Failed to approve verification: " + (err.response?.data?.message || err.message));
+      alert(" Failed to approve verification: " + (err.response?.data?.message || err.message));
     }
   };
 
@@ -179,12 +179,12 @@ export default function AdminDashboard() {
     if (!window.confirm("Are you sure you want to reject this verification?")) return;
     try {
       await API.put(`/kyc-verification/admin/${verificationId}/reject`, { rejectionReason });
-      alert("✅ Verification rejected successfully");
+      alert(" Verification rejected successfully");
       loadPendingVerifications();
       setSelectedVerification(null);
       setRejectionReason('');
     } catch (err) {
-      alert("❌ Failed to reject verification");
+      alert(" Failed to reject verification");
     }
   };
 
@@ -296,7 +296,7 @@ export default function AdminDashboard() {
       // Check for new notifications and show alert
       if (notifications.length > previousNotificationCount && previousNotificationCount > 0) {
         const newCount = notifications.length - previousNotificationCount;
-        alert(`🔔 You have ${newCount} new notification${newCount > 1 ? 's' : ''} awaiting approval!`);
+        alert(` You have ${newCount} new notification${newCount > 1 ? 's' : ''} awaiting approval!`);
       }
       setPreviousNotificationCount(notifications.length);
     } catch (e) { console.error("unified notifications load:", e); }
@@ -311,12 +311,12 @@ export default function AdminDashboard() {
         payload.badgeId = badgeId;
       }
       await API.put(`/payment/notifications/${notifId}/read`, payload);
-      setBoostMessage(badgeId ? "✅ Payment confirmed & badge issued!" : "✅ Payment confirmed!");
+      setBoostMessage(badgeId ? " Payment confirmed & badge issued!" : " Payment confirmed!");
       loadPendingBoosts();
       loadAllBoosts();
       loadStats();
     } catch (e) {
-      setBoostMessage("❌ Failed: " + (e.response?.data?.error || e.message));
+      setBoostMessage(" Failed: " + (e.response?.data?.error || e.message));
     }
     setTimeout(() => setBoostMessage(""), 4000);
   };
@@ -324,11 +324,11 @@ export default function AdminDashboard() {
   const handleRejectBoost = async (notifId) => {
     try {
       await API.put(`/payment/notifications/${notifId}/read`, { approve: false });
-      setBoostMessage("✅ Notification rejected & dismissed.");
+      setBoostMessage(" Notification rejected & dismissed.");
       loadPendingBoosts();
       loadAllBoosts();
     } catch (e) {
-      setBoostMessage("❌ Failed: " + (e.response?.data?.error || e.message));
+      setBoostMessage(" Failed: " + (e.response?.data?.error || e.message));
     }
     setTimeout(() => setBoostMessage(""), 4000);
   };
@@ -337,8 +337,8 @@ export default function AdminDashboard() {
       await API.patch(`/admin/${type}/${id}/approve`);
       refresh();
       if (selected?._id === id) setSelected(null);
-      alert("✅ Approved successfully");
-    } catch (e) { alert("❌ Failed to approve"); }
+      alert(" Approved successfully");
+    } catch (e) { alert(" Failed to approve"); }
   };
 
   const handleReject = async (type, id) => {
@@ -346,8 +346,8 @@ export default function AdminDashboard() {
       await API.patch(`/admin/${type}/${id}/reject`);
       refresh();
       if (selected?._id === id) setSelected(null);
-      alert("✅ Rejected successfully");
-    } catch (e) { alert("❌ Failed to reject"); }
+      alert(" Rejected successfully");
+    } catch (e) { alert(" Failed to reject"); }
   };
 
   const refresh = () => { loadStats(); loadAllPending(); loadItems(activeTab, statusView); };
@@ -358,10 +358,10 @@ export default function AdminDashboard() {
       await API.delete(`/admin/${type}/${id}`);
       refresh();
       if (selected?._id === id) setSelected(null);
-      alert("✅ Deleted successfully");
+      alert(" Deleted successfully");
     } catch (e) {
       console.error("Delete error:", e);
-      alert("❌ Failed to delete: " + (e.response?.data?.error || e.message));
+      alert(" Failed to delete: " + (e.response?.data?.error || e.message));
     }
   };
 
@@ -408,9 +408,9 @@ export default function AdminDashboard() {
     try {
       await API.patch(`/business/admin/${businessId}/status`, { status });
       setPendingBusinesses((prev) => prev.filter((b) => b._id !== businessId));
-      alert(`✅ Business ${status} successfully`);
+      alert(` Business ${status} successfully`);
     } catch (err) {
-      alert("❌ Failed to update business status");
+      alert(" Failed to update business status");
     }
   };
 
@@ -418,9 +418,9 @@ export default function AdminDashboard() {
     try {
       await API.post(`/business/admin/${businessId}/verify`, { badgeType });
       loadPendingBusinesses();
-      alert("✅ Verification badge added successfully");
+      alert(" Verification badge added successfully");
     } catch (err) {
-      alert("❌ Failed to add verification badge");
+      alert(" Failed to add verification badge");
     }
   };
 
@@ -439,10 +439,10 @@ export default function AdminDashboard() {
       setShowFeatureModal(false);
       setSelectedBusinessForFeature(null);
       loadPendingBusinesses();
-      alert("✅ Business featured successfully");
+      alert(" Business featured successfully");
     } catch (err) {
       console.error("Feature error:", err);
-      alert("❌ Failed to feature business: " + (err.response?.data?.error || err.message));
+      alert(" Failed to feature business: " + (err.response?.data?.error || err.message));
     }
   };
 
@@ -452,10 +452,10 @@ export default function AdminDashboard() {
       const response = await API.patch(`/business/admin/${businessId}/feature`, { featured: false });
       console.log("Unfeature response:", response);
       loadPendingBusinesses();
-      alert("✅ Business unfeatured successfully");
+      alert(" Business unfeatured successfully");
     } catch (err) {
       console.error("Unfeature error:", err);
-      alert("❌ Failed to unfeature business: " + (err.response?.data?.error || err.message));
+      alert(" Failed to unfeature business: " + (err.response?.data?.error || err.message));
     }
   };
 
@@ -468,7 +468,7 @@ export default function AdminDashboard() {
         featured,
         featuredUntil
       });
-      alert(`✅ Item ${featured ? 'featured' : 'unfeatured'} successfully`);
+      alert(` Item ${featured ? 'featured' : 'unfeatured'} successfully`);
       // Reload current data based on active tab
       if (activeTab === 'businesses') {
         loadPendingBusinesses();
@@ -477,7 +477,7 @@ export default function AdminDashboard() {
       }
     } catch (err) {
       console.error("Feature error:", err);
-      alert(`❌ Failed to ${featured ? 'feature' : 'unfeature'} item: ` + (err.response?.data?.error || err.message));
+      alert(` Failed to ${featured ? 'feature' : 'unfeature'} item: ` + (err.response?.data?.error || err.message));
     }
   };
 
@@ -499,9 +499,9 @@ export default function AdminDashboard() {
     try {
       await API.patch(`/business/admin/${businessId}/announcements/${announcementId}/status`, { status });
       loadPendingAnnouncements();
-      alert(`✅ Announcement ${status} successfully`);
+      alert(` Announcement ${status} successfully`);
     } catch (err) {
-      alert("❌ Failed to update announcement status");
+      alert(" Failed to update announcement status");
     }
   };
 
@@ -513,9 +513,9 @@ export default function AdminDashboard() {
     try {
       await API.delete(`/business/admin/${businessId}/announcements/${announcementId}`);
       loadPendingAnnouncements();
-      alert("✅ Announcement deleted successfully");
+      alert(" Announcement deleted successfully");
     } catch (err) {
-      alert("❌ Failed to delete announcement");
+      alert(" Failed to delete announcement");
     }
   };
 
@@ -538,9 +538,9 @@ export default function AdminDashboard() {
       setRequests((prev) =>
         prev.map((r) => (r._id === requestId ? { ...r, status } : r))
       );
-      alert(`✅ Request status updated to ${status}`);
+      alert(` Request status updated to ${status}`);
     } catch (err) {
-      alert("❌ Failed to update request status");
+      alert(" Failed to update request status");
     }
   };
 
@@ -554,8 +554,8 @@ export default function AdminDashboard() {
       if (!ep) { alert("Edit not supported for this type."); setSaving(false); return; }
       await API.patch(`/${ep}/${editData._id}`, editData);
       refresh(); setEditMode(false); setSelected({ ...selected, ...editData });
-      alert("✅ Saved successfully");
-    } catch (e) { alert("❌ Failed to save: " + (e.response?.data?.error || e.message)); }
+      alert(" Saved successfully");
+    } catch (e) { alert(" Failed to save: " + (e.response?.data?.error || e.message)); }
     finally { setSaving(false); }
   };
 
@@ -569,8 +569,8 @@ export default function AdminDashboard() {
         API.post("/config", { key: "mpesa_consumer_key", value: mpesaConfig.mpesa_consumer_key, description: "M-Pesa Consumer Key" }),
         API.post("/config", { key: "mpesa_consumer_secret", value: mpesaConfig.mpesa_consumer_secret, description: "M-Pesa Consumer Secret" }),
       ]);
-      setConfigMessage("✅ M-Pesa configuration saved successfully!");
-    } catch (e) { setConfigMessage("❌ Failed to save configuration."); }
+      setConfigMessage(" M-Pesa configuration saved successfully!");
+    } catch (e) { setConfigMessage(" Failed to save configuration."); }
     finally { setConfigSaving(false); setTimeout(() => setConfigMessage(""), 3000); }
   };
 
@@ -605,7 +605,7 @@ export default function AdminDashboard() {
   const getTitle = (item) => item.title || item.name || item.businessName || "—";
   const getSub = (item) => {
     if (activeTab === "sold") {
-      const typeLabels = { property: "🏠 Property", material: "🛍️ Material", tourism: "🏨 Tourism" };
+      const typeLabels = { property: " Property", material: " Material", tourism: " Tourism" };
       return `${typeLabels[item.itemType] || item.itemType} · ${item.category || item.county || ""}`;
     }
     return item.category || item.county || (item.businessRegNumber ? `Reg: ${item.businessRegNumber}` : "") || item.vehicleType || "—";
@@ -649,11 +649,11 @@ export default function AdminDashboard() {
 
   const getNotifIcon = (type, isPayment) => {
     if (isPayment || ["property_booking", "material_purchase", "tourism_booking", "boost", "subscription"].includes(type)) {
-      const icons = { property_booking: "🏠", material_purchase: "🛍️", tourism_booking: "🏨", boost: "🚀", subscription: "📋" };
-      return icons[type] || "💳";
+      const icons = { property_booking: "", material_purchase: "", tourism_booking: "", boost: "", subscription: "" };
+      return icons[type] || "";
     }
-    const icons = { property: "🏠", material: "🛍️", tourism: "🏨", mover: "🚛", seller: "📋", business: "🏪", announcement: "📢" };
-    return icons[type] || "📄";
+    const icons = { property: "", material: "", tourism: "", mover: "", seller: "", business: "", announcement: "" };
+    return icons[type] || "";
   };
 
   const hasPendingBoosts = pendingBoosts.length > 0;
@@ -665,7 +665,7 @@ export default function AdminDashboard() {
       {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />}
       <aside className={`admin-sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div className="admin-sidebar-brand">
-          <span className="brand-emoji">🛡️</span> AXXSPACE ADMIN
+          <span className="brand-emoji"></span> AXXSPACE ADMIN
           <button className="btn-close-sidebar-mobile" onClick={() => setIsSidebarOpen(false)}>✕</button>
         </div>
         <div className="admin-sidebar-subtitle">Control Center</div>
@@ -693,7 +693,7 @@ export default function AdminDashboard() {
           <button className="btn-toggle-sidebar" onClick={() => setIsSidebarOpen(true)}>
             ☰ Menu
           </button>
-          <span className="mobile-logo-text">🛡️ AXXSPACE</span>
+          <span className="mobile-logo-text"> AXXSPACE</span>
         </div>
 
         {/* HEADER */}
@@ -741,12 +741,12 @@ export default function AdminDashboard() {
           <>
             <div className="stats-grid">
               {[
-                { label: "🏢 Properties", total: stats.properties.total, pending: stats.properties.pending, color: "#3b82f6" },
-                { label: "🛍️ Materials", total: stats.materials.total, pending: stats.materials.pending, color: "#22c55e" },
-                { label: "🚛 Movers", total: stats.movers.total, pending: stats.movers.pending, color: "#f59e0b" },
-                { label: "🏨 Tourism", total: stats.tourism.total, pending: stats.tourism.pending, color: "#8b5cf6" },
-                { label: "📋 Sellers", total: stats.sellers.total, pending: stats.sellers.pending, color: "#ec4899" },
-                { label: "💳 Payments", total: allBoosts.length, pending: pendingBoosts.length, color: "#fbbf24", isPulse: pendingBoosts.length > 0 },
+                { label: " Properties", total: stats.properties.total, pending: stats.properties.pending, color: "#3b82f6" },
+                { label: " Materials", total: stats.materials.total, pending: stats.materials.pending, color: "#22c55e" },
+                { label: " Movers", total: stats.movers.total, pending: stats.movers.pending, color: "#f59e0b" },
+                { label: " Tourism", total: stats.tourism.total, pending: stats.tourism.pending, color: "#8b5cf6" },
+                { label: " Sellers", total: stats.sellers.total, pending: stats.sellers.pending, color: "#ec4899" },
+                { label: " Payments", total: allBoosts.length, pending: pendingBoosts.length, color: "#fbbf24", isPulse: pendingBoosts.length > 0 },
               ].map(s => (
                 <StatsCard
                   key={s.label}
@@ -762,11 +762,11 @@ export default function AdminDashboard() {
             {/* VIEW STATISTICS */}
             {viewStats && (
               <div className="chart-container">
-                <h3 className="chart-title">👁️ View Statistics by Category</h3>
+                <h3 className="chart-title"> View Statistics by Category</h3>
                 <div className="view-stats-grid">
                   {viewStats.properties && viewStats.properties.length > 0 && (
                     <div className="view-stat-section">
-                      <h4 className="view-stat-title">🏠 Properties</h4>
+                      <h4 className="view-stat-title"> Properties</h4>
                       {viewStats.properties.map(stat => (
                         <div key={stat._id} className="view-stat-item">
                           <span className="view-stat-label">{stat._id}</span>
@@ -778,7 +778,7 @@ export default function AdminDashboard() {
                   )}
                   {viewStats.materials && viewStats.materials.length > 0 && (
                     <div className="view-stat-section">
-                      <h4 className="view-stat-title">🛍️ Materials</h4>
+                      <h4 className="view-stat-title"> Materials</h4>
                       {viewStats.materials.map(stat => (
                         <div key={stat._id} className="view-stat-item">
                           <span className="view-stat-label">{stat._id}</span>
@@ -790,7 +790,7 @@ export default function AdminDashboard() {
                   )}
                   {viewStats.tourism && viewStats.tourism.length > 0 && (
                     <div className="view-stat-section">
-                      <h4 className="view-stat-title">🏨 Tourism</h4>
+                      <h4 className="view-stat-title"> Tourism</h4>
                       {viewStats.tourism.map(stat => (
                         <div key={stat._id} className="view-stat-item">
                           <span className="view-stat-label">{stat._id}</span>
@@ -807,11 +807,11 @@ export default function AdminDashboard() {
             {/* TOP VIEWED ITEMS */}
             {topViewed && (
               <div className="chart-container">
-                <h3 className="chart-title">🔥 Top Viewed Items</h3>
+                <h3 className="chart-title"> Top Viewed Items</h3>
                 <div className="top-viewed-grid">
                   {topViewed.properties && topViewed.properties.length > 0 && (
                     <div className="view-stat-section">
-                      <h4 className="view-stat-title">🏠 Properties</h4>
+                      <h4 className="view-stat-title"> Properties</h4>
                       {topViewed.properties.map(item => (
                         <div key={item._id} className="top-view-item">
                           <span className="top-view-title">{item.title}</span>
@@ -823,7 +823,7 @@ export default function AdminDashboard() {
                   )}
                   {topViewed.materials && topViewed.materials.length > 0 && (
                     <div className="view-stat-section">
-                      <h4 className="view-stat-title">🛍️ Materials</h4>
+                      <h4 className="view-stat-title"> Materials</h4>
                       {topViewed.materials.map(item => (
                         <div key={item._id} className="top-view-item">
                           <span className="top-view-title">{item.title}</span>
@@ -835,7 +835,7 @@ export default function AdminDashboard() {
                   )}
                   {topViewed.tourism && topViewed.tourism.length > 0 && (
                     <div className="view-stat-section">
-                      <h4 className="view-stat-title">🏨 Tourism</h4>
+                      <h4 className="view-stat-title"> Tourism</h4>
                       {topViewed.tourism.map(item => (
                         <div key={item._id} className="top-view-item">
                           <span className="top-view-title">{item.title}</span>
@@ -851,7 +851,7 @@ export default function AdminDashboard() {
 
             {/* ACTIVITY CHART */}
             <div className="chart-container">
-              <h3 className="chart-title">📊 Overview Distribution</h3>
+              <h3 className="chart-title"> Overview Distribution</h3>
               <div className="chart-bars">
                 {[
                   { label: "Properties", total: stats.properties.total, pending: stats.properties.pending, color: "#3b82f6" },
@@ -883,25 +883,25 @@ export default function AdminDashboard() {
 
             {/* QUICK ACTIONS */}
             <div className="quick-actions">
-              <h3 className="quick-actions-title">⚡ Quick Actions</h3>
+              <h3 className="quick-actions-title"> Quick Actions</h3>
               <div className="quick-actions-grid">
                 <button className="btn-quick-action" onClick={() => { setActiveTab("properties"); setStatusView("pending"); }}>
-                  <span className="quick-action-icon">🏠</span>
+                  <span className="quick-action-icon"></span>
                   <span className="quick-action-text">Review Properties</span>
                   {stats?.properties?.pending > 0 && <span className="quick-action-badge">{stats.properties.pending}</span>}
                 </button>
                 <button className="btn-quick-action" onClick={() => { setActiveTab("materials"); setStatusView("pending"); }}>
-                  <span className="quick-action-icon">🛍️</span>
+                  <span className="quick-action-icon"></span>
                   <span className="quick-action-text">Review Materials</span>
                   {stats?.materials?.pending > 0 && <span className="quick-action-badge">{stats.materials.pending}</span>}
                 </button>
                 <button className="btn-quick-action" onClick={() => { setActiveTab("tourism"); setStatusView("pending"); }}>
-                  <span className="quick-action-icon">🏨</span>
+                  <span className="quick-action-icon"></span>
                   <span className="quick-action-text">Review Tourism</span>
                   {stats?.tourism?.pending > 0 && <span className="quick-action-badge">{stats.tourism.pending}</span>}
                 </button>
                 <button className="btn-quick-action" onClick={() => { setActiveTab("businesses"); setStatusView("pending"); }}>
-                  <span className="quick-action-icon">🏪</span>
+                  <span className="quick-action-icon"></span>
                   <span className="quick-action-text">Review Businesses</span>
                   {stats?.businesses?.pending > 0 && <span className="quick-action-badge">{stats.businesses.pending}</span>}
                 </button>
@@ -909,12 +909,12 @@ export default function AdminDashboard() {
                   className="btn-quick-action"
                   style={hasPendingBoosts ? { borderColor: "#ef4444", boxShadow: "0 0 12px rgba(239,68,68,0.3)" } : {}}
                   onClick={() => setActiveTab("boosts")}>
-                  <span className="quick-action-icon">💳</span>
+                  <span className="quick-action-icon"></span>
                   <span className="quick-action-text">Review Payments</span>
                   {hasPendingBoosts && <span className="quick-action-badge" style={{ background: "#ef4444" }}>{pendingBoosts.length}</span>}
                 </button>
                 <button className="btn-quick-action" onClick={() => setActiveTab("sold")}>
-                  <span className="quick-action-icon">💰</span>
+                  <span className="quick-action-icon"></span>
                   <span className="quick-action-text">View Sold Items</span>
                 </button>
               </div>
@@ -931,7 +931,7 @@ export default function AdminDashboard() {
               <button key={v}
                 className={`btn-status ${statusView === v ? 'active' : ''}`}
                 onClick={() => setStatusView(v)}>
-                {v === "pending" ? "⏳ Pending" : v === "approved" ? "✅ Approved" : "❌ Rejected"}
+                {v === "pending" ? " Pending" : v === "approved" ? " Approved" : " Rejected"}
               </button>
             ))}
           </div>
@@ -941,7 +941,7 @@ export default function AdminDashboard() {
         {activeTab !== "payment" && activeTab !== "boosts" && activeTab !== "businesses" && activeTab !== "verification" && (
           <div className="search-bar">
             <div className="search-input-wrapper">
-              <span className="search-icon">🔍</span>
+              <span className="search-icon"></span>
               <input
                 className="search-input"
                 placeholder="Search by title, owner, or contact..."
@@ -958,7 +958,7 @@ export default function AdminDashboard() {
                 {activeTab === "tourism" && ["Hotel", "Resort", "Airbnb", "Lodge", "Camping"].map(cat => <option key={cat} value={cat}>{cat}</option>)}
               </select>
             )}
-            <button className="btn-export" onClick={exportData}>📥 Export CSV</button>
+            <button className="btn-export" onClick={exportData}> Export CSV</button>
           </div>
         )}
 
@@ -972,7 +972,7 @@ export default function AdminDashboard() {
 
         {/* BOOST / PAYMENT MESSAGE TOAST */}
         {boostMessage && (
-          <div className={`boost-toast ${boostMessage.startsWith("✅") ? 'success' : 'error'}`}>
+          <div className={`boost-toast ${boostMessage.startsWith("") ? 'success' : 'error'}`}>
             {boostMessage}
           </div>
         )}
@@ -997,11 +997,11 @@ export default function AdminDashboard() {
           businessesLoading ? (
             <div className="loader">
               <div className="spinner"></div>
-              <p>⏳ Loading pending businesses...</p>
+              <p> Loading pending businesses...</p>
             </div>
           ) : pendingBusinesses.length === 0 ? (
             <div className="empty">
-              <p className="empty-text">✅ No pending businesses found.</p>
+              <p className="empty-text"> No pending businesses found.</p>
             </div>
           ) : (
             <div className="grid">
@@ -1013,10 +1013,10 @@ export default function AdminDashboard() {
                   <div className="card-body">
                     <p className="card-title">{business.name}</p>
                     <p className="card-subtitle">{business.categories.join(", ")}</p>
-                    <p className="card-owner">📍 {business.location.town}, {business.location.county}</p>
-                    <p className="card-owner">👤 {business.submitterName || business.owner?.name || "Anonymous"}</p>
-                    <p className="card-owner">📞 {business.contact.phone}</p>
-                    <p className="card-owner">📸 {business.images && business.images.length > 0 ? `${business.images.length} photos` : "No photos"}</p>
+                    <p className="card-owner"> {business.location.town}, {business.location.county}</p>
+                    <p className="card-owner"> {business.submitterName || business.owner?.name || "Anonymous"}</p>
+                    <p className="card-owner"> {business.contact.phone}</p>
+                    <p className="card-owner"> {business.images && business.images.length > 0 ? `${business.images.length} photos` : "No photos"}</p>
                     {business.pricelist?.url && (
                       <p className="card-owner">
                         <button
@@ -1025,7 +1025,7 @@ export default function AdminDashboard() {
                           style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
                           onClick={() => window.open(getPricelistUrl(business.pricelist), "_blank", "noopener,noreferrer")}
                         >
-                          📄 View pricelist
+                           View pricelist
                         </button>
                       </p>
                     )}
@@ -1035,8 +1035,8 @@ export default function AdminDashboard() {
                       </span>
                     </div>
                     <div className="card-buttons">
-                      <button className="btn-approve" onClick={() => handleBusinessStatus(business._id, "approved")}>✅ Approve</button>
-                      <button className="btn-reject" onClick={() => handleBusinessStatus(business._id, "rejected")}>❌ Reject</button>
+                      <button className="btn-approve" onClick={() => handleBusinessStatus(business._id, "approved")}> Approve</button>
+                      <button className="btn-reject" onClick={() => handleBusinessStatus(business._id, "rejected")}> Reject</button>
                     </div>
                     {business.status === "approved" && (
                       <button
@@ -1057,7 +1057,7 @@ export default function AdminDashboard() {
                           handleFeatureItem("business", business._id, !business.featured);
                         }}
                       >
-                        {business.featured ? "🚫 Unfeature" : "⭐ Feature"}
+                        {business.featured ? " Unfeature" : " Feature"}
                       </button>
                     )}
                     <select
@@ -1067,19 +1067,19 @@ export default function AdminDashboard() {
                       defaultValue=""
                     >
                       <option value="">Add Badge</option>
-                      <option value="student_verified">🟢 Student</option>
-                      <option value="identity_verified">🟢 Identity</option>
-                      <option value="business_verified">🔵 Business</option>
-                      <option value="online_verified">🔵 Online</option>
-                      <option value="location_verified">🟣 Location</option>
-                      <option value="premium_verified">⭐ Premium</option>
+                      <option value="student_verified"> Student</option>
+                      <option value="identity_verified"> Identity</option>
+                      <option value="business_verified"> Business</option>
+                      <option value="online_verified"> Online</option>
+                      <option value="location_verified"> Location</option>
+                      <option value="premium_verified"> Premium</option>
                     </select>
                     <button
                       className="btn-view"
                       style={{ marginTop: "10px", width: "100%" }}
                       onClick={() => navigate(`/business/${business._id}`)}
                     >
-                      👁️ View Details & Reviews
+                       View Details & Reviews
                     </button>
                   </div>
                 </div>
@@ -1090,11 +1090,11 @@ export default function AdminDashboard() {
           announcementsLoading ? (
             <div className="loader">
               <div className="spinner"></div>
-              <p>⏳ Loading announcements...</p>
+              <p> Loading announcements...</p>
             </div>
           ) : pendingAnnouncements.length === 0 ? (
             <div className="empty">
-              <p className="empty-text">✅ No announcements found.</p>
+              <p className="empty-text"> No announcements found.</p>
             </div>
           ) : (
             <div className="grid">
@@ -1102,12 +1102,12 @@ export default function AdminDashboard() {
                 <div key={announcement.announcementId} className="card admin-card">
                   <div className="card-body">
                     <p className="card-title">{announcement.title}</p>
-                    <p className="card-subtitle">📢 {announcement.businessName}</p>
-                    <p className="card-owner">👤 Submitted by: {announcement.submitterName || "Unknown"}</p>
+                    <p className="card-subtitle"> {announcement.businessName}</p>
+                    <p className="card-owner"> Submitted by: {announcement.submitterName || "Unknown"}</p>
                     {announcement.organizationName && (
-                      <p className="card-owner">🏢 Organization: {announcement.organizationName}</p>
+                      <p className="card-owner"> Organization: {announcement.organizationName}</p>
                     )}
-                    <p className="card-owner">📅 {new Date(announcement.createdAt).toLocaleDateString()}</p>
+                    <p className="card-owner"> {new Date(announcement.createdAt).toLocaleDateString()}</p>
                     <p className="card-owner" style={{ color: announcement.status === "approved" ? "#22c55e" : announcement.status === "rejected" ? "#ef4444" : "#fbbf24" }}>
                       Status: {announcement.status.toUpperCase()}
                     </p>
@@ -1115,11 +1115,11 @@ export default function AdminDashboard() {
                     <div className="card-buttons">
                       {announcement.status === "pending" && (
                         <>
-                          <button className="btn-approve" onClick={() => handleAnnouncementStatus(announcement.businessId, announcement.announcementId, "approved")}>✅ Approve</button>
-                          <button className="btn-reject" onClick={() => handleAnnouncementStatus(announcement.businessId, announcement.announcementId, "rejected")}>❌ Reject</button>
+                          <button className="btn-approve" onClick={() => handleAnnouncementStatus(announcement.businessId, announcement.announcementId, "approved")}> Approve</button>
+                          <button className="btn-reject" onClick={() => handleAnnouncementStatus(announcement.businessId, announcement.announcementId, "rejected")}> Reject</button>
                         </>
                       )}
-                      <button className="btn-delete" onClick={() => handleDeleteAnnouncement(announcement.businessId, announcement.announcementId)}>🗑️ Delete</button>
+                      <button className="btn-delete" onClick={() => handleDeleteAnnouncement(announcement.businessId, announcement.announcementId)}> Delete</button>
                     </div>
                   </div>
                 </div>
@@ -1183,7 +1183,7 @@ export default function AdminDashboard() {
                           className="doc-link"
                           onClick={() => handleOpenFile(doc.url)}
                         >
-                          📄 View / Download
+                           View / Download
                         </button>
                         <p style={{ fontSize: 11, color: '#64748b' }}>Filename: {doc.filename}</p>
                       </div>
@@ -1208,10 +1208,10 @@ export default function AdminDashboard() {
                       style={{ marginTop: "8px" }}
                       onClick={() => handleOpenFile(selectedVerification.selfie.url)}
                     >
-                      📥 Download selfie
+                       Download selfie
                     </button>
                     <p style={{ fontSize: 12, color: '#ef4444', display: 'none' }}>
-                      ⚠️ Selfie image not available (file may not exist on server)
+                       Selfie image not available (file may not exist on server)
                     </p>
                     <p style={{ fontSize: 11, color: '#64748b', marginTop: '8px' }}>
                       Filename: {selectedVerification.selfie.filename}
@@ -1221,7 +1221,7 @@ export default function AdminDashboard() {
                 {selectedVerification.status === 'pending' && (
                   <div className="action-buttons">
                     <button className="btn-approve" onClick={() => handleApproveVerification(selectedVerification._id)}>
-                      ✅ Approve
+                       Approve
                     </button>
                     <div className="reject-section">
                       <textarea
@@ -1231,7 +1231,7 @@ export default function AdminDashboard() {
                         onChange={(e) => setRejectionReason(e.target.value)}
                       />
                       <button className="btn-reject" onClick={() => handleRejectVerification(selectedVerification._id)}>
-                        ❌ Reject
+                         Reject
                       </button>
                     </div>
                   </div>
@@ -1241,11 +1241,11 @@ export default function AdminDashboard() {
           ) : verificationLoading ? (
             <div className="loader">
               <div className="spinner"></div>
-              <p>⏳ Loading verifications...</p>
+              <p> Loading verifications...</p>
             </div>
           ) : pendingVerifications.length === 0 ? (
             <div className="empty">
-              <p className="empty-text">✅ No pending verifications found.</p>
+              <p className="empty-text"> No pending verifications found.</p>
             </div>
           ) : (
             <div className="grid">
@@ -1253,14 +1253,14 @@ export default function AdminDashboard() {
                 <div key={verification._id} className="card admin-card">
                   <div className="card-body">
                     <p className="card-title">Level {verification.verificationLevel} Verification</p>
-                    <p className="card-subtitle">👤 User: {verification.user?.name || verification.user?.email || 'Unknown'}</p>
-                    <p className="card-owner">📅 Submitted: {new Date(verification.submittedAt).toLocaleDateString()}</p>
+                    <p className="card-subtitle"> User: {verification.user?.name || verification.user?.email || 'Unknown'}</p>
+                    <p className="card-owner"> Submitted: {new Date(verification.submittedAt).toLocaleDateString()}</p>
                     <p className="card-owner" style={{ color: '#fbbf24' }}>
                       Status: {verification.status.toUpperCase()}
                     </p>
                     <div className="card-buttons">
                       <button className="btn-view" onClick={() => loadVerificationDetails(verification._id)}>
-                        👁️ Review Verification
+                         Review Verification
                       </button>
                     </div>
                   </div>
@@ -1272,11 +1272,11 @@ export default function AdminDashboard() {
           requestsLoading ? (
             <div className="loader">
               <div className="spinner"></div>
-              <p>⏳ Fetching user requests...</p>
+              <p> Fetching user requests...</p>
             </div>
           ) : requests.length === 0 ? (
             <div className="empty">
-              <p className="empty-text">✅ No custom service requests submitted yet.</p>
+              <p className="empty-text"> No custom service requests submitted yet.</p>
             </div>
           ) : (
             <div style={{ width: "100%", overflowX: "auto", background: "rgba(15, 23, 42, 0.8)", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.05)" }}>
@@ -1297,7 +1297,7 @@ export default function AdminDashboard() {
                       <td style={{ padding: "18px" }}>
                         <div style={{ fontWeight: 700, fontSize: "16px", marginBottom: "4px" }}>{req.name}</div>
                         <div style={{ fontSize: "13px", color: "#94a3b8" }}>{req.email}</div>
-                        {req.phone && <div style={{ fontSize: "12px", color: "#94a3b8" }}>📞 {req.phone}</div>}
+                        {req.phone && <div style={{ fontSize: "12px", color: "#94a3b8" }}> {req.phone}</div>}
                       </td>
                       <td style={{ padding: "18px" }}>
                         <span style={{
@@ -1383,7 +1383,7 @@ export default function AdminDashboard() {
                               textAlign: "center"
                             }}
                           >
-                            ✉️ Email
+                             Email
                           </a>
                         </div>
                       </td>
@@ -1400,11 +1400,11 @@ export default function AdminDashboard() {
         ) : loading ? (
           <div className="loader">
             <div className="spinner"></div>
-            <p>⏳ Loading {activeTab === "sold" ? "sold" : statusView} {activeTab}...</p>
+            <p> Loading {activeTab === "sold" ? "sold" : statusView} {activeTab}...</p>
           </div>
         ) : filteredItems.length === 0 ? (
           <div className="empty">
-            <p className="empty-text">✅ No {activeTab === "sold" ? "sold" : statusView} {activeTab} found.</p>
+            <p className="empty-text"> No {activeTab === "sold" ? "sold" : statusView} {activeTab} found.</p>
             {(searchQuery || filterCategory) && (
               <button className="btn-reset" onClick={() => { setSearchQuery(""); setFilterCategory(""); }}>
                 Clear Filters
@@ -1415,14 +1415,14 @@ export default function AdminDashboard() {
           <div className="grid">
             {filteredItems.map(item => (
               <div key={item._id} className={`card admin-card ${item.isFeatured ? 'featured' : ''}`} onClick={() => setSelected(item)}>
-                {item.isFeatured && <div className="featured-banner">⭐ FEATURED</div>}
+                {item.isFeatured && <div className="featured-banner"> FEATURED</div>}
                 {getImages(item)[0] && (
                   <div className="card-image" style={{ backgroundImage: `url(${getImages(item)[0]})` }} />
                 )}
                 <div className="card-body">
                   <p className="card-title">{getTitle(item)}</p>
                   <p className="card-subtitle">{getSub(item)}</p>
-                  <p className="card-owner">👤 {getOwner(item)} · {getContact(item)}</p>
+                  <p className="card-owner"> {getOwner(item)} · {getContact(item)}</p>
                   <div className="card-footer">
                     <span className="price-badge">{getPrice(item)}</span>
                     <span className="status-dot" style={{ background: item.status === "approved" || item.isApproved ? "#22c55e" : item.status === "rejected" ? "#ef4444" : "#fbbf24" }}>
@@ -1431,8 +1431,8 @@ export default function AdminDashboard() {
                   </div>
                   {statusView === "pending" && activeTab !== "sold" && (
                     <div className="card-buttons" onClick={e => e.stopPropagation()}>
-                      <button className="btn-approve" onClick={() => handleApprove(activeTab, item._id)}>✅ Approve</button>
-                      <button className="btn-reject" onClick={() => handleReject(activeTab, item._id)}>❌ Reject</button>
+                      <button className="btn-approve" onClick={() => handleApprove(activeTab, item._id)}> Approve</button>
+                      <button className="btn-reject" onClick={() => handleReject(activeTab, item._id)}> Reject</button>
                     </div>
                   )}
                   {(statusView === "approved" || item.status === "approved" || item.isApproved) && (
@@ -1456,10 +1456,10 @@ export default function AdminDashboard() {
                         cursor: "pointer"
                       }}
                     >
-                      {item.isFeatured ? "🚫 Unfeature" : "⭐ Feature"}
+                      {item.isFeatured ? " Unfeature" : " Feature"}
                     </button>
                   )}
-                  <button className="btn-delete" onClick={(e) => { e.stopPropagation(); confirmDelete(activeTab, item._id, getTitle(item)); }}>🗑️</button>
+                  <button className="btn-delete" onClick={(e) => { e.stopPropagation(); confirmDelete(activeTab, item._id, getTitle(item)); }}></button>
                 </div>
               </div>
             ))}
@@ -1489,7 +1489,7 @@ export default function AdminDashboard() {
           deleteConfirm && (
             <div className="modal-overlay" onClick={() => setDeleteConfirm(null)}>
               <div className="confirm-modal" onClick={e => e.stopPropagation()}>
-                <h3 className="confirm-title">⚠️ Confirm Delete</h3>
+                <h3 className="confirm-title"> Confirm Delete</h3>
                 <p className="confirm-text">
                   Are you sure you want to delete <strong>{deleteConfirm.title}</strong>?
                   <br />
@@ -1497,7 +1497,7 @@ export default function AdminDashboard() {
                 </p>
                 <div className="confirm-buttons">
                   <button className="btn-cancel" onClick={() => setDeleteConfirm(null)}>Cancel</button>
-                  <button className="btn-confirm-delete" onClick={executeDelete}>🗑️ Delete</button>
+                  <button className="btn-confirm-delete" onClick={executeDelete}> Delete</button>
                 </div>
               </div>
             </div>
@@ -1510,7 +1510,7 @@ export default function AdminDashboard() {
             <div className="modal-overlay" onClick={() => setShowFeatureModal(false)}>
               <div className="modal" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                  <h2 className="modal-title">⭐ Feature Business</h2>
+                  <h2 className="modal-title"> Feature Business</h2>
                   <button className="btn-close-modal" onClick={() => setShowFeatureModal(false)}>✕</button>
                 </div>
                 <div className="modal-body">
@@ -1567,7 +1567,7 @@ export default function AdminDashboard() {
                         cursor: "pointer"
                       }}
                     >
-                      ⭐ Feature Business
+                       Feature Business
                     </button>
                   </div>
                 </div>
@@ -1611,7 +1611,7 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
         <button className={`btn-status ${viewMode === "pending" ? 'active' : ''}`}
           style={{ position: "relative" }}
           onClick={() => setViewMode("pending")}>
-          🔴 Unread Payments
+           Unread Payments
           {pendingBoosts.length > 0 && (
             <span className="notification-badge" style={{ position: "static", display: "inline-flex", marginLeft: 8 }}>
               {pendingBoosts.length}
@@ -1619,7 +1619,7 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
           )}
         </button>
         <button className={`btn-status ${viewMode === "all" ? 'active' : ''}`} onClick={() => setViewMode("all")}>
-          📋 All Payments
+           All Payments
         </button>
       </div>
 
@@ -1628,7 +1628,7 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
       ) : displayed.length === 0 ? (
         <div className="empty">
           <p className="empty-text">
-            {viewMode === "pending" ? "✅ No unread payment notifications." : "No payment records found."}
+            {viewMode === "pending" ? " No unread payment notifications." : "No payment records found."}
           </p>
         </div>
       ) : (
@@ -1647,32 +1647,32 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
                 <div style={{ marginBottom: 16 }}>
                   <p className="boost-listing-title">
                     {getNotifIcon(notif.type)} {getNotifTitle(notif)}
-                    {notif.read && <span className="boost-featured-tag" style={{ background: "rgba(34,197,94,0.15)", color: "#22c55e" }}>✅ Read</span>}
+                    {notif.read && <span className="boost-featured-tag" style={{ background: "rgba(34,197,94,0.15)", color: "#22c55e" }}> Read</span>}
                   </p>
                   <p className="boost-listing-meta">{typeLabel(notif.type)}</p>
                 </div>
 
                 <div className="boost-details">
                   <div className="boost-detail-row">
-                    <span className="boost-detail-key">👤 User</span>
+                    <span className="boost-detail-key"> User</span>
                     <span className="boost-detail-val">{notif.userName || "—"}</span>
                   </div>
                   <div className="boost-detail-row">
-                    <span className="boost-detail-key">📞 Phone</span>
+                    <span className="boost-detail-key"> Phone</span>
                     <span className="boost-detail-val">{notif.userPhone || "—"}</span>
                   </div>
                   <div className="boost-detail-row">
-                    <span className="boost-detail-key">✉️ Email</span>
+                    <span className="boost-detail-key"> Email</span>
                     <span className="boost-detail-val">{notif.userEmail || "—"}</span>
                   </div>
                   <div className="boost-detail-row">
-                    <span className="boost-detail-key">💰 Amount</span>
+                    <span className="boost-detail-key"> Amount</span>
                     <span className="boost-detail-val" style={{ color: "#fbbf24", fontWeight: 700 }}>
                       KES {notif.amount?.toLocaleString() || "—"}
                     </span>
                   </div>
                   <div className="boost-detail-row">
-                    <span className="boost-detail-key">🔖 Transaction ID</span>
+                    <span className="boost-detail-key"> Transaction ID</span>
                     <span className="boost-detail-val" style={{ fontFamily: "monospace", color: "#a78bfa", fontSize: 11 }}>
                       {notif.transactionId || notif.mpesaRef || "—"}
                     </span>
@@ -1680,23 +1680,23 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
                   {notif.type === "tourism_booking" && notif.checkIn && (
                     <>
                       <div className="boost-detail-row">
-                        <span className="boost-detail-key">📅 Check-in</span>
+                        <span className="boost-detail-key"> Check-in</span>
                         <span className="boost-detail-val">{new Date(notif.checkIn).toLocaleDateString()}</span>
                       </div>
                       <div className="boost-detail-row">
-                        <span className="boost-detail-key">📅 Check-out</span>
+                        <span className="boost-detail-key"> Check-out</span>
                         <span className="boost-detail-val">{new Date(notif.checkOut).toLocaleDateString()}</span>
                       </div>
                     </>
                   )}
                   <div className="boost-detail-row">
-                    <span className="boost-detail-key">📅 Received</span>
+                    <span className="boost-detail-key"> Received</span>
                     <span className="boost-detail-val">{new Date(notif.createdAt).toLocaleString()}</span>
                   </div>
                   <div className="boost-detail-row">
                     <span className="boost-detail-key">Status</span>
                     <span className="boost-detail-val" style={{ color: statusColor(notif), fontWeight: 700, textTransform: "capitalize" }}>
-                      {notif.read ? "✅ Read" : "🔴 Unread"}
+                      {notif.read ? " Read" : " Unread"}
                     </span>
                   </div>
                 </div>
@@ -1705,7 +1705,7 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
                   <>
                     <div style={{ marginTop: 16, padding: "16px", background: "linear-gradient(135deg, rgba(251, 191, 36, 0.08) 0%, rgba(251, 191, 36, 0.02) 100%)", borderRadius: "12px", border: "1px solid rgba(251, 191, 36, 0.25)" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-                        <span style={{ fontSize: 16 }}>🏅</span>
+                        <span style={{ fontSize: 16 }}></span>
                         <label style={{ fontSize: 13, fontWeight: 700, color: "#fbbf24", letterSpacing: "0.5px" }}>
                           ISSUE VERIFICATION BADGE
                         </label>
@@ -1724,7 +1724,7 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
                             transition: "all 0.2s"
                           }}
                         >
-                          <div style={{ fontSize: 20, marginBottom: 4 }}>❌</div>
+                          <div style={{ fontSize: 20, marginBottom: 4 }}></div>
                           <div style={{ fontSize: 10, color: "#94a3b8" }}>No Badge</div>
                         </div>
                         {VERIFICATION_BADGES.map(badge => (
@@ -1778,7 +1778,7 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
                     </div>
                     <div className="boost-actions" style={{ marginTop: 12 }}>
                       <button className="btn-boost-approve" onClick={() => onApprove(notif._id, selectedBadges[notif._id])}>
-                        ✅ Mark as Confirmed
+                         Mark as Confirmed
                       </button>
                       <button className="btn-boost-reject" onClick={() => onReject(notif._id)}>
                         ✕ Dismiss
@@ -1788,7 +1788,7 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
                 )}
                 {notif.read && (
                   <div style={{ padding: "10px 0", color: "#22c55e", fontWeight: 600, fontSize: 13 }}>
-                    ✅ Payment reviewed
+                     Payment reviewed
                   </div>
                 )}
               </div>
@@ -1817,7 +1817,7 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
       <div className="modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h2 className="modal-title">
-            {item.isFeatured && <span style={{ marginRight: 8 }}>⭐</span>}
+            {item.isFeatured && <span style={{ marginRight: 8 }}></span>}
             {getTitle(item)}
           </h2>
           <button className="btn-close-modal" onClick={onClose}>✕</button>
@@ -1837,8 +1837,8 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
             </div>
           )}
           <div className="owner-box">
-            <p className="owner-line">👤 <strong>{getOwner(item)}</strong> &nbsp;|&nbsp; 📞 {getContact(item)}</p>
-            {item.owner?.email && <p className="owner-line">✉️ {item.owner.email}</p>}
+            <p className="owner-line"> <strong>{getOwner(item)}</strong> &nbsp;|&nbsp;  {getContact(item)}</p>
+            {item.owner?.email && <p className="owner-line"> {item.owner.email}</p>}
           </div>
           {editMode ? (
             <div className="edit-grid">
@@ -1867,21 +1867,21 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
         <div className="modal-footer">
           {editMode ? (
             <>
-              <button className="btn-save" onClick={onSave} disabled={saving}>{saving ? "Saving…" : "💾 Save Changes"}</button>
+              <button className="btn-save" onClick={onSave} disabled={saving}>{saving ? "Saving…" : " Save Changes"}</button>
               <button className="btn-cancel" onClick={onCancelEdit}>Cancel</button>
             </>
           ) : (
             <>
               {statusView === "pending" && tab !== "sold" && (
                 <>
-                  <button className="btn-approve" onClick={onApprove}>✅ Approve</button>
-                  <button className="btn-reject" onClick={onReject}>❌ Reject</button>
+                  <button className="btn-approve" onClick={onApprove}> Approve</button>
+                  <button className="btn-reject" onClick={onReject}> Reject</button>
                 </>
               )}
               {["properties", "materials", "tourism"].includes(tab) && tab !== "sold" && (
-                <button className="btn-edit" onClick={onEdit}>✏️ Edit</button>
+                <button className="btn-edit" onClick={onEdit}> Edit</button>
               )}
-              <button className="btn-delete" onClick={() => onDelete(tab, item._id, item.title || item.name || item.businessName)}>🗑️ Delete</button>
+              <button className="btn-delete" onClick={() => onDelete(tab, item._id, item.title || item.name || item.businessName)}> Delete</button>
               <button className="btn-cancel" onClick={onClose}>Close</button>
             </>
           )}
@@ -1901,8 +1901,8 @@ function PaymentSettings({ mpesaConfig, setMpesaConfig, configSaving, configMess
   ];
   return (
     <div className="config-box">
-      <h2 className="config-title">💳 M-Pesa Configuration</h2>
-      {configMessage && <div className={`config-message ${configMessage.startsWith("✅") ? 'success' : 'error'}`}>{configMessage}</div>}
+      <h2 className="config-title"> M-Pesa Configuration</h2>
+      {configMessage && <div className={`config-message ${configMessage.startsWith("") ? 'success' : 'error'}`}>{configMessage}</div>}
       {fields.map(([k, type, label, placeholder, hint]) => (
         <div key={k} style={{ marginBottom: 16 }}>
           <label className="edit-label">{label}</label>
@@ -1911,7 +1911,7 @@ function PaymentSettings({ mpesaConfig, setMpesaConfig, configSaving, configMess
           <p style={{ fontSize: 11, color: "#64748b", margin: "4px 0 0" }}>{hint}</p>
         </div>
       ))}
-      <button className="btn-save" onClick={handleSave} disabled={configSaving}>{configSaving ? "Saving…" : "💾 Save Configuration"}</button>
+      <button className="btn-save" onClick={handleSave} disabled={configSaving}>{configSaving ? "Saving…" : " Save Configuration"}</button>
     </div>
   );
 }

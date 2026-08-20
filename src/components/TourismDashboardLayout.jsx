@@ -11,10 +11,10 @@ export default function TourismDashboardLayout({ children }) {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return "☀️ Good morning";
-    if (hour < 17) return "🌤️ Good afternoon";
-    if (hour < 22) return "🌙 Good evening";
-    return "✨ Hello";
+    if (hour < 12) return " Good morning";
+    if (hour < 17) return " Good afternoon";
+    if (hour < 22) return " Good evening";
+    return " Hello";
   };
 
   const navItems = [
@@ -38,7 +38,7 @@ export default function TourismDashboardLayout({ children }) {
       <style>{css}</style>
       <header style={styles.header}>
         <Link to="/tourism" style={styles.brand} onClick={() => setMenuOpen(false)}>
-          <span style={styles.brandText}>🏨 AXX Tourism</span>
+          <span style={styles.brandText}> AXX Tourism</span>
         </Link>
 
         <button

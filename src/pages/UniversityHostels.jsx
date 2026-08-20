@@ -145,13 +145,13 @@ export default function UniversityHostels() {
           /* University Selection View */
           <div style={S.universitySection}>
             <div style={S.universityHeader}>
-              <div style={S.universityBadge}>🎓 STUDENT HOUSING</div>
+              <div style={S.universityBadge}> STUDENT HOUSING</div>
               <h2 style={S.universityTitle}>Select Your University</h2>
               <p style={S.universitySub}>Browse universities across all 47 counties in Kenya and discover hostels nearby</p>
             </div>
 
             <div style={S.universitySearchBox}>
-              <span>🔍</span>
+              <span></span>
               <input
                 type="text"
                 placeholder="Search your university (e.g., Nairobi, Kenyatta, JKUAT)..."
@@ -169,7 +169,7 @@ export default function UniversityHostels() {
                   style={S.universityCard}
                   onClick={() => handleUniversityClick(university)}
                 >
-                  <div style={S.universityCardIcon}>🏛️</div>
+                  <div style={S.universityCardIcon}></div>
                   <div style={S.universityCardName}>{university.name}</div>
                   <div style={{ ...S.universityCardLocation, display: "flex", alignItems: "center", gap: "4px" }}>
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
@@ -208,7 +208,7 @@ export default function UniversityHostels() {
               </div>
             ) : filteredProperties.length === 0 ? (
               <div style={S.empty}>
-                <div style={S.emptyIcon}>🏠</div>
+                <div style={S.emptyIcon}></div>
                 <h3 style={S.emptyTitle}>No Hostels Found</h3>
                 <p style={S.emptySub}>There are currently no hostels listed near {selectedUniversity.name}. Check back later!</p>
               </div>
@@ -224,7 +224,7 @@ export default function UniversityHostels() {
                       />
                     ) : (
                       <div style={{ ...S.cardImg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "3rem" }}>
-                        🏠
+                        
                       </div>
                     )}
                     <div style={S.cardBody}>
@@ -238,8 +238,8 @@ export default function UniversityHostels() {
                         <span style={S.cardPriceUnit}>/month</span>
                       </div>
                       <div style={S.cardMeta}>
-                        <div style={S.cardMetaItem}>🛏 {property.bedrooms || "Studio"}</div>
-                        <div style={S.cardMetaItem}>🚿 {property.bathrooms || "1"}</div>
+                        <div style={S.cardMetaItem}> {property.bedrooms || "Studio"}</div>
+                        <div style={S.cardMetaItem}> {property.bathrooms || "1"}</div>
                       </div>
                       <button
                         className="card-btn"

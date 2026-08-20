@@ -20,7 +20,7 @@ export default function AdminHeader({
   return (
     <header className="admin-header">
       <div className="admin-logo-section">
-        <h1 className="admin-logo">🛡️ Axxspace Admin</h1>
+        <h1 className="admin-logo"> Axxspace Admin</h1>
         <p className="admin-logo-sub">Welcome back, {user?.name?.split(" ")[0]}</p>
       </div>
 
@@ -29,7 +29,7 @@ export default function AdminHeader({
           className="btn-logout"
           onClick={handleLogout}
         >
-          🚪 Logout
+           Logout
         </button>
         {children}
       </div>

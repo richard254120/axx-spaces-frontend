@@ -18,12 +18,12 @@ export default function UserBadgeManagement() {
   const [amount, setAmount] = useState("");
 
   const badgeTypes = [
-    { value: "premium_verified", label: "Premium Verified", icon: "⭐", color: "#fbbf24", image: "Premium Verified.png" },
-    { value: "student_verified", label: "Student Verified", icon: "🎓", color: "#3b82f6", image: "Student Verified.png" },
-    { value: "business_verified", label: "Business Verified", icon: "🏢", color: "#8b5cf6", image: "Business Verified.png" },
-    { value: "identity_verified", label: "Identity Verified", icon: "🪪", color: "#22c55e", image: "Identity Verified.png" },
-    { value: "location_verified", label: "Location Verified", icon: "📍", color: "#ef4444", image: "Locationn Verified.png" },
-    { value: "online_verified", label: "Online Verified", icon: "🌐", color: "#06b6d4", image: "Online Verified.png" },
+    { value: "premium_verified", label: "Premium Verified", icon: "", color: "#fbbf24", image: "Premium Verified.png" },
+    { value: "student_verified", label: "Student Verified", icon: "", color: "#3b82f6", image: "Student Verified.png" },
+    { value: "business_verified", label: "Business Verified", icon: "", color: "#8b5cf6", image: "Business Verified.png" },
+    { value: "identity_verified", label: "Identity Verified", icon: "", color: "#22c55e", image: "Identity Verified.png" },
+    { value: "location_verified", label: "Location Verified", icon: "", color: "#ef4444", image: "Locationn Verified.png" },
+    { value: "online_verified", label: "Online Verified", icon: "", color: "#06b6d4", image: "Online Verified.png" },
   ];
 
   useEffect(() => {
@@ -149,7 +149,7 @@ export default function UserBadgeManagement() {
   };
 
   const getBadgeInfo = (badgeType) => {
-    return badgeTypes.find(b => b.value === badgeType) || { label: badgeType, icon: "🏅", color: "#6b7280" };
+    return badgeTypes.find(b => b.value === badgeType) || { label: badgeType, icon: "", color: "#6b7280" };
   };
 
   return (

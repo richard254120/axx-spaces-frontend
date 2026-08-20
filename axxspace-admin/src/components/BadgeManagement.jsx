@@ -13,12 +13,12 @@ export default function BadgeManagement() {
   const [stats, setStats] = useState(null);
 
   const badgeTypes = [
-    { value: "premium_verified", label: "Premium Verified", icon: "⭐", color: "#fbbf24" },
-    { value: "student_verified", label: "Student Verified", icon: "🎓", color: "#3b82f6" },
-    { value: "business_verified", label: "Business Verified", icon: "🏢", color: "#8b5cf6" },
-    { value: "identity_verified", label: "Identity Verified", icon: "🪪", color: "#22c55e" },
-    { value: "location_verified", label: "Location Verified", icon: "📍", color: "#ef4444" },
-    { value: "online_verified", label: "Online Verified", icon: "🌐", color: "#06b6d4" },
+    { value: "premium_verified", label: "Premium Verified", icon: "", color: "#fbbf24" },
+    { value: "student_verified", label: "Student Verified", icon: "", color: "#3b82f6" },
+    { value: "business_verified", label: "Business Verified", icon: "", color: "#8b5cf6" },
+    { value: "identity_verified", label: "Identity Verified", icon: "", color: "#22c55e" },
+    { value: "location_verified", label: "Location Verified", icon: "", color: "#ef4444" },
+    { value: "online_verified", label: "Online Verified", icon: "", color: "#06b6d4" },
   ];
 
   useEffect(() => {

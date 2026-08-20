@@ -79,14 +79,14 @@ export default function NotificationsPage() {
 
   const getTypeIcon = (type) => {
     switch (type) {
-      case "property_booking": case "booking": return "📅";
-      case "material_purchase": case "payment": return "💳";
-      case "tourism_booking": return "🏨";
-      case "boost": return "🚀";
-      case "subscription": return "⭐";
-      case "message": return "💬";
-      case "review": return "⭐";
-      default: return "🔔";
+      case "property_booking": case "booking": return "";
+      case "material_purchase": case "payment": return "";
+      case "tourism_booking": return "";
+      case "boost": return "";
+      case "subscription": return "";
+      case "message": return "";
+      case "review": return "";
+      default: return "";
     }
   };
 
@@ -196,7 +196,7 @@ export default function NotificationsPage() {
 
       {filteredNotifs.length === 0 ? (
         <div style={styles.emptyState}>
-          <div style={styles.emptyIcon}>🔔</div>
+          <div style={styles.emptyIcon}></div>
           <h2 style={styles.emptyTitle}>No Notifications</h2>
           <p style={styles.emptyText}>
             {filter === "all" ? "You're all caught up! No notifications at the moment." : `No ${filter} notifications.`}

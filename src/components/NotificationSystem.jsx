@@ -179,12 +179,12 @@ export default function NotificationBell() {
 
   const getNotificationIcon = (type) => {
     switch (type) {
-      case "message": return "💬";
-      case "booking": return "📅";
-      case "payment": return "💳";
-      case "review": return "⭐";
-      case "property": return "🏠";
-      default: return "🔔";
+      case "message": return "";
+      case "booking": return "";
+      case "payment": return "";
+      case "review": return "";
+      case "property": return "";
+      default: return "";
     }
   };
 
@@ -209,7 +209,7 @@ export default function NotificationBell() {
         onClick={() => setIsOpen(!isOpen)}
         title="Notifications"
       >
-        <span style={styles.bellIcon}>🔔</span>
+        <span style={styles.bellIcon}></span>
         {unreadCount > 0 && (
           <span style={styles.badge}>{unreadCount}</span>
         )}
@@ -242,7 +242,7 @@ export default function NotificationBell() {
 
           {notifications.length === 0 ? (
             <div style={styles.emptyState}>
-              <span style={styles.emptyIcon}>🔔</span>
+              <span style={styles.emptyIcon}></span>
               <p style={styles.emptyText}>No notifications yet</p>
             </div>
           ) : (

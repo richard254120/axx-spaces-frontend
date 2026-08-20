@@ -139,12 +139,12 @@ export default function MoverRegister() {
         headers: { "Content-Type": "multipart/form-data" }
       });
 
-      setMessage("✅ Mover registration successful! Please check your email to verify your account.");
+      setMessage(" Mover registration successful! Please check your email to verify your account.");
       setTimeout(() => {
         navigate("/login");
       }, 3000);
     } catch (err) {
-      setMessage("❌ " + (err.response?.data?.error || "Registration failed"));
+      setMessage(" " + (err.response?.data?.error || "Registration failed"));
     } finally {
       setLoading(false);
     }
@@ -153,7 +153,7 @@ export default function MoverRegister() {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h1 style={styles.title}>🚚 Register as a Professional Mover</h1>
+        <h1 style={styles.title}> Register as a Professional Mover</h1>
         <p style={styles.subtitle}>Join Axxspace Movers Network</p>
 
         <form onSubmit={handleSubmit}>
@@ -425,7 +425,7 @@ export default function MoverRegister() {
 
           {/* Equipment & Safety */}
           <div style={styles.section}>
-            <h3 style={styles.sectionTitle}>🔧 Equipment & Safety</h3>
+            <h3 style={styles.sectionTitle}> Equipment & Safety</h3>
             <textarea
               name="equipment"
               placeholder="Equipment you have (e.g. Dollies, Ramps, Straps, Blankets, Tool Kit)"
@@ -467,7 +467,7 @@ export default function MoverRegister() {
 
           {/* Proof of Work */}
           <div style={styles.section}>
-            <h3 style={styles.sectionTitle}>📷 Proof of Work</h3>
+            <h3 style={styles.sectionTitle}> Proof of Work</h3>
             <p style={styles.hint}>Upload photos of you doing moving activities to build trust with customers (up to 10 photos)</p>
 
             <input

@@ -74,7 +74,7 @@ export default function MessagingSystem({ recipientId, recipientName, recipientT
         style={styles.openBtn}
         title={`Message ${recipientName}`}
       >
-        💬 Message
+         Message
       </button>
     );
   }
@@ -86,7 +86,7 @@ export default function MessagingSystem({ recipientId, recipientName, recipientT
       {/* Header */}
       <div style={styles.header}>
         <div style={styles.headerInfo}>
-          <span style={styles.headerIcon}>💬</span>
+          <span style={styles.headerIcon}></span>
           <div>
             <h3 style={styles.headerTitle}>{recipientName}</h3>
             <p style={styles.headerSubtitle}>{recipientType}</p>

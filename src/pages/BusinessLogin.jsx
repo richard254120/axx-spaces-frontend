@@ -183,7 +183,7 @@ export default function BusinessLogin() {
       if (!res.ok) throw new Error(data.error || "Google authentication failed");
 
       login(data.token, data.user);
-      setSuccess("✅ Google login successful! Redirecting...");
+      setSuccess(" Google login successful! Redirecting...");
       setTimeout(() => navigate(getDashboardPath(data.user?.role)), 1000);
     } catch (err) {
       setError(err.message || "Google authentication failed. Please try again.");
@@ -206,10 +206,10 @@ export default function BusinessLogin() {
 
     try {
       const res = await API.post("/auth/resend-verification", { email: resendEmail, role: "user" });
-      setSuccess("✅ " + (res.data.message || "Verification email sent successfully! Please check your inbox."));
+      setSuccess(" " + (res.data.message || "Verification email sent successfully! Please check your inbox."));
       setShowResend(false);
     } catch (err) {
-      setError("❌ " + (err.response?.data?.error || "Failed to resend verification email. Please try again."));
+      setError(" " + (err.response?.data?.error || "Failed to resend verification email. Please try again."));
     } finally {
       setResendLoading(false);
     }
@@ -227,7 +227,7 @@ export default function BusinessLogin() {
       const { token, user } = res.data;
 
       login(token, user);
-      setSuccess("✅ Login successful! Redirecting to your dashboard...");
+      setSuccess(" Login successful! Redirecting to your dashboard...");
 
       setTimeout(() => {
         navigate(getDashboardPath(user?.role));
@@ -248,7 +248,7 @@ export default function BusinessLogin() {
     setForgotMsg("");
 
     if (!forgotEmail) {
-      setForgotMsg("❌ Please enter your email address.");
+      setForgotMsg(" Please enter your email address.");
       return;
     }
 
@@ -256,9 +256,9 @@ export default function BusinessLogin() {
 
     try {
       const res = await API.post("/auth/forgot-password", { email: forgotEmail, role: "user" });
-      setForgotMsg(res.data.message || "✅ Reset link sent! Check your inbox.");
+      setForgotMsg(res.data.message || " Reset link sent! Check your inbox.");
     } catch (err) {
-      setForgotMsg("❌ Failed to send reset email. Try again.");
+      setForgotMsg(" Failed to send reset email. Try again.");
     } finally {
       setForgotLoading(false);
     }
@@ -269,11 +269,11 @@ export default function BusinessLogin() {
       <div style={styles.form}>
         {showForgot ? (
           <>
-            <h1 style={styles.title}>🔐 Reset Password</h1>
+            <h1 style={styles.title}> Reset Password</h1>
             <p style={styles.subtitle}>Enter your email to receive a reset link</p>
 
             {forgotMsg && (
-              <div style={forgotMsg.includes("❌") ? styles.error : styles.success}>
+              <div style={forgotMsg.includes("") ? styles.error : styles.success}>
                 {forgotMsg}
               </div>
             )}
@@ -294,7 +294,7 @@ export default function BusinessLogin() {
                 style={{ ...styles.button, ...(forgotLoading ? styles.buttonDisabled : {}) }}
                 disabled={forgotLoading}
               >
-                {forgotLoading ? "Sending..." : "📧 Send Reset Link"}
+                {forgotLoading ? "Sending..." : " Send Reset Link"}
               </button>
             </form>
 
@@ -335,7 +335,7 @@ export default function BusinessLogin() {
                     transition: "all 0.2s"
                   }}
                 >
-                  {resendLoading ? "⏳ Sending..." : "📧 Resend Verification Email"}
+                  {resendLoading ? " Sending..." : " Resend Verification Email"}
                 </button>
               </div>
             )}

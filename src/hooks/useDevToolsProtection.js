@@ -7,11 +7,11 @@ export const useDevToolsProtection = () => {
     const showWarning = () => {
       console.clear();
       console.log(
-        '%c⚠️  WARNING: DEVELOPER TOOLS DETECTED',
+        '%c  WARNING: DEVELOPER TOOLS DETECTED',
         'color: #ff0000; font-size: 24px; font-weight: bold;'
       );
       console.log(
-        '%c🚫 Do NOT paste or run any code here!',
+        '%c Do NOT paste or run any code here!',
         'color: #ff8800; font-size: 18px; font-weight: 600;'
       );
       console.log(

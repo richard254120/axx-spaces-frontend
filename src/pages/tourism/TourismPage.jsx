@@ -45,7 +45,7 @@ export default function TourismPage() {
             {user ? (
               <>
                 <button style={s.navLink} onClick={() => navigate("/tourism/dashboard")}>Dashboard</button>
-                <div style={s.userChip}>👤 {user.name?.split(" ")[0]}</div>
+                <div style={s.userChip}> {user.name?.split(" ")[0]}</div>
               </>
             ) : (
               <>
@@ -73,7 +73,7 @@ export default function TourismPage() {
       <section style={s.hero}>
         <div style={s.heroOverlay} />
         <div style={s.heroContent}>
-          <div style={s.heroBadge}>🇰🇪 Kenya's Premier Tourism QuickSales</div>
+          <div style={s.heroBadge}> Kenya's Premier Tourism QuickSales</div>
           <h1 style={s.heroTitle}>
             Discover Kenya's
             <br />
@@ -83,7 +83,7 @@ export default function TourismPage() {
             From Diani's pristine beaches to Masai Mara's wildlife safaris — explore Kenya's most breathtaking destinations with verified properties and direct bookings.
           </p>
           <div style={s.searchBox}>
-            <span style={s.searchIcon}>🔍</span>
+            <span style={s.searchIcon}></span>
             <input
               style={s.searchInput}
               placeholder="Search resorts, safaris, lodges, hotels..."
@@ -153,7 +153,7 @@ export default function TourismPage() {
                       <span style={{ ...s.propPrice, color: p.color }}>KSh {p.price.toLocaleString()}</span>
                       <span style={s.propPer}>/night</span>
                     </div>
-                    <div style={s.propRating}>⭐ {p.rating} <span style={{ color: "#9ca3af" }}>({p.reviews})</span></div>
+                    <div style={s.propRating}> {p.rating} <span style={{ color: "#9ca3af" }}>({p.reviews})</span></div>
                   </div>
                   <button style={{ ...s.propBtn, background: p.color }} onClick={(e) => { e.stopPropagation(); navigate(`/tourism/${p.id}`); }}>
                     View Details →
@@ -177,7 +177,7 @@ export default function TourismPage() {
           <div className="pkg-grid">
             {packages.map((pkg) => (
               <div key={pkg.name} style={{ ...s.pkgCard, ...(pkg.popular ? s.pkgPopular : {}) }} className="pkg-card">
-                {pkg.popular && <div style={s.pkgBadge}>⭐ Most Popular</div>}
+                {pkg.popular && <div style={s.pkgBadge}> Most Popular</div>}
                 <div style={{ ...s.pkgName, color: pkg.color }}>{pkg.name}</div>
                 <div style={s.pkgDuration}>{pkg.duration}</div>
                 <div style={s.pkgPrice}>
@@ -211,10 +211,10 @@ export default function TourismPage() {
           <h2 style={{ ...s.sectionTitle, textAlign: "center", marginBottom: "32px" }}>How It Works</h2>
           <div className="how-grid">
             {[
-              { step: "01", icon: "📝", title: "Create an Account", desc: "Register as a property owner/manager and choose your advertising package." },
-              { step: "02", icon: "🏨", title: "List Your Property", desc: "Add your property details, amenities, pricing and your existing booking site link." },
-              { step: "03", icon: "🌍", title: "Get Discovered", desc: "Your property is advertised to thousands of travelers on AXXSpace." },
-              { step: "04", icon: "🔗", title: "Guests Book Direct", desc: "Interested guests click your booking link and are redirected to your own site." },
+              { step: "01", icon: "", title: "Create an Account", desc: "Register as a property owner/manager and choose your advertising package." },
+              { step: "02", icon: "", title: "List Your Property", desc: "Add your property details, amenities, pricing and your existing booking site link." },
+              { step: "03", icon: "", title: "Get Discovered", desc: "Your property is advertised to thousands of travelers on AXXSpace." },
+              { step: "04", icon: "", title: "Guests Book Direct", desc: "Interested guests click your booking link and are redirected to your own site." },
             ].map((h) => (
               <div key={h.step} style={s.howCard}>
                 <div style={s.howStep}>{h.step}</div>
@@ -238,7 +238,7 @@ export default function TourismPage() {
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
             <button style={s.ctaBtn} onClick={() => user ? navigate("/tourism/register-property") : navigate("/register")}>
-              🚀 List Your Property
+               List Your Property
             </button>
             <button style={s.ctaBtnSecondary} onClick={() => navigate("/tourism/listings")}>
               Browse Properties
@@ -277,15 +277,15 @@ export default function TourismPage() {
             </div>
             <div style={s.footerCol}>
               <div style={s.footerColTitle}>Contact</div>
-              <div style={{ ...s.footerLink, cursor: "default" }}>📧 tourismaxxspace@gmail.com</div>
-              <div style={{ ...s.footerLink, cursor: "default" }}>📞 +254 745689773</div>
-              <div style={{ ...s.footerLink, cursor: "default" }}>💬 WhatsApp Business</div>
+              <div style={{ ...s.footerLink, cursor: "default" }}> tourismaxxspace@gmail.com</div>
+              <div style={{ ...s.footerLink, cursor: "default" }}> +254 745689773</div>
+              <div style={{ ...s.footerLink, cursor: "default" }}> WhatsApp Business</div>
             </div>
           </div>
         </div>
         <div style={s.footerBottom}>
-          <span>© 2026 AXXSpace Tourism. All rights reserved.</span>
-          <span>Nairobi, Kenya 🇰🇪</span>
+          <span> 2026 AXXSpace Tourism. All rights reserved.</span>
+          <span>Nairobi, Kenya </span>
         </div>
       </footer>
     </div>

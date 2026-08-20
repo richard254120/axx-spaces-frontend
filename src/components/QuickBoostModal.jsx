@@ -31,7 +31,7 @@ export default function QuickBoostModal({ isOpen, onClose, itemType, itemId, ite
   const handleMpesaPayment = async (e) => {
     e.preventDefault();
     if (!phone || phone.length < 9) {
-      setMessage("❌ Please enter a valid M-Pesa phone number");
+      setMessage(" Please enter a valid M-Pesa phone number");
       return;
     }
 
@@ -63,14 +63,14 @@ export default function QuickBoostModal({ isOpen, onClose, itemType, itemId, ite
 
       if (data.success) {
         setCompleted(true);
-        setMessage("✅ Payment initiated! Please check your phone for the M-Pesa PIN prompt.");
+        setMessage(" Payment initiated! Please check your phone for the M-Pesa PIN prompt.");
         if (onSuccess) onSuccess();
       } else {
-        setMessage("❌ " + (data.error || "Payment initiation failed"));
+        setMessage(" " + (data.error || "Payment initiation failed"));
       }
     } catch (err) {
       console.error(err);
-      setMessage("❌ Connection error. Please try again.");
+      setMessage(" Connection error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -80,7 +80,7 @@ export default function QuickBoostModal({ isOpen, onClose, itemType, itemId, ite
     e.preventDefault();
     const trimmed = bankMessage.trim();
     if (!trimmed || trimmed.length < 10) {
-      setMessage("❌ Please paste the full M-Pesa confirmation message");
+      setMessage(" Please paste the full M-Pesa confirmation message");
       return;
     }
 
@@ -116,14 +116,14 @@ export default function QuickBoostModal({ isOpen, onClose, itemType, itemId, ite
 
       if (data.success) {
         setCompleted(true);
-        setMessage("✅ Transaction submitted for manual review! Admin will verify and activate your boost within a few hours.");
+        setMessage(" Transaction submitted for manual review! Admin will verify and activate your boost within a few hours.");
         if (onSuccess) onSuccess();
       } else {
-        setMessage("❌ " + (data.error || "Verification submission failed"));
+        setMessage(" " + (data.error || "Verification submission failed"));
       }
     } catch (err) {
       console.error(err);
-      setMessage("❌ Connection error. Please try again.");
+      setMessage(" Connection error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -134,7 +134,7 @@ export default function QuickBoostModal({ isOpen, onClose, itemType, itemId, ite
       <div style={styles.modal}>
         {/* Header */}
         <div style={styles.header}>
-          <h2 style={styles.title}>🚀 Boost Your Listing</h2>
+          <h2 style={styles.title}> Boost Your Listing</h2>
           <button style={styles.closeBtn} onClick={onClose}>✕</button>
         </div>
 
@@ -146,7 +146,7 @@ export default function QuickBoostModal({ isOpen, onClose, itemType, itemId, ite
 
         {completed ? (
           <div style={styles.completedContent}>
-            <div style={styles.successIcon}>🎉</div>
+            <div style={styles.successIcon}></div>
             <p style={styles.successText}>{message}</p>
             <button style={styles.doneBtn} onClick={onClose}>Close</button>
           </div>
@@ -188,13 +188,13 @@ export default function QuickBoostModal({ isOpen, onClose, itemType, itemId, ite
                 onClick={() => { setPaymentMethod("mpesa"); setMessage(""); }}
                 style={{ ...styles.toggleBtn, ...(paymentMethod === "mpesa" ? styles.toggleActive : {}) }}
               >
-                📱 M-Pesa STK Push
+                 M-Pesa STK Push
               </button>
               <button
                 onClick={() => { setPaymentMethod("bank"); setMessage(""); }}
                 style={{ ...styles.toggleBtn, ...(paymentMethod === "bank" ? styles.toggleActive : {}) }}
               >
-                🏦 Paybill Bank Transfer
+                 Paybill Bank Transfer
               </button>
             </div>
 
@@ -247,9 +247,9 @@ export default function QuickBoostModal({ isOpen, onClose, itemType, itemId, ite
                     rows={4}
                     required
                   />
-                  <div style={styles.hint}>💡 Copy and paste the full M-Pesa message exactly as received.</div>
+                  <div style={styles.hint}> Copy and paste the full M-Pesa message exactly as received.</div>
 
-                  {message && <div style={{ ...styles.msg, color: message.includes("✅") ? "#22c55e" : "#ef4444" }}>{message}</div>}
+                  {message && <div style={{ ...styles.msg, color: message.includes("") ? "#22c55e" : "#ef4444" }}>{message}</div>}
 
                   <button type="submit" disabled={loading} style={styles.payBtn}>
                     {loading ? "Submitting for review..." : "Submit for Verification"}

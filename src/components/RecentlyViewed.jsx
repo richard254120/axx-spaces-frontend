@@ -50,7 +50,7 @@ export default function RecentlyViewed({ onSelect }) {
 
   return (
     <div style={s.wrap}>
-      <h3 style={s.title}>🕐 Recently Viewed</h3>
+      <h3 style={s.title}> Recently Viewed</h3>
       <div style={s.grid}>
         {items.map((p) => (
           <div
@@ -63,17 +63,17 @@ export default function RecentlyViewed({ onSelect }) {
               {p.images?.[0] ? (
                 <img src={p.images[0]} alt={p.title} style={s.img} />
               ) : (
-                <div style={s.noImg}>📷</div>
+                <div style={s.noImg}></div>
               )}
               {p.availableUnits > 0 ? (
-                <span style={s.badgeGreen}>✅ {p.availableUnits} left</span>
+                <span style={s.badgeGreen}> {p.availableUnits} left</span>
               ) : (
-                <span style={s.badgeRed}>❌ Booked</span>
+                <span style={s.badgeRed}> Booked</span>
               )}
             </div>
             <div style={s.info}>
               <p style={s.name}>{p.title}</p>
-              <p style={s.loc}>📍 {p.county} • {p.location}</p>
+              <p style={s.loc}> {p.county} • {p.location}</p>
               <p style={s.price}>KES {p.price?.toLocaleString()}/mo</p>
             </div>
           </div>

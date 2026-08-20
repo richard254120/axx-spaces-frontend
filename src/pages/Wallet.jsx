@@ -278,21 +278,21 @@ export default function Wallet() {
 
   const getTransactionIcon = (plan) => {
     if (plan?.toLowerCase().includes("premium") || plan?.toLowerCase().includes("boost")) {
-      return "⭐";
+      return "";
     }
     if (plan?.toLowerCase().includes("booking") || plan?.toLowerCase().includes("rental")) {
-      return "🏠";
+      return "";
     }
     if (plan?.toLowerCase().includes("material")) {
-      return "🛍️";
+      return "";
     }
-    return "💳";
+    return "";
   };
 
   if (loading) {
     return (
       <div style={styles.container}>
-        <div style={styles.loading}>⏳ Loading wallet...</div>
+        <div style={styles.loading}> Loading wallet...</div>
       </div>
     );
   }
@@ -314,10 +314,10 @@ export default function Wallet() {
           </div>
           <div style={{ marginTop: "24px" }}>
             <button style={styles.button} onClick={() => navigate("/premium-plans")}>
-              💰 Add Funds
+               Add Funds
             </button>
             <button style={{ ...styles.button, ...styles.buttonSecondary }} onClick={() => navigate("/payment-history")}>
-              📊 View All Transactions
+               View All Transactions
             </button>
           </div>
         </div>

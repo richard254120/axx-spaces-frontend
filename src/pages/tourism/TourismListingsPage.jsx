@@ -74,7 +74,7 @@ export default function TourismListingsPage() {
             onClick={() => setFiltersOpen(!filtersOpen)}
             style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "10px 14px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
           >
-            ⚙️ Filters
+             Filters
           </button>
         }
       />

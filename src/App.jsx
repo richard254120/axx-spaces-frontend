@@ -399,7 +399,7 @@ function App() {
               background: "#0f1729", color: "#94a3b8",
               fontFamily: "'DM Sans', sans-serif",
             }}>
-              <div style={{ fontSize: "64px", marginBottom: "16px" }}>🏚️</div>
+              <div style={{ fontSize: "64px", marginBottom: "16px" }}></div>
               <h2 style={{ color: "#fbbf24", margin: "0 0 8px" }}>Page Not Found</h2>
               <p style={{ margin: "0 0 24px" }}>This page doesn't exist on Axxspace.</p>
               <button

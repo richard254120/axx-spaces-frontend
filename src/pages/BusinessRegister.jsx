@@ -166,7 +166,7 @@ export default function BusinessRegister() {
         role: "user",
       });
 
-      setSuccess("✅ Registration successful! Please check your email to verify your account, then login.");
+      setSuccess(" Registration successful! Please check your email to verify your account, then login.");
 
       setTimeout(() => {
         navigate("/business-login");
@@ -231,7 +231,7 @@ export default function BusinessRegister() {
           />
           {formData.password && (formData.password.length < 6 || !/[a-zA-Z]/.test(formData.password) || !/[0-9]/.test(formData.password)) && (
             <div style={{ color: "#fca5a5", fontSize: "11px", marginTop: "-12px", marginBottom: "12px" }}>
-              ⚠️ Password must contain both letters and numbers.
+               Password must contain both letters and numbers.
             </div>
           )}
 

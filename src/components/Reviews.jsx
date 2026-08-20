@@ -333,7 +333,7 @@ export default function Reviews({ category = "general", relatedId = null, limit 
 
       {reviews.length === 0 ? (
         <div style={styles.noReviews}>
-          <div style={styles.noReviewsIcon}>💬</div>
+          <div style={styles.noReviewsIcon}></div>
           <p style={styles.noReviewsText}>No reviews yet</p>
           <p style={{ color: "#64748b" }}>Be the first to share your experience!</p>
         </div>
@@ -365,13 +365,13 @@ export default function Reviews({ category = "general", relatedId = null, limit 
                   }}
                   onClick={() => handleMarkHelpful(review._id)}
                 >
-                  👍 Helpful ({review.helpfulCount})
+                   Helpful ({review.helpfulCount})
                 </button>
                 <button
                   style={styles.actionButton}
                   onClick={() => setReplyingTo(replyingTo === review._id ? null : review._id)}
                 >
-                  💬 Reply
+                   Reply
                 </button>
               </div>
 

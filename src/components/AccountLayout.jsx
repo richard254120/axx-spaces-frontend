@@ -21,10 +21,10 @@ export default function AccountLayout({ children, preferSeller = false }) {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return "☀️ Good morning";
-    if (hour < 17) return "🌤️ Good afternoon";
-    if (hour < 22) return "🌙 Good evening";
-    return "✨ Hello";
+    if (hour < 12) return " Good morning";
+    if (hour < 17) return " Good afternoon";
+    if (hour < 22) return " Good evening";
+    return " Hello";
   };
 
   const dashboardPath = getDashboardPath(user?.role);

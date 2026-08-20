@@ -112,7 +112,7 @@ export default function MapView({ properties = [] }) {
       {/* ── Header bar ── */}
       <div style={S.bar}>
         <span style={S.barText}>
-          📍 Showing <strong style={{ color: "#fbbf24" }}>{mappable.length}</strong> of {properties.length} listings on map
+           Showing <strong style={{ color: "#fbbf24" }}>{mappable.length}</strong> of {properties.length} listings on map
           {unmapped > 0 && <span style={S.barMuted}> · {unmapped} without coordinates</span>}
         </span>
         <div style={S.legend}>
@@ -145,7 +145,7 @@ export default function MapView({ properties = [] }) {
                 <div style={S.thumb}>
                   {p.images?.[0]
                     ? <img src={p.images[0]} alt="" style={S.thumbImg} />
-                    : <span style={{ fontSize: 18 }}>🏠</span>}
+                    : <span style={{ fontSize: 18 }}></span>}
                   {p.isFeatured && <span style={S.featBadge}>★</span>}
                 </div>
 
@@ -154,16 +154,16 @@ export default function MapView({ properties = [] }) {
                   <div style={S.cardPrice}>{FMT(p.price)}<span style={S.perMo}>/mo</span></div>
                   <div style={S.cardName}>{p.title}</div>
                   <div style={S.cardMeta}>
-                    <span>📍 {p.county}</span>
-                    <span>🛏 {p.bedrooms}bd</span>
-                    <span>🚿 {p.bathrooms}ba</span>
+                    <span> {p.county}</span>
+                    <span> {p.bedrooms}bd</span>
+                    <span> {p.bathrooms}ba</span>
                   </div>
                   <div style={S.cardFooter}>
                     <span style={{ ...S.dot, background: available ? "#22c55e" : "#ef4444" }} />
                     <span style={S.availText}>
                       {available ? `${p.availableUnits} avail.` : "Fully booked"}
                     </span>
-                    {rating && <span style={S.rating}>⭐ {rating}</span>}
+                    {rating && <span style={S.rating}> {rating}</span>}
                   </div>
                 </div>
               </div>
@@ -221,16 +221,16 @@ export default function MapView({ properties = [] }) {
                         </div>
                         <div style={S.popupTitle}>{p.title}</div>
                         <div style={S.popupMeta}>
-                          📍 {p.location}, {p.county}
+                           {p.location}, {p.county}
                         </div>
                         <div style={S.popupMeta}>
-                          🛏 {p.bedrooms} bed &nbsp;·&nbsp;
-                          🚿 {p.bathrooms} bath &nbsp;·&nbsp;
-                          {p.furnished ? "✅ Furnished" : "📦 Unfurnished"}
+                           {p.bedrooms} bed &nbsp;·&nbsp;
+                           {p.bathrooms} bath &nbsp;·&nbsp;
+                          {p.furnished ? " Furnished" : " Unfurnished"}
                         </div>
                         {p.leaseType && (
                           <div style={S.popupMeta}>
-                            📄 {
+                             {
                               { monthly: "Monthly", "6months": "6 Months", yearly: "Yearly" }
                               [p.leaseType] ?? p.leaseType
                             }
@@ -250,7 +250,7 @@ export default function MapView({ properties = [] }) {
                             : "Fully booked"}
                           {avgRating(p.reviews) &&
                             <span style={{ marginLeft: "auto" }}>
-                              ⭐ {avgRating(p.reviews)}
+                               {avgRating(p.reviews)}
                             </span>}
                         </div>
 
@@ -269,7 +269,7 @@ export default function MapView({ properties = [] }) {
                               window.open(`tel:${p.owner?.phone || p.phone}`)
                             }
                           >
-                            📞 Call
+                             Call
                           </button>
                         </div>
                       </div>
@@ -281,7 +281,7 @@ export default function MapView({ properties = [] }) {
           ) : (
             <div style={S.noMap}>
               <p style={{ color: "#94a3b8", textAlign: "center" }}>
-                🗺️ No properties with GPS coordinates to display.<br/>
+                 No properties with GPS coordinates to display.<br/>
                 <span style={{ fontSize: 12 }}>
                   Ask landlords to add lat/lng when listing their property.
                 </span>

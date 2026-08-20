@@ -27,10 +27,10 @@ export default function ProviderDashboard() {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return "☀️ Good morning";
-    if (hour < 17) return "🌤️ Good afternoon";
-    if (hour < 22) return "🌙 Good evening";
-    return "✨ Hello";
+    if (hour < 12) return " Good morning";
+    if (hour < 17) return " Good afternoon";
+    if (hour < 22) return " Good evening";
+    return " Hello";
   };
 
   const displayName = getDisplayName(user || authUser);
@@ -105,7 +105,7 @@ export default function ProviderDashboard() {
                         <span>{l.location} · KSh {l.price?.toLocaleString()}/night</span>
                       </p>
                       <p style={{ fontSize: "12px", color: tourismTheme.muted, marginTop: "6px" }}>
-                        📷 {(l.images?.length || 0)} photo(s) · 🎬 {(l.videos?.length || 0)} video(s) · 👁 {l.views || 0} views
+                         {(l.images?.length || 0)} photo(s) ·  {(l.videos?.length || 0)} video(s) ·  {l.views || 0} views
                       </p>
                       {l.status === "pending" && (
                         <p style={{ fontSize: "12px", color: "#92400e", marginTop: "8px" }}>
@@ -136,7 +136,7 @@ export default function ProviderDashboard() {
         ) : !loggedIn ? (
           <div style={statCard}>
             <p style={{ marginBottom: "16px", color: tourismTheme.muted }}>Sign in to manage your tourism properties.</p>
-            <button type="button" style={primaryBtn} onClick={() => navigate("/tourism/login")}>🔑 Log in</button>
+            <button type="button" style={primaryBtn} onClick={() => navigate("/tourism/login")}> Log in</button>
             <button type="button" style={{ ...secondaryBtn, marginLeft: "10px" }} onClick={() => navigate("/tourism/register-property")}>
               Register property
             </button>

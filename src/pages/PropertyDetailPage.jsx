@@ -136,12 +136,12 @@ export default function PropertyDetailPage() {
       // 3. Construct WhatsApp message and open link
       const phone = formatKenyaPhone(property.landlordPhone);
       const msg = `Hi, my name is ${bookingData.name} (Phone: ${bookingData.phone}). I would like to book your property "${property.title}" on Axxspace.\n\n` +
-                  `📅 Proposed Move-in Date: ${bookingData.moveInDate}\n` +
-                  `💬 Message: ${bookingData.message || "No additional message"}`;
+                  ` Proposed Move-in Date: ${bookingData.moveInDate}\n` +
+                  ` Message: ${bookingData.message || "No additional message"}`;
       
       window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
 
-      setBookingSuccess("✅ Booking prepared! Redirecting to WhatsApp...");
+      setBookingSuccess(" Booking prepared! Redirecting to WhatsApp...");
       setTimeout(() => {
         setShowBookingModal(false);
         setBookingData({ name: "", phone: "", moveInDate: "", message: "" });
@@ -164,7 +164,7 @@ export default function PropertyDetailPage() {
   if (error || !property) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#f8fafc" }}>
-        <div style={{ fontSize: "64px", marginBottom: "16px" }}>🏚️</div>
+        <div style={{ fontSize: "64px", marginBottom: "16px" }}></div>
         <h2 style={{ color: "#ef4444", margin: "0 0 8px" }}>Property Not Found</h2>
         <p style={{ color: "#64748b", margin: "0 0 24px" }}>{error || "This property doesn't exist or has been removed."}</p>
         <button
@@ -280,15 +280,15 @@ export default function PropertyDetailPage() {
 
               <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", marginBottom: "24px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <span style={{ fontSize: "20px" }}>🛏️</span>
+                  <span style={{ fontSize: "20px" }}></span>
                   <span style={{ fontSize: "14px", fontWeight: 600, color: "#1e293b" }}>{property.bedrooms} Bedrooms</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <span style={{ fontSize: "20px" }}>🚿</span>
+                  <span style={{ fontSize: "20px" }}></span>
                   <span style={{ fontSize: "14px", fontWeight: 600, color: "#1e293b" }}>{property.bathrooms} Bathrooms</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <span style={{ fontSize: "20px" }}>📐</span>
+                  <span style={{ fontSize: "20px" }}></span>
                   <span style={{ fontSize: "14px", fontWeight: 600, color: "#1e293b" }}>{property.furnished ? "Furnished" : "Unfurnished"}</span>
                 </div>
               </div>

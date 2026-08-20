@@ -478,12 +478,12 @@ const KENYA_COUNTIES = [
 ];
 
 const BADGE_CONFIG = {
-  student_verified: { label: "🟢 Student Verified", style: styles.badgeStudent },
-  identity_verified: { label: "🟢 Identity Verified", style: styles.badgeIdentity },
-  business_verified: { label: "🔵 Business Verified", style: styles.badgeBusiness },
-  online_verified: { label: "🔵 Online Verified", style: styles.badgeOnline },
-  location_verified: { label: "🟣 Location Verified", style: styles.badgeLocation },
-  premium_verified: { label: "⭐ Premium Verified", style: styles.badgePremium },
+  student_verified: { label: " Student Verified", style: styles.badgeStudent },
+  identity_verified: { label: " Identity Verified", style: styles.badgeIdentity },
+  business_verified: { label: " Business Verified", style: styles.badgeBusiness },
+  online_verified: { label: " Online Verified", style: styles.badgeOnline },
+  location_verified: { label: " Location Verified", style: styles.badgeLocation },
+  premium_verified: { label: " Premium Verified", style: styles.badgePremium },
 };
 
 export default function AxxBiashara() {
@@ -551,7 +551,7 @@ export default function AxxBiashara() {
         submitterName,
         organizationName,
       });
-      setAnnouncementSuccess("✅ Announcement submitted for approval!");
+      setAnnouncementSuccess(" Announcement submitted for approval!");
       setAnnouncementTitle("");
       setAnnouncementContent("");
       setSubmitterName("");
@@ -559,7 +559,7 @@ export default function AxxBiashara() {
       setShowAnnouncementForm(false);
       setTimeout(() => setAnnouncementSuccess(""), 3000);
     } catch (err) {
-      alert("❌ Failed to submit announcement");
+      alert(" Failed to submit announcement");
     }
   };
 
@@ -638,7 +638,7 @@ export default function AxxBiashara() {
 
         {/* Announcements Section */}
         <div style={styles.announcementsSection}>
-          <h3 style={styles.announcementsTitle}>📢 Latest Announcements</h3>
+          <h3 style={styles.announcementsTitle}> Latest Announcements</h3>
           {announcements.length > 0 ? (
             <div style={styles.announcementsScroll}>
               {announcements.slice(0, 10).map((announcement, index) => (
@@ -661,8 +661,8 @@ export default function AxxBiashara() {
                   <span style={styles.announcementBusiness}>{announcement.businessName}</span>
                   <h4 style={styles.announcementBoxTitle}>{announcement.title}</h4>
                   <span style={styles.announcementSubmitter}>
-                    👤 {announcement.submitterName || "Anonymous"}
-                    {announcement.organizationName && ` • 🏢 ${announcement.organizationName}`}
+                     {announcement.submitterName || "Anonymous"}
+                    {announcement.organizationName && ` •  ${announcement.organizationName}`}
                   </span>
                   <span style={styles.announcementBoxDate}>
                     {new Date(announcement.createdAt).toLocaleDateString()}
@@ -691,7 +691,7 @@ export default function AxxBiashara() {
       {/* ── SEARCH ─────────────────────────────────────────────────────────── */}
       <div style={styles.searchSection}>
         <div style={styles.searchInputWrapper}>
-          <span style={styles.searchIcon}>🔍</span>
+          <span style={styles.searchIcon}></span>
           <input
             type="text"
             style={styles.searchInput}
@@ -770,7 +770,7 @@ export default function AxxBiashara() {
                 e.currentTarget.style.boxShadow = "none";
               }}
             >
-              {business.featured && <div style={styles.featured}>⭐ Featured</div>}
+              {business.featured && <div style={styles.featured}> Featured</div>}
               {business.images && business.images.length > 0 && (
                 <img src={business.images[0]} alt={business.name} style={styles.image} />
               )}
@@ -784,7 +784,7 @@ export default function AxxBiashara() {
                 </p>
                 {/* FIX: optional chaining so missing location doesn't crash render */}
                 <p style={styles.cardLocation}>
-                  📍 {business.location?.town}, {business.location?.county}
+                   {business.location?.town}, {business.location?.county}
                 </p>
                 <p style={styles.cardDescription}>{business.description}</p>
 
@@ -805,7 +805,7 @@ export default function AxxBiashara() {
                       style={styles.contactButton}
                       onClick={(e) => e.stopPropagation()}
                     >
-                      📞 Call
+                       Call
                     </a>
                   )}
                   {business.contact?.email && (
@@ -814,7 +814,7 @@ export default function AxxBiashara() {
                       style={styles.contactButton}
                       onClick={(e) => e.stopPropagation()}
                     >
-                      ✉️ Email
+                       Email
                     </a>
                   )}
                 </div>
@@ -853,7 +853,7 @@ export default function AxxBiashara() {
                           e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
                           e.currentTarget.style.color = "#f1f5f9";
                         }}
-                      >📷</a>
+                      ></a>
                     )}
                     {business.socialMedia.whatsapp && (
                       <a
@@ -870,7 +870,7 @@ export default function AxxBiashara() {
                           e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
                           e.currentTarget.style.color = "#f1f5f9";
                         }}
-                      >💬</a>
+                      ></a>
                     )}
                     {business.contact?.website && (
                       <a
@@ -887,7 +887,7 @@ export default function AxxBiashara() {
                           e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
                           e.currentTarget.style.color = "#f1f5f9";
                         }}
-                      >🔗</a>
+                      ></a>
                     )}
                   </div>
                 )}
@@ -905,9 +905,9 @@ export default function AxxBiashara() {
               ✕
             </button>
             <h3 style={styles.modalTitle}>{selectedAnnouncement.title}</h3>
-            <p style={styles.modalBusiness}>📢 {selectedAnnouncement.businessName}</p>
+            <p style={styles.modalBusiness}> {selectedAnnouncement.businessName}</p>
             <p style={styles.modalDate}>
-              📅 {new Date(selectedAnnouncement.createdAt).toLocaleDateString()}
+               {new Date(selectedAnnouncement.createdAt).toLocaleDateString()}
             </p>
             <p style={styles.modalContentText}>{selectedAnnouncement.content}</p>
           </div>

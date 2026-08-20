@@ -11,22 +11,22 @@ These Terms and Conditions ("Terms") govern your access to and use of the Axxspa
 ## 2. Our Services
 Axxspace provides a multi-service platform designed to serve Kenyans across all 47 counties. The platform currently includes the following core services:
 
-**🏢 RENTALS**
+** RENTALS**
 Verified rental property listings — bedsitters, apartments, maisonettes — with GPS mapping and direct landlord contact.
 
-**🚛 MOVERS**
+** MOVERS**
 Directory of vetted moving companies offering local and long-distance relocation services with transparent pricing.
 
-**🏨 TOURISM**
+** TOURISM**
 Hotels, lodges, safari packages, and unique Kenyan experiences available for direct booking across all counties.
 
-**💼 AXXBIASHARA**
+** AXXBIASHARA**
 Professional business services including company registration, accounting, tax, legal support, and digital solutions.
 
-**🛍 QUICKSALES**
+** QUICKSALES**
 Buy-and-sell listings for new and used goods — electronics, furniture, fashion, vehicles, and more nationwide.
 
-**📍 QUICKSALES**
+** QUICKSALES**
 Fast-listing tools for sellers who need rapid exposure across the Axxspace network and partner channels.
 
 Axxspace acts as a platform intermediary — we connect users with landlords, service providers, businesses, and sellers. We are not a party to any transaction or agreement made between users through the platform unless explicitly stated.
@@ -192,7 +192,7 @@ We aim to respond to all formal legal enquiries within 5 business days.
 **Jurisdiction:** Republic of Kenya
 **Company:** Axxspace Limited
 
-© 2026 Axxspace Limited · All Rights Reserved
+ 2026 Axxspace Limited · All Rights Reserved
 `;
 
 const privacy = `

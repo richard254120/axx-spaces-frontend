@@ -78,7 +78,7 @@ const SelfieCapture = ({ onCapture, capturedImage, onRetake }) => {
             style={styles.retakeButton}
             onClick={onRetake}
           >
-            🔄 Retake
+             Retake
           </button>
         </div>
       </div>
@@ -98,7 +98,7 @@ const SelfieCapture = ({ onCapture, capturedImage, onRetake }) => {
             style={styles.startCameraButton}
             onClick={startCamera}
           >
-            <span style={styles.cameraIcon}>📷</span>
+            <span style={styles.cameraIcon}></span>
             <span style={styles.cameraText}>Start Camera</span>
           </button>
           {error && <div style={styles.error}>{error}</div>}
@@ -140,7 +140,7 @@ const SelfieCapture = ({ onCapture, capturedImage, onRetake }) => {
               onClick={capturePhoto}
               disabled={isCapturing}
             >
-              {isCapturing ? '⏳ Capturing...' : '📸 Capture'}
+              {isCapturing ? ' Capturing...' : ' Capture'}
             </button>
           </div>
 

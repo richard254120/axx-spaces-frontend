@@ -177,7 +177,7 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       const res = await API.post("/item-requests", formData, { headers });
       if (res.data.success) {
-        setMsg({ text: "✅ Request submitted successfully! The admin has been notified.", type: "success" });
+        setMsg({ text: " Request submitted successfully! The admin has been notified.", type: "success" });
         setTimeout(() => {
           onClose();
         }, 2500);
@@ -257,12 +257,12 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
               onChange={handleChange}
               style={styles.select}
             >
-              <option value="rental">🏠 Rental Properties</option>
-              <option value="mover">🚛 Movers & Logistics</option>
-              <option value="material">🛍️ Construction & General Materials</option>
-              <option value="tourism">🏨 Tourism & Travel</option>
-              <option value="business">🏪 Business Services (Biashara)</option>
-              <option value="other">❓ Other Services</option>
+              <option value="rental"> Rental Properties</option>
+              <option value="mover"> Movers & Logistics</option>
+              <option value="material"> Construction & General Materials</option>
+              <option value="tourism"> Tourism & Travel</option>
+              <option value="business"> Business Services (Biashara)</option>
+              <option value="other"> Other Services</option>
             </select>
           </div>
 
@@ -292,7 +292,7 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
           </div>
 
           <button type="submit" style={styles.submitBtn} disabled={loading}>
-            {loading ? "Submitting request..." : "🚀 Submit Request"}
+            {loading ? "Submitting request..." : " Submit Request"}
           </button>
 
           <button type="button" style={styles.cancelBtn} onClick={onClose}>

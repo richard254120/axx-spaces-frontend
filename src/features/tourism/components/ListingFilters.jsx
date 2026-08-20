@@ -22,7 +22,7 @@ export default function ListingFilters({
             style={{ ...chip, ...(category === c ? chipActive : {}) }}
             onClick={() => setCategory(c)}
           >
-            {CATEGORY_ICONS[c] || "🌍"} {c}
+            {CATEGORY_ICONS[c] || ""} {c}
           </button>
         ))}
       </div>
@@ -37,7 +37,7 @@ export default function ListingFilters({
         <div style={label}>Minimum rating</div>
         {[0, 4, 4.5, 4.7].map((r) => (
           <button key={r} type="button" style={{ ...chip, ...(minRating === r ? chipActive : {}) }} onClick={() => setMinRating(r)}>
-            {r === 0 ? "Any rating" : `⭐ ${r}+`}
+            {r === 0 ? "Any rating" : ` ${r}+`}
           </button>
         ))}
       </div>

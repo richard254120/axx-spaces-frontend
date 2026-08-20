@@ -286,7 +286,7 @@ export default function TourismLogin() {
         role: data.user.role,
       });
 
-      setSuccess("✅ Google login successful! Redirecting...");
+      setSuccess(" Google login successful! Redirecting...");
       setTimeout(() => {
         navigate("/tourism/dashboard");
       }, 1000);
@@ -315,10 +315,10 @@ export default function TourismLogin() {
         throw new Error(data.error || "Failed to resend verification email");
       }
 
-      setSuccess("✅ " + (data.message || "Verification email sent successfully! Please check your inbox."));
+      setSuccess(" " + (data.message || "Verification email sent successfully! Please check your inbox."));
       setShowResend(false);
     } catch (err) {
-      setError("❌ " + (err.message || "Failed to resend verification email. Please try again."));
+      setError(" " + (err.message || "Failed to resend verification email. Please try again."));
     } finally {
       setResendLoading(false);
     }
@@ -383,7 +383,7 @@ export default function TourismLogin() {
     setForgotMsg("");
 
     if (!forgotEmail) {
-      setForgotMsg("❌ Please enter your email address.");
+      setForgotMsg(" Please enter your email address.");
       return;
     }
 
@@ -397,9 +397,9 @@ export default function TourismLogin() {
       });
 
       const data = await response.json();
-      setForgotMsg(data.message || "✅ Reset link sent! Check your inbox.");
+      setForgotMsg(data.message || " Reset link sent! Check your inbox.");
     } catch (err) {
-      setForgotMsg("❌ Failed to send reset email. Try again.");
+      setForgotMsg(" Failed to send reset email. Try again.");
     } finally {
       setForgotLoading(false);
     }
@@ -417,11 +417,11 @@ export default function TourismLogin() {
               <span style={styles.logoWord}>SPACE</span>
             </div>
 
-            <h1 style={styles.title}>🔐 Reset Password</h1>
+            <h1 style={styles.title}> Reset Password</h1>
             <p style={styles.subtitle}>Enter your email to receive a reset link</p>
 
             {forgotMsg && (
-              <div style={forgotMsg.includes("❌") ? styles.error : { ...styles.error, background: "#f0fdf4", borderColor: "#22c55e", color: "#16a34a" }}>
+              <div style={forgotMsg.includes("") ? styles.error : { ...styles.error, background: "#f0fdf4", borderColor: "#22c55e", color: "#16a34a" }}>
                 {forgotMsg}
               </div>
             )}
@@ -444,7 +444,7 @@ export default function TourismLogin() {
                 style={{ ...styles.button, ...(forgotLoading ? styles.buttonDisabled : {}) }}
                 disabled={forgotLoading}
               >
-                {forgotLoading ? "Sending..." : "📧 Send Reset Link"}
+                {forgotLoading ? "Sending..." : " Send Reset Link"}
               </button>
             </form>
 
@@ -486,7 +486,7 @@ export default function TourismLogin() {
                     transition: "all 0.2s"
                   }}
                 >
-                  {resendLoading ? "⏳ Sending..." : "📧 Resend Verification Email"}
+                  {resendLoading ? " Sending..." : " Resend Verification Email"}
                 </button>
               </div>
             )}

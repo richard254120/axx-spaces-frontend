@@ -196,7 +196,7 @@ export default function TourismRegister() {
         throw new Error(data.error || "Registration failed");
       }
 
-      setSuccess("✅ Registration successful! Redirecting to login...");
+      setSuccess(" Registration successful! Redirecting to login...");
       
       setTimeout(() => {
         navigate("/tourism/login");

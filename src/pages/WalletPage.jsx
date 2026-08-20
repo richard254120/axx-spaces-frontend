@@ -103,7 +103,7 @@ export default function WalletPage() {
       {/* Transactions List */}
       {filteredTransactions.length === 0 ? (
         <div style={styles.emptyState}>
-          <div style={styles.emptyIcon}>💰</div>
+          <div style={styles.emptyIcon}></div>
           <h2 style={styles.emptyTitle}>No Transactions</h2>
           <p style={styles.emptyText}>
             {filter === "all" ? "You haven't made any transactions yet." : `No ${filter} transactions found.`}
@@ -117,7 +117,7 @@ export default function WalletPage() {
             return (
               <div key={tx.transactionId || idx} style={styles.txCard}>
                 <div style={styles.txLeft}>
-                  <div style={styles.txIcon}>💳</div>
+                  <div style={styles.txIcon}></div>
                   <div>
                     <div style={styles.txPlan}>{tx.plan || "Payment"}</div>
                     <div style={styles.txDate}>

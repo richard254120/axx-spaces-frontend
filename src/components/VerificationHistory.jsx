@@ -101,7 +101,7 @@ const VerificationHistory = ({ history = [] }) => {
         </div>
       ) : displayHistory.length === 0 ? (
         <div style={styles.emptyState}>
-          <div style={styles.emptyIcon}>📋</div>
+          <div style={styles.emptyIcon}></div>
           <p style={styles.emptyText}>No verification history yet</p>
         </div>
       ) : (

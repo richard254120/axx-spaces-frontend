@@ -100,7 +100,7 @@ export default function AxxWallet() {
 
       {/* Coming Soon Banner */}
       <div style={styles.comingSoonBanner}>
-        <div style={styles.comingSoonIcon}>🚧</div>
+        <div style={styles.comingSoonIcon}></div>
         <div style={styles.comingSoonText}>
           <div style={styles.comingSoonTitle}>AxxWallet Coming Soon</div>
           <div style={styles.comingSoonSubtitle}>We're working hard to bring you the best wallet experience. Stay tuned!</div>
@@ -141,7 +141,7 @@ export default function AxxWallet() {
           {/* Balance Cards */}
           <div style={styles.balanceGrid}>
             <div style={styles.mainBalanceCard}>
-              <div style={styles.balanceIcon}>💳</div>
+              <div style={styles.balanceIcon}></div>
               <div style={styles.balanceLabel}>Main Balance</div>
               <div style={styles.balanceAmount}>KES {(walletData?.balance || 0).toLocaleString()}</div>
               <div style={styles.balanceHint}>Available for transactions</div>
@@ -161,22 +161,22 @@ export default function AxxWallet() {
             <h3 style={styles.sectionTitle}>Quick Actions</h3>
             <div style={styles.actionsGrid}>
               <button style={styles.actionBtn} onClick={() => setShowDepositModal(true)}>
-                <div style={styles.actionIcon}>📥</div>
+                <div style={styles.actionIcon}></div>
                 <div style={styles.actionLabel}>Deposit</div>
                 <div style={styles.comingSoonBadge}>Coming Soon</div>
               </button>
               <button style={styles.actionBtn} onClick={() => setShowWithdrawModal(true)}>
-                <div style={styles.actionIcon}>📤</div>
+                <div style={styles.actionIcon}></div>
                 <div style={styles.actionLabel}>Withdraw</div>
                 <div style={styles.comingSoonBadge}>Coming Soon</div>
               </button>
               <button style={styles.actionBtn} onClick={() => setShowTransferModal(true)}>
-                <div style={styles.actionIcon}>💸</div>
+                <div style={styles.actionIcon}></div>
                 <div style={styles.actionLabel}>Transfer</div>
                 <div style={styles.comingSoonBadge}>Coming Soon</div>
               </button>
               <button style={styles.actionBtn} onClick={() => setActiveTab("transactions")}>
-                <div style={styles.actionIcon}>📋</div>
+                <div style={styles.actionIcon}></div>
                 <div style={styles.actionLabel}>History</div>
               </button>
             </div>
@@ -187,7 +187,7 @@ export default function AxxWallet() {
             <h3 style={styles.sectionTitle}>Recent Transactions</h3>
             {transactions.slice(0, 5).length === 0 ? (
               <div style={styles.emptyState}>
-                <div style={styles.emptyIcon}>💰</div>
+                <div style={styles.emptyIcon}></div>
                 <p style={styles.emptyText}>No transactions yet</p>
               </div>
             ) : (
@@ -197,7 +197,7 @@ export default function AxxWallet() {
                   return (
                     <div key={tx.transactionId || idx} style={styles.txCard}>
                       <div style={styles.txLeft}>
-                        <div style={styles.txIcon}>{tx.type === "transfer_received" ? "💰" : "💳"}</div>
+                        <div style={styles.txIcon}>{tx.type === "transfer_received" ? "" : ""}</div>
                         <div>
                           <div style={styles.txPlan}>{tx.plan || tx.type || "Payment"}</div>
                           <div style={styles.txDate}>
@@ -243,7 +243,7 @@ export default function AxxWallet() {
           </div>
           {transactions.length === 0 ? (
             <div style={styles.emptyState}>
-              <div style={styles.emptyIcon}>💰</div>
+              <div style={styles.emptyIcon}></div>
               <h2 style={styles.emptyTitle}>No Transactions</h2>
               <p style={styles.emptyText}>You haven't made any transactions yet.</p>
               <Link to="/listings" style={styles.browseBtn}>Browse Properties</Link>
@@ -255,7 +255,7 @@ export default function AxxWallet() {
                 return (
                   <div key={tx.transactionId || idx} style={styles.txCard}>
                     <div style={styles.txLeft}>
-                      <div style={styles.txIcon}>{tx.type === "transfer_received" ? "💰" : "💳"}</div>
+                      <div style={styles.txIcon}>{tx.type === "transfer_received" ? "" : ""}</div>
                       <div>
                         <div style={styles.txPlan}>{tx.plan || tx.type || "Payment"}</div>
                         <div style={styles.txDate}>
@@ -330,7 +330,7 @@ export default function AxxWallet() {
           <h3 style={styles.sectionTitle}>Virtual Cards</h3>
           <div style={styles.virtualCard}>
             <div style={styles.cardHeader}>
-              <div style={styles.cardChip}>📱</div>
+              <div style={styles.cardChip}></div>
               <div style={styles.cardBrand}>AxxWallet</div>
             </div>
             <div style={styles.cardNumber}>•••• •••• •••• 1234</div>

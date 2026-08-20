@@ -55,7 +55,7 @@ export default function UniversityPicker({
         {label} {required && "*"}
       </label>
       <div style={styles.inputWrap}>
-        <span style={styles.icon}>🏛️</span>
+        <span style={styles.icon}></span>
         <input
           type="text"
           value={query}

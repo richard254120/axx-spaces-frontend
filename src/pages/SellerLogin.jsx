@@ -137,7 +137,7 @@ export default function SellerLogin() {
       }
 
       login(data.token, data.user);
-      setSuccess("✅ Google login successful! Redirecting...");
+      setSuccess(" Google login successful! Redirecting...");
 
       setTimeout(() => {
         navigate("/seller-dashboard");
@@ -167,10 +167,10 @@ export default function SellerLogin() {
         throw new Error(data.error || "Failed to resend verification email");
       }
 
-      setSuccess("✅ " + (data.message || "Verification email sent successfully! Please check your inbox."));
+      setSuccess(" " + (data.message || "Verification email sent successfully! Please check your inbox."));
       setShowResend(false);
     } catch (err) {
-      setError("❌ " + (err.message || "Failed to resend verification email. Please try again."));
+      setError(" " + (err.message || "Failed to resend verification email. Please try again."));
     } finally {
       setResendLoading(false);
     }
@@ -225,7 +225,7 @@ export default function SellerLogin() {
       }
 
       if (mode === "register") {
-        setSuccess("✅ Account created! You can now login.");
+        setSuccess(" Account created! You can now login.");
         setMode("login");
         setForm({ name: "", email: "", password: "", phone: "", county: "" });
       } else {
@@ -246,7 +246,7 @@ export default function SellerLogin() {
     setForgotMsg("");
 
     if (!forgotEmail) {
-      setForgotMsg("❌ Please enter your email address.");
+      setForgotMsg(" Please enter your email address.");
       return;
     }
 
@@ -260,9 +260,9 @@ export default function SellerLogin() {
       });
 
       const data = await res.json();
-      setForgotMsg(data.message || "✅ Reset link sent! Check your inbox.");
+      setForgotMsg(data.message || " Reset link sent! Check your inbox.");
     } catch (err) {
-      setForgotMsg("❌ Failed to send reset email. Try again.");
+      setForgotMsg(" Failed to send reset email. Try again.");
     } finally {
       setForgotLoading(false);
     }
@@ -277,13 +277,13 @@ export default function SellerLogin() {
           <>
             {/* Forgot Password Form */}
             <div style={s.header}>
-              <div style={s.icon}>🔐</div>
+              <div style={s.icon}></div>
               <h1 style={s.title}>Reset Password</h1>
               <p style={s.subtitle}>Enter your email to receive a reset link</p>
             </div>
 
             {forgotMsg && (
-              <div style={forgotMsg.includes("❌") ? s.error : s.successMsg}>
+              <div style={forgotMsg.includes("") ? s.error : s.successMsg}>
                 {forgotMsg}
               </div>
             )}
@@ -297,7 +297,7 @@ export default function SellerLogin() {
                 style={s.input}
               />
               <button style={s.submitBtn} onClick={handleForgotPassword} disabled={forgotLoading}>
-                {forgotLoading ? "Sending..." : "📧 Send Reset Link"}
+                {forgotLoading ? "Sending..." : " Send Reset Link"}
               </button>
             </div>
 
@@ -311,7 +311,7 @@ export default function SellerLogin() {
           <>
             {/* Header */}
             <div style={s.header}>
-              <div style={s.icon}>🛒</div>
+              <div style={s.icon}></div>
               <h1 style={s.title}>Seller Portal</h1>
               <p style={s.subtitle}>
                 {mode === "login"
@@ -359,7 +359,7 @@ export default function SellerLogin() {
                     transition: "all 0.2s"
                   }}
                 >
-                  {resendLoading ? "⏳ Sending..." : "📧 Resend Verification Email"}
+                  {resendLoading ? " Sending..." : " Resend Verification Email"}
                 </button>
               </div>
             )}
@@ -385,7 +385,7 @@ export default function SellerLogin() {
                 onChange={handleChange} style={s.input} />
               {mode === "register" && form.password && (form.password.length < 6 || !/[a-zA-Z]/.test(form.password) || !/[0-9]/.test(form.password)) && (
                 <div style={{ color: "#fca5a5", fontSize: "11px", marginTop: "-12px", marginBottom: "12px", textAlign: "left" }}>
-                  ⚠️ Password must contain both letters and numbers.
+                   Password must contain both letters and numbers.
                 </div>
               )}
 
@@ -420,7 +420,7 @@ export default function SellerLogin() {
             {/* Info box */}
             <div style={s.infoBox}>
               <p style={s.infoText}>
-                📋 After registering, you can upload your materials immediately.
+                 After registering, you can upload your materials immediately.
                 They will appear on the marketplace once approved by our admin team.
               </p>
             </div>

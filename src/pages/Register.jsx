@@ -47,7 +47,7 @@ export default function Register() {
       if (!res.ok) throw new Error(data.error || "Google authentication failed");
 
       login(data.token, data.user);
-      setSuccess("✅ Google registration successful! Redirecting...");
+      setSuccess(" Google registration successful! Redirecting...");
       setTimeout(() => navigate(getDashboardPath(data.user?.role)), 1000);
     } catch (err) {
       setError(err.message || "Google authentication failed. Please try again.");
@@ -70,17 +70,17 @@ export default function Register() {
 
     // Basic Validation
     if (!formData.name || !formData.email || !formData.password || !formData.phone) {
-      setError("❌ All fields are required");
+      setError(" All fields are required");
       return;
     }
     if (formData.password.length < 6) {
-      setError("❌ Password must be at least 6 characters");
+      setError(" Password must be at least 6 characters");
       return;
     }
     const hasLetter = /[a-zA-Z]/.test(formData.password);
     const hasNumber = /[0-9]/.test(formData.password);
     if (!hasLetter || !hasNumber) {
-      setError("❌ Password must contain a mixture of both letters and numbers.");
+      setError(" Password must contain a mixture of both letters and numbers.");
       return;
     }
 
@@ -96,8 +96,8 @@ export default function Register() {
         landlordType,
       };
 
-      console.log("📤 Sending registration payload:", payload);
-      console.log("🌐 API URL:", `${API_BASE}/auth/register`);
+      console.log(" Sending registration payload:", payload);
+      console.log(" API URL:", `${API_BASE}/auth/register`);
 
       const response = await fetch(`${API_BASE}/auth/register`, {
         method: "POST",
@@ -107,7 +107,7 @@ export default function Register() {
 
       const data = await response.json();
 
-      console.log("📥 Backend response:", data);
+      console.log(" Backend response:", data);
       console.log("Status:", response.status);
 
       if (!response.ok) {
@@ -115,7 +115,7 @@ export default function Register() {
       }
 
       // Registration successful but email verification required
-      setSuccess(data.message || "✅ Registration successful! Please check your email to verify your account.");
+      setSuccess(data.message || " Registration successful! Please check your email to verify your account.");
 
       // Clear form
       setFormData({
@@ -131,7 +131,7 @@ export default function Register() {
       }, 3000);
 
     } catch (err) {
-      console.error("❌ Registration error:", err);
+      console.error(" Registration error:", err);
       setError(err.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
@@ -156,7 +156,7 @@ export default function Register() {
               style={{ ...styles.typeCard, ...(landlordType === "general" ? styles.typeCardActive : {}) }}
               onClick={() => setLandlordType("general")}
             >
-              <span style={styles.typeIcon}>🏘️</span>
+              <span style={styles.typeIcon}></span>
               <strong>General Landlord</strong>
               <span style={styles.typeDesc}>List rentals anywhere in Kenya</span>
             </button>
@@ -165,7 +165,7 @@ export default function Register() {
               style={{ ...styles.typeCard, ...(landlordType === "university" ? styles.typeCardActive : {}) }}
               onClick={() => setLandlordType("university")}
             >
-              <span style={styles.typeIcon}>🎓</span>
+              <span style={styles.typeIcon}></span>
               <strong>Near University</strong>
               <span style={styles.typeDesc}>List hostels/rooms near a campus — shown to students</span>
             </button>
@@ -222,7 +222,7 @@ export default function Register() {
               />
               {formData.password && (formData.password.length < 6 || !/[a-zA-Z]/.test(formData.password) || !/[0-9]/.test(formData.password)) && (
                 <div style={{ color: "#fca5a5", fontSize: "11px", marginTop: "4px" }}>
-                  ⚠️ Password must contain both letters and numbers.
+                   Password must contain both letters and numbers.
                 </div>
               )}
             </div>

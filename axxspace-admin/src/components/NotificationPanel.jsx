@@ -24,25 +24,25 @@ export default function NotificationPanel({
   const getNotifIcon = (type, isPayment) => {
     if (isPayment) {
       const icons = {
-        property_booking: "🏠",
-        material_purchase: "🛍️",
-        tourism_booking: "🏨",
-        boost: "🚀",
-        subscription: "📋"
+        property_booking: "",
+        material_purchase: "",
+        tourism_booking: "",
+        boost: "",
+        subscription: ""
       };
-      return icons[type] || "💳";
+      return icons[type] || "";
     }
     const icons = {
-      property: "🏠",
-      material: "🛍️",
-      tourism: "🏨",
-      mover: "🚛",
-      seller: "📋",
-      business: "🏪",
-      announcement: "📢",
-      item_request: "🔍"
+      property: "",
+      material: "",
+      tourism: "",
+      mover: "",
+      seller: "",
+      business: "",
+      announcement: "",
+      item_request: ""
     };
-    return icons[type] || "📄";
+    return icons[type] || "";
   };
 
   const getNotifTitle = (n) => {
@@ -74,7 +74,7 @@ export default function NotificationPanel({
         onClick={() => setShowNotifPanel(!showNotifPanel)}
         title={notifications.length > 0 ? `${notifications.length} notification(s) awaiting approval` : "No pending notifications"}
       >
-        🔔
+        
         {notifications.length > 0 && (
           <span className={`notification-badge ${notifications.length > 0 ? 'blink' : ''}`}>
             {notifications.length}
@@ -85,7 +85,7 @@ export default function NotificationPanel({
       {showNotifPanel && (
         <div className="notification-panel">
           <div className="notification-panel-header">
-            <span className="notification-panel-title">🔔 All Notifications</span>
+            <span className="notification-panel-title"> All Notifications</span>
             <button className="btn-close-notification" onClick={() => setShowNotifPanel(false)}>✕</button>
           </div>
 
@@ -99,12 +99,12 @@ export default function NotificationPanel({
                       {getNotifIcon(notif.type, notif.isPayment)} {getNotifTitle(notif)}
                     </span>
                     <span style={{ fontSize: 10, color: "#94a3b8", marginLeft: "auto" }}>
-                      {notif.isPayment ? "💳 Payment" : "📝 Approval"}
+                      {notif.isPayment ? " Payment" : " Approval"}
                     </span>
                   </div>
                   <div className="notification-item-meta">
-                    <span>👤 {notif.ownerName || notif.userName || notif.userId?.name || "User"}</span>
-                    <span>📞 {notif.ownerPhone || notif.userPhone || notif.userId?.phone || "—"}</span>
+                    <span> {notif.ownerName || notif.userName || notif.userId?.name || "User"}</span>
+                    <span> {notif.ownerPhone || notif.userPhone || notif.userId?.phone || "—"}</span>
                   </div>
                   {notif.isPayment && (
                     <div className="notification-item-meta">
@@ -125,7 +125,7 @@ export default function NotificationPanel({
                   )}
                   {notif.type === "tourism_booking" && notif.checkIn && (
                     <div style={{ ...styles.notifItemMeta, fontSize: 11 }}>
-                      <span>📅 Check-in: {new Date(notif.checkIn).toLocaleDateString()}</span>
+                      <span> Check-in: {new Date(notif.checkIn).toLocaleDateString()}</span>
                       <span>Check-out: {new Date(notif.checkOut).toLocaleDateString()}</span>
                     </div>
                   )}
@@ -141,7 +141,7 @@ export default function NotificationPanel({
                           className="btn-approve-notification"
                           onClick={() => { onApprove(notif._id); setShowNotifPanel(false); }}
                         >
-                          ✅ Confirm
+                           Confirm
                         </button>
                         <button
                           className="btn-reject-notification"
@@ -158,7 +158,7 @@ export default function NotificationPanel({
                           setShowNotifPanel(false);
                         }}
                       >
-                        👁️ Review
+                         Review
                       </button>
                     )}
                   </div>
@@ -167,7 +167,7 @@ export default function NotificationPanel({
             </div>
           ) : (
             <div className="notification-empty">
-              <p>✅ No pending notifications</p>
+              <p> No pending notifications</p>
             </div>
           )}
 

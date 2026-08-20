@@ -64,49 +64,49 @@ export default function AboutPage() {
 
   const whatWeDo = [
     {
-      icon: "💼",
+      icon: "",
       title: "AxxBiashara",
       color: "#fbbf24",
       desc: "Kenya's premier business directory connecting users with trusted businesses across all sectors. Features reviews, ratings, advanced search, business comparison, and premium listings.",
       items: ["Reviews & Ratings", "Favorites & Bookmarks", "Business Analytics", "Events & Promotions", "Verification Badges", "Business Subscriptions"],
     },
     {
-      icon: "🏠",
+      icon: "",
       title: "Rental Space",
       color: "#22c55e",
       desc: "We help users discover available rental houses and business spaces — compare pricing and locations, connect directly with landlords and caretakers, and access property information more conveniently.",
       items: ["GPS Mapping", "Direct Landlord Contact", "Premium Boost Plans", "University Hostels", "Property Verification"],
     },
     {
-      icon: "🏢",
+      icon: "",
       title: "Business Space",
       color: "#3b82f6",
       desc: "We help entrepreneurs and businesses find spaces that match their operational needs and budgets.",
       items: ["Shops", "Offices", "Commercial spaces", "Small business locations"],
     },
     {
-      icon: "🚚",
+      icon: "",
       title: "Movers & Relocation",
       color: "#0ea5e9",
       desc: "Moving can be stressful and expensive. Axxspace connects users with movers and relocation service providers to make transitions easier and more organized.",
       items: ["Verified Movers", "Transparent Pricing", "Materials Marketplace", "Direct Booking", "Review System"],
     },
     {
-      icon: "🏨",
+      icon: "",
       title: "Tourism & Hospitality",
       color: "#a855f7",
       desc: "Discover and book amazing hotels, resorts, lodges, and tourism experiences across Kenya. Property owners advertise their properties with flexible subscription packages.",
       items: ["Beach Resorts", "Mountain Lodges", "Hotels", "Adventure Tours", "Spa & Wellness", "Safari Packages"],
     },
     {
-      icon: "🛍️",
+      icon: "",
       title: "Marketplace",
       color: "#ec4899",
       desc: "A buy-and-sell platform for new and used goods — electronics, furniture, fashion, vehicles, and more nationwide. Connect directly with sellers.",
       items: ["Seller Dashboard", "Product Listings", "Direct Messaging", "Secure Transactions", "Premium Visibility"],
     },
     {
-      icon: "💳",
+      icon: "",
       title: "AxxWallet",
       color: "#f59e0b",
       desc: "Your digital wallet for seamless transactions on the platform. Deposit funds, make payments for premium services, withdraw money, and transfer funds to other users.",
@@ -139,7 +139,7 @@ export default function AboutPage() {
       {/* ── HERO ── */}
       <section style={styles.hero}>
         <div style={styles.heroContent}>
-          <div style={styles.badge}>🌍 About Axxspace</div>
+          <div style={styles.badge}> About Axxspace</div>
           <h1 style={styles.heroTitle}>Spaces. Services.<br />Businesses. All in One.</h1>
           <p style={styles.heroSubtitle}>
             A digital ecosystem connecting tenants, landlords, business owners, movers, tourism providers, and
@@ -169,14 +169,14 @@ export default function AboutPage() {
       <section style={styles.missionSection}>
         <div style={styles.missionInner}>
           <div style={styles.missionCard}>
-            <div style={styles.missionIcon}>🎯</div>
+            <div style={styles.missionIcon}></div>
             <h2 style={styles.missionTitle}>Our Mission</h2>
             <p style={styles.missionText}>
               To simplify access to spaces, tourism experiences, relocation services, and affordable marketplaces through technology.
             </p>
           </div>
           <div style={styles.missionCard}>
-            <div style={styles.missionIcon}>🌍</div>
+            <div style={styles.missionIcon}></div>
             <h2 style={styles.missionTitle}>Our Vision</h2>
             <p style={styles.missionText}>
               To become Africa's leading digital platform for spaces, tourism, moving services, and community-driven commerce.
@@ -291,14 +291,14 @@ export default function AboutPage() {
 
           <div style={styles.trustGrid}>
             {[
-              { icon: "🔐", title: "Secure Authentication", desc: "JWT-based authentication with role-based access control for different user types." },
-              { icon: "📱", title: "Mobile-First Design", desc: "Responsive design that works seamlessly on desktop, tablet, and mobile devices." },
-              { icon: "🗺️", title: "GPS Mapping", desc: "Interactive maps powered by Leaflet for precise property and business location." },
-              { icon: "💬", title: "Real-Time Messaging", desc: "In-platform messaging system for direct communication between users." },
-              { icon: "🔔", title: "Smart Notifications", desc: "Real-time notifications for messages, bookings, and important updates." },
-              { icon: "💾", title: "Cloud Storage", desc: "Secure cloud storage for images and documents using Cloudinary." },
-              { icon: "📊", title: "Analytics Dashboard", desc: "Comprehensive analytics for businesses and landlords to track performance." },
-              { icon: "🎯", title: "Advanced Search", desc: "Powerful search with filters for location, price, amenities, and more." },
+              { icon: "", title: "Secure Authentication", desc: "JWT-based authentication with role-based access control for different user types." },
+              { icon: "", title: "Mobile-First Design", desc: "Responsive design that works seamlessly on desktop, tablet, and mobile devices." },
+              { icon: "", title: "GPS Mapping", desc: "Interactive maps powered by Leaflet for precise property and business location." },
+              { icon: "", title: "Real-Time Messaging", desc: "In-platform messaging system for direct communication between users." },
+              { icon: "", title: "Smart Notifications", desc: "Real-time notifications for messages, bookings, and important updates." },
+              { icon: "", title: "Cloud Storage", desc: "Secure cloud storage for images and documents using Cloudinary." },
+              { icon: "", title: "Analytics Dashboard", desc: "Comprehensive analytics for businesses and landlords to track performance." },
+              { icon: "", title: "Advanced Search", desc: "Powerful search with filters for location, price, amenities, and more." },
             ].map((feature) => (
               <div key={feature.title} style={styles.trustCard} className="trust-card">
                 <div style={styles.trustIcon}>{feature.icon}</div>
@@ -319,14 +319,14 @@ export default function AboutPage() {
 
           <div style={styles.valuesGrid}>
             {[
-              { icon: "🏠", title: "Landlords", text: "List properties, manage bookings, track analytics, and boost visibility." },
-              { icon: "👤", title: "Tenants", text: "Search properties, save favorites, contact landlords, and leave reviews." },
-              { icon: "💼", title: "Business Owners", text: "List businesses, respond to inquiries, manage subscriptions, and view analytics." },
-              { icon: "🚚", title: "Movers", text: "Showcase services, manage bookings, build reputation through reviews." },
-              { icon: "🏨", title: "Tourism Providers", text: "List hotels/lodges, manage bookings, offer packages and promotions." },
-              { icon: "🛍️", title: "Sellers", text: "List products, manage inventory, communicate with buyers, track sales." },
-              { icon: "🎓", title: "Students", text: "Find university hostels, save favorites, contact landlords near campus." },
-              { icon: "🛡️", title: "Admins", text: "Verify users, moderate content, manage disputes, and ensure platform safety." },
+              { icon: "", title: "Landlords", text: "List properties, manage bookings, track analytics, and boost visibility." },
+              { icon: "", title: "Tenants", text: "Search properties, save favorites, contact landlords, and leave reviews." },
+              { icon: "", title: "Business Owners", text: "List businesses, respond to inquiries, manage subscriptions, and view analytics." },
+              { icon: "", title: "Movers", text: "Showcase services, manage bookings, build reputation through reviews." },
+              { icon: "", title: "Tourism Providers", text: "List hotels/lodges, manage bookings, offer packages and promotions." },
+              { icon: "", title: "Sellers", text: "List products, manage inventory, communicate with buyers, track sales." },
+              { icon: "", title: "Students", text: "Find university hostels, save favorites, contact landlords near campus." },
+              { icon: "", title: "Admins", text: "Verify users, moderate content, manage disputes, and ensure platform safety." },
             ].map((role) => (
               <div key={role.title} style={styles.valueCard} className="value-card">
                 <div style={styles.valueIcon}>{role.icon}</div>
@@ -367,7 +367,7 @@ export default function AboutPage() {
       <section style={styles.noticeSection}>
         <div style={styles.noticeInner}>
           <div style={styles.noticeCard}>
-            <div style={styles.noticeIcon}>⚠️</div>
+            <div style={styles.noticeIcon}></div>
             <div>
               <h3 style={styles.noticeTitle}>Important Notice</h3>
               <p style={styles.noticeText}>
@@ -471,23 +471,23 @@ export default function AboutPage() {
           </div>
           <div style={styles.footerSection}>
             <h4 style={styles.footerTitle}>Quick Links</h4>
-            <p style={styles.footerLink} onClick={() => navigate("/listings")}>🏢 Browse Listings</p>
-            <p style={styles.footerLink} onClick={() => navigate("/axxbiashara")}>💼 AxxBiashara</p>
-            <p style={styles.footerLink} onClick={() => navigate("/tourism")}>🏨 Tourism</p>
-            <p style={styles.footerLink} onClick={() => navigate("/")}>🏠 Home</p>
-            <p style={styles.footerLink} onClick={() => navigate("/materials")}>🛍️ Materials Marketplace</p>
+            <p style={styles.footerLink} onClick={() => navigate("/listings")}> Browse Listings</p>
+            <p style={styles.footerLink} onClick={() => navigate("/axxbiashara")}> AxxBiashara</p>
+            <p style={styles.footerLink} onClick={() => navigate("/tourism")}> Tourism</p>
+            <p style={styles.footerLink} onClick={() => navigate("/")}> Home</p>
+            <p style={styles.footerLink} onClick={() => navigate("/materials")}> Materials Marketplace</p>
           </div>
           <div style={styles.footerSection}>
             <h4 style={styles.footerTitle}>Support</h4>
-            <p style={styles.footerLink}>📧 info@axxspace.com</p>
-            <p style={styles.footerLink}>📧 support@axxspace.com</p>
-            <p style={styles.footerLink}>📧 admin@axxspace.com</p>
-            <p style={styles.footerLink}>📞 +254 796740883</p>
-            <p style={styles.footerLink}>💬 WhatsApp Support</p>
+            <p style={styles.footerLink}> info@axxspace.com</p>
+            <p style={styles.footerLink}> support@axxspace.com</p>
+            <p style={styles.footerLink}> admin@axxspace.com</p>
+            <p style={styles.footerLink}> +254 796740883</p>
+            <p style={styles.footerLink}> WhatsApp Support</p>
           </div>
         </div>
         <div style={styles.footerBottom}>
-          <p style={styles.footerCopy}>© 2026 Axxspace. All rights reserved. Built for Kenya, by Kenyans.</p>
+          <p style={styles.footerCopy}> 2026 Axxspace. All rights reserved. Built for Kenya, by Kenyans.</p>
         </div>
       </footer>
     </div>

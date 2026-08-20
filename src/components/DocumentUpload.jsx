@@ -120,7 +120,7 @@ const DocumentUpload = ({
             onChange={handleFileChange}
             style={styles.fileInput}
           />
-          <div style={styles.uploadIcon}>📄</div>
+          <div style={styles.uploadIcon}></div>
           <div style={styles.uploadText}>
             <span style={styles.uploadTextPrimary}>Click to upload</span>
             <span style={styles.uploadTextSecondary}>or drag and drop</span>
@@ -133,7 +133,7 @@ const DocumentUpload = ({
         <div style={styles.previewContainer}>
           {!previewUrl || !previewUrl.startsWith('data:') ? (
             <div style={styles.pdfPreview}>
-              <div style={styles.pdfIcon}>📕</div>
+              <div style={styles.pdfIcon}></div>
               <span style={styles.fileName}>{fileName || 'Document uploaded'}</span>
             </div>
           ) : (

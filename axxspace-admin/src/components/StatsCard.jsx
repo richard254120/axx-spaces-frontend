@@ -8,7 +8,7 @@ export default function StatsCard({ label, total, pending, color, isPulse }) {
       <p className="stat-value" style={{ color }}>{total}</p>
       {pending > 0 && (
         <p className="stat-pending">
-          {isPulse ? `🔴 ${pending} unread` : `${pending} pending`}
+          {isPulse ? ` ${pending} unread` : `${pending} pending`}
         </p>
       )}
     </div>

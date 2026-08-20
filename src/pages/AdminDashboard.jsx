@@ -123,7 +123,7 @@ export default function AdminDashboard() {
         prev.filter((p) => p.transactionRef !== payment.transactionRef)
       );
     } catch (err) {
-      alert("❌ Failed to process payment verification.");
+      alert(" Failed to process payment verification.");
     } finally {
       setVerifyingId(null);
     }
@@ -152,9 +152,9 @@ export default function AdminDashboard() {
       setPendingBusinesses((prev) =>
         prev.filter((b) => b._id !== businessId)
       );
-      alert(`✅ Business ${status} successfully`);
+      alert(` Business ${status} successfully`);
     } catch (err) {
-      alert("❌ Failed to update business status");
+      alert(" Failed to update business status");
     }
   };
 
@@ -162,9 +162,9 @@ export default function AdminDashboard() {
     try {
       await API.post(`/business/admin/${businessId}/verify`, { badgeType });
       loadPendingBusinesses();
-      alert("✅ Verification badge added successfully");
+      alert(" Verification badge added successfully");
     } catch (err) {
-      alert("❌ Failed to add verification badge");
+      alert(" Failed to add verification badge");
     }
   };
 
@@ -192,9 +192,9 @@ export default function AdminDashboard() {
         createdAt: announcement.createdAt,
       });
       loadPendingAnnouncements();
-      alert(`✅ Announcement ${status} successfully`);
+      alert(` Announcement ${status} successfully`);
     } catch (err) {
-      alert("❌ Failed to update announcement status");
+      alert(" Failed to update announcement status");
     }
   };
   // END ADDED
@@ -222,9 +222,9 @@ export default function AdminDashboard() {
     try {
       await API.delete(`/admin/users/${userId}`);
       setUsers((prev) => prev.filter((u) => u._id !== userId));
-      alert("✅ User deleted successfully");
+      alert(" User deleted successfully");
     } catch (err) {
-      alert("❌ Failed to delete user");
+      alert(" Failed to delete user");
     }
   };
   // END ADDED
@@ -248,9 +248,9 @@ export default function AdminDashboard() {
       setRequests((prev) =>
         prev.map((r) => (r._id === requestId ? { ...r, status } : r))
       );
-      alert(`✅ Request status updated to ${status}`);
+      alert(` Request status updated to ${status}`);
     } catch (err) {
-      alert("❌ Failed to update request status");
+      alert(" Failed to update request status");
     }
   };
 
@@ -299,10 +299,10 @@ export default function AdminDashboard() {
         API.post("/config", { key: "mpesa_consumer_key", value: mpesaConfig.mpesa_consumer_key, description: "M-Pesa Consumer Key" }),
         API.post("/config", { key: "mpesa_consumer_secret", value: mpesaConfig.mpesa_consumer_secret, description: "M-Pesa Consumer Secret" }),
       ]);
-      setConfigMessage("✅ M-Pesa configuration saved successfully!");
+      setConfigMessage(" M-Pesa configuration saved successfully!");
       setTimeout(() => setConfigMessage(""), 3000);
     } catch (err) {
-      setConfigMessage("❌ Failed to save configuration. Please try again.");
+      setConfigMessage(" Failed to save configuration. Please try again.");
       setTimeout(() => setConfigMessage(""), 3000);
     } finally {
       setConfigSaving(false);
@@ -316,7 +316,7 @@ export default function AdminDashboard() {
       const res = await API.get("/properties/admin/pending");
       setPending(res.data);
     } catch (err) {
-      console.error("❌ Failed to load pending properties", err);
+      console.error(" Failed to load pending properties", err);
     } finally {
       setLoading(false);
     }
@@ -327,7 +327,7 @@ export default function AdminDashboard() {
       const res = await API.get("/users/pending-tourism-providers");
       setPendingProviders(res.data);
     } catch (err) {
-      console.error("❌ Failed to load pending tourism providers", err);
+      console.error(" Failed to load pending tourism providers", err);
     }
   };
 
@@ -336,9 +336,9 @@ export default function AdminDashboard() {
       // Using a single PATCH route is cleaner for state management
       await API.patch(`/properties/${id}/status`, { status });
       setPending((prev) => prev.filter((item) => item._id !== id));
-      console.log(`✅ Property ${status} successfully`);
+      console.log(` Property ${status} successfully`);
     } catch (err) {
-      alert("❌ Operation failed. Please check permissions.");
+      alert(" Operation failed. Please check permissions.");
     }
   };
 
@@ -346,9 +346,9 @@ export default function AdminDashboard() {
     try {
       await API.patch(`/users/${userId}/approve-tourism-provider`, { approve });
       setPendingProviders((prev) => prev.filter((p) => p._id !== userId));
-      console.log(`✅ Tourism provider ${approve ? 'approved' : 'rejected'} successfully`);
+      console.log(` Tourism provider ${approve ? 'approved' : 'rejected'} successfully`);
     } catch (err) {
-      alert("❌ Operation failed. Please check permissions.");
+      alert(" Operation failed. Please check permissions.");
     }
   };
 
@@ -357,9 +357,9 @@ export default function AdminDashboard() {
       await API.patch(`/admin/${type}/${id}/approve`);
       loadAllPending();
       loadStats();
-      alert("✅ Approved successfully");
+      alert(" Approved successfully");
     } catch (err) {
-      alert("❌ Failed to approve");
+      alert(" Failed to approve");
     }
   };
 
@@ -368,9 +368,9 @@ export default function AdminDashboard() {
       await API.patch(`/admin/${type}/${id}/reject`);
       loadAllPending();
       loadStats();
-      alert("✅ Rejected successfully");
+      alert(" Rejected successfully");
     } catch (err) {
-      alert("❌ Failed to reject");
+      alert(" Failed to reject");
     }
   };
 
@@ -379,7 +379,7 @@ export default function AdminDashboard() {
       <style dangerouslySetInnerHTML={{ __html: cssStyles }} />
 
       <div style={styles.header}>
-        <h1 style={styles.title}>🛡️ Admin Review Panel</h1>
+        <h1 style={styles.title}> Admin Review Panel</h1>
         <p style={styles.subtitle}>Manage pending submissions for Axxspace</p>
       </div>
 
@@ -387,27 +387,27 @@ export default function AdminDashboard() {
       {stats && (
         <div style={styles.statsGrid}>
           <div style={styles.statCard}>
-            <h3 style={styles.statTitle}>🏢 Properties</h3>
+            <h3 style={styles.statTitle}> Properties</h3>
             <p style={styles.statValue}>{stats.properties.total}</p>
             <p style={styles.statPending}>{stats.properties.pending} pending</p>
           </div>
           <div style={styles.statCard}>
-            <h3 style={styles.statTitle}>🛍️ Materials</h3>
+            <h3 style={styles.statTitle}> Materials</h3>
             <p style={styles.statValue}>{stats.materials.total}</p>
             <p style={styles.statPending}>{stats.materials.pending} pending</p>
           </div>
           <div style={styles.statCard}>
-            <h3 style={styles.statTitle}>🚛 Movers</h3>
+            <h3 style={styles.statTitle}> Movers</h3>
             <p style={styles.statValue}>{stats.movers.total}</p>
             <p style={styles.statPending}>{stats.movers.pending} pending</p>
           </div>
           <div style={styles.statCard}>
-            <h3 style={styles.statTitle}>🏨 Tourism</h3>
+            <h3 style={styles.statTitle}> Tourism</h3>
             <p style={styles.statValue}>{stats.tourism.total}</p>
             <p style={styles.statPending}>{stats.tourism.pending} pending</p>
           </div>
           <div style={styles.statCard}>
-            <h3 style={styles.statTitle}>📋 Sellers</h3>
+            <h3 style={styles.statTitle}> Sellers</h3>
             <p style={styles.statValue}>{stats.sellers.total}</p>
             <p style={styles.statPending}>{stats.sellers.pending} pending</p>
           </div>
@@ -420,44 +420,44 @@ export default function AdminDashboard() {
           style={{ ...styles.tab, ...(activeTab === "properties" ? styles.tabActive : {}) }}
           onClick={() => setActiveTab("properties")}
         >
-          🏠 Properties {allPending?.properties ? `(${allPending.properties.length})` : ""}
+           Properties {allPending?.properties ? `(${allPending.properties.length})` : ""}
         </button>
         <button
           style={{ ...styles.tab, ...(activeTab === "materials" ? styles.tabActive : {}) }}
           onClick={() => setActiveTab("materials")}
         >
-          🛍️ Materials {allPending?.materials ? `(${allPending.materials.length})` : ""}
+           Materials {allPending?.materials ? `(${allPending.materials.length})` : ""}
         </button>
         <button
           style={{ ...styles.tab, ...(activeTab === "tourism" ? styles.tabActive : {}) }}
           onClick={() => setActiveTab("tourism")}
         >
-          🏨 Tourism {allPending?.tourism ? `(${allPending.tourism.length})` : ""}
+           Tourism {allPending?.tourism ? `(${allPending.tourism.length})` : ""}
         </button>
         <button
           style={{ ...styles.tab, ...(activeTab === "movers" ? styles.tabActive : {}) }}
           onClick={() => setActiveTab("movers")}
         >
-          🚛 Movers {allPending?.movers ? `(${allPending.movers.length})` : ""}
+           Movers {allPending?.movers ? `(${allPending.movers.length})` : ""}
         </button>
         <button
           style={{ ...styles.tab, ...(activeTab === "sellers" ? styles.tabActive : {}) }}
           onClick={() => setActiveTab("sellers")}
         >
-          📋 Sellers {allPending?.sellers ? `(${allPending.sellers.length})` : ""}
+           Sellers {allPending?.sellers ? `(${allPending.sellers.length})` : ""}
         </button>
         <button
           style={{ ...styles.tab, ...(activeTab === "payment" ? styles.tabActive : {}) }}
           onClick={() => setActiveTab("payment")}
         >
-          💳 Payment Settings
+           Payment Settings
         </button>
         {/* ADDED: Payments tab button */}
         <button
           style={{ ...styles.tab, ...(activeTab === "payments" ? styles.tabActive : {}) }}
           onClick={() => setActiveTab("payments")}
         >
-          💰 Payments {pendingPayments.length > 0 ? `(${pendingPayments.length})` : ""}
+           Payments {pendingPayments.length > 0 ? `(${pendingPayments.length})` : ""}
         </button>
         {/* END ADDED */}
         {/* ADDED: Businesses tab button */}
@@ -465,14 +465,14 @@ export default function AdminDashboard() {
           style={{ ...styles.tab, ...(activeTab === "businesses" ? styles.tabActive : {}) }}
           onClick={() => setActiveTab("businesses")}
         >
-          🏪 Businesses {pendingBusinesses.length > 0 ? `(${pendingBusinesses.length})` : ""}
+           Businesses {pendingBusinesses.length > 0 ? `(${pendingBusinesses.length})` : ""}
         </button>
         {/* ADDED: Announcements tab button */}
         <button
           style={{ ...styles.tab, ...(activeTab === "announcements" ? styles.tabActive : {}) }}
           onClick={() => setActiveTab("announcements")}
         >
-          📢 Announcements {pendingAnnouncements.filter(a => a.status === "pending").length > 0 ? `(${pendingAnnouncements.filter(a => a.status === "pending").length})` : ""}
+           Announcements {pendingAnnouncements.filter(a => a.status === "pending").length > 0 ? `(${pendingAnnouncements.filter(a => a.status === "pending").length})` : ""}
         </button>
         {/* END ADDED */}
         {/* ADDED: Users tab button */}
@@ -480,7 +480,7 @@ export default function AdminDashboard() {
           style={{ ...styles.tab, ...(activeTab === "users" ? styles.tabActive : {}) }}
           onClick={() => setActiveTab("users")}
         >
-          👥 Users {users.length > 0 ? `(${users.length})` : ""}
+           Users {users.length > 0 ? `(${users.length})` : ""}
         </button>
         {/* END ADDED */}
         {/* ADDED: Requests tab button */}
@@ -488,7 +488,7 @@ export default function AdminDashboard() {
           style={{ ...styles.tab, ...(activeTab === "requests" ? styles.tabActive : {}) }}
           onClick={() => setActiveTab("requests")}
         >
-          🙋 Requests {requests.length > 0 ? `(${requests.length})` : ""}
+           Requests {requests.length > 0 ? `(${requests.length})` : ""}
         </button>
         {/* Verification tab button */}
         <button
@@ -500,11 +500,11 @@ export default function AdminDashboard() {
       </div>
 
       {loading ? (
-        <div style={styles.loader}>⏳ Syncing with database...</div>
+        <div style={styles.loader}> Syncing with database...</div>
       ) : activeTab === "properties" ? (
         pending.length === 0 ? (
           <div style={styles.emptyCard}>
-            <p style={styles.emptyText}>✅ All caught up! No pending properties to review.</p>
+            <p style={styles.emptyText}> All caught up! No pending properties to review.</p>
           </div>
         ) : (
           <div style={styles.tableContainer}>
@@ -526,7 +526,7 @@ export default function AdminDashboard() {
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                         <span>{item.location || `${item.area}, ${item.county}`}</span>
                       </div>
-                      {/* ✅ FULLY-BOOKED BADGE: Admin can see which properties are hidden from the public */}
+                      {/*  FULLY-BOOKED BADGE: Admin can see which properties are hidden from the public */}
                       {(() => {
                         const available = Math.max(0, (item.totalUnits || 1) - (item.bookedUnits || 0));
                         const isFullyBooked = available === 0;
@@ -541,7 +541,7 @@ export default function AdminDashboard() {
                               color: isFullyBooked ? "#ef4444" : "#22c55e",
                               border: `1px solid ${isFullyBooked ? "rgba(239,68,68,0.3)" : "rgba(34,197,94,0.3)"}`,
                             }}>
-                              {isFullyBooked ? "🔴 Fully Booked — Hidden from Public" : `🟢 ${available}/${item.totalUnits || 1} units available`}
+                              {isFullyBooked ? " Fully Booked — Hidden from Public" : ` ${available}/${item.totalUnits || 1} units available`}
                             </span>
                           </div>
                         );
@@ -583,7 +583,7 @@ export default function AdminDashboard() {
         // Materials Tab
         !allPending?.materials || allPending.materials.length === 0 ? (
           <div style={styles.emptyCard}>
-            <p style={styles.emptyText}>✅ All caught up! No pending materials to review.</p>
+            <p style={styles.emptyText}> All caught up! No pending materials to review.</p>
           </div>
         ) : (
           <div style={styles.tableContainer}>
@@ -601,7 +601,7 @@ export default function AdminDashboard() {
                   <tr key={item._id} style={styles.tr}>
                     <td style={styles.td}>
                       <div style={styles.propTitle}>{item.title}</div>
-                      <div style={styles.propLoc}>📦 {item.category}</div>
+                      <div style={styles.propLoc}> {item.category}</div>
                     </td>
                     <td style={styles.td}>
                       <div style={styles.ownerName}>{item.seller?.name}</div>
@@ -632,7 +632,7 @@ export default function AdminDashboard() {
         // Tourism Tab
         !allPending?.tourism || allPending.tourism.length === 0 ? (
           <div style={styles.emptyCard}>
-            <p style={styles.emptyText}>✅ All caught up! No pending tourism listings to review.</p>
+            <p style={styles.emptyText}> All caught up! No pending tourism listings to review.</p>
           </div>
         ) : (
           <div style={styles.tableContainer}>
@@ -650,7 +650,7 @@ export default function AdminDashboard() {
                   <tr key={item._id} style={styles.tr}>
                     <td style={styles.td}>
                       <div style={styles.propTitle}>{item.name}</div>
-                      <div style={styles.propLoc}>🏨 {item.category}</div>
+                      <div style={styles.propLoc}> {item.category}</div>
                     </td>
                     <td style={styles.td}>
                       <div style={styles.ownerName}>{item.owner?.name}</div>
@@ -681,7 +681,7 @@ export default function AdminDashboard() {
         // Movers Tab
         !allPending?.movers || allPending.movers.length === 0 ? (
           <div style={styles.emptyCard}>
-            <p style={styles.emptyText}>✅ All caught up! No pending movers to review.</p>
+            <p style={styles.emptyText}> All caught up! No pending movers to review.</p>
           </div>
         ) : (
           <div style={styles.tableContainer}>
@@ -733,7 +733,7 @@ export default function AdminDashboard() {
         // Sellers Tab
         !allPending?.sellers || allPending.sellers.length === 0 ? (
           <div style={styles.emptyCard}>
-            <p style={styles.emptyText}>✅ All caught up! No pending seller verifications to review.</p>
+            <p style={styles.emptyText}> All caught up! No pending seller verifications to review.</p>
           </div>
         ) : (
           <div style={styles.tableContainer}>
@@ -751,7 +751,7 @@ export default function AdminDashboard() {
                   <tr key={item._id} style={styles.tr}>
                     <td style={styles.td}>
                       <div style={styles.propTitle}>{item.businessName}</div>
-                      <div style={styles.propLoc}>📋 Reg: {item.businessRegNumber}</div>
+                      <div style={styles.propLoc}> Reg: {item.businessRegNumber}</div>
                     </td>
                     <td style={styles.td}>
                       <div style={styles.ownerName}>{item.seller?.name}</div>
@@ -781,15 +781,15 @@ export default function AdminDashboard() {
       ) : activeTab === "payment" ? (
         // Payment Settings Tab
         <div style={styles.configContainer}>
-          <h2 style={styles.configTitle}>💳 M-Pesa Payment Configuration</h2>
+          <h2 style={styles.configTitle}> M-Pesa Payment Configuration</h2>
           <p style={styles.configSubtitle}>Configure your M-Pesa credentials to enable payments for subscriptions, boosts, and property promotions.</p>
 
           {configMessage && (
             <div style={{
               ...styles.configMessage,
-              background: configMessage.startsWith("✅") ? "rgba(34, 197, 94, 0.1)" : "rgba(239, 68, 68, 0.1)",
-              color: configMessage.startsWith("✅") ? "#22c55e" : "#ef4444",
-              borderColor: configMessage.startsWith("✅") ? "#22c55e" : "#ef4444",
+              background: configMessage.startsWith("") ? "rgba(34, 197, 94, 0.1)" : "rgba(239, 68, 68, 0.1)",
+              color: configMessage.startsWith("") ? "#22c55e" : "#ef4444",
+              borderColor: configMessage.startsWith("") ? "#22c55e" : "#ef4444",
             }}>
               {configMessage}
             </div>
@@ -849,12 +849,12 @@ export default function AdminDashboard() {
               disabled={configSaving}
               style={styles.saveConfigBtn}
             >
-              {configSaving ? "Saving..." : "💾 Save Configuration"}
+              {configSaving ? "Saving..." : " Save Configuration"}
             </button>
           </div>
 
           <div style={styles.configInfo}>
-            <h3 style={styles.configInfoTitle}>📋 Configuration Notes</h3>
+            <h3 style={styles.configInfoTitle}> Configuration Notes</h3>
             <ul style={styles.configInfoList}>
               <li>These credentials are required for M-Pesa STK Push payments</li>
               <li>Get your credentials from the <a href="https://developer.safaricom.co.ke/" target="_blank" style={styles.configLink}>Safaricom Developer Portal</a></li>
@@ -866,10 +866,10 @@ export default function AdminDashboard() {
       ) : activeTab === "payments" ? (
         // ADDED: Payments Tab
         paymentsLoading ? (
-          <div style={styles.loader}>⏳ Loading pending payments...</div>
+          <div style={styles.loader}> Loading pending payments...</div>
         ) : pendingPayments.length === 0 ? (
           <div style={styles.emptyCard}>
-            <p style={styles.emptyText}>✅ No pending bank transfer payments.</p>
+            <p style={styles.emptyText}> No pending bank transfer payments.</p>
           </div>
         ) : (
           <div style={styles.tableContainer}>
@@ -924,7 +924,7 @@ export default function AdminDashboard() {
                             onClick={() => handleVerifyPayment(p, true)}
                             style={styles.approveBtn}
                           >
-                            {verifyingId === p.transactionRef ? "..." : "✅ Approve"}
+                            {verifyingId === p.transactionRef ? "..." : " Approve"}
                           </button>
                           <button
                             disabled={verifyingId === p.transactionRef}
@@ -946,10 +946,10 @@ export default function AdminDashboard() {
       ) : activeTab === "businesses" ? (
         // ADDED: Businesses Tab
         businessesLoading ? (
-          <div style={styles.loader}>⏳ Loading pending businesses...</div>
+          <div style={styles.loader}> Loading pending businesses...</div>
         ) : pendingBusinesses.length === 0 ? (
           <div style={styles.emptyCard}>
-            <p style={styles.emptyText}>✅ No pending businesses to review.</p>
+            <p style={styles.emptyText}> No pending businesses to review.</p>
           </div>
         ) : (
           <div style={styles.tableContainer}>
@@ -1003,7 +1003,7 @@ export default function AdminDashboard() {
                     <td style={styles.td}>
                       {business.pricelist && business.pricelist.url ? (
                         <a href={getPricelistUrl(business.pricelist)} target="_blank" rel="noopener noreferrer" style={{ fontSize: "12px", color: "#60a5fa", textDecoration: "none" }}>
-                          📄 View / Download
+                           View / Download
                         </a>
                       ) : (
                         <span style={{ fontSize: "12px", color: "#94a3b8" }}>None</span>
@@ -1023,12 +1023,12 @@ export default function AdminDashboard() {
                         defaultValue=""
                       >
                         <option value="">Add Badge</option>
-                        <option value="student_verified">🟢 Student</option>
-                        <option value="identity_verified">🟢 Identity</option>
-                        <option value="business_verified">🔵 Business</option>
-                        <option value="online_verified">🔵 Online</option>
-                        <option value="location_verified">🟣 Location</option>
-                        <option value="premium_verified">⭐ Premium</option>
+                        <option value="student_verified"> Student</option>
+                        <option value="identity_verified"> Identity</option>
+                        <option value="business_verified"> Business</option>
+                        <option value="online_verified"> Online</option>
+                        <option value="location_verified"> Location</option>
+                        <option value="premium_verified"> Premium</option>
                       </select>
                     </td>
                     <td style={styles.td}>
@@ -1057,10 +1057,10 @@ export default function AdminDashboard() {
       ) : activeTab === "announcements" ? (
         // ADDED: Announcements Tab
         announcementsLoading ? (
-          <div style={styles.loader}>⏳ Loading pending announcements...</div>
+          <div style={styles.loader}> Loading pending announcements...</div>
         ) : pendingAnnouncements.filter(a => a.status === "pending").length === 0 ? (
           <div style={styles.emptyCard}>
-            <p style={styles.emptyText}>✅ All caught up! No pending announcements to review.</p>
+            <p style={styles.emptyText}> All caught up! No pending announcements to review.</p>
           </div>
         ) : (
           <div style={styles.tableContainer}>
@@ -1109,10 +1109,10 @@ export default function AdminDashboard() {
       ) : activeTab === "users" ? (
         // ADDED: Users Tab
         usersLoading ? (
-          <div style={styles.loader}>⏳ Loading users...</div>
+          <div style={styles.loader}> Loading users...</div>
         ) : users.length === 0 ? (
           <div style={styles.emptyCard}>
-            <p style={styles.emptyText}>✅ No users found in the system.</p>
+            <p style={styles.emptyText}> No users found in the system.</p>
           </div>
         ) : (
           <div style={styles.tableContainer}>
@@ -1197,10 +1197,10 @@ export default function AdminDashboard() {
         // END ADDED
       ) : activeTab === "requests" ? (
         requestsLoading ? (
-          <div style={styles.loader}>⏳ Fetching user requests...</div>
+          <div style={styles.loader}> Fetching user requests...</div>
         ) : requests.length === 0 ? (
           <div style={styles.emptyCard}>
-            <p style={styles.emptyText}>✅ No custom service requests submitted yet.</p>
+            <p style={styles.emptyText}> No custom service requests submitted yet.</p>
           </div>
         ) : (
           <div style={styles.tableContainer}>
@@ -1221,7 +1221,7 @@ export default function AdminDashboard() {
                     <td style={styles.td}>
                       <div style={styles.propTitle}>{req.name}</div>
                       <div style={styles.propLoc}>{req.email}</div>
-                      {req.phone && <div style={{ fontSize: "12px", color: "#94a3b8" }}>📞 {req.phone}</div>}
+                      {req.phone && <div style={{ fontSize: "12px", color: "#94a3b8" }}> {req.phone}</div>}
                     </td>
                     <td style={styles.td}>
                       <span style={{
@@ -1296,7 +1296,7 @@ export default function AdminDashboard() {
                             textAlign: "center"
                           }}
                         >
-                          ✉️ Email
+                           Email
                         </a>
                       </div>
                     </td>

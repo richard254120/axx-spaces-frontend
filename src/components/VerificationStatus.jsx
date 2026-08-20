@@ -37,7 +37,7 @@ const VerificationStatus = () => {
   if (loading) {
     return (
       <div style={styles.container}>
-        <div style={styles.loadingText}>⏳ Loading verification status...</div>
+        <div style={styles.loadingText}> Loading verification status...</div>
       </div>
     );
   }
@@ -49,7 +49,7 @@ const VerificationStatus = () => {
       name: 'Student ID Verification',
       statusField: 'studentVerificationStatus',
       badgeName: 'student_verified',
-      badgeText: '🎓 Student Badge',
+      badgeText: ' Student Badge',
       description: 'Verifies you are currently enrolled in a college or university.',
       color: '#3b82f6',
       details: verificationData?.levels?.student,
@@ -87,7 +87,7 @@ const VerificationStatus = () => {
       name: 'Premium Physical Verification',
       statusField: 'premiumVerificationStatus',
       badgeName: 'premium_verified',
-      badgeText: '👑 Premium Verified Gold Badge',
+      badgeText: ' Premium Verified Gold Badge',
       description: 'On-site physical inspection of your business premises or rental unit by AxxSpace staff.',
       color: '#f59e0b',
       details: verificationData?.levels?.premium,
@@ -185,7 +185,7 @@ const VerificationStatus = () => {
 
               <div style={styles.detailsGrid}>
                 <div style={styles.detailsColumn}>
-                  <div style={styles.detailsColumnTitle}>📋 Requirements:</div>
+                  <div style={styles.detailsColumnTitle}> Requirements:</div>
                   <ul style={styles.detailsList}>
                     {lvl.requirements.map((req, idx) => (
                       <li key={idx} style={styles.detailsListItem}>• {req}</li>
@@ -193,7 +193,7 @@ const VerificationStatus = () => {
                   </ul>
                 </div>
                 <div style={styles.detailsColumn}>
-                  <div style={styles.detailsColumnTitle}>✨ Unlocks / Benefits:</div>
+                  <div style={styles.detailsColumnTitle}> Unlocks / Benefits:</div>
                   <ul style={styles.detailsList}>
                     {lvl.benefits.map((ben, idx) => (
                       <li key={idx} style={{ ...styles.detailsListItem, color: '#fbbf24', fontWeight: 500 }}>★ {ben}</li>
@@ -204,7 +204,7 @@ const VerificationStatus = () => {
 
               {status === 'rejected' && details?.rejectionReason && (
                 <div style={styles.rejectionBox}>
-                  <span style={styles.rejectionTitle}>❌ Rejection Reason:</span>
+                  <span style={styles.rejectionTitle}> Rejection Reason:</span>
                   <p style={styles.rejectionText}>{details.rejectionReason}</p>
                   <Link to="/verification" style={styles.resubmitLink}>
                     Modify & Resubmit Level {lvl.level}
@@ -214,7 +214,7 @@ const VerificationStatus = () => {
 
               {status === 'pending' && (
                 <div style={styles.pendingBox}>
-                  <span style={styles.pendingIcon}>⏳</span>
+                  <span style={styles.pendingIcon}></span>
                   <span style={styles.pendingText}>
                     Submitted on {new Date(details?.submittedAt || Date.now()).toLocaleDateString()}. Admin will review it shortly.
                   </span>
@@ -223,7 +223,7 @@ const VerificationStatus = () => {
 
               {status === 'approved' && (
                 <div style={styles.approvedBox}>
-                  <span style={styles.approvedIcon}>✅</span>
+                  <span style={styles.approvedIcon}></span>
                   <span style={styles.approvedText}>
                     Approved! You have been awarded the <strong>{lvl.badgeText}</strong>.
                   </span>
@@ -238,7 +238,7 @@ const VerificationStatus = () => {
       <div style={styles.badgePricingSection}>
         <div style={styles.badgePricingHeader}>
           <div>
-            <h3 style={styles.pricingTitle}>🎖️ Trust Badges & Verification Plans</h3>
+            <h3 style={styles.pricingTitle}> Trust Badges & Verification Plans</h3>
             <p style={styles.pricingSubtitle}>Boost your profile visibility and credibility. Select a badge subscription below.</p>
           </div>
           <div style={styles.cycleToggleContainer}>
@@ -267,7 +267,7 @@ const VerificationStatus = () => {
           {Object.entries({
             student_verified: {
               name: "Student Verified",
-              emoji: "🎓",
+              emoji: "",
               color: "#3b82f6",
               monthly: 20,
               monthlyExact: 19.80,
@@ -281,7 +281,7 @@ const VerificationStatus = () => {
             },
             online_verified: {
               name: "Online Verified",
-              emoji: "🌐",
+              emoji: "",
               color: "#10b981",
               monthly: 60,
               monthlyExact: 59.80,
@@ -295,7 +295,7 @@ const VerificationStatus = () => {
             },
             identity_verified: {
               name: "Identity Verified",
-              emoji: "🆔",
+              emoji: "",
               color: "#6366f1",
               monthly: 60,
               monthlyExact: 59.80,
@@ -328,7 +328,7 @@ const VerificationStatus = () => {
             },
             business_verified: {
               name: "Business Verified",
-              emoji: "🏢",
+              emoji: "",
               color: "#06b6d4",
               monthly: 400,
               monthlyExact: 399.80,
@@ -342,7 +342,7 @@ const VerificationStatus = () => {
             },
             premium_verified: {
               name: "Premium Verified",
-              emoji: "👑",
+              emoji: "",
               color: "#f59e0b",
               monthly: 1400,
               monthlyExact: 1400,

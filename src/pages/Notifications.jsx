@@ -174,7 +174,7 @@ export default function Notifications() {
           title: "Welcome to AxxSpace!",
           message: "Thank you for joining AxxSpace. Start exploring properties and services today.",
           type: "success",
-          icon: "🎉",
+          icon: "",
           time: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
           read: false,
         },
@@ -183,7 +183,7 @@ export default function Notifications() {
           title: "Profile Complete",
           message: "Your profile has been set up successfully. You can now book properties and connect with service providers.",
           type: "info",
-          icon: "✅",
+          icon: "",
           time: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
           read: false,
         },
@@ -192,7 +192,7 @@ export default function Notifications() {
           title: "New Listings Available",
           message: "Check out the latest properties added in your area. New rentals are waiting for you!",
           type: "info",
-          icon: "🏠",
+          icon: "",
           time: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
           read: true,
         },
@@ -251,7 +251,7 @@ export default function Notifications() {
   if (loading) {
     return (
       <div style={styles.container}>
-        <div style={styles.loading}>⏳ Loading notifications...</div>
+        <div style={styles.loading}> Loading notifications...</div>
       </div>
     );
   }
@@ -275,7 +275,7 @@ export default function Notifications() {
 
         {notifications.length === 0 ? (
           <div style={styles.empty}>
-            <div style={styles.emptyIcon}>🔔</div>
+            <div style={styles.emptyIcon}></div>
             <div style={styles.emptyTitle}>No Notifications</div>
             <p style={styles.emptyText}>
               You're all caught up! We'll notify you when there's something new.

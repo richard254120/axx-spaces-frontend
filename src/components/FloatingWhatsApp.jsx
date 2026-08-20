@@ -5,7 +5,7 @@ import { useEffect } from "react";
 export default function FloatingWhatsApp() {
   useEffect(() => {
     const phone = "254745689773";
-    const message = "Hello Axxspace! 👋 I need help finding a property.";
+    const message = "Hello Axxspace!  I need help finding a property.";
     const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 
     const existing = document.getElementById("wa-float-root");

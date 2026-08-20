@@ -14,10 +14,10 @@ import { useAuth } from "../../context/AuthContext";
 const properties = {
   1: {
     id: 1, name: "Serena Beach Resort & Spa", location: "Nyali, Mombasa", county: "Mombasa",
-    category: "Beach Resort", price: 12500, rating: 4.8, reviews: 312, color: "#0ea5e9", tag: "Top Rated", emoji: "🏖️",
+    category: "Beach Resort", price: 12500, rating: 4.8, reviews: 312, color: "#0ea5e9", tag: "Top Rated", emoji: "",
     bookingUrl: "https://www.serenahotels.com/mombasa", // Owner's own booking site
     description: "Experience the ultimate coastal getaway at Serena Beach Resort & Spa. Nestled along the pristine shores of Nyali, Mombasa, our resort offers breathtaking Indian Ocean views, world-class amenities, and an unparalleled blend of modern luxury with authentic Swahili hospitality. Award-winning cuisine, a full-service spa, and dedicated kids club make us the perfect destination for families, couples, and corporate retreats.",
-    amenities: ["🏊 Infinity Pool", "🍽️ 3 Restaurants", "💆 Full Spa", "🏋️ Fitness Centre", "📶 Free WiFi", "🚗 Free Parking", "🎾 Tennis Court", "🚣 Water Sports", "🌅 Beach Access", "🛎️ 24hr Room Service", "🍸 Beach Bar", "👶 Kids Club"],
+    amenities: [" Infinity Pool", " 3 Restaurants", " Full Spa", " Fitness Centre", " Free WiFi", " Free Parking", " Tennis Court", " Water Sports", " Beach Access", " 24hr Room Service", " Beach Bar", " Kids Club"],
     policies: { checkin: "2:00 PM", checkout: "11:00 AM", cancellation: "Free cancellation up to 48 hours before check-in", payment: "M-Pesa, Visa, Mastercard accepted" },
     roomTypes: [
       { name: "Standard Garden Room", price: 12500, guests: 2, desc: "Garden view, king bed, en-suite with rain shower" },
@@ -34,10 +34,10 @@ const properties = {
   },
   2: {
     id: 2, name: "Fairmont Mount Kenya Safari Club", location: "Nanyuki, Laikipia", county: "Laikipia",
-    category: "Mountain Lodge", price: 28000, rating: 4.9, reviews: 198, color: "#22c55e", tag: "Luxury", emoji: "⛰️",
+    category: "Mountain Lodge", price: 28000, rating: 4.9, reviews: 198, color: "#22c55e", tag: "Luxury", emoji: "",
     bookingUrl: "https://www.fairmont.com/mount-kenya-safari-club",
     description: "Perched on the equator at 7,000 feet, the Fairmont Mount Kenya Safari Club sits on 100 acres of manicured grounds at the foot of Mount Kenya. This historic property — founded by actor William Holden — combines colonial elegance with modern luxury. Wake to Mount Kenya views, spot wildlife from your cottage, and dine under the stars.",
-    amenities: ["🦁 Game Drives", "🏊 Heated Pool", "🍽️ Fine Dining", "🐴 Horse Riding", "📶 Free WiFi", "🚗 Airport Transfer", "🎾 Tennis", "🧘 Yoga & Meditation", "🔭 Stargazing Deck", "🛎️ Butler Service", "🌿 Nature Walks", "📸 Photography Tours"],
+    amenities: [" Game Drives", " Heated Pool", " Fine Dining", " Horse Riding", " Free WiFi", " Airport Transfer", " Tennis", " Yoga & Meditation", " Stargazing Deck", " Butler Service", " Nature Walks", " Photography Tours"],
     policies: { checkin: "3:00 PM", checkout: "12:00 PM", cancellation: "Free cancellation up to 72 hours before check-in", payment: "M-Pesa, Visa, Mastercard, Bank Transfer" },
     roomTypes: [
       { name: "Classic Room", price: 28000, guests: 2, desc: "Mountain view, queen bed, en-suite, fireplace" },
@@ -52,10 +52,10 @@ const properties = {
   },
   4: {
     id: 4, name: "Ol Pejeta Bush Camp", location: "Laikipia Conservancy", county: "Laikipia",
-    category: "Safari Camp", price: 18000, rating: 4.9, reviews: 87, color: "#a855f7", tag: "Hidden Gem", emoji: "🦁",
+    category: "Safari Camp", price: 18000, rating: 4.9, reviews: 87, color: "#a855f7", tag: "Hidden Gem", emoji: "",
     bookingUrl: "https://www.olpejetabushcamp.com",
     description: "Ol Pejeta Bush Camp sits in the heart of the Ol Pejeta Conservancy — home to the world's last two northern white rhinos and Africa's largest black rhino sanctuary. Experience Big Five game drives, chimpanzee sanctuary visits, and the powerful conservation story of this remarkable 90,000-acre conservancy. An intimate camp experience with only 10 tented suites.",
-    amenities: ["🦏 Rhino Tracking", "🦁 Big Five Drives", "🐒 Chimp Sanctuary", "🍽️ Bush Dining", "📶 WiFi in Lodge", "🌿 Night Game Drive", "🔭 Stargazing", "🎙️ Conservation Talks", "📸 Photography Guide", "🧘 Bush Yoga"],
+    amenities: [" Rhino Tracking", " Big Five Drives", " Chimp Sanctuary", " Bush Dining", " WiFi in Lodge", " Night Game Drive", " Stargazing", " Conservation Talks", " Photography Guide", " Bush Yoga"],
     policies: { checkin: "2:00 PM", checkout: "10:00 AM", cancellation: "Free cancellation up to 7 days before check-in", payment: "M-Pesa, Visa, Mastercard, USD/EUR accepted" },
     roomTypes: [
       { name: "Tented Suite", price: 18000, guests: 2, desc: "En-suite tent, raised deck, bush views, all meals included" },
@@ -157,16 +157,16 @@ export default function TourismDetailPage() {
       const data = await response.json();
 
       if (response.ok) {
-        setPaymentSuccess("✅ M-Pesa prompt sent! Check your phone to complete payment.");
+        setPaymentSuccess(" M-Pesa prompt sent! Check your phone to complete payment.");
         setTimeout(() => {
           setShowPaymentModal(false);
           setPaymentSuccess("");
         }, 3000);
       } else {
-        setPaymentError(data.error || "❌ Payment failed. Please try again.");
+        setPaymentError(data.error || " Payment failed. Please try again.");
       }
     } catch (err) {
-      setPaymentError("❌ Payment failed. Please try again.");
+      setPaymentError(" Payment failed. Please try again.");
     } finally {
       setPaymentLoading(false);
     }
@@ -179,7 +179,7 @@ export default function TourismDetailPage() {
           <span style={{ ...s.bookingPrice, color: property.color }}>KSh {roomPrice.toLocaleString()}</span>
           <span style={s.bookingPer}>/night</span>
         </div>
-        <div style={s.bookingRating}>⭐ {property.rating} <span style={{ color: "#9ca3af", fontSize: "11px" }}>({property.reviews})</span></div>
+        <div style={s.bookingRating}> {property.rating} <span style={{ color: "#9ca3af", fontSize: "11px" }}>({property.reviews})</span></div>
       </div>
 
       {/* Room selector */}
@@ -195,7 +195,7 @@ export default function TourismDetailPage() {
       {/* Booking redirect notice */}
       {property.bookingUrl && (
         <div style={s.redirectNotice}>
-          <div style={s.redirectIcon}>🔗</div>
+          <div style={s.redirectIcon}></div>
           <div>
             <div style={s.redirectTitle}>Direct Booking Available</div>
             <div style={s.redirectSub}>Clicking "Book Now" will redirect you to {property.name}'s official booking site for secure payment.</div>
@@ -205,10 +205,10 @@ export default function TourismDetailPage() {
 
       <div style={s.buttonGroup}>
         <button style={{ ...s.bookNowBtn, background: property.color }} onClick={handleBook}>
-          {property.bookingUrl ? "🔗 Book on Official Site →" : "📞 Request Booking"}
+          {property.bookingUrl ? " Book on Official Site →" : " Request Booking"}
         </button>
         <button style={s.mpesaBookBtn} onClick={handleBookWithMpesa}>
-          📱 Pay with M-Pesa
+           Pay with M-Pesa
         </button>
       </div>
       {property.bookingUrl && <div style={s.bookNote}>You'll be redirected to the property's official booking site</div>}
@@ -229,7 +229,7 @@ export default function TourismDetailPage() {
       <div style={s.topBar}>
         <button style={s.backBtn} onClick={() => navigate("/tourism/listings")}>← Listings</button>
         <div style={s.breadcrumb}>{property.category} / {property.name}</div>
-        <button style={s.homeBtn} onClick={() => navigate("/tourism")}>🏠 Home</button>
+        <button style={s.homeBtn} onClick={() => navigate("/tourism")}> Home</button>
       </div>
 
       <div className="detail-layout">
@@ -241,7 +241,7 @@ export default function TourismDetailPage() {
             <div style={{ marginBottom: "16px" }}>
               {property.videos?.length > 0 && (
                 <div style={{ marginBottom: "16px" }}>
-                  <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#374151", marginBottom: "8px" }}>🎬 Videos</h3>
+                  <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#374151", marginBottom: "8px" }}> Videos</h3>
                   {property.videos.map((url, idx) => {
                     // Ensure proper Cloudinary video URL format
                     let videoUrl = url;
@@ -279,7 +279,7 @@ export default function TourismDetailPage() {
               )}
               {property.images?.length > 0 && (
                 <div>
-                  <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#374151", marginBottom: "8px" }}>📷 Photos</h3>
+                  <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#374151", marginBottom: "8px" }}> Photos</h3>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "10px" }}>
                     {property.images.map((url) => (
                       <img key={url} src={url} alt={property.name} style={{ width: "100%", height: "200px", objectFit: "cover", borderRadius: "12px", border: `1px solid ${property.color}25`, cursor: "pointer" }} />
@@ -293,7 +293,7 @@ export default function TourismDetailPage() {
               <span style={{ fontSize: "88px" }}>{property.emoji}</span>
               {property.tag && <div style={{ ...s.heroTag, background: property.color }}>{property.tag}</div>}
               {property.bookingUrl && (
-                <div style={s.bookingUrlBadge}>🔗 Official Booking Available</div>
+                <div style={s.bookingUrlBadge}> Official Booking Available</div>
               )}
             </div>
           )}
@@ -307,7 +307,7 @@ export default function TourismDetailPage() {
                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                 <span>{property.location}, {property.county} County</span>
               </span>
-              <span style={{ color: property.color, fontWeight: 700 }}>⭐ {property.rating} ({property.reviews} reviews)</span>
+              <span style={{ color: property.color, fontWeight: 700 }}> {property.rating} ({property.reviews} reviews)</span>
             </div>
             <p style={s.description}>{property.description}</p>
           </div>
@@ -336,7 +336,7 @@ export default function TourismDetailPage() {
                   rel="noreferrer"
                   style={s.mapBtn}
                 >
-                  🗺️ Open in Google Maps
+                   Open in Google Maps
                 </a>
               </div>
             </div>
@@ -344,7 +344,7 @@ export default function TourismDetailPage() {
 
           {/* MOBILE BOOK */}
           <button className="mobile-book-btn" style={{ ...s.mobileBookBtn, background: property.color }} onClick={() => setBookingOpen(true)}>
-            {property.bookingUrl ? "🔗 Book on Official Site" : "📅 Enquire Now"} — KSh {roomPrice.toLocaleString()}/night
+            {property.bookingUrl ? " Book on Official Site" : " Enquire Now"} — KSh {roomPrice.toLocaleString()}/night
           </button>
 
           {/* AMENITIES */}
@@ -373,7 +373,7 @@ export default function TourismDetailPage() {
                     <div style={{ fontSize: "15px", fontWeight: 800, color: property.color }}>KSh {r.price.toLocaleString()}<span style={{ fontSize: "11px", color: "#9ca3af", fontWeight: 400 }}>/night</span></div>
                   </div>
                   <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "4px" }}>{r.desc}</div>
-                  <div style={{ fontSize: "11px", color: "#9ca3af" }}>👥 Up to {r.guests} guests</div>
+                  <div style={{ fontSize: "11px", color: "#9ca3af" }}> Up to {r.guests} guests</div>
                   {selectedRoom === i && <div style={{ position: "absolute", top: "10px", right: "10px", background: property.color, color: "white", fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "20px" }}>✓ Selected</div>}
                 </div>
               ))}
@@ -397,7 +397,7 @@ export default function TourismDetailPage() {
             <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "20px" }}>
               <div style={{ fontSize: "42px", fontWeight: 900, color: property.color, lineHeight: 1 }}>{property.rating}</div>
               <div>
-                <div style={{ fontSize: "18px", marginBottom: "3px" }}>{"⭐".repeat(Math.round(property.rating))}</div>
+                <div style={{ fontSize: "18px", marginBottom: "3px" }}>{"".repeat(Math.round(property.rating))}</div>
                 <div style={{ fontSize: "13px", color: "#6b7280" }}>{property.reviews} verified reviews</div>
               </div>
             </div>
@@ -407,7 +407,7 @@ export default function TourismDetailPage() {
                   <div style={s.reviewAvatar}>{r.name[0]}</div>
                   <div>
                     <div style={{ fontSize: "13px", fontWeight: 700, color: "#1f2937" }}>{r.name}</div>
-                    <div style={{ fontSize: "11px", color: "#9ca3af" }}>{r.date} · {"⭐".repeat(r.rating)}</div>
+                    <div style={{ fontSize: "11px", color: "#9ca3af" }}>{r.date} · {"".repeat(r.rating)}</div>
                   </div>
                 </div>
                 <p style={{ fontSize: "13px", color: "#4b5563", lineHeight: 1.65, margin: 0 }}>{r.comment}</p>
@@ -418,15 +418,15 @@ export default function TourismDetailPage() {
           {/* CONTACT */}
           <div style={s.card}>
             <h3 style={s.cardTitle}>Contact Property Manager</h3>
-            <div style={{ fontSize: "13px", color: "#6b7280", marginBottom: "14px" }}>👤 {property.manager.name} — Property Representative</div>
+            <div style={{ fontSize: "13px", color: "#6b7280", marginBottom: "14px" }}> {property.manager.name} — Property Representative</div>
             <div style={s.contactBtns}>
-              <a href={`tel:${property.manager.phone}`} style={s.contactBtn}>📞 Call</a>
-              <a href={`https://wa.me/${property.manager.whatsapp}`} style={{ ...s.contactBtn, background: "#22c55e" }} target="_blank" rel="noreferrer">💬 WhatsApp</a>
-              <a href={`mailto:${property.manager.email}`} style={{ ...s.contactBtn, background: "#3b82f6" }}>📧 Email</a>
+              <a href={`tel:${property.manager.phone}`} style={s.contactBtn}> Call</a>
+              <a href={`https://wa.me/${property.manager.whatsapp}`} style={{ ...s.contactBtn, background: "#22c55e" }} target="_blank" rel="noreferrer"> WhatsApp</a>
+              <a href={`mailto:${property.manager.email}`} style={{ ...s.contactBtn, background: "#3b82f6" }}> Email</a>
             </div>
             {property.bookingUrl && (
               <a href={property.bookingUrl} target="_blank" rel="noreferrer" style={{ ...s.contactBtn, background: property.color, display: "block", textAlign: "center", marginTop: "10px", padding: "12px" }}>
-                🌐 Visit Official Website
+                 Visit Official Website
               </a>
             )}
           </div>
@@ -437,11 +437,11 @@ export default function TourismDetailPage() {
           <BookingWidget />
           <div style={s.sideContact}>
             <h3 style={{ fontSize: "14px", fontWeight: 800, color: "#1f2937", marginBottom: "10px" }}>Need Help?</h3>
-            <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}>👤 {property.manager.name}</div>
+            <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}> {property.manager.name}</div>
             <div style={s.contactBtns}>
-              <a href={`tel:${property.manager.phone}`} style={s.contactBtn}>📞 Call</a>
-              <a href={`https://wa.me/${property.manager.whatsapp}`} style={{ ...s.contactBtn, background: "#22c55e" }} target="_blank" rel="noreferrer">💬 WhatsApp</a>
-              <a href={`mailto:${property.manager.email}`} style={{ ...s.contactBtn, background: "#3b82f6" }}>📧 Email</a>
+              <a href={`tel:${property.manager.phone}`} style={s.contactBtn}> Call</a>
+              <a href={`https://wa.me/${property.manager.whatsapp}`} style={{ ...s.contactBtn, background: "#22c55e" }} target="_blank" rel="noreferrer"> WhatsApp</a>
+              <a href={`mailto:${property.manager.email}`} style={{ ...s.contactBtn, background: "#3b82f6" }}> Email</a>
             </div>
           </div>
         </aside>
@@ -465,7 +465,7 @@ export default function TourismDetailPage() {
       {showPaymentModal && (
         <div style={s.paymentModal} onClick={() => setShowPaymentModal(false)}>
           <div style={s.paymentModalContent} onClick={(e) => e.stopPropagation()}>
-            <h3 style={s.paymentTitle}>💳 Book Tourism - M-Pesa Payment</h3>
+            <h3 style={s.paymentTitle}> Book Tourism - M-Pesa Payment</h3>
             <p style={s.paymentSubtitle}>
               {property.name} - KES {paymentAmount}
             </p>
@@ -522,7 +522,7 @@ export default function TourismDetailPage() {
                   style={s.paymentButton}
                   disabled={paymentLoading}
                 >
-                  {paymentLoading ? "Processing..." : "📱 Pay with M-Pesa"}
+                  {paymentLoading ? "Processing..." : " Pay with M-Pesa"}
                 </button>
                 <button
                   type="button"

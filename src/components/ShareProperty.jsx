@@ -12,12 +12,12 @@ export default function ShareProperty({ property }) {
   const shareUrl = `${window.location.origin}/listings?highlight=${property._id}`;
 
   const shareText =
-    `🏠 Check out this property on Axxspace!\n\n` +
+    ` Check out this property on Axxspace!\n\n` +
     `*${property.title}*\n` +
-    `📍 ${property.county} - ${property.location}\n` +
-    `💰 KES ${property.price?.toLocaleString()}/month\n` +
-    `🛏 ${property.bedrooms} Bed | 🚿 ${property.bathrooms} Bath\n` +
-    `✅ ${property.availableUnits} unit(s) available\n\n` +
+    ` ${property.county} - ${property.location}\n` +
+    ` KES ${property.price?.toLocaleString()}/month\n` +
+    ` ${property.bedrooms} Bed |  ${property.bathrooms} Bath\n` +
+    ` ${property.availableUnits} unit(s) available\n\n` +
     `View it here: ${shareUrl}`;
 
   const handleWhatsApp = () => {
@@ -59,7 +59,7 @@ export default function ShareProperty({ property }) {
 
   return (
     <div style={s.wrap}>
-      <p style={s.label}>📤 Share this property</p>
+      <p style={s.label}> Share this property</p>
       <div style={s.row}>
         {/* WhatsApp share */}
         <button style={{ ...s.btn, ...s.waBtn }} onClick={handleWhatsApp}>
@@ -71,13 +71,13 @@ export default function ShareProperty({ property }) {
 
         {/* Copy link */}
         <button style={{ ...s.btn, ...s.copyBtn }} onClick={handleCopyLink}>
-          {copied ? "✅ Copied!" : "🔗 Copy Link"}
+          {copied ? " Copied!" : " Copy Link"}
         </button>
 
         {/* Native share (mobile) */}
         {navigator.share && (
           <button style={{ ...s.btn, ...s.nativeBtn }} onClick={handleNativeShare}>
-            ↗ Share
+             Share
           </button>
         )}
       </div>

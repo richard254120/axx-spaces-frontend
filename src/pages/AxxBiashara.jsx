@@ -10,19 +10,19 @@ const BUSINESS_CATEGORIES = [
 ];
 
 const CATEGORY_EMOJIS = {
-  "Restaurants": "🍔",
-  "Retail": "🛍️",
-  "Services": "🛠️",
-  "Technology": "💻",
-  "Healthcare": "🏥",
-  "Education": "🎓",
-  "Entertainment": "🎬",
-  "Professional Services": "💼",
-  "Manufacturing": "🏭",
-  "Agriculture": "🌾",
-  "Construction": "🏗️",
-  "Transportation": "🚛",
-  "Other": "🏪"
+  "Restaurants": "",
+  "Retail": "",
+  "Services": "",
+  "Technology": "",
+  "Healthcare": "",
+  "Education": "",
+  "Entertainment": "",
+  "Professional Services": "",
+  "Manufacturing": "",
+  "Agriculture": "",
+  "Construction": "",
+  "Transportation": "",
+  "Other": ""
 };
 
 const KENYA_COUNTIES = [
@@ -92,8 +92,8 @@ export default function AxxBiashara() {
       if (openNow) params.openNow = "true";
       if (verification) params.verification = verification;
       const res = await API.get("/business", { params });
-      console.log("🔍 Frontend received businesses:", res.data.businesses?.length);
-      console.log("🔍 Setting businesses state:", res.data.businesses);
+      console.log(" Frontend received businesses:", res.data.businesses?.length);
+      console.log(" Setting businesses state:", res.data.businesses);
       setBusinesses(res.data.businesses || []);
     } catch (err) {
       console.error("Failed to load businesses:", err);
@@ -762,7 +762,7 @@ export default function AxxBiashara() {
           </div>
           
           <div style={{ position: "relative", flexGrow: 1, maxWidth: "450px", minWidth: "200px" }}>
-            <span style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", fontSize: "14px", color: "#fbbf24" }}>🔍</span>
+            <span style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", fontSize: "14px", color: "#fbbf24" }}></span>
             <input
               className="search-input"
               type="text"
@@ -810,7 +810,7 @@ export default function AxxBiashara() {
               onClick={() => setSelectedCategory(null)}
               style={{ padding: "6px 12px", fontSize: "12px", borderRadius: "8px" }}
             >
-              🏪 All Categories
+               All Categories
             </button>
             {BUSINESS_CATEGORIES.map(cat => (
               <button
@@ -819,7 +819,7 @@ export default function AxxBiashara() {
                 onClick={() => setSelectedCategory(cat)}
                 style={{ padding: "6px 12px", fontSize: "12px", borderRadius: "8px" }}
               >
-                <span>{CATEGORY_EMOJIS[cat] || "🏪"}</span>
+                <span>{CATEGORY_EMOJIS[cat] || ""}</span>
                 <span>{cat}</span>
               </button>
             ))}
@@ -875,25 +875,25 @@ export default function AxxBiashara() {
 
         {/* Directory Grid */}
         {(() => {
-          console.log("🔍 Conditional check - loading:", loading, "businesses.length:", businesses.length);
+          console.log(" Conditional check - loading:", loading, "businesses.length:", businesses.length);
           if (loading) {
-            console.log("⏳ Showing loading state");
+            console.log(" Showing loading state");
             return (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "24px" }}>
                 {[...Array(6)].map((_, i) => <div key={i} className="shimmer-card" style={{ animationDelay: `${i * 0.08}s` }} />)}
               </div>
             );
           } else if (businesses.length === 0) {
-            console.log("❌ Showing no results state");
+            console.log(" Showing no results state");
             return (
               <div className="no-results">
-                <div className="no-results-icon">🔍</div>
+                <div className="no-results-icon"></div>
                 <p style={{ fontSize: "19px", fontWeight: 700, color: "#94a3b8", marginBottom: "8px" }}>No matching businesses</p>
                 <p style={{ color: "#475569" }}>Try broadening your search query or selecting a different category/county.</p>
               </div>
             );
           } else {
-            console.log("✅ Showing businesses grid, count:", businesses.length);
+            console.log(" Showing businesses grid, count:", businesses.length);
             return (
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "24px" }} className="business-grid">
                   {businesses.map((biz, idx) => (
@@ -943,7 +943,7 @@ export default function AxxBiashara() {
                                 transition: "all 0.2s"
                               }}
                             >
-                              📊
+                              
                             </button>
                             {/* Favorite Button */}
                             <button
@@ -963,14 +963,14 @@ export default function AxxBiashara() {
                                 transition: "all 0.2s"
                               }}
                             >
-                              {isFavorite(biz._id) ? "❤️" : "🤍"}
+                              {isFavorite(biz._id) ? "" : ""}
                             </button>
                           </div>
                         </div>
                       ) : (
                         <div style={{ width: "100%", aspectRatio: "16/10", background: "linear-gradient(135deg, rgba(251,191,36,0.08) 0%, rgba(20,184,166,0.05) 100%)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
                           <span style={{ fontSize: "38px" }}>
-                            {CATEGORY_EMOJIS[biz.categories?.[0]] || CATEGORY_EMOJIS[biz.category] || "🏪"}
+                            {CATEGORY_EMOJIS[biz.categories?.[0]] || CATEGORY_EMOJIS[biz.category] || ""}
                           </span>
                           
                           {/* Action Buttons Overlay */}
@@ -994,7 +994,7 @@ export default function AxxBiashara() {
                                 transition: "all 0.2s"
                               }}
                             >
-                              📊
+                              
                             </button>
                             {/* Favorite Button */}
                             <button
@@ -1014,7 +1014,7 @@ export default function AxxBiashara() {
                                 transition: "all 0.2s"
                               }}
                             >
-                              {isFavorite(biz._id) ? "❤️" : "🤍"}
+                              {isFavorite(biz._id) ? "" : ""}
                             </button>
                           </div>
                         </div>
@@ -1241,7 +1241,7 @@ export default function AxxBiashara() {
         <div className="modal-overlay" onClick={() => setShowAnnouncementModal(false)}>
           <div className="modal-box" style={{ maxWidth: "560px", width: "90%" }} onClick={e => e.stopPropagation()}>
             <button onClick={() => setShowAnnouncementModal(false)} style={{ position: "absolute", top: "18px", right: "18px", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#94a3b8", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justify: "center", transition: "all 0.2s" }} onMouseEnter={e => e.target.style.background = "rgba(255,255,255,0.1)"} onMouseLeave={e => e.target.style.background = "rgba(255,255,255,0.04)"}>✕</button>
-            <div style={{ fontSize: "11px", fontWeight: 800, color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>📢 {selectedAnnouncement.businessName || "Announcement"}</div>
+            <div style={{ fontSize: "11px", fontWeight: 800, color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}> {selectedAnnouncement.businessName || "Announcement"}</div>
             <h3 style={{ fontSize: "22px", fontWeight: 800, color: "#f8fafc", marginBottom: "12px", lineHeight: 1.3 }}>{selectedAnnouncement.title}</h3>
             <div style={{ fontSize: "12.5px", color: "#64748b", marginBottom: "20px" }}>
               {selectedAnnouncement.submitterName && `${selectedAnnouncement.submitterName}`}

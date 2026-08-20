@@ -20,18 +20,18 @@ export default function ResetPassword() {
     setError("");
 
     if (password.length < 6) {
-      setError("❌ Password must be at least 6 characters.");
+      setError(" Password must be at least 6 characters.");
       return;
     }
     const hasLetter = /[a-zA-Z]/.test(password);
     const hasNumber = /[0-9]/.test(password);
     if (!hasLetter || !hasNumber) {
-      setError("❌ Password must contain a mixture of both letters and numbers.");
+      setError(" Password must contain a mixture of both letters and numbers.");
       return;
     }
 
     if (password !== confirm) {
-      setError("❌ Passwords do not match.");
+      setError(" Passwords do not match.");
       return;
     }
 
@@ -50,11 +50,11 @@ export default function ResetPassword() {
         throw new Error(data.error || "Failed to reset password");
       }
 
-      setSuccess("✅ Password reset successfully! Redirecting to login...");
+      setSuccess(" Password reset successfully! Redirecting to login...");
       setTimeout(() => navigate("/login"), 2000);
 
     } catch (err) {
-      setError(err.message || "❌ Failed to reset password. Link may have expired.");
+      setError(err.message || " Failed to reset password. Link may have expired.");
     } finally {
       setLoading(false);
     }
@@ -69,7 +69,7 @@ export default function ResetPassword() {
         </div>
 
         <div style={styles.formBox}>
-          <h1 style={styles.title}>🔑 New Password</h1>
+          <h1 style={styles.title}> New Password</h1>
           <p style={styles.subtitle}>Enter your new password below</p>
 
           {error && <div style={styles.error}>{error}</div>}
@@ -89,7 +89,7 @@ export default function ResetPassword() {
                 />
                 {password && (password.length < 6 || !/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) && (
                   <div style={{ color: "#fca5a5", fontSize: "11px", marginTop: "4px" }}>
-                    ⚠️ Password must contain both letters and numbers.
+                     Password must contain both letters and numbers.
                   </div>
                 )}
               </div>
@@ -115,7 +115,7 @@ export default function ResetPassword() {
                   cursor: loading ? "not-allowed" : "pointer",
                 }}
               >
-                {loading ? "⏳ Resetting..." : "🔐 Reset Password"}
+                {loading ? " Resetting..." : " Reset Password"}
               </button>
             </form>
           )}

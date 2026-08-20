@@ -1103,12 +1103,12 @@ export default function BusinessForm() {
     <div style={styles.container}>
       <form style={styles.form} onSubmit={handleSubmit}>
         <h1 style={styles.title}>
-          {isEditing ? "✏️ Edit Business" : "➕ Add Business"}
+          {isEditing ? " Edit Business" : " Add Business"}
         </h1>
 
         {!isEditing && (
           <div style={styles.instructions}>
-            <h3 style={styles.instructionsTitle}>📋 Instructions</h3>
+            <h3 style={styles.instructionsTitle}> Instructions</h3>
             <ul style={styles.instructionsList}>
               <li>Fill in your business details to list on AxxBiashara</li>
               <li>Select multiple categories that describe your business</li>
@@ -1158,12 +1158,12 @@ export default function BusinessForm() {
         {success && (
           <div>
             <div style={styles.success}>
-              <span style={{ fontSize: "20px" }}>✅</span>
+              <span style={{ fontSize: "20px" }}></span>
               {success}
             </div>
             {isEditing && countdown !== null && (
               <div style={styles.redirectBar}>
-                <span>🔄</span>
+                <span></span>
                 Taking you to the business directory in{" "}
                 <strong style={{ color: "#f1f5f9", margin: "0 4px" }}>{countdown}</strong>
                 {" "}second{countdown !== 1 ? "s" : ""}…
@@ -1438,9 +1438,9 @@ export default function BusinessForm() {
                     }}
                   />
                   {logoPreview ? (
-                    <p style={{ fontSize: "12px", color: "#fbbf24", marginTop: "6px" }}>⚡ Uploading logo...</p>
+                    <p style={{ fontSize: "12px", color: "#fbbf24", marginTop: "6px" }}> Uploading logo...</p>
                   ) : (
-                    <p style={{ fontSize: "12px", color: "#4ade80", marginTop: "6px" }}>✅ Logo uploaded successfully</p>
+                    <p style={{ fontSize: "12px", color: "#4ade80", marginTop: "6px" }}> Logo uploaded successfully</p>
                   )}
                 </div>
               )}
@@ -1537,7 +1537,7 @@ export default function BusinessForm() {
             <h2 style={styles.sectionTitle}>Products & Services</h2>
 
             <div style={styles.productFormBox}>
-              <p style={styles.productFormTitle}>➕ Add a Product or Service</p>
+              <p style={styles.productFormTitle}> Add a Product or Service</p>
 
               <label style={styles.label}>Product / Service Name *</label>
               <input
@@ -1587,7 +1587,7 @@ export default function BusinessForm() {
               {uploading.product && <p style={{ fontSize: "12px", color: "#fbbf24", marginBottom: "8px" }}>Uploading product image…</p>}
               {productImageFile && !uploading.product && (
                 <p style={{ fontSize: "12px", color: "#94a3b8", marginBottom: "10px" }}>
-                  📎 {productImageFile.name} selected
+                   {productImageFile.name} selected
                 </p>
               )}
 
@@ -1626,12 +1626,12 @@ export default function BusinessForm() {
                                 background: "rgba(15, 23, 42, 0.5)", display: "flex",
                                 alignItems: "center", justifyContent: "center", borderRadius: "8px"
                               }}>
-                                <span style={{ fontSize: "12px", color: "#60a5fa" }}>⏳</span>
+                                <span style={{ fontSize: "12px", color: "#60a5fa" }}></span>
                               </div>
                             )}
                           </div>
                         ) : (
-                          <div style={styles.productThumbPlaceholder}>🛍</div>
+                          <div style={styles.productThumbPlaceholder}></div>
                         )}
                         <div style={{ minWidth: 0 }}>
                           <div style={styles.productName}>{product.name}</div>
@@ -1683,7 +1683,7 @@ export default function BusinessForm() {
             {uploading.pricelist && <p style={{ fontSize: "12px", color: "#fbbf24", marginBottom: "8px" }}>Uploading pricelist...</p>}
             {formData.pricelist?.url && (
               <p style={{ fontSize: "12px", color: "#4ade80", marginTop: "8px" }}>
-                ✅ Pricelist uploaded: {formData.pricelist.name}
+                 Pricelist uploaded: {formData.pricelist.name}
               </p>
             )}
           </div>
@@ -1759,37 +1759,37 @@ export default function BusinessForm() {
               {formData.socialMedia.facebook && (
                 <div style={styles.reviewItem}>
                   <span style={styles.reviewLabel}>Facebook:</span>
-                  <span style={styles.reviewValue}>✅ Added</span>
+                  <span style={styles.reviewValue}> Added</span>
                 </div>
               )}
               {formData.socialMedia.instagram && (
                 <div style={styles.reviewItem}>
                   <span style={styles.reviewLabel}>Instagram:</span>
-                  <span style={styles.reviewValue}>✅ Added</span>
+                  <span style={styles.reviewValue}> Added</span>
                 </div>
               )}
               {formData.socialMedia.twitter && (
                 <div style={styles.reviewItem}>
                   <span style={styles.reviewLabel}>Twitter:</span>
-                  <span style={styles.reviewValue}>✅ Added</span>
+                  <span style={styles.reviewValue}> Added</span>
                 </div>
               )}
               {formData.socialMedia.linkedin && (
                 <div style={styles.reviewItem}>
                   <span style={styles.reviewLabel}>LinkedIn:</span>
-                  <span style={styles.reviewValue}>✅ Added</span>
+                  <span style={styles.reviewValue}> Added</span>
                 </div>
               )}
               {formData.socialMedia.tiktok && (
                 <div style={styles.reviewItem}>
                   <span style={styles.reviewLabel}>TikTok:</span>
-                  <span style={styles.reviewValue}>✅ Added</span>
+                  <span style={styles.reviewValue}> Added</span>
                 </div>
               )}
               {formData.socialMedia.whatsapp && (
                 <div style={styles.reviewItem}>
                   <span style={styles.reviewLabel}>WhatsApp:</span>
-                  <span style={styles.reviewValue}>✅ Added</span>
+                  <span style={styles.reviewValue}> Added</span>
                 </div>
               )}
               {!formData.socialMedia.facebook && !formData.socialMedia.instagram && !formData.socialMedia.twitter &&
@@ -1805,7 +1805,7 @@ export default function BusinessForm() {
               <p style={styles.reviewTitle}>Additional Info</p>
               <div style={styles.reviewItem}>
                 <span style={styles.reviewLabel}>Logo:</span>
-                <span style={styles.reviewValue}>{formData.logo ? "✅ Uploaded" : "Not uploaded"}</span>
+                <span style={styles.reviewValue}>{formData.logo ? " Uploaded" : "Not uploaded"}</span>
               </div>
               <div style={styles.reviewItem}>
                 <span style={styles.reviewLabel}>Photos:</span>
@@ -1817,7 +1817,7 @@ export default function BusinessForm() {
               </div>
               <div style={styles.reviewItem}>
                 <span style={styles.reviewLabel}>Pricelist:</span>
-                <span style={styles.reviewValue}>{formData.pricelist?.url ? "✅ Uploaded" : "Not uploaded"}</span>
+                <span style={styles.reviewValue}>{formData.pricelist?.url ? " Uploaded" : "Not uploaded"}</span>
               </div>
             </div>
           </div>

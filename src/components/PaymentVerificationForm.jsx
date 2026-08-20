@@ -168,7 +168,7 @@ export default function PaymentVerificationForm({ propertyId, tourismPropertyId,
     <div style={styles.container}>
       <style>{css}</style>
 
-      <h3 style={styles.title}>💳 Manual Payment Verification</h3>
+      <h3 style={styles.title}> Manual Payment Verification</h3>
 
       {error && <div style={styles.error}>{error}</div>}
       {success && <div style={styles.success}>{success}</div>}

@@ -194,21 +194,21 @@ export default function QuickSales() {
 
   const getCategoryEmoji = (category) => {
     const emojiMap = {
-      "Furniture": "🪑",
-      "Electronics": "📱",
-      "Appliances": "🍳",
-      "Tools": "🔧",
-      "Clothing": "👕",
-      "Books": "📚",
-      "Sports & Outdoors": "⛰️",
-      "Home & Garden": "🏡",
-      "Beauty & Personal Care": "💄",
-      "Toys & Games": "🎮",
-      "Construction Materials": "🏗️",
-      "Vehicles & Parts": "🚗",
-      "Other": "📦",
+      "Furniture": "",
+      "Electronics": "",
+      "Appliances": "",
+      "Tools": "",
+      "Clothing": "",
+      "Books": "",
+      "Sports & Outdoors": "",
+      "Home & Garden": "",
+      "Beauty & Personal Care": "",
+      "Toys & Games": "",
+      "Construction Materials": "",
+      "Vehicles & Parts": "",
+      "Other": "",
     };
-    return emojiMap[category] || "📦";
+    return emojiMap[category] || "";
   };
 
   return (
@@ -219,14 +219,14 @@ export default function QuickSales() {
       {/* Row 1: Logo & Title | Search Bar | Action Buttons */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", marginBottom: "8px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span style={{ fontSize: "20px" }}>🛍️</span>
+          <span style={{ fontSize: "20px" }}></span>
           <h1 style={{ fontSize: "20px", fontWeight: 800, background: "linear-gradient(135deg, #0B2140 0%, #E31B1B 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", margin: 0, lineHeight: 1 }}>
             QuickSales
           </h1>
         </div>
         
         <div style={{ position: "relative", flexGrow: 1, maxWidth: "450px", minWidth: "200px" }}>
-          <span style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", fontSize: "14px", color: "#E31B1B" }}>🔍</span>
+          <span style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", fontSize: "14px", color: "#E31B1B" }}></span>
           <input
             className="search-input"
             type="text"
@@ -311,7 +311,7 @@ export default function QuickSales() {
         </div>
       ) : items.length === 0 ? (
         <div style={styles.emptyState}>
-          <div style={{ fontSize: "3rem", marginBottom: "16px" }}>📦</div>
+          <div style={{ fontSize: "3rem", marginBottom: "16px" }}></div>
           <h3 style={{ color: "#0B2140", marginBottom: "8px" }}>No items found</h3>
           <p style={{ color: "#6b7280", marginBottom: "24px" }}>Try adjusting your search or browsing all categories</p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
@@ -333,8 +333,8 @@ export default function QuickSales() {
 
                   {/* BADGES */}
                   <div style={styles.badgeStack}>
-                    {isLowStock && <span style={styles.lowStockBadge}>⚠️ Only {item.quantity}</span>}
-                    {isNewItem && <span style={styles.newItemBadge}>🆕 New</span>}
+                    {isLowStock && <span style={styles.lowStockBadge}> Only {item.quantity}</span>}
+                    {isNewItem && <span style={styles.newItemBadge}> New</span>}
                   </div>
 
                   {/* ACTION BUTTONS */}
@@ -342,18 +342,18 @@ export default function QuickSales() {
                     style={{ ...styles.actionBtn, ...styles.favBtn, color: isFavorite ? "#ef4444" : "#9ca3af" }}
                     onClick={(e) => handleToggleFavorite(e, item._id)}
                   >
-                    ❤️
+                    
                   </button>
 
                   <button
                     style={{ ...styles.actionBtn, ...styles.shareBtn }}
                     onClick={(e) => handleShareListing(e, item)}
                   >
-                    {copiedId === item._id ? "✅" : "🔗"}
+                    {copiedId === item._id ? "" : ""}
                   </button>
 
                   {item.images?.length > 1 && (
-                    <span style={styles.photoCount}>📷 {item.images.length}</span>
+                    <span style={styles.photoCount}> {item.images.length}</span>
                   )}
                 </div>
 
@@ -414,7 +414,7 @@ export default function QuickSales() {
                   )}
                 </>
               ) : (
-                <div style={styles.noImagePlaceholder}>📷</div>
+                <div style={styles.noImagePlaceholder}></div>
               )}
             </div>
 
@@ -435,7 +435,7 @@ export default function QuickSales() {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", gap: "12px", marginBottom: "8px" }}>
                   <span style={styles.verifiedBadge}>✓ Verified Listing</span>
                   <button style={styles.shareLinkBtn} onClick={(e) => handleShareListing(e, selected)}>
-                    {copiedId === selected._id ? "✅ Copied" : "🔗 Share"}
+                    {copiedId === selected._id ? " Copied" : " Share"}
                   </button>
                 </div>
                 <h2 style={styles.modalTitle}>{selected.title}</h2>
@@ -448,7 +448,7 @@ export default function QuickSales() {
               {/* CATEGORY BADGES */}
               <div style={styles.badgesRow}>
                 <span style={styles.modalCategoryBadge}>{getCategoryEmoji(selected.category)} {selected.category}</span>
-                {selected.quantity <= 2 && <span style={styles.urgentTag}>⚠️ Limited Stock</span>}
+                {selected.quantity <= 2 && <span style={styles.urgentTag}> Limited Stock</span>}
               </div>
 
               {/* PRICE & STOCK */}
@@ -471,7 +471,7 @@ export default function QuickSales() {
 
               {/* SELLER INFO */}
               <div style={styles.sellerSection}>
-                <h4 style={{ margin: "0 0 12px 0", color: "#0B2140", fontWeight: 700 }}>👤 Seller Information</h4>
+                <h4 style={{ margin: "0 0 12px 0", color: "#0B2140", fontWeight: 700 }}> Seller Information</h4>
                 <div style={{ background: "#f3f4f6", padding: "12px", borderRadius: "8px", marginBottom: "12px" }}>
                   <p style={{ margin: "6px 0", fontSize: "14px", color: "#0B2140" }}><strong>{selected.sellerName}</strong></p>
                   <p style={{ margin: "6px 0", fontSize: "13px", color: "#6b7280" }}>{selected.location}, {selected.county}</p>
@@ -482,10 +482,10 @@ export default function QuickSales() {
               {/* CONTACT BUTTONS */}
               <div style={styles.contactBtns}>
                 <button style={styles.whatsappBtn} onClick={() => handleWhatsApp(selected)}>
-                  💬 Chat on WhatsApp
+                   Chat on WhatsApp
                 </button>
                 <button style={styles.callBtn} onClick={() => handleCall(selected)}>
-                  📞 Call Seller
+                   Call Seller
                 </button>
               </div>
 

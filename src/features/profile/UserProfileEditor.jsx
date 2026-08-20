@@ -192,7 +192,7 @@ export default function UserProfileEditor({
               fontFamily: "inherit",
             }}
           >
-            ✏️ Update profile
+             Update profile
           </button>
         )}
       </div>
@@ -215,7 +215,7 @@ export default function UserProfileEditor({
             <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPickPhoto} />
             <div style={{ display: "flex", gap: "8px", marginTop: "12px", flexWrap: "wrap", justifyContent: "center" }}>
               <button type="button" onClick={() => fileRef.current?.click()} style={photoBtn(accentColor)}>
-                📷 Upload photo
+                 Upload photo
               </button>
               {(profile.profileImage || avatarPreview) && !removePhoto && (
                 <button type="button" onClick={() => { setRemovePhoto(true); setAvatarFile(null); setAvatarPreview(null); }} style={ghostBtn}>

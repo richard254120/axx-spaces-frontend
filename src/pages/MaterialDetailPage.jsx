@@ -15,21 +15,21 @@ const formatKenyaPhone = (phone) => {
 
 const getCategoryEmoji = (category) => {
   const emojiMap = {
-    "Furniture": "🪑",
-    "Electronics": "📱",
-    "Appliances": "🍳",
-    "Tools": "🔧",
-    "Clothing": "👕",
-    "Books": "📚",
-    "Sports & Outdoors": "⚽",
-    "Home & Garden": "🏡",
-    "Beauty & Personal Care": "💄",
-    "Toys & Games": "🎮",
-    "Construction Materials": "🧱",
-    "Vehicles & Parts": "🚗",
-    "Other": "📦",
+    "Furniture": "",
+    "Electronics": "",
+    "Appliances": "",
+    "Tools": "",
+    "Clothing": "",
+    "Books": "",
+    "Sports & Outdoors": "",
+    "Home & Garden": "",
+    "Beauty & Personal Care": "",
+    "Toys & Games": "",
+    "Construction Materials": "",
+    "Vehicles & Parts": "",
+    "Other": "",
   };
-  return emojiMap[category] || "📦";
+  return emojiMap[category] || "";
 };
 
 export default function MaterialDetailPage() {
@@ -91,7 +91,7 @@ export default function MaterialDetailPage() {
   if (error || !item) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#f8fafc" }}>
-        <div style={{ fontSize: "64px", marginBottom: "16px" }}>🏚️</div>
+        <div style={{ fontSize: "64px", marginBottom: "16px" }}></div>
         <h2 style={{ color: "#ef4444", margin: "0 0 8px" }}>Item Not Found</h2>
         <p style={{ color: "#64748b", margin: "0 0 24px" }}>{error || "This item doesn't exist or has been removed."}</p>
         <button
@@ -201,7 +201,7 @@ export default function MaterialDetailPage() {
                   boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
                 }}
               >
-                {isFavorite ? "❤️" : "♡"}
+                {isFavorite ? "" : "♡"}
               </button>
             </>
           ) : (
@@ -234,7 +234,7 @@ export default function MaterialDetailPage() {
                 </div>
                 {item.quantity && (
                   <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    <span style={{ fontSize: "20px" }}>📦</span>
+                    <span style={{ fontSize: "20px" }}></span>
                     <span style={{ fontSize: "14px", fontWeight: 600, color: "#1e293b" }}>{item.quantity} available</span>
                   </div>
                 )}

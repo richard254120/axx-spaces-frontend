@@ -33,7 +33,7 @@ export default function LeaveReview() {
     setSuccess("");
 
     if (!formData.title || !formData.comment) {
-      setError("❌ Please fill in all required fields");
+      setError(" Please fill in all required fields");
       return;
     }
 
@@ -50,7 +50,7 @@ export default function LeaveReview() {
         ? await API.post("/reviews", payload)
         : await API.post("/reviews", payload, { skipAuth: true });
 
-      setSuccess("✅ Review submitted successfully!");
+      setSuccess(" Review submitted successfully!");
       
       setTimeout(() => {
         navigate("/");

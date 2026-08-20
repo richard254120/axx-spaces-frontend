@@ -1010,7 +1010,7 @@ export default function BusinessDetail() {
         <div className="bd-logo-row">
           {b.logo
             ? <img src={b.logo} alt={b.name} className="bd-logo" />
-            : <div className="bd-logo-fallback">🏪</div>
+            : <div className="bd-logo-fallback"></div>
           }
           <div>
             <h1 className="bd-name">{b.name}</h1>
@@ -1065,7 +1065,7 @@ export default function BusinessDetail() {
                 whiteSpace: "nowrap",
               }}
             >
-              🗺️ Open Map
+               Open Map
             </a>
           </div>
         )}
@@ -1141,7 +1141,7 @@ export default function BusinessDetail() {
           <div>
             {/* Photo count badge */}
             <div className="bd-photo-count">
-              📷 {images.length} {images.length === 1 ? "Photo" : "Photos"}
+               {images.length} {images.length === 1 ? "Photo" : "Photos"}
             </div>
 
             <div className="bd-gallery">
@@ -1163,11 +1163,11 @@ export default function BusinessDetail() {
         {b.socialMedia && Object.values(b.socialMedia).some(Boolean) && (
           <div className="bd-scroll-x">
             <div className="bd-scroll-x-inner">
-              {b.socialMedia.facebook && <a href={b.socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="bd-social-link">📘 Facebook</a>}
-              {b.socialMedia.instagram && <a href={b.socialMedia.instagram} target="_blank" rel="noopener noreferrer" className="bd-social-link">📸 Instagram</a>}
-              {b.socialMedia.twitter && <a href={b.socialMedia.twitter} target="_blank" rel="noopener noreferrer" className="bd-social-link">🐦 Twitter</a>}
-              {b.socialMedia.linkedin && <a href={b.socialMedia.linkedin} target="_blank" rel="noopener noreferrer" className="bd-social-link">💼 LinkedIn</a>}
-              {b.socialMedia.whatsapp && <a href={`https://wa.me/${b.socialMedia.whatsapp}`} target="_blank" rel="noopener noreferrer" className="bd-social-link">💬 WhatsApp</a>}
+              {b.socialMedia.facebook && <a href={b.socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="bd-social-link"> Facebook</a>}
+              {b.socialMedia.instagram && <a href={b.socialMedia.instagram} target="_blank" rel="noopener noreferrer" className="bd-social-link"> Instagram</a>}
+              {b.socialMedia.twitter && <a href={b.socialMedia.twitter} target="_blank" rel="noopener noreferrer" className="bd-social-link"> Twitter</a>}
+              {b.socialMedia.linkedin && <a href={b.socialMedia.linkedin} target="_blank" rel="noopener noreferrer" className="bd-social-link"> LinkedIn</a>}
+              {b.socialMedia.whatsapp && <a href={`https://wa.me/${b.socialMedia.whatsapp}`} target="_blank" rel="noopener noreferrer" className="bd-social-link"> WhatsApp</a>}
             </div>
           </div>
         )}
@@ -1278,7 +1278,7 @@ export default function BusinessDetail() {
           <div style={{ textAlign: "center", padding: "20px", color: "var(--text-muted)" }}>Loading reviews...</div>
         ) : reviews.length === 0 ? (
           <div className="bd-no-reviews">
-            <div style={{ fontSize: "32px", marginBottom: "8px" }}>⭐</div>
+            <div style={{ fontSize: "32px", marginBottom: "8px" }}></div>
             <div>No reviews yet</div>
             <div style={{ fontSize: "12px", marginTop: "4px" }}>Be the first to review this business</div>
           </div>
@@ -1362,7 +1362,7 @@ export default function BusinessDetail() {
 
             {/* Product count badge */}
             <div className="bd-product-count">
-              🛍 {products.length} {products.length === 1 ? "Item" : "Items"}
+               {products.length} {products.length === 1 ? "Item" : "Items"}
             </div>
 
             <div className="bd-products-grid">
@@ -1370,7 +1370,7 @@ export default function BusinessDetail() {
                 <div key={i} className="bd-product-card">
                   {product.imageUrl
                     ? <img src={product.imageUrl} alt={product.name} className="bd-product-img" loading="lazy" />
-                    : <div className="bd-product-img-placeholder">🛍</div>
+                    : <div className="bd-product-img-placeholder"></div>
                   }
                   <div className="bd-product-body">
                     <div className="bd-product-name">{product.name}</div>
@@ -1414,12 +1414,12 @@ export default function BusinessDetail() {
       <div className="bd-section">
         <p className="bd-section-title">Contact</p>
         <div className="bd-contact-item">
-          <span className="bd-contact-icon">📞</span>
+          <span className="bd-contact-icon"></span>
           <a href={`tel:${b.contact.phone}`} style={{ color: "inherit", textDecoration: "none" }}>{b.contact.phone}</a>
         </div>
         {b.contact.email && (
           <div className="bd-contact-item">
-            <span className="bd-contact-icon">✉️</span>
+            <span className="bd-contact-icon"></span>
             <a href={`mailto:${b.contact.email}`} style={{ color: "inherit", textDecoration: "none" }}>{b.contact.email}</a>
           </div>
         )}
@@ -1440,7 +1440,7 @@ export default function BusinessDetail() {
           <div className="bd-section">
             <p className="bd-section-title">Business Owner</p>
             <div className="bd-owner-card">
-              <div className="bd-owner-avatar">👤</div>
+              <div className="bd-owner-avatar"></div>
               <div>
                 <div className="bd-owner-name">{b.owner.name}</div>
                 <div className="bd-owner-detail">{b.owner.email}</div>
@@ -1454,9 +1454,9 @@ export default function BusinessDetail() {
       {/* ── Support ── */}
       <div className="bd-support-card">
         <div className="bd-support-title">Axxspace Support</div>
-        <div className="bd-support-item">📧 info@axxspace.com</div>
-        <div className="bd-support-item">🛠 support@axxspace.com</div>
-        <div className="bd-support-item">⚙️ admin@axxspace.com</div>
+        <div className="bd-support-item"> info@axxspace.com</div>
+        <div className="bd-support-item"> support@axxspace.com</div>
+        <div className="bd-support-item"> admin@axxspace.com</div>
       </div>
 
       {/* ── Admin ── */}

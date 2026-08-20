@@ -52,11 +52,11 @@ export default function PaymentHistory() {
     switch (status?.toLowerCase()) {
       case "completed":
       case "success":
-        return { bg: "rgba(34, 197, 94, 0.15)", color: "#22c55e", label: "✅ Completed" };
+        return { bg: "rgba(34, 197, 94, 0.15)", color: "#22c55e", label: " Completed" };
       case "pending":
-        return { bg: "rgba(251, 191, 36, 0.15)", color: "#fbbf24", label: "⏳ Pending" };
+        return { bg: "rgba(251, 191, 36, 0.15)", color: "#fbbf24", label: " Pending" };
       case "failed":
-        return { bg: "rgba(239, 68, 68, 0.15)", color: "#ef4444", label: "❌ Failed" };
+        return { bg: "rgba(239, 68, 68, 0.15)", color: "#ef4444", label: " Failed" };
       default:
         return { bg: "rgba(148, 163, 184, 0.15)", color: "#94a3b8", label: status };
     }
@@ -81,14 +81,14 @@ export default function PaymentHistory() {
       <div style={styles.header}>
         <button style={styles.backBtn} onClick={() => navigate(-1)}>← Back</button>
         <div>
-          <h1 style={styles.title}>💳 Payment History</h1>
+          <h1 style={styles.title}> Payment History</h1>
           <p style={styles.subtitle}>View all your transactions</p>
         </div>
       </div>
 
       {payments.length === 0 ? (
         <div style={styles.emptyState}>
-          <div style={styles.emptyIcon}>📄</div>
+          <div style={styles.emptyIcon}></div>
           <h2 style={styles.emptyTitle}>No Payment History</h2>
           <p style={styles.emptyText}>
             You haven't made any payments yet. When you do, they'll appear here.
@@ -146,7 +146,7 @@ export default function PaymentHistory() {
 
                 {payment.receiptUrl && (
                   <button style={styles.receiptBtn} onClick={() => window.open(payment.receiptUrl, "_blank")}>
-                    📄 View Receipt
+                     View Receipt
                   </button>
                 )}
               </div>

@@ -115,7 +115,7 @@ export default function MessagesPage() {
           />
           {filtered.length === 0 ? (
             <div style={styles.sidebarEmpty}>
-              <span style={{ fontSize: "2rem" }}>💬</span>
+              <span style={{ fontSize: "2rem" }}></span>
               <p style={{ color: "#94a3b8", margin: "8px 0 0", fontSize: "0.85rem" }}>No conversations yet</p>
             </div>
           ) : (
@@ -153,7 +153,7 @@ export default function MessagesPage() {
         <div style={styles.chatArea}>
           {!selectedConversation ? (
             <div style={styles.chatEmpty}>
-              <span style={{ fontSize: "3rem" }}>💬</span>
+              <span style={{ fontSize: "3rem" }}></span>
               <h3 style={{ color: "#f1f5f9", margin: "12px 0 4px" }}>Select a Conversation</h3>
               <p style={{ color: "#94a3b8", fontSize: "0.9rem" }}>Choose a conversation from the left to start messaging</p>
             </div>

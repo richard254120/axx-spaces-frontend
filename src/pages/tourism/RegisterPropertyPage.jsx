@@ -93,18 +93,18 @@ export default function RegisterPropertyPage() {
     return (
       <div style={{ fontFamily: "'DM Sans', sans-serif", minHeight: "100vh", background: "#f8f4f0", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
         <div style={{ background: "white", borderRadius: "20px", padding: "36px 24px", textAlign: "center", maxWidth: "520px", width: "100%", border: "1px solid #e5e7eb", boxShadow: "0 20px 60px rgba(0,0,0,0.08)" }}>
-          <div style={{ fontSize: "56px", marginBottom: "16px" }}>🎉</div>
+          <div style={{ fontSize: "56px", marginBottom: "16px" }}></div>
           <h2 style={{ fontSize: "22px", fontWeight: 800, color: "#1f2937", marginBottom: "10px" }}>Property Submitted!</h2>
           <p style={{ color: "#6b7280", lineHeight: 1.7, marginBottom: "20px", fontSize: "14px" }}>
             <strong>{form.name}</strong> has been submitted for review under the <strong style={{ color: pkg.color }}>{pkg.name}</strong> plan. Our team will verify within 24 hours and contact you at <strong>{form.ownerEmail}</strong>.
           </p>
           <div style={{ background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "12px", padding: "16px", marginBottom: "20px", textAlign: "left" }}>
-            <div style={{ fontSize: "13px", fontWeight: 800, color: "#92400e", marginBottom: "8px" }}>📊 Your Plan: {pkg.name} — KSh {pkg.price.toLocaleString()}</div>
+            <div style={{ fontSize: "13px", fontWeight: 800, color: "#92400e", marginBottom: "8px" }}> Your Plan: {pkg.name} — KSh {pkg.price.toLocaleString()}</div>
             <div style={{ fontSize: "12px", color: "#78350f" }}>Duration: {pkg.duration} · Payment link will be sent to your email.</div>
           </div>
           {form.bookingUrl && (
             <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "12px", padding: "14px", marginBottom: "20px", textAlign: "left" }}>
-              <div style={{ fontSize: "12px", fontWeight: 800, color: "#166534", marginBottom: "4px" }}>🔗 Booking Site Registered</div>
+              <div style={{ fontSize: "12px", fontWeight: 800, color: "#166534", marginBottom: "4px" }}> Booking Site Registered</div>
               <div style={{ fontSize: "12px", color: "#15803d" }}>Guests will be redirected to: {form.bookingUrl}</div>
             </div>
           )}
@@ -163,7 +163,7 @@ export default function RegisterPropertyPage() {
             {/* STEP 0 — ACCOUNT & PACKAGE */}
             {step === 0 && (
               <div>
-                <h2 style={s.formTitle}>👤 Your Account Details</h2>
+                <h2 style={s.formTitle}> Your Account Details</h2>
                 <p style={s.formSub}>Create your AXXSpace owner account and choose an advertising plan</p>
                 <div className="two-col-form">
                   <div style={s.field}>
@@ -184,14 +184,14 @@ export default function RegisterPropertyPage() {
                   <input style={s.input} type="password" placeholder="Min 6 chars with letters & numbers" value={form.password} onChange={(e) => update("password", e.target.value)} />
                   {form.password && (form.password.length < 6 || !/[a-zA-Z]/.test(form.password) || !/[0-9]/.test(form.password)) && (
                     <div style={{ color: "#dc2626", fontSize: "11px", marginTop: "4px" }}>
-                      ⚠️ Password must be at least 6 characters and contain a mixture of both letters and numbers.
+                       Password must be at least 6 characters and contain a mixture of both letters and numbers.
                     </div>
                   )}
                 </div>
 
                 {/* PACKAGE SELECTION */}
                 <div style={s.pkgSection}>
-                  <div style={s.pkgTitle}>📦 Choose Your Advertising Package</div>
+                  <div style={s.pkgTitle}> Choose Your Advertising Package</div>
                   <div className="pkg-grid">
                     {packages.map((pkg) => (
                       <div
@@ -199,7 +199,7 @@ export default function RegisterPropertyPage() {
                         style={{ ...s.pkgCard, ...(form.selectedPackage === pkg.name ? { borderColor: pkg.color, background: pkg.color + "08" } : {}) }}
                         onClick={() => update("selectedPackage", pkg.name)}
                       >
-                        {pkg.popular && <div style={{ ...s.pkgBadge, background: pkg.color }}>⭐ Popular</div>}
+                        {pkg.popular && <div style={{ ...s.pkgBadge, background: pkg.color }}> Popular</div>}
                         <div style={{ fontSize: "16px", fontWeight: 800, color: pkg.color, marginBottom: "2px" }}>{pkg.name}</div>
                         <div style={{ fontSize: "11px", color: "#6b7280", marginBottom: "8px" }}>{pkg.duration}</div>
                         <div style={{ fontSize: "20px", fontWeight: 900, color: "#1f2937", marginBottom: "8px" }}>KSh {pkg.price.toLocaleString()}</div>
@@ -208,7 +208,7 @@ export default function RegisterPropertyPage() {
                       </div>
                     ))}
                   </div>
-                  <p style={{ fontSize: "11px", color: "#9ca3af", marginTop: "10px" }}>💳 Payment link will be emailed after submission. 7-day free trial included.</p>
+                  <p style={{ fontSize: "11px", color: "#9ca3af", marginTop: "10px" }}> Payment link will be emailed after submission. 7-day free trial included.</p>
                 </div>
               </div>
             )}
@@ -216,7 +216,7 @@ export default function RegisterPropertyPage() {
             {/* STEP 1 — PROPERTY INFO */}
             {step === 1 && (
               <div>
-                <h2 style={s.formTitle}>🏷️ Property Information</h2>
+                <h2 style={s.formTitle}> Property Information</h2>
                 <p style={s.formSub}>Tell guests what makes your property special</p>
                 <div style={s.field}>
                   <label style={s.label}>Property Name *</label>
@@ -277,7 +277,7 @@ export default function RegisterPropertyPage() {
                   </div>
                 </div>
                 <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "4px" }}>
-                  💡 Add GPS coordinates for precise location tracking. Get them from Google Maps (right-click → coordinates).
+                   Add GPS coordinates for precise location tracking. Get them from Google Maps (right-click → coordinates).
                 </div>
               </div>
             )}
@@ -285,7 +285,7 @@ export default function RegisterPropertyPage() {
             {/* STEP 3 — MEDIA UPLOAD */}
             {step === 3 && (
               <div>
-                <h2 style={s.formTitle}>📷 Photos & Videos</h2>
+                <h2 style={s.formTitle}> Photos & Videos</h2>
                 <p style={s.formSub}>Upload photos and videos of your property to attract more guests. You can upload up to 20 photos and 10 videos.</p>
 
                 <div style={{ marginBottom: "20px" }}>
@@ -300,7 +300,7 @@ export default function RegisterPropertyPage() {
                       id="image-upload"
                     />
                     <label htmlFor="image-upload" style={s.uploadBtn}>
-                      <span style={{ fontSize: "32px", marginBottom: "8px" }}>📷</span>
+                      <span style={{ fontSize: "32px", marginBottom: "8px" }}></span>
                       <span style={{ fontWeight: 700 }}>Click to add photos</span>
                       <span style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>or drag and drop</span>
                     </label>
@@ -324,7 +324,7 @@ export default function RegisterPropertyPage() {
                       id="video-upload"
                     />
                     <label htmlFor="video-upload" style={s.uploadBtn}>
-                      <span style={{ fontSize: "32px", marginBottom: "8px" }}>🎬</span>
+                      <span style={{ fontSize: "32px", marginBottom: "8px" }}></span>
                       <span style={{ fontWeight: 700 }}>Click to add videos</span>
                       <span style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>or drag and drop</span>
                     </label>
@@ -337,7 +337,7 @@ export default function RegisterPropertyPage() {
                 </div>
 
                 <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "10px", padding: "12px", fontSize: "12px", color: "#166534" }}>
-                  💡 Tip: You can also upload photos and videos later from your dashboard after submitting your property.
+                   Tip: You can also upload photos and videos later from your dashboard after submitting your property.
                 </div>
               </div>
             )}
@@ -345,7 +345,7 @@ export default function RegisterPropertyPage() {
             {/* STEP 4 — AMENITIES */}
             {step === 4 && (
               <div>
-                <h2 style={s.formTitle}>✨ Amenities & Features</h2>
+                <h2 style={s.formTitle}> Amenities & Features</h2>
                 <p style={s.formSub}>Select everything your property offers — this helps guests discover you</p>
                 <div className="amenities-grid">
                   {amenitiesList.map((a) => (
@@ -362,19 +362,19 @@ export default function RegisterPropertyPage() {
                   <label style={s.label}>Other Amenities (comma-separated)</label>
                   <input style={s.input} placeholder="e.g. Helicopter pad, Private beach, Rooftop terrace, Nightclub" />
                 </div>
-                {form.amenities.length === 0 && <div style={s.validationHint}>⚠️ Please select at least one amenity to continue</div>}
+                {form.amenities.length === 0 && <div style={s.validationHint}> Please select at least one amenity to continue</div>}
               </div>
             )}
 
             {/* STEP 5 — PRICING & BOOKING URL */}
             {step === 5 && (
               <div>
-                <h2 style={s.formTitle}>💰 Pricing, Rooms & Booking</h2>
+                <h2 style={s.formTitle}> Pricing, Rooms & Booking</h2>
                 <p style={s.formSub}>Set your rates and add your existing booking site link</p>
 
                 {/* BOOKING URL — KEY FEATURE */}
                 <div style={s.bookingUrlBox}>
-                  <div style={s.bookingUrlTitle}>🔗 Your Booking Website (Optional but Recommended)</div>
+                  <div style={s.bookingUrlTitle}> Your Booking Website (Optional but Recommended)</div>
                   <p style={s.bookingUrlSub}>
                     Already have your own booking site? Add the link here. When guests click "Book Now" on AXXSpace, they'll be redirected directly to your booking site. No commission on bookings — we just advertise for you.
                   </p>
@@ -389,7 +389,7 @@ export default function RegisterPropertyPage() {
                   )}
                   {!form.bookingUrl && (
                     <div style={{ fontSize: "12px", color: "#92400e", background: "#fffbeb", padding: "8px 12px", borderRadius: "8px", border: "1px solid #fde68a" }}>
-                      ℹ️ No booking URL? Guests will use your contact details (phone, email, WhatsApp) to enquire.
+                       No booking URL? Guests will use your contact details (phone, email, WhatsApp) to enquire.
                     </div>
                   )}
                 </div>
@@ -448,7 +448,7 @@ export default function RegisterPropertyPage() {
             {/* STEP 6 — REVIEW */}
             {step === 6 && (
               <div>
-                <h2 style={s.formTitle}>✅ Review & Submit</h2>
+                <h2 style={s.formTitle}> Review & Submit</h2>
                 <p style={s.formSub}>Confirm your details before going live</p>
                 <div className="review-grid">
                   {[
@@ -470,13 +470,13 @@ export default function RegisterPropertyPage() {
 
                 {form.bookingUrl && (
                   <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "12px", padding: "14px", marginBottom: "16px" }}>
-                    <div style={{ fontSize: "13px", fontWeight: 800, color: "#166534", marginBottom: "4px" }}>🔗 Booking Redirect Confirmed</div>
+                    <div style={{ fontSize: "13px", fontWeight: 800, color: "#166534", marginBottom: "4px" }}> Booking Redirect Confirmed</div>
                     <div style={{ fontSize: "12px", color: "#15803d" }}>Guests clicking "Book Now" on AXXSpace will be redirected to:<br /><strong>{form.bookingUrl}</strong></div>
                   </div>
                 )}
 
                 <div style={s.commissionBox}>
-                  <div style={s.commissionTitle}>📋 What Happens After Submission?</div>
+                  <div style={s.commissionTitle}> What Happens After Submission?</div>
                   <div style={{ fontSize: "13px", color: "#78350f", lineHeight: 1.7 }}>
                     1. Our team reviews your listing within 24 hours.<br />
                     2. Payment link for your <strong>{form.selectedPackage}</strong> plan is sent to your email.<br />
@@ -505,7 +505,7 @@ export default function RegisterPropertyPage() {
                 <>
                   {submitError && <div style={{ flex: "1 1 100%", marginBottom: "8px" }}><ErrorAlert message={submitError} /></div>}
                   <button style={{ ...s.nextBtn, opacity: form.agreeTerms && !submitting ? 1 : 0.5 }} onClick={handleSubmit} disabled={submitting}>
-                    {submitting ? "Submitting…" : "Submit Property 🚀"}
+                    {submitting ? "Submitting…" : "Submit Property "}
                   </button>
                 </>
               )}

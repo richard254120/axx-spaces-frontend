@@ -279,8 +279,8 @@ export default function MoverDashboard() {
   }[status] || "#6b7280");
 
   const getStatusLabel = (status) => ({
-    completed: "✅ Completed", active: "🔄 Active",
-    accepted: "🔵 Accepted", pending: "⏳ Pending",
+    completed: " Completed", active: " Active",
+    accepted: " Accepted", pending: " Pending",
   }[status] || status);
 
 
@@ -289,7 +289,7 @@ export default function MoverDashboard() {
     return (
       <div style={{ ...styles.container, display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ textAlign: "center", color: "#6b7280" }}>
-          <div style={{ fontSize: "40px", marginBottom: "12px" }}>🚚</div>
+          <div style={{ fontSize: "40px", marginBottom: "12px" }}></div>
           <p style={{ fontWeight: 600 }}>Loading your dashboard...</p>
         </div>
       </div>
@@ -309,25 +309,25 @@ export default function MoverDashboard() {
           style={{ ...styles.tabBtn, ...(activeTab === "overview" && styles.tabBtnActive) }}
           onClick={() => setActiveTab("overview")}
         >
-          📊 Overview
+           Overview
         </button>
         <button
           style={{ ...styles.tabBtn, ...(activeTab === "jobs" && styles.tabBtnActive) }}
           onClick={() => setActiveTab("jobs")}
         >
-          📦 Jobs {pendingJobsCount > 0 && <span style={styles.tabBadge}>{pendingJobsCount}</span>}
+           Jobs {pendingJobsCount > 0 && <span style={styles.tabBadge}>{pendingJobsCount}</span>}
         </button>
         <button
           style={{ ...styles.tabBtn, ...(activeTab === "earnings" && styles.tabBtnActive) }}
           onClick={() => setActiveTab("earnings")}
         >
-          💰 Earnings
+           Earnings
         </button>
         <button
           style={{ ...styles.tabBtn, ...(activeTab === "profile" && styles.tabBtnActive) }}
           onClick={() => setActiveTab("profile")}
         >
-          👤 Profile
+           Profile
         </button>
       </div>
 
@@ -338,7 +338,7 @@ export default function MoverDashboard() {
       {/* PENDING JOBS BANNER */}
       {pendingJobsCount > 0 && (
         <div style={styles.notificationBanner} onClick={() => setActiveTab("jobs")}>
-          <span style={{ fontSize: "18px" }}>🚨</span>
+          <span style={{ fontSize: "18px" }}></span>
           <div style={{ flex: 1 }}>
             <p style={{ margin: 0, fontWeight: 700 }}>Incoming request alert!</p>
             <p style={{ margin: 0, fontSize: "11px", opacity: 0.9 }}>
@@ -357,7 +357,7 @@ export default function MoverDashboard() {
           <section>
             <div style={styles.welcomeCard}>
               <div>
-                <h2 style={styles.welcomeTitle}>{getGreeting()}, {user?.name?.split(" ")[0] || "Partner"}! 👋</h2>
+                <h2 style={styles.welcomeTitle}>{getGreeting()}, {user?.name?.split(" ")[0] || "Partner"}! </h2>
                 <p style={{ ...styles.welcomeSubtitle, display: "flex", alignItems: "center", gap: "4px" }}>
                   <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                   <span>{user?.county || "Kenya"}</span>
@@ -379,18 +379,18 @@ export default function MoverDashboard() {
                     transition: "all 0.3s ease",
                   }}
                 >
-                  ⭐ Boost Profile
+                   Boost Profile
                 </button>
-                <div style={styles.statusBadge}>🟢 Active</div>
+                <div style={styles.statusBadge}> Active</div>
               </div>
             </div>
 
             <div style={styles.statsGrid}>
               {[
-                { icon: "📦", label: "Total Jobs", value: moverStats.totalJobs },
-                { icon: "✅", label: "Completed", value: moverStats.completedJobs },
-                { icon: "🔄", label: "Active", value: moverStats.activeJobs },
-                { icon: "💰", label: "Earnings", value: `KES ${moverStats.totalEarnings.toLocaleString()}` },
+                { icon: "", label: "Total Jobs", value: moverStats.totalJobs },
+                { icon: "", label: "Completed", value: moverStats.completedJobs },
+                { icon: "", label: "Active", value: moverStats.activeJobs },
+                { icon: "", label: "Earnings", value: `KES ${moverStats.totalEarnings.toLocaleString()}` },
               ].map(stat => (
                 <div key={stat.label} style={styles.statCard}>
                   <div style={styles.statIcon}>{stat.icon}</div>
@@ -412,7 +412,7 @@ export default function MoverDashboard() {
 
             {jobs.filter(j => j.status === "pending").length > 0 && (
               <div style={{ marginBottom: "24px" }}>
-                <h3 style={{ ...styles.sectionTitle, color: "#ef4444" }}>⚡ Pending Bookings</h3>
+                <h3 style={{ ...styles.sectionTitle, color: "#ef4444" }}> Pending Bookings</h3>
                 <JobList
                   jobs={jobs.filter(j => j.status === "pending")}
                   actionLoading={actionLoading}
@@ -424,7 +424,7 @@ export default function MoverDashboard() {
               </div>
             )}
 
-            <h3 style={styles.sectionTitle}>📋 Recent Jobs</h3>
+            <h3 style={styles.sectionTitle}> Recent Jobs</h3>
             <JobList
               jobs={jobs.filter(j => j.status !== "pending").slice(0, 3)}
               actionLoading={actionLoading}
@@ -439,7 +439,7 @@ export default function MoverDashboard() {
         {/* ── JOBS TAB ── */}
         {activeTab === "jobs" && (
           <section>
-            <h2 style={styles.sectionTitle}>📦 All Jobs</h2>
+            <h2 style={styles.sectionTitle}> All Jobs</h2>
             <JobFilterTabs
               jobs={jobs}
               getStatusColor={getStatusColor}
@@ -455,14 +455,14 @@ export default function MoverDashboard() {
         {activeTab === "earnings" && (
           <section>
             <div style={styles.earningsCard}>
-              <p style={styles.earningsLabel}>💰 Total Earnings</p>
+              <p style={styles.earningsLabel}> Total Earnings</p>
               <h1 style={styles.earningsAmount}>KES {moverStats.totalEarnings.toLocaleString()}</h1>
               <p style={{ ...styles.earningsLabel, marginTop: "8px" }}>
                 From {moverStats.completedJobs} completed job{moverStats.completedJobs !== 1 ? "s" : ""}
               </p>
             </div>
 
-            <h3 style={styles.sectionTitle}>📊 Completed Jobs</h3>
+            <h3 style={styles.sectionTitle}> Completed Jobs</h3>
             {jobs.filter(j => j.status === "completed").length > 0 ? (
               <div style={styles.earningsList}>
                 {jobs.filter(j => j.status === "completed").map(job => (
@@ -474,7 +474,7 @@ export default function MoverDashboard() {
                         <span>{job.pickupLocation} → {job.dropoffLocation}</span>
                       </p>
                       <p style={styles.earningDate}>
-                        📅 {new Date(job.scheduledDate || job.createdAt).toLocaleDateString("en-KE", {
+                         {new Date(job.scheduledDate || job.createdAt).toLocaleDateString("en-KE", {
                           year: "numeric", month: "short", day: "numeric"
                         })}
                       </p>
@@ -497,7 +497,7 @@ export default function MoverDashboard() {
 
             {/* Portfolio Management */}
             <div style={styles.profileSection}>
-              <h3 style={styles.sectionTitle}>📸 Portfolio Gallery</h3>
+              <h3 style={styles.sectionTitle}> Portfolio Gallery</h3>
               <p style={{ ...styles.fieldLabel, marginBottom: "12px", fontSize: "12px", color: "#94a3b8" }}>
                 Upload photos of you doing moving activities to build trust with customers
               </p>
@@ -559,7 +559,7 @@ export default function MoverDashboard() {
 
             {/* Enhanced Profile Fields */}
             <div style={styles.profileSection}>
-              <h3 style={styles.sectionTitle}>💰 Pricing Information</h3>
+              <h3 style={styles.sectionTitle}> Pricing Information</h3>
               <div style={styles.fieldGroup}>
                 <label style={styles.fieldLabel}>Base Rate (KES)</label>
                 <input
@@ -604,7 +604,7 @@ export default function MoverDashboard() {
 
             {/* Insurance Information */}
             <div style={styles.profileSection}>
-              <h3 style={styles.sectionTitle}>🛡️ Insurance Information</h3>
+              <h3 style={styles.sectionTitle}> Insurance Information</h3>
               <div style={styles.fieldGroup}>
                 <label style={styles.checkboxLabel}>
                   <input
@@ -651,7 +651,7 @@ export default function MoverDashboard() {
 
             {/* Team Information */}
             <div style={styles.profileSection}>
-              <h3 style={styles.sectionTitle}>👥 Team Information</h3>
+              <h3 style={styles.sectionTitle}> Team Information</h3>
               <div style={styles.fieldGroup}>
                 <label style={styles.fieldLabel}>Team Size</label>
                 <input
@@ -669,7 +669,7 @@ export default function MoverDashboard() {
 
             {/* Specialties */}
             <div style={styles.profileSection}>
-              <h3 style={styles.sectionTitle}>⭐ Specialties</h3>
+              <h3 style={styles.sectionTitle}> Specialties</h3>
               <div style={styles.fieldGroup}>
                 <label style={styles.fieldLabel}>Specialties (comma-separated)</label>
                 <textarea
@@ -706,7 +706,7 @@ export default function MoverDashboard() {
 
             {/* Equipment & Safety */}
             <div style={styles.profileSection}>
-              <h3 style={styles.sectionTitle}>🔧 Equipment & Safety</h3>
+              <h3 style={styles.sectionTitle}> Equipment & Safety</h3>
               <div style={styles.fieldGroup}>
                 <label style={styles.fieldLabel}>Equipment</label>
                 <textarea
@@ -768,7 +768,7 @@ export default function MoverDashboard() {
             />
 
             <button onClick={handleSaveProfile} disabled={profileSaving} style={styles.saveBtn}>
-              {profileSaving ? "Saving..." : "💾 Save All Changes"}
+              {profileSaving ? "Saving..." : " Save All Changes"}
             </button>
           </section>
         )}
@@ -868,12 +868,12 @@ function JobCard({ job, actionLoading, onAccept, onComplete, getStatusColor, get
       <div style={styles.jobHeader}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <h4 style={styles.jobTitle}>{job.serviceType || "Moving Job"}</h4>
-          <p style={styles.jobCustomer}>👤 {job.customerName || "Client"}</p>
+          <p style={styles.jobCustomer}> {job.customerName || "Client"}</p>
 
           {/* Phone is hidden until job is accepted */}
           <p style={{ ...styles.jobCustomer, marginTop: "2px" }}>
-            📞 {isPending ? (
-              <span style={styles.maskedPhone}>🔒 Accept to unlock contact</span>
+             {isPending ? (
+              <span style={styles.maskedPhone}> Accept to unlock contact</span>
             ) : (
               <a
                 href={`tel:${job.customerPhone}`}
@@ -901,18 +901,18 @@ function JobCard({ job, actionLoading, onAccept, onComplete, getStatusColor, get
           </p>
         )}
         {job.dropoffLocation && (
-          <p style={styles.jobDetail}>🏁 <strong>Dropoff:</strong> {job.dropoffLocation}</p>
+          <p style={styles.jobDetail}> <strong>Dropoff:</strong> {job.dropoffLocation}</p>
         )}
         {job.scheduledDate && (
           <p style={styles.jobDetail}>
-            📅 <strong>Date:</strong> {new Date(job.scheduledDate).toLocaleDateString("en-KE", {
+             <strong>Date:</strong> {new Date(job.scheduledDate).toLocaleDateString("en-KE", {
               weekday: "short", year: "numeric", month: "short", day: "numeric",
             })}
           </p>
         )}
         {job.amount > 0 && (
           <p style={{ ...styles.jobDetail, fontSize: "14px", fontWeight: 700, color: "#22c55e" }}>
-            💰 KES {job.amount.toLocaleString()}
+             KES {job.amount.toLocaleString()}
           </p>
         )}
         {job.notes && (
@@ -920,7 +920,7 @@ function JobCard({ job, actionLoading, onAccept, onComplete, getStatusColor, get
             ...styles.jobDetail, fontStyle: "italic", marginTop: "4px",
             background: "#f9fafb", padding: "6px", borderRadius: "4px",
           }}>
-            📝 "{job.notes}"
+             "{job.notes}"
           </p>
         )}
       </div>
@@ -931,7 +931,7 @@ function JobCard({ job, actionLoading, onAccept, onComplete, getStatusColor, get
           onClick={() => onAccept(id)}
           disabled={isLoading}
         >
-          {isLoading ? "Processing..." : "🤝 Accept Job"}
+          {isLoading ? "Processing..." : " Accept Job"}
         </button>
       )}
       {(job.status === "accepted" || job.status === "active") && (
@@ -940,7 +940,7 @@ function JobCard({ job, actionLoading, onAccept, onComplete, getStatusColor, get
           onClick={() => onComplete(id)}
           disabled={isLoading}
         >
-          {isLoading ? "Processing..." : "🏁 Mark as Completed"}
+          {isLoading ? "Processing..." : " Mark as Completed"}
         </button>
       )}
     </div>

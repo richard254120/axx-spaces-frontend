@@ -59,7 +59,7 @@ export default function BoostNotification({ user, userType = "landlord" }) {
   return (
     <div style={styles.notification}>
       <div style={styles.notificationContent}>
-        <div style={styles.icon}>🚀</div>
+        <div style={styles.icon}></div>
         <div style={styles.text}>
           <div style={styles.title}>Boost Your {userType === "landlord" ? "Property" : userType === "seller" ? "Items" : "Profile"}</div>
           <div style={styles.message}>

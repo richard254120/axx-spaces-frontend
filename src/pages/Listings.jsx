@@ -205,13 +205,13 @@ export default function Listings() {
       });
       const data = await response.json();
       if (response.ok) {
-        setPaymentSuccess("✅ M-Pesa prompt sent! Check your phone to complete payment.");
+        setPaymentSuccess(" M-Pesa prompt sent! Check your phone to complete payment.");
         setTimeout(() => { setShowPaymentModal(false); setPaymentSuccess(""); }, 3000);
       } else {
-        setPaymentError(data.error || "❌ Payment failed. Please try again.");
+        setPaymentError(data.error || " Payment failed. Please try again.");
       }
     } catch (err) {
-      setPaymentError("❌ Payment failed. Please try again.");
+      setPaymentError(" Payment failed. Please try again.");
     } finally {
       setPaymentLoading(false);
     }
@@ -238,7 +238,7 @@ export default function Listings() {
     const updatedSearches = [...savedSearches, newSearch];
     setSavedSearches(updatedSearches);
     localStorage.setItem("axxspace_saved_searches", JSON.stringify(updatedSearches));
-    alert("✅ Search saved successfully!");
+    alert(" Search saved successfully!");
   };
 
   const applySavedSearch = (search) => { setFilters(search.filters); setShowSavedSearches(false); };
@@ -309,7 +309,7 @@ export default function Listings() {
             style={{ ...S.tabBtn, ...(showUniversityHostels ? S.tabBtnActive : {}) }}
             onClick={() => setShowUniversityHostels(true)}
           >
-            🎓 University Hostels
+             University Hostels
           </button>
         </div>
 
@@ -335,7 +335,7 @@ export default function Listings() {
               </div>
               <div style={S.searchDivider} />
               <div style={S.searchField}>
-                <span style={S.searchIcon}>🛏</span>
+                <span style={S.searchIcon}></span>
                 <select name="bedrooms" value={filters.bedrooms} onChange={handleFilterChange} style={S.searchSelect} className="search-inp">
                   <option value="">Bedrooms</option>
                   <option value="1">1 Bedroom</option>
@@ -407,10 +407,10 @@ export default function Listings() {
             <p style={S.resultsText}>
               <span style={S.resultsNum}>{filteredProperties.length}</span>
               {filteredProperties.length === 1 ? " property found" : " properties found"}
-              {favorites.length > 0 && <span style={S.toolbarBit}> · ♥ {favorites.length} saved</span>}
+              {favorites.length > 0 && <span style={S.toolbarBit}> ·  {favorites.length} saved</span>}
             </p>
             <div style={S.toolbarActions}>
-              <button className="tool-btn" style={S.toolBtn} onClick={saveCurrentSearch}>🔖 Save Search</button>
+              <button className="tool-btn" style={S.toolBtn} onClick={saveCurrentSearch}> Save Search</button>
               {savedSearches.length > 0 && (
                 <button className="tool-btn" style={{ ...S.toolBtn, ...(showSavedSearches ? S.toolBtnActive : {}) }} onClick={() => setShowSavedSearches(!showSavedSearches)}>
                   Saved ({savedSearches.length})
@@ -418,11 +418,11 @@ export default function Listings() {
               )}
               {favorites.length > 0 && (
                 <button className="tool-btn" style={{ ...S.toolBtn, ...(showFavoritesOnly ? S.toolBtnActive : {}) }} onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}>
-                  {showFavoritesOnly ? "Show All" : "♥ Favourites"}
+                  {showFavoritesOnly ? "Show All" : " Favourites"}
                 </button>
               )}
               <button className="tool-btn" style={{ ...S.toolBtn, ...(showMap ? S.toolBtnActive : {}) }} onClick={() => setShowMap(v => !v)}>
-                {showMap ? "Hide Map" : "🗺 Map View"}
+                {showMap ? "Hide Map" : " Map View"}
               </button>
             </div>
           </div>
@@ -435,13 +435,13 @@ export default function Listings() {
             {!selectedUniversity && (
               <>
                 <div style={S.universityHeader}>
-                  <div style={S.universityBadge}>🎓 STUDENT HOUSING</div>
+                  <div style={S.universityBadge}> STUDENT HOUSING</div>
                   <h2 style={S.universityTitle}>Find Hostels Near Your University</h2>
                   <p style={S.universitySub}>Browse universities across all 47 counties in Kenya and discover affordable hostels nearby</p>
                 </div>
 
                 <div style={S.universitySearchBox}>
-                  <span style={S.searchIcon}>🔍</span>
+                  <span style={S.searchIcon}></span>
                   <input
                     type="text"
                     placeholder="Search your university (e.g., Nairobi, Kenyatta, JKUAT)..."
@@ -458,7 +458,7 @@ export default function Listings() {
                       style={S.universityCard}
                       onClick={() => setSelectedUniversity(university)}
                     >
-                      <div style={S.universityCardIcon}>🏛️</div>
+                      <div style={S.universityCardIcon}></div>
                       <div style={S.universityCardName}>{university.name}</div>
                       <div style={{ ...S.universityCardLocation, display: "flex", alignItems: "center", gap: "4px" }}>
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
@@ -524,7 +524,7 @@ export default function Listings() {
         {/* ── EMPTY STATE (only show when NOT in university hostels mode) ── */}
         {!showUniversityHostels && filteredProperties.length === 0 && (
           <div style={S.empty}>
-            <div style={S.emptyIcon}>🔍</div>
+            <div style={S.emptyIcon}></div>
             <p style={S.emptyTitle}>No properties match your search</p>
             <p style={S.emptySub}>Try adjusting your filters to broaden your results</p>
             <button
@@ -549,7 +549,7 @@ export default function Listings() {
                 transition: "all 0.2s",
               }}
             >
-              🙋 Submit Custom Request
+               Submit Custom Request
             </button>
           </div>
         )}
@@ -563,7 +563,7 @@ export default function Listings() {
         {/* ── EMPTY STATE FOR UNIVERSITY HOSTELS (no hostels found) ── */}
         {showUniversityHostels && selectedUniversity && !universityLoading && displayProperties.length === 0 && (
           <div style={S.empty}>
-            <div style={S.emptyIcon}>🏠</div>
+            <div style={S.emptyIcon}></div>
             <p style={S.emptyTitle}>No hostels found near {selectedUniversity.name}</p>
             <p style={S.emptySub}>Landlords near this campus can list here. Check back soon or try another university.</p>
           </div>
@@ -589,7 +589,7 @@ export default function Listings() {
                   )}
                   {/* Favourite */}
                   <button style={S.favBtn} className="fav-btn" onClick={(e) => { e.stopPropagation(); toggleFavorite(property._id); }}>
-                    {favorites.includes(property._id) ? "♥" : "♡"}
+                    {favorites.includes(property._id) ? "" : "♡"}
                   </button>
                   <div style={S.cardImgGrad} />
                 </div>
@@ -736,7 +736,7 @@ export default function Listings() {
                     rel="noreferrer"
                     style={S.mapLink}
                   >
-                    🗺️ Open in Google Maps
+                     Open in Google Maps
                   </a>
                 </div>
               )}
@@ -830,7 +830,7 @@ export default function Listings() {
                   {/* CTA Buttons */}
                   <div style={S.ctaGrid}>
                     <button style={{ ...S.ctaBtn, ...S.ctaWa }} onClick={() => handleContactLandlord(selectedProperty)}>WhatsApp</button>
-                    <button style={{ ...S.ctaBtn, ...S.ctaCall }} onClick={() => window.open(`tel:${selectedProperty.owner?.phone || selectedProperty.phone}`)}>📞 Call</button>
+                    <button style={{ ...S.ctaBtn, ...S.ctaCall }} onClick={() => window.open(`tel:${selectedProperty.owner?.phone || selectedProperty.phone}`)}> Call</button>
                     <button style={{ ...S.ctaBtn, ...S.ctaSms }} onClick={() => handleSendSMS(selectedProperty)}>SMS</button>
                     <button style={{ ...S.ctaBtn, ...S.ctaBook }} onClick={() => handleBookNow(selectedProperty)}>Book Now</button>
                   </div>
@@ -838,7 +838,7 @@ export default function Listings() {
               ) : (
                 /* Fully Booked notice — no contact info shown */
                 <div style={{ background: "rgba(224,82,82,0.1)", border: "1px solid rgba(224,82,82,0.25)", borderRadius: "10px", padding: "18px 20px", textAlign: "center" }}>
-                  <div style={{ fontSize: "1.6rem", marginBottom: "8px" }}>🔒</div>
+                  <div style={{ fontSize: "1.6rem", marginBottom: "8px" }}></div>
                   <div style={{ color: "#F28B8B", fontWeight: 700, fontSize: "1rem", marginBottom: "4px" }}>Fully Booked</div>
                   <div style={{ color: "#B8AD96", fontSize: "0.88rem" }}>All units are currently occupied. Check back later for availability.</div>
                 </div>

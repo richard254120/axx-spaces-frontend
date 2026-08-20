@@ -1682,7 +1682,7 @@ export default function Home() {
       color: "#A78BFA", iconBg: "linear-gradient(135deg,#2E1B4A,#3D2566)",
     },
     {
-      id: "marketplace", icon: "🏪", iconType: "emoji",
+      id: "marketplace", icon: "", iconType: "emoji",
       title: "QuickSales", tagline: "Buy & sell anything",
       description: "The ultimate QuickSales for buying and selling new and used items. From electronics to furniture, fashion to cars.",
       features: ["New & used items", "Secure transactions", "Nationwide delivery", "Direct seller contact"],
@@ -1690,7 +1690,7 @@ export default function Home() {
       color: "#38BDF8", iconBg: "linear-gradient(135deg,#0C2A3A,#103A4F)",
     },
     {
-      id: "requests", icon: "🙋", iconType: "emoji",
+      id: "requests", icon: "", iconType: "emoji",
       title: "Requests", tagline: "Can't find what you need?",
       description: "Submit a custom request. Our administrators and verified providers will search across all of AxxSpace to locate it for you!",
       features: ["Search assistance", "All services covered", "Admin review", "Verified responses"],
@@ -1854,7 +1854,7 @@ export default function Home() {
           subtitleText: `${p.location}, ${p.county}`,
           priceText: `KES ${p.price?.toLocaleString()}/month`,
           typeLabel: p.propertyType || "Rental",
-          tags: [`🛏️ ${p.bedrooms} bed`, `🚿 ${p.bathrooms} bath`].filter(Boolean)
+          tags: [` ${p.bedrooms} bed`, ` ${p.bathrooms} bath`].filter(Boolean)
         }));
       case "businesses":
         return featuredBusinesses.map(b => ({
@@ -1864,7 +1864,7 @@ export default function Home() {
           subtitleText: `${b.location?.town || "Various"}, ${b.location?.county || ""}`,
           priceText: b.priceRange || "Contact for pricing",
           typeLabel: b.categories?.[0] || "Business",
-          tags: [b.rating ? `⭐ ${b.rating}` : "", b.reviewCount ? `📝 ${b.reviewCount} reviews` : ""].filter(Boolean)
+          tags: [b.rating ? ` ${b.rating}` : "", b.reviewCount ? ` ${b.reviewCount} reviews` : ""].filter(Boolean)
         }));
       case "materials":
         return featuredMaterials.map(m => ({
@@ -1874,7 +1874,7 @@ export default function Home() {
           subtitleText: `${m.location}, ${m.county}`,
           priceText: `KES ${m.price?.toLocaleString()}`,
           typeLabel: m.category || "Material",
-          tags: [`👁️ ${m.views || 0} views`].filter(Boolean)
+          tags: [` ${m.views || 0} views`].filter(Boolean)
         }));
       case "tourism":
         return featuredTourism.map(t => ({
@@ -1884,7 +1884,7 @@ export default function Home() {
           subtitleText: `${t.location}, ${t.county}`,
           priceText: `KES ${t.price?.toLocaleString()}/night`,
           typeLabel: t.category || "Tourism",
-          tags: [`👁️ ${t.views || 0} views`, t.reviews?.length ? `⭐ ${t.reviews.length} reviews` : ""].filter(Boolean)
+          tags: [` ${t.views || 0} views`, t.reviews?.length ? ` ${t.reviews.length} reviews` : ""].filter(Boolean)
         }));
       case "movers":
         return featuredMovers.map(v => ({
@@ -1894,7 +1894,7 @@ export default function Home() {
           subtitleText: `${v.county}`,
           priceText: `${v.pricing?.baseRate ? `KES ${v.pricing.baseRate.toLocaleString()}` : "Contact for pricing"}${v.pricing?.rateType ? `/${v.pricing.rateType.replace('_', ' ')}` : ""}`,
           typeLabel: "Moving Service",
-          tags: [`🚚 ${v.vehicleType || "Various"}`, `⭐ ${v.experienceYears || 0} yrs exp`].filter(Boolean)
+          tags: [` ${v.vehicleType || "Various"}`, ` ${v.experienceYears || 0} yrs exp`].filter(Boolean)
         }));
       default:
         return [];
@@ -1980,11 +1980,11 @@ export default function Home() {
         {/* CATEGORY TABS SELECTOR */}
         <div className="feat-tabs-bar">
           {[
-            { id: "properties", label: "🏠 Rentals", count: featuredProperties.length },
-            { id: "businesses", label: "🏪 Businesses", count: featuredBusinesses.length },
-            { id: "materials", label: "📦 QuickSales", count: featuredMaterials.length },
-            { id: "tourism", label: "🏨 Tourism", count: featuredTourism.length },
-            { id: "movers", label: "🚚 Movers", count: featuredMovers.length }
+            { id: "properties", label: " Rentals", count: featuredProperties.length },
+            { id: "businesses", label: " Businesses", count: featuredBusinesses.length },
+            { id: "materials", label: " QuickSales", count: featuredMaterials.length },
+            { id: "tourism", label: " Tourism", count: featuredTourism.length },
+            { id: "movers", label: " Movers", count: featuredMovers.length }
           ].map(tab => (
             <button
               key={tab.id}
@@ -2003,7 +2003,7 @@ export default function Home() {
 
         {allFeaturedListings.length === 0 ? (
           <div className="no-feat-wrap" style={{ textAlign: 'center', padding: '40px 28px' }}>
-            <span className="no-feat-icon" style={{ fontSize: '32px' }}>✨</span>
+            <span className="no-feat-icon" style={{ fontSize: '32px' }}></span>
             <h4 className="no-feat-title" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: C.gold, fontSize: '20px', marginTop: '12px' }}>No Featured Listings Found</h4>
             <p className="no-feat-sub" style={{ color: C.textMid, fontSize: '14px' }}>Check back later for active premium listings!</p>
           </div>
@@ -2159,13 +2159,13 @@ export default function Home() {
               onClick={() => setDemoTab("services")}
               className={`demo-tab-btn ${demoTab === "services" ? "active" : ""}`}
             >
-              📊 Service Popularity
+               Service Popularity
             </button>
             <button
               onClick={() => setDemoTab("counties")}
               className={`demo-tab-btn ${demoTab === "counties" ? "active" : ""}`}
             >
-              📈 Top Counties
+               Top Counties
             </button>
           </div>
 
@@ -2179,7 +2179,7 @@ export default function Home() {
 
               {demoTab === "services" && (
                 <div className="demo-card">
-                  <h3 className="demo-card-title">📊 Service Popularity</h3>
+                  <h3 className="demo-card-title"> Service Popularity</h3>
                   <div style={{ display: "flex", flexDirection: "column", gap: "28px", flex: 1, justifyContent: "center" }}>
 
                     {/* SVG Pie Chart Container */}
@@ -2275,7 +2275,7 @@ export default function Home() {
 
               {demoTab === "counties" && (
                 <div className="demo-card">
-                  <h3 className="demo-card-title">📈 Top Counties Rankings</h3>
+                  <h3 className="demo-card-title"> Top Counties Rankings</h3>
                   <div className="demo-county-list">
                     {demographics.counties && demographics.counties.length > 0 ? (
                       demographics.counties.slice(0, 10).map((item, idx) => {
@@ -2307,7 +2307,7 @@ export default function Home() {
               <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
 
                 <div className="demo-card">
-                  <h3 className="demo-card-title">📈 Platform Overview</h3>
+                  <h3 className="demo-card-title"> Platform Overview</h3>
                   <div className="demo-stats-grid">
                     <div className="demo-stat-card">
                       <span className="demo-stat-num">{demographics.totalListings || 0}</span>
@@ -2345,7 +2345,7 @@ export default function Home() {
                 </div>
 
                 <div className="demo-info-box">
-                  <span className="demo-info-icon">🔄</span>
+                  <span className="demo-info-icon"></span>
                   <div className="demo-info-text">
                     <h5>Auto-Refreshing Analytics</h5>
                     <p>Live stats recalculate automatically every 5 minutes.</p>
@@ -2357,7 +2357,7 @@ export default function Home() {
             </div >
           ) : (
             <div className="demo-card" style={{ textAlign: "center", padding: "80px 28px" }}>
-              <span style={{ fontSize: "56px", marginBottom: "16px", display: "block" }}>📊</span>
+              <span style={{ fontSize: "56px", marginBottom: "16px", display: "block" }}></span>
               <h4 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "24px", fontWeight: 600, color: "#F0EAD8", marginBottom: "8px" }}>
                 Demographics Currently Unavailable
               </h4>
@@ -2379,7 +2379,7 @@ export default function Home() {
         <div className="steps-grid">
           <div className="step-card">
             <span className="step-num">01</span>
-            <span className="step-icon">🔍</span>
+            <span className="step-icon"></span>
             <h3 className="step-title">Search & Discover</h3>
             <p className="step-text">
               Browse through verified listings across rentals, movers, tourism, quick sales, or business services.
@@ -2387,7 +2387,7 @@ export default function Home() {
           </div>
           <div className="step-card">
             <span className="step-num">02</span>
-            <span className="step-icon">💬</span>
+            <span className="step-icon"></span>
             <h3 className="step-title">Connect Directly</h3>
             <p className="step-text">
               Reach landlords, sellers, or professional service providers instantly via WhatsApp or direct phone calls.
@@ -2395,7 +2395,7 @@ export default function Home() {
           </div>
           <div className="step-card">
             <span className="step-num">03</span>
-            <span className="step-icon">🤝</span>
+            <span className="step-icon"></span>
             <h3 className="step-title">Close the Deal</h3>
             <p className="step-text">
               Transact safely and securely with verified ratings, reviews, and direct communication. No broker fees.
@@ -2426,7 +2426,7 @@ export default function Home() {
                     {review.category === "general" ? "General" : review.category.charAt(0).toUpperCase() + review.category.slice(1)}
                   </div>
                 </div>
-                <div className="test-rating">{"⭐".repeat(review.rating)}</div>
+                <div className="test-rating">{"".repeat(review.rating)}</div>
                 <p className="test-text">"{review.comment}"</p>
                 <div><div className="test-name">{review.userName}</div><div className="test-role">{new Date(review.createdAt).toLocaleDateString()}</div></div>
               </div>
@@ -2443,7 +2443,7 @@ export default function Home() {
                   <div className="test-avatar">{t.name.charAt(0)}</div>
                   <div className="test-service-tag">{t.role.split("·")[0].trim()}</div>
                 </div>
-                <div className="test-rating">{"⭐".repeat(t.rating)}</div>
+                <div className="test-rating">{"".repeat(t.rating)}</div>
                 <p className="test-text">"{t.text}"</p>
                 <div><div className="test-name">{t.name}</div><div className="test-role">{t.role}</div></div>
               </div>
@@ -2451,7 +2451,7 @@ export default function Home() {
           )}
         </div>
         <div style={{ textAlign: "center" }}>
-          <button onClick={() => navigate("/leave-review")} className="review-btn">✍️ Leave a Review</button>
+          <button onClick={() => navigate("/leave-review")} className="review-btn"> Leave a Review</button>
         </div>
       </section >
 
@@ -2466,10 +2466,10 @@ export default function Home() {
             Join thousands of Kenyans who find homes, move smarter, build better, and explore more — all through Axxspace.
           </p>
           <div className="cta-btns">
-            <button className="cta-btn-gold" onClick={() => navigate("/listings")}>🏢 Browse Rentals</button>
-            <button className="cta-btn-ghost" onClick={() => navigate("/movers")}>🚛 Find Movers</button>
-            <button className="cta-btn-ghost" onClick={() => navigate("/materials")}>🛍️ Shop Materials</button>
-            <button className="cta-btn-ghost" onClick={() => navigate("/tourism")}>🏨 Explore Tourism</button>
+            <button className="cta-btn-gold" onClick={() => navigate("/listings")}> Browse Rentals</button>
+            <button className="cta-btn-ghost" onClick={() => navigate("/movers")}> Find Movers</button>
+            <button className="cta-btn-ghost" onClick={() => navigate("/materials")}> Shop Materials</button>
+            <button className="cta-btn-ghost" onClick={() => navigate("/tourism")}> Explore Tourism</button>
           </div>
           <div className="cta-divider"></div>
           <button
@@ -2480,7 +2480,7 @@ export default function Home() {
             }
             onClick={handleListProperty}
           >
-            {token ? "📝 List Your Property / Service" : "🔐 Login to List Your Business"}
+            {token ? " List Your Property / Service" : " Login to List Your Business"}
           </button>
           {!token && <p className="cta-hint">Free to Join — No Credit Card Required</p>}
         </div>
@@ -2499,7 +2499,7 @@ export default function Home() {
           <div className="footer-cols">
             <div className="footer-col">
               <p className="footer-col-title">Services</p>
-              {[["🏢 Rentals", "/listings"], ["🚛 Movers", "/movers"], ["🛍️ Merchants", "/materials"], ["🏨 Tourism", "/tourism"]].map(([l, r]) => (
+              {[[" Rentals", "/listings"], [" Movers", "/movers"], [" Merchants", "/materials"], [" Tourism", "/tourism"]].map(([l, r]) => (
                 <span key={l} className="footer-link" onClick={() => navigate(r)}>{l}</span>
               ))}
             </div>
@@ -2517,12 +2517,12 @@ export default function Home() {
             </div>
             <div className="footer-col">
               <p className="footer-col-title">Contact</p>
-              <span className="footer-link">📧 info@axxspace.com</span>
-              <span className="footer-link">📧 support@axxspace.com</span>
-              <span className="footer-link">📧 admin@axxspace.com</span>
+              <span className="footer-link"> info@axxspace.com</span>
+              <span className="footer-link"> support@axxspace.com</span>
+              <span className="footer-link"> admin@axxspace.com</span>
             </div>
           </div>
-          <p className="footer-copy">© 2026 Axxspace · All Rights Reserved</p>
+          <p className="footer-copy"> 2026 Axxspace · All Rights Reserved</p>
         </div>
       </footer >
 
@@ -2536,11 +2536,11 @@ export default function Home() {
               <p className="modal-sub">Select the type of service you want to list or boost on Axxspace</p>
               <div className="modal-services">
                 {[
-                  { icon: "🏠", title: "Landlord / Rentals", desc: "List rental properties and boost your listings", bg: `linear-gradient(135deg,${C.gold},${C.goldLight})`, route: "/login" },
-                  { icon: "🚛", title: "Mover / Moving Company", desc: "Offer moving services across Kenya", bg: "linear-gradient(135deg,#1E3A5F,#2D5080)", route: "/login?type=mover" },
-                  { icon: "🛍️", title: "Seller / QuickSales", desc: "Sell items in the materials QuickSales", bg: "linear-gradient(135deg,#0C2A3A,#103A4F)", route: "/seller-login" },
-                  { icon: "🏨", title: "Tourism Provider", desc: "List hotels, lodges, and tourism experiences", bg: "linear-gradient(135deg,#1B3A2A,#264D38)", route: "/tourism/login" },
-                  { icon: "💼", title: "Business / AxxBiashara", desc: "List professional business services", bg: "linear-gradient(135deg,#2E1B4A,#3D2566)", route: "/business-login" },
+                  { icon: "", title: "Landlord / Rentals", desc: "List rental properties and boost your listings", bg: `linear-gradient(135deg,${C.gold},${C.goldLight})`, route: "/login" },
+                  { icon: "", title: "Mover / Moving Company", desc: "Offer moving services across Kenya", bg: "linear-gradient(135deg,#1E3A5F,#2D5080)", route: "/login?type=mover" },
+                  { icon: "", title: "Seller / QuickSales", desc: "Sell items in the materials QuickSales", bg: "linear-gradient(135deg,#0C2A3A,#103A4F)", route: "/seller-login" },
+                  { icon: "", title: "Tourism Provider", desc: "List hotels, lodges, and tourism experiences", bg: "linear-gradient(135deg,#1B3A2A,#264D38)", route: "/tourism/login" },
+                  { icon: "", title: "Business / AxxBiashara", desc: "List professional business services", bg: "linear-gradient(135deg,#2E1B4A,#3D2566)", route: "/business-login" },
                 ].map(svc => (
                   <div key={svc.title} className="modal-svc-card" onClick={() => { setShowBoostModal(false); navigate(svc.route); }}>
                     <div className="modal-svc-icon" style={{ background: svc.bg }}>{svc.icon}</div>

@@ -1,18 +1,18 @@
 export default function TabNavigation({ tabs, activeTab, setActiveTab, pendingCounts, hasPendingBoosts, pendingBoosts }) {
   const TAB_LABELS = {
-    overview: "📊 Overview",
-    properties: "🏠 Properties",
-    materials: "🛍️ Materials",
-    tourism: "🏨 Tourism",
-    movers: "🚛 Movers",
-    sellers: "📋 Sellers",
-    sold: "💰 Sold",
-    payment: "💳 Payment",
-    boosts: "🚀 Payments",
-    businesses: "🏪 Businesses",
-    announcements: "📢 Announcements",
+    overview: " Overview",
+    properties: " Properties",
+    materials: " Materials",
+    tourism: " Tourism",
+    movers: " Movers",
+    sellers: " Sellers",
+    sold: " Sold",
+    payment: " Payment",
+    boosts: " Payments",
+    businesses: " Businesses",
+    announcements: " Announcements",
     verification: "✓ KYC Verification",
-    requests: "🙋 User Requests"
+    requests: " User Requests"
   };
 
   const getPendingCount = (tab) => {

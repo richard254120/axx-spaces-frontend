@@ -123,7 +123,7 @@ export default function AnalyticsDashboard({ userType = "landlord", userId = nul
 
       {/* Header */}
       <div style={styles.header}>
-        <h2 style={styles.title}>📊 Analytics Dashboard</h2>
+        <h2 style={styles.title}> Analytics Dashboard</h2>
         <div style={styles.timeRangeSelector}>
           {["7d", "30d", "90d"].map(range => (
             <button
@@ -143,28 +143,28 @@ export default function AnalyticsDashboard({ userType = "landlord", userId = nul
       {/* Key Metrics */}
       <div style={styles.metricsGrid}>
         <MetricCard
-          icon="👁️"
+          icon=""
           label="Total Views"
           value={analytics.views.toLocaleString()}
           change={`+${Math.floor(Math.random() * 20 + 5)}%`}
           positive={true}
         />
         <MetricCard
-          icon="💬"
+          icon=""
           label="Inquiries"
           value={analytics.inquiries.toLocaleString()}
           change={`+${Math.floor(Math.random() * 15 + 3)}%`}
           positive={true}
         />
         <MetricCard
-          icon="✅"
+          icon=""
           label={userType === "mover" ? "Jobs Completed" : "Bookings"}
           value={analytics.bookings?.toLocaleString() || analytics.jobsCompleted?.toLocaleString()}
           change={`+${Math.floor(Math.random() * 10 + 2)}%`}
           positive={true}
         />
         <MetricCard
-          icon="💰"
+          icon=""
           label="Revenue"
           value={`KES ${analytics.revenue?.toLocaleString()}`}
           change={`+${Math.floor(Math.random() * 25 + 8)}%`}
@@ -228,7 +228,7 @@ export default function AnalyticsDashboard({ userType = "landlord", userId = nul
           <>
             <div style={styles.metricCard}>
               <h4 style={styles.metricTitle}>Average Rating</h4>
-              <div style={styles.metricValue}>⭐ {analytics.averageRating}</div>
+              <div style={styles.metricValue}> {analytics.averageRating}</div>
               <p style={styles.metricDescription}>Customer satisfaction</p>
             </div>
             <div style={styles.metricCard}>

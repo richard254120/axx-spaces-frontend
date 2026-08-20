@@ -117,7 +117,7 @@ export default function Messages() {
         </div>
 
         <div style={styles.card}>
-          <div style={styles.icon}>💬</div>
+          <div style={styles.icon}></div>
           <h2 style={styles.cardTitle}>Messaging Coming Soon</h2>
           <p style={styles.cardText}>
             We're building a secure messaging system that will allow you to:
@@ -125,28 +125,28 @@ export default function Messages() {
           
           <div style={styles.features}>
             <div style={styles.featureCard}>
-              <div style={styles.featureIcon}>🏠</div>
+              <div style={styles.featureIcon}></div>
               <h3 style={styles.featureTitle}>Contact Property Owners</h3>
               <p style={styles.featureText}>
                 Send messages directly to landlords and property managers
               </p>
             </div>
             <div style={styles.featureCard}>
-              <div style={styles.featureIcon}>🚛</div>
+              <div style={styles.featureIcon}></div>
               <h3 style={styles.featureTitle}>Chat with Movers</h3>
               <p style={styles.featureText}>
                 Discuss moving details with verified moving companies
               </p>
             </div>
             <div style={styles.featureCard}>
-              <div style={styles.featureIcon}>🏪</div>
+              <div style={styles.featureIcon}></div>
               <h3 style={styles.featureTitle}>Business Inquiries</h3>
               <p style={styles.featureText}>
                 Ask questions about businesses and services
               </p>
             </div>
             <div style={styles.featureCard}>
-              <div style={styles.featureIcon}>🔒</div>
+              <div style={styles.featureIcon}></div>
               <h3 style={styles.featureTitle}>Secure & Private</h3>
               <p style={styles.featureText}>
                 End-to-end encrypted messaging for your privacy

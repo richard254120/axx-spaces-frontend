@@ -86,7 +86,7 @@ export default function ReviewsSection({ propertyId }) {
 
       if (!res.ok) throw new Error("Failed to submit review");
 
-      setSuccess("✅ Thank you! Your review has been submitted.");
+      setSuccess(" Thank you! Your review has been submitted.");
       setForm({ name: "", rating: 0, comment: "" });
       await fetchReviews(); // Refresh list
 
@@ -100,7 +100,7 @@ export default function ReviewsSection({ propertyId }) {
 
   return (
     <div style={styles.container}>
-      <h3 style={styles.heading}>⭐ Reviews & Ratings</h3>
+      <h3 style={styles.heading}> Reviews & Ratings</h3>
 
       {/* Average Rating */}
       {reviews.length > 0 && (

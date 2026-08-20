@@ -31,7 +31,7 @@ export default class ErrorBoundary extends Component {
             textAlign: "center",
           }}
         >
-          <div style={{ fontSize: "48px", marginBottom: "16px" }}>⚠️</div>
+          <div style={{ fontSize: "48px", marginBottom: "16px" }}></div>
           <h2 style={{ color: "#fbbf24", margin: "0 0 12px" }}>Page failed to load</h2>
           <p style={{ color: "#94a3b8", maxWidth: "480px", margin: "0 0 24px", lineHeight: 1.6 }}>
             {this.state.message || "An unexpected error occurred. Please refresh or go back home."}

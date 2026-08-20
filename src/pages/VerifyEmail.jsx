@@ -45,7 +45,7 @@ export default function VerifyEmail() {
       }}>
         {status === "loading" && (
           <>
-            <div style={{ fontSize: "64px", marginBottom: "20px" }}>📧</div>
+            <div style={{ fontSize: "64px", marginBottom: "20px" }}></div>
             <h2 style={{ color: "#0B2140", margin: "0 0 16px", fontSize: "24px", fontWeight: 800 }}>
               Verifying Your Email...
             </h2>
@@ -55,7 +55,7 @@ export default function VerifyEmail() {
 
         {status === "success" && (
           <>
-            <div style={{ fontSize: "64px", marginBottom: "20px" }}>✅</div>
+            <div style={{ fontSize: "64px", marginBottom: "20px" }}></div>
             <h2 style={{ color: "#22c55e", margin: "0 0 16px", fontSize: "24px", fontWeight: 800 }}>
               Email Verified!
             </h2>
@@ -93,7 +93,7 @@ export default function VerifyEmail() {
 
         {status === "error" && (
           <>
-            <div style={{ fontSize: "64px", marginBottom: "20px" }}>❌</div>
+            <div style={{ fontSize: "64px", marginBottom: "20px" }}></div>
             <h2 style={{ color: "#ef4444", margin: "0 0 16px", fontSize: "24px", fontWeight: 800 }}>
               Verification Failed
             </h2>

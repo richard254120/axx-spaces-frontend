@@ -39,7 +39,7 @@ const Verification = () => {
       level: 1,
       name: 'Student Verification',
       description: 'Upload your Student ID to verify enrollment. Grants the academic Student Badge.',
-      badge: '🎓 Student Badge',
+      badge: ' Student Badge',
       color: '#3b82f6',
       requirements: [
         'Valid Student ID Card showing clear expiration date',
@@ -71,7 +71,7 @@ const Verification = () => {
       level: 3,
       name: 'Premium Verification',
       description: 'Request physical, in-person verification by AxxSpace staff at your location.',
-      badge: '👑 Premium Verified Gold Badge',
+      badge: ' Premium Verified Gold Badge',
       color: '#f59e0b',
       requirements: [
         'Detailed physical address and location coordinates',
@@ -265,7 +265,7 @@ const Verification = () => {
                   
                   <div style={styles.detailsGrid}>
                     <div style={styles.detailsColumn}>
-                      <div style={styles.detailsColumnTitle}>📋 Requirements:</div>
+                      <div style={styles.detailsColumnTitle}> Requirements:</div>
                       <ul style={styles.detailsList}>
                         {lvl.requirements.map((req, idx) => (
                           <li key={idx} style={styles.detailsListItem}>• {req}</li>
@@ -273,7 +273,7 @@ const Verification = () => {
                       </ul>
                     </div>
                     <div style={styles.detailsColumn}>
-                      <div style={styles.detailsColumnTitle}>✨ Unlocks / Benefits:</div>
+                      <div style={styles.detailsColumnTitle}> Unlocks / Benefits:</div>
                       <ul style={styles.detailsList}>
                         {lvl.benefits.map((ben, idx) => (
                           <li key={idx} style={{ ...styles.detailsListItem, color: '#fbbf24', fontWeight: 500 }}>★ {ben}</li>
@@ -303,7 +303,7 @@ const Verification = () => {
                   required
                 />
                 <div style={styles.infoBox}>
-                  <span style={styles.infoIcon}>💡</span>
+                  <span style={styles.infoIcon}></span>
                   <span style={styles.infoText}>
                     Please ensure the ID clearly shows your name, institution name, student number, and expiry date.
                   </span>
@@ -368,7 +368,7 @@ const Verification = () => {
                   />
                 </div>
                 <div style={styles.infoBoxGold}>
-                  <span style={styles.infoIcon}>👑</span>
+                  <span style={styles.infoIcon}></span>
                   <span style={styles.infoTextGold}>
                     Premium verification involves a quick on-site physical check by an authorized AxxSpace representative. Once completed, your profile will display the exclusive Premium Gold Badge.
                   </span>
@@ -395,7 +395,7 @@ const Verification = () => {
                   required
                 />
                 <div style={styles.infoBox}>
-                  <span style={styles.infoIcon}>ℹ️</span>
+                  <span style={styles.infoIcon}></span>
                   <span style={styles.infoText}>
                     Document must display your full name and matching address.
                   </span>

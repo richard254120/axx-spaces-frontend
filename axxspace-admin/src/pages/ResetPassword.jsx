@@ -17,12 +17,12 @@ export default function ResetPassword() {
     setError("");
 
     if (password.length < 6) {
-      setError("❌ Password must be at least 6 characters.");
+      setError(" Password must be at least 6 characters.");
       return;
     }
 
     if (password !== confirm) {
-      setError("❌ Passwords do not match.");
+      setError(" Passwords do not match.");
       return;
     }
 
@@ -32,11 +32,11 @@ export default function ResetPassword() {
       const response = await API.post(`/auth/reset-password/${token}`, { password });
       const data = response.data;
 
-      setSuccess("✅ Password reset successfully! Redirecting to login...");
+      setSuccess(" Password reset successfully! Redirecting to login...");
       setTimeout(() => navigate("/login"), 2000);
 
     } catch (err) {
-      setError(err.response?.data?.error || "❌ Failed to reset password. Link may have expired.");
+      setError(err.response?.data?.error || " Failed to reset password. Link may have expired.");
     } finally {
       setLoading(false);
     }
@@ -45,7 +45,7 @@ export default function ResetPassword() {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h1 style={styles.title}>🔑 New Password</h1>
+        <h1 style={styles.title}> New Password</h1>
         <p style={styles.subtitle}>Enter your new password below</p>
 
         {error && <div style={styles.error}>{error}</div>}
@@ -86,7 +86,7 @@ export default function ResetPassword() {
                 cursor: loading ? "not-allowed" : "pointer",
               }}
             >
-              {loading ? "⏳ Resetting..." : "🔐 Reset Password"}
+              {loading ? " Resetting..." : " Reset Password"}
             </button>
           </form>
         )}

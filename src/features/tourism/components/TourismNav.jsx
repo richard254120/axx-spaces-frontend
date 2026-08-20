@@ -39,7 +39,7 @@ export default function TourismNav({
           {loggedIn ? (
             <>
               <button type="button" style={s.navLink} onClick={() => navigate("/tourism/dashboard")}>Dashboard</button>
-              <span style={s.userChip}>👤 {userName}</span>
+              <span style={s.userChip}> {userName}</span>
             </>
           ) : (
             <button type="button" style={s.navBtnPrimary} onClick={() => navigate("/tourism/register-property")}>

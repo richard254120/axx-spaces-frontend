@@ -171,16 +171,16 @@ export default function MaterialsMarketplace() {
       const data = await response.json();
 
       if (response.ok) {
-        setPaymentSuccess("✅ M-Pesa prompt sent! Check your phone to complete payment.");
+        setPaymentSuccess(" M-Pesa prompt sent! Check your phone to complete payment.");
         setTimeout(() => {
           setShowPaymentModal(false);
           setPaymentSuccess("");
         }, 3000);
       } else {
-        setPaymentError(data.error || "❌ Payment failed. Please try again.");
+        setPaymentError(data.error || " Payment failed. Please try again.");
       }
     } catch (err) {
-      setPaymentError("❌ Payment failed. Please try again.");
+      setPaymentError(" Payment failed. Please try again.");
     } finally {
       setPaymentLoading(false);
     }
@@ -272,7 +272,7 @@ export default function MaterialsMarketplace() {
       {/* HERO SECTION */}
       <section style={styles.hero}>
         <div style={styles.heroContent}>
-          <div style={styles.badge}>✨ Verified Sellers Only</div>
+          <div style={styles.badge}> Verified Sellers Only</div>
           <h1 style={styles.heroTitle}>Materials Marketplace</h1>
           <p style={styles.heroSubtitle}>
             Browse construction materials, furniture, appliances, and more from verified sellers across Kenya
@@ -288,13 +288,13 @@ export default function MaterialsMarketplace() {
               style={styles.searchInput}
             />
             <button onClick={() => { fetchMaterials(); }} style={styles.searchBtn}>
-              🔍 Search
+               Search
             </button>
             <button
               onClick={() => setShowFilters(!showFilters)}
               style={styles.filterToggleBtn}
             >
-              {showFilters ? "✕ Close" : "⚙ Filters"}
+              {showFilters ? "✕ Close" : " Filters"}
             </button>
           </div>
 
@@ -393,15 +393,15 @@ export default function MaterialsMarketplace() {
           </div>
         ) : error ? (
           <div style={styles.errorContainer}>
-            <div style={styles.errorIcon}>⚠️</div>
+            <div style={styles.errorIcon}></div>
             <p style={styles.errorText}>{error}</p>
             <button onClick={fetchMaterials} style={styles.retryBtn}>
-              🔄 Retry
+               Retry
             </button>
           </div>
         ) : materials.length === 0 ? (
           <div style={styles.emptyContainer}>
-            <div style={styles.emptyIcon}>📦</div>
+            <div style={styles.emptyIcon}></div>
             <h3 style={styles.emptyTitle}>No Materials Found</h3>
             <p style={styles.emptyText}>
               Try adjusting your filters or check back later for new listings
@@ -425,7 +425,7 @@ export default function MaterialsMarketplace() {
                   cursor: "pointer",
                 }}
               >
-                🙋 Submit Custom Request
+                 Submit Custom Request
               </button>
             </div>
           </div>
@@ -449,7 +449,7 @@ export default function MaterialsMarketplace() {
                         onError={(e) => { e.target.style.display = "none"; }}
                       />
                     ) : (
-                      <div style={styles.noImage}>📷 No Image</div>
+                      <div style={styles.noImage}> No Image</div>
                     )}
                     <div style={styles.categoryBadge}>{material.category}</div>
                     <div style={styles.conditionBadge}>{material.condition}</div>
@@ -468,7 +468,7 @@ export default function MaterialsMarketplace() {
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                         <span>{material.location}, {material.county}</span>
                       </span>
-                      <span style={styles.metaItem}>📦 Qty: {material.quantity}</span>
+                      <span style={styles.metaItem}> Qty: {material.quantity}</span>
                     </div>
 
                     {/* GPS Coordinates */}
@@ -487,7 +487,7 @@ export default function MaterialsMarketplace() {
                           rel="noreferrer"
                           style={styles.mapLink}
                         >
-                          🗺️ View on Map
+                           View on Map
                         </a>
                       </div>
                     )}
@@ -497,7 +497,7 @@ export default function MaterialsMarketplace() {
                       <span style={styles.sellerName}>{material.sellerName}</span>
                       {material.sellerRating > 0 && (
                         <span style={styles.sellerRating}>
-                          ⭐ {material.sellerRating.toFixed(1)}
+                           {material.sellerRating.toFixed(1)}
                         </span>
                       )}
                     </div>
@@ -506,7 +506,7 @@ export default function MaterialsMarketplace() {
                     {material.seller?.verificationBadges && material.seller.verificationBadges.length > 0 && (
                       <div style={styles.badgeSection}>
                         <div style={styles.badgeSectionLabel}>
-                          <span style={{ fontSize: 12 }}>✅</span>
+                          <span style={{ fontSize: 12 }}></span>
                           <span style={{ fontSize: 11, fontWeight: 600, color: "#0ea5e9" }}>Verified Seller</span>
                         </div>
                         <div style={styles.badgeContainer}>
@@ -530,7 +530,7 @@ export default function MaterialsMarketplace() {
                     {/* Views and Rating */}
                     <div style={styles.engagementStats}>
                       <span style={styles.engagementItem}>
-                        👁️ {material.views || 0} views
+                         {material.views || 0} views
                       </span>
                       <span style={styles.engagementSeparator}>·</span>
                       <span style={styles.engagementItem}>
@@ -547,19 +547,19 @@ export default function MaterialsMarketplace() {
                           onClick={() => handleViewReviews(material)}
                           style={styles.reviewsBtn}
                         >
-                          ⭐ Reviews
+                           Reviews
                         </button>
                         <button
                           onClick={() => handleInquiry(material._id)}
                           style={styles.inquireBtn}
                         >
-                          💬 Inquire
+                           Inquire
                         </button>
                         <button
                           onClick={() => handlePurchaseMaterial(material)}
                           style={styles.purchaseBtn}
                         >
-                          🛒 Buy Now
+                           Buy Now
                         </button>
                       </div>
                     </div>
@@ -582,7 +582,7 @@ export default function MaterialsMarketplace() {
             onClick={() => navigate("/seller-login")}
             style={styles.ctaBtn}
           >
-            🛒 Become a Seller
+             Become a Seller
           </button>
         </div>
       </section>
@@ -592,7 +592,7 @@ export default function MaterialsMarketplace() {
         <div style={styles.reviewsModal} onClick={() => setShowReviewsModal(false)}>
           <div style={styles.reviewsModalContent} onClick={(e) => e.stopPropagation()}>
             <div style={styles.reviewsModalHeader}>
-              <h3 style={styles.reviewsModalTitle}>⭐ Reviews - {selectedMaterialForReviews.title}</h3>
+              <h3 style={styles.reviewsModalTitle}> Reviews - {selectedMaterialForReviews.title}</h3>
               <button style={styles.closeBtn} onClick={() => setShowReviewsModal(false)}>✕</button>
             </div>
             {materialReviewsLoading ? (
@@ -622,7 +622,7 @@ export default function MaterialsMarketplace() {
       {showPaymentModal && selectedMaterial && (
         <div style={styles.paymentModal} onClick={() => setShowPaymentModal(false)}>
           <div style={styles.paymentModalContent} onClick={(e) => e.stopPropagation()}>
-            <h3 style={styles.paymentTitle}>💳 Purchase Material - M-Pesa Payment</h3>
+            <h3 style={styles.paymentTitle}> Purchase Material - M-Pesa Payment</h3>
             <p style={styles.paymentSubtitle}>
               {selectedMaterial.title} - KES {paymentAmount}
             </p>
@@ -659,7 +659,7 @@ export default function MaterialsMarketplace() {
                   style={styles.paymentButton}
                   disabled={paymentLoading}
                 >
-                  {paymentLoading ? "Processing..." : "📱 Pay with M-Pesa"}
+                  {paymentLoading ? "Processing..." : " Pay with M-Pesa"}
                 </button>
                 <button
                   type="button"

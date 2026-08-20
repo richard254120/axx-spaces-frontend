@@ -18,9 +18,9 @@ export default function Contact() {
   };
 
   const channels = [
-    { icon: "📧", label: "Email", value: "info@axxspace.co.ke", href: "mailto:info@axxspace.co.ke" },
+    { icon: "", label: "Email", value: "info@axxspace.co.ke", href: "mailto:info@axxspace.co.ke" },
     { icon: "�", label: "Support", value: "support@axxspace.co.ke", href: "mailto:support@axxspace.co.ke" },
-    { icon: "📱", label: "WhatsApp", value: "+254 745 689773", href: "https://wa.me/254745689773" },
+    { icon: "", label: "WhatsApp", value: "+254 745 689773", href: "https://wa.me/254745689773" },
   ];
 
   return (

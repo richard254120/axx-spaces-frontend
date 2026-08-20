@@ -53,7 +53,7 @@ export default function QRStatsModal({ isOpen, onClose, property }) {
       <div style={styles.modal}>
         <div style={styles.header}>
           <div>
-            <h2 style={styles.title}>📊 QR scan & Inquiry Analytics</h2>
+            <h2 style={styles.title}> QR scan & Inquiry Analytics</h2>
             <p style={styles.subtitle}>{property.title}</p>
           </div>
           <button style={styles.closeBtn} onClick={onClose}>&times;</button>
@@ -75,17 +75,17 @@ export default function QRStatsModal({ isOpen, onClose, property }) {
               {/* Metrics Grid */}
               <div style={styles.metricsGrid}>
                 <div style={styles.metricCard}>
-                  <div style={styles.metricIcon}>👁️</div>
+                  <div style={styles.metricIcon}></div>
                   <div style={styles.metricValue}>{stats.totalScans}</div>
                   <div style={styles.metricLabel}>Total QR Scans</div>
                 </div>
                 <div style={styles.metricCard}>
-                  <div style={styles.metricIcon}>💬</div>
+                  <div style={styles.metricIcon}></div>
                   <div style={styles.metricValue}>{stats.totalInquiries}</div>
                   <div style={styles.metricLabel}>QR Inquiries</div>
                 </div>
                 <div style={styles.metricCard}>
-                  <div style={styles.metricIcon}>🎯</div>
+                  <div style={styles.metricIcon}></div>
                   <div style={styles.metricValue}>{stats.conversionRate}%</div>
                   <div style={styles.metricLabel}>Scan-to-Inquiry Rate</div>
                 </div>
@@ -147,7 +147,7 @@ export default function QRStatsModal({ isOpen, onClose, property }) {
 
               {stats.totalScans === 0 && (
                 <div style={styles.emptyContainer}>
-                  <div style={styles.emptyIcon}>📢</div>
+                  <div style={styles.emptyIcon}></div>
                   <h4 style={styles.emptyTitle}>No physical scans recorded yet</h4>
                   <p style={styles.emptyText}>
                     Print the vacancy poster and place it outside your building, on noticeboards, or gates. When passers-by scan it, their activity will appear here!

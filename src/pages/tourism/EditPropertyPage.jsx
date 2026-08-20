@@ -188,11 +188,11 @@ export default function EditPropertyPage() {
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginTop: "16px" }}>
           <label style={uploadLabel}>
-            <span>📷 Add photos</span>
+            <span> Add photos</span>
             <input type="file" accept="image/*" multiple hidden onChange={(e) => setNewImages([...newImages, ...Array.from(e.target.files)])} />
           </label>
           <label style={uploadLabel}>
-            <span>🎬 Add videos</span>
+            <span> Add videos</span>
             <input type="file" accept="video/*" multiple hidden onChange={(e) => setNewVideos([...newVideos, ...Array.from(e.target.files)])} />
           </label>
         </div>

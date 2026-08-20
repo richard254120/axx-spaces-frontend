@@ -121,7 +121,7 @@ export default function ReviewRatingSystem({
           style={styles.writeReviewBtn}
           onClick={() => setShowReviewForm(!showReviewForm)}
         >
-          {showReviewForm ? "Cancel" : "✍️ Write a Review"}
+          {showReviewForm ? "Cancel" : " Write a Review"}
         </button>
       )}
 

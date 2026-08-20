@@ -64,7 +64,7 @@ export const AuthProvider = ({ children }) => {
         color: "#fbbf24",
         fontSize: "18px",
       }}>
-        ✨ Loading Axxspace...
+         Loading Axxspace...
       </div>
     );
   }

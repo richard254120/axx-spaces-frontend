@@ -37,12 +37,12 @@ const CATEGORIES = [
 const CONDITIONS = ["Like New", "Good", "Fair", "Poor"];
 
 const STATUS_COLORS = {
-  pending: { bg: "rgba(251,191,36,0.15)", color: "#fbbf24", label: "⏳ Pending Approval" },
-  active: { bg: "rgba(34,197,94,0.15)", color: "#22c55e", label: "✅ Live" },
-  approved: { bg: "rgba(34,197,94,0.15)", color: "#22c55e", label: "✅ Live" },
-  sold: { bg: "rgba(148,163,184,0.15)", color: "#94a3b8", label: "🏷️ Sold" },
-  archived: { bg: "rgba(239,68,68,0.15)", color: "#ef4444", label: "❌ Rejected" },
-  rejected: { bg: "rgba(239,68,68,0.15)", color: "#ef4444", label: "❌ Rejected" },
+  pending: { bg: "rgba(251,191,36,0.15)", color: "#fbbf24", label: " Pending Approval" },
+  active: { bg: "rgba(34,197,94,0.15)", color: "#22c55e", label: " Live" },
+  approved: { bg: "rgba(34,197,94,0.15)", color: "#22c55e", label: " Live" },
+  sold: { bg: "rgba(148,163,184,0.15)", color: "#94a3b8", label: " Sold" },
+  archived: { bg: "rgba(239,68,68,0.15)", color: "#ef4444", label: " Rejected" },
+  rejected: { bg: "rgba(239,68,68,0.15)", color: "#ef4444", label: " Rejected" },
 };
 
 const resolveStatus = (item) => {
@@ -156,19 +156,19 @@ export default function UserDashboard() {
           style={{ ...s.tabBtn, ...(activeTab === "overview" && s.tabBtnActive) }}
           onClick={() => setActiveTab("overview")}
         >
-          📊 Overview
+           Overview
         </button>
         <button
           style={{ ...s.tabBtn, ...(activeTab === "businesses" && s.tabBtnActive) }}
           onClick={() => setActiveTab("businesses")}
         >
-          🏢 Directory Listings
+           Directory Listings
         </button>
         <button
           style={{ ...s.tabBtn, ...(activeTab === "profile" && s.tabBtnActive) }}
           onClick={() => setActiveTab("profile")}
         >
-          👤 Profile & KYC
+           Profile & KYC
         </button>
       </div>
 
@@ -186,7 +186,7 @@ export default function UserDashboard() {
             <div style={s.welcomeBanner}>
               <div style={s.bannerLeft}>
                 <h1 style={s.bannerTitle}>
-                  {getGreeting()}, {user?.name?.split(" ")[0] || "User"}! 👋
+                  {getGreeting()}, {user?.name?.split(" ")[0] || "User"}! 
                 </h1>
                 <p style={s.bannerSubtitle}>Monitor your listings, active items, and KYC verification tier from one unified space.</p>
               </div>
@@ -211,10 +211,10 @@ export default function UserDashboard() {
 
             {/* Quick Actions Panel */}
             <div style={s.panelCard}>
-              <h3 style={s.panelHeading}>⚡ Quick Actions</h3>
+              <h3 style={s.panelHeading}> Quick Actions</h3>
               <div style={s.actionsGrid}>
                 <button style={s.actionGridBtn} onClick={() => navigate("/business/create")}>
-                  🏢 Register New Business
+                   Register New Business
                 </button>
               </div>
             </div>
@@ -229,7 +229,7 @@ export default function UserDashboard() {
         {activeTab === "businesses" && (
           <div style={s.panelCard}>
             <div style={s.panelFlexHeader}>
-              <h2 style={s.tabTitle}>🏢 My Directory Listings</h2>
+              <h2 style={s.tabTitle}> My Directory Listings</h2>
               <button style={s.btnPrimary} onClick={() => navigate("/business/create")}>+ Register Business</button>
             </div>
 
@@ -255,7 +255,7 @@ export default function UserDashboard() {
                           <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                           <span>{biz.location?.town}, {biz.location?.county}</span>
                         </div>
-                        <div>📂 {biz.categories?.join(", ")}</div>
+                        <div> {biz.categories?.join(", ")}</div>
                       </div>
                       <div style={s.itemActions}>
                         <button style={s.btnEdit} onClick={() => handleEditBusiness(biz._id)}>Edit</button>
@@ -279,7 +279,7 @@ export default function UserDashboard() {
                           }}
                           onClick={() => handleBoost(biz)}
                         >
-                          ⭐ Boost Business
+                           Boost Business
                         </button>
                       )}
                     </div>
@@ -294,7 +294,7 @@ export default function UserDashboard() {
         {activeTab === "profile" && (
           <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
             <div style={s.panelCard}>
-              <h2 style={s.tabTitle}>👤 Account Profile Info</h2>
+              <h2 style={s.tabTitle}> Account Profile Info</h2>
               <UserProfileEditor
                 token={token}
                 user={user}
@@ -306,7 +306,7 @@ export default function UserDashboard() {
             </div>
 
             <div style={s.panelCard}>
-              <h2 style={s.tabTitle}>🔐 Identity & Verification status</h2>
+              <h2 style={s.tabTitle}> Identity & Verification status</h2>
               <VerificationStatus />
             </div>
           </div>

@@ -80,7 +80,7 @@ export default function MoverDetailPage() {
       });
 
       if (!response.ok) throw new Error("Booking failed");
-      setBookingSuccess("✅ Booking request sent successfully!");
+      setBookingSuccess(" Booking request sent successfully!");
       setTimeout(() => {
         setShowBookingModal(false);
         setBookingData({
@@ -111,7 +111,7 @@ export default function MoverDetailPage() {
   if (error || !mover) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#f8fafc" }}>
-        <div style={{ fontSize: "64px", marginBottom: "16px" }}>🏚️</div>
+        <div style={{ fontSize: "64px", marginBottom: "16px" }}></div>
         <h2 style={{ color: "#ef4444", margin: "0 0 8px" }}>Mover Not Found</h2>
         <p style={{ color: "#64748b", margin: "0 0 24px" }}>{error || "This mover doesn't exist or has been removed."}</p>
         <button
@@ -215,7 +215,7 @@ export default function MoverDetailPage() {
                   fontSize: "11px",
                   fontWeight: 700,
                 }}>
-                  ⭐ Featured
+                   Featured
                 </div>
               )}
             </>
@@ -237,7 +237,7 @@ export default function MoverDetailPage() {
                 </span>
               </div>
               <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#1e293b", marginBottom: "8px", lineHeight: "1.3" }}>{mover.name}</h1>
-              {mover.company && <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "6px" }}>🏢 {mover.company}</p>}
+              {mover.company && <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "6px" }}> {mover.company}</p>}
               <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "20px", display: "flex", alignItems: "center", gap: "4px" }}>
                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                 <span>{mover.county}</span>
@@ -246,19 +246,19 @@ export default function MoverDetailPage() {
               {/* Key Features */}
               <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginBottom: "24px" }}>
                 <span style={{ background: "#f1f5f9", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", color: "#475569" }}>
-                  🚚 {mover.vehicleType || "Various"}
+                   {mover.vehicleType || "Various"}
                 </span>
                 <span style={{ background: "#f1f5f9", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", color: "#475569" }}>
-                  ⭐ {mover.experienceYears || 0} years exp
+                   {mover.experienceYears || 0} years exp
                 </span>
                 {mover.teamInfo?.teamSize && (
                   <span style={{ background: "#f1f5f9", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", color: "#475569" }}>
-                    👥 {mover.teamInfo.teamSize} team
+                     {mover.teamInfo.teamSize} team
                   </span>
                 )}
                 {mover.responseTime && (
                   <span style={{ background: "#f1f5f9", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", color: "#475569" }}>
-                    ⚡ {mover.responseTime}
+                     {mover.responseTime}
                   </span>
                 )}
               </div>
@@ -270,17 +270,17 @@ export default function MoverDetailPage() {
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
                     {mover.insurance?.hasInsurance && (
                       <span style={{ background: "rgba(34, 197, 94, 0.15)", color: "#22c55e", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", fontWeight: 600, border: "1px solid rgba(34, 197, 94, 0.3)" }}>
-                        🛡️ Insured
+                         Insured
                       </span>
                     )}
                     {mover.uniform && (
                       <span style={{ background: "#f1f5f9", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", color: "#475569" }}>
-                        👔 Uniform
+                         Uniform
                       </span>
                     )}
                     {mover.safetyGear && (
                       <span style={{ background: "#f1f5f9", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", color: "#475569" }}>
-                        ⛑️ Safety Gear
+                         Safety Gear
                       </span>
                     )}
                   </div>
@@ -294,7 +294,7 @@ export default function MoverDetailPage() {
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
                     {mover.specialties.map((specialty, idx) => (
                       <span key={idx} style={{ background: "#f1f5f9", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", color: "#475569" }}>
-                        ⭐ {specialty}
+                         {specialty}
                       </span>
                     ))}
                   </div>
@@ -322,7 +322,7 @@ export default function MoverDetailPage() {
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
                     {mover.languages.map((lang, idx) => (
                       <span key={idx} style={{ background: "#f1f5f9", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", color: "#475569" }}>
-                        🌐 {lang}
+                         {lang}
                       </span>
                     ))}
                   </div>
@@ -333,7 +333,7 @@ export default function MoverDetailPage() {
               {mover.workHours && (
                 <div style={{ marginBottom: "24px" }}>
                   <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b", marginBottom: "12px" }}>Working Hours</h2>
-                  <p style={{ fontSize: "14px", color: "#475569" }}>⏰ {mover.workHours}</p>
+                  <p style={{ fontSize: "14px", color: "#475569" }}> {mover.workHours}</p>
                 </div>
               )}
 
@@ -362,7 +362,7 @@ export default function MoverDetailPage() {
 
                 <div style={{ marginBottom: "16px", padding: "14px", background: "#f1f5f9", borderRadius: "8px" }}>
                   <div style={{ fontSize: "13px", color: "#64748b", marginBottom: "6px" }}>Rating</div>
-                  <div style={{ fontSize: "20px", fontWeight: 700, color: "#1e293b" }}>⭐ {mover.rating || 4.5}</div>
+                  <div style={{ fontSize: "20px", fontWeight: 700, color: "#1e293b" }}> {mover.rating || 4.5}</div>
                   {mover.reviewCount && <div style={{ fontSize: "13px", color: "#64748b", marginTop: "4px" }}>{mover.reviewCount} reviews</div>}
                 </div>
 

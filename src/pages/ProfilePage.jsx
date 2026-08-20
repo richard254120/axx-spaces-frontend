@@ -113,7 +113,7 @@ export default function ProfilePage() {
 
         {/* Verification Badges Section */}
         <div style={styles.badgeSection}>
-          <h3 style={styles.sectionTitle}>🏅 Verification Badges</h3>
+          <h3 style={styles.sectionTitle}> Verification Badges</h3>
           {profile?.verificationBadges && profile.verificationBadges.length > 0 ? (
             <div style={styles.badgeGrid}>
               {profile.verificationBadges.map((badgeId) => (
@@ -132,7 +132,7 @@ export default function ProfilePage() {
             </div>
           ) : (
             <div style={styles.noBadges}>
-              <span style={styles.noBadgesIcon}>🏅</span>
+              <span style={styles.noBadgesIcon}></span>
               <div style={styles.noBadgesText}>No verification badges yet</div>
               <div style={styles.noBadgesSubtext}>
                 Complete payments and get verified by admins to earn badges
@@ -144,22 +144,22 @@ export default function ProfilePage() {
         {/* Quick Stats */}
         <div style={styles.statsGrid}>
           <Link to="/wallet" style={styles.statCard}>
-            <div style={styles.statIcon}>💰</div>
+            <div style={styles.statIcon}></div>
             <div style={styles.statValue}>KES {(profile?.walletBalance || 0).toLocaleString()}</div>
             <div style={styles.statLabel}>Wallet Balance</div>
           </Link>
           <Link to="/payment-history" style={styles.statCard}>
-            <div style={styles.statIcon}>💳</div>
+            <div style={styles.statIcon}></div>
             <div style={styles.statValue}>{profile?.paymentHistory?.length || 0}</div>
             <div style={styles.statLabel}>Transactions</div>
           </Link>
           <Link to="/saved" style={styles.statCard}>
-            <div style={styles.statIcon}>❤️</div>
+            <div style={styles.statIcon}></div>
             <div style={styles.statValue}>View</div>
             <div style={styles.statLabel}>Saved Listings</div>
           </Link>
           <Link to="/messages" style={styles.statCard}>
-            <div style={styles.statIcon}>💬</div>
+            <div style={styles.statIcon}></div>
             <div style={styles.statValue}>View</div>
             <div style={styles.statLabel}>Messages</div>
           </Link>
@@ -170,19 +170,19 @@ export default function ProfilePage() {
           <h3 style={styles.sectionTitle}>Quick Links</h3>
           <div style={styles.linksGrid}>
             <Link to="/settings" style={styles.linkCard}>
-              <span style={styles.linkIcon}>⚙️</span>
+              <span style={styles.linkIcon}></span>
               <span style={styles.linkText}>Account Settings</span>
             </Link>
             <Link to="/notifications" style={styles.linkCard}>
-              <span style={styles.linkIcon}>🔔</span>
+              <span style={styles.linkIcon}></span>
               <span style={styles.linkText}>Notifications</span>
             </Link>
             <Link to="/wallet" style={styles.linkCard}>
-              <span style={styles.linkIcon}>💰</span>
+              <span style={styles.linkIcon}></span>
               <span style={styles.linkText}>Wallet</span>
             </Link>
             <Link to="/upload" style={styles.linkCard}>
-              <span style={styles.linkIcon}>📤</span>
+              <span style={styles.linkIcon}></span>
               <span style={styles.linkText}>Upload Property</span>
             </Link>
           </div>

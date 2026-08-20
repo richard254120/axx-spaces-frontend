@@ -13,7 +13,7 @@ export default function PropertyCard({ property, isOwner = false, onDelete }) {
 
   return (
     <div style={styles.card}>
-      {/* ✅ FIXED: Image Gallery - Shows ALL images! */}
+      {/*  FIXED: Image Gallery - Shows ALL images! */}
       <div style={styles.imageGallery}>
         {property.images && property.images.length > 0 ? (
           property.images.map((imageUrl, index) => (
@@ -39,7 +39,7 @@ export default function PropertyCard({ property, isOwner = false, onDelete }) {
       {property.owner?.verificationBadges && property.owner.verificationBadges.length > 0 && (
         <div style={styles.badgeSection}>
           <div style={styles.badgeSectionLabel}>
-            <span style={{ fontSize: 12 }}>✅</span>
+            <span style={{ fontSize: 12 }}></span>
             <span style={{ fontSize: 11, fontWeight: 600, color: "#0ea5e9" }}>Verified Seller</span>
           </div>
           <div style={styles.badgeContainer}>
@@ -65,12 +65,12 @@ export default function PropertyCard({ property, isOwner = false, onDelete }) {
         ...styles.statusBadge,
         backgroundColor: isApproved ? "#4ade80" : "#facc15",
       }}>
-        {isApproved ? "✅ Approved" : "⏳ Pending Approval"}
+        {isApproved ? " Approved" : " Pending Approval"}
       </div>
 
       {property.images && property.images.length > 1 && (
         <p style={styles.imageCount}>
-          📸 {property.images.length} photos total
+           {property.images.length} photos total
         </p>
       )}
 
@@ -80,7 +80,7 @@ export default function PropertyCard({ property, isOwner = false, onDelete }) {
           onClick={() => onDelete(property._id)}
           style={styles.deleteBtn}
         >
-          🗑 Delete Property
+           Delete Property
         </button>
       )}
     </div>
@@ -96,7 +96,7 @@ const styles = {
     border: "1px solid #222",
   },
 
-  // ✅ NEW: Image Gallery Container
+  //  NEW: Image Gallery Container
   imageGallery: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
@@ -106,7 +106,7 @@ const styles = {
 
   image: {
     width: "100%",
-    height: "120px",  // ✅ Reduced height for multiple images
+    height: "120px",  //  Reduced height for multiple images
     objectFit: "cover",
     borderRadius: "8px",
     cursor: "pointer",

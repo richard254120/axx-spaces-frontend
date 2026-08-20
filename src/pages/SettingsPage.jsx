@@ -219,7 +219,7 @@ const Verification = () => {
                 required={selectedLevel >= 3}
               />
               <div style={styles.infoBox}>
-                <span style={styles.infoIcon}>ℹ️</span>
+                <span style={styles.infoIcon}></span>
                 <span style={styles.infoText}>
                   Accepted: Utility bills, bank statements, or government letters issued within the last 3 months.
                   Images and PDF files are both supported.

@@ -38,17 +38,17 @@ const CATEGORIES = [
 ];
 const CONDITIONS = ["Like New", "Good", "Fair", "Poor"];
 
-// ✅ FIXED: "active" is the single live status. "approved" alias added for any
+//  FIXED: "active" is the single live status. "approved" alias added for any
 //    legacy documents already in the DB that were saved with the old status value.
 const STATUS_COLORS = {
-  pending: { bg: "rgba(251,191,36,0.15)", color: "#fbbf24", label: "⏳ Pending Approval" },
-  active: { bg: "rgba(34,197,94,0.15)", color: "#22c55e", label: "✅ Live" },
-  approved: { bg: "rgba(34,197,94,0.15)", color: "#22c55e", label: "✅ Live" }, // legacy alias
-  sold: { bg: "rgba(148,163,184,0.15)", color: "#94a3b8", label: "🏷️ Sold" },
-  archived: { bg: "rgba(239,68,68,0.15)", color: "#ef4444", label: "❌ Rejected" },
+  pending: { bg: "rgba(251,191,36,0.15)", color: "#fbbf24", label: " Pending Approval" },
+  active: { bg: "rgba(34,197,94,0.15)", color: "#22c55e", label: " Live" },
+  approved: { bg: "rgba(34,197,94,0.15)", color: "#22c55e", label: " Live" }, // legacy alias
+  sold: { bg: "rgba(148,163,184,0.15)", color: "#94a3b8", label: " Sold" },
+  archived: { bg: "rgba(239,68,68,0.15)", color: "#ef4444", label: " Rejected" },
 };
 
-// ✅ Helper: normalise status so "approved" (old DB docs) shows the same as "active"
+//  Helper: normalise status so "approved" (old DB docs) shows the same as "active"
 const resolveStatus = (material) => {
   const raw = material.status || "pending";
   if (raw === "approved") return "active"; // treat legacy value as active
@@ -105,7 +105,7 @@ export default function SellerDashboard() {
 
   useEffect(() => {
     if (materials.length > 0) {
-      // ✅ FIXED: count live items using resolveStatus so both "active" and
+      //  FIXED: count live items using resolveStatus so both "active" and
       //    legacy "approved" documents are counted correctly.
       const earnings = materials
         .filter(m => resolveStatus(m) === "sold")
@@ -164,7 +164,7 @@ export default function SellerDashboard() {
       });
 
       if (!res.ok) { setError("Failed to submit"); return; }
-      setSuccess("✅ Upload completed successfully!");
+      setSuccess(" Upload completed successfully!");
       setForm({ title: "", description: "", category: "", condition: "", price: "", quantity: "", location: "", county: "", lat: "", lng: "" });
       setImages([]); setPreviews([]); setView("listings");
       fetchMyMaterials(token);
@@ -186,7 +186,7 @@ export default function SellerDashboard() {
     fetchMyMaterials(token);
   };
 
-  // ✅ FIXED: use resolveStatus so filter dropdown works correctly for both
+  //  FIXED: use resolveStatus so filter dropdown works correctly for both
   //    "active" (new) and "approved" (legacy) documents.
   const filteredMaterials = materials.filter((m) => {
     const matchesSearch = (m.title || "").toLowerCase().includes(searchQuery.toLowerCase());
@@ -209,47 +209,47 @@ export default function SellerDashboard() {
           style={{ ...s.tabBtn, ...(view === "listings" && s.tabBtnActive) }}
           onClick={() => setView("listings")}
         >
-          📦 My Stock
+           My Stock
         </button>
         <button
           style={{ ...s.tabBtn, ...(view === "upload" && s.tabBtnActive) }}
           onClick={() => setView("upload")}
         >
-          ➕ Upload Material
+           Upload Material
         </button>
         <button
           style={{ ...s.tabBtn, ...(view === "profile" && s.tabBtnActive) }}
           onClick={() => setView("profile")}
         >
-          👤 Profile
+           Profile
         </button>
       </div>
 
       {/* STATS */}
       <div style={s.statsGrid}>
         <div style={s.statCard}>
-          <span style={s.statIcon}>💰</span>
+          <span style={s.statIcon}></span>
           <div>
             <div style={s.statLabel}>Revenue</div>
             <div style={s.statVal}>KES {stats.totalEarnings.toLocaleString()}</div>
           </div>
         </div>
         <div style={s.statCard}>
-          <span style={s.statIcon}>🌐</span>
+          <span style={s.statIcon}></span>
           <div>
             <div style={s.statLabel}>Live Listings</div>
             <div style={s.statVal}>{stats.liveItems}</div>
           </div>
         </div>
         <div style={s.statCard}>
-          <span style={s.statIcon}>⏳</span>
+          <span style={s.statIcon}></span>
           <div>
             <div style={s.statLabel}>Pending</div>
             <div style={s.statVal}>{stats.pendingReview}</div>
           </div>
         </div>
         <div style={s.statCard}>
-          <span style={s.statIcon}>👁️</span>
+          <span style={s.statIcon}></span>
           <div>
             <div style={s.statLabel}>Views</div>
             <div style={s.statVal}>{stats.totalViews}</div>
@@ -274,7 +274,7 @@ export default function SellerDashboard() {
             style={{ ...s.uploadBtn, background: "linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)", margin: 0 }}
             onClick={() => navigate("/business/create")}
           >
-            🏢 Add Business
+             Add Business
           </button>
           <div style={s.filterGroup}>
             <input
@@ -291,7 +291,7 @@ export default function SellerDashboard() {
               <option value="sold">Sold</option>
               <option value="archived">Rejected</option>
             </select>
-            <button style={s.refreshBtn} onClick={() => fetchMyMaterials(token)}>🔄 Refresh Status</button>
+            <button style={s.refreshBtn} onClick={() => fetchMyMaterials(token)}> Refresh Status</button>
           </div>
         </div>
       )}
@@ -315,7 +315,7 @@ export default function SellerDashboard() {
           </div>
         ) : filteredMaterials.length === 0 ? (
           <div style={s.emptyBox}>
-            <p style={{ fontSize: "3rem" }}>📦</p>
+            <p style={{ fontSize: "3rem" }}></p>
             <p style={{ color: "#94a3b8" }}>
               {materials.length === 0
                 ? "No materials yet. Upload your first listing!"
@@ -325,7 +325,7 @@ export default function SellerDashboard() {
         ) : (
           <div style={s.grid}>
             {filteredMaterials.map((m) => {
-              // ✅ FIXED: use resolveStatus so the card badge always shows correctly
+              //  FIXED: use resolveStatus so the card badge always shows correctly
               const currentStatus = resolveStatus(m);
               const st = STATUS_COLORS[currentStatus] || STATUS_COLORS.pending;
               return (
@@ -333,7 +333,7 @@ export default function SellerDashboard() {
                   <div style={s.cardImg}>
                     {m.images?.[0]
                       ? <img src={m.images[0]} alt="" style={s.img} />
-                      : <div style={s.noImg}>📷 No Image</div>
+                      : <div style={s.noImg}> No Image</div>
                     }
                     <span style={{ ...s.statusBadge, background: st.bg, color: st.color }}>
                       {st.label}
@@ -345,7 +345,7 @@ export default function SellerDashboard() {
                     <p style={s.cardMeta}>Qty: {m.quantity} • {m.location}, {m.county}</p>
                     {/* Engagement Stats */}
                     <div style={s.engagementStats}>
-                      <span style={s.engagementItem}>👁️ {m.views || 0} views</span>
+                      <span style={s.engagementItem}> {m.views || 0} views</span>
                       <span style={s.engagementSeparator}>·</span>
                       <span style={s.engagementItem}>★ {(m.rating && m.rating > 0) ? m.rating.toFixed(1) : "—"} · {m.reviewCount || 0} reviews</span>
                     </div>
@@ -377,7 +377,7 @@ export default function SellerDashboard() {
                         }}
                         onClick={() => handleBoost(m)}
                       >
-                        ⭐ Boost Item
+                         Boost Item
                       </button>
                     )}
                   </div>

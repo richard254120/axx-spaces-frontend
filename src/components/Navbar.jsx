@@ -119,7 +119,7 @@ export default function Navbar() {
               setIsRequestModalOpen(true);
             }}
           >
-            <span style={styles.dropdownIcon}>🙋 Custom Requests</span>
+            <span style={styles.dropdownIcon}> Custom Requests</span>
           </button>
           <Link to="/about" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>About</span>
@@ -142,7 +142,7 @@ export default function Navbar() {
           >
             <div style={styles.jobItem}>
               <span style={styles.dropdownIcon}>Web Development</span>
-              <span style={styles.dropdownArrow}>{jobDropdownOpen === 'web-development' ? '▼' : '▶'}</span>
+              <span style={styles.dropdownArrow}>{jobDropdownOpen === 'web-development' ? '▼' : ''}</span>
             </div>
           </button>
           {jobDropdownOpen === 'web-development' && (
@@ -159,7 +159,7 @@ export default function Navbar() {
           >
             <div style={styles.jobItem}>
               <span style={styles.dropdownIcon}>Marketing</span>
-              <span style={styles.dropdownArrow}>{jobDropdownOpen === 'marketing' ? '▼' : '▶'}</span>
+              <span style={styles.dropdownArrow}>{jobDropdownOpen === 'marketing' ? '▼' : ''}</span>
             </div>
           </button>
           {jobDropdownOpen === 'marketing' && (
@@ -176,7 +176,7 @@ export default function Navbar() {
           >
             <div style={styles.jobItem}>
               <span style={styles.dropdownIcon}>UI/UX Design</span>
-              <span style={styles.dropdownArrow}>{jobDropdownOpen === 'ui-ux-design' ? '▼' : '▶'}</span>
+              <span style={styles.dropdownArrow}>{jobDropdownOpen === 'ui-ux-design' ? '▼' : ''}</span>
             </div>
           </button>
           {jobDropdownOpen === 'ui-ux-design' && (
@@ -424,7 +424,7 @@ export default function Navbar() {
             setIsRequestModalOpen(true);
           }}
         >
-          🙋 Requests
+           Requests
         </button>
 
         {token && user && (
@@ -459,20 +459,20 @@ export default function Navbar() {
                       style={styles.dropdownItem}
                       onClick={() => { setDropdownOpen(false); setMenuOpen(false); }}
                     >
-                      📋 Payment History
+                       Payment History
                     </Link>
                     <Link
                       to={getDashboardLink()}
                       style={styles.dropdownItem}
                       onClick={() => { setDropdownOpen(false); setMenuOpen(false); }}
                     >
-                      📊 Dashboard
+                       Dashboard
                     </Link>
                     <button
                       style={styles.dropdownItem}
                       onClick={() => { handleLogout(); setDropdownOpen(false); setMenuOpen(false); }}
                     >
-                      🚪 Logout
+                       Logout
                     </button>
                   </div>
                 )}

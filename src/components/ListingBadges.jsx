@@ -2,25 +2,25 @@ import React from "react";
 
 const badgeConfig = {
   premium_verified: {
-    icon: "⭐",
+    icon: "",
     label: "Premium Verified",
     color: "#fbbf24",
     bgColor: "rgba(251, 191, 36, 0.15)",
   },
   student_verified: {
-    icon: "🎓",
+    icon: "",
     label: "Student Verified",
     color: "#3b82f6",
     bgColor: "rgba(59, 130, 246, 0.15)",
   },
   business_verified: {
-    icon: "🏢",
+    icon: "",
     label: "Business Verified",
     color: "#8b5cf6",
     bgColor: "rgba(139, 92, 246, 0.15)",
   },
   identity_verified: {
-    icon: "🪪",
+    icon: "",
     label: "Identity Verified",
     color: "#22c55e",
     bgColor: "rgba(34, 197, 94, 0.15)",
@@ -37,7 +37,7 @@ const badgeConfig = {
     bgColor: "rgba(239, 68, 68, 0.15)",
   },
   online_verified: {
-    icon: "🌐",
+    icon: "",
     label: "Online Verified",
     color: "#06b6d4",
     bgColor: "rgba(6, 182, 212, 0.15)",

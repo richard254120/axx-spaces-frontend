@@ -26,7 +26,7 @@ export default function VerificationBadges({ userId, userType = "landlord" }) {
   const badges = [
     {
       key: "email",
-      icon: "✉️",
+      icon: "",
       label: "Email Verified",
       color: "#22c55e",
       bgColor: "rgba(34, 197, 94, 0.15)",
@@ -34,7 +34,7 @@ export default function VerificationBadges({ userId, userType = "landlord" }) {
     },
     {
       key: "phone",
-      icon: "📱",
+      icon: "",
       label: "Phone Verified",
       color: "#3b82f6",
       bgColor: "rgba(59, 130, 246, 0.15)",
@@ -42,7 +42,7 @@ export default function VerificationBadges({ userId, userType = "landlord" }) {
     },
     {
       key: "id",
-      icon: "🪪",
+      icon: "",
       label: "ID Verified",
       color: "#fbbf24",
       bgColor: "rgba(251, 191, 36, 0.15)",
@@ -50,7 +50,7 @@ export default function VerificationBadges({ userId, userType = "landlord" }) {
     },
     {
       key: "business",
-      icon: "🏢",
+      icon: "",
       label: "Business Verified",
       color: "#8b5cf6",
       bgColor: "rgba(139, 92, 246, 0.15)",
@@ -137,7 +137,7 @@ export default function VerificationBadges({ userId, userType = "landlord" }) {
         </div>
 
         <div style={styles.tips}>
-          <p style={styles.tipsTitle}>💡 Why get verified?</p>
+          <p style={styles.tipsTitle}> Why get verified?</p>
           <ul style={styles.tipsList}>
             <li style={styles.tip}>Build trust with potential clients</li>
             <li style={styles.tip}>Get priority in search results</li>
@@ -152,10 +152,10 @@ export default function VerificationBadges({ userId, userType = "landlord" }) {
 
 export function VerificationBadge({ type, size = "medium" }) {
   const badgeConfig = {
-    email: { icon: "✉️", color: "#22c55e", label: "Email Verified" },
-    phone: { icon: "📱", color: "#3b82f6", label: "Phone Verified" },
-    id: { icon: "🪪", color: "#fbbf24", label: "ID Verified" },
-    business: { icon: "🏢", color: "#8b5cf6", label: "Business Verified" },
+    email: { icon: "", color: "#22c55e", label: "Email Verified" },
+    phone: { icon: "", color: "#3b82f6", label: "Phone Verified" },
+    id: { icon: "", color: "#fbbf24", label: "ID Verified" },
+    business: { icon: "", color: "#8b5cf6", label: "Business Verified" },
   };
 
   const config = badgeConfig[type] || badgeConfig.email;
