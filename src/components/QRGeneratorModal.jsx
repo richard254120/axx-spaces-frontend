@@ -859,6 +859,161 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
       posterCtx.fillStyle = "#C5A059";
       posterCtx.fillRect(350, 675, 100, 2);
 
+      // Why choose columns
+      const benefits = [
+        {
+          label: "MORE VISIBILITY",
+          desc1: "Reach more potential",
+          desc2: "tenants online & offline.",
+          drawIcon: (cx, cy) => {
+            posterCtx.strokeStyle = "#081A34";
+            posterCtx.lineWidth = 1.5;
+            posterCtx.beginPath();
+            posterCtx.moveTo(cx - 12, cy);
+            posterCtx.quadraticCurveTo(cx, cy - 8, cx + 12, cy);
+            posterCtx.quadraticCurveTo(cx, cy + 8, cx - 12, cy);
+            posterCtx.stroke();
+            posterCtx.beginPath();
+            posterCtx.arc(cx, cy, 3, 0, Math.PI * 2);
+            posterCtx.fillStyle = "#C5A059";
+            posterCtx.fill();
+          }
+        },
+        {
+          label: "EASY ACCESS",
+          desc1: "Tenants can scan and",
+          desc2: "view details instantly.",
+          drawIcon: (cx, cy) => {
+            posterCtx.strokeStyle = "#081A34";
+            posterCtx.lineWidth = 1.5;
+            posterCtx.beginPath();
+            const pw = 12;
+            const ph = 20;
+            const px = cx - pw / 2;
+            const py = cy - ph / 2;
+            const r = 2;
+            posterCtx.moveTo(px + r, py);
+            posterCtx.lineTo(px + pw - r, py);
+            posterCtx.quadraticCurveTo(px + pw, py, px + pw, py + r);
+            posterCtx.lineTo(px + pw, py + ph - r);
+            posterCtx.quadraticCurveTo(px + pw, py + ph, px + pw - r, py + ph);
+            posterCtx.lineTo(px + r, py + ph);
+            posterCtx.quadraticCurveTo(px, py + ph, px, py + ph - r);
+            posterCtx.lineTo(px, py + r);
+            posterCtx.quadraticCurveTo(px, py, px + r, py);
+            posterCtx.closePath();
+            posterCtx.stroke();
+            posterCtx.beginPath();
+            posterCtx.moveTo(cx - 2, cy + ph / 2 - 3);
+            posterCtx.lineTo(cx + 2, cy + ph / 2 - 3);
+            posterCtx.stroke();
+          }
+        },
+        {
+          label: "TRACK PERFORMANCE",
+          desc1: "Monitor views &",
+          desc2: "enquiries in real-time.",
+          drawIcon: (cx, cy) => {
+            posterCtx.strokeStyle = "#081A34";
+            posterCtx.lineWidth = 2;
+            posterCtx.beginPath();
+            posterCtx.moveTo(cx - 10, cy + 6);
+            posterCtx.lineTo(cx - 3, cy);
+            posterCtx.lineTo(cx + 2, cy + 5);
+            posterCtx.lineTo(cx + 9, cy - 6);
+            posterCtx.stroke();
+            posterCtx.beginPath();
+            posterCtx.moveTo(cx + 4, cy - 6);
+            posterCtx.lineTo(cx + 9, cy - 6);
+            posterCtx.lineTo(cx + 9, cy - 1);
+            posterCtx.stroke();
+          }
+        },
+        {
+          label: "MORE ENQUIRIES",
+          desc1: "Get more genuine",
+          desc2: "leads and serious tenants.",
+          drawIcon: (cx, cy) => {
+            posterCtx.strokeStyle = "#081A34";
+            posterCtx.lineWidth = 1.5;
+            posterCtx.beginPath();
+            posterCtx.arc(cx - 4, cy - 2, 3, 0, Math.PI * 2);
+            posterCtx.stroke();
+            posterCtx.beginPath();
+            posterCtx.arc(cx - 4, cy + 7, 5, Math.PI, 0);
+            posterCtx.stroke();
+            posterCtx.fillStyle = "#ffffff";
+            posterCtx.beginPath();
+            posterCtx.arc(cx + 4, cy - 2, 3.5, 0, Math.PI * 2);
+            posterCtx.fill();
+            posterCtx.stroke();
+            posterCtx.beginPath();
+            posterCtx.arc(cx + 4, cy + 7, 5.5, Math.PI, 0);
+            posterCtx.fill();
+            posterCtx.stroke();
+          }
+        },
+        {
+          label: "TRUSTED PLATFORM",
+          desc1: "A professional",
+          desc2: "system built for users.",
+          drawIcon: (cx, cy) => {
+            posterCtx.strokeStyle = "#081A34";
+            posterCtx.lineWidth = 1.5;
+            posterCtx.beginPath();
+            posterCtx.moveTo(cx - 7, cy - 8);
+            posterCtx.lineTo(cx + 7, cy - 8);
+            posterCtx.lineTo(cx + 7, cy - 1);
+            posterCtx.quadraticCurveTo(cx + 7, cy + 5, cx, cy + 9);
+            posterCtx.quadraticCurveTo(cx - 7, cy + 5, cx - 7, cy - 1);
+            posterCtx.closePath();
+            posterCtx.stroke();
+            posterCtx.strokeStyle = "#C5A059";
+            posterCtx.lineWidth = 1.5;
+            posterCtx.beginPath();
+            posterCtx.moveTo(cx - 3, cy);
+            posterCtx.lineTo(cx - 1, cy + 2);
+            posterCtx.lineTo(cx + 3, cy - 2);
+            posterCtx.stroke();
+          }
+        }
+      ];
+
+      benefits.forEach((b, index) => {
+        const colW = 144;
+        const cx = 40 + colW / 2 + index * colW;
+        const cyIcon = 720;
+        
+        // Draw icon
+        b.drawIcon(cx, cyIcon);
+        
+        // Draw label
+        posterCtx.fillStyle = "#081A34";
+        posterCtx.textAlign = "center";
+        posterCtx.font = "800 10.5px 'Inter', sans-serif";
+        posterCtx.fillText(b.label, cx, 752);
+        
+        // Draw description line 1
+        posterCtx.fillStyle = "#475569";
+        posterCtx.font = "600 8.5px 'Inter', sans-serif";
+        posterCtx.fillText(b.desc1, cx, 770);
+        
+        // Draw description line 2
+        posterCtx.fillText(b.desc2, cx, 784);
+        
+        // Draw column divider (except last column)
+        if (index < 4) {
+          const divX = 40 + (index + 1) * colW;
+          posterCtx.strokeStyle = "#e2e8f0";
+          posterCtx.lineWidth = 1;
+          posterCtx.beginPath();
+          posterCtx.moveTo(divX, 715);
+          posterCtx.lineTo(divX, 780);
+          posterCtx.stroke();
+        }
+      });
+
+
       // Footers
       posterCtx.fillStyle = "#081A34";
       posterCtx.fillRect(0, 990, 800, 50);
