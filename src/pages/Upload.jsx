@@ -49,8 +49,9 @@ function validateDetails(data) {
   const missing = [];
   if (!data.description?.trim()) missing.push("Description");
   if (!data.price || Number(data.price) <= 0) missing.push("Price");
-  if (data.bedrooms === "" || Number(data.bedrooms) < 0) missing.push("Bedrooms");
-  if (data.bathrooms === "" || Number(data.bathrooms) < 0) missing.push("Bathrooms");
+  // Bedrooms and bathrooms are now optional for single rooms
+  // if (data.bedrooms === "" || Number(data.bedrooms) < 0) missing.push("Bedrooms");
+  // if (data.bathrooms === "" || Number(data.bathrooms) < 0) missing.push("Bathrooms");
   if (data.bookedUnits > data.totalUnits) missing.push("Booked units cannot exceed total units");
   return missing;
 }
@@ -140,7 +141,7 @@ export default function Upload() {
           });
           if (!response.ok) throw new Error("Failed to fetch property details");
           const data = await response.json();
-          
+
           setFormData({
             title: data.title || "",
             description: data.description || "",
@@ -175,10 +176,10 @@ export default function Upload() {
           setExistingImages(data.images || []);
           setImagePreviews(data.images || []);
           setConsent(true); // already agreed on upload
-          
+
           // In edit mode, unlock all steps immediately
           setMaxUnlockedStep(3);
-          
+
         } catch (err) {
           setError(err.message || "Error loading property for editing");
         } finally {
@@ -197,7 +198,7 @@ export default function Upload() {
     }
     const validator = STEP_VALIDATORS[stepIndex];
     if (!validator) return [];
-        if (stepIndex === 2) return (existingImages.length + images.length === 0) ? ["At least one image"] : [];
+    if (stepIndex === 2) return (existingImages.length + images.length === 0) ? ["At least one image"] : [];
     if (stepIndex === 3) return validator(formData, images, consent);
     return validator(formData);
   };
@@ -396,7 +397,7 @@ export default function Upload() {
       }
 
       setSuccess(isEditMode ? "Property updated successfully!" : "Property submitted! Pending admin approval.");
-      
+
       if (!isEditMode) {
         setFormData({
           title: "", description: "", location: "", price: "", deposit: "",
@@ -574,7 +575,7 @@ export default function Upload() {
 
               {(formData.lat || formData.lng) && (
                 <div style={styles.coordsDisplay}>
-                   {formData.lat}, {formData.lng}
+                  {formData.lat}, {formData.lng}
                   <button
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, lat: "", lng: "" }))}
@@ -615,7 +616,7 @@ export default function Upload() {
               </div>
 
               <p style={styles.gpsTip}>
-                 Not sure? Open Google Maps, long-press your property location, and copy the coordinates shown.
+                Not sure? Open Google Maps, long-press your property location, and copy the coordinates shown.
               </p>
             </div>
 
@@ -662,12 +663,12 @@ export default function Upload() {
 
             <div style={styles.twoCol}>
               <div style={styles.formGroup}>
-                <label style={styles.label}>Bedrooms *</label>
-                <input type="number" name="bedrooms" placeholder="2" value={formData.bedrooms} onChange={handleChange} style={styles.input} required />
+                <label style={styles.label}>Bedrooms</label>
+                <input type="number" name="bedrooms" placeholder="2" value={formData.bedrooms} onChange={handleChange} style={styles.input} />
               </div>
               <div style={styles.formGroup}>
-                <label style={styles.label}>Bathrooms *</label>
-                <input type="number" name="bathrooms" placeholder="1" value={formData.bathrooms} onChange={handleChange} style={styles.input} required />
+                <label style={styles.label}>Bathrooms</label>
+                <input type="number" name="bathrooms" placeholder="1" value={formData.bathrooms} onChange={handleChange} style={styles.input} />
               </div>
             </div>
 
