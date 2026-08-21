@@ -216,10 +216,11 @@ export default function SellerLogin() {
       const data = await res.json();
 
       if (!res.ok) {
-        if (data.requiresVerification) {
-          setShowResend(true);
-          setResendEmail(data.email || form.email);
-        }
+        // Email verification check disabled - no longer show resend button
+        // if (data.requiresVerification) {
+        //   setShowResend(true);
+        //   setResendEmail(data.email || form.email);
+        // }
         setError(data.error || "Something went wrong");
         return;
       }
@@ -385,7 +386,7 @@ export default function SellerLogin() {
                 onChange={handleChange} style={s.input} />
               {mode === "register" && form.password && (form.password.length < 6 || !/[a-zA-Z]/.test(form.password) || !/[0-9]/.test(form.password)) && (
                 <div style={{ color: "#fca5a5", fontSize: "11px", marginTop: "-12px", marginBottom: "12px", textAlign: "left" }}>
-                   Password must contain both letters and numbers.
+                  Password must contain both letters and numbers.
                 </div>
               )}
 
@@ -420,7 +421,7 @@ export default function SellerLogin() {
             {/* Info box */}
             <div style={s.infoBox}>
               <p style={s.infoText}>
-                 After registering, you can upload your materials immediately.
+                After registering, you can upload your materials immediately.
                 They will appear on the marketplace once approved by our admin team.
               </p>
             </div>

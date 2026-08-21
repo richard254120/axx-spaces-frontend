@@ -119,10 +119,11 @@ export default function Login() {
       const data = await response.json();
 
       if (!response.ok) {
-        if (data.requiresVerification) {
-          setShowResend(true);
-          setResendEmail(data.email || formData.email);
-        }
+        // Email verification check disabled - no longer show resend button
+        // if (data.requiresVerification) {
+        //   setShowResend(true);
+        //   setResendEmail(data.email || formData.email);
+        // }
         throw new Error(data.error || "Login failed");
       }
 
@@ -278,7 +279,7 @@ export default function Login() {
                 </div>
               ) : (
                 <div style={styles.warningBox}>
-                   Google Sign-In not configured. Check your .env file.
+                  Google Sign-In not configured. Check your .env file.
                 </div>
               )}
 

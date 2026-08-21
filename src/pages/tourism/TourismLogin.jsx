@@ -352,10 +352,11 @@ export default function TourismLogin() {
       }
 
       if (!response.ok) {
-        if (data.requiresVerification) {
-          setShowResend(true);
-          setResendEmail(data.email || email);
-        }
+        // Email verification check disabled - no longer show resend button
+        // if (data.requiresVerification) {
+        //   setShowResend(true);
+        //   setResendEmail(data.email || email);
+        // }
         throw new Error(data.error || "Login failed");
       }
 
