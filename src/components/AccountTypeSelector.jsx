@@ -185,9 +185,6 @@ export default function AccountTypeSelector({ isOpen, onClose, mode = "login" })
                 e.currentTarget.style.borderColor = "#334155";
               }}
             >
-              <div style={styles.accountIcon}>
-                <img src={account.icon} alt={account.name} style={styles.accountIconImg} />
-              </div>
               <div style={styles.accountInfo}>
                 <div style={styles.accountName}>{account.name}</div>
                 <div style={styles.accountDesc}>{account.description}</div>
