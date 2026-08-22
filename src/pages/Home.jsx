@@ -1977,112 +1977,413 @@ export default function Home() {
           <p className="section-sub">Discover top-rated services and verified listings handpicked for you</p>
         </div>
 
-        {/* CATEGORY TABS SELECTOR */}
-        <div className="feat-tabs-bar">
-          {[
-            { id: "properties", label: " Rentals", count: featuredProperties.length },
-            { id: "businesses", label: " Businesses", count: featuredBusinesses.length },
-            { id: "materials", label: " QuickSales", count: featuredMaterials.length },
-            { id: "tourism", label: " Tourism", count: featuredTourism.length },
-            { id: "movers", label: " Movers", count: featuredMovers.length }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveFeaturedTab(tab.id)}
-              className={`feat-tab-btn ${activeFeaturedTab === tab.id ? 'active' : ''}`}
-            >
-              <span>{tab.label}</span>
-              {tab.count > 0 && (
-                <span className="feat-tab-count">
-                  {tab.count}
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
+        {/* RENTALS */}
+        {featuredProperties.length > 0 && (
+          <div style={{ marginBottom: '48px', padding: '0 28px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Rentals</h3>
+              <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredProperties.length}</span>
+            </div>
+            <div className="cards-track-wrap">
+              <div className="cards-track" style={{ animationDuration: '20s' }}>
+                {featuredProperties.map((item, idx) => (
+                  <div key={`${item._id}-${idx}`} className="feat-card">
+                    <div className="feat-img-wrap">
+                      <img
+                        src={getListingImage(item)}
+                        alt={item.title}
+                        className="feat-img"
+                        loading="lazy"
+                        onError={e => { e.target.style.display = "none"; }}
+                      />
+                      <div className="feat-boosted">★ Featured</div>
+                      <div className="feat-type">{item.propertyType || "Rental"}</div>
+                      <div className="feat-img-grad"></div>
+                    </div>
+                    <div className="feat-body">
+                      <p className="feat-type-label">{item.propertyType || "Rental"}</p>
+                      <h3 className="feat-title">{item.title}</h3>
+                      <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>{item.county} · {item.location}</span>
+                      </p>
+                      <div className="feat-meta">
+                        <span className="feat-tag">{item.bedrooms} Bed</span>
+                        <span className="feat-tag">{item.bathrooms} Bath</span>
+                      </div>
+                      <p className="feat-price">
+                        KES {item.price?.toLocaleString()}<span>/month</span>
+                      </p>
+                      <button onClick={() => navigate(`/listings?property=${item._id}`)} className="feat-view-btn magical-btn">
+                        View Details →
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {featuredProperties.map((item, idx) => (
+                  <div key={`${item._id}-dup-${idx}`} className="feat-card">
+                    <div className="feat-img-wrap">
+                      <img
+                        src={getListingImage(item)}
+                        alt={item.title}
+                        className="feat-img"
+                        loading="lazy"
+                        onError={e => { e.target.style.display = "none"; }}
+                      />
+                      <div className="feat-boosted">★ Featured</div>
+                      <div className="feat-type">{item.propertyType || "Rental"}</div>
+                      <div className="feat-img-grad"></div>
+                    </div>
+                    <div className="feat-body">
+                      <p className="feat-type-label">{item.propertyType || "Rental"}</p>
+                      <h3 className="feat-title">{item.title}</h3>
+                      <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>{item.county} · {item.location}</span>
+                      </p>
+                      <div className="feat-meta">
+                        <span className="feat-tag">{item.bedrooms} Bed</span>
+                        <span className="feat-tag">{item.bathrooms} Bath</span>
+                      </div>
+                      <p className="feat-price">
+                        KES {item.price?.toLocaleString()}<span>/month</span>
+                      </p>
+                      <button onClick={() => navigate(`/listings?property=${item._id}`)} className="feat-view-btn magical-btn">
+                        View Details →
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
-        {allFeaturedListings.length === 0 ? (
+        {/* BUSINESSES */}
+        {featuredBusinesses.length > 0 && (
+          <div style={{ marginBottom: '48px', padding: '0 28px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Businesses</h3>
+              <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredBusinesses.length}</span>
+            </div>
+            <div className="cards-track-wrap">
+              <div className="cards-track" style={{ animationDuration: '20s' }}>
+                {featuredBusinesses.map((item, idx) => (
+                  <div key={`${item._id}-${idx}`} className="feat-card">
+                    <div className="feat-img-wrap">
+                      <img
+                        src={getListingImage(item)}
+                        alt={item.name}
+                        className="feat-img"
+                        loading="lazy"
+                        onError={e => { e.target.style.display = "none"; }}
+                      />
+                      <div className="feat-boosted">★ Featured</div>
+                      <div className="feat-type">{item.category || "Business"}</div>
+                      <div className="feat-img-grad"></div>
+                    </div>
+                    <div className="feat-body">
+                      <p className="feat-type-label">{item.category || "Business"}</p>
+                      <h3 className="feat-title">{item.name}</h3>
+                      <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>{item.county} · {item.location}</span>
+                      </p>
+                      <div className="feat-meta">
+                        <span className="feat-tag">{item.businessType || "General"}</span>
+                      </div>
+                      <p className="feat-price">
+                        KES {item.price?.toLocaleString()}<span>/month</span>
+                      </p>
+                      <button onClick={() => navigate(`/businesses?business=${item._id}`)} className="feat-view-btn magical-btn">
+                        View Details →
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {featuredBusinesses.map((item, idx) => (
+                  <div key={`${item._id}-dup-${idx}`} className="feat-card">
+                    <div className="feat-img-wrap">
+                      <img
+                        src={getListingImage(item)}
+                        alt={item.name}
+                        className="feat-img"
+                        loading="lazy"
+                        onError={e => { e.target.style.display = "none"; }}
+                      />
+                      <div className="feat-boosted">★ Featured</div>
+                      <div className="feat-type">{item.category || "Business"}</div>
+                      <div className="feat-img-grad"></div>
+                    </div>
+                    <div className="feat-body">
+                      <p className="feat-type-label">{item.category || "Business"}</p>
+                      <h3 className="feat-title">{item.name}</h3>
+                      <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>{item.county} · {item.location}</span>
+                      </p>
+                      <div className="feat-meta">
+                        <span className="feat-tag">{item.businessType || "General"}</span>
+                      </div>
+                      <p className="feat-price">
+                        KES {item.price?.toLocaleString()}<span>/month</span>
+                      </p>
+                      <button onClick={() => navigate(`/businesses?business=${item._id}`)} className="feat-view-btn magical-btn">
+                        View Details →
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* QUICKSALES */}
+        {featuredMaterials.length > 0 && (
+          <div style={{ marginBottom: '48px', padding: '0 28px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>QuickSales</h3>
+              <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredMaterials.length}</span>
+            </div>
+            <div className="cards-track-wrap">
+              <div className="cards-track" style={{ animationDuration: '20s' }}>
+                {featuredMaterials.map((item, idx) => (
+                  <div key={`${item._id}-${idx}`} className="feat-card">
+                    <div className="feat-img-wrap">
+                      <img
+                        src={getListingImage(item)}
+                        alt={item.name}
+                        className="feat-img"
+                        loading="lazy"
+                        onError={e => { e.target.style.display = "none"; }}
+                      />
+                      <div className="feat-boosted">★ Featured</div>
+                      <div className="feat-type">{item.category || "Item"}</div>
+                      <div className="feat-img-grad"></div>
+                    </div>
+                    <div className="feat-body">
+                      <p className="feat-type-label">{item.category || "Item"}</p>
+                      <h3 className="feat-title">{item.name}</h3>
+                      <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>{item.county} · {item.location}</span>
+                      </p>
+                      <div className="feat-meta">
+                        <span className="feat-tag">{item.condition || "Good"}</span>
+                      </div>
+                      <p className="feat-price">
+                        KES {item.price?.toLocaleString()}
+                      </p>
+                      <button onClick={() => navigate(`/materials?material=${item._id}`)} className="feat-view-btn magical-btn">
+                        View Details →
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {featuredMaterials.map((item, idx) => (
+                  <div key={`${item._id}-dup-${idx}`} className="feat-card">
+                    <div className="feat-img-wrap">
+                      <img
+                        src={getListingImage(item)}
+                        alt={item.name}
+                        className="feat-img"
+                        loading="lazy"
+                        onError={e => { e.target.style.display = "none"; }}
+                      />
+                      <div className="feat-boosted">★ Featured</div>
+                      <div className="feat-type">{item.category || "Item"}</div>
+                      <div className="feat-img-grad"></div>
+                    </div>
+                    <div className="feat-body">
+                      <p className="feat-type-label">{item.category || "Item"}</p>
+                      <h3 className="feat-title">{item.name}</h3>
+                      <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>{item.county} · {item.location}</span>
+                      </p>
+                      <div className="feat-meta">
+                        <span className="feat-tag">{item.condition || "Good"}</span>
+                      </div>
+                      <p className="feat-price">
+                        KES {item.price?.toLocaleString()}
+                      </p>
+                      <button onClick={() => navigate(`/materials?material=${item._id}`)} className="feat-view-btn magical-btn">
+                        View Details →
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TOURISM */}
+        {featuredTourism.length > 0 && (
+          <div style={{ marginBottom: '48px', padding: '0 28px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Tourism</h3>
+              <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredTourism.length}</span>
+            </div>
+            <div className="cards-track-wrap">
+              <div className="cards-track" style={{ animationDuration: '20s' }}>
+                {featuredTourism.map((item, idx) => (
+                  <div key={`${item._id}-${idx}`} className="feat-card">
+                    <div className="feat-img-wrap">
+                      <img
+                        src={getListingImage(item)}
+                        alt={item.name}
+                        className="feat-img"
+                        loading="lazy"
+                        onError={e => { e.target.style.display = "none"; }}
+                      />
+                      <div className="feat-boosted">★ Featured</div>
+                      <div className="feat-type">{item.type || "Tourism"}</div>
+                      <div className="feat-img-grad"></div>
+                    </div>
+                    <div className="feat-body">
+                      <p className="feat-type-label">{item.type || "Tourism"}</p>
+                      <h3 className="feat-title">{item.name}</h3>
+                      <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>{item.county} · {item.location}</span>
+                      </p>
+                      <div className="feat-meta">
+                        <span className="feat-tag">{item.amenities?.[0] || "Available"}</span>
+                      </div>
+                      <p className="feat-price">
+                        KES {item.price?.toLocaleString()}<span>/-night</span>
+                      </p>
+                      <button onClick={() => navigate(`/tourism/property/${item._id}`)} className="feat-view-btn magical-btn">
+                        View Details →
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {featuredTourism.map((item, idx) => (
+                  <div key={`${item._id}-dup-${idx}`} className="feat-card">
+                    <div className="feat-img-wrap">
+                      <img
+                        src={getListingImage(item)}
+                        alt={item.name}
+                        className="feat-img"
+                        loading="lazy"
+                        onError={e => { e.target.style.display = "none"; }}
+                      />
+                      <div className="feat-boosted">★ Featured</div>
+                      <div className="feat-type">{item.type || "Tourism"}</div>
+                      <div className="feat-img-grad"></div>
+                    </div>
+                    <div className="feat-body">
+                      <p className="feat-type-label">{item.type || "Tourism"}</p>
+                      <h3 className="feat-title">{item.name}</h3>
+                      <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>{item.county} · {item.location}</span>
+                      </p>
+                      <div className="feat-meta">
+                        <span className="feat-tag">{item.amenities?.[0] || "Available"}</span>
+                      </div>
+                      <p className="feat-price">
+                        KES {item.price?.toLocaleString()}<span>/night</span>
+                      </p>
+                      <button onClick={() => navigate(`/tourism/property/${item._id}`)} className="feat-view-btn magical-btn">
+                        View Details →
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MOVERS */}
+        {featuredMovers.length > 0 && (
+          <div style={{ marginBottom: '48px', padding: '0 28px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Movers</h3>
+              <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredMovers.length}</span>
+            </div>
+            <div className="cards-track-wrap">
+              <div className="cards-track" style={{ animationDuration: '20s' }}>
+                {featuredMovers.map((item, idx) => (
+                  <div key={`${item._id}-${idx}`} className="feat-card">
+                    <div className="feat-img-wrap">
+                      <img
+                        src={getListingImage(item)}
+                        alt={item.name}
+                        className="feat-img"
+                        loading="lazy"
+                        onError={e => { e.target.style.display = "none"; }}
+                      />
+                      <div className="feat-boosted">★ Featured</div>
+                      <div className="feat-type">{item.serviceType || "Mover"}</div>
+                      <div className="feat-img-grad"></div>
+                    </div>
+                    <div className="feat-body">
+                      <p className="feat-type-label">{item.serviceType || "Mover"}</p>
+                      <h3 className="feat-title">{item.name}</h3>
+                      <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>{item.county} · {item.location}</span>
+                      </p>
+                      <div className="feat-meta">
+                        <span className="feat-tag">{item.coverageArea || "Nationwide"}</span>
+                      </div>
+                      <p className="feat-price">
+                        KES {item.price?.toLocaleString()}<span>/trip</span>
+                      </p>
+                      <button onClick={() => navigate(`/movers?mover=${item._id}`)} className="feat-view-btn magical-btn">
+                        View Details →
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {featuredMovers.map((item, idx) => (
+                  <div key={`${item._id}-dup-${idx}`} className="feat-card">
+                    <div className="feat-img-wrap">
+                      <img
+                        src={getListingImage(item)}
+                        alt={item.name}
+                        className="feat-img"
+                        loading="lazy"
+                        onError={e => { e.target.style.display = "none"; }}
+                      />
+                      <div className="feat-boosted">★ Featured</div>
+                      <div className="feat-type">{item.serviceType || "Mover"}</div>
+                      <div className="feat-img-grad"></div>
+                    </div>
+                    <div className="feat-body">
+                      <p className="feat-type-label">{item.serviceType || "Mover"}</p>
+                      <h3 className="feat-title">{item.name}</h3>
+                      <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>{item.county} · {item.location}</span>
+                      </p>
+                      <div className="feat-meta">
+                        <span className="feat-tag">{item.coverageArea || "Nationwide"}</span>
+                      </div>
+                      <p className="feat-price">
+                        KES {item.price?.toLocaleString()}<span>/trip</span>
+                      </p>
+                      <button onClick={() => navigate(`/movers?mover=${item._id}`)} className="feat-view-btn magical-btn">
+                        View Details →
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {featuredProperties.length === 0 && featuredBusinesses.length === 0 && featuredMaterials.length === 0 && featuredTourism.length === 0 && featuredMovers.length === 0 && (
           <div className="no-feat-wrap" style={{ textAlign: 'center', padding: '40px 28px' }}>
             <span className="no-feat-icon" style={{ fontSize: '32px' }}></span>
             <h4 className="no-feat-title" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: C.gold, fontSize: '20px', marginTop: '12px' }}>No Featured Listings Found</h4>
             <p className="no-feat-sub" style={{ color: C.textMid, fontSize: '14px' }}>Check back later for active premium listings!</p>
-          </div>
-        ) : (
-          <div className="cards-track-wrap">
-            <div key={activeFeaturedTab} className="cards-track" style={{ animationDuration: '20s' }}>
-              {/* First group */}
-              {allFeaturedListings.map((item, idx) => (
-                <div key={`${item._id}-${idx}`} className="feat-card">
-                  <div className="feat-img-wrap">
-                    <img
-                      src={getListingImage(item)}
-                      alt={item.title || item.name}
-                      className="feat-img"
-                      loading="lazy"
-                      onError={e => { e.target.style.display = "none"; }}
-                    />
-                    <div className="feat-boosted">★ Featured</div>
-                    <div className="feat-type">{item.typeText}</div>
-                    <div className="feat-img-grad"></div>
-                  </div>
-                  <div className="feat-body">
-                    <p className="feat-type-label">{item.typeLabel}</p>
-                    <h3 className="feat-title">{item.title || item.name}</h3>
-                    <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                      <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                      <span>{item.subtitleText}</span>
-                    </p>
-                    <div className="feat-meta">
-                      {item.tags.map((tag, tagIdx) => (
-                        <span key={tagIdx} className="feat-tag">{tag}</span>
-                      ))}
-                    </div>
-                    <p className="feat-price">
-                      {item.priceText}
-                    </p>
-                    <button onClick={() => navigate(item.detailPath)} className="feat-view-btn magical-btn">
-                      View Details →
-                    </button>
-                  </div>
-                </div>
-              ))}
-              {/* Duplicate group for infinite scroll */}
-              {allFeaturedListings.map((item, idx) => (
-                <div key={`${item._id}-dup-${idx}`} className="feat-card">
-                  <div className="feat-img-wrap">
-                    <img
-                      src={getListingImage(item)}
-                      alt={item.title || item.name}
-                      className="feat-img"
-                      loading="lazy"
-                      onError={e => { e.target.style.display = "none"; }}
-                    />
-                    <div className="feat-boosted">★ Featured</div>
-                    <div className="feat-type">{item.typeText}</div>
-                    <div className="feat-img-grad"></div>
-                  </div>
-                  <div className="feat-body">
-                    <p className="feat-type-label">{item.typeLabel}</p>
-                    <h3 className="feat-title">{item.title || item.name}</h3>
-                    <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                      <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                      <span>{item.subtitleText}</span>
-                    </p>
-                    <div className="feat-meta">
-                      {item.tags.map((tag, tagIdx) => (
-                        <span key={tagIdx} className="feat-tag">{tag}</span>
-                      ))}
-                    </div>
-                    <p className="feat-price">
-                      {item.priceText}
-                    </p>
-                    <button onClick={() => navigate(item.detailPath)} className="feat-view-btn magical-btn">
-                      View Details →
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         )}
       </section>
@@ -2159,13 +2460,13 @@ export default function Home() {
               onClick={() => setDemoTab("services")}
               className={`demo-tab-btn ${demoTab === "services" ? "active" : ""}`}
             >
-               Service Popularity
+              Service Popularity
             </button>
             <button
               onClick={() => setDemoTab("counties")}
               className={`demo-tab-btn ${demoTab === "counties" ? "active" : ""}`}
             >
-               Top Counties
+              Top Counties
             </button>
           </div>
 
