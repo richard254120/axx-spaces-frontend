@@ -277,10 +277,7 @@ export default function Listings() {
           </div>
 
           {!user ? (
-            <div style={{ display: "flex", gap: "10px" }}>
-              <button className="btn-ghost" style={{ ...S.btnGhost, padding: "8px 18px", fontSize: "0.8rem" }} onClick={() => window.location.href = "/login"}>Sign In</button>
-              <button className="btn-gold" style={{ ...S.btnGold, padding: "8px 18px", fontSize: "0.8rem" }} onClick={() => window.location.href = "/register"}>List Your Property</button>
-            </div>
+            <button className="btn-gold" style={{ ...S.btnGold, padding: "8px 18px", fontSize: "0.8rem" }} onClick={() => window.location.href = "/register"}>List Your Property</button>
           ) : (
             <div style={{ display: "flex", gap: "10px" }}>
               {user.role === "landlord" && (
