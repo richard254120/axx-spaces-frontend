@@ -2005,7 +2005,7 @@ export default function Home() {
                       <h3 className="feat-title">{item.title}</h3>
                       <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        <span>{item.county} · {item.location}</span>
+                        <span>{item.county} · {typeof item.location === 'object' ? item.location.town || item.location.address : item.location}</span>
                       </p>
                       <div className="feat-meta">
                         <span className="feat-tag">{item.bedrooms} Bed</span>
@@ -2039,7 +2039,7 @@ export default function Home() {
                       <h3 className="feat-title">{item.title}</h3>
                       <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        <span>{item.county} · {item.location}</span>
+                        <span>{item.county} · {typeof item.location === 'object' ? item.location.town || item.location.address : item.location}</span>
                       </p>
                       <div className="feat-meta">
                         <span className="feat-tag">{item.bedrooms} Bed</span>
@@ -2087,7 +2087,7 @@ export default function Home() {
                       <h3 className="feat-title">{item.name}</h3>
                       <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        <span>{item.county} · {item.location}</span>
+                        <span>{item.county} · {typeof item.location === 'object' ? item.location.town || item.location.address : item.location}</span>
                       </p>
                       <div className="feat-meta">
                         <span className="feat-tag">{item.businessType || "General"}</span>
@@ -2120,7 +2120,7 @@ export default function Home() {
                       <h3 className="feat-title">{item.name}</h3>
                       <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        <span>{item.county} · {item.location}</span>
+                        <span>{item.county} · {typeof item.location === 'object' ? item.location.town || item.location.address : item.location}</span>
                       </p>
                       <div className="feat-meta">
                         <span className="feat-tag">{item.businessType || "General"}</span>
@@ -2167,7 +2167,7 @@ export default function Home() {
                       <h3 className="feat-title">{item.name}</h3>
                       <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        <span>{item.county} · {item.location}</span>
+                        <span>{item.county} · {typeof item.location === 'object' ? item.location.town || item.location.address : item.location}</span>
                       </p>
                       <div className="feat-meta">
                         <span className="feat-tag">{item.condition || "Good"}</span>
@@ -2200,7 +2200,7 @@ export default function Home() {
                       <h3 className="feat-title">{item.name}</h3>
                       <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        <span>{item.county} · {item.location}</span>
+                        <span>{item.county} · {typeof item.location === 'object' ? item.location.town || item.location.address : item.location}</span>
                       </p>
                       <div className="feat-meta">
                         <span className="feat-tag">{item.condition || "Good"}</span>
@@ -2247,7 +2247,7 @@ export default function Home() {
                       <h3 className="feat-title">{item.name}</h3>
                       <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        <span>{item.county} · {item.location}</span>
+                        <span>{item.county} · {typeof item.location === 'object' ? item.location.town || item.location.address : item.location}</span>
                       </p>
                       <div className="feat-meta">
                         <span className="feat-tag">{item.amenities?.[0] || "Available"}</span>
@@ -2280,7 +2280,7 @@ export default function Home() {
                       <h3 className="feat-title">{item.name}</h3>
                       <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        <span>{item.county} · {item.location}</span>
+                        <span>{item.county} · {typeof item.location === 'object' ? item.location.town || item.location.address : item.location}</span>
                       </p>
                       <div className="feat-meta">
                         <span className="feat-tag">{item.amenities?.[0] || "Available"}</span>
@@ -2327,7 +2327,7 @@ export default function Home() {
                       <h3 className="feat-title">{item.name}</h3>
                       <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        <span>{item.county} · {item.location}</span>
+                        <span>{item.county} · {typeof item.location === 'object' ? item.location.town || item.location.address : item.location}</span>
                       </p>
                       <div className="feat-meta">
                         <span className="feat-tag">{item.coverageArea || "Nationwide"}</span>
@@ -2360,7 +2360,7 @@ export default function Home() {
                       <h3 className="feat-title">{item.name}</h3>
                       <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        <span>{item.county} · {item.location}</span>
+                        <span>{item.county} · {typeof item.location === 'object' ? item.location.town || item.location.address : item.location}</span>
                       </p>
                       <div className="feat-meta">
                         <span className="feat-tag">{item.coverageArea || "Nationwide"}</span>
