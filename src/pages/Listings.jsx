@@ -582,7 +582,7 @@ export default function Listings() {
                   }
                   {/* Badges */}
                   <div style={{ ...S.availBadge, ...(property.availableUnits > 0 ? S.availBadgeGreen : S.availBadgeRed) }}>
-                    {property.availableUnits > 0 ? `${property.availableUnits} Available` : "Fully Booked"}
+                    {property.availableUnits > 0 ? `${property.availableUnits} Available` : "Fully Occupied"}
                   </div>
                   {property.images?.length > 1 && (
                     <div style={S.photoBadge}>{property.images.length} Photos</div>
@@ -836,10 +836,10 @@ export default function Listings() {
                   </div>
                 </>
               ) : (
-                /* Fully Booked notice — no contact info shown */
+                /* Fully Occupied notice — no contact info shown */
                 <div style={{ background: "rgba(224,82,82,0.1)", border: "1px solid rgba(224,82,82,0.25)", borderRadius: "10px", padding: "18px 20px", textAlign: "center" }}>
                   <div style={{ fontSize: "1.6rem", marginBottom: "8px" }}></div>
-                  <div style={{ color: "#F28B8B", fontWeight: 700, fontSize: "1rem", marginBottom: "4px" }}>Fully Booked</div>
+                  <div style={{ color: "#F28B8B", fontWeight: 700, fontSize: "1rem", marginBottom: "4px" }}>Fully Occupied</div>
                   <div style={{ color: "#B8AD96", fontSize: "0.88rem" }}>All units are currently occupied. Check back later for availability.</div>
                 </div>
               )}
