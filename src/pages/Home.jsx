@@ -1985,7 +1985,7 @@ export default function Home() {
               <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredProperties.length}</span>
             </div>
             <div className="cards-track-wrap">
-              <div className="cards-track" style={{ animationDuration: '20s' }}>
+              <div className="cards-track" style={{ animationDuration: '10s' }}>
                 {featuredProperties.map((item, idx) => (
                   <div key={`${item._id}-${idx}`} className="feat-card">
                     <div className="feat-img-wrap">
@@ -2067,7 +2067,7 @@ export default function Home() {
               <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredBusinesses.length}</span>
             </div>
             <div className="cards-track-wrap">
-              <div className="cards-track" style={{ animationDuration: '20s' }}>
+              <div className="cards-track" style={{ animationDuration: '10s' }}>
                 {featuredBusinesses.map((item, idx) => (
                   <div key={`${item._id}-${idx}`} className="feat-card">
                     <div className="feat-img-wrap">
@@ -2147,7 +2147,7 @@ export default function Home() {
               <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredMaterials.length}</span>
             </div>
             <div className="cards-track-wrap">
-              <div className="cards-track" style={{ animationDuration: '20s' }}>
+              <div className="cards-track" style={{ animationDuration: '10s' }}>
                 {featuredMaterials.map((item, idx) => (
                   <div key={`${item._id}-${idx}`} className="feat-card">
                     <div className="feat-img-wrap">
@@ -2227,7 +2227,7 @@ export default function Home() {
               <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredTourism.length}</span>
             </div>
             <div className="cards-track-wrap">
-              <div className="cards-track" style={{ animationDuration: '20s' }}>
+              <div className="cards-track" style={{ animationDuration: '10s' }}>
                 {featuredTourism.map((item, idx) => (
                   <div key={`${item._id}-${idx}`} className="feat-card">
                     <div className="feat-img-wrap">
@@ -2307,7 +2307,7 @@ export default function Home() {
               <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredMovers.length}</span>
             </div>
             <div className="cards-track-wrap">
-              <div className="cards-track" style={{ animationDuration: '20s' }}>
+              <div className="cards-track" style={{ animationDuration: '10s' }}>
                 {featuredMovers.map((item, idx) => (
                   <div key={`${item._id}-${idx}`} className="feat-card">
                     <div className="feat-img-wrap">
