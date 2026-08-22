@@ -117,7 +117,7 @@ const accountTypes = [
   },
   {
     id: "marketplace",
-    name: "Marketplace Account",
+    name: "QuickSales Account",
     icon: "/assets/marketplace-icon.png",
     description: "Buy and sell goods in the marketplace",
     loginPath: "/seller-login",
