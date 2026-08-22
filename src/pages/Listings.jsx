@@ -707,9 +707,19 @@ export default function Listings() {
                   <div style={S.modalType}>{selectedProperty.propertyType || "Rental"}</div>
                   <h2 style={S.modalTitle}>{selectedProperty.title}</h2>
                   <p style={{ ...S.modalLocation, display: "flex", alignItems: "center", gap: "4px" }}>
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="#C9A84C" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="#E31B1B" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                     <span>{selectedProperty.county} · {selectedProperty.location}</span>
                   </p>
+                  {selectedProperty.lat && selectedProperty.lng && (
+                    <a
+                      href={`https://www.google.com/maps?q=${selectedProperty.lat},${selectedProperty.lng}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ color: "#E31B1B", fontSize: "0.85rem", textDecoration: "none", fontWeight: 600, marginTop: "4px", display: "inline-block" }}
+                    >
+                      View on Map →
+                    </a>
+                  )}
                 </div>
                 <div style={S.modalPriceBlock}>
                   <div style={S.modalPrice}>KES {selectedProperty.price?.toLocaleString()}</div>
@@ -717,68 +727,35 @@ export default function Listings() {
                 </div>
               </div>
 
-              {/* GPS Coordinates */}
-              {selectedProperty.lat && selectedProperty.lng && (
-                <div style={S.gpsBox}>
-                  <div style={S.gpsCoords}>
-                    <div style={S.gpsCoordItem}>
-                      <span style={S.gpsLabel}>Latitude:</span>
-                      <span style={S.gpsValue}>{selectedProperty.lat.toFixed(6)}</span>
-                    </div>
-                    <div style={S.gpsCoordItem}>
-                      <span style={S.gpsLabel}>Longitude:</span>
-                      <span style={S.gpsValue}>{selectedProperty.lng.toFixed(6)}</span>
-                    </div>
-                  </div>
-                  <a
-                    href={`https://www.google.com/maps?q=${selectedProperty.lat},${selectedProperty.lng}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    style={S.mapLink}
-                  >
-                    Open in Google Maps
-                  </a>
-                </div>
-              )}
-
               <div style={S.modalSpecsRow}>
-                <div style={S.modalSpec}><span style={S.modalSpecNum}>{selectedProperty.bedrooms}</span><span style={S.modalSpecLbl}>Bedrooms</span></div>
+                <div style={S.modalSpec}><span style={S.modalSpecNum}>{selectedProperty.bedrooms}</span><span style={S.modalSpecLbl}>Beds</span></div>
                 <div style={S.modalSpecDiv} />
-                <div style={S.modalSpec}><span style={S.modalSpecNum}>{selectedProperty.bathrooms}</span><span style={S.modalSpecLbl}>Bathrooms</span></div>
+                <div style={S.modalSpec}><span style={S.modalSpecNum}>{selectedProperty.bathrooms}</span><span style={S.modalSpecLbl}>Baths</span></div>
                 <div style={S.modalSpecDiv} />
                 <div style={S.modalSpec}><span style={S.modalSpecNum}>{selectedProperty.availableUnits}</span><span style={S.modalSpecLbl}>Available</span></div>
                 <div style={S.modalSpecDiv} />
                 <div style={S.modalSpec}><span style={S.modalSpecNum}>{selectedProperty.furnished ? "Yes" : "No"}</span><span style={S.modalSpecLbl}>Furnished</span></div>
               </div>
 
-              {/* Pricing boxes */}
+              {/* Pricing info */}
               {(selectedProperty.deposit > 0 || selectedProperty.leaseType) && (
-                <div style={S.pricingRow}>
+                <div style={{ display: "flex", gap: "12px", marginBottom: "20px", flexWrap: "wrap" }}>
                   {selectedProperty.deposit > 0 && (
-                    <div style={S.pricingBox}>
-                      <span style={S.pricingLbl}>Deposit</span>
-                      <span style={S.pricingVal}>KES {selectedProperty.deposit?.toLocaleString()}</span>
+                    <div style={{ background: "#f9fafb", padding: "10px 16px", borderRadius: "8px", fontSize: "0.85rem" }}>
+                      <span style={{ color: "#6b7280", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.08em" }}>Deposit</span>
+                      <span style={{ color: "#0B2140", fontWeight: 700, marginLeft: "8px" }}>KES {selectedProperty.deposit?.toLocaleString()}</span>
                     </div>
                   )}
                   {selectedProperty.leaseType && (
-                    <div style={S.pricingBox}>
-                      <span style={S.pricingLbl}>Lease Term</span>
-                      <span style={S.pricingVal}>{leaseLabel[selectedProperty.leaseType] || selectedProperty.leaseType}</span>
+                    <div style={{ background: "#f9fafb", padding: "10px 16px", borderRadius: "8px", fontSize: "0.85rem" }}>
+                      <span style={{ color: "#6b7280", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.08em" }}>Lease</span>
+                      <span style={{ color: "#0B2140", fontWeight: 700, marginLeft: "8px" }}>{leaseLabel[selectedProperty.leaseType] || selectedProperty.leaseType}</span>
                     </div>
                   )}
                 </div>
               )}
 
-              {/* Description */}
               <p style={S.modalDesc}>{selectedProperty.description}</p>
-
-              {/* Rules */}
-              {selectedProperty.rules && (
-                <div style={S.rulesBox}>
-                  <h4 style={S.sectionHead}>House Rules</h4>
-                  <p style={S.rulesText}>{selectedProperty.rules}</p>
-                </div>
-              )}
 
               {/* Amenities */}
               {selectedProperty.amenities?.length > 0 && (
@@ -792,73 +769,51 @@ export default function Listings() {
                 </div>
               )}
 
-              {/* Availability */}
-              <div style={S.section}>
-                <h4 style={S.sectionHead}>Unit Availability</h4>
-                <div style={S.unitGrid}>
-                  <div style={S.unitBox}><p style={S.unitLbl}>Total Units</p><p style={S.unitNum}>{selectedProperty.totalUnits || 1}</p></div>
-                  <div style={S.unitBox}><p style={S.unitLbl}>Booked</p><p style={S.unitNum}>{selectedProperty.bookedUnits || 0}</p></div>
-                  <div style={{ ...S.unitBox, background: "rgba(180,150,80,0.12)", border: "1px solid rgba(180,150,80,0.3)" }}><p style={S.unitLbl}>Available</p><p style={{ ...S.unitNum, color: "#C9A84C" }}>{selectedProperty.availableUnits}</p></div>
+              {/* Rules */}
+              {selectedProperty.rules && (
+                <div style={S.rulesBox}>
+                  <h4 style={S.sectionHead}>House Rules</h4>
+                  <p style={S.rulesText}>{selectedProperty.rules}</p>
                 </div>
-              </div>
+              )}
 
-              {/* Landlord & Agent info + CTA — only when units are available */}
+              {/* Contact Info & CTA */}
               {selectedProperty.availableUnits > 0 ? (
                 <>
-                  {/* Landlord */}
-                  <div style={S.contactCard}>
-                    <div style={S.contactCardLabel}>Listed by</div>
-                    <div style={S.contactCardName}>{selectedProperty.owner?.name || "—"}</div>
-                    <div style={S.contactCardPhone}>{selectedProperty.owner?.phone || "—"}</div>
-                  </div>
-
-                  {/* Agent */}
-                  {selectedProperty.assignedAgent && (
-                    <div style={{ ...S.contactCard, borderColor: "rgba(180,150,80,0.3)" }}>
-                      <div style={S.contactCardLabel}>Property Agent</div>
-                      <div style={S.contactCardName}>{selectedProperty.assignedAgent?.name || "—"}</div>
-                      <div style={S.contactCardPhone}>{selectedProperty.assignedAgent?.phone || "—"}</div>
-                      <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
-                        <button style={S.agentWaBtn} onClick={() => { const ph = formatKenyaPhone(selectedProperty.assignedAgent?.phone || ""); const n = selectedProperty.assignedAgent?.name || "Agent"; window.open(`https://wa.me/${ph}?text=${encodeURIComponent(`Hi ${n}, I'm interested in "${selectedProperty.title}".`)}`, "_blank"); }}>WhatsApp Agent</button>
-                        <button style={S.agentCallBtn} onClick={() => window.open(`tel:+254${selectedProperty.assignedAgent?.phone || ""}`)}>Call Agent</button>
+                  <div style={{ background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "16px 18px", marginBottom: "16px" }}>
+                    <div style={{ fontSize: "0.68rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "#6b7280", marginBottom: "8px" }}>Contact</div>
+                    <div style={{ color: "#0B2140", fontSize: "1rem", fontWeight: 700, marginBottom: "4px" }}>{selectedProperty.owner?.name || "—"}</div>
+                    <div style={{ color: "#6b7280", fontSize: "0.87rem" }}>{selectedProperty.owner?.phone || "—"}</div>
+                    {selectedProperty.assignedAgent && (
+                      <div style={{ marginTop: "12px", paddingTop: "12px", borderTop: "1px solid #e5e7eb" }}>
+                        <div style={{ fontSize: "0.68rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "#6b7280", marginBottom: "8px" }}>Agent</div>
+                        <div style={{ color: "#0B2140", fontSize: "0.95rem", fontWeight: 600 }}>{selectedProperty.assignedAgent?.name}</div>
+                        <div style={{ color: "#6b7280", fontSize: "0.85rem" }}>{selectedProperty.assignedAgent?.phone}</div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
 
                   <ShareProperty property={selectedProperty} />
 
-                  {/* CTA Buttons */}
                   <div style={S.ctaGrid}>
                     <button style={{ ...S.ctaBtn, ...S.ctaWa }} onClick={() => handleContactLandlord(selectedProperty)}>WhatsApp</button>
-                    <button style={{ ...S.ctaBtn, ...S.ctaCall }} onClick={() => window.open(`tel:${selectedProperty.owner?.phone || selectedProperty.phone}`)}> Call</button>
-                    <button style={{ ...S.ctaBtn, ...S.ctaSms }} onClick={() => handleSendSMS(selectedProperty)}>SMS</button>
+                    <button style={{ ...S.ctaBtn, ...S.ctaCall }} onClick={() => window.open(`tel:${selectedProperty.owner?.phone || selectedProperty.phone}`)}>Call</button>
                     <button style={{ ...S.ctaBtn, ...S.ctaBook }} onClick={() => handleBookNow(selectedProperty)}>Book Now</button>
                   </div>
                 </>
               ) : (
-                /* Fully Occupied notice — no contact info shown */
                 <div style={{ background: "rgba(224,82,82,0.1)", border: "1px solid rgba(224,82,82,0.25)", borderRadius: "10px", padding: "18px 20px", textAlign: "center" }}>
-                  <div style={{ fontSize: "1.6rem", marginBottom: "8px" }}></div>
-                  <div style={{ color: "#F28B8B", fontWeight: 700, fontSize: "1rem", marginBottom: "4px" }}>Fully Occupied</div>
-                  <div style={{ color: "#B8AD96", fontSize: "0.88rem" }}>All units are currently occupied. Check back later for availability.</div>
+                  <div style={{ color: "#dc2626", fontWeight: 700, fontSize: "1rem", marginBottom: "4px" }}>Fully Occupied</div>
+                  <div style={{ color: "#6b7280", fontSize: "0.88rem" }}>All units are currently occupied. Check back later for availability.</div>
                 </div>
               )}
 
-              {/* Booking Calendar */}
-              <div style={S.section}>
-                <h4 style={S.sectionHead}>Check Availability</h4>
-                <BookingCalendar propertyId={selectedProperty._id} availableUnits={selectedProperty.availableUnits} />
-              </div>
-
-              {/* Messaging — only when units are available */}
               {user && selectedProperty.availableUnits > 0 && (
                 <div style={S.section}>
-                  <h4 style={S.sectionHead}>Message Landlord</h4>
+                  <h4 style={S.sectionHead}>Send Message</h4>
                   <MessagingSystem recipientId={selectedProperty.owner?._id || selectedProperty.owner?.id} recipientName={selectedProperty.owner?.name || "Landlord"} recipientType="landlord" propertyId={selectedProperty._id} propertyTitle={selectedProperty.title} />
                 </div>
               )}
-
-              <ReviewsSection propertyId={selectedProperty._id} />
             </div>
           </div>
         </div>
