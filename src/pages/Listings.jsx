@@ -14,31 +14,6 @@ import { kenyanUniversities, searchUniversities } from "../data/kenyanUniversiti
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
-const PROPERTY_TYPES = [
-  "All Types",
-  "Bedsitter",
-  "Studio Apartment",
-  "1 Bedroom",
-  "2 Bedroom",
-  "3 Bedroom",
-  "4+ Bedroom",
-  "Maisonette",
-  "Bungalow",
-  "Townhouse",
-  "Apartment Block",
-  "Single Room",
-  "Shared Room",
-  "Hostel Room",
-  "Commercial Office",
-  "Shop / Retail Space",
-  "Warehouse",
-  "Plot / Land",
-  "Furnished Apartment",
-  "Unfurnished Apartment",
-  "Penthouse",
-  "Duplex",
-];
-
 const formatKenyaPhone = (phone) => {
   if (!phone) return "";
   let cleaned = phone.toString().replace(/\D/g, "");
@@ -88,7 +63,6 @@ export default function Listings() {
   const [universitySearch, setUniversitySearch] = useState("");
   const [universityProperties, setUniversityProperties] = useState([]);
   const [universityLoading, setUniversityLoading] = useState(false);
-  const [sidebarPropertyType, setSidebarPropertyType] = useState("All Types");
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -154,10 +128,9 @@ export default function Listings() {
     if (filters.petFriendly !== "") filtered = filtered.filter((p) => p.petFriendly === (filters.petFriendly === "true"));
     if (filters.availableFrom) filtered = filtered.filter((p) => { if (!p.availableFrom) return true; return new Date(p.availableFrom) <= new Date(filters.availableFrom); });
     if (showFavoritesOnly) filtered = filtered.filter((p) => favorites.includes(p._id));
-    if (sidebarPropertyType !== "All Types") filtered = filtered.filter((p) => (p.propertyType || "").toLowerCase() === sidebarPropertyType.toLowerCase());
     filtered = filtered.filter((p) => p.price >= filters.minPrice && p.price <= filters.maxPrice);
     setFilteredProperties(filtered);
-  }, [filters, properties, favorites, showFavoritesOnly, sidebarPropertyType]);
+  }, [filters, properties, favorites, showFavoritesOnly]);
 
   useEffect(() => {
     if (!showUniversityHostels || !selectedUniversity?.id) {
@@ -319,376 +292,353 @@ export default function Listings() {
       </div>
 
       <div style={S.mainBody}>
-        {/* ── LEFT SIDEBAR (Property Types) ── */}
+
+        {error && <div style={S.errorBar}>{error}</div>}
+
+        {/* ── TABS SECTION ── */}
+        <div style={S.tabsSection}>
+          <button
+            className="tab-btn"
+            style={{ ...S.tabBtn, ...(!showUniversityHostels ? S.tabBtnActive : {}) }}
+            onClick={() => setShowUniversityHostels(false)}
+          >
+            All Rentals
+          </button>
+          <button
+            className="tab-btn"
+            style={{ ...S.tabBtn, ...(showUniversityHostels ? S.tabBtnActive : {}) }}
+            onClick={() => setShowUniversityHostels(true)}
+          >
+            University Hostels
+          </button>
+        </div>
+
+        {/* ── SEARCH STRIP (only show when NOT in university hostels mode) ── */}
         {!showUniversityHostels && (
-          <div style={S.sidebar}>
-            <h3 style={S.sidebarTitle}>Property Types</h3>
-            <div style={S.sidebarScroll}>
-              {PROPERTY_TYPES.map((type) => (
-                <button
-                  key={type}
-                  style={{
-                    ...S.sidebarItem,
-                    ...(sidebarPropertyType === type ? S.sidebarItemActive : {}),
-                  }}
-                  onClick={() => setSidebarPropertyType(type)}
-                >
-                  {type}
-                </button>
-              ))}
+          <div style={S.searchStrip}>
+            <div style={S.searchStripInner}>
+              <div style={S.searchField}>
+                <span style={S.searchIcon}>⌖</span>
+                <input type="text" name="location" placeholder="Location or county…" value={filters.location} onChange={handleFilterChange} style={S.searchInput} className="search-inp" />
+              </div>
+              <div style={S.searchDivider} />
+              <div style={S.searchField}>
+                <span style={S.searchIcon}>⊞</span>
+                <select name="propertyType" value={filters.propertyType} onChange={handleFilterChange} style={S.searchSelect} className="search-inp">
+                  <option value="">Property Type</option>
+                  <option value="apartment">Apartment</option>
+                  <option value="bedsitter">Bedsitter</option>
+                  <option value="maisonette">Maisonette</option>
+                  <option value="studio">Studio</option>
+                  <option value="house">House</option>
+                </select>
+              </div>
+              <div style={S.searchDivider} />
+              <div style={S.searchField}>
+                <span style={S.searchIcon}></span>
+                <select name="bedrooms" value={filters.bedrooms} onChange={handleFilterChange} style={S.searchSelect} className="search-inp">
+                  <option value="">Bedrooms</option>
+                  <option value="1">1 Bedroom</option>
+                  <option value="2">2 Bedrooms</option>
+                  <option value="3">3 Bedrooms</option>
+                  <option value="4">4+ Bedrooms</option>
+                </select>
+              </div>
+              <div style={S.searchDivider} />
+              <button className="btn-gold" style={{ ...S.btnGold, padding: "0 28px", fontSize: "0.85rem", borderRadius: "6px" }} onClick={() => setFiltersOpen(v => !v)}>
+                {filtersOpen ? "Close Filters" : "More Filters"}
+              </button>
             </div>
           </div>
         )}
 
-        <div style={S.contentArea}>
-
-          {error && <div style={S.errorBar}>{error}</div>}
-
-          {/* ── TABS SECTION ── */}
-          <div style={S.tabsSection}>
-            <button
-              className="tab-btn"
-              style={{ ...S.tabBtn, ...(!showUniversityHostels ? S.tabBtnActive : {}) }}
-              onClick={() => setShowUniversityHostels(false)}
-            >
-              All Rentals
-            </button>
-            <button
-              className="tab-btn"
-              style={{ ...S.tabBtn, ...(showUniversityHostels ? S.tabBtnActive : {}) }}
-              onClick={() => setShowUniversityHostels(true)}
-            >
-              University Hostels
-            </button>
+        {/* ── EXPANDED FILTERS (only show when NOT in university hostels mode) ── */}
+        {!showUniversityHostels && filtersOpen && (
+          <div style={S.filtersPanel} className="filters-panel">
+            <div style={S.filtersGrid}>
+              <div style={S.filterGroup}>
+                <label style={S.filterLabel}>Bathrooms</label>
+                <select name="bathrooms" value={filters.bathrooms} onChange={handleFilterChange} style={S.filterCtrl} className="filter-ctrl">
+                  <option value="">Any</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3+</option>
+                </select>
+              </div>
+              <div style={S.filterGroup}>
+                <label style={S.filterLabel}>Furnished</label>
+                <select name="furnished" value={filters.furnished} onChange={handleFilterChange} style={S.filterCtrl} className="filter-ctrl">
+                  <option value="">Either</option>
+                  <option value="true">Furnished</option>
+                  <option value="false">Unfurnished</option>
+                </select>
+              </div>
+              <div style={S.filterGroup}>
+                <label style={S.filterLabel}>Pet Policy</label>
+                <select name="petFriendly" value={filters.petFriendly} onChange={handleFilterChange} style={S.filterCtrl} className="filter-ctrl">
+                  <option value="">Any</option>
+                  <option value="true">Pet Friendly</option>
+                  <option value="false">No Pets</option>
+                </select>
+              </div>
+              <div style={S.filterGroup}>
+                <label style={S.filterLabel}>Amenity</label>
+                <input type="text" name="amenities" placeholder="WiFi, Parking…" value={filters.amenities} onChange={handleFilterChange} style={S.filterCtrl} className="filter-ctrl" />
+              </div>
+              <div style={S.filterGroup}>
+                <label style={S.filterLabel}>Available From</label>
+                <input type="date" name="availableFrom" value={filters.availableFrom} onChange={handleFilterChange} style={S.filterCtrl} className="filter-ctrl" />
+              </div>
+              <div style={S.filterGroup}>
+                <label style={S.filterLabel}>Min Price (KES)</label>
+                <input type="number" name="minPrice" placeholder="0" value={filters.minPrice} onChange={handleFilterChange} style={S.filterCtrl} className="filter-ctrl" />
+              </div>
+              <div style={S.filterGroup}>
+                <label style={S.filterLabel}>Max Price (KES)</label>
+                <input type="number" name="maxPrice" placeholder="1,000,000" value={filters.maxPrice} onChange={handleFilterChange} style={S.filterCtrl} className="filter-ctrl" />
+              </div>
+            </div>
           </div>
+        )}
 
-          {/* ── SEARCH STRIP (only show when NOT in university hostels mode) ── */}
-          {!showUniversityHostels && (
-            <div style={S.searchStrip}>
-              <div style={S.searchStripInner}>
-                <div style={S.searchField}>
-                  <span style={S.searchIcon}>⌖</span>
-                  <input type="text" name="location" placeholder="Location or county…" value={filters.location} onChange={handleFilterChange} style={S.searchInput} className="search-inp" />
-                </div>
-                <div style={S.searchDivider} />
-                <div style={S.searchField}>
-                  <span style={S.searchIcon}>⊞</span>
-                  <select name="propertyType" value={filters.propertyType} onChange={handleFilterChange} style={S.searchSelect} className="search-inp">
-                    <option value="">Property Type</option>
-                    <option value="apartment">Apartment</option>
-                    <option value="bedsitter">Bedsitter</option>
-                    <option value="maisonette">Maisonette</option>
-                    <option value="studio">Studio</option>
-                    <option value="house">House</option>
-                  </select>
-                </div>
-                <div style={S.searchDivider} />
-                <div style={S.searchField}>
-                  <span style={S.searchIcon}></span>
-                  <select name="bedrooms" value={filters.bedrooms} onChange={handleFilterChange} style={S.searchSelect} className="search-inp">
-                    <option value="">Bedrooms</option>
-                    <option value="1">1 Bedroom</option>
-                    <option value="2">2 Bedrooms</option>
-                    <option value="3">3 Bedrooms</option>
-                    <option value="4">4+ Bedrooms</option>
-                  </select>
-                </div>
-                <div style={S.searchDivider} />
-                <button className="btn-gold" style={{ ...S.btnGold, padding: "0 28px", fontSize: "0.85rem", borderRadius: "6px" }} onClick={() => setFiltersOpen(v => !v)}>
-                  {filtersOpen ? "Close Filters" : "More Filters"}
+        {/* ── TOOLBAR (only show when NOT in university hostels mode) ── */}
+        {!showUniversityHostels && (
+          <div style={S.toolbar}>
+            <p style={S.resultsText}>
+              <span style={S.resultsNum}>{filteredProperties.length}</span>
+              {filteredProperties.length === 1 ? " property found" : " properties found"}
+              {favorites.length > 0 && <span style={S.toolbarBit}> ·  {favorites.length} saved</span>}
+            </p>
+            <div style={S.toolbarActions}>
+              <button className="tool-btn" style={S.toolBtn} onClick={saveCurrentSearch}> Save Search</button>
+              {savedSearches.length > 0 && (
+                <button className="tool-btn" style={{ ...S.toolBtn, ...(showSavedSearches ? S.toolBtnActive : {}) }} onClick={() => setShowSavedSearches(!showSavedSearches)}>
+                  Saved ({savedSearches.length})
                 </button>
-              </div>
-            </div>
-          )}
-
-          {/* ── EXPANDED FILTERS (only show when NOT in university hostels mode) ── */}
-          {!showUniversityHostels && filtersOpen && (
-            <div style={S.filtersPanel} className="filters-panel">
-              <div style={S.filtersGrid}>
-                <div style={S.filterGroup}>
-                  <label style={S.filterLabel}>Bathrooms</label>
-                  <select name="bathrooms" value={filters.bathrooms} onChange={handleFilterChange} style={S.filterCtrl} className="filter-ctrl">
-                    <option value="">Any</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3+</option>
-                  </select>
-                </div>
-                <div style={S.filterGroup}>
-                  <label style={S.filterLabel}>Furnished</label>
-                  <select name="furnished" value={filters.furnished} onChange={handleFilterChange} style={S.filterCtrl} className="filter-ctrl">
-                    <option value="">Either</option>
-                    <option value="true">Furnished</option>
-                    <option value="false">Unfurnished</option>
-                  </select>
-                </div>
-                <div style={S.filterGroup}>
-                  <label style={S.filterLabel}>Pet Policy</label>
-                  <select name="petFriendly" value={filters.petFriendly} onChange={handleFilterChange} style={S.filterCtrl} className="filter-ctrl">
-                    <option value="">Any</option>
-                    <option value="true">Pet Friendly</option>
-                    <option value="false">No Pets</option>
-                  </select>
-                </div>
-                <div style={S.filterGroup}>
-                  <label style={S.filterLabel}>Amenity</label>
-                  <input type="text" name="amenities" placeholder="WiFi, Parking…" value={filters.amenities} onChange={handleFilterChange} style={S.filterCtrl} className="filter-ctrl" />
-                </div>
-                <div style={S.filterGroup}>
-                  <label style={S.filterLabel}>Available From</label>
-                  <input type="date" name="availableFrom" value={filters.availableFrom} onChange={handleFilterChange} style={S.filterCtrl} className="filter-ctrl" />
-                </div>
-                <div style={S.filterGroup}>
-                  <label style={S.filterLabel}>Min Price (KES)</label>
-                  <input type="number" name="minPrice" placeholder="0" value={filters.minPrice} onChange={handleFilterChange} style={S.filterCtrl} className="filter-ctrl" />
-                </div>
-                <div style={S.filterGroup}>
-                  <label style={S.filterLabel}>Max Price (KES)</label>
-                  <input type="number" name="maxPrice" placeholder="1,000,000" value={filters.maxPrice} onChange={handleFilterChange} style={S.filterCtrl} className="filter-ctrl" />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ── TOOLBAR (only show when NOT in university hostels mode) ── */}
-          {!showUniversityHostels && (
-            <div style={S.toolbar}>
-              <p style={S.resultsText}>
-                <span style={S.resultsNum}>{filteredProperties.length}</span>
-                {filteredProperties.length === 1 ? " property found" : " properties found"}
-                {favorites.length > 0 && <span style={S.toolbarBit}> ·  {favorites.length} saved</span>}
-              </p>
-              <div style={S.toolbarActions}>
-                <button className="tool-btn" style={S.toolBtn} onClick={saveCurrentSearch}> Save Search</button>
-                {savedSearches.length > 0 && (
-                  <button className="tool-btn" style={{ ...S.toolBtn, ...(showSavedSearches ? S.toolBtnActive : {}) }} onClick={() => setShowSavedSearches(!showSavedSearches)}>
-                    Saved ({savedSearches.length})
-                  </button>
-                )}
-                {favorites.length > 0 && (
-                  <button className="tool-btn" style={{ ...S.toolBtn, ...(showFavoritesOnly ? S.toolBtnActive : {}) }} onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}>
-                    {showFavoritesOnly ? "Show All" : " Favourites"}
-                  </button>
-                )}
-                <button className="tool-btn" style={{ ...S.toolBtn, ...(showMap ? S.toolBtnActive : {}) }} onClick={() => setShowMap(v => !v)}>
-                  {showMap ? "Hide Map" : " Map View"}
+              )}
+              {favorites.length > 0 && (
+                <button className="tool-btn" style={{ ...S.toolBtn, ...(showFavoritesOnly ? S.toolBtnActive : {}) }} onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}>
+                  {showFavoritesOnly ? "Show All" : " Favourites"}
                 </button>
-              </div>
-            </div>
-          )}
-
-          {/* ── UNIVERSITY HOSTEL SECTION (only show when in university hostels mode) ── */}
-          {showUniversityHostels && (
-            <div style={S.universitySection}>
-              {/* Show university selection when no university is selected */}
-              {!selectedUniversity && (
-                <>
-                  <div style={S.universityHeader}>
-                    <div style={S.universityBadge}> STUDENT HOUSING</div>
-                    <h2 style={S.universityTitle}>Find Hostels Near Your University</h2>
-                    <p style={S.universitySub}>Browse universities across all 47 counties in Kenya and discover affordable hostels nearby</p>
-                  </div>
-
-                  <div style={S.universitySearchBox}>
-                    <span style={S.searchIcon}></span>
-                    <input
-                      type="text"
-                      placeholder="Search your university (e.g., Nairobi, Kenyatta, JKUAT)..."
-                      value={universitySearch}
-                      onChange={(e) => setUniversitySearch(e.target.value)}
-                      style={S.universitySearchInput}
-                    />
-                  </div>
-
-                  <div style={S.universityGrid}>
-                    {(universitySearch ? searchUniversities(universitySearch) : kenyanUniversities).map((university) => (
-                      <div
-                        key={university.id}
-                        style={S.universityCard}
-                        onClick={() => setSelectedUniversity(university)}
-                      >
-                        <div style={S.universityCardIcon}></div>
-                        <div style={S.universityCardName}>{university.name}</div>
-                        <div style={{ ...S.universityCardLocation, display: "flex", alignItems: "center", gap: "4px" }}>
-                          <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                          <span>{university.location}</span>
-                          <span style={S.universityCardCounty}>{university.county} County</span>
-                        </div>
-                        <div style={S.universityCardCode}>{university.code}</div>
-                      </div>
-                    ))}
-                  </div>
-                </>
               )}
-
-              {/* Show selected university bar when a university is selected */}
-              {selectedUniversity && (
-                <div style={S.selectedUniversityBar}>
-                  <div style={S.selectedUniversityInfo}>
-                    <span style={S.selectedUniversityLabel}>Showing hostels near:</span>
-                    <span style={S.selectedUniversityName}>{selectedUniversity.name}</span>
-                    <span style={{ ...S.selectedUniversityLocation, display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                      <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                      {selectedUniversity.location}, {selectedUniversity.county}
-                    </span>
-                  </div>
-                  <button
-                    style={S.clearUniversityBtn}
-                    onClick={() => {
-                      setSelectedUniversity(null);
-                      setUniversityProperties([]);
-                    }}
-                  >
-                    ← Back to Universities
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ── SAVED SEARCHES (only show when NOT in university hostels mode) ── */}
-          {!showUniversityHostels && showSavedSearches && savedSearches.length > 0 && (
-            <div style={S.savedPanel}>
-              <h3 style={S.savedTitle}>Saved Searches</h3>
-              {savedSearches.map((s) => (
-                <div key={s.id} style={S.savedRow}>
-                  <div>
-                    <p style={S.savedName}>{s.name}</p>
-                    <p style={S.savedDate}>{new Date(s.createdAt).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" })}</p>
-                  </div>
-                  <div style={{ display: "flex", gap: "8px" }}>
-                    <button style={S.savedApply} onClick={() => applySavedSearch(s)}>Apply</button>
-                    <button style={S.savedDelete} onClick={() => deleteSavedSearch(s.id)}>Delete</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* ── MAP VIEW (only show when NOT in university hostels mode) ── */}
-          {!showUniversityHostels && showMap && <div style={S.mapWrap}><MapView properties={filteredProperties} /></div>}
-
-
-
-          {/* ── EMPTY STATE (only show when NOT in university hostels mode) ── */}
-          {!showUniversityHostels && filteredProperties.length === 0 && (
-            <div style={S.empty}>
-              <div style={S.emptyIcon}></div>
-              <p style={S.emptyTitle}>No properties match your search</p>
-              <p style={S.emptySub}>Try adjusting your filters to broaden your results</p>
-              <button
-                onClick={() => {
-                  setModalQuery(filters.location || "");
-                  setModalService("rental");
-                  setIsRequestModalOpen(true);
-                }}
-                style={{
-                  marginTop: "16px",
-                  padding: "12px 24px",
-                  background: "linear-gradient(135deg, #C9A84C 0%, #E2C47A 100%)",
-                  border: "none",
-                  borderRadius: "6px",
-                  color: "#0D1B2A",
-                  fontWeight: 700,
-                  fontSize: "13px",
-                  cursor: "pointer",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                  boxShadow: "0 4px 15px rgba(201, 168, 76, 0.25)",
-                  transition: "all 0.2s",
-                }}
-              >
-                Submit Custom Request
+              <button className="tool-btn" style={{ ...S.toolBtn, ...(showMap ? S.toolBtnActive : {}) }} onClick={() => setShowMap(v => !v)}>
+                {showMap ? "Hide Map" : " Map View"}
               </button>
             </div>
-          )}
+          </div>
+        )}
 
-          {showUniversityHostels && selectedUniversity && universityLoading && (
-            <div style={S.empty}>
-              <p style={S.emptyTitle}>Loading listings near {selectedUniversity.name}...</p>
-            </div>
-          )}
+        {/* ── UNIVERSITY HOSTEL SECTION (only show when in university hostels mode) ── */}
+        {showUniversityHostels && (
+          <div style={S.universitySection}>
+            {/* Show university selection when no university is selected */}
+            {!selectedUniversity && (
+              <>
+                <div style={S.universityHeader}>
+                  <div style={S.universityBadge}> STUDENT HOUSING</div>
+                  <h2 style={S.universityTitle}>Find Hostels Near Your University</h2>
+                  <p style={S.universitySub}>Browse universities across all 47 counties in Kenya and discover affordable hostels nearby</p>
+                </div>
 
-          {/* ── EMPTY STATE FOR UNIVERSITY HOSTELS (no hostels found) ── */}
-          {showUniversityHostels && selectedUniversity && !universityLoading && displayProperties.length === 0 && (
-            <div style={S.empty}>
-              <div style={S.emptyIcon}></div>
-              <p style={S.emptyTitle}>No hostels found near {selectedUniversity.name}</p>
-              <p style={S.emptySub}>Landlords near this campus can list here. Check back soon or try another university.</p>
-            </div>
-          )}
+                <div style={S.universitySearchBox}>
+                  <span style={S.searchIcon}></span>
+                  <input
+                    type="text"
+                    placeholder="Search your university (e.g., Nairobi, Kenyatta, JKUAT)..."
+                    value={universitySearch}
+                    onChange={(e) => setUniversitySearch(e.target.value)}
+                    style={S.universitySearchInput}
+                  />
+                </div>
 
-          {/* ── PROPERTY GRID (show when NOT in university hostels mode, OR when university is selected) ── */}
-          {(!showUniversityHostels || selectedUniversity) && displayProperties.length > 0 && (
-            <div className="properties-grid">
-              {displayProperties.map((property, i) => (
-                <article key={property._id} data-property-id={property._id} style={S.card} className="prop-card" onClick={() => openModal(property)}>
-                  {/* Image */}
-                  <div style={S.cardImg}>
-                    {property.images?.length > 0
-                      ? <img src={property.images[0]} alt={property.title} style={S.cardImgEl} className="card-img-el" />
-                      : <div style={S.cardImgFallback}>No Photo</div>
-                    }
-                    {/* Badges */}
-                    <div style={{ ...S.availBadge, ...(property.availableUnits > 0 ? S.availBadgeGreen : S.availBadgeRed) }}>
-                      {property.availableUnits > 0 ? `${property.availableUnits} Available` : "Fully Booked"}
+                <div style={S.universityGrid}>
+                  {(universitySearch ? searchUniversities(universitySearch) : kenyanUniversities).map((university) => (
+                    <div
+                      key={university.id}
+                      style={S.universityCard}
+                      onClick={() => setSelectedUniversity(university)}
+                    >
+                      <div style={S.universityCardIcon}></div>
+                      <div style={S.universityCardName}>{university.name}</div>
+                      <div style={{ ...S.universityCardLocation, display: "flex", alignItems: "center", gap: "4px" }}>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>{university.location}</span>
+                        <span style={S.universityCardCounty}>{university.county} County</span>
+                      </div>
+                      <div style={S.universityCardCode}>{university.code}</div>
                     </div>
-                    {property.images?.length > 1 && (
-                      <div style={S.photoBadge}>{property.images.length} Photos</div>
-                    )}
-                    {/* Favourite */}
-                    <button style={S.favBtn} className="fav-btn" onClick={(e) => { e.stopPropagation(); toggleFavorite(property._id); }}>
-                      {favorites.includes(property._id) ? "" : "♡"}
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* Show selected university bar when a university is selected */}
+            {selectedUniversity && (
+              <div style={S.selectedUniversityBar}>
+                <div style={S.selectedUniversityInfo}>
+                  <span style={S.selectedUniversityLabel}>Showing hostels near:</span>
+                  <span style={S.selectedUniversityName}>{selectedUniversity.name}</span>
+                  <span style={{ ...S.selectedUniversityLocation, display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    {selectedUniversity.location}, {selectedUniversity.county}
+                  </span>
+                </div>
+                <button
+                  style={S.clearUniversityBtn}
+                  onClick={() => {
+                    setSelectedUniversity(null);
+                    setUniversityProperties([]);
+                  }}
+                >
+                  ← Back to Universities
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── SAVED SEARCHES (only show when NOT in university hostels mode) ── */}
+        {!showUniversityHostels && showSavedSearches && savedSearches.length > 0 && (
+          <div style={S.savedPanel}>
+            <h3 style={S.savedTitle}>Saved Searches</h3>
+            {savedSearches.map((s) => (
+              <div key={s.id} style={S.savedRow}>
+                <div>
+                  <p style={S.savedName}>{s.name}</p>
+                  <p style={S.savedDate}>{new Date(s.createdAt).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" })}</p>
+                </div>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <button style={S.savedApply} onClick={() => applySavedSearch(s)}>Apply</button>
+                  <button style={S.savedDelete} onClick={() => deleteSavedSearch(s.id)}>Delete</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ── MAP VIEW (only show when NOT in university hostels mode) ── */}
+        {!showUniversityHostels && showMap && <div style={S.mapWrap}><MapView properties={filteredProperties} /></div>}
+
+
+
+        {/* ── EMPTY STATE (only show when NOT in university hostels mode) ── */}
+        {!showUniversityHostels && filteredProperties.length === 0 && (
+          <div style={S.empty}>
+            <div style={S.emptyIcon}></div>
+            <p style={S.emptyTitle}>No properties match your search</p>
+            <p style={S.emptySub}>Try adjusting your filters to broaden your results</p>
+            <button
+              onClick={() => {
+                setModalQuery(filters.location || "");
+                setModalService("rental");
+                setIsRequestModalOpen(true);
+              }}
+              style={{
+                marginTop: "16px",
+                padding: "12px 24px",
+                background: "linear-gradient(135deg, #C9A84C 0%, #E2C47A 100%)",
+                border: "none",
+                borderRadius: "6px",
+                color: "#0D1B2A",
+                fontWeight: 700,
+                fontSize: "13px",
+                cursor: "pointer",
+                textTransform: "uppercase",
+                letterSpacing: "0.06em",
+                boxShadow: "0 4px 15px rgba(201, 168, 76, 0.25)",
+                transition: "all 0.2s",
+              }}
+            >
+              Submit Custom Request
+            </button>
+          </div>
+        )}
+
+        {showUniversityHostels && selectedUniversity && universityLoading && (
+          <div style={S.empty}>
+            <p style={S.emptyTitle}>Loading listings near {selectedUniversity.name}...</p>
+          </div>
+        )}
+
+        {/* ── EMPTY STATE FOR UNIVERSITY HOSTELS (no hostels found) ── */}
+        {showUniversityHostels && selectedUniversity && !universityLoading && displayProperties.length === 0 && (
+          <div style={S.empty}>
+            <div style={S.emptyIcon}></div>
+            <p style={S.emptyTitle}>No hostels found near {selectedUniversity.name}</p>
+            <p style={S.emptySub}>Landlords near this campus can list here. Check back soon or try another university.</p>
+          </div>
+        )}
+
+        {/* ── PROPERTY GRID (show when NOT in university hostels mode, OR when university is selected) ── */}
+        {(!showUniversityHostels || selectedUniversity) && displayProperties.length > 0 && (
+          <div className="properties-grid">
+            {displayProperties.map((property, i) => (
+              <article key={property._id} data-property-id={property._id} style={S.card} className="prop-card" onClick={() => openModal(property)}>
+                {/* Image */}
+                <div style={S.cardImg}>
+                  {property.images?.length > 0
+                    ? <img src={property.images[0]} alt={property.title} style={S.cardImgEl} className="card-img-el" />
+                    : <div style={S.cardImgFallback}>No Photo</div>
+                  }
+                  {/* Badges */}
+                  <div style={{ ...S.availBadge, ...(property.availableUnits > 0 ? S.availBadgeGreen : S.availBadgeRed) }}>
+                    {property.availableUnits > 0 ? `${property.availableUnits} Available` : "Fully Booked"}
+                  </div>
+                  {property.images?.length > 1 && (
+                    <div style={S.photoBadge}>{property.images.length} Photos</div>
+                  )}
+                  {/* Favourite */}
+                  <button style={S.favBtn} className="fav-btn" onClick={(e) => { e.stopPropagation(); toggleFavorite(property._id); }}>
+                    {favorites.includes(property._id) ? "" : "♡"}
+                  </button>
+                  <div style={S.cardImgGrad} />
+                </div>
+
+                {/* Content */}
+                <div style={S.cardBody}>
+                  <div style={S.cardType}>{property.propertyType || "Rental"}</div>
+                  <h2 style={S.cardTitle}>{property.title}</h2>
+                  <p style={{ ...S.cardLocation, display: "flex", alignItems: "center", gap: "4px" }}>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span>{property.county} · {property.location}</span>
+                  </p>
+
+                  <div style={S.cardSpecs}>
+                    <span style={S.cardSpec}>{property.bedrooms} Bed</span>
+                    <span style={S.specDot}>·</span>
+                    <span style={S.cardSpec}>{property.bathrooms} Bath</span>
+                    <span style={S.specDot}>·</span>
+                    <span style={S.cardSpec}>{property.furnished ? "Furnished" : "Unfurnished"}</span>
+                  </div>
+
+                  {property.amenities?.length > 0 && (
+                    <div style={S.cardAmenities}>
+                      {property.amenities.slice(0, 3).map((a, idx) => (
+                        <span key={idx} style={S.cardAmenityTag}>{a}</span>
+                      ))}
+                      {property.amenities.length > 3 && <span style={S.cardAmenityMore}>+{property.amenities.length - 3}</span>}
+                    </div>
+                  )}
+
+                  <div style={S.cardFooter}>
+                    <div>
+                      <div style={S.cardPrice}>KES {property.price?.toLocaleString()}</div>
+                      <div style={S.cardPriceSub}>per month</div>
+                    </div>
+                    <button
+                      style={{ ...S.cardCta, ...(property.availableUnits === 0 ? S.cardCtaDisabled : {}) }}
+                      className="card-cta"
+                      onClick={(e) => { e.stopPropagation(); if (property.availableUnits > 0) handleContactLandlord(property); }}
+                      disabled={property.availableUnits === 0}
+                    >
+                      Enquire
                     </button>
-                    <div style={S.cardImgGrad} />
                   </div>
-
-                  {/* Content */}
-                  <div style={S.cardBody}>
-                    <div style={S.cardType}>{property.propertyType || "Rental"}</div>
-                    <h2 style={S.cardTitle}>{property.title}</h2>
-                    <p style={{ ...S.cardLocation, display: "flex", alignItems: "center", gap: "4px" }}>
-                      <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                      <span>{property.county} · {property.location}</span>
-                    </p>
-
-                    <div style={S.cardSpecs}>
-                      <span style={S.cardSpec}>{property.bedrooms} Bed</span>
-                      <span style={S.specDot}>·</span>
-                      <span style={S.cardSpec}>{property.bathrooms} Bath</span>
-                      <span style={S.specDot}>·</span>
-                      <span style={S.cardSpec}>{property.furnished ? "Furnished" : "Unfurnished"}</span>
-                    </div>
-
-                    {property.amenities?.length > 0 && (
-                      <div style={S.cardAmenities}>
-                        {property.amenities.slice(0, 3).map((a, idx) => (
-                          <span key={idx} style={S.cardAmenityTag}>{a}</span>
-                        ))}
-                        {property.amenities.length > 3 && <span style={S.cardAmenityMore}>+{property.amenities.length - 3}</span>}
-                      </div>
-                    )}
-
-                    <div style={S.cardFooter}>
-                      <div>
-                        <div style={S.cardPrice}>KES {property.price?.toLocaleString()}</div>
-                        <div style={S.cardPriceSub}>per month</div>
-                      </div>
-                      <button
-                        style={{ ...S.cardCta, ...(property.availableUnits === 0 ? S.cardCtaDisabled : {}) }}
-                        className="card-cta"
-                        onClick={(e) => { e.stopPropagation(); if (property.availableUnits > 0) handleContactLandlord(property); }}
-                        disabled={property.availableUnits === 0}
-                      >
-                        Enquire
-                      </button>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
-        </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* ═══════════════════════════════ MODAL ═══════════════════════════════ */}
@@ -920,7 +870,7 @@ export default function Listings() {
         initialQuery={modalQuery}
         defaultService={modalService}
       />
-    </div>
+    </div >
   );
 }
 
@@ -977,18 +927,8 @@ const S = {
   btnGhost: { background: "transparent", color: C.textMain, border: `1px solid ${C.border}`, borderRadius: "6px", fontWeight: 500, cursor: "pointer", fontSize: "0.9rem", padding: "12px 28px", fontFamily: "'DM Sans', sans-serif", transition: "all 0.25s ease" },
 
   /* Main Body */
-  mainBody: { maxWidth: "1280px", margin: "0 auto", padding: "0 28px 80px", display: "flex", gap: "24px" },
+  mainBody: { maxWidth: "1280px", margin: "0 auto", padding: "0 28px 80px" },
   errorBar: { background: "rgba(224,82,82,0.12)", border: "1px solid rgba(224,82,82,0.3)", color: "#F28B8B", padding: "12px 18px", borderRadius: "8px", margin: "24px 0", textAlign: "center" },
-
-  /* Sidebar */
-  sidebar: { width: "200px", flexShrink: 0, position: "sticky", top: "20px", height: "fit-content", maxHeight: "calc(100vh - 40px)" },
-  sidebarTitle: { color: C.gold, fontSize: "0.85rem", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", margin: "0 0 16px", fontFamily: "'DM Sans', sans-serif" },
-  sidebarScroll: { display: "flex", flexDirection: "column", gap: "6px", maxHeight: "calc(100vh - 100px)", overflowY: "auto", paddingRight: "8px" },
-  sidebarItem: { padding: "10px 14px", background: "transparent", border: `1px solid ${C.border}`, color: C.textMid, borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem", fontWeight: 500, fontFamily: "'DM Sans', sans-serif", transition: "all 0.2s", textAlign: "left", whiteSpace: "nowrap" },
-  sidebarItemActive: { background: C.goldDim, borderColor: C.gold, color: C.gold, fontWeight: 600 },
-
-  /* Content Area */
-  contentArea: { flex: 1, minWidth: 0 },
 
   /* Tabs Section */
   tabsSection: { display: "flex", gap: "8px", marginBottom: "24px", borderBottom: `1px solid ${C.border}`, paddingBottom: "16px" },
