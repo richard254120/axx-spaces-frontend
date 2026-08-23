@@ -2118,9 +2118,29 @@ export default function Home() {
         {/* RENTALS */}
         {featuredProperties.length > 0 && (
           <div style={{ marginBottom: '48px', padding: '0 28px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Rentals</h3>
-              <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredProperties.length}</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Rentals</h3>
+                <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredProperties.length}</span>
+              </div>
+              <button
+                onClick={() => navigate('/listings?featured=true')}
+                style={{
+                  padding: '8px 16px',
+                  background: 'rgba(201,168,76,0.1)',
+                  border: '1px solid rgba(201,168,76,0.3)',
+                  borderRadius: '20px',
+                  color: C.gold,
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => e.target.style.background = 'rgba(201,168,76,0.2)'}
+                onMouseLeave={(e) => e.target.style.background = 'rgba(201,168,76,0.1)'}
+              >
+                View All
+              </button>
             </div>
             <div className="cards-track-wrap">
               {featuredProperties.length > 0 && (
@@ -2159,14 +2179,35 @@ export default function Home() {
               )}
             </div>
           </div>
-        )}
+        )
+        }
 
         {/* BUSINESSES */}
         {featuredBusinesses.length > 0 && (
           <div style={{ marginBottom: '48px', padding: '0 28px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Businesses</h3>
-              <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredBusinesses.length}</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Businesses</h3>
+                <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredBusinesses.length}</span>
+              </div>
+              <button
+                onClick={() => navigate('/axxbiashara?featured=true')}
+                style={{
+                  padding: '8px 16px',
+                  background: 'rgba(201,168,76,0.1)',
+                  border: '1px solid rgba(201,168,76,0.3)',
+                  borderRadius: '20px',
+                  color: C.gold,
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => e.target.style.background = 'rgba(201,168,76,0.2)'}
+                onMouseLeave={(e) => e.target.style.background = 'rgba(201,168,76,0.1)'}
+              >
+                View All
+              </button>
             </div>
             <div className="cards-track-wrap">
               {featuredBusinesses.length > 0 && (
@@ -2209,9 +2250,29 @@ export default function Home() {
         {/* QUICKSALES */}
         {featuredMaterials.length > 0 && (
           <div style={{ marginBottom: '48px', padding: '0 28px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>QuickSales</h3>
-              <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredMaterials.length}</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>QuickSales</h3>
+                <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredMaterials.length}</span>
+              </div>
+              <button
+                onClick={() => navigate('/materials?featured=true')}
+                style={{
+                  padding: '8px 16px',
+                  background: 'rgba(201,168,76,0.1)',
+                  border: '1px solid rgba(201,168,76,0.3)',
+                  borderRadius: '20px',
+                  color: C.gold,
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => e.target.style.background = 'rgba(201,168,76,0.2)'}
+                onMouseLeave={(e) => e.target.style.background = 'rgba(201,168,76,0.1)'}
+              >
+                View All
+              </button>
             </div>
             <div className="cards-track-wrap">
               {featuredMaterials.length > 0 && (
@@ -2249,14 +2310,35 @@ export default function Home() {
               )}
             </div>
           </div>
-        )}
+        )
+        }
 
         {/* TOURISM */}
         {featuredTourism.length > 0 && (
           <div style={{ marginBottom: '48px', padding: '0 28px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Tourism</h3>
-              <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredTourism.length}</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Tourism</h3>
+                <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredTourism.length}</span>
+              </div>
+              <button
+                onClick={() => navigate('/tourism?featured=true')}
+                style={{
+                  padding: '8px 16px',
+                  background: 'rgba(201,168,76,0.1)',
+                  border: '1px solid rgba(201,168,76,0.3)',
+                  borderRadius: '20px',
+                  color: C.gold,
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => e.target.style.background = 'rgba(201,168,76,0.2)'}
+                onMouseLeave={(e) => e.target.style.background = 'rgba(201,168,76,0.1)'}
+              >
+                View All
+              </button>
             </div>
             <div className="cards-track-wrap">
               {featuredTourism.length > 0 && (
@@ -2299,9 +2381,29 @@ export default function Home() {
         {/* MOVERS */}
         {featuredMovers.length > 0 && (
           <div style={{ marginBottom: '48px', padding: '0 28px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Movers</h3>
-              <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredMovers.length}</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Movers</h3>
+                <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredMovers.length}</span>
+              </div>
+              <button
+                onClick={() => navigate('/movers?featured=true')}
+                style={{
+                  padding: '8px 16px',
+                  background: 'rgba(201,168,76,0.1)',
+                  border: '1px solid rgba(201,168,76,0.3)',
+                  borderRadius: '20px',
+                  color: C.gold,
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => e.target.style.background = 'rgba(201,168,76,0.2)'}
+                onMouseLeave={(e) => e.target.style.background = 'rgba(201,168,76,0.1)'}
+              >
+                View All
+              </button>
             </div>
             <div className="cards-track-wrap">
               {featuredMovers.length > 0 && (
@@ -2339,6 +2441,7 @@ export default function Home() {
               )}
             </div>
           </div>
+        )
         )}
 
         {featuredProperties.length === 0 && featuredBusinesses.length === 0 && featuredMaterials.length === 0 && featuredTourism.length === 0 && featuredMovers.length === 0 && (
