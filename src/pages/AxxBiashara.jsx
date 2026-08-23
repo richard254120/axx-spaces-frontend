@@ -208,15 +208,15 @@ export default function AxxBiashara() {
      RENDER
   ════════════════════════════════════════════ */
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(185deg, #090d16 0%, #0d1220 50%, #07090f 100%)", color: "#f1f5f9", fontFamily: "'Sora', 'DM Sans', sans-serif", overflowX: "hidden" }}>
+    <div style={{ minHeight: "100vh", background: "#ffffff", color: "#0B2140", fontFamily: "'Sora', 'DM Sans', sans-serif", overflowX: "hidden" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #07090f; }
-        ::-webkit-scrollbar-thumb { background: #fbbf2450; border-radius: 3px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
 
         @keyframes marquee {
           0% { transform: translateX(0); }
@@ -249,11 +249,10 @@ export default function AxxBiashara() {
           transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
           cursor: pointer;
           position: relative;
-          background: rgba(15, 23, 42, 0.55);
+          background: #ffffff;
           border-radius: 14px;
-          border: 1px solid rgba(255, 255, 255, 0.05);
+          border: 1px solid #e5e7eb;
           overflow: hidden;
-          backdrop-filter: blur(12px);
           display: flex;
           flex-direction: column;
           height: 100%;
@@ -264,15 +263,15 @@ export default function AxxBiashara() {
         }
         .axx-card:hover {
           transform: translateY(-4px);
-          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45), 0 0 20px rgba(251, 191, 36, 0.15);
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1), 0 0 20px rgba(251, 191, 36, 0.15);
           border-color: rgba(251, 191, 36, 0.4);
-          background: rgba(15, 23, 42, 0.6);
+          background: #ffffff;
         }
         .axx-card.featured-card:hover {
           border-color: rgba(251, 191, 36, 0.7);
         }
 
-        .card-img-wrap { position: relative; overflow: hidden; aspect-ratio: 16/9; width: 100%; background: #0f172a; }
+        .card-img-wrap { position: relative; overflow: hidden; aspect-ratio: 16/9; width: 100%; background: #f1f5f9; }
         .business-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -282,7 +281,7 @@ export default function AxxBiashara() {
         .axx-card:hover .card-img-wrap img { transform: scale(1.04); }
         .card-img-overlay {
           position: absolute; inset: 0;
-          background: linear-gradient(to top, rgba(9, 13, 22, 0.8) 0%, transparent 60%);
+          background: linear-gradient(to top, rgba(11, 33, 64, 0.6) 0%, transparent 60%);
         }
 
         /* Redesigned Card Sub-components (Compressed) */
@@ -302,8 +301,8 @@ export default function AxxBiashara() {
         .card-category-tag {
           font-size: 9px;
           font-weight: 700;
-          color: #fbbf24;
-          background: rgba(251, 191, 36, 0.1);
+          color: #E31B1B;
+          background: rgba(227, 27, 27, 0.1);
           padding: 2px 6px;
           border-radius: 4px;
           text-transform: uppercase;
@@ -312,7 +311,7 @@ export default function AxxBiashara() {
         .card-title {
           font-size: 15px;
           font-weight: 700;
-          color: #f8fafc;
+          color: #0B2140;
           margin-bottom: 4px;
           line-height: 1.15;
           display: -webkit-box;
@@ -326,11 +325,11 @@ export default function AxxBiashara() {
           gap: 4px;
           margin-bottom: 6px;
           font-size: 11px;
-          color: #e2e8f0;
+          color: #64748b;
         }
         .card-description {
           font-size: 12px;
-          color: #94a3b8;
+          color: #64748b;
           line-height: 1.25;
           margin-bottom: 8px;
           display: -webkit-box;
@@ -346,7 +345,7 @@ export default function AxxBiashara() {
         }
         .card-location {
           font-size: 11.5px;
-          color: #94a3b8;
+          color: #64748b;
           display: flex;
           align-items: center;
           gap: 4px;
@@ -356,7 +355,7 @@ export default function AxxBiashara() {
         }
         .card-footer {
           padding-top: 10px;
-          border-top: 1px solid rgba(255, 255, 255, 0.05);
+          border-top: 1px solid #e5e7eb;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -365,7 +364,7 @@ export default function AxxBiashara() {
         .card-profile-link {
           font-size: 12px;
           font-weight: 700;
-          color: #fbbf24;
+          color: #E31B1B;
           display: flex;
           align-items: center;
           gap: 3px;
@@ -497,10 +496,10 @@ export default function AxxBiashara() {
 
         .filter-select {
           padding: 12px 16px;
-          background: rgba(17, 24, 39, 0.8);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: #ffffff;
+          border: 1px solid #e5e7eb;
           border-radius: 12px;
-          color: #e2e8f0;
+          color: #0B2140;
           font-size: 13.5px;
           font-family: inherit;
           cursor: pointer;
@@ -508,30 +507,30 @@ export default function AxxBiashara() {
           transition: all 0.25s;
           min-width: 170px;
           appearance: none;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23fbbf24' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23E31B1B' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
           background-repeat: no-repeat;
           background-position: right 14px center;
           padding-right: 36px;
         }
-        .filter-select:focus, .filter-select:hover { border-color: rgba(251, 191, 36, 0.4); }
+        .filter-select:focus, .filter-select:hover { border-color: #E31B1B; }
 
         .search-input {
           width: 100%; padding: 16px 16px 16px 54px;
-          background: rgba(17, 24, 39, 0.6);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: #ffffff;
+          border: 1px solid #e5e7eb;
           border-radius: 16px;
-          color: #f8fafc;
+          color: #0B2140;
           font-size: 15.5px;
           font-family: inherit;
           outline: none;
           transition: all 0.3s;
         }
         .search-input:focus {
-          border-color: rgba(251, 191, 36, 0.5);
-          box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.08);
-          background: rgba(17, 24, 39, 0.8);
+          border-color: #E31B1B;
+          box-shadow: 0 0 0 3px rgba(227, 27, 27, 0.08);
+          background: #ffffff;
         }
-        .search-input::placeholder { color: #64748b; }
+        .search-input::placeholder { color: #94a3b8; }
 
         .ann-card {
           background: rgba(251, 191, 36, 0.03);
@@ -567,21 +566,21 @@ export default function AxxBiashara() {
 
         .modal-overlay {
           position: fixed; inset: 0;
-          background: rgba(5, 8, 15, 0.8);
+          background: rgba(0, 0, 0, 0.5);
           backdrop-filter: blur(10px);
           display: flex; align-items: center; justify-content: center;
           z-index: 9999;
           animation: fadeSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .modal-box {
-          background: #0d1220;
-          border: 1px solid rgba(251, 191, 36, 0.25);
+          background: #ffffff;
+          border: 1px solid #e5e7eb;
           border-radius: 24px;
           padding: 40px;
           position: relative;
           max-height: 85vh;
           overflow-y: auto;
-          box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+          box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
         }
 
         .shimmer-card {
@@ -623,22 +622,22 @@ export default function AxxBiashara() {
 
         .comparison-bar {
           position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-          background: rgba(13, 18, 32, 0.95);
-          border: 1px solid rgba(251, 191, 36, 0.3);
+          background: rgba(255, 255, 255, 0.95);
+          border: 1px solid rgba(227, 27, 27, 0.3);
           border-radius: 20px; padding: 14px 28px;
           display: flex; align-items: center; gap: 20px;
-          box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+          box-shadow: 0 15px 40px rgba(0,0,0,0.15);
           z-index: 1000; backdrop-filter: blur(16px);
           animation: float 3s ease-in-out infinite;
         }
 
         .section-label {
           font-size: 11px; font-weight: 800; letter-spacing: 0.15em;
-          text-transform: uppercase; color: #fbbf24;
+          text-transform: uppercase; color: #E31B1B;
         }
         .section-title {
           font-size: 28px; font-weight: 800;
-          background: linear-gradient(135deg, #f8fafc 30%, #94a3b8 100%);
+          background: linear-gradient(135deg, #0B2140 30%, #64748b 100%);
           -webkit-background-clip: text; -webkit-text-fill-color: transparent;
           background-clip: text;
         }
@@ -651,26 +650,26 @@ export default function AxxBiashara() {
 
         .form-input {
           width: 100%; padding: 12px 16px;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 12px; color: #f1f5f9;
+          background: #ffffff;
+          border: 1px solid #e5e7eb;
+          border-radius: 12px; color: #0B2140;
           font-size: 14px; font-family: inherit;
           outline: none; transition: border-color 0.25s;
           margin-bottom: 12px;
         }
-        .form-input:focus { border-color: rgba(251, 191, 36, 0.45); }
-        .form-input::placeholder { color: #475569; }
+        .form-input:focus { border-color: #E31B1B; }
+        .form-input::placeholder { color: #94a3b8; }
 
         .social-dot {
           width: 32px; height: 32px; border-radius: 50%;
-          background: rgba(255, 255, 255, 0.04);
+          background: #f8fafc;
           display: flex; align-items: center; justify-content: center;
           font-size: 12px; text-decoration: none;
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          border: 1px solid #e5e7eb;
           transition: all 0.2s ease;
-          color: #cbd5e1;
+          color: #64748b;
         }
-        .social-dot:hover { background: rgba(251, 191, 36, 0.15); border-color: rgba(251, 191, 36, 0.4); transform: scale(1.1); color: #fbbf24; }
+        .social-dot:hover { background: rgba(227, 27, 27, 0.1); border-color: rgba(227, 27, 27, 0.4); transform: scale(1.1); color: #E31B1B; }
 
         .featured-tag {
           position: absolute; top: 12px; left: 12px;
@@ -682,14 +681,14 @@ export default function AxxBiashara() {
 
         .stat-chip {
           display: inline-flex; align-items: center; gap: 6px;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.06);
+          background: #f8fafc;
+          border: 1px solid #e5e7eb;
           border-radius: 10px; padding: 6px 14px;
-          font-size: 12px; color: #94a3b8;
+          font-size: 12px; color: #64748b;
         }
-        .stat-chip strong { color: #fbbf24; font-weight: 700; }
+        .stat-chip strong { color: #E31B1B; font-weight: 700; }
 
-        .divider { border: none; border-top: 1px solid rgba(255, 255, 255, 0.08); margin: 16px 0; }
+        .divider { border: none; border-top: 1px solid #e5e7eb; margin: 16px 0; }
 
         .refresh-banner {
           animation: slideDown 0.35s ease;
@@ -723,35 +722,34 @@ export default function AxxBiashara() {
           align-items: center;
           gap: 6px;
           padding: 8px 14px;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: #f8fafc;
+          border: 1px solid #e5e7eb;
           border-radius: 10px;
-          color: #94a3b8;
+          color: #64748b;
           font-size: 12.5px;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.25s ease;
           white-space: nowrap;
-          backdrop-filter: blur(8px);
           font-family: inherit;
         }
         .category-pill:hover {
-          background: rgba(251, 191, 36, 0.08);
-          border-color: rgba(251, 191, 36, 0.35);
-          color: #fbbf24;
+          background: rgba(227, 27, 27, 0.08);
+          border-color: rgba(227, 27, 27, 0.35);
+          color: #E31B1B;
           transform: translateY(-1px);
         }
         .category-pill.active {
-          background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.1) 100%);
-          border-color: #fbbf24;
-          color: #fbbf24;
-          box-shadow: 0 4px 15px rgba(251, 191, 36, 0.15);
+          background: linear-gradient(135deg, rgba(227, 27, 27, 0.1) 0%, rgba(227, 27, 27, 0.05) 100%);
+          border-color: #E31B1B;
+          color: #E31B1B;
+          box-shadow: 0 4px 15px rgba(227, 27, 27, 0.15);
         }
       `}</style>
 
       {/* ── COMPACT HEADER & CATEGORIES ── */}
       <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "12px 24px 0px" }}>
-        
+
         {/* Row 1: Logo & Title | Search Bar | Action Buttons */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", marginBottom: "8px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -760,7 +758,7 @@ export default function AxxBiashara() {
               AxxBiashara
             </h1>
           </div>
-          
+
           <div style={{ position: "relative", flexGrow: 1, maxWidth: "450px", minWidth: "200px" }}>
             <span style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", fontSize: "14px", color: "#fbbf24" }}></span>
             <input
@@ -805,12 +803,12 @@ export default function AxxBiashara() {
         {/* Row 2: Categories Pills Scrolling | Small Dropdown Filters */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px", marginBottom: "4px" }}>
           <div className="categories-container" style={{ margin: 0, padding: "2px 0 6px", flexGrow: 1, overflowX: "auto" }}>
-            <button 
+            <button
               className={`category-pill ${selectedCategory === null ? "active" : ""}`}
               onClick={() => setSelectedCategory(null)}
               style={{ padding: "6px 12px", fontSize: "12px", borderRadius: "8px" }}
             >
-               All Categories
+              All Categories
             </button>
             {BUSINESS_CATEGORIES.map(cat => (
               <button
@@ -895,250 +893,250 @@ export default function AxxBiashara() {
           } else {
             console.log(" Showing businesses grid, count:", businesses.length);
             return (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "24px" }} className="business-grid">
-                  {businesses.map((biz, idx) => (
-                    <div
-                      key={biz._id}
-                      className={`axx-card ${biz.featured ? "featured-card" : ""}`}
-                      style={{
-                        animationDelay: `${Math.min(idx * 0.05, 0.4)}s`,
-                      }}
-                      onClick={() => navigate(`/business/${biz._id}`)}
-                      onMouseEnter={() => setHoveredCard(biz._id)}
-                      onMouseLeave={() => setHoveredCard(null)}
-                    >
-                      {biz.featured && <div className="featured-tag">Featured</div>}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "24px" }} className="business-grid">
+                {businesses.map((biz, idx) => (
+                  <div
+                    key={biz._id}
+                    className={`axx-card ${biz.featured ? "featured-card" : ""}`}
+                    style={{
+                      animationDelay: `${Math.min(idx * 0.05, 0.4)}s`,
+                    }}
+                    onClick={() => navigate(`/business/${biz._id}`)}
+                    onMouseEnter={() => setHoveredCard(biz._id)}
+                    onMouseLeave={() => setHoveredCard(null)}
+                  >
+                    {biz.featured && <div className="featured-tag">Featured</div>}
 
-                      {/* Visual Header */}
-                      {biz.images?.length > 0 ? (
-                        <div className="card-img-wrap">
-                          <img src={biz.images[0]} alt={biz.name} />
-                          <div className="card-img-overlay" />
-                          
-                          {/* Rating Badge on Image */}
-                          {biz.rating > 0 && (
-                            <div style={{ position: "absolute", bottom: "12px", left: "14px", background: "rgba(9, 13, 22, 0.8)", backdropFilter: "blur(4px)", borderRadius: "8px", padding: "4px 10px", fontSize: "11px", fontWeight: 800, color: "#fbbf24", zIndex: 2, border: "1px solid rgba(255,255,255,0.08)" }}>
-                              ★ {biz.rating?.toFixed(1)}
-                            </div>
-                          )}
+                    {/* Visual Header */}
+                    {biz.images?.length > 0 ? (
+                      <div className="card-img-wrap">
+                        <img src={biz.images[0]} alt={biz.name} />
+                        <div className="card-img-overlay" />
 
-                          {/* Action Buttons Overlay */}
-                          <div style={{ position: "absolute", top: "12px", right: "12px", display: "flex", gap: "8px", zIndex: 2 }}>
-                            {/* Compare Toggle */}
-                            <button
-                              className="icon-btn"
-                              onClick={e => toggleComparison(biz._id, e)}
-                              title={comparisonList.includes(biz._id) ? "Remove from Compare" : "Compare Business"}
-                              style={{
-                                width: "32px",
-                                height: "32px",
-                                borderRadius: "8px",
-                                background: comparisonList.includes(biz._id) ? "#fbbf24" : "rgba(9, 13, 22, 0.75)",
-                                border: "1px solid rgba(255,255,255,0.08)",
-                                color: comparisonList.includes(biz._id) ? "#090d16" : "#f1f5f9",
-                                fontSize: "12px",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                transition: "all 0.2s"
-                              }}
-                            >
-                              
-                            </button>
-                            {/* Favorite Button */}
-                            <button
-                              className="icon-btn"
-                              onClick={e => toggleFavorite(biz._id, e)}
-                              title={isFavorite(biz._id) ? "Remove from Favorites" : "Add to Favorites"}
-                              style={{
-                                width: "32px",
-                                height: "32px",
-                                borderRadius: "8px",
-                                background: isFavorite(biz._id) ? "rgba(239, 68, 68, 0.15)" : "rgba(9, 13, 22, 0.75)",
-                                border: `1px solid ${isFavorite(biz._id) ? "rgba(239, 68, 68, 0.3)" : "rgba(255, 255, 255, 0.08)"}`,
-                                color: isFavorite(biz._id) ? "#ef4444" : "#f1f5f9",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                transition: "all 0.2s"
-                              }}
-                            >
-                              {isFavorite(biz._id) ? "" : ""}
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div style={{ width: "100%", aspectRatio: "16/10", background: "linear-gradient(135deg, rgba(251,191,36,0.08) 0%, rgba(20,184,166,0.05) 100%)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-                          <span style={{ fontSize: "38px" }}>
-                            {CATEGORY_EMOJIS[biz.categories?.[0]] || CATEGORY_EMOJIS[biz.category] || ""}
-                          </span>
-                          
-                          {/* Action Buttons Overlay */}
-                          <div style={{ position: "absolute", top: "12px", right: "12px", display: "flex", gap: "8px", zIndex: 2 }}>
-                            {/* Compare Toggle */}
-                            <button
-                              className="icon-btn"
-                              onClick={e => toggleComparison(biz._id, e)}
-                              title={comparisonList.includes(biz._id) ? "Remove from Compare" : "Compare Business"}
-                              style={{
-                                width: "32px",
-                                height: "32px",
-                                borderRadius: "8px",
-                                background: comparisonList.includes(biz._id) ? "#fbbf24" : "rgba(9, 13, 22, 0.75)",
-                                border: "1px solid rgba(255,255,255,0.08)",
-                                color: comparisonList.includes(biz._id) ? "#090d16" : "#f1f5f9",
-                                fontSize: "12px",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                transition: "all 0.2s"
-                              }}
-                            >
-                              
-                            </button>
-                            {/* Favorite Button */}
-                            <button
-                              className="icon-btn"
-                              onClick={e => toggleFavorite(biz._id, e)}
-                              title={isFavorite(biz._id) ? "Remove from Favorites" : "Add to Favorites"}
-                              style={{
-                                width: "32px",
-                                height: "32px",
-                                borderRadius: "8px",
-                                background: isFavorite(biz._id) ? "rgba(239, 68, 68, 0.15)" : "rgba(9, 13, 22, 0.75)",
-                                border: `1px solid ${isFavorite(biz._id) ? "rgba(239, 68, 68, 0.3)" : "rgba(255, 255, 255, 0.08)"}`,
-                                color: isFavorite(biz._id) ? "#ef4444" : "#f1f5f9",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                transition: "all 0.2s"
-                              }}
-                            >
-                              {isFavorite(biz._id) ? "" : ""}
-                            </button>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Body Content */}
-                      <div className="card-body">
-                        
-                        {/* Meta Category Row */}
-                        <div className="card-meta-row">
-                          <span className="card-category-tag">
-                            {biz.categories?.[0] || biz.category || "Business"}
-                          </span>
-                          <div style={{ display: "flex", gap: "6px", color: "#64748b" }}>
-                            {biz.priceRange && <span style={{ color: "#fbbf24", fontWeight: 700 }}>{biz.priceRange}</span>}
-                            {biz.yearEstablished && <span>Est. {biz.yearEstablished}</span>}
-                          </div>
-                        </div>
-
-                        {/* Title */}
-                        <h3 className="card-title">
-                          {biz.name}
-                        </h3>
-
-                        {/* Rating Row */}
-                        <div className="card-rating-row">
-                          {biz.rating > 0 ? (
-                            <>
-                              <span style={{ color: "#fbbf24" }}>★</span>
-                              <span style={{ fontWeight: 700 }}>{biz.rating?.toFixed(1)}</span>
-                              <span style={{ color: "#64748b" }}>({biz.reviewCount || 0})</span>
-                            </>
-                          ) : (
-                            <span style={{ color: "#64748b" }}>No reviews</span>
-                          )}
-                        </div>
-
-                        {/* Description snippet */}
-                        <p className="card-description">
-                          {biz.description}
-                        </p>
-
-                        {/* Verification Badges */}
-                        {biz.verificationBadges?.length > 0 && (
-                          <div className="card-badges">
-                            {biz.verificationBadges.map((badge, bIdx) => {
-                              const config = BADGE_CONFIG[badge.type] || { label: badge.type, color: "#64748b", icon: "◈" };
-                              return (
-                                <span
-                                  key={bIdx}
-                                  style={{
-                                    display: "inline-flex",
-                                    alignItems: "center",
-                                    gap: "3px",
-                                    padding: "3px 6px",
-                                    borderRadius: "6px",
-                                    background: `${config.color}15`,
-                                    border: `1px solid ${config.color}25`,
-                                    color: config.color,
-                                    fontSize: "9.5px",
-                                    fontWeight: 700,
-                                    textTransform: "uppercase",
-                                    letterSpacing: "0.02em"
-                                  }}
-                                >
-                                  <span>{config.icon}</span>
-                                  <span>{config.label}</span>
-                                </span>
-                              );
-                            })}
+                        {/* Rating Badge on Image */}
+                        {biz.rating > 0 && (
+                          <div style={{ position: "absolute", bottom: "12px", left: "14px", background: "rgba(9, 13, 22, 0.8)", backdropFilter: "blur(4px)", borderRadius: "8px", padding: "4px 10px", fontSize: "11px", fontWeight: 800, color: "#fbbf24", zIndex: 2, border: "1px solid rgba(255,255,255,0.08)" }}>
+                            ★ {biz.rating?.toFixed(1)}
                           </div>
                         )}
 
-                        {/* Location */}
-                        <div className="card-location" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                          <svg viewBox="0 0 24 24" width="12" height="12" stroke="#fbbf24" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                          <span>{biz.location?.town}, {biz.location?.county}</span>
+                        {/* Action Buttons Overlay */}
+                        <div style={{ position: "absolute", top: "12px", right: "12px", display: "flex", gap: "8px", zIndex: 2 }}>
+                          {/* Compare Toggle */}
+                          <button
+                            className="icon-btn"
+                            onClick={e => toggleComparison(biz._id, e)}
+                            title={comparisonList.includes(biz._id) ? "Remove from Compare" : "Compare Business"}
+                            style={{
+                              width: "32px",
+                              height: "32px",
+                              borderRadius: "8px",
+                              background: comparisonList.includes(biz._id) ? "#fbbf24" : "rgba(9, 13, 22, 0.75)",
+                              border: "1px solid rgba(255,255,255,0.08)",
+                              color: comparisonList.includes(biz._id) ? "#090d16" : "#f1f5f9",
+                              fontSize: "12px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              transition: "all 0.2s"
+                            }}
+                          >
+
+                          </button>
+                          {/* Favorite Button */}
+                          <button
+                            className="icon-btn"
+                            onClick={e => toggleFavorite(biz._id, e)}
+                            title={isFavorite(biz._id) ? "Remove from Favorites" : "Add to Favorites"}
+                            style={{
+                              width: "32px",
+                              height: "32px",
+                              borderRadius: "8px",
+                              background: isFavorite(biz._id) ? "rgba(239, 68, 68, 0.15)" : "rgba(9, 13, 22, 0.75)",
+                              border: `1px solid ${isFavorite(biz._id) ? "rgba(239, 68, 68, 0.3)" : "rgba(255, 255, 255, 0.08)"}`,
+                              color: isFavorite(biz._id) ? "#ef4444" : "#f1f5f9",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              transition: "all 0.2s"
+                            }}
+                          >
+                            {isFavorite(biz._id) ? "" : ""}
+                          </button>
                         </div>
-
-                        {/* Footer Quick Shortcuts */}
-                        <div className="card-footer">
-                          <span className="card-profile-link">
-                            View Profile <span style={{ transition: "transform 0.2s" }} className="profile-arrow">→</span>
-                          </span>
-
-                          {(biz.socialMedia?.whatsapp || biz.contact?.phone) && (
-                            <a
-                              href={`https://wa.me/${(biz.socialMedia?.whatsapp || biz.contact?.phone).replace(/[^0-9]/g, "")}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={e => e.stopPropagation()}
-                              style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                width: "36px",
-                                height: "36px",
-                                borderRadius: "10px",
-                                background: "rgba(34, 197, 94, 0.1)",
-                                border: "1px solid rgba(34, 197, 94, 0.25)",
-                                color: "#22c55e",
-                                transition: "all 0.2s"
-                              }}
-                              onMouseEnter={e => {
-                                e.currentTarget.style.background = "#22c55e";
-                                e.currentTarget.style.color = "#090d16";
-                              }}
-                              onMouseLeave={e => {
-                                e.currentTarget.style.background = "rgba(34, 197, 94, 0.1)";
-                                e.currentTarget.style.color = "#22c55e";
-                              }}
-                              title="Chat on WhatsApp"
-                            >
-                              <svg style={{ width: "16px", height: "16px" }} viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.625 1.451 5.403.002 9.803-4.394 9.805-9.801.002-2.618-1.01-5.078-2.856-6.927C16.378 1.986 13.93 1.902 12.01 1.9c-5.412 0-9.817 4.404-9.82 9.812-.002 1.549.431 3.064 1.249 4.385l-.974 3.565 3.69-.967-.008.006z"/>
-                              </svg>
-                            </a>
-                          )}
-                        </div>
-
                       </div>
+                    ) : (
+                      <div style={{ width: "100%", aspectRatio: "16/10", background: "linear-gradient(135deg, rgba(251,191,36,0.08) 0%, rgba(20,184,166,0.05) 100%)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                        <span style={{ fontSize: "38px" }}>
+                          {CATEGORY_EMOJIS[biz.categories?.[0]] || CATEGORY_EMOJIS[biz.category] || ""}
+                        </span>
+
+                        {/* Action Buttons Overlay */}
+                        <div style={{ position: "absolute", top: "12px", right: "12px", display: "flex", gap: "8px", zIndex: 2 }}>
+                          {/* Compare Toggle */}
+                          <button
+                            className="icon-btn"
+                            onClick={e => toggleComparison(biz._id, e)}
+                            title={comparisonList.includes(biz._id) ? "Remove from Compare" : "Compare Business"}
+                            style={{
+                              width: "32px",
+                              height: "32px",
+                              borderRadius: "8px",
+                              background: comparisonList.includes(biz._id) ? "#fbbf24" : "rgba(9, 13, 22, 0.75)",
+                              border: "1px solid rgba(255,255,255,0.08)",
+                              color: comparisonList.includes(biz._id) ? "#090d16" : "#f1f5f9",
+                              fontSize: "12px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              transition: "all 0.2s"
+                            }}
+                          >
+
+                          </button>
+                          {/* Favorite Button */}
+                          <button
+                            className="icon-btn"
+                            onClick={e => toggleFavorite(biz._id, e)}
+                            title={isFavorite(biz._id) ? "Remove from Favorites" : "Add to Favorites"}
+                            style={{
+                              width: "32px",
+                              height: "32px",
+                              borderRadius: "8px",
+                              background: isFavorite(biz._id) ? "rgba(239, 68, 68, 0.15)" : "rgba(9, 13, 22, 0.75)",
+                              border: `1px solid ${isFavorite(biz._id) ? "rgba(239, 68, 68, 0.3)" : "rgba(255, 255, 255, 0.08)"}`,
+                              color: isFavorite(biz._id) ? "#ef4444" : "#f1f5f9",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              transition: "all 0.2s"
+                            }}
+                          >
+                            {isFavorite(biz._id) ? "" : ""}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Body Content */}
+                    <div className="card-body">
+
+                      {/* Meta Category Row */}
+                      <div className="card-meta-row">
+                        <span className="card-category-tag">
+                          {biz.categories?.[0] || biz.category || "Business"}
+                        </span>
+                        <div style={{ display: "flex", gap: "6px", color: "#64748b" }}>
+                          {biz.priceRange && <span style={{ color: "#fbbf24", fontWeight: 700 }}>{biz.priceRange}</span>}
+                          {biz.yearEstablished && <span>Est. {biz.yearEstablished}</span>}
+                        </div>
+                      </div>
+
+                      {/* Title */}
+                      <h3 className="card-title">
+                        {biz.name}
+                      </h3>
+
+                      {/* Rating Row */}
+                      <div className="card-rating-row">
+                        {biz.rating > 0 ? (
+                          <>
+                            <span style={{ color: "#fbbf24" }}>★</span>
+                            <span style={{ fontWeight: 700 }}>{biz.rating?.toFixed(1)}</span>
+                            <span style={{ color: "#64748b" }}>({biz.reviewCount || 0})</span>
+                          </>
+                        ) : (
+                          <span style={{ color: "#64748b" }}>No reviews</span>
+                        )}
+                      </div>
+
+                      {/* Description snippet */}
+                      <p className="card-description">
+                        {biz.description}
+                      </p>
+
+                      {/* Verification Badges */}
+                      {biz.verificationBadges?.length > 0 && (
+                        <div className="card-badges">
+                          {biz.verificationBadges.map((badge, bIdx) => {
+                            const config = BADGE_CONFIG[badge.type] || { label: badge.type, color: "#64748b", icon: "◈" };
+                            return (
+                              <span
+                                key={bIdx}
+                                style={{
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "3px",
+                                  padding: "3px 6px",
+                                  borderRadius: "6px",
+                                  background: `${config.color}15`,
+                                  border: `1px solid ${config.color}25`,
+                                  color: config.color,
+                                  fontSize: "9.5px",
+                                  fontWeight: 700,
+                                  textTransform: "uppercase",
+                                  letterSpacing: "0.02em"
+                                }}
+                              >
+                                <span>{config.icon}</span>
+                                <span>{config.label}</span>
+                              </span>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {/* Location */}
+                      <div className="card-location" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="#fbbf24" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>{biz.location?.town}, {biz.location?.county}</span>
+                      </div>
+
+                      {/* Footer Quick Shortcuts */}
+                      <div className="card-footer">
+                        <span className="card-profile-link">
+                          View Profile <span style={{ transition: "transform 0.2s" }} className="profile-arrow">→</span>
+                        </span>
+
+                        {(biz.socialMedia?.whatsapp || biz.contact?.phone) && (
+                          <a
+                            href={`https://wa.me/${(biz.socialMedia?.whatsapp || biz.contact?.phone).replace(/[^0-9]/g, "")}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={e => e.stopPropagation()}
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              width: "36px",
+                              height: "36px",
+                              borderRadius: "10px",
+                              background: "rgba(34, 197, 94, 0.1)",
+                              border: "1px solid rgba(34, 197, 94, 0.25)",
+                              color: "#22c55e",
+                              transition: "all 0.2s"
+                            }}
+                            onMouseEnter={e => {
+                              e.currentTarget.style.background = "#22c55e";
+                              e.currentTarget.style.color = "#090d16";
+                            }}
+                            onMouseLeave={e => {
+                              e.currentTarget.style.background = "rgba(34, 197, 94, 0.1)";
+                              e.currentTarget.style.color = "#22c55e";
+                            }}
+                            title="Chat on WhatsApp"
+                          >
+                            <svg style={{ width: "16px", height: "16px" }} viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.625 1.451 5.403.002 9.803-4.394 9.805-9.801.002-2.618-1.01-5.078-2.856-6.927C16.378 1.986 13.93 1.902 12.01 1.9c-5.412 0-9.817 4.404-9.82 9.812-.002 1.549.431 3.064 1.249 4.385l-.974 3.565 3.69-.967-.008.006z" />
+                            </svg>
+                          </a>
+                        )}
+                      </div>
+
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
+              </div>
             );
           }
         })()}
