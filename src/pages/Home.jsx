@@ -2441,7 +2441,6 @@ export default function Home() {
               )}
             </div>
           </div>
-        )
         )}
 
         {featuredProperties.length === 0 && featuredBusinesses.length === 0 && featuredMaterials.length === 0 && featuredTourism.length === 0 && featuredMovers.length === 0 && (
