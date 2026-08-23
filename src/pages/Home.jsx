@@ -59,7 +59,14 @@ option { background: #162233; color: #F0EAD8; }
 }
 @keyframes cardsScroll {
   0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  20%  { transform: translateX(0); }
+  25%  { transform: translateX(-25%); }
+  45%  { transform: translateX(-25%); }
+  50%  { transform: translateX(-50%); }
+  70%  { transform: translateX(-50%); }
+  75%  { transform: translateX(-75%); }
+  95%  { transform: translateX(-75%); }
+  100% { transform: translateX(0); }
 }
 @keyframes pulseDot {
   0%, 100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.7); }
@@ -637,14 +644,23 @@ option { background: #162233; color: #F0EAD8; }
   background: #C9A84C;
   color: #0D1B2A;
 }
-.cards-track-wrap { overflow: hidden; width: 100%; }
+.cards-track-wrap { 
+  overflow: hidden; 
+  width: 100%; 
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y;
+}
+.cards-track-wrap:active { cursor: grabbing; }
 .cards-track {
   display: flex; align-items: stretch;
   width: max-content;
   animation: cardsScroll 10s linear infinite;
   padding: 8px 0 24px;
+  will-change: transform;
 }
 .cards-track:hover { animation-play-state: paused; }
+.cards-track.swiping { animation: none; }
 .feat-card {
   background: rgba(22, 34, 51, 0.75);
   backdrop-filter: blur(8px);
@@ -1617,6 +1633,7 @@ export default function Home() {
   const [loadingDemographics, setLoadingDemographics] = useState(true);
   const [demoTab, setDemoTab] = useState("services");
   const [hoveredService, setHoveredService] = useState(null);
+  const [carouselPositions, setCarouselPositions] = useState({});
 
   const counties = [
     "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta",
@@ -1829,6 +1846,68 @@ export default function Home() {
     navigate("/upload");
   };
 
+  const handleCarouselSwipe = (carouselId, direction) => {
+    setCarouselPositions(prev => {
+      const currentPos = prev[carouselId] || 0;
+      const newPos = direction === 'left' ? currentPos + 304 : currentPos - 304;
+      return { ...prev, [carouselId]: Math.max(0, newPos) };
+    });
+  };
+
+  const handleMouseDown = (e, carouselId) => {
+    const track = e.currentTarget.querySelector('.cards-track');
+    track.classList.add('swiping');
+    const startX = e.clientX;
+    const scrollLeft = track.style.transform ? parseInt(track.style.transform.replace('translateX(', '').replace('px)', '')) : 0;
+
+    const handleMouseMove = (moveEvent) => {
+      const diff = moveEvent.clientX - startX;
+      track.style.transform = `translateX(${scrollLeft + diff}px)`;
+    };
+
+    const handleMouseUp = (upEvent) => {
+      track.classList.remove('swiping');
+      const diff = upEvent.clientX - startX;
+      if (Math.abs(diff) > 50) {
+        handleCarouselSwipe(carouselId, diff > 0 ? 'right' : 'left');
+      } else {
+        track.style.transform = `translateX(${scrollLeft}px)`;
+      }
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
+  const handleTouchStart = (e, carouselId) => {
+    const track = e.currentTarget.querySelector('.cards-track');
+    track.classList.add('swiping');
+    const startX = e.touches[0].clientX;
+    const scrollLeft = track.style.transform ? parseInt(track.style.transform.replace('translateX(', '').replace('px)', '')) : 0;
+
+    const handleTouchMove = (moveEvent) => {
+      const diff = moveEvent.touches[0].clientX - startX;
+      track.style.transform = `translateX(${scrollLeft + diff}px)`;
+    };
+
+    const handleTouchEnd = (upEvent) => {
+      track.classList.remove('swiping');
+      const diff = upEvent.changedTouches[0].clientX - startX;
+      if (Math.abs(diff) > 50) {
+        handleCarouselSwipe(carouselId, diff > 0 ? 'right' : 'left');
+      } else {
+        track.style.transform = `translateX(${scrollLeft}px)`;
+      }
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+
+    document.addEventListener('touchmove', handleTouchMove);
+    document.addEventListener('touchend', handleTouchEnd);
+  };
+
   const activeCategory = platformCategories.find(c => c.id === activeCategoryTab);
 
   /* ── ERROR BOUNDARY ── */
@@ -1984,8 +2063,8 @@ export default function Home() {
               <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Rentals</h3>
               <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredProperties.length}</span>
             </div>
-            <div className="cards-track-wrap">
-              <div className="cards-track" style={{ animationDuration: '5s' }}>
+            <div className="cards-track-wrap" onMouseDown={(e) => handleMouseDown(e, 'rentals')} onTouchStart={(e) => handleTouchStart(e, 'rentals')}>
+              <div className="cards-track" style={{ animationDuration: '13s', transform: `translateX(-${carouselPositions['rentals'] || 0}px)` }}>
                 {featuredProperties.map((item, idx) => (
                   <div key={`${item._id}-${idx}`} className="feat-card">
                     <div className="feat-img-wrap">
@@ -2066,8 +2145,8 @@ export default function Home() {
               <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Businesses</h3>
               <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredBusinesses.length}</span>
             </div>
-            <div className="cards-track-wrap">
-              <div className="cards-track" style={{ animationDuration: '5s' }}>
+            <div className="cards-track-wrap" onMouseDown={(e) => handleMouseDown(e, 'businesses')} onTouchStart={(e) => handleTouchStart(e, 'businesses')}>
+              <div className="cards-track" style={{ animationDuration: '13s', transform: `translateX(-${carouselPositions['businesses'] || 0}px)` }}>
                 {featuredBusinesses.map((item, idx) => (
                   <div key={`${item._id}-${idx}`} className="feat-card">
                     <div className="feat-img-wrap">
@@ -2146,8 +2225,8 @@ export default function Home() {
               <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>QuickSales</h3>
               <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredMaterials.length}</span>
             </div>
-            <div className="cards-track-wrap">
-              <div className="cards-track" style={{ animationDuration: '5s' }}>
+            <div className="cards-track-wrap" onMouseDown={(e) => handleMouseDown(e, 'quicksales')} onTouchStart={(e) => handleTouchStart(e, 'quicksales')}>
+              <div className="cards-track" style={{ animationDuration: '13s', transform: `translateX(-${carouselPositions['quicksales'] || 0}px)` }}>
                 {featuredMaterials.map((item, idx) => (
                   <div key={`${item._id}-${idx}`} className="feat-card">
                     <div className="feat-img-wrap">
@@ -2226,8 +2305,8 @@ export default function Home() {
               <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Tourism</h3>
               <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredTourism.length}</span>
             </div>
-            <div className="cards-track-wrap">
-              <div className="cards-track" style={{ animationDuration: '5s' }}>
+            <div className="cards-track-wrap" onMouseDown={(e) => handleMouseDown(e, 'tourism')} onTouchStart={(e) => handleTouchStart(e, 'tourism')}>
+              <div className="cards-track" style={{ animationDuration: '13s', transform: `translateX(-${carouselPositions['tourism'] || 0}px)` }}>
                 {featuredTourism.map((item, idx) => (
                   <div key={`${item._id}-${idx}`} className="feat-card">
                     <div className="feat-img-wrap">
@@ -2303,11 +2382,11 @@ export default function Home() {
         {featuredMovers.length > 0 && (
           <div style={{ marginBottom: '48px', padding: '0 28px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Movers</h3>
+              <h3 style={{ fontFamily: "'Cormorant Garamond", Georgia, serif', fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Movers</h3>
               <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredMovers.length}</span>
             </div>
-            <div className="cards-track-wrap">
-              <div className="cards-track" style={{ animationDuration: '5s' }}>
+            <div className="cards-track-wrap" onMouseDown={(e) => handleMouseDown(e, 'movers')} onTouchStart={(e) => handleTouchStart(e, 'movers')}>
+              <div className="cards-track" style={{ animationDuration: '13s', transform: `translateX(-${carouselPositions['movers'] || 0}px)` }}>
                 {featuredMovers.map((item, idx) => (
                   <div key={`${item._id}-${idx}`} className="feat-card">
                     <div className="feat-img-wrap">
@@ -2377,19 +2456,22 @@ export default function Home() {
               </div>
             </div>
           </div>
-        )}
+  )
+}
 
-        {featuredProperties.length === 0 && featuredBusinesses.length === 0 && featuredMaterials.length === 0 && featuredTourism.length === 0 && featuredMovers.length === 0 && (
-          <div className="no-feat-wrap" style={{ textAlign: 'center', padding: '40px 28px' }}>
-            <span className="no-feat-icon" style={{ fontSize: '32px' }}></span>
-            <h4 className="no-feat-title" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: C.gold, fontSize: '20px', marginTop: '12px' }}>No Featured Listings Found</h4>
-            <p className="no-feat-sub" style={{ color: C.textMid, fontSize: '14px' }}>Check back later for active premium listings!</p>
-          </div>
-        )}
-      </section>
+{
+  featuredProperties.length === 0 && featuredBusinesses.length === 0 && featuredMaterials.length === 0 && featuredTourism.length === 0 && featuredMovers.length === 0 && (
+    <div className="no-feat-wrap" style={{ textAlign: 'center', padding: '40px 28px' }}>
+      <span className="no-feat-icon" style={{ fontSize: '32px' }}></span>
+      <h4 className="no-feat-title" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: C.gold, fontSize: '20px', marginTop: '12px' }}>No Featured Listings Found</h4>
+      <p className="no-feat-sub" style={{ color: C.textMid, fontSize: '14px' }}>Check back later for active premium listings!</p>
+    </div>
+  )
+}
+      </section >
 
-      {/* ── CATEGORIES SHOWCASE ── */}
-      <section className="cats-section">
+  {/* ── CATEGORIES SHOWCASE ── */ }
+  < section className = "cats-section" >
         <div className="section-hdr">
           <p className="section-eyebrow">What We Offer</p>
           <h2 className="section-title">Everything on One Platform</h2>
@@ -2443,10 +2525,10 @@ export default function Home() {
             </div>
           ))}
         </div>
-      </section>
+      </section >
 
-      {/* ── DEMOGRAPHICS SECTION ── */}
-      <section className="demo-section">
+  {/* ── DEMOGRAPHICS SECTION ── */ }
+  < section className = "demo-section" >
         <div className="section-hdr">
           <p className="section-eyebrow">Live Analytics</p>
           <h2 className="section-title">Platform Demographics</h2>
@@ -2670,8 +2752,8 @@ export default function Home() {
         </div >
       </section >
 
-      {/* ── HOW IT WORKS ── */}
-      <section className="how-section">
+  {/* ── HOW IT WORKS ── */ }
+  < section className = "how-section" >
         <div className="section-hdr">
           <p className="section-eyebrow">Direct & transparent</p>
           <h2 className="section-title">How Axxspace Works</h2>
@@ -2703,10 +2785,10 @@ export default function Home() {
             </p>
           </div>
         </div>
-      </section>
+      </section >
 
-      {/* ── TESTIMONIALS ── */}
-      < section className="test-section" >
+  {/* ── TESTIMONIALS ── */ }
+  < section className = "test-section" >
         <div className="section-hdr">
           <p className="section-eyebrow">Social Proof</p>
           <h2 className="section-title">What Our Users Say</h2>
@@ -2756,108 +2838,108 @@ export default function Home() {
         </div>
       </section >
 
-      {/* ── FINAL CTA ── */}
-      < section className="cta-section" >
-        <div className="cta-inner">
-          <div className="cta-badge">Start Your Journey Today</div>
-          <h2 className="cta-title">
-            Find Your Place<br /><em>in Kenya</em>
-          </h2>
-          <p className="cta-text">
-            Join thousands of Kenyans who find homes, move smarter, build better, and explore more — all through Axxspace.
-          </p>
-          <div className="cta-btns">
-            <button className="cta-btn-gold" onClick={() => navigate("/listings")}> Browse Rentals</button>
-            <button className="cta-btn-ghost" onClick={() => navigate("/movers")}> Find Movers</button>
-            <button className="cta-btn-ghost" onClick={() => navigate("/materials")}> Shop Materials</button>
-            <button className="cta-btn-ghost" onClick={() => navigate("/tourism")}> Explore Tourism</button>
-          </div>
-          <div className="cta-divider"></div>
-          <button
-            className="cta-list-btn"
-            style={token
-              ? { background: `linear-gradient(135deg,${C.gold},${C.goldLight})`, color: C.navy, border: "none" }
-              : { background: "transparent", color: C.textMain, border: `1px solid ${C.border}` }
-            }
-            onClick={handleListProperty}
-          >
-            {token ? " List Your Property / Service" : " Login to List Your Business"}
-          </button>
-          {!token && <p className="cta-hint">Free to Join — No Credit Card Required</p>}
-        </div>
+  {/* ── FINAL CTA ── */ }
+  < section className = "cta-section" >
+    <div className="cta-inner">
+      <div className="cta-badge">Start Your Journey Today</div>
+      <h2 className="cta-title">
+        Find Your Place<br /><em>in Kenya</em>
+      </h2>
+      <p className="cta-text">
+        Join thousands of Kenyans who find homes, move smarter, build better, and explore more — all through Axxspace.
+      </p>
+      <div className="cta-btns">
+        <button className="cta-btn-gold" onClick={() => navigate("/listings")}> Browse Rentals</button>
+        <button className="cta-btn-ghost" onClick={() => navigate("/movers")}> Find Movers</button>
+        <button className="cta-btn-ghost" onClick={() => navigate("/materials")}> Shop Materials</button>
+        <button className="cta-btn-ghost" onClick={() => navigate("/tourism")}> Explore Tourism</button>
+      </div>
+      <div className="cta-divider"></div>
+      <button
+        className="cta-list-btn"
+        style={token
+          ? { background: `linear-gradient(135deg,${C.gold},${C.goldLight})`, color: C.navy, border: "none" }
+          : { background: "transparent", color: C.textMain, border: `1px solid ${C.border}` }
+        }
+        onClick={handleListProperty}
+      >
+        {token ? " List Your Property / Service" : " Login to List Your Business"}
+      </button>
+      {!token && <p className="cta-hint">Free to Join — No Credit Card Required</p>}
+    </div>
       </section >
 
-      {/* ── FOOTER ── */}
-      < footer className="footer" >
-        <div className="footer-inner">
-          <div className="footer-top">
-            <div className="footer-brand">Axx<span>space</span></div>
-            <p className="footer-tagline">Kenya's Most Trusted Property &amp; Services Platform</p>
-            <div style={{ marginTop: "20px" }}>
-              <SocialMediaLinks iconSize={20} />
-            </div>
-          </div>
-          <div className="footer-cols">
-            <div className="footer-col">
-              <p className="footer-col-title">Services</p>
-              {[[" Rentals", "/listings"], [" Movers", "/movers"], [" Merchants", "/materials"], [" Tourism", "/tourism"]].map(([l, r]) => (
-                <span key={l} className="footer-link" onClick={() => navigate(r)}>{l}</span>
-              ))}
-            </div>
-            <div className="footer-col">
-              <p className="footer-col-title">Company</p>
-              {["About Us", "How It Works", "Contact Us", "Advertise"].map(l => (
-                <span key={l} className="footer-link">{l}</span>
-              ))}
-            </div>
-            <div className="footer-col">
-              <p className="footer-col-title">Legal</p>
-              {["Terms of Service", "Privacy Policy", "FAQ", "Safety Tips"].map(l => (
-                <span key={l} className="footer-link">{l}</span>
-              ))}
-            </div>
-            <div className="footer-col">
-              <p className="footer-col-title">Contact</p>
-              <span className="footer-link"> info@axxspace.com</span>
-              <span className="footer-link"> support@axxspace.com</span>
-              <span className="footer-link"> admin@axxspace.com</span>
-            </div>
-          </div>
-          <p className="footer-copy"> 2026 Axxspace · All Rights Reserved</p>
+  {/* ── FOOTER ── */ }
+  < footer className = "footer" >
+    <div className="footer-inner">
+      <div className="footer-top">
+        <div className="footer-brand">Axx<span>space</span></div>
+        <p className="footer-tagline">Kenya's Most Trusted Property &amp; Services Platform</p>
+        <div style={{ marginTop: "20px" }}>
+          <SocialMediaLinks iconSize={20} />
         </div>
+      </div>
+      <div className="footer-cols">
+        <div className="footer-col">
+          <p className="footer-col-title">Services</p>
+          {[[" Rentals", "/listings"], [" Movers", "/movers"], [" Merchants", "/materials"], [" Tourism", "/tourism"]].map(([l, r]) => (
+            <span key={l} className="footer-link" onClick={() => navigate(r)}>{l}</span>
+          ))}
+        </div>
+        <div className="footer-col">
+          <p className="footer-col-title">Company</p>
+          {["About Us", "How It Works", "Contact Us", "Advertise"].map(l => (
+            <span key={l} className="footer-link">{l}</span>
+          ))}
+        </div>
+        <div className="footer-col">
+          <p className="footer-col-title">Legal</p>
+          {["Terms of Service", "Privacy Policy", "FAQ", "Safety Tips"].map(l => (
+            <span key={l} className="footer-link">{l}</span>
+          ))}
+        </div>
+        <div className="footer-col">
+          <p className="footer-col-title">Contact</p>
+          <span className="footer-link"> info@axxspace.com</span>
+          <span className="footer-link"> support@axxspace.com</span>
+          <span className="footer-link"> admin@axxspace.com</span>
+        </div>
+      </div>
+      <p className="footer-copy"> 2026 Axxspace · All Rights Reserved</p>
+    </div>
       </footer >
 
-      {/* ── BOOST / SERVICE SELECTION MODAL ── */}
-      {
-        showBoostModal && (
-          <div className="modal-overlay" onClick={() => setShowBoostModal(false)}>
-            <div className="modal-box" onClick={e => e.stopPropagation()}>
-              <button className="modal-close" onClick={() => setShowBoostModal(false)}>✕</button>
-              <h2 className="modal-title">Choose Your Service</h2>
-              <p className="modal-sub">Select the type of service you want to list or boost on Axxspace</p>
-              <div className="modal-services">
-                {[
-                  { icon: "", title: "Landlord / Rentals", desc: "List rental properties and boost your listings", bg: `linear-gradient(135deg,${C.gold},${C.goldLight})`, route: "/login" },
-                  { icon: "", title: "Mover / Moving Company", desc: "Offer moving services across Kenya", bg: "linear-gradient(135deg,#1E3A5F,#2D5080)", route: "/login?type=mover" },
-                  { icon: "", title: "Seller / QuickSales", desc: "Sell items in the materials QuickSales", bg: "linear-gradient(135deg,#0C2A3A,#103A4F)", route: "/seller-login" },
-                  { icon: "", title: "Tourism Provider", desc: "List hotels, lodges, and tourism experiences", bg: "linear-gradient(135deg,#1B3A2A,#264D38)", route: "/tourism/login" },
-                  { icon: "", title: "Business / AxxBiashara", desc: "List professional business services", bg: "linear-gradient(135deg,#2E1B4A,#3D2566)", route: "/business-login" },
-                ].map(svc => (
-                  <div key={svc.title} className="modal-svc-card" onClick={() => { setShowBoostModal(false); navigate(svc.route); }}>
-                    <div className="modal-svc-icon" style={{ background: svc.bg }}>{svc.icon}</div>
-                    <div>
-                      <p className="modal-svc-title">{svc.title}</p>
-                      <p className="modal-svc-desc">{svc.desc}</p>
-                    </div>
-                    <span className="modal-arrow">→</span>
-                  </div>
-                ))}
+  {/* ── BOOST / SERVICE SELECTION MODAL ── */ }
+{
+  showBoostModal && (
+    <div className="modal-overlay" onClick={() => setShowBoostModal(false)}>
+      <div className="modal-box" onClick={e => e.stopPropagation()}>
+        <button className="modal-close" onClick={() => setShowBoostModal(false)}>✕</button>
+        <h2 className="modal-title">Choose Your Service</h2>
+        <p className="modal-sub">Select the type of service you want to list or boost on Axxspace</p>
+        <div className="modal-services">
+          {[
+            { icon: "", title: "Landlord / Rentals", desc: "List rental properties and boost your listings", bg: `linear-gradient(135deg,${C.gold},${C.goldLight})`, route: "/login" },
+            { icon: "", title: "Mover / Moving Company", desc: "Offer moving services across Kenya", bg: "linear-gradient(135deg,#1E3A5F,#2D5080)", route: "/login?type=mover" },
+            { icon: "", title: "Seller / QuickSales", desc: "Sell items in the materials QuickSales", bg: "linear-gradient(135deg,#0C2A3A,#103A4F)", route: "/seller-login" },
+            { icon: "", title: "Tourism Provider", desc: "List hotels, lodges, and tourism experiences", bg: "linear-gradient(135deg,#1B3A2A,#264D38)", route: "/tourism/login" },
+            { icon: "", title: "Business / AxxBiashara", desc: "List professional business services", bg: "linear-gradient(135deg,#2E1B4A,#3D2566)", route: "/business-login" },
+          ].map(svc => (
+            <div key={svc.title} className="modal-svc-card" onClick={() => { setShowBoostModal(false); navigate(svc.route); }}>
+              <div className="modal-svc-icon" style={{ background: svc.bg }}>{svc.icon}</div>
+              <div>
+                <p className="modal-svc-title">{svc.title}</p>
+                <p className="modal-svc-desc">{svc.desc}</p>
               </div>
+              <span className="modal-arrow">→</span>
             </div>
-          </div>
-        )
-      }
-      <RequestItemModal isOpen={isRequestModalOpen} onClose={() => setIsRequestModalOpen(false)} />
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+<RequestItemModal isOpen={isRequestModalOpen} onClose={() => setIsRequestModalOpen(false)} />
     </div >
   );
 }
