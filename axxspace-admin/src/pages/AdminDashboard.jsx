@@ -9,6 +9,7 @@ import NotificationPanel from "../components/NotificationPanel";
 import BadgeManagement from "../components/BadgeManagement";
 import UserBadgeManagement from "../components/UserBadgeManagement";
 import { getPricelistUrl, openAdminFile, resolveMediaUrl } from "../utils/fileLinks";
+import QRGeneratorModal from "../components/QRGeneratorModal";
 import "./AdminDashboard.css";
 
 // ── tiny helpers ──────────────────────────────────────────────
@@ -90,6 +91,10 @@ export default function AdminDashboard() {
   // ── REQUESTS STATE ──────────────────────────────────────────
   const [requests, setRequests] = useState([]);
   const [requestsLoading, setRequestsLoading] = useState(false);
+
+  // ── POSTER / QR STATE ──────────────────────────────────────
+  const [selectedPropertyForQR, setSelectedPropertyForQR] = useState(null);
+  const [qrModalOpen, setQrModalOpen] = useState(false);
 
   // ── auth guard ─────────────────────────────────────────────
   useEffect(() => {
@@ -1459,6 +1464,25 @@ export default function AdminDashboard() {
                       {item.isFeatured ? " Unfeature" : " Feature"}
                     </button>
                   )}
+                  {activeTab === "properties" && (
+                    <button
+                      className="btn-feature"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedPropertyForQR(item);
+                        setQrModalOpen(true);
+                      }}
+                      style={{
+                        marginTop: "10px",
+                        width: "100%",
+                        background: "#3b82f6",
+                        color: "#ffffff",
+                        cursor: "pointer"
+                      }}
+                    >
+                      Poster / QR
+                    </button>
+                  )}
                   <button className="btn-delete" onClick={(e) => { e.stopPropagation(); confirmDelete(activeTab, item._id, getTitle(item)); }}></button>
                 </div>
               </div>
@@ -1480,6 +1504,10 @@ export default function AdminDashboard() {
               onCancelEdit={() => setEditMode(false)}
               onDelete={confirmDelete}
               getImages={getImages} getTitle={getTitle} getOwner={getOwner} getContact={getContact}
+              onOpenQR={() => {
+                setSelectedPropertyForQR(selected);
+                setQrModalOpen(true);
+              }}
             />
           )
         }
@@ -1575,6 +1603,17 @@ export default function AdminDashboard() {
             </div>
           )
         }
+
+        {selectedPropertyForQR && (
+          <QRGeneratorModal
+            isOpen={qrModalOpen}
+            onClose={() => {
+              setQrModalOpen(false);
+              setSelectedPropertyForQR(null);
+            }}
+            property={selectedPropertyForQR}
+          />
+        )}
       </main >
     </div >
   );
@@ -1803,14 +1842,11 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
 // ── DETAIL MODAL ──────────────────────────────────────────────
 function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
   editMode, editData, setEditData, onEdit, onSave, saving, onCancelEdit, onDelete,
-  getImages, getTitle, getOwner, getContact }) {
+  getImages, getTitle, getOwner, getContact, onOpenQR }) {
 
   const images = getImages(item);
   const [imgIdx, setImgIdx] = useState(0);
   const [qrCodeUrl, setQrCodeUrl] = useState("");
-  const [posterLoading, setPosterLoading] = useState(false);
-  const qrCanvasRef = useRef(null);
-  const posterCanvasRef = useRef(null);
   const fields = Object.entries(item).filter(([k]) =>
     !["_id", "__v", "password", "emailVerificationToken", "resetPasswordToken",
       "images", "photos", "coverImage", "image", "owner", "seller"].includes(k)
@@ -1824,306 +1860,13 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
     setQrCodeUrl(qrApiUrl);
   };
 
-  // Draw poster on canvas
-  const drawPoster = () => {
-    setPosterLoading(true);
-    const posterCanvas = posterCanvasRef.current;
-    const qrCanvas = qrCanvasRef.current;
-    if (!posterCanvas || !qrCanvas) {
-      setPosterLoading(false);
-      return;
-    }
-
-    const posterCtx = posterCanvas.getContext("2d");
-    const qrCtx = qrCanvas.getContext("2d");
-
-    // First generate QR on canvas
+  // Download QR code
+  const downloadQRCode = () => {
     const baseUrl = window.location.origin;
     const listingUrl = `${baseUrl}/listings/${item._id}`;
     const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(listingUrl)}&bgcolor=ffffff&color=081A34`;
-
-    const qrImg = new Image();
-    qrImg.crossOrigin = "anonymous";
-    qrImg.onload = () => {
-      try {
-        // Draw QR on canvas
-        qrCtx.fillStyle = "#ffffff";
-        qrCtx.fillRect(0, 0, 300, 300);
-        qrCtx.drawImage(qrImg, 0, 0, 300, 300);
-
-        // Now draw poster
-        posterCtx.fillStyle = "#ffffff";
-        posterCtx.fillRect(0, 0, posterCanvas.width, posterCanvas.height);
-
-        // Helper function to draw round rects
-        const drawRoundRect = (ctx, x, y, width, height, radius, fill, stroke, strokeColor, strokeWidth) => {
-          ctx.beginPath();
-          ctx.moveTo(x + radius, y);
-          ctx.lineTo(x + width - radius, y);
-          ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-          ctx.lineTo(x + width, y + height - radius);
-          ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-          ctx.lineTo(x + radius, y + height);
-          ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-          ctx.lineTo(x, y + radius);
-          ctx.quadraticCurveTo(x, y, x + radius, y);
-          ctx.closePath();
-          if (fill) ctx.fill();
-          if (stroke) {
-            ctx.strokeStyle = strokeColor;
-            ctx.lineWidth = strokeWidth;
-            ctx.stroke();
-          }
-        };
-
-        // Helper function to draw scallop badge
-        const drawScallopBadge = (ctx, cx, cy, r, numScallops, depth, fillColor, strokeColor, strokeWidth) => {
-          ctx.beginPath();
-          for (let i = 0; i <= 360; i++) {
-            const angle = (i * Math.PI) / 180;
-            const currentR = r + Math.sin(angle * numScallops) * depth;
-            const x = cx + currentR * Math.cos(angle);
-            const y = cy + currentR * Math.sin(angle);
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-          }
-          ctx.closePath();
-          if (fillColor) {
-            ctx.fillStyle = fillColor;
-            ctx.fill();
-          }
-          if (strokeColor) {
-            ctx.strokeStyle = strokeColor;
-            ctx.lineWidth = strokeWidth;
-            ctx.stroke();
-          }
-        };
-
-        // Draw background waves watermark
-        posterCtx.strokeStyle = "#f1f5f9";
-        posterCtx.lineWidth = 1.5;
-        for (let yOffset = 0; yOffset < 1200; yOffset += 200) {
-          posterCtx.beginPath();
-          posterCtx.moveTo(-100, yOffset + 200);
-          posterCtx.quadraticCurveTo(200, yOffset + 100, 400, yOffset + 300);
-          posterCtx.quadraticCurveTo(600, yOffset + 500, 900, yOffset + 200);
-          posterCtx.stroke();
-        }
-
-        // Draw top slanted accent
-        posterCtx.fillStyle = "#081A34";
-        posterCtx.beginPath();
-        posterCtx.moveTo(0, 0);
-        posterCtx.lineTo(posterCanvas.width, 0);
-        posterCtx.lineTo(posterCanvas.width, 14);
-        posterCtx.lineTo(0, 35);
-        posterCtx.closePath();
-        posterCtx.fill();
-
-        // Logo placeholder (centered)
-        posterCtx.fillStyle = "#081A34";
-        posterCtx.font = "900 42px 'Inter', sans-serif";
-        const brandY = 195;
-        const text1 = "AXX ";
-        const text2 = "SPACE";
-        const w1 = posterCtx.measureText(text1).width;
-        const w2 = posterCtx.measureText(text2).width;
-        const startX = (posterCanvas.width - (w1 + w2)) / 2;
-        posterCtx.textAlign = "left";
-        posterCtx.fillStyle = "#d9383a";
-        posterCtx.fillText(text1, startX, brandY);
-        posterCtx.fillStyle = "#081A34";
-        posterCtx.fillText(text2, startX + w1, brandY);
-
-        // Tagline
-        posterCtx.textAlign = "center";
-        posterCtx.fillStyle = "#475569";
-        posterCtx.font = "500 16px 'Inter', sans-serif";
-        posterCtx.fillText("Space hunting bila stress", posterCanvas.width / 2, 222);
-
-        // Red separator line
-        posterCtx.fillStyle = "#d9383a";
-        posterCtx.fillRect(40, 240, 720, 4);
-
-        // Main title
-        posterCtx.textAlign = "center";
-        posterCtx.fillStyle = "#081A34";
-        posterCtx.font = "900 60px 'Inter', sans-serif";
-        posterCtx.fillText("ROOM/HOUSE", posterCanvas.width / 2, 330);
-
-        posterCtx.fillStyle = "#d9383a";
-        posterCtx.font = "900 85px 'Inter', sans-serif";
-        posterCtx.fillText("AVAILABLE", posterCanvas.width / 2, 420);
-
-        // Draw scalloped stamp badge
-        const badgeX = 650;
-        const badgeY = 350;
-        drawScallopBadge(posterCtx, badgeX, badgeY, 45, 18, 4, "#081A34", "#d9383a", 3);
-
-        // Draw house icon inside badge
-        posterCtx.strokeStyle = "#ffffff";
-        posterCtx.lineWidth = 2.5;
-        posterCtx.lineCap = "round";
-        posterCtx.lineJoin = "round";
-        posterCtx.beginPath();
-        posterCtx.moveTo(badgeX - 17, badgeY - 12);
-        posterCtx.lineTo(badgeX, badgeY - 27);
-        posterCtx.lineTo(badgeX + 17, badgeY - 12);
-        posterCtx.stroke();
-        posterCtx.beginPath();
-        posterCtx.moveTo(badgeX - 11, badgeY - 12);
-        posterCtx.lineTo(badgeX - 11, badgeY + 3);
-        posterCtx.lineTo(badgeX + 11, badgeY + 3);
-        posterCtx.lineTo(badgeX + 11, badgeY - 12);
-        posterCtx.stroke();
-        posterCtx.fillStyle = "#ffffff";
-        posterCtx.fillRect(badgeX - 4, badgeY - 7, 8, 10);
-        posterCtx.fillStyle = "#ffffff";
-        posterCtx.textAlign = "center";
-        posterCtx.font = "bold 8px 'Inter', sans-serif";
-        posterCtx.fillText("Listed On", badgeX, badgeY + 15);
-        posterCtx.font = "900 9.5px 'Inter', sans-serif";
-        posterCtx.fillText("AXXSPACE", badgeX, badgeY + 26);
-
-        // Scan instruction
-        posterCtx.fillStyle = "#081A34";
-        posterCtx.textAlign = "center";
-        posterCtx.font = "800 20px 'Inter', sans-serif";
-        posterCtx.fillText("SCAN TO VIEW HOUSE DETAILS AND CONTACTS", posterCanvas.width / 2, 480);
-
-        // QR Code Box
-        const qrBoxW = 296;
-        const qrBoxH = 296;
-        const qrBoxX = (posterCanvas.width - qrBoxW) / 2;
-        const qrBoxY = 515;
-        posterCtx.fillStyle = "#ffffff";
-        drawRoundRect(posterCtx, qrBoxX, qrBoxY, qrBoxW, qrBoxH, 10, true, true, "#d9383a", 4);
-        posterCtx.drawImage(qrImg, qrBoxX + 16, qrBoxY + 16, 264, 264);
-
-        // OR VISIT
-        posterCtx.fillStyle = "#081A34";
-        posterCtx.textAlign = "center";
-        posterCtx.font = "800 16px 'Inter', sans-serif";
-        posterCtx.fillText("OR VISIT", posterCanvas.width / 2, 850);
-
-        // www.axxspace.com Pill
-        const pillW = 280;
-        const pillH = 44;
-        const pillX = (posterCanvas.width - pillW) / 2;
-        const pillY = 870;
-        posterCtx.fillStyle = "#ffffff";
-        drawRoundRect(posterCtx, pillX, pillY, pillW, pillH, 22, true, true, "#081A34", 2);
-
-        // Globe icon
-        const globeX = pillX + 22;
-        const globeY = pillY + 22;
-        posterCtx.fillStyle = "#081A34";
-        posterCtx.beginPath();
-        posterCtx.arc(globeX, globeY, 12, 0, Math.PI * 2);
-        posterCtx.fill();
-        posterCtx.strokeStyle = "#ffffff";
-        posterCtx.lineWidth = 1.5;
-        posterCtx.beginPath();
-        posterCtx.arc(globeX, globeY, 10, 0, Math.PI * 2);
-        posterCtx.stroke();
-        posterCtx.beginPath();
-        posterCtx.moveTo(globeX - 10, globeY);
-        posterCtx.lineTo(globeX + 10, globeY);
-        posterCtx.stroke();
-        posterCtx.beginPath();
-        posterCtx.moveTo(globeX, globeY - 10);
-        posterCtx.lineTo(globeX, globeY + 10);
-        posterCtx.stroke();
-
-        // URL text
-        posterCtx.fillStyle = "#081A34";
-        posterCtx.textAlign = "left";
-        posterCtx.font = "800 18px 'Inter', sans-serif";
-        posterCtx.fillText("www.axxspace.com", pillX + 44, pillY + 28);
-
-        // Contact Footer
-        const contactY = 960;
-        posterCtx.textAlign = "left";
-        posterCtx.font = "800 15px 'Inter', sans-serif";
-        posterCtx.strokeStyle = "#081A34";
-        posterCtx.lineWidth = 1.5;
-
-        // Email
-        posterCtx.strokeRect(80, contactY - 12, 18, 12);
-        posterCtx.beginPath();
-        posterCtx.moveTo(80, contactY - 12);
-        posterCtx.lineTo(89, contactY - 6);
-        posterCtx.lineTo(98, contactY - 12);
-        posterCtx.stroke();
-        posterCtx.fillText("info@axxspace.com", 106, contactY - 1);
-
-        // WhatsApp
-        posterCtx.fillStyle = "#081A34";
-        posterCtx.beginPath();
-        posterCtx.arc(338, contactY - 6, 6, 0.15 * Math.PI, 1.85 * Math.PI);
-        posterCtx.lineTo(331, contactY - 1);
-        posterCtx.closePath();
-        posterCtx.fill();
-        posterCtx.beginPath();
-        posterCtx.arc(338, contactY - 6, 3, 0.7 * Math.PI, 1.3 * Math.PI);
-        posterCtx.stroke();
-        posterCtx.fillText("+254 745 689 773", 364, contactY - 1);
-
-        // Social
-        posterCtx.strokeStyle = "#081A34";
-        posterCtx.lineWidth = 1.5;
-        drawRoundRect(posterCtx, 590, contactY - 12, 12, 12, 3, false, true, "#081A34", 1.5);
-        posterCtx.beginPath();
-        posterCtx.arc(596, contactY - 6, 2.5, 0, Math.PI * 2);
-        posterCtx.stroke();
-        posterCtx.fillStyle = "#081A34";
-        posterCtx.fillText("axx.space", 638, contactY - 1);
-
-        // Bottom accents
-        posterCtx.fillStyle = "#d9383a";
-        posterCtx.beginPath();
-        posterCtx.moveTo(0, posterCanvas.height - 35);
-        posterCtx.lineTo(240, posterCanvas.height);
-        posterCtx.lineTo(0, posterCanvas.height);
-        posterCtx.closePath();
-        posterCtx.fill();
-
-        posterCtx.fillStyle = "#081A34";
-        posterCtx.beginPath();
-        posterCtx.moveTo(240, posterCanvas.height);
-        posterCtx.lineTo(posterCanvas.width, posterCanvas.height - 35);
-        posterCtx.lineTo(posterCanvas.width, posterCanvas.height);
-        posterCtx.closePath();
-        posterCtx.fill();
-
-        setPosterLoading(false);
-      } catch (error) {
-        console.error("Error drawing poster:", error);
-        setPosterLoading(false);
-      }
-    };
-    qrImg.onerror = () => {
-      console.error("Failed to load QR image for poster");
-      setPosterLoading(false);
-    };
-
-    // Timeout fallback
-    setTimeout(() => {
-      if (posterLoading) {
-        console.warn("Poster generation timeout");
-        setPosterLoading(false);
-      }
-    }, 10000);
-  };
-
-  // Download QR code
-  const downloadQRCode = () => {
-    if (!qrCodeUrl) {
-      generateQRCode();
-      return;
-    }
     const link = document.createElement('a');
-    link.href = qrCodeUrl;
+    link.href = qrApiUrl;
     link.download = `axxspace_qr_${item._id}.png`;
     link.target = '_blank';
     document.body.appendChild(link);
@@ -2131,39 +1874,16 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
     document.body.removeChild(link);
   };
 
-  // Download poster
-  const downloadPoster = () => {
-    const posterCanvas = posterCanvasRef.current;
-    if (!posterCanvas) {
-      drawPoster();
-      return;
-    }
-    const link = document.createElement('a');
-    link.download = `axxspace_poster_${item._id}.png`;
-    link.href = posterCanvas.toDataURL('image/png');
-    link.click();
-  };
-
-  // Generate QR code and poster when modal opens for relevant tabs
+  // Generate QR code when modal opens for relevant tabs
   useEffect(() => {
     if (["properties", "materials", "tourism"].includes(tab) && item._id) {
-      // Small delay to ensure canvas refs are available
-      const timer = setTimeout(() => {
-        generateQRCode();
-        drawPoster();
-      }, 100);
-      return () => clearTimeout(timer);
+      generateQRCode();
     }
   }, [item, tab]);
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={e => e.stopPropagation()}>
-        {/* Hidden canvases for QR and poster generation */}
-        <div style={{ display: "none" }}>
-          <canvas ref={qrCanvasRef} width={300} height={300} />
-          <canvas ref={posterCanvasRef} width={800} height={1130} />
-        </div>
         <div className="modal-header">
           <h2 className="modal-title">
             {item.isFeatured && <span style={{ marginRight: 8 }}></span>}
@@ -2190,10 +1910,10 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
             {item.owner?.email && <p className="owner-line"> {item.owner.email}</p>}
           </div>
 
-          {/* QR Code & Poster Section for Properties, Materials, Tourism */}
+          {/* QR Code Section for Properties, Materials, Tourism */}
           {["properties", "materials", "tourism"].includes(tab) && (
             <div style={{ marginTop: "20px", padding: "16px", background: "#f8fafc", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-              <h4 style={{ margin: "0 0 12px 0", fontSize: "14px", fontWeight: "600", color: "#0f1729" }}>Listing QR Code & Poster</h4>
+              <h4 style={{ margin: "0 0 12px 0", fontSize: "14px", fontWeight: "600", color: "#0f1729" }}>Listing QR Code</h4>
               <div style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
                 {qrCodeUrl ? (
                   <img src={qrCodeUrl} alt="QR Code" style={{ width: "100px", height: "100px", border: "1px solid #e2e8f0", borderRadius: "8px" }} />
@@ -2222,27 +1942,24 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
                     >
                       Download QR Code
                     </button>
-                    <button
-                      onClick={downloadPoster}
-                      disabled={posterLoading}
-                      style={{
-                        padding: "8px 16px",
-                        background: "#d9383a",
-                        color: "#ffffff",
-                        border: "none",
-                        borderRadius: "6px",
-                        fontSize: "13px",
-                        fontWeight: "600",
-                        cursor: posterLoading ? "not-allowed" : "pointer",
-                        opacity: posterLoading ? 0.6 : 1
-                      }}
-                    >
-                      {posterLoading ? "Generating..." : "Download Poster"}
-                    </button>
+                    {tab === "properties" && (
+                      <button
+                        onClick={onOpenQR}
+                        style={{
+                          padding: "8px 16px",
+                          background: "#3b82f6",
+                          color: "#ffffff",
+                          border: "none",
+                          borderRadius: "6px",
+                          fontSize: "13px",
+                          fontWeight: "600",
+                          cursor: "pointer"
+                        }}
+                      >
+                        Poster / QR
+                      </button>
+                    )}
                   </div>
-                  <p style={{ margin: "8px 0 0 0", fontSize: "11px", color: "#94a3b8" }}>
-                    Poster includes QR code and is ready for printing (800x1130px)
-                  </p>
                 </div>
               </div>
             </div>

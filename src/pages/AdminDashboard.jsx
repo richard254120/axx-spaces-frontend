@@ -3,11 +3,17 @@ import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 import { getPricelistUrl } from "../utils/fileLinks";
+import QRGeneratorModal from "../components/QRGeneratorModal";
 
 export default function AdminDashboard() {
   const { token, user } = useContext(AuthContext);
   const navigate = useNavigate();
   const [pending, setPending] = useState([]);
+  const [propertiesList, setPropertiesList] = useState([]);
+  const [propertiesLoading, setPropertiesLoading] = useState(false);
+  const [propertyFilter, setPropertyFilter] = useState("pending");
+  const [qrModalOpen, setQrModalOpen] = useState(false);
+  const [selectedPropertyForQR, setSelectedPropertyForQR] = useState(null);
   const [pendingProviders, setPendingProviders] = useState([]);
   const [stats, setStats] = useState(null);
   const [allPending, setAllPending] = useState(null);
@@ -95,6 +101,32 @@ export default function AdminDashboard() {
       loadRequests();
     }
   }, [activeTab]);
+
+  // ADDED: load properties when tab or filter changes
+  useEffect(() => {
+    if (activeTab === "properties") {
+      fetchProperties();
+    }
+  }, [activeTab, propertyFilter]);
+
+  const fetchProperties = async () => {
+    setPropertiesLoading(true);
+    try {
+      let res;
+      if (propertyFilter === "pending") {
+        res = await API.get("/admin/all", { params: { type: "properties", status: "pending" } });
+      } else if (propertyFilter === "approved") {
+        res = await API.get("/admin/all", { params: { type: "properties", status: "approved" } });
+      } else {
+        res = await API.get("/admin/all", { params: { type: "properties" } });
+      }
+      setPropertiesList(res.data || []);
+    } catch (err) {
+      console.error("Failed to load properties:", err);
+    } finally {
+      setPropertiesLoading(false);
+    }
+  };
 
   const loadPendingPayments = async () => {
     setPaymentsLoading(true);
@@ -335,7 +367,8 @@ export default function AdminDashboard() {
     try {
       // Using a single PATCH route is cleaner for state management
       await API.patch(`/properties/${id}/status`, { status });
-      setPending((prev) => prev.filter((item) => item._id !== id));
+      fetchProperties();
+      loadStats();
       console.log(` Property ${status} successfully`);
     } catch (err) {
       alert(" Operation failed. Please check permissions.");
@@ -499,86 +532,142 @@ export default function AdminDashboard() {
         </button>
       </div>
 
-      {loading ? (
-        <div style={styles.loader}> Syncing with database...</div>
-      ) : activeTab === "properties" ? (
-        pending.length === 0 ? (
-          <div style={styles.emptyCard}>
-            <p style={styles.emptyText}> All caught up! No pending properties to review.</p>
+      {activeTab === "properties" ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: "20px", width: "100%" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
+            <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Properties Directory</h2>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <span style={{ fontSize: "14px", color: "#94a3b8", fontWeight: 600 }}>Filter by Status:</span>
+              <select
+                value={propertyFilter}
+                onChange={(e) => setPropertyFilter(e.target.value)}
+                style={{
+                  padding: "8px 12px",
+                  backgroundColor: "#0f172a",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: "8px",
+                  color: "#fff",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  outline: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <option value="pending">Pending Approval</option>
+                <option value="approved">Approved</option>
+                <option value="all">All Properties</option>
+              </select>
+            </div>
           </div>
-        ) : (
-          <div style={styles.tableContainer}>
-            <table style={styles.table}>
-              <thead>
-                <tr style={styles.theadRow}>
-                  <th style={styles.th}>Property Details</th>
-                  <th style={styles.th}>Owner Info</th>
-                  <th style={styles.th}>Price (KES)</th>
-                  <th style={styles.th}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {pending.map((item) => (
-                  <tr key={item._id} style={styles.tr}>
-                    <td style={styles.td}>
-                      <div style={styles.propTitle}>{item.title}</div>
-                      <div style={{ ...styles.propLoc, display: "flex", alignItems: "center", gap: "4px" }}>
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        <span>{item.location || `${item.area}, ${item.county}`}</span>
-                      </div>
-                      {/*  FULLY-BOOKED BADGE: Admin can see which properties are hidden from the public */}
-                      {(() => {
-                        const available = Math.max(0, (item.totalUnits || 1) - (item.bookedUnits || 0));
-                        const isFullyBooked = available === 0;
-                        return (
-                          <div style={{ marginTop: "6px", display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
-                            <span style={{
-                              fontSize: "11px",
-                              padding: "2px 8px",
-                              borderRadius: "4px",
-                              fontWeight: 600,
-                              background: isFullyBooked ? "rgba(239,68,68,0.12)" : "rgba(34,197,94,0.12)",
-                              color: isFullyBooked ? "#ef4444" : "#22c55e",
-                              border: `1px solid ${isFullyBooked ? "rgba(239,68,68,0.3)" : "rgba(34,197,94,0.3)"}`,
-                            }}>
-                              {isFullyBooked ? " Fully Booked — Hidden from Public" : ` ${available}/${item.totalUnits || 1} units available`}
-                            </span>
-                          </div>
-                        );
-                      })()}
-                    </td>
-                    <td style={styles.td}>
-                      <div style={styles.ownerName}>{item.owner?.name || "Member"}</div>
-                      <div style={styles.ownerContact}>{item.owner?.phone}</div>
-                    </td>
-                    <td style={styles.td}>
-                      <span style={styles.priceBadge}>{item.price.toLocaleString()}</span>
-                    </td>
-                    <td style={styles.td}>
-                      <div style={styles.btnGroup}>
-                        <button
-                          onClick={() => navigate(`/property/edit/${item._id}`)}
-                          style={{
-                            background: "#3b82f6", color: "white", border: "none",
-                            padding: "8px 16px", borderRadius: "8px", fontWeight: 700, cursor: "pointer"
-                          }}
-                        >Edit</button>
-                        <button
-                          onClick={() => handleStatusUpdate(item._id, "approved")}
-                          style={styles.approveBtn}
-                        >Approve</button>
-                        <button
-                          onClick={() => handleStatusUpdate(item._id, "rejected")}
-                          style={styles.rejectBtn}
-                        >Reject</button>
-                      </div>
-                    </td>
+
+          {propertiesLoading ? (
+            <div style={styles.loader}>Syncing with database...</div>
+          ) : propertiesList.length === 0 ? (
+            <div style={styles.emptyCard}>
+              <p style={styles.emptyText}>No properties found matching "{propertyFilter}" status.</p>
+            </div>
+          ) : (
+            <div style={styles.tableContainer}>
+              <table style={styles.table}>
+                <thead>
+                  <tr style={styles.theadRow}>
+                    <th style={styles.th}>Property Details</th>
+                    <th style={styles.th}>Owner Info</th>
+                    <th style={styles.th}>Price (KES)</th>
+                    <th style={styles.th}>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )
+                </thead>
+                <tbody>
+                  {propertiesList.map((item) => (
+                    <tr key={item._id} style={styles.tr}>
+                      <td style={styles.td}>
+                        <div style={styles.propTitle}>{item.title}</div>
+                        <div style={{ ...styles.propLoc, display: "flex", alignItems: "center", gap: "4px" }}>
+                          <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                          <span>{item.location || `${item.area}, ${item.county}`}</span>
+                        </div>
+                        {/* Status & Availability Badges */}
+                        <div style={{ marginTop: "6px", display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+                          <span style={{
+                            fontSize: "11px",
+                            padding: "2px 8px",
+                            borderRadius: "4px",
+                            fontWeight: 600,
+                            background: item.status === "approved" ? "rgba(34,197,94,0.12)" : item.status === "rejected" ? "rgba(239,68,68,0.12)" : "rgba(251,191,36,0.12)",
+                            color: item.status === "approved" ? "#22c55e" : item.status === "rejected" ? "#ef4444" : "#fbbf24",
+                            border: `1px solid ${item.status === "approved" ? "rgba(34,197,94,0.3)" : item.status === "rejected" ? "rgba(239,68,68,0.3)" : "rgba(251,191,36,0.3)"}`,
+                          }}>
+                            {item.status.toUpperCase()}
+                          </span>
+                          {(() => {
+                            const available = Math.max(0, (item.totalUnits || 1) - (item.bookedUnits || 0));
+                            const isFullyBooked = available === 0;
+                            return (
+                              <span style={{
+                                fontSize: "11px",
+                                padding: "2px 8px",
+                                borderRadius: "4px",
+                                fontWeight: 600,
+                                background: isFullyBooked ? "rgba(239,68,68,0.12)" : "rgba(34,197,94,0.12)",
+                                color: isFullyBooked ? "#ef4444" : "#22c55e",
+                                border: `1px solid ${isFullyBooked ? "rgba(239,68,68,0.3)" : "rgba(34,197,94,0.3)"}`,
+                              }}>
+                                {isFullyBooked ? "Fully Booked — Hidden" : `${available}/${item.totalUnits || 1} units available`}
+                              </span>
+                            );
+                          })()}
+                        </div>
+                      </td>
+                      <td style={styles.td}>
+                        <div style={styles.ownerName}>{item.owner?.name || "Member"}</div>
+                        <div style={styles.ownerContact}>{item.owner?.phone}</div>
+                      </td>
+                      <td style={styles.td}>
+                        <span style={styles.priceBadge}>{item.price?.toLocaleString()}</span>
+                      </td>
+                      <td style={styles.td}>
+                        <div style={styles.btnGroup}>
+                          <button
+                            onClick={() => {
+                              setSelectedPropertyForQR(item);
+                              setQrModalOpen(true);
+                            }}
+                            style={{
+                              background: "rgba(59, 130, 246, 0.15)",
+                              color: "#60a5fa",
+                              border: "1px solid rgba(59, 130, 246, 0.3)",
+                              padding: "8px 16px", borderRadius: "8px", fontWeight: 700, cursor: "pointer",
+                              transition: "all 0.2s"
+                            }}
+                          >Poster / QR</button>
+                          <button
+                            onClick={() => navigate(`/property/edit/${item._id}`)}
+                            style={{
+                              background: "#3b82f6", color: "white", border: "none",
+                              padding: "8px 16px", borderRadius: "8px", fontWeight: 700, cursor: "pointer"
+                            }}
+                          >Edit</button>
+                          {item.status !== "approved" && (
+                            <button
+                              onClick={() => handleStatusUpdate(item._id, "approved")}
+                              style={styles.approveBtn}
+                            >Approve</button>
+                          )}
+                          {item.status !== "rejected" && (
+                            <button
+                              onClick={() => handleStatusUpdate(item._id, "rejected")}
+                              style={styles.rejectBtn}
+                            >Reject</button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       ) : activeTab === "materials" ? (
         // Materials Tab
         !allPending?.materials || allPending.materials.length === 0 ? (
@@ -1307,6 +1396,17 @@ export default function AdminDashboard() {
           </div>
         )
       ) : null}
+
+      {qrModalOpen && selectedPropertyForQR && (
+        <QRGeneratorModal
+          property={selectedPropertyForQR}
+          isOpen={qrModalOpen}
+          onClose={() => {
+            setQrModalOpen(false);
+            setSelectedPropertyForQR(null);
+          }}
+        />
+      )}
     </div>
   );
 }
