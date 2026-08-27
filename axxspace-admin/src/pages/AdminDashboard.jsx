@@ -1852,9 +1852,21 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
       "images", "photos", "coverImage", "image", "owner", "seller"].includes(k)
   );
 
+  const resolveMainOrigin = () => {
+    let mainOrigin = window.location.origin;
+    if (mainOrigin.includes("5174")) {
+      mainOrigin = mainOrigin.replace("5174", "5173");
+    } else if (mainOrigin.includes("admin.axxspace.com")) {
+      mainOrigin = mainOrigin.replace("admin.axxspace.com", "axxspace.com");
+    } else if (mainOrigin.includes("admin.")) {
+      mainOrigin = mainOrigin.replace("admin.", "");
+    }
+    return mainOrigin;
+  };
+
   // Generate QR code using online API
   const generateQRCode = () => {
-    const baseUrl = window.location.origin;
+    const baseUrl = resolveMainOrigin();
     const listingUrl = `${baseUrl}/listings/${item._id}`;
     const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(listingUrl)}&bgcolor=ffffff&color=081A34`;
     setQrCodeUrl(qrApiUrl);
@@ -1862,7 +1874,7 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
 
   // Download QR code
   const downloadQRCode = () => {
-    const baseUrl = window.location.origin;
+    const baseUrl = resolveMainOrigin();
     const listingUrl = `${baseUrl}/listings/${item._id}`;
     const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(listingUrl)}&bgcolor=ffffff&color=081A34`;
     const link = document.createElement('a');

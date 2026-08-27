@@ -379,10 +379,14 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
   };
 
   const getQrUrl = () => {
-    // If running on admin subdomain/port, redirect main listings URL to main domain/port
-    const mainOrigin = window.location.origin.includes("5174") 
-      ? window.location.origin.replace("5174", "5173") 
-      : window.location.origin;
+    let mainOrigin = window.location.origin;
+    if (mainOrigin.includes("5174")) {
+      mainOrigin = mainOrigin.replace("5174", "5173");
+    } else if (mainOrigin.includes("admin.axxspace.com")) {
+      mainOrigin = mainOrigin.replace("admin.axxspace.com", "axxspace.com");
+    } else if (mainOrigin.includes("admin.")) {
+      mainOrigin = mainOrigin.replace("admin.", "");
+    }
     return `${mainOrigin}/listings/${property._id}?ref=qr&source=${source}`;
   };
 

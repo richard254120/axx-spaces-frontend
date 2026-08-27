@@ -25,7 +25,7 @@ export default function ProtectedRoute({
     return (
       <div
         style={{
-          minHeight: "40vh",
+          minHeight: "40vh",            
           display: "flex",
           alignItems: "center",
           justifyContent: "center",

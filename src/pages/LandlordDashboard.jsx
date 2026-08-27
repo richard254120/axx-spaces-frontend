@@ -341,7 +341,7 @@ export default function LandlordDashboard() {
     useEffect(() => {
       if (!selectedProperty) return;
       const url = `${window.location.origin}/listings/${selectedProperty._id}?ref=qr&source=${promoSource}`;
-      
+
       QRCode.toCanvas(canvasRef.current, url, {
         width: 300,
         margin: 1.5,
@@ -443,16 +443,16 @@ export default function LandlordDashboard() {
 
             {/* Micro Property Details Card */}
             <div style={styles.promoPropDetailCard}>
-              <img 
-                src={selectedProperty.images?.[0] || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=150&q=80"} 
-                alt={selectedProperty.title} 
+              <img
+                src={selectedProperty.images?.[0] || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=150&q=80"}
+                alt={selectedProperty.title}
                 style={styles.promoPropImg}
               />
               <div style={styles.promoPropInfo}>
                 <h4 style={styles.promoPropTitle}>{selectedProperty.title}</h4>
                 <p style={styles.promoPropLoc}> {selectedProperty.location}</p>
                 <a href={`/listings/${selectedProperty._id}`} target="_blank" rel="noreferrer" style={styles.promoPropLink}>
-                  View Property 
+                  View Property
                 </a>
               </div>
             </div>
@@ -460,10 +460,10 @@ export default function LandlordDashboard() {
             {/* Property URL */}
             <div style={styles.formGroup}>
               <label style={styles.fieldLabel}>Property URL</label>
-              <input 
-                type="text" 
-                value={getPromoUrl()} 
-                readOnly 
+              <input
+                type="text"
+                value={getPromoUrl()}
+                readOnly
                 style={styles.formInputReadOnly}
               />
             </div>
@@ -488,7 +488,7 @@ export default function LandlordDashboard() {
           {/* QR Preview Block */}
           <div style={styles.promoteQrCard}>
             <div style={styles.promoteQrTitle}>QR Code Preview</div>
-            
+
             <div style={styles.promoteQrFrame}>
               {qrCodeDataUrl ? (
                 <img src={qrCodeDataUrl} alt="QR Code Preview" style={{ width: "200px", height: "200px", display: "block" }} />
@@ -499,12 +499,12 @@ export default function LandlordDashboard() {
               )}
             </div>
 
-            <button 
-              onClick={downloadQR} 
-              disabled={!qrLoaded} 
+            <button
+              onClick={downloadQR}
+              disabled={!qrLoaded}
               style={styles.promoRedBtn}
             >
-               Download QR Code
+              Download QR Code
             </button>
 
             <div style={styles.promoFormatText}>PNG &nbsp;|&nbsp; PDF</div>
@@ -628,7 +628,7 @@ export default function LandlordDashboard() {
                 <p style={styles.contentSubtitle}>Manage your listed rentals, assign agents, and adjust vacancy levels.</p>
               </div>
               <button onClick={() => navigate("/upload")} style={styles.addPropHeaderBtn}>
-                 Add Property
+                Add Property
               </button>
             </div>
 
@@ -694,18 +694,10 @@ export default function LandlordDashboard() {
                         {/* Units counts */}
                         <div style={styles.unitsRow}>
                           <div style={styles.unitBox}>
-                            <span style={styles.unitNum}>{total}</span>
-                            <span style={styles.unitLbl}>Total Units</span>
-                          </div>
-                          <div style={styles.unitBox}>
-                            <span style={{ ...styles.unitNum, color: "#ef4444" }}>{booked}</span>
-                            <span style={styles.unitLbl}>Booked</span>
-                          </div>
-                          <div style={styles.unitBox}>
                             <span style={{ ...styles.unitNum, color: available > 0 ? "#22c55e" : "#ef4444" }}>
                               {available}
                             </span>
-                            <span style={styles.unitLbl}>Available</span>
+                            <span style={styles.unitLbl}>Available Units</span>
                           </div>
                         </div>
 
@@ -760,7 +752,7 @@ export default function LandlordDashboard() {
                               onClick={() => handleBoost(property)}
                               style={{ ...styles.actionGridBtn, ...styles.boostBtnGrid, gridColumn: "1 / -1" }}
                             >
-                               Boost Property
+                              Boost Property
                             </button>
 
                             <button
@@ -770,7 +762,7 @@ export default function LandlordDashboard() {
                               }}
                               style={styles.qrGridBtn}
                             >
-                               Poster / QR
+                              Poster / QR
                             </button>
 
                             <button
@@ -780,7 +772,7 @@ export default function LandlordDashboard() {
                               }}
                               style={styles.statsGridBtn}
                             >
-                               QR Stats
+                              QR Stats
                             </button>
 
                             {/* Assign Agent Selector */}
@@ -801,7 +793,7 @@ export default function LandlordDashboard() {
                             </div>
                           </div>
                         )}
-                        
+
                         <div style={{ marginTop: "12px" }}>
                           <button
                             onClick={() => navigate(`/property/edit/${property._id}`)}
@@ -818,7 +810,7 @@ export default function LandlordDashboard() {
                               border: "none"
                             }}
                           >
-                             Edit Details & Images
+                            Edit Details & Images
                           </button>
                         </div>
                       </div>
@@ -864,7 +856,7 @@ export default function LandlordDashboard() {
                     <div style={styles.statValue}>
                       {enquiriesData.reduce((acc, curr) => acc + curr.totalScans, 0) > 0
                         ? ((enquiriesData.reduce((acc, curr) => acc + curr.totalInquiries, 0) /
-                            enquiriesData.reduce((acc, curr) => acc + curr.totalScans, 0)) * 100).toFixed(1)
+                          enquiriesData.reduce((acc, curr) => acc + curr.totalScans, 0)) * 100).toFixed(1)
                         : "0.0"}%
                     </div>
                     <div style={styles.statName}>Scan-to-Inquiry Rate</div>
@@ -1090,11 +1082,11 @@ export default function LandlordDashboard() {
               <VerificationBadges userId={user?._id || user?.id} userType="landlord" />
             </div>
 
-            <UserProfileEditor 
-              token={token} 
-              user={user} 
-              accentColor="#fbbf24" 
-              onUpdated={(u) => { if (u) login(token, u); }} 
+            <UserProfileEditor
+              token={token}
+              user={user}
+              accentColor="#fbbf24"
+              onUpdated={(u) => { if (u) login(token, u); }}
             />
           </div>
         )}
@@ -1287,214 +1279,214 @@ const styles = {
     color: "#94a3b8",
     margin: "4px 0 24px",
   },
-  statsContainer: { 
-    display: "grid", 
-    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", 
-    gap: "16px", 
-    marginBottom: "28px" 
+  statsContainer: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+    gap: "16px",
+    marginBottom: "28px"
   },
   statCard: {
     background: "linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)",
     border: "1px solid rgba(255, 255, 255, 0.08)",
-    borderRadius: "16px", 
-    padding: "24px", 
+    borderRadius: "16px",
+    padding: "24px",
     textAlign: "center",
   },
-  statValue: { 
-    fontSize: "36px", 
-    fontWeight: 800, 
-    color: "#fbbf24", 
-    marginBottom: "8px", 
-    letterSpacing: "-1px" 
+  statValue: {
+    fontSize: "36px",
+    fontWeight: 800,
+    color: "#fbbf24",
+    marginBottom: "8px",
+    letterSpacing: "-1px"
   },
-  statName: { 
-    fontSize: "13px", 
-    color: "#94a3b8", 
-    fontWeight: 600, 
-    textTransform: "uppercase", 
-    letterSpacing: "1px" 
+  statName: {
+    fontSize: "13px",
+    color: "#94a3b8",
+    fontWeight: 600,
+    textTransform: "uppercase",
+    letterSpacing: "1px"
   },
   addPropHeaderBtn: {
     padding: "10px 20px",
     background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
-    color: "white", 
-    border: "none", 
+    color: "white",
+    border: "none",
     borderRadius: "10px",
-    fontSize: "13px", 
-    fontWeight: 700, 
+    fontSize: "13px",
+    fontWeight: 700,
     cursor: "pointer",
-    boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)", 
+    boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
     transition: "all 0.3s ease",
   },
   tabsScroll: {
-    display: "flex", 
-    gap: "8px", 
+    display: "flex",
+    gap: "8px",
     overflowX: "auto",
-    marginBottom: "20px", 
-    paddingBottom: "8px", 
+    marginBottom: "20px",
+    paddingBottom: "8px",
     scrollBehavior: "smooth",
   },
   tabBtn: {
-    background: "rgba(30, 41, 59, 0.6)", 
-    border: "1px solid rgba(255, 255, 255, 0.08)", 
+    background: "rgba(30, 41, 59, 0.6)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
     color: "#94a3b8",
-    padding: "10px 16px", 
-    borderRadius: "8px", 
+    padding: "10px 16px",
+    borderRadius: "8px",
     fontSize: "12px",
-    fontWeight: 600, 
-    cursor: "pointer", 
-    whiteSpace: "nowrap", 
+    fontWeight: 600,
+    cursor: "pointer",
+    whiteSpace: "nowrap",
     transition: "all 0.3s ease",
   },
-  tabBtnActive: { 
-    background: "#fbbf24", 
-    color: "#0f1729", 
-    border: "1px solid #fbbf24", 
-    boxShadow: "0 4px 12px rgba(251, 191, 36, 0.3)" 
+  tabBtnActive: {
+    background: "#fbbf24",
+    color: "#0f1729",
+    border: "1px solid #fbbf24",
+    boxShadow: "0 4px 12px rgba(251, 191, 36, 0.3)"
   },
-  tabCount: { 
+  tabCount: {
     fontSize: "10px",
-    fontWeight: "750" 
+    fontWeight: "750"
   },
-  propertiesGrid: { 
+  propertiesGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-    gap: "20px" 
+    gap: "20px"
   },
   propertyCard: {
     background: "linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)",
     border: "1px solid rgba(255, 255, 255, 0.08)",
-    borderRadius: "18px", 
+    borderRadius: "18px",
     overflow: "hidden",
     boxShadow: "0 4px 16px rgba(0, 0, 0, 0.15)",
     display: "flex",
     flexDirection: "column",
   },
-  propertyImage: { 
-    position: "relative", 
-    height: "180px", 
-    width: "100%" 
+  propertyImage: {
+    position: "relative",
+    height: "180px",
+    width: "100%"
   },
-  image: { 
-    width: "100%", 
-    height: "100%", 
-    objectFit: "cover" 
+  image: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover"
   },
   badge: {
-    position: "absolute", 
-    top: "8px", 
+    position: "absolute",
+    top: "8px",
     right: "8px",
-    padding: "4px 10px", 
+    padding: "4px 10px",
     borderRadius: "16px",
-    fontSize: "11px", 
-    fontWeight: 700, 
+    fontSize: "11px",
+    fontWeight: 700,
     color: "white",
   },
   fullyBookedBadge: {
-    position: "absolute", 
-    bottom: "8px", 
+    position: "absolute",
+    bottom: "8px",
     left: "8px",
-    background: "rgba(239,68,68,0.9)", 
+    background: "rgba(239,68,68,0.9)",
     color: "white",
-    padding: "4px 10px", 
+    padding: "4px 10px",
     borderRadius: "8px",
-    fontSize: "11px", 
-    fontWeight: 800, 
+    fontSize: "11px",
+    fontWeight: 800,
     letterSpacing: "0.05em",
   },
-  propertyContent: { 
+  propertyContent: {
     padding: "20px",
     display: "flex",
     flexDirection: "column",
     flex: 1,
   },
-  propertyTitle: { 
-    margin: "0 0 8px", 
-    fontSize: "17px", 
-    fontWeight: 800, 
-    color: "#f1f5f9", 
-    letterSpacing: "-0.3px" 
+  propertyTitle: {
+    margin: "0 0 8px",
+    fontSize: "17px",
+    fontWeight: 800,
+    color: "#f1f5f9",
+    letterSpacing: "-0.3px"
   },
-  propertyLocation: { 
-    margin: "0 0 6px", 
-    fontSize: "13px", 
-    color: "#94a3b8" 
+  propertyLocation: {
+    margin: "0 0 6px",
+    fontSize: "13px",
+    color: "#94a3b8"
   },
-  propertyPrice: { 
-    margin: "8px 0 16px", 
-    fontSize: "18px", 
-    fontWeight: 850, 
-    color: "#fbbf24", 
-    letterSpacing: "-0.5px" 
+  propertyPrice: {
+    margin: "8px 0 16px",
+    fontSize: "18px",
+    fontWeight: 850,
+    color: "#fbbf24",
+    letterSpacing: "-0.5px"
   },
   unitsRow: {
-    display: "grid", 
+    display: "grid",
     gridTemplateColumns: "1fr 1fr 1fr",
-    gap: "8px", 
+    gap: "8px",
     marginBottom: "10px",
   },
   unitBox: {
-    background: "rgba(255,255,255,0.05)", 
+    background: "rgba(255,255,255,0.05)",
     borderRadius: "10px",
-    padding: "10px 4px", 
+    padding: "10px 4px",
     textAlign: "center",
     border: "1px solid rgba(255, 255, 255, 0.08)",
   },
-  unitNum: { 
-    display: "block", 
-    fontSize: "20px", 
-    fontWeight: 800, 
-    color: "#fbbf24", 
-    letterSpacing: "-1px" 
+  unitNum: {
+    display: "block",
+    fontSize: "20px",
+    fontWeight: 800,
+    color: "#fbbf24",
+    letterSpacing: "-1px"
   },
-  unitLbl: { 
-    display: "block", 
-    fontSize: "9px", 
-    color: "#94a3b8", 
-    marginTop: "4px", 
-    fontWeight: 700, 
-    textTransform: "uppercase" 
+  unitLbl: {
+    display: "block",
+    fontSize: "9px",
+    color: "#94a3b8",
+    marginTop: "4px",
+    fontWeight: 700,
+    textTransform: "uppercase"
   },
   progressBar: {
-    height: "6px", 
-    background: "#1e293b", 
+    height: "6px",
+    background: "#1e293b",
     borderRadius: "4px",
-    overflow: "hidden", 
-    marginBottom: "6px", 
+    overflow: "hidden",
+    marginBottom: "6px",
     border: "1px solid #334155",
   },
-  progressFill: { 
-    height: "100%", 
-    borderRadius: "4px", 
-    transition: "width 0.4s ease" 
+  progressFill: {
+    height: "100%",
+    borderRadius: "4px",
+    transition: "width 0.4s ease"
   },
-  progressLabel: { 
-    fontSize: "11px", 
-    color: "#94a3b8", 
-    margin: "0 0 16px", 
-    lineHeight: 1.4 
+  progressLabel: {
+    fontSize: "11px",
+    color: "#94a3b8",
+    margin: "0 0 16px",
+    lineHeight: 1.4
   },
   actionsGrid: {
-    display: "grid", 
+    display: "grid",
     gridTemplateColumns: "1fr 1fr",
-    gap: "8px", 
+    gap: "8px",
     marginTop: "auto",
   },
   actionGridBtn: {
-    padding: "10px", 
-    background: "rgba(51, 65, 85, 0.8)", 
+    padding: "10px",
+    background: "rgba(51, 65, 85, 0.8)",
     color: "#f1f5f9",
-    border: "1px solid rgba(255, 255, 255, 0.08)", 
-    borderRadius: "8px", 
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderRadius: "8px",
     fontSize: "12px",
-    fontWeight: 700, 
-    cursor: "pointer", 
+    fontWeight: 700,
+    cursor: "pointer",
     transition: "all 0.3s ease",
   },
-  boostBtnGrid: { 
-    background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)", 
-    color: "#0f1729", 
-    boxShadow: "0 4px 12px rgba(251, 191, 36, 0.3)" 
+  boostBtnGrid: {
+    background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
+    color: "#0f1729",
+    boxShadow: "0 4px 12px rgba(251, 191, 36, 0.3)"
   },
   qrGridBtn: {
     padding: "10px",
@@ -1516,56 +1508,56 @@ const styles = {
     color: "#fbbf24",
     border: "1px solid rgba(251, 191, 36, 0.3)",
   },
-  agentLabel: { 
-    fontSize: "11px", 
-    color: "#94a3b8", 
+  agentLabel: {
+    fontSize: "11px",
+    color: "#94a3b8",
     marginBottom: "4px",
     display: "block",
     fontWeight: "700"
   },
   agentSelect: {
-    width: "100%", 
-    padding: "10px", 
+    width: "100%",
+    padding: "10px",
     background: "rgba(30, 41, 59, 0.8)",
-    color: "#f1f5f9", 
-    border: "1px solid rgba(255, 255, 255, 0.08)", 
+    color: "#f1f5f9",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
     borderRadius: "8px",
-    fontSize: "12px", 
-    fontWeight: 600, 
+    fontSize: "12px",
+    fontWeight: 600,
     cursor: "pointer",
   },
   successMsg: {
-    background: "rgba(34, 197, 94, 0.2)", 
+    background: "rgba(34, 197, 94, 0.2)",
     border: "1px solid #22c55e",
-    color: "#86efac", 
-    padding: "12px", 
+    color: "#86efac",
+    padding: "12px",
     borderRadius: "8px",
-    marginBottom: "20px", 
-    fontSize: "13px", 
+    marginBottom: "20px",
+    fontSize: "13px",
     fontWeight: 600,
   },
   errorMsg: {
-    background: "rgba(239, 68, 68, 0.2)", 
+    background: "rgba(239, 68, 68, 0.2)",
     border: "1px solid #ef4444",
-    color: "#fca5a5", 
-    padding: "12px", 
+    color: "#fca5a5",
+    padding: "12px",
     borderRadius: "8px",
-    marginBottom: "20px", 
-    fontSize: "13px", 
+    marginBottom: "20px",
+    fontSize: "13px",
     fontWeight: 600,
   },
-  loading: { 
-    textAlign: "center", 
-    color: "#94a3b8", 
-    fontSize: "14px", 
-    padding: "40px 20px" 
+  loading: {
+    textAlign: "center",
+    color: "#94a3b8",
+    fontSize: "14px",
+    padding: "40px 20px"
   },
   empty: {
-    textAlign: "center", 
-    color: "#94a3b8", 
+    textAlign: "center",
+    color: "#94a3b8",
     padding: "40px 20px",
-    background: "#1e293b", 
-    borderRadius: "12px", 
+    background: "#1e293b",
+    borderRadius: "12px",
     border: "1px dashed #334155",
   },
   // Promote Property Screen layout Styles
