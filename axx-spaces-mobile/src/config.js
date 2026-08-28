@@ -3,7 +3,7 @@ export const CONFIG = {
   // API Configuration - Updated to work with existing backend
   API_URL: __DEV__
     ? 'http://localhost:1001/api'
-    : 'https://axx-spaces-backend.onrender.com/api',
+    : 'https://axxspace.com/api',
 
   // App Configuration
   APP_NAME: 'AXX Spaces',
