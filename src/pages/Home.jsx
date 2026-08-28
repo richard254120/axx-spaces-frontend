@@ -1563,6 +1563,181 @@ option { background: #162233; color: #F0EAD8; }
   box-shadow: 0 4px 20px rgba(201,168,76,0.25);
   font-weight: 700;
 }
+
+/* ── APP DOWNLOAD SECTION ── */
+.app-download-section {
+  padding: 96px 28px;
+  background: radial-gradient(circle at center top, #162233 0%, #0D1B2A 100%);
+  border-top: 1px solid rgba(201,168,76,0.1);
+  border-bottom: 1px solid rgba(201,168,76,0.1);
+  position: relative;
+  overflow: hidden;
+}
+.app-download-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+.app-download-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 40px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.app-download-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #EDE6D6;
+  font-size: 14px;
+  font-weight: 500;
+}
+.app-download-feature-icon {
+  color: #C9A84C;
+  font-size: 16px;
+}
+.app-download-btn-wrapper {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.app-download-btn {
+  padding: 16px 32px;
+  background: linear-gradient(135deg, #C9A84C 0%, #E2C47A 100%);
+  color: #0D1B2A;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(201, 168, 76, 0.35);
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.app-download-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(201, 168, 76, 0.55);
+}
+.app-download-mockup-wrapper {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+.app-download-phone {
+  width: 280px;
+  height: 560px;
+  border: 12px solid #1E3148;
+  border-radius: 40px;
+  background: #0D1B2A;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,168,76,0.15);
+  overflow: hidden;
+  position: relative;
+}
+.app-download-phone-notch {
+  width: 120px;
+  height: 24px;
+  background: #1E3148;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  z-index: 10;
+}
+.app-download-phone-screen {
+  height: 100%;
+  padding: 36px 16px 16px;
+  display: flex;
+  flex-direction: column;
+}
+.app-download-phone-header {
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  text-align: left;
+}
+.app-download-phone-logo {
+  font-size: 18px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #FB2424 0%, #F59E0B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.app-download-phone-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.app-download-phone-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: left;
+}
+.app-download-phone-card-image {
+  height: 100px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+.app-download-phone-card-title {
+  height: 14px;
+  background: #C9A84C;
+  width: 70%;
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+.app-download-phone-card-text {
+  height: 10px;
+  background: rgba(255,255,255,0.3);
+  width: 40%;
+  border-radius: 2px;
+}
+.app-download-phone-card-simple {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: left;
+}
+.app-download-phone-card-simple-title {
+  height: 14px;
+  background: rgba(255,255,255,0.5);
+  width: 50%;
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+.app-download-phone-card-simple-text {
+  height: 10px;
+  background: rgba(255,255,255,0.3);
+  width: 30%;
+  border-radius: 2px;
+}
+@media (max-width: 768px) {
+  .app-download-container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    text-align: center;
+  }
+  .app-download-features {
+    align-items: center;
+  }
+  .app-download-btn-wrapper {
+    justify-content: center;
+  }
+}
 `;
 
 const COUNTY_COORDS = {
@@ -2095,6 +2270,30 @@ export default function Home() {
           <p className="hero-sub">
             Rentals · Movers · Tourism · AxxBiashara · QuickSales<br />Verified across all 47 counties
           </p>
+
+          <div style={{ display: "flex", justifyContent: "center", gap: "16px", flexWrap: "wrap", marginTop: "24px", marginBottom: "24px" }}>
+            <button
+              onClick={() => navigate("/mobile-app")}
+              className="magical-btn"
+              style={{
+                padding: "14px 28px",
+                background: "linear-gradient(135deg, #C9A84C 0%, #E2C47A 100%)",
+                color: "#0D1B2A",
+                border: "none",
+                borderRadius: "8px",
+                fontWeight: 700,
+                fontSize: "14px",
+                cursor: "pointer",
+                boxShadow: "0 8px 30px rgba(201, 168, 76, 0.4)",
+                transition: "all 0.3s ease",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px"
+              }}
+            >
+              <span>📱</span> Download Axxspace App
+            </button>
+          </div>
 
 
           {/* SCROLL DOWN INDICATOR */}
@@ -2768,6 +2967,78 @@ export default function Home() {
           </div>
         </div>
       </section >
+
+      {/* ── MOBILE APP SECTION ── */}
+      <section className="app-download-section">
+        <div className="app-download-container">
+          {/* Text Content */}
+          <div style={{ zIndex: 2, textAlign: 'left' }}>
+            <p className="section-eyebrow" style={{ color: "#C9A84C", letterSpacing: "0.2em", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", marginBottom: "12px" }}>Go Mobile</p>
+            <h2 className="section-title" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(32px, 4vw, 48px)", fontWeight: 600, color: "#F0EAD8", margin: "0 0 20px", lineHeight: 1.2 }}>
+              Download Axxspace App
+            </h2>
+            <p style={{ color: "#B8AD96", fontSize: "16px", lineHeight: "1.8", marginBottom: "30px", fontWeight: 300 }}>
+              Get the best mobile experience for property rentals, tourism booking, quick sales, and professional moving services across all 47 counties in Kenya. Fast, secure, and direct communication.
+            </p>
+
+            <ul className="app-download-features">
+              {[
+                "Instant push notifications for new listings",
+                "Direct WhatsApp & phone calling to landlords/sellers",
+                "Built-in offline support for saved properties",
+                "GPS tracking and map navigation integration"
+              ].map((item, idx) => (
+                <li key={idx} className="app-download-feature-item">
+                  <span className="app-download-feature-icon">✓</span> {item}
+                </li>
+              ))}
+            </ul>
+
+            <div className="app-download-btn-wrapper">
+              <button
+                onClick={() => navigate("/mobile-app")}
+                className="app-download-btn magical-btn"
+              >
+                <span>📥</span> Get APK File
+              </button>
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <span style={{ fontSize: "13px", fontWeight: 700, color: "#EDE6D6" }}>Version 1.0.0</span>
+                <span style={{ fontSize: "12px", color: "#7A7260" }}>Safe download (3.1 MB)</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Visual Showcase (Mockup) */}
+          <div className="app-download-mockup-wrapper">
+            {/* Phone mockup */}
+            <div className="app-download-phone">
+              {/* Speaker / Notch */}
+              <div className="app-download-phone-notch"></div>
+              
+              {/* App Screen preview */}
+              <div className="app-download-phone-screen">
+                <div className="app-download-phone-header">
+                  <span className="app-download-phone-logo">Axxspace</span>
+                </div>
+                
+                {/* Simulated Content */}
+                <div className="app-download-phone-content">
+                  <div className="app-download-phone-card">
+                    <div className="app-download-phone-card-image"></div>
+                    <div className="app-download-phone-card-title"></div>
+                    <div className="app-download-phone-card-text"></div>
+                  </div>
+                  
+                  <div className="app-download-phone-card-simple">
+                    <div className="app-download-phone-card-simple-title"></div>
+                    <div className="app-download-phone-card-simple-text"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ── TESTIMONIALS ── */}
       < section className="test-section" >

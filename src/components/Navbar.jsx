@@ -127,6 +127,9 @@ export default function Navbar() {
           <Link to="/faq" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>FAQ</span>
           </Link>
+          <Link to="/mobile-app" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+            <span style={styles.dropdownIcon}>📱 Mobile App</span>
+          </Link>
           <Link to="/axxwallet" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>AxxWallet</span>
           </Link>
@@ -311,176 +314,179 @@ export default function Navbar() {
   return (
     <>
       <nav style={styles.navbar}>
-      <style>{css}</style>
+        <style>{css}</style>
 
-      <div style={styles.topSection}>
-        <Link to="/" style={styles.logoContainer}>
-          <img src={logo} alt="AxxSpace" style={styles.logo} />
-          <div style={styles.titleSection}>
-            <span style={styles.brandName}>AxxSpace</span>
-          </div>
-        </Link>
-
-        <div style={styles.topRight}>
-          <HamburgerDropdown />
-          {/* Account Indicator */}
-          {token && user ? (
-            <div style={styles.accountIndicator} ref={accountRef}>
-              <button
-                style={styles.accountBtn}
-                onClick={() => setAccountOpen(!accountOpen)}
-              >
-                <ProfileAvatar user={user} size={28} />
-                <span style={styles.accountStatus}>In Account</span>
-              </button>
-              {accountOpen && (
-                <div style={styles.accountDropdown}>
-                  <div style={styles.accountHeader}>
-                    <ProfileAvatar user={user} size={40} />
-                    <div>
-                      <div style={styles.accountName}>{user.name}</div>
-                      <div style={styles.accountRole}>{user.role?.toUpperCase() || "USER"}</div>
-                    </div>
-                  </div>
-                  <div style={styles.accountDivider} />
-                  <Link
-                    to="/profile"
-                    style={styles.accountItem}
-                    onClick={() => { setAccountOpen(false); setMenuOpen(false); }}
-                  >
-                    My Profile
-                  </Link>
-                  <Link
-                    to="/settings"
-                    style={styles.accountItem}
-                    onClick={() => { setAccountOpen(false); setMenuOpen(false); }}
-                  >
-                    Settings
-                  </Link>
-                  <button
-                    style={styles.accountLogout}
-                    onClick={() => { handleLogout(); setAccountOpen(false); setMenuOpen(false); }}
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
+        <div style={styles.topSection}>
+          <Link to="/" style={styles.logoContainer}>
+            <img src={logo} alt="AxxSpace" style={styles.logo} />
+            <div style={styles.titleSection}>
+              <span style={styles.brandName}>AxxSpace</span>
             </div>
-          ) : (
-            <button
-              className="guest-signin-btn"
-              onClick={() => setAccountSelectorOpen(true)}
-            >
-              <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" className="guest-signin-icon">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
-              <span>Sign In</span>
-            </button>
-          )}
-          <button
-            style={styles.hamburger}
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            {menuOpen ? "✕" : "☰"}
-          </button>
-        </div>
-      </div>
-
-      <div style={{ ...styles.navLinksContainer, ...(menuOpen && styles.navLinksContainerOpen) }}>
-        <Link to="/" style={{ ...styles.navLink, ...(isActive("/") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
-          Home
-        </Link>
-        <Link to="/axxbiashara" style={{ ...styles.navLink, ...(isActive("/axxbiashara") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
-          AxxBiashara
-        </Link>
-        <Link to="/materials" style={{ ...styles.navLink, ...(isActive("/materials") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
-          QuickSales
-        </Link>
-        <Link to="/listings" style={{ ...styles.navLink, ...(isActive("/listings") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
-          Rentals
-        </Link>
-        <Link to="/tourism" style={{ ...styles.navLink, ...(isActive("/tourism") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
-          Tourism
-        </Link>
-        <button
-          style={{
-            ...styles.navLink,
-            background: "rgba(251, 191, 36, 0.1)",
-            border: "1px solid rgba(251, 191, 36, 0.3)",
-            color: "#fbbf24",
-            padding: "5px 12px",
-            borderRadius: "8px",
-            fontWeight: 700,
-            cursor: "pointer",
-            outline: "none",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "4px",
-            transition: "all 0.2s ease"
-          }}
-          onClick={() => {
-            setMenuOpen(false);
-            setIsRequestModalOpen(true);
-          }}
-        >
-           Requests
-        </button>
-
-        {token && user && (
-          <Link to="/settings" style={{ ...styles.navLink, ...(isActive("/settings") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
-            Settings
           </Link>
-        )}
 
-        {token && user && (
-          <>
-            <Link to="/upload" style={{ ...styles.navLink, ...(isActive("/upload") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
-              Upload
-            </Link>
-            <Link to={getDashboardLink()} style={{ ...styles.navLink, ...(isActive(getDashboardLink()) && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
-              Dashboard
-            </Link>
-            <div style={styles.userSection}>
-              <NotificationBell />
-              <div style={styles.userDropdownWrapper} ref={dropdownRef}>
+          <div style={styles.topRight}>
+            <HamburgerDropdown />
+            {/* Account Indicator */}
+            {token && user ? (
+              <div style={styles.accountIndicator} ref={accountRef}>
                 <button
-                  style={styles.userDropdownBtn}
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  style={styles.accountBtn}
+                  onClick={() => setAccountOpen(!accountOpen)}
                 >
-                  <ProfileAvatar user={user} size={32} />
-                  <span style={styles.userName}>{user.name}</span>
-                  <span style={styles.dropdownArrow}>{dropdownOpen ? "▲" : "▼"}</span>
+                  <ProfileAvatar user={user} size={28} />
+                  <span style={styles.accountStatus}>In Account</span>
                 </button>
-                {dropdownOpen && (
-                  <div style={styles.userDropdown}>
+                {accountOpen && (
+                  <div style={styles.accountDropdown}>
+                    <div style={styles.accountHeader}>
+                      <ProfileAvatar user={user} size={40} />
+                      <div>
+                        <div style={styles.accountName}>{user.name}</div>
+                        <div style={styles.accountRole}>{user.role?.toUpperCase() || "USER"}</div>
+                      </div>
+                    </div>
+                    <div style={styles.accountDivider} />
                     <Link
-                      to="/payment-history"
-                      style={styles.dropdownItem}
-                      onClick={() => { setDropdownOpen(false); setMenuOpen(false); }}
+                      to="/profile"
+                      style={styles.accountItem}
+                      onClick={() => { setAccountOpen(false); setMenuOpen(false); }}
                     >
-                       Payment History
+                      My Profile
                     </Link>
                     <Link
-                      to={getDashboardLink()}
-                      style={styles.dropdownItem}
-                      onClick={() => { setDropdownOpen(false); setMenuOpen(false); }}
+                      to="/settings"
+                      style={styles.accountItem}
+                      onClick={() => { setAccountOpen(false); setMenuOpen(false); }}
                     >
-                       Dashboard
+                      Settings
                     </Link>
                     <button
-                      style={styles.dropdownItem}
-                      onClick={() => { handleLogout(); setDropdownOpen(false); setMenuOpen(false); }}
+                      style={styles.accountLogout}
+                      onClick={() => { handleLogout(); setAccountOpen(false); setMenuOpen(false); }}
                     >
-                       Logout
+                      Logout
                     </button>
                   </div>
                 )}
               </div>
-            </div>
-          </>
-        )}
-      </div>
+            ) : (
+              <button
+                className="guest-signin-btn"
+                onClick={() => setAccountSelectorOpen(true)}
+              >
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" className="guest-signin-icon">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+                <span>Sign In</span>
+              </button>
+            )}
+            <button
+              style={styles.hamburger}
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              {menuOpen ? "✕" : "☰"}
+            </button>
+          </div>
+        </div>
+
+        <div style={{ ...styles.navLinksContainer, ...(menuOpen && styles.navLinksContainerOpen) }}>
+          <Link to="/" style={{ ...styles.navLink, ...(isActive("/") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
+            Home
+          </Link>
+          <Link to="/axxbiashara" style={{ ...styles.navLink, ...(isActive("/axxbiashara") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
+            AxxBiashara
+          </Link>
+          <Link to="/materials" style={{ ...styles.navLink, ...(isActive("/materials") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
+            QuickSales
+          </Link>
+          <Link to="/listings" style={{ ...styles.navLink, ...(isActive("/listings") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
+            Rentals
+          </Link>
+          <Link to="/tourism" style={{ ...styles.navLink, ...(isActive("/tourism") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
+            Tourism
+          </Link>
+          <Link to="/mobile-app" style={{ ...styles.navLink, ...(isActive("/mobile-app") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
+            Download App
+          </Link>
+          <button
+            style={{
+              ...styles.navLink,
+              background: "rgba(251, 191, 36, 0.1)",
+              border: "1px solid rgba(251, 191, 36, 0.3)",
+              color: "#fbbf24",
+              padding: "5px 12px",
+              borderRadius: "8px",
+              fontWeight: 700,
+              cursor: "pointer",
+              outline: "none",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "4px",
+              transition: "all 0.2s ease"
+            }}
+            onClick={() => {
+              setMenuOpen(false);
+              setIsRequestModalOpen(true);
+            }}
+          >
+            Requests
+          </button>
+
+          {token && user && (
+            <Link to="/settings" style={{ ...styles.navLink, ...(isActive("/settings") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
+              Settings
+            </Link>
+          )}
+
+          {token && user && (
+            <>
+              <Link to="/upload" style={{ ...styles.navLink, ...(isActive("/upload") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
+                Upload
+              </Link>
+              <Link to={getDashboardLink()} style={{ ...styles.navLink, ...(isActive(getDashboardLink()) && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
+                Dashboard
+              </Link>
+              <div style={styles.userSection}>
+                <NotificationBell />
+                <div style={styles.userDropdownWrapper} ref={dropdownRef}>
+                  <button
+                    style={styles.userDropdownBtn}
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                  >
+                    <ProfileAvatar user={user} size={32} />
+                    <span style={styles.userName}>{user.name}</span>
+                    <span style={styles.dropdownArrow}>{dropdownOpen ? "▲" : "▼"}</span>
+                  </button>
+                  {dropdownOpen && (
+                    <div style={styles.userDropdown}>
+                      <Link
+                        to="/payment-history"
+                        style={styles.dropdownItem}
+                        onClick={() => { setDropdownOpen(false); setMenuOpen(false); }}
+                      >
+                        Payment History
+                      </Link>
+                      <Link
+                        to={getDashboardLink()}
+                        style={styles.dropdownItem}
+                        onClick={() => { setDropdownOpen(false); setMenuOpen(false); }}
+                      >
+                        Dashboard
+                      </Link>
+                      <button
+                        style={styles.dropdownItem}
+                        onClick={() => { handleLogout(); setDropdownOpen(false); setMenuOpen(false); }}
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       </nav>
       <RequestItemModal isOpen={isRequestModalOpen} onClose={() => setIsRequestModalOpen(false)} />
     </>

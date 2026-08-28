@@ -69,6 +69,7 @@ import BusinessDetail from "./pages/BusinessDetail";
 import UserDashboard from "./pages/UserDashboard";
 import BusinessLogin from "./pages/BusinessLogin";
 import BusinessRegister from "./pages/BusinessRegister";
+import MobileAppDownload from "./pages/MobileAppDownload";
 
 import "leaflet/dist/leaflet.css";
 
@@ -152,6 +153,7 @@ function App() {
       <Route path="/materials/:id" element={<PublicLayout><MaterialDetailPage /></PublicLayout>} />
       <Route path="/faq" element={<PublicLayout><FAQ /></PublicLayout>} />
       <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
+      <Route path="/mobile-app" element={<PublicLayout><MobileAppDownload /></PublicLayout>} />
       <Route path="/terms" element={<PublicLayout><TermsAndPrivacy /></PublicLayout>} />
       <Route path="/users" element={<PublicLayout><UsersPage /></PublicLayout>} />
 
