@@ -5,9 +5,12 @@ export const CONFIG = {
     ? 'http://localhost:1001/api'
     : 'https://axxspace.com/api',
 
+  // Web App URL Configuration
+  WEBSITE_URL: 'https://www.axxspace.com',
+
   // App Configuration
   APP_NAME: 'AXX Spaces',
-  APP_VERSION: '1.0.0',
+  APP_VERSION: '1.0.1',
 
   // Feature Flags
   FEATURES: {
