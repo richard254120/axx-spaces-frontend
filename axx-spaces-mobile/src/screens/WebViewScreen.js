@@ -11,28 +11,36 @@ import {
   Platform,
   RefreshControl,
   ScrollView,
+  Linking,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import NetInfo from '@react-native-community/netinfo';
 import CONFIG from '../config';
 
 const TARGET_URL = CONFIG.WEBSITE_URL || 'https://www.axxspace.com';
+const CHROME_USER_AGENT =
+  'Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36';
 
 export default function WebViewScreen() {
   const webViewRef = useRef(null);
   const [canGoBack, setCanGoBack] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isOffline, setIsOffline] = useState(false);
+  const [webError, setWebError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
 
   // Monitor network connectivity status
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
-      setIsOffline(state.isConnected === false);
+      if (state.isConnected === false) {
+        setIsOffline(true);
+      } else if (state.isConnected === true && isOffline) {
+        setIsOffline(false);
+      }
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [isOffline]);
 
   // Handle Android hardware back button
   useEffect(() => {
@@ -52,6 +60,7 @@ export default function WebViewScreen() {
 
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
+    setWebError(null);
     if (webViewRef.current) {
       webViewRef.current.reload();
     }
@@ -62,10 +71,28 @@ export default function WebViewScreen() {
 
   const handleRetry = () => {
     setIsOffline(false);
+    setWebError(null);
     setIsLoading(true);
     if (webViewRef.current) {
       webViewRef.current.reload();
     }
+  };
+
+  const handleShouldStartLoad = (event) => {
+    const { url } = event;
+    // Allow standard HTTP/HTTPS web links in WebView
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return true;
+    }
+    // External protocols like tel:, mailto:, whatsapp:, etc. open in external system apps
+    Linking.canOpenURL(url)
+      .then((supported) => {
+        if (supported) {
+          Linking.openURL(url);
+        }
+      })
+      .catch((err) => console.log('Error opening external link:', err));
+    return false;
   };
 
   return (
@@ -90,7 +117,7 @@ export default function WebViewScreen() {
             </View>
             <Text style={styles.offlineTitle}>No Internet Connection</Text>
             <Text style={styles.offlineSubtitle}>
-              Please check your Wi-Fi or mobile data connection to access Axxspace.
+              Please check your mobile data or Wi-Fi connection and tap retry.
             </Text>
             <TouchableOpacity style={styles.retryButton} activeOpacity={0.8} onPress={handleRetry}>
               <Text style={styles.retryText}>Retry Connection</Text>
@@ -103,6 +130,8 @@ export default function WebViewScreen() {
             ref={webViewRef}
             source={{ uri: TARGET_URL }}
             style={styles.webView}
+            userAgent={CHROME_USER_AGENT}
+            originWhitelist={['*']}
             javaScriptEnabled={true}
             domStorageEnabled={true}
             startInLoadingState={true}
@@ -112,12 +141,23 @@ export default function WebViewScreen() {
             thirdPartyCookiesEnabled={true}
             sharedCookiesEnabled={true}
             allowsBackForwardNavigationGestures={true}
+            setSupportMultipleWindows={false}
+            onShouldStartLoadWithRequest={handleShouldStartLoad}
             onNavigationStateChange={(navState) => {
               setCanGoBack(navState.canGoBack);
             }}
             onLoadStart={() => setIsLoading(true)}
-            onLoadEnd={() => setIsLoading(false)}
-            onError={() => setIsOffline(true)}
+            onLoadEnd={() => {
+              setIsLoading(false);
+              setWebError(null);
+            }}
+            onError={(syntheticEvent) => {
+              const { nativeEvent } = syntheticEvent;
+              console.warn('WebView load error: ', nativeEvent);
+              if (nativeEvent.code === -2 || nativeEvent.description?.includes('ERR_NAME_NOT_RESOLVED')) {
+                setWebError(nativeEvent.description || 'Failed to load page');
+              }
+            }}
             renderLoading={() => (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#fbbf24" />
@@ -126,7 +166,17 @@ export default function WebViewScreen() {
             )}
           />
 
-          {isLoading && (
+          {webError && (
+            <View style={styles.errorOverlay}>
+              <Text style={styles.errorTitle}>Unable to load Axxspace</Text>
+              <Text style={styles.errorSubtitle}>{webError}</Text>
+              <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
+                <Text style={styles.retryText}>Reload Page</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {isLoading && !webError && (
             <View style={styles.topProgressBar}>
               <ActivityIndicator size="small" color="#fbbf24" />
             </View>
@@ -173,6 +223,26 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(15, 23, 41, 0.8)',
     borderRadius: 20,
     padding: 6,
+  },
+  errorOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#0f1729',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+    zIndex: 30,
+  },
+  errorTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginBottom: 8,
+  },
+  errorSubtitle: {
+    fontSize: 14,
+    color: '#94a3b8',
+    textAlign: 'center',
+    marginBottom: 20,
   },
   offlineContainer: {
     flexGrow: 1,

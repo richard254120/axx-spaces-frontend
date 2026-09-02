@@ -23,7 +23,17 @@
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundColor": "#0f1729"
       },
-      "package": "com.axxspaces.mobile"
+      "package": "com.axxspaces.mobile",
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ],
+      "usesCleartextTraffic": true
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
