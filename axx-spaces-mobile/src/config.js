@@ -6,7 +6,7 @@ export const CONFIG = {
     : 'https://axxspace.com/api',
 
   // Web App URL Configuration
-  WEBSITE_URL: 'https://www.axxspace.com',
+  WEBSITE_URL: 'https://axxspace.com',
 
   // App Configuration
   APP_NAME: 'AXX Spaces',

@@ -4,18 +4,13 @@ import QRCode from "qrcode";
 import "./MobileAppDownload.css";
 
 const MobileAppDownload = () => {
-  const [appVersion, setAppVersion] = useState("1.0.0");
-  const [downloadCount, setDownloadCount] = useState(0);
+  const [appVersion, setAppVersion] = useState("1.0.1");
+  const [downloadCount, setDownloadCount] = useState(1480);
   const [isDownloading, setIsDownloading] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState("");
-  const qrRef = useRef(null);
+  const [activeTab, setActiveTab] = useState("download"); // 'download' | 'web' | 'troubleshoot'
 
   useEffect(() => {
-    // Simulate loading app info
-    setAppVersion("1.0.0");
-    setDownloadCount(1234);
-
-    // Generate QR code for the download page
     generateQRCode();
   }, []);
 
@@ -23,11 +18,11 @@ const MobileAppDownload = () => {
     try {
       const url = window.location.origin + "/mobile-app";
       const qrDataUrl = await QRCode.toDataURL(url, {
-        width: 200,
+        width: 220,
         margin: 2,
         color: {
-          dark: "#C9A84C",
-          light: "#0D1B2A"
+          dark: "#F59E0B",
+          light: "#0F172A"
         }
       });
       setQrCodeUrl(qrDataUrl);
@@ -38,14 +33,11 @@ const MobileAppDownload = () => {
 
   const handleDownload = () => {
     setIsDownloading(true);
-    // In production, this would link to the actual APK file
-    // Update this path to match your actual APK file location
     const apkUrl = "/downloads/axx-spaces-mobile-v1.0.0.apk";
 
-    // Create a temporary link to trigger download
     const link = document.createElement('a');
     link.href = apkUrl;
-    link.download = "axx-spaces-mobile-v1.0.0.apk";
+    link.download = "axx-spaces-mobile-v1.0.1.apk";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -56,20 +48,17 @@ const MobileAppDownload = () => {
     }, 1500);
   };
 
-  const features = [
-    { icon: "🏠", title: "Property Rentals", description: "Browse and rent apartments, hostels, and houses" },
-    { icon: "✈️", title: "Tourism", description: "Discover hotels, safaris, and cultural experiences" },
-    { icon: "💼", title: "Business Directory", description: "Connect with local businesses via AxxBiashara" },
-    { icon: "🔨", title: "Materials", description: "Construction materials marketplace" },
-    { icon: "🚚", title: "Movers", description: "Professional moving and logistics services" },
-    { icon: "💳", title: "Digital Wallet", description: "Secure payments and transactions" },
-  ];
+  const handleOpenWebApp = () => {
+    window.open("https://axxspace.com", "_blank", "noopener,noreferrer");
+  };
 
-  const screenshots = [
-    "/screenshots/home-screen.png",
-    "/screenshots/properties-screen.png",
-    "/screenshots/tourism-screen.png",
-    "/screenshots/profile-screen.png",
+  const features = [
+    { icon: "🏠", title: "Property Rentals", description: "Browse, view, and rent apartments, hostels, and residential homes in real-time." },
+    { icon: "✈️", title: "Tourism & Hotels", description: "Discover top vacation rentals, hotels, safaris, and local cultural experiences." },
+    { icon: "💼", title: "AxxBiashara Directory", description: "Connect directly with verified local businesses and services across Kenya." },
+    { icon: "🔨", title: "Materials Marketplace", description: "Source quality construction materials and hardware straight from vendors." },
+    { icon: "🚚", title: "Movers & Logistics", description: "Book verified relocation, moving, and delivery services effortlessly." },
+    { icon: "💳", title: "AxxWallet Payments", description: "Seamless, secure digital wallet transactions and instant booking receipts." },
   ];
 
   return (
@@ -79,81 +68,124 @@ const MobileAppDownload = () => {
         <div className="container">
           <div className="hero-content">
             <div className="hero-text">
-              <h1>AXX Spaces Mobile App</h1>
+              <div className="badge-wrapper">
+                <span className="app-badge">Official Release v{appVersion}</span>
+                <span className="badge-dot"></span>
+                <span className="app-badge-sub">WebView & Web Enabled</span>
+              </div>
+              
+              <h1>AXX Spaces Mobile</h1>
               <p className="hero-subtitle">
-                Kenya's Premier Property Platform - Now on Your Phone
+                Kenya's Premier All-in-One Property & Services Platform
               </p>
               <p className="hero-description">
-                Download the AXX Spaces mobile app and access property rentals, tourism,
-                business directory, materials marketplace, and movers services - all in one place.
+                Experience seamless access to property rentals, tourism stays, business directory, material sales, and movers. Download the Android APK or open the web app directly in your browser.
               </p>
 
+              {/* Action Buttons */}
               <div className="download-buttons">
                 <button
                   className="download-btn primary"
                   onClick={handleDownload}
                   disabled={isDownloading}
+                  id="download-apk-btn"
                 >
                   {isDownloading ? (
                     <>
                       <span className="spinner"></span>
-                      Downloading...
+                      Downloading APK...
                     </>
                   ) : (
                     <>
                       <span className="download-icon">📥</span>
-                      Download APK
+                      Download Android APK
                     </>
                   )}
                 </button>
 
-                <div className="app-info">
-                  <span className="version">Version {appVersion}</span>
-                  <span className="separator">•</span>
-                  <span className="downloads">{downloadCount.toLocaleString()} downloads</span>
-                </div>
+                <button
+                  className="download-btn secondary-web"
+                  onClick={handleOpenWebApp}
+                  id="open-web-app-btn"
+                >
+                  <span className="download-icon">🌐</span>
+                  Open Web App Directly
+                </button>
+              </div>
+
+              <div className="app-info">
+                <span className="version">Version {appVersion}</span>
+                <span className="separator">•</span>
+                <span className="downloads">{downloadCount.toLocaleString()} downloads</span>
+                <span className="separator">•</span>
+                <span className="size">3.2 MB</span>
               </div>
 
               <div className="security-notice">
                 <span className="security-icon">🔒</span>
-                <span>Safe & Secure - Direct from AXX Spaces</span>
+                <span>Verified Safe & Secure - Direct from AXX Spaces</span>
               </div>
 
               {qrCodeUrl && (
                 <div className="qr-code-section">
-                  <p className="qr-code-title">Scan to Download</p>
+                  <div className="qr-header">
+                    <span className="qr-icon">📱</span>
+                    <p className="qr-code-title">Scan with Phone Camera</p>
+                  </div>
                   <div className="qr-code-container">
                     <img src={qrCodeUrl} alt="Download QR Code" className="qr-code-image" />
                   </div>
                   <p className="qr-code-instruction">
-                    Point your phone camera at the QR code to download the app
+                    Point your mobile device camera at the QR code to open or download the app.
                   </p>
                 </div>
               )}
             </div>
 
+            {/* Interactive Phone Mockup */}
             <div className="hero-image">
               <div className="phone-mockup">
+                <div className="phone-notch"></div>
                 <div className="phone-screen">
                   <div className="status-bar">
-                    <span>9:41</span>
+                    <span>09:41</span>
                     <div className="status-icons">
                       <span>📶</span>
+                      <span>5G</span>
                       <span>🔋</span>
                     </div>
                   </div>
                   <div className="app-content">
                     <div className="app-header">
-                      <h2>AXX Spaces</h2>
+                      <div className="header-logo-brand">
+                        <span className="brand-dot"></span>
+                        <h2>AXX Space</h2>
+                      </div>
+                      <span className="live-status-pill">LIVE</span>
                     </div>
-                    <div className="app-preview">
+                    
+                    <div className="app-preview-body">
+                      <div className="preview-banner">
+                        <span className="banner-title">Featured Listings</span>
+                        <span className="banner-badge">Nairobi & Beyond</span>
+                      </div>
+                      
                       <div className="preview-card">
-                        <div className="preview-image"></div>
-                        <div className="preview-info">
-                          <div className="preview-title">Modern Apartment</div>
-                          <div className="preview-location">Westlands, Nairobi</div>
-                          <div className="preview-price">KES 45,000/month</div>
+                        <div className="preview-image-placeholder">
+                          <span className="house-icon">🏢</span>
+                          <span className="verified-tag">✓ Verified</span>
                         </div>
+                        <div className="preview-info">
+                          <div className="preview-title">Luxury Studio Apartment</div>
+                          <div className="preview-location">📍 Kilimani, Nairobi</div>
+                          <div className="preview-price">KES 35,000 / mo</div>
+                        </div>
+                      </div>
+
+                      <div className="mini-quick-actions">
+                        <div className="action-chip">🏠 Rentals</div>
+                        <div className="action-chip">✈️ Tourism</div>
+                        <div className="action-chip">💼 Biashara</div>
                       </div>
                     </div>
                   </div>
@@ -164,10 +196,58 @@ const MobileAppDownload = () => {
         </div>
       </section>
 
+      {/* Troubleshooting Section: Why the app needs internet or web link */}
+      <section className="troubleshoot-section" id="troubleshoot">
+        <div className="container">
+          <div className="troubleshoot-card">
+            <div className="troubleshoot-header">
+              <span className="alert-icon">💡</span>
+              <div>
+                <h2>App Not Opening the Website?</h2>
+                <p>If you downloaded the app and it displays a connection message or white screen, check these quick solutions:</p>
+              </div>
+            </div>
+            
+            <div className="troubleshoot-grid">
+              <div className="troubleshoot-item">
+                <div className="item-num">1</div>
+                <div>
+                  <h4>Internet & Data Connection</h4>
+                  <p>The AXX Spaces app connects securely to <strong>https://axxspace.com</strong>. Make sure Wi-Fi or Mobile Data is turned on.</p>
+                </div>
+              </div>
+
+              <div className="troubleshoot-item">
+                <div className="item-num">2</div>
+                <div>
+                  <h4>Allow Android App Permissions</h4>
+                  <p>When installing via APK, allow unknown installation sources in your Android Security Settings.</p>
+                </div>
+              </div>
+
+              <div className="troubleshoot-item">
+                <div className="item-num">3</div>
+                <div>
+                  <h4>Direct Browser Alternative</h4>
+                  <p>You can always access all features directly at <a href="https://axxspace.com" target="_blank" rel="noreferrer" className="inline-link">https://axxspace.com</a> from any browser.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="troubleshoot-actions">
+              <button onClick={handleOpenWebApp} className="direct-web-btn">
+                Launch Web Version Now →
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="features-section">
         <div className="container">
-          <h2 className="section-title">App Features</h2>
+          <h2 className="section-title">Everything in One App</h2>
+          <p className="section-subtitle">Seamless access across all AXX Space services</p>
           <div className="features-grid">
             {features.map((feature, index) => (
               <div key={index} className="feature-card">
@@ -180,80 +260,38 @@ const MobileAppDownload = () => {
         </div>
       </section>
 
-      {/* Screenshots Section */}
-      <section className="screenshots-section">
-        <div className="container">
-          <h2 className="section-title">App Screenshots</h2>
-          <div className="screenshots-grid">
-            {screenshots.map((screenshot, index) => (
-              <div key={index} className="screenshot-card">
-                <div className="screenshot-placeholder">
-                  <span>📱</span>
-                  <p>Screen {index + 1}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Installation Guide */}
       <section className="installation-section">
         <div className="container">
-          <h2 className="section-title">Installation Guide</h2>
+          <h2 className="section-title">Easy 4-Step Installation</h2>
           <div className="installation-steps">
             <div className="step">
               <div className="step-number">1</div>
               <div className="step-content">
                 <h3>Download the APK</h3>
-                <p>Click the download button above to get the latest version of AXX Spaces mobile app.</p>
+                <p>Tap the "Download Android APK" button to download the setup file directly to your phone.</p>
               </div>
             </div>
             <div className="step">
               <div className="step-number">2</div>
               <div className="step-content">
-                <h3>Enable Unknown Sources</h3>
-                <p>Go to Settings &gt; Security &gt; Allow installation from unknown sources.</p>
+                <h3>Allow Unknown Sources</h3>
+                <p>If prompted, go to Settings &gt; Security &gt; Enable "Install from unknown sources" for your browser.</p>
               </div>
             </div>
             <div className="step">
               <div className="step-number">3</div>
               <div className="step-content">
-                <h3>Install the App</h3>
-                <p>Open the downloaded APK file and follow the installation prompts.</p>
+                <h3>Tap Install</h3>
+                <p>Open your downloads folder and tap <strong>axx-spaces-mobile-v1.0.1.apk</strong> to complete installation.</p>
               </div>
             </div>
             <div className="step">
               <div className="step-number">4</div>
               <div className="step-content">
-                <h3>Launch & Enjoy</h3>
-                <p>Open the app and start exploring all features of AXX Spaces.</p>
+                <h3>Launch & Access AXX Space</h3>
+                <p>Open the app icon on your home screen to instantly connect to Axxspace website and services.</p>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Requirements Section */}
-      <section className="requirements-section">
-        <div className="container">
-          <h2 className="section-title">System Requirements</h2>
-          <div className="requirements-grid">
-            <div className="requirement-card">
-              <h3>Android Version</h3>
-              <p>Android 5.0 (Lollipop) or higher</p>
-            </div>
-            <div className="requirement-card">
-              <h3>Storage Space</h3>
-              <p>Minimum 50MB free space</p>
-            </div>
-            <div className="requirement-card">
-              <h3>RAM</h3>
-              <p>Minimum 2GB RAM recommended</p>
-            </div>
-            <div className="requirement-card">
-              <h3>Internet</h3>
-              <p>Stable internet connection required</p>
             </div>
           </div>
         </div>
@@ -265,20 +303,20 @@ const MobileAppDownload = () => {
           <h2 className="section-title">Frequently Asked Questions</h2>
           <div className="faq-list">
             <div className="faq-item">
-              <h3>Is the app safe to download?</h3>
-              <p>Yes, the APK is hosted directly on our secure servers and is regularly scanned for malware.</p>
+              <h3>What website does the mobile app open?</h3>
+              <p>The app automatically loads <strong>https://axxspace.com</strong> in a fast, dedicated mobile WebView interface.</p>
             </div>
             <div className="faq-item">
-              <h3>Why isn't it on the Play Store?</h3>
-              <p>We're currently in the process of Play Store verification. Download from our website for immediate access.</p>
+              <h3>Is the app safe to install?</h3>
+              <p>Yes, the APK is hosted directly on our official servers and scanned for malware and security integrity.</p>
             </div>
             <div className="faq-item">
-              <h3>How do I update the app?</h3>
-              <p>Visit this page regularly and download the latest version when updates are available.</p>
+              <h3>Can I use the website without installing the APK?</h3>
+              <p>Absolutely! Tap "Open Web App Directly" or visit <strong>axxspace.com</strong> on any phone, tablet, or PC browser.</p>
             </div>
             <div className="faq-item">
-              <h3>Will my data be safe?</h3>
-              <p>Yes, we use the same secure backend as our web platform with encrypted data transmission.</p>
+              <h3>What if I get a connection error in the app?</h3>
+              <p>Check your mobile data or Wi-Fi connection, tap "Retry Connection" in the app, or click the direct web link above.</p>
             </div>
           </div>
         </div>
@@ -287,25 +325,34 @@ const MobileAppDownload = () => {
       {/* CTA Section */}
       <section className="cta-section">
         <div className="container">
-          <h2>Ready to Get Started?</h2>
-          <p>Download the AXX Spaces mobile app now and enjoy seamless property services on the go.</p>
-          <button
-            className="download-btn large"
-            onClick={handleDownload}
-            disabled={isDownloading}
-          >
-            {isDownloading ? (
-              <>
-                <span className="spinner"></span>
-                Downloading...
-              </>
-            ) : (
-              <>
-                <span className="download-icon">📥</span>
-                Download APK Now
-              </>
-            )}
-          </button>
+          <h2>Ready to Explore AXX Spaces?</h2>
+          <p>Get instant access on your mobile device or open the platform online right now.</p>
+          <div className="cta-buttons">
+            <button
+              className="download-btn large primary"
+              onClick={handleDownload}
+              disabled={isDownloading}
+            >
+              {isDownloading ? (
+                <>
+                  <span className="spinner"></span>
+                  Downloading APK...
+                </>
+              ) : (
+                <>
+                  <span className="download-icon">📥</span>
+                  Download Mobile APK
+                </>
+              )}
+            </button>
+            <button
+              className="download-btn large secondary-web"
+              onClick={handleOpenWebApp}
+            >
+              <span className="download-icon">🌐</span>
+              Open Web Version
+            </button>
+          </div>
         </div>
       </section>
     </div>

@@ -17,7 +17,7 @@ import { WebView } from 'react-native-webview';
 import NetInfo from '@react-native-community/netinfo';
 import CONFIG from '../config';
 
-const TARGET_URL = CONFIG.WEBSITE_URL || 'https://www.axxspace.com';
+const TARGET_URL = CONFIG.WEBSITE_URL || 'https://axxspace.com';
 const CHROME_USER_AGENT =
   'Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36';
 
@@ -78,10 +78,15 @@ export default function WebViewScreen() {
     }
   };
 
+  const handleOpenBrowser = () => {
+    Linking.openURL(TARGET_URL).catch((err) => console.log('Error launching browser:', err));
+  };
+
   const handleShouldStartLoad = (event) => {
     const { url } = event;
+    if (!url) return true;
     // Allow standard HTTP/HTTPS web links in WebView
-    if (url.startsWith('http://') || url.startsWith('https://')) {
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('about:')) {
       return true;
     }
     // External protocols like tel:, mailto:, whatsapp:, etc. open in external system apps
@@ -117,7 +122,7 @@ export default function WebViewScreen() {
             </View>
             <Text style={styles.offlineTitle}>No Internet Connection</Text>
             <Text style={styles.offlineSubtitle}>
-              Please check your mobile data or Wi-Fi connection and tap retry.
+              Please check your mobile data or Wi-Fi connection and tap retry to open Axxspace.
             </Text>
             <TouchableOpacity style={styles.retryButton} activeOpacity={0.8} onPress={handleRetry}>
               <Text style={styles.retryText}>Retry Connection</Text>
@@ -134,6 +139,9 @@ export default function WebViewScreen() {
             originWhitelist={['*']}
             javaScriptEnabled={true}
             domStorageEnabled={true}
+            allowFileAccess={true}
+            allowUniversalAccessFromFileURLs={true}
+            javaScriptCanOpenWindowsAutomatically={true}
             startInLoadingState={true}
             allowsInlineMediaPlayback={true}
             mediaPlaybackRequiresUserAction={false}
@@ -154,9 +162,7 @@ export default function WebViewScreen() {
             onError={(syntheticEvent) => {
               const { nativeEvent } = syntheticEvent;
               console.warn('WebView load error: ', nativeEvent);
-              if (nativeEvent.code === -2 || nativeEvent.description?.includes('ERR_NAME_NOT_RESOLVED')) {
-                setWebError(nativeEvent.description || 'Failed to load page');
-              }
+              setWebError(nativeEvent.description || 'Failed to connect to Axxspace website.');
             }}
             renderLoading={() => (
               <View style={styles.loadingContainer}>
@@ -172,6 +178,12 @@ export default function WebViewScreen() {
               <Text style={styles.errorSubtitle}>{webError}</Text>
               <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
                 <Text style={styles.retryText}>Reload Page</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.retryButton, { marginTop: 12, backgroundColor: 'transparent', borderWidth: 1, borderColor: '#fbbf24' }]}
+                onPress={handleOpenBrowser}
+              >
+                <Text style={[styles.retryText, { color: '#fbbf24' }]}>Open in Browser</Text>
               </TouchableOpacity>
             </View>
           )}
