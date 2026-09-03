@@ -85,18 +85,31 @@ export default function WebViewScreen() {
   const handleShouldStartLoad = (event) => {
     const { url } = event;
     if (!url) return true;
+
+    // Allow blob/data URLs for canvas exports, posters, and dynamic media
+    if (url.startsWith('blob:') || url.startsWith('data:')) {
+      return true;
+    }
+
     // Allow standard HTTP/HTTPS web links in WebView
     if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('about:')) {
       return true;
     }
+
     // External protocols like tel:, mailto:, whatsapp:, etc. open in external system apps
-    Linking.canOpenURL(url)
-      .then((supported) => {
-        if (supported) {
-          Linking.openURL(url);
-        }
-      })
-      .catch((err) => console.log('Error opening external link:', err));
+    try {
+      Linking.canOpenURL(url)
+        .then((supported) => {
+          if (supported) {
+            Linking.openURL(url);
+          } else {
+            Linking.openURL(url).catch(() => {});
+          }
+        })
+        .catch((err) => console.log('Error opening external link:', err));
+    } catch (e) {
+      console.log('Error checking external URL:', e);
+    }
     return false;
   };
 
@@ -139,8 +152,8 @@ export default function WebViewScreen() {
             originWhitelist={['*']}
             javaScriptEnabled={true}
             domStorageEnabled={true}
-            allowFileAccess={true}
-            allowUniversalAccessFromFileURLs={true}
+            allowFileAccess={false}
+            allowUniversalAccessFromFileURLs={false}
             javaScriptCanOpenWindowsAutomatically={true}
             startInLoadingState={true}
             allowsInlineMediaPlayback={true}
@@ -150,6 +163,7 @@ export default function WebViewScreen() {
             sharedCookiesEnabled={true}
             allowsBackForwardNavigationGestures={true}
             setSupportMultipleWindows={false}
+            androidLayerType="hardware"
             onShouldStartLoadWithRequest={handleShouldStartLoad}
             onNavigationStateChange={(navState) => {
               setCanGoBack(navState.canGoBack);
@@ -163,6 +177,16 @@ export default function WebViewScreen() {
               const { nativeEvent } = syntheticEvent;
               console.warn('WebView load error: ', nativeEvent);
               setWebError(nativeEvent.description || 'Failed to connect to Axxspace website.');
+            }}
+            onRenderProcessGone={(syntheticEvent) => {
+              const { nativeEvent } = syntheticEvent;
+              console.warn('WebView render process killed: ', nativeEvent);
+              setIsLoading(false);
+              setWebError('WebView system process reset. Tap Reload to restore.');
+            }}
+            onReceivedSslError={(syntheticEvent) => {
+              const { nativeEvent } = syntheticEvent;
+              console.warn('WebView SSL notice: ', nativeEvent);
             }}
             renderLoading={() => (
               <View style={styles.loadingContainer}>
