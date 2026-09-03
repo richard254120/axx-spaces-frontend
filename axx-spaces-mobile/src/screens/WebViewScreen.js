@@ -18,8 +18,6 @@ import NetInfo from '@react-native-community/netinfo';
 import CONFIG from '../config';
 
 const TARGET_URL = CONFIG.WEBSITE_URL || 'https://axxspace.com';
-const CHROME_USER_AGENT =
-  'Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36';
 
 export default function WebViewScreen() {
   const webViewRef = useRef(null);
@@ -148,7 +146,6 @@ export default function WebViewScreen() {
             ref={webViewRef}
             source={{ uri: TARGET_URL }}
             style={styles.webView}
-            userAgent={CHROME_USER_AGENT}
             originWhitelist={['*']}
             javaScriptEnabled={true}
             domStorageEnabled={true}
@@ -163,7 +160,7 @@ export default function WebViewScreen() {
             sharedCookiesEnabled={true}
             allowsBackForwardNavigationGestures={true}
             setSupportMultipleWindows={false}
-            androidLayerType="hardware"
+            androidLayerType="software"
             onShouldStartLoadWithRequest={handleShouldStartLoad}
             onNavigationStateChange={(navState) => {
               setCanGoBack(navState.canGoBack);
@@ -178,11 +175,15 @@ export default function WebViewScreen() {
               console.warn('WebView load error: ', nativeEvent);
               setWebError(nativeEvent.description || 'Failed to connect to Axxspace website.');
             }}
+            onReceivedHttpError={(syntheticEvent) => {
+              const { nativeEvent } = syntheticEvent;
+              console.warn('WebView HTTP error: ', nativeEvent);
+            }}
             onRenderProcessGone={(syntheticEvent) => {
               const { nativeEvent } = syntheticEvent;
               console.warn('WebView render process killed: ', nativeEvent);
               setIsLoading(false);
-              setWebError('WebView system process reset. Tap Reload to restore.');
+              setWebError('WebView process reset. Tap Reload to restore.');
             }}
             onReceivedSslError={(syntheticEvent) => {
               const { nativeEvent } = syntheticEvent;
