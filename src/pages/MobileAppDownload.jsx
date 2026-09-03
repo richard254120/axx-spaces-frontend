@@ -33,11 +33,12 @@ const MobileAppDownload = () => {
 
   const handleDownload = () => {
     setIsDownloading(true);
-    const apkUrl = "/downloads/axx-spaces-mobile-v1.0.0.apk";
+    const apkUrl = "/downloads/axx-spaces-mobile-v1.0.1.apk";
 
     const link = document.createElement('a');
     link.href = apkUrl;
     link.download = "axx-spaces-mobile-v1.0.1.apk";
+    link.target = "_self";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
