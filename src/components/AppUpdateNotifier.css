@@ -1,0 +1,141 @@
+.app-update-notifier-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 99999;
+  max-width: 420px;
+  width: calc(100% - 48px);
+  animation: appUpdateSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes appUpdateSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.app-update-notifier-card {
+  background: linear-gradient(135deg, #1e293b 0%, #0f1729 100%);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 16px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(251, 191, 36, 0.15);
+  backdrop-filter: blur(12px);
+}
+
+.app-update-notifier-icon {
+  font-size: 28px;
+  background: rgba(251, 191, 36, 0.15);
+  padding: 10px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.app-update-notifier-content {
+  flex: 1;
+}
+
+.app-update-notifier-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.app-update-notifier-header h4 {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.app-update-badge {
+  background: #fbbf24;
+  color: #0f1729;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+.app-update-notifier-desc {
+  color: #94a3b8;
+  font-size: 13px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.app-update-notifier-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: 6px;
+}
+
+.app-update-btn-primary {
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+  color: #0f1729;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.app-update-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+}
+
+.app-update-btn-dismiss {
+  background: transparent;
+  color: #64748b;
+  border: none;
+  padding: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.app-update-btn-dismiss:hover {
+  color: #94a3b8;
+}
+
+@media (max-width: 480px) {
+  .app-update-notifier-container {
+    bottom: 16px;
+    right: 16px;
+    left: 16px;
+    width: auto;
+  }
+  .app-update-notifier-card {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .app-update-notifier-actions {
+    flex-direction: row;
+    width: 100%;
+    margin-left: 0;
+  }
+  .app-update-btn-primary {
+    flex: 1;
+    text-align: center;
+  }
+}

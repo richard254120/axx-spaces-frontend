@@ -26,6 +26,36 @@ export default function WebViewScreen() {
   const [isOffline, setIsOffline] = useState(false);
   const [webError, setWebError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [updateAvailable, setUpdateAvailable] = useState(null);
+  const [showUpdateBanner, setShowUpdateBanner] = useState(false);
+
+  // Check for app version updates from version manifest
+  useEffect(() => {
+    fetch('https://axxspace.com/downloads/version.json?t=' + Date.now())
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.latestVersion) {
+          const installedVersion = CONFIG.APP_VERSION || '1.0.1';
+          if (isNewerVersion(data.latestVersion, installedVersion)) {
+            setUpdateAvailable(data);
+            setShowUpdateBanner(true);
+          }
+        }
+      })
+      .catch((err) => console.log('Version check skipped:', err));
+  }, []);
+
+  const isNewerVersion = (latest, current) => {
+    const lParts = latest.split('.').map(Number);
+    const cParts = current.split('.').map(Number);
+    for (let i = 0; i < Math.max(lParts.length, cParts.length); i++) {
+      const l = lParts[i] || 0;
+      const c = cParts[i] || 0;
+      if (l > c) return true;
+      if (l < c) return false;
+    }
+    return false;
+  };
 
   // Monitor network connectivity status
   useEffect(() => {
@@ -197,6 +227,36 @@ export default function WebViewScreen() {
             )}
           />
 
+          {showUpdateBanner && updateAvailable && (
+            <View style={styles.updateBannerContainer}>
+              <View style={styles.updateBannerContent}>
+                <Text style={styles.updateBannerTitle}>🚀 App Upgrade Available!</Text>
+                <Text style={styles.updateBannerDesc}>
+                  Version {updateAvailable.latestVersion} is ready with new features and improvements.
+                </Text>
+              </View>
+              <View style={styles.updateBannerActions}>
+                <TouchableOpacity
+                  style={styles.updateNowButton}
+                  onPress={() => {
+                    Linking.openURL(
+                      updateAvailable.downloadUrl ||
+                        'https://axxspace.com/downloads/axx-spaces-mobile-v1.0.1.apk'
+                    ).catch((err) => console.log('Error launching download:', err));
+                  }}
+                >
+                  <Text style={styles.updateNowText}>Update</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.dismissButton}
+                  onPress={() => setShowUpdateBanner(false)}
+                >
+                  <Text style={styles.dismissText}>✕</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
           {webError && (
             <View style={styles.errorOverlay}>
               <Text style={styles.errorTitle}>Unable to load Axxspace</Text>
@@ -237,6 +297,65 @@ const styles = StyleSheet.create({
   webView: {
     flex: 1,
     backgroundColor: '#0f1729',
+  },
+  updateBannerContainer: {
+    position: 'absolute',
+    top: 10,
+    left: 12,
+    right: 12,
+    zIndex: 99,
+    backgroundColor: '#1e293b',
+    borderColor: '#fbbf24',
+    borderWidth: 1,
+    borderRadius: 14,
+    padding: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    elevation: 10,
+  },
+  updateBannerContent: {
+    flex: 1,
+    marginRight: 8,
+  },
+  updateBannerTitle: {
+    color: '#fbbf24',
+    fontWeight: '700',
+    fontSize: 14,
+    marginBottom: 2,
+  },
+  updateBannerDesc: {
+    color: '#94a3b8',
+    fontSize: 12,
+    lineHeight: 16,
+  },
+  updateBannerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  updateNowButton: {
+    backgroundColor: '#fbbf24',
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+  },
+  updateNowText: {
+    color: '#0f1729',
+    fontWeight: '800',
+    fontSize: 13,
+  },
+  dismissButton: {
+    padding: 6,
+  },
+  dismissText: {
+    color: '#94a3b8',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   loadingContainer: {
     ...StyleSheet.absoluteFillObject,

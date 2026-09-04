@@ -6,6 +6,7 @@ import { useDevToolsProtection } from "./hooks/useDevToolsProtection";
 import Navbar from "./components/Navbar";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
 import SplashScreen from "./components/SplashScreen";
+import AppUpdateNotifier from "./components/AppUpdateNotifier";
 
 import Home from "./pages/Home";
 import Listings from "./pages/Listings";
@@ -78,20 +79,26 @@ import "leaflet/dist/leaflet.css";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AccountLayout from "./components/AccountLayout";
 
-// Public pages get the Navbar + WhatsApp button
+// Public pages get the Navbar + WhatsApp button + App Update Notifier
 function PublicLayout({ children }) {
   return (
     <>
       <Navbar />
       {children}
       <FloatingWhatsApp />
+      <AppUpdateNotifier />
     </>
   );
 }
 
 // Dashboard / account pages — role-focused nav only, no public site links
 function DashboardLayout({ children, preferSeller = false }) {
-  return <AccountLayout preferSeller={preferSeller}>{children}</AccountLayout>;
+  return (
+    <AccountLayout preferSeller={preferSeller}>
+      {children}
+      <AppUpdateNotifier />
+    </AccountLayout>
+  );
 }
 
 // Auth / standalone pages — no nav shell
