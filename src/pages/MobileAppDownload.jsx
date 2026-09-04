@@ -54,12 +54,12 @@ const MobileAppDownload = () => {
   };
 
   const features = [
-    { icon: "🏠", title: "Property Rentals", description: "Browse, view, and rent apartments, hostels, and residential homes in real-time." },
-    { icon: "✈️", title: "Tourism & Hotels", description: "Discover top vacation rentals, hotels, safaris, and local cultural experiences." },
-    { icon: "💼", title: "AxxBiashara Directory", description: "Connect directly with verified local businesses and services across Kenya." },
-    { icon: "🔨", title: "Materials Marketplace", description: "Source quality construction materials and hardware straight from vendors." },
-    { icon: "🚚", title: "Movers & Logistics", description: "Book verified relocation, moving, and delivery services effortlessly." },
-    { icon: "💳", title: "AxxWallet Payments", description: "Seamless, secure digital wallet transactions and instant booking receipts." },
+    { title: "Property Rentals", description: "Browse, view, and rent apartments, hostels, and residential homes in real-time." },
+    { title: "Tourism & Hotels", description: "Discover top vacation rentals, hotels, safaris, and local cultural experiences." },
+    { title: "AxxBiashara Directory", description: "Connect directly with verified local businesses and services across Kenya." },
+    { title: "Materials Marketplace", description: "Source quality construction materials and hardware straight from vendors." },
+    { title: "Movers & Logistics", description: "Book verified relocation, moving, and delivery services effortlessly." },
+    { title: "AxxWallet Payments", description: "Seamless, secure digital wallet transactions and instant booking receipts." },
   ];
 
   return (
@@ -98,7 +98,6 @@ const MobileAppDownload = () => {
                     </>
                   ) : (
                     <>
-                      <span className="download-icon">📥</span>
                       Download Android APK
                     </>
                   )}
@@ -109,7 +108,6 @@ const MobileAppDownload = () => {
                   onClick={handleOpenWebApp}
                   id="open-web-app-btn"
                 >
-                  <span className="download-icon">🌐</span>
                   Open Web App Directly
                 </button>
               </div>
@@ -123,14 +121,12 @@ const MobileAppDownload = () => {
               </div>
 
               <div className="security-notice">
-                <span className="security-icon">🔒</span>
                 <span>Verified Safe & Secure - Direct from AXX Spaces</span>
               </div>
 
               {qrCodeUrl && (
                 <div className="qr-code-section">
                   <div className="qr-header">
-                    <span className="qr-icon">📱</span>
                     <p className="qr-code-title">Scan with Phone Camera</p>
                   </div>
                   <div className="qr-code-container">
@@ -151,9 +147,7 @@ const MobileAppDownload = () => {
                   <div className="status-bar">
                     <span>09:41</span>
                     <div className="status-icons">
-                      <span>📶</span>
                       <span>5G</span>
-                      <span>🔋</span>
                     </div>
                   </div>
                   <div className="app-content">
@@ -173,20 +167,19 @@ const MobileAppDownload = () => {
                       
                       <div className="preview-card">
                         <div className="preview-image-placeholder">
-                          <span className="house-icon">🏢</span>
                           <span className="verified-tag">✓ Verified</span>
                         </div>
                         <div className="preview-info">
                           <div className="preview-title">Luxury Studio Apartment</div>
-                          <div className="preview-location">📍 Kilimani, Nairobi</div>
+                          <div className="preview-location">Kilimani, Nairobi</div>
                           <div className="preview-price">KES 35,000 / mo</div>
                         </div>
                       </div>
 
                       <div className="mini-quick-actions">
-                        <div className="action-chip">🏠 Rentals</div>
-                        <div className="action-chip">✈️ Tourism</div>
-                        <div className="action-chip">💼 Biashara</div>
+                        <div className="action-chip">Rentals</div>
+                        <div className="action-chip">Tourism</div>
+                        <div className="action-chip">Biashara</div>
                       </div>
                     </div>
                   </div>
@@ -202,7 +195,6 @@ const MobileAppDownload = () => {
         <div className="container">
           <div className="troubleshoot-card">
             <div className="troubleshoot-header">
-              <span className="alert-icon">💡</span>
               <div>
                 <h2>App Not Opening the Website?</h2>
                 <p>If you downloaded the app and it displays a connection message or white screen, check these quick solutions:</p>
@@ -252,7 +244,6 @@ const MobileAppDownload = () => {
           <div className="features-grid">
             {features.map((feature, index) => (
               <div key={index} className="feature-card">
-                <div className="feature-icon">{feature.icon}</div>
                 <h3 className="feature-title">{feature.title}</h3>
                 <p className="feature-description">{feature.description}</p>
               </div>
@@ -341,7 +332,6 @@ const MobileAppDownload = () => {
                 </>
               ) : (
                 <>
-                  <span className="download-icon">📥</span>
                   Download Mobile APK
                 </>
               )}
@@ -350,7 +340,6 @@ const MobileAppDownload = () => {
               className="download-btn large secondary-web"
               onClick={handleOpenWebApp}
             >
-              <span className="download-icon">🌐</span>
               Open Web Version
             </button>
           </div>

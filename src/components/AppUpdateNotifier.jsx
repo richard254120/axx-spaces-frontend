@@ -57,7 +57,6 @@ export default function AppUpdateNotifier() {
   return (
     <div className="app-update-notifier-container" role="alert">
       <div className="app-update-notifier-compact">
-        <span className="app-update-notifier-icon">🚀</span>
         <div className="app-update-notifier-text">
           <span className="app-update-title">Update Available</span>
           <span className="app-update-version">v{updateInfo.latestVersion}</span>

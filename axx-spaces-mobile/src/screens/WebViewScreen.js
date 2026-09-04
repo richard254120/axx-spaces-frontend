@@ -230,7 +230,7 @@ export default function WebViewScreen() {
           {showUpdateBanner && updateAvailable && (
             <View style={styles.updateBannerContainer}>
               <View style={styles.updateBannerContent}>
-                <Text style={styles.updateBannerTitle}>🚀 App Upgrade Available!</Text>
+                <Text style={styles.updateBannerTitle}>App Upgrade Available!</Text>
                 <Text style={styles.updateBannerDesc}>
                   Version {updateAvailable.latestVersion} is ready with new features and improvements.
                 </Text>
