@@ -96,11 +96,8 @@ export default function Navbar() {
           <Link to="/listings" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>Rentals</span>
           </Link>
-          <Link to="/movers" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>Movers</span>
-          </Link>
-          <Link to="/tourism" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>Tourism</span>
+          <Link to="/accommodation" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+            <span style={styles.dropdownIcon}>Accommodation</span>
           </Link>
           <button
             style={{
@@ -403,8 +400,8 @@ export default function Navbar() {
           <Link to="/listings" style={{ ...styles.navLink, ...(isActive("/listings") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
             Rentals
           </Link>
-          <Link to="/tourism" style={{ ...styles.navLink, ...(isActive("/tourism") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
-            Tourism
+          <Link to="/accommodation" style={{ ...styles.navLink, ...(isActive("/accommodation") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
+            Accommodation
           </Link>
           <Link to="/mobile-app" style={{ ...styles.navLink, ...(isActive("/mobile-app") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
             Download App

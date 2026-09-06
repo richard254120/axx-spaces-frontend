@@ -249,7 +249,7 @@ export default function AdminDashboard() {
   };
 
   const handleDeleteUser = async (userId) => {
-    if (!window.confirm("Are you sure you want to delete this user? This will also delete all their properties, materials, and tourism listings.")) return;
+    if (!window.confirm("Are you sure you want to delete this user? This will also delete all their properties, materials, and accommodation listings.")) return;
 
     try {
       await API.delete(`/admin/users/${userId}`);
@@ -359,7 +359,7 @@ export default function AdminDashboard() {
       const res = await API.get("/users/pending-tourism-providers");
       setPendingProviders(res.data);
     } catch (err) {
-      console.error(" Failed to load pending tourism providers", err);
+      console.error(" Failed to load pending accommodation providers", err);
     }
   };
 
@@ -379,7 +379,7 @@ export default function AdminDashboard() {
     try {
       await API.patch(`/users/${userId}/approve-tourism-provider`, { approve });
       setPendingProviders((prev) => prev.filter((p) => p._id !== userId));
-      console.log(` Tourism provider ${approve ? 'approved' : 'rejected'} successfully`);
+      console.log(` Accommodation provider ${approve ? 'approved' : 'rejected'} successfully`);
     } catch (err) {
       alert(" Operation failed. Please check permissions.");
     }
@@ -430,12 +430,7 @@ export default function AdminDashboard() {
             <p style={styles.statPending}>{stats.materials.pending} pending</p>
           </div>
           <div style={styles.statCard}>
-            <h3 style={styles.statTitle}> Movers</h3>
-            <p style={styles.statValue}>{stats.movers.total}</p>
-            <p style={styles.statPending}>{stats.movers.pending} pending</p>
-          </div>
-          <div style={styles.statCard}>
-            <h3 style={styles.statTitle}> Tourism</h3>
+            <h3 style={styles.statTitle}> Accommodation</h3>
             <p style={styles.statValue}>{stats.tourism.total}</p>
             <p style={styles.statPending}>{stats.tourism.pending} pending</p>
           </div>
@@ -453,44 +448,38 @@ export default function AdminDashboard() {
           style={{ ...styles.tab, ...(activeTab === "properties" ? styles.tabActive : {}) }}
           onClick={() => setActiveTab("properties")}
         >
-           Properties {allPending?.properties ? `(${allPending.properties.length})` : ""}
+          Properties {allPending?.properties ? `(${allPending.properties.length})` : ""}
         </button>
         <button
           style={{ ...styles.tab, ...(activeTab === "materials" ? styles.tabActive : {}) }}
           onClick={() => setActiveTab("materials")}
         >
-           Materials {allPending?.materials ? `(${allPending.materials.length})` : ""}
+          Materials {allPending?.materials ? `(${allPending.materials.length})` : ""}
         </button>
         <button
           style={{ ...styles.tab, ...(activeTab === "tourism" ? styles.tabActive : {}) }}
           onClick={() => setActiveTab("tourism")}
         >
-           Tourism {allPending?.tourism ? `(${allPending.tourism.length})` : ""}
-        </button>
-        <button
-          style={{ ...styles.tab, ...(activeTab === "movers" ? styles.tabActive : {}) }}
-          onClick={() => setActiveTab("movers")}
-        >
-           Movers {allPending?.movers ? `(${allPending.movers.length})` : ""}
+          Accommodation {allPending?.tourism ? `(${allPending.tourism.length})` : ""}
         </button>
         <button
           style={{ ...styles.tab, ...(activeTab === "sellers" ? styles.tabActive : {}) }}
           onClick={() => setActiveTab("sellers")}
         >
-           Sellers {allPending?.sellers ? `(${allPending.sellers.length})` : ""}
+          Sellers {allPending?.sellers ? `(${allPending.sellers.length})` : ""}
         </button>
         <button
           style={{ ...styles.tab, ...(activeTab === "payment" ? styles.tabActive : {}) }}
           onClick={() => setActiveTab("payment")}
         >
-           Payment Settings
+          Payment Settings
         </button>
         {/* ADDED: Payments tab button */}
         <button
           style={{ ...styles.tab, ...(activeTab === "payments" ? styles.tabActive : {}) }}
           onClick={() => setActiveTab("payments")}
         >
-           Payments {pendingPayments.length > 0 ? `(${pendingPayments.length})` : ""}
+          Payments {pendingPayments.length > 0 ? `(${pendingPayments.length})` : ""}
         </button>
         {/* END ADDED */}
         {/* ADDED: Businesses tab button */}
@@ -498,14 +487,14 @@ export default function AdminDashboard() {
           style={{ ...styles.tab, ...(activeTab === "businesses" ? styles.tabActive : {}) }}
           onClick={() => setActiveTab("businesses")}
         >
-           Businesses {pendingBusinesses.length > 0 ? `(${pendingBusinesses.length})` : ""}
+          Businesses {pendingBusinesses.length > 0 ? `(${pendingBusinesses.length})` : ""}
         </button>
         {/* ADDED: Announcements tab button */}
         <button
           style={{ ...styles.tab, ...(activeTab === "announcements" ? styles.tabActive : {}) }}
           onClick={() => setActiveTab("announcements")}
         >
-           Announcements {pendingAnnouncements.filter(a => a.status === "pending").length > 0 ? `(${pendingAnnouncements.filter(a => a.status === "pending").length})` : ""}
+          Announcements {pendingAnnouncements.filter(a => a.status === "pending").length > 0 ? `(${pendingAnnouncements.filter(a => a.status === "pending").length})` : ""}
         </button>
         {/* END ADDED */}
         {/* ADDED: Users tab button */}
@@ -513,7 +502,7 @@ export default function AdminDashboard() {
           style={{ ...styles.tab, ...(activeTab === "users" ? styles.tabActive : {}) }}
           onClick={() => setActiveTab("users")}
         >
-           Users {users.length > 0 ? `(${users.length})` : ""}
+          Users {users.length > 0 ? `(${users.length})` : ""}
         </button>
         {/* END ADDED */}
         {/* ADDED: Requests tab button */}
@@ -521,7 +510,7 @@ export default function AdminDashboard() {
           style={{ ...styles.tab, ...(activeTab === "requests" ? styles.tabActive : {}) }}
           onClick={() => setActiveTab("requests")}
         >
-           Requests {requests.length > 0 ? `(${requests.length})` : ""}
+          Requests {requests.length > 0 ? `(${requests.length})` : ""}
         </button>
         {/* Verification tab button */}
         <button
@@ -718,17 +707,17 @@ export default function AdminDashboard() {
           </div>
         )
       ) : activeTab === "tourism" ? (
-        // Tourism Tab
+        // Accommodation Tab
         !allPending?.tourism || allPending.tourism.length === 0 ? (
           <div style={styles.emptyCard}>
-            <p style={styles.emptyText}> All caught up! No pending tourism listings to review.</p>
+            <p style={styles.emptyText}> All caught up! No pending accommodation listings to review.</p>
           </div>
         ) : (
           <div style={styles.tableContainer}>
             <table style={styles.table}>
               <thead>
                 <tr style={styles.theadRow}>
-                  <th style={styles.th}>Tourism Details</th>
+                  <th style={styles.th}>Accommodation Details</th>
                   <th style={styles.th}>Owner Info</th>
                   <th style={styles.th}>Price (KES)</th>
                   <th style={styles.th}>Actions</th>
@@ -756,58 +745,6 @@ export default function AdminDashboard() {
                         >Approve</button>
                         <button
                           onClick={() => handleAdminReject("tourism", item._id)}
-                          style={styles.rejectBtn}
-                        >Reject</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )
-      ) : activeTab === "movers" ? (
-        // Movers Tab
-        !allPending?.movers || allPending.movers.length === 0 ? (
-          <div style={styles.emptyCard}>
-            <p style={styles.emptyText}> All caught up! No pending movers to review.</p>
-          </div>
-        ) : (
-          <div style={styles.tableContainer}>
-            <table style={styles.table}>
-              <thead>
-                <tr style={styles.theadRow}>
-                  <th style={styles.th}>Mover Details</th>
-                  <th style={styles.th}>Contact Info</th>
-                  <th style={styles.th}>Vehicle Type</th>
-                  <th style={styles.th}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {allPending.movers.map((item) => (
-                  <tr key={item._id} style={styles.tr}>
-                    <td style={styles.td}>
-                      <div style={styles.propTitle}>{item.name}</div>
-                      <div style={{ ...styles.propLoc, display: "flex", alignItems: "center", gap: "4px" }}>
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        <span>{item.county}</span>
-                      </div>
-                    </td>
-                    <td style={styles.td}>
-                      <div style={styles.ownerName}>{item.email}</div>
-                      <div style={styles.ownerContact}>{item.phone}</div>
-                    </td>
-                    <td style={styles.td}>
-                      <span style={styles.roleBadge}>{item.vehicleType}</span>
-                    </td>
-                    <td style={styles.td}>
-                      <div style={styles.btnGroup}>
-                        <button
-                          onClick={() => handleAdminApprove("movers", item._id)}
-                          style={styles.approveBtn}
-                        >Approve</button>
-                        <button
-                          onClick={() => handleAdminReject("movers", item._id)}
                           style={styles.rejectBtn}
                         >Reject</button>
                       </div>
@@ -1092,7 +1029,7 @@ export default function AdminDashboard() {
                     <td style={styles.td}>
                       {business.pricelist && business.pricelist.url ? (
                         <a href={getPricelistUrl(business.pricelist)} target="_blank" rel="noopener noreferrer" style={{ fontSize: "12px", color: "#60a5fa", textDecoration: "none" }}>
-                           View / Download
+                          View / Download
                         </a>
                       ) : (
                         <span style={{ fontSize: "12px", color: "#94a3b8" }}>None</span>
@@ -1385,7 +1322,7 @@ export default function AdminDashboard() {
                             textAlign: "center"
                           }}
                         >
-                           Email
+                          Email
                         </a>
                       </div>
                     </td>

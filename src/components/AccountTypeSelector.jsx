@@ -124,20 +124,12 @@ const accountTypes = [
     registerPath: "/seller-login",
   },
   {
-    id: "mover",
-    name: "Movers Account",
-    icon: "/assets/mover-icon.png",
-    description: "Offer moving and logistics services",
-    loginPath: "/movers",
-    registerPath: "/movers",
-  },
-  {
-    id: "tourism",
-    name: "Tourism Account",
+    id: "accommodation",
+    name: "Accommodation Account",
     icon: "/assets/tourism-icon.png",
-    description: "List and manage tourism properties",
-    loginPath: "/tourism/login",
-    registerPath: "/tourism/register-property",
+    description: "List and manage accommodation properties",
+    loginPath: "/accommodation/login",
+    registerPath: "/accommodation/register-property",
   },
 ];
 

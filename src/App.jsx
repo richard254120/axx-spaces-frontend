@@ -15,9 +15,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Upload from "./pages/Upload";
 import LandlordDashboard from "./pages/LandlordDashboard";
-import MoverDashboard from "./pages/MoverDashboard";
-import Movers from "./pages/Movers";
-import MoverDetailPage from "./pages/MoverDetailPage";
+
 import ResetPassword from "./pages/ResetPassword";
 import AboutUs from "./pages/AboutUs";
 import SellerLogin from "./pages/SellerLogin";
@@ -52,16 +50,16 @@ import SavedListingsPage from "./pages/SavedListingsPage";
 import MessagesPage from "./pages/MessagesPage";
 import NotificationsPage from "./pages/NotificationsPage";
 
-// ─── Tourism Pages ───────────────────────────────────────────────────────────
-import TourismPage from "./pages/tourism/TourismPage";
-import TourismListingsPage from "./pages/tourism/TourismListingsPage";
-import TourismDetailPage from "./pages/tourism/TourismDetailPage";
-import TourismLogin from "./pages/tourism/TourismLogin";
-import TourismRegister from "./pages/tourism/TourismRegister";
+// ─── Accommodation Pages ───────────────────────────────────────────────────────────
+import AccommodationPage from "./pages/tourism/TourismPage";
+import AccommodationListingsPage from "./pages/tourism/TourismListingsPage";
+import AccommodationDetailPage from "./pages/tourism/TourismDetailPage";
+import AccommodationLogin from "./pages/tourism/TourismLogin";
+import AccommodationRegister from "./pages/tourism/TourismRegister";
 import RegisterPropertyPage from "./pages/tourism/RegisterPropertyPage";
 import ProviderDashboard from "./pages/tourism/ProviderDashboard";
 import EditPropertyPage from "./pages/tourism/EditPropertyPage";
-import TourismDashboardLayout from "./components/TourismDashboardLayout";
+import AccommodationDashboardLayout from "./components/TourismDashboardLayout";
 
 // ─── AxxBiashara Business Directory Pages ─────────────────────────────────────
 import AxxBiashara from "./pages/AxxBiashara";
@@ -148,8 +146,7 @@ function App() {
       <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
       <Route path="/listings" element={<PublicLayout><Listings /></PublicLayout>} />
       <Route path="/listings/:id" element={<PublicLayout><PropertyDetailPage /></PublicLayout>} />
-      <Route path="/movers" element={<PublicLayout><Movers /></PublicLayout>} />
-      <Route path="/movers/:id" element={<PublicLayout><MoverDetailPage /></PublicLayout>} />
+
       <Route path="/login" element={<PublicLayout><Login /></PublicLayout>} />
       <Route path="/register" element={<PublicLayout><Register /></PublicLayout>} />
       <Route path="/about" element={<PublicLayout><AboutUs /></PublicLayout>} />
@@ -164,34 +161,34 @@ function App() {
       <Route path="/terms" element={<PublicLayout><TermsAndPrivacy /></PublicLayout>} />
       <Route path="/users" element={<PublicLayout><UsersPage /></PublicLayout>} />
 
-      {/* ── TOURISM ROUTES (have Navbar) ── */}
-      {/* IMPORTANT: specific /tourism/* paths must come before /tourism/:id */}
-      <Route path="/tourism" element={<PublicLayout><TourismPage /></PublicLayout>} />
-      <Route path="/tourism/login" element={<BareLayout><TourismLogin /></BareLayout>} />
-      <Route path="/tourism/register" element={<BareLayout><TourismRegister /></BareLayout>} />
-      <Route path="/tourism/listings" element={<PublicLayout><TourismListingsPage /></PublicLayout>} />
-      <Route path="/tourism/register-property" element={<PublicLayout><RegisterPropertyPage /></PublicLayout>} />
+      {/* ── ACCOMMODATION ROUTES (have Navbar) ── */}
+      {/* IMPORTANT: specific /accommodation/* paths must come before /accommodation/:id */}
+      <Route path="/accommodation" element={<PublicLayout><AccommodationPage /></PublicLayout>} />
+      <Route path="/accommodation/login" element={<BareLayout><AccommodationLogin /></BareLayout>} />
+      <Route path="/accommodation/register" element={<BareLayout><AccommodationRegister /></BareLayout>} />
+      <Route path="/accommodation/listings" element={<PublicLayout><AccommodationListingsPage /></PublicLayout>} />
+      <Route path="/accommodation/register-property" element={<PublicLayout><RegisterPropertyPage /></PublicLayout>} />
       <Route
-        path="/tourism/dashboard"
+        path="/accommodation/dashboard"
         element={
-          <TourismDashboardLayout>
+          <AccommodationDashboardLayout>
             <ProtectedRoute allowedRoles={["landlord"]}>
               <ProviderDashboard />
             </ProtectedRoute>
-          </TourismDashboardLayout>
+          </AccommodationDashboardLayout>
         }
       />
       <Route
-        path="/tourism/dashboard/property/:id"
+        path="/accommodation/dashboard/property/:id"
         element={
-          <TourismDashboardLayout>
+          <AccommodationDashboardLayout>
             <ProtectedRoute allowedRoles={["landlord"]}>
               <EditPropertyPage />
             </ProtectedRoute>
-          </TourismDashboardLayout>
+          </AccommodationDashboardLayout>
         }
       />
-      <Route path="/tourism/:id" element={<PublicLayout><TourismDetailPage /></PublicLayout>} />
+      <Route path="/accommodation/:id" element={<PublicLayout><AccommodationDetailPage /></PublicLayout>} />
 
       {/* ── AXXBIASHARA BUSINESS DIRECTORY ROUTES (have Navbar) ── */}
       <Route path="/axxbiashara" element={<PublicLayout><AxxBiashara /></PublicLayout>} />
@@ -250,16 +247,7 @@ function App() {
           </DashboardLayout>
         }
       />
-      <Route
-        path="/mover-dashboard"
-        element={
-          <DashboardLayout>
-            <ProtectedRoute allowedRoles={["mover"]}>
-              <MoverDashboard />
-            </ProtectedRoute>
-          </DashboardLayout>
-        }
-      />
+
 
       <Route
         path="/upload"
@@ -295,7 +283,7 @@ function App() {
         path="/checkout"
         element={
           <DashboardLayout>
-            <ProtectedRoute allowedRoles={["landlord", "user", "seller", "mover"]}>
+            <ProtectedRoute allowedRoles={["landlord", "user", "seller"]}>
               <Checkout />
             </ProtectedRoute>
           </DashboardLayout>

@@ -22,7 +22,7 @@ export default function TourismPage() {
   const { featured: featuredList, stats: heroStats } = useTourismHome();
 
   const handleSelectPackage = (pkg) => {
-    navigate("/tourism/register-property");
+    navigate("/accommodation/register-property");
   };
 
   return (
@@ -37,20 +37,20 @@ export default function TourismPage() {
             <span style={s.logoAccent}>AXX</span>
             <span style={s.logoSub}>SPACE</span>
             <span style={s.logoDivider}>|</span>
-            <span style={s.logoLabel}>Tourism</span>
+            <span style={s.logoLabel}>Accommodation</span>
           </div>
           <div style={s.navLinks} className="nav-links">
-            <button style={s.navLink} onClick={() => navigate("/tourism/listings")}>Explore</button>
-            <button style={s.navLink} onClick={() => navigate("/tourism/listings")}>Pricing</button>
+            <button style={s.navLink} onClick={() => navigate("/accommodation/listings")}>Explore</button>
+            <button style={s.navLink} onClick={() => navigate("/accommodation/listings")}>Pricing</button>
             {user ? (
               <>
-                <button style={s.navLink} onClick={() => navigate("/tourism/dashboard")}>Dashboard</button>
+                <button style={s.navLink} onClick={() => navigate("/accommodation/dashboard")}>Dashboard</button>
                 <div style={s.userChip}> {user.name?.split(" ")[0]}</div>
               </>
             ) : (
               <>
-                <button style={s.navLink} onClick={() => navigate("/tourism/login")}>Sign In</button>
-                <button style={s.navBtnPrimary} onClick={() => navigate("/tourism/register")}>
+                <button style={s.navLink} onClick={() => navigate("/accommodation/login")}>Sign In</button>
+                <button style={s.navBtnPrimary} onClick={() => navigate("/accommodation/register")}>
                   List Your Property
                 </button>
               </>
@@ -59,9 +59,9 @@ export default function TourismPage() {
           {/* Mobile menu */}
           <div className="nav-mobile-btns">
             {user ? (
-              <button style={s.navBtnPrimary} onClick={() => navigate("/tourism/dashboard")}>Dashboard</button>
+              <button style={s.navBtnPrimary} onClick={() => navigate("/accommodation/dashboard")}>Dashboard</button>
             ) : (
-              <button style={s.navBtnPrimary} onClick={() => navigate("/tourism/register")}>
+              <button style={s.navBtnPrimary} onClick={() => navigate("/accommodation/register")}>
                 List Property
               </button>
             )}
@@ -73,25 +73,25 @@ export default function TourismPage() {
       <section style={s.hero}>
         <div style={s.heroOverlay} />
         <div style={s.heroContent}>
-          <div style={s.heroBadge}> Kenya's Premier Tourism QuickSales</div>
+          <div style={s.heroBadge}> Kenya's Premier Accommodation QuickSales</div>
           <h1 style={s.heroTitle}>
             Discover Kenya's
             <br />
-            <span style={s.heroAccent}>Finest Getaways</span>
+            <span style={s.heroAccent}>Finest Stays</span>
           </h1>
           <p style={s.heroSub}>
-            From Diani's pristine beaches to Masai Mara's wildlife safaris — explore Kenya's most breathtaking destinations with verified properties and direct bookings.
+            From luxury hotels to cozy guesthouses across all 47 counties — find perfect accommodation for every occasion with verified properties and direct bookings.
           </p>
           <div style={s.searchBox}>
             <span style={s.searchIcon}></span>
             <input
               style={s.searchInput}
-              placeholder="Search resorts, safaris, lodges, hotels..."
+              placeholder="Search hotels, lodges, apartments, guesthouses..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && navigate("/tourism/listings")}
+              onKeyDown={(e) => e.key === "Enter" && navigate("/accommodation/listings")}
             />
-            <button style={s.searchBtn} onClick={() => navigate("/tourism/listings")}>Search</button>
+            <button style={s.searchBtn} onClick={() => navigate("/accommodation/listings")}>Search</button>
           </div>
           <div style={s.heroStats}>
             {heroStats.map((st) => (
@@ -109,11 +109,11 @@ export default function TourismPage() {
         <div style={s.sectionInner}>
           <div style={{ textAlign: "center", marginBottom: "36px" }}>
             <h2 style={s.sectionTitle}>Explore by Category</h2>
-            <p style={{ fontSize: "15px", color: "#6b7280", marginTop: "8px" }}>Find the perfect accommodation for your Kenyan adventure</p>
+            <p style={{ fontSize: "15px", color: "#6b7280", marginTop: "8px" }}>Find the perfect accommodation for every occasion</p>
           </div>
           <div className="cat-grid">
             {categories.map((c) => (
-              <button key={c.name} style={s.catCard} onClick={() => navigate("/tourism/listings")} className="cat-card">
+              <button key={c.name} style={s.catCard} onClick={() => navigate("/accommodation/listings")} className="cat-card">
                 <span style={s.catEmoji}>{c.emoji}</span>
                 <div style={s.catName}>{c.name}</div>
                 <div style={s.catCount}>{c.count} properties</div>
@@ -131,11 +131,11 @@ export default function TourismPage() {
               <h2 style={s.sectionTitle}>Featured Properties</h2>
               <p style={{ fontSize: "14px", color: "#6b7280", marginTop: "4px" }}>Curated selection of Kenya's top-rated accommodations</p>
             </div>
-            <button style={s.viewAllBtn} onClick={() => navigate("/tourism/listings")}>View All →</button>
+            <button style={s.viewAllBtn} onClick={() => navigate("/accommodation/listings")}>View All →</button>
           </div>
           <div className="prop-grid">
             {featuredList.map((p) => (
-              <div key={p.id} className="prop-card" style={s.propCard} onClick={() => navigate(`/tourism/${p.id}`)}>
+              <div key={p.id} className="prop-card" style={s.propCard} onClick={() => navigate(`/accommodation/${p.id}`)}>
                 <div style={{ ...s.propImg, background: `linear-gradient(135deg, ${p.color}30, ${p.color}10)`, border: `1px solid ${p.color}25` }}>
                   <span style={{ fontSize: "52px" }}>{p.emoji}</span>
                   {p.tag && <div style={{ ...s.propTag, background: p.color }}>{p.tag}</div>}
@@ -155,7 +155,7 @@ export default function TourismPage() {
                     </div>
                     <div style={s.propRating}> {p.rating} <span style={{ color: "#9ca3af" }}>({p.reviews})</span></div>
                   </div>
-                  <button style={{ ...s.propBtn, background: p.color }} onClick={(e) => { e.stopPropagation(); navigate(`/tourism/${p.id}`); }}>
+                  <button style={{ ...s.propBtn, background: p.color }} onClick={(e) => { e.stopPropagation(); navigate(`/accommodation/${p.id}`); }}>
                     View Details →
                   </button>
                 </div>
@@ -171,7 +171,7 @@ export default function TourismPage() {
           <div style={{ textAlign: "center", marginBottom: "36px" }}>
             <h2 style={{ ...s.sectionTitle, color: "white" }}>Advertise on AXXSpace</h2>
             <p style={{ color: "#9ca3af", fontSize: "15px", marginTop: "8px" }}>
-              List your property and reach 18,000+ monthly visitors looking for Kenya's best tourism experiences.
+              List your property and reach 18,000+ monthly visitors looking for Kenya's best accommodation experiences.
             </p>
           </div>
           <div className="pkg-grid">
@@ -192,7 +192,7 @@ export default function TourismPage() {
                 </div>
                 <button
                   style={{ ...s.pkgBtn, background: pkg.popular ? "#fbbf24" : "transparent", color: pkg.popular ? "#1f2937" : "white", border: pkg.popular ? "none" : "1px solid #374151" }}
-                  onClick={() => loggedIn ? navigate("/tourism/register-property") : (setAuthModal("auth"), setAuthTab("register"))}
+                  onClick={() => user ? navigate("/accommodation/register-property") : navigate("/accommodation/register")}
                 >
                   Get Started
                 </button>
@@ -212,9 +212,9 @@ export default function TourismPage() {
           <div className="how-grid">
             {[
               { step: "01", icon: "", title: "Create an Account", desc: "Register as a property owner/manager and choose your advertising package." },
-              { step: "02", icon: "", title: "List Your Property", desc: "Add your property details, amenities, pricing and your existing booking site link." },
-              { step: "03", icon: "", title: "Get Discovered", desc: "Your property is advertised to thousands of travelers on AXXSpace." },
-              { step: "04", icon: "", title: "Guests Book Direct", desc: "Interested guests click your booking link and are redirected to your own site." },
+              { step: "02", icon: "", title: "List Your Property", desc: "Add your property details, amenities, pricing and contact information." },
+              { step: "03", icon: "", title: "Get Discovered", desc: "Your property is advertised to thousands of guests on AXXSpace." },
+              { step: "04", icon: "", title: "Guests Contact Direct", desc: "Interested guests contact you directly via WhatsApp or phone for bookings." },
             ].map((h) => (
               <div key={h.step} style={s.howCard}>
                 <div style={s.howStep}>{h.step}</div>
@@ -234,13 +234,13 @@ export default function TourismPage() {
             Ready to List Your Property?
           </h2>
           <p style={{ fontSize: "14px", color: "#78350f", marginBottom: "24px", lineHeight: 1.7 }}>
-            Join 200+ properties already benefiting from AXXSpace's tourism QuickSales. Start attracting guests today.
+            Join 300+ properties already benefiting from AXXSpace's accommodation QuickSales. Start attracting guests today.
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
-            <button style={s.ctaBtn} onClick={() => user ? navigate("/tourism/register-property") : navigate("/register")}>
-               List Your Property
+            <button style={s.ctaBtn} onClick={() => user ? navigate("/accommodation/register-property") : navigate("/accommodation/register")}>
+              List Your Property
             </button>
-            <button style={s.ctaBtnSecondary} onClick={() => navigate("/tourism/listings")}>
+            <button style={s.ctaBtnSecondary} onClick={() => navigate("/accommodation/listings")}>
               Browse Properties
             </button>
           </div>
@@ -256,7 +256,7 @@ export default function TourismPage() {
               <span style={{ color: "white", fontWeight: 800, fontSize: "18px" }}>SPACE</span>
             </div>
             <p style={{ color: "#6b7280", fontSize: "12px", marginTop: "8px", maxWidth: "220px", lineHeight: 1.6 }}>
-              Kenya's premier platform for discovering and advertising tourism properties.
+              Kenya's premier platform for discovering and advertising accommodation properties.
             </p>
             <div style={{ marginTop: "16px" }}>
               <SocialMediaLinks iconSize={20} />
@@ -265,8 +265,8 @@ export default function TourismPage() {
           <div style={s.footerLinks}>
             <div style={s.footerCol}>
               <div style={s.footerColTitle}>Explore</div>
-              {["Beach Resorts", "Safari Camps", "Mountain Lodges", "City Hotels"].map((l) => (
-                <button key={l} style={s.footerLink} onClick={() => navigate("/tourism/listings")}>{l}</button>
+              {["Luxury Hotels", "Budget Stays", "Serviced Apartments", "Guest Houses"].map((l) => (
+                <button key={l} style={s.footerLink} onClick={() => navigate("/accommodation/listings")}>{l}</button>
               ))}
             </div>
             <div style={s.footerCol}>
@@ -277,14 +277,14 @@ export default function TourismPage() {
             </div>
             <div style={s.footerCol}>
               <div style={s.footerColTitle}>Contact</div>
-              <div style={{ ...s.footerLink, cursor: "default" }}> tourismaxxspace@gmail.com</div>
+              <div style={{ ...s.footerLink, cursor: "default" }}> accommodationaxxspace@gmail.com</div>
               <div style={{ ...s.footerLink, cursor: "default" }}> +254 745689773</div>
               <div style={{ ...s.footerLink, cursor: "default" }}> WhatsApp Business</div>
             </div>
           </div>
         </div>
         <div style={s.footerBottom}>
-          <span> 2026 AXXSpace Tourism. All rights reserved.</span>
+          <span> 2026 AXXSpace Accommodation. All rights reserved.</span>
           <span>Nairobi, Kenya </span>
         </div>
       </footer>

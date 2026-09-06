@@ -4,53 +4,55 @@ import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
 import bgVideo from "../assets/AXX Homepage video.mp4";
 import rentalsIcon from "/rentals.png";
-import moversIcon from "/movers.png";
-import tourismIcon from "/tourism.png";
+import accommodationIcon from "/tourism.png";
 import axxbiasharaIcon from "/axxbiashara.png";
 import SocialMediaLinks from "../components/SocialMediaLinks";
 import RequestItemModal from "../components/RequestItemModal";
 
 /* ════════════════════════════════════════════════
-   DESIGN SYSTEM  — Luxury Real Estate (from Listings.jsx)
-   Palette: Deep Navy · Champagne Gold · Ivory Cream
-   Font: Cormorant Garamond (headings) + DM Sans (body)
+   DESIGN SYSTEM  — Aurora Design
+   Palette: Purple/Blue/Pink Gradients · Glassmorphism
+   Font: Inter + Poppins (modern sans-serif)
 ════════════════════════════════════════════════ */
 const C = {
-  navy: "#0D1B2A",
-  navyMid: "#162233",
-  navyLight: "#1E3148",
-  gold: "#C9A84C",
-  goldLight: "#E2C47A",
-  goldDim: "rgba(201,168,76,0.15)",
-  goldBorder: "rgba(201,168,76,0.18)",
-  cream: "#F5F0E8",
-  creamDim: "#EDE6D6",
+  bg: "#0A0E27",
+  bgLight: "#151936",
+  primary: "#6366F1",
+  primaryLight: "#818CF8",
+  secondary: "#EC4899",
+  secondaryLight: "#F472B6",
+  accent: "#06B6D4",
+  accentLight: "#22D3EE",
   white: "#FFFFFF",
-  textMain: "#F0EAD8",
-  textMid: "#B8AD96",
-  textDim: "#7A7260",
-  red: "#E31B1B",
-  redDark: "#B01212",
-  green: "#4CAF74",
-  border: "rgba(201,168,76,0.18)",
-  borderSoft: "rgba(255,255,255,0.08)",
+  textMain: "#F8FAFC",
+  textMid: "#CBD5E1",
+  textDim: "#64748B",
+  glass: "rgba(255,255,255,0.1)",
+  glassDark: "rgba(0,0,0,0.3)",
+  gradient1: "linear-gradient(135deg, #6366F1 0%, #EC4899 50%, #06B6D4 100%)",
+  gradient2: "linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)",
+  gradient3: "linear-gradient(135deg, #06B6D4 0%, #6366F1 100%)",
+  border: "rgba(255,255,255,0.1)",
+  borderSoft: "rgba(255,255,255,0.05)",
+  glow: "rgba(99,102,241,0.5)",
+  glowPink: "rgba(236,72,153,0.5)",
 };
 
 /* ════════ GLOBAL CSS ════════ */
 const css = `
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,700&family=DM+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
-body { font-family: 'DM Sans', sans-serif; background: #0D1B2A; color: #F0EAD8; }
+body { font-family: 'Inter', sans-serif; background: #0A0E27; color: #F8FAFC; }
 
-::placeholder { color: #7A7260 !important; }
-option { background: #162233; color: #F0EAD8; }
+::placeholder { color: #64748B !important; }
+option { background: #151936; color: #F8FAFC; }
 
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #0D1B2A; }
-::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.4); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(201,168,76,0.7); }
+::-webkit-scrollbar-track { background: #0A0E27; }
+::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.4); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.7); }
 
 /* ── KEYFRAMES ── */
 @keyframes ticker {
@@ -115,22 +117,23 @@ option { background: #162233; color: #F0EAD8; }
 
 /* ── ROOT ── */
 .home-root {
-  font-family: 'DM Sans', sans-serif;
-  background: #0D1B2A;
-  color: #F0EAD8;
+  font-family: 'Inter', sans-serif;
+  background: #0A0E27;
+  color: #F8FAFC;
   min-height: 100vh;
   overflow-x: hidden;
 }
 
 /* ── TICKER ── */
 .ticker-outer {
-  background: #071018;
-  border-bottom: 1px solid rgba(201,168,76,0.25);
+  background: rgba(10,14,39,0.8);
+  border-bottom: 1px solid rgba(99,102,241,0.25);
   overflow: hidden;
   height: 38px;
   display: flex;
   align-items: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 10px rgba(99,102,241,0.2);
+  backdrop-filter: blur(10px);
 }
 .ticker-track {
   display: flex;
@@ -144,16 +147,16 @@ option { background: #162233; color: #F0EAD8; }
   align-items: center;
   gap: 8px;
   padding: 0 28px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 500;
-  color: #B8AD96;
+  color: #CBD5E1;
   white-space: nowrap;
-  border-right: 1px solid rgba(201,168,76,0.12);
+  border-right: 1px solid rgba(99,102,241,0.12);
   letter-spacing: 0.06em;
 }
-.ticker-item b { color: #C9A84C; font-weight: 700; }
-.ticker-dot { width: 4px; height: 4px; background: #C9A84C; border-radius: 50%; flex-shrink: 0; }
+.ticker-item b { color: #6366F1; font-weight: 700; }
+.ticker-dot { width: 4px; height: 4px; background: #EC4899; border-radius: 50%; flex-shrink: 0; }
 
 /* ── HERO ── */
 .hero {
@@ -164,7 +167,7 @@ option { background: #162233; color: #F0EAD8; }
   justify-content: center;
   text-align: center;
   overflow: hidden;
-  border-bottom: 1px solid rgba(201,168,76,0.2);
+  border-bottom: 1px solid rgba(99,102,241,0.2);
 }
 .hero-bg-video {
   position: absolute; inset: 0;
@@ -182,36 +185,36 @@ option { background: #162233; color: #F0EAD8; }
 }
 .hero-bg-fallback {
   position: absolute; inset: 0;
-  background: linear-gradient(135deg, #071018 0%, #0D1B2A 40%, #162233 70%, #0a1520 100%);
+  background: linear-gradient(135deg, #0A0E27 0%, #151936 40%, #1E1B4B 70%, #0F172A 100%);
   z-index: 0;
 }
 .hero-overlay {
   position: absolute; inset: 0;
   background: linear-gradient(160deg,
-    rgba(7,16,24,0.88) 0%,
-    rgba(13,27,42,0.72) 40%,
-    rgba(13,27,42,0.85) 100%);
+    rgba(10,14,39,0.88) 0%,
+    rgba(21,25,54,0.72) 40%,
+    rgba(30,27,75,0.85) 100%);
   z-index: 1;
 }
 .hero-radial {
   position: absolute; inset: 0;
-  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,168,76,0.09) 0%, transparent 70%);
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(99,102,241,0.15) 0%, transparent 70%);
   z-index: 2; pointer-events: none;
 }
 .hero-decor1 {
   position: absolute; width: 500px; height: 500px;
-  border: 1px solid rgba(201,168,76,0.08);
+  border: 1px solid rgba(99,102,241,0.15);
   border-radius: 50%; top: -200px; right: -120px;
   pointer-events: none; z-index: 2;
-  box-shadow: inset 0 0 40px rgba(201,168,76,0.02);
+  box-shadow: inset 0 0 40px rgba(99,102,241,0.1), 0 0 60px rgba(99,102,241,0.2);
   animation: rotateDecor1 30s linear infinite;
 }
 .hero-decor2 {
   position: absolute; width: 350px; height: 350px;
-  border: 1px solid rgba(201,168,76,0.08);
+  border: 1px solid rgba(236,72,153,0.15);
   border-radius: 50%; bottom: -120px; left: -80px;
   pointer-events: none; z-index: 2;
-  box-shadow: inset 0 0 30px rgba(201,168,76,0.02);
+  box-shadow: inset 0 0 30px rgba(236,72,153,0.1), 0 0 50px rgba(236,72,153,0.2);
   animation: rotateDecor2 25s linear infinite;
 }
 
@@ -238,20 +241,20 @@ option { background: #162233; color: #F0EAD8; }
   font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 0.22em;
-  color: #B8AD96;
+  color: #CBD5E1;
   font-weight: 600;
 }
 .mouse {
   width: 22px;
   height: 36px;
-  border: 2px solid rgba(201, 168, 76, 0.45);
+  border: 2px solid rgba(99,102,241,0.5);
   border-radius: 12px;
   position: relative;
 }
 .wheel {
   width: 4px;
   height: 8px;
-  background: #C9A84C;
+  background: #6366F1;
   border-radius: 2px;
   position: absolute;
   top: 6px;
@@ -285,19 +288,19 @@ option { background: #162233; color: #F0EAD8; }
 }
 .hero-badge {
   display: inline-block;
-  border: 1px solid rgba(201,168,76,0.4);
-  color: #C9A84C;
-  font-family: 'DM Sans', sans-serif;
+  border: 1px solid rgba(99,102,241,0.4);
+  color: #6366F1;
+  font-family: 'Inter', sans-serif;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.22em;
   padding: 6px 20px;
   border-radius: 20px;
+  background: rgba(99,102,241,0.1);
+  backdrop-filter: blur(10px);
   margin-bottom: 28px;
   text-transform: uppercase;
-  background: rgba(201,168,76,0.06);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 0 20px rgba(201,168,76,0.1), inset 0 0 10px rgba(201,168,76,0.05);
+  box-shadow: 0 0 20px rgba(99,102,241,0.2), inset 0 0 10px rgba(99,102,241,0.1);
 }
 .hero-title {
   margin: 0;
@@ -305,34 +308,34 @@ option { background: #162233; color: #F0EAD8; }
 }
 .hero-title-line1 {
   display: block;
-  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-family: 'Poppins', sans-serif;
   font-size: clamp(2.8rem, 7vw, 5.2rem);
-  font-weight: 300;
-  background: linear-gradient(135deg, #FFFFFF 30%, #E6DFD3 100%);
+  font-weight: 700;
+  background: linear-gradient(135deg, #6366F1 0%, #EC4899 50%, #06B6D4 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   letter-spacing: 0.04em;
 }
 .hero-title-line2 {
   display: block;
-  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-family: 'Poppins', sans-serif;
   font-size: clamp(2.8rem, 7vw, 5.2rem);
   font-weight: 700;
-  background: linear-gradient(135deg, #C9A84C 0%, #F5D382 50%, #C9A84C 100%);
+  background: linear-gradient(135deg, #EC4899 0%, #F472B6 50%, #EC4899 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   letter-spacing: 0.04em;
   font-style: italic;
-  filter: drop-shadow(0 2px 10px rgba(201,168,76,0.35));
+  filter: drop-shadow(0 2px 10px rgba(236,72,153,0.35));
 }
 .hero-sub {
-  font-family: 'DM Sans', sans-serif;
-  color: #B8AD96;
+  font-family: 'Inter', sans-serif;
+  color: #CBD5E1;
   font-size: clamp(14px, 1.8vw, 17px);
   margin: 18px auto 32px;
   letter-spacing: 0.06em;
   line-height: 1.7;
-  font-weight: 300;
+  font-weight: 400;
   max-width: 500px;
 }
 
@@ -346,62 +349,62 @@ option { background: #162233; color: #F0EAD8; }
   display: flex; align-items: center; gap: 7px;
   padding: 10px 20px;
   border-radius: 24px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 13px; font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   letter-spacing: 0.03em;
 }
 .hero-tab-inactive {
-  background: rgba(22, 34, 51, 0.45);
-  border: 1px solid rgba(255,255,255,0.07);
-  color: #B8AD96;
+  background: rgba(15,23,42,0.45);
+  border: 1px solid rgba(99,102,241,0.2);
+  color: #CBD5E1;
   backdrop-filter: blur(10px);
 }
 .hero-tab-inactive:hover {
-  border-color: rgba(201,168,76,0.5);
-  color: #C9A84C;
-  background: rgba(201,168,76,0.08);
+  border-color: rgba(99,102,241,0.6);
+  color: #6366F1;
+  background: rgba(99,102,241,0.1);
   transform: translateY(-2px);
 }
 .hero-tab-active {
-  background: linear-gradient(135deg, #C9A84C 0%, #E2C47A 100%);
-  border: 1px solid #C9A84C;
-  color: #0D1B2A;
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+  border: 1px solid #6366F1;
+  color: #FFFFFF;
   font-weight: 700;
-  box-shadow: 0 8px 32px rgba(201,168,76,0.4);
+  box-shadow: 0 8px 32px rgba(99,102,241,0.4);
   transform: translateY(-2px);
 }
 
 /* ── SEARCH ── */
 .search-label {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 10px; font-weight: 700;
   letter-spacing: 0.2em; text-transform: uppercase;
-  color: rgba(184,173,150,0.7);
+  color: rgba(99,102,241,0.7);
   margin-bottom: 10px;
 }
 
 .search-trigger {
   display: inline-flex; align-items: center; gap: 12px;
-  background: rgba(22,34,51,0.5);
-  border: 1px solid rgba(201,168,76,0.3);
+  background: rgba(15,23,42,0.5);
+  border: 1px solid rgba(99,102,241,0.3);
   backdrop-filter: blur(16px);
   border-radius: 8px;
   padding: 8px 24px 8px 8px;
   cursor: pointer;
   margin: 0 auto 14px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  box-shadow: 0 8px 32px rgba(99,102,241,0.2);
 }
 .search-trigger:hover {
-  border-color: rgba(201,168,76,0.75);
+  border-color: rgba(99,102,241,0.75);
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(201,168,76,0.15);
+  box-shadow: 0 12px 40px rgba(99,102,241,0.3);
 }
 .search-trigger-icon {
   width: 40px; height: 40px;
-  background: linear-gradient(135deg, #C9A84C 0%, #E2C47A 100%);
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
   border-radius: 6px;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center; gap: 4px;
@@ -409,52 +412,53 @@ option { background: #162233; color: #F0EAD8; }
 }
 .search-trigger-line {
   width: 18px; height: 2px;
-  background: #0D1B2A;
+  background: #FFFFFF;
   border-radius: 1px;
   transition: transform 0.25s, opacity 0.2s;
 }
 .search-trigger-text {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 700; font-size: 14px;
-  color: #F0EAD8; letter-spacing: 0.04em;
+  color: #F8FAFC; letter-spacing: 0.04em;
 }
 .search-panel {
-  background: rgba(22,34,51,0.85);
-  border: 1px solid rgba(201,168,76,0.4);
-  border-top: 3px solid #C9A84C;
+  background: rgba(15,23,42,0.85);
+  border: 1px solid rgba(99,102,241,0.4);
+  border-top: 3px solid #6366F1;
   backdrop-filter: blur(20px);
   border-radius: 8px;
   padding: 18px;
   max-width: 440px; width: 100%;
   margin: 0 auto 18px;
   display: flex; flex-direction: column; gap: 10px;
-  box-shadow: 0 30px 70px rgba(0,0,0,0.6);
+  box-shadow: 0 30px 70px rgba(99,102,241,0.3);
   animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1) ease;
 }
 
 .search-select {
   padding: 11px 38px 11px 14px;
-  border: 1px solid rgba(201,168,76,0.18);
+  border: 1px solid rgba(99,102,241,0.3);
   border-radius: 6px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 14px; font-weight: 400;
-  color: #F0EAD8;
-  background: #1E3148;
+  color: #F8FAFC;
+  background: rgba(15,23,42,0.6);
+  backdrop-filter: blur(10px);
   width: 100%; cursor: pointer;
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237A7260' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366F1' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: right 10px center;
   background-size: 18px;
   transition: border-color 0.2s;
 }
-.search-select:focus { outline: none; border-color: #C9A84C; }
+.search-select:focus { outline: none; border-color: #6366F1; }
 .search-submit {
   padding: 13px;
-  background: linear-gradient(135deg, #C9A84C 0%, #E2C47A 100%);
-  color: #0D1B2A;
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+  color: #FFFFFF;
   border: none; border-radius: 6px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 14px; font-weight: 700;
   cursor: pointer; transition: all 0.2s;
   letter-spacing: 0.06em; text-transform: uppercase;
@@ -672,25 +676,25 @@ option { background: #162233; color: #F0EAD8; }
 .cards-track:hover { animation-play-state: paused; }
 .cards-track.swiping { animation: none; }
 .feat-card {
-  background: rgba(22, 34, 51, 0.75);
-  backdrop-filter: blur(8px);
-  border-radius: 14px;
+  background: rgba(15,23,42,0.6);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
   overflow: hidden;
-  border: 1px solid rgba(201,168,76,0.18);
+  border: 1px solid rgba(99,102,241,0.2);
   min-width: 292px;
   max-width: 292px;
   flex-shrink: 0;
   margin: 0;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  box-shadow: 0 8px 30px rgba(99,102,241,0.15);
   opacity: 0;
   transform: translateX(50px);
   animation: slideIn 0.6s ease forwards;
 }
 .feat-card:hover {
   transform: translateY(-8px) scale(1.015);
-  box-shadow: 0 25px 60px rgba(0,0,0,0.55), 0 0 20px rgba(201,168,76,0.18);
-  border-color: rgba(201,168,76,0.45);
+  box-shadow: 0 25px 60px rgba(99,102,241,0.3), 0 0 20px rgba(99,102,241,0.2);
+  border-color: rgba(99,102,241,0.5);
 }
 @keyframes slideIn {
   from {
@@ -707,73 +711,73 @@ option { background: #162233; color: #F0EAD8; }
 .feat-card:hover .feat-img { transform: scale(1.08); }
 .feat-boosted {
   position: absolute; top: 12px; left: 12px;
-  background: linear-gradient(135deg, #C9A84C 0%, #E2C47A 100%);
-  color: #0D1B2A;
+  background: linear-gradient(135deg, #EC4899 0%, #F472B6 100%);
+  color: #FFFFFF;
   padding: 4px 14px; border-radius: 20px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
   text-transform: uppercase;
-  box-shadow: 0 4px 15px rgba(201,168,76,0.4);
+  box-shadow: 0 4px 15px rgba(236,72,153,0.4);
 }
 .feat-type {
   position: absolute; top: 12px; right: 12px;
-  background: rgba(13,27,42,0.85);
-  color: #B8AD96;
+  background: rgba(15,23,42,0.85);
+  color: #CBD5E1;
   padding: 4px 12px; border-radius: 6px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 10px; font-weight: 600;
   letter-spacing: 0.06em; text-transform: uppercase;
   backdrop-filter: blur(4px);
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid rgba(99,102,241,0.2);
 }
 .feat-img-grad {
   position: absolute; inset: 0;
-  background: linear-gradient(to top, rgba(22, 34, 51, 0.8) 0%, transparent 50%);
+  background: linear-gradient(to top, rgba(15, 23, 42, 0.8) 0%, transparent 50%);
   pointer-events: none;
 }
 .feat-body { padding: 20px 20px 22px; }
 .feat-type-label {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 10px; font-weight: 700;
   letter-spacing: 0.16em; text-transform: uppercase;
-  color: #C9A84C; margin-bottom: 8px;
+  color: #6366F1; margin-bottom: 8px;
 }
 .feat-title {
-  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 18px; font-weight: 700;
-  color: #F0EAD8; margin: 0 0 8px; letter-spacing: 0.01em;
+  color: #F8FAFC; margin: 0 0 8px; letter-spacing: 0.01em;
   line-height: 1.3;
 }
-.feat-loc { color: #7A7260; font-size: 12px; margin: 0 0 12px; font-family: 'DM Sans', sans-serif; }
+.feat-loc { color: #64748B; font-size: 12px; margin: 0 0 12px; font-family: 'Inter', sans-serif; }
 .feat-meta { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 12px; }
 .feat-tag {
-  background: rgba(201,168,76,0.08);
-  border: 1px solid rgba(201,168,76,0.18);
-  color: #C9A84C;
+  background: rgba(99,102,241,0.1);
+  border: 1px solid rgba(99,102,241,0.3);
+  color: #6366F1;
   padding: 4px 12px; border-radius: 4px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 11px; font-weight: 500;
 }
 .feat-price {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  color: #C9A84C; font-size: 21px; font-weight: 700;
+  font-family: 'Poppins', sans-serif;
+  color: #EC4899; font-size: 21px; font-weight: 700;
   margin: 10px 0 0;
   text-shadow: 0 1px 1px rgba(0,0,0,0.1);
 }
-.feat-price span { font-size: 12px; color: #7A7260; font-weight: 400; }
+.feat-price span { font-size: 12px; color: #64748B; font-weight: 400; }
 .feat-view-btn {
   margin-top: 16px; width: 100%;
   padding: 12px;
   background: transparent;
-  color: #B8AD96;
-  border: 1px solid rgba(201,168,76,0.25); border-radius: 6px;
-  font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 12px;
+  color: #CBD5E1;
+  border: 1px solid rgba(99,102,241,0.3); border-radius: 6px;
+  font-family: 'Inter', sans-serif; font-weight: 700; font-size: 12px;
   cursor: pointer; transition: all 0.3s ease;
   letter-spacing: 0.06em; text-transform: uppercase;
 }
 .feat-view-btn:hover {
-  background: linear-gradient(135deg, #C9A84C 0%, #E2C47A 100%);
-  border-color: #C9A84C; color: #0D1B2A;
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+  border-color: #6366F1; color: #FFFFFF;
 }
 .view-all-wrap { text-align: center; margin-top: 36px; padding: 0 28px; }
 .view-all-btn {
@@ -1812,13 +1816,11 @@ export default function Home() {
   const [featuredProperties, setFeaturedProperties] = useState([]);
   const [featuredBusinesses, setFeaturedBusinesses] = useState([]);
   const [featuredMaterials, setFeaturedMaterials] = useState([]);
-  const [featuredTourism, setFeaturedTourism] = useState([]);
-  const [featuredMovers, setFeaturedMovers] = useState([]);
+  const [featuredAccommodation, setFeaturedAccommodation] = useState([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
   const [loadingBusinesses, setLoadingBusinesses] = useState(true);
   const [loadingMaterials, setLoadingMaterials] = useState(true);
-  const [loadingTourism, setLoadingTourism] = useState(true);
-  const [loadingMovers, setLoadingMovers] = useState(true);
+  const [loadingAccommodation, setLoadingAccommodation] = useState(true);
   const [fetchError, setFetchError] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [animatedStats, setAnimatedStats] = useState({ listings: 0, counties: 0, tenants: 0 });
@@ -1829,7 +1831,7 @@ export default function Home() {
 
   // Auto-cycle through featured items every 2 seconds
   useEffect(() => {
-    const categories = ['properties', 'businesses', 'materials', 'tourism', 'movers'];
+    const categories = ['properties', 'businesses', 'materials', 'accommodation'];
     const intervals = {};
 
     categories.forEach(category => {
@@ -1839,8 +1841,7 @@ export default function Home() {
             properties: featuredProperties,
             businesses: featuredBusinesses,
             materials: featuredMaterials,
-            tourism: featuredTourism,
-            movers: featuredMovers
+            accommodation: featuredAccommodation
           }[category] || [];
 
           if (items.length === 0) return prev;
@@ -1856,7 +1857,7 @@ export default function Home() {
     return () => {
       Object.values(intervals).forEach(clearInterval);
     };
-  }, [featuredProperties, featuredBusinesses, featuredMaterials, featuredTourism, featuredMovers]);
+  }, [featuredProperties, featuredBusinesses, featuredMaterials, featuredAccommodation]);
   const [reviews, setReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [showBoostModal, setShowBoostModal] = useState(false);
@@ -1888,8 +1889,7 @@ export default function Home() {
   const marqueeItems = [
     { label: "Welcome to Axxspace!", accent: "Kenya's #1 Platform" },
     { label: "Rentals Across All", accent: "47 Counties" },
-    { label: "Trusted Moving", accent: "Services" },
-    { label: "Hotels & Tourism", accent: "Experiences" },
+    { label: "Hotels & Accommodation", accent: "Experiences" },
     { label: "AxxBiashara", accent: "Business Services" },
     { label: "QuickSales for", accent: "All Your Needs" },
     { label: "Verified Listings —", accent: "Zero Hidden Fees" },
@@ -1909,19 +1909,11 @@ export default function Home() {
       color: C.gold, iconBg: "linear-gradient(135deg,#C9A84C,#E2C47A)",
     },
     {
-      id: "movers", icon: moversIcon, iconType: "image",
-      title: "Movers", tagline: "Stress-free moving",
-      description: "Connect with trusted, vetted moving companies across Kenya. Get quotes, compare rates, and book your move with confidence.",
-      features: ["Vetted moving crews", "Transparent pricing", "Local & long-distance", "Real-time tracking"],
-      cta: "Find Movers", route: "/movers",
-      color: "#60A5FA", iconBg: "linear-gradient(135deg,#1E3A5F,#2D5080)",
-    },
-    {
-      id: "tourism", icon: tourismIcon, iconType: "image",
-      title: "Tourism", tagline: "Discover Kenya's best",
-      description: "Explore hotels, lodges, resorts, and unique experiences across Kenya's 47 counties. From Nairobi to the coast and beyond.",
-      features: ["Hotels & lodges", "Safari packages", "Weekend getaways", "Direct bookings"],
-      cta: "Explore Tourism", route: "/tourism",
+      id: "accommodation", icon: accommodationIcon, iconType: "image",
+      title: "Accommodation", tagline: "Comfortable stays everywhere",
+      description: "Discover premium hotels, lodges, resorts, and unique stays across Kenya's 47 counties. From luxury suites to cozy guesthouses — find your perfect getaway.",
+      features: ["Hotels & lodges", "Luxury resorts", "Budget-friendly stays", "Instant booking"],
+      cta: "Explore Accommodation", route: "/accommodation",
       color: "#4CAF74", iconBg: "linear-gradient(135deg,#1B3A2A,#264D38)",
     },
     {
@@ -1952,9 +1944,8 @@ export default function Home() {
 
   const categoryStats = {
     rentals: [{ val: "280+", label: "Active Listings" }, { val: "47", label: "Counties" }, { val: "500+", label: "Happy Tenants" }],
-    movers: [{ val: "60+", label: "Moving Companies" }, { val: "47", label: "Counties Covered" }, { val: "1,200+", label: "Moves Completed" }],
+    accommodation: [{ val: "300+", label: "Premium Stays" }, { val: "47", label: "Counties" }, { val: "5,000+", label: "Happy Guests" }],
     merchants: [{ val: "150+", label: "Merchants" }, { val: "5,000+", label: "Products" }, { val: "30+", label: "Counties" }],
-    tourism: [{ val: "200+", label: "Hotels & Lodges" }, { val: "47", label: "Counties" }, { val: "3,000+", label: "Happy Guests" }],
     axxbiashara: [{ val: "100+", label: "Service Providers" }, { val: "47", label: "Counties" }, { val: "2,000+", label: "Businesses Served" }],
     marketplace: [{ val: "10,000+", label: "Active Listings" }, { val: "47", label: "Counties" }, { val: "5,000+", label: "Happy Users" }],
     requests: [{ val: "24/7", label: "Admin Assistance" }, { val: "100%", label: "Response Rate" }, { val: "All", label: "Services" }],
@@ -1991,15 +1982,13 @@ export default function Home() {
           propertiesRes,
           businessesRes,
           materialsRes,
-          tourismRes,
-          moversRes,
+          accommodationRes,
           reviewsRes
         ] = await Promise.all([
           API.get("/properties?featured=true&limit=4", { timeout }).catch(() => ({ data: [] })),
           API.get("/business?featured=true&limit=4&sort=rating", { timeout }).catch(() => ({ data: { businesses: [] } })),
           API.get("/materials?featured=true&limit=4", { timeout }).catch(() => ({ data: [] })),
           API.get("/tourism?featured=true&limit=4", { timeout }).catch(() => ({ data: [] })),
-          API.get("/movers?featured=true&limit=4", { timeout }).catch(() => ({ data: [] })),
           API.get("/reviews", { timeout }).catch(() => ({ data: [] }))
         ]);
 
@@ -2018,15 +2007,10 @@ export default function Home() {
         if (Array.isArray(matData)) setFeaturedMaterials(matData);
         else setFeaturedMaterials([]);
 
-        // Process tourism
-        const tourData = tourismRes?.data;
-        if (Array.isArray(tourData)) setFeaturedTourism(tourData);
-        else setFeaturedTourism([]);
-
-        // Process movers
-        const moverData = moversRes?.data;
-        if (Array.isArray(moverData)) setFeaturedMovers(moverData);
-        else setFeaturedMovers([]);
+        // Process accommodation
+        const accomData = accommodationRes?.data;
+        if (Array.isArray(accomData)) setFeaturedAccommodation(accomData);
+        else setFeaturedAccommodation([]);
 
         // Process reviews
         const revData = reviewsRes?.data;
@@ -2039,15 +2023,13 @@ export default function Home() {
         setFeaturedProperties([]);
         setFeaturedBusinesses([]);
         setFeaturedMaterials([]);
-        setFeaturedTourism([]);
-        setFeaturedMovers([]);
+        setFeaturedAccommodation([]);
         setReviews([]);
       } finally {
         setLoadingFeatured(false);
         setLoadingBusinesses(false);
         setLoadingMaterials(false);
-        setLoadingTourism(false);
-        setLoadingMovers(false);
+        setLoadingAccommodation(false);
         setLoadingReviews(false);
       }
     };
@@ -2189,25 +2171,15 @@ export default function Home() {
           typeLabel: m.category || "Material",
           tags: [` ${m.views || 0} views`].filter(Boolean)
         }));
-      case "tourism":
-        return featuredTourism.map(t => ({
+      case "accommodation":
+        return featuredAccommodation.map(t => ({
           ...t,
-          typeText: 'Tourism',
-          detailPath: `/tourism/${t._id}`,
+          typeText: 'Accommodation',
+          detailPath: `/accommodation/${t._id}`,
           subtitleText: `${t.location}, ${t.county}`,
           priceText: `KES ${t.price?.toLocaleString()}/night`,
-          typeLabel: t.category || "Tourism",
+          typeLabel: t.category || "Accommodation",
           tags: [` ${t.views || 0} views`, t.reviews?.length ? ` ${t.reviews.length} reviews` : ""].filter(Boolean)
-        }));
-      case "movers":
-        return featuredMovers.map(v => ({
-          ...v,
-          typeText: 'Moving Service',
-          detailPath: `/movers/${v._id}`,
-          subtitleText: `${v.county}`,
-          priceText: `${v.pricing?.baseRate ? `KES ${v.pricing.baseRate.toLocaleString()}` : "Contact for pricing"}${v.pricing?.rateType ? `/${v.pricing.rateType.replace('_', ' ')}` : ""}`,
-          typeLabel: "Moving Service",
-          tags: [` ${v.vehicleType || "Various"}`, ` ${v.experienceYears || 0} yrs exp`].filter(Boolean)
         }));
       default:
         return [];
@@ -2217,9 +2189,6 @@ export default function Home() {
   const allFeaturedListings = getFilteredListings();
 
   const getListingImage = (item) => {
-    if (item.typeText === 'Moving Service') {
-      return item.portfolioImages?.[0] || item.workPhotos?.[0] || item.profileImage || "";
-    }
     if (item.typeText === 'Business') {
       return item.images?.[0] || item.logo || "";
     }
@@ -2268,7 +2237,7 @@ export default function Home() {
             <span className="hero-title-line2">Under One Roof</span>
           </h1>
           <p className="hero-sub">
-            Rentals · Movers · Tourism · AxxBiashara · QuickSales<br />Verified across all 47 counties
+            Rentals · Accommodation · AxxBiashara · QuickSales<br />Verified across all 47 counties
           </p>
 
           <div style={{ display: "flex", justifyContent: "center", gap: "16px", flexWrap: "wrap", marginTop: "24px", marginBottom: "24px" }}>
@@ -2512,16 +2481,16 @@ export default function Home() {
         )
         }
 
-        {/* TOURISM */}
-        {featuredTourism.length > 0 && (
+        {/* ACCOMMODATION */}
+        {featuredAccommodation.length > 0 && (
           <div style={{ marginBottom: '48px', padding: '0 28px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Tourism</h3>
-                <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredTourism.length}</span>
+                <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Accommodation</h3>
+                <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredAccommodation.length}</span>
               </div>
               <button
-                onClick={() => navigate('/tourism?featured=true')}
+                onClick={() => navigate('/accommodation?featured=true')}
                 style={{
                   padding: '8px 16px',
                   background: 'rgba(201,168,76,0.1)',
@@ -2540,34 +2509,34 @@ export default function Home() {
               </button>
             </div>
             <div className="cards-track-wrap">
-              {featuredTourism.length > 0 && (
+              {featuredAccommodation.length > 0 && (
                 <div className="feat-card" style={{ animationDelay: '0s' }}>
                   <div className="feat-img-wrap">
                     <img
-                      src={getListingImage(featuredTourism[currentFeaturedIndex.tourism || 0])}
-                      alt={featuredTourism[currentFeaturedIndex.tourism || 0].name}
+                      src={getListingImage(featuredAccommodation[currentFeaturedIndex.accommodation || 0])}
+                      alt={featuredAccommodation[currentFeaturedIndex.accommodation || 0].name}
                       className="feat-img"
                       loading="lazy"
                       onError={e => { e.target.style.display = "none"; }}
                     />
                     <div className="feat-boosted">★ Featured</div>
-                    <div className="feat-type">{featuredTourism[currentFeaturedIndex.tourism || 0].type || "Tourism"}</div>
+                    <div className="feat-type">{featuredAccommodation[currentFeaturedIndex.accommodation || 0].type || "Accommodation"}</div>
                     <div className="feat-img-grad"></div>
                   </div>
                   <div className="feat-body">
-                    <p className="feat-type-label">{featuredTourism[currentFeaturedIndex.tourism || 0].type || "Tourism"}</p>
-                    <h3 className="feat-title">{featuredTourism[currentFeaturedIndex.tourism || 0].name}</h3>
+                    <p className="feat-type-label">{featuredAccommodation[currentFeaturedIndex.accommodation || 0].type || "Accommodation"}</p>
+                    <h3 className="feat-title">{featuredAccommodation[currentFeaturedIndex.accommodation || 0].name}</h3>
                     <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                       <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                      <span>{featuredTourism[currentFeaturedIndex.tourism || 0].county} · {typeof featuredTourism[currentFeaturedIndex.tourism || 0].location === 'object' ? featuredTourism[currentFeaturedIndex.tourism || 0].location.town || featuredTourism[currentFeaturedIndex.tourism || 0].location.address : featuredTourism[currentFeaturedIndex.tourism || 0].location}</span>
+                      <span>{featuredAccommodation[currentFeaturedIndex.accommodation || 0].county} · {typeof featuredAccommodation[currentFeaturedIndex.accommodation || 0].location === 'object' ? featuredAccommodation[currentFeaturedIndex.accommodation || 0].location.town || featuredAccommodation[currentFeaturedIndex.accommodation || 0].location.address : featuredAccommodation[currentFeaturedIndex.accommodation || 0].location}</span>
                     </p>
                     <div className="feat-meta">
-                      <span className="feat-tag">{featuredTourism[currentFeaturedIndex.tourism || 0].amenities?.[0] || "Available"}</span>
+                      <span className="feat-tag">{featuredAccommodation[currentFeaturedIndex.accommodation || 0].amenities?.[0] || "Available"}</span>
                     </div>
                     <p className="feat-price">
-                      KES {featuredTourism[currentFeaturedIndex.tourism || 0].price?.toLocaleString()}<span>/night</span>
+                      KES {featuredAccommodation[currentFeaturedIndex.accommodation || 0].price?.toLocaleString()}<span>/night</span>
                     </p>
-                    <button onClick={() => navigate(`/tourism/property/${featuredTourism[currentFeaturedIndex.tourism || 0]._id}`)} className="feat-view-btn magical-btn">
+                    <button onClick={() => navigate(`/accommodation/property/${featuredAccommodation[currentFeaturedIndex.accommodation || 0]._id}`)} className="feat-view-btn magical-btn">
                       View Details →
                     </button>
                   </div>
@@ -2577,72 +2546,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* MOVERS */}
-        {featuredMovers.length > 0 && (
-          <div style={{ marginBottom: '48px', padding: '0 28px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Movers</h3>
-                <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredMovers.length}</span>
-              </div>
-              <button
-                onClick={() => navigate('/movers?featured=true')}
-                style={{
-                  padding: '8px 16px',
-                  background: 'rgba(201,168,76,0.1)',
-                  border: '1px solid rgba(201,168,76,0.3)',
-                  borderRadius: '20px',
-                  color: C.gold,
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => e.target.style.background = 'rgba(201,168,76,0.2)'}
-                onMouseLeave={(e) => e.target.style.background = 'rgba(201,168,76,0.1)'}
-              >
-                View All
-              </button>
-            </div>
-            <div className="cards-track-wrap">
-              {featuredMovers.length > 0 && (
-                <div className="feat-card" style={{ animationDelay: '0s' }}>
-                  <div className="feat-img-wrap">
-                    <img
-                      src={getListingImage(featuredMovers[currentFeaturedIndex.movers || 0])}
-                      alt={featuredMovers[currentFeaturedIndex.movers || 0].name}
-                      className="feat-img"
-                      loading="lazy"
-                      onError={e => { e.target.style.display = "none"; }}
-                    />
-                    <div className="feat-boosted">★ Featured</div>
-                    <div className="feat-type">{featuredMovers[currentFeaturedIndex.movers || 0].serviceType || "Mover"}</div>
-                    <div className="feat-img-grad"></div>
-                  </div>
-                  <div className="feat-body">
-                    <p className="feat-type-label">{featuredMovers[currentFeaturedIndex.movers || 0].serviceType || "Mover"}</p>
-                    <h3 className="feat-title">{featuredMovers[currentFeaturedIndex.movers || 0].name}</h3>
-                    <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                      <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                      <span>{featuredMovers[currentFeaturedIndex.movers || 0].county} · {typeof featuredMovers[currentFeaturedIndex.movers || 0].location === 'object' ? featuredMovers[currentFeaturedIndex.movers || 0].location.town || featuredMovers[currentFeaturedIndex.movers || 0].location.address : featuredMovers[currentFeaturedIndex.movers || 0].location}</span>
-                    </p>
-                    <div className="feat-meta">
-                      <span className="feat-tag">{featuredMovers[currentFeaturedIndex.movers || 0].coverageArea || "Nationwide"}</span>
-                    </div>
-                    <p className="feat-price">
-                      KES {featuredMovers[currentFeaturedIndex.movers || 0].price?.toLocaleString()}<span>/trip</span>
-                    </p>
-                    <button onClick={() => navigate(`/movers?mover=${featuredMovers[currentFeaturedIndex.movers || 0]._id}`)} className="feat-view-btn magical-btn">
-                      View Details →
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {featuredProperties.length === 0 && featuredBusinesses.length === 0 && featuredMaterials.length === 0 && featuredTourism.length === 0 && featuredMovers.length === 0 && (
+        {featuredProperties.length === 0 && featuredBusinesses.length === 0 && featuredMaterials.length === 0 && featuredAccommodation.length === 0 && (
           <div className="no-feat-wrap" style={{ textAlign: 'center', padding: '40px 28px' }}>
             <span className="no-feat-icon" style={{ fontSize: '32px' }}></span>
             <h4 className="no-feat-title" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: C.gold, fontSize: '20px', marginTop: '12px' }}>No Featured Listings Found</h4>
@@ -2946,7 +2850,7 @@ export default function Home() {
             <span className="step-icon"></span>
             <h3 className="step-title">Search & Discover</h3>
             <p className="step-text">
-              Browse through verified listings across rentals, movers, tourism, quick sales, or business services.
+              Browse through verified listings across rentals, accommodation, quick sales, or business services.
             </p>
           </div>
           <div className="step-card">
@@ -2978,7 +2882,7 @@ export default function Home() {
               Download Axxspace App
             </h2>
             <p style={{ color: "#B8AD96", fontSize: "16px", lineHeight: "1.8", marginBottom: "30px", fontWeight: 300 }}>
-              Get the best mobile experience for property rentals, tourism booking, quick sales, and professional moving services across all 47 counties in Kenya. Fast, secure, and direct communication.
+              Get the best mobile experience for property rentals, accommodation booking, quick sales, and business services across all 47 counties in Kenya. Fast, secure, and direct communication.
             </p>
 
             <ul className="app-download-features">
@@ -3014,13 +2918,13 @@ export default function Home() {
             <div className="app-download-phone">
               {/* Speaker / Notch */}
               <div className="app-download-phone-notch"></div>
-              
+
               {/* App Screen preview */}
               <div className="app-download-phone-screen">
                 <div className="app-download-phone-header">
                   <span className="app-download-phone-logo">Axxspace</span>
                 </div>
-                
+
                 {/* Simulated Content */}
                 <div className="app-download-phone-content">
                   <div className="app-download-phone-card">
@@ -3028,7 +2932,7 @@ export default function Home() {
                     <div className="app-download-phone-card-title"></div>
                     <div className="app-download-phone-card-text"></div>
                   </div>
-                  
+
                   <div className="app-download-phone-card-simple">
                     <div className="app-download-phone-card-simple-title"></div>
                     <div className="app-download-phone-card-simple-text"></div>
@@ -3070,9 +2974,9 @@ export default function Home() {
           ) : (
             [
               { name: "Sarah Wanjiku", role: "Tenant · Nairobi", rating: 5, text: "Found my dream apartment in 2 days! The WhatsApp feature made connecting with the landlord so easy. No agents, no hidden fees." },
-              { name: "David Mwangi", role: "Customer · Mombasa", rating: 5, text: "Booked movers through Axxspace for my relocation to Nairobi. Professional team, transparent pricing, everything arrived safely." },
               { name: "Grace Omondi", role: "Developer · Kisumu", rating: 5, text: "The merchant listings saved me thousands on my construction project. Found roofing materials at 20% below market prices." },
-              { name: "James Kariuki", role: "Tourist · Nairobi", rating: 5, text: "Planned a full safari weekend through Axxspace Tourism. Best lodge, easy booking, and zero commission. Absolutely loved it!" },
+              { name: "James Kariuki", role: "Traveler · Nairobi", rating: 5, text: "Booked a luxury lodge through Axxspace Accommodation for my family vacation. Amazing experience, easy booking, and great rates!" },
+              { name: "Faith Kamau", role: "Business Owner · Mombasa", rating: 5, text: "Used AxxBiashara to find reliable legal services for my business registration. Professional and affordable." },
             ].map(t => (
               <div key={t.name} className="test-card">
                 <div className="test-top">
@@ -3103,9 +3007,8 @@ export default function Home() {
           </p>
           <div className="cta-btns">
             <button className="cta-btn-gold" onClick={() => navigate("/listings")}> Browse Rentals</button>
-            <button className="cta-btn-ghost" onClick={() => navigate("/movers")}> Find Movers</button>
+            <button className="cta-btn-ghost" onClick={() => navigate("/accommodation")}> Explore Accommodation</button>
             <button className="cta-btn-ghost" onClick={() => navigate("/materials")}> Shop Materials</button>
-            <button className="cta-btn-ghost" onClick={() => navigate("/tourism")}> Explore Tourism</button>
           </div>
           <div className="cta-divider"></div>
           <button
@@ -3135,7 +3038,7 @@ export default function Home() {
           <div className="footer-cols">
             <div className="footer-col">
               <p className="footer-col-title">Services</p>
-              {[[" Rentals", "/listings"], [" Movers", "/movers"], [" Merchants", "/materials"], [" Tourism", "/tourism"]].map(([l, r]) => (
+              {[[" Rentals", "/listings"], [" Accommodation", "/accommodation"], [" Merchants", "/materials"]].map(([l, r]) => (
                 <span key={l} className="footer-link" onClick={() => navigate(r)}>{l}</span>
               ))}
             </div>
@@ -3173,9 +3076,8 @@ export default function Home() {
               <div className="modal-services">
                 {[
                   { icon: "", title: "Landlord / Rentals", desc: "List rental properties and boost your listings", bg: `linear-gradient(135deg,${C.gold},${C.goldLight})`, route: "/login" },
-                  { icon: "", title: "Mover / Moving Company", desc: "Offer moving services across Kenya", bg: "linear-gradient(135deg,#1E3A5F,#2D5080)", route: "/login?type=mover" },
                   { icon: "", title: "Seller / QuickSales", desc: "Sell items in the materials QuickSales", bg: "linear-gradient(135deg,#0C2A3A,#103A4F)", route: "/seller-login" },
-                  { icon: "", title: "Tourism Provider", desc: "List hotels, lodges, and tourism experiences", bg: "linear-gradient(135deg,#1B3A2A,#264D38)", route: "/tourism/login" },
+                  { icon: "", title: "Accommodation Provider", desc: "List hotels, lodges, and accommodation experiences", bg: "linear-gradient(135deg,#1B3A2A,#264D38)", route: "/accommodation/login" },
                   { icon: "", title: "Business / AxxBiashara", desc: "List professional business services", bg: "linear-gradient(135deg,#2E1B4A,#3D2566)", route: "/business-login" },
                 ].map(svc => (
                   <div key={svc.title} className="modal-svc-card" onClick={() => { setShowBoostModal(false); navigate(svc.route); }}>
