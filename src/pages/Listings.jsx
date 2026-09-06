@@ -594,43 +594,13 @@ export default function Listings() {
                 {/* Content */}
                 <div style={S.cardBody}>
                   <div style={S.cardType}>{property.propertyType || "Rental"}</div>
-                  <h2 style={S.cardTitle}>{property.title}</h2>
                   <p style={{ ...S.cardLocation, display: "flex", alignItems: "center", gap: "4px" }}>
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                     <span>{property.county} · {property.location}</span>
                   </p>
-
-                  <div style={S.cardSpecs}>
-                    <span style={S.cardSpec}>{property.bedrooms} Bed</span>
-                    <span style={S.specDot}>·</span>
-                    <span style={S.cardSpec}>{property.bathrooms} Bath</span>
-                    <span style={S.specDot}>·</span>
-                    <span style={S.cardSpec}>{property.furnished ? "Furnished" : "Unfurnished"}</span>
-                  </div>
-
-                  {property.amenities?.length > 0 && (
-                    <div style={S.cardAmenities}>
-                      {property.amenities.slice(0, 3).map((a, idx) => (
-                        <span key={idx} style={S.cardAmenityTag}>{a}</span>
-                      ))}
-                      {property.amenities.length > 3 && <span style={S.cardAmenityMore}>+{property.amenities.length - 3}</span>}
-                    </div>
-                  )}
-
-                  <div style={S.cardFooter}>
-                    <div>
-                      <div style={S.cardPrice}>KES {property.price?.toLocaleString()}</div>
-                      <div style={S.cardPriceSub}>per month</div>
-                    </div>
-                    <button
-                      style={{ ...S.cardCta, ...(property.availableUnits === 0 ? S.cardCtaDisabled : {}) }}
-                      className="card-cta"
-                      onClick={(e) => { e.stopPropagation(); if (property.availableUnits > 0) handleContactLandlord(property); }}
-                      disabled={property.availableUnits === 0}
-                    >
-                      Enquire
-                    </button>
-                  </div>
+                  <p style={{ ...S.cardClickHint, marginTop: "8px", fontSize: "12px", color: "#6b7280", fontStyle: "italic" }}>
+                    Click to view details
+                  </p>
                 </div>
               </article>
             ))}
@@ -795,6 +765,7 @@ export default function Listings() {
                   <div style={S.ctaGrid}>
                     <button style={{ ...S.ctaBtn, ...S.ctaWa }} onClick={() => handleContactLandlord(selectedProperty)}>WhatsApp</button>
                     <button style={{ ...S.ctaBtn, ...S.ctaCall }} onClick={() => window.open(`tel:${selectedProperty.owner?.phone || selectedProperty.phone}`)}>Call</button>
+                    <button style={{ ...S.ctaBtn, ...S.ctaSms }} onClick={() => handleSendSMS(selectedProperty)}>SMS</button>
                     <button style={{ ...S.ctaBtn, ...S.ctaBook }} onClick={() => handleBookNow(selectedProperty)}>Book Now</button>
                   </div>
                 </>
@@ -983,8 +954,8 @@ const S = {
 
   cardBody: { padding: "14px 16px 16px", display: "flex", flexDirection: "column", flex: 1 },
   cardType: { fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#E31B1B", marginBottom: "4px", fontWeight: 700 },
-  cardTitle: { color: "#0B2140", fontSize: "1rem", fontWeight: 700, margin: "0 0 4px", lineHeight: 1.3, fontFamily: "'DM Sans', sans-serif" },
-  cardLocation: { color: "#6b7280", fontSize: "0.8rem", margin: "0 0 10px" },
+  cardLocation: { color: "#6b7280", fontSize: "0.8rem", margin: "0 0 4px" },
+  cardClickHint: { color: "#9ca3af", fontSize: "0.75rem", margin: "0", fontStyle: "italic" },
   cardSpecs: { display: "flex", alignItems: "center", gap: "6px", marginBottom: "10px", flexWrap: "wrap" },
   cardSpec: { color: "#6b7280", fontSize: "0.8rem" },
   specDot: { color: "#9ca3af", fontSize: "0.7rem" },
@@ -1068,7 +1039,7 @@ const S = {
   agentWaBtn: { flex: 1, padding: "10px 16px", background: "rgba(76,175,116,0.15)", border: "1px solid rgba(76,175,116,0.4)", color: "#10b981", borderRadius: "7px", cursor: "pointer", fontSize: "0.85rem", fontFamily: "'DM Sans', sans-serif", fontWeight: 600 },
   agentCallBtn: { flex: 1, padding: "10px 16px", background: "#f9fafb", border: "1px solid #e5e7eb", color: "#0B2140", borderRadius: "7px", cursor: "pointer", fontSize: "0.85rem", fontFamily: "'DM Sans', sans-serif", fontWeight: 600 },
 
-  ctaGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", margin: "22px 0" },
+  ctaGrid: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "10px", margin: "22px 0" },
   ctaBtn: { padding: "13px 16px", border: "none", borderRadius: "8px", fontWeight: 700, cursor: "pointer", fontSize: "0.9rem", letterSpacing: "0.04em", fontFamily: "'DM Sans', sans-serif", transition: "all 0.25s" },
   ctaWa: { background: "linear-gradient(135deg, #22a55e 0%, #1a8b4e 100%)", color: "white" },
   ctaCall: { background: "linear-gradient(135deg, #2563EB 0%, #1E4DB7 100%)", color: "white" },
