@@ -3,9 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
 import bgVideo from "../assets/AXX Homepage video.mp4";
-import rentalsIcon from "/rentals.png";
-import accommodationIcon from "/tourism.png";
-import axxbiasharaIcon from "/axxbiashara.png";
 import SocialMediaLinks from "../components/SocialMediaLinks";
 import RequestItemModal from "../components/RequestItemModal";
 
@@ -531,79 +528,6 @@ option { background: #151936; color: #F8FAFC; }
 }
 .section-hdr { text-align: center; margin-bottom: 50px; }
 
-/* ── CATEGORIES SECTION ── */
-.cats-section {
-  padding: 96px 28px;
-  background: radial-gradient(circle at center bottom, #1E3148 0%, #162233 60%, #0D1B2A 100%);
-  border-top: 1px solid rgba(201,168,76,0.1);
-  border-bottom: 1px solid rgba(201,168,76,0.1);
-}
-.cats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
-  gap: 24px; max-width: 1280px; margin: 0 auto;
-}
-.cat-card {
-  background: rgba(22, 34, 51, 0.7);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(201,168,76,0.15);
-  border-radius: 14px;
-  padding: 32px 24px 28px;
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative; overflow: hidden;
-  border-top-width: 4px;
-}
-.cat-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.45), 0 0 25px var(--glow-color, rgba(201,168,76,0.2));
-  border-color: rgba(201,168,76,0.4);
-}
-.cat-icon-wrap {
-  width: 54px; height: 54px; border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  margin-bottom: 20px; font-size: 26px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
-  transition: transform 0.3s ease;
-}
-.cat-card:hover .cat-icon-wrap {
-  transform: scale(1.1) rotate(5deg);
-}
-.cat-card-title {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 23px; font-weight: 700;
-  margin: 0 0 6px; letter-spacing: 0.02em;
-}
-.cat-card-tagline {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 10px; font-weight: 700;
-  letter-spacing: 0.16em; text-transform: uppercase;
-  color: #7A7260; margin: 0 0 16px;
-}
-.cat-card-desc {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px; color: #B8AD96;
-  line-height: 1.75; margin: 0 0 20px; font-weight: 300;
-}
-.cat-feature-list {
-  list-style: none; margin: 0 0 24px;
-  display: flex; flex-direction: column; gap: 8px;
-}
-.cat-feature-item {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 12px; font-weight: 600;
-  display: flex; align-items: center; gap: 8px;
-  color: #B8AD96;
-}
-.cat-btn {
-  width: 100%; padding: 13px;
-  color: #0D1B2A; border: none; border-radius: 6px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px; font-weight: 700;
-  cursor: pointer; transition: all 0.3s ease;
-  letter-spacing: 0.06em; text-transform: uppercase;
-}
-.cat-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
 
 /* ── FEATURED LISTINGS ── */
@@ -1824,7 +1748,6 @@ export default function Home() {
   const [fetchError, setFetchError] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [animatedStats, setAnimatedStats] = useState({ listings: 0, counties: 0, tenants: 0 });
-  const [activeCategoryTab, setActiveCategoryTab] = useState("rentals");
   const [activeFeaturedTab, setActiveFeaturedTab] = useState("properties");
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [currentFeaturedIndex, setCurrentFeaturedIndex] = useState({});
@@ -1899,57 +1822,7 @@ export default function Home() {
     { label: "One Platform.", accent: "Everything." },
   ];
 
-  const platformCategories = [
-    {
-      id: "rentals", icon: rentalsIcon, iconType: "image",
-      title: "Rentals", tagline: "Find your next home",
-      description: "Browse verified rental properties across all 47 counties. Bedsitters, apartments, maisonettes & more — no agents, no hidden fees.",
-      features: ["Verified landlords", "All property types", "GPS-mapped locations", "Direct WhatsApp contact"],
-      cta: "Browse Rentals", route: "/listings",
-      color: C.gold, iconBg: "linear-gradient(135deg,#C9A84C,#E2C47A)",
-    },
-    {
-      id: "accommodation", icon: accommodationIcon, iconType: "image",
-      title: "Accommodation", tagline: "Comfortable stays everywhere",
-      description: "Discover premium hotels, lodges, resorts, and unique stays across Kenya's 47 counties. From luxury suites to cozy guesthouses — find your perfect getaway.",
-      features: ["Hotels & lodges", "Luxury resorts", "Budget-friendly stays", "Instant booking"],
-      cta: "Explore Accommodation", route: "/accommodation",
-      color: "#4CAF74", iconBg: "linear-gradient(135deg,#1B3A2A,#264D38)",
-    },
-    {
-      id: "axxbiashara", icon: axxbiasharaIcon, iconType: "image",
-      title: "AxxBiashara", tagline: "Business solutions",
-      description: "Access professional business services, from company registration to accounting, legal support, and digital solutions.",
-      features: ["Business registration", "Accounting & tax", "Legal services", "Digital solutions"],
-      cta: "Explore Services", route: "/axxbiashara",
-      color: "#A78BFA", iconBg: "linear-gradient(135deg,#2E1B4A,#3D2566)",
-    },
-    {
-      id: "marketplace", icon: "", iconType: "emoji",
-      title: "QuickSales", tagline: "Buy & sell anything",
-      description: "The ultimate QuickSales for buying and selling new and used items. From electronics to furniture, fashion to cars.",
-      features: ["New & used items", "Secure transactions", "Nationwide delivery", "Direct seller contact"],
-      cta: "Browse QuickSales", route: "/materials",
-      color: "#38BDF8", iconBg: "linear-gradient(135deg,#0C2A3A,#103A4F)",
-    },
-    {
-      id: "requests", icon: "", iconType: "emoji",
-      title: "Requests", tagline: "Can't find what you need?",
-      description: "Submit a custom request. Our administrators and verified providers will search across all of AxxSpace to locate it for you!",
-      features: ["Search assistance", "All services covered", "Admin review", "Verified responses"],
-      cta: "Submit Request", route: "#request",
-      color: "#fbbf24", iconBg: "linear-gradient(135deg,#7C5E0D,#B08A27)",
-    },
-  ];
 
-  const categoryStats = {
-    rentals: [{ val: "280+", label: "Active Listings" }, { val: "47", label: "Counties" }, { val: "500+", label: "Happy Tenants" }],
-    accommodation: [{ val: "300+", label: "Premium Stays" }, { val: "47", label: "Counties" }, { val: "5,000+", label: "Happy Guests" }],
-    merchants: [{ val: "150+", label: "Merchants" }, { val: "5,000+", label: "Products" }, { val: "30+", label: "Counties" }],
-    axxbiashara: [{ val: "100+", label: "Service Providers" }, { val: "47", label: "Counties" }, { val: "2,000+", label: "Businesses Served" }],
-    marketplace: [{ val: "10,000+", label: "Active Listings" }, { val: "47", label: "Counties" }, { val: "5,000+", label: "Happy Users" }],
-    requests: [{ val: "24/7", label: "Admin Assistance" }, { val: "100%", label: "Response Rate" }, { val: "All", label: "Services" }],
-  };
 
   /* ── DATA FETCHING ── */
   useEffect(() => {
@@ -2124,7 +1997,6 @@ export default function Home() {
     document.addEventListener('touchend', handleTouchEnd);
   };
 
-  const activeCategory = platformCategories.find(c => c.id === activeCategoryTab);
 
   /* ── ERROR BOUNDARY ── */
   if (componentError) {
@@ -2554,63 +2426,6 @@ export default function Home() {
           </div>
         )}
       </section>
-
-      {/* ── CATEGORIES SHOWCASE ── */}
-      <section className="cats-section">
-        <div className="section-hdr">
-          <p className="section-eyebrow">What We Offer</p>
-          <h2 className="section-title">Everything on One Platform</h2>
-          <p className="section-sub">From finding a home to settling in — Axxspace has you covered</p>
-        </div>
-        <div className="cats-grid">
-          {platformCategories.map(cat => (
-            <div
-              key={cat.id}
-              className="cat-card"
-              style={{ borderTopColor: cat.color, '--glow-color': cat.color === C.gold ? 'rgba(201,168,76,0.22)' : cat.color + '33' }}
-              onClick={() => {
-                if (cat.id === "requests") {
-                  setIsRequestModalOpen(true);
-                } else {
-                  navigate(cat.route);
-                }
-              }}
-            >
-              <div className="cat-icon-wrap" style={{ background: cat.iconBg }}>
-                {cat.iconType === "image"
-                  ? <img src={cat.icon} alt={cat.title} style={{ width: "30px", height: "30px", objectFit: "contain" }} />
-                  : <span style={{ fontSize: "26px" }}>{cat.icon}</span>
-                }
-              </div>
-              <h3 className="cat-card-title" style={{ color: cat.color }}>{cat.title}</h3>
-              <p className="cat-card-tagline">{cat.tagline}</p>
-              <p className="cat-card-desc">{cat.description}</p>
-              <ul className="cat-feature-list">
-                {cat.features.map(f => (
-                  <li key={f} className="cat-feature-item">
-                    <span style={{ color: cat.color, fontWeight: 800 }}>✓</span> {f}
-                  </li>
-                ))}
-              </ul>
-              <button
-                className="cat-btn magical-btn"
-                style={{ background: `linear-gradient(135deg,${cat.color},${cat.color}cc)`, color: "#0D1B2A" }}
-                onClick={e => {
-                  e.stopPropagation();
-                  if (cat.id === "requests") {
-                    setIsRequestModalOpen(true);
-                  } else {
-                    navigate(cat.route);
-                  }
-                }}
-              >
-
-                {cat.cta} →
-              </button>
-            </div>
-          ))}
-        </div>
-      </section >
 
       {/* ── DEMOGRAPHICS SECTION ── */}
       < section className="demo-section" >

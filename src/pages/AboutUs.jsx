@@ -86,17 +86,10 @@ export default function AboutPage() {
     },
     {
       icon: "",
-      title: "Movers & Relocation",
-      color: "#0ea5e9",
-      desc: "Moving can be stressful and expensive. Axxspace connects users with movers and relocation service providers to make transitions easier and more organized.",
-      items: ["Verified Movers", "Transparent Pricing", "Materials Marketplace", "Direct Booking", "Review System"],
-    },
-    {
-      icon: "",
-      title: "Tourism & Hospitality",
+      title: "Accommodation",
       color: "#a855f7",
-      desc: "Discover and book amazing hotels, resorts, lodges, and tourism experiences across Kenya. Property owners advertise their properties with flexible subscription packages.",
-      items: ["Beach Resorts", "Mountain Lodges", "Hotels", "Adventure Tours", "Spa & Wellness", "Safari Packages"],
+      desc: "Discover and book amazing hotels, lodges, resorts, and accommodation experiences across Kenya. Property owners advertise their properties with flexible subscription packages.",
+      items: ["Hotels & Lodges", "Luxury Resorts", "Budget Stays", "Guest Houses", "Apartments", "Instant Booking"],
     },
     {
       icon: "",
@@ -191,7 +184,7 @@ export default function AboutPage() {
           <div style={styles.sectionLabelDark}>What We Do</div>
           <h2 style={{ ...styles.sectionTitle, color: "#fbbf24" }}>Our Services</h2>
           <p style={{ ...styles.sectionSubtitle, color: "#94a3b8" }}>
-            Everything you need — spaces, tourism, movers, and a marketplace — in one connected platform
+            Everything you need — spaces, accommodation, business services, and a marketplace — in one connected platform
           </p>
 
           <div style={styles.whatGrid}>
@@ -211,6 +204,91 @@ export default function AboutPage() {
                     ))}
                   </ul>
                 )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CATEGORIES SHOWCASE ── */}
+      <section style={styles.categoriesSection}>
+        <div style={styles.categoriesInner}>
+          <div style={styles.sectionLabelDark}>What We Offer</div>
+          <h2 style={{ ...styles.sectionTitle, color: "#fbbf24" }}>Everything on One Platform</h2>
+          <p style={{ ...styles.sectionSubtitle, color: "#94a3b8" }}>From finding a home to settling in — Axxspace has you covered</p>
+
+          <div style={styles.categoriesGrid}>
+            {[
+              {
+                id: "rentals",
+                title: "Rentals",
+                tagline: "Find your next home",
+                description: "Browse verified rental properties across all 47 counties. Bedsitters, apartments, maisonettes & more — no agents, no hidden fees.",
+                features: ["Verified landlords", "All property types", "GPS-mapped locations", "Direct WhatsApp contact"],
+                color: "#C9A84C",
+                route: "/listings"
+              },
+              {
+                id: "accommodation",
+                title: "Accommodation",
+                tagline: "Comfortable stays everywhere",
+                description: "Discover premium hotels, lodges, resorts, and unique stays across Kenya's 47 counties. From luxury suites to cozy guesthouses — find your perfect getaway.",
+                features: ["Hotels & lodges", "Luxury resorts", "Budget-friendly stays", "Instant booking"],
+                color: "#4CAF74",
+                route: "/accommodation"
+              },
+              {
+                id: "axxbiashara",
+                title: "AxxBiashara",
+                tagline: "Business solutions",
+                description: "Access professional business services, from company registration to accounting, legal support, and digital solutions.",
+                features: ["Business registration", "Accounting & tax", "Legal services", "Digital solutions"],
+                color: "#A78BFA",
+                route: "/axxbiashara"
+              },
+              {
+                id: "marketplace",
+                title: "QuickSales",
+                tagline: "Buy & sell anything",
+                description: "The ultimate QuickSales for buying and selling new and used items. From electronics to furniture, fashion to cars.",
+                features: ["New & used items", "Secure transactions", "Nationwide delivery", "Direct seller contact"],
+                color: "#38BDF8",
+                route: "/materials"
+              },
+              {
+                id: "requests",
+                title: "Requests",
+                tagline: "Can't find what you need?",
+                description: "Submit a custom request. Our administrators and verified providers will search across all of AxxSpace to locate it for you!",
+                features: ["Search assistance", "All services covered", "Admin review", "Verified responses"],
+                color: "#fbbf24",
+                route: "/about"
+              }
+            ].map(cat => (
+              <div
+                key={cat.id}
+                style={styles.categoryCard}
+                onClick={() => navigate(cat.route)}
+              >
+                <div style={{ ...styles.categoryIcon, background: cat.color + "20", border: `2px solid ${cat.color}40` }}>
+                  <span style={{ fontSize: "24px" }}>{cat.id === "rentals" ? "🏠" : cat.id === "accommodation" ? "🏨" : cat.id === "axxbiashara" ? "💼" : cat.id === "marketplace" ? "🛒" : "🔍"}</span>
+                </div>
+                <h3 style={{ ...styles.categoryTitle, color: cat.color }}>{cat.title}</h3>
+                <p style={styles.categoryTagline}>{cat.tagline}</p>
+                <p style={styles.categoryDesc}>{cat.description}</p>
+                <ul style={styles.categoryFeatures}>
+                  {cat.features.map(f => (
+                    <li key={f} style={styles.categoryFeature}>
+                      <span style={{ color: cat.color, fontWeight: 800 }}>✓</span> {f}
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  style={{ ...styles.categoryButton, background: cat.color }}
+                  onClick={(e) => { e.stopPropagation(); navigate(cat.route); }}
+                >
+                  {cat.cta || "Explore →"}
+                </button>
               </div>
             ))}
           </div>
@@ -249,8 +327,7 @@ export default function AboutPage() {
               { val: "500+", label: "Happy Tenants", icon: "" },
               { val: "150+", label: "Landlords Onboarded", icon: "" },
               { val: "100+", label: "Verified Businesses", icon: "" },
-              { val: "50+", label: "Verified Movers", icon: "" },
-              { val: "30+", label: "Tourism Properties", icon: "" },
+              { val: "300+", label: "Accommodation Properties", icon: "" },
               { val: "200+", label: "Marketplace Sellers", icon: "" },
             ].map((s) => (
               <div key={s.label} style={styles.statCard} className="stat-card">
@@ -322,8 +399,7 @@ export default function AboutPage() {
               { icon: "", title: "Landlords", text: "List properties, manage bookings, track analytics, and boost visibility." },
               { icon: "", title: "Tenants", text: "Search properties, save favorites, contact landlords, and leave reviews." },
               { icon: "", title: "Business Owners", text: "List businesses, respond to inquiries, manage subscriptions, and view analytics." },
-              { icon: "", title: "Movers", text: "Showcase services, manage bookings, build reputation through reviews." },
-              { icon: "", title: "Tourism Providers", text: "List hotels/lodges, manage bookings, offer packages and promotions." },
+              { icon: "", title: "Accommodation Providers", text: "List hotels/lodges, manage bookings, offer packages and promotions." },
               { icon: "", title: "Sellers", text: "List products, manage inventory, communicate with buyers, track sales." },
               { icon: "", title: "Students", text: "Find university hostels, save favorites, contact landlords near campus." },
               { icon: "", title: "Admins", text: "Verify users, moderate content, manage disputes, and ensure platform safety." },
@@ -426,12 +502,12 @@ export default function AboutPage() {
             <button
               style={{
                 ...styles.ctaBtnSecondary,
-                background: "#0ea5e9",
+                background: "#4CAF74",
                 color: "white",
               }}
-              onClick={() => navigate("/tourism")}
+              onClick={() => navigate("/accommodation")}
             >
-              Tourism
+              Accommodation
             </button>
             <button
               style={{
@@ -473,7 +549,7 @@ export default function AboutPage() {
             <h4 style={styles.footerTitle}>Quick Links</h4>
             <p style={styles.footerLink} onClick={() => navigate("/listings")}> Browse Listings</p>
             <p style={styles.footerLink} onClick={() => navigate("/axxbiashara")}> AxxBiashara</p>
-            <p style={styles.footerLink} onClick={() => navigate("/tourism")}> Tourism</p>
+            <p style={styles.footerLink} onClick={() => navigate("/accommodation")}> Accommodation</p>
             <p style={styles.footerLink} onClick={() => navigate("/")}> Home</p>
             <p style={styles.footerLink} onClick={() => navigate("/materials")}> Materials Marketplace</p>
           </div>
@@ -655,6 +731,51 @@ const styles = {
   noticeTitle: { fontSize: "16px", fontWeight: 800, color: COLORS.accent, margin: "0 0 10px" },
   noticeText: { fontSize: "14px", color: COLORS.textMutedLight, lineHeight: 1.75, margin: 0 },
 
+  categoriesSection: { background: COLORS.bgDark, padding: "72px 20px" },
+  categoriesInner: { maxWidth: "1200px", margin: "0 auto" },
+  categoriesGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+    gap: "24px",
+    marginTop: "32px"
+  },
+  categoryCard: {
+    background: COLORS.bgLight,
+    border: "1.5px solid rgba(255,255,255,0.1)",
+    borderRadius: "16px",
+    padding: "28px 24px",
+    cursor: "pointer",
+    transition: "all 0.3s ease",
+    display: "flex",
+    flexDirection: "column",
+    gap: "16px",
+  },
+  categoryIcon: {
+    width: "60px",
+    height: "60px",
+    borderRadius: "12px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "28px",
+  },
+  categoryTitle: { fontSize: "20px", fontWeight: 800, margin: "0 0 4px" },
+  categoryTagline: { fontSize: "14px", color: COLORS.textMutedLight, margin: "0 0 8px", fontStyle: "italic" },
+  categoryDesc: { fontSize: "14px", color: COLORS.textMutedLight, lineHeight: "1.6", margin: "0 0 16px" },
+  categoryFeatures: { listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "8px" },
+  categoryFeature: { fontSize: "13px", color: COLORS.textMutedLight, display: "flex", alignItems: "center", gap: "8px" },
+  categoryButton: {
+    padding: "12px 24px",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: 700,
+    cursor: "pointer",
+    transition: "all 0.3s",
+    color: "#0f172a",
+    marginTop: "auto",
+  },
+
   futureSection: { background: COLORS.bgDarker, padding: "72px 20px", textAlign: "center" },
   futureInner: { maxWidth: "700px", margin: "0 auto" },
   futureLabel: {
@@ -754,6 +875,12 @@ const css = `
     transform: translateY(-6px);
     box-shadow: 0 16px 40px rgba(0,0,0,0.4) !important;
     border-color: ${COLORS.accent} !important;
+  }
+
+  .categoryCard:hover {
+    transform: translateY(-4px);
+    border-color: ${COLORS.accent} !important;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4) !important;
   }
 
   button:hover {
