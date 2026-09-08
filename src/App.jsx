@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
 import SplashScreen from "./components/SplashScreen";
 import AppUpdateNotifier from "./components/AppUpdateNotifier";
+import StickyHover from "./components/StickyHover";
 
 import Home from "./pages/Home";
 import Listings from "./pages/Listings";
@@ -85,6 +86,28 @@ function PublicLayout({ children }) {
       {children}
       <FloatingWhatsApp />
       <AppUpdateNotifier />
+      <StickyHover position="bottom-right">
+        <div>
+          <p style={{ marginBottom: '12px', fontSize: '13px', color: '#94a3b8' }}>
+            Quick Links
+          </p>
+          <a href="/" style={{ display: 'block', padding: '8px 12px', color: '#e2e8f0', textDecoration: 'none', borderRadius: '6px', marginBottom: '4px', background: 'rgba(59, 130, 246, 0.1)', transition: 'background 0.2s' }}>
+            🏠 Home
+          </a>
+          <a href="/listings" style={{ display: 'block', padding: '8px 12px', color: '#e2e8f0', textDecoration: 'none', borderRadius: '6px', marginBottom: '4px', background: 'rgba(59, 130, 246, 0.1)', transition: 'background 0.2s' }}>
+            🏢 Listings
+          </a>
+          <a href="/accommodation" style={{ display: 'block', padding: '8px 12px', color: '#e2e8f0', textDecoration: 'none', borderRadius: '6px', marginBottom: '4px', background: 'rgba(59, 130, 246, 0.1)', transition: 'background 0.2s' }}>
+            🏨 Accommodation
+          </a>
+          <a href="/axxbiashara" style={{ display: 'block', padding: '8px 12px', color: '#e2e8f0', textDecoration: 'none', borderRadius: '6px', marginBottom: '4px', background: 'rgba(59, 130, 246, 0.1)', transition: 'background 0.2s' }}>
+            🏪 AxxBiashara
+          </a>
+          <a href="/materials" style={{ display: 'block', padding: '8px 12px', color: '#e2e8f0', textDecoration: 'none', borderRadius: '6px', marginBottom: '4px', background: 'rgba(59, 130, 246, 0.1)', transition: 'background 0.2s' }}>
+            🧱 Materials
+          </a>
+        </div>
+      </StickyHover>
     </>
   );
 }
@@ -95,6 +118,28 @@ function DashboardLayout({ children, preferSeller = false }) {
     <AccountLayout preferSeller={preferSeller}>
       {children}
       <AppUpdateNotifier />
+      <StickyHover position="bottom-right">
+        <div>
+          <p style={{ marginBottom: '12px', fontSize: '13px', color: '#94a3b8' }}>
+            Quick Links
+          </p>
+          <a href="/" style={{ display: 'block', padding: '8px 12px', color: '#e2e8f0', textDecoration: 'none', borderRadius: '6px', marginBottom: '4px', background: 'rgba(59, 130, 246, 0.1)', transition: 'background 0.2s' }}>
+            🏠 Home
+          </a>
+          <a href="/listings" style={{ display: 'block', padding: '8px 12px', color: '#e2e8f0', textDecoration: 'none', borderRadius: '6px', marginBottom: '4px', background: 'rgba(59, 130, 246, 0.1)', transition: 'background 0.2s' }}>
+            🏢 Listings
+          </a>
+          <a href="/accommodation" style={{ display: 'block', padding: '8px 12px', color: '#e2e8f0', textDecoration: 'none', borderRadius: '6px', marginBottom: '4px', background: 'rgba(59, 130, 246, 0.1)', transition: 'background 0.2s' }}>
+            🏨 Accommodation
+          </a>
+          <a href="/axxbiashara" style={{ display: 'block', padding: '8px 12px', color: '#e2e8f0', textDecoration: 'none', borderRadius: '6px', marginBottom: '4px', background: 'rgba(59, 130, 246, 0.1)', transition: 'background 0.2s' }}>
+            🏪 AxxBiashara
+          </a>
+          <a href="/materials" style={{ display: 'block', padding: '8px 12px', color: '#e2e8f0', textDecoration: 'none', borderRadius: '6px', marginBottom: '4px', background: 'rgba(59, 130, 246, 0.1)', transition: 'background 0.2s' }}>
+            🧱 Materials
+          </a>
+        </div>
+      </StickyHover>
     </AccountLayout>
   );
 }

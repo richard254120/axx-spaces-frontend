@@ -1,0 +1,142 @@
+.sticky-hover-container {
+  position: fixed;
+  z-index: 9999;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.sticky-hover-bottom-right {
+  bottom: 100px;
+  right: 20px;
+}
+
+.sticky-hover-bottom-left {
+  bottom: 100px;
+  left: 20px;
+}
+
+.sticky-hover-top-right {
+  top: 100px;
+  right: 20px;
+}
+
+.sticky-hover-top-left {
+  top: 100px;
+  left: 20px;
+}
+
+.sticky-hover-content {
+  background: linear-gradient(135deg, #1e293b 0%, #0f1729 100%);
+  border: 1px solid #3b82f6;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
+  min-width: 280px;
+  max-width: 320px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.sticky-hover-content.minimized {
+  min-width: auto;
+  max-width: auto;
+}
+
+.sticky-hover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(59, 130, 246, 0.1);
+  border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.sticky-hover-title {
+  color: #fbbf24;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.sticky-hover-toggle,
+.sticky-hover-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px 8px;
+  font-size: 16px;
+  transition: color 0.2s ease;
+}
+
+.sticky-hover-toggle:hover,
+.sticky-hover-close:hover {
+  color: #fbbf24;
+}
+
+.sticky-hover-body {
+  padding: 16px;
+  color: #e2e8f0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.sticky-hover-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sticky-hover-body::-webkit-scrollbar-track {
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 3px;
+}
+
+.sticky-hover-body::-webkit-scrollbar-thumb {
+  background: #3b82f6;
+  border-radius: 3px;
+}
+
+.sticky-hover-restore {
+  position: fixed;
+  bottom: 100px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border: 2px solid #fbbf24;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
+  transition: all 0.3s ease;
+  z-index: 9999;
+}
+
+.sticky-hover-restore:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 24px rgba(59, 130, 246, 0.6);
+}
+
+@media (max-width: 768px) {
+  .sticky-hover-bottom-right,
+  .sticky-hover-bottom-left {
+    bottom: 80px;
+    right: 10px;
+  }
+
+  .sticky-hover-top-right,
+  .sticky-hover-top-left {
+    top: 80px;
+    right: 10px;
+  }
+
+  .sticky-hover-content {
+    min-width: 250px;
+    max-width: 280px;
+  }
+
+  .sticky-hover-restore {
+    bottom: 80px;
+    right: 10px;
+  }
+}
