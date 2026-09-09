@@ -222,7 +222,7 @@ export default function Register() {
               />
               {formData.password && (formData.password.length < 6 || !/[a-zA-Z]/.test(formData.password) || !/[0-9]/.test(formData.password)) && (
                 <div style={{ color: "#fca5a5", fontSize: "11px", marginTop: "4px" }}>
-                   Password must contain both letters and numbers.
+                  Password must contain both letters and numbers.
                 </div>
               )}
             </div>
@@ -374,10 +374,14 @@ const styles = {
   submitBtn: buttonStyles.primary,
   googleButtonContainer: {
     width: "100%",
-    minHeight: "44px",
+    minHeight: "50px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    position: "relative",
+    zIndex: "5",
+    overflow: "visible",
+    margin: "8px 0",
   },
   googleBtn: {
     width: "100%",
@@ -435,5 +439,17 @@ const css = `
   
   a[style*="color: #fbbf24"]:hover {
     opacity: 0.8;
+  }
+
+  /* Google Sign-In Button Fixes */
+  .googleButtonContainer iframe {
+    position: relative !important;
+    z-index: 100 !important;
+  }
+
+  .googleButtonContainer > div {
+    display: flex !important;
+    justify-content: center !important;
+    width: 100% !important;
   }
 `;

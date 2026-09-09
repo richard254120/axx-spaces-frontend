@@ -381,14 +381,17 @@ const styles = {
   success: { background: "rgba(34, 197, 94, 0.15)", color: "#86efac", padding: "12px", borderRadius: "8px", marginBottom: "20px", fontSize: "14px", textAlign: "center", border: "1px solid rgba(34, 197, 94, 0.3)" },
   warningBox: { background: "rgba(245, 158, 11, 0.15)", color: "#fbbf24", padding: "12px", borderRadius: "8px", marginBottom: "20px", fontSize: "14px", textAlign: "center", border: "1px solid rgba(245, 158, 11, 0.3)" },
 
-  googleSection: { marginBottom: "20px" },
+  googleSection: { marginBottom: "24px", position: "relative", zIndex: "10" },
   googleLabel: { fontSize: "12px", fontWeight: 700, color: COLORS.textMutedLight, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "12px", textAlign: "center" },
   googleButtonContainer: {
     width: "100%",
-    minHeight: "44px",
+    minHeight: "50px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    position: "relative",
+    zIndex: "5",
+    overflow: "visible",
   },
   googleButton: {
     width: "100%",
@@ -439,5 +442,17 @@ const css = `
   
   a[style*="color: #fbbf24"]:hover {
     opacity: 0.8;
+  }
+
+  /* Google Sign-In Button Fixes */
+  .googleButtonContainer iframe {
+    position: relative !important;
+    z-index: 100 !important;
+  }
+
+  .googleButtonContainer > div {
+    display: flex !important;
+    justify-content: center !important;
+    width: 100% !important;
   }
 `;
