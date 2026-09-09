@@ -624,18 +624,14 @@ export default function BusinessForm() {
     description: "",
     categories: [],
     // Essential fields
-    location: { county: "", town: "", address: "", coordinates: { lat: "", lng: "" } },
+    location: { county: "", town: "", coordinates: { lat: "", lng: "" } },
     contact: { phone: "", email: "", website: "" },
     // Optional fields that can be updated later in dashboard
     yearEstablished: "",
-    employeeCount: "",
-    priceRange: "",
     submitterName: "",
     socialMedia: { facebook: "", instagram: "", twitter: "", linkedin: "", tiktok: "", whatsapp: "" },
     images: [],
     logo: "",
-    products: [],
-    pricelist: { url: "", name: "" },
   });
 
   /* ── FIX 1: Controlled product form state (replaces uncontrolled DOM inputs) ── */
@@ -647,29 +643,23 @@ export default function BusinessForm() {
   const formDataRef = useRef(formData);
   useEffect(() => { formDataRef.current = formData; }, [formData]);
 
-  const [newProduct, setNewProduct] = useState({ name: "", description: "", price: "", category: "", imageUrl: "" });
-  const [productImageFile, setProductImageFile] = useState(null);
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [countdown, setCountdown] = useState(null);
-  const [uploading, setUploading] = useState({ logo: false, photos: false, product: false, pricelist: false });
+  const [uploading, setUploading] = useState({ logo: false, photos: false });
   const [businessPhotos, setBusinessPhotos] = useState([]);
   const [currentStep, setCurrentStep] = useState(1);
   const [uploadProgress, setUploadProgress] = useState({ photos: 0, current: 0, total: 0 });
   const [isUploading, setIsUploading] = useState(false);
   const [logoPreview, setLogoPreview] = useState("");
-  const [productUploadCount, setProductUploadCount] = useState(0);
 
   const STEPS = [
     { id: 1, title: "Basic Info" },
     { id: 2, title: "Location" },
     { id: 3, title: "Contact" },
     { id: 4, title: "Logo & Photos" },
-    { id: 5, title: "Products" },
-    { id: 6, title: "Pricelist" },
-    { id: 7, title: "Review" },
+    { id: 5, title: "Review" },
   ];
 
   /* ── Load existing business when editing ── */
@@ -768,48 +758,6 @@ export default function BusinessForm() {
     }
   };
 
-  const uploadProductImage = async (file) => {
-    if (!file) return "";
-    setProductUploadCount(prev => prev + 1);
-    setUploading(prev => ({ ...prev, product: true }));
-    try {
-      const compressedFile = await compressImage(file, 500, 500, 0.7);
-      const fd = new FormData();
-      fd.append("image", compressedFile);
-      const res = await API.post("/uploads/product-image", fd, { headers: { "Content-Type": "multipart/form-data" } });
-      return res.data.url || "";
-    } catch {
-      setError("Failed to upload product image");
-      return "";
-    } finally {
-      setProductUploadCount(prev => {
-        const nextVal = Math.max(0, prev - 1);
-        if (nextVal === 0) {
-          setUploading(u => ({ ...u, product: false }));
-        }
-        return nextVal;
-      });
-    }
-  };
-
-  const handlePricelistUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setUploading(prev => ({ ...prev, pricelist: true }));
-    const fd = new FormData();
-    fd.append("pricelist", file);
-    try {
-      const res = await API.post("/uploads/pricelist", fd, { headers: { "Content-Type": "multipart/form-data" } });
-      setFormData(prev => ({
-        ...prev,
-        pricelist: { ...prev.pricelist, url: res.data.url, publicId: res.data.publicId, name: res.data.originalName || file.name },
-      }));
-    } catch {
-      setError("Failed to upload pricelist");
-    } finally {
-      setUploading(prev => ({ ...prev, pricelist: false }));
-    }
-  };
 
   const handleBusinessPhotosUpload = async (e) => {
     const files = Array.from(e.target.files);
@@ -914,79 +862,11 @@ export default function BusinessForm() {
     setFormData(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }));
   };
 
-  const handleAddProduct = () => {
-    if (!newProduct.name.trim()) {
-      setError("Product name is required");
-      return;
-    }
-
-    // 1. Generate local preview URL instantly
-    const localUrl = productImageFile ? URL.createObjectURL(productImageFile) : "";
-    const tempIndex = formData.products.length;
-
-    // 2. Add product to state immediately using the local preview URL
-    const productToAdd = {
-      name: newProduct.name.trim(),
-      description: newProduct.description.trim(),
-      price: newProduct.price ? parseFloat(newProduct.price) : 0,
-      category: newProduct.category.trim(),
-      imageUrl: localUrl,
-    };
-
-    setFormData(prev => ({
-      ...prev,
-      products: [...prev.products, productToAdd],
-    }));
-
-    // 3. Clear new product input fields instantly
-    setNewProduct({ name: "", description: "", price: "", category: "", imageUrl: "" });
-    const currentFile = productImageFile;
-    setProductImageFile(null);
-
-    // 4. Perform upload in the background if a file was selected
-    if (currentFile) {
-      uploadProductImage(currentFile).then(uploadedUrl => {
-        setFormData(prev => {
-          const updatedProducts = [...prev.products];
-          if (updatedProducts[tempIndex]) {
-            updatedProducts[tempIndex].imageUrl = uploadedUrl;
-          }
-          return { ...prev, products: updatedProducts };
-        });
-        try {
-          URL.revokeObjectURL(localUrl);
-        } catch (e) {
-          console.error(e);
-        }
-      }).catch(err => {
-        console.error("Background product upload error:", err);
-        setFormData(prev => {
-          const updatedProducts = [...prev.products];
-          if (updatedProducts[tempIndex]) {
-            updatedProducts[tempIndex].imageUrl = "";
-          }
-          return { ...prev, products: updatedProducts };
-        });
-        try {
-          URL.revokeObjectURL(localUrl);
-        } catch (e) {
-          console.error(e);
-        }
-      });
-    }
-  };
-
-  const handleRemoveProduct = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      products: prev.products.filter((_, i) => i !== index),
-    }));
-  };
 
   /* ── Step navigation ── */
   const validateStep = (step) => {
     // Prevent navigation if uploads are still active
-    const activeUpload = isUploading || uploading.logo || uploading.photos || uploading.product || uploading.pricelist || productUploadCount > 0;
+    const activeUpload = isUploading || uploading.logo || uploading.photos;
     if (activeUpload) {
       setError("Please wait for all uploads to complete before proceeding");
       return false;
@@ -1002,10 +882,6 @@ export default function BusinessForm() {
       case 4:
         return true; // Logo and photos are optional
       case 5:
-        return true; // Products are optional
-      case 6:
-        return true; // Pricelist is optional
-      case 7:
         return true; // Review step
       default:
         return true;
@@ -1038,7 +914,7 @@ export default function BusinessForm() {
     e.preventDefault();
 
     // Prevent submission if uploads are still active
-    const activeUpload = isUploading || uploading.logo || uploading.photos || uploading.product || uploading.pricelist || productUploadCount > 0;
+    const activeUpload = isUploading || uploading.logo || uploading.photos;
     if (activeUpload) {
       setError("Please wait for all uploads to complete before submitting");
       return;
@@ -1055,12 +931,10 @@ export default function BusinessForm() {
     setSuccess("");
 
     const basePayload = formDataRef.current; // always latest, never stale
-    
+
     // Clean optional fields to avoid sending empty strings for enums/numbers
     const payload = {
       ...basePayload,
-      employeeCount: basePayload.employeeCount === "" ? undefined : basePayload.employeeCount,
-      priceRange: basePayload.priceRange === "" ? undefined : basePayload.priceRange,
       yearEstablished: basePayload.yearEstablished === "" ? undefined : basePayload.yearEstablished,
     };
 
@@ -1228,32 +1102,6 @@ export default function BusinessForm() {
               max={new Date().getFullYear()}
             />
 
-            <label style={styles.label}>Number of Employees</label>
-            <select
-              style={styles.select}
-              value={formData.employeeCount || ""}
-              onChange={e => setFormData(prev => ({ ...prev, employeeCount: e.target.value }))}
-            >
-              <option value="">Select size</option>
-              <option value="1-10">1-10 employees</option>
-              <option value="11-50">11-50 employees</option>
-              <option value="51-200">51-200 employees</option>
-              <option value="201-500">201-500 employees</option>
-              <option value="500+">500+ employees</option>
-            </select>
-
-            <label style={styles.label}>Price Range</label>
-            <select
-              style={styles.select}
-              value={formData.priceRange || ""}
-              onChange={e => setFormData(prev => ({ ...prev, priceRange: e.target.value }))}
-            >
-              <option value="">Select price range</option>
-              <option value="$">$ - Budget friendly</option>
-              <option value="$$">$$ - Moderate</option>
-              <option value="$$$">$$$ - Expensive</option>
-              <option value="$$$$">$$$$ - Premium</option>
-            </select>
 
             <label style={styles.label}>Categories (Select multiple) *</label>
             <MultiSelectDropdown
@@ -1289,13 +1137,6 @@ export default function BusinessForm() {
               required
             />
 
-            <label style={styles.label}>Address</label>
-            <input
-              type="text"
-              style={styles.input}
-              value={formData.location.address}
-              onChange={e => setFormData(prev => ({ ...prev, location: { ...prev.location, address: e.target.value } }))}
-            />
 
             <label style={styles.label}>GPS Latitude (optional)</label>
             <input
@@ -1531,166 +1372,9 @@ export default function BusinessForm() {
           </>
         ) : null}
 
-        {/* ── STEP 5: PRODUCTS & SERVICES ── */}
-        {(!isEditing && currentStep === 5) || isEditing ? (
-          <div style={styles.section}>
-            <h2 style={styles.sectionTitle}>Products & Services</h2>
 
-            <div style={styles.productFormBox}>
-              <p style={styles.productFormTitle}> Add a Product or Service</p>
-
-              <label style={styles.label}>Product / Service Name *</label>
-              <input
-                type="text"
-                style={styles.input}
-                placeholder="e.g. Beef Burger, Web Design Package"
-                value={newProduct.name}
-                onChange={e => setNewProduct(prev => ({ ...prev, name: e.target.value }))}
-              />
-
-              <label style={styles.label}>Description</label>
-              <input
-                type="text"
-                style={styles.input}
-                placeholder="Brief description of the product or service"
-                value={newProduct.description}
-                onChange={e => setNewProduct(prev => ({ ...prev, description: e.target.value }))}
-              />
-
-              <label style={styles.label}>Price (KES)</label>
-              <input
-                type="number"
-                style={styles.input}
-                placeholder="e.g. 1500"
-                value={newProduct.price}
-                onChange={e => setNewProduct(prev => ({ ...prev, price: e.target.value }))}
-                min="0"
-              />
-
-              <label style={styles.label}>Category</label>
-              <input
-                type="text"
-                style={styles.input}
-                placeholder="e.g. Food, Design, Consulting"
-                value={newProduct.category}
-                onChange={e => setNewProduct(prev => ({ ...prev, category: e.target.value }))}
-              />
-
-              <label style={styles.label}>Product Image (Optional)</label>
-              <input
-                type="file"
-                style={styles.input}
-                accept="image/*"
-                disabled={uploading.product}
-                onChange={e => setProductImageFile(e.target.files[0] || null)}
-              />
-              {uploading.product && <p style={{ fontSize: "12px", color: "#fbbf24", marginBottom: "8px" }}>Uploading product image…</p>}
-              {productImageFile && !uploading.product && (
-                <p style={{ fontSize: "12px", color: "#94a3b8", marginBottom: "10px" }}>
-                   {productImageFile.name} selected
-                </p>
-              )}
-
-              <button
-                type="button"
-                style={styles.addProductBtn}
-                onClick={handleAddProduct}
-              >
-                + Add Product / Service
-              </button>
-            </div>
-
-            {formData.products.length > 0 && (
-              <div>
-                <p style={{ fontSize: "13px", fontWeight: 700, color: "#94a3b8", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                  {formData.products.length} {formData.products.length === 1 ? "Product" : "Products"} Added
-                </p>
-                {formData.products.map((product, index) => {
-                  const isBlob = product.imageUrl && product.imageUrl.startsWith("blob:");
-                  return (
-                    <div key={index} style={styles.productCard}>
-                      <div style={styles.productCardLeft}>
-                        {product.imageUrl ? (
-                          <div style={{ position: "relative", flexShrink: 0 }}>
-                            <img
-                              src={product.imageUrl}
-                              alt={product.name}
-                              style={{
-                                ...styles.productThumb,
-                                opacity: isBlob ? 0.6 : 1
-                              }}
-                            />
-                            {isBlob && (
-                              <div style={{
-                                position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
-                                background: "rgba(15, 23, 42, 0.5)", display: "flex",
-                                alignItems: "center", justifyContent: "center", borderRadius: "8px"
-                              }}>
-                                <span style={{ fontSize: "12px", color: "#60a5fa" }}></span>
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          <div style={styles.productThumbPlaceholder}></div>
-                        )}
-                        <div style={{ minWidth: 0 }}>
-                          <div style={styles.productName}>{product.name}</div>
-                          <div style={styles.productMeta}>
-                            {product.price ? `KES ${Number(product.price).toLocaleString()}` : "No price set"}
-                            {product.category ? ` · ${product.category}` : ""}
-                            {isBlob && <span style={{ color: "#fbbf24", marginLeft: "8px", fontSize: "11px", fontWeight: "bold" }}>(Uploading...)</span>}
-                          </div>
-                          {product.description && (
-                            <div style={{ ...styles.productMeta, marginTop: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "260px" }}>
-                              {product.description}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        style={styles.removeBtn}
-                        onClick={() => handleRemoveProduct(index)}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {formData.products.length === 0 && (
-              <p style={{ fontSize: "13px", color: "#475569", textAlign: "center", padding: "20px 0" }}>
-                No products added yet. Use the form above to add your first product or service.
-              </p>
-            )}
-          </div>
-        ) : null}
-
-        {/* ── STEP 6: PRICELIST ── */}
-        {(!isEditing && currentStep === 6) || isEditing ? (
-          <div style={styles.section}>
-            <h2 style={styles.sectionTitle}>Pricelist / Menu</h2>
-            <label style={styles.label}>Upload Pricelist/Menu</label>
-            <input
-              type="file"
-              style={styles.input}
-              accept=".pdf,.doc,.docx,.txt"
-              onChange={handlePricelistUpload}
-              disabled={uploading.pricelist}
-            />
-            {uploading.pricelist && <p style={{ fontSize: "12px", color: "#fbbf24", marginBottom: "8px" }}>Uploading pricelist...</p>}
-            {formData.pricelist?.url && (
-              <p style={{ fontSize: "12px", color: "#4ade80", marginTop: "8px" }}>
-                 Pricelist uploaded: {formData.pricelist.name}
-              </p>
-            )}
-          </div>
-        ) : null}
-
-        {/* ── STEP 7: REVIEW ── */}
-        {!isEditing && currentStep === 7 ? (
+        {/* ── STEP 5: REVIEW ── */}
+        {!isEditing && currentStep === 5 ? (
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>Review Your Business</h2>
 
@@ -1712,14 +1396,6 @@ export default function BusinessForm() {
                 <span style={styles.reviewLabel}>Year Established:</span>
                 <span style={styles.reviewValue}>{formData.yearEstablished || "Not specified"}</span>
               </div>
-              <div style={styles.reviewItem}>
-                <span style={styles.reviewLabel}>Employees:</span>
-                <span style={styles.reviewValue}>{formData.employeeCount || "Not specified"}</span>
-              </div>
-              <div style={styles.reviewItem}>
-                <span style={styles.reviewLabel}>Price Range:</span>
-                <span style={styles.reviewValue}>{formData.priceRange || "Not specified"}</span>
-              </div>
             </div>
 
             <div style={styles.reviewSection}>
@@ -1731,10 +1407,6 @@ export default function BusinessForm() {
               <div style={styles.reviewItem}>
                 <span style={styles.reviewLabel}>Town/City:</span>
                 <span style={styles.reviewValue}>{formData.location.town}</span>
-              </div>
-              <div style={styles.reviewItem}>
-                <span style={styles.reviewLabel}>Address:</span>
-                <span style={styles.reviewValue}>{formData.location.address || "Not specified"}</span>
               </div>
             </div>
 
@@ -1810,14 +1482,6 @@ export default function BusinessForm() {
               <div style={styles.reviewItem}>
                 <span style={styles.reviewLabel}>Photos:</span>
                 <span style={styles.reviewValue}>{businessPhotos.length} uploaded</span>
-              </div>
-              <div style={styles.reviewItem}>
-                <span style={styles.reviewLabel}>Products:</span>
-                <span style={styles.reviewValue}>{formData.products.length} added</span>
-              </div>
-              <div style={styles.reviewItem}>
-                <span style={styles.reviewLabel}>Pricelist:</span>
-                <span style={styles.reviewValue}>{formData.pricelist?.url ? " Uploaded" : "Not uploaded"}</span>
               </div>
             </div>
           </div>
