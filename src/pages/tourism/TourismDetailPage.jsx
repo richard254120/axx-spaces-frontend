@@ -7,9 +7,11 @@ import {
   ErrorAlert,
   TOURISM_FONT_CSS,
   tourismTheme,
+  CompactReviews,
 } from "../../features/tourism";
 import PhoneInput from "../../components/PhoneInput";
 import { useAuth } from "../../context/AuthContext";
+import MessagingSystem from "../../components/MessagingSystem";
 
 const properties = {
   1: {
@@ -208,7 +210,7 @@ export default function TourismDetailPage() {
           {property.bookingUrl ? " Book on Official Site →" : " Request Booking"}
         </button>
         <button style={s.mpesaBookBtn} onClick={handleBookWithMpesa}>
-           Pay with M-Pesa
+          Pay with M-Pesa
         </button>
       </div>
       {property.bookingUrl && <div style={s.bookNote}>You'll be redirected to the property's official booking site</div>}
@@ -237,8 +239,25 @@ export default function TourismDetailPage() {
         <div style={s.leftCol}>
 
           {/* HERO / MEDIA */}
-          {(property.images?.length > 0 || property.videos?.length > 0) ? (
+          {(property.images?.length > 0 || property.videos?.length > 0 || property.audio?.length > 0) ? (
             <div style={{ marginBottom: "16px" }}>
+              {property.audio?.length > 0 && (
+                <div style={{ marginBottom: "16px" }}>
+                  <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#374151", marginBottom: "8px" }}> Audio Clips</h3>
+                  {property.audio.map((url, idx) => (
+                    <div key={url} style={{ marginBottom: "12px" }}>
+                      <audio
+                        controls
+                        style={{ width: "100%", borderRadius: "8px" }}
+                        preload="metadata"
+                      >
+                        <source src={url} type="audio/mpeg" />
+                        Your browser does not support the audio element.
+                      </audio>
+                    </div>
+                  ))}
+                </div>
+              )}
               {property.videos?.length > 0 && (
                 <div style={{ marginBottom: "16px" }}>
                   <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#374151", marginBottom: "8px" }}> Videos</h3>
@@ -336,7 +355,7 @@ export default function TourismDetailPage() {
                   rel="noreferrer"
                   style={s.mapBtn}
                 >
-                   Open in Google Maps
+                  Open in Google Maps
                 </a>
               </div>
             </div>
@@ -394,25 +413,11 @@ export default function TourismDetailPage() {
           {/* REVIEWS */}
           <div style={s.card}>
             <h2 style={s.cardTitle}>Guest Reviews</h2>
-            <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "20px" }}>
-              <div style={{ fontSize: "42px", fontWeight: 900, color: property.color, lineHeight: 1 }}>{property.rating}</div>
-              <div>
-                <div style={{ fontSize: "18px", marginBottom: "3px" }}>{"".repeat(Math.round(property.rating))}</div>
-                <div style={{ fontSize: "13px", color: "#6b7280" }}>{property.reviews} verified reviews</div>
-              </div>
-            </div>
-            {(property.reviewList || []).map((r) => (
-              <div key={r.name} style={s.reviewCard}>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-                  <div style={s.reviewAvatar}>{r.name[0]}</div>
-                  <div>
-                    <div style={{ fontSize: "13px", fontWeight: 700, color: "#1f2937" }}>{r.name}</div>
-                    <div style={{ fontSize: "11px", color: "#9ca3af" }}>{r.date} · {"".repeat(r.rating)}</div>
-                  </div>
-                </div>
-                <p style={{ fontSize: "13px", color: "#4b5563", lineHeight: 1.65, margin: 0 }}>{r.comment}</p>
-              </div>
-            ))}
+            <CompactReviews
+              reviews={property.reviewList || []}
+              rating={property.rating}
+              totalReviews={property.reviews}
+            />
           </div>
 
           {/* CONTACT */}
@@ -426,9 +431,20 @@ export default function TourismDetailPage() {
             </div>
             {property.bookingUrl && (
               <a href={property.bookingUrl} target="_blank" rel="noreferrer" style={{ ...s.contactBtn, background: property.color, display: "block", textAlign: "center", marginTop: "10px", padding: "12px" }}>
-                 Visit Official Website
+                Visit Official Website
               </a>
             )}
+
+            {/* In-App Chat */}
+            <div style={{ marginTop: "16px", paddingTop: "16px", borderTop: "1px solid #e5e7eb" }}>
+              <MessagingSystem
+                recipientId={property.manager.email}
+                recipientName={property.manager.name}
+                recipientType="Property Manager"
+                propertyId={property.id}
+                propertyTitle={property.name}
+              />
+            </div>
           </div>
         </div>
 

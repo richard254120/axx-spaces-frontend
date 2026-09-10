@@ -31,13 +31,14 @@ export default function RegisterPropertyPage() {
   const [form, setForm] = useState({ ...INITIAL_REGISTER_FORM });
   const [newImages, setNewImages] = useState([]);
   const [newVideos, setNewVideos] = useState([]);
+  const [newAudio, setNewAudio] = useState([]);
 
   const update = (field, value) => setForm((f) => ({ ...f, [field]: value }));
   const toggleAmenity = (a) => setForm((f) => ({
     ...f,
     amenities: f.amenities.includes(a) ? f.amenities.filter((x) => x !== a) : [...f.amenities, a],
   }));
-  const addRoomType = () => setForm((f) => ({ ...f, roomTypes: [...f.roomTypes, { name: "", price: "", guests: "" }] }));
+  const addRoomType = () => setForm((f) => ({ ...f, roomTypes: [...f.roomTypes, { name: "", price: "", guests: "", images: [], videos: [] }] }));
   const updateRoom = (i, field, val) => setForm((f) => {
     const rt = [...f.roomTypes]; rt[i] = { ...rt[i], [field]: val }; return { ...f, roomTypes: rt };
   });
@@ -69,6 +70,7 @@ export default function RegisterPropertyPage() {
       });
       newImages.forEach((file) => fd.append("images", file));
       newVideos.forEach((file) => fd.append("videos", file));
+      newAudio.forEach((file) => fd.append("audio", file));
 
       const result = await registerTourismProperty(fd);
       if (result.token) {
@@ -184,7 +186,7 @@ export default function RegisterPropertyPage() {
                   <input style={s.input} type="password" placeholder="Min 6 chars with letters & numbers" value={form.password} onChange={(e) => update("password", e.target.value)} />
                   {form.password && (form.password.length < 6 || !/[a-zA-Z]/.test(form.password) || !/[0-9]/.test(form.password)) && (
                     <div style={{ color: "#dc2626", fontSize: "11px", marginTop: "4px" }}>
-                       Password must be at least 6 characters and contain a mixture of both letters and numbers.
+                      Password must be at least 6 characters and contain a mixture of both letters and numbers.
                     </div>
                   )}
                 </div>
@@ -259,6 +261,13 @@ export default function RegisterPropertyPage() {
                   </div>
                 </div>
                 <div style={s.field}>
+                  <label style={s.label}>Common Location Name (optional)</label>
+                  <input style={s.input} placeholder="e.g. South Coast, CBD, Nyali Beach" value={form.commonLocation} onChange={(e) => update("commonLocation", e.target.value)} />
+                  <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "4px" }}>
+                    Include commonly known names if they differ from the official location name
+                  </div>
+                </div>
+                <div style={s.field}>
                   <label style={s.label}>Physical Address / Landmark</label>
                   <input style={s.input} placeholder="e.g. Off Mombasa-Malindi Road, next to Kenya Wildlife Service gate" value={form.address} onChange={(e) => update("address", e.target.value)} />
                 </div>
@@ -277,7 +286,7 @@ export default function RegisterPropertyPage() {
                   </div>
                 </div>
                 <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "4px" }}>
-                   Add GPS coordinates for precise location tracking. Get them from Google Maps (right-click → coordinates).
+                  Add GPS coordinates for precise location tracking. Get them from Google Maps (right-click → coordinates).
                 </div>
               </div>
             )}
@@ -336,8 +345,32 @@ export default function RegisterPropertyPage() {
                   )}
                 </div>
 
+                <div style={{ marginBottom: "20px" }}>
+                  <label style={s.label}>Audio Clips (up to 5)</label>
+                  <div style={s.uploadBox}>
+                    <input
+                      type="file"
+                      accept="audio/*"
+                      multiple
+                      onChange={(e) => setNewAudio([...newAudio, ...Array.from(e.target.files)])}
+                      style={{ display: "none" }}
+                      id="audio-upload"
+                    />
+                    <label htmlFor="audio-upload" style={s.uploadBtn}>
+                      <span style={{ fontSize: "32px", marginBottom: "8px" }}></span>
+                      <span style={{ fontWeight: 700 }}>Click to add audio clips</span>
+                      <span style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>or drag and drop</span>
+                    </label>
+                  </div>
+                  {newAudio.length > 0 && (
+                    <div style={{ marginTop: "12px", fontSize: "13px", color: "#16a34a" }}>
+                      ✓ {newAudio.length} audio clip(s) selected
+                    </div>
+                  )}
+                </div>
+
                 <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "10px", padding: "12px", fontSize: "12px", color: "#166534" }}>
-                   Tip: You can also upload photos and videos later from your dashboard after submitting your property.
+                  Tip: You can also upload photos and videos later from your dashboard after submitting your property.
                 </div>
               </div>
             )}
@@ -389,7 +422,7 @@ export default function RegisterPropertyPage() {
                   )}
                   {!form.bookingUrl && (
                     <div style={{ fontSize: "12px", color: "#92400e", background: "#fffbeb", padding: "8px 12px", borderRadius: "8px", border: "1px solid #fde68a" }}>
-                       No booking URL? Guests will use your contact details (phone, email, WhatsApp) to enquire.
+                      No booking URL? Guests will use your contact details (phone, email, WhatsApp) to enquire.
                     </div>
                   )}
                 </div>
@@ -412,11 +445,65 @@ export default function RegisterPropertyPage() {
 
                 <div style={s.sectionBreak}>Room Types (optional)</div>
                 {form.roomTypes.map((r, i) => (
-                  <div key={i} className="room-row">
-                    <input style={{ ...s.input, flex: 2 }} placeholder="Room type name (e.g. Deluxe Suite)" value={r.name} onChange={(e) => updateRoom(i, "name", e.target.value)} />
-                    <input style={{ ...s.input, flex: 1 }} type="number" placeholder="Price KSh" value={r.price} onChange={(e) => updateRoom(i, "price", e.target.value)} />
-                    <input style={{ ...s.input, flex: 1 }} type="number" placeholder="Max guests" value={r.guests} onChange={(e) => updateRoom(i, "guests", e.target.value)} />
-                    {form.roomTypes.length > 1 && <button style={s.removeRoomBtn} onClick={() => removeRoom(i)}>✕</button>}
+                  <div key={i} style={{ background: "#f9fafb", borderRadius: "12px", padding: "16px", marginBottom: "16px", border: "1px solid #e5e7eb" }}>
+                    <div className="room-row" style={{ marginBottom: "12px" }}>
+                      <input style={{ ...s.input, flex: 2 }} placeholder="Room type name (e.g. Deluxe Suite)" value={r.name} onChange={(e) => updateRoom(i, "name", e.target.value)} />
+                      <input style={{ ...s.input, flex: 1 }} type="number" placeholder="Price KSh" value={r.price} onChange={(e) => updateRoom(i, "price", e.target.value)} />
+                      <input style={{ ...s.input, flex: 1 }} type="number" placeholder="Max guests" value={r.guests} onChange={(e) => updateRoom(i, "guests", e.target.value)} />
+                      {form.roomTypes.length > 1 && <button style={s.removeRoomBtn} onClick={() => removeRoom(i)}>✕</button>}
+                    </div>
+
+                    {/* Room Images */}
+                    <div style={{ marginBottom: "12px" }}>
+                      <label style={{ ...s.label, fontSize: "10px" }}>Room Images</label>
+                      <div style={{ border: "1px dashed #d1d5db", borderRadius: "8px", padding: "12px", textAlign: "center", background: "white" }}>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={(e) => {
+                            const files = Array.from(e.target.files);
+                            updateRoom(i, "images", [...(r.images || []), ...files]);
+                          }}
+                          style={{ display: "none" }}
+                          id={`room-images-${i}`}
+                        />
+                        <label htmlFor={`room-images-${i}`} style={{ cursor: "pointer", fontSize: "12px", color: "#6b7280" }}>
+                          + Add room photos
+                        </label>
+                      </div>
+                      {r.images && r.images.length > 0 && (
+                        <div style={{ fontSize: "11px", color: "#16a34a", marginTop: "4px" }}>
+                          ✓ {r.images.length} photo(s)
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Room Videos */}
+                    <div>
+                      <label style={{ ...s.label, fontSize: "10px" }}>Room Videos (WhatsApp Status-style)</label>
+                      <div style={{ border: "1px dashed #d1d5db", borderRadius: "8px", padding: "12px", textAlign: "center", background: "white" }}>
+                        <input
+                          type="file"
+                          accept="video/*"
+                          multiple
+                          onChange={(e) => {
+                            const files = Array.from(e.target.files);
+                            updateRoom(i, "videos", [...(r.videos || []), ...files]);
+                          }}
+                          style={{ display: "none" }}
+                          id={`room-videos-${i}`}
+                        />
+                        <label htmlFor={`room-videos-${i}`} style={{ cursor: "pointer", fontSize: "12px", color: "#6b7280" }}>
+                          + Add room videos
+                        </label>
+                      </div>
+                      {r.videos && r.videos.length > 0 && (
+                        <div style={{ fontSize: "11px", color: "#16a34a", marginTop: "4px" }}>
+                          ✓ {r.videos.length} video(s)
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ))}
                 <button style={s.addRoomBtn} onClick={addRoomType}>+ Add Room Type</button>

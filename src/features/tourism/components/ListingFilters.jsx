@@ -10,6 +10,10 @@ export default function ListingFilters({
   minRating,
   setMinRating,
   onClear,
+  area,
+  setArea,
+  availability,
+  setAvailability,
 }) {
   return (
     <>
@@ -23,6 +27,31 @@ export default function ListingFilters({
             onClick={() => setCategory(c)}
           >
             {CATEGORY_ICONS[c] || ""} {c}
+          </button>
+        ))}
+      </div>
+
+      <div style={fg}>
+        <div style={label}>Area / Location</div>
+        <input
+          type="text"
+          placeholder="e.g. Diani, Westlands, Nyali"
+          value={area}
+          onChange={(e) => setArea(e.target.value)}
+          style={select}
+        />
+      </div>
+
+      <div style={fg}>
+        <div style={label}>Availability</div>
+        {["All", "Available Today", "Available This Week", "Available This Month"].map((a) => (
+          <button
+            key={a}
+            type="button"
+            style={{ ...chip, ...(availability === a ? chipActive : {}) }}
+            onClick={() => setAvailability(a)}
+          >
+            {a}
           </button>
         ))}
       </div>

@@ -43,10 +43,12 @@ export default function TourismListingsPage() {
   const [maxPrice, setMaxPrice] = useState(35000);
   const [minRating, setMinRating] = useState(0);
   const [search, setSearch] = useState("");
+  const [area, setArea] = useState("");
+  const [availability, setAvailability] = useState("All");
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const { properties, loading, offline, error, total } = useTourismListings({
-    category, sort, maxPrice, minRating, search,
+    category, sort, maxPrice, minRating, search, area, availability,
   });
 
   const clearFilters = () => {
@@ -54,6 +56,8 @@ export default function TourismListingsPage() {
     setMaxPrice(35000);
     setMinRating(0);
     setSearch("");
+    setArea("");
+    setAvailability("All");
   };
 
   const openProperty = (id) => navigate(`/tourism/${id}`);
@@ -74,7 +78,7 @@ export default function TourismListingsPage() {
             onClick={() => setFiltersOpen(!filtersOpen)}
             style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "10px 14px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
           >
-             Filters
+            Filters
           </button>
         }
       />
@@ -97,6 +101,8 @@ export default function TourismListingsPage() {
           sort={sort} setSort={setSort}
           maxPrice={maxPrice} setMaxPrice={setMaxPrice}
           minRating={minRating} setMinRating={setMinRating}
+          area={area} setArea={setArea}
+          availability={availability} setAvailability={setAvailability}
           onClear={() => { clearFilters(); setFiltersOpen(false); }}
         />
       </div>
@@ -109,6 +115,8 @@ export default function TourismListingsPage() {
             sort={sort} setSort={setSort}
             maxPrice={maxPrice} setMaxPrice={setMaxPrice}
             minRating={minRating} setMinRating={setMinRating}
+            area={area} setArea={setArea}
+            availability={availability} setAvailability={setAvailability}
             onClear={clearFilters}
           />
         </aside>

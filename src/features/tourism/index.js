@@ -14,3 +14,4 @@ export { default as LoadingBlock } from "./components/LoadingBlock";
 export { default as ErrorAlert } from "./components/ErrorAlert";
 export { default as EmptyState } from "./components/EmptyState";
 export { default as StatusBadge } from "./components/StatusBadge";
+export { default as CompactReviews } from "./components/CompactReviews";
