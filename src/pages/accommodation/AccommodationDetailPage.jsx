@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  useTourismProperty,
-  TourismNav,
+  useAccommodationProperty,
+  AccommodationNav,
   LoadingBlock,
   ErrorAlert,
   TOURISM_FONT_CSS,
   tourismTheme,
   CompactReviews,
-} from "../../features/tourism";
+} from "../../features/accommodation";
 import PhoneInput from "../../components/PhoneInput";
 import { useAuth } from "../../context/AuthContext";
 import MessagingSystem from "../../components/MessagingSystem";
@@ -73,10 +73,10 @@ const properties = {
 
 const defaultProperty = properties[2];
 
-export default function TourismDetailPage() {
+export default function AccommodationDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { property, roomTypes, loading, error } = useTourismProperty(id);
+  const { property, loading, offline, error } = useAccommodationProperty(id);
   const { user, token } = useAuth();
 
   const [selectedRoom, setSelectedRoom] = useState(0);

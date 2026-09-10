@@ -2,10 +2,10 @@ import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import {
-  useTourismHome,
+  useAccommodationHome,
   ADVERTISING_PACKAGES,
   DEFAULT_CATEGORIES,
-} from "../../features/tourism";
+} from "../../features/accommodation";
 import SocialMediaLinks from "../../components/SocialMediaLinks";
 
 const packages = ADVERTISING_PACKAGES.map((p) => ({
@@ -15,11 +15,11 @@ const packages = ADVERTISING_PACKAGES.map((p) => ({
 
 const categories = DEFAULT_CATEGORIES;
 
-export default function TourismPage() {
+export default function AccommodationPage() {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const [search, setSearch] = useState("");
-  const { featured: featuredList, stats: heroStats } = useTourismHome();
+  const { featured: featuredList, stats: heroStats } = useAccommodationHome();
 
   const handleSelectPackage = (pkg) => {
     navigate("/accommodation/register-property");

@@ -1,6 +1,13 @@
-import { useState, useContext, useRef, useEffect } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import { loginTourismUser } from "../../api/tourism";
+import {
+  setAccommodationSession,
+  isAccommodationLoggedIn,
+  TOURISM_FONT_CSS,
+  tourismTheme,
+} from "../../features/accommodation";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -157,7 +164,13 @@ const css = `
   }
 `;
 
-export default function TourismLogin() {
+export default function AccommodationLogin() {
+  if (isAccommodationLoggedIn()) {
+    const navigate = useNavigate();
+    navigate("/accommodation/dashboard");
+    return null;
+  }
+
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
   const [email, setEmail] = useState("");

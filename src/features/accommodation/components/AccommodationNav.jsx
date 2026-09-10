@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { navStyles as s } from "../styles";
-import { getTourismUser, getDisplayName, isTourismLoggedIn } from "../auth";
+import { getAccommodationUser, getDisplayName, isAccommodationLoggedIn } from "../auth";
 
-export default function TourismNav({
+export default function AccommodationNav({
   showSearch = false,
   search = "",
   onSearchChange,
@@ -10,17 +10,17 @@ export default function TourismNav({
   extraActions,
 }) {
   const navigate = useNavigate();
-  const loggedIn = isTourismLoggedIn();
-  const userName = getDisplayName(getTourismUser());
+  const loggedIn = isAccommodationLoggedIn();
+  const userName = getDisplayName(getAccommodationUser());
 
   return (
     <header style={s.nav}>
       <div style={s.navInner}>
-        <button type="button" style={s.logoBtn} onClick={() => navigate("/tourism")}>
+        <button type="button" style={s.logoBtn} onClick={() => navigate("/accommodation")}>
           <span style={s.logoAccent}>AXX</span>
           <span style={s.logoWord}>SPACE</span>
           <span style={s.logoPipe}>|</span>
-          <span style={s.logoLabel}>Tourism</span>
+          <span style={s.logoLabel}>Accommodation</span>
         </button>
 
         {showSearch && (
@@ -34,15 +34,15 @@ export default function TourismNav({
         )}
 
         <nav style={{ display: "flex", alignItems: "center", gap: "4px", marginLeft: "auto", flexWrap: "wrap" }}>
-          <button type="button" style={s.navLink} onClick={() => navigate("/tourism/listings")}>Explore</button>
-          <button type="button" style={s.navLink} onClick={() => navigate("/tourism/register-property")}>List property</button>
+          <button type="button" style={s.navLink} onClick={() => navigate("/accommodation/listings")}>Explore</button>
+          <button type="button" style={s.navLink} onClick={() => navigate("/accommodation/register-property")}>List property</button>
           {loggedIn ? (
             <>
-              <button type="button" style={s.navLink} onClick={() => navigate("/tourism/dashboard")}>Dashboard</button>
+              <button type="button" style={s.navLink} onClick={() => navigate("/accommodation/dashboard")}>Dashboard</button>
               <span style={s.userChip}> {userName}</span>
             </>
           ) : (
-            <button type="button" style={s.navBtnPrimary} onClick={() => navigate("/tourism/register-property")}>
+            <button type="button" style={s.navBtnPrimary} onClick={() => navigate("/accommodation/register-property")}>
               Get started
             </button>
           )}

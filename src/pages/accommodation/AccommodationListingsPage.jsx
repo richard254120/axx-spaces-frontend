@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  useTourismListings,
-  TourismNav,
+  useAccommodationListings,
+  AccommodationNav,
   PropertyCard,
   ListingFilters,
   LoadingBlock,
@@ -10,7 +10,7 @@ import {
   EmptyState,
   TOURISM_FONT_CSS,
   tourismTheme,
-} from "../../features/tourism";
+} from "../../features/accommodation";
 
 const listingsCss = `
   .page-body { max-width: 1400px; margin: 0 auto; padding: 20px 16px; display: grid; grid-template-columns: 260px 1fr; gap: 24px; }
@@ -47,7 +47,7 @@ export default function TourismListingsPage() {
   const [availability, setAvailability] = useState("All");
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  const { properties, loading, offline, error, total } = useTourismListings({
+  const { properties, loading, offline, error, total } = useAccommodationListings({
     category, sort, maxPrice, minRating, search, area, availability,
   });
 

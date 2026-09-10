@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { fetchOwnerProfile } from "../../../api/tourism";
-import { getTourismToken } from "../auth";
+import { getAccommodationToken } from "../auth";
 
 export function useOwnerProfile() {
   const [profile, setProfile] = useState(null);
@@ -8,7 +8,7 @@ export function useOwnerProfile() {
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
-    const token = getTourismToken();
+    const token = getAccommodationToken();
     if (!token) {
       setError("Please sign in to view your profile.");
       setLoading(false);

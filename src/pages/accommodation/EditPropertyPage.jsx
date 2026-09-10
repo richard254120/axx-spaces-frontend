@@ -9,14 +9,14 @@ import {
   PROPERTY_CATEGORIES,
   KENYA_COUNTIES,
   AMENITIES_LIST,
-} from "../../features/tourism";
+} from "../../features/accommodation";
 import { fetchOwnerListing, updateOwnerListing } from "../../api/tourism";
-import { getTourismToken } from "../../features/tourism";
+import { getAccommodationToken } from "../../features/accommodation";
 
 export default function EditPropertyPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const token = getTourismToken();
+  const token = getAccommodationToken();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

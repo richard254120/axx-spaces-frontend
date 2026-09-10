@@ -1,11 +1,11 @@
 const TOKEN_KEY = "token";
-const USER_KEY = "tourismUser";
+const USER_KEY = "accommodationUser";
 
-export function getTourismToken() {
+export function getAccommodationToken() {
   return localStorage.getItem(TOKEN_KEY);
 }
 
-export function getTourismUser() {
+export function getAccommodationUser() {
   try {
     const raw = localStorage.getItem(USER_KEY);
     return raw ? JSON.parse(raw) : null;
@@ -14,7 +14,7 @@ export function getTourismUser() {
   }
 }
 
-export function setTourismSession(token, user) {
+export function setAccommodationSession(token, user) {
   if (token) localStorage.setItem(TOKEN_KEY, token);
   if (user) {
     localStorage.setItem(USER_KEY, JSON.stringify(user));
@@ -29,14 +29,14 @@ export function setTourismSession(token, user) {
   }
 }
 
-export function clearTourismSession() {
+export function clearAccommodationSession() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
   localStorage.removeItem("user");
 }
 
-export function isTourismLoggedIn() {
-  return Boolean(getTourismToken());
+export function isAccommodationLoggedIn() {
+  return Boolean(getAccommodationToken());
 }
 
 export function getDisplayName(user) {

@@ -1,5 +1,12 @@
 import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { registerTourismUser } from "../../api/tourism";
+import {
+  setAccommodationSession,
+  isAccommodationLoggedIn,
+  TOURISM_FONT_CSS,
+  tourismTheme,
+} from "../../features/accommodation";
 import { AuthContext } from "../../context/AuthContext";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
@@ -133,7 +140,12 @@ const css = `
   }
 `;
 
-export default function TourismRegister() {
+export default function AccommodationRegister() {
+  if (isAccommodationLoggedIn()) {
+    const navigate = useNavigate();
+    navigate("/accommodation");
+  }
+
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
   const [formData, setFormData] = useState({
@@ -197,7 +209,7 @@ export default function TourismRegister() {
       }
 
       setSuccess(" Registration successful! Redirecting to login...");
-      
+
       setTimeout(() => {
         navigate("/tourism/login");
       }, 2000);

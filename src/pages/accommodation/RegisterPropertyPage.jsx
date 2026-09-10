@@ -7,11 +7,10 @@ import {
   PROPERTY_CATEGORIES,
   KENYA_COUNTIES,
   AMENITIES_LIST,
-  REGISTER_STEPS,
   INITIAL_REGISTER_FORM,
-  setTourismSession,
+  setAccommodationSession,
   ErrorAlert,
-} from "../../features/tourism";
+} from "../../features/accommodation";
 import PhoneInput from "../../components/PhoneInput";
 
 const categories = PROPERTY_CATEGORIES;
@@ -74,7 +73,7 @@ export default function RegisterPropertyPage() {
 
       const result = await registerTourismProperty(fd);
       if (result.token) {
-        setTourismSession(result.token, result.user);
+        setAccommodationSession(result.token, result.user);
         authLogin(result.token, {
           _id: result.user?.id,
           name: result.user?.name,

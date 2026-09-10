@@ -10,7 +10,7 @@ import {
   TOURISM_FONT_CSS,
   tourismTheme,
   getDisplayName,
-} from "../../features/tourism";
+} from "../../features/accommodation";
 
 export default function ProviderDashboard() {
   const navigate = useNavigate();
@@ -105,7 +105,7 @@ export default function ProviderDashboard() {
                         <span>{l.location} · KSh {l.price?.toLocaleString()}/night</span>
                       </p>
                       <p style={{ fontSize: "12px", color: tourismTheme.muted, marginTop: "6px" }}>
-                         {(l.images?.length || 0)} photo(s) ·  {(l.videos?.length || 0)} video(s) ·  {l.views || 0} views
+                        {(l.images?.length || 0)} photo(s) ·  {(l.videos?.length || 0)} video(s) ·  {l.views || 0} views
                       </p>
                       {l.status === "pending" && (
                         <p style={{ fontSize: "12px", color: "#92400e", marginTop: "8px" }}>

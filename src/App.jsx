@@ -51,15 +51,15 @@ import MessagesPage from "./pages/MessagesPage";
 import NotificationsPage from "./pages/NotificationsPage";
 
 // ─── Accommodation Pages ───────────────────────────────────────────────────────────
-import AccommodationPage from "./pages/tourism/TourismPage";
-import AccommodationListingsPage from "./pages/tourism/TourismListingsPage";
-import AccommodationDetailPage from "./pages/tourism/TourismDetailPage";
-import AccommodationLogin from "./pages/tourism/TourismLogin";
-import AccommodationRegister from "./pages/tourism/TourismRegister";
-import RegisterPropertyPage from "./pages/tourism/RegisterPropertyPage";
-import ProviderDashboard from "./pages/tourism/ProviderDashboard";
-import EditPropertyPage from "./pages/tourism/EditPropertyPage";
-import AccommodationDashboardLayout from "./components/TourismDashboardLayout";
+import AccommodationPage from "./pages/accommodation/AccommodationPage";
+import AccommodationListingsPage from "./pages/accommodation/AccommodationListingsPage";
+import AccommodationDetailPage from "./pages/accommodation/AccommodationDetailPage";
+import AccommodationLogin from "./pages/accommodation/AccommodationLogin";
+import AccommodationRegister from "./pages/accommodation/AccommodationRegister";
+import RegisterPropertyPage from "./pages/accommodation/RegisterPropertyPage";
+import ProviderDashboard from "./pages/accommodation/ProviderDashboard";
+import EditPropertyPage from "./pages/accommodation/EditPropertyPage";
+import AccommodationDashboardLayout from "./components/AccommodationDashboardLayout";
 
 // ─── AxxBiashara Business Directory Pages ─────────────────────────────────────
 import AxxBiashara from "./pages/AxxBiashara";

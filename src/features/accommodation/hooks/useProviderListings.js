@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { fetchMyTourismListings } from "../../../api/tourism";
-import { getTourismToken } from "../auth";
+import { getAccommodationToken } from "../auth";
 
 export function useProviderListings() {
   const [listings, setListings] = useState([]);
@@ -8,7 +8,7 @@ export function useProviderListings() {
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
-    const token = getTourismToken();
+    const token = getAccommodationToken();
     if (!token) {
       setError("Please sign in or register a property to view your dashboard.");
       setLoading(false);
