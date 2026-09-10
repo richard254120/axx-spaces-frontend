@@ -33,7 +33,7 @@ export default function CompactReviews({ reviews = [], rating = 0, totalReviews 
               <span style={s.reviewDate}>{review.date || ''}</span>
             </div>
             <div style={s.reviewRating}>{"".repeat(review.rating || 5)}</div>
-            <p style={s.reviewText}>
+            <p style={{ ...s.reviewText, WebkitLineClamp: expanded ? 'unset' : 2 }}>
               {expanded || review.comment?.length <= 100
                 ? review.comment
                 : `${review.comment?.substring(0, 100)}...`}
@@ -130,7 +130,6 @@ const s = {
     lineHeight: '1.5',
     margin: '0',
     display: '-webkit-box',
-    WebkitLineClamp: expanded ? 'unset' : 2,
     WebkitBoxOrient: 'vertical',
     overflow: 'hidden',
   },
