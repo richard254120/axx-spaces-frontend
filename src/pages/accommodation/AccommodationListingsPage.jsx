@@ -64,7 +64,7 @@ export default function TourismListingsPage() {
 
   return (
     <div style={{ fontFamily: "'DM Sans', sans-serif", background: accommodationTheme.bg, minHeight: "100vh" }}>
-      <style>{TOURISM_FONT_CSS}{listingsCss}</style>
+      <style>{ACCOMMODATION_FONT_CSS}{listingsCss}</style>
 
       <TourismNav
         showSearch

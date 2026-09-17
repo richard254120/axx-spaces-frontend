@@ -39,7 +39,7 @@ export default function ProviderDashboard() {
 
   return (
     <div style={{ fontFamily: "'DM Sans', sans-serif", minHeight: "100vh", background: accommodationTheme.bg }}>
-      <style>{TOURISM_FONT_CSS}</style>
+      <style>{ACCOMMODATION_FONT_CSS}</style>
 
       <main style={{ padding: "32px 24px", maxWidth: "1200px", margin: "0 auto" }}>
         <div style={mainHeader}>

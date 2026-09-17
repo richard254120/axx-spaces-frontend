@@ -109,7 +109,7 @@ export default function EditPropertyPage() {
   if (loading) {
     return (
       <div style={page}>
-        <style>{TOURISM_FONT_CSS}</style>
+        <style>{ACCOMMODATION_FONT_CSS}</style>
         <LoadingBlock message="Loading your property…" />
       </div>
     );

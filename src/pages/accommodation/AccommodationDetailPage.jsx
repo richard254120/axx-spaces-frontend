@@ -93,7 +93,7 @@ export default function AccommodationDetailPage() {
   if (loading) {
     return (
       <div style={{ fontFamily: "'DM Sans', sans-serif", background: accommodationTheme.bg, minHeight: "100vh" }}>
-        <style>{TOURISM_FONT_CSS}</style>
+        <style>{ACCOMMODATION_FONT_CSS}</style>
         <TourismNav />
         <LoadingBlock message="Loading property details…" />
       </div>
