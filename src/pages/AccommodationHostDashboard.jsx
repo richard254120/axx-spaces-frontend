@@ -53,8 +53,12 @@ export default function AccommodationHostDashboard() {
       navigate("/user-login");
       return;
     }
+    if (user.role !== "host") {
+      navigate("/login");
+      return;
+    }
     fetchAccommodations();
-  }, [user]);
+  }, [user, navigate]);
 
   const fetchAccommodations = async () => {
     try {
@@ -126,6 +130,8 @@ export default function AccommodationHostDashboard() {
           checkOutTime: "11:00",
           maxGuests: 1,
           totalRooms: 1,
+          basePrice: "",
+          currency: "KES",
         });
         fetchAccommodations();
       }
@@ -454,6 +460,37 @@ export default function AccommodationHostDashboard() {
                           onChange={(e) => setFormData({ ...formData, totalRooms: parseInt(e.target.value) })}
                           style={{ width: "100%", padding: "12px", border: "1px solid #d1d5db", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit" }}
                         />
+                      </div>
+                    </div>
+
+                    <div style={{ display: "flex", gap: "16px", marginBottom: "16px" }}>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ fontSize: "14px", fontWeight: 700, color: "#374151", marginBottom: "8px", display: "block" }}>
+                          Base Price per Night (KES) *
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          required
+                          value={formData.basePrice}
+                          onChange={(e) => setFormData({ ...formData, basePrice: e.target.value })}
+                          style={{ width: "100%", padding: "12px", border: "1px solid #d1d5db", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit" }}
+                        />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ fontSize: "14px", fontWeight: 700, color: "#374151", marginBottom: "8px", display: "block" }}>
+                          Currency
+                        </label>
+                        <select
+                          value={formData.currency}
+                          onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                          style={{ width: "100%", padding: "12px", border: "1px solid #d1d5db", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit" }}
+                        >
+                          <option value="KES">KES</option>
+                          <option value="USD">USD</option>
+                          <option value="EUR">EUR</option>
+                        </select>
                       </div>
                     </div>
 

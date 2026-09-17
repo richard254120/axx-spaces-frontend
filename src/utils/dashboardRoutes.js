@@ -130,6 +130,7 @@ export function getWorkspaceBrand(role) {
     user: "Business Workspace",
     admin: "Admin Panel",
     team: "Admin Panel",
+    host: "Accommodation Host Portal",
   };
   return brands[normalizeRole(role)] || "My Account";
 }
