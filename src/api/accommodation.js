@@ -24,27 +24,28 @@ export async function fetchAccommodationListings(params = {}) {
   Object.entries(params).forEach(([k, v]) => {
     if (v !== undefined && v !== null && v !== "") qs.set(k, v);
   });
-  const json = await request(`/accommodation?${qs}`);
-  return json.data || [];
+  const json = await request(`/accommodations?${qs}`);
+  return json || [];
 }
 
 export async function fetchFeaturedAccommodation(limit = 6) {
-  const json = await request(`/accommodation/featured?limit=${limit}`);
-  return json.data || [];
+  const qs = new URLSearchParams({ featured: "true", limit });
+  const json = await request(`/accommodations?${qs}`);
+  return json || [];
 }
 
 export async function fetchAccommodationStats() {
-  const json = await request("/accommodation/stats");
-  return json.data;
+  const json = await request("/accommodations");
+  return json;
 }
 
 export async function fetchAccommodationById(id) {
-  const json = await request(`/accommodation/${id}`);
-  return json.data;
+  const json = await request(`/accommodations/${id}`);
+  return json;
 }
 
 export async function recordAccommodationView(id) {
-  await fetch(`${API_BASE}/accommodation/${id}/view`, { method: "PATCH" }).catch(() => { });
+  await fetch(`${API_BASE}/accommodations/${id}`, { method: "PATCH" }).catch(() => { });
 }
 
 // ─── Auth (uses main auth routes) ─────────────────────────────────────
@@ -94,14 +95,14 @@ export async function updateOwnerProfile(token, { name, phone }) {
 }
 
 export async function fetchOwnerListing(token, listingId) {
-  const json = await request(`/accommodation/owner/listings/${listingId}`, {
+  const json = await request(`/accommodations/${listingId}`, {
     headers: { ...authHeaders(token) },
   });
-  return json.data;
+  return json;
 }
 
 export async function updateOwnerListing(token, listingId, formData) {
-  const res = await fetch(`${API_BASE}/accommodation/owner/listings/${listingId}`, {
+  const res = await fetch(`${API_BASE}/accommodations/${listingId}`, {
     method: "PATCH",
     headers: { ...authHeaders(token) },
     body: formData,
@@ -111,10 +112,13 @@ export async function updateOwnerListing(token, listingId, formData) {
   return data;
 }
 
-export async function submitAccommodationReview(id, { name, rating, comment }) {
-  return request(`/accommodation/${id}/reviews`, {
+export async function submitAccommodationReview(accommodationId, { rating, title, comment }, token) {
+  const res = await fetch(`${API_BASE}/accommodation-reviews`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, rating, comment }),
+    headers: { "Content-Type": "application/json", ...authHeaders(token) },
+    body: JSON.stringify({ accommodationId, rating, title, comment }),
   });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "Failed to submit review");
+  return data;
 }

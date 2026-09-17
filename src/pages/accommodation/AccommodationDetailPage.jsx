@@ -94,7 +94,7 @@ export default function AccommodationDetailPage() {
     return (
       <div style={{ fontFamily: "'DM Sans', sans-serif", background: accommodationTheme.bg, minHeight: "100vh" }}>
         <style>{ACCOMMODATION_FONT_CSS}</style>
-        <TourismNav />
+        <AccommodationNav />
         <LoadingBlock message="Loading property details…" />
       </div>
     );
@@ -103,7 +103,7 @@ export default function AccommodationDetailPage() {
   if (!property) {
     return (
       <div style={{ fontFamily: "'DM Sans', sans-serif", background: accommodationTheme.bg, minHeight: "100vh", padding: "40px 20px" }}>
-        <TourismNav />
+        <AccommodationNav />
         <ErrorAlert message={error || "Property not found"} />
         <button type="button" onClick={() => navigate("/tourism/listings")} style={{ marginTop: "16px", padding: "12px 20px", borderRadius: "10px", border: "none", background: "#fbbf24", fontWeight: 800, cursor: "pointer" }}>
           Back to listings
@@ -220,7 +220,7 @@ export default function AccommodationDetailPage() {
   return (
     <div style={s.root}>
       <style>{TOURISM_FONT_CSS}{css}</style>
-      <TourismNav />
+      <AccommodationNav />
       {error && (
         <div style={{ maxWidth: "1100px", margin: "12px auto", padding: "0 16px" }}>
           <ErrorAlert message={`Showing cached preview: ${error}`} />

@@ -60,17 +60,17 @@ export default function TourismListingsPage() {
     setAvailability("All");
   };
 
-  const openProperty = (id) => navigate(`/tourism/${id}`);
+  const openProperty = (id) => navigate(`/accommodation/${id}`);
 
   return (
     <div style={{ fontFamily: "'DM Sans', sans-serif", background: accommodationTheme.bg, minHeight: "100vh" }}>
       <style>{ACCOMMODATION_FONT_CSS}{listingsCss}</style>
 
-      <TourismNav
+      <AccommodationNav
         showSearch
         search={search}
         onSearchChange={setSearch}
-        onSearchSubmit={() => navigate("/tourism/listings")}
+        onSearchSubmit={() => navigate("/accommodation/listings")}
         extraActions={
           <button
             type="button"
