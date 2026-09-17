@@ -63,7 +63,7 @@ export default function TourismListingsPage() {
   const openProperty = (id) => navigate(`/tourism/${id}`);
 
   return (
-    <div style={{ fontFamily: "'DM Sans', sans-serif", background: tourismTheme.bg, minHeight: "100vh" }}>
+    <div style={{ fontFamily: "'DM Sans', sans-serif", background: accommodationTheme.bg, minHeight: "100vh" }}>
       <style>{TOURISM_FONT_CSS}{listingsCss}</style>
 
       <TourismNav
@@ -83,10 +83,10 @@ export default function TourismListingsPage() {
         }
       />
 
-      <div style={{ maxWidth: "1400px", margin: "8px auto 0", padding: "0 16px", fontSize: "13px", color: tourismTheme.muted }}>
+      <div style={{ maxWidth: "1400px", margin: "8px auto 0", padding: "0 16px", fontSize: "13px", color: accommodationTheme.muted }}>
         {loading && <span>Loading… </span>}
         {offline && <span style={{ color: "#b45309" }}>Offline preview · </span>}
-        <strong style={{ color: tourismTheme.text }}>{total}</strong> properties found
+        <strong style={{ color: accommodationTheme.text }}>{total}</strong> properties found
       </div>
 
       {error && offline && (
@@ -127,7 +127,7 @@ export default function TourismListingsPage() {
           ) : total === 0 ? (
             <EmptyState
               action={
-                <button type="button" onClick={clearFilters} style={{ background: tourismTheme.accent, border: "none", padding: "12px 24px", borderRadius: "10px", fontWeight: 800, cursor: "pointer" }}>
+                <button type="button" onClick={clearFilters} style={{ background: accommodationTheme.accent, border: "none", padding: "12px 24px", borderRadius: "10px", fontWeight: 800, cursor: "pointer" }}>
                   Clear filters
                 </button>
               }

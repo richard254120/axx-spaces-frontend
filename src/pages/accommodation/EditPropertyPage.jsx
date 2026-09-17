@@ -197,7 +197,7 @@ export default function EditPropertyPage() {
           </label>
         </div>
         {(newImages.length > 0 || newVideos.length > 0) && (
-          <p style={{ fontSize: "12px", color: tourismTheme.muted, marginTop: "8px" }}>
+          <p style={{ fontSize: "12px", color: accommodationTheme.muted, marginTop: "8px" }}>
             Ready to upload: {newImages.length} photo(s), {newVideos.length} video(s)
           </p>
         )}

@@ -38,16 +38,16 @@ export default function ProviderDashboard() {
   const loggedIn = Boolean(token);
 
   return (
-    <div style={{ fontFamily: "'DM Sans', sans-serif", minHeight: "100vh", background: tourismTheme.bg }}>
+    <div style={{ fontFamily: "'DM Sans', sans-serif", minHeight: "100vh", background: accommodationTheme.bg }}>
       <style>{TOURISM_FONT_CSS}</style>
 
       <main style={{ padding: "32px 24px", maxWidth: "1200px", margin: "0 auto" }}>
         <div style={mainHeader}>
           <div>
-            <h1 style={{ fontSize: "28px", fontWeight: 800, color: tourismTheme.text, marginBottom: "8px" }}>
+            <h1 style={{ fontSize: "28px", fontWeight: 800, color: accommodationTheme.text, marginBottom: "8px" }}>
               {getGreeting()}, {displayName.split(" ")[0]}!
             </h1>
-            <p style={{ color: tourismTheme.muted, fontSize: "14px" }}>
+            <p style={{ color: accommodationTheme.muted, fontSize: "14px" }}>
               Your tourism property dashboard
             </p>
           </div>
@@ -68,8 +68,8 @@ export default function ProviderDashboard() {
                 { label: "Total views", value: stats?.totalViews ?? 0, color: "#0ea5e9" },
               ].map((s) => (
                 <div key={s.label} style={statCard}>
-                  <div style={{ fontSize: "13px", color: tourismTheme.muted }}>{s.label}</div>
-                  <div style={{ fontSize: "26px", fontWeight: 900, color: s.color || tourismTheme.text }}>{s.value}</div>
+                  <div style={{ fontSize: "13px", color: accommodationTheme.muted }}>{s.label}</div>
+                  <div style={{ fontSize: "26px", fontWeight: 900, color: s.color || accommodationTheme.text }}>{s.value}</div>
                 </div>
               ))}
             </div>
@@ -78,7 +78,7 @@ export default function ProviderDashboard() {
 
             {listings.length === 0 ? (
               <div style={{ ...statCard, textAlign: "center", padding: "40px" }}>
-                <p style={{ color: tourismTheme.muted, marginBottom: "16px" }}>No properties submitted yet.</p>
+                <p style={{ color: accommodationTheme.muted, marginBottom: "16px" }}>No properties submitted yet.</p>
                 <button type="button" style={primaryBtn} onClick={() => navigate("/tourism/register-property")}>
                   List your first property →
                 </button>
@@ -99,12 +99,12 @@ export default function ProviderDashboard() {
                         <h3 style={{ fontSize: "16px", fontWeight: 800 }}>{l.name}</h3>
                         <StatusBadge status={l.status} />
                       </div>
-                      <p style={{ fontSize: "13px", color: tourismTheme.muted, marginTop: "4px", display: "flex", alignItems: "center", gap: "4px" }}>
+                      <p style={{ fontSize: "13px", color: accommodationTheme.muted, marginTop: "4px", display: "flex", alignItems: "center", gap: "4px" }}>
                         <span>{l.category} ·</span>
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                         <span>{l.location} · KSh {l.price?.toLocaleString()}/night</span>
                       </p>
-                      <p style={{ fontSize: "12px", color: tourismTheme.muted, marginTop: "6px" }}>
+                      <p style={{ fontSize: "12px", color: accommodationTheme.muted, marginTop: "6px" }}>
                         {(l.images?.length || 0)} photo(s) ·  {(l.videos?.length || 0)} video(s) ·  {l.views || 0} views
                       </p>
                       {l.status === "pending" && (
@@ -135,7 +135,7 @@ export default function ProviderDashboard() {
           </>
         ) : !loggedIn ? (
           <div style={statCard}>
-            <p style={{ marginBottom: "16px", color: tourismTheme.muted }}>Sign in to manage your tourism properties.</p>
+            <p style={{ marginBottom: "16px", color: accommodationTheme.muted }}>Sign in to manage your tourism properties.</p>
             <button type="button" style={primaryBtn} onClick={() => navigate("/tourism/login")}> Log in</button>
             <button type="button" style={{ ...secondaryBtn, marginLeft: "10px" }} onClick={() => navigate("/tourism/register-property")}>
               Register property

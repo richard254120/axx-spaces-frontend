@@ -92,7 +92,7 @@ export default function AccommodationDetailPage() {
 
   if (loading) {
     return (
-      <div style={{ fontFamily: "'DM Sans', sans-serif", background: tourismTheme.bg, minHeight: "100vh" }}>
+      <div style={{ fontFamily: "'DM Sans', sans-serif", background: accommodationTheme.bg, minHeight: "100vh" }}>
         <style>{TOURISM_FONT_CSS}</style>
         <TourismNav />
         <LoadingBlock message="Loading property details…" />
@@ -102,7 +102,7 @@ export default function AccommodationDetailPage() {
 
   if (!property) {
     return (
-      <div style={{ fontFamily: "'DM Sans', sans-serif", background: tourismTheme.bg, minHeight: "100vh", padding: "40px 20px" }}>
+      <div style={{ fontFamily: "'DM Sans', sans-serif", background: accommodationTheme.bg, minHeight: "100vh", padding: "40px 20px" }}>
         <TourismNav />
         <ErrorAlert message={error || "Property not found"} />
         <button type="button" onClick={() => navigate("/tourism/listings")} style={{ marginTop: "16px", padding: "12px 20px", borderRadius: "10px", border: "none", background: "#fbbf24", fontWeight: 800, cursor: "pointer" }}>
