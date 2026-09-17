@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { accommodationLogin } from "../../api/accommodation";
@@ -165,13 +165,13 @@ const css = `
 `;
 
 export default function AccommodationLogin() {
-  if (isAccommodationLoggedIn()) {
-    const navigate = useNavigate();
-    navigate("/accommodation/dashboard");
-    return null;
-  }
-
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAccommodationLoggedIn()) {
+      navigate("/accommodation/dashboard");
+    }
+  }, [navigate]);
   const { login } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -301,7 +301,7 @@ export default function AccommodationLogin() {
 
       setSuccess(" Google login successful! Redirecting...");
       setTimeout(() => {
-        navigate("/tourism/dashboard");
+        navigate("/accommodation/dashboard");
       }, 1000);
 
     } catch (err) {
@@ -384,7 +384,7 @@ export default function AccommodationLogin() {
         role: data.user.role,
       });
 
-      navigate("/tourism/dashboard");
+      navigate("/accommodation/dashboard");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -559,14 +559,14 @@ export default function AccommodationLogin() {
 
             <div style={styles.link}>
               Don't have an account?{" "}
-              <span style={styles.linkText} onClick={() => navigate("/tourism/register-property")}>
+              <span style={styles.linkText} onClick={() => navigate("/accommodation/register-property")}>
                 Register Your Property
               </span>
             </div>
 
             <div style={styles.link}>
-              <span style={styles.linkText} onClick={() => navigate("/tourism")}>
-                ← Back to Tourism
+              <span style={styles.linkText} onClick={() => navigate("/accommodation")}>
+                ← Back to Accommodation
               </span>
             </div>
           </>

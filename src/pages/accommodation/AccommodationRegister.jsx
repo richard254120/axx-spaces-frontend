@@ -211,7 +211,7 @@ export default function AccommodationRegister() {
       setSuccess(" Registration successful! Redirecting to login...");
 
       setTimeout(() => {
-        navigate("/tourism/login");
+        navigate("/accommodation/login");
       }, 2000);
     } catch (err) {
       setError(err.message || "Registration failed. Please try again.");
@@ -303,14 +303,14 @@ export default function AccommodationRegister() {
 
         <div style={styles.link}>
           Already have an account?{" "}
-          <span style={styles.linkText} onClick={() => navigate("/tourism/login")}>
+          <span style={styles.linkText} onClick={() => navigate("/accommodation/login")}>
             Login
           </span>
         </div>
 
         <div style={styles.link}>
-          <span style={styles.linkText} onClick={() => navigate("/tourism")}>
-            ← Back to Tourism
+          <span style={styles.linkText} onClick={() => navigate("/accommodation")}>
+            ← Back to Accommodation
           </span>
         </div>
       </div>
