@@ -1,5 +1,5 @@
 /**
- * Tourism API — all backend calls in one place.
+ * Accommodation API — all backend calls in one place.
  * Set VITE_API_URL in .env (e.g. http://localhost:1000/api)
  */
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
@@ -19,37 +19,37 @@ function authHeaders(token) {
 
 // ─── Browse ───────────────────────────────────────────────────────────
 
-export async function fetchTourismListings(params = {}) {
+export async function fetchAccommodationListings(params = {}) {
   const qs = new URLSearchParams();
   Object.entries(params).forEach(([k, v]) => {
     if (v !== undefined && v !== null && v !== "") qs.set(k, v);
   });
-  const json = await request(`/tourism?${qs}`);
+  const json = await request(`/accommodation?${qs}`);
   return json.data || [];
 }
 
-export async function fetchFeaturedTourism(limit = 6) {
-  const json = await request(`/tourism/featured?limit=${limit}`);
+export async function fetchFeaturedAccommodation(limit = 6) {
+  const json = await request(`/accommodation/featured?limit=${limit}`);
   return json.data || [];
 }
 
-export async function fetchTourismStats() {
-  const json = await request("/tourism/stats");
+export async function fetchAccommodationStats() {
+  const json = await request("/accommodation/stats");
   return json.data;
 }
 
-export async function fetchTourismById(id) {
-  const json = await request(`/tourism/${id}`);
+export async function fetchAccommodationById(id) {
+  const json = await request(`/accommodation/${id}`);
   return json.data;
 }
 
-export async function recordTourismView(id) {
-  await fetch(`${API_BASE}/tourism/${id}/view`, { method: "PATCH" }).catch(() => { });
+export async function recordAccommodationView(id) {
+  await fetch(`${API_BASE}/accommodation/${id}/view`, { method: "PATCH" }).catch(() => { });
 }
 
 // ─── Auth (uses main auth routes) ─────────────────────────────────────
 
-export async function tourismLogin(email, password) {
+export async function accommodationLogin(email, password) {
   const json = await request("/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -60,8 +60,8 @@ export async function tourismLogin(email, password) {
 
 // ─── Provider ─────────────────────────────────────────────────────────
 
-export async function registerTourismProperty(formData) {
-  const res = await fetch(`${API_BASE}/tourism/register`, {
+export async function registerAccommodationProperty(formData) {
+  const res = await fetch(`${API_BASE}/accommodation/register`, {
     method: "POST",
     body: formData,
   });
@@ -70,22 +70,22 @@ export async function registerTourismProperty(formData) {
   return data;
 }
 
-export async function fetchMyTourismListings(token) {
-  const json = await request("/tourism/my", {
+export async function fetchMyAccommodationListings(token) {
+  const json = await request("/accommodation/my", {
     headers: { ...authHeaders(token) },
   });
   return json.data || [];
 }
 
 export async function fetchOwnerProfile(token) {
-  const json = await request("/tourism/owner/profile", {
+  const json = await request("/accommodation/owner/profile", {
     headers: { ...authHeaders(token) },
   });
   return json.data;
 }
 
 export async function updateOwnerProfile(token, { name, phone }) {
-  const json = await request("/tourism/owner/profile", {
+  const json = await request("/accommodation/owner/profile", {
     method: "PATCH",
     headers: { "Content-Type": "application/json", ...authHeaders(token) },
     body: JSON.stringify({ name, phone }),
@@ -94,14 +94,14 @@ export async function updateOwnerProfile(token, { name, phone }) {
 }
 
 export async function fetchOwnerListing(token, listingId) {
-  const json = await request(`/tourism/owner/listings/${listingId}`, {
+  const json = await request(`/accommodation/owner/listings/${listingId}`, {
     headers: { ...authHeaders(token) },
   });
   return json.data;
 }
 
 export async function updateOwnerListing(token, listingId, formData) {
-  const res = await fetch(`${API_BASE}/tourism/owner/listings/${listingId}`, {
+  const res = await fetch(`${API_BASE}/accommodation/owner/listings/${listingId}`, {
     method: "PATCH",
     headers: { ...authHeaders(token) },
     body: formData,
@@ -111,8 +111,8 @@ export async function updateOwnerListing(token, listingId, formData) {
   return data;
 }
 
-export async function submitTourismReview(id, { name, rating, comment }) {
-  return request(`/tourism/${id}/reviews`, {
+export async function submitAccommodationReview(id, { name, rating, comment }) {
+  return request(`/accommodation/${id}/reviews`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, rating, comment }),

@@ -4,13 +4,13 @@ import {
   StatusBadge,
   LoadingBlock,
   ErrorAlert,
-  TOURISM_FONT_CSS,
-  tourismTheme,
+  ACCOMMODATION_FONT_CSS,
+  accommodationTheme,
   PROPERTY_CATEGORIES,
   KENYA_COUNTIES,
   AMENITIES_LIST,
 } from "../../features/accommodation";
-import { fetchOwnerListing, updateOwnerListing } from "../../api/tourism";
+import { fetchOwnerListing, updateOwnerListing } from "../../api/accommodation";
 import { getAccommodationToken } from "../../features/accommodation";
 
 export default function EditPropertyPage() {

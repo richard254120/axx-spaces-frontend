@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { fetchMyTourismListings } from "../../../api/tourism";
+import { fetchMyAccommodationListings } from "../../../api/accommodation";
 import { getAccommodationToken } from "../auth";
 
 export function useProviderListings() {
@@ -17,7 +17,7 @@ export function useProviderListings() {
     setLoading(true);
     setError("");
     try {
-      const data = await fetchMyTourismListings(token);
+      const data = await fetchMyAccommodationListings(token);
       setListings(data);
     } catch (err) {
       setError(err.message);

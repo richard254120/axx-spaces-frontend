@@ -33,6 +33,9 @@ const C = {
   borderSoft: "rgba(255,255,255,0.05)",
   glow: "rgba(99,102,241,0.5)",
   glowPink: "rgba(236,72,153,0.5)",
+  gold: "#C9A84C",
+  goldLight: "#E2C47A",
+  navy: "#0D1B2A",
 };
 
 /* ════════ GLOBAL CSS ════════ */

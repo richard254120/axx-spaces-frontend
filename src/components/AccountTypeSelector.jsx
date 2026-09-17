@@ -100,6 +100,14 @@ const styles = {
 
 const accountTypes = [
   {
+    id: "user",
+    name: "User Account",
+    icon: "/assets/user-icon.png",
+    description: "Browse properties and services as a regular user",
+    loginPath: "/user-login",
+    registerPath: "/user-register",
+  },
+  {
     id: "landlord",
     name: "Landlord Account",
     icon: "/assets/landlord-icon.png",
@@ -177,6 +185,9 @@ export default function AccountTypeSelector({ isOpen, onClose, mode = "login" })
                 e.currentTarget.style.borderColor = "#334155";
               }}
             >
+              <div style={styles.accountIcon}>
+                <span style={{ fontSize: "24px" }}>{account.id === "user" ? "👤" : account.id === "landlord" ? "🏠" : account.id === "axxbiashara" ? "💼" : account.id === "marketplace" ? "🛒" : "🏨"}</span>
+              </div>
               <div style={styles.accountInfo}>
                 <div style={styles.accountName}>{account.name}</div>
                 <div style={styles.accountDesc}>{account.description}</div>

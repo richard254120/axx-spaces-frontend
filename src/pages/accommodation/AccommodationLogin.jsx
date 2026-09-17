@@ -1,12 +1,12 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import { loginTourismUser } from "../../api/tourism";
+import { accommodationLogin } from "../../api/accommodation";
 import {
   setAccommodationSession,
   isAccommodationLoggedIn,
-  TOURISM_FONT_CSS,
-  tourismTheme,
+  ACCOMMODATION_FONT_CSS,
+  accommodationTheme,
 } from "../../features/accommodation";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";

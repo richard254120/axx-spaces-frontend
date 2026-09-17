@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { fetchFeaturedTourism, fetchTourismStats } from "../../../api/tourism";
+import { fetchFeaturedAccommodation, fetchAccommodationStats } from "../../../api/accommodation";
 import { DEFAULT_STATS, FALLBACK_PROPERTIES } from "../constants";
 
 export function useTourismHome() {
@@ -14,8 +14,8 @@ export function useTourismHome() {
       setLoading(true);
       try {
         const [featuredData, statsData] = await Promise.all([
-          fetchFeaturedTourism(6),
-          fetchTourismStats(),
+          fetchFeaturedAccommodation(6),
+          fetchAccommodationStats(),
         ]);
         if (!cancelled) {
           if (featuredData.length) setFeatured(featuredData);

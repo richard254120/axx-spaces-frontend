@@ -13,6 +13,8 @@ import Listings from "./pages/Listings";
 import PropertyDetailPage from "./pages/PropertyDetailPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import UserLogin from "./pages/UserLogin";
+import UserRegister from "./pages/UserRegister";
 import Upload from "./pages/Upload";
 import LandlordDashboard from "./pages/LandlordDashboard";
 
@@ -49,6 +51,12 @@ import AxxWallet from "./pages/AxxWallet";
 import SavedListingsPage from "./pages/SavedListingsPage";
 import MessagesPage from "./pages/MessagesPage";
 import NotificationsPage from "./pages/NotificationsPage";
+
+// ─── New Accommodation Booking Pages ──────────────────────────────────────────
+import AccommodationSearch from "./pages/AccommodationSearch";
+import AccommodationBookingDetail from "./pages/AccommodationBookingDetail";
+import AccommodationGuestDashboard from "./pages/AccommodationGuestDashboard";
+import AccommodationLeaveReview from "./pages/AccommodationLeaveReview";
 
 // ─── Accommodation Pages ───────────────────────────────────────────────────────────
 import AccommodationPage from "./pages/accommodation/AccommodationPage";
@@ -110,21 +118,24 @@ function App() {
   const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
+    // Temporarily disable splash screen for debugging
+    setShowSplash(false);
+
     // Check if this is the first visit or if forced via URL parameter
-    const hasVisited = localStorage.getItem('axxspace_visited');
-    const urlParams = new URLSearchParams(window.location.search);
-    const forceSplash = urlParams.get('splash') === 'true';
+    // const hasVisited = localStorage.getItem('axxspace_visited');
+    // const urlParams = new URLSearchParams(window.location.search);
+    // const forceSplash = urlParams.get('splash') === 'true';
 
     // Only skip if explicitly visited AND not forced
     // If hasVisited is null (first time ever), show the splash
-    if (hasVisited === 'true' && !forceSplash) {
-      setShowSplash(false);
-    } else {
-      // Only set the flag if not forced
-      if (!forceSplash) {
-        localStorage.setItem('axxspace_visited', 'true');
-      }
-    }
+    // if (hasVisited === 'true' && !forceSplash) {
+    //   setShowSplash(false);
+    // } else {
+    //   // Only set the flag if not forced
+    //   if (!forceSplash) {
+    //     localStorage.setItem('axxspace_visited', 'true');
+    //   }
+    // }
   }, []);
 
   // Function to reset splash screen for testing (call from browser console: window.resetSplash())
@@ -149,6 +160,8 @@ function App() {
 
       <Route path="/login" element={<PublicLayout><Login /></PublicLayout>} />
       <Route path="/register" element={<PublicLayout><Register /></PublicLayout>} />
+      <Route path="/user-login" element={<PublicLayout><UserLogin /></PublicLayout>} />
+      <Route path="/user-register" element={<PublicLayout><UserRegister /></PublicLayout>} />
       <Route path="/about" element={<PublicLayout><AboutUs /></PublicLayout>} />
       <Route path="/reset-password/:token" element={<PublicLayout><ResetPassword /></PublicLayout>} />
       <Route path="/verify-email/:token" element={<PublicLayout><VerifyEmail /></PublicLayout>} />
@@ -160,6 +173,26 @@ function App() {
       <Route path="/mobile-app" element={<PublicLayout><MobileAppDownload /></PublicLayout>} />
       <Route path="/terms" element={<PublicLayout><TermsAndPrivacy /></PublicLayout>} />
       <Route path="/users" element={<PublicLayout><UsersPage /></PublicLayout>} />
+
+      {/* ── NEW ACCOMMODATION BOOKING ROUTES ── */}
+      <Route path="/accommodation-booking-search" element={<PublicLayout><AccommodationSearch /></PublicLayout>} />
+      <Route path="/accommodation-booking-detail/:id" element={<PublicLayout><AccommodationBookingDetail /></PublicLayout>} />
+      <Route
+        path="/my-bookings"
+        element={
+          <DashboardLayout>
+            <ProtectedRoute><AccommodationGuestDashboard /></ProtectedRoute>
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/accommodation-leave-review"
+        element={
+          <DashboardLayout>
+            <ProtectedRoute><AccommodationLeaveReview /></ProtectedRoute>
+          </DashboardLayout>
+        }
+      />
 
       {/* ── ACCOMMODATION ROUTES (have Navbar) ── */}
       {/* IMPORTANT: specific /accommodation/* paths must come before /accommodation/:id */}

@@ -53,6 +53,12 @@ export default function AdminDashboard() {
   const [requests, setRequests] = useState([]);
   const [requestsLoading, setRequestsLoading] = useState(false);
 
+  // ADDED: accommodations tab state
+  const [pendingAccommodations, setPendingAccommodations] = useState([]);
+  const [accommodationsLoading, setAccommodationsLoading] = useState(false);
+  const [accommodationFilter, setAccommodationFilter] = useState("pending");
+  // END ADDED
+
   useEffect(() => {
     // Security check: ensure only admins can stay on this page
     if (user?.role !== "admin") {
@@ -102,6 +108,13 @@ export default function AdminDashboard() {
     }
   }, [activeTab]);
 
+  // ADDED: load accommodations when tab or filter changes
+  useEffect(() => {
+    if (activeTab === "accommodations") {
+      loadAccommodations();
+    }
+  }, [activeTab, accommodationFilter]);
+
   // ADDED: load properties when tab or filter changes
   useEffect(() => {
     if (activeTab === "properties") {
@@ -127,6 +140,41 @@ export default function AdminDashboard() {
       setPropertiesLoading(false);
     }
   };
+
+  // ADDED: load accommodations function
+  const loadAccommodations = async () => {
+    setAccommodationsLoading(true);
+    try {
+      const params = {};
+      if (accommodationFilter === "pending") {
+        params.status = "pending_review";
+      } else if (accommodationFilter === "active") {
+        params.status = "active";
+      } else if (accommodationFilter === "inactive") {
+        params.status = "inactive";
+      }
+
+      const res = await API.get("/accommodations", { params });
+      setPendingAccommodations(res.data || []);
+    } catch (err) {
+      console.error("Failed to load accommodations:", err);
+    } finally {
+      setAccommodationsLoading(false);
+    }
+  };
+
+  const handleAccommodationStatus = async (accommodationId, status) => {
+    try {
+      await API.patch(`/accommodations/${accommodationId}/status`, { status });
+      setPendingAccommodations((prev) =>
+        prev.filter((a) => a._id !== accommodationId)
+      );
+      alert(`Accommodation ${status} successfully`);
+    } catch (err) {
+      alert("Failed to update accommodation status");
+    }
+  };
+  // END ADDED
 
   const loadPendingPayments = async () => {
     setPaymentsLoading(true);
@@ -512,6 +560,14 @@ export default function AdminDashboard() {
         >
           Requests {requests.length > 0 ? `(${requests.length})` : ""}
         </button>
+        {/* ADDED: Accommodations tab button */}
+        <button
+          style={{ ...styles.tab, ...(activeTab === "accommodations" ? styles.tabActive : {}) }}
+          onClick={() => setActiveTab("accommodations")}
+        >
+          Accommodations {pendingAccommodations.length > 0 ? `(${pendingAccommodations.length})` : ""}
+        </button>
+        {/* END ADDED */}
         {/* Verification tab button */}
         <button
           style={{ ...styles.tab, ...(activeTab === "verification" ? styles.tabActive : {}) }}
@@ -1218,6 +1274,148 @@ export default function AdminDashboard() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )
+        // END ADDED
+      ) : activeTab === "accommodations" ? (
+        // ADDED: Accommodations Tab
+        accommodationsLoading ? (
+          <div style={styles.loader}>Loading accommodations...</div>
+        ) : pendingAccommodations.length === 0 ? (
+          <div style={styles.emptyCard}>
+            <p style={styles.emptyText}>No accommodations found matching "{accommodationFilter}" status.</p>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px", width: "100%" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
+              <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Accommodation Directory</h2>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <span style={{ fontSize: "14px", color: "#94a3b8", fontWeight: 600 }}>Filter by Status:</span>
+                <select
+                  value={accommodationFilter}
+                  onChange={(e) => setAccommodationFilter(e.target.value)}
+                  style={{
+                    padding: "8px 12px",
+                    backgroundColor: "#0f172a",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: "8px",
+                    color: "#fff",
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    outline: "none",
+                  }}
+                >
+                  <option value="pending">Pending Review</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                  <option value="all">All</option>
+                </select>
+              </div>
+            </div>
+            <div style={styles.tableContainer}>
+              <table style={styles.table}>
+                <thead>
+                  <tr style={styles.theadRow}>
+                    <th style={styles.th}>Accommodation Details</th>
+                    <th style={styles.th}>Owner Info</th>
+                    <th style={styles.th}>Type</th>
+                    <th style={styles.th}>Location</th>
+                    <th style={styles.th}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pendingAccommodations.map((accommodation) => (
+                    <tr key={accommodation._id} style={styles.tr}>
+                      <td style={styles.td}>
+                        <div style={styles.propTitle}>{accommodation.name}</div>
+                        <div style={{ fontSize: "13px", color: "#94a3b8", marginTop: "4px" }}>
+                          {accommodation.description?.substring(0, 80)}...
+                        </div>
+                        <div style={{ marginTop: "6px", display: "flex", alignItems: "center", gap: "6px" }}>
+                          <span style={{
+                            fontSize: "11px",
+                            padding: "2px 8px",
+                            borderRadius: "4px",
+                            fontWeight: 600,
+                            background: accommodation.status === "active" ? "rgba(34,197,94,0.12)" :
+                              accommodation.status === "inactive" ? "rgba(239,68,68,0.12)" :
+                                "rgba(251,191,36,0.12)",
+                            color: accommodation.status === "active" ? "#22c55e" :
+                              accommodation.status === "inactive" ? "#ef4444" :
+                                "#fbbf24",
+                            border: `1px solid ${accommodation.status === "active" ? "rgba(34,197,94,0.3)" :
+                              accommodation.status === "inactive" ? "rgba(239,68,68,0.3)" :
+                                "rgba(251,191,36,0.3)"}`,
+                          }}>
+                            {accommodation.status.replace("_", " ").toUpperCase()}
+                          </span>
+                          <span style={{ fontSize: "11px", color: "#94a3b8" }}>
+                            {accommodation.maxGuests} guests • {accommodation.totalRooms} rooms
+                          </span>
+                        </div>
+                      </td>
+                      <td style={styles.td}>
+                        <div style={styles.ownerName}>{accommodation.owner?.name || "Member"}</div>
+                        <div style={styles.ownerContact}>{accommodation.owner?.email}</div>
+                      </td>
+                      <td style={styles.td}>
+                        <span style={{
+                          fontSize: "12px",
+                          padding: "4px 8px",
+                          borderRadius: "4px",
+                          fontWeight: 600,
+                          textTransform: "capitalize",
+                          background: "rgba(59, 130, 246, 0.15)",
+                          color: "#60a5fa",
+                          border: "1px solid rgba(59, 130, 246, 0.3)",
+                        }}>
+                          {accommodation.type}
+                        </span>
+                      </td>
+                      <td style={styles.td}>
+                        <div style={styles.propLoc}>{accommodation.address}</div>
+                      </td>
+                      <td style={styles.td}>
+                        <div style={styles.btnGroup}>
+                          {accommodation.status === "pending_review" && (
+                            <>
+                              <button
+                                onClick={() => handleAccommodationStatus(accommodation._id, "active")}
+                                style={styles.approveBtn}
+                              >
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => handleAccommodationStatus(accommodation._id, "inactive")}
+                                style={styles.rejectBtn}
+                              >
+                                Reject
+                              </button>
+                            </>
+                          )}
+                          {accommodation.status === "active" && (
+                            <button
+                              onClick={() => handleAccommodationStatus(accommodation._id, "inactive")}
+                              style={styles.rejectBtn}
+                            >
+                              Deactivate
+                            </button>
+                          )}
+                          {accommodation.status === "inactive" && (
+                            <button
+                              onClick={() => handleAccommodationStatus(accommodation._id, "active")}
+                              style={styles.approveBtn}
+                            >
+                              Activate
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )
         // END ADDED

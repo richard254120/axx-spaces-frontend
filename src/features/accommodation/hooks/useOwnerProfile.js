@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { fetchOwnerProfile } from "../../../api/tourism";
+import { fetchOwnerProfile } from "../../../api/accommodation";
 import { getAccommodationToken } from "../auth";
 
 export function useOwnerProfile() {

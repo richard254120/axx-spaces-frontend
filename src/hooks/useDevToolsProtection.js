@@ -30,6 +30,9 @@ export const useDevToolsProtection = () => {
         showWarning();
       }
 
+      // Skip debugger timing check in development to prevent blocking
+      if (import.meta.env.DEV) return;
+
       const start = performance.now();
       debugger;
       const end = performance.now();

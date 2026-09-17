@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { fetchTourismListings } from "../../../api/tourism";
+import { fetchAccommodationListings } from "../../../api/accommodation";
 import { API_SORT, FALLBACK_PROPERTIES, filterPropertiesLocal } from "../constants";
 
 export function useTourismListings(filters) {
@@ -16,7 +16,7 @@ export function useTourismListings(filters) {
       setLoading(true);
       setError("");
       try {
-        const data = await fetchTourismListings({
+        const data = await fetchAccommodationListings({
           category: category === "All" ? undefined : category,
           maxPrice,
           minRating: minRating || undefined,

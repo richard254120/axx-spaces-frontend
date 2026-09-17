@@ -1,11 +1,11 @@
 import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { registerTourismUser } from "../../api/tourism";
+
 import {
   setAccommodationSession,
   isAccommodationLoggedIn,
-  TOURISM_FONT_CSS,
-  tourismTheme,
+  ACCOMMODATION_FONT_CSS,
+  accommodationTheme,
 } from "../../features/accommodation";
 import { AuthContext } from "../../context/AuthContext";
 

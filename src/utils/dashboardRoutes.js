@@ -13,7 +13,7 @@ export const LOGIN_BY_ROLE = {
   landlord: "/login",
   seller: "/seller-login",
   mover: "/login",
-  user: "/business-login",
+  user: "/user-login",
   admin: "/login",
   team: "/login",
 };

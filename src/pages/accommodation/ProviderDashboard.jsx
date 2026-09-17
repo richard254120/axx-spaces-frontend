@@ -7,8 +7,8 @@ import {
   StatusBadge,
   LoadingBlock,
   ErrorAlert,
-  TOURISM_FONT_CSS,
-  tourismTheme,
+  ACCOMMODATION_FONT_CSS,
+  accommodationTheme,
   getDisplayName,
 } from "../../features/accommodation";
 

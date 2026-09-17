@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { fetchTourismById, recordTourismView } from "../../../api/tourism";
+import { fetchAccommodationById, recordAccommodationView } from "../../../api/accommodation";
 import { FALLBACK_PROPERTIES } from "../constants";
 
 const FALLBACK_DETAILS = {
@@ -80,10 +80,10 @@ export function useTourismProperty(id) {
       }
 
       try {
-        const data = await fetchTourismById(id);
+        const data = await fetchAccommodationById(id);
         if (!cancelled) {
           setProperty(data);
-          recordTourismView(id);
+          recordAccommodationView(id);
         }
       } catch (err) {
         if (!cancelled) {

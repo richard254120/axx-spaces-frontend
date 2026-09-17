@@ -1,13 +1,14 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import { registerTourismProperty } from "../../api/tourism";
+import { registerAccommodationProperty } from "../../api/accommodation";
 import {
   ADVERTISING_PACKAGES,
   PROPERTY_CATEGORIES,
   KENYA_COUNTIES,
   AMENITIES_LIST,
   INITIAL_REGISTER_FORM,
+  REGISTER_STEPS,
   setAccommodationSession,
   ErrorAlert,
 } from "../../features/accommodation";
@@ -71,7 +72,7 @@ export default function RegisterPropertyPage() {
       newVideos.forEach((file) => fd.append("videos", file));
       newAudio.forEach((file) => fd.append("audio", file));
 
-      const result = await registerTourismProperty(fd);
+      const result = await registerAccommodationProperty(fd);
       if (result.token) {
         setAccommodationSession(result.token, result.user);
         authLogin(result.token, {

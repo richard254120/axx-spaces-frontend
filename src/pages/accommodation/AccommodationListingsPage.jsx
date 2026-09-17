@@ -8,8 +8,8 @@ import {
   LoadingBlock,
   ErrorAlert,
   EmptyState,
-  TOURISM_FONT_CSS,
-  tourismTheme,
+  ACCOMMODATION_FONT_CSS,
+  accommodationTheme,
 } from "../../features/accommodation";
 
 const listingsCss = `

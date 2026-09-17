@@ -5,8 +5,8 @@ import {
   AccommodationNav,
   LoadingBlock,
   ErrorAlert,
-  TOURISM_FONT_CSS,
-  tourismTheme,
+  ACCOMMODATION_FONT_CSS,
+  accommodationTheme,
   CompactReviews,
 } from "../../features/accommodation";
 import PhoneInput from "../../components/PhoneInput";
