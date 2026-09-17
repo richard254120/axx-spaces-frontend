@@ -61,9 +61,10 @@ export async function accommodationLogin(email, password) {
 
 // ─── Provider ─────────────────────────────────────────────────────────
 
-export async function registerAccommodationProperty(formData) {
-  const res = await fetch(`${API_BASE}/accommodation/register`, {
+export async function registerAccommodationProperty(formData, token) {
+  const res = await fetch(`${API_BASE}/accommodations`, {
     method: "POST",
+    headers: { ...authHeaders(token) },
     body: formData,
   });
   const data = await res.json().catch(() => ({}));
@@ -72,21 +73,21 @@ export async function registerAccommodationProperty(formData) {
 }
 
 export async function fetchMyAccommodationListings(token) {
-  const json = await request("/accommodation/my", {
+  const json = await request("/accommodations/my-accommodations/all", {
     headers: { ...authHeaders(token) },
   });
-  return json.data || [];
+  return json || [];
 }
 
 export async function fetchOwnerProfile(token) {
-  const json = await request("/accommodation/owner/profile", {
+  const json = await request("/accommodations/owner/profile", {
     headers: { ...authHeaders(token) },
   });
-  return json.data;
+  return json;
 }
 
 export async function updateOwnerProfile(token, { name, phone }) {
-  const json = await request("/accommodation/owner/profile", {
+  const json = await request("/accommodations/owner/profile", {
     method: "PATCH",
     headers: { "Content-Type": "application/json", ...authHeaders(token) },
     body: JSON.stringify({ name, phone }),
