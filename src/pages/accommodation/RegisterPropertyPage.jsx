@@ -91,18 +91,17 @@ export default function RegisterPropertyPage() {
   };
 
   if (submitted) {
-    const pkg = packages.find((p) => p.name === form.selectedPackage) || packages[0];
     return (
       <div style={{ fontFamily: "'DM Sans', sans-serif", minHeight: "100vh", background: "#f8f4f0", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
         <div style={{ background: "white", borderRadius: "20px", padding: "36px 24px", textAlign: "center", maxWidth: "520px", width: "100%", border: "1px solid #e5e7eb", boxShadow: "0 20px 60px rgba(0,0,0,0.08)" }}>
           <div style={{ fontSize: "56px", marginBottom: "16px" }}></div>
           <h2 style={{ fontSize: "22px", fontWeight: 800, color: "#1f2937", marginBottom: "10px" }}>Property Submitted!</h2>
           <p style={{ color: "#6b7280", lineHeight: 1.7, marginBottom: "20px", fontSize: "14px" }}>
-            <strong>{form.name}</strong> has been submitted for review under the <strong style={{ color: pkg.color }}>{pkg.name}</strong> plan. Our team will verify within 24 hours and contact you at <strong>{form.ownerEmail}</strong>.
+            <strong>{form.name}</strong> has been submitted for review. Our team will verify within 24 hours and contact you at <strong>{form.ownerEmail}</strong>.
           </p>
           <div style={{ background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "12px", padding: "16px", marginBottom: "20px", textAlign: "left" }}>
-            <div style={{ fontSize: "13px", fontWeight: 800, color: "#92400e", marginBottom: "8px" }}> Your Plan: {pkg.name} — KSh {pkg.price.toLocaleString()}</div>
-            <div style={{ fontSize: "12px", color: "#78350f" }}>Duration: {pkg.duration} · Payment link will be sent to your email.</div>
+            <div style={{ fontSize: "13px", fontWeight: 800, color: "#92400e", marginBottom: "8px" }}> Next Steps</div>
+            <div style={{ fontSize: "12px", color: "#b45309" }}>• Review within 24 hours<br />• Listing goes live after approval</div>
           </div>
           {form.bookingUrl && (
             <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "12px", padding: "14px", marginBottom: "20px", textAlign: "left" }}>
@@ -112,11 +111,11 @@ export default function RegisterPropertyPage() {
           )}
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             <button style={{ background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "10px", padding: "14px", fontWeight: 800, fontSize: "15px", cursor: "pointer", fontFamily: "inherit" }} onClick={() => navigate("/tourism/dashboard")}>
-              Go to Dashboard →
+              Go to Dashboard →accmodationhost-
             </button>
             <button style={{ background: "transparent", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "14px", fontWeight: 700, fontSize: "14px", cursor: "pointer", fontFamily: "inherit", color: "#4b5563" }} onClick={() => navigate("/tourism")}>
-              Browse Tourism
-            </button>
+              Browse Tourismaccommodain
+            </button>Accommdaton
           </div>
         </div>
       </div>
@@ -566,9 +565,8 @@ export default function RegisterPropertyPage() {
                   <div style={s.commissionTitle}> What Happens After Submission?</div>
                   <div style={{ fontSize: "13px", color: "#78350f", lineHeight: 1.7 }}>
                     1. Our team reviews your listing within 24 hours.<br />
-                    2. Payment link for your <strong>{form.selectedPackage}</strong> plan is sent to your email.<br />
-                    3. Once paid, your listing goes live on AXXSpace.<br />
-                    4. Guests discover you, and bookings go to your site — <strong>no commission charged</strong>.
+                    2. Once approved, your listing goes live on AXXSpace.<br />
+                    3. Guests discover you, and bookings go to your site — <strong>no commission charged</strong>.
                   </div>
                 </div>
 
