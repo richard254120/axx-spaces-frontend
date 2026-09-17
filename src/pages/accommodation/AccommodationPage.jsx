@@ -3,15 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import {
   useAccommodationHome,
-  ADVERTISING_PACKAGES,
   DEFAULT_CATEGORIES,
 } from "../../features/accommodation";
 import SocialMediaLinks from "../../components/SocialMediaLinks";
 
-const packages = ADVERTISING_PACKAGES.map((p) => ({
-  ...p,
-  features: p.desc.split(",").map((x) => x.trim()),
-}));
 
 const categories = DEFAULT_CATEGORIES;
 
@@ -234,69 +229,15 @@ export default function AccommodationPage() {
         </div>
       </section>
 
-      {/* ── PACKAGES / ADVERTISE ── */}
-      <section style={{ ...s.section, background: "#1f2937" }} id="packages">
-        <div style={s.sectionInner}>
-          <div style={{ textAlign: "center", marginBottom: "48px" }}>
-            <h2 style={{ ...s.sectionTitle, color: "white" }}>Advertise on AXXSpace</h2>
-            <p style={{ color: "#9ca3af", fontSize: "16px", marginTop: "8px", lineHeight: 1.6 }}>
-              List your property and reach 18,000+ monthly visitors looking for Kenya's best accommodation experiences.
-            </p>
-          </div>
-          <div className="pkg-grid">
-            {packages.map((pkg) => (
-              <div
-                key={pkg.name}
-                style={{
-                  ...s.pkgCard,
-                  ...(pkg.popular ? { ...s.pkgPopular, transform: "scale(1.05)", zIndex: 2 } : {}),
-                  ...(pkg.popular ? { background: "linear-gradient(135deg, #1f2937 0%, #111827 100%)" } : {})
-                }}
-                className="pkg-card"
-              >
-                {pkg.popular && <div style={s.pkgRibbon}> Most Popular</div>}
-                <div style={{ ...s.pkgName, color: pkg.color }}>{pkg.name}</div>
-                <div style={s.pkgDuration}>{pkg.duration}</div>
-                <div style={s.pkgPrice}>
-                  <span style={s.pkgPriceVal}>KSh {pkg.price.toLocaleString()}</span>
-                </div>
-                <div style={s.pkgFeatures}>
-                  {pkg.features.map((f) => (
-                    <div key={f} style={s.pkgFeature}>
-                      <span style={{ color: pkg.color, fontWeight: 700, marginRight: "10px", fontSize: "16px" }}>✓</span>{f}
-                    </div>
-                  ))}
-                </div>
-                <button
-                  style={{
-                    ...s.pkgBtn,
-                    background: pkg.popular ? "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)" : "transparent",
-                    color: pkg.popular ? "#1f2937" : "white",
-                    border: pkg.popular ? "none" : "1px solid #374151",
-                    ...(pkg.popular ? { fontWeight: 900, fontSize: "15px" } : {})
-                  }}
-                  onClick={() => user ? navigate("/accommodation/register-property") : navigate("/accommodation/register")}
-                >
-                  Get Started
-                </button>
-              </div>
-            ))}
-          </div>
-          <p style={{ textAlign: "center", color: "#9ca3af", fontSize: "13px", marginTop: "32px", lineHeight: 1.6 }}>
-            All plans include a free 7-day trial. No credit card required to start.
-          </p>
-        </div>
-      </section>
-
       {/* ── HOW IT WORKS ── */}
       <section style={s.section}>
         <div style={s.sectionInner}>
           <h2 style={{ ...s.sectionTitle, textAlign: "center", marginBottom: "48px" }}>How It Works</h2>
           <div className="how-grid">
             {[
-              { step: "01", icon: "", title: "Create an Account", desc: "Register as a property owner/manager and choose your advertising package." },
+              { step: "01", icon: "", title: "Create an Account", desc: "Register as a property owner/manager to get started." },
               { step: "02", icon: "", title: "List Your Property", desc: "Add your property details, amenities, pricing and contact information." },
-              { step: "03", icon: "", title: "Get Discovered", desc: "Your property is advertised to thousands of guests on AXXSpace." },
+              { step: "03", icon: "", title: "Get Discovered", desc: "Your property is visible to thousands of guests on AXXSpace." },
               { step: "04", icon: "", title: "Guests Contact Direct", desc: "Interested guests contact you directly via WhatsApp or phone for bookings." },
             ].map((h, idx) => (
               <div key={h.step} className="how-item" style={s.howItem}>
@@ -643,57 +584,6 @@ const s = {
     marginTop: "auto"
   },
 
-  // Packages
-  pkgCard: {
-    background: "#111827",
-    border: "1px solid #374151",
-    borderRadius: "20px",
-    padding: "32px 24px",
-    position: "relative",
-    transition: "all 0.3s"
-  },
-  pkgPopular: {
-    border: "2px solid #fbbf24",
-    boxShadow: "0 0 40px rgba(251, 191, 36, 0.2)"
-  },
-  pkgRibbon: {
-    position: "absolute",
-    top: "-14px",
-    left: "50%",
-    transform: "translateX(-50%)",
-    background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
-    color: "#1f2937",
-    fontSize: "12px",
-    fontWeight: 900,
-    padding: "6px 20px",
-    borderRadius: "24px",
-    whiteSpace: "nowrap",
-    boxShadow: "0 4px 16px rgba(251, 191, 36, 0.4)"
-  },
-  pkgName: { fontSize: "20px", fontWeight: 800, marginBottom: "6px" },
-  pkgDuration: { fontSize: "13px", color: "#9ca3af", marginBottom: "20px", fontWeight: 600 },
-  pkgPrice: { marginBottom: "24px" },
-  pkgPriceVal: { fontSize: "32px", fontWeight: 900, color: "white" },
-  pkgFeatures: { marginBottom: "24px" },
-  pkgFeature: {
-    fontSize: "14px",
-    color: "#d1d5db",
-    padding: "8px 0",
-    borderBottom: "1px solid #1f2937",
-    display: "flex",
-    alignItems: "center"
-  },
-  pkgBtn: {
-    width: "100%",
-    borderRadius: "12px",
-    padding: "16px",
-    fontSize: "14px",
-    fontWeight: 800,
-    cursor: "pointer",
-    fontFamily: "inherit",
-    transition: "all 0.3s"
-  },
-
   // How it works
   howItem: {
     position: "relative",
@@ -814,8 +704,6 @@ const css = `
   }
 
   @media (max-width: 900px) {
-    .pkg-grid { grid-template-columns: 1fr; max-width: 400px; }
-    .pkg-grid-modal { grid-template-columns: 1fr; }
     .how-grid { flex-direction: column; }
     .how-item { padding: "0 0 40px 0"; }
     .how-line { display: none; }
