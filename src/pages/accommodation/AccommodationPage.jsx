@@ -165,29 +165,6 @@ export default function AccommodationPage() {
         </div>
       </section>
 
-      {/* ── CATEGORIES ── */}
-      <section style={s.section}>
-        <div style={s.sectionInner}>
-          <div style={{ textAlign: "center", marginBottom: "48px" }}>
-            <h2 style={s.sectionTitle}>Explore by Category</h2>
-            <p style={{ fontSize: "16px", color: "#6b7280", marginTop: "8px", lineHeight: 1.6 }}>Find the perfect accommodation for every occasion</p>
-          </div>
-          <div className="cat-grid">
-            {categories.map((c) => (
-              <button key={c.name} style={s.catCard} onClick={() => navigate("/accommodation/listings")} className="cat-card">
-                <div style={{ ...s.catImage, background: `linear-gradient(135deg, ${getCategoryColor(c.name)}40, ${getCategoryColor(c.name)}20)` }}>
-                  <span style={s.catEmoji}>{c.emoji}</span>
-                </div>
-                <div style={s.catOverlay}>
-                  <div style={s.catName}>{c.name}</div>
-                  <div style={s.catCount}>{c.count} properties</div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── FEATURED ── */}
       <section style={{ ...s.section, background: "linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%)", paddingTop: "100px" }}>
         <div style={s.sectionInner}>
