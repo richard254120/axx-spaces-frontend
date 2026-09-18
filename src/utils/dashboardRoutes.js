@@ -1,6 +1,7 @@
 /** Dashboard home path for each account role */
 export const DASHBOARD_BY_ROLE = {
   landlord: "/dashboard",
+  host: "/accommodation/host-dashboard",
   seller: "/seller-dashboard",
   mover: "/mover-dashboard",
   user: "/business-dashboard",
@@ -10,6 +11,7 @@ export const DASHBOARD_BY_ROLE = {
 
 /** Login page when that dashboard requires auth */
 export const LOGIN_BY_ROLE = {
+  host: "/accommodation/login",
   landlord: "/login",
   seller: "/seller-login",
   mover: "/login",
@@ -92,6 +94,10 @@ export const ACCOUNT_NAV_BY_ROLE = {
     { label: "Dashboard", path: "/dashboard" },
     { label: "Upload", path: "/upload" },
     { label: "Payments", path: "/payment-history" },
+    { label: "Settings", path: "/settings" },
+  ],
+  host: [
+    { label: "Dashboard", path: "/accommodation/host-dashboard" },
     { label: "Settings", path: "/settings" },
   ],
   seller: [

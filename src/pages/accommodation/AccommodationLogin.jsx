@@ -475,8 +475,8 @@ export default function AccommodationLogin() {
               <span style={styles.logoWord}>SPACE</span>
             </div>
 
-            <h1 style={styles.title}>Tourism Provider Login</h1>
-            <p style={styles.subtitle}>Access your tourism property dashboard</p>
+            <h1 style={styles.title}>Accommodation Provider Login</h1>
+            <p style={styles.subtitle}>Access your accommodation property dashboard</p>
 
             {error && <div style={styles.error}>{error}</div>}
             {success && <div style={{ ...styles.error, background: "#f0fdf4", borderColor: "#22c55e", color: "#16a34a" }}>{success}</div>}
