@@ -3,7 +3,7 @@ import { fetchFeaturedAccommodation, fetchAccommodationStats } from "../../../ap
 import { DEFAULT_STATS, FALLBACK_PROPERTIES } from "../constants";
 
 export function useTourismHome() {
-  const [featured, setFeatured] = useState(FALLBACK_PROPERTIES.slice(0, 6));
+  const [featured, setFeatured] = useState([]);
   const [stats, setStats] = useState(DEFAULT_STATS);
   const [loading, setLoading] = useState(true);
 
@@ -18,7 +18,7 @@ export function useTourismHome() {
           fetchAccommodationStats(),
         ]);
         if (!cancelled) {
-          if (featuredData.length) setFeatured(featuredData);
+          setFeatured(featuredData || []);
           if (statsData) {
             setStats([
               { val: `${statsData.propertiesListed || 0}+`, label: "Properties Listed" },
@@ -29,7 +29,7 @@ export function useTourismHome() {
           }
         }
       } catch {
-        /* keep defaults */
+        /* keep empty featured, use default stats */
       } finally {
         if (!cancelled) setLoading(false);
       }

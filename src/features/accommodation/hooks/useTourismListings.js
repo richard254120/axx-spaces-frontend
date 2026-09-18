@@ -4,7 +4,7 @@ import { API_SORT, FALLBACK_PROPERTIES, filterPropertiesLocal } from "../constan
 
 export function useTourismListings(filters) {
   const { category, sort, maxPrice, minRating, search } = filters;
-  const [properties, setProperties] = useState(FALLBACK_PROPERTIES);
+  const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [offline, setOffline] = useState(false);
   const [error, setError] = useState("");
@@ -24,16 +24,14 @@ export function useTourismListings(filters) {
           sort: API_SORT[sort] || "recommended",
         });
         if (!cancelled) {
-          setProperties(data.length ? data : []);
+          setProperties(data || []);
           setOffline(false);
         }
       } catch (err) {
         if (!cancelled) {
           setError(err.message);
           setOffline(true);
-          setProperties(
-            filterPropertiesLocal(FALLBACK_PROPERTIES, { category, maxPrice, minRating, search })
-          );
+          setProperties([]);
         }
       } finally {
         if (!cancelled) setLoading(false);
