@@ -22,7 +22,7 @@ const packages = ADVERTISING_PACKAGES;
 
 export default function RegisterPropertyPage() {
   const navigate = useNavigate();
-  const { login: authLogin } = useContext(AuthContext);
+  const { login: authLogin, token } = useContext(AuthContext);
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -72,14 +72,14 @@ export default function RegisterPropertyPage() {
       newVideos.forEach((file) => fd.append("videos", file));
       newAudio.forEach((file) => fd.append("audio", file));
 
-      const result = await registerAccommodationProperty(fd);
+      const result = await registerAccommodationProperty(fd, token);
       if (result.token) {
         setAccommodationSession(result.token, result.user);
         authLogin(result.token, {
           _id: result.user?.id,
           name: result.user?.name,
           email: result.user?.email,
-          role: "landlord",
+          role: "host",
         });
       }
       setSubmitted(true);
