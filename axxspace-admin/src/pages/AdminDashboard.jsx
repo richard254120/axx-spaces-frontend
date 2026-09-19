@@ -13,7 +13,7 @@ import QRGeneratorModal from "../components/QRGeneratorModal";
 import "./AdminDashboard.css";
 
 // ── tiny helpers ──────────────────────────────────────────────
-const TABS = ["overview", "properties", "materials", "tourism", "movers", "sellers", "sold", "payment", "boosts", "businesses", "announcements", "verification", "requests", "listings-badges", "user-badges"];
+const TABS = ["overview", "properties", "materials", "tourism", "movers", "sellers", "sold", "payment", "boosts", "businesses", "announcements", "verification", "requests", "listings-badges", "user-badges", "accommodations"];
 const TAB_LABELS = {
   overview: " Dashboard Overview",
   properties: " Properties",
@@ -29,7 +29,8 @@ const TAB_LABELS = {
   verification: "✓ KYC Verification",
   requests: " User Requests",
   "listings-badges": " Listing Badges",
-  "user-badges": " User Badges"
+  "user-badges": " User Badges",
+  accommodations: " Accommodations"
 };
 const STATUS_VIEWS = ["pending", "approved", "rejected"];
 
@@ -92,6 +93,10 @@ export default function AdminDashboard() {
   const [requests, setRequests] = useState([]);
   const [requestsLoading, setRequestsLoading] = useState(false);
 
+  // ── ACCOMMODATIONS STATE ────────────────────────────────────
+  const [pendingAccommodations, setPendingAccommodations] = useState([]);
+  const [accommodationsLoading, setAccommodationsLoading] = useState(false);
+
   // ── POSTER / QR STATE ──────────────────────────────────────
   const [selectedPropertyForQR, setSelectedPropertyForQR] = useState(null);
   const [qrModalOpen, setQrModalOpen] = useState(false);
@@ -132,6 +137,13 @@ export default function AdminDashboard() {
       loadPendingVerifications();
     }
   }, [activeTab, statusView]);
+
+  // ── load accommodations when tab changes ─────────────────────
+  useEffect(() => {
+    if (activeTab === "accommodations") {
+      loadAccommodations();
+    }
+  }, [activeTab]);
 
   // ── KYC VERIFICATION FUNCTIONS ───────────────────────────────
   const loadPendingVerifications = async () => {
@@ -549,6 +561,30 @@ export default function AdminDashboard() {
     }
   };
 
+  // ── ACCOMMODATIONS FUNCTIONS ───────────────────────────────────
+  const loadAccommodations = async () => {
+    setAccommodationsLoading(true);
+    try {
+      const res = await API.get("/accommodations/admin/pending");
+      setPendingAccommodations(res.data || []);
+    } catch (err) {
+      console.error("Failed to load accommodations:", err);
+    } finally {
+      setAccommodationsLoading(false);
+    }
+  };
+
+  const handleAccommodationStatus = async (accommodationId, status) => {
+    try {
+      await API.patch(`/accommodations/${accommodationId}/status`, { status });
+      loadAccommodations();
+      loadStats();
+      alert(`Accommodation ${status} successfully`);
+    } catch (err) {
+      alert("Failed to update accommodation status");
+    }
+  };
+
   // ── edit / save ────────────────────────────────────────────
   const openEdit = (item) => { setEditData({ ...item }); setEditMode(true); };
   const saveEdit = async () => {
@@ -586,6 +622,9 @@ export default function AdminDashboard() {
     }
     if (tab === "announcements") {
       return pendingAnnouncements.length > 0 ? ` (${pendingAnnouncements.length})` : "";
+    }
+    if (tab === "accommodations") {
+      return pendingAccommodations.length > 0 ? ` (${pendingAccommodations.length})` : "";
     }
     if (!allPending) return "";
     const map = { properties: "properties", materials: "materials", tourism: "tourism", movers: "movers", sellers: "sellers" };
@@ -1402,6 +1441,42 @@ export default function AdminDashboard() {
           <BadgeManagement />
         ) : activeTab === "user-badges" ? (
           <UserBadgeManagement />
+        ) : activeTab === "accommodations" ? (
+          accommodationsLoading ? (
+            <div className="loader">
+              <div className="spinner"></div>
+              <p> Loading accommodations...</p>
+            </div>
+          ) : pendingAccommodations.length === 0 ? (
+            <div className="empty">
+              <p className="empty-text"> No pending accommodations found.</p>
+            </div>
+          ) : (
+            <div className="grid">
+              {pendingAccommodations.map(item => (
+                <div key={item._id} className={`card admin-card`} onClick={() => setSelected(item)}>
+                  {item.images && item.images.length > 0 && (
+                    <div className="card-image" style={{ backgroundImage: `url(${item.images[0].imageUrl})` }} />
+                  )}
+                  <div className="card-body">
+                    <p className="card-title">{item.name}</p>
+                    <p className="card-subtitle">{item.type} · {item.address}</p>
+                    <p className="card-owner"> {item.owner?.name} · {item.owner?.phone}</p>
+                    <div className="card-footer">
+                      <span className="price-badge">KSh {item.basePrice?.toLocaleString()}/night</span>
+                      <span className="status-dot" style={{ background: item.status === "active" ? "#22c55e" : item.status === "inactive" ? "#ef4444" : "#fbbf24" }}>
+                        {item.status}
+                      </span>
+                    </div>
+                    <div className="card-buttons" onClick={e => e.stopPropagation()}>
+                      <button className="btn-approve" onClick={() => handleAccommodationStatus(item._id, "active")}> Approve</button>
+                      <button className="btn-reject" onClick={() => handleAccommodationStatus(item._id, "inactive")}> Reject</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )
         ) : loading ? (
           <div className="loader">
             <div className="spinner"></div>
