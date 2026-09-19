@@ -135,9 +135,9 @@ export default function ProviderDashboard() {
           </>
         ) : !loggedIn ? (
           <div style={statCard}>
-            <p style={{ marginBottom: "16px", color: accommodationTheme.muted }}>Sign in to manage your tourism properties.</p>
-            <button type="button" style={primaryBtn} onClick={() => navigate("/tourism/login")}> Log in</button>
-            <button type="button" style={{ ...secondaryBtn, marginLeft: "10px" }} onClick={() => navigate("/tourism/register-property")}>
+            <p style={{ marginBottom: "16px", color: accommodationTheme.muted }}>Sign in to manage your accommodation properties.</p>
+            <button type="button" style={primaryBtn} onClick={() => navigate("/accommodation/login")}> Log in</button>
+            <button type="button" style={{ ...secondaryBtn, marginLeft: "10px" }} onClick={() => navigate("/accommodation/register-property")}>
               Register property
             </button>
           </div>
