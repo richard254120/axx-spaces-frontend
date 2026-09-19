@@ -702,3 +702,15 @@ const css = `
     .room-row { flex-direction: column; }
   }
 `;
+@media(max - width: 720px) {
+    .step - nav - desktop { display: none; }
+    .reg - layout { grid - template - columns: 1fr; }
+    .two - col - form { grid - template - columns: 1fr; }
+    .pkg - grid { grid - template - columns: 1fr; }
+}
+@media(max - width: 480px) {
+    .amenities - grid { grid - template - columns: repeat(2, 1fr); }
+    .review - grid { grid - template - columns: 1fr; }
+    .room - row { flex - direction: column; }
+}
+`;
