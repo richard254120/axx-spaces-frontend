@@ -149,6 +149,8 @@ export const INITIAL_REGISTER_FORM = {
   town: "",
   address: "",
   mapLink: "",
+  lat: "",
+  lng: "",
   amenities: [],
   basePrice: "",
   weekendPrice: "",

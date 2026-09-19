@@ -65,227 +65,220 @@ export default function RegisterPropertyPage() {
       const fd = new FormData();
       Object.entries(form).forEach(([k, v]) => {
         if (k === "amenities") fd.append("amenities", JSON.stringify(v));
-        else if (Array.isArray(v)) return;
-        else if (v !== undefined && v !== null) fd.append(k, v);
-      });
-      newImages.forEach((file) => fd.append("images", file));
-      newVideos.forEach((file) => fd.append("videos", file));
-      newAudio.forEach((file) => fd.append("audio", file));
-
-      const result = await registerAccommodationProperty(fd, token);
-      if (result.token) {
-        setAccommodationSession(result.token, result.user);
-        authLogin(result.token, {
-          _id: result.user?.id,
-          name: result.user?.name,
-          email: result.user?.email,
-          role: "host",
-        });
+        else if (token) {
+          setAccommodationSession(result.token, result.user);
+          authLogin(result.token, {
+            _id: result.user?.id,
+            name: result.user?.name,
+            email: result.user?.email,
+            role: "host",
+          });
+        }
+        setSubmitted(true);
+      } catch (err) {
+        setSubmitError(err.message || "Submission failed. Please try again.");
+      } finally {
+        setSubmitting(false);
       }
-      setSubmitted(true);
-    } catch (err) {
-      setSubmitError(err.message || "Submission failed. Please try again.");
-    } finally {
-      setSubmitting(false);
+    };
+
+    if (submitted) {
+      return (
+        <div style={{ fontFamily: "'DM Sans', sans-serif", minHeight: "100vh", background: "#f8f4f0", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+          <div style={{ background: "white", borderRadius: "20px", padding: "36px 24px", textAlign: "center", maxWidth: "520px", width: "100%", border: "1px solid #e5e7eb", boxShadow: "0 20px 60px rgba(0,0,0,0.08)" }}>
+            <div style={{ fontSize: "56px", marginBottom: "16px" }}></div>
+            <h2 style={{ fontSize: "22px", fontWeight: 800, color: "#1f2937", marginBottom: "10px" }}>Property Submitted!</h2>
+            <p style={{ color: "#6b7280", lineHeight: 1.7, marginBottom: "20px", fontSize: "14px" }}>
+              <strong>{form.name}</strong> has been submitted for review. Our team will verify within 24 hours and contact you at <strong>{form.ownerEmail}</strong>.
+            </p>
+            <div style={{ background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "12px", padding: "16px", marginBottom: "20px", textAlign: "left" }}>
+              <div style={{ fontSize: "13px", fontWeight: 800, color: "#92400e", marginBottom: "8px" }}> Next Steps</div>
+              <div style={{ fontSize: "12px", color: "#b45309" }}>• Review within 24 hours<br />• Listing goes live after approval</div>
+            </div>
+            {form.bookingUrl && (
+              <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "12px", padding: "14px", marginBottom: "20px", textAlign: "left" }}>
+                <div style={{ fontSize: "12px", fontWeight: 800, color: "#166534", marginBottom: "4px" }}> Booking Site Registered</div>
+                <div style={{ fontSize: "12px", color: "#15803d" }}>Guests will be redirected to: {form.bookingUrl}</div>
+              </div>
+            )}
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              <button style={{ background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "10px", padding: "14px", fontWeight: 800, fontSize: "15px", cursor: "pointer", fontFamily: "inherit" }} onClick={() => navigate("/tourism/dashboard")}>
+                Go to Dashboard →accmodationhost-
+              </button>
+              <button style={{ background: "transparent", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "14px", fontWeight: 700, fontSize: "14px", cursor: "pointer", fontFamily: "inherit", color: "#4b5563" }} onClick={() => navigate("/tourism")}>
+                Browse Tourismaccommodain
+              </button>Accommdaton
+            </div>
+          </div>
+        </div>
+      );
     }
-  };
 
-  if (submitted) {
     return (
-      <div style={{ fontFamily: "'DM Sans', sans-serif", minHeight: "100vh", background: "#f8f4f0", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
-        <div style={{ background: "white", borderRadius: "20px", padding: "36px 24px", textAlign: "center", maxWidth: "520px", width: "100%", border: "1px solid #e5e7eb", boxShadow: "0 20px 60px rgba(0,0,0,0.08)" }}>
-          <div style={{ fontSize: "56px", marginBottom: "16px" }}></div>
-          <h2 style={{ fontSize: "22px", fontWeight: 800, color: "#1f2937", marginBottom: "10px" }}>Property Submitted!</h2>
-          <p style={{ color: "#6b7280", lineHeight: 1.7, marginBottom: "20px", fontSize: "14px" }}>
-            <strong>{form.name}</strong> has been submitted for review. Our team will verify within 24 hours and contact you at <strong>{form.ownerEmail}</strong>.
-          </p>
-          <div style={{ background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "12px", padding: "16px", marginBottom: "20px", textAlign: "left" }}>
-            <div style={{ fontSize: "13px", fontWeight: 800, color: "#92400e", marginBottom: "8px" }}> Next Steps</div>
-            <div style={{ fontSize: "12px", color: "#b45309" }}>• Review within 24 hours<br />• Listing goes live after approval</div>
+      <div style={s.root}>
+        <style>{css}</style>
+
+        {/* HEADER */}
+        <div style={s.header}>
+          <button style={s.backBtn} onClick={() => navigate("/accommodation")}>← Back</button>
+          <div style={s.headerCenter}>
+            <div style={s.logo}><span style={s.logoAccent}>AXX</span><span style={s.logoWord}>SPACE</span></div>
+            <p style={s.headerSub}>List Your Property — Step {step + 1} of {steps.length}</p>
           </div>
-          {form.bookingUrl && (
-            <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "12px", padding: "14px", marginBottom: "20px", textAlign: "left" }}>
-              <div style={{ fontSize: "12px", fontWeight: 800, color: "#166534", marginBottom: "4px" }}> Booking Site Registered</div>
-              <div style={{ fontSize: "12px", color: "#15803d" }}>Guests will be redirected to: {form.bookingUrl}</div>
-            </div>
-          )}
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            <button style={{ background: "#fbbf24", color: "#1f2937", border: "none", borderRadius: "10px", padding: "14px", fontWeight: 800, fontSize: "15px", cursor: "pointer", fontFamily: "inherit" }} onClick={() => navigate("/tourism/dashboard")}>
-              Go to Dashboard →accmodationhost-
-            </button>
-            <button style={{ background: "transparent", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "14px", fontWeight: 700, fontSize: "14px", cursor: "pointer", fontFamily: "inherit", color: "#4b5563" }} onClick={() => navigate("/tourism")}>
-              Browse Tourismaccommodain
-            </button>Accommdaton
-          </div>
+          <div style={s.stepCount}>Step {step + 1}/{steps.length}</div>
         </div>
-      </div>
-    );
-  }
 
-  return (
-    <div style={s.root}>
-      <style>{css}</style>
-
-      {/* HEADER */}
-      <div style={s.header}>
-        <button style={s.backBtn} onClick={() => navigate("/accommodation")}>← Back</button>
-        <div style={s.headerCenter}>
-          <div style={s.logo}><span style={s.logoAccent}>AXX</span><span style={s.logoWord}>SPACE</span></div>
-          <p style={s.headerSub}>List Your Property — Step {step + 1} of {steps.length}</p>
+        {/* PROGRESS */}
+        <div style={s.progressBar}>
+          <div style={{ ...s.progressFill, width: `${((step + 1) / steps.length) * 100}%` }} />
         </div>
-        <div style={s.stepCount}>Step {step + 1}/{steps.length}</div>
-      </div>
 
-      {/* PROGRESS */}
-      <div style={s.progressBar}>
-        <div style={{ ...s.progressFill, width: `${((step + 1) / steps.length) * 100}%` }} />
-      </div>
-
-      <div className="reg-layout">
-        {/* STEP NAV */}
-        <aside className="step-nav-desktop">
-          {steps.map((st, i) => (
-            <div
-              key={st}
-              style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 12px", borderRadius: "10px", marginBottom: "4px", background: i === step ? "#fef9c3" : "transparent", cursor: i < step ? "pointer" : "default", opacity: i > step ? 0.5 : 1 }}
-              onClick={() => { if (i < step) setStep(i); }}
-            >
-              <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: i < step ? "#22c55e" : i === step ? "#fbbf24" : "#e5e7eb", color: i < step || i === step ? "white" : "#9ca3af", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 700, flexShrink: 0 }}>
-                {i < step ? "✓" : i + 1}
+        <div className="reg-layout">
+          {/* STEP NAV */}
+          <aside className="step-nav-desktop">
+            {steps.map((st, i) => (
+              <div
+                key={st}
+                style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 12px", borderRadius: "10px", marginBottom: "4px", background: i === step ? "#fef9c3" : "transparent", cursor: i < step ? "pointer" : "default", opacity: i > step ? 0.5 : 1 }}
+                onClick={() => { if (i < step) setStep(i); }}
+              >
+                <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: i < step ? "#22c55e" : i === step ? "#fbbf24" : "#e5e7eb", color: i < step || i === step ? "white" : "#9ca3af", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 700, flexShrink: 0 }}>
+                  {i < step ? "✓" : i + 1}
+                </div>
+                <span style={{ fontSize: "13px", fontWeight: 600, color: i === step ? "#92400e" : "#4b5563" }}>{st}</span>
               </div>
-              <span style={{ fontSize: "13px", fontWeight: 600, color: i === step ? "#92400e" : "#4b5563" }}>{st}</span>
-            </div>
-          ))}
-        </aside>
+            ))}
+          </aside>
 
-        <main>
-          <div style={s.formCard}>
+          <main>
+            <div style={s.formCard}>
 
-            {/* STEP 0 — ACCOUNT & PACKAGE */}
-            {step === 0 && (
-              <div>
-                <h2 style={s.formTitle}> Your Account Details</h2>
-                <p style={s.formSub}>Create your AXXSpace owner account and choose an advertising plan</p>
-                <div className="two-col-form">
-                  <div style={s.field}>
-                    <label style={s.label}>Full Name *</label>
-                    <input style={s.input} placeholder="Your full name" value={form.ownerName} onChange={(e) => update("ownerName", e.target.value)} />
-                  </div>
-                  <div style={s.field}>
-                    <label style={s.label}>Phone / WhatsApp *</label>
-                    <PhoneInput style={s.input} value={form.ownerPhone} onChange={(value) => update("ownerPhone", value)} />
-                  </div>
-                </div>
-                <div style={s.field}>
-                  <label style={s.label}>Email Address *</label>
-                  <input style={s.input} type="email" placeholder="you@yourbusiness.co.ke" value={form.ownerEmail} onChange={(e) => update("ownerEmail", e.target.value)} />
-                </div>
-                <div style={s.field}>
-                  <label style={s.label}>Create Password *</label>
-                  <input style={s.input} type="password" placeholder="Min 6 chars with letters & numbers" value={form.password} onChange={(e) => update("password", e.target.value)} />
-                  {form.password && (form.password.length < 6 || !/[a-zA-Z]/.test(form.password) || !/[0-9]/.test(form.password)) && (
-                    <div style={{ color: "#dc2626", fontSize: "11px", marginTop: "4px" }}>
-                      Password must be at least 6 characters and contain a mixture of both letters and numbers.
+              {/* STEP 0 — ACCOUNT & PACKAGE */}
+              {step === 0 && (
+                <div>
+                  <h2 style={s.formTitle}> Your Account Details</h2>
+                  <p style={s.formSub}>Create your AXXSpace owner account and choose an advertising plan</p>
+                  <div className="two-col-form">
+                    <div style={s.field}>
+                      <label style={s.label}>Full Name *</label>
+                      <input style={s.input} placeholder="Your full name" value={form.ownerName} onChange={(e) => update("ownerName", e.target.value)} />
                     </div>
-                  )}
-                </div>
-
-                {/* PACKAGE SELECTION */}
-                <div style={s.pkgSection}>
-                  <div style={s.pkgTitle}> Choose Your Advertising Package</div>
-                  <div className="pkg-grid">
-                    {packages.map((pkg) => (
-                      <div
-                        key={pkg.name}
-                        style={{ ...s.pkgCard, ...(form.selectedPackage === pkg.name ? { borderColor: pkg.color, background: pkg.color + "08" } : {}) }}
-                        onClick={() => update("selectedPackage", pkg.name)}
-                      >
-                        {pkg.popular && <div style={{ ...s.pkgBadge, background: pkg.color }}> Popular</div>}
-                        <div style={{ fontSize: "16px", fontWeight: 800, color: pkg.color, marginBottom: "2px" }}>{pkg.name}</div>
-                        <div style={{ fontSize: "11px", color: "#6b7280", marginBottom: "8px" }}>{pkg.duration}</div>
-                        <div style={{ fontSize: "20px", fontWeight: 900, color: "#1f2937", marginBottom: "8px" }}>KSh {pkg.price.toLocaleString()}</div>
-                        <div style={{ fontSize: "12px", color: "#4b5563", lineHeight: 1.5 }}>{pkg.desc}</div>
-                        {form.selectedPackage === pkg.name && <div style={{ marginTop: "10px", color: pkg.color, fontSize: "12px", fontWeight: 800 }}>✓ Selected</div>}
-                      </div>
-                    ))}
+                    <div style={s.field}>
+                      <label style={s.label}>Phone / WhatsApp *</label>
+                      <PhoneInput style={s.input} value={form.ownerPhone} onChange={(value) => update("ownerPhone", value)} />
+                    </div>
                   </div>
-                  <p style={{ fontSize: "11px", color: "#9ca3af", marginTop: "10px" }}> Payment link will be emailed after submission. 7-day free trial included.</p>
-                </div>
-              </div>
-            )}
-
-            {/* STEP 1 — PROPERTY INFO */}
-            {step === 1 && (
-              <div>
-                <h2 style={s.formTitle}> Property Information</h2>
-                <p style={s.formSub}>Tell guests what makes your property special</p>
-                <div style={s.field}>
-                  <label style={s.label}>Property Name *</label>
-                  <input style={s.input} placeholder="e.g. Sunrise Beach Resort" value={form.name} onChange={(e) => update("name", e.target.value)} />
-                </div>
-                <div style={s.field}>
-                  <label style={s.label}>Category *</label>
-                  <select style={s.input} value={form.category} onChange={(e) => update("category", e.target.value)}>
-                    <option value="">Select category...</option>
-                    {categories.map((c) => <option key={c}>{c}</option>)}
-                  </select>
-                </div>
-                <div style={s.field}>
-                  <label style={s.label}>Description *</label>
-                  <textarea style={{ ...s.input, height: "140px", resize: "vertical" }} placeholder="Describe your property, unique features, nearby attractions, experiences offered..." value={form.description} onChange={(e) => update("description", e.target.value)} />
-                  <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "4px" }}>{form.description.length}/500 characters recommended</div>
-                </div>
-              </div>
-            )}
-
-            {/* STEP 2 — LOCATION */}
-            {step === 2 && (
-              <div>
-                <h2 style={{ ...s.formTitle, display: "flex", alignItems: "center", gap: "8px" }}>
-                  <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                  <span>Location Details</span>
-                </h2>
-                <p style={s.formSub}>Help guests find you</p>
-                <div className="two-col-form">
                   <div style={s.field}>
-                    <label style={s.label}>County *</label>
-                    <select style={s.input} value={form.county} onChange={(e) => update("county", e.target.value)}>
-                      <option value="">Select county...</option>
-                      {counties.map((c) => <option key={c}>{c}</option>)}
+                    <label style={s.label}>Email Address *</label>
+                    <input style={s.input} type="email" placeholder="you@yourbusiness.co.ke" value={form.ownerEmail} onChange={(e) => update("ownerEmail", e.target.value)} />
+                  </div>
+                  <div style={s.field}>
+                    <label style={s.label}>Create Password *</label>
+                    <input style={s.input} type="password" placeholder="Min 6 chars with letters & numbers" value={form.password} onChange={(e) => update("password", e.target.value)} />
+                    {form.password && (form.password.length < 6 || !/[a-zA-Z]/.test(form.password) || !/[0-9]/.test(form.password)) && (
+                      <div style={{ color: "#dc2626", fontSize: "11px", marginTop: "4px" }}>
+                        Password must be at least 6 characters and contain a mixture of both letters and numbers.
+                      </div>
+                    )}
+                  </div>
+
+                  {/* PACKAGE SELECTION */}
+                  <div style={s.pkgSection}>
+                    <div style={s.pkgTitle}> Choose Your Advertising Package</div>
+                    <div className="pkg-grid">
+                      {packages.map((pkg) => (
+                        <div
+                          key={pkg.name}
+                          style={{ ...s.pkgCard, ...(form.selectedPackage === pkg.name ? { borderColor: pkg.color, background: pkg.color + "08" } : {}) }}
+                          onClick={() => update("selectedPackage", pkg.name)}
+                        >
+                          {pkg.popular && <div style={{ ...s.pkgBadge, background: pkg.color }}> Popular</div>}
+                          <div style={{ fontSize: "16px", fontWeight: 800, color: pkg.color, marginBottom: "2px" }}>{pkg.name}</div>
+                          <div style={{ fontSize: "11px", color: "#6b7280", marginBottom: "8px" }}>{pkg.duration}</div>
+                          <div style={{ fontSize: "20px", fontWeight: 900, color: "#1f2937", marginBottom: "8px" }}>KSh {pkg.price.toLocaleString()}</div>
+                          <div style={{ fontSize: "12px", color: "#4b5563", lineHeight: 1.5 }}>{pkg.desc}</div>
+                          {form.selectedPackage === pkg.name && <div style={{ marginTop: "10px", color: pkg.color, fontSize: "12px", fontWeight: 800 }}>✓ Selected</div>}
+                        </div>
+                      ))}
+                    </div>
+                    <p style={{ fontSize: "11px", color: "#9ca3af", marginTop: "10px" }}> Payment link will be emailed after submission. 7-day free trial included.</p>
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 1 — PROPERTY INFO */}
+              {step === 1 && (
+                <div>
+                  <h2 style={s.formTitle}> Property Information</h2>
+                  <p style={s.formSub}>Tell guests what makes your property special</p>
+                  <div style={s.field}>
+                    <label style={s.label}>Property Name *</label>
+                    <input style={s.input} placeholder="e.g. Sunrise Beach Resort" value={form.name} onChange={(e) => update("name", e.target.value)} />
+                  </div>
+                  <div style={s.field}>
+                    <label style={s.label}>Category *</label>
+                    <select style={s.input} value={form.category} onChange={(e) => update("category", e.target.value)}>
+                      <option value="">Select category...</option>
+                      {categories.map((c) => <option key={c}>{c}</option>)}
                     </select>
                   </div>
                   <div style={s.field}>
-                    <label style={s.label}>Town / Area *</label>
-                    <input style={s.input} placeholder="e.g. Diani, Westlands, Nyali" value={form.town} onChange={(e) => update("town", e.target.value)} />
+                    <label style={s.label}>Description *</label>
+                    <textarea style={{ ...s.input, height: "140px", resize: "vertical" }} placeholder="Describe your property, unique features, nearby attractions, experiences offered..." value={form.description} onChange={(e) => update("description", e.target.value)} />
+                    <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "4px" }}>{form.description.length}/500 characters recommended</div>
                   </div>
                 </div>
-                <div style={s.field}>
-                  <label style={s.label}>Common Location Name (optional)</label>
-                  <input style={s.input} placeholder="e.g. South Coast, CBD, Nyali Beach" value={form.commonLocation} onChange={(e) => update("commonLocation", e.target.value)} />
-                  <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "4px" }}>
-                    Include commonly known names if they differ from the official location name
+              )}
+
+              {/* STEP 2 — LOCATION */}
+              {step === 2 && (
+                <div>
+                  <h2 style={{ ...s.formTitle, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span>Location Details</span>
+                  </h2>
+                  <p style={s.formSub}>Help guests find you</p>
+                  <div className="two-col-form">
+                    <div style={s.field}>
+                      <label style={s.label}>County *</label>
+                      <select style={s.input} value={form.county} onChange={(e) => update("county", e.target.value)}>
+                        <option value="">Select county...</option>
+                        {counties.map((c) => <option key={c}>{c}</option>)}
+                      </select>
+                    </div>
+                    <div style={s.field}>
+                      <label style={s.label}>Town / Area *</label>
+                      <input style={s.input} placeholder="e.g. Diani, Westlands, Nyali" value={form.town} onChange={(e) => update("town", e.target.value)} />
+                    </div>
                   </div>
-                </div>
-                <div style={s.field}>
-                  <label style={s.label}>Physical Address / Landmark</label>
-                  <input style={s.input} placeholder="e.g. Off Mombasa-Malindi Road, next to Kenya Wildlife Service gate" value={form.address} onChange={(e) => update("address", e.target.value)} />
-                </div>
-                <div style={s.field}>
-                  <label style={s.label}>Google Maps Link (optional)</label>
-                  <input style={s.input} placeholder="https://maps.google.com/..." value={form.mapLink} onChange={(e) => update("mapLink", e.target.value)} />
-                </div>
-                <div className="two-col-form">
                   <div style={s.field}>
-                    <label style={s.label}>GPS Latitude (optional)</label>
-                    <input style={s.input} type="number" step="any" placeholder="e.g. -1.286389" value={form.lat} onChange={(e) => update("lat", e.target.value)} />
+                    <label style={s.label}>Common Location Name (optional)</label>
+                    <input style={s.input} placeholder="e.g. South Coast, CBD, Nyali Beach" value={form.commonLocation} onChange={(e) => update("commonLocation", e.target.value)} />
+                    <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "4px" }}>
+                      Include commonly known names if they differ from the official location name
+                    </div>
                   </div>
                   <div style={s.field}>
-                    <label style={s.label}>GPS Longitude (optional)</label>
-                    <input style={s.input} type="number" step="any" placeholder="e.g. 36.817223" value={form.lng} onChange={(e) => update("lng", e.target.value)} />
+                    <label style={s.label}>Physical Address / Landmark *</label>
+                    <input style={s.input} placeholder="e.g. Off Mombasa-Malindi Road, next to Kenya Wildlife Service gate" value={form.address} onChange={(e) => update("address", e.target.value)} required />
                   </div>
-                </div>
-                <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "4px" }}>
-                  Add GPS coordinates for precise location tracking. Get them from Google Maps (right-click → coordinates).
+                  <div style={s.field}>
+                    <label style={s.label}>Google Maps Link (optional)</label>
+                    <input style={s.input} placeholder="https://maps.google.com/..." value={form.mapLink} onChange={(e) => update("mapLink", e.target.value)} />
+                  </div>
+                  <div className="two-col-form">
+                    <div style={s.field}>
+                      <label style={s.label}>GPS Latitude (optional)</label>
+                      <input style={s.input} type="number" step="any" placeholder="e.g. -1.286389" value={form.lat} onChange={(e) => update("lat", e.target.value)} />
+                    </div>
+                    <div style={s.field}>
+                      <label style={s.label}>GPS Longitude*)</label>
+                      <input style={s.input} type="number" step="any" placeholder="e.g. 36.817223" value={form.lng} onChange={(e) => update("lng", e.target.value)} required />
+                    </div>
+                  </div>
+                  <div style={{
+                    fontSize: "11px", color: "#*arginTop: "4px" }}>
+                  Add GPS coordinates for precise location tracking.Get them from Google Maps(right- click → coordinates). required
                 </div>
               </div>
             )}
@@ -293,7 +286,7 @@ export default function RegisterPropertyPage() {
             {/* STEP 3 — MEDIA UPLOAD */}
             {step === 3 && (
               <div>
-                <h2 style={s.formTitle}> Photos & Videos</h2>
+                <htyle={s.formTitlea ePo&qus>ed
                 <p style={s.formSub}>Upload photos and videos of your property to attract more guests. You can upload up to 20 photos and 10 videos.</p>
 
                 <div style={{ marginBottom: "20px" }}>
@@ -595,10 +588,10 @@ export default function RegisterPropertyPage() {
                 </>
               )}
             </div>
-          </div>
-        </main>
-      </div>
-    </div>
+        </div>
+      </main>
+      </div >
+    </div >
   );
 }
 
