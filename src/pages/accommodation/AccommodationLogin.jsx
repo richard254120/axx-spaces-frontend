@@ -274,7 +274,7 @@ export default function AccommodationLogin() {
           email: googleUser.email,
           name: googleUser.name,
           picture: googleUser.picture,
-          role: "landlord",
+          role: "host",
         }),
       });
 
@@ -284,8 +284,8 @@ export default function AccommodationLogin() {
         throw new Error(data.error || "Google authentication failed");
       }
 
-      if (data.user.role !== "landlord") {
-        throw new Error("This login is for tourism providers only");
+      if (data.user.role !== "host") {
+        throw new Error("This login is for accommodation providers only");
       }
 
       if (!data.user.isApproved) {
@@ -373,8 +373,8 @@ export default function AccommodationLogin() {
         throw new Error(data.error || "Login failed");
       }
 
-      if (data.user.role !== "landlord") {
-        throw new Error("This login is for tourism providers only");
+      if (data.user.role !== "host") {
+        throw new Error("This login is for accommodation providers only");
       }
 
       login(data.token, {
