@@ -160,7 +160,9 @@ export default function RegisterPropertyPage() {
         else if (k === "category") fd.append("type", categoryToTypeMap[v] || "hotel");
         else if (k === "checkIn") fd.append("checkInTime", v);
         else if (k === "checkOut") fd.append("checkOutTime", v);
-        else if (k === "basePrice") fd.append("pricePerNight", v);
+        else if (k === "basePrice") {
+          if (v && v !== "") fd.append("basePrice", parseFloat(v) || 0);
+        }
         else if (k === "maxGuests" || k === "totalRooms") {
           if (v && v !== "") fd.append(k, parseInt(v) || 0);
         }
