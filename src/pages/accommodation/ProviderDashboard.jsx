@@ -48,7 +48,7 @@ export default function ProviderDashboard() {
               {getGreeting()}, {displayName.split(" ")[0]}!
             </h1>
             <p style={{ color: accommodationTheme.muted, fontSize: "14px" }}>
-              Your tourism property dashboard
+              Your accommodation property dashboard
             </p>
           </div>
         </div>
@@ -79,7 +79,7 @@ export default function ProviderDashboard() {
             {listings.length === 0 ? (
               <div style={{ ...statCard, textAlign: "center", padding: "40px" }}>
                 <p style={{ color: accommodationTheme.muted, marginBottom: "16px" }}>No properties submitted yet.</p>
-                <button type="button" style={primaryBtn} onClick={() => navigate("/tourism/register-property")}>
+                <button type="button" style={primaryBtn} onClick={() => navigate("/accommodation/register-property")}>
                   List your first property →
                 </button>
               </div>
