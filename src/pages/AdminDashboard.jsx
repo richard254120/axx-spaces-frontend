@@ -166,9 +166,8 @@ export default function AdminDashboard() {
   const handleAccommodationStatus = async (accommodationId, status) => {
     try {
       await API.patch(`/accommodations/${accommodationId}/status`, { status });
-      setPendingAccommodations((prev) =>
-        prev.filter((a) => a._id !== accommodationId)
-      );
+      loadAccommodations();
+      loadStats();
       alert(`Accommodation ${status} successfully`);
     } catch (err) {
       alert("Failed to update accommodation status");
