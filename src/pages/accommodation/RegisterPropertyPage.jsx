@@ -117,14 +117,55 @@ export default function RegisterPropertyPage() {
 
     try {
       const fd = new FormData();
+
+      // Map category to backend enum value (kebab-case)
+      const categoryToTypeMap = {
+        "Hotel": "hotel",
+        "Beach Resort": "beach-resort",
+        "Mountain Lodge": "mountain-lodge",
+        "Safari Camp": "safari-camp",
+        "Camping Grounds": "camping-grounds",
+        "Boutique Hotel": "boutique-hotel",
+        "Eco Lodge": "eco-lodge",
+        "Guest House": "guesthouse",
+        "Bed & Breakfast": "bnb",
+        "Hostel": "hostel",
+        "Apartment": "apartment",
+        "Villa": "villa",
+        "Holiday Home": "holiday-home",
+        "Cottage": "cottage",
+        "Treehouse": "treehouse",
+        "Glamping Site": "glamping-site",
+        "Luxury Tented Camp": "luxury-tented-camp",
+        "Safari Lodge": "safari-lodge",
+        "Game Lodge": "game-lodge",
+        "Bush Camp": "bush-camp",
+        "City Hotel": "city-hotel",
+        "Airport Hotel": "airport-hotel",
+        "Business Hotel": "business-hotel",
+        "Conference Hotel": "conference-hotel",
+        "Resort Hotel": "resort-hotel",
+        "All-Inclusive Resort": "all-inclusive-resort",
+        "Family Resort": "family-resort",
+        "Adults Only Resort": "adults-only-resort",
+        "Beach Hotel": "beach-hotel",
+        "Lake Resort": "lake-resort",
+        "River Lodge": "river-lodge",
+        "Forest Lodge": "forest-lodge",
+        "Hill Station": "hill-station",
+      };
+
       Object.entries(form).forEach(([k, v]) => {
         if (k === "amenities") fd.append("amenities", JSON.stringify(v));
-        else if (k === "category") fd.append("type", v);
+        else if (k === "category") fd.append("type", categoryToTypeMap[v] || "hotel");
         else if (k === "checkIn") fd.append("checkInTime", v);
         else if (k === "checkOut") fd.append("checkOutTime", v);
         else if (k === "basePrice") fd.append("pricePerNight", v);
+        else if (k === "maxGuests" || k === "totalRooms") {
+          if (v && v !== "") fd.append(k, parseInt(v) || 0);
+        }
         else if (Array.isArray(v)) return;
-        else if (v !== undefined && v !== null) fd.append(k, v);
+        else if (v !== undefined && v !== null && v !== "") fd.append(k, v);
       });
       newImages.forEach((file) => fd.append("images", file));
       newVideos.forEach((file) => fd.append("videos", file));
