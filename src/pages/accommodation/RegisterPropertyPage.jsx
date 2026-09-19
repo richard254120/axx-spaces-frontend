@@ -50,7 +50,7 @@ export default function RegisterPropertyPage() {
       return form.ownerName && form.ownerEmail && form.ownerPhone && isPasswordMixed && form.selectedPackage;
     }
     if (step === 1) return form.name && form.category && form.description;
-    if (step === 2) return form.county && form.town;
+    if (step === 2) return form.county && form.town && form.address && form.lat && form.lng;
     if (step === 3) return true; // Media upload is optional
     if (step === 4) return form.amenities.length > 0;
     if (step === 5) return form.basePrice;
