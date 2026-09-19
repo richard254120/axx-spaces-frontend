@@ -97,7 +97,7 @@ export const ACCOUNT_NAV_BY_ROLE = {
     { label: "Settings", path: "/settings" },
   ],
   host: [
-    { label: "Dashboard", path: "/accommodation/host-dashboard" },
+    { label: "Dashboard", path: "/accommodation/dashboard" },
     { label: "Settings", path: "/settings" },
   ],
   seller: [
