@@ -61,6 +61,44 @@ export default function RegisterPropertyPage() {
     if (!form.agreeTerms || submitting) return;
     setSubmitting(true);
     setSubmitError("");
+
+    let authToken = token;
+
+    // If not logged in, register the user first
+    if (!authToken && form.ownerEmail && form.password) {
+      try {
+        const registerRes = await fetch(`${API_BASE}/auth/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: form.ownerName,
+            email: form.ownerEmail,
+            phone: form.ownerPhone,
+            password: form.password,
+            role: "host",
+          }),
+        });
+        const registerData = await registerRes.json();
+        if (!registerRes.ok) {
+          throw new Error(registerData.error || "Registration failed");
+        }
+        authToken = registerData.token;
+        // Log the user in
+        authLogin(authToken, {
+          _id: registerData.user._id,
+          name: registerData.user.name,
+          email: registerData.user.email,
+          role: "host",
+        });
+      } catch (err) {
+        throw new Error(`Account registration failed: ${err.message}`);
+      }
+    }
+
+    if (!authToken) {
+      throw new Error("You must be logged in to submit a property. Please log in first.");
+    }
+
     try {
       const fd = new FormData();
       Object.entries(form).forEach(([k, v]) => {
@@ -76,7 +114,7 @@ export default function RegisterPropertyPage() {
       newVideos.forEach((file) => fd.append("videos", file));
       newAudio.forEach((file) => fd.append("audio", file));
 
-      const result = await registerAccommodationProperty(fd, token);
+      const result = await registerAccommodationProperty(fd, authToken);
       if (result.token) {
         setAccommodationSession(result.token, result.user);
         authLogin(result.token, {
