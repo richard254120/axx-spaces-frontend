@@ -198,7 +198,7 @@ export default function AccommodationRegister() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
-          role: "landlord",
+          role: "host",
         }),
       });
 
@@ -230,8 +230,8 @@ export default function AccommodationRegister() {
           <span style={styles.logoWord}>SPACE</span>
         </div>
 
-        <h1 style={styles.title}>Tourism Provider Registration</h1>
-        <p style={styles.subtitle}>Create your tourism provider account</p>
+        <h1 style={styles.title}>Accommodation Provider Registration</h1>
+        <p style={styles.subtitle}>Create your accommodation provider account</p>
 
         {error && <div style={styles.error}>{error}</div>}
         {success && <div style={styles.success}>{success}</div>}
