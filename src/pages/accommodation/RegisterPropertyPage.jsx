@@ -128,7 +128,7 @@ export default function RegisterPropertyPage() {
 
       {/* HEADER */}
       <div style={s.header}>
-        <button style={s.backBtn} onClick={() => navigate("/tourism")}>← Back</button>
+        <button style={s.backBtn} onClick={() => navigate("/accommodation")}>← Back</button>
         <div style={s.headerCenter}>
           <div style={s.logo}><span style={s.logoAccent}>AXX</span><span style={s.logoWord}>SPACE</span></div>
           <p style={s.headerSub}>List Your Property — Step {step + 1} of {steps.length}</p>

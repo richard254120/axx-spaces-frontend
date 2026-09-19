@@ -205,7 +205,7 @@ function App() {
         path="/accommodation/dashboard"
         element={
           <AccommodationDashboardLayout>
-            <ProtectedRoute allowedRoles={["landlord"]}>
+            <ProtectedRoute allowedRoles={["host"]}>
               <ProviderDashboard />
             </ProtectedRoute>
           </AccommodationDashboardLayout>
@@ -215,7 +215,7 @@ function App() {
         path="/accommodation/dashboard/property/:id"
         element={
           <AccommodationDashboardLayout>
-            <ProtectedRoute allowedRoles={["landlord"]}>
+            <ProtectedRoute allowedRoles={["host"]}>
               <EditPropertyPage />
             </ProtectedRoute>
           </AccommodationDashboardLayout>
