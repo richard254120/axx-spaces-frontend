@@ -318,51 +318,51 @@ export default function RegisterPropertyPage() {
                   </div>
                 </div>
                 <div style={s.field}>
-                  <label style={s.label}>Common Location*ional)</label>
-                  <input style={s.input} placeholder="e.g. South Coast, CBD, Nyali Beach" value={form.commonLocation} onChange={(e) => update("commonLocation", e.required target.value)} />
+                  <label style={s.label}>Common Location Name (optional)</label>
+                  <input style={s.input} placeholder="e.g. South Coast, CBD, Nyali Beach" value={form.commonLocation} onChange={(e) => update("commonLocation", e.target.value)} />
                   <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "4px" }}>
                     Include commonly known names if they differ from the official location name
                   </div>
                 </div>
                 <div style={s.field}>
                   <label style={s.label}>Physical Address / Landmark *</label>
-                  <input styledisplay: "=lex", aligsI.umst} centerehojustifyCdntent"e.spOce-betweenMombasa-Malindi Road, next to Kenya Wildlife Service gate" value={form.address} onChange={(e) => update("address", e.target.value)} required />
-                </<div style={{ fontSize: "11px", color: "#9ca3af" }}>
-                    div>
+                  <input style={s.input} placeholder="e.g. Off Mombasa-Malindi Road, next to Kenya Wildlife Service gate" value={form.address} onChange={(e) => update("address", e.target.value)} required />
                 </div>
-                <button
-                  type="button"
-                  onClick={detectLocation}
-                  style={{
-                    background: "#fbbf24",
-                    color: "#1f2937",
-                    border: "none",
-                    borderRadius: "8px",
-                    padding: "8px 16px",
-                    fontWeight: 700,
-                    fontSize: "12px",
-                    cursor: "pointer",
-                    fontFamily: "inherit",
-                  }}
-                >
-                  📍 Auto-detect Location
-                </button>
                 <div style={s.field}>
                   <label style={s.label}>Google Maps Link (optional)</label>
                   <input style={s.input} placeholder="https://maps.google.com/..." value={form.mapLink} onChange={(e) => update("mapLink", e.target.value)} />
                 </div>
                 <div className="two-col-form">
                   <div style={s.field}>
-                    <label style={s.label}>GPS Latitude (optional)</label>
-                    <input style={s.input} type="number" step="any" placeholder="e.g. -1.286389" value={form.lat} onChange={(e) => update("lat", e.target.value)} />
+                    <label style={s.label}>GPS Latitude *</label>
+                    <input style={s.input} type="number" step="any" placeholder="e.g. -1.286389" value={form.lat} onChange={(e) => update("lat", e.target.value)} required />
                   </div>
                   <div style={s.field}>
                     <label style={s.label}>GPS Longitude *</label>
                     <input style={s.input} type="number" step="any" placeholder="e.g. 36.817223" value={form.lng} onChange={(e) => update("lng", e.target.value)} required />
                   </div>
                 </div>
-                <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "4px" }}>
-                  GPS coordinates are required. Get them from Google Maps (right-click → coordinates).
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "4px" }}>
+                  <div style={{ fontSize: "11px", color: "#9ca3af" }}>
+                    GPS coordinates are required. Get them from Google Maps (right-click → coordinates).
+                  </div>
+                  <button
+                    type="button"
+                    onClick={detectLocation}
+                    style={{
+                      background: "#fbbf24",
+                      color: "#1f2937",
+                      border: "none",
+                      borderRadius: "8px",
+                      padding: "8px 16px",
+                      fontWeight: 700,
+                      fontSize: "12px",
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                    }}
+                  >
+                    📍 Auto-detect Location
+                  </button>
                 </div>
               </div>
             )}
