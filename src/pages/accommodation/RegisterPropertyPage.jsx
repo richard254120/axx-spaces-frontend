@@ -69,7 +69,7 @@ export default function RegisterPropertyPage() {
     if (step === 2) return form.county && form.town && form.address && form.lat && form.lng;
     if (step === 3) return true; // Media upload is optional
     if (step === 4) return form.amenities.length > 0;
-    if (step === 5) return form.basePrice;
+    if (step === 5) return form.basePrice && form.basePrice !== "";
     return true;
   };
 
