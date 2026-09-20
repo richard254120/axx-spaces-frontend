@@ -216,6 +216,30 @@ export default function RegisterPropertyPage() {
         <main>
           <div style={s.formCard}>
 
+            {/* STEP 0 — PROPERTY INFO */}
+            {step === 0 && (
+              <div>
+                <h2 style={s.formTitle}> Property Information</h2>
+                <p style={s.formSub}>Tell guests what makes your property special</p>
+                <div style={s.field}>
+                  <label style={s.label}>Property Name *</label>
+                  <input style={s.input} placeholder="e.g. Sunrise Beach Resort" value={form.name} onChange={(e) => update("name", e.target.value)} />
+                </div>
+                <div style={s.field}>
+                  <label style={s.label}>Category *</label>
+                  <select style={s.input} value={form.category} onChange={(e) => update("category", e.target.value)}>
+                    <option value="">Select category...</option>
+                    {categories.map((c) => <option key={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div style={s.field}>
+                  <label style={s.label}>Description *</label>
+                  <textarea style={{ ...s.input, height: "140px", resize: "vertical" }} placeholder="Describe your property, unique features, nearby attractions, experiences offered..." value={form.description} onChange={(e) => update("description", e.target.value)} />
+                  <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "4px" }}>{form.description.length}/500 characters recommended</div>
+                </div>
+              </div>
+            )}
+
             {/* STEP 1 — LOCATION */}
             {step === 1 && (
               <div>
