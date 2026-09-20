@@ -119,11 +119,11 @@ export default function ProviderDashboard() {
                       )}
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: "8px", flexShrink: 0 }}>
-                      <button type="button" style={primaryBtn} onClick={() => navigate(`/tourism/dashboard/property/${l.id || l._id}`)}>
+                      <button type="button" style={primaryBtn} onClick={() => navigate(`/accommodation/dashboard/property/${l.id || l._id}`)}>
                         Edit & upload media
                       </button>
                       {l.status === "approved" && (
-                        <button type="button" style={secondaryBtn} onClick={() => navigate(`/tourism/${l.id || l._id}`)}>
+                        <button type="button" style={secondaryBtn} onClick={() => navigate(`/accommodation/${l.id || l._id}`)}>
                           View live
                         </button>
                       )}
