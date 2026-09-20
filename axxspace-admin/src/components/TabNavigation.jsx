@@ -12,7 +12,10 @@ export default function TabNavigation({ tabs, activeTab, setActiveTab, pendingCo
     businesses: " Businesses",
     announcements: " Announcements",
     verification: "✓ KYC Verification",
-    requests: " User Requests"
+    requests: " User Requests",
+    "listings-badges": " Listing Badges",
+    "user-badges": " User Badges",
+    accommodations: " Accommodations"
   };
 
   const getPendingCount = (tab) => {
@@ -27,6 +30,9 @@ export default function TabNavigation({ tabs, activeTab, setActiveTab, pendingCo
     }
     if (tab === "requests") {
       return pendingCounts?.requests > 0 ? ` (${pendingCounts.requests})` : "";
+    }
+    if (tab === "accommodations") {
+      return pendingCounts?.accommodations > 0 ? ` (${pendingCounts.accommodations})` : "";
     }
     if (!pendingCounts?.allPending) return "";
     const map = { properties: "properties", materials: "materials", tourism: "tourism", movers: "movers", sellers: "sellers" };

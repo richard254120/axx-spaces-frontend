@@ -24,12 +24,16 @@ export async function fetchAccommodationListings(params = {}) {
   Object.entries(params).forEach(([k, v]) => {
     if (v !== undefined && v !== null && v !== "") qs.set(k, v);
   });
+  // Only show approved (active) accommodations to users
+  qs.set("status", "active");
   const json = await request(`/accommodations?${qs}`);
   return json || [];
 }
 
 export async function fetchFeaturedAccommodation(limit = 6) {
   const qs = new URLSearchParams({ featured: "true", limit });
+  // Only show approved (active) accommodations to users
+  qs.set("status", "active");
   const json = await request(`/accommodations?${qs}`);
   return json || [];
 }

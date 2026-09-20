@@ -96,6 +96,7 @@ export default function AdminDashboard() {
   // ── ACCOMMODATIONS STATE ────────────────────────────────────
   const [pendingAccommodations, setPendingAccommodations] = useState([]);
   const [accommodationsLoading, setAccommodationsLoading] = useState(false);
+  const [accommodationStatusView, setAccommodationStatusView] = useState("pending_review");
 
   // ── POSTER / QR STATE ──────────────────────────────────────
   const [selectedPropertyForQR, setSelectedPropertyForQR] = useState(null);
@@ -143,7 +144,7 @@ export default function AdminDashboard() {
     if (activeTab === "accommodations") {
       loadAccommodations();
     }
-  }, [activeTab]);
+  }, [activeTab, accommodationStatusView]);
 
   // ── KYC VERIFICATION FUNCTIONS ───────────────────────────────
   const loadPendingVerifications = async () => {
@@ -565,7 +566,7 @@ export default function AdminDashboard() {
   const loadAccommodations = async () => {
     setAccommodationsLoading(true);
     try {
-      const res = await API.get("/accommodations/admin/pending");
+      const res = await API.get(`/accommodations/admin/pending?status=${accommodationStatusView}`);
       setPendingAccommodations(res.data || []);
     } catch (err) {
       console.error("Failed to load accommodations:", err);
@@ -577,6 +578,7 @@ export default function AdminDashboard() {
   const handleAccommodationStatus = async (accommodationId, status) => {
     try {
       await API.patch(`/accommodations/${accommodationId}/status`, { status });
+      setAccommodationStatusView(status);
       loadAccommodations();
       loadStats();
       alert(`Accommodation ${status} successfully`);
@@ -726,7 +728,8 @@ export default function AdminDashboard() {
             businesses: stats?.businesses,
             announcements: pendingAnnouncements.length,
             verification: pendingVerifications.length,
-            requests: requests.length
+            requests: requests.length,
+            accommodations: pendingAccommodations.length
           }}
           hasPendingBoosts={hasPendingBoosts}
           pendingBoosts={pendingBoosts}
@@ -1000,6 +1003,13 @@ export default function AdminDashboard() {
                 {activeTab === "materials" && ["Furniture", "Electronics", "Appliances", "Tools", "Clothing", "Books", "Sports & Outdoors", "Home & Garden", "Beauty & Personal Care", "Toys & Games", "Construction Materials", "Vehicles & Parts", "Other"].map(cat => <option key={cat} value={cat}>{cat}</option>)}
                 {activeTab === "properties" && ["Apartment", "House", "Office", "Land", "Warehouse"].map(cat => <option key={cat} value={cat}>{cat}</option>)}
                 {activeTab === "tourism" && ["Hotel", "Resort", "Airbnb", "Lodge", "Camping"].map(cat => <option key={cat} value={cat}>{cat}</option>)}
+              </select>
+            )}
+            {activeTab === "accommodations" && (
+              <select className="filter-select" value={accommodationStatusView} onChange={(e) => setAccommodationStatusView(e.target.value)}>
+                <option value="pending_review">Pending Review</option>
+                <option value="active">Approved (Active)</option>
+                <option value="inactive">Rejected (Inactive)</option>
               </select>
             )}
             <button className="btn-export" onClick={exportData}> Export CSV</button>
