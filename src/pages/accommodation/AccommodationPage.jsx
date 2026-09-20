@@ -84,7 +84,9 @@ export default function AccommodationPage() {
       setHeroVisible(false);
       const featuredSection = document.getElementById('featured-section');
       if (featuredSection) {
-        featuredSection.scrollIntoView({ behavior: 'smooth' });
+        const offset = 60; // Account for navbar height
+        const top = featuredSection.getBoundingClientRect().top + window.pageYOffset - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
       }
     }, 3000);
     return () => clearTimeout(timer);
