@@ -23,7 +23,7 @@ export default function PropertyCard({ property: p, onOpen }) {
       }}>
         {p.images && p.images.length > 0 ? (
           <img
-            src={p.images[0]}
+            src={p.images[0].imageUrl || p.images[0]}
             alt={p.name}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
@@ -37,7 +37,7 @@ export default function PropertyCard({ property: p, onOpen }) {
         )}
         {p.bookingUrl && (
           <div style={{ position: "absolute", top: "10px", right: "10px", background: "rgba(255,255,255,0.9)", color: "#6b7280", fontSize: "9px", fontWeight: 700, padding: "2px 7px", borderRadius: "20px", zIndex: 1 }}>
-             Book online
+            Book online
           </div>
         )}
       </div>

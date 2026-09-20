@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import {
@@ -31,6 +31,32 @@ const getBadgeColor = (tag) => {
   return colors[tag] || "#065f46";
 };
 
+// ── ANIMATION: counts a stat up once it scrolls into view ──
+function CountUp({ value }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const m = String(value).match(/^([\d.]+)(.*)$/);
+    if (!m) return;
+    const end = parseFloat(m[1]), dec = (m[1].split(".")[1] || "").length, suffix = m[2];
+    const el = ref.current;
+    el.textContent = (0).toFixed(dec) + suffix;
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      const t0 = performance.now();
+      const tick = (t) => {
+        const p = Math.min((t - t0) / 1400, 1);
+        el.textContent = (end * (1 - Math.pow(1 - p, 3))).toFixed(dec) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [value]);
+  return <span ref={ref}>{value}</span>;
+}
+
 export default function AccommodationPage() {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
@@ -39,6 +65,15 @@ export default function AccommodationPage() {
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState("");
   const { featured: featuredList, stats: heroStats } = useAccommodationHome();
+
+  // ── ANIMATION: reveal elements as they scroll into view ──
+  useEffect(() => {
+    const io = new IntersectionObserver((es) => es.forEach((e) => {
+      if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+    }), { threshold: 0.15 });
+    document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [featuredList]);
 
   const handleSelectPackage = (pkg) => {
     navigate("/accommodation/register-property");
@@ -91,19 +126,20 @@ export default function AccommodationPage() {
       {/* ── HERO ── */}
       <section style={s.hero}>
         <div style={s.heroOverlay} />
+        <div className="blob b1" /><div className="blob b2" />
         <div style={s.heroContent}>
-          <div style={s.heroBadge}> Kenya's Premier Accommodation QuickSales</div>
-          <h1 style={s.heroTitle}>
+          <div style={s.heroBadge} className="hero-in i1"> Kenya's Premier Accommodation QuickSales</div>
+          <h1 style={s.heroTitle} className="hero-in i2">
             Discover Kenya's
             <br />
-            <span style={s.heroAccent}>Finest Stays</span>
+            <span style={s.heroAccent} className="hero-accent">Finest Stays</span>
           </h1>
-          <p style={s.heroSub}>
+          <p style={s.heroSub} className="hero-in i3">
             From luxury hotels to cozy guesthouses across all 47 counties — find perfect accommodation for every occasion with verified properties and direct bookings.
           </p>
 
           {/* Segmented Search Bar */}
-          <div style={s.searchContainer}>
+          <div style={s.searchContainer} className="search-container hero-in i4">
             <div style={s.searchSegment}>
               <span style={s.searchSegmentIcon}></span>
               <input
@@ -140,7 +176,7 @@ export default function AccommodationPage() {
                 onChange={(e) => setGuests(e.target.value)}
               />
             </div>
-            <button style={s.searchBtn} onClick={() => navigate("/accommodation/listings")}>Search</button>
+            <button style={s.searchBtn} className="search-btn" onClick={() => navigate("/accommodation/listings")}>Search</button>
           </div>
         </div>
       </section>
@@ -154,10 +190,10 @@ export default function AccommodationPage() {
             { icon: "", val: "18K+", label: "Monthly Visitors" },
             { icon: "", val: "4.8★", label: "Avg. Rating" },
           ].map((st) => (
-            <div key={st.label} style={s.statItem}>
+            <div key={st.label} style={s.statItem} className="reveal">
               <span style={s.statIcon}>{st.icon}</span>
               <div>
-                <div style={s.statVal}>{st.val}</div>
+                <div style={s.statVal}><CountUp value={st.val} /></div>
                 <div style={s.statLabel}>{st.label}</div>
               </div>
             </div>
@@ -168,7 +204,7 @@ export default function AccommodationPage() {
       {/* ── FEATURED ── */}
       <section style={{ ...s.section, background: "linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%)", paddingTop: "100px" }}>
         <div style={s.sectionInner}>
-          <div style={s.sectionHead}>
+          <div style={s.sectionHead} className="reveal">
             <div>
               <h2 style={s.sectionTitle}>Featured Properties</h2>
               <p style={{ fontSize: "16px", color: "#6b7280", marginTop: "8px", lineHeight: 1.6 }}>Curated selection of Kenya's top-rated accommodations</p>
@@ -177,9 +213,19 @@ export default function AccommodationPage() {
           </div>
           <div className="prop-grid">
             {featuredList.map((p) => (
-              <div key={p._id || p.id} className="prop-card" style={s.propCard} onClick={() => navigate(`/accommodation/${p._id || p.id}`)}>
-                <div style={{ ...s.propImg, background: `linear-gradient(135deg, ${p.color || "#065f46"}40, ${p.color || "#065f46"}20)`, aspectRatio: "4/3" }}>
-                  <span style={{ fontSize: "64px", filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.15))" }}>{p.emoji || "🏨"}</span>
+              <div key={p._id || p.id} className="prop-card reveal" style={s.propCard} onClick={() => navigate(`/accommodation/${p._id || p.id}`)}>
+                <div className="prop-img" style={{ ...s.propImg, aspectRatio: "4/3", position: "relative", overflow: "hidden" }}>
+                  {p.images && p.images.length > 0 ? (
+                    <img
+                      src={p.images[0].imageUrl}
+                      alt={p.name}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                  ) : (
+                    <div style={{ width: "100%", height: "100%", background: `linear-gradient(135deg, ${p.color || "#065f46"}40, ${p.color || "#065f46"}20)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <span style={{ fontSize: "64px", filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.15))" }}>{p.emoji || "🏨"}</span>
+                    </div>
+                  )}
                   {p.tag && <div style={{ ...s.propTag, background: getBadgeColor(p.tag) }}>{p.tag}</div>}
                 </div>
                 <div style={s.propBody}>
@@ -217,7 +263,7 @@ export default function AccommodationPage() {
               { step: "03", icon: "", title: "Get Discovered", desc: "Your property is visible to thousands of guests on AXXSpace." },
               { step: "04", icon: "", title: "Guests Contact Direct", desc: "Interested guests contact you directly via WhatsApp or phone for bookings." },
             ].map((h, idx) => (
-              <div key={h.step} className="how-item" style={s.howItem}>
+              <div key={h.step} className="how-item reveal" style={s.howItem}>
                 <div className="how-number" style={s.howNumber}>{h.step}</div>
                 {idx < 3 && <div className="how-line" style={s.howLine}></div>}
                 <div style={s.howIcon}>{h.icon}</div>
@@ -708,5 +754,55 @@ const css = `
     .logoLabel { font-size: 10px !important; }
     .nav-mobile-btns button { font-size: 10px !important; padding: 6px 10px !important; }
     .searchBtn { width: 100%; }
+  }
+
+  /* ── ANIMATIONS ── */
+  .blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .45; pointer-events: none; }
+  .blob.b1 { width: 380px; height: 380px; background: #fbbf24; top: -120px; right: -80px; animation: drift 12s ease-in-out infinite alternate; }
+  .blob.b2 { width: 320px; height: 320px; background: #06b6d4; bottom: -120px; left: -80px; animation: drift 10s ease-in-out infinite alternate-reverse; }
+  @keyframes drift { to { transform: translate(40px, 30px) scale(1.15); } }
+
+  .hero-in { animation: heroUp .8s cubic-bezier(.2,.8,.2,1) backwards; }
+  .hero-in.i1 { animation-delay: .1s; } .hero-in.i2 { animation-delay: .25s; }
+  .hero-in.i3 { animation-delay: .4s; } .hero-in.i4 { animation-delay: .55s; }
+  @keyframes heroUp { from { opacity: 0; transform: translateY(28px); } }
+
+  .hero-accent {
+    background: linear-gradient(90deg, #fbbf24, #fff3c4, #fbbf24); background-size: 200% 100%;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent !important;
+    animation: shine 4s linear infinite;
+  }
+  @keyframes shine { to { background-position: -200% 0; } }
+
+  .reveal { opacity: 0; }
+  .reveal.in { opacity: 1; animation: revealUp .7s cubic-bezier(.2,.8,.2,1) backwards; }
+  @keyframes revealUp { from { opacity: 0; transform: translateY(36px); } }
+  .prop-grid .reveal:nth-child(3n+2), .how-grid .reveal:nth-child(2) { animation-delay: .12s; }
+  .prop-grid .reveal:nth-child(3n), .how-grid .reveal:nth-child(3) { animation-delay: .24s; }
+  .how-grid .reveal:nth-child(4) { animation-delay: .36s; }
+
+  .prop-img img { transition: transform .7s cubic-bezier(.2,.8,.2,1); }
+  .prop-card:hover .prop-img img { transform: scale(1.08); }
+
+  .how-item.in .how-number { animation: popIn .6s .2s cubic-bezier(.34,1.56,.64,1) backwards; }
+  .how-line { transform-origin: left; }
+  .how-item.in .how-line { animation: draw .8s .4s ease-out backwards; }
+  @keyframes popIn { from { transform: scale(0); } }
+  @keyframes draw { from { transform: scaleX(0); } }
+
+  .search-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(99,102,241,.45); }
+  .search-btn:active { transform: scale(.97); }
+
+  /* Mobile fix: search stacks on phones (inline styles need !important) */
+  @media (max-width: 900px) {
+    .search-container { flex-direction: column !important; border-radius: 20px !important; }
+    .search-container > div { width: 100%; }
+    .search-btn { width: 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; }
+    *, *::before, *::after { animation: none !important; transition: none !important; }
   }
 `;
