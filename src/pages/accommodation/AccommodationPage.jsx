@@ -234,37 +234,6 @@ export default function AccommodationPage() {
         </div>
       </section>
 
-      {/* ── BROWSE BY TYPE ── */}
-      {categories && categories.length > 0 && (
-        <section style={s.section}>
-          <div style={s.sectionInner}>
-            <div style={s.sectionHead} className="reveal">
-              <div>
-                <h2 style={s.sectionTitle}>Browse by Type</h2>
-                <p style={{ fontSize: "16px", color: "#6b7280", marginTop: "8px", lineHeight: 1.6 }}>Find the stay that fits your trip</p>
-              </div>
-            </div>
-            <div className="cat-grid">
-              {categories.map((c, i) => {
-                const name = c.name || c.label || c.title || String(c);
-                const color = getCategoryColor(name);
-                return (
-                  <button key={name + i} className="cat-card reveal" style={{ ...s.catCard, border: "none", padding: 0 }} onClick={() => navigate("/accommodation/listings")}>
-                    <div className="catImage" style={{ ...s.catImage, background: `linear-gradient(135deg, ${color}66, ${color}22)` }}>
-                      <span style={s.catEmoji}>{c.emoji || c.icon || "🏨"}</span>
-                    </div>
-                    <div style={s.catOverlay}>
-                      <div style={s.catName}>{name}</div>
-                      {c.count !== undefined && <div style={s.catCount}>{c.count} properties</div>}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* ── FEATURED ── */}
       <section style={{ ...s.section, background: "linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%)", paddingTop: "100px" }}>
         <div style={s.sectionInner}>
