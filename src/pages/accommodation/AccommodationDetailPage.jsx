@@ -105,14 +105,23 @@ export default function AccommodationDetailPage() {
       <div style={{ fontFamily: "'DM Sans', sans-serif", background: accommodationTheme.bg, minHeight: "100vh", padding: "40px 20px" }}>
         <AccommodationNav />
         <ErrorAlert message={error || "Property not found"} />
-        <button type="button" onClick={() => navigate("/tourism/listings")} style={{ marginTop: "16px", padding: "12px 20px", borderRadius: "10px", border: "none", background: "#fbbf24", fontWeight: 800, cursor: "pointer" }}>
+        <button type="button" onClick={() => navigate("/accommodation/listings")} style={{ marginTop: "16px", padding: "12px 20px", borderRadius: "10px", border: "none", background: "#fbbf24", fontWeight: 800, cursor: "pointer" }}>
           Back to listings
         </button>
       </div>
     );
   }
 
-  const roomPrice = roomTypes[selectedRoom]?.price ?? property.price;
+  const roomTypes = property.roomTypes || [{ name: "Standard Room", price: property.basePrice || property.price || 0, guests: property.maxGuests || 2, desc: property.description || "Comfortable accommodation" }];
+  const roomPrice = roomTypes[selectedRoom]?.price ?? property.basePrice ?? property.price ?? 0;
+
+  // Manager/contact info from owner
+  const manager = property.owner || {
+    name: property.ownerName || "Property Owner",
+    phone: property.ownerPhone || "",
+    email: property.ownerEmail || property.owner?.email || "",
+    whatsapp: property.ownerPhone?.replace(/\D/g, '') || ""
+  };
 
   // If property has its own booking URL, redirect there; otherwise handle internally
   const handleBook = () => {
@@ -219,7 +228,7 @@ export default function AccommodationDetailPage() {
 
   return (
     <div style={s.root}>
-      <style>{TOURISM_FONT_CSS}{css}</style>
+      <style>{ACCOMMODATION_FONT_CSS}{css}</style>
       <AccommodationNav />
       {error && (
         <div style={{ maxWidth: "1100px", margin: "12px auto", padding: "0 16px" }}>
@@ -229,9 +238,9 @@ export default function AccommodationDetailPage() {
 
       {/* TOP BAR */}
       <div style={s.topBar}>
-        <button style={s.backBtn} onClick={() => navigate("/tourism/listings")}>← Listings</button>
-        <div style={s.breadcrumb}>{property.category} / {property.name}</div>
-        <button style={s.homeBtn} onClick={() => navigate("/tourism")}> Home</button>
+        <button style={s.backBtn} onClick={() => navigate("/accommodation/listings")}>← Listings</button>
+        <div style={s.breadcrumb}>{property.type || property.category} / {property.name}</div>
+        <button style={s.homeBtn} onClick={() => navigate("/accommodation")}> Home</button>
       </div>
 
       <div className="detail-layout">
@@ -319,20 +328,20 @@ export default function AccommodationDetailPage() {
 
           {/* INFO */}
           <div style={s.card}>
-            <div style={s.catBadge}>{property.category}</div>
+            <div style={s.catBadge}>{property.type || "Accommodation"}</div>
             <h1 style={s.propName}>{property.name}</h1>
             <div style={s.propMeta}>
               <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                <span>{property.location}, {property.county} County</span>
+                <span>{typeof property.location === 'object' ? property.address : property.location || property.address || "Kenya"}</span>
               </span>
-              <span style={{ color: property.color, fontWeight: 700 }}> {property.rating} ({property.reviews} reviews)</span>
+              <span style={{ color: property.color || "#065f46", fontWeight: 700 }}> {property.rating || "4.5"} ({property.reviews || "0"} reviews)</span>
             </div>
             <p style={s.description}>{property.description}</p>
           </div>
 
           {/* GPS LOCATION */}
-          {property.coordinates?.lat && property.coordinates?.lng && (
+          {(property.location?.lat && property.location?.lng) || (property.coordinates?.lat && property.coordinates?.lng) && (
             <div style={s.card}>
               <h2 style={{ ...s.cardTitle, display: "flex", alignItems: "center", gap: "4px" }}>
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
@@ -342,15 +351,15 @@ export default function AccommodationDetailPage() {
                 <div style={s.coordsDisplay}>
                   <div style={s.coordItem}>
                     <span style={s.coordLabel}>Latitude:</span>
-                    <span style={s.coordValue}>{property.coordinates.lat}</span>
+                    <span style={s.coordValue}>{property.location?.lat || property.coordinates?.lat}</span>
                   </div>
                   <div style={s.coordItem}>
                     <span style={s.coordLabel}>Longitude:</span>
-                    <span style={s.coordValue}>{property.coordinates.lng}</span>
+                    <span style={s.coordValue}>{property.location?.lng || property.coordinates?.lng}</span>
                   </div>
                 </div>
                 <a
-                  href={`https://www.google.com/maps?q=${property.coordinates.lat},${property.coordinates.lng}`}
+                  href={`https://www.google.com/maps?q=${property.location?.lat || property.coordinates?.lat},${property.location?.lng || property.coordinates?.lng}`}
                   target="_blank"
                   rel="noreferrer"
                   style={s.mapBtn}
@@ -403,10 +412,10 @@ export default function AccommodationDetailPage() {
           <div style={s.card}>
             <h2 style={s.cardTitle}>Policies</h2>
             <div className="policies-grid">
-              <div style={s.policyItem}><div style={s.policyLabel}>Check-in</div><div style={s.policyVal}>{property.policies.checkin}</div></div>
-              <div style={s.policyItem}><div style={s.policyLabel}>Check-out</div><div style={s.policyVal}>{property.policies.checkout}</div></div>
-              <div style={s.policyItem}><div style={s.policyLabel}>Cancellation</div><div style={s.policyVal}>{property.policies.cancellation}</div></div>
-              <div style={s.policyItem}><div style={s.policyLabel}>Payment Methods</div><div style={s.policyVal}>{property.policies.payment}</div></div>
+              <div style={s.policyItem}><div style={s.policyLabel}>Check-in</div><div style={s.policyVal}>{property.checkInTime || "14:00"}</div></div>
+              <div style={s.policyItem}><div style={s.policyLabel}>Check-out</div><div style={s.policyVal}>{property.checkOutTime || "11:00"}</div></div>
+              <div style={s.policyItem}><div style={s.policyLabel}>House Rules</div><div style={s.policyVal}>{property.houseRules || "Contact property for details"}</div></div>
+              <div style={s.policyItem}><div style={s.policyLabel}>Payment Methods</div><div style={s.policyVal}>M-Pesa, Visa, Mastercard accepted</div></div>
             </div>
           </div>
 
@@ -423,14 +432,14 @@ export default function AccommodationDetailPage() {
           {/* CONTACT */}
           <div style={s.card}>
             <h3 style={s.cardTitle}>Contact Property Manager</h3>
-            <div style={{ fontSize: "13px", color: "#6b7280", marginBottom: "14px" }}> {property.manager.name} — Property Representative</div>
+            <div style={{ fontSize: "13px", color: "#6b7280", marginBottom: "14px" }}> {manager.name} — Property Representative</div>
             <div style={s.contactBtns}>
-              <a href={`tel:${property.manager.phone}`} style={s.contactBtn}> Call</a>
-              <a href={`https://wa.me/${property.manager.whatsapp}`} style={{ ...s.contactBtn, background: "#22c55e" }} target="_blank" rel="noreferrer"> WhatsApp</a>
-              <a href={`mailto:${property.manager.email}`} style={{ ...s.contactBtn, background: "#3b82f6" }}> Email</a>
+              <a href={`tel:${manager.phone}`} style={s.contactBtn}> Call</a>
+              <a href={`https://wa.me/${manager.whatsapp}`} style={{ ...s.contactBtn, background: "#22c55e" }} target="_blank" rel="noreferrer"> WhatsApp</a>
+              <a href={`mailto:${manager.email}`} style={{ ...s.contactBtn, background: "#3b82f6" }}> Email</a>
             </div>
             {property.bookingUrl && (
-              <a href={property.bookingUrl} target="_blank" rel="noreferrer" style={{ ...s.contactBtn, background: property.color, display: "block", textAlign: "center", marginTop: "10px", padding: "12px" }}>
+              <a href={property.bookingUrl} target="_blank" rel="noreferrer" style={{ ...s.contactBtn, background: property.color || "#065f46", display: "block", textAlign: "center", marginTop: "10px", padding: "12px" }}>
                 Visit Official Website
               </a>
             )}
@@ -438,10 +447,10 @@ export default function AccommodationDetailPage() {
             {/* In-App Chat */}
             <div style={{ marginTop: "16px", paddingTop: "16px", borderTop: "1px solid #e5e7eb" }}>
               <MessagingSystem
-                recipientId={property.manager.email}
-                recipientName={property.manager.name}
+                recipientId={manager.email}
+                recipientName={manager.name}
                 recipientType="Property Manager"
-                propertyId={property.id}
+                propertyId={property._id || property.id}
                 propertyTitle={property.name}
               />
             </div>
@@ -453,11 +462,11 @@ export default function AccommodationDetailPage() {
           <BookingWidget />
           <div style={s.sideContact}>
             <h3 style={{ fontSize: "14px", fontWeight: 800, color: "#1f2937", marginBottom: "10px" }}>Need Help?</h3>
-            <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}> {property.manager.name}</div>
+            <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}> {manager.name}</div>
             <div style={s.contactBtns}>
-              <a href={`tel:${property.manager.phone}`} style={s.contactBtn}> Call</a>
-              <a href={`https://wa.me/${property.manager.whatsapp}`} style={{ ...s.contactBtn, background: "#22c55e" }} target="_blank" rel="noreferrer"> WhatsApp</a>
-              <a href={`mailto:${property.manager.email}`} style={{ ...s.contactBtn, background: "#3b82f6" }}> Email</a>
+              <a href={`tel:${manager.phone}`} style={s.contactBtn}> Call</a>
+              <a href={`https://wa.me/${manager.whatsapp}`} style={{ ...s.contactBtn, background: "#22c55e" }} target="_blank" rel="noreferrer"> WhatsApp</a>
+              <a href={`mailto:${manager.email}`} style={{ ...s.contactBtn, background: "#3b82f6" }}> Email</a>
             </div>
           </div>
         </aside>
