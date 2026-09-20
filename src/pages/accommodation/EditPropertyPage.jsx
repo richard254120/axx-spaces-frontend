@@ -111,7 +111,7 @@ export default function EditPropertyPage() {
     return (
       <div style={page}>
         <ErrorAlert message={error || "Property not found"} />
-        <button type="button" style={btnPrimary} onClick={() => navigate("/tourism/dashboard")}>← Dashboard</button>
+        <button type="button" style={btnPrimary} onClick={() => navigate("/accommodation/dashboard")}>← Dashboard</button>
       </div>
     );
   }
@@ -121,10 +121,10 @@ export default function EditPropertyPage() {
 
   return (
     <div style={page}>
-      <style>{TOURISM_FONT_CSS}</style>
+      <style>{ACCOMMODATION_FONT_CSS}</style>
 
       <div style={topBar}>
-        <button type="button" style={btnGhost} onClick={() => navigate("/tourism/dashboard")}>← Dashboard</button>
+        <button type="button" style={btnGhost} onClick={() => navigate("/accommodation/dashboard")}>← Dashboard</button>
         <h1 style={{ fontSize: "20px", fontWeight: 800 }}>Edit property</h1>
       </div>
 
