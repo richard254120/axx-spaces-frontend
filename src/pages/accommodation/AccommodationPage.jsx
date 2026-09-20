@@ -31,6 +31,8 @@ const getBadgeColor = (tag) => {
   return colors[tag] || "#065f46";
 };
 
+const DESTINATIONS = ["Nairobi", "Mombasa", "Diani Beach", "Maasai Mara", "Naivasha", "Nakuru", "Nanyuki", "Lamu", "Malindi", "Kisumu", "Watamu", "Amboseli"];
+
 // ── ANIMATION: counts a stat up once it scrolls into view ──
 function CountUp({ value }) {
   const ref = useRef(null);
@@ -75,6 +77,27 @@ export default function AccommodationPage() {
     return () => io.disconnect();
   }, [featuredList]);
 
+  // ── FEATURES: scroll progress, nav shadow, back-to-top, saved properties ──
+  const [scrolled, setScrolled] = useState(false);
+  const [showTop, setShowTop] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [favs, setFavs] = useState([]);
+  useEffect(() => {
+    const onScroll = () => {
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      setScrolled(window.scrollY > 20);
+      setShowTop(window.scrollY > 500);
+      setProgress(h > 0 ? (window.scrollY / h) * 100 : 0);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  const toggleFav = (e, id) => {
+    e.stopPropagation();
+    setFavs((f) => (f.includes(id) ? f.filter((x) => x !== id) : [...f, id]));
+  };
+
   const handleSelectPackage = (pkg) => {
     navigate("/accommodation/register-property");
   };
@@ -82,9 +105,10 @@ export default function AccommodationPage() {
   return (
     <div style={s.root}>
       <style>{css}</style>
+      <div className="scroll-progress" style={{ width: progress + "%" }} />
 
       {/* ── NAV ── */}
-      <nav style={s.nav}>
+      <nav style={s.nav} className={scrolled ? "nav scrolled" : "nav"}>
         <div style={s.navInner}>
           <div style={s.logo}>
             <img src="/tourism.png" alt="Tourism" style={{ width: "40px", height: "40px", marginRight: "10px", verticalAlign: "middle", filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.2))", borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(0,0,0,0.1)" }} />
@@ -140,7 +164,7 @@ export default function AccommodationPage() {
 
           {/* Segmented Search Bar */}
           <div style={s.searchContainer} className="search-container hero-in i4">
-            <div style={s.searchSegment}>
+            <div style={s.searchSegment} className="search-seg">
               <span style={s.searchSegmentIcon}></span>
               <input
                 style={s.searchSegmentInput}
@@ -149,7 +173,7 @@ export default function AccommodationPage() {
                 onChange={(e) => setDestination(e.target.value)}
               />
             </div>
-            <div style={s.searchSegment}>
+            <div style={s.searchSegment} className="search-seg">
               <span style={s.searchSegmentIcon}></span>
               <input
                 style={s.searchSegmentInput}
@@ -158,7 +182,7 @@ export default function AccommodationPage() {
                 onChange={(e) => setCheckIn(e.target.value)}
               />
             </div>
-            <div style={s.searchSegment}>
+            <div style={s.searchSegment} className="search-seg">
               <span style={s.searchSegmentIcon}></span>
               <input
                 style={s.searchSegmentInput}
@@ -167,7 +191,7 @@ export default function AccommodationPage() {
                 onChange={(e) => setCheckOut(e.target.value)}
               />
             </div>
-            <div style={s.searchSegment}>
+            <div style={s.searchSegment} className="search-seg">
               <span style={s.searchSegmentIcon}></span>
               <input
                 style={s.searchSegmentInput}
@@ -201,6 +225,46 @@ export default function AccommodationPage() {
         </div>
       </section>
 
+      {/* ── DESTINATIONS MARQUEE ── */}
+      <section className="marquee" aria-label="Popular destinations">
+        <div className="marquee-track">
+          {[...DESTINATIONS, ...DESTINATIONS].map((d, i) => (
+            <button key={d + i} className="dest-pill" onClick={() => navigate("/accommodation/listings")}>{d}</button>
+          ))}
+        </div>
+      </section>
+
+      {/* ── BROWSE BY TYPE ── */}
+      {categories && categories.length > 0 && (
+        <section style={s.section}>
+          <div style={s.sectionInner}>
+            <div style={s.sectionHead} className="reveal">
+              <div>
+                <h2 style={s.sectionTitle}>Browse by Type</h2>
+                <p style={{ fontSize: "16px", color: "#6b7280", marginTop: "8px", lineHeight: 1.6 }}>Find the stay that fits your trip</p>
+              </div>
+            </div>
+            <div className="cat-grid">
+              {categories.map((c, i) => {
+                const name = c.name || c.label || c.title || String(c);
+                const color = getCategoryColor(name);
+                return (
+                  <button key={name + i} className="cat-card reveal" style={{ ...s.catCard, border: "none", padding: 0 }} onClick={() => navigate("/accommodation/listings")}>
+                    <div className="catImage" style={{ ...s.catImage, background: `linear-gradient(135deg, ${color}66, ${color}22)` }}>
+                      <span style={s.catEmoji}>{c.emoji || c.icon || "🏨"}</span>
+                    </div>
+                    <div style={s.catOverlay}>
+                      <div style={s.catName}>{name}</div>
+                      {c.count !== undefined && <div style={s.catCount}>{c.count} properties</div>}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ── FEATURED ── */}
       <section style={{ ...s.section, background: "linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%)", paddingTop: "100px" }}>
         <div style={s.sectionInner}>
@@ -227,6 +291,9 @@ export default function AccommodationPage() {
                     </div>
                   )}
                   {p.tag && <div style={{ ...s.propTag, background: getBadgeColor(p.tag) }}>{p.tag}</div>}
+                  <button className={"fav-btn" + (favs.includes(p._id || p.id) ? " on" : "")} aria-label="Save property" aria-pressed={favs.includes(p._id || p.id)} onClick={(e) => toggleFav(e, p._id || p.id)}>
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z" /></svg>
+                  </button>
                 </div>
                 <div style={s.propBody}>
                   <div style={s.propCat}>{p.type || p.category || "Accommodation"}</div>
@@ -270,6 +337,47 @@ export default function AccommodationPage() {
                 <h3 style={s.howTitle}>{h.title}</h3>
                 <p style={s.howDesc}>{h.desc}</p>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── WHY CHOOSE US ── */}
+      <section style={{ ...s.section, background: "#f8fafc" }}>
+        <div style={s.sectionInner}>
+          <h2 style={{ ...s.sectionTitle, textAlign: "center", marginBottom: "48px" }} className="reveal">Why Choose AXXSpace</h2>
+          <div className="why-grid">
+            {[
+              { icon: "✅", title: "Verified Properties", desc: "Every listing is reviewed by our team before it goes live." },
+              { icon: "💬", title: "Direct Contact", desc: "Reach owners on WhatsApp or phone. No middlemen." },
+              { icon: "🗺️", title: "All 47 Counties", desc: "From Mombasa beaches to Mara safari camps and city hotels." },
+              { icon: "⚡", title: "Quick Listing", desc: "Owners add a property in minutes and get discovered fast." },
+            ].map((w) => (
+              <div key={w.title} className="why-card reveal">
+                <div className="why-icon">{w.icon}</div>
+                <h3 style={s.howTitle}>{w.title}</h3>
+                <p style={s.howDesc}>{w.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── TESTIMONIALS (sample text: replace with real reviews) ── */}
+      <section style={s.section}>
+        <div style={s.sectionInner}>
+          <h2 style={{ ...s.sectionTitle, textAlign: "center", marginBottom: "48px" }} className="reveal">What People Say</h2>
+          <div className="testi-grid">
+            {[
+              { name: "Wanjiru M.", role: "Guest, Nairobi", text: "Found a clean apartment in Diani and booked straight with the owner on WhatsApp. Easy." },
+              { name: "Brian O.", role: "Property owner, Nakuru", text: "I listed my guest house on Monday and had my first enquiry by Wednesday." },
+              { name: "Amina H.", role: "Guest, Mombasa", text: "The photos matched the place exactly. No surprises when we arrived." },
+            ].map((t) => (
+              <figure key={t.name} className="testi-card reveal">
+                <div className="testi-stars" aria-label="5 out of 5 stars">★★★★★</div>
+                <blockquote>{t.text}</blockquote>
+                <figcaption><b>{t.name}</b><span>{t.role}</span></figcaption>
+              </figure>
             ))}
           </div>
         </div>
@@ -336,6 +444,12 @@ export default function AccommodationPage() {
           <span>Nairobi, Kenya </span>
         </div>
       </footer>
+
+      {/* ── FLOATING ACTIONS ── */}
+      <a className="wa-float" href="https://wa.me/254745689773" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.2 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.3.3c-.1.1-.3.3-.1.6.2.3.7 1.2 1.6 1.9 1 .9 1.9 1.2 2.2 1.3.3.1.4.1.6-.1l.8-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.2z" /></svg>
+      </a>
+      <button className={"to-top" + (showTop ? " show" : "")} aria-label="Back to top" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>↑</button>
     </div>
   );
 }
@@ -799,6 +913,62 @@ const css = `
     .search-container { flex-direction: column !important; border-radius: 20px !important; }
     .search-container > div { width: 100%; }
     .search-btn { width: 100%; }
+  }
+
+  /* ── NEW FEATURES ── */
+  .scroll-progress { position: fixed; top: 0; left: 0; height: 3px; z-index: 300; background: linear-gradient(90deg, #6366F1, #ec4899, #fbbf24); transition: width .1s linear; }
+  .nav { transition: box-shadow .3s, background .3s; }
+  .nav.scrolled { box-shadow: 0 8px 30px rgba(15,23,42,.12); background: rgba(255,255,255,.88) !important; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .search-seg:focus-within { border-color: #6366F1 !important; background: #fff !important; box-shadow: 0 0 0 3px rgba(99,102,241,.15); }
+
+  .marquee { overflow: hidden; background: #0f172a; padding: 16px 0; }
+  .marquee-track { display: flex; width: max-content; animation: marquee 45s linear infinite; }
+  .marquee:hover .marquee-track { animation-play-state: paused; }
+  .dest-pill { margin-right: 12px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); color: #e5e7eb; border-radius: 999px; padding: 9px 20px; font: 600 14px 'DM Sans', sans-serif; cursor: pointer; white-space: nowrap; transition: background .2s, color .2s, transform .2s; }
+  .dest-pill::before { content: "📍 "; }
+  .dest-pill:hover { background: #fbbf24; color: #1f2937; transform: translateY(-2px); }
+  @keyframes marquee { to { transform: translateX(-50%); } }
+
+  .cat-grid .reveal:nth-child(4n+2) { animation-delay: .1s; }
+  .cat-grid .reveal:nth-child(4n+3) { animation-delay: .2s; }
+  .cat-grid .reveal:nth-child(4n) { animation-delay: .3s; }
+
+  .fav-btn { position: absolute; top: 14px; right: 14px; width: 40px; height: 40px; border-radius: 50%; border: none; cursor: pointer; display: grid; place-items: center; background: rgba(255,255,255,.92); color: #1f2937; box-shadow: 0 4px 12px rgba(0,0,0,.18); transition: transform .2s; z-index: 2; }
+  .fav-btn:hover { transform: scale(1.1); }
+  .fav-btn.on { color: #e0355e; animation: heartPop .45s; }
+  .fav-btn.on svg { fill: currentColor; }
+  @keyframes heartPop { 40% { transform: scale(1.4); } }
+
+  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .why-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 20px; padding: 32px 24px; text-align: center; transition: transform .3s, box-shadow .3s; }
+  .why-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(99,102,241,.15); }
+  .why-icon { width: 64px; height: 64px; margin: 0 auto 18px; border-radius: 18px; display: grid; place-items: center; font-size: 30px; background: linear-gradient(135deg, #eef2ff, #fdf2f8); }
+  .why-card:hover .why-icon { animation: wiggle .6s; }
+  @keyframes wiggle { 25% { transform: rotate(-8deg) scale(1.1); } 75% { transform: rotate(8deg) scale(1.1); } }
+  .why-grid .reveal:nth-child(4n+2) { animation-delay: .1s; }
+  .why-grid .reveal:nth-child(4n+3) { animation-delay: .2s; }
+  .why-grid .reveal:nth-child(4n) { animation-delay: .3s; }
+
+  .testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .testi-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 20px; padding: 28px; box-shadow: 0 4px 20px rgba(0,0,0,.06); display: flex; flex-direction: column; gap: 14px; }
+  .testi-stars { color: #fbbf24; font-size: 18px; letter-spacing: 2px; }
+  .testi-card blockquote { font-size: 15px; line-height: 1.7; color: #374151; flex: 1; }
+  .testi-card figcaption { display: flex; flex-direction: column; font-size: 13px; color: #6b7280; }
+  .testi-card figcaption b { color: #1f2937; font-size: 14px; }
+  .testi-grid .reveal:nth-child(3n+2) { animation-delay: .12s; }
+  .testi-grid .reveal:nth-child(3n) { animation-delay: .24s; }
+
+  .wa-float { position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); width: 58px; height: 58px; border-radius: 50%; background: #25D366; color: #fff; display: grid; place-items: center; box-shadow: 0 10px 28px rgba(37,211,102,.5); z-index: 150; animation: waPulse 2.4s infinite; }
+  @keyframes waPulse { 0% { box-shadow: 0 0 0 0 rgba(37,211,102,.55); } 70% { box-shadow: 0 0 0 18px rgba(37,211,102,0); } 100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); } }
+  .to-top { position: fixed; right: 26px; bottom: calc(88px + env(safe-area-inset-bottom, 0px)); width: 42px; height: 42px; border-radius: 50%; border: none; background: #6366F1; color: #fff; font-size: 20px; font-weight: 800; cursor: pointer; z-index: 150; opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity .3s, transform .3s; box-shadow: 0 8px 20px rgba(99,102,241,.4); }
+  .to-top.show { opacity: 1; transform: none; pointer-events: auto; }
+
+  @media (max-width: 900px) {
+    .why-grid { grid-template-columns: repeat(2, 1fr); }
+    .testi-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .why-grid { grid-template-columns: 1fr; }
   }
 
   @media (prefers-reduced-motion: reduce) {

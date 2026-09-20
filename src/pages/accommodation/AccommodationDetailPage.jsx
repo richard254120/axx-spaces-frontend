@@ -248,8 +248,22 @@ export default function AccommodationDetailPage() {
         <div style={s.leftCol}>
 
           {/* HERO / MEDIA */}
-          {(property.images?.length > 0 || property.videos?.length > 0 || property.audio?.length > 0) ? (
+          {property.images?.length > 0 ? (
             <div style={{ marginBottom: "16px" }}>
+              {/* Hero Image */}
+              <div style={{ ...s.heroImg, position: "relative", overflow: "hidden", border: `1px solid ${property.color}25` }}>
+                <img
+                  src={property.images[0].imageUrl}
+                  alt={property.name}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+                {property.tag && <div style={{ ...s.heroTag, background: property.color }}>{property.tag}</div>}
+                {property.bookingUrl && (
+                  <div style={s.bookingUrlBadge}> Official Booking Available</div>
+                )}
+              </div>
+
+              {/* Additional Media */}
               {property.audio?.length > 0 && (
                 <div style={{ marginBottom: "16px" }}>
                   <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#374151", marginBottom: "8px" }}> Audio Clips</h3>
@@ -305,12 +319,12 @@ export default function AccommodationDetailPage() {
                   })}
                 </div>
               )}
-              {property.images?.length > 0 && (
+              {property.images?.length > 1 && (
                 <div>
-                  <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#374151", marginBottom: "8px" }}> Photos</h3>
+                  <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#374151", marginBottom: "8px" }}> More Photos</h3>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "10px" }}>
-                    {property.images.map((url) => (
-                      <img key={url} src={url} alt={property.name} style={{ width: "100%", height: "200px", objectFit: "cover", borderRadius: "12px", border: `1px solid ${property.color}25`, cursor: "pointer" }} />
+                    {property.images.slice(1).map((img) => (
+                      <img key={img._id || img.imageUrl} src={img.imageUrl || img} alt={property.name} style={{ width: "100%", height: "200px", objectFit: "cover", borderRadius: "12px", border: `1px solid ${property.color}25`, cursor: "pointer" }} />
                     ))}
                   </div>
                 </div>
