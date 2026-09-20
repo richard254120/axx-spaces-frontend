@@ -177,26 +177,26 @@ export default function AccommodationPage() {
           </div>
           <div className="prop-grid">
             {featuredList.map((p) => (
-              <div key={p.id} className="prop-card" style={s.propCard} onClick={() => navigate(`/accommodation/${p.id}`)}>
-                <div style={{ ...s.propImg, background: `linear-gradient(135deg, ${p.color}40, ${p.color}20)`, aspectRatio: "4/3" }}>
-                  <span style={{ fontSize: "64px", filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.15))" }}>{p.emoji}</span>
+              <div key={p._id || p.id} className="prop-card" style={s.propCard} onClick={() => navigate(`/accommodation/${p._id || p.id}`)}>
+                <div style={{ ...s.propImg, background: `linear-gradient(135deg, ${p.color || "#065f46"}40, ${p.color || "#065f46"}20)`, aspectRatio: "4/3" }}>
+                  <span style={{ fontSize: "64px", filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.15))" }}>{p.emoji || "🏨"}</span>
                   {p.tag && <div style={{ ...s.propTag, background: getBadgeColor(p.tag) }}>{p.tag}</div>}
                 </div>
                 <div style={s.propBody}>
-                  <div style={s.propCat}>{p.category}</div>
+                  <div style={s.propCat}>{p.type || p.category || "Accommodation"}</div>
                   <h3 style={s.propName}>{p.name}</h3>
                   <div style={{ ...s.propLoc, display: "flex", alignItems: "center", gap: "6px" }}>
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, color: p.color }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                    <span>{p.location}</span>
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, color: p.color || "#065f46" }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span>{typeof p.location === 'object' ? p.address : p.location || p.address || "Kenya"}</span>
                   </div>
                   <div style={s.propFooter}>
                     <div>
-                      <span style={{ ...s.propPrice, color: p.color, fontSize: "22px" }}>KSh {(p.basePrice || p.price || 0).toLocaleString()}</span>
+                      <span style={{ ...s.propPrice, color: p.color || "#065f46", fontSize: "22px" }}>KSh {(p.basePrice || p.price || 0).toLocaleString()}</span>
                       <span style={s.propPer}>/night</span>
                     </div>
                     <div style={s.propRating}> <span style={{ color: "#fbbf24", fontSize: "16px" }}>★</span> {p.rating || "4.5"} <span style={{ color: "#9ca3af" }}>({p.reviews || "0"})</span></div>
                   </div>
-                  <button style={{ ...s.propBtn, background: p.color }} onClick={(e) => { e.stopPropagation(); navigate(`/accommodation/${p._id || p.id}`); }}>
+                  <button style={{ ...s.propBtn, background: p.color || "#065f46" }} onClick={(e) => { e.stopPropagation(); navigate(`/accommodation/${p._id || p.id}`); }}>
                     View Details →
                   </button>
                 </div>
