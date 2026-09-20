@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   useAccommodationProperty,
@@ -90,6 +90,43 @@ export default function AccommodationDetailPage() {
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
 
+  // ── FEATURES: lightbox, share/save, scroll-reveal, section scroll-spy ──
+  // (hooks must stay above the early returns below)
+  const [lightbox, setLightbox] = useState(-1);
+  const [saved, setSaved] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [activeSec, setActiveSec] = useState("overview");
+
+  useEffect(() => {
+    const io = new IntersectionObserver((es) => es.forEach((e) => {
+      if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+    }), { threshold: 0.12 });
+    document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [property, loading]);
+
+  useEffect(() => {
+    const ids = ["overview", "amenities", "rooms", "policies", "reviews", "contact"];
+    const io = new IntersectionObserver((es) => es.forEach((e) => {
+      if (e.isIntersecting) setActiveSec(e.target.id);
+    }), { rootMargin: "-35% 0px -55% 0px" });
+    ids.forEach((i) => { const el = document.getElementById(i); if (el) io.observe(el); });
+    return () => io.disconnect();
+  }, [property, loading]);
+
+  useEffect(() => {
+    if (lightbox < 0) return;
+    const n = property?.images?.length || 0;
+    const onKey = (e) => {
+      if (e.key === "Escape") setLightbox(-1);
+      if (e.key === "ArrowRight" && n) setLightbox((i) => (i + 1) % n);
+      if (e.key === "ArrowLeft" && n) setLightbox((i) => (i - 1 + n) % n);
+    };
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
+  }, [lightbox, property]);
+
   if (loading) {
     return (
       <div style={{ fontFamily: "'DM Sans', sans-serif", background: accommodationTheme.bg, minHeight: "100vh" }}>
@@ -130,6 +167,14 @@ export default function AccommodationDetailPage() {
     } else {
       alert("Contact the property manager to book.");
     }
+  };
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    try {
+      if (navigator.share) await navigator.share({ title: property.name, url });
+      else { await navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 2000); }
+    } catch (e) { /* user cancelled */ }
   };
 
   const handleBookWithMpesa = () => {
@@ -184,7 +229,7 @@ export default function AccommodationDetailPage() {
   };
 
   const BookingWidget = () => (
-    <div style={s.bookingCard}>
+    <div style={s.bookingCard} className="booking-card">
       <div style={s.bookingHeader}>
         <div>
           <span style={{ ...s.bookingPrice, color: property.color }}>KSh {roomPrice.toLocaleString()}</span>
@@ -215,10 +260,10 @@ export default function AccommodationDetailPage() {
       )}
 
       <div style={s.buttonGroup}>
-        <button style={{ ...s.bookNowBtn, background: property.color }} onClick={handleBook}>
+        <button className="cta-btn" style={{ ...s.bookNowBtn, background: property.color }} onClick={handleBook}>
           {property.bookingUrl ? " Book on Official Site →" : " Request Booking"}
         </button>
-        <button style={s.mpesaBookBtn} onClick={handleBookWithMpesa}>
+        <button className="cta-btn" style={s.mpesaBookBtn} onClick={handleBookWithMpesa}>
           Pay with M-Pesa
         </button>
       </div>
@@ -243,6 +288,20 @@ export default function AccommodationDetailPage() {
         <button style={s.homeBtn} onClick={() => navigate("/accommodation")}> Home</button>
       </div>
 
+      {/* SECTION NAV */}
+      <div className="section-nav" role="navigation" aria-label="Page sections">
+        {[["overview", "Overview"], ["amenities", "Amenities"], ["rooms", "Rooms"], ["policies", "Policies"], ["reviews", "Reviews"], ["contact", "Contact"]].map(([sid, label]) => (
+          <a
+            key={sid}
+            href={`#${sid}`}
+            className={activeSec === sid ? "active" : ""}
+            onClick={(e) => { e.preventDefault(); document.getElementById(sid)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
+          >
+            {label}
+          </a>
+        ))}
+      </div>
+
       <div className="detail-layout">
         {/* ── LEFT ── */}
         <div style={s.leftCol}>
@@ -251,15 +310,20 @@ export default function AccommodationDetailPage() {
           {property.images?.length > 0 ? (
             <div style={{ marginBottom: "16px" }}>
               {/* Hero Image */}
-              <div style={{ ...s.heroImg, position: "relative", overflow: "hidden", border: `1px solid ${property.color}25` }}>
+              <div className="hero-main" style={{ ...s.heroImg, position: "relative", overflow: "hidden", border: `1px solid ${property.color}25` }}>
                 <img
                   src={property.images[0].imageUrl}
                   alt={property.name}
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  className="zoomable"
+                  onClick={() => setLightbox(0)}
                 />
                 {property.tag && <div style={{ ...s.heroTag, background: property.color }}>{property.tag}</div>}
                 {property.bookingUrl && (
                   <div style={s.bookingUrlBadge}> Official Booking Available</div>
+                )}
+                {property.images.length > 1 && (
+                  <button className="photo-count" onClick={() => setLightbox(0)}>📷 View all {property.images.length} photos</button>
                 )}
               </div>
 
@@ -323,8 +387,8 @@ export default function AccommodationDetailPage() {
                 <div>
                   <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#374151", marginBottom: "8px" }}> More Photos</h3>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "10px" }}>
-                    {property.images.slice(1).map((img) => (
-                      <img key={img._id || img.imageUrl} src={img.imageUrl || img} alt={property.name} style={{ width: "100%", height: "200px", objectFit: "cover", borderRadius: "12px", border: `1px solid ${property.color}25`, cursor: "pointer" }} />
+                    {property.images.slice(1).map((img, i) => (
+                      <img key={img._id || img.imageUrl} src={img.imageUrl || img} alt={property.name} className="thumb" onClick={() => setLightbox(i + 1)} style={{ width: "100%", height: "200px", objectFit: "cover", borderRadius: "12px", border: `1px solid ${property.color}25`, cursor: "pointer" }} />
                     ))}
                   </div>
                 </div>
@@ -341,7 +405,7 @@ export default function AccommodationDetailPage() {
           )}
 
           {/* INFO */}
-          <div style={s.card}>
+          <div style={s.card} className="card reveal" id="overview">
             <div style={s.catBadge}>{property.type || "Accommodation"}</div>
             <h1 style={s.propName}>{property.name}</h1>
             <div style={s.propMeta}>
@@ -352,11 +416,37 @@ export default function AccommodationDetailPage() {
               <span style={{ color: property.color || "#065f46", fontWeight: 700 }}> {property.rating || "4.5"} ({property.reviews || "0"} reviews)</span>
             </div>
             <p style={s.description}>{property.description}</p>
+            <div className="action-row">
+              <button type="button" className={"action-btn" + (saved ? " on" : "")} aria-pressed={saved} onClick={() => setSaved((v) => !v)}>
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z" /></svg>
+                {saved ? "Saved" : "Save"}
+              </button>
+              <button type="button" className="action-btn" onClick={handleShare}>
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4" /></svg>
+                {copied ? "Link copied" : "Share"}
+              </button>
+            </div>
+          </div>
+
+          {/* QUICK FACTS */}
+          <div className="facts reveal">
+            {[
+              ["🕑", "Check-in", property.checkInTime],
+              ["🕚", "Check-out", property.checkOutTime],
+              ["👥", "Guests", property.maxGuests ? `Up to ${property.maxGuests}` : null],
+              ["🛏️", "Rooms", property.totalRooms],
+              ["⭐", "Rating", property.rating ? `${property.rating} / 5` : null],
+            ].filter((f) => f[2]).map(([icon, label, val]) => (
+              <div key={label} className="fact">
+                <span className="fact-icon">{icon}</span>
+                <div><div className="fact-val">{val}</div><div className="fact-label">{label}</div></div>
+              </div>
+            ))}
           </div>
 
           {/* GPS LOCATION */}
           {(property.location?.lat && property.location?.lng) || (property.coordinates?.lat && property.coordinates?.lng) && (
-            <div style={s.card}>
+            <div style={s.card} className="card reveal">
               <h2 style={{ ...s.cardTitle, display: "flex", alignItems: "center", gap: "4px" }}>
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                 <span>Exact Location</span>
@@ -390,17 +480,17 @@ export default function AccommodationDetailPage() {
           </button>
 
           {/* AMENITIES */}
-          <div style={s.card}>
+          <div style={s.card} className="card reveal" id="amenities">
             <h2 style={s.cardTitle}>Amenities & Features</h2>
             <div className="amenities-grid">
               {property.amenities.map((a) => (
-                <div key={a} style={s.amenityItem}>{a}</div>
+                <div key={a} style={s.amenityItem} className="amenity">{a}</div>
               ))}
             </div>
           </div>
 
           {/* ROOM TYPES */}
-          <div style={s.card}>
+          <div style={s.card} className="card reveal" id="rooms">
             <h2 style={s.cardTitle}>Room Types & Rates</h2>
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               {roomTypes.map((r, i) => (
@@ -423,7 +513,7 @@ export default function AccommodationDetailPage() {
           </div>
 
           {/* POLICIES */}
-          <div style={s.card}>
+          <div style={s.card} className="card reveal" id="policies">
             <h2 style={s.cardTitle}>Policies</h2>
             <div className="policies-grid">
               <div style={s.policyItem}><div style={s.policyLabel}>Check-in</div><div style={s.policyVal}>{property.checkInTime || "14:00"}</div></div>
@@ -434,7 +524,7 @@ export default function AccommodationDetailPage() {
           </div>
 
           {/* REVIEWS */}
-          <div style={s.card}>
+          <div style={s.card} className="card reveal" id="reviews">
             <h2 style={s.cardTitle}>Guest Reviews</h2>
             <CompactReviews
               reviews={property.reviewList || []}
@@ -444,7 +534,7 @@ export default function AccommodationDetailPage() {
           </div>
 
           {/* CONTACT */}
-          <div style={s.card}>
+          <div style={s.card} className="card reveal" id="contact">
             <h3 style={s.cardTitle}>Contact Property Manager</h3>
             <div style={{ fontSize: "13px", color: "#6b7280", marginBottom: "14px" }}> {manager.name} — Property Representative</div>
             <div style={s.contactBtns}>
@@ -497,6 +587,21 @@ export default function AccommodationDetailPage() {
             </div>
             <BookingWidget />
           </div>
+        </div>
+      )}
+
+      {/* PHOTO LIGHTBOX */}
+      {lightbox >= 0 && property.images?.length > 0 && (
+        <div className="lightbox" onClick={() => setLightbox(-1)} role="dialog" aria-modal="true" aria-label="Photo viewer">
+          <button className="lb-close" aria-label="Close photo viewer" onClick={() => setLightbox(-1)}>✕</button>
+          {property.images.length > 1 && (
+            <button className="lb-nav lb-prev" aria-label="Previous photo" onClick={(e) => { e.stopPropagation(); setLightbox((i) => (i - 1 + property.images.length) % property.images.length); }}>‹</button>
+          )}
+          <img key={lightbox} className="lb-img" src={property.images[lightbox]?.imageUrl || property.images[lightbox]} alt={property.name} onClick={(e) => e.stopPropagation()} />
+          {property.images.length > 1 && (
+            <button className="lb-nav lb-next" aria-label="Next photo" onClick={(e) => { e.stopPropagation(); setLightbox((i) => (i + 1) % property.images.length); }}>›</button>
+          )}
+          <div className="lb-count">{lightbox + 1} / {property.images.length}</div>
         </div>
       )}
 
@@ -707,5 +812,82 @@ const css = `
   }
   @media (max-width: 480px) {
     .policies-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── NEW LAYOUT + ANIMATION ── */
+  html { scroll-behavior: smooth; }
+  :root { --nav-h: 0px; } /* set to your sticky AccommodationNav height (e.g. 61px) if it is sticky */
+
+  .hero-main { height: clamp(260px, 42vw, 470px) !important; border-radius: 20px !important; box-shadow: 0 18px 50px rgba(15,23,42,.18); animation: heroIn .8s cubic-bezier(.2,.8,.2,1) backwards; }
+  @keyframes heroIn { from { opacity: 0; transform: scale(.97); } }
+  .hero-main .zoomable { cursor: zoom-in; transition: transform .8s cubic-bezier(.2,.8,.2,1); }
+  .hero-main:hover .zoomable { transform: scale(1.04); }
+  .hero-main::after { content: ""; position: absolute; inset: auto 0 0 0; height: 35%; background: linear-gradient(to top, rgba(0,0,0,.35), transparent); pointer-events: none; }
+  .photo-count { position: absolute; right: 14px; bottom: 14px; z-index: 2; border: none; cursor: pointer; background: rgba(255,255,255,.95); color: #1f2937; font: 700 12px 'DM Sans', sans-serif; padding: 9px 16px; border-radius: 999px; box-shadow: 0 6px 18px rgba(0,0,0,.2); transition: transform .2s; }
+  .photo-count:hover { transform: translateY(-2px); }
+  .thumb { transition: transform .35s, box-shadow .35s; }
+  .thumb:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 14px 30px rgba(0,0,0,.2); }
+
+  .section-nav { position: sticky; top: var(--nav-h); z-index: 50; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 10px 16px; background: rgba(255,255,255,.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid #e5e7eb; }
+  .section-nav::-webkit-scrollbar { display: none; }
+  .section-nav a { flex: none; text-decoration: none; color: #4b5563; font-size: 13px; font-weight: 700; padding: 8px 16px; border-radius: 999px; transition: background .2s, color .2s; }
+  .section-nav a:hover { background: #f3f4f6; }
+  .section-nav a.active { background: #1f2937; color: #fff; }
+  .card, .facts { scroll-margin-top: calc(var(--nav-h) + 64px); }
+
+  .reveal { opacity: 0; }
+  .reveal.in { opacity: 1; animation: revealUp .7s cubic-bezier(.2,.8,.2,1) backwards; }
+  @keyframes revealUp { from { opacity: 0; transform: translateY(30px); } }
+  .card { transition: box-shadow .3s; }
+  .card:hover { box-shadow: 0 14px 36px rgba(15,23,42,.08); }
+
+  .action-row { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+  .action-btn { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font: 700 13px 'DM Sans', sans-serif; color: #374151; background: #fff; border: 1px solid #e5e7eb; border-radius: 999px; padding: 9px 18px; transition: background .2s, transform .15s, color .2s; }
+  .action-btn:hover { background: #f9fafb; }
+  .action-btn:active { transform: scale(.95); }
+  .action-btn.on { color: #e0355e; border-color: #f7b4c4; background: #fff1f4; animation: heartPop .4s; }
+  .action-btn.on svg { fill: currentColor; }
+  @keyframes heartPop { 40% { transform: scale(1.12); } }
+
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+  .fact { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid #e5e7eb; border-radius: 14px; padding: 14px; }
+  .fact-icon { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-size: 18px; background: linear-gradient(135deg, #eef2ff, #fdf2f8); flex: none; }
+  .fact-val { font-size: 14px; font-weight: 800; color: #1f2937; }
+  .fact-label { font-size: 11px; color: #9ca3af; font-weight: 600; }
+
+  .amenity { transition: transform .2s, background .2s, border-color .2s; }
+  .amenity:hover { transform: translateY(-2px); background: #fff !important; border-color: #fbbf24 !important; }
+  .room-card { transition: transform .2s, box-shadow .2s, border-color .2s; }
+  .room-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,.08); }
+
+  .booking-card { transition: box-shadow .3s; }
+  .booking-card:hover { box-shadow: 0 16px 44px rgba(15,23,42,.16) !important; }
+  .cta-btn { transition: transform .15s, filter .2s, box-shadow .2s; }
+  .cta-btn:hover { transform: translateY(-2px); filter: brightness(1.06); box-shadow: 0 10px 22px rgba(0,0,0,.2); }
+  .cta-btn:active { transform: scale(.97); }
+
+  .lightbox { position: fixed; inset: 0; z-index: 3000; background: rgba(8,12,20,.94); display: flex; align-items: center; justify-content: center; animation: fadeIn .25s; }
+  @keyframes fadeIn { from { opacity: 0; } }
+  .lb-img { max-width: 92vw; max-height: 84vh; border-radius: 14px; object-fit: contain; animation: lbIn .35s cubic-bezier(.2,.8,.2,1); }
+  @keyframes lbIn { from { opacity: 0; transform: scale(.94); } }
+  .lb-close, .lb-nav { position: absolute; border: none; cursor: pointer; color: #fff; background: rgba(255,255,255,.14); border-radius: 50%; display: grid; place-items: center; transition: background .2s; }
+  .lb-close:hover, .lb-nav:hover { background: rgba(255,255,255,.28); }
+  .lb-close { top: calc(16px + env(safe-area-inset-top, 0px)); right: 16px; width: 42px; height: 42px; font-size: 16px; }
+  .lb-nav { top: 50%; transform: translateY(-50%); width: 48px; height: 48px; font-size: 30px; padding-bottom: 4px; }
+  .lb-prev { left: 14px; } .lb-next { right: 14px; }
+  .lb-count { position: absolute; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); color: #e5e7eb; font: 600 13px 'DM Sans', sans-serif; background: rgba(255,255,255,.12); padding: 6px 14px; border-radius: 999px; }
+
+  @media (max-width: 860px) {
+    .detail-layout { padding-bottom: 100px; }
+    .mobile-book-btn { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); width: auto !important; z-index: 90; box-shadow: 0 14px 34px rgba(0,0,0,.35); animation: ctaUp .5s .4s cubic-bezier(.2,.8,.2,1) backwards; }
+    .hero-main { border-radius: 16px !important; }
+    .lb-nav { width: 40px; height: 40px; font-size: 26px; }
+  }
+  @keyframes ctaUp { from { opacity: 0; transform: translateY(30px); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; }
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation: none !important; transition: none !important; }
   }
 `;
