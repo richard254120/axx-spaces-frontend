@@ -6,8 +6,6 @@ import {
   ErrorAlert,
   ACCOMMODATION_FONT_CSS,
   accommodationTheme,
-  PROPERTY_CATEGORIES,
-  KENYA_COUNTIES,
   AMENITIES_LIST,
 } from "../../features/accommodation";
 import { fetchOwnerListing, updateOwnerListing } from "../../api/accommodation";
@@ -42,24 +40,18 @@ export default function EditPropertyPage() {
         setProperty(data);
         setForm({
           name: data.name || "",
-          category: data.category || "",
+          type: data.type || "",
           description: data.description || "",
-          county: data.county || "",
-          town: data.town || "",
           address: data.address || "",
-          mapLink: data.mapLink || "",
-          basePrice: data.price ?? "",
-          weekendPrice: data.weekendPrice ?? "",
-          peakPrice: data.peakPrice ?? "",
-          bookingUrl: data.bookingUrl || "",
+          lat: data.location?.lat || "",
+          lng: data.location?.lng || "",
+          basePrice: data.basePrice ?? "",
           amenities: data.amenities || [],
-          checkIn: data.policiesRaw?.checkIn || "14:00",
-          checkOut: data.policiesRaw?.checkOut || "11:00",
-          cancellation: data.policiesRaw?.cancellation || "48",
-          managerName: data.manager?.name || "",
-          phone: data.manager?.phone || "",
-          email: data.manager?.email || "",
-          whatsapp: data.manager?.whatsapp || "",
+          checkInTime: data.checkInTime || "14:00",
+          checkOutTime: data.checkOutTime || "11:00",
+          houseRules: data.houseRules || "",
+          maxGuests: data.maxGuests ?? "",
+          totalRooms: data.totalRooms ?? "",
         });
       } catch (err) {
         setError(err.message);
@@ -207,43 +199,78 @@ export default function EditPropertyPage() {
         <Field label="Property name *">
           <input style={input} value={form.name} onChange={(e) => update("name", e.target.value)} required />
         </Field>
-        <Field label="Category *">
-          <select style={input} value={form.category} onChange={(e) => update("category", e.target.value)} required>
+        <Field label="Property type *">
+          <select style={input} value={form.type} onChange={(e) => update("type", e.target.value)} required>
             <option value="">Select…</option>
-            {PROPERTY_CATEGORIES.map((c) => <option key={c}>{c}</option>)}
+            <option value="hotel">Hotel</option>
+            <option value="bnb">B&B</option>
+            <option value="guesthouse">Guesthouse</option>
+            <option value="apartment">Apartment</option>
+            <option value="hostel">Hostel</option>
+            <option value="villa">Villa</option>
+            <option value="cottage">Cottage</option>
+            <option value="treehouse">Treehouse</option>
+            <option value="beach-resort">Beach Resort</option>
+            <option value="city-hotel">City Hotel</option>
+            <option value="mountain-lodge">Mountain Lodge</option>
+            <option value="safari-camp">Safari Camp</option>
+            <option value="camping-grounds">Camping Grounds</option>
+            <option value="boutique-hotel">Boutique Hotel</option>
+            <option value="eco-lodge">Eco Lodge</option>
+            <option value="glamping-site">Glamping Site</option>
           </select>
         </Field>
         <Field label="Description *">
           <textarea style={{ ...input, minHeight: "120px" }} value={form.description} onChange={(e) => update("description", e.target.value)} required />
         </Field>
 
-        <div style={twoCol}>
-          <Field label="County *">
-            <select style={input} value={form.county} onChange={(e) => update("county", e.target.value)} required>
-              <option value="">Select…</option>
-              {KENYA_COUNTIES.map((c) => <option key={c}>{c}</option>)}
-            </select>
-          </Field>
-          <Field label="Town / area *">
-            <input style={input} value={form.town} onChange={(e) => update("town", e.target.value)} required />
-          </Field>
-        </div>
-        <Field label="Address">
-          <input style={input} value={form.address} onChange={(e) => update("address", e.target.value)} />
-        </Field>
-        <Field label="Google Maps link">
-          <input style={input} value={form.mapLink} onChange={(e) => update("mapLink", e.target.value)} />
+        <Field label="Address *">
+          <input style={input} value={form.address} onChange={(e) => update("address", e.target.value)} required />
         </Field>
 
-        <h2 style={{ ...sectionTitle, marginTop: "24px" }}>Pricing & booking</h2>
+        <div style={twoCol}>
+          <Field label="Latitude *">
+            <input style={input} type="number" step="any" value={form.lat} onChange={(e) => update("lat", e.target.value)} required />
+          </Field>
+          <Field label="Longitude *">
+            <input style={input} type="number" step="any" value={form.lng} onChange={(e) => update("lng", e.target.value)} required />
+          </Field>
+        </div>
+
+        <h2 style={{ ...sectionTitle, marginTop: "24px" }}>Pricing & capacity</h2>
         <div style={twoCol}>
           <Field label="Price per night (KSh) *">
             <input style={input} type="number" value={form.basePrice} onChange={(e) => update("basePrice", e.target.value)} required />
           </Field>
-          <Field label="Booking website URL">
-            <input style={input} type="url" value={form.bookingUrl} onChange={(e) => update("bookingUrl", e.target.value)} placeholder="https://…" />
+          <Field label="Currency">
+            <select style={input} value={form.currency || "KES"} onChange={(e) => update("currency", e.target.value)}>
+              <option value="KES">KES</option>
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+            </select>
           </Field>
         </div>
+        <div style={twoCol}>
+          <Field label="Max guests *">
+            <input style={input} type="number" min="1" value={form.maxGuests} onChange={(e) => update("maxGuests", e.target.value)} required />
+          </Field>
+          <Field label="Total rooms *">
+            <input style={input} type="number" min="1" value={form.totalRooms} onChange={(e) => update("totalRooms", e.target.value)} required />
+          </Field>
+        </div>
+
+        <h2 style={{ ...sectionTitle, marginTop: "24px" }}>Policies</h2>
+        <div style={twoCol}>
+          <Field label="Check-in time">
+            <input style={input} type="time" value={form.checkInTime} onChange={(e) => update("checkInTime", e.target.value)} />
+          </Field>
+          <Field label="Check-out time">
+            <input style={input} type="time" value={form.checkOutTime} onChange={(e) => update("checkOutTime", e.target.value)} />
+          </Field>
+        </div>
+        <Field label="House rules">
+          <textarea style={{ ...input, minHeight: "80px" }} value={form.houseRules} onChange={(e) => update("houseRules", e.target.value)} />
+        </Field>
 
         <h2 style={{ ...sectionTitle, marginTop: "24px" }}>Amenities</h2>
         <div style={amenityGrid}>
@@ -262,25 +289,12 @@ export default function EditPropertyPage() {
           ))}
         </div>
 
-        <h2 style={{ ...sectionTitle, marginTop: "24px" }}>Contact (shown to guests)</h2>
-        <div style={twoCol}>
-          <Field label="Manager name">
-            <input style={input} value={form.managerName} onChange={(e) => update("managerName", e.target.value)} />
-          </Field>
-          <Field label="Phone">
-            <input style={input} value={form.phone} onChange={(e) => update("phone", e.target.value)} />
-          </Field>
-        </div>
-        <Field label="Email">
-          <input style={input} type="email" value={form.email} onChange={(e) => update("email", e.target.value)} />
-        </Field>
-
         <div style={{ marginTop: "28px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
           <button type="submit" style={btnPrimary} disabled={saving}>
             {saving ? "Saving…" : "Save changes"}
           </button>
-          {property.status === "approved" && (
-            <button type="button" style={btnGhost} onClick={() => navigate(`/tourism/${id}`)}>View live listing</button>
+          {property.status === "active" && (
+            <button type="button" style={btnGhost} onClick={() => navigate(`/accommodation/${id}`)}>View live listing</button>
           )}
         </div>
       </form>
@@ -299,11 +313,11 @@ function Field({ label, children }) {
 
 function statusBox(status) {
   const colors = {
-    pending: { bg: "#fffbeb", border: "#fde68a", text: "#78350f" },
-    approved: { bg: "#f0fdf4", border: "#bbf7d0", text: "#166534" },
-    rejected: { bg: "#fef2f2", border: "#fecaca", text: "#991b1b" },
+    pending_review: { bg: "#fffbeb", border: "#fde68a", text: "#78350f" },
+    active: { bg: "#f0fdf4", border: "#bbf7d0", text: "#166534" },
+    inactive: { bg: "#fef2f2", border: "#fecaca", text: "#991b1b" },
   };
-  const c = colors[status] || colors.pending;
+  const c = colors[status] || colors.pending_review;
   return { background: c.bg, border: `1px solid ${c.border}`, color: c.text, padding: "16px", borderRadius: "12px", marginBottom: "20px", maxWidth: "800px" };
 }
 
