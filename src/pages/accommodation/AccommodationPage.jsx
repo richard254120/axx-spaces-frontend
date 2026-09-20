@@ -77,6 +77,17 @@ export default function AccommodationPage() {
     return () => io.disconnect();
   }, [featuredList]);
 
+  // ── AUTO-SCROLL: scroll to featured properties after 3 seconds ──
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const featuredSection = document.querySelector('[style*="linear-gradient(180deg, #f0fdf4"]');
+      if (featuredSection) {
+        featuredSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
   // ── FEATURES: scroll progress, nav shadow, back-to-top, saved properties ──
   const [scrolled, setScrolled] = useState(false);
   const [showTop, setShowTop] = useState(false);
