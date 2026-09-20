@@ -134,14 +134,9 @@ export const AMENITIES_LIST = [
   "Game Drives", "Beach Access", "Kids Club", "Airport Transfer", "Room Service",
 ];
 
-export const REGISTER_STEPS = ["Account", "Property", "Location", "Media Upload", "Amenities", "Pricing & Booking", "Review"];
+export const REGISTER_STEPS = ["Property", "Location", "Media Upload", "Amenities", "Pricing & Booking", "Review"];
 
 export const INITIAL_REGISTER_FORM = {
-  ownerName: "",
-  ownerEmail: "",
-  ownerPhone: "",
-  password: "",
-  selectedPackage: "",
   name: "",
   category: "",
   description: "",

@@ -61,15 +61,11 @@ export default function RegisterPropertyPage() {
   };
 
   const canNext = () => {
-    if (step === 0) {
-      const isPasswordMixed = form.password && form.password.length >= 6 && /[a-zA-Z]/.test(form.password) && /[0-9]/.test(form.password);
-      return form.ownerName && form.ownerEmail && form.ownerPhone && isPasswordMixed && form.selectedPackage;
-    }
-    if (step === 1) return form.name && form.category && form.description;
-    if (step === 2) return form.county && form.town && form.address && form.lat && form.lng;
-    if (step === 3) return true; // Media upload is optional
-    if (step === 4) return form.amenities.length > 0;
-    if (step === 5) return form.basePrice && form.basePrice !== "";
+    if (step === 0) return form.name && form.category && form.description;
+    if (step === 1) return form.county && form.town && form.address && form.lat && form.lng;
+    if (step === 2) return true; // Media upload is optional
+    if (step === 3) return form.amenities.length > 0;
+    if (step === 4) return form.basePrice && form.basePrice !== "";
     return true;
   };
 
@@ -78,40 +74,7 @@ export default function RegisterPropertyPage() {
     setSubmitting(true);
     setSubmitError("");
 
-    let authToken = token;
-
-    // If not logged in, register the user first
-    if (!authToken && form.ownerEmail && form.password) {
-      try {
-        const registerRes = await fetch(`${API_BASE}/auth/register`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: form.ownerName,
-            email: form.ownerEmail,
-            phone: form.ownerPhone,
-            password: form.password,
-            role: "host",
-          }),
-        });
-        const registerData = await registerRes.json();
-        if (!registerRes.ok) {
-          throw new Error(registerData.error || "Registration failed");
-        }
-        authToken = registerData.token;
-        // Log the user in
-        authLogin(authToken, {
-          _id: registerData.user._id,
-          name: registerData.user.name,
-          email: registerData.user.email,
-          role: "host",
-        });
-      } catch (err) {
-        throw new Error(`Account registration failed: ${err.message}`);
-      }
-    }
-
-    if (!authToken) {
+    if (!token) {
       throw new Error("You must be logged in to submit a property. Please log in first.");
     }
 
@@ -173,16 +136,7 @@ export default function RegisterPropertyPage() {
       newVideos.forEach((file) => fd.append("videos", file));
       newAudio.forEach((file) => fd.append("audio", file));
 
-      const result = await registerAccommodationProperty(fd, authToken);
-      if (result.token) {
-        setAccommodationSession(result.token, result.user);
-        authLogin(result.token, {
-          _id: result.user?.id,
-          name: result.user?.name,
-          email: result.user?.email,
-          role: "host",
-        });
-      }
+      const result = await registerAccommodationProperty(fd, token);
       setSubmitted(true);
     } catch (err) {
       setSubmitError(err.message || "Submission failed. Please try again.");
@@ -198,7 +152,7 @@ export default function RegisterPropertyPage() {
           <div style={{ fontSize: "56px", marginBottom: "16px" }}></div>
           <h2 style={{ fontSize: "22px", fontWeight: 800, color: "#1f2937", marginBottom: "10px" }}>Property Submitted!</h2>
           <p style={{ color: "#6b7280", lineHeight: 1.7, marginBottom: "20px", fontSize: "14px" }}>
-            <strong>{form.name}</strong> has been submitted for review. Our team will verify within 24 hours and contact you at <strong>{form.ownerEmail}</strong>.
+            <strong>{form.name}</strong> has been submitted for review. Our team will verify within 24 hours.
           </p>
           <div style={{ background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "12px", padding: "16px", marginBottom: "20px", textAlign: "left" }}>
             <div style={{ fontSize: "13px", fontWeight: 800, color: "#92400e", marginBottom: "8px" }}> Next Steps</div>
@@ -262,85 +216,8 @@ export default function RegisterPropertyPage() {
         <main>
           <div style={s.formCard}>
 
-            {/* STEP 0 — ACCOUNT & PACKAGE */}
-            {step === 0 && (
-              <div>
-                <h2 style={s.formTitle}> Your Account Details</h2>
-                <p style={s.formSub}>Create your AXXSpace owner account and choose an advertising plan</p>
-                <div className="two-col-form">
-                  <div style={s.field}>
-                    <label style={s.label}>Full Name *</label>
-                    <input style={s.input} placeholder="Your full name" value={form.ownerName} onChange={(e) => update("ownerName", e.target.value)} />
-                  </div>
-                  <div style={s.field}>
-                    <label style={s.label}>Phone / WhatsApp *</label>
-                    <PhoneInput style={s.input} value={form.ownerPhone} onChange={(value) => update("ownerPhone", value)} />
-                  </div>
-                </div>
-                <div style={s.field}>
-                  <label style={s.label}>Email Address *</label>
-                  <input style={s.input} type="email" placeholder="you@yourbusiness.co.ke" value={form.ownerEmail} onChange={(e) => update("ownerEmail", e.target.value)} />
-                </div>
-                <div style={s.field}>
-                  <label style={s.label}>Create Password *</label>
-                  <input style={s.input} type="password" placeholder="Min 6 chars with letters & numbers" value={form.password} onChange={(e) => update("password", e.target.value)} />
-                  {form.password && (form.password.length < 6 || !/[a-zA-Z]/.test(form.password) || !/[0-9]/.test(form.password)) && (
-                    <div style={{ color: "#dc2626", fontSize: "11px", marginTop: "4px" }}>
-                      Password must be at least 6 characters and contain a mixture of both letters and numbers.
-                    </div>
-                  )}
-                </div>
-
-                {/* PACKAGE SELECTION */}
-                <div style={s.pkgSection}>
-                  <div style={s.pkgTitle}> Choose Your Advertising Package</div>
-                  <div className="pkg-grid">
-                    {packages.map((pkg) => (
-                      <div
-                        key={pkg.name}
-                        style={{ ...s.pkgCard, ...(form.selectedPackage === pkg.name ? { borderColor: pkg.color, background: pkg.color + "08" } : {}) }}
-                        onClick={() => update("selectedPackage", pkg.name)}
-                      >
-                        {pkg.popular && <div style={{ ...s.pkgBadge, background: pkg.color }}> Popular</div>}
-                        <div style={{ fontSize: "16px", fontWeight: 800, color: pkg.color, marginBottom: "2px" }}>{pkg.name}</div>
-                        <div style={{ fontSize: "11px", color: "#6b7280", marginBottom: "8px" }}>{pkg.duration}</div>
-                        <div style={{ fontSize: "20px", fontWeight: 900, color: "#1f2937", marginBottom: "8px" }}>KSh {pkg.price.toLocaleString()}</div>
-                        <div style={{ fontSize: "12px", color: "#4b5563", lineHeight: 1.5 }}>{pkg.desc}</div>
-                        {form.selectedPackage === pkg.name && <div style={{ marginTop: "10px", color: pkg.color, fontSize: "12px", fontWeight: 800 }}>✓ Selected</div>}
-                      </div>
-                    ))}
-                  </div>
-                  <p style={{ fontSize: "11px", color: "#9ca3af", marginTop: "10px" }}> Payment link will be emailed after submission. 7-day free trial included.</p>
-                </div>
-              </div>
-            )}
-
-            {/* STEP 1 — PROPERTY INFO */}
+            {/* STEP 1 — LOCATION */}
             {step === 1 && (
-              <div>
-                <h2 style={s.formTitle}> Property Information</h2>
-                <p style={s.formSub}>Tell guests what makes your property special</p>
-                <div style={s.field}>
-                  <label style={s.label}>Property Name *</label>
-                  <input style={s.input} placeholder="e.g. Sunrise Beach Resort" value={form.name} onChange={(e) => update("name", e.target.value)} />
-                </div>
-                <div style={s.field}>
-                  <label style={s.label}>Category *</label>
-                  <select style={s.input} value={form.category} onChange={(e) => update("category", e.target.value)}>
-                    <option value="">Select category...</option>
-                    {categories.map((c) => <option key={c}>{c}</option>)}
-                  </select>
-                </div>
-                <div style={s.field}>
-                  <label style={s.label}>Description *</label>
-                  <textarea style={{ ...s.input, height: "140px", resize: "vertical" }} placeholder="Describe your property, unique features, nearby attractions, experiences offered..." value={form.description} onChange={(e) => update("description", e.target.value)} />
-                  <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "4px" }}>{form.description.length}/500 characters recommended</div>
-                </div>
-              </div>
-            )}
-
-            {/* STEP 2 — LOCATION */}
-            {step === 2 && (
               <div>
                 <h2 style={{ ...s.formTitle, display: "flex", alignItems: "center", gap: "8px" }}>
                   <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
@@ -410,8 +287,8 @@ export default function RegisterPropertyPage() {
               </div>
             )}
 
-            {/* STEP 3 — MEDIA UPLOAD */}
-            {step === 3 && (
+            {/* STEP 2 — MEDIA UPLOAD */}
+            {step === 2 && (
               <div>
                 <h2 style={s.formTitle}>Photos & Videos</h2>
                 <p style={s.formSub}>Upload photos and videos of your property to attract more guests. You can upload up to 20 photos and 10 videos.</p>
@@ -494,8 +371,8 @@ export default function RegisterPropertyPage() {
               </div>
             )}
 
-            {/* STEP 4 — AMENITIES */}
-            {step === 4 && (
+            {/* STEP 3 — AMENITIES */}
+            {step === 3 && (
               <div>
                 <h2 style={s.formTitle}> Amenities & Features</h2>
                 <p style={s.formSub}>Select everything your property offers — this helps guests discover you</p>
@@ -518,8 +395,8 @@ export default function RegisterPropertyPage() {
               </div>
             )}
 
-            {/* STEP 5 — PRICING & BOOKING URL */}
-            {step === 5 && (
+            {/* STEP 4 — PRICING & BOOKING URL */}
+            {step === 4 && (
               <div>
                 <h2 style={s.formTitle}> Pricing, Rooms & Booking</h2>
                 <p style={s.formSub}>Set your rates and add your existing booking site link</p>
@@ -651,8 +528,8 @@ export default function RegisterPropertyPage() {
               </div>
             )}
 
-            {/* STEP 6 — REVIEW */}
-            {step === 6 && (
+            {/* STEP 5 — REVIEW */}
+            {step === 5 && (
               <div>
                 <h2 style={s.formTitle}> Review & Submit</h2>
                 <p style={s.formSub}>Confirm your details before going live</p>
@@ -664,8 +541,6 @@ export default function RegisterPropertyPage() {
                     ["Base Price", form.basePrice ? `KSh ${Number(form.basePrice).toLocaleString()}/night` : "—"],
                     ["Amenities", form.amenities.length > 0 ? `${form.amenities.length} selected` : "—"],
                     ["Booking URL", form.bookingUrl || "Guests will contact you directly"],
-                    ["Plan", form.selectedPackage ? `${form.selectedPackage} (${packages.find((p) => p.name === form.selectedPackage)?.duration})` : "—"],
-                    ["Account Email", form.ownerEmail || "—"],
                   ].map(([k, v]) => (
                     <div key={k} style={s.reviewItem}>
                       <div style={s.reviewKey}>{k}</div>
