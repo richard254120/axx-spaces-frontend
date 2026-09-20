@@ -18,18 +18,18 @@ export default function TourismDashboardLayout({ children }) {
   };
 
   const navItems = [
-    { path: "/tourism/dashboard", label: "Dashboard" },
-    { path: "/tourism/register-property", label: "Add Property" },
-    { path: "/tourism/listings", label: "Browse Listings" },
+    { path: "/accommodation/dashboard", label: "Dashboard" },
+    { path: "/accommodation/register-property", label: "Add Property" },
+    { path: "/accommodation/listings", label: "Browse Listings" },
   ];
 
   const isActive = (path) => location.pathname === path;
 
   const handleLogout = () => {
     if (logout) {
-      logout("/tourism");
+      logout("/accommodation");
     } else {
-      window.location.href = "/tourism";
+      window.location.href = "/accommodation";
     }
   };
 
@@ -37,8 +37,8 @@ export default function TourismDashboardLayout({ children }) {
     <div style={styles.root}>
       <style>{css}</style>
       <header style={styles.header}>
-        <Link to="/tourism" style={styles.brand} onClick={() => setMenuOpen(false)}>
-          <span style={styles.brandText}> AXX Tourism</span>
+        <Link to="/accommodation" style={styles.brand} onClick={() => setMenuOpen(false)}>
+          <span style={styles.brandText}> AXX Accommodation</span>
         </Link>
 
         <button
