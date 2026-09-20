@@ -75,7 +75,9 @@ export default function RegisterPropertyPage() {
     setSubmitError("");
 
     if (!token) {
-      throw new Error("You must be logged in to submit a property. Please log in first.");
+      setSubmitError("You must be logged in to submit a property. Please log in first.");
+      setSubmitting(false);
+      return;
     }
 
     try {
@@ -136,9 +138,12 @@ export default function RegisterPropertyPage() {
       newVideos.forEach((file) => fd.append("videos", file));
       newAudio.forEach((file) => fd.append("audio", file));
 
+      console.log("Submitting property with", newImages.length, "images,", newVideos.length, "videos,", newAudio.length, "audio files");
       const result = await registerAccommodationProperty(fd, token);
+      console.log("Submission successful:", result);
       setSubmitted(true);
     } catch (err) {
+      console.error("Submission error:", err);
       setSubmitError(err.message || "Submission failed. Please try again.");
     } finally {
       setSubmitting(false);
