@@ -191,12 +191,12 @@ export default function AccommodationPage() {
                   </div>
                   <div style={s.propFooter}>
                     <div>
-                      <span style={{ ...s.propPrice, color: p.color, fontSize: "22px" }}>KSh {p.price.toLocaleString()}</span>
+                      <span style={{ ...s.propPrice, color: p.color, fontSize: "22px" }}>KSh {(p.basePrice || p.price || 0).toLocaleString()}</span>
                       <span style={s.propPer}>/night</span>
                     </div>
-                    <div style={s.propRating}> <span style={{ color: "#fbbf24", fontSize: "16px" }}>★</span> {p.rating} <span style={{ color: "#9ca3af" }}>({p.reviews})</span></div>
+                    <div style={s.propRating}> <span style={{ color: "#fbbf24", fontSize: "16px" }}>★</span> {p.rating || "4.5"} <span style={{ color: "#9ca3af" }}>({p.reviews || "0"})</span></div>
                   </div>
-                  <button style={{ ...s.propBtn, background: p.color }} onClick={(e) => { e.stopPropagation(); navigate(`/accommodation/${p.id}`); }}>
+                  <button style={{ ...s.propBtn, background: p.color }} onClick={(e) => { e.stopPropagation(); navigate(`/accommodation/${p._id || p.id}`); }}>
                     View Details →
                   </button>
                 </div>
