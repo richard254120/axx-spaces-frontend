@@ -67,6 +67,7 @@ export default function AccommodationPage() {
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState("");
   const { featured: featuredList, stats: heroStats } = useAccommodationHome();
+  const [heroVisible, setHeroVisible] = useState(true);
 
   // ── ANIMATION: reveal elements as they scroll into view ──
   useEffect(() => {
@@ -80,7 +81,8 @@ export default function AccommodationPage() {
   // ── AUTO-SCROLL: scroll to featured properties after 3 seconds ──
   useEffect(() => {
     const timer = setTimeout(() => {
-      const featuredSection = document.querySelector('[style*="linear-gradient(180deg, #f0fdf4"]');
+      setHeroVisible(false);
+      const featuredSection = document.getElementById('featured-section');
       if (featuredSection) {
         featuredSection.scrollIntoView({ behavior: 'smooth' });
       }
@@ -159,62 +161,64 @@ export default function AccommodationPage() {
       </nav>
 
       {/* ── HERO ── */}
-      <section style={s.hero}>
-        <div style={s.heroOverlay} />
-        <div className="blob b1" /><div className="blob b2" />
-        <div style={s.heroContent}>
-          <div style={s.heroBadge} className="hero-in i1"> Kenya's Premier Accommodation QuickSales</div>
-          <h1 style={s.heroTitle} className="hero-in i2">
-            Discover Kenya's
-            <br />
-            <span style={s.heroAccent} className="hero-accent">Finest Stays</span>
-          </h1>
-          <p style={s.heroSub} className="hero-in i3">
-            From luxury hotels to cozy guesthouses across all 47 counties — find perfect accommodation for every occasion with verified properties and direct bookings.
-          </p>
+      {heroVisible && (
+        <section style={s.hero}>
+          <div style={s.heroOverlay} />
+          <div className="blob b1" /><div className="blob b2" />
+          <div style={s.heroContent}>
+            <div style={s.heroBadge} className="hero-in i1"> Kenya's Premier Accommodation QuickSales</div>
+            <h1 style={s.heroTitle} className="hero-in i2">
+              Discover Kenya's
+              <br />
+              <span style={s.heroAccent} className="hero-accent">Finest Stays</span>
+            </h1>
+            <p style={s.heroSub} className="hero-in i3">
+              From luxury hotels to cozy guesthouses across all 47 counties — find perfect accommodation for every occasion with verified properties and direct bookings.
+            </p>
 
-          {/* Segmented Search Bar */}
-          <div style={s.searchContainer} className="search-container hero-in i4">
-            <div style={s.searchSegment} className="search-seg">
-              <span style={s.searchSegmentIcon}></span>
-              <input
-                style={s.searchSegmentInput}
-                placeholder="Where are you going?"
-                value={destination}
-                onChange={(e) => setDestination(e.target.value)}
-              />
+            {/* Segmented Search Bar */}
+            <div style={s.searchContainer} className="search-container hero-in i4">
+              <div style={s.searchSegment} className="search-seg">
+                <span style={s.searchSegmentIcon}></span>
+                <input
+                  style={s.searchSegmentInput}
+                  placeholder="Where are you going?"
+                  value={destination}
+                  onChange={(e) => setDestination(e.target.value)}
+                />
+              </div>
+              <div style={s.searchSegment} className="search-seg">
+                <span style={s.searchSegmentIcon}></span>
+                <input
+                  style={s.searchSegmentInput}
+                  type="date"
+                  value={checkIn}
+                  onChange={(e) => setCheckIn(e.target.value)}
+                />
+              </div>
+              <div style={s.searchSegment} className="search-seg">
+                <span style={s.searchSegmentIcon}></span>
+                <input
+                  style={s.searchSegmentInput}
+                  type="date"
+                  value={checkOut}
+                  onChange={(e) => setCheckOut(e.target.value)}
+                />
+              </div>
+              <div style={s.searchSegment} className="search-seg">
+                <span style={s.searchSegmentIcon}></span>
+                <input
+                  style={s.searchSegmentInput}
+                  placeholder="Add guests"
+                  value={guests}
+                  onChange={(e) => setGuests(e.target.value)}
+                />
+              </div>
+              <button style={s.searchBtn} className="search-btn" onClick={() => navigate("/accommodation/listings")}>Search</button>
             </div>
-            <div style={s.searchSegment} className="search-seg">
-              <span style={s.searchSegmentIcon}></span>
-              <input
-                style={s.searchSegmentInput}
-                type="date"
-                value={checkIn}
-                onChange={(e) => setCheckIn(e.target.value)}
-              />
-            </div>
-            <div style={s.searchSegment} className="search-seg">
-              <span style={s.searchSegmentIcon}></span>
-              <input
-                style={s.searchSegmentInput}
-                type="date"
-                value={checkOut}
-                onChange={(e) => setCheckOut(e.target.value)}
-              />
-            </div>
-            <div style={s.searchSegment} className="search-seg">
-              <span style={s.searchSegmentIcon}></span>
-              <input
-                style={s.searchSegmentInput}
-                placeholder="Add guests"
-                value={guests}
-                onChange={(e) => setGuests(e.target.value)}
-              />
-            </div>
-            <button style={s.searchBtn} className="search-btn" onClick={() => navigate("/accommodation/listings")}>Search</button>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── STATS BAR ── */}
       <section style={s.statsBar}>
@@ -246,7 +250,7 @@ export default function AccommodationPage() {
       </section>
 
       {/* ── FEATURED ── */}
-      <section style={{ ...s.section, background: "linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%)", paddingTop: "100px" }}>
+      <section id="featured-section" style={{ ...s.section, background: "linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%)", paddingTop: "100px" }}>
         <div style={s.sectionInner}>
           <div style={s.sectionHead} className="reveal">
             <div>
