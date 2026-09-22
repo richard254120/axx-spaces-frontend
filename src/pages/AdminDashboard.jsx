@@ -59,6 +59,11 @@ export default function AdminDashboard() {
   const [accommodationFilter, setAccommodationFilter] = useState("pending");
   // END ADDED
 
+  // ADDED: agents tab state
+  const [agents, setAgents] = useState([]);
+  const [agentsLoading, setAgentsLoading] = useState(false);
+  // END ADDED
+
   useEffect(() => {
     // Security check: ensure only admins can stay on this page
     if (user?.role !== "admin") {
@@ -114,6 +119,13 @@ export default function AdminDashboard() {
       loadAccommodations();
     }
   }, [activeTab, accommodationFilter]);
+
+  // ADDED: load agents when tab is selected
+  useEffect(() => {
+    if (activeTab === "agents") {
+      loadAgents();
+    }
+  }, [activeTab]);
 
   // ADDED: load properties when tab or filter changes
   useEffect(() => {
@@ -171,6 +183,40 @@ export default function AdminDashboard() {
       alert(`Accommodation ${status} successfully`);
     } catch (err) {
       alert("Failed to update accommodation status");
+    }
+  };
+  // END ADDED
+
+  // ADDED: load agents function
+  const loadAgents = async () => {
+    setAgentsLoading(true);
+    try {
+      const res = await API.get("/agents");
+      setAgents(res.data || []);
+    } catch (err) {
+      console.error("Failed to load agents:", err);
+    } finally {
+      setAgentsLoading(false);
+    }
+  };
+
+  const handleVerifyAgent = async (agentId) => {
+    try {
+      await API.put(`/agents/${agentId}/verify`);
+      loadAgents();
+      alert("Agent verified successfully");
+    } catch (err) {
+      alert("Failed to verify agent");
+    }
+  };
+
+  const handleAssignAgent = async (accommodationId, agentId) => {
+    try {
+      await API.put(`/agents/assign/${accommodationId}`, { agentId });
+      loadAccommodations();
+      alert("Agent assigned successfully");
+    } catch (err) {
+      alert("Failed to assign agent");
     }
   };
   // END ADDED
@@ -565,6 +611,14 @@ export default function AdminDashboard() {
           onClick={() => setActiveTab("accommodations")}
         >
           Accommodations {pendingAccommodations.length > 0 ? `(${pendingAccommodations.length})` : ""}
+        </button>
+        {/* END ADDED */}
+        {/* ADDED: Agents tab button */}
+        <button
+          style={{ ...styles.tab, ...(activeTab === "agents" ? styles.tabActive : {}) }}
+          onClick={() => setActiveTab("agents")}
+        >
+          Agents {agents.length > 0 ? `(${agents.length})` : ""}
         </button>
         {/* END ADDED */}
         {/* Verification tab button */}
@@ -1406,6 +1460,112 @@ export default function AdminDashboard() {
                               style={styles.approveBtn}
                             >
                               Activate
+                            </button>
+                          )}
+                          {/* Agent Assignment Dropdown */}
+                          {accommodation.status === "active" && (
+                            <select
+                              onChange={(e) => {
+                                if (e.target.value) {
+                                  handleAssignAgent(accommodation._id, e.target.value);
+                                  e.target.value = "";
+                                }
+                              }}
+                              style={{
+                                padding: "6px 10px",
+                                backgroundColor: "#0f172a",
+                                border: "1px solid rgba(255,255,255,0.1)",
+                                borderRadius: "6px",
+                                color: "#fff",
+                                fontSize: "12px",
+                                fontWeight: 600,
+                                outline: "none",
+                                cursor: "pointer",
+                              }}
+                            >
+                              <option value="">Assign Agent</option>
+                              {agents.filter(a => a.agentProfile?.verified).map(agent => (
+                                <option key={agent._id} value={agent._id}>
+                                  {agent.name} ({agent.agentProfile?.county})
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )
+        // END ADDED
+      ) : activeTab === "agents" ? (
+        // ADDED: Agents Tab
+        agentsLoading ? (
+          <div style={styles.loader}>Loading agents...</div>
+        ) : agents.length === 0 ? (
+          <div style={styles.emptyCard}>
+            <p style={styles.emptyText}>No agents have applied yet.</p>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px", width: "100%" }}>
+            <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Rental Agents</h2>
+            <div style={styles.tableContainer}>
+              <table style={styles.table}>
+                <thead>
+                  <tr style={styles.theadRow}>
+                    <th style={styles.th}>Agent Info</th>
+                    <th style={styles.th}>Phone</th>
+                    <th style={styles.th}>County</th>
+                    <th style={styles.th}>Bio</th>
+                    <th style={styles.th}>Status</th>
+                    <th style={styles.th}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {agents.map((agent) => (
+                    <tr key={agent._id} style={styles.tr}>
+                      <td style={styles.td}>
+                        <div style={styles.propTitle}>{agent.name}</div>
+                        <div style={{ fontSize: "12px", color: "#94a3b8", marginTop: "4px" }}>
+                          {agent.email}
+                        </div>
+                      </td>
+                      <td style={styles.td}>
+                        <div style={styles.propLoc}>{agent.agentProfile?.phone || "N/A"}</div>
+                      </td>
+                      <td style={styles.td}>
+                        <div style={styles.propLoc}>{agent.agentProfile?.county || "N/A"}</div>
+                      </td>
+                      <td style={styles.td}>
+                        <div style={{ maxWidth: "250px", fontSize: "13px", color: "#94a3b8" }}>
+                          {agent.agentProfile?.bio?.substring(0, 100) || "N/A"}
+                          {agent.agentProfile?.bio?.length > 100 && "..."}
+                        </div>
+                      </td>
+                      <td style={styles.td}>
+                        <span style={{
+                          fontSize: "11px",
+                          padding: "2px 8px",
+                          borderRadius: "4px",
+                          fontWeight: 600,
+                          background: agent.agentProfile?.verified ? "rgba(34,197,94,0.12)" : "rgba(251,191,36,0.12)",
+                          color: agent.agentProfile?.verified ? "#22c55e" : "#fbbf24",
+                          border: `1px solid ${agent.agentProfile?.verified ? "rgba(34,197,94,0.3)" : "rgba(251,191,36,0.3)"}`,
+                        }}>
+                          {agent.agentProfile?.verified ? "VERIFIED" : "PENDING"}
+                        </span>
+                      </td>
+                      <td style={styles.td}>
+                        <div style={styles.btnGroup}>
+                          {!agent.agentProfile?.verified && (
+                            <button
+                              onClick={() => handleVerifyAgent(agent._id)}
+                              style={styles.approveBtn}
+                            >
+                              Verify
                             </button>
                           )}
                         </div>

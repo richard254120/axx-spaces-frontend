@@ -12,6 +12,7 @@ import {
 import PhoneInput from "../../components/PhoneInput";
 import { useAuth } from "../../context/AuthContext";
 import MessagingSystem from "../../components/MessagingSystem";
+import AgentCard from "../../components/AgentCard";
 
 const properties = {
   1: {
@@ -559,6 +560,11 @@ export default function AccommodationDetailPage() {
               />
             </div>
           </div>
+
+          {/* ASSIGNED AGENT */}
+          {property.assignedAgent && (
+            <AgentCard agent={property.assignedAgent} />
+          )}
         </div>
 
         {/* ── RIGHT (desktop) ── */}
