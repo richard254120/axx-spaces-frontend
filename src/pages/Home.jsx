@@ -7,7 +7,7 @@ import SocialMediaLinks from "../components/SocialMediaLinks";
 import RequestItemModal from "../components/RequestItemModal";
 
 /* ════════════════════════════════════════════════
-   DESIGN SYSTEM  — Aurora Design
+   DESIGN SYSTEM
    Palette: Purple/Blue/Pink Gradients · Glassmorphism
    Font: Inter + Poppins (modern sans-serif)
 ════════════════════════════════════════════════ */
