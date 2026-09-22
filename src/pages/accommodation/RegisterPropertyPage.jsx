@@ -31,7 +31,6 @@ export default function RegisterPropertyPage() {
   const [form, setForm] = useState({ ...INITIAL_REGISTER_FORM });
   const [newImages, setNewImages] = useState([]);
   const [newVideos, setNewVideos] = useState([]);
-  const [newAudio, setNewAudio] = useState([]);
 
   const update = (field, value) => setForm((f) => ({ ...f, [field]: value }));
   const toggleAmenity = (a) => setForm((f) => ({
@@ -137,9 +136,8 @@ export default function RegisterPropertyPage() {
       });
       newImages.forEach((file) => fd.append("images", file));
       newVideos.forEach((file) => fd.append("videos", file));
-      newAudio.forEach((file) => fd.append("audio", file));
 
-      console.log("Submitting property with", newImages.length, "images,", newVideos.length, "videos,", newAudio.length, "audio files");
+      console.log("Submitting property with", newImages.length, "images,", newVideos.length, "videos");
       const result = await registerAccommodationProperty(fd, token);
       console.log("Submission successful:", result);
       setSubmitted(true);
@@ -367,30 +365,6 @@ export default function RegisterPropertyPage() {
                   {newVideos.length > 0 && (
                     <div style={{ marginTop: "12px", fontSize: "13px", color: "#16a34a" }}>
                       ✓ {newVideos.length} video(s) selected
-                    </div>
-                  )}
-                </div>
-
-                <div style={{ marginBottom: "20px" }}>
-                  <label style={s.label}>Audio Clips (up to 5)</label>
-                  <div style={s.uploadBox}>
-                    <input
-                      type="file"
-                      accept="audio/*"
-                      multiple
-                      onChange={(e) => setNewAudio([...newAudio, ...Array.from(e.target.files)])}
-                      style={{ display: "none" }}
-                      id="audio-upload"
-                    />
-                    <label htmlFor="audio-upload" style={s.uploadBtn}>
-                      <span style={{ fontSize: "32px", marginBottom: "8px" }}></span>
-                      <span style={{ fontWeight: 700 }}>Click to add audio clips</span>
-                      <span style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>or drag and drop</span>
-                    </label>
-                  </div>
-                  {newAudio.length > 0 && (
-                    <div style={{ marginTop: "12px", fontSize: "13px", color: "#16a34a" }}>
-                      ✓ {newAudio.length} audio clip(s) selected
                     </div>
                   )}
                 </div>
