@@ -86,6 +86,7 @@ export default function RegisterPropertyPage() {
       // Map category to backend enum value (kebab-case)
       const categoryToTypeMap = {
         "Hotel": "hotel",
+        "Airbnb": "bnb",
         "Beach Resort": "beach-resort",
         "Mountain Lodge": "mountain-lodge",
         "Safari Camp": "safari-camp",

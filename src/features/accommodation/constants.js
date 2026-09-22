@@ -55,6 +55,7 @@ export const ADVERTISING_PACKAGES = [
 export const PROPERTY_CATEGORIES = [
   // Accommodation Types
   "Hotel",
+  "Airbnb",
   "Beach Resort",
   "Mountain Lodge",
   "Safari Camp",
