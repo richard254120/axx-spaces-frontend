@@ -175,6 +175,31 @@ export default function BecomeAgentPage() {
         {error && <div style={s.error}>{error}</div>}
         {success && <div style={s.success}>{success}</div>}
 
+        {!user && (
+          <div style={{ background: "#fef3c7", border: "1px solid #fcd34d", borderRadius: "8px", padding: "16px", marginBottom: "20px", textAlign: "center" }}>
+            <p style={{ fontSize: "13px", color: "#92400e", marginBottom: "12px" }}>
+              You need to be logged in to apply as an agent.
+            </p>
+            <button
+              type="button"
+              onClick={() => navigate("/login")}
+              style={{
+                background: "#fbbf24",
+                color: "#1f2937",
+                border: "none",
+                borderRadius: "8px",
+                padding: "10px 20px",
+                fontWeight: 700,
+                fontSize: "14px",
+                cursor: "pointer",
+                fontFamily: "inherit",
+              }}
+            >
+              Log In
+            </button>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit}>
           <div style={s.field}>
             <label style={s.label}>Phone Number *</label>
