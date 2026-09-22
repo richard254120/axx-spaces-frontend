@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   useAccommodationListings,
   AccommodationNav,
@@ -38,6 +38,7 @@ const listingsCss = `
 
 export default function TourismListingsPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [category, setCategory] = useState("All");
   const [sort, setSort] = useState("Recommended");
   const [maxPrice, setMaxPrice] = useState(35000);
@@ -46,6 +47,14 @@ export default function TourismListingsPage() {
   const [area, setArea] = useState("");
   const [availability, setAvailability] = useState("All");
   const [filtersOpen, setFiltersOpen] = useState(false);
+
+  // Set area from URL query parameter
+  useEffect(() => {
+    const areaParam = searchParams.get("area");
+    if (areaParam) {
+      setArea(areaParam);
+    }
+  }, [searchParams]);
 
   const { properties, loading, offline, error, total } = useAccommodationListings({
     category, sort, maxPrice, minRating, search, area, availability,

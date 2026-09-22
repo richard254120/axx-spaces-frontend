@@ -68,6 +68,11 @@ export default function AccommodationPage() {
   const [guests, setGuests] = useState("");
   const { featured: featuredList, stats: heroStats } = useAccommodationHome();
   const [heroVisible, setHeroVisible] = useState(true);
+  const [marqueePaused, setMarqueePaused] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const marqueeRef = useRef(null);
 
   // ── ANIMATION: reveal elements as they scroll into view ──
   useEffect(() => {
@@ -89,6 +94,29 @@ export default function AccommodationPage() {
     }, 3000);
     return () => clearTimeout(timer);
   }, []);
+
+  // ── MARQUEE DRAG SCROLL ──
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    setStartX(e.pageX - marqueeRef.current.offsetLeft);
+    setScrollLeft(marqueeRef.current.scrollLeft);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const x = e.pageX - marqueeRef.current.offsetLeft;
+    const walk = (x - startX) * 2;
+    marqueeRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+  };
 
   // ── FEATURES: scroll progress, nav shadow, back-to-top, saved properties ──
   const [scrolled, setScrolled] = useState(false);
@@ -221,10 +249,20 @@ export default function AccommodationPage() {
       )}
 
       {/* ── DESTINATIONS MARQUEE ── */}
-      <section className="marquee" aria-label="Popular destinations">
-        <div className="marquee-track">
+      <section
+        className="marquee"
+        aria-label="Popular destinations"
+        ref={marqueeRef}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={() => { handleMouseLeave(); setMarqueePaused(false); }}
+        onMouseEnter={() => setMarqueePaused(true)}
+        style={{ cursor: isDragging ? 'grabbing' : 'grab', overflowX: 'auto', overflowY: 'hidden' }}
+      >
+        <div className="marquee-track" style={{ animationPlayState: marqueePaused || isDragging ? 'paused' : 'running' }}>
           {[...DESTINATIONS, ...DESTINATIONS].map((d, i) => (
-            <button key={d + i} className="dest-pill" onClick={() => navigate("/accommodation/listings")}>{d}</button>
+            <button key={d + i} className="dest-pill" onClick={() => navigate(`/accommodation/listings?area=${encodeURIComponent(d)}`)}>{d}</button>
           ))}
         </div>
       </section>
@@ -885,13 +923,15 @@ const css = `
   .nav.scrolled { box-shadow: 0 8px 30px rgba(15,23,42,.12); background: rgba(255,255,255,.88) !important; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
   .search-seg:focus-within { border-color: #6366F1 !important; background: #fff !important; box-shadow: 0 0 0 3px rgba(99,102,241,.15); }
 
-  .marquee { overflow: hidden; background: #0f172a; padding: 16px 0; }
+  .marquee { overflow: hidden; background: #0f172a; padding: 16px 0; user-select: none; -webkit-user-select: none; }
   .marquee-track { display: flex; width: max-content; animation: marquee 45s linear infinite; }
   .marquee:hover .marquee-track { animation-play-state: paused; }
   .dest-pill { margin-right: 12px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); color: #e5e7eb; border-radius: 999px; padding: 9px 20px; font: 600 14px 'DM Sans', sans-serif; cursor: pointer; white-space: nowrap; transition: background .2s, color .2s, transform .2s; }
   .dest-pill::before { content: "📍 "; }
   .dest-pill:hover { background: #fbbf24; color: #1f2937; transform: translateY(-2px); }
   @keyframes marquee { to { transform: translateX(-50%); } }
+  .marquee::-webkit-scrollbar { display: none; }
+  .marquee { -ms-overflow-style: none; scrollbar-width: none; }
 
   .cat-grid .reveal:nth-child(4n+2) { animation-delay: .1s; }
   .cat-grid .reveal:nth-child(4n+3) { animation-delay: .2s; }
