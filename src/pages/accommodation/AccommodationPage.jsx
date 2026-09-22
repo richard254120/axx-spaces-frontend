@@ -222,26 +222,6 @@ export default function AccommodationPage() {
         </section>
       )}
 
-      {/* ── STATS BAR ── */}
-      <section style={s.statsBar}>
-        <div style={s.statsInner}>
-          {[
-            { icon: "", val: "200+", label: "Properties Listed" },
-            { icon: "", val: "47", label: "Counties Covered" },
-            { icon: "", val: "18K+", label: "Monthly Visitors" },
-            { icon: "", val: "4.8★", label: "Avg. Rating" },
-          ].map((st) => (
-            <div key={st.label} style={s.statItem} className="reveal">
-              <span style={s.statIcon}>{st.icon}</span>
-              <div>
-                <div style={s.statVal}><CountUp value={st.val} /></div>
-                <div style={s.statLabel}>{st.label}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ── DESTINATIONS MARQUEE ── */}
       <section className="marquee" aria-label="Popular destinations">
         <div className="marquee-track">
@@ -256,7 +236,7 @@ export default function AccommodationPage() {
         <div style={s.sectionInner}>
           <div style={s.sectionHead} className="reveal">
             <div>
-              <h2 style={s.sectionTitle}>Featured Properties</h2>
+              <h2 style={s.sectionTitle}>Featured Accomodations</h2>
               <p style={{ fontSize: "16px", color: "#6b7280", marginTop: "8px", lineHeight: 1.6 }}>Curated selection of Kenya's top-rated accommodations</p>
             </div>
             <button style={s.viewAllBtn} onClick={() => navigate("/accommodation/listings")}>View All →</button>
