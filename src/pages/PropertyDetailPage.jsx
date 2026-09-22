@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import FloatingWhatsApp from "../components/FloatingWhatsApp";
+import AgentCard from "../components/AgentCard";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -136,9 +137,9 @@ export default function PropertyDetailPage() {
       // 3. Construct WhatsApp message and open link
       const phone = formatKenyaPhone(property.landlordPhone);
       const msg = `Hi, my name is ${bookingData.name} (Phone: ${bookingData.phone}). I would like to book your property "${property.title}" on Axxspace.\n\n` +
-                  ` Proposed Move-in Date: ${bookingData.moveInDate}\n` +
-                  ` Message: ${bookingData.message || "No additional message"}`;
-      
+        ` Proposed Move-in Date: ${bookingData.moveInDate}\n` +
+        ` Message: ${bookingData.message || "No additional message"}`;
+
       window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
 
       setBookingSuccess(" Booking prepared! Redirecting to WhatsApp...");
@@ -391,6 +392,11 @@ export default function PropertyDetailPage() {
               </div>
             </div>
           </div>
+
+          {/* ASSIGNED AGENT */}
+          {property.assignedAgent && (
+            <AgentCard agent={property.assignedAgent} />
+          )}
         </div>
       </div>
       <FloatingWhatsApp />

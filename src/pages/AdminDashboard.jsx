@@ -757,6 +757,35 @@ export default function AdminDashboard() {
                               style={styles.rejectBtn}
                             >Reject</button>
                           )}
+                          {/* Agent Assignment Dropdown */}
+                          {item.status === "approved" && (
+                            <select
+                              onChange={(e) => {
+                                if (e.target.value) {
+                                  handleAssignAgent(item._id, e.target.value);
+                                  e.target.value = "";
+                                }
+                              }}
+                              style={{
+                                padding: "6px 10px",
+                                backgroundColor: "#0f172a",
+                                border: "1px solid rgba(255,255,255,0.1)",
+                                borderRadius: "6px",
+                                color: "#fff",
+                                fontSize: "12px",
+                                fontWeight: 600,
+                                outline: "none",
+                                cursor: "pointer",
+                              }}
+                            >
+                              <option value="">Assign Agent</option>
+                              {agents.filter(a => a.agentProfile?.verified).map(agent => (
+                                <option key={agent._id} value={agent._id}>
+                                  {agent.name} ({agent.agentProfile?.county})
+                                </option>
+                              ))}
+                            </select>
+                          )}
                         </div>
                       </td>
                     </tr>
