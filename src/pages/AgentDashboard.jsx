@@ -238,7 +238,7 @@ const s = {
 export default function AgentDashboard() {
   const navigate = useNavigate();
   const { user, token, logout } = useContext(AuthContext);
-  const [activeTab, setActiveTab] = useState("providers");
+  const [activeTab, setActiveTab] = useState("hosts");
   const [providers, setProviders] = useState([]);
   const [landlords, setLandlords] = useState([]);
   const [myRequests, setMyRequests] = useState([]);
@@ -259,22 +259,15 @@ export default function AgentDashboard() {
     try {
       setLoading(true);
 
-      // Load providers (hosts)
+      // Load all providers (hosts and landlords)
       const providersRes = await fetch(`${API_BASE}/agent-requests/providers`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (providersRes.ok) {
         const providersData = await providersRes.json();
-        setProviders(providersData);
-      }
-
-      // Load landlords
-      const landlordsRes = await fetch(`${API_BASE}/users?role=landlord`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (landlordsRes.ok) {
-        const landlordsData = await landlordsRes.json();
-        setLandlords(landlordsData);
+        // Split into hosts and landlords
+        setProviders(providersData.filter(p => p.role === "host"));
+        setLandlords(providersData.filter(p => p.role === "landlord"));
       }
 
       // Load my requests
@@ -358,10 +351,10 @@ export default function AgentDashboard() {
       <div style={s.container}>
         <div style={s.tabs}>
           <button
-            style={{ ...s.tab, ...(activeTab === "providers" ? s.tabActive : {}) }}
-            onClick={() => setActiveTab("providers")}
+            style={{ ...s.tab, ...(activeTab === "hosts" ? s.tabActive : {}) }}
+            onClick={() => setActiveTab("hosts")}
           >
-            Accommodation Providers ({providers.length})
+            Accommodation Hosts ({providers.length})
           </button>
           <button
             style={{ ...s.tab, ...(activeTab === "landlords" ? s.tabActive : {}) }}
@@ -377,21 +370,20 @@ export default function AgentDashboard() {
           </button>
         </div>
 
-        {activeTab === "providers" && (
+        {activeTab === "hosts" && (
           <div>
-            <h2 style={s.sectionTitle}>Accommodation Providers & Landlords</h2>
+            <h2 style={s.sectionTitle}>Accommodation Hosts</h2>
             {providers.length === 0 ? (
-              <div style={s.empty}>No providers found</div>
+              <div style={s.empty}>No accommodation hosts found</div>
             ) : (
               <div style={s.grid}>
                 {providers.map((provider) => {
                   const status = getRequestStatus(provider._id);
-                  const isHost = provider.role === "host";
                   return (
                     <div key={provider._id} style={s.card}>
                       <div style={s.cardHeader}>
                         <div style={s.avatar}>
-                          {provider.name?.charAt(0).toUpperCase() || "P"}
+                          {provider.name?.charAt(0).toUpperCase() || "H"}
                         </div>
                         <div>
                           <div style={s.cardName}>{provider.name}</div>
@@ -399,10 +391,7 @@ export default function AgentDashboard() {
                         </div>
                       </div>
                       {provider.phone && <div style={s.cardPhone}>📞 {provider.phone}</div>}
-                      <div style={s.cardCounty}>
-                        {isHost ? "🏨 Accommodation Provider" : "🏠 Landlord"}
-                        {provider.landlordType && ` (${provider.landlordType})`}
-                      </div>
+                      <div style={s.cardCounty}>🏨 Accommodation Host</div>
                       {provider.agentProfile?.county && (
                         <div style={s.cardCounty}>📍 {provider.agentProfile.county}</div>
                       )}
@@ -443,21 +432,46 @@ export default function AgentDashboard() {
               <div style={s.empty}>No landlords found</div>
             ) : (
               <div style={s.grid}>
-                {landlords.map((landlord) => (
-                  <div key={landlord._id} style={s.card}>
-                    <div style={s.cardHeader}>
-                      <div style={s.avatar}>
-                        {landlord.name?.charAt(0).toUpperCase() || "L"}
+                {landlords.map((landlord) => {
+                  const status = getRequestStatus(landlord._id);
+                  return (
+                    <div key={landlord._id} style={s.card}>
+                      <div style={s.cardHeader}>
+                        <div style={s.avatar}>
+                          {landlord.name?.charAt(0).toUpperCase() || "L"}
+                        </div>
+                        <div>
+                          <div style={s.cardName}>{landlord.name}</div>
+                          <div style={s.cardEmail}>{landlord.email}</div>
+                        </div>
                       </div>
-                      <div>
-                        <div style={s.cardName}>{landlord.name}</div>
-                        <div style={s.cardEmail}>{landlord.email}</div>
-                      </div>
+                      {landlord.phone && <div style={s.cardPhone}>📞 {landlord.phone}</div>}
+                      <div style={s.cardCounty}>🏠 Landlord ({landlord.landlordType || "General"})</div>
+                      {status && (
+                        <div
+                          style={{
+                            ...s.statusBadge,
+                            ...(status === "pending"
+                              ? s.statusPending
+                              : status === "accepted"
+                                ? s.statusAccepted
+                                : s.statusRejected),
+                          }}
+                        >
+                          {status.toUpperCase()}
+                        </div>
+                      )}
+                      {!status && (
+                        <button
+                          style={s.requestBtn}
+                          onClick={() => setSelectedProvider(landlord)}
+                        >
+                          Send Request
+                        </button>
+                      )}
                     </div>
-                    {landlord.phone && <div style={s.cardPhone}>📞 {landlord.phone}</div>}
-                    <div style={s.cardCounty}>Type: {landlord.landlordType || "General"}</div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
