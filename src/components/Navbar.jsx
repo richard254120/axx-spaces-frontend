@@ -99,7 +99,7 @@ export default function Navbar() {
           <Link to="/accommodation" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>Accommodation</span>
           </Link>
-          <Link to="/become-agent" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+          <Link to="/agent/register" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>Become an Agent</span>
           </Link>
           <button
