@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { ProfileAvatar } from "../../features/profile";
@@ -12,6 +12,8 @@ import {
   getDisplayName,
 } from "../../features/accommodation";
 
+const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
+
 export default function ProviderDashboard() {
   const navigate = useNavigate();
   const { user: authUser, token, logout: authLogout } = useContext(AuthContext);
@@ -20,6 +22,65 @@ export default function ProviderDashboard() {
   const user = profile?.user;
   const stats = profile?.stats;
   const listings = profile?.listings || [];
+
+  const [agentRequests, setAgentRequests] = useState([]);
+  const [showRequests, setShowRequests] = useState(false);
+  const [respondingTo, setRespondingTo] = useState(null);
+  const [response, setResponse] = useState("");
+
+  useEffect(() => {
+    if (token) {
+      loadAgentRequests();
+    }
+  }, [token]);
+
+  const loadAgentRequests = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/agent-requests/provider`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAgentRequests(data);
+      }
+    } catch (err) {
+      console.error("Error loading agent requests:", err);
+    }
+  };
+
+  const handleAcceptRequest = async (requestId) => {
+    try {
+      const res = await fetch(`${API_BASE}/agent-requests/${requestId}/accept`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        loadAgentRequests();
+      }
+    } catch (err) {
+      console.error("Error accepting request:", err);
+    }
+  };
+
+  const handleRejectRequest = async (requestId) => {
+    try {
+      const res = await fetch(`${API_BASE}/agent-requests/${requestId}/reject`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ response }),
+      });
+      if (res.ok) {
+        setRespondingTo(null);
+        setResponse("");
+        loadAgentRequests();
+      }
+    } catch (err) {
+      console.error("Error rejecting request:", err);
+    }
+  };
 
   const handleLogout = () => {
     authLogout("/");
@@ -51,7 +112,108 @@ export default function ProviderDashboard() {
               Your accommodation property dashboard
             </p>
           </div>
+          {agentRequests.filter(r => r.status === "pending").length > 0 && (
+            <button
+              style={{
+                background: "#fbbf24",
+                color: "#1f2937",
+                border: "none",
+                borderRadius: "12px",
+                padding: "12px 20px",
+                fontWeight: 800,
+                cursor: "pointer",
+                fontFamily: "inherit",
+                fontSize: "14px",
+                boxShadow: "0 4px 12px rgba(251, 191, 36, 0.3)",
+              }}
+              onClick={() => setShowRequests(!showRequests)}
+            >
+              Agent Requests ({agentRequests.filter(r => r.status === "pending").length})
+            </button>
+          )}
         </div>
+
+        {showRequests && (
+          <div style={{ ...statCard, marginBottom: "24px" }}>
+            <h3 style={{ fontSize: "18px", fontWeight: 800, marginBottom: "16px", color: accommodationTheme.text }}>
+              Agent Requests
+            </h3>
+            {agentRequests.length === 0 ? (
+              <p style={{ color: accommodationTheme.muted }}>No agent requests yet.</p>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                {agentRequests.map((request) => (
+                  <div key={request._id} style={{ background: "white", padding: "16px", borderRadius: "12px", border: "1px solid #e5e7eb" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+                      <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "#fbbf24", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", fontWeight: 700, color: "#1f2937" }}>
+                        {request.agent?.name?.charAt(0).toUpperCase() || "A"}
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "15px", fontWeight: 700, color: accommodationTheme.text }}>{request.agent?.name}</div>
+                        <div style={{ fontSize: "12px", color: accommodationTheme.muted }}>{request.agent?.email}</div>
+                        {request.agent?.phone && <div style={{ fontSize: "12px", color: accommodationTheme.muted }}>📞 {request.agent.phone}</div>}
+                      </div>
+                    </div>
+                    {request.agentMessage && (
+                      <div style={{ fontSize: "13px", color: "#4b5563", marginBottom: "12px", padding: "12px", background: "#f9fafb", borderRadius: "8px" }}>
+                        <strong>Message:</strong> {request.agentMessage}
+                      </div>
+                    )}
+                    {request.agent?.agentProfile?.county && (
+                      <div style={{ fontSize: "12px", color: accommodationTheme.muted, marginBottom: "12px" }}>
+                        📍 {request.agent.agentProfile.county}
+                      </div>
+                    )}
+                    {request.status === "pending" ? (
+                      <div style={{ display: "flex", gap: "8px" }}>
+                        <button
+                          style={{ ...primaryBtn, flex: 1, padding: "10px", fontSize: "13px" }}
+                          onClick={() => handleAcceptRequest(request._id)}
+                        >
+                          Accept
+                        </button>
+                        <button
+                          style={{ ...secondaryBtn, flex: 1, padding: "10px", fontSize: "13px" }}
+                          onClick={() => setRespondingTo(request._id)}
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: "12px", fontWeight: 700, padding: "6px 12px", borderRadius: "12px", display: "inline-block", ...(request.status === "accepted" ? { background: "#dcfce7", color: "#166534" } : { background: "#fee2e2", color: "#dc2626" }) }}>
+                        {request.status.toUpperCase()}
+                      </div>
+                    )}
+                    {respondingTo === request._id && (
+                      <div style={{ marginTop: "12px" }}>
+                        <textarea
+                          style={{ width: "100%", padding: "10px", border: "2px solid #e5e7eb", borderRadius: "8px", fontSize: "13px", fontFamily: "inherit", minHeight: "60px", resize: "vertical", marginBottom: "8px" }}
+                          placeholder="Optional reason for rejection..."
+                          value={response}
+                          onChange={(e) => setResponse(e.target.value)}
+                        />
+                        <div style={{ display: "flex", gap: "8px" }}>
+                          <button
+                            style={{ ...primaryBtn, flex: 1, padding: "8px", fontSize: "12px" }}
+                            onClick={() => handleRejectRequest(request._id)}
+                          >
+                            Confirm Reject
+                          </button>
+                          <button
+                            style={{ ...secondaryBtn, flex: 1, padding: "8px", fontSize: "12px" }}
+                            onClick={() => { setRespondingTo(null); setResponse(""); }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {error && <ErrorAlert message={error} onRetry={reload} />}
 

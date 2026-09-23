@@ -69,6 +69,9 @@ import ProviderDashboard from "./pages/accommodation/ProviderDashboard";
 import EditPropertyPage from "./pages/accommodation/EditPropertyPage";
 import AccommodationDashboardLayout from "./components/AccommodationDashboardLayout";
 import BecomeAgentPage from "./pages/BecomeAgentPage";
+import AgentRegister from "./pages/AgentRegister";
+import AgentLogin from "./pages/AgentLogin";
+import AgentDashboard from "./pages/AgentDashboard";
 
 // ─── AxxBiashara Business Directory Pages ─────────────────────────────────────
 import AxxBiashara from "./pages/AxxBiashara";
@@ -224,6 +227,20 @@ function App() {
       />
       <Route path="/accommodation/:id" element={<PublicLayout><AccommodationDetailPage /></PublicLayout>} />
       <Route path="/become-agent" element={<PublicLayout><BecomeAgentPage /></PublicLayout>} />
+
+      {/* ── AGENT ROUTES ── */}
+      <Route path="/agent/register" element={<BareLayout><AgentRegister /></BareLayout>} />
+      <Route path="/agent/login" element={<BareLayout><AgentLogin /></BareLayout>} />
+      <Route
+        path="/agent/dashboard"
+        element={
+          <BareLayout>
+            <ProtectedRoute loginPath="/agent/login" allowedRoles={["agent"]}>
+              <AgentDashboard />
+            </ProtectedRoute>
+          </BareLayout>
+        }
+      />
 
       {/* ── AXXBIASHARA BUSINESS DIRECTORY ROUTES (have Navbar) ── */}
       <Route path="/axxbiashara" element={<PublicLayout><AxxBiashara /></PublicLayout>} />
