@@ -379,13 +379,14 @@ export default function AgentDashboard() {
 
         {activeTab === "providers" && (
           <div>
-            <h2 style={s.sectionTitle}>Accommodation Providers</h2>
+            <h2 style={s.sectionTitle}>Accommodation Providers & Landlords</h2>
             {providers.length === 0 ? (
               <div style={s.empty}>No providers found</div>
             ) : (
               <div style={s.grid}>
                 {providers.map((provider) => {
                   const status = getRequestStatus(provider._id);
+                  const isHost = provider.role === "host";
                   return (
                     <div key={provider._id} style={s.card}>
                       <div style={s.cardHeader}>
@@ -398,6 +399,10 @@ export default function AgentDashboard() {
                         </div>
                       </div>
                       {provider.phone && <div style={s.cardPhone}>📞 {provider.phone}</div>}
+                      <div style={s.cardCounty}>
+                        {isHost ? "🏨 Accommodation Provider" : "🏠 Landlord"}
+                        {provider.landlordType && ` (${provider.landlordType})`}
+                      </div>
                       {provider.agentProfile?.county && (
                         <div style={s.cardCounty}>📍 {provider.agentProfile.county}</div>
                       )}
@@ -408,8 +413,8 @@ export default function AgentDashboard() {
                             ...(status === "pending"
                               ? s.statusPending
                               : status === "accepted"
-                              ? s.statusAccepted
-                              : s.statusRejected),
+                                ? s.statusAccepted
+                                : s.statusRejected),
                           }}
                         >
                           {status.toUpperCase()}
@@ -492,8 +497,8 @@ export default function AgentDashboard() {
                         ...(request.status === "pending"
                           ? s.statusPending
                           : request.status === "accepted"
-                          ? s.statusAccepted
-                          : s.statusRejected),
+                            ? s.statusAccepted
+                            : s.statusRejected),
                       }}
                     >
                       {request.status.toUpperCase()}

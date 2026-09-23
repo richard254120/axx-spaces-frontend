@@ -119,6 +119,12 @@ export default function LandlordDashboard() {
   const [selectedPropertyForStats, setSelectedPropertyForStats] = useState(null);
   const [statsModalOpen, setStatsModalOpen] = useState(false);
 
+  // Agent requests state
+  const [agentRequests, setAgentRequests] = useState([]);
+  const [showAgentRequests, setShowAgentRequests] = useState(false);
+  const [respondingToRequest, setRespondingToRequest] = useState(null);
+  const [requestResponse, setRequestResponse] = useState("");
+
   // New Sidebar navigation states
   const [activeSidebarTab, setActiveSidebarTab] = useState("my-properties");
   const [propertyFilter, setPropertyFilter] = useState("all");
@@ -154,6 +160,12 @@ export default function LandlordDashboard() {
       fetchAllPropertiesStats();
     }
   }, [activeSidebarTab, properties]);
+
+  useEffect(() => {
+    if (token) {
+      fetchAgentRequests();
+    }
+  }, [token]);
 
   const fetchMyProperties = async () => {
     setLoading(true);
@@ -193,6 +205,54 @@ export default function LandlordDashboard() {
       setAgents(data);
     } catch (err) {
       console.error("Fetch agents error:", err);
+    }
+  };
+
+  const fetchAgentRequests = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/agent-requests/provider`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setAgentRequests(data);
+      }
+    } catch (err) {
+      console.error("Error fetching agent requests:", err);
+    }
+  };
+
+  const handleAcceptAgentRequest = async (requestId) => {
+    try {
+      const response = await fetch(`${API_BASE}/agent-requests/${requestId}/accept`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.ok) {
+        fetchAgentRequests();
+      }
+    } catch (err) {
+      console.error("Error accepting agent request:", err);
+    }
+  };
+
+  const handleRejectAgentRequest = async (requestId) => {
+    try {
+      const response = await fetch(`${API_BASE}/agent-requests/${requestId}/reject`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ response: requestResponse }),
+      });
+      if (response.ok) {
+        setRespondingToRequest(null);
+        setRequestResponse("");
+        fetchAgentRequests();
+      }
+    } catch (err) {
+      console.error("Error rejecting agent request:", err);
     }
   };
 
@@ -549,6 +609,25 @@ export default function LandlordDashboard() {
             <span style={styles.logoText}>AXXSPACE</span>
           </div>
           <span style={styles.portalSubtitle}>LANDLORD PORTAL</span>
+          {agentRequests.filter(r => r.status === "pending").length > 0 && (
+            <button
+              style={{
+                background: "#fbbf24",
+                color: "#1f2937",
+                border: "none",
+                borderRadius: "8px",
+                padding: "8px 12px",
+                fontWeight: 700,
+                fontSize: "12px",
+                cursor: "pointer",
+                marginTop: "12px",
+                width: "100%",
+              }}
+              onClick={() => setShowAgentRequests(!showAgentRequests)}
+            >
+              Agent Requests ({agentRequests.filter(r => r.status === "pending").length})
+            </button>
+          )}
         </div>
 
         <nav style={styles.sidebarMenu}>
@@ -584,6 +663,89 @@ export default function LandlordDashboard() {
 
         {successMessage && <div style={styles.successMsg}>{successMessage}</div>}
         {error && <div style={styles.errorMsg}>{error}</div>}
+
+        {/* AGENT REQUESTS SECTION */}
+        {showAgentRequests && (
+          <div style={{ ...styles.card, marginBottom: "24px" }}>
+            <h3 style={{ fontSize: "18px", fontWeight: 700, marginBottom: "16px", color: "#1f2937" }}>
+              Agent Requests
+            </h3>
+            {agentRequests.length === 0 ? (
+              <p style={{ color: "#6b7280" }}>No agent requests yet.</p>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                {agentRequests.map((request) => (
+                  <div key={request._id} style={{ background: "white", padding: "16px", borderRadius: "12px", border: "1px solid #e5e7eb" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+                      <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "#fbbf24", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", fontWeight: 700, color: "#1f2937" }}>
+                        {request.agent?.name?.charAt(0).toUpperCase() || "A"}
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "15px", fontWeight: 700, color: "#1f2937" }}>{request.agent?.name}</div>
+                        <div style={{ fontSize: "12px", color: "#6b7280" }}>{request.agent?.email}</div>
+                        {request.agent?.phone && <div style={{ fontSize: "12px", color: "#6b7280" }}>📞 {request.agent.phone}</div>}
+                      </div>
+                    </div>
+                    {request.agentMessage && (
+                      <div style={{ fontSize: "13px", color: "#4b5563", marginBottom: "12px", padding: "12px", background: "#f9fafb", borderRadius: "8px" }}>
+                        <strong>Message:</strong> {request.agentMessage}
+                      </div>
+                    )}
+                    {request.agent?.agentProfile?.county && (
+                      <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}>
+                        📍 {request.agent.agentProfile.county}
+                      </div>
+                    )}
+                    {request.status === "pending" ? (
+                      <div style={{ display: "flex", gap: "8px" }}>
+                        <button
+                          style={{ ...styles.primaryButton, flex: 1, padding: "10px", fontSize: "13px" }}
+                          onClick={() => handleAcceptAgentRequest(request._id)}
+                        >
+                          Accept
+                        </button>
+                        <button
+                          style={{ ...styles.secondaryButton, flex: 1, padding: "10px", fontSize: "13px" }}
+                          onClick={() => setRespondingToRequest(request._id)}
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: "12px", fontWeight: 700, padding: "6px 12px", borderRadius: "12px", display: "inline-block", ...(request.status === "accepted" ? { background: "#dcfce7", color: "#166534" } : { background: "#fee2e2", color: "#dc2626" }) }}>
+                        {request.status.toUpperCase()}
+                      </div>
+                    )}
+                    {respondingToRequest === request._id && (
+                      <div style={{ marginTop: "12px" }}>
+                        <textarea
+                          style={{ width: "100%", padding: "10px", border: "2px solid #e5e7eb", borderRadius: "8px", fontSize: "13px", fontFamily: "inherit", minHeight: "60px", resize: "vertical", marginBottom: "8px" }}
+                          placeholder="Optional reason for rejection..."
+                          value={requestResponse}
+                          onChange={(e) => setRequestResponse(e.target.value)}
+                        />
+                        <div style={{ display: "flex", gap: "8px" }}>
+                          <button
+                            style={{ ...styles.primaryButton, flex: 1, padding: "8px", fontSize: "12px" }}
+                            onClick={() => handleRejectAgentRequest(request._id)}
+                          >
+                            Confirm Reject
+                          </button>
+                          <button
+                            style={{ ...styles.secondaryButton, flex: 1, padding: "8px", fontSize: "12px" }}
+                            onClick={() => { setRespondingToRequest(null); setRequestResponse(""); }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* ── SCREEN 1: DASHBOARD OVERVIEW ── */}
         {activeSidebarTab === "dashboard" && (
