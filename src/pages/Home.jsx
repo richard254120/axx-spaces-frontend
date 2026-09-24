@@ -161,13 +161,14 @@ option { background: #151936; color: #F8FAFC; }
 /* ── HERO ── */
 .hero {
   position: relative;
-  min-height: 55dvh;
+  min-height: 84vh;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   overflow: hidden;
-  border-bottom: 1px solid rgba(99,102,241,0.2);
+  padding: 50px 16px 70px;
+  border-bottom: 1px solid rgba(99,102,241,0.25);
 }
 .hero-bg-video {
   position: absolute; inset: 0;
@@ -178,9 +179,13 @@ option { background: #151936; color: #F8FAFC; }
 }
 
 @media (max-width: 768px) {
+  .hero {
+    min-height: 80vh;
+    padding: 30px 14px 60px;
+  }
   .hero-bg-video {
-    object-fit: contain;
-    object-position: center top;
+    object-fit: cover;
+    object-position: center;
   }
 }
 .hero-bg-fallback {
@@ -191,31 +196,397 @@ option { background: #151936; color: #F8FAFC; }
 .hero-overlay {
   position: absolute; inset: 0;
   background: linear-gradient(160deg,
-    rgba(10,14,39,0.88) 0%,
-    rgba(21,25,54,0.72) 40%,
-    rgba(30,27,75,0.85) 100%);
+    rgba(10,14,39,0.90) 0%,
+    rgba(21,25,54,0.78) 40%,
+    rgba(30,27,75,0.92) 100%);
   z-index: 1;
 }
 .hero-radial {
   position: absolute; inset: 0;
-  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(99,102,241,0.15) 0%, transparent 70%);
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(99,102,241,0.2) 0%, transparent 70%);
   z-index: 2; pointer-events: none;
 }
 .hero-decor1 {
-  position: absolute; width: 500px; height: 500px;
-  border: 1px solid rgba(99,102,241,0.15);
+  position: absolute; width: 550px; height: 550px;
+  border: 1px solid rgba(99,102,241,0.18);
   border-radius: 50%; top: -200px; right: -120px;
   pointer-events: none; z-index: 2;
-  box-shadow: inset 0 0 40px rgba(99,102,241,0.1), 0 0 60px rgba(99,102,241,0.2);
+  box-shadow: inset 0 0 40px rgba(99,102,241,0.12), 0 0 70px rgba(99,102,241,0.25);
   animation: rotateDecor1 30s linear infinite;
 }
 .hero-decor2 {
-  position: absolute; width: 350px; height: 350px;
-  border: 1px solid rgba(236,72,153,0.15);
+  position: absolute; width: 400px; height: 400px;
+  border: 1px solid rgba(236,72,153,0.18);
   border-radius: 50%; bottom: -120px; left: -80px;
   pointer-events: none; z-index: 2;
-  box-shadow: inset 0 0 30px rgba(236,72,153,0.1), 0 0 50px rgba(236,72,153,0.2);
+  box-shadow: inset 0 0 30px rgba(236,72,153,0.12), 0 0 60px rgba(236,72,153,0.25);
   animation: rotateDecor2 25s linear infinite;
+}
+
+@keyframes pulseBadge {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.02); opacity: 0.9; }
+}
+@keyframes cardRise {
+  from { opacity: 0; transform: translateY(24px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes glowBorderPulse {
+  0%, 100% { border-color: rgba(99,102,241,0.35); box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 25px rgba(99,102,241,0.2); }
+  50% { border-color: rgba(236,72,153,0.5); box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 35px rgba(236,72,153,0.28); }
+}
+@keyframes badgeDot {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34,211,238,0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(34,211,238,0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34,211,238,0); }
+}
+
+.hero-quick-pills {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 18px auto 26px;
+  max-width: 820px;
+}
+.hero-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  background: rgba(15,23,42,0.65);
+  border: 1px solid rgba(99,102,241,0.28);
+  border-radius: 20px;
+  color: #CBD5E1;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(10px);
+}
+.hero-pill-btn:hover {
+  background: linear-gradient(135deg, rgba(99,102,241,0.3) 0%, rgba(236,72,153,0.3) 100%);
+  border-color: rgba(99,102,241,0.7);
+  color: #FFFFFF;
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 8px 20px rgba(99,102,241,0.35);
+}
+
+.hero-search-glass {
+  background: rgba(15,23,42,0.8);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(99,102,241,0.35);
+  border-radius: 18px;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 820px;
+  width: 100%;
+  margin: 0 auto 28px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 35px rgba(99,102,241,0.25);
+  transition: all 0.3s ease;
+  animation: glowBorderPulse 6s infinite alternate;
+}
+.hero-search-glass:focus-within {
+  border-color: rgba(99,102,241,0.85);
+  box-shadow: 0 25px 70px rgba(0,0,0,0.6), 0 0 45px rgba(99,102,241,0.45);
+}
+.search-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  padding: 6px 12px;
+  text-align: left;
+}
+.search-field-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.search-field-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.search-field-content label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  color: #818CF8;
+  margin-bottom: 2px;
+}
+.search-field-content select {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #F8FAFC;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  width: 100%;
+}
+.search-field-content select option {
+  background: #0F172A;
+  color: #F8FAFC;
+}
+.search-field-divider {
+  width: 1px;
+  height: 38px;
+  background: rgba(255,255,255,0.12);
+}
+.hero-search-submit {
+  background: linear-gradient(135deg, #6366F1 0%, #EC4899 100%);
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 26px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(99,102,241,0.4);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+.hero-search-submit:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(236,72,153,0.5);
+}
+@media (max-width: 680px) {
+  .hero-search-glass {
+    flex-direction: column;
+    padding: 14px;
+    gap: 12px;
+  }
+  .search-field-divider {
+    display: none;
+  }
+  .search-field {
+    width: 100%;
+    padding: 4px 6px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding-bottom: 8px;
+  }
+  .hero-search-submit {
+    width: 100%;
+    justify-content: center;
+    padding: 13px;
+  }
+}
+
+.hero-stats-strip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 12px 32px;
+  background: rgba(15,23,42,0.65);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 36px;
+  margin: 0 auto 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  flex-wrap: wrap;
+}
+.hero-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.hero-stat-number {
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #F8FAFC;
+  line-height: 1.1;
+}
+.hero-stat-desc {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #94A3B8;
+  margin-top: 3px;
+  font-weight: 600;
+}
+.hero-stat-sep {
+  width: 1px;
+  height: 26px;
+  background: rgba(255,255,255,0.12);
+}
+
+.featured-modern-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
+  gap: 24px;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.featured-modern-card {
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  animation: cardRise 0.6s ease both;
+}
+.featured-modern-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: rgba(99, 102, 241, 0.5);
+  box-shadow: 0 22px 50px rgba(99, 102, 241, 0.25), 0 0 25px rgba(236, 72, 153, 0.15);
+}
+.modern-card-img-wrap {
+  position: relative;
+  height: 190px;
+  overflow: hidden;
+  background: #1E293B;
+}
+.modern-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.featured-modern-card:hover .modern-card-img {
+  transform: scale(1.08);
+}
+.modern-card-fallback-img {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  background: linear-gradient(135deg, #1E1B4B 0%, #0F172A 100%);
+}
+.modern-card-badge-row {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 2;
+}
+.badge-featured {
+  background: linear-gradient(135deg, #EC4899 0%, #F472B6 100%);
+  color: #FFFFFF;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.4);
+}
+.badge-video {
+  background: rgba(15, 23, 42, 0.85);
+  color: #38BDF8;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  backdrop-filter: blur(8px);
+}
+.modern-card-gradient-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, transparent 60%);
+  pointer-events: none;
+}
+.modern-card-body {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.modern-card-category {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #818CF8;
+  margin-bottom: 6px;
+}
+.modern-card-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #F8FAFC;
+  margin: 0 0 8px;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.modern-card-location {
+  color: #94A3B8;
+  font-size: 12px;
+  margin: 0 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.modern-card-footer {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modern-card-price {
+  font-family: 'Poppins', sans-serif;
+  color: #EC4899;
+  font-size: 17px;
+  font-weight: 700;
+}
+.modern-card-arrow {
+  color: #6366F1;
+  font-size: 18px;
+  font-weight: 700;
+  transition: transform 0.3s ease;
+}
+.featured-modern-card:hover .modern-card-arrow {
+  transform: translateX(4px);
+  color: #EC4899;
+}
+.view-all-modern-btn {
+  padding: 12px 36px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  color: #F8FAFC;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.05em;
+}
+.view-all-modern-btn:hover {
+  background: linear-gradient(135deg, #6366F1 0%, #EC4899 100%);
+  border-color: transparent;
+  color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.35);
 }
 
 /* ── SCROLL DOWN INDICATOR ── */
@@ -1753,37 +2124,6 @@ export default function Home() {
   const [animatedStats, setAnimatedStats] = useState({ listings: 0, counties: 0, tenants: 0 });
   const [activeFeaturedTab, setActiveFeaturedTab] = useState("properties");
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
-  const [currentFeaturedIndex, setCurrentFeaturedIndex] = useState({});
-
-  // Auto-cycle through featured items every 2 seconds
-  useEffect(() => {
-    const categories = ['properties', 'businesses', 'materials', 'accommodation'];
-    const intervals = {};
-
-    categories.forEach(category => {
-      intervals[category] = setInterval(() => {
-        setCurrentFeaturedIndex(prev => {
-          const items = {
-            properties: featuredProperties,
-            businesses: featuredBusinesses,
-            materials: featuredMaterials,
-            accommodation: featuredAccommodation
-          }[category] || [];
-
-          if (items.length === 0) return prev;
-
-          const currentIndex = prev[category] || 0;
-          const nextIndex = (currentIndex + 1) % items.length;
-
-          return { ...prev, [category]: nextIndex };
-        });
-      }, 2000);
-    });
-
-    return () => {
-      Object.values(intervals).forEach(clearInterval);
-    };
-  }, [featuredProperties, featuredBusinesses, featuredMaterials, featuredAccommodation]);
   const [reviews, setReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [showBoostModal, setShowBoostModal] = useState(false);
@@ -2064,10 +2404,15 @@ export default function Home() {
   const allFeaturedListings = getFilteredListings();
 
   const getListingImage = (item) => {
+    if (!item) return "";
     if (item.typeText === 'Business') {
       return item.images?.[0] || item.logo || "";
     }
-    return item.images?.[0] || "";
+    if (item.images && item.images.length > 0) {
+      const first = item.images[0];
+      return typeof first === "object" ? (first.imageUrl || first.url || "") : first;
+    }
+    return item.coverImage || item.imageUrl || "";
   };
 
   /* ════════════════════════════════════ RENDER ════════════════════════════════════ */
@@ -2105,40 +2450,106 @@ export default function Home() {
         <div className="hero-decor2"></div>
 
         <div className="hero-content">
-          <div className="hero-badge">Kenya's Premier Property &amp; Services Platform</div>
+          <div className="hero-badge">
+            <span className="badge-dot"></span>
+            Kenya's Premier Property &amp; Services Platform
+          </div>
 
           <h1 className="hero-title">
             <span className="hero-title-line1">Everything You Need</span>
             <span className="hero-title-line2">Under One Roof</span>
           </h1>
           <p className="hero-sub">
-            Rentals · Accommodation · AxxBiashara · QuickSales<br />Verified across all 47 counties
+            Verified Rentals · Luxury Accommodation · AxxBiashara Services · Direct QuickSales
+            <br />
+            <span style={{ color: "#94a3b8", fontSize: "14px" }}>Available across all 47 counties · 100% Direct Contact</span>
           </p>
 
-          <div style={{ display: "flex", justifyContent: "center", gap: "16px", flexWrap: "wrap", marginTop: "24px", marginBottom: "24px" }}>
-            <button
-              onClick={() => navigate("/mobile-app")}
-              className="magical-btn"
-              style={{
-                padding: "14px 28px",
-                background: "linear-gradient(135deg, #C9A84C 0%, #E2C47A 100%)",
-                color: "#0D1B2A",
-                border: "none",
-                borderRadius: "8px",
-                fontWeight: 700,
-                fontSize: "14px",
-                cursor: "pointer",
-                boxShadow: "0 8px 30px rgba(201, 168, 76, 0.4)",
-                transition: "all 0.3s ease",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px"
-              }}
-            >
-              <span>📱</span> Download Axxspace App
-            </button>
+          {/* QUICK CATEGORY PILLS */}
+          <div className="hero-quick-pills">
+            {[
+              { icon: "🏠", label: "Rentals", path: "/listings" },
+              { icon: "🏨", label: "Accommodation", path: "/accommodation" },
+              { icon: "💼", label: "AxxBiashara", path: "/axxbiashara" },
+              { icon: "⚡", label: "QuickSales", path: "/materials" },
+              { icon: "🚚", label: "Movers", path: "/movers" },
+              { icon: "📱", label: "Mobile App", path: "/mobile-app" },
+            ].map(pill => (
+              <button
+                key={pill.label}
+                className="hero-pill-btn"
+                onClick={() => navigate(pill.path)}
+              >
+                <span>{pill.icon}</span>
+                <span>{pill.label}</span>
+              </button>
+            ))}
           </div>
 
+          {/* HERO QUICK SEARCH BAR */}
+          <form className="hero-search-glass" onSubmit={handleSearch}>
+            <div className="search-field">
+              <span className="search-field-icon">📍</span>
+              <div className="search-field-content">
+                <label>County / Region</label>
+                <select
+                  value={searchForm.county}
+                  onChange={(e) => setSearchForm(prev => ({ ...prev, county: e.target.value }))}
+                >
+                  <option value="">All 47 Counties</option>
+                  {counties.map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="search-field-divider"></div>
+
+            <div className="search-field">
+              <span className="search-field-icon">🏢</span>
+              <div className="search-field-content">
+                <label>Property / Space Type</label>
+                <select
+                  value={searchForm.type}
+                  onChange={(e) => setSearchForm(prev => ({ ...prev, type: e.target.value }))}
+                >
+                  <option value="">All Property Types</option>
+                  {types.map(t => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" className="hero-search-submit magical-btn">
+              <span>🔍</span>
+              <span>Explore Spaces</span>
+            </button>
+          </form>
+
+          {/* FLOATING STATS STRIP */}
+          <div className="hero-stats-strip">
+            <div className="hero-stat-item">
+              <div className="hero-stat-number">{animatedStats.listings}+</div>
+              <div className="hero-stat-desc">Active Listings</div>
+            </div>
+            <div className="hero-stat-sep"></div>
+            <div className="hero-stat-item">
+              <div className="hero-stat-number">{animatedStats.counties}</div>
+              <div className="hero-stat-desc">Counties Covered</div>
+            </div>
+            <div className="hero-stat-sep"></div>
+            <div className="hero-stat-item">
+              <div className="hero-stat-number">{animatedStats.tenants}+</div>
+              <div className="hero-stat-desc">Direct Inquiries</div>
+            </div>
+            <div className="hero-stat-sep"></div>
+            <div className="hero-stat-item">
+              <div className="hero-stat-number" style={{ color: "#22c55e" }}>0%</div>
+              <div className="hero-stat-desc">Broker Fees</div>
+            </div>
+          </div>
 
           {/* SCROLL DOWN INDICATOR */}
           <div className="scroll-indicator" onClick={() => window.scrollTo({ top: window.innerHeight - 100, behavior: 'smooth' })}>
@@ -2153,281 +2564,154 @@ export default function Home() {
       {/* ── UNIFIED FEATURED SHOWCASE ── */}
       <section className="featured-section">
         <div className="featured-header">
-          <p className="section-eyebrow">Premium Offerings</p>
+          <p className="section-eyebrow">Curated Excellence</p>
           <h2 className="section-title">Explore Featured Listings</h2>
-          <p className="section-sub">Discover top-rated services and verified listings handpicked for you</p>
+          <p className="section-sub">Discover top-rated services, accommodation retreats, and verified listings handpicked for you</p>
         </div>
 
-        {/* RENTALS */}
-        {featuredProperties.length > 0 && (
-          <div style={{ marginBottom: '48px', padding: '0 28px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Rentals</h3>
-                <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredProperties.length}</span>
-              </div>
-              <button
-                onClick={() => navigate('/listings?featured=true')}
-                style={{
-                  padding: '8px 16px',
-                  background: 'rgba(201,168,76,0.1)',
-                  border: '1px solid rgba(201,168,76,0.3)',
-                  borderRadius: '20px',
-                  color: C.gold,
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => e.target.style.background = 'rgba(201,168,76,0.2)'}
-                onMouseLeave={(e) => e.target.style.background = 'rgba(201,168,76,0.1)'}
-              >
-                View All
-              </button>
-            </div>
-            <div className="cards-track-wrap">
-              {featuredProperties.length > 0 && (
-                <div className="feat-card" style={{ animationDelay: '0s' }}>
-                  <div className="feat-img-wrap">
-                    <img
-                      src={getListingImage(featuredProperties[currentFeaturedIndex.properties || 0])}
-                      alt={featuredProperties[currentFeaturedIndex.properties || 0].title}
-                      className="feat-img"
-                      loading="lazy"
-                      onError={e => { e.target.style.display = "none"; }}
-                    />
-                    <div className="feat-boosted">★ Featured</div>
-                    <div className="feat-type">{featuredProperties[currentFeaturedIndex.properties || 0].propertyType || "Rental"}</div>
-                    <div className="feat-img-grad"></div>
-                  </div>
-                  <div className="feat-body">
-                    <p className="feat-type-label">{featuredProperties[currentFeaturedIndex.properties || 0].propertyType || "Rental"}</p>
-                    <h3 className="feat-title">{featuredProperties[currentFeaturedIndex.properties || 0].title}</h3>
-                    <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                      <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                      <span>{featuredProperties[currentFeaturedIndex.properties || 0].county} · {typeof featuredProperties[currentFeaturedIndex.properties || 0].location === 'object' ? featuredProperties[currentFeaturedIndex.properties || 0].location.town || featuredProperties[currentFeaturedIndex.properties || 0].location.address : featuredProperties[currentFeaturedIndex.properties || 0].location}</span>
-                    </p>
-                    <div className="feat-meta">
-                      <span className="feat-tag">{featuredProperties[currentFeaturedIndex.properties || 0].bedrooms} Bed</span>
-                      <span className="feat-tag">{featuredProperties[currentFeaturedIndex.properties || 0].bathrooms} Bath</span>
-                    </div>
-                    <p className="feat-price">
-                      KES {featuredProperties[currentFeaturedIndex.properties || 0].price?.toLocaleString()}<span>/month</span>
-                    </p>
-                    <button onClick={() => navigate(`/listings?property=${featuredProperties[currentFeaturedIndex.properties || 0]._id}`)} className="feat-view-btn magical-btn">
-                      View Details →
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )
-        }
+        {/* TABS */}
+        <div className="feat-tabs-bar">
+          {[
+            { id: "properties", label: "🏠 Rentals", count: featuredProperties.length },
+            { id: "accommodation", label: "🏨 Accommodation", count: featuredAccommodation.length },
+            { id: "businesses", label: "💼 AxxBiashara", count: featuredBusinesses.length },
+            { id: "materials", label: "⚡ QuickSales", count: featuredMaterials.length },
+          ].map(tab => (
+            <button
+              key={tab.id}
+              className={`feat-tab-btn ${activeFeaturedTab === tab.id ? 'active' : ''}`}
+              onClick={() => setActiveFeaturedTab(tab.id)}
+            >
+              <span>{tab.label}</span>
+              <span className="feat-tab-count">{tab.count}</span>
+            </button>
+          ))}
+        </div>
 
-        {/* BUSINESSES */}
-        {featuredBusinesses.length > 0 && (
-          <div style={{ marginBottom: '48px', padding: '0 28px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Businesses</h3>
-                <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredBusinesses.length}</span>
-              </div>
-              <button
-                onClick={() => navigate('/axxbiashara?featured=true')}
-                style={{
-                  padding: '8px 16px',
-                  background: 'rgba(201,168,76,0.1)',
-                  border: '1px solid rgba(201,168,76,0.3)',
-                  borderRadius: '20px',
-                  color: C.gold,
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => e.target.style.background = 'rgba(201,168,76,0.2)'}
-                onMouseLeave={(e) => e.target.style.background = 'rgba(201,168,76,0.1)'}
-              >
-                View All
-              </button>
-            </div>
-            <div className="cards-track-wrap">
-              {featuredBusinesses.length > 0 && (
-                <div className="feat-card" style={{ animationDelay: '0s' }}>
-                  <div className="feat-img-wrap">
-                    <img
-                      src={getListingImage(featuredBusinesses[currentFeaturedIndex.businesses || 0])}
-                      alt={featuredBusinesses[currentFeaturedIndex.businesses || 0].name}
-                      className="feat-img"
-                      loading="lazy"
-                      onError={e => { e.target.style.display = "none"; }}
-                    />
-                    <div className="feat-boosted">★ Featured</div>
-                    <div className="feat-type">{featuredBusinesses[currentFeaturedIndex.businesses || 0].category || "Business"}</div>
-                    <div className="feat-img-grad"></div>
-                  </div>
-                  <div className="feat-body">
-                    <p className="feat-type-label">{featuredBusinesses[currentFeaturedIndex.businesses || 0].category || "Business"}</p>
-                    <h3 className="feat-title">{featuredBusinesses[currentFeaturedIndex.businesses || 0].name}</h3>
-                    <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                      <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                      <span>{featuredBusinesses[currentFeaturedIndex.businesses || 0].county} · {typeof featuredBusinesses[currentFeaturedIndex.businesses || 0].location === 'object' ? featuredBusinesses[currentFeaturedIndex.businesses || 0].location.town || featuredBusinesses[currentFeaturedIndex.businesses || 0].location.address : featuredBusinesses[currentFeaturedIndex.businesses || 0].location}</span>
-                    </p>
-                    <div className="feat-meta">
-                      <span className="feat-tag">{featuredBusinesses[currentFeaturedIndex.businesses || 0].businessType || "General"}</span>
-                    </div>
-                    <p className="feat-price">
-                      KES {featuredBusinesses[currentFeaturedIndex.businesses || 0].price?.toLocaleString()}<span>/month</span>
-                    </p>
-                    <button onClick={() => navigate(`/businesses?business=${featuredBusinesses[currentFeaturedIndex.businesses || 0]._id}`)} className="feat-view-btn magical-btn">
-                      View Details →
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+        {/* FEATURED GRID */}
+        {(() => {
+          const itemsMap = {
+            properties: featuredProperties,
+            accommodation: featuredAccommodation,
+            businesses: featuredBusinesses,
+            materials: featuredMaterials,
+          };
+          const currentItems = itemsMap[activeFeaturedTab] || [];
 
-        {/* QUICKSALES */}
-        {featuredMaterials.length > 0 && (
-          <div style={{ marginBottom: '48px', padding: '0 28px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>QuickSales</h3>
-                <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredMaterials.length}</span>
+          if (currentItems.length === 0) {
+            return (
+              <div className="no-feat-wrap" style={{ textAlign: 'center', padding: '60px 28px' }}>
+                <span className="no-feat-icon" style={{ fontSize: '48px', display: 'block', marginBottom: '12px' }}>✨</span>
+                <h4 style={{ color: "#F8FAFC", fontSize: '20px', fontWeight: 600 }}>No featured listings currently found in this category</h4>
+                <p style={{ color: "#94a3b8", fontSize: '14px', marginTop: '6px' }}>Check back soon or explore our general directory</p>
+                <button
+                  onClick={() => {
+                    const paths = {
+                      properties: "/listings",
+                      accommodation: "/accommodation",
+                      businesses: "/axxbiashara",
+                      materials: "/materials"
+                    };
+                    navigate(paths[activeFeaturedTab] || "/listings");
+                  }}
+                  className="magical-btn"
+                  style={{ marginTop: '20px', padding: '10px 24px', borderRadius: '8px', background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', border: 'none', color: '#fff', fontWeight: '600', cursor: 'pointer' }}
+                >
+                  Browse All {activeFeaturedTab} →
+                </button>
               </div>
-              <button
-                onClick={() => navigate('/materials?featured=true')}
-                style={{
-                  padding: '8px 16px',
-                  background: 'rgba(201,168,76,0.1)',
-                  border: '1px solid rgba(201,168,76,0.3)',
-                  borderRadius: '20px',
-                  color: C.gold,
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => e.target.style.background = 'rgba(201,168,76,0.2)'}
-                onMouseLeave={(e) => e.target.style.background = 'rgba(201,168,76,0.1)'}
-              >
-                View All
-              </button>
-            </div>
-            <div className="cards-track-wrap">
-              {featuredMaterials.length > 0 && (
-                <div className="feat-card" style={{ animationDelay: '0s' }}>
-                  <div className="feat-img-wrap">
-                    <img
-                      src={getListingImage(featuredMaterials[currentFeaturedIndex.materials || 0])}
-                      alt={featuredMaterials[currentFeaturedIndex.materials || 0].name}
-                      className="feat-img"
-                      loading="lazy"
-                      onError={e => { e.target.style.display = "none"; }}
-                    />
-                    <div className="feat-boosted">★ Featured</div>
-                    <div className="feat-type">{featuredMaterials[currentFeaturedIndex.materials || 0].category || "Item"}</div>
-                    <div className="feat-img-grad"></div>
-                  </div>
-                  <div className="feat-body">
-                    <p className="feat-type-label">{featuredMaterials[currentFeaturedIndex.materials || 0].category || "Item"}</p>
-                    <h3 className="feat-title">{featuredMaterials[currentFeaturedIndex.materials || 0].name}</h3>
-                    <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                      <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                      <span>{featuredMaterials[currentFeaturedIndex.materials || 0].county} · {typeof featuredMaterials[currentFeaturedIndex.materials || 0].location === 'object' ? featuredMaterials[currentFeaturedIndex.materials || 0].location.town || featuredMaterials[currentFeaturedIndex.materials || 0].location.address : featuredMaterials[currentFeaturedIndex.materials || 0].location}</span>
-                    </p>
-                    <div className="feat-meta">
-                      <span className="feat-tag">{featuredMaterials[currentFeaturedIndex.materials || 0].condition || "Good"}</span>
-                    </div>
-                    <p className="feat-price">
-                      KES {featuredMaterials[currentFeaturedIndex.materials || 0].price?.toLocaleString()}
-                    </p>
-                    <button onClick={() => navigate(`/materials?material=${featuredMaterials[currentFeaturedIndex.materials || 0]._id}`)} className="feat-view-btn magical-btn">
-                      View Details →
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )
-        }
+            );
+          }
 
-        {/* ACCOMMODATION */}
-        {featuredAccommodation.length > 0 && (
-          <div style={{ marginBottom: '48px', padding: '0 28px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '24px', fontWeight: 700, color: C.gold, margin: 0 }}>Accommodation</h3>
-                <span style={{ background: 'rgba(201,168,76,0.15)', color: C.gold, padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700 }}>{featuredAccommodation.length}</span>
-              </div>
-              <button
-                onClick={() => navigate('/accommodation?featured=true')}
-                style={{
-                  padding: '8px 16px',
-                  background: 'rgba(201,168,76,0.1)',
-                  border: '1px solid rgba(201,168,76,0.3)',
-                  borderRadius: '20px',
-                  color: C.gold,
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => e.target.style.background = 'rgba(201,168,76,0.2)'}
-                onMouseLeave={(e) => e.target.style.background = 'rgba(201,168,76,0.1)'}
-              >
-                View All
-              </button>
-            </div>
-            <div className="cards-track-wrap">
-              {featuredAccommodation.length > 0 && (
-                <div className="feat-card" style={{ animationDelay: '0s' }}>
-                  <div className="feat-img-wrap">
-                    <img
-                      src={getListingImage(featuredAccommodation[currentFeaturedIndex.accommodation || 0])}
-                      alt={featuredAccommodation[currentFeaturedIndex.accommodation || 0].name}
-                      className="feat-img"
-                      loading="lazy"
-                      onError={e => { e.target.style.display = "none"; }}
-                    />
-                    <div className="feat-boosted">★ Featured</div>
-                    <div className="feat-type">{featuredAccommodation[currentFeaturedIndex.accommodation || 0].type || "Accommodation"}</div>
-                    <div className="feat-img-grad"></div>
-                  </div>
-                  <div className="feat-body">
-                    <p className="feat-type-label">{featuredAccommodation[currentFeaturedIndex.accommodation || 0].type || "Accommodation"}</p>
-                    <h3 className="feat-title">{featuredAccommodation[currentFeaturedIndex.accommodation || 0].name}</h3>
-                    <p className="feat-loc" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                      <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                      <span>{featuredAccommodation[currentFeaturedIndex.accommodation || 0].county} · {typeof featuredAccommodation[currentFeaturedIndex.accommodation || 0].location === 'object' ? featuredAccommodation[currentFeaturedIndex.accommodation || 0].location.town || featuredAccommodation[currentFeaturedIndex.accommodation || 0].location.address : featuredAccommodation[currentFeaturedIndex.accommodation || 0].location}</span>
-                    </p>
-                    <div className="feat-meta">
-                      <span className="feat-tag">{featuredAccommodation[currentFeaturedIndex.accommodation || 0].amenities?.[0] || "Available"}</span>
-                    </div>
-                    <p className="feat-price">
-                      KES {featuredAccommodation[currentFeaturedIndex.accommodation || 0].price?.toLocaleString()}<span>/night</span>
-                    </p>
-                    <button onClick={() => navigate(`/accommodation/property/${featuredAccommodation[currentFeaturedIndex.accommodation || 0]._id}`)} className="feat-view-btn magical-btn">
-                      View Details →
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+          return (
+            <div className="featured-modern-grid">
+              {currentItems.slice(0, 8).map((item, idx) => {
+                const image = getListingImage({ ...item, typeText: activeFeaturedTab === "businesses" ? "Business" : "Item" });
+                const hasVideos = item.videos && item.videos.length > 0;
+                const title = item.title || item.name || item.businessName || "Featured Listing";
+                const loc = item.county
+                  ? `${item.county}${item.town || item.address ? ` · ${item.town || item.address}` : ""}`
+                  : (item.location ? (typeof item.location === 'object' ? `${item.location.town || ""} · ${item.location.county || ""}` : item.location) : "Kenya");
+                const price = item.price != null
+                  ? `KES ${item.price.toLocaleString()}${activeFeaturedTab === "accommodation" ? "/night" : activeFeaturedTab === "properties" ? "/month" : ""}`
+                  : (item.basePrice != null ? `KES ${item.basePrice.toLocaleString()}/night` : (item.priceRange || "Contact for pricing"));
 
-        {featuredProperties.length === 0 && featuredBusinesses.length === 0 && featuredMaterials.length === 0 && featuredAccommodation.length === 0 && (
-          <div className="no-feat-wrap" style={{ textAlign: 'center', padding: '40px 28px' }}>
-            <span className="no-feat-icon" style={{ fontSize: '32px' }}></span>
-            <h4 className="no-feat-title" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: C.gold, fontSize: '20px', marginTop: '12px' }}>No Featured Listings Found</h4>
-            <p className="no-feat-sub" style={{ color: C.textMid, fontSize: '14px' }}>Check back later for active premium listings!</p>
-          </div>
-        )}
+                const detailUrl = activeFeaturedTab === "properties"
+                  ? `/listings?property=${item._id}`
+                  : activeFeaturedTab === "accommodation"
+                    ? `/accommodation/property/${item._id}`
+                    : activeFeaturedTab === "businesses"
+                      ? `/axxbiashara?business=${item._id}`
+                      : `/materials?material=${item._id}`;
+
+                return (
+                  <div
+                    key={item._id || idx}
+                    className="featured-modern-card"
+                    onClick={() => navigate(detailUrl)}
+                    style={{ animationDelay: `${idx * 0.08}s` }}
+                  >
+                    <div className="modern-card-img-wrap">
+                      {image ? (
+                        <img
+                          src={image}
+                          alt={title}
+                          className="modern-card-img"
+                          loading="lazy"
+                          onError={e => { e.target.src = "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=600&q=80"; }}
+                        />
+                      ) : (
+                        <div className="modern-card-fallback-img">
+                          <span>{activeFeaturedTab === "accommodation" ? "🏨" : activeFeaturedTab === "businesses" ? "💼" : "🏠"}</span>
+                        </div>
+                      )}
+                      <div className="modern-card-badge-row">
+                        <span className="badge-featured">★ Featured</span>
+                        {hasVideos && (
+                          <span className="badge-video">🎬 Video Tour</span>
+                        )}
+                      </div>
+                      <div className="modern-card-gradient-overlay"></div>
+                    </div>
+
+                    <div className="modern-card-body">
+                      <div className="modern-card-category">
+                        {item.propertyType || item.type || item.category || item.categories?.[0] || "Verified"}
+                      </div>
+                      <h3 className="modern-card-title">{title}</h3>
+                      <p className="modern-card-location">
+                        <span>📍</span>
+                        <span>{loc}</span>
+                      </p>
+
+                      <div className="modern-card-footer">
+                        <div className="modern-card-price">{price}</div>
+                        <span className="modern-card-arrow">→</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
+
+        <div style={{ textAlign: "center", marginTop: "36px" }}>
+          <button
+            onClick={() => {
+              const routes = {
+                properties: "/listings?featured=true",
+                accommodation: "/accommodation?featured=true",
+                businesses: "/axxbiashara?featured=true",
+                materials: "/materials?featured=true"
+              };
+              navigate(routes[activeFeaturedTab] || "/listings");
+            }}
+            className="view-all-modern-btn magical-btn"
+          >
+            Explore All {activeFeaturedTab.charAt(0).toUpperCase() + activeFeaturedTab.slice(1)} →
+          </button>
+        </div>
       </section>
 
       {/* ── DEMOGRAPHICS SECTION ── */}
