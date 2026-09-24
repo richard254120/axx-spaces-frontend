@@ -87,6 +87,25 @@ const DEFAULT_REVIEWS = [
   },
 ];
 
+function formatVideoUrl(url) {
+  if (!url || typeof url !== "string") return "";
+  let cleanUrl = url.trim();
+  if (cleanUrl.includes("cloudinary.com") && cleanUrl.includes("/video/upload/")) {
+    if (!/\.(mp4|webm|ogv|mov|m4v)$/i.test(cleanUrl)) {
+      cleanUrl = `${cleanUrl}.mp4`;
+    }
+  }
+  return cleanUrl;
+}
+
+function getVideoPoster(url, fallbackImg) {
+  if (!url || typeof url !== "string") return fallbackImg;
+  if (url.includes("cloudinary.com") && url.includes("/video/upload/")) {
+    return url.replace(/\.[a-zA-Z0-9]+$/, "") + ".jpg";
+  }
+  return fallbackImg;
+}
+
 export default function AccommodationDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -190,7 +209,7 @@ export default function AccommodationDetailPage() {
 
   // Section Observer for ScrollSpy
   useEffect(() => {
-    const sections = ["overview", "amenities", "rooms", "location", "policies", "reviews", "host"];
+    const sections = ["overview", "amenities", "walkthrough", "rooms", "location", "policies", "reviews", "host"];
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -494,18 +513,33 @@ export default function AccommodationDetailPage() {
                 ))}
               </div>
 
-              <button
-                type="button"
-                className="bento-show-all-btn"
-                onClick={() => setLightboxIndex(0)}
-              >
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                  <circle cx="8.5" cy="8.5" r="1.5" />
-                  <polyline points="21 15 16 10 5 21" />
-                </svg>
-                <span>View all {galleryImages.length} photos</span>
-              </button>
+              <div style={{ display: "flex", gap: "10px", position: "absolute", bottom: "16px", right: "16px", zIndex: 3 }}>
+                {property.videos && property.videos.length > 0 && (
+                  <button
+                    type="button"
+                    className="bento-video-btn"
+                    onClick={() => {
+                      const el = document.getElementById("walkthrough");
+                      if (el) el.scrollIntoView({ behavior: "smooth" });
+                    }}
+                  >
+                    <span className="bento-play-icon">▶</span>
+                    <span>Video Tour ({property.videos.length})</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="bento-show-all-btn"
+                  onClick={() => setLightboxIndex(0)}
+                >
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <polyline points="21 15 16 10 5 21" />
+                  </svg>
+                  <span>View all {galleryImages.length} photos</span>
+                </button>
+              </div>
             </div>
           ) : galleryImages.length >= 2 ? (
             <div className="bento-gallery-multi">
@@ -514,20 +548,51 @@ export default function AccommodationDetailPage() {
                   <img src={imgUrl} alt={`${property.name} photo ${idx + 1}`} />
                 </div>
               ))}
-              <button
-                type="button"
-                className="bento-show-all-btn"
-                onClick={() => setLightboxIndex(0)}
-              >
-                View photos ({galleryImages.length})
-              </button>
+              <div style={{ display: "flex", gap: "10px", position: "absolute", bottom: "16px", right: "16px", zIndex: 3 }}>
+                {property.videos && property.videos.length > 0 && (
+                  <button
+                    type="button"
+                    className="bento-video-btn"
+                    onClick={() => {
+                      const el = document.getElementById("walkthrough");
+                      if (el) el.scrollIntoView({ behavior: "smooth" });
+                    }}
+                  >
+                    <span className="bento-play-icon">▶</span>
+                    <span>Video Tour ({property.videos.length})</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="bento-show-all-btn"
+                  onClick={() => setLightboxIndex(0)}
+                >
+                  View photos ({galleryImages.length})
+                </button>
+              </div>
             </div>
           ) : (
             <div className="bento-gallery-single" onClick={() => setLightboxIndex(0)}>
               <img src={galleryImages[0]} alt={property.name} />
-              <button type="button" className="bento-show-all-btn">
-                Fullscreen Image
-              </button>
+              <div style={{ display: "flex", gap: "10px", position: "absolute", bottom: "16px", right: "16px", zIndex: 3 }}>
+                {property.videos && property.videos.length > 0 && (
+                  <button
+                    type="button"
+                    className="bento-video-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const el = document.getElementById("walkthrough");
+                      if (el) el.scrollIntoView({ behavior: "smooth" });
+                    }}
+                  >
+                    <span className="bento-play-icon">▶</span>
+                    <span>Video Tour ({property.videos.length})</span>
+                  </button>
+                )}
+                <button type="button" className="bento-show-all-btn">
+                  Fullscreen Image
+                </button>
+              </div>
             </div>
           )}
         </section>
@@ -536,6 +601,9 @@ export default function AccommodationDetailPage() {
         <div className="lux-section-nav">
           <a href="#overview" className={activeSection === "overview" ? "active" : ""}>Overview</a>
           <a href="#amenities" className={activeSection === "amenities" ? "active" : ""}>Amenities</a>
+          {property.videos && property.videos.length > 0 && (
+            <a href="#walkthrough" className={activeSection === "walkthrough" ? "active" : ""}>🎬 Video Tour ({property.videos.length})</a>
+          )}
           <a href="#rooms" className={activeSection === "rooms" ? "active" : ""}>Rooms & Suites</a>
           <a href="#location" className={activeSection === "location" ? "active" : ""}>Location & Map</a>
           <a href="#policies" className={activeSection === "policies" ? "active" : ""}>Policies</a>
@@ -725,17 +793,68 @@ export default function AccommodationDetailPage() {
 
             {/* Video / Audio Walkthroughs (If available) */}
             {((property.videos && property.videos.length > 0) || (property.audio && property.audio.length > 0)) && (
-              <div className="lux-card">
-                <h3 className="lux-sec-title">Virtual Walkthrough & Media</h3>
+              <div className="lux-card" id="walkthrough">
+                <div className="lux-card-header">
+                  <div>
+                    <h3 className="lux-sec-title">Virtual Video Walkthrough</h3>
+                    <p className="lux-sec-sub">
+                      Experience this stay with authentic, high-definition video walkthroughs provided by the host.
+                    </p>
+                  </div>
+                  {property.videos && property.videos.length > 0 && (
+                    <span className="lux-video-count-badge">
+                      🎬 {property.videos.length} {property.videos.length === 1 ? "Video Tour" : "Video Tours"}
+                    </span>
+                  )}
+                </div>
+
                 {property.videos && property.videos.length > 0 && (
-                  <div className="lux-video-wrap">
-                    {property.videos.map((vidUrl, idx) => (
-                      <video key={idx} src={vidUrl} controls playsInline preload="metadata" className="lux-video-player" />
-                    ))}
+                  <div className="lux-videos-grid">
+                    {property.videos.map((vidUrl, idx) => {
+                      const cleanVidUrl = formatVideoUrl(vidUrl);
+                      const posterUrl = getVideoPoster(cleanVidUrl, galleryImages[0]);
+                      return (
+                        <div key={idx} className="lux-video-card">
+                          <div className="lux-video-player-container">
+                            <video
+                              src={cleanVidUrl}
+                              controls
+                              playsInline
+                              preload="metadata"
+                              poster={posterUrl}
+                              className="lux-video-player"
+                            >
+                              <source src={cleanVidUrl} type="video/mp4" />
+                              <source src={cleanVidUrl} type="video/webm" />
+                              Your browser does not support HTML5 video playback.
+                            </video>
+                          </div>
+                          <div className="lux-video-info-bar">
+                            <div className="lux-video-title">
+                              <span>🎥 Tour {idx + 1} of {property.videos.length}</span>
+                              <span className="lux-video-hd-pill">HD Video Tour</span>
+                            </div>
+                            <a
+                              href={cleanVidUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="lux-video-popout-btn"
+                              title="Open video in new tab"
+                            >
+                              Fullscreen ↗
+                            </a>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
+
                 {property.audio && property.audio.length > 0 && (
-                  <div className="lux-audio-wrap">
+                  <div className="lux-audio-wrap" style={{ marginTop: "20px" }}>
+                    <div style={{ fontSize: "13px", fontWeight: 700, color: "#1e293b", marginBottom: "8px" }}>
+                      🎧 Audio Tour & Ambience:
+                    </div>
                     {property.audio.map((audUrl, idx) => (
                       <audio key={idx} src={audUrl} controls className="lux-audio-player" />
                     ))}
@@ -1834,15 +1953,117 @@ const luxStyles = `
     border-color: #0ea5e9;
   }
 
-  /* Media Players */
-  .lux-video-wrap {
-    margin-bottom: 16px;
+  /* Bento Video Button */
+  .bento-video-btn {
+    background: rgba(15, 23, 42, 0.88);
+    backdrop-filter: blur(8px);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+  }
+  .bento-video-btn:hover {
+    background: #0ea5e9;
+    border-color: #0ea5e9;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+  }
+  .bento-play-icon {
+    font-size: 11px;
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.2);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .bento-video-btn:hover .bento-play-icon {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  /* Media Players & Walkthrough */
+  .lux-video-count-badge {
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 4px 12px;
+    borderRadius: 20px;
+  }
+  .lux-videos-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 14px;
+  }
+  .lux-video-card {
+    background: #0f172a;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #334155;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  }
+  .lux-video-player-container {
+    position: relative;
+    background: #000000;
+    width: 100%;
   }
   .lux-video-player {
     width: 100%;
-    max-height: 400px;
-    border-radius: 14px;
+    max-height: 480px;
+    display: block;
     background: #000000;
+    outline: none;
+  }
+  .lux-video-info-bar {
+    padding: 12px 16px;
+    background: #0f172a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #1e293b;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .lux-video-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #f8fafc;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .lux-video-hd-pill {
+    background: rgba(14, 165, 233, 0.2);
+    color: #38bdf8;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+    border: 1px solid rgba(14, 165, 233, 0.3);
+  }
+  .lux-video-popout-btn {
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .lux-video-popout-btn:hover {
+    color: #38bdf8;
   }
   .lux-audio-player {
     width: 100%;

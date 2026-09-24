@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { registerAccommodationProperty } from "../../api/accommodation";
@@ -20,6 +20,150 @@ const amenitiesList = AMENITIES_LIST;
 const steps = REGISTER_STEPS;
 const packages = ADVERTISING_PACKAGES;
 
+function VideoPreviewCard({ file, index, onRemove }) {
+  const [previewUrl, setPreviewUrl] = useState("");
+
+  useEffect(() => {
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
+
+  const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+  const isTooLarge = file.size > 100 * 1024 * 1024;
+
+  return (
+    <div style={{
+      position: "relative",
+      borderRadius: "12px",
+      overflow: "hidden",
+      border: isTooLarge ? "2px solid #ef4444" : "1px solid #e5e7eb",
+      background: "#0f172a",
+      boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+      display: "flex",
+      flexDirection: "column"
+    }}>
+      {previewUrl && (
+        <video
+          src={previewUrl}
+          controls
+          playsInline
+          preload="metadata"
+          style={{ width: "100%", height: "180px", objectFit: "contain", background: "#000" }}
+        />
+      )}
+      <div style={{
+        padding: "10px 12px",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        background: "rgba(15, 23, 42, 0.95)",
+        gap: "10px"
+      }}>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div style={{ fontSize: "12px", fontWeight: 700, color: "#f8fafc", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            📹 {file.name || `Video Walkthrough #${index + 1}`}
+          </div>
+          <div style={{ fontSize: "11px", color: isTooLarge ? "#f87171" : "#94a3b8", marginTop: "2px" }}>
+            {sizeMb} MB {isTooLarge ? "• ⚠️ Exceeds 100MB limit" : "• Ready to upload"}
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => onRemove(index)}
+          style={{
+            background: "rgba(239, 68, 68, 0.15)",
+            border: "1px solid rgba(239, 68, 68, 0.4)",
+            color: "#fca5a5",
+            borderRadius: "6px",
+            padding: "5px 10px",
+            fontSize: "12px",
+            fontWeight: 700,
+            cursor: "pointer",
+            flexShrink: 0
+          }}
+          title="Remove video"
+        >
+          ✕ Remove
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ImagePreviewCard({ file, index, onRemove }) {
+  const [previewUrl, setPreviewUrl] = useState("");
+
+  useEffect(() => {
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
+
+  return (
+    <div style={{
+      position: "relative",
+      borderRadius: "10px",
+      overflow: "hidden",
+      border: "1px solid #e5e7eb",
+      aspectRatio: "4/3",
+      background: "#f3f4f6",
+      boxShadow: "0 2px 8px rgba(0,0,0,0.04)"
+    }}>
+      {previewUrl && (
+        <img
+          src={previewUrl}
+          alt={`Photo ${index + 1}`}
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        />
+      )}
+      {index === 0 && (
+        <span style={{
+          position: "absolute",
+          top: "6px",
+          left: "6px",
+          background: "#0284c7",
+          color: "white",
+          fontSize: "10px",
+          fontWeight: 800,
+          padding: "3px 8px",
+          borderRadius: "6px",
+          letterSpacing: "0.04em",
+          boxShadow: "0 2px 6px rgba(0,0,0,0.2)"
+        }}>
+          Primary Cover
+        </span>
+      )}
+      <button
+        type="button"
+        onClick={() => onRemove(index)}
+        style={{
+          position: "absolute",
+          top: "6px",
+          right: "6px",
+          background: "rgba(0,0,0,0.7)",
+          border: "none",
+          color: "white",
+          borderRadius: "50%",
+          width: "26px",
+          height: "26px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: "12px",
+          cursor: "pointer",
+          transition: "background 0.2s"
+        }}
+        title="Remove photo"
+      >
+        ✕
+      </button>
+    </div>
+  );
+}
+
 export default function RegisterPropertyPage() {
   const navigate = useNavigate();
   const { login: authLogin, token } = useContext(AuthContext);
@@ -31,6 +175,8 @@ export default function RegisterPropertyPage() {
   const [form, setForm] = useState({ ...INITIAL_REGISTER_FORM });
   const [newImages, setNewImages] = useState([]);
   const [newVideos, setNewVideos] = useState([]);
+  const [isDraggingVideo, setIsDraggingVideo] = useState(false);
+  const [isDraggingImage, setIsDraggingImage] = useState(false);
 
   const update = (field, value) => setForm((f) => ({ ...f, [field]: value }));
   const toggleAmenity = (a) => setForm((f) => ({
@@ -42,6 +188,38 @@ export default function RegisterPropertyPage() {
     const rt = [...f.roomTypes]; rt[i] = { ...rt[i], [field]: val }; return { ...f, roomTypes: rt };
   });
   const removeRoom = (i) => setForm((f) => ({ ...f, roomTypes: f.roomTypes.filter((_, idx) => idx !== i) }));
+
+  const handleImageFiles = (files) => {
+    const valid = Array.from(files).filter((f) => f.type && f.type.startsWith("image/"));
+    setNewImages((prev) => [...prev, ...valid].slice(0, 20));
+  };
+
+  const handleVideoFiles = (files) => {
+    const fileList = Array.from(files);
+    const valid = [];
+    const oversized = [];
+    fileList.forEach((f) => {
+      if (f.type && f.type.startsWith("video/")) {
+        if (f.size > 100 * 1024 * 1024) {
+          oversized.push(`${f.name} (${(f.size / (1024 * 1024)).toFixed(1)}MB)`);
+        } else {
+          valid.push(f);
+        }
+      }
+    });
+    if (oversized.length > 0) {
+      alert(`The following video(s) exceed the 100MB limit and were skipped:\n\n${oversized.join("\n")}\n\nPlease compress them or choose shorter clips under 100MB.`);
+    }
+    setNewVideos((prev) => [...prev, ...valid].slice(0, 10));
+  };
+
+  const removeImage = (index) => {
+    setNewImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const removeVideo = (index) => {
+    setNewVideos((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const detectLocation = () => {
     if (!navigator.geolocation) {
@@ -318,59 +496,188 @@ export default function RegisterPropertyPage() {
             {/* STEP 2 — MEDIA UPLOAD */}
             {step === 2 && (
               <div>
-                <h2 style={s.formTitle}>Photos & Videos</h2>
-                <p style={s.formSub}>Upload photos and videos of your property to attract more guests. You can upload up to 20 photos and 10 videos.</p>
+                <h2 style={s.formTitle}>Photos & Virtual Video Walkthroughs</h2>
+                <p style={s.formSub}>
+                  Upload high-resolution photos and video tours. Video walkthroughs will be playable directly on your listing page with interactive full-screen controls.
+                </p>
 
-                <div style={{ marginBottom: "20px" }}>
-                  <label style={s.label}>Photos (up to 20)</label>
-                  <div style={s.uploadBox}>
+                {/* PHOTOS UPLOAD */}
+                <div style={{ marginBottom: "28px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                    <label style={{ ...s.label, marginBottom: 0 }}>Property Photos ({newImages.length}/20)</label>
+                    <span style={{ fontSize: "12px", color: "#6b7280" }}>JPG, PNG, WebP • Max 10MB each</span>
+                  </div>
+
+                  <div
+                    style={{
+                      ...s.uploadBox,
+                      borderColor: isDraggingImage ? "#0284c7" : "#fbbf24",
+                      background: isDraggingImage ? "#f0f9ff" : "#fffbeb",
+                      transition: "all 0.2s"
+                    }}
+                    onDragOver={(e) => { e.preventDefault(); setIsDraggingImage(true); }}
+                    onDragLeave={() => setIsDraggingImage(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setIsDraggingImage(false);
+                      if (e.dataTransfer.files) handleImageFiles(e.dataTransfer.files);
+                    }}
+                  >
                     <input
                       type="file"
                       accept="image/*"
                       multiple
-                      onChange={(e) => setNewImages([...newImages, ...Array.from(e.target.files)])}
+                      onChange={(e) => {
+                        if (e.target.files) handleImageFiles(e.target.files);
+                        e.target.value = "";
+                      }}
                       style={{ display: "none" }}
                       id="image-upload"
                     />
                     <label htmlFor="image-upload" style={s.uploadBtn}>
-                      <span style={{ fontSize: "32px", marginBottom: "8px" }}></span>
-                      <span style={{ fontWeight: 700 }}>Click to add photos</span>
-                      <span style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>or drag and drop</span>
+                      <span style={{ fontSize: "36px", marginBottom: "8px" }}>📸</span>
+                      <span style={{ fontWeight: 800, fontSize: "15px" }}>Click to add photos</span>
+                      <span style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>
+                        or drag and drop your photos here
+                      </span>
                     </label>
                   </div>
+
                   {newImages.length > 0 && (
-                    <div style={{ marginTop: "12px", fontSize: "13px", color: "#16a34a" }}>
-                      ✓ {newImages.length} photo(s) selected
+                    <div style={{ marginTop: "16px" }}>
+                      <div style={{ fontSize: "13px", fontWeight: 700, color: "#166534", marginBottom: "10px" }}>
+                        ✓ {newImages.length} photo(s) selected:
+                      </div>
+                      <div style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))",
+                        gap: "10px"
+                      }}>
+                        {newImages.map((file, idx) => (
+                          <ImagePreviewCard
+                            key={`${file.name}-${idx}`}
+                            file={file}
+                            index={idx}
+                            onRemove={removeImage}
+                          />
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
 
-                <div style={{ marginBottom: "20px" }}>
-                  <label style={s.label}>Videos (up to 10)</label>
-                  <div style={s.uploadBox}>
+                {/* VIDEOS UPLOAD */}
+                <div style={{
+                  marginBottom: "28px",
+                  padding: "20px",
+                  borderRadius: "16px",
+                  background: "#f8fafc",
+                  border: "1px solid #e2e8f0"
+                }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px", flexWrap: "wrap", gap: "8px" }}>
+                    <div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <span style={{ fontSize: "18px" }}>🎬</span>
+                        <label style={{ ...s.label, marginBottom: 0, fontSize: "13px", color: "#0f172a" }}>
+                          Virtual Video Walkthroughs ({newVideos.length}/10)
+                        </label>
+                      </div>
+                      <p style={{ fontSize: "12px", color: "#64748b", marginTop: "4px", margin: "4px 0 0 0" }}>
+                        MP4, WebM, MOV, QuickTime • Up to 100MB per video walkthrough
+                      </p>
+                    </div>
+                    {newVideos.length > 0 && (
+                      <span style={{
+                        background: "#f0fdf4",
+                        color: "#166534",
+                        fontSize: "12px",
+                        fontWeight: 700,
+                        padding: "4px 10px",
+                        borderRadius: "20px",
+                        border: "1px solid #bbf7d0"
+                      }}>
+                        ✓ {newVideos.length} Video(s) Ready
+                      </span>
+                    )}
+                  </div>
+
+                  <div
+                    style={{
+                      ...s.uploadBox,
+                      borderColor: isDraggingVideo ? "#2563eb" : "#cbd5e1",
+                      background: isDraggingVideo ? "#eff6ff" : "white",
+                      borderStyle: "dashed",
+                      borderWidth: "2px",
+                      padding: "28px 16px",
+                      transition: "all 0.2s"
+                    }}
+                    onDragOver={(e) => { e.preventDefault(); setIsDraggingVideo(true); }}
+                    onDragLeave={() => setIsDraggingVideo(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setIsDraggingVideo(false);
+                      if (e.dataTransfer.files) handleVideoFiles(e.dataTransfer.files);
+                    }}
+                  >
                     <input
                       type="file"
                       accept="video/*"
                       multiple
-                      onChange={(e) => setNewVideos([...newVideos, ...Array.from(e.target.files)])}
+                      onChange={(e) => {
+                        if (e.target.files) handleVideoFiles(e.target.files);
+                        e.target.value = "";
+                      }}
                       style={{ display: "none" }}
                       id="video-upload"
                     />
                     <label htmlFor="video-upload" style={s.uploadBtn}>
-                      <span style={{ fontSize: "32px", marginBottom: "8px" }}></span>
-                      <span style={{ fontWeight: 700 }}>Click to add videos</span>
-                      <span style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>or drag and drop</span>
+                      <span style={{ fontSize: "38px", marginBottom: "8px" }}>🎥</span>
+                      <span style={{ fontWeight: 800, fontSize: "15px", color: "#0f172a" }}>
+                        Click to select video walkthrough(s)
+                      </span>
+                      <span style={{ fontSize: "12px", color: "#64748b", marginTop: "4px" }}>
+                        or drag & drop video files directly into this box
+                      </span>
                     </label>
                   </div>
+
+                  {/* Video Live Preview Grid */}
                   {newVideos.length > 0 && (
-                    <div style={{ marginTop: "12px", fontSize: "13px", color: "#16a34a" }}>
-                      ✓ {newVideos.length} video(s) selected
+                    <div style={{ marginTop: "20px" }}>
+                      <div style={{
+                        fontSize: "13px",
+                        fontWeight: 700,
+                        color: "#0f172a",
+                        marginBottom: "12px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px"
+                      }}>
+                        <span>▶ Test Playback Preview:</span>
+                        <span style={{ fontSize: "12px", fontWeight: 500, color: "#64748b" }}>
+                          (Use the player below to test audio/video before uploading)
+                        </span>
+                      </div>
+                      <div style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+                        gap: "16px"
+                      }}>
+                        {newVideos.map((file, idx) => (
+                          <VideoPreviewCard
+                            key={`${file.name}-${idx}`}
+                            file={file}
+                            index={idx}
+                            onRemove={removeVideo}
+                          />
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
 
-                <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "10px", padding: "12px", fontSize: "12px", color: "#166534" }}>
-                  Tip: You can also upload photos and videos later from your dashboard after submitting your property.
+                <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "12px", padding: "14px 16px", fontSize: "13px", color: "#166534", lineHeight: 1.6 }}>
+                  💡 <strong>Pro-Tip:</strong> Verified virtual tours dramatically increase guest bookings! You can also manage, add or replace videos at any time from your owner dashboard.
                 </div>
               </div>
             )}
@@ -536,13 +843,15 @@ export default function RegisterPropertyPage() {
             {step === 5 && (
               <div>
                 <h2 style={s.formTitle}> Review & Submit</h2>
-                <p style={s.formSub}>Confirm your details before going live</p>
+                <p style={s.formSub}>Confirm your details before submitting for approval</p>
                 <div className="review-grid">
                   {[
                     ["Property Name", form.name || "—"],
                     ["Category", form.category || "—"],
                     ["Location", form.town ? `${form.town}, ${form.county}` : "—"],
                     ["Base Price", form.basePrice ? `KSh ${Number(form.basePrice).toLocaleString()}/night` : "—"],
+                    ["Photos", `${newImages.length} photo(s) selected`],
+                    ["Video Walkthroughs", `${newVideos.length} video(s) ready`],
                     ["Amenities", form.amenities.length > 0 ? `${form.amenities.length} selected` : "—"],
                     ["Booking URL", form.bookingUrl || "Guests will contact you directly"],
                   ].map(([k, v]) => (
@@ -552,6 +861,17 @@ export default function RegisterPropertyPage() {
                     </div>
                   ))}
                 </div>
+
+                {newVideos.length > 0 && (
+                  <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "12px", padding: "14px", marginBottom: "16px" }}>
+                    <div style={{ fontSize: "13px", fontWeight: 800, color: "#166534", marginBottom: "4px" }}>
+                      🎬 Virtual Video Tour Attached
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#15803d" }}>
+                      {newVideos.length} video file(s) will be uploaded to our cloud media CDN and made playable on your listing page.
+                    </div>
+                  </div>
+                )}
 
                 {form.bookingUrl && (
                   <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "12px", padding: "14px", marginBottom: "16px" }}>
@@ -563,9 +883,9 @@ export default function RegisterPropertyPage() {
                 <div style={s.commissionBox}>
                   <div style={s.commissionTitle}> What Happens After Submission?</div>
                   <div style={{ fontSize: "13px", color: "#78350f", lineHeight: 1.7 }}>
-                    1. Our team reviews your listing within 24 hours.<br />
-                    2. Once approved, your listing goes live on AXXSpace.<br />
-                    3. Guests discover you, and bookings go to your site — <strong>no commission charged</strong>.
+                    1. Our team reviews your listing and media within 24 hours.<br />
+                    2. Once approved, your listing and video walkthroughs go live on AXXSpace.<br />
+                    3. Guests discover you, and bookings go directly to your site or contact — <strong>0% commission</strong>.
                   </div>
                 </div>
 
@@ -578,9 +898,35 @@ export default function RegisterPropertyPage() {
               </div>
             )}
 
+            {/* Media Upload Progress Indicator */}
+            {submitting && (
+              <div style={{
+                background: "#fffbeb",
+                border: "1px solid #fde68a",
+                borderRadius: "12px",
+                padding: "16px",
+                marginTop: "20px",
+                display: "flex",
+                alignItems: "center",
+                gap: "14px"
+              }}>
+                <div className="spinner-media-upload"></div>
+                <div>
+                  <div style={{ fontSize: "14px", fontWeight: 800, color: "#92400e" }}>
+                    Uploading Property & Media...
+                  </div>
+                  <div style={{ fontSize: "12px", color: "#b45309", marginTop: "3px", lineHeight: 1.5 }}>
+                    {newVideos.length > 0
+                      ? `Uploading ${newVideos.length} video walkthrough(s) and ${newImages.length} photo(s). High-definition media processing may take 15–30 seconds. Please keep this tab open.`
+                      : `Uploading ${newImages.length} photo(s) and listing details. Please wait a moment.`}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* NAV */}
             <div style={s.navBtns}>
-              {step > 0 && <button style={s.prevBtn} onClick={() => setStep((s) => s - 1)}>← Previous</button>}
+              {step > 0 && <button style={s.prevBtn} onClick={() => setStep((s) => s - 1)} disabled={submitting}>← Previous</button>}
               {step < steps.length - 1 ? (
                 <button style={{ ...s.nextBtn, opacity: canNext() ? 1 : 0.5 }} onClick={() => { if (canNext()) setStep((s) => s + 1); }}>
                   Next →
@@ -589,7 +935,7 @@ export default function RegisterPropertyPage() {
                 <>
                   {submitError && <div style={{ flex: "1 1 100%", marginBottom: "8px" }}><ErrorAlert message={submitError} /></div>}
                   <button style={{ ...s.nextBtn, opacity: form.agreeTerms && !submitting ? 1 : 0.5 }} onClick={handleSubmit} disabled={submitting}>
-                    {submitting ? "Submitting…" : "Submit Property "}
+                    {submitting ? "Uploading Media & Submitting…" : "Submit Property "}
                   </button>
                 </>
               )}
@@ -706,5 +1052,19 @@ const css = `
     .amenities-grid { grid-template-columns: repeat(2, 1fr); }
     .review-grid { grid-template-columns: 1fr; }
     .room-row { flex-direction: column; }
+  }
+
+  .spinner-media-upload {
+    width: 24px;
+    height: 24px;
+    border: 3px solid #fde68a;
+    border-top: 3px solid #d97706;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
   }
 `;

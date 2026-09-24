@@ -38,6 +38,11 @@ export function normalizeAccommodation(acc) {
     .map(w => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
 
+  const rawVideos = acc.videos || (acc.video ? [acc.video] : []);
+  const videos = Array.isArray(rawVideos)
+    ? rawVideos.map(v => typeof v === "string" ? v : v?.url || v?.videoUrl || "").filter(Boolean)
+    : [];
+
   return {
     ...acc,
     id: acc._id || acc.id,
@@ -50,6 +55,7 @@ export function normalizeAccommodation(acc) {
     address: address || locationStr,
     coordinates: typeof acc.location === "object" ? acc.location : null,
     images: images,
+    videos: videos,
     rating: acc.rating || 4.8,
     reviews: acc.reviews?.length || (typeof acc.reviews === "number" ? acc.reviews : 12),
     color: acc.color || (type.includes("beach") ? "#0ea5e9" : type.includes("safari") ? "#16a34a" : type.includes("mountain") ? "#8b5cf6" : "#f59e0b"),

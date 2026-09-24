@@ -49,6 +49,27 @@ export default function PropertyCard({ property: p, onOpen }) {
             Book online
           </div>
         )}
+        {p.videos && p.videos.length > 0 && (
+          <div style={{
+            position: "absolute",
+            bottom: "8px",
+            right: "8px",
+            background: "rgba(15, 23, 42, 0.85)",
+            backdropFilter: "blur(4px)",
+            color: "#f8fafc",
+            fontSize: "10px",
+            fontWeight: 800,
+            padding: "3px 8px",
+            borderRadius: "6px",
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
+            zIndex: 1,
+            boxShadow: "0 2px 6px rgba(0,0,0,0.3)"
+          }}>
+            <span style={{ color: "#38bdf8" }}>▶</span> Video Tour
+          </div>
+        )}
       </div>
       <div style={{ padding: "14px" }}>
         <div style={{ fontSize: "10px", color: "#6b7280", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.08em", marginBottom: "4px" }}>{categoryText}</div>

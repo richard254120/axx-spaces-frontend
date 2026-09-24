@@ -1267,6 +1267,11 @@ export default function AccommodationPage() {
                     <div className="prop-badge-strip">
                       <span className="prop-category-tag">{prop.type || prop.category}</span>
                       {prop.tag && <span className="prop-highlight-tag">{prop.tag}</span>}
+                      {prop.videos && prop.videos.length > 0 && (
+                        <span className="prop-video-tag" style={{ background: "rgba(15, 23, 42, 0.85)", color: "#38bdf8", fontWeight: 800 }}>
+                          🎬 Video Tour
+                        </span>
+                      )}
                     </div>
 
                     {/* Wishlist Heart Button */}

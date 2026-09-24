@@ -2016,6 +2016,20 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
               )}
             </div>
           )}
+          {item.videos && item.videos.length > 0 && (
+            <div style={{ marginTop: "16px", marginBottom: "16px", padding: "14px", background: "#f8fafc", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
+              <h4 style={{ margin: "0 0 10px 0", fontSize: "14px", fontWeight: "700", color: "#0f1729", display: "flex", alignItems: "center", gap: "6px" }}>
+                <span>🎬</span> Video Walkthrough ({item.videos.length})
+              </h4>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                {item.videos.map((vidUrl, vIdx) => (
+                  <div key={vIdx} style={{ borderRadius: "8px", overflow: "hidden", background: "#000" }}>
+                    <video src={vidUrl} controls playsInline style={{ width: "100%", maxHeight: "280px", display: "block" }} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="owner-box">
             <p className="owner-line"> <strong>{getOwner(item)}</strong> &nbsp;|&nbsp;  {getContact(item)}</p>
             {item.owner?.email && <p className="owner-line"> {item.owner.email}</p>}
