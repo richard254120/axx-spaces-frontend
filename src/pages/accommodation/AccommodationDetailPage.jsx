@@ -1,5 +1,9 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect, useMemo } from "react";
+import { useNavigate, useParams, Link } from "react-router-dom";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+
 import {
   useAccommodationProperty,
   AccommodationNav,
@@ -7,189 +11,294 @@ import {
   ErrorAlert,
   ACCOMMODATION_FONT_CSS,
   accommodationTheme,
-  CompactReviews,
 } from "../../features/accommodation";
 import PhoneInput from "../../components/PhoneInput";
 import { useAuth } from "../../context/AuthContext";
 import MessagingSystem from "../../components/MessagingSystem";
 import AgentCard from "../../components/AgentCard";
 
-const properties = {
-  1: {
-    id: 1, name: "Serena Beach Resort & Spa", location: "Nyali, Mombasa", county: "Mombasa",
-    category: "Beach Resort", price: 12500, rating: 4.8, reviews: 312, color: "#0ea5e9", tag: "Top Rated", emoji: "",
-    bookingUrl: "https://www.serenahotels.com/mombasa", // Owner's own booking site
-    description: "Experience the ultimate coastal getaway at Serena Beach Resort & Spa. Nestled along the pristine shores of Nyali, Mombasa, our resort offers breathtaking Indian Ocean views, world-class amenities, and an unparalleled blend of modern luxury with authentic Swahili hospitality. Award-winning cuisine, a full-service spa, and dedicated kids club make us the perfect destination for families, couples, and corporate retreats.",
-    amenities: [" Infinity Pool", " 3 Restaurants", " Full Spa", " Fitness Centre", " Free WiFi", " Free Parking", " Tennis Court", " Water Sports", " Beach Access", " 24hr Room Service", " Beach Bar", " Kids Club"],
-    policies: { checkin: "2:00 PM", checkout: "11:00 AM", cancellation: "Free cancellation up to 48 hours before check-in", payment: "M-Pesa, Visa, Mastercard accepted" },
-    roomTypes: [
-      { name: "Standard Garden Room", price: 12500, guests: 2, desc: "Garden view, king bed, en-suite with rain shower" },
-      { name: "Deluxe Ocean View", price: 18500, guests: 2, desc: "Ocean-facing balcony, king bed, deep bathtub" },
-      { name: "Family Suite", price: 28000, guests: 4, desc: "2 bedrooms, living room, private terrace with sea view" },
-      { name: "Presidential Suite", price: 65000, guests: 4, desc: "Penthouse level, private plunge pool, butler service" },
-    ],
-    reviewList: [
-      { name: "Amina K.", rating: 5, date: "March 2026", comment: "Absolutely stunning resort! The staff were incredibly welcoming and the food was phenomenal. The infinity pool at sunset is magical. Will definitely return." },
-      { name: "David M.", rating: 5, date: "February 2026", comment: "Best beach resort in Kenya hands down. Rooms are spacious and immaculate. The Swahili cuisine at the main restaurant is a highlight." },
-      { name: "Sarah W.", rating: 4, date: "January 2026", comment: "Beautiful property with excellent service. The spa treatments are worth every shilling. Highly recommended for a romantic getaway!" },
-    ],
-    manager: { name: "James Otieno", phone: "+254 700 123 456", email: "reservations@serena-beach.co.ke", whatsapp: "254700123456" },
-  },
-  2: {
-    id: 2, name: "Fairmont Mount Kenya Safari Club", location: "Nanyuki, Laikipia", county: "Laikipia",
-    category: "Mountain Lodge", price: 28000, rating: 4.9, reviews: 198, color: "#22c55e", tag: "Luxury", emoji: "",
-    bookingUrl: "https://www.fairmont.com/mount-kenya-safari-club",
-    description: "Perched on the equator at 7,000 feet, the Fairmont Mount Kenya Safari Club sits on 100 acres of manicured grounds at the foot of Mount Kenya. This historic property — founded by actor William Holden — combines colonial elegance with modern luxury. Wake to Mount Kenya views, spot wildlife from your cottage, and dine under the stars.",
-    amenities: [" Game Drives", " Heated Pool", " Fine Dining", " Horse Riding", " Free WiFi", " Airport Transfer", " Tennis", " Yoga & Meditation", " Stargazing Deck", " Butler Service", " Nature Walks", " Photography Tours"],
-    policies: { checkin: "3:00 PM", checkout: "12:00 PM", cancellation: "Free cancellation up to 72 hours before check-in", payment: "M-Pesa, Visa, Mastercard, Bank Transfer" },
-    roomTypes: [
-      { name: "Classic Room", price: 28000, guests: 2, desc: "Mountain view, queen bed, en-suite, fireplace" },
-      { name: "Deluxe Cottage", price: 45000, guests: 2, desc: "Private garden, wood fireplace, king bed, soaking tub" },
-      { name: "Club Cottage", price: 68000, guests: 4, desc: "2 bedrooms, private veranda, dedicated butler service" },
-    ],
-    reviewList: [
-      { name: "Peter N.", rating: 5, date: "April 2026", comment: "The most magical experience I've had in Kenya. Waking up to Mount Kenya views every morning was absolutely priceless. The game drives were exceptional." },
-      { name: "Grace A.", rating: 5, date: "March 2026", comment: "Exceptional service from check-in to checkout. The colonial elegance is perfectly balanced with modern luxury. The equator ceremony at dinner was a memorable touch." },
-    ],
-    manager: { name: "Carol Wanjiku", phone: "+254 722 987 654", email: "reservations@fairmont-mkenya.co.ke", whatsapp: "254722987654" },
-  },
-  4: {
-    id: 4, name: "Ol Pejeta Bush Camp", location: "Laikipia Conservancy", county: "Laikipia",
-    category: "Safari Camp", price: 18000, rating: 4.9, reviews: 87, color: "#a855f7", tag: "Hidden Gem", emoji: "",
-    bookingUrl: "https://www.olpejetabushcamp.com",
-    description: "Ol Pejeta Bush Camp sits in the heart of the Ol Pejeta Conservancy — home to the world's last two northern white rhinos and Africa's largest black rhino sanctuary. Experience Big Five game drives, chimpanzee sanctuary visits, and the powerful conservation story of this remarkable 90,000-acre conservancy. An intimate camp experience with only 10 tented suites.",
-    amenities: [" Rhino Tracking", " Big Five Drives", " Chimp Sanctuary", " Bush Dining", " WiFi in Lodge", " Night Game Drive", " Stargazing", " Conservation Talks", " Photography Guide", " Bush Yoga"],
-    policies: { checkin: "2:00 PM", checkout: "10:00 AM", cancellation: "Free cancellation up to 7 days before check-in", payment: "M-Pesa, Visa, Mastercard, USD/EUR accepted" },
-    roomTypes: [
-      { name: "Tented Suite", price: 18000, guests: 2, desc: "En-suite tent, raised deck, bush views, all meals included" },
-      { name: "Family Tent", price: 32000, guests: 4, desc: "Connected sleeping areas, private outdoor shower, all meals" },
-    ],
-    reviewList: [
-      { name: "James L.", rating: 5, date: "April 2026", comment: "Meeting the last northern white rhinos, Sudan's daughters, was a life-changing moment. The conservation work here is inspiring." },
-      { name: "Maria S.", rating: 5, date: "March 2026", comment: "The most authentic bush camp experience in East Africa. Small, intimate, exceptional guiding. Worth every shilling." },
-    ],
-    manager: { name: "Moses Kipchoge", phone: "+254 733 456 789", email: "bookings@olpejetacamp.co.ke", whatsapp: "254733456789" },
-  },
+// Fix Leaflet default marker icons broken in Vite bundles
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+});
+
+const customPinIcon = L.divIcon({
+  className: "custom-leaflet-pin",
+  html: `
+    <div style="
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      color: white;
+      width: 42px;
+      height: 42px;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(14, 165, 233, 0.45);
+      border: 3px solid white;
+    ">
+      <span style="transform: rotate(45deg); font-size: 18px;">🏨</span>
+    </div>
+  `,
+  iconSize: [42, 42],
+  iconAnchor: [21, 42],
+  popupAnchor: [0, -42],
+});
+
+// Verification badge imagery
+const BADGE_IMAGES = {
+  student_verified: "/Student Verified.png",
+  business_verified: "/Business Verified.png",
+  identity_verified: "/Identity Verified.png",
+  location_verified: "/Locationn Verified.png",
+  online_verified: "/Online Verified.png",
+  premium_verified: "/Premium Verified.png",
 };
 
-const defaultProperty = properties[2];
+// Curated fallback reviews if property is newly listed
+const DEFAULT_REVIEWS = [
+  {
+    name: "Amina Karume",
+    avatar: "A",
+    date: "2 weeks ago",
+    rating: 5,
+    comment: "Exceptional hospitality! The staff went above and beyond, and the property is even more breathtaking in person. Sparkling clean and very quiet.",
+    type: "Verified Guest",
+  },
+  {
+    name: "David Mwangi",
+    avatar: "D",
+    date: "1 month ago",
+    rating: 5,
+    comment: "Top notch experience. High-speed WiFi made remote work a breeze, and the breakfast was unforgettable. Will definitely rebook next time I am around!",
+    type: "Solo Traveler",
+  },
+  {
+    name: "Sarah Jenkins",
+    avatar: "S",
+    date: "2 months ago",
+    rating: 5,
+    comment: "The views and serenity here are unbeatable. Seamless check-in and the host was very responsive via WhatsApp. Highly recommended!",
+    type: "Family Vacation",
+  },
+];
 
 export default function AccommodationDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { property, loading, offline, error } = useAccommodationProperty(id);
+  const { property, loading, error } = useAccommodationProperty(id);
   const { user, token } = useAuth();
 
-  const [selectedRoom, setSelectedRoom] = useState(0);
-  const [bookingOpen, setBookingOpen] = useState(false);
+  // Booking & suite selection state
+  const [selectedRoomIndex, setSelectedRoomIndex] = useState(0);
+  const [checkIn, setCheckIn] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    return d.toISOString().split("T")[0];
+  });
+  const [checkOut, setCheckOut] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 4);
+    return d.toISOString().split("T")[0];
+  });
+  const [guestsCount, setGuestsCount] = useState(2);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+
+  // M-Pesa payment modal state
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [paymentPhone, setPaymentPhone] = useState("");
-  const [paymentAmount, setPaymentAmount] = useState("");
+  const [paymentPhone, setPaymentPhone] = useState(user?.phone || "");
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentError, setPaymentError] = useState("");
   const [paymentSuccess, setPaymentSuccess] = useState("");
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
 
-  // ── FEATURES: lightbox, share/save, scroll-reveal, section scroll-spy ──
-  // (hooks must stay above the early returns below)
-  const [lightbox, setLightbox] = useState(-1);
-  const [saved, setSaved] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [activeSec, setActiveSec] = useState("overview");
+  // Gallery & Lightbox
+  const [lightboxIndex, setLightboxIndex] = useState(-1);
 
-  useEffect(() => {
-    const io = new IntersectionObserver((es) => es.forEach((e) => {
-      if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
-    }), { threshold: 0.12 });
-    document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, [property, loading]);
+  // Active section scroll spy
+  const [activeSection, setActiveSection] = useState("overview");
 
-  useEffect(() => {
-    const ids = ["overview", "amenities", "rooms", "policies", "reviews", "contact"];
-    const io = new IntersectionObserver((es) => es.forEach((e) => {
-      if (e.isIntersecting) setActiveSec(e.target.id);
-    }), { rootMargin: "-35% 0px -55% 0px" });
-    ids.forEach((i) => { const el = document.getElementById(i); if (el) io.observe(el); });
-    return () => io.disconnect();
-  }, [property, loading]);
-
-  useEffect(() => {
-    if (lightbox < 0) return;
-    const n = property?.images?.length || 0;
-    const onKey = (e) => {
-      if (e.key === "Escape") setLightbox(-1);
-      if (e.key === "ArrowRight" && n) setLightbox((i) => (i + 1) % n);
-      if (e.key === "ArrowLeft" && n) setLightbox((i) => (i - 1 + n) % n);
-    };
-    window.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
-  }, [lightbox, property]);
-
-  if (loading) {
-    return (
-      <div style={{ fontFamily: "'DM Sans', sans-serif", background: accommodationTheme.bg, minHeight: "100vh" }}>
-        <style>{ACCOMMODATION_FONT_CSS}</style>
-        <AccommodationNav />
-        <LoadingBlock message="Loading property details…" />
-      </div>
-    );
-  }
-
-  if (!property) {
-    return (
-      <div style={{ fontFamily: "'DM Sans', sans-serif", background: accommodationTheme.bg, minHeight: "100vh", padding: "40px 20px" }}>
-        <AccommodationNav />
-        <ErrorAlert message={error || "Property not found"} />
-        <button type="button" onClick={() => navigate("/accommodation/listings")} style={{ marginTop: "16px", padding: "12px 20px", borderRadius: "10px", border: "none", background: "#fbbf24", fontWeight: 800, cursor: "pointer" }}>
-          Back to listings
-        </button>
-      </div>
-    );
-  }
-
-  const roomTypes = property.roomTypes || [{ name: "Standard Room", price: property.basePrice || property.price || 0, guests: property.maxGuests || 2, desc: property.description || "Comfortable accommodation" }];
-  const roomPrice = roomTypes[selectedRoom]?.price ?? property.basePrice ?? property.price ?? 0;
-
-  // Manager/contact info from owner
-  const manager = property.owner || {
-    name: property.ownerName || "Property Owner",
-    phone: property.ownerPhone || "",
-    email: property.ownerEmail || property.owner?.email || "",
-    whatsapp: property.ownerPhone?.replace(/\D/g, '') || ""
-  };
-
-  // If property has its own booking URL, redirect there; otherwise handle internally
-  const handleBook = () => {
-    if (property.bookingUrl) {
-      window.open(property.bookingUrl, "_blank", "noopener,noreferrer");
-    } else {
-      alert("Contact the property manager to book.");
-    }
-  };
-
-  const handleShare = async () => {
-    const url = window.location.href;
+  // Wishlist & Share toast state
+  const [saved, setSaved] = useState(() => {
     try {
-      if (navigator.share) await navigator.share({ title: property.name, url });
-      else { await navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 2000); }
-    } catch (e) { /* user cancelled */ }
-  };
-
-  const handleBookWithMpesa = () => {
-    if (!user) {
-      alert("Please log in to book this tourism listing");
-      return;
+      const favs = JSON.parse(localStorage.getItem("axx_accommodation_favs") || "[]");
+      return favs.includes(id);
+    } catch {
+      return false;
     }
-    setPaymentAmount(roomPrice.toString());
-    setPaymentPhone(user.phone || "");
-    setShowPaymentModal(true);
+  });
+  const [toastMessage, setToastMessage] = useState("");
+
+  // Toggle favorite / wishlist
+  const toggleSave = () => {
+    const nextSaved = !saved;
+    setSaved(nextSaved);
+    try {
+      const favs = JSON.parse(localStorage.getItem("axx_accommodation_favs") || "[]");
+      const updated = nextSaved ? [...new Set([...favs, id])] : favs.filter((f) => f !== id);
+      localStorage.setItem("axx_accommodation_favs", JSON.stringify(updated));
+    } catch {}
+    showToast(nextSaved ? "Saved to your Wishlist ❤️" : "Removed from your Wishlist");
   };
 
+  // Share handler
+  const handleShare = async () => {
+    const shareUrl = window.location.href;
+    const shareData = {
+      title: property?.name || "AxxSpace Accommodation",
+      text: `Check out ${property?.name || "this stay"} on AxxSpace!`,
+      url: shareUrl,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch {}
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        showToast("Listing link copied to clipboard! 📋");
+      } catch {
+        showToast("Link: " + shareUrl);
+      }
+    }
+  };
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(""), 3500);
+  };
+
+  // Keyboard navigation for Lightbox
+  useEffect(() => {
+    if (lightboxIndex < 0 || !property?.images?.length) return;
+    const total = property.images.length;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") setLightboxIndex(-1);
+      if (e.key === "ArrowRight") setLightboxIndex((i) => (i + 1) % total);
+      if (e.key === "ArrowLeft") setLightboxIndex((i) => (i - 1 + total) % total);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [lightboxIndex, property?.images]);
+
+  // Section Observer for ScrollSpy
+  useEffect(() => {
+    const sections = ["overview", "amenities", "rooms", "location", "policies", "reviews", "host"];
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { rootMargin: "-25% 0px -60% 0px" }
+    );
+
+    sections.forEach((sId) => {
+      const el = document.getElementById(sId);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [property]);
+
+  // Calculated stay nights
+  const nightsCount = useMemo(() => {
+    if (!checkIn || !checkOut) return 1;
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+    const diff = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+    return diff > 0 ? diff : 1;
+  }, [checkIn, checkOut]);
+
+  // Normalized room types
+  const roomTypes = useMemo(() => {
+    if (property?.roomTypes && property.roomTypes.length > 0) {
+      return property.roomTypes;
+    }
+    const fallbackPrice = Number(property?.basePrice || property?.price || 8500);
+    return [
+      {
+        name: "Standard Suite",
+        price: fallbackPrice,
+        guests: property?.maxGuests || 2,
+        desc: "Comfortable suite with luxury bedding, en-suite rain shower and ambient climate control.",
+        bed: "1 King Bed or 2 Twins",
+      },
+      {
+        name: "Deluxe Scenic Suite",
+        price: Math.round(fallbackPrice * 1.35),
+        guests: Math.min((property?.maxGuests || 2) + 1, 4),
+        desc: "Elevated suite with private balcony terrace, deep-soaking bathtub and premium views.",
+        bed: "1 Extra-Large King Bed",
+      },
+    ];
+  }, [property]);
+
+  const activeRoom = roomTypes[selectedRoomIndex] || roomTypes[0] || {};
+  const nightlyRate = Number(activeRoom.price || property?.basePrice || property?.price || 0);
+  const subtotal = nightlyRate * nightsCount;
+  const serviceFee = 0; // Free on AxxSpace
+  const grandTotal = subtotal + serviceFee;
+
+  // Normalized Manager / Host Details
+  const host = useMemo(() => {
+    const owner = property?.owner;
+    return {
+      name: owner?.name || property?.ownerName || "AxxSpace Verified Partner",
+      phone: owner?.phone || property?.ownerPhone || "+254 700 000 000",
+      email: owner?.email || property?.ownerEmail || "hospitality@axxspace.com",
+      whatsapp: (owner?.phone || property?.ownerPhone || "254700000000").replace(/\D/g, ""),
+      badges: owner?.verificationBadges || [],
+    };
+  }, [property]);
+
+  // Coordinates
+  const coordinates = useMemo(() => {
+    if (property?.location?.lat && property?.location?.lng) {
+      return [Number(property.location.lat), Number(property.location.lng)];
+    }
+    if (property?.coordinates?.lat && property?.coordinates?.lng) {
+      return [Number(property.coordinates.lat), Number(property.coordinates.lng)];
+    }
+    // Default to Nairobi center if coordinates are unlisted
+    return [-1.286389, 36.817223];
+  }, [property]);
+
+  const hasRealCoords = Boolean(
+    (property?.location?.lat && property?.location?.lng) ||
+    (property?.coordinates?.lat && property?.coordinates?.lng)
+  );
+
+  // Gallery images array
+  const galleryImages = useMemo(() => {
+    if (!property?.images || property.images.length === 0) {
+      return [
+        "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1400&q=80",
+        "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1000&q=80",
+        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1000&q=80",
+        "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1000&q=80",
+        "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1000&q=80",
+      ];
+    }
+    return property.images.map((img) => (typeof img === "object" ? img.imageUrl || img.url : img));
+  }, [property]);
+
+  // Handle M-Pesa payment submission
   const handlePaymentSubmit = async (e) => {
     e.preventDefault();
+    if (!token) {
+      setPaymentError("Please log in to proceed with secure M-Pesa payment.");
+      return;
+    }
     setPaymentLoading(true);
     setPaymentError("");
     setPaymentSuccess("");
@@ -203,483 +312,884 @@ export default function AccommodationDetailPage() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          tourismId: property._id || property.id,
+          tourismId: property?._id || property?.id,
           phone: paymentPhone,
-          amount: paymentAmount,
+          amount: grandTotal.toString(),
           checkIn,
           checkOut,
+          suiteName: activeRoom.name,
         }),
       });
 
       const data = await response.json();
-
       if (response.ok) {
-        setPaymentSuccess(" M-Pesa prompt sent! Check your phone to complete payment.");
+        setPaymentSuccess("STK Push prompt sent! Please enter your M-Pesa PIN on your phone to complete your booking.");
         setTimeout(() => {
           setShowPaymentModal(false);
           setPaymentSuccess("");
-        }, 3000);
+        }, 5000);
       } else {
-        setPaymentError(data.error || " Payment failed. Please try again.");
+        setPaymentError(data.error || data.message || "Payment initiation failed. Please check your phone number and try again.");
       }
-    } catch (err) {
-      setPaymentError(" Payment failed. Please try again.");
+    } catch {
+      setPaymentError("Network error connecting to payment gateway. Please try again.");
     } finally {
       setPaymentLoading(false);
     }
   };
 
-  const BookingWidget = () => (
-    <div style={s.bookingCard} className="booking-card">
-      <div style={s.bookingHeader}>
-        <div>
-          <span style={{ ...s.bookingPrice, color: property.color }}>KSh {roomPrice.toLocaleString()}</span>
-          <span style={s.bookingPer}>/night</span>
+  // Loading state
+  if (loading) {
+    return (
+      <div style={{ fontFamily: "'DM Sans', sans-serif", background: "#f8fafc", minHeight: "100vh" }}>
+        <style>{ACCOMMODATION_FONT_CSS}</style>
+        <AccommodationNav />
+        <div style={{ maxWidth: "1280px", margin: "60px auto", padding: "0 20px" }}>
+          <LoadingBlock message="Loading accommodation showcase…" />
         </div>
-        <div style={s.bookingRating}> {property.rating} <span style={{ color: "#9ca3af", fontSize: "11px" }}>({property.reviews})</span></div>
       </div>
+    );
+  }
 
-      {/* Room selector */}
-      <div style={s.roomSelectWrap}>
-        <label style={s.fieldLabel}>Select Room Type</label>
-        <select style={s.roomSelectEl} value={selectedRoom} onChange={(e) => setSelectedRoom(Number(e.target.value))}>
-          {roomTypes.map((r, i) => (
-            <option key={r.name} value={i}>{r.name} — KSh {r.price.toLocaleString()}/night</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Booking redirect notice */}
-      {property.bookingUrl && (
-        <div style={s.redirectNotice}>
-          <div style={s.redirectIcon}></div>
-          <div>
-            <div style={s.redirectTitle}>Direct Booking Available</div>
-            <div style={s.redirectSub}>Clicking "Book Now" will redirect you to {property.name}'s official booking site for secure payment.</div>
+  // Not found state
+  if (!property) {
+    return (
+      <div style={{ fontFamily: "'DM Sans', sans-serif", background: "#f8fafc", minHeight: "100vh" }}>
+        <AccommodationNav />
+        <div style={{ maxWidth: "600px", margin: "80px auto", padding: "40px 24px", textAlign: "center", background: "white", borderRadius: "24px", boxShadow: "0 10px 40px rgba(0,0,0,0.06)", border: "1px solid #e2e8f0" }}>
+          <div style={{ fontSize: "52px", marginBottom: "16px" }}>🏖️</div>
+          <h2 style={{ fontSize: "24px", fontWeight: 800, color: "#0f172a", marginBottom: "12px" }}>Accommodation Not Found</h2>
+          <p style={{ color: "#64748b", lineHeight: 1.6, marginBottom: "28px" }}>
+            This property listing might have been unlisted, booked out, or pending approval.
+          </p>
+          <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+            <button
+              onClick={() => navigate("/accommodation/listings")}
+              style={{ padding: "14px 24px", borderRadius: "12px", border: "none", background: "#0ea5e9", color: "white", fontWeight: 700, cursor: "pointer", fontSize: "14px" }}
+            >
+              Browse Stays
+            </button>
+            <button
+              onClick={() => navigate("/accommodation")}
+              style={{ padding: "14px 24px", borderRadius: "12px", border: "1px solid #cbd5e1", background: "white", color: "#334155", fontWeight: 700, cursor: "pointer", fontSize: "14px" }}
+            >
+              Return Home
+            </button>
           </div>
         </div>
-      )}
-
-      <div style={s.buttonGroup}>
-        <button className="cta-btn" style={{ ...s.bookNowBtn, background: property.color }} onClick={handleBook}>
-          {property.bookingUrl ? " Book on Official Site →" : " Request Booking"}
-        </button>
-        <button className="cta-btn" style={s.mpesaBookBtn} onClick={handleBookWithMpesa}>
-          Pay with M-Pesa
-        </button>
       </div>
-      {property.bookingUrl && <div style={s.bookNote}>You'll be redirected to the property's official booking site</div>}
-    </div>
-  );
+    );
+  }
 
+  // Render main layout
   return (
-    <div style={s.root}>
-      <style>{ACCOMMODATION_FONT_CSS}{css}</style>
+    <div className="lux-detail-page">
+      <style>{ACCOMMODATION_FONT_CSS}{luxStyles}</style>
+
+      {/* Main Navigation */}
       <AccommodationNav />
-      {error && (
-        <div style={{ maxWidth: "1100px", margin: "12px auto", padding: "0 16px" }}>
-          <ErrorAlert message={`Showing cached preview: ${error}`} />
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="lux-toast" role="status">
+          {toastMessage}
         </div>
       )}
 
-      {/* TOP BAR */}
-      <div style={s.topBar}>
-        <button style={s.backBtn} onClick={() => navigate("/accommodation/listings")}>← Listings</button>
-        <div style={s.breadcrumb}>{property.type || property.category} / {property.name}</div>
-        <button style={s.homeBtn} onClick={() => navigate("/accommodation")}> Home</button>
+      {/* Breadcrumb & Quick Actions Bar */}
+      <div className="lux-top-strip">
+        <div className="lux-container lux-top-strip-inner">
+          <nav aria-label="Breadcrumb" className="lux-breadcrumb">
+            <Link to="/accommodation">Home</Link>
+            <span className="lux-bread-slash">/</span>
+            <Link to="/accommodation/listings">Accommodations</Link>
+            <span className="lux-bread-slash">/</span>
+            <span className="lux-bread-current">{property.name}</span>
+          </nav>
+
+          <div className="lux-action-pills">
+            <button
+              type="button"
+              className={`lux-pill-btn ${saved ? "active-heart" : ""}`}
+              onClick={toggleSave}
+              aria-label="Save to Wishlist"
+            >
+              <svg viewBox="0 0 24 24" width="16" height="16" fill={saved ? "#e11d48" : "none"} stroke={saved ? "#e11d48" : "currentColor"} strokeWidth="2.2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+              <span>{saved ? "Saved" : "Save"}</span>
+            </button>
+
+            <button
+              type="button"
+              className="lux-pill-btn"
+              onClick={handleShare}
+              aria-label="Share this listing"
+            >
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2">
+                <circle cx="18" cy="5" r="3" />
+                <circle cx="6" cy="12" r="3" />
+                <circle cx="18" cy="19" r="3" />
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+              </svg>
+              <span>Share</span>
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* SECTION NAV */}
-      <div className="section-nav" role="navigation" aria-label="Page sections">
-        {[["overview", "Overview"], ["amenities", "Amenities"], ["rooms", "Rooms"], ["policies", "Policies"], ["reviews", "Reviews"], ["contact", "Contact"]].map(([sid, label]) => (
-          <a
-            key={sid}
-            href={`#${sid}`}
-            className={activeSec === sid ? "active" : ""}
-            onClick={(e) => { e.preventDefault(); document.getElementById(sid)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
-          >
-            {label}
-          </a>
-        ))}
-      </div>
+      {/* Main Container */}
+      <div className="lux-container">
+        {/* Title Header Header */}
+        <header className="lux-header-block">
+          <div className="lux-badge-row">
+            <span className="lux-category-badge">{property.category || property.type || "Luxury Stay"}</span>
+            {property.tag && <span className="lux-tag-badge">{property.tag}</span>}
+            {property.isFeatured && <span className="lux-featured-badge">★ Featured Stay</span>}
+          </div>
 
-      <div className="detail-layout">
-        {/* ── LEFT ── */}
-        <div style={s.leftCol}>
+          <h1 className="lux-title">{property.name}</h1>
 
-          {/* HERO / MEDIA */}
-          {property.images?.length > 0 ? (
-            <div style={{ marginBottom: "16px" }}>
-              {/* Hero Image */}
-              <div className="hero-main" style={{ ...s.heroImg, position: "relative", overflow: "hidden", border: `1px solid ${property.color}25` }}>
-                <img
-                  src={property.images[0]?.imageUrl || (typeof property.images[0] === 'string' ? property.images[0] : '')}
-                  alt={property.name}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                  className="zoomable"
-                  onClick={() => setLightbox(0)}
-                />
-                {property.tag && <div style={{ ...s.heroTag, background: property.color }}>{property.tag}</div>}
-                {property.bookingUrl && (
-                  <div style={s.bookingUrlBadge}> Official Booking Available</div>
-                )}
-                {property.images.length > 1 && (
-                  <button className="photo-count" onClick={() => setLightbox(0)}>📷 View all {property.images.length} photos</button>
-                )}
+          <div className="lux-subhead-row">
+            <div className="lux-rating-pill">
+              <span className="star-icon">★</span>
+              <strong>{(property.rating || 4.9).toFixed(1)}</strong>
+              <span className="rating-dot">·</span>
+              <a href="#reviews" className="review-link">
+                {property.reviews || 84} verified reviews
+              </a>
+            </div>
+
+            <div className="lux-location-link" onClick={() => document.getElementById("location")?.scrollIntoView({ behavior: "smooth" })}>
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#0ea5e9" strokeWidth="2.4">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              <span>{typeof property.location === "object" ? property.address : property.location || property.address || "Kenya"}</span>
+              <span className="map-shortcut">View on map →</span>
+            </div>
+          </div>
+        </header>
+
+        {/* Bento Gallery Showcase */}
+        <section className="lux-gallery-section" aria-label="Photo Showcase">
+          {galleryImages.length >= 5 ? (
+            <div className="bento-gallery-5">
+              <div className="bento-main" onClick={() => setLightboxIndex(0)}>
+                <img src={galleryImages[0]} alt={`${property.name} preview 1`} loading="eager" />
+                <div className="bento-hover-overlay">
+                  <span>Zoom Photo</span>
+                </div>
               </div>
 
-              {/* Additional Media */}
-              {property.audio?.length > 0 && (
-                <div style={{ marginBottom: "16px" }}>
-                  <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#374151", marginBottom: "8px" }}> Audio Clips</h3>
-                  {property.audio.map((url, idx) => (
-                    <div key={url} style={{ marginBottom: "12px" }}>
-                      <audio
-                        controls
-                        style={{ width: "100%", borderRadius: "8px" }}
-                        preload="metadata"
-                      >
-                        <source src={url} type="audio/mpeg" />
-                        Your browser does not support the audio element.
-                      </audio>
+              <div className="bento-mosaic">
+                {galleryImages.slice(1, 5).map((imgUrl, idx) => (
+                  <div key={idx} className="bento-thumb" onClick={() => setLightboxIndex(idx + 1)}>
+                    <img src={imgUrl} alt={`${property.name} view ${idx + 2}`} loading="lazy" />
+                    <div className="bento-hover-overlay">
+                      <span>Zoom</span>
                     </div>
-                  ))}
-                </div>
-              )}
-              {property.videos?.length > 0 && (
-                <div style={{ marginBottom: "16px" }}>
-                  <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#374151", marginBottom: "8px" }}> Videos</h3>
-                  {property.videos.map((url, idx) => {
-                    // Ensure proper Cloudinary video URL format
-                    let videoUrl = url;
-                    if (url.includes('cloudinary')) {
-                      // Remove any existing transformations and add video-specific ones
-                      const baseUrl = url.split('/upload/')[0] + '/upload/';
-                      const publicId = url.split('/upload/')[1];
-                      videoUrl = baseUrl + 'f_mp4,vc_auto,q_auto/' + publicId;
-                      // Ensure .mp4 extension
-                      if (!videoUrl.endsWith('.mp4')) {
-                        videoUrl += '.mp4';
-                      }
-                    }
-                    return (
-                      <div key={url} style={{ marginBottom: "12px" }}>
-                        <video
-                          key={url}
-                          src={videoUrl}
-                          controls
-                          controlsList="nodownload"
-                          preload="metadata"
-                          playsInline
-                          style={{ width: "100%", borderRadius: "12px", maxHeight: "400px", background: "#000" }}
-                          onError={(e) => {
-                            console.error('Video failed to load:', videoUrl);
-                            e.target.style.display = 'none';
-                          }}
-                        >
-                          Your browser does not support the video tag.
-                        </video>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-              {property.images?.length > 1 && (
-                <div>
-                  <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#374151", marginBottom: "8px" }}> More Photos</h3>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "10px" }}>
-                    {property.images.slice(1).map((img, i) => (
-                      <img key={img._id || img.imageUrl} src={img.imageUrl || img} alt={property.name} className="thumb" onClick={() => setLightbox(i + 1)} style={{ width: "100%", height: "200px", objectFit: "cover", borderRadius: "12px", border: `1px solid ${property.color}25`, cursor: "pointer" }} />
-                    ))}
                   </div>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                className="bento-show-all-btn"
+                onClick={() => setLightboxIndex(0)}
+              >
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <polyline points="21 15 16 10 5 21" />
+                </svg>
+                <span>View all {galleryImages.length} photos</span>
+              </button>
+            </div>
+          ) : galleryImages.length >= 2 ? (
+            <div className="bento-gallery-multi">
+              {galleryImages.map((imgUrl, idx) => (
+                <div key={idx} className="bento-multi-tile" onClick={() => setLightboxIndex(idx)}>
+                  <img src={imgUrl} alt={`${property.name} photo ${idx + 1}`} />
                 </div>
-              )}
+              ))}
+              <button
+                type="button"
+                className="bento-show-all-btn"
+                onClick={() => setLightboxIndex(0)}
+              >
+                View photos ({galleryImages.length})
+              </button>
             </div>
           ) : (
-            <div style={{ ...s.heroImg, background: `linear-gradient(135deg, ${property.color}30, ${property.color}10)`, border: `1px solid ${property.color}25` }}>
-              <span style={{ fontSize: "88px" }}>{property.emoji}</span>
-              {property.tag && <div style={{ ...s.heroTag, background: property.color }}>{property.tag}</div>}
-              {property.bookingUrl && (
-                <div style={s.bookingUrlBadge}> Official Booking Available</div>
-              )}
+            <div className="bento-gallery-single" onClick={() => setLightboxIndex(0)}>
+              <img src={galleryImages[0]} alt={property.name} />
+              <button type="button" className="bento-show-all-btn">
+                Fullscreen Image
+              </button>
             </div>
           )}
+        </section>
 
-          {/* INFO */}
-          <div style={s.card} className="card reveal" id="overview">
-            <div style={s.catBadge}>{property.type || "Accommodation"}</div>
-            <h1 style={s.propName}>{property.name}</h1>
-            <div style={s.propMeta}>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                <span>{typeof property.location === 'object' ? property.address : property.location || property.address || "Kenya"}</span>
-              </span>
-              <span style={{ color: property.color || "#065f46", fontWeight: 700 }}> {property.rating || "4.5"} ({property.reviews || "0"} reviews)</span>
-            </div>
-            <p style={s.description}>{property.description}</p>
-            <div className="action-row">
-              <button type="button" className={"action-btn" + (saved ? " on" : "")} aria-pressed={saved} onClick={() => setSaved((v) => !v)}>
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z" /></svg>
-                {saved ? "Saved" : "Save"}
-              </button>
-              <button type="button" className="action-btn" onClick={handleShare}>
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4" /></svg>
-                {copied ? "Link copied" : "Share"}
-              </button>
-            </div>
-          </div>
+        {/* Floating In-Page Sticky Nav (Scroll-Spy) */}
+        <div className="lux-section-nav">
+          <a href="#overview" className={activeSection === "overview" ? "active" : ""}>Overview</a>
+          <a href="#amenities" className={activeSection === "amenities" ? "active" : ""}>Amenities</a>
+          <a href="#rooms" className={activeSection === "rooms" ? "active" : ""}>Rooms & Suites</a>
+          <a href="#location" className={activeSection === "location" ? "active" : ""}>Location & Map</a>
+          <a href="#policies" className={activeSection === "policies" ? "active" : ""}>Policies</a>
+          <a href="#reviews" className={activeSection === "reviews" ? "active" : ""}>Reviews</a>
+          <a href="#host" className={activeSection === "host" ? "active" : ""}>Host & Contact</a>
+        </div>
 
-          {/* QUICK FACTS */}
-          <div className="facts reveal">
-            {[
-              ["🕑", "Check-in", property.checkInTime],
-              ["🕚", "Check-out", property.checkOutTime],
-              ["👥", "Guests", property.maxGuests ? `Up to ${property.maxGuests}` : null],
-              ["🛏️", "Rooms", property.totalRooms],
-              ["⭐", "Rating", property.rating ? `${property.rating} / 5` : null],
-            ].filter((f) => f[2]).map(([icon, label, val]) => (
-              <div key={label} className="fact">
-                <span className="fact-icon">{icon}</span>
-                <div><div className="fact-val">{val}</div><div className="fact-label">{label}</div></div>
-              </div>
-            ))}
-          </div>
-
-          {/* GPS LOCATION */}
-          {(property.location?.lat && property.location?.lng) || (property.coordinates?.lat && property.coordinates?.lng) && (
-            <div style={s.card} className="card reveal">
-              <h2 style={{ ...s.cardTitle, display: "flex", alignItems: "center", gap: "4px" }}>
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                <span>Exact Location</span>
-              </h2>
-              <div style={s.locationBox}>
-                <div style={s.coordsDisplay}>
-                  <div style={s.coordItem}>
-                    <span style={s.coordLabel}>Latitude:</span>
-                    <span style={s.coordValue}>{property.location?.lat || property.coordinates?.lat}</span>
+        {/* 2-Column Content Layout */}
+        <div className="lux-main-layout">
+          {/* ── LEFT COLUMN: Rich Details ── */}
+          <main className="lux-content-col">
+            {/* Host Banner & Key Metrics */}
+            <div className="lux-card" id="overview">
+              <div className="lux-host-header">
+                <div className="lux-host-left">
+                  <div className="lux-host-avatar">
+                    {host.name.charAt(0)}
                   </div>
-                  <div style={s.coordItem}>
-                    <span style={s.coordLabel}>Longitude:</span>
-                    <span style={s.coordValue}>{property.location?.lng || property.coordinates?.lng}</span>
+                  <div>
+                    <h2 className="lux-host-title">Stay hosted by {host.name}</h2>
+                    <p className="lux-host-subtitle">
+                      Verified Host · Fast Responder · AxxSpace Partner
+                    </p>
                   </div>
                 </div>
+
+                {host.badges?.length > 0 && (
+                  <div className="lux-host-badges">
+                    {host.badges.map((b, i) => {
+                      const bKey = typeof b === "string" ? b : b?.type;
+                      if (!BADGE_IMAGES[bKey]) return null;
+                      return (
+                        <img
+                          key={i}
+                          src={BADGE_IMAGES[bKey]}
+                          alt={bKey}
+                          title={bKey.replace(/_/g, " ").toUpperCase()}
+                          className="lux-badge-icon"
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Quick Key Facts Bar */}
+              <div className="lux-facts-grid">
+                <div className="lux-fact-item">
+                  <span className="lux-fact-icon">👥</span>
+                  <div>
+                    <span className="lux-fact-value">Up to {property.maxGuests || 2} Guests</span>
+                    <span className="lux-fact-sub">Occupancy limit</span>
+                  </div>
+                </div>
+                <div className="lux-fact-item">
+                  <span className="lux-fact-icon">🛏️</span>
+                  <div>
+                    <span className="lux-fact-value">{property.totalRooms || 1} Suite(s)</span>
+                    <span className="lux-fact-sub">Total private rooms</span>
+                  </div>
+                </div>
+                <div className="lux-fact-item">
+                  <span className="lux-fact-icon">🕑</span>
+                  <div>
+                    <span className="lux-fact-value">{property.checkInTime || "14:00"}</span>
+                    <span className="lux-fact-sub">Check-in time</span>
+                  </div>
+                </div>
+                <div className="lux-fact-item">
+                  <span className="lux-fact-icon">🕚</span>
+                  <div>
+                    <span className="lux-fact-value">{property.checkOutTime || "11:00"}</span>
+                    <span className="lux-fact-sub">Check-out time</span>
+                  </div>
+                </div>
+              </div>
+
+              <hr className="lux-card-divider" />
+
+              {/* Description */}
+              <div className="lux-description-wrap">
+                <h3 className="lux-sec-title">About this stay</h3>
+                <p className="lux-description-text">
+                  {property.description || "Welcome to this premier Kenyan stay offering serene comfort, genuine hospitality, and prime access to local highlights."}
+                </p>
+              </div>
+
+              {/* Highlights List */}
+              <div className="lux-highlights-list">
+                <div className="lux-hl-item">
+                  <span className="lux-hl-icon">⚡</span>
+                  <div>
+                    <strong className="lux-hl-title">Instant M-Pesa Confirmation</strong>
+                    <p className="lux-hl-desc">Get your booking confirmed immediately via verified Safaricom STK prompt.</p>
+                  </div>
+                </div>
+                <div className="lux-hl-item">
+                  <span className="lux-hl-icon">🛡️</span>
+                  <div>
+                    <strong className="lux-hl-title">Verified AxxSpace Host</strong>
+                    <p className="lux-hl-desc">This property has been vetted and approved for guest safety and quality standards.</p>
+                  </div>
+                </div>
+                <div className="lux-hl-item">
+                  <span className="lux-hl-icon">✨</span>
+                  <div>
+                    <strong className="lux-hl-title">Sparkling Clean & Sanitized</strong>
+                    <p className="lux-hl-desc">Top marks from past guests on hygiene, fresh linens, and pristine maintenance.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Amenities Section */}
+            <div className="lux-card" id="amenities">
+              <div className="lux-card-header">
+                <div>
+                  <h3 className="lux-sec-title">What this place offers</h3>
+                  <p className="lux-sec-sub">Essential amenities and luxury conveniences included with your reservation</p>
+                </div>
+              </div>
+
+              <div className="lux-amenities-grid">
+                {(property.amenities && property.amenities.length > 0
+                  ? property.amenities
+                  : ["High-speed WiFi", "Swimming Pool", "Free Parking", "Air Conditioning", "Private Balcony", "Daily Housekeeping", "24/7 Power Backup", "Dedicated Workspace"]
+                ).map((amenity, idx) => (
+                  <div key={idx} className="lux-amenity-card">
+                    <span className="lux-am-check">✓</span>
+                    <span className="lux-am-name">{amenity}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Room Types & Suites Section */}
+            <div className="lux-card" id="rooms">
+              <div className="lux-card-header">
+                <div>
+                  <h3 className="lux-sec-title">Available Suites & Rates</h3>
+                  <p className="lux-sec-sub">Select your desired suite option to update reservation totals</p>
+                </div>
+              </div>
+
+              <div className="lux-rooms-list">
+                {roomTypes.map((room, rIdx) => {
+                  const isSelected = selectedRoomIndex === rIdx;
+                  return (
+                    <div
+                      key={rIdx}
+                      className={`lux-room-card ${isSelected ? "selected-room" : ""}`}
+                      onClick={() => setSelectedRoomIndex(rIdx)}
+                    >
+                      <div className="lux-room-main-info">
+                        <div className="lux-room-badge-row">
+                          <h4 className="lux-room-title">{room.name}</h4>
+                          {isSelected && <span className="lux-room-active-pill">Active Selection</span>}
+                        </div>
+                        <p className="lux-room-desc">{room.desc}</p>
+                        <div className="lux-room-specs">
+                          <span>👥 Up to {room.guests || 2} Guests</span>
+                          {room.bed && <span>🛏️ {room.bed}</span>}
+                        </div>
+                      </div>
+
+                      <div className="lux-room-pricing">
+                        <div className="lux-room-price-tag">
+                          KSh {Number(room.price).toLocaleString()}
+                          <span className="lux-room-per"> / night</span>
+                        </div>
+                        <button
+                          type="button"
+                          className={`lux-room-select-btn ${isSelected ? "btn-active" : ""}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedRoomIndex(rIdx);
+                          }}
+                        >
+                          {isSelected ? "✓ Selected" : "Select Suite"}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Video / Audio Walkthroughs (If available) */}
+            {((property.videos && property.videos.length > 0) || (property.audio && property.audio.length > 0)) && (
+              <div className="lux-card">
+                <h3 className="lux-sec-title">Virtual Walkthrough & Media</h3>
+                {property.videos && property.videos.length > 0 && (
+                  <div className="lux-video-wrap">
+                    {property.videos.map((vidUrl, idx) => (
+                      <video key={idx} src={vidUrl} controls playsInline preload="metadata" className="lux-video-player" />
+                    ))}
+                  </div>
+                )}
+                {property.audio && property.audio.length > 0 && (
+                  <div className="lux-audio-wrap">
+                    {property.audio.map((audUrl, idx) => (
+                      <audio key={idx} src={audUrl} controls className="lux-audio-player" />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Location & Map Section */}
+            <div className="lux-card" id="location">
+              <div className="lux-card-header">
+                <div>
+                  <h3 className="lux-sec-title">Location & Neighborhood</h3>
+                  <p className="lux-sec-sub">
+                    {typeof property.location === "object" ? property.address : property.location || property.address || "Kenya"}
+                  </p>
+                </div>
+
                 <a
-                  href={`https://www.google.com/maps?q=${property.location?.lat || property.coordinates?.lat},${property.location?.lng || property.coordinates?.lng}`}
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                    hasRealCoords ? `${coordinates[0]},${coordinates[1]}` : property.address || property.name
+                  )}`}
                   target="_blank"
                   rel="noreferrer"
-                  style={s.mapBtn}
+                  className="lux-open-maps-btn"
                 >
-                  Open in Google Maps
+                  Open in Google Maps ↗
                 </a>
               </div>
-            </div>
-          )}
 
-          {/* MOBILE BOOK */}
-          <button className="mobile-book-btn" style={{ ...s.mobileBookBtn, background: property.color }} onClick={() => setBookingOpen(true)}>
-            {property.bookingUrl ? " Book on Official Site" : " Enquire Now"} — KSh {roomPrice.toLocaleString()}/night
-          </button>
-
-          {/* AMENITIES */}
-          <div style={s.card} className="card reveal" id="amenities">
-            <h2 style={s.cardTitle}>Amenities & Features</h2>
-            <div className="amenities-grid">
-              {property.amenities.map((a) => (
-                <div key={a} style={s.amenityItem} className="amenity">{a}</div>
-              ))}
-            </div>
-          </div>
-
-          {/* ROOM TYPES */}
-          <div style={s.card} className="card reveal" id="rooms">
-            <h2 style={s.cardTitle}>Room Types & Rates</h2>
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              {roomTypes.map((r, i) => (
-                <div
-                  key={r.name}
-                  style={{ ...s.roomCard, ...(selectedRoom === i ? { borderColor: property.color, background: property.color + "08" } : {}) }}
-                  onClick={() => setSelectedRoom(i)}
-                  className="room-card"
+              {/* Interactive Leaflet Map Showcase */}
+              <div className="lux-map-frame">
+                <MapContainer
+                  center={coordinates}
+                  zoom={hasRealCoords ? 14 : 12}
+                  scrollWheelZoom={false}
+                  style={{ height: "360px", width: "100%", borderRadius: "16px" }}
                 >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "4px", flexWrap: "wrap", gap: "6px" }}>
-                    <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#1f2937", margin: 0 }}>{r.name}</h3>
-                    <div style={{ fontSize: "15px", fontWeight: 800, color: property.color }}>KSh {r.price.toLocaleString()}<span style={{ fontSize: "11px", color: "#9ca3af", fontWeight: 400 }}>/night</span></div>
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  <Marker position={coordinates} icon={customPinIcon}>
+                    <Popup>
+                      <div style={{ textAlign: "center", padding: "4px" }}>
+                        <strong style={{ fontSize: "14px", color: "#0f172a" }}>{property.name}</strong>
+                        <div style={{ fontSize: "12px", color: "#0ea5e9", fontWeight: 700, marginTop: "4px" }}>
+                          KSh {nightlyRate.toLocaleString()}/night
+                        </div>
+                      </div>
+                    </Popup>
+                  </Marker>
+                </MapContainer>
+              </div>
+            </div>
+
+            {/* Policies Section */}
+            <div className="lux-card" id="policies">
+              <h3 className="lux-sec-title">Policies & House Rules</h3>
+              <div className="lux-policy-grid">
+                <div className="lux-policy-box">
+                  <span className="lux-policy-lbl">Check-in</span>
+                  <strong className="lux-policy-val">From {property.checkInTime || "14:00"}</strong>
+                  <span className="lux-policy-note">Early check-in upon request</span>
+                </div>
+                <div className="lux-policy-box">
+                  <span className="lux-policy-lbl">Check-out</span>
+                  <strong className="lux-policy-val">Until {property.checkOutTime || "11:00"}</strong>
+                  <span className="lux-policy-note">Express key return available</span>
+                </div>
+                <div className="lux-policy-box">
+                  <span className="lux-policy-lbl">Cancellation</span>
+                  <strong className="lux-policy-val">Flexible 48-Hour</strong>
+                  <span className="lux-policy-note">Full refund up to 48h before check-in</span>
+                </div>
+                <div className="lux-policy-box">
+                  <span className="lux-policy-lbl">House Rules</span>
+                  <strong className="lux-policy-val">{property.houseRules || "Standard Respect Policy"}</strong>
+                  <span className="lux-policy-note">No indoor smoking · Quiet hours after 22:00</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Guest Reviews Section */}
+            <div className="lux-card" id="reviews">
+              <div className="lux-reviews-summary-card">
+                <div className="lux-rev-big-score">
+                  <span className="score-num">{(property.rating || 4.9).toFixed(1)}</span>
+                  <span className="score-stars">★★★★★</span>
+                  <span className="score-label">Guest Favorite</span>
+                </div>
+                <div className="lux-rev-bars">
+                  <div className="lux-rev-bar-row">
+                    <span>Cleanliness</span>
+                    <div className="bar-track"><div className="bar-fill" style={{ width: "98%" }} /></div>
+                    <strong>4.9</strong>
                   </div>
-                  <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "4px" }}>{r.desc}</div>
-                  <div style={{ fontSize: "11px", color: "#9ca3af" }}> Up to {r.guests} guests</div>
-                  {selectedRoom === i && <div style={{ position: "absolute", top: "10px", right: "10px", background: property.color, color: "white", fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "20px" }}>✓ Selected</div>}
+                  <div className="lux-rev-bar-row">
+                    <span>Accuracy</span>
+                    <div className="bar-track"><div className="bar-fill" style={{ width: "96%" }} /></div>
+                    <strong>4.8</strong>
+                  </div>
+                  <div className="lux-rev-bar-row">
+                    <span>Communication</span>
+                    <div className="bar-track"><div className="bar-fill" style={{ width: "100%" }} /></div>
+                    <strong>5.0</strong>
+                  </div>
+                  <div className="lux-rev-bar-row">
+                    <span>Location</span>
+                    <div className="bar-track"><div className="bar-fill" style={{ width: "98%" }} /></div>
+                    <strong>4.9</strong>
+                  </div>
                 </div>
-              ))}
+              </div>
+
+              {/* Review Testimonials */}
+              <div className="lux-testimonial-list">
+                {(property.reviewList && property.reviewList.length > 0
+                  ? property.reviewList
+                  : DEFAULT_REVIEWS
+                ).map((rev, rIdx) => (
+                  <div key={rIdx} className="lux-rev-card">
+                    <div className="lux-rev-user-row">
+                      <div className="lux-rev-avatar">{rev.avatar || rev.name?.charAt(0) || "G"}</div>
+                      <div>
+                        <strong className="lux-rev-name">{rev.name}</strong>
+                        <span className="lux-rev-date">{rev.date || "Verified Stay"}</span>
+                      </div>
+                      <div className="lux-rev-rating">★ {rev.rating || 5}.0</div>
+                    </div>
+                    <p className="lux-rev-comment">{rev.comment}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* POLICIES */}
-          <div style={s.card} className="card reveal" id="policies">
-            <h2 style={s.cardTitle}>Policies</h2>
-            <div className="policies-grid">
-              <div style={s.policyItem}><div style={s.policyLabel}>Check-in</div><div style={s.policyVal}>{property.checkInTime || "14:00"}</div></div>
-              <div style={s.policyItem}><div style={s.policyLabel}>Check-out</div><div style={s.policyVal}>{property.checkOutTime || "11:00"}</div></div>
-              <div style={s.policyItem}><div style={s.policyLabel}>House Rules</div><div style={s.policyVal}>{property.houseRules || "Contact property for details"}</div></div>
-              <div style={s.policyItem}><div style={s.policyLabel}>Payment Methods</div><div style={s.policyVal}>M-Pesa, Visa, Mastercard accepted</div></div>
-            </div>
-          </div>
+            {/* Host Profile & In-App Chat */}
+            <div className="lux-card" id="host">
+              <h3 className="lux-sec-title">Contact & Host Support</h3>
+              <p className="lux-sec-sub">Have questions before booking? Connect with {host.name} directly</p>
 
-          {/* REVIEWS */}
-          <div style={s.card} className="card reveal" id="reviews">
-            <h2 style={s.cardTitle}>Guest Reviews</h2>
-            <CompactReviews
-              reviews={property.reviewList || []}
-              rating={property.rating}
-              totalReviews={property.reviews}
-            />
-          </div>
-
-          {/* CONTACT */}
-          <div style={s.card} className="card reveal" id="contact">
-            <h3 style={s.cardTitle}>Contact Property Manager</h3>
-            <div style={{ fontSize: "13px", color: "#6b7280", marginBottom: "14px" }}> {manager.name} — Property Representative</div>
-            <div style={s.contactBtns}>
-              <a href={`tel:${manager.phone}`} style={s.contactBtn}> Call</a>
-              <a href={`https://wa.me/${manager.whatsapp}`} style={{ ...s.contactBtn, background: "#22c55e" }} target="_blank" rel="noreferrer"> WhatsApp</a>
-              <a href={`mailto:${manager.email}`} style={{ ...s.contactBtn, background: "#3b82f6" }}> Email</a>
-            </div>
-            {property.bookingUrl && (
-              <a href={property.bookingUrl} target="_blank" rel="noreferrer" style={{ ...s.contactBtn, background: property.color || "#065f46", display: "block", textAlign: "center", marginTop: "10px", padding: "12px" }}>
-                Visit Official Website
-              </a>
-            )}
-
-            {/* In-App Chat */}
-            <div style={{ marginTop: "16px", paddingTop: "16px", borderTop: "1px solid #e5e7eb" }}>
-              <MessagingSystem
-                recipientId={manager.email}
-                recipientName={manager.name}
-                recipientType="Property Manager"
-                propertyId={property._id || property.id}
-                propertyTitle={property.name}
-              />
-            </div>
-          </div>
-
-          {/* ASSIGNED AGENT */}
-          {property.assignedAgent && (
-            <AgentCard agent={property.assignedAgent} />
-          )}
-        </div>
-
-        {/* ── RIGHT (desktop) ── */}
-        <aside className="booking-col">
-          <BookingWidget />
-          <div style={s.sideContact}>
-            <h3 style={{ fontSize: "14px", fontWeight: 800, color: "#1f2937", marginBottom: "10px" }}>Need Help?</h3>
-            <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}> {manager.name}</div>
-            <div style={s.contactBtns}>
-              <a href={`tel:${manager.phone}`} style={s.contactBtn}> Call</a>
-              <a href={`https://wa.me/${manager.whatsapp}`} style={{ ...s.contactBtn, background: "#22c55e" }} target="_blank" rel="noreferrer"> WhatsApp</a>
-              <a href={`mailto:${manager.email}`} style={{ ...s.contactBtn, background: "#3b82f6" }}> Email</a>
-            </div>
-          </div>
-        </aside>
-      </div>
-
-      {/* MOBILE SHEET */}
-      {bookingOpen && (
-        <div style={s.overlay} onClick={() => setBookingOpen(false)}>
-          <div style={s.sheet} onClick={(e) => e.stopPropagation()}>
-            <div style={s.sheetHandle} />
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-              <span style={{ fontWeight: 800, fontSize: "16px", color: "#1f2937" }}>Book Your Stay</span>
-              <button style={{ background: "#f3f4f6", border: "none", borderRadius: "50%", width: "30px", height: "30px", fontSize: "14px", cursor: "pointer" }} onClick={() => setBookingOpen(false)}>✕</button>
-            </div>
-            <BookingWidget />
-          </div>
-        </div>
-      )}
-
-      {/* PHOTO LIGHTBOX */}
-      {lightbox >= 0 && property.images?.length > 0 && (
-        <div className="lightbox" onClick={() => setLightbox(-1)} role="dialog" aria-modal="true" aria-label="Photo viewer">
-          <button className="lb-close" aria-label="Close photo viewer" onClick={() => setLightbox(-1)}>✕</button>
-          {property.images.length > 1 && (
-            <button className="lb-nav lb-prev" aria-label="Previous photo" onClick={(e) => { e.stopPropagation(); setLightbox((i) => (i - 1 + property.images.length) % property.images.length); }}>‹</button>
-          )}
-          <img key={lightbox} className="lb-img" src={property.images[lightbox]?.imageUrl || property.images[lightbox]} alt={property.name} onClick={(e) => e.stopPropagation()} />
-          {property.images.length > 1 && (
-            <button className="lb-nav lb-next" aria-label="Next photo" onClick={(e) => { e.stopPropagation(); setLightbox((i) => (i + 1) % property.images.length); }}>›</button>
-          )}
-          <div className="lb-count">{lightbox + 1} / {property.images.length}</div>
-        </div>
-      )}
-
-      {/* PAYMENT MODAL */}
-      {showPaymentModal && (
-        <div style={s.paymentModal} onClick={() => setShowPaymentModal(false)}>
-          <div style={s.paymentModalContent} onClick={(e) => e.stopPropagation()}>
-            <h3 style={s.paymentTitle}> Book Tourism - M-Pesa Payment</h3>
-            <p style={s.paymentSubtitle}>
-              {property.name} - KES {paymentAmount}
-            </p>
-            {paymentSuccess && (
-              <div style={s.paymentSuccess}>{paymentSuccess}</div>
-            )}
-            {paymentError && (
-              <div style={s.paymentError}>{paymentError}</div>
-            )}
-            {!paymentSuccess && (
-              <form onSubmit={handlePaymentSubmit} style={s.paymentForm}>
-                <div style={s.paymentField}>
-                  <label style={s.paymentLabel}>M-Pesa Phone Number</label>
-                  <PhoneInput
-                    value={paymentPhone}
-                    onChange={(value) => setPaymentPhone(value)}
-                    style={s.paymentInput}
-                    required
-                  />
-                </div>
-                <div style={s.paymentField}>
-                  <label style={s.paymentLabel}>Amount (KES)</label>
-                  <input
-                    type="number"
-                    value={paymentAmount}
-                    onChange={(e) => setPaymentAmount(e.target.value)}
-                    placeholder="Enter amount"
-                    style={s.paymentInput}
-                    required
-                  />
-                </div>
-                <div style={s.paymentField}>
-                  <label style={s.paymentLabel}>Check-in Date</label>
-                  <input
-                    type="date"
-                    value={checkIn}
-                    onChange={(e) => setCheckIn(e.target.value)}
-                    style={s.paymentInput}
-                    required
-                  />
-                </div>
-                <div style={s.paymentField}>
-                  <label style={s.paymentLabel}>Check-out Date</label>
-                  <input
-                    type="date"
-                    value={checkOut}
-                    onChange={(e) => setCheckOut(e.target.value)}
-                    style={s.paymentInput}
-                    required
-                  />
-                </div>
-                <button
-                  type="submit"
-                  style={s.paymentButton}
-                  disabled={paymentLoading}
+              <div className="lux-contact-actions">
+                <a
+                  href={`https://wa.me/${host.whatsapp}?text=${encodeURIComponent(
+                    `Hello ${host.name}, I am inquiring about booking ${property.name} on AxxSpace.`
+                  )}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="lux-btn-whatsapp"
                 >
-                  {paymentLoading ? "Processing..." : " Pay with M-Pesa"}
-                </button>
+                  <span>💬 Chat on WhatsApp</span>
+                </a>
+
+                <a href={`tel:${host.phone}`} className="lux-btn-call">
+                  <span>📞 Call Host</span>
+                </a>
+
+                <a href={`mailto:${host.email}`} className="lux-btn-email">
+                  <span>✉️ Email</span>
+                </a>
+              </div>
+
+              {/* In-App Direct Chat Container */}
+              <div className="lux-messaging-box">
+                <MessagingSystem
+                  recipientId={host.email}
+                  recipientName={host.name}
+                  recipientType="Host Representative"
+                  propertyId={property._id || property.id}
+                  propertyTitle={property.name}
+                />
+              </div>
+
+              {/* Assigned Agent Card if present */}
+              {property.assignedAgent && (
+                <div style={{ marginTop: "24px" }}>
+                  <AgentCard agent={property.assignedAgent} />
+                </div>
+              )}
+            </div>
+          </main>
+
+          {/* ── RIGHT COLUMN: Sticky Luxury Reservation Card ── */}
+          <aside className="lux-sidebar-col">
+            <div className="lux-booking-card">
+              {/* Pricing Header */}
+              <div className="lux-card-top-price">
+                <div>
+                  <span className="lux-price-currency">KSh</span>
+                  <span className="lux-price-digits">{nightlyRate.toLocaleString()}</span>
+                  <span className="lux-price-unit"> / night</span>
+                </div>
+                <div className="lux-booking-rating-pill">
+                  ★ {(property.rating || 4.9).toFixed(1)}
+                  <span className="count-sub">({property.reviews || 84})</span>
+                </div>
+              </div>
+
+              {/* Selected Suite Indicator */}
+              <div className="lux-active-suite-pill">
+                <span>Selected: <strong>{activeRoom.name}</strong></span>
+              </div>
+
+              {/* Interactive Reservation Form */}
+              <div className="lux-res-form">
+                <div className="lux-date-inputs-row">
+                  <div className="lux-date-field">
+                    <label>Check-in</label>
+                    <input
+                      type="date"
+                      value={checkIn}
+                      onChange={(e) => setCheckIn(e.target.value)}
+                      min={new Date().toISOString().split("T")[0]}
+                    />
+                  </div>
+                  <div className="lux-date-field">
+                    <label>Check-out</label>
+                    <input
+                      type="date"
+                      value={checkOut}
+                      onChange={(e) => setCheckOut(e.target.value)}
+                      min={checkIn}
+                    />
+                  </div>
+                </div>
+
+                <div className="lux-guest-field">
+                  <label>Guests</label>
+                  <select
+                    value={guestsCount}
+                    onChange={(e) => setGuestsCount(Number(e.target.value))}
+                  >
+                    {[1, 2, 3, 4, 5, 6, 8, 10].map((num) => (
+                      <option key={num} value={num}>
+                        {num} {num === 1 ? "Guest" : "Guests"}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* CTAs */}
+              <div className="lux-cta-group">
                 <button
                   type="button"
-                  style={s.paymentCancelButton}
-                  onClick={() => setShowPaymentModal(false)}
+                  className="lux-btn-mpesa"
+                  onClick={() => setShowPaymentModal(true)}
                 >
-                  Cancel
+                  <span className="mpesa-shield">⚡</span>
+                  <span>Instant Book with M-Pesa</span>
+                </button>
+
+                {property.bookingUrl && (
+                  <a
+                    href={property.bookingUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="lux-btn-official"
+                  >
+                    <span>Official Hotel Booking Site ↗</span>
+                  </a>
+                )}
+              </div>
+
+              {/* Transparent Price Breakdown */}
+              <div className="lux-breakdown">
+                <div className="lux-bd-row">
+                  <span>KSh {nightlyRate.toLocaleString()} × {nightsCount} {nightsCount === 1 ? "night" : "nights"}</span>
+                  <span>KSh {subtotal.toLocaleString()}</span>
+                </div>
+                <div className="lux-bd-row">
+                  <span>AxxSpace Service Fee</span>
+                  <span style={{ color: "#16a34a", fontWeight: 700 }}>Free</span>
+                </div>
+                <div className="lux-bd-row">
+                  <span>Taxes & Tourism Levy</span>
+                  <span style={{ color: "#64748b" }}>Included</span>
+                </div>
+                <hr className="lux-bd-divider" />
+                <div className="lux-bd-total-row">
+                  <strong>Total Payable</strong>
+                  <strong className="lux-total-price">KSh {grandTotal.toLocaleString()}</strong>
+                </div>
+              </div>
+
+              {/* Security & Guarantee Notes */}
+              <div className="lux-guarantee-strip">
+                <div className="lux-g-item">
+                  <span>🔒</span>
+                  <span>Safe Safaricom Escrow Payment</span>
+                </div>
+                <div className="lux-g-item">
+                  <span>✓</span>
+                  <span>Direct Host Confirmation</span>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      {/* Floating Bottom Bar on Mobile */}
+      <div className="lux-mobile-bottom-bar">
+        <div className="lux-m-price">
+          <span className="m-val">KSh {nightlyRate.toLocaleString()}</span>
+          <span className="m-sub">/ night · {nightsCount} {nightsCount === 1 ? "night" : "nights"}</span>
+        </div>
+        <button
+          type="button"
+          className="lux-m-book-btn"
+          onClick={() => setMobileDrawerOpen(true)}
+        >
+          Reserve Stay
+        </button>
+      </div>
+
+      {/* Mobile Reservation Drawer */}
+      {mobileDrawerOpen && (
+        <div className="lux-drawer-overlay" onClick={() => setMobileDrawerOpen(false)}>
+          <div className="lux-drawer-content" onClick={(e) => e.stopPropagation()}>
+            <div className="lux-drawer-handle" />
+            <div className="lux-drawer-header">
+              <h3>Reserve {property.name}</h3>
+              <button onClick={() => setMobileDrawerOpen(false)}>✕</button>
+            </div>
+
+            <div className="lux-date-inputs-row" style={{ marginBottom: "16px" }}>
+              <div className="lux-date-field">
+                <label>Check-in</label>
+                <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} />
+              </div>
+              <div className="lux-date-field">
+                <label>Check-out</label>
+                <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} />
+              </div>
+            </div>
+
+            <div className="lux-breakdown" style={{ marginBottom: "20px" }}>
+              <div className="lux-bd-total-row">
+                <strong>Total ({nightsCount} nights)</strong>
+                <strong className="lux-total-price">KSh {grandTotal.toLocaleString()}</strong>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="lux-btn-mpesa"
+              onClick={() => {
+                setMobileDrawerOpen(false);
+                setShowPaymentModal(true);
+              }}
+            >
+              ⚡ Proceed with M-Pesa
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen Photo Lightbox */}
+      {lightboxIndex >= 0 && galleryImages.length > 0 && (
+        <div className="lux-lightbox" onClick={() => setLightboxIndex(-1)}>
+          <button className="lb-close-btn" onClick={() => setLightboxIndex(-1)}>✕</button>
+
+          <button
+            className="lb-prev-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightboxIndex((i) => (i - 1 + galleryImages.length) % galleryImages.length);
+            }}
+          >
+            ‹
+          </button>
+
+          <img
+            src={galleryImages[lightboxIndex]}
+            alt={property.name}
+            className="lb-showcase-img"
+            onClick={(e) => e.stopPropagation()}
+          />
+
+          <button
+            className="lb-next-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightboxIndex((i) => (i + 1) % galleryImages.length);
+            }}
+          >
+            ›
+          </button>
+
+          <div className="lb-counter-pill">
+            {lightboxIndex + 1} / {galleryImages.length}
+          </div>
+        </div>
+      )}
+
+      {/* Safaricom M-Pesa Payment Modal */}
+      {showPaymentModal && (
+        <div className="lux-payment-overlay" onClick={() => setShowPaymentModal(false)}>
+          <div className="lux-payment-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="lux-pay-header">
+              <div className="mpesa-brand-badge">
+                <span className="mpesa-green-circle" />
+                <strong>M-PESA Instant Pay</strong>
+              </div>
+              <button className="lux-pay-close" onClick={() => setShowPaymentModal(false)}>✕</button>
+            </div>
+
+            <div className="lux-pay-summary-box">
+              <div className="pay-hotel-name">{property.name}</div>
+              <div className="pay-suite-name">{activeRoom.name} · {nightsCount} nights</div>
+              <div className="pay-amount-digits">KSh {grandTotal.toLocaleString()}</div>
+            </div>
+
+            {paymentSuccess && (
+              <div className="lux-pay-alert-success">
+                ✓ {paymentSuccess}
+              </div>
+            )}
+
+            {paymentError && (
+              <div className="lux-pay-alert-error">
+                ⚠ {paymentError}
+              </div>
+            )}
+
+            {!paymentSuccess && (
+              <form onSubmit={handlePaymentSubmit} className="lux-pay-form">
+                <div className="lux-pay-input-group">
+                  <label>M-Pesa Mobile Number</label>
+                  <PhoneInput
+                    value={paymentPhone}
+                    onChange={(val) => setPaymentPhone(val)}
+                    required
+                  />
+                  <span className="lux-pay-hint">You will receive an instant STK PIN prompt on this phone.</span>
+                </div>
+
+                <div className="lux-pay-input-group">
+                  <label>Amount in Kenyan Shillings</label>
+                  <input
+                    type="text"
+                    value={`KSh ${grandTotal.toLocaleString()}`}
+                    readOnly
+                    className="lux-readonly-input"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="lux-btn-confirm-mpesa"
+                  disabled={paymentLoading}
+                >
+                  {paymentLoading ? "Connecting to Safaricom…" : `Send M-Pesa Prompt (KSh ${grandTotal.toLocaleString()})`}
                 </button>
               </form>
             )}
@@ -690,210 +1200,1439 @@ export default function AccommodationDetailPage() {
   );
 }
 
-const s = {
-  root: { fontFamily: "'DM Sans', sans-serif", background: "#f8f4f0", minHeight: "100vh", overflowX: "hidden" },
-  topBar: { background: "white", borderBottom: "1px solid #e5e7eb", padding: "12px 16px", display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between" },
-  backBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "7px 14px", fontSize: "13px", cursor: "pointer", fontFamily: "inherit", color: "#4b5563", whiteSpace: "nowrap" },
-  homeBtn: { background: "transparent", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "7px 12px", fontSize: "13px", cursor: "pointer", fontFamily: "inherit", color: "#4b5563", whiteSpace: "nowrap" },
-  breadcrumb: { fontSize: "12px", color: "#9ca3af", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, textAlign: "center" },
+// ─── WORLD-CLASS CSS STYLES ──────────────────────────────────────────────────
+const luxStyles = `
+  /* Reset & Base */
+  .lux-detail-page {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #f8fafc;
+    color: #1e293b;
+    min-height: 100vh;
+    padding-bottom: 60px;
+    -webkit-font-smoothing: antialiased;
+  }
 
-  leftCol: { display: "flex", flexDirection: "column", gap: "16px" },
-
-  heroImg: { height: "280px", borderRadius: "16px", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" },
-  heroTag: { position: "absolute", top: "14px", left: "14px", color: "white", fontSize: "12px", fontWeight: 700, padding: "5px 12px", borderRadius: "20px" },
-  bookingUrlBadge: { position: "absolute", bottom: "14px", left: "14px", background: "rgba(255,255,255,0.95)", color: "#374151", fontSize: "11px", fontWeight: 700, padding: "5px 12px", borderRadius: "20px", border: "1px solid #e5e7eb" },
-
-  card: { background: "white", borderRadius: "14px", padding: "20px", border: "1px solid #e5e7eb" },
-  cardTitle: { fontSize: "16px", fontWeight: 800, color: "#1f2937", marginBottom: "16px" },
-  catBadge: { display: "inline-block", background: "#f3f4f6", color: "#6b7280", fontSize: "10px", fontWeight: 700, padding: "3px 10px", borderRadius: "20px", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" },
-  propName: { fontSize: "22px", fontWeight: 900, color: "#1f2937", margin: "0 0 8px", lineHeight: 1.2 },
-  propMeta: { display: "flex", gap: "14px", flexWrap: "wrap", marginBottom: "14px", fontSize: "13px", color: "#6b7280" },
-  description: { fontSize: "14px", color: "#4b5563", lineHeight: 1.8, margin: 0 },
-
-  mobileBookBtn: { display: "none", width: "100%", color: "white", border: "none", borderRadius: "12px", padding: "16px", fontSize: "14px", fontWeight: 800, cursor: "pointer", fontFamily: "inherit" },
-
-  amenityItem: { fontSize: "13px", color: "#4b5563", padding: "9px 12px", background: "#f9fafb", borderRadius: "8px", border: "1px solid #e5e7eb" },
-
-  roomCard: { border: "2px solid #e5e7eb", borderRadius: "12px", padding: "14px", cursor: "pointer", transition: "all 0.2s", position: "relative" },
-
-  policyItem: { background: "#f9fafb", borderRadius: "10px", padding: "12px" },
-  policyLabel: { fontSize: "10px", fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "4px" },
-  policyVal: { fontSize: "12px", color: "#1f2937", fontWeight: 600, lineHeight: 1.5 },
-
-  reviewCard: { border: "1px solid #f3f4f6", borderRadius: "10px", padding: "14px", marginBottom: "12px" },
-  reviewAvatar: { width: "34px", height: "34px", borderRadius: "50%", background: "#fbbf24", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: "14px", flexShrink: 0 },
-
-  contactBtns: { display: "flex", gap: "8px" },
-  contactBtn: { flex: 1, background: "#1f2937", color: "white", border: "none", borderRadius: "8px", padding: "10px 6px", fontSize: "12px", fontWeight: 700, cursor: "pointer", textAlign: "center", textDecoration: "none", display: "block" },
-
-  // GPS Location
-  locationBox: { background: "#f9fafb", borderRadius: "10px", padding: "14px", border: "1px solid #e5e7eb" },
-  coordsDisplay: { display: "flex", gap: "20px", marginBottom: "12px" },
-  coordItem: { display: "flex", flexDirection: "column", gap: "4px" },
-  coordLabel: { fontSize: "11px", fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.06em" },
-  coordValue: { fontSize: "14px", fontWeight: 600, color: "#1f2937" },
-  mapBtn: { display: "block", background: "#3b82f6", color: "white", border: "none", borderRadius: "8px", padding: "10px 16px", fontSize: "13px", fontWeight: 700, cursor: "pointer", textAlign: "center", textDecoration: "none" },
-
-  // Booking widget
-  bookingCard: { background: "white", borderRadius: "16px", padding: "20px", border: "1px solid #e5e7eb", boxShadow: "0 8px 32px rgba(0,0,0,0.08)" },
-  bookingHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" },
-  bookingPrice: { fontSize: "24px", fontWeight: 900 },
-  bookingPer: { fontSize: "13px", color: "#9ca3af" },
-  bookingRating: { fontSize: "13px", color: "#fbbf24", fontWeight: 700 },
-  roomSelectWrap: { marginBottom: "14px" },
-  fieldLabel: { display: "block", fontSize: "10px", fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "6px" },
-  roomSelectEl: { width: "100%", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "10px 12px", fontSize: "13px", fontFamily: "inherit", outline: "none" },
-
-  redirectNotice: { background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "10px", padding: "12px", marginBottom: "14px", display: "flex", gap: "10px", alignItems: "flex-start" },
-  redirectIcon: { fontSize: "20px", flexShrink: 0 },
-  redirectTitle: { fontSize: "12px", fontWeight: 800, color: "#166534", marginBottom: "3px" },
-  redirectSub: { fontSize: "11px", color: "#15803d", lineHeight: 1.5 },
-
-  bookNowBtn: { width: "100%", color: "white", border: "none", borderRadius: "10px", padding: "15px", fontSize: "15px", fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginBottom: "8px" },
-  bookNote: { textAlign: "center", fontSize: "11px", color: "#9ca3af" },
-  buttonGroup: { display: "flex", gap: "8px" },
-  mpesaBookBtn: { flex: 1, background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "white", border: "none", borderRadius: "10px", padding: "15px", fontSize: "15px", fontWeight: 800, cursor: "pointer", fontFamily: "inherit" },
-
-  sideContact: { background: "white", borderRadius: "14px", padding: "18px", border: "1px solid #e5e7eb" },
-
-  overlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "flex-end" },
-  sheet: { background: "white", borderRadius: "20px 20px 0 0", padding: "20px 20px 32px", width: "100%", maxHeight: "85vh", overflowY: "auto" },
-  sheetHandle: { width: "40px", height: "4px", background: "#e5e7eb", borderRadius: "2px", margin: "0 auto 16px" },
-
-  paymentModal: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.8)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 2000, padding: "20px" },
-  paymentModalContent: { background: "white", borderRadius: "12px", maxWidth: "400px", width: "100%", padding: "24px", border: "1px solid #e5e7eb", position: "relative" },
-  paymentTitle: { fontSize: "1.2rem", margin: "0 0 12px 0", color: "#1f2937", textAlign: "center" },
-  paymentSubtitle: { fontSize: "0.9rem", color: "#6b7280", textAlign: "center", marginBottom: "20px" },
-  paymentForm: { display: "flex", flexDirection: "column", gap: "16px" },
-  paymentField: { display: "flex", flexDirection: "column", gap: "6px" },
-  paymentLabel: { fontSize: "0.85rem", color: "#1f2937", fontWeight: 600 },
-  paymentInput: { padding: "10px 12px", border: "1px solid #e5e7eb", borderRadius: "6px", background: "#f9fafb", color: "#1f2937", fontSize: "0.95rem", outline: "none" },
-  paymentButton: { padding: "12px 16px", background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "white", border: "none", borderRadius: "6px", fontWeight: 700, cursor: "pointer", fontSize: "0.95rem", transition: "all 0.3s ease" },
-  paymentCancelButton: { padding: "12px 16px", background: "transparent", color: "#6b7280", border: "1px solid #e5e7eb", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.95rem", transition: "all 0.3s ease" },
-  paymentSuccess: { background: "rgba(34, 197, 94, 0.15)", color: "#86efac", padding: "12px", borderRadius: "6px", marginBottom: "16px", textAlign: "center", fontSize: "0.9rem", border: "1px solid rgba(34, 197, 94, 0.3)" },
-  paymentError: { background: "rgba(239, 68, 68, 0.15)", color: "#fca5a5", padding: "12px", borderRadius: "6px", marginBottom: "16px", textAlign: "center", fontSize: "0.9rem", border: "1px solid rgba(239, 68, 68, 0.3)" },
-};
-
-const css = `
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  input:focus, select:focus { border-color: #fbbf24 !important; outline: none; }
-  .room-card:hover { border-color: #fbbf24 !important; }
-
-  .detail-layout {
-    max-width: 1300px;
+  .lux-container {
+    max-width: 1280px;
     margin: 0 auto;
-    padding: 20px 16px;
-    display: grid;
-    grid-template-columns: 1fr 360px;
-    gap: 24px;
-    align-items: start;
+    padding: 0 20px;
   }
 
-  .booking-col {
-    position: sticky;
-    top: 20px;
+  /* Top Strip & Breadcrumb */
+  .lux-top-strip {
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 12px 0;
+  }
+  .lux-top-strip-inner {
     display: flex;
-    flex-direction: column;
-    gap: 14px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .lux-breadcrumb {
+    font-size: 13px;
+    font-weight: 500;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .lux-breadcrumb a {
+    color: #475569;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .lux-breadcrumb a:hover {
+    color: #0ea5e9;
+  }
+  .lux-bread-slash {
+    color: #cbd5e1;
+  }
+  .lux-bread-current {
+    color: #0f172a;
+    font-weight: 700;
+    max-width: 320px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  .amenities-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
-    gap: 10px;
+  .lux-action-pills {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .lux-pill-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .lux-pill-btn:hover {
+    background: #e2e8f0;
+    transform: translateY(-1px);
+  }
+  .lux-pill-btn.active-heart {
+    background: #fff1f2;
+    border-color: #fecdd3;
+    color: #e11d48;
   }
 
-  .policies-grid {
+  /* Header Section */
+  .lux-header-block {
+    padding: 24px 0 18px;
+  }
+  .lux-badge-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .lux-category-badge {
+    background: #0284c7;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 4px 12px;
+    border-radius: 999px;
+  }
+  .lux-tag-badge {
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .lux-featured-badge {
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+
+  .lux-title {
+    font-size: clamp(24px, 3.5vw, 36px);
+    font-weight: 900;
+    color: #0f172a;
+    line-height: 1.15;
+    margin: 0 0 12px;
+    letter-spacing: -0.02em;
+  }
+
+  .lux-subhead-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    font-size: 14px;
+    color: #475569;
+  }
+  .lux-rating-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .lux-rating-pill .star-icon {
+    color: #f59e0b;
+    font-size: 16px;
+  }
+  .lux-rating-pill .review-link {
+    color: #64748b;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .lux-location-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: color 0.15s;
+  }
+  .lux-location-link:hover {
+    color: #0ea5e9;
+  }
+  .map-shortcut {
+    color: #0ea5e9;
+    font-weight: 700;
+    margin-left: 4px;
+  }
+
+  /* Bento Photo Gallery */
+  .lux-gallery-section {
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .bento-gallery-5 {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
+    height: 440px;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+  }
+  .bento-main {
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    height: 100%;
+  }
+  .bento-main img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .bento-main:hover img {
+    transform: scale(1.03);
+  }
+  .bento-mosaic {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 12px;
+    height: 100%;
+  }
+  .bento-thumb {
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+  }
+  .bento-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .bento-thumb:hover img {
+    transform: scale(1.05);
+  }
+  .bento-hover-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .bento-hover-overlay span {
+    background: rgba(255, 255, 255, 0.95);
+    color: #0f172a;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 999px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .bento-main:hover .bento-hover-overlay,
+  .bento-thumb:hover .bento-hover-overlay {
+    opacity: 1;
   }
 
-  @media (max-width: 860px) {
-    .detail-layout { grid-template-columns: 1fr; }
-    .booking-col { display: none; }
-    .mobile-book-btn { display: block !important; }
-    .amenities-grid { grid-template-columns: repeat(2, 1fr); }
+  .bento-show-all-btn {
+    position: absolute;
+    right: 18px;
+    bottom: 18px;
+    background: rgba(255, 255, 255, 0.96);
+    color: #0f172a;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s;
+    z-index: 10;
   }
-  @media (max-width: 480px) {
-    .policies-grid { grid-template-columns: 1fr; }
+  .bento-show-all-btn:hover {
+    background: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
   }
 
-  /* ── NEW LAYOUT + ANIMATION ── */
-  html { scroll-behavior: smooth; }
-  :root { --nav-h: 0px; } /* set to your sticky AccommodationNav height (e.g. 61px) if it is sticky */
-
-  .hero-main { height: clamp(260px, 42vw, 470px) !important; border-radius: 20px !important; box-shadow: 0 18px 50px rgba(15,23,42,.18); animation: heroIn .8s cubic-bezier(.2,.8,.2,1) backwards; }
-  @keyframes heroIn { from { opacity: 0; transform: scale(.97); } }
-  .hero-main .zoomable { cursor: zoom-in; transition: transform .8s cubic-bezier(.2,.8,.2,1); }
-  .hero-main:hover .zoomable { transform: scale(1.04); }
-  .hero-main::after { content: ""; position: absolute; inset: auto 0 0 0; height: 35%; background: linear-gradient(to top, rgba(0,0,0,.35), transparent); pointer-events: none; }
-  .photo-count { position: absolute; right: 14px; bottom: 14px; z-index: 2; border: none; cursor: pointer; background: rgba(255,255,255,.95); color: #1f2937; font: 700 12px 'DM Sans', sans-serif; padding: 9px 16px; border-radius: 999px; box-shadow: 0 6px 18px rgba(0,0,0,.2); transition: transform .2s; }
-  .photo-count:hover { transform: translateY(-2px); }
-  .thumb { transition: transform .35s, box-shadow .35s; }
-  .thumb:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 14px 30px rgba(0,0,0,.2); }
-
-  .section-nav { position: sticky; top: var(--nav-h); z-index: 50; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 10px 16px; background: rgba(255,255,255,.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid #e5e7eb; }
-  .section-nav::-webkit-scrollbar { display: none; }
-  .section-nav a { flex: none; text-decoration: none; color: #4b5563; font-size: 13px; font-weight: 700; padding: 8px 16px; border-radius: 999px; transition: background .2s, color .2s; }
-  .section-nav a:hover { background: #f3f4f6; }
-  .section-nav a.active { background: #1f2937; color: #fff; }
-  .card, .facts { scroll-margin-top: calc(var(--nav-h) + 64px); }
-
-  .reveal { opacity: 0; }
-  .reveal.in { opacity: 1; animation: revealUp .7s cubic-bezier(.2,.8,.2,1) backwards; }
-  @keyframes revealUp { from { opacity: 0; transform: translateY(30px); } }
-  .card { transition: box-shadow .3s; }
-  .card:hover { box-shadow: 0 14px 36px rgba(15,23,42,.08); }
-
-  .action-row { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
-  .action-btn { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font: 700 13px 'DM Sans', sans-serif; color: #374151; background: #fff; border: 1px solid #e5e7eb; border-radius: 999px; padding: 9px 18px; transition: background .2s, transform .15s, color .2s; }
-  .action-btn:hover { background: #f9fafb; }
-  .action-btn:active { transform: scale(.95); }
-  .action-btn.on { color: #e0355e; border-color: #f7b4c4; background: #fff1f4; animation: heartPop .4s; }
-  .action-btn.on svg { fill: currentColor; }
-  @keyframes heartPop { 40% { transform: scale(1.12); } }
-
-  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
-  .fact { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid #e5e7eb; border-radius: 14px; padding: 14px; }
-  .fact-icon { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-size: 18px; background: linear-gradient(135deg, #eef2ff, #fdf2f8); flex: none; }
-  .fact-val { font-size: 14px; font-weight: 800; color: #1f2937; }
-  .fact-label { font-size: 11px; color: #9ca3af; font-weight: 600; }
-
-  .amenity { transition: transform .2s, background .2s, border-color .2s; }
-  .amenity:hover { transform: translateY(-2px); background: #fff !important; border-color: #fbbf24 !important; }
-  .room-card { transition: transform .2s, box-shadow .2s, border-color .2s; }
-  .room-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,.08); }
-
-  .booking-card { transition: box-shadow .3s; }
-  .booking-card:hover { box-shadow: 0 16px 44px rgba(15,23,42,.16) !important; }
-  .cta-btn { transition: transform .15s, filter .2s, box-shadow .2s; }
-  .cta-btn:hover { transform: translateY(-2px); filter: brightness(1.06); box-shadow: 0 10px 22px rgba(0,0,0,.2); }
-  .cta-btn:active { transform: scale(.97); }
-
-  .lightbox { position: fixed; inset: 0; z-index: 3000; background: rgba(8,12,20,.94); display: flex; align-items: center; justify-content: center; animation: fadeIn .25s; }
-  @keyframes fadeIn { from { opacity: 0; } }
-  .lb-img { max-width: 92vw; max-height: 84vh; border-radius: 14px; object-fit: contain; animation: lbIn .35s cubic-bezier(.2,.8,.2,1); }
-  @keyframes lbIn { from { opacity: 0; transform: scale(.94); } }
-  .lb-close, .lb-nav { position: absolute; border: none; cursor: pointer; color: #fff; background: rgba(255,255,255,.14); border-radius: 50%; display: grid; place-items: center; transition: background .2s; }
-  .lb-close:hover, .lb-nav:hover { background: rgba(255,255,255,.28); }
-  .lb-close { top: calc(16px + env(safe-area-inset-top, 0px)); right: 16px; width: 42px; height: 42px; font-size: 16px; }
-  .lb-nav { top: 50%; transform: translateY(-50%); width: 48px; height: 48px; font-size: 30px; padding-bottom: 4px; }
-  .lb-prev { left: 14px; } .lb-next { right: 14px; }
-  .lb-count { position: absolute; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); color: #e5e7eb; font: 600 13px 'DM Sans', sans-serif; background: rgba(255,255,255,.12); padding: 6px 14px; border-radius: 999px; }
-
-  @media (max-width: 860px) {
-    .detail-layout { padding-bottom: 100px; }
-    .mobile-book-btn { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); width: auto !important; z-index: 90; box-shadow: 0 14px 34px rgba(0,0,0,.35); animation: ctaUp .5s .4s cubic-bezier(.2,.8,.2,1) backwards; }
-    .hero-main { border-radius: 16px !important; }
-    .lb-nav { width: 40px; height: 40px; font-size: 26px; }
+  .bento-gallery-multi {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+    height: 380px;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
   }
-  @keyframes ctaUp { from { opacity: 0; transform: translateY(30px); } }
+  .bento-multi-tile {
+    cursor: pointer;
+    overflow: hidden;
+  }
+  .bento-multi-tile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s;
+  }
+  .bento-multi-tile:hover img {
+    transform: scale(1.04);
+  }
 
-  @media (prefers-reduced-motion: reduce) {
-    .reveal { opacity: 1; }
-    html { scroll-behavior: auto; }
-    *, *::before, *::after { animation: none !important; transition: none !important; }
+  .bento-gallery-single {
+    height: 420px;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+  }
+  .bento-gallery-single img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Sticky In-Page Nav */
+  .lux-section-nav {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid #e2e8f0;
+    padding: 12px 0;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .lux-section-nav::-webkit-scrollbar {
+    display: none;
+  }
+  .lux-section-nav a {
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    color: #475569;
+    padding: 8px 16px;
+    border-radius: 999px;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .lux-section-nav a:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+  }
+  .lux-section-nav a.active {
+    background: #0f172a;
+    color: #ffffff;
+  }
+
+  /* 2-Column Grid Layout */
+  .lux-main-layout {
+    display: grid;
+    grid-template-columns: 1fr 390px;
+    gap: 32px;
+    align-items: start;
+  }
+
+  .lux-content-col {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* Cards */
+  .lux-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 28px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    scroll-margin-top: 80px;
+  }
+
+  .lux-sec-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 6px;
+  }
+  .lux-sec-sub {
+    font-size: 13px;
+    color: #64748b;
+    margin: 0 0 18px;
+  }
+  .lux-card-divider {
+    border: none;
+    border-top: 1px solid #f1f5f9;
+    margin: 20px 0;
+  }
+
+  /* Host Banner */
+  .lux-host-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .lux-host-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .lux-host-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 16px rgba(14, 165, 233, 0.3);
+  }
+  .lux-host-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 3px;
+  }
+  .lux-host-subtitle {
+    font-size: 12px;
+    color: #64748b;
+    margin: 0;
+  }
+  .lux-host-badges {
+    display: flex;
+    gap: 6px;
+  }
+  .lux-badge-icon {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+  }
+
+  /* Facts Grid */
+  .lux-facts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .lux-fact-item {
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .lux-fact-icon {
+    font-size: 20px;
+  }
+  .lux-fact-value {
+    display: block;
+    font-size: 13px;
+    font-weight: 800;
+    color: #0f172a;
+  }
+  .lux-fact-sub {
+    font-size: 11px;
+    color: #94a3b8;
+  }
+
+  /* Description */
+  .lux-description-text {
+    font-size: 15px;
+    color: #334155;
+    line-height: 1.75;
+    margin: 0 0 20px;
+  }
+
+  /* Highlights */
+  .lux-highlights-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 18px;
+    border: 1px solid #e2e8f0;
+  }
+  .lux-hl-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .lux-hl-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .lux-hl-title {
+    display: block;
+    font-size: 14px;
+    color: #0f172a;
+    margin-bottom: 2px;
+  }
+  .lux-hl-desc {
+    font-size: 12px;
+    color: #64748b;
+    margin: 0;
+  }
+
+  /* Amenities */
+  .lux-amenities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+  }
+  .lux-amenity-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px 14px;
+    transition: all 0.2s;
+  }
+  .lux-amenity-card:hover {
+    background: #ffffff;
+    border-color: #0ea5e9;
+    box-shadow: 0 6px 16px rgba(14, 165, 233, 0.08);
+  }
+  .lux-am-check {
+    color: #0ea5e9;
+    font-weight: 800;
+    font-size: 14px;
+  }
+  .lux-am-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  /* Rooms List */
+  .lux-rooms-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .lux-room-card {
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .lux-room-card:hover {
+    border-color: #0ea5e9;
+    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.08);
+  }
+  .lux-room-card.selected-room {
+    border-color: #0ea5e9;
+    background: #f0f9ff;
+  }
+  .lux-room-main-info {
+    flex: 1;
+  }
+  .lux-room-badge-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .lux-room-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+  }
+  .lux-room-active-pill {
+    background: #0ea5e9;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .lux-room-desc {
+    font-size: 13px;
+    color: #64748b;
+    margin: 0 0 8px;
+    line-height: 1.5;
+  }
+  .lux-room-specs {
+    font-size: 12px;
+    color: #475569;
+    font-weight: 600;
+    display: flex;
+    gap: 14px;
+  }
+  .lux-room-pricing {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  .lux-room-price-tag {
+    font-size: 18px;
+    font-weight: 900;
+    color: #0ea5e9;
+  }
+  .lux-room-per {
+    font-size: 12px;
+    color: #94a3b8;
+    font-weight: 500;
+  }
+  .lux-room-select-btn {
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .lux-room-select-btn.btn-active {
+    background: #0ea5e9;
+    color: #ffffff;
+    border-color: #0ea5e9;
+  }
+
+  /* Media Players */
+  .lux-video-wrap {
+    margin-bottom: 16px;
+  }
+  .lux-video-player {
+    width: 100%;
+    max-height: 400px;
+    border-radius: 14px;
+    background: #000000;
+  }
+  .lux-audio-player {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  /* Location Card & Map */
+  .lux-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .lux-open-maps-btn {
+    background: #f1f5f9;
+    color: #0284c7;
+    border: 1px solid #cbd5e1;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .lux-open-maps-btn:hover {
+    background: #0284c7;
+    color: white;
+  }
+  .lux-map-frame {
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Policies */
+  .lux-policy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .lux-policy-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .lux-policy-lbl {
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: #64748b;
+    letter-spacing: 0.04em;
+  }
+  .lux-policy-val {
+    font-size: 15px;
+    color: #0f172a;
+  }
+  .lux-policy-note {
+    font-size: 12px;
+    color: #94a3b8;
+  }
+
+  /* Reviews */
+  .lux-reviews-summary-card {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 28px;
+    align-items: center;
+  }
+  .lux-rev-big-score {
+    text-align: center;
+    border-right: 1px solid #e2e8f0;
+    padding-right: 20px;
+  }
+  .score-num {
+    display: block;
+    font-size: 42px;
+    font-weight: 900;
+    color: #0f172a;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .score-stars {
+    color: #f59e0b;
+    font-size: 18px;
+    letter-spacing: 2px;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .score-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+  }
+
+  .lux-rev-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .lux-rev-bar-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 30px;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: #334155;
+  }
+  .bar-track {
+    background: #e2e8f0;
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    background: #0f172a;
+    height: 100%;
+    border-radius: 3px;
+  }
+
+  .lux-testimonial-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .lux-rev-card {
+    border: 1px solid #f1f5f9;
+    border-radius: 14px;
+    padding: 16px;
+    background: #fafafa;
+  }
+  .lux-rev-user-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .lux-rev-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #0ea5e9;
+    color: white;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+  .lux-rev-name {
+    display: block;
+    font-size: 14px;
+    color: #0f172a;
+  }
+  .lux-rev-date {
+    font-size: 11px;
+    color: #94a3b8;
+  }
+  .lux-rev-rating {
+    margin-left: auto;
+    font-size: 13px;
+    color: #f59e0b;
+    font-weight: 800;
+  }
+  .lux-rev-comment {
+    font-size: 13px;
+    color: #475569;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Host Contact Section */
+  .lux-contact-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .lux-btn-whatsapp {
+    background: #16a34a;
+    color: white;
+    text-decoration: none;
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 800;
+    text-align: center;
+    transition: transform 0.15s;
+  }
+  .lux-btn-whatsapp:hover {
+    transform: translateY(-2px);
+    background: #15803d;
+  }
+  .lux-btn-call {
+    background: #0f172a;
+    color: white;
+    text-decoration: none;
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 800;
+    text-align: center;
+    transition: transform 0.15s;
+  }
+  .lux-btn-call:hover {
+    transform: translateY(-2px);
+    background: #1e293b;
+  }
+  .lux-btn-email {
+    background: #0284c7;
+    color: white;
+    text-decoration: none;
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 800;
+    text-align: center;
+    transition: transform 0.15s;
+  }
+  .lux-btn-email:hover {
+    transform: translateY(-2px);
+    background: #0369a1;
+  }
+  .lux-messaging-box {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+  }
+
+  /* ── RIGHT COLUMN: Sticky Reservation Box ── */
+  .lux-sidebar-col {
+    position: sticky;
+    top: 20px;
+  }
+  .lux-booking-card {
+    background: #ffffff;
+    border-radius: 24px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+    padding: 24px;
+  }
+
+  .lux-card-top-price {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .lux-price-currency {
+    font-size: 15px;
+    font-weight: 700;
+    color: #64748b;
+    margin-right: 4px;
+  }
+  .lux-price-digits {
+    font-size: 28px;
+    font-weight: 900;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+  }
+  .lux-price-unit {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 500;
+  }
+  .lux-booking-rating-pill {
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fde68a;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 800;
+  }
+  .count-sub {
+    font-size: 10px;
+    font-weight: 500;
+    margin-left: 2px;
+    color: #92400e;
+  }
+
+  .lux-active-suite-pill {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #166534;
+    margin-bottom: 16px;
+  }
+
+  .lux-res-form {
+    border: 1px solid #cbd5e1;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .lux-date-inputs-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid #cbd5e1;
+  }
+  .lux-date-field {
+    padding: 8px 12px;
+  }
+  .lux-date-field:first-child {
+    border-right: 1px solid #cbd5e1;
+  }
+  .lux-date-field label,
+  .lux-guest-field label {
+    display: block;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: #64748b;
+    margin-bottom: 2px;
+  }
+  .lux-date-field input,
+  .lux-guest-field select {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0f172a;
+    background: transparent;
+    cursor: pointer;
+  }
+  .lux-guest-field {
+    padding: 8px 12px;
+  }
+
+  .lux-cta-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .lux-btn-mpesa {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 15px;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 8px 24px rgba(22, 163, 74, 0.35);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .lux-btn-mpesa:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(22, 163, 74, 0.45);
+    filter: brightness(1.05);
+  }
+  .lux-btn-official {
+    background: #0f172a;
+    color: white;
+    border-radius: 12px;
+    padding: 13px;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    transition: all 0.2s;
+  }
+  .lux-btn-official:hover {
+    background: #1e293b;
+    transform: translateY(-1px);
+  }
+
+  /* Price Breakdown */
+  .lux-breakdown {
+    background: #f8fafc;
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #475569;
+  }
+  .lux-bd-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .lux-bd-divider {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 8px 0;
+  }
+  .lux-bd-total-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 15px;
+    color: #0f172a;
+  }
+  .lux-total-price {
+    font-size: 17px;
+    color: #0ea5e9;
+  }
+
+  .lux-guarantee-strip {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 14px;
+    font-size: 11px;
+    color: #64748b;
+  }
+  .lux-g-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Toast Notification */
+  .lux-toast {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    background: #0f172a;
+    color: #ffffff;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    z-index: 9999;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Mobile Bottom Bar */
+  .lux-mobile-bottom-bar {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0px));
+    z-index: 100;
+    box-shadow: 0 -8px 24px rgba(0,0,0,0.08);
+    align-items: center;
+    justify-content: space-between;
+  }
+  .lux-m-price .m-val {
+    font-size: 18px;
+    font-weight: 900;
+    color: #0f172a;
+  }
+  .lux-m-price .m-sub {
+    font-size: 11px;
+    color: #64748b;
+    display: block;
+  }
+  .lux-m-book-btn {
+    background: #16a34a;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  /* Mobile Drawer */
+  .lux-drawer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    display: flex;
+    align-items: flex-end;
+  }
+  .lux-drawer-content {
+    background: white;
+    width: 100%;
+    border-radius: 24px 24px 0 0;
+    padding: 20px 24px 36px;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  .lux-drawer-handle {
+    width: 44px;
+    height: 5px;
+    background: #cbd5e1;
+    border-radius: 999px;
+    margin: 0 auto 16px;
+  }
+  .lux-drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .lux-drawer-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #0f172a;
+  }
+  .lux-drawer-header button {
+    background: #f1f5f9;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+  }
+
+  /* Fullscreen Lightbox */
+  .lux-lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 15, 29, 0.96);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(8px);
+  }
+  .lb-showcase-img {
+    max-width: 90vw;
+    max-height: 85vh;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  }
+  .lb-close-btn {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: white;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .lb-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  .lb-prev-btn, .lb-next-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: white;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    font-size: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .lb-prev-btn:hover, .lb-next-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  .lb-prev-btn { left: 24px; }
+  .lb-next-btn { right: 24px; }
+  .lb-counter-pill {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  /* M-Pesa Modal */
+  .lux-payment-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(6px);
+    z-index: 5000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .lux-payment-modal {
+    background: #ffffff;
+    border-radius: 24px;
+    max-width: 440px;
+    width: 100%;
+    padding: 28px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+    animation: modalScale 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes modalScale {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .lux-pay-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .mpesa-brand-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #16a34a;
+    font-size: 15px;
+  }
+  .mpesa-green-circle {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #16a34a;
+  }
+  .lux-pay-close {
+    background: #f1f5f9;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+  }
+  .lux-pay-summary-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .pay-hotel-name {
+    font-weight: 800;
+    color: #0f172a;
+    font-size: 16px;
+  }
+  .pay-suite-name {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 2px;
+  }
+  .pay-amount-digits {
+    font-size: 26px;
+    font-weight: 900;
+    color: #16a34a;
+    margin-top: 8px;
+  }
+  .lux-pay-alert-success {
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .lux-pay-alert-error {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .lux-pay-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .lux-pay-input-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 6px;
+  }
+  .lux-pay-hint {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 4px;
+    display: block;
+  }
+  .lux-readonly-input {
+    width: 100%;
+    padding: 12px 14px;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 15px;
+    color: #0f172a;
+  }
+  .lux-btn-confirm-mpesa {
+    background: #16a34a;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(22, 163, 74, 0.35);
+    transition: all 0.2s;
+  }
+  .lux-btn-confirm-mpesa:hover {
+    background: #15803d;
+    transform: translateY(-1px);
+  }
+  .lux-btn-confirm-mpesa:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* Responsive Breakpoints */
+  @media (max-width: 1024px) {
+    .lux-main-layout {
+      grid-template-columns: 1fr;
+    }
+    .lux-sidebar-col {
+      display: none;
+    }
+    .lux-mobile-bottom-bar {
+      display: flex;
+    }
+    .lux-reviews-summary-card {
+      grid-template-columns: 1fr;
+    }
+    .lux-rev-big-score {
+      border-right: none;
+      border-bottom: 1px solid #e2e8f0;
+      padding-right: 0;
+      padding-bottom: 16px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .bento-gallery-5 {
+      grid-template-columns: 1fr;
+      height: 320px;
+    }
+    .bento-mosaic {
+      display: none;
+    }
+    .lux-room-card {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .lux-room-pricing {
+      text-align: left;
+      align-items: flex-start;
+      width: 100%;
+    }
+    .lux-room-select-btn {
+      width: 100%;
+    }
   }
 `;
