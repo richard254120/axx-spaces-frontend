@@ -48,12 +48,19 @@ export default function TourismListingsPage() {
   const [availability, setAvailability] = useState("All");
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  // Set area from URL query parameter
+  // Set filters from URL query parameters
   useEffect(() => {
     const areaParam = searchParams.get("area");
-    if (areaParam) {
-      setArea(areaParam);
-    }
+    const searchParam = searchParams.get("search") || searchParams.get("destination") || searchParams.get("q");
+    const categoryParam = searchParams.get("category");
+    const maxPriceParam = searchParams.get("maxPrice");
+    const minRatingParam = searchParams.get("minRating");
+
+    if (areaParam) setArea(areaParam);
+    if (searchParam) setSearch(searchParam);
+    if (categoryParam) setCategory(categoryParam);
+    if (maxPriceParam) setMaxPrice(Number(maxPriceParam) || 35000);
+    if (minRatingParam) setMinRating(Number(minRatingParam) || 0);
   }, [searchParams]);
 
   const { properties, loading, offline, error, total } = useAccommodationListings({
