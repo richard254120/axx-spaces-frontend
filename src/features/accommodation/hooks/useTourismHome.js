@@ -20,9 +20,10 @@ export function useTourismHome() {
         if (!cancelled) {
           setFeatured(featuredData || []);
           if (statsData) {
+            const count = Array.isArray(statsData) ? statsData.length : (statsData.propertiesListed || 0);
             setStats([
-              { val: `${statsData.propertiesListed || 0}+`, label: "Properties Listed" },
-              { val: String(statsData.countiesCovered || 0), label: "Counties Covered" },
+              { val: `${count}+`, label: "Properties Listed" },
+              { val: String(statsData.countiesCovered || 47), label: "Counties Covered" },
               { val: statsData.monthlyVisitors || "18K+", label: "Monthly Visitors" },
               { val: statsData.avgRating || "4.8★", label: "Avg. Rating" },
             ]);

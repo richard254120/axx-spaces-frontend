@@ -8,12 +8,21 @@ export default function PropertyCard({ property: p, onOpen }) {
     premium_verified: "/Premium Verified.png",
   };
 
+  const propId = p._id || p.id;
+  const primaryImg = p.images?.[0]?.imageUrl || (typeof p.images?.[0] === "string" ? p.images[0] : null);
+  const locationText = typeof p.location === "object"
+    ? (p.address || p.county || "Kenya")
+    : (p.location || p.address || "Kenya");
+  const priceVal = Number(p.price ?? p.basePrice ?? 0);
+  const categoryText = p.category || (p.type ? p.type.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ") : "Accommodation");
+  const cardColor = p.color || "#0ea5e9";
+
   return (
-    <div className="prop-card" onClick={() => onOpen(p.id)} style={{ cursor: "pointer" }}>
+    <div className="prop-card" onClick={() => onOpen(propId)} style={{ cursor: "pointer" }}>
       <div style={{
         height: "150px",
-        background: `linear-gradient(135deg, ${p.color}25, ${p.color}10)`,
-        border: `1px solid ${p.color}25`,
+        background: `linear-gradient(135deg, ${cardColor}25, ${cardColor}10)`,
+        border: `1px solid ${cardColor}25`,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -21,17 +30,17 @@ export default function PropertyCard({ property: p, onOpen }) {
         borderRadius: "12px 12px 0 0",
         overflow: "hidden",
       }}>
-        {p.images && p.images.length > 0 ? (
+        {primaryImg ? (
           <img
-            src={p.images[0].imageUrl || p.images[0]}
+            src={primaryImg}
             alt={p.name}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         ) : (
-          <span style={{ fontSize: "52px" }}>{p.emoji}</span>
+          <span style={{ fontSize: "52px" }}>{p.emoji || "🏨"}</span>
         )}
         {p.tag && (
-          <div style={{ position: "absolute", top: "10px", left: "10px", background: p.color, color: "white", fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "20px", zIndex: 1 }}>
+          <div style={{ position: "absolute", top: "10px", left: "10px", background: cardColor, color: "white", fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "20px", zIndex: 1 }}>
             {p.tag}
           </div>
         )}
@@ -42,9 +51,9 @@ export default function PropertyCard({ property: p, onOpen }) {
         )}
       </div>
       <div style={{ padding: "14px" }}>
-        <div style={{ fontSize: "10px", color: "#6b7280", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.08em", marginBottom: "4px" }}>{p.category}</div>
+        <div style={{ fontSize: "10px", color: "#6b7280", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.08em", marginBottom: "4px" }}>{categoryText}</div>
         <h3 style={{ fontSize: "14px", fontWeight: 800, color: "#1f2937", margin: "0 0 4px", lineHeight: 1.3 }}>{p.name}</h3>
-        <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "8px" }}> {p.location}</div>
+        <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "8px" }}> {locationText}</div>
 
         {/* Verification Badges */}
         {p.owner?.verificationBadges && p.owner.verificationBadges.length > 0 && (
@@ -56,49 +65,31 @@ export default function PropertyCard({ property: p, onOpen }) {
             border: "1px solid rgba(14, 165, 233, 0.2)"
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
-              <span style={{ fontSize: 11 }}></span>
+              <span style={{ fontSize: 11 }}>🛡️</span>
               <span style={{ fontSize: 10, fontWeight: 600, color: "#0ea5e9" }}>Verified Owner</span>
             </div>
             <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-              {p.owner.verificationBadges.map((badgeId) => (
-                <div key={badgeId} style={{ position: "relative", display: "inline-block" }}>
-                  <img
-                    src={BADGE_IMAGES[badgeId]}
-                    alt={badgeId}
-                    style={{
-                      width: "28px",
-                      height: "28px",
-                      objectFit: "contain",
-                      borderRadius: "6px",
-                      cursor: "pointer",
-                      transition: "transform 0.2s"
-                    }}
-                    title={badgeId.replace(/_/g, ' ').toUpperCase()}
-                  />
-                  <div style={{
-                    position: "absolute",
-                    bottom: "100%",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    background: "#1e293b",
-                    color: "#f1f5f9",
-                    padding: "4px 8px",
-                    borderRadius: "4px",
-                    fontSize: "9px",
-                    fontWeight: 600,
-                    whiteSpace: "nowrap",
-                    opacity: 0,
-                    visibility: "hidden",
-                    transition: "all 0.2s",
-                    marginBottom: "4px",
-                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
-                    zIndex: 10,
-                    pointerEvents: "none"
-                  }}>
-                    {badgeId.replace(/_/g, ' ').toUpperCase()}
+              {p.owner.verificationBadges.map((badge, bIdx) => {
+                const badgeId = typeof badge === "string" ? badge : badge?.type;
+                if (!badgeId || !BADGE_IMAGES[badgeId]) return null;
+                return (
+                  <div key={badgeId + bIdx} style={{ position: "relative", display: "inline-block" }}>
+                    <img
+                      src={BADGE_IMAGES[badgeId]}
+                      alt={badgeId}
+                      style={{
+                        width: "28px",
+                        height: "28px",
+                        objectFit: "contain",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                        transition: "transform 0.2s"
+                      }}
+                      title={badgeId.replace(/_/g, ' ').toUpperCase()}
+                    />
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -110,15 +101,15 @@ export default function PropertyCard({ property: p, onOpen }) {
         ))}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "10px 0" }}>
           <div>
-            <span style={{ fontSize: "16px", fontWeight: 800, color: p.color }}>KSh {p.price?.toLocaleString()}</span>
+            <span style={{ fontSize: "16px", fontWeight: 800, color: cardColor }}>KSh {priceVal.toLocaleString()}</span>
             <span style={{ fontSize: "11px", color: "#9ca3af" }}>/night</span>
           </div>
-          <div style={{ fontSize: "12px", color: "#fbbf24", fontWeight: 700 }}> {p.rating} ({p.reviews})</div>
+          <div style={{ fontSize: "12px", color: "#fbbf24", fontWeight: 700 }}>★ {p.rating || "4.8"} ({p.reviews || 0})</div>
         </div>
         <button
           type="button"
-          style={{ width: "100%", background: p.color, border: "none", color: "white", padding: "10px", borderRadius: "8px", fontWeight: 700, fontSize: "13px", cursor: "pointer", fontFamily: "inherit" }}
-          onClick={(e) => { e.stopPropagation(); onOpen(p.id); }}
+          style={{ width: "100%", background: cardColor, border: "none", color: "white", padding: "10px", borderRadius: "8px", fontWeight: 700, fontSize: "13px", cursor: "pointer", fontFamily: "inherit" }}
+          onClick={(e) => { e.stopPropagation(); onOpen(propId); }}
         >
           {p.bookingUrl ? "View & Book →" : "View Details →"}
         </button>

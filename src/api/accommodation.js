@@ -17,6 +17,47 @@ function authHeaders(token) {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
+// ─── Normalizer ───────────────────────────────────────────────────────
+
+export function normalizeAccommodation(acc) {
+  if (!acc || typeof acc !== "object") return acc;
+  const address = acc.address || "";
+  const locationStr = typeof acc.location === "string"
+    ? acc.location
+    : (acc.location?.lat != null ? address || `${acc.location.lat}, ${acc.location.lng}` : address || "Kenya");
+
+  const basePrice = Number(acc.basePrice ?? acc.price ?? 0);
+  const rawImages = acc.images || acc.photos || [];
+  const images = Array.isArray(rawImages)
+    ? rawImages.map(img => typeof img === "object" ? img : { imageUrl: img })
+    : [];
+
+  const type = acc.type || acc.category || "hotel";
+  const formattedCategory = acc.category || type
+    .split("-")
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+
+  return {
+    ...acc,
+    id: acc._id || acc.id,
+    _id: acc._id || acc.id,
+    price: basePrice,
+    basePrice: basePrice,
+    category: formattedCategory,
+    type: type,
+    location: locationStr,
+    address: address || locationStr,
+    coordinates: typeof acc.location === "object" ? acc.location : null,
+    images: images,
+    rating: acc.rating || 4.8,
+    reviews: acc.reviews?.length || (typeof acc.reviews === "number" ? acc.reviews : 12),
+    color: acc.color || (type.includes("beach") ? "#0ea5e9" : type.includes("safari") ? "#16a34a" : type.includes("mountain") ? "#8b5cf6" : "#f59e0b"),
+    tag: acc.tag || (acc.isFeatured ? "Featured" : "Verified Host"),
+    amenities: Array.isArray(acc.amenities) ? acc.amenities : [],
+  };
+}
+
 // ─── Browse ───────────────────────────────────────────────────────────
 
 export async function fetchAccommodationListings(params = {}) {
@@ -27,7 +68,8 @@ export async function fetchAccommodationListings(params = {}) {
   // Only show approved (active) accommodations to users
   qs.set("status", "active");
   const json = await request(`/accommodations?${qs}`);
-  return json || [];
+  const list = Array.isArray(json) ? json : [];
+  return list.map(normalizeAccommodation);
 }
 
 export async function fetchFeaturedAccommodation(limit = 6) {
@@ -35,7 +77,8 @@ export async function fetchFeaturedAccommodation(limit = 6) {
   // Only show approved (active) accommodations to users
   qs.set("status", "active");
   const json = await request(`/accommodations?${qs}`);
-  return json || [];
+  const list = Array.isArray(json) ? json : [];
+  return list.map(normalizeAccommodation);
 }
 
 export async function fetchAccommodationStats() {
@@ -45,7 +88,7 @@ export async function fetchAccommodationStats() {
 
 export async function fetchAccommodationById(id) {
   const json = await request(`/accommodations/${id}`);
-  return json;
+  return normalizeAccommodation(json);
 }
 
 export async function recordAccommodationView(id) {

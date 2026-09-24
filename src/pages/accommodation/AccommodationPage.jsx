@@ -394,10 +394,10 @@ export default function AccommodationPage() {
         tag: p.tag || "Verified",
         badge: "Verified Host",
         amenities: p.amenities && p.amenities.length > 0 ? p.amenities.slice(0, 5) : ["WiFi", "Pool", "Parking"],
-        image: p.images && p.images[0]?.imageUrl ? p.images[0].imageUrl : CURATED_KENYA_PROPERTIES[idx % CURATED_KENYA_PROPERTIES.length].image,
+        image: p.images && p.images[0]?.imageUrl ? p.images[0].imageUrl : (typeof p.images?.[0] === 'string' ? p.images[0] : (p.image || CURATED_KENYA_PROPERTIES[idx % CURATED_KENYA_PROPERTIES.length].image)),
         whatsapp: p.whatsapp || p.phone || "254745689773",
         color: p.color || "#4f46e5",
-        categoryTab: p.category?.toLowerCase().includes("beach") ? "beach" : p.category?.toLowerCase().includes("safari") ? "safari" : "city",
+        categoryTab: (p.category || p.type || "")?.toLowerCase().includes("beach") ? "beach" : (p.category || p.type || "")?.toLowerCase().includes("safari") ? "safari" : (p.category || p.type || "")?.toLowerCase().includes("mountain") || (p.category || p.type || "")?.toLowerCase().includes("lake") ? "mountain" : "city",
         description: p.description || "Comfortable stay with verified Kenyan hospitality.",
       }));
 

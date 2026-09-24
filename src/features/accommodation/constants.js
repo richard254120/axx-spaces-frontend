@@ -173,17 +173,35 @@ export const STATUS_LABELS = {
 export const FALLBACK_PROPERTIES = [];
 
 export function filterPropertiesLocal(list, { category, maxPrice, minRating, search }) {
+  if (!Array.isArray(list)) return [];
   return list
-    .filter((p) => category === "All" || p.category === category)
-    .filter((p) => p.price <= maxPrice)
-    .filter((p) => p.rating >= minRating)
+    .filter((p) => {
+      if (!category || category === "All") return true;
+      const catNorm = category.toLowerCase().replace(/[\s-_]+/g, "");
+      const pCat = (p.category || "").toLowerCase().replace(/[\s-_]+/g, "");
+      const pType = (p.type || "").toLowerCase().replace(/[\s-_]+/g, "");
+      return pCat === catNorm || pType === catNorm || pCat.includes(catNorm) || catNorm.includes(pCat) || pType.includes(catNorm) || catNorm.includes(pType);
+    })
+    .filter((p) => {
+      const price = Number(p.basePrice ?? p.price ?? 0);
+      return !maxPrice || price <= maxPrice;
+    })
+    .filter((p) => {
+      if (!minRating) return true;
+      const rating = Number(p.rating ?? 0);
+      return rating >= minRating;
+    })
     .filter((p) => {
       if (!search) return true;
       const q = search.toLowerCase();
+      const loc = typeof p.location === "object" ? (p.address || "") : (p.location || p.address || "");
       return (
-        p.name.toLowerCase().includes(q) ||
-        p.location.toLowerCase().includes(q) ||
-        (p.county || "").toLowerCase().includes(q)
+        (p.name || "").toLowerCase().includes(q) ||
+        loc.toLowerCase().includes(q) ||
+        (p.county || "").toLowerCase().includes(q) ||
+        (p.type || "").toLowerCase().includes(q) ||
+        (p.category || "").toLowerCase().includes(q) ||
+        (p.description || "").toLowerCase().includes(q)
       );
     });
 }

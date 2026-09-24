@@ -351,6 +351,9 @@ export default function AdminDashboard() {
     setTimeout(() => setBoostMessage(""), 4000);
   };
   const handleApprove = async (type, id) => {
+    if (type === "accommodations") {
+      return handleAccommodationStatus(id, "active");
+    }
     try {
       await API.patch(`/admin/${type}/${id}/approve`);
       refresh();
@@ -360,6 +363,9 @@ export default function AdminDashboard() {
   };
 
   const handleReject = async (type, id) => {
+    if (type === "accommodations") {
+      return handleAccommodationStatus(id, "inactive");
+    }
     try {
       await API.patch(`/admin/${type}/${id}/reject`);
       refresh();
@@ -373,8 +379,13 @@ export default function AdminDashboard() {
   // ── delete ─────────────────────────────────────────────────
   const handleDelete = async (type, id) => {
     try {
-      await API.delete(`/admin/${type}/${id}`);
-      refresh();
+      if (type === "accommodations") {
+        await API.delete(`/accommodations/${id}`);
+        loadAccommodations();
+      } else {
+        await API.delete(`/admin/${type}/${id}`);
+        refresh();
+      }
       if (selected?._id === id) setSelected(null);
       alert(" Deleted successfully");
     } catch (e) {
@@ -563,10 +574,10 @@ export default function AdminDashboard() {
   };
 
   // ── ACCOMMODATIONS FUNCTIONS ───────────────────────────────────
-  const loadAccommodations = async () => {
+  const loadAccommodations = async (targetStatus = accommodationStatusView) => {
     setAccommodationsLoading(true);
     try {
-      const res = await API.get(`/accommodations/admin/pending?status=${accommodationStatusView}`);
+      const res = await API.get(`/accommodations/admin/pending?status=${targetStatus}`);
       setPendingAccommodations(res.data || []);
     } catch (err) {
       console.error("Failed to load accommodations:", err);
@@ -578,10 +589,11 @@ export default function AdminDashboard() {
   const handleAccommodationStatus = async (accommodationId, status) => {
     try {
       await API.patch(`/accommodations/${accommodationId}/status`, { status });
-      setAccommodationStatusView(status);
-      loadAccommodations();
+      setPendingAccommodations(prev => prev.filter(item => item._id !== accommodationId));
+      loadAccommodations(accommodationStatusView);
       loadStats();
-      alert(`Accommodation ${status} successfully`);
+      if (selected?._id === accommodationId) setSelected(null);
+      alert(`Accommodation ${status === "active" ? "approved" : "rejected"} successfully`);
     } catch (err) {
       alert("Failed to update accommodation status");
     }
@@ -662,7 +674,9 @@ export default function AdminDashboard() {
   const getImages = (item) => {
     const imgs = item.images || item.photos || item.coverImage || item.image || [];
     if (typeof imgs === "string") return [imgs];
-    return Array.isArray(imgs) ? imgs.filter(Boolean) : [];
+    return Array.isArray(imgs)
+      ? imgs.map(img => typeof img === "object" ? (img.imageUrl || img.url || "") : img).filter(Boolean)
+      : [];
   };
 
   const getNotifTitle = (n) => {
@@ -2093,7 +2107,7 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
             </>
           ) : (
             <>
-              {statusView === "pending" && tab !== "sold" && (
+              {(statusView === "pending" || item.status === "pending_review") && tab !== "sold" && (
                 <>
                   <button className="btn-approve" onClick={onApprove}> Approve</button>
                   <button className="btn-reject" onClick={onReject}> Reject</button>

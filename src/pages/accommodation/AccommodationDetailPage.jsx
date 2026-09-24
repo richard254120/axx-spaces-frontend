@@ -203,7 +203,7 @@ export default function AccommodationDetailPage() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          tourismId: property.id,
+          tourismId: property._id || property.id,
           phone: paymentPhone,
           amount: paymentAmount,
           checkIn,
@@ -313,7 +313,7 @@ export default function AccommodationDetailPage() {
               {/* Hero Image */}
               <div className="hero-main" style={{ ...s.heroImg, position: "relative", overflow: "hidden", border: `1px solid ${property.color}25` }}>
                 <img
-                  src={property.images[0].imageUrl}
+                  src={property.images[0]?.imageUrl || (typeof property.images[0] === 'string' ? property.images[0] : '')}
                   alt={property.name}
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
                   className="zoomable"
