@@ -32,10 +32,11 @@ export default function TabNavigation({ tabs, activeTab, setActiveTab, pendingCo
       return pendingCounts?.requests > 0 ? ` (${pendingCounts.requests})` : "";
     }
     if (tab === "accommodations") {
-      return pendingCounts?.accommodations > 0 ? ` (${pendingCounts.accommodations})` : "";
+      const count = pendingCounts?.accommodations || pendingCounts?.allPending?.accommodations?.length || 0;
+      return count > 0 ? ` (${count})` : "";
     }
     if (!pendingCounts?.allPending) return "";
-    const map = { properties: "properties", materials: "materials", tourism: "tourism", movers: "movers", sellers: "sellers" };
+    const map = { properties: "properties", materials: "materials", tourism: "tourism", movers: "movers", sellers: "sellers", accommodations: "accommodations" };
     const key = map[tab];
     return key && pendingCounts.allPending[key]?.length ? ` (${pendingCounts.allPending[key].length})` : "";
   };

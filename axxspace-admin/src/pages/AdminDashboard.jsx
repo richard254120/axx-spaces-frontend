@@ -225,6 +225,8 @@ export default function AdminDashboard() {
       loadPendingBusinesses();
     } else if (activeTab === "requests") {
       loadRequests();
+    } else if (activeTab === "accommodations") {
+      loadAccommodations();
     } else if (activeTab !== "payment") {
       loadItems(activeTab, statusView);
       loadViewStats(activeTab);
@@ -382,6 +384,8 @@ export default function AdminDashboard() {
       if (type === "accommodations") {
         await API.delete(`/accommodations/${id}`);
         loadAccommodations();
+        loadAllPending();
+        loadStats();
       } else {
         await API.delete(`/admin/${type}/${id}`);
         refresh();
@@ -592,6 +596,8 @@ export default function AdminDashboard() {
       setPendingAccommodations(prev => prev.filter(item => item._id !== accommodationId));
       loadAccommodations(accommodationStatusView);
       loadStats();
+      loadAllPending();
+      loadAllNotifications();
       if (selected?._id === accommodationId) setSelected(null);
       alert(`Accommodation ${status === "active" ? "approved" : "rejected"} successfully`);
     } catch (err) {
@@ -638,10 +644,11 @@ export default function AdminDashboard() {
       return pendingAnnouncements.length > 0 ? ` (${pendingAnnouncements.length})` : "";
     }
     if (tab === "accommodations") {
-      return pendingAccommodations.length > 0 ? ` (${pendingAccommodations.length})` : "";
+      const count = pendingAccommodations.length || (allPending?.accommodations?.length || 0);
+      return count > 0 ? ` (${count})` : "";
     }
     if (!allPending) return "";
-    const map = { properties: "properties", materials: "materials", tourism: "tourism", movers: "movers", sellers: "sellers" };
+    const map = { properties: "properties", materials: "materials", tourism: "tourism", movers: "movers", sellers: "sellers", accommodations: "accommodations" };
     const key = map[tab];
     return key && allPending[key]?.length ? ` (${allPending[key].length})` : "";
   };
@@ -743,7 +750,7 @@ export default function AdminDashboard() {
             announcements: pendingAnnouncements.length,
             verification: pendingVerifications.length,
             requests: requests.length,
-            accommodations: pendingAccommodations.length
+            accommodations: pendingAccommodations.length || (allPending?.accommodations?.length || 0)
           }}
           hasPendingBoosts={hasPendingBoosts}
           pendingBoosts={pendingBoosts}
@@ -775,7 +782,8 @@ export default function AdminDashboard() {
                   seller: "sellers",
                   business: "businesses",
                   announcement: "announcements",
-                  item_request: "requests"
+                  item_request: "requests",
+                  accommodation: "accommodations"
                 };
                 setActiveTab(tabMap[notif.type] || "properties");
                 setStatusView("pending");
@@ -802,11 +810,12 @@ export default function AdminDashboard() {
           <>
             <div className="stats-grid">
               {[
-                { label: " Properties", total: stats.properties.total, pending: stats.properties.pending, color: "#3b82f6" },
-                { label: " Materials", total: stats.materials.total, pending: stats.materials.pending, color: "#22c55e" },
-                { label: " Movers", total: stats.movers.total, pending: stats.movers.pending, color: "#f59e0b" },
-                { label: " Tourism", total: stats.tourism.total, pending: stats.tourism.pending, color: "#8b5cf6" },
-                { label: " Sellers", total: stats.sellers.total, pending: stats.sellers.pending, color: "#ec4899" },
+                { label: " Properties", total: stats.properties?.total || 0, pending: stats.properties?.pending || 0, color: "#3b82f6" },
+                { label: " Materials", total: stats.materials?.total || 0, pending: stats.materials?.pending || 0, color: "#22c55e" },
+                { label: " Accommodations", total: stats.accommodations?.total || 0, pending: stats.accommodations?.pending || 0, color: "#14b8a6" },
+                { label: " Movers", total: stats.movers?.total || 0, pending: stats.movers?.pending || 0, color: "#f59e0b" },
+                { label: " Tourism", total: stats.tourism?.total || 0, pending: stats.tourism?.pending || 0, color: "#8b5cf6" },
+                { label: " Sellers", total: stats.sellers?.total || 0, pending: stats.sellers?.pending || 0, color: "#ec4899" },
                 { label: " Payments", total: allBoosts.length, pending: pendingBoosts.length, color: "#fbbf24", isPulse: pendingBoosts.length > 0 },
               ].map(s => (
                 <StatsCard
@@ -1471,36 +1480,139 @@ export default function AdminDashboard() {
               <div className="spinner"></div>
               <p> Loading accommodations...</p>
             </div>
-          ) : pendingAccommodations.length === 0 ? (
-            <div className="empty">
-              <p className="empty-text"> No pending accommodations found.</p>
-            </div>
-          ) : (
-            <div className="grid">
-              {pendingAccommodations.map(item => (
-                <div key={item._id} className={`card admin-card`} onClick={() => setSelected(item)}>
-                  {item.images && item.images.length > 0 && (
-                    <div className="card-image" style={{ backgroundImage: `url(${item.images[0].imageUrl})` }} />
+          ) : (() => {
+            const rawItems = (pendingAccommodations.length > 0)
+              ? pendingAccommodations
+              : (accommodationStatusView === "pending_review" ? (allPending?.accommodations || []) : []);
+            const items = rawItems.filter(item => {
+              if (!searchQuery) return true;
+              const q = searchQuery.toLowerCase();
+              return (item.name || "").toLowerCase().includes(q) ||
+                     (item.type || "").toLowerCase().includes(q) ||
+                     (item.address || "").toLowerCase().includes(q) ||
+                     (item.county || "").toLowerCase().includes(q) ||
+                     (item.town || "").toLowerCase().includes(q) ||
+                     (item.owner?.name || "").toLowerCase().includes(q) ||
+                     (item.owner?.email || "").toLowerCase().includes(q) ||
+                     (item.owner?.phone || "").toLowerCase().includes(q);
+            });
+
+            if (items.length === 0) {
+              return (
+                <div className="empty">
+                  <p className="empty-text"> No accommodations found for {accommodationStatusView.replace("_", " ")}.</p>
+                  {searchQuery && (
+                    <button className="btn-reset" onClick={() => setSearchQuery("")}>Clear Search</button>
                   )}
-                  <div className="card-body">
-                    <p className="card-title">{item.name}</p>
-                    <p className="card-subtitle">{item.type} · {item.address}</p>
-                    <p className="card-owner"> {item.owner?.name} · {item.owner?.phone}</p>
-                    <div className="card-footer">
-                      <span className="price-badge">KSh {item.basePrice?.toLocaleString()}/night</span>
-                      <span className="status-dot" style={{ background: item.status === "active" ? "#22c55e" : item.status === "inactive" ? "#ef4444" : "#fbbf24" }}>
-                        {item.status}
-                      </span>
-                    </div>
-                    <div className="card-buttons" onClick={e => e.stopPropagation()}>
-                      <button className="btn-approve" onClick={() => handleAccommodationStatus(item._id, "active")}> Approve</button>
-                      <button className="btn-reject" onClick={() => handleAccommodationStatus(item._id, "inactive")}> Reject</button>
-                    </div>
-                  </div>
                 </div>
-              ))}
-            </div>
-          )
+              );
+            }
+
+            return (
+              <div className="grid">
+                {items.map(item => {
+                  const firstImg = item.images && item.images.length > 0
+                    ? (typeof item.images[0] === "object" ? item.images[0].imageUrl : item.images[0])
+                    : (item.coverImage || "");
+                  const hasVideos = item.videos && item.videos.length > 0;
+
+                  return (
+                    <div key={item._id} className="card admin-card" onClick={() => setSelected(item)}>
+                      {firstImg ? (
+                        <div className="card-image" style={{ backgroundImage: `url(${firstImg})`, position: "relative" }}>
+                          {hasVideos && (
+                            <span style={{
+                              position: "absolute",
+                              top: 8,
+                              right: 8,
+                              background: "rgba(15, 23, 42, 0.85)",
+                              color: "#38bdf8",
+                              padding: "3px 8px",
+                              borderRadius: "6px",
+                              fontSize: "11px",
+                              fontWeight: "700",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "4px",
+                              boxShadow: "0 2px 6px rgba(0,0,0,0.3)"
+                            }}>
+                              🎬 Video Tour
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <div style={{
+                          height: "160px",
+                          background: "linear-gradient(135deg, #1e293b, #0f172a)",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "#94a3b8",
+                          gap: "8px",
+                          position: "relative"
+                        }}>
+                          <span style={{ fontSize: "32px" }}>{hasVideos ? "🎬" : "🏨"}</span>
+                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#cbd5e1" }}>
+                            {hasVideos ? "Video Walkthrough Included" : "No Photo Uploaded"}
+                          </span>
+                          {hasVideos && (
+                            <span style={{
+                              position: "absolute",
+                              top: 8,
+                              right: 8,
+                              background: "#0284c7",
+                              color: "#fff",
+                              padding: "3px 8px",
+                              borderRadius: "6px",
+                              fontSize: "10px",
+                              fontWeight: "700"
+                            }}>
+                              {item.videos.length} Video{item.videos.length > 1 ? "s" : ""}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      <div className="card-body">
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "8px" }}>
+                          <p className="card-title" style={{ margin: 0 }}>{item.name}</p>
+                          <span className="status-dot" style={{
+                            padding: "2px 8px",
+                            borderRadius: "12px",
+                            fontSize: "11px",
+                            fontWeight: "600",
+                            background: item.status === "active" ? "#dcfce7" : item.status === "inactive" ? "#fee2e2" : "#fef3c7",
+                            color: item.status === "active" ? "#166534" : item.status === "inactive" ? "#991b1b" : "#92400e"
+                          }}>
+                            {item.status === "active" ? "Active" : item.status === "inactive" ? "Inactive" : "Pending"}
+                          </span>
+                        </div>
+                        <p className="card-subtitle">{item.type} · {item.address}{item.county ? `, ${item.county}` : ""}</p>
+                        <p className="card-owner">👤 {item.owner?.name || "Host"} · 📞 {item.owner?.phone || "—"}</p>
+                        <div className="card-footer">
+                          <span className="price-badge">KSh {item.basePrice?.toLocaleString()}/night</span>
+                          {hasVideos && (
+                            <span style={{ fontSize: "12px", color: "#0284c7", fontWeight: "600" }}>
+                              ▶ Has Video
+                            </span>
+                          )}
+                        </div>
+                        <div className="card-buttons" onClick={e => e.stopPropagation()}>
+                          {item.status !== "active" && (
+                            <button className="btn-approve" onClick={() => handleAccommodationStatus(item._id, "active")}>✓ Approve</button>
+                          )}
+                          {item.status !== "inactive" && (
+                            <button className="btn-reject" onClick={() => handleAccommodationStatus(item._id, "inactive")}>✕ Reject</button>
+                          )}
+                          <button className="btn-delete" style={{ padding: "6px 10px", background: "#ef4444", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "12px" }} onClick={() => confirmDelete("accommodations", item._id, item.name)}>🗑 Delete</button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()
         ) : loading ? (
           <div className="loader">
             <div className="spinner"></div>
