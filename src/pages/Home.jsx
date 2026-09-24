@@ -99,16 +99,7 @@ option { background: #151936; color: #F8FAFC; }
   0%, 100% { transform: translateY(0px); }
   50%       { transform: translateY(-12px); }
 }
-@keyframes rotateDecor1 {
-  0% { transform: rotate(0deg) scale(1); }
-  50% { transform: rotate(180deg) scale(1.05); }
-  100% { transform: rotate(360deg) scale(1); }
-}
-@keyframes rotateDecor2 {
-  0% { transform: rotate(0deg) scale(1.02); }
-  50% { transform: rotate(-180deg) scale(0.96); }
-  100% { transform: rotate(-360deg) scale(1.02); }
-}
+
 @keyframes mouseScroll {
   0% { opacity: 0; transform: translate(-50%, 0) scale(0.6); }
   50% { opacity: 1; transform: translate(-50%, 6px) scale(1); }
@@ -161,14 +152,14 @@ option { background: #151936; color: #F8FAFC; }
 /* ── HERO ── */
 .hero {
   position: relative;
-  min-height: 84vh;
+  min-height: 80vh;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   overflow: hidden;
-  padding: 50px 16px 70px;
-  border-bottom: 1px solid rgba(99,102,241,0.25);
+  padding: 60px 20px 70px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 .hero-bg-video {
   position: absolute; inset: 0;
@@ -180,118 +171,58 @@ option { background: #151936; color: #F8FAFC; }
 
 @media (max-width: 768px) {
   .hero {
-    min-height: 80vh;
-    padding: 30px 14px 60px;
-  }
-  .hero-bg-video {
-    object-fit: cover;
-    object-position: center;
+    min-height: 75vh;
+    padding: 40px 16px 50px;
   }
 }
 .hero-bg-fallback {
   position: absolute; inset: 0;
-  background: linear-gradient(135deg, #0A0E27 0%, #151936 40%, #1E1B4B 70%, #0F172A 100%);
+  background: #090D1A;
   z-index: 0;
 }
 .hero-overlay {
   position: absolute; inset: 0;
-  background: linear-gradient(160deg,
-    rgba(10,14,39,0.90) 0%,
-    rgba(21,25,54,0.78) 40%,
-    rgba(30,27,75,0.92) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(9, 13, 26, 0.76) 0%,
+    rgba(10, 16, 32, 0.84) 50%,
+    rgba(9, 13, 26, 0.95) 100%
+  );
   z-index: 1;
-}
-.hero-radial {
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(99,102,241,0.2) 0%, transparent 70%);
-  z-index: 2; pointer-events: none;
-}
-.hero-decor1 {
-  position: absolute; width: 550px; height: 550px;
-  border: 1px solid rgba(99,102,241,0.18);
-  border-radius: 50%; top: -200px; right: -120px;
-  pointer-events: none; z-index: 2;
-  box-shadow: inset 0 0 40px rgba(99,102,241,0.12), 0 0 70px rgba(99,102,241,0.25);
-  animation: rotateDecor1 30s linear infinite;
-}
-.hero-decor2 {
-  position: absolute; width: 400px; height: 400px;
-  border: 1px solid rgba(236,72,153,0.18);
-  border-radius: 50%; bottom: -120px; left: -80px;
-  pointer-events: none; z-index: 2;
-  box-shadow: inset 0 0 30px rgba(236,72,153,0.12), 0 0 60px rgba(236,72,153,0.25);
-  animation: rotateDecor2 25s linear infinite;
 }
 
 @keyframes pulseBadge {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.02); opacity: 0.9; }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
 }
 @keyframes cardRise {
-  from { opacity: 0; transform: translateY(24px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-@keyframes glowBorderPulse {
-  0%, 100% { border-color: rgba(99,102,241,0.35); box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 25px rgba(99,102,241,0.2); }
-  50% { border-color: rgba(236,72,153,0.5); box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 35px rgba(236,72,153,0.28); }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 @keyframes badgeDot {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34,211,238,0.7); }
-  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(34,211,238,0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34,211,238,0); }
-}
-
-.hero-quick-pills {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin: 18px auto 26px;
-  max-width: 820px;
-}
-.hero-pill-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 8px 16px;
-  background: rgba(15,23,42,0.65);
-  border: 1px solid rgba(99,102,241,0.28);
-  border-radius: 20px;
-  color: #CBD5E1;
-  font-size: 12px;
-  font-weight: 600;
-  font-family: 'Inter', sans-serif;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  backdrop-filter: blur(10px);
-}
-.hero-pill-btn:hover {
-  background: linear-gradient(135deg, rgba(99,102,241,0.3) 0%, rgba(236,72,153,0.3) 100%);
-  border-color: rgba(99,102,241,0.7);
-  color: #FFFFFF;
-  transform: translateY(-3px) scale(1.04);
-  box-shadow: 0 8px 20px rgba(99,102,241,0.35);
+  0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(56, 189, 248, 0); }
+  100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
 }
 
 .hero-search-glass {
-  background: rgba(15,23,42,0.8);
-  backdrop-filter: blur(24px);
-  border: 1px solid rgba(99,102,241,0.35);
-  border-radius: 18px;
-  padding: 8px 14px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 8px 10px 8px 16px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   max-width: 820px;
   width: 100%;
-  margin: 0 auto 28px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 35px rgba(99,102,241,0.25);
-  transition: all 0.3s ease;
-  animation: glowBorderPulse 6s infinite alternate;
+  margin: 0 auto 34px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 .hero-search-glass:focus-within {
-  border-color: rgba(99,102,241,0.85);
-  box-shadow: 0 25px 70px rgba(0,0,0,0.6), 0 0 45px rgba(99,102,241,0.45);
+  border-color: rgba(56, 189, 248, 0.55);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 25px rgba(56, 189, 248, 0.18);
 }
 .search-field {
   display: flex;
@@ -315,15 +246,15 @@ option { background: #151936; color: #F8FAFC; }
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-weight: 700;
-  color: #818CF8;
-  margin-bottom: 2px;
+  color: #38BDF8;
+  margin-bottom: 3px;
 }
 .search-field-content select {
   background: transparent;
   border: none;
   outline: none;
   color: #F8FAFC;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 500;
   font-family: 'Inter', sans-serif;
   cursor: pointer;
@@ -336,29 +267,30 @@ option { background: #151936; color: #F8FAFC; }
 .search-field-divider {
   width: 1px;
   height: 38px;
-  background: rgba(255,255,255,0.12);
+  background: rgba(255, 255, 255, 0.12);
 }
 .hero-search-submit {
-  background: linear-gradient(135deg, #6366F1 0%, #EC4899 100%);
+  background: linear-gradient(135deg, #0284C7 0%, #2563EB 100%);
   color: #FFFFFF;
-  font-weight: 700;
-  font-size: 13px;
+  font-weight: 600;
+  font-size: 14px;
   font-family: 'Inter', sans-serif;
   border: none;
   border-radius: 12px;
-  padding: 12px 26px;
+  padding: 13px 28px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   white-space: nowrap;
-  box-shadow: 0 8px 24px rgba(99,102,241,0.4);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 18px rgba(37, 99, 235, 0.35);
+  transition: all 0.25s ease;
   flex-shrink: 0;
 }
 .hero-search-submit:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 12px 30px rgba(236,72,153,0.5);
+  background: linear-gradient(135deg, #0369A1 0%, #1D4ED8 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.5);
 }
 @media (max-width: 680px) {
   .hero-search-glass {
@@ -372,7 +304,7 @@ option { background: #151936; color: #F8FAFC; }
   .search-field {
     width: 100%;
     padding: 4px 6px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     padding-bottom: 8px;
   }
   .hero-search-submit {
@@ -653,98 +585,61 @@ option { background: #151936; color: #F8FAFC; }
 
 .hero-content {
   position: relative; z-index: 3;
-  max-width: 900px;
-  padding: 40px 28px 30px;
-  animation: fadeUp 1s ease both;
+  max-width: 940px;
+  padding: 30px 20px 20px;
+  animation: fadeUp 0.9s ease both;
 }
 .hero-badge {
-  display: inline-block;
-  border: 1px solid rgba(99,102,241,0.4);
-  color: #6366F1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #38BDF8;
   font-family: 'Inter', sans-serif;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  padding: 6px 20px;
-  border-radius: 20px;
-  background: rgba(99,102,241,0.1);
-  backdrop-filter: blur(10px);
-  margin-bottom: 28px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  padding: 7px 20px;
+  border-radius: 9999px;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(12px);
+  margin-bottom: 24px;
   text-transform: uppercase;
-  box-shadow: 0 0 20px rgba(99,102,241,0.2), inset 0 0 10px rgba(99,102,241,0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 .hero-title {
   margin: 0;
-  line-height: 1.1;
+  line-height: 1.15;
 }
 .hero-title-line1 {
   display: block;
   font-family: 'Poppins', sans-serif;
-  font-size: clamp(2.8rem, 7vw, 5.2rem);
-  font-weight: 700;
-  background: linear-gradient(135deg, #6366F1 0%, #EC4899 50%, #06B6D4 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: 0.04em;
+  font-size: clamp(2.6rem, 5.8vw, 4.5rem);
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
 }
 .hero-title-line2 {
   display: block;
   font-family: 'Poppins', sans-serif;
-  font-size: clamp(2.8rem, 7vw, 5.2rem);
-  font-weight: 700;
-  background: linear-gradient(135deg, #EC4899 0%, #F472B6 50%, #EC4899 100%);
+  font-size: clamp(2.6rem, 5.8vw, 4.5rem);
+  font-weight: 800;
+  background: linear-gradient(135deg, #38BDF8 0%, #60A5FA 50%, #818CF8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  letter-spacing: 0.04em;
-  font-style: italic;
-  filter: drop-shadow(0 2px 10px rgba(236,72,153,0.35));
+  letter-spacing: -0.02em;
+  margin-top: 6px;
 }
 .hero-sub {
   font-family: 'Inter', sans-serif;
-  color: #CBD5E1;
-  font-size: clamp(14px, 1.8vw, 17px);
-  margin: 18px auto 32px;
-  letter-spacing: 0.06em;
-  line-height: 1.7;
+  color: #94A3B8;
+  font-size: clamp(14px, 1.6vw, 17px);
+  margin: 18px auto 34px;
+  letter-spacing: 0.01em;
+  line-height: 1.65;
   font-weight: 400;
-  max-width: 500px;
-}
-
-/* ── HERO CATEGORY TABS ── */
-.hero-tabs {
-  display: flex; justify-content: center;
-  flex-wrap: wrap; gap: 8px;
-  margin-bottom: 28px;
-}
-.hero-tab {
-  display: flex; align-items: center; gap: 7px;
-  padding: 10px 20px;
-  border-radius: 24px;
-  font-family: 'Inter', sans-serif;
-  font-size: 13px; font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  letter-spacing: 0.03em;
-}
-.hero-tab-inactive {
-  background: rgba(15,23,42,0.45);
-  border: 1px solid rgba(99,102,241,0.2);
-  color: #CBD5E1;
-  backdrop-filter: blur(10px);
-}
-.hero-tab-inactive:hover {
-  border-color: rgba(99,102,241,0.6);
-  color: #6366F1;
-  background: rgba(99,102,241,0.1);
-  transform: translateY(-2px);
-}
-.hero-tab-active {
-  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
-  border: 1px solid #6366F1;
-  color: #FFFFFF;
-  font-weight: 700;
-  box-shadow: 0 8px 32px rgba(99,102,241,0.4);
-  transform: translateY(-2px);
+  max-width: 640px;
 }
 
 /* ── SEARCH ── */
@@ -2445,14 +2340,11 @@ export default function Home() {
           <source src={bgVideo} type="video/mp4" />
         </video>
         <div className="hero-overlay"></div>
-        <div className="hero-radial"></div>
-        <div className="hero-decor1"></div>
-        <div className="hero-decor2"></div>
 
         <div className="hero-content">
           <div className="hero-badge">
             <span className="badge-dot"></span>
-            Kenya's Premier Property &amp; Services Platform
+            Kenya's Premier Property &amp; Spaces Platform
           </div>
 
           <h1 className="hero-title">
@@ -2462,36 +2354,17 @@ export default function Home() {
           <p className="hero-sub">
             Verified Rentals · Luxury Accommodation · AxxBiashara Services · Direct QuickSales
             <br />
-            <span style={{ color: "#94a3b8", fontSize: "14px" }}>Available across all 47 counties · 100% Direct Contact</span>
+            <span style={{ color: "#94a3b8", fontSize: "14px", display: "inline-block", marginTop: "6px" }}>
+              Direct contact with owners and hosts across all 47 counties · 0% Broker Fees
+            </span>
           </p>
-
-          {/* QUICK CATEGORY PILLS */}
-          <div className="hero-quick-pills">
-            {[
-              { icon: "🏠", label: "Rentals", path: "/listings" },
-              { icon: "🏨", label: "Accommodation", path: "/accommodation" },
-              { icon: "💼", label: "AxxBiashara", path: "/axxbiashara" },
-              { icon: "⚡", label: "QuickSales", path: "/materials" },
-              { icon: "🚚", label: "Movers", path: "/movers" },
-              { icon: "📱", label: "Mobile App", path: "/mobile-app" },
-            ].map(pill => (
-              <button
-                key={pill.label}
-                className="hero-pill-btn"
-                onClick={() => navigate(pill.path)}
-              >
-                <span>{pill.icon}</span>
-                <span>{pill.label}</span>
-              </button>
-            ))}
-          </div>
 
           {/* HERO QUICK SEARCH BAR */}
           <form className="hero-search-glass" onSubmit={handleSearch}>
             <div className="search-field">
               <span className="search-field-icon">📍</span>
               <div className="search-field-content">
-                <label>County / Region</label>
+                <label>Location / County</label>
                 <select
                   value={searchForm.county}
                   onChange={(e) => setSearchForm(prev => ({ ...prev, county: e.target.value }))}
@@ -2522,9 +2395,9 @@ export default function Home() {
               </div>
             </div>
 
-            <button type="submit" className="hero-search-submit magical-btn">
+            <button type="submit" className="hero-search-submit">
               <span>🔍</span>
-              <span>Explore Spaces</span>
+              <span>Search Spaces</span>
             </button>
           </form>
 
