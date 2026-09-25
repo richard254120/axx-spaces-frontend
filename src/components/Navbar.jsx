@@ -69,6 +69,18 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Prevent background scroll when mobile dropdown is open
+  useEffect(() => {
+    if (dropdownOpen || accountOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [dropdownOpen, accountOpen]);
+
   // ─── HAMBURGER DROPDOWN MENU (top-right icon) ────────────────────────────
   const HamburgerDropdown = () => (
     <div style={styles.dropdownWrapper} ref={dropdownRef}>
@@ -81,12 +93,40 @@ export default function Navbar() {
       </button>
 
       {dropdownOpen && (
-        <div style={styles.dropdown}>
-          {/* NAVIGATION SECTION */}
-          <div style={styles.dropdownHeader}>Navigation</div>
-          <Link to="/" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>Home</span>
-          </Link>
+        <>
+          <div
+            className="navbar-dropdown-backdrop"
+            onClick={() => setDropdownOpen(false)}
+          />
+          <div className="navbar-hamburger-dropdown" style={styles.dropdown}>
+            {/* MOBILE TOP TITLE BAR WITH EXPLICIT CLOSE */}
+            <div className="mobile-dropdown-title-bar">
+              <span style={{ fontWeight: 800, color: "#fbbf24", fontSize: "14px", display: "flex", alignItems: "center", gap: "6px" }}>
+                <span>☰</span> AxxSpace Navigation
+              </span>
+              <button
+                type="button"
+                onClick={() => setDropdownOpen(false)}
+                style={{
+                  background: "rgba(255,255,255,0.08)",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  borderRadius: "8px",
+                  color: "#94a3b8",
+                  padding: "5px 12px",
+                  fontSize: "12px",
+                  cursor: "pointer",
+                  fontWeight: 700,
+                }}
+              >
+                ✕ Close
+              </button>
+            </div>
+
+            {/* NAVIGATION SECTION */}
+            <div style={styles.dropdownHeader}>Navigation</div>
+            <Link to="/" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+              <span style={styles.dropdownIcon}>Home</span>
+            </Link>
           <Link to="/axxbiashara" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>AxxBiashara</span>
           </Link>
@@ -249,7 +289,8 @@ export default function Navbar() {
             </>
           )}
         </div>
-      )}
+      </>
+    )}
 
       <AccountTypeSelector
         isOpen={accountSelectorOpen}
@@ -337,36 +378,42 @@ export default function Navbar() {
                   <span style={styles.accountStatus}>In Account</span>
                 </button>
                 {accountOpen && (
-                  <div style={styles.accountDropdown}>
-                    <div style={styles.accountHeader}>
-                      <ProfileAvatar user={user} size={40} />
-                      <div>
-                        <div style={styles.accountName}>{user.name}</div>
-                        <div style={styles.accountRole}>{user.role?.toUpperCase() || "USER"}</div>
+                  <>
+                    <div
+                      className="navbar-dropdown-backdrop"
+                      onClick={() => setAccountOpen(false)}
+                    />
+                    <div className="navbar-account-dropdown" style={styles.accountDropdown}>
+                      <div style={styles.accountHeader}>
+                        <ProfileAvatar user={user} size={40} />
+                        <div>
+                          <div style={styles.accountName}>{user.name}</div>
+                          <div style={styles.accountRole}>{user.role?.toUpperCase() || "USER"}</div>
+                        </div>
                       </div>
+                      <div style={styles.accountDivider} />
+                      <Link
+                        to="/profile"
+                        style={styles.accountItem}
+                        onClick={() => { setAccountOpen(false); setMenuOpen(false); }}
+                      >
+                        My Profile
+                      </Link>
+                      <Link
+                        to="/settings"
+                        style={styles.accountItem}
+                        onClick={() => { setAccountOpen(false); setMenuOpen(false); }}
+                      >
+                        Settings
+                      </Link>
+                      <button
+                        style={styles.accountLogout}
+                        onClick={() => { handleLogout(); setAccountOpen(false); setMenuOpen(false); }}
+                      >
+                        Logout
+                      </button>
                     </div>
-                    <div style={styles.accountDivider} />
-                    <Link
-                      to="/profile"
-                      style={styles.accountItem}
-                      onClick={() => { setAccountOpen(false); setMenuOpen(false); }}
-                    >
-                      My Profile
-                    </Link>
-                    <Link
-                      to="/settings"
-                      style={styles.accountItem}
-                      onClick={() => { setAccountOpen(false); setMenuOpen(false); }}
-                    >
-                      Settings
-                    </Link>
-                    <button
-                      style={styles.accountLogout}
-                      onClick={() => { handleLogout(); setAccountOpen(false); setMenuOpen(false); }}
-                    >
-                      Logout
-                    </button>
-                  </div>
+                  </>
                 )}
               </div>
             ) : (
@@ -691,13 +738,17 @@ const styles = {
     border: "1px solid rgba(251, 191, 36, 0.35)",
     borderRadius: "16px",
     minWidth: "280px",
-    zIndex: 9999,
-    overflow: "visible",
+    maxWidth: "calc(100vw - 20px)",
+    zIndex: 99999,
     maxHeight: "80vh",
     overflowY: "auto",
-    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.65), 0 0 15px rgba(251, 191, 36, 0.08)",
-    backdropFilter: "blur(16px)",
-    padding: "6px 0",
+    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.75), 0 0 20px rgba(251, 191, 36, 0.12)",
+    backdropFilter: "blur(20px)",
+    WebkitBackdropFilter: "blur(20px)",
+    padding: "6px 0 24px 0",
+    boxSizing: "border-box",
+    overscrollBehavior: "contain",
+    WebkitOverflowScrolling: "touch",
   },
 
   dropdownHeader: {
@@ -1085,7 +1136,68 @@ const css = `
     padding-left: 17px !important;
   }
 
+  .mobile-dropdown-title-bar {
+    display: none;
+  }
+
   @media (max-width: 768px) {
+    .mobile-dropdown-title-bar {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      padding: 12px 18px !important;
+      border-bottom: 1px solid rgba(251, 191, 36, 0.25) !important;
+      background: rgba(15, 23, 42, 0.95) !important;
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 10 !important;
+      backdrop-filter: blur(12px) !important;
+    }
+
+    .navbar-dropdown-backdrop {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      background: rgba(0, 0, 0, 0.7) !important;
+      backdrop-filter: blur(4px) !important;
+      -webkit-backdrop-filter: blur(4px) !important;
+      z-index: 99998 !important;
+    }
+
+    .navbar-hamburger-dropdown {
+      position: fixed !important;
+      top: 64px !important;
+      left: 10px !important;
+      right: 10px !important;
+      width: auto !important;
+      min-width: unset !important;
+      max-width: calc(100vw - 20px) !important;
+      max-height: calc(100dvh - 78px) !important;
+      max-height: calc(100vh - 78px) !important;
+      border-radius: 16px !important;
+      z-index: 99999 !important;
+      box-sizing: border-box !important;
+      overflow-y: auto !important;
+      overscroll-behavior: contain !important;
+      -webkit-overflow-scrolling: touch !important;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 25px rgba(251, 191, 36, 0.15) !important;
+      padding-bottom: 40px !important;
+    }
+
+    .navbar-account-dropdown {
+      position: fixed !important;
+      top: 64px !important;
+      left: 12px !important;
+      right: 12px !important;
+      width: auto !important;
+      min-width: unset !important;
+      max-width: calc(100vw - 24px) !important;
+      z-index: 99999 !important;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85) !important;
+    }
+
     [style*="display: none"][style*="background: none"][style*="border: none"] {
       display: block !important;
     }
@@ -1102,6 +1214,16 @@ const css = `
   }
 
   @media (max-width: 480px) {
+    .navbar-hamburger-dropdown {
+      top: 56px !important;
+      left: 6px !important;
+      right: 6px !important;
+      max-width: calc(100vw - 12px) !important;
+      max-height: calc(100dvh - 66px) !important;
+      max-height: calc(100vh - 66px) !important;
+      padding-bottom: 50px !important;
+    }
+
     [style*="display: flex"][style*="gap: 4px"][style*="flexWrap: nowrap"] {
       gap: 3px !important;
     }

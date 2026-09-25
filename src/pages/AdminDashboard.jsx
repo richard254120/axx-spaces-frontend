@@ -76,6 +76,19 @@ export default function AdminDashboard() {
     loadRequests();
   }, []);
 
+  const handleRefreshAll = () => {
+    loadStats();
+    loadAllPending();
+    fetchProperties();
+    loadAccommodations();
+    loadPendingBusinesses();
+    loadPendingAnnouncements();
+    loadUsers();
+    loadRequests();
+    loadPendingPayments();
+    loadAgents();
+  };
+
   // ADDED: load pending payments when tab is selected
   useEffect(() => {
     if (activeTab === "payments") {
@@ -504,129 +517,198 @@ export default function AdminDashboard() {
     <div style={styles.container}>
       <style dangerouslySetInnerHTML={{ __html: cssStyles }} />
 
-      <div style={styles.header}>
-        <h1 style={styles.title}> Admin Review Panel</h1>
-        <p style={styles.subtitle}>Manage pending submissions for Axxspace</p>
+      {/* ENTERPRISE TOP ADMIN BAR */}
+      <div style={styles.topAdminBar}>
+        <div style={styles.brandGroup}>
+          <div style={styles.brandLogo}>AXX</div>
+          <div>
+            <div style={styles.brandTitleRow}>
+              <h1 style={styles.brandTitle}>AxxSpace Command Center</h1>
+              <span style={styles.liveBadge}>
+                <span style={styles.pulsingDot}></span> Production Active
+              </span>
+            </div>
+            <p style={styles.brandSubtitle}>Centralized Portal Operations, Moderation &amp; Gateway Management</p>
+          </div>
+        </div>
+
+        <div style={styles.topRightControls}>
+          <button onClick={handleRefreshAll} style={styles.refreshBtn} title="Sync database records">
+            <span>🔄</span> Sync Data
+          </button>
+          <button onClick={() => navigate("/admin/verification")} style={styles.verificationBtn}>
+            <span>🛡️</span> KYC Verification
+          </button>
+          <div style={styles.adminUserPill}>
+            <span style={styles.userRoleBadge}>SUPERADMIN</span>
+            <span style={styles.userEmail}>{user?.name || user?.email || "Admin"}</span>
+          </div>
+          <button onClick={() => navigate("/")} style={styles.exitBtn} title="View public site">
+            <span>🌐</span> Site
+          </button>
+        </div>
       </div>
 
-      {/* Stats */}
+      {/* EXECUTIVE KPI OVERVIEW */}
       {stats && (
         <div style={styles.statsGrid}>
-          <div style={styles.statCard}>
-            <h3 style={styles.statTitle}> Properties</h3>
-            <p style={styles.statValue}>{stats.properties.total}</p>
-            <p style={styles.statPending}>{stats.properties.pending} pending</p>
+          <div style={{ ...styles.statCard, borderTop: "3px solid #f59e0b" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+              <span style={styles.statTitle}>Rental Properties</span>
+              <span style={{ fontSize: "20px" }}>🏢</span>
+            </div>
+            <p style={styles.statValue}>{stats.properties?.total || 0}</p>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <span style={{
+                fontSize: "12px",
+                fontWeight: 700,
+                color: (stats.properties?.pending || 0) > 0 ? "#ef4444" : "#22c55e",
+                background: (stats.properties?.pending || 0) > 0 ? "rgba(239, 68, 68, 0.12)" : "rgba(34, 197, 94, 0.12)",
+                padding: "2px 8px",
+                borderRadius: "4px"
+              }}>
+                {stats.properties?.pending || 0} pending review
+              </span>
+            </div>
           </div>
-          <div style={styles.statCard}>
-            <h3 style={styles.statTitle}> Materials</h3>
-            <p style={styles.statValue}>{stats.materials.total}</p>
-            <p style={styles.statPending}>{stats.materials.pending} pending</p>
+
+          <div style={{ ...styles.statCard, borderTop: "3px solid #3b82f6" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+              <span style={styles.statTitle}>Accommodations</span>
+              <span style={{ fontSize: "20px" }}>🏨</span>
+            </div>
+            <p style={{ ...styles.statValue, color: "#60a5fa" }}>{stats.tourism?.total || pendingAccommodations.length || 0}</p>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <span style={{
+                fontSize: "12px",
+                fontWeight: 700,
+                color: (stats.tourism?.pending || 0) > 0 ? "#ef4444" : "#22c55e",
+                background: (stats.tourism?.pending || 0) > 0 ? "rgba(239, 68, 68, 0.12)" : "rgba(34, 197, 94, 0.12)",
+                padding: "2px 8px",
+                borderRadius: "4px"
+              }}>
+                {stats.tourism?.pending || 0} pending review
+              </span>
+            </div>
           </div>
-          <div style={styles.statCard}>
-            <h3 style={styles.statTitle}> Accommodation</h3>
-            <p style={styles.statValue}>{stats.tourism.total}</p>
-            <p style={styles.statPending}>{stats.tourism.pending} pending</p>
+
+          <div style={{ ...styles.statCard, borderTop: "3px solid #10b981" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+              <span style={styles.statTitle}>QuickSales &amp; Materials</span>
+              <span style={{ fontSize: "20px" }}>📦</span>
+            </div>
+            <p style={{ ...styles.statValue, color: "#34d399" }}>{stats.materials?.total || 0}</p>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <span style={{
+                fontSize: "12px",
+                fontWeight: 700,
+                color: (stats.materials?.pending || 0) > 0 ? "#ef4444" : "#22c55e",
+                background: (stats.materials?.pending || 0) > 0 ? "rgba(239, 68, 68, 0.12)" : "rgba(34, 197, 94, 0.12)",
+                padding: "2px 8px",
+                borderRadius: "4px"
+              }}>
+                {stats.materials?.pending || 0} pending review
+              </span>
+            </div>
           </div>
-          <div style={styles.statCard}>
-            <h3 style={styles.statTitle}> Sellers</h3>
-            <p style={styles.statValue}>{stats.sellers.total}</p>
-            <p style={styles.statPending}>{stats.sellers.pending} pending</p>
+
+          <div style={{ ...styles.statCard, borderTop: "3px solid #8b5cf6" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+              <span style={styles.statTitle}>Verified Sellers</span>
+              <span style={{ fontSize: "20px" }}>🏷️</span>
+            </div>
+            <p style={{ ...styles.statValue, color: "#a78bfa" }}>{stats.sellers?.total || 0}</p>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <span style={{
+                fontSize: "12px",
+                fontWeight: 700,
+                color: (stats.sellers?.pending || 0) > 0 ? "#ef4444" : "#22c55e",
+                background: (stats.sellers?.pending || 0) > 0 ? "rgba(239, 68, 68, 0.12)" : "rgba(34, 197, 94, 0.12)",
+                padding: "2px 8px",
+                borderRadius: "4px"
+              }}>
+                {stats.sellers?.pending || 0} pending review
+              </span>
+            </div>
+          </div>
+
+          <div style={{ ...styles.statCard, borderTop: "3px solid #ec4899" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+              <span style={styles.statTitle}>Pending Payments</span>
+              <span style={{ fontSize: "20px" }}>💳</span>
+            </div>
+            <p style={{ ...styles.statValue, color: "#f472b6" }}>{pendingPayments?.length || 0}</p>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <span style={{
+                fontSize: "12px",
+                fontWeight: 700,
+                color: (pendingPayments?.length || 0) > 0 ? "#ef4444" : "#22c55e",
+                background: (pendingPayments?.length || 0) > 0 ? "rgba(239, 68, 68, 0.12)" : "rgba(34, 197, 94, 0.12)",
+                padding: "2px 8px",
+                borderRadius: "4px"
+              }}>
+                {(pendingPayments?.length || 0) > 0 ? "Action required" : "All cleared"}
+              </span>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Tabs */}
+      {/* MODERN TAB PILLS BAR */}
       <div style={styles.tabs}>
+        {[
+          { id: "properties", label: "Properties", icon: "🏢", count: allPending?.properties?.length || 0 },
+          { id: "accommodations", label: "Accommodations", icon: "🏨", count: pendingAccommodations?.length || (allPending?.tourism?.length || 0) },
+          { id: "businesses", label: "Businesses", icon: "💼", count: pendingBusinesses?.length || 0 },
+          { id: "announcements", label: "Announcements", icon: "📢", count: pendingAnnouncements.filter(a => a.status === "pending").length || 0 },
+          { id: "materials", label: "Materials", icon: "📦", count: allPending?.materials?.length || 0 },
+          { id: "sellers", label: "Sellers", icon: "🏷️", count: allPending?.sellers?.length || 0 },
+          { id: "agents", label: "Agents", icon: "🤝", count: agents?.length || 0 },
+          { id: "users", label: "Users", icon: "👥", count: users?.length || 0 },
+          { id: "requests", label: "Requests", icon: "📋", count: requests?.length || 0 },
+          { id: "payments", label: "Payments", icon: "💳", count: pendingPayments?.length || 0 },
+          { id: "payment", label: "Payment Settings", icon: "⚙️" },
+        ].map((t) => {
+          const isActive = activeTab === t.id || (t.id === "accommodations" && activeTab === "tourism");
+          return (
+            <button
+              key={t.id}
+              className="admin-tab-btn"
+              style={{
+                ...styles.tab,
+                ...(isActive ? styles.tabActive : {}),
+              }}
+              onClick={() => setActiveTab(t.id)}
+            >
+              <span>{t.icon}</span>
+              <span>{t.label}</span>
+              {t.count !== undefined && t.count > 0 && (
+                <span
+                  style={{
+                    ...styles.tabBadge,
+                    ...(isActive ? styles.tabBadgeActive : styles.tabBadgePending),
+                  }}
+                >
+                  {t.count}
+                </span>
+              )}
+            </button>
+          );
+        })}
+
         <button
-          style={{ ...styles.tab, ...(activeTab === "properties" ? styles.tabActive : {}) }}
-          onClick={() => setActiveTab("properties")}
-        >
-          Properties {allPending?.properties ? `(${allPending.properties.length})` : ""}
-        </button>
-        <button
-          style={{ ...styles.tab, ...(activeTab === "materials" ? styles.tabActive : {}) }}
-          onClick={() => setActiveTab("materials")}
-        >
-          Materials {allPending?.materials ? `(${allPending.materials.length})` : ""}
-        </button>
-        <button
-          style={{ ...styles.tab, ...(activeTab === "tourism" ? styles.tabActive : {}) }}
-          onClick={() => setActiveTab("tourism")}
-        >
-          Accommodation {allPending?.tourism ? `(${allPending.tourism.length})` : ""}
-        </button>
-        <button
-          style={{ ...styles.tab, ...(activeTab === "sellers" ? styles.tabActive : {}) }}
-          onClick={() => setActiveTab("sellers")}
-        >
-          Sellers {allPending?.sellers ? `(${allPending.sellers.length})` : ""}
-        </button>
-        <button
-          style={{ ...styles.tab, ...(activeTab === "payment" ? styles.tabActive : {}) }}
-          onClick={() => setActiveTab("payment")}
-        >
-          Payment Settings
-        </button>
-        {/* ADDED: Payments tab button */}
-        <button
-          style={{ ...styles.tab, ...(activeTab === "payments" ? styles.tabActive : {}) }}
-          onClick={() => setActiveTab("payments")}
-        >
-          Payments {pendingPayments.length > 0 ? `(${pendingPayments.length})` : ""}
-        </button>
-        {/* END ADDED */}
-        {/* ADDED: Businesses tab button */}
-        <button
-          style={{ ...styles.tab, ...(activeTab === "businesses" ? styles.tabActive : {}) }}
-          onClick={() => setActiveTab("businesses")}
-        >
-          Businesses {pendingBusinesses.length > 0 ? `(${pendingBusinesses.length})` : ""}
-        </button>
-        {/* ADDED: Announcements tab button */}
-        <button
-          style={{ ...styles.tab, ...(activeTab === "announcements" ? styles.tabActive : {}) }}
-          onClick={() => setActiveTab("announcements")}
-        >
-          Announcements {pendingAnnouncements.filter(a => a.status === "pending").length > 0 ? `(${pendingAnnouncements.filter(a => a.status === "pending").length})` : ""}
-        </button>
-        {/* END ADDED */}
-        {/* ADDED: Users tab button */}
-        <button
-          style={{ ...styles.tab, ...(activeTab === "users" ? styles.tabActive : {}) }}
-          onClick={() => setActiveTab("users")}
-        >
-          Users {users.length > 0 ? `(${users.length})` : ""}
-        </button>
-        {/* END ADDED */}
-        {/* ADDED: Requests tab button */}
-        <button
-          style={{ ...styles.tab, ...(activeTab === "requests" ? styles.tabActive : {}) }}
-          onClick={() => setActiveTab("requests")}
-        >
-          Requests {requests.length > 0 ? `(${requests.length})` : ""}
-        </button>
-        {/* ADDED: Accommodations tab button */}
-        <button
-          style={{ ...styles.tab, ...(activeTab === "accommodations" ? styles.tabActive : {}) }}
-          onClick={() => setActiveTab("accommodations")}
-        >
-          Accommodations {pendingAccommodations.length > 0 ? `(${pendingAccommodations.length})` : ""}
-        </button>
-        {/* END ADDED */}
-        {/* ADDED: Agents tab button */}
-        <button
-          style={{ ...styles.tab, ...(activeTab === "agents" ? styles.tabActive : {}) }}
-          onClick={() => setActiveTab("agents")}
-        >
-          Agents {agents.length > 0 ? `(${agents.length})` : ""}
-        </button>
-        {/* END ADDED */}
-        {/* Verification tab button */}
-        <button
-          style={{ ...styles.tab, ...(activeTab === "verification" ? styles.tabActive : {}) }}
+          className="admin-tab-btn"
+          style={{
+            ...styles.tab,
+            background: "rgba(245, 158, 11, 0.12)",
+            borderColor: "rgba(245, 158, 11, 0.3)",
+            color: "#fbbf24",
+          }}
           onClick={() => navigate("/admin/verification")}
         >
-          ✓ Verification
+          <span>🛡️</span>
+          <span>KYC Verifications</span>
+          <span style={{ fontSize: "11px", opacity: 0.8 }}>→</span>
         </button>
       </div>
 
@@ -1738,71 +1820,156 @@ export default function AdminDashboard() {
 const styles = {
   container: {
     minHeight: "100vh",
-    background: "linear-gradient(135deg, #06101f 0%, #0a1428 100%)",
-    padding: "50px 5%",
+    background: "linear-gradient(135deg, #040914 0%, #071224 50%, #0b1a33 100%)",
+    padding: "36px 4%",
     color: "#f1f5f9",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif",
   },
-  header: { textAlign: "center", marginBottom: "50px" },
-  title: { fontSize: "32px", fontWeight: 800, color: "#fbbf24", marginBottom: "10px" },
-  subtitle: { color: "#94a3b8", fontSize: "16px" },
-  statsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px", marginBottom: "30px" },
-  statCard: { background: "rgba(30, 41, 59, 0.6)", padding: "20px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.05)" },
-  statTitle: { fontSize: "13px", color: "#94a3b8", margin: "0 0 8px 0" },
-  statValue: { fontSize: "28px", fontWeight: 800, color: "#fbbf24", margin: "0 0 4px 0" },
-  statPending: { fontSize: "12px", color: "#ef4444", margin: 0 },
-  loader: { textAlign: "center", padding: "100px", color: "#fbbf24", fontSize: "18px" },
-  emptyCard: {
-    background: "rgba(30, 41, 59, 0.4)",
-    padding: "60px",
-    borderRadius: "20px",
-    textAlign: "center",
-    border: "1px dashed rgba(251, 191, 36, 0.3)"
-  },
-  emptyText: { color: "#94a3b8", fontSize: "18px" },
-  tableContainer: {
-    background: "rgba(15, 23, 42, 0.8)",
+  topAdminBar: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    background: "rgba(15, 23, 42, 0.75)",
+    backdropFilter: "blur(16px)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
     borderRadius: "16px",
-    overflow: "hidden",
-    border: "1px solid rgba(255,255,255,0.05)",
-    boxShadow: "0 20px 40px rgba(0,0,0,0.4)"
+    padding: "18px 24px",
+    marginBottom: "28px",
+    flexWrap: "wrap",
+    gap: "16px",
+    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.35)",
   },
-  table: { width: "100%", borderCollapse: "collapse" },
-  theadRow: { background: "rgba(251, 191, 36, 0.1)" },
-  th: { padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" },
-  tr: { borderBottom: "1px solid rgba(255,255,255,0.05)", transition: "0.2s" },
-  td: { padding: "18px", verticalAlign: "middle" },
-  propTitle: { fontWeight: 700, fontSize: "16px", marginBottom: "4px" },
-  propLoc: { fontSize: "13px", color: "#94a3b8" },
-  ownerName: { fontWeight: 600, fontSize: "14px" },
-  ownerContact: { fontSize: "12px", color: "#64748b" },
-  priceBadge: { background: "rgba(59, 130, 246, 0.1)", color: "#3b82f6", padding: "6px 12px", borderRadius: "6px", fontWeight: 700 },
-  btnGroup: { display: "flex", gap: "10px" },
-  approveBtn: {
-    background: "#22c55e", color: "white", border: "none",
-    padding: "8px 16px", borderRadius: "8px", fontWeight: 700, cursor: "pointer"
+  brandGroup: {
+    display: "flex",
+    alignItems: "center",
+    gap: "16px",
   },
-  rejectBtn: {
-    background: "rgba(239, 68, 68, 0.1)", color: "#ef4444", border: "1px solid #ef4444",
-    padding: "8px 16px", borderRadius: "8px", fontWeight: 700, cursor: "pointer"
+  brandLogo: {
+    width: "44px",
+    height: "44px",
+    borderRadius: "12px",
+    background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontWeight: 900,
+    color: "#0f172a",
+    fontSize: "17px",
+    letterSpacing: "1px",
+    boxShadow: "0 4px 15px rgba(245, 158, 11, 0.35)",
   },
-  tabs: { display: "flex", gap: "10px", marginBottom: "30px", justifyContent: "center" },
-  tab: {
-    background: "rgba(30, 41, 59, 0.6)",
+  brandTitleRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    flexWrap: "wrap",
+  },
+  brandTitle: {
+    fontSize: "22px",
+    fontWeight: 800,
+    color: "#f8fafc",
+    margin: 0,
+    letterSpacing: "-0.5px",
+  },
+  liveBadge: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    background: "rgba(34, 197, 94, 0.12)",
+    border: "1px solid rgba(34, 197, 94, 0.3)",
+    color: "#4ade80",
+    padding: "3px 10px",
+    borderRadius: "9999px",
+    fontSize: "11px",
+    fontWeight: 700,
+    letterSpacing: "0.4px",
+    textTransform: "uppercase",
+  },
+  pulsingDot: {
+    width: "7px",
+    height: "7px",
+    borderRadius: "50%",
+    background: "#22c55e",
+    boxShadow: "0 0 8px #22c55e",
+    display: "inline-block",
+  },
+  brandSubtitle: {
+    fontSize: "13px",
     color: "#94a3b8",
-    border: "1px solid rgba(255,255,255,0.1)",
-    padding: "12px 24px",
+    margin: "4px 0 0 0",
+    fontWeight: 500,
+  },
+  topRightControls: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    flexWrap: "wrap",
+  },
+  refreshBtn: {
+    background: "rgba(30, 41, 59, 0.8)",
+    color: "#f1f5f9",
+    border: "1px solid rgba(255, 255, 255, 0.12)",
+    padding: "9px 16px",
     borderRadius: "10px",
+    fontSize: "13px",
     fontWeight: 700,
     cursor: "pointer",
-    transition: "0.2s",
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    transition: "all 0.2s ease",
   },
-  tabActive: {
-    background: "#fbbf24",
-    color: "#1f2937",
-    borderColor: "#fbbf24",
+  verificationBtn: {
+    background: "rgba(245, 158, 11, 0.15)",
+    color: "#fbbf24",
+    border: "1px solid rgba(245, 158, 11, 0.3)",
+    padding: "9px 16px",
+    borderRadius: "10px",
+    fontSize: "13px",
+    fontWeight: 700,
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    transition: "all 0.2s ease",
   },
-  roleBadge: { background: "rgba(251, 191, 36, 0.1)", color: "#fbbf24", padding: "6px 12px", borderRadius: "6px", fontWeight: 700 },
+  adminUserPill: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    background: "rgba(15, 23, 42, 0.9)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    padding: "6px 14px",
+    borderRadius: "10px",
+  },
+  userRoleBadge: {
+    background: "#f59e0b",
+    color: "#0f172a",
+    fontSize: "10px",
+    fontWeight: 800,
+    padding: "2px 6px",
+    borderRadius: "4px",
+    letterSpacing: "0.5px",
+  },
+  userEmail: {
+    fontSize: "12px",
+    color: "#e2e8f0",
+    fontWeight: 600,
+  },
+  exitBtn: {
+    background: "transparent",
+    color: "#94a3b8",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    padding: "8px 14px",
+    borderRadius: "10px",
+    fontSize: "12px",
+    fontWeight: 600,
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    transition: "all 0.2s ease",
+  },
   // ADDED styles
   txCode: { background: "rgba(34, 197, 94, 0.1)", color: "#22c55e", padding: "4px 10px", borderRadius: "6px", fontSize: "13px", fontFamily: "monospace" },
   smsPreview: { fontSize: "12px", color: "#64748b", maxWidth: "220px", lineHeight: "1.5" },
