@@ -2346,48 +2346,6 @@ export default function Home() {
             </span>
           </p>
 
-          {/* HERO QUICK SEARCH BAR */}
-          <form className="hero-search-glass" onSubmit={handleSearch}>
-            <div className="search-field">
-              <span className="search-field-icon">📍</span>
-              <div className="search-field-content">
-                <label>Location / County</label>
-                <select
-                  value={searchForm.county}
-                  onChange={(e) => setSearchForm(prev => ({ ...prev, county: e.target.value }))}
-                >
-                  <option value="">All 47 Counties</option>
-                  {counties.map(c => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="search-field-divider"></div>
-
-            <div className="search-field">
-              <span className="search-field-icon">🏢</span>
-              <div className="search-field-content">
-                <label>Property / Space Type</label>
-                <select
-                  value={searchForm.type}
-                  onChange={(e) => setSearchForm(prev => ({ ...prev, type: e.target.value }))}
-                >
-                  <option value="">All Property Types</option>
-                  {types.map(t => (
-                    <option key={t} value={t}>{t}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <button type="submit" className="hero-search-submit">
-              <span>🔍</span>
-              <span>Search Spaces</span>
-            </button>
-          </form>
-
           {/* SCROLL DOWN INDICATOR */}
           <div className="scroll-indicator" onClick={() => window.scrollTo({ top: window.innerHeight - 100, behavior: 'smooth' })}>
             <div className="mouse">
