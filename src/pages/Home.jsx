@@ -2016,7 +2016,6 @@ export default function Home() {
   const [loadingAccommodation, setLoadingAccommodation] = useState(true);
   const [fetchError, setFetchError] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [animatedStats, setAnimatedStats] = useState({ listings: 0, counties: 0, tenants: 0 });
   const [activeFeaturedTab, setActiveFeaturedTab] = useState("properties");
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [reviews, setReviews] = useState([]);
@@ -2146,18 +2145,6 @@ export default function Home() {
     };
 
     fetchAllFeatured().catch(() => setComponentError("Failed to load featured items"));
-  }, []);
-
-  useEffect(() => {
-    const target = { listings: 280, counties: 47, tenants: 500 };
-    const steps = 60; let step = 0;
-    const timer = setInterval(() => {
-      step++;
-      const e = 1 - Math.pow(1 - step / steps, 3);
-      setAnimatedStats({ listings: Math.floor(target.listings * e), counties: Math.floor(target.counties * e), tenants: Math.floor(target.tenants * e) });
-      if (step >= steps) { clearInterval(timer); setAnimatedStats(target); }
-    }, 2000 / steps);
-    return () => clearInterval(timer);
   }, []);
 
   const handleSearch = (ev) => {
@@ -2400,29 +2387,6 @@ export default function Home() {
               <span>Search Spaces</span>
             </button>
           </form>
-
-          {/* FLOATING STATS STRIP */}
-          <div className="hero-stats-strip">
-            <div className="hero-stat-item">
-              <div className="hero-stat-number">{animatedStats.listings}+</div>
-              <div className="hero-stat-desc">Active Listings</div>
-            </div>
-            <div className="hero-stat-sep"></div>
-            <div className="hero-stat-item">
-              <div className="hero-stat-number">{animatedStats.counties}</div>
-              <div className="hero-stat-desc">Counties Covered</div>
-            </div>
-            <div className="hero-stat-sep"></div>
-            <div className="hero-stat-item">
-              <div className="hero-stat-number">{animatedStats.tenants}+</div>
-              <div className="hero-stat-desc">Direct Inquiries</div>
-            </div>
-            <div className="hero-stat-sep"></div>
-            <div className="hero-stat-item">
-              <div className="hero-stat-number" style={{ color: "#22c55e" }}>0%</div>
-              <div className="hero-stat-desc">Broker Fees</div>
-            </div>
-          </div>
 
           {/* SCROLL DOWN INDICATOR */}
           <div className="scroll-indicator" onClick={() => window.scrollTo({ top: window.innerHeight - 100, behavior: 'smooth' })}>
