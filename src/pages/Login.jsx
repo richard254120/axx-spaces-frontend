@@ -43,7 +43,7 @@ export default function Login() {
           email: googleUser.email,
           name: googleUser.name,
           picture: googleUser.picture,
-          role: loginType === "mover" ? "mover" : "landlord",
+          role: loginType === "mover" ? "mover" : (loginType === "landlord" ? "landlord" : undefined),
         }),
       });
 
@@ -113,7 +113,10 @@ export default function Login() {
       const response = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, role: loginType === "mover" ? "mover" : "landlord" }),
+        body: JSON.stringify({
+          ...formData,
+          role: loginType === "mover" ? "mover" : (loginType === "landlord" ? "landlord" : undefined),
+        }),
       });
 
       const data = await response.json();
@@ -345,7 +348,13 @@ export default function Login() {
                   Create Account
                 </Link>
               </p>
-              <p style={{ ...styles.footer, marginTop: "10px", fontSize: "12px" }}>
+              <p style={{ ...styles.footer, marginTop: "10px", fontSize: "13px" }}>
+                Looking to explore or join as a member?{" "}
+                <Link to="/user-login" style={{ ...styles.link, color: "#f59e0b", fontWeight: 700 }}>
+                  Member Sign In / Join
+                </Link>
+              </p>
+              <p style={{ ...styles.footer, marginTop: "8px", fontSize: "12px" }}>
                 Are you a mover?{" "}
                 <Link to="/movers" style={styles.link}>
                   Go to Mover Portal

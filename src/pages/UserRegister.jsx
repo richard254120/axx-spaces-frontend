@@ -76,21 +76,19 @@ export default function UserRegister() {
         throw new Error(data.error || data.message || "Registration failed");
       }
 
-      // Registration successful
-      setSuccess(data.message || "Registration successful! You can now log in.");
-
-      // Clear form
-      setFormData({
-        name: "",
-        email: "",
-        password: "",
-        phone: "",
-      });
-
-      // Redirect to login after 2 seconds
-      setTimeout(() => {
-        navigate("/user-login");
-      }, 2000);
+      // Registration successful & auto-login
+      if (data.token && data.user) {
+        login(data.token, data.user);
+        setSuccess("🎉 Welcome to AxxSpace! Your account is active. Redirecting...");
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
+      } else {
+        setSuccess(data.message || "Registration successful! You can now log in.");
+        setTimeout(() => {
+          navigate("/user-login");
+        }, 1500);
+      }
 
     } catch (err) {
       console.error("Registration error:", err);
