@@ -305,7 +305,7 @@ function App() {
         path="/upload"
         element={
           <DashboardLayout>
-            <ProtectedRoute allowedRoles={["landlord"]}>
+            <ProtectedRoute allowedRoles={["landlord", "agent"]}>
               <Upload />
             </ProtectedRoute>
           </DashboardLayout>
@@ -315,7 +315,7 @@ function App() {
         path="/property/edit/:id"
         element={
           <DashboardLayout>
-            <ProtectedRoute allowedRoles={["landlord", "admin"]}>
+            <ProtectedRoute allowedRoles={["landlord", "agent", "admin"]}>
               <Upload />
             </ProtectedRoute>
           </DashboardLayout>

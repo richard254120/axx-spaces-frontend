@@ -1,6 +1,7 @@
 /** Dashboard home path for each account role */
 export const DASHBOARD_BY_ROLE = {
   landlord: "/dashboard",
+  agent: "/agent/dashboard",
   host: "/accommodation/host-dashboard",
   seller: "/seller-dashboard",
   mover: "/mover-dashboard",
@@ -11,6 +12,7 @@ export const DASHBOARD_BY_ROLE = {
 
 /** Login page when that dashboard requires auth */
 export const LOGIN_BY_ROLE = {
+  agent: "/agent/login",
   host: "/accommodation/login",
   landlord: "/login",
   seller: "/seller-login",
@@ -96,6 +98,11 @@ export const ACCOUNT_NAV_BY_ROLE = {
     { label: "Payments", path: "/payment-history" },
     { label: "Settings", path: "/settings" },
   ],
+  agent: [
+    { label: "Dashboard", path: "/agent/dashboard" },
+    { label: "Upload House", path: "/upload" },
+    { label: "Settings", path: "/settings" },
+  ],
   host: [
     { label: "Dashboard", path: "/accommodation/dashboard" },
     { label: "Settings", path: "/settings" },
@@ -130,6 +137,7 @@ export function getAccountNav(role) {
 
 export function getWorkspaceBrand(role) {
   const brands = {
+    agent: "Agent Portal",
     landlord: "Landlord Portal",
     seller: "Seller Portal",
     mover: "Axx Movers",

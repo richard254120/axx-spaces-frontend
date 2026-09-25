@@ -415,7 +415,7 @@ export default function Upload() {
         setStepErrors([]);
       }
 
-      const redirectPath = user?.role === "admin" ? "/admin/dashboard" : "/dashboard";
+      const redirectPath = user?.role === "admin" ? "/admin/dashboard" : user?.role === "agent" ? "/agent/dashboard" : "/dashboard";
       setTimeout(() => navigate(redirectPath), 2800);
     } catch (err) {
       setError(err.message || "Error submitting property");
