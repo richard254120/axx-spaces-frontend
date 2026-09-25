@@ -8,7 +8,7 @@ import {
   accommodationTheme,
   AMENITIES_LIST,
 } from "../../features/accommodation";
-import { fetchOwnerListing, updateOwnerListing } from "../../api/accommodation";
+import { fetchOwnerListing, updateOwnerListing, formatVideoUrl } from "../../api/accommodation";
 import { getAccommodationToken } from "../../features/accommodation";
 
 export default function EditPropertyPage() {
@@ -170,7 +170,7 @@ export default function EditPropertyPage() {
             <div style={mediaGrid}>
               {currentVideos.map((url) => (
                 <div key={url} style={mediaItem}>
-                  <video src={url} controls style={mediaImg} />
+                  <video src={formatVideoUrl(url)} controls playsInline preload="metadata" style={mediaImg} />
                   <button type="button" style={removeBtn} onClick={() => setRemoveVideos((r) => [...r, url])}>Remove</button>
                 </div>
               ))}

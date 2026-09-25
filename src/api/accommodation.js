@@ -17,6 +17,18 @@ function authHeaders(token) {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
+export function formatVideoUrl(url) {
+  if (!url || typeof url !== "string") return "";
+  let cleanUrl = url.trim().replace(/^http:\/\//i, "https://");
+  if (cleanUrl.includes("cloudinary.com") && cleanUrl.includes("/video/upload/")) {
+    cleanUrl = cleanUrl.replace(/\.(mov|quicktime|mkv|avi|webm|ogv|m4v)$/i, ".mp4");
+    if (!/\.(mp4|webm)$/i.test(cleanUrl)) {
+      cleanUrl = `${cleanUrl}.mp4`;
+    }
+  }
+  return cleanUrl;
+}
+
 // ─── Normalizer ───────────────────────────────────────────────────────
 
 export function normalizeAccommodation(acc) {
@@ -40,7 +52,7 @@ export function normalizeAccommodation(acc) {
 
   const rawVideos = acc.videos || (acc.video ? [acc.video] : []);
   const videos = Array.isArray(rawVideos)
-    ? rawVideos.map(v => typeof v === "string" ? v : v?.url || v?.videoUrl || "").filter(Boolean)
+    ? rawVideos.map(v => formatVideoUrl(typeof v === "string" ? v : v?.url || v?.videoUrl || "")).filter(Boolean)
     : [];
 
   return {

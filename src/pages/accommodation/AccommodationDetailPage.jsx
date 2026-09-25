@@ -89,9 +89,10 @@ const DEFAULT_REVIEWS = [
 
 function formatVideoUrl(url) {
   if (!url || typeof url !== "string") return "";
-  let cleanUrl = url.trim();
+  let cleanUrl = url.trim().replace(/^http:\/\//i, "https://");
   if (cleanUrl.includes("cloudinary.com") && cleanUrl.includes("/video/upload/")) {
-    if (!/\.(mp4|webm|ogv|mov|m4v)$/i.test(cleanUrl)) {
+    cleanUrl = cleanUrl.replace(/\.(mov|quicktime|mkv|avi|webm|ogv|m4v)$/i, ".mp4");
+    if (!/\.(mp4|webm)$/i.test(cleanUrl)) {
       cleanUrl = `${cleanUrl}.mp4`;
     }
   }
@@ -825,7 +826,6 @@ export default function AccommodationDetailPage() {
                               className="lux-video-player"
                             >
                               <source src={cleanVidUrl} type="video/mp4" />
-                              <source src={cleanVidUrl} type="video/webm" />
                               Your browser does not support HTML5 video playback.
                             </video>
                           </div>

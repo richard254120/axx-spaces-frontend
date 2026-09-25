@@ -34,6 +34,18 @@ const TAB_LABELS = {
 };
 const STATUS_VIEWS = ["pending", "approved", "rejected"];
 
+function formatVideoUrl(url) {
+  if (!url || typeof url !== "string") return "";
+  let cleanUrl = url.trim().replace(/^http:\/\//i, "https://");
+  if (cleanUrl.includes("cloudinary.com") && cleanUrl.includes("/video/upload/")) {
+    cleanUrl = cleanUrl.replace(/\.(mov|quicktime|mkv|avi|webm|ogv|m4v)$/i, ".mp4");
+    if (!/\.(mp4|webm)$/i.test(cleanUrl)) {
+      cleanUrl = `${cleanUrl}.mp4`;
+    }
+  }
+  return cleanUrl;
+}
+
 export default function AdminDashboard() {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -2136,7 +2148,7 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
               <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                 {item.videos.map((vidUrl, vIdx) => (
                   <div key={vIdx} style={{ borderRadius: "8px", overflow: "hidden", background: "#000" }}>
-                    <video src={vidUrl} controls playsInline style={{ width: "100%", maxHeight: "280px", display: "block" }} />
+                    <video src={formatVideoUrl(vidUrl)} controls playsInline preload="metadata" style={{ width: "100%", maxHeight: "280px", display: "block" }} />
                   </div>
                 ))}
               </div>
