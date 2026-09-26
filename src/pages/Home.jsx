@@ -610,26 +610,174 @@ option { background: #151936; color: #F8FAFC; }
 .hero-title {
   margin: 0;
   line-height: 1.15;
+  position: relative;
+  display: inline-block;
+  cursor: default;
+}
+.magic-hero-title {
+  position: relative;
+  display: inline-block;
 }
 .hero-title-line1 {
   display: block;
   font-family: 'Poppins', sans-serif;
-  font-size: clamp(2.6rem, 5.8vw, 4.5rem);
+  font-size: clamp(2.6rem, 5.8vw, 4.6rem);
   font-weight: 800;
-  color: #FFFFFF;
   letter-spacing: -0.02em;
-  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+  position: relative;
+}
+.magic-shimmer-text {
+  background: linear-gradient(
+    110deg,
+    #ffffff 0%,
+    #ffffff 30%,
+    #fde68a 45%,
+    #ffffff 50%,
+    #67e8f9 55%,
+    #ffffff 70%,
+    #ffffff 100%
+  );
+  background-size: 240% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: magicShimmerSweep 5.5s ease-in-out infinite;
+  filter: drop-shadow(0 4px 24px rgba(0, 0, 0, 0.7));
 }
 .hero-title-line2 {
   display: block;
   font-family: 'Poppins', sans-serif;
-  font-size: clamp(2.6rem, 5.8vw, 4.5rem);
-  font-weight: 800;
-  background: linear-gradient(135deg, #38BDF8 0%, #60A5FA 50%, #818CF8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: clamp(2.6rem, 5.8vw, 4.6rem);
+  font-weight: 900;
   letter-spacing: -0.02em;
   margin-top: 6px;
+  position: relative;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
+}
+.magic-aurora-text {
+  background: linear-gradient(
+    135deg,
+    #fbbf24 0%,
+    #f59e0b 15%,
+    #f43f5e 35%,
+    #c084fc 55%,
+    #38bdf8 75%,
+    #34d399 90%,
+    #fbbf24 100%
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: magicAuroraFlow 6s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 25px rgba(245, 158, 11, 0.5)) drop-shadow(0 0 50px rgba(56, 189, 248, 0.35));
+}
+.magic-hero-title:hover .magic-aurora-text {
+  transform: scale(1.02);
+  filter: drop-shadow(0 0 35px rgba(245, 158, 11, 0.8)) drop-shadow(0 0 65px rgba(56, 189, 248, 0.6));
+}
+.magic-star {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  font-size: clamp(14px, 1.8vw, 22px);
+  display: inline-block;
+  line-height: 1;
+}
+.magic-star-top {
+  top: -12px;
+  right: -24px;
+  color: #fde047;
+  animation: starFloatTwinkle 3.4s ease-in-out infinite;
+}
+.magic-star-left {
+  left: -28px;
+  top: 50%;
+  color: #38bdf8;
+  animation: starFloatTwinkle 4.2s ease-in-out infinite 0.7s;
+}
+.magic-star-right {
+  right: -28px;
+  top: 50%;
+  color: #f43f5e;
+  animation: starFloatTwinkle 3.8s ease-in-out infinite 1.4s;
+}
+.magic-ambient-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 90%;
+  height: 120%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(245, 158, 11, 0.22) 0%,
+    rgba(56, 189, 248, 0.16) 45%,
+    transparent 75%
+  );
+  filter: blur(45px);
+  pointer-events: none;
+  z-index: -1;
+  animation: magicGlowPulse 4.5s ease-in-out infinite alternate;
+}
+
+@keyframes magicShimmerSweep {
+  0% {
+    background-position: 100% 0;
+  }
+  35%, 100% {
+    background-position: -140% 0;
+  }
+}
+
+@keyframes magicAuroraFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes starFloatTwinkle {
+  0%, 100% {
+    transform: translateY(0px) scale(0.85) rotate(0deg);
+    opacity: 0.6;
+    filter: drop-shadow(0 0 6px currentColor);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.3) rotate(45deg);
+    opacity: 1;
+    filter: drop-shadow(0 0 16px currentColor);
+  }
+}
+
+@keyframes magicGlowPulse {
+  0% {
+    opacity: 0.45;
+    transform: translate(-50%, -50%) scale(0.92);
+  }
+  100% {
+    opacity: 0.85;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+}
+
+@media (max-width: 640px) {
+  .magic-star-left {
+    left: -14px;
+    font-size: 14px;
+  }
+  .magic-star-right {
+    right: -14px;
+    font-size: 14px;
+  }
+  .magic-star-top {
+    right: -12px;
+    top: -8px;
+    font-size: 14px;
+  }
 }
 .hero-sub {
   font-family: 'Inter', sans-serif;
@@ -2334,9 +2482,17 @@ export default function Home() {
             Kenya's Premier Property &amp; Spaces Platform
           </div>
 
-          <h1 className="hero-title">
-            <span className="hero-title-line1">Everything You Need</span>
-            <span className="hero-title-line2">Under One Roof</span>
+          <h1 className="hero-title magic-hero-title">
+            <span className="hero-title-line1 magic-shimmer-text">
+              Everything You Need
+              <span className="magic-star magic-star-top" aria-hidden="true">✦</span>
+            </span>
+            <span className="hero-title-line2 magic-aurora-text">
+              <span className="magic-star magic-star-left" aria-hidden="true">✨</span>
+              Under One Roof
+              <span className="magic-star magic-star-right" aria-hidden="true">✨</span>
+            </span>
+            <span className="magic-ambient-glow" aria-hidden="true"></span>
           </h1>
           <p className="hero-sub">
             Verified Rentals · Luxury Accommodation · AxxBiashara Services · Direct QuickSales

@@ -62,6 +62,7 @@ export default function AdminDashboard() {
   // ADDED: agents tab state
   const [agents, setAgents] = useState([]);
   const [agentsLoading, setAgentsLoading] = useState(false);
+  const [agentStatusFilter, setAgentStatusFilter] = useState("");
   // END ADDED
 
   useEffect(() => {
@@ -136,9 +137,9 @@ export default function AdminDashboard() {
   // ADDED: load agents when tab is selected
   useEffect(() => {
     if (activeTab === "agents") {
-      loadAgents();
+      loadAgents(agentStatusFilter);
     }
-  }, [activeTab]);
+  }, [activeTab, agentStatusFilter]);
 
   // ADDED: load properties when tab or filter changes
   useEffect(() => {
@@ -201,10 +202,11 @@ export default function AdminDashboard() {
   // END ADDED
 
   // ADDED: load agents function
-  const loadAgents = async () => {
+  const loadAgents = async (statusFilter = null) => {
     setAgentsLoading(true);
     try {
-      const res = await API.get("/agents");
+      const params = statusFilter ? { verificationStatus: statusFilter } : {};
+      const res = await API.get("/agents", { params });
       setAgents(res.data || []);
     } catch (err) {
       console.error("Failed to load agents:", err);
@@ -220,6 +222,19 @@ export default function AdminDashboard() {
       alert("Agent verified successfully");
     } catch (err) {
       alert("Failed to verify agent");
+    }
+  };
+
+  const handleRejectAgent = async (agentId) => {
+    const reason = prompt("Please provide a reason for rejection:");
+    if (!reason) return;
+
+    try {
+      await API.put(`/agents/${agentId}/reject`, { reason });
+      loadAgents();
+      alert("Agent rejected successfully");
+    } catch (err) {
+      alert("Failed to reject agent");
     }
   };
 
@@ -1622,7 +1637,25 @@ export default function AdminDashboard() {
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "20px", width: "100%" }}>
-            <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Rental Agents</h2>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Rental Agents</h2>
+              <select
+                value={agentStatusFilter}
+                onChange={(e) => setAgentStatusFilter(e.target.value)}
+                style={{
+                  padding: "8px 12px",
+                  borderRadius: "8px",
+                  border: "1px solid #e5e7eb",
+                  fontSize: "13px",
+                  fontFamily: "inherit",
+                }}
+              >
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="verified">Verified</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
             <div style={styles.tableContainer}>
               <table style={styles.table}>
                 <thead>
@@ -1630,6 +1663,7 @@ export default function AdminDashboard() {
                     <th style={styles.th}>Agent Info</th>
                     <th style={styles.th}>Phone</th>
                     <th style={styles.th}>County</th>
+                    <th style={styles.th}>ID Number</th>
                     <th style={styles.th}>Bio</th>
                     <th style={styles.th}>Status</th>
                     <th style={styles.th}>Actions</th>
@@ -1651,6 +1685,9 @@ export default function AdminDashboard() {
                         <div style={styles.propLoc}>{agent.agentProfile?.county || "N/A"}</div>
                       </td>
                       <td style={styles.td}>
+                        <div style={styles.propLoc}>{agent.agentProfile?.idNumber || "N/A"}</div>
+                      </td>
+                      <td style={styles.td}>
                         <div style={{ maxWidth: "250px", fontSize: "13px", color: "#94a3b8" }}>
                           {agent.agentProfile?.bio?.substring(0, 100) || "N/A"}
                           {agent.agentProfile?.bio?.length > 100 && "..."}
@@ -1662,21 +1699,57 @@ export default function AdminDashboard() {
                           padding: "2px 8px",
                           borderRadius: "4px",
                           fontWeight: 600,
-                          background: agent.agentProfile?.verified ? "rgba(34,197,94,0.12)" : "rgba(251,191,36,0.12)",
-                          color: agent.agentProfile?.verified ? "#22c55e" : "#fbbf24",
-                          border: `1px solid ${agent.agentProfile?.verified ? "rgba(34,197,94,0.3)" : "rgba(251,191,36,0.3)"}`,
+                          background: agent.agentProfile?.verificationStatus === "verified"
+                            ? "rgba(34,197,94,0.12)"
+                            : agent.agentProfile?.verificationStatus === "rejected"
+                              ? "rgba(239,68,68,0.12)"
+                              : "rgba(251,191,36,0.12)",
+                          color: agent.agentProfile?.verificationStatus === "verified"
+                            ? "#22c55e"
+                            : agent.agentProfile?.verificationStatus === "rejected"
+                              ? "#ef4444"
+                              : "#fbbf24",
+                          border: `1px solid ${agent.agentProfile?.verificationStatus === "verified"
+                            ? "rgba(34,197,94,0.3)"
+                            : agent.agentProfile?.verificationStatus === "rejected"
+                              ? "rgba(239,68,68,0.3)"
+                              : "rgba(251,191,36,0.3)"}`,
                         }}>
-                          {agent.agentProfile?.verified ? "VERIFIED" : "PENDING"}
+                          {agent.agentProfile?.verificationStatus?.toUpperCase() || "PENDING"}
                         </span>
                       </td>
                       <td style={styles.td}>
                         <div style={styles.btnGroup}>
-                          {!agent.agentProfile?.verified && (
+                          {agent.agentProfile?.verificationStatus === "pending" && (
+                            <>
+                              <button
+                                onClick={() => handleVerifyAgent(agent._id)}
+                                style={styles.approveBtn}
+                              >
+                                Verify
+                              </button>
+                              <button
+                                onClick={() => handleRejectAgent(agent._id)}
+                                style={styles.rejectBtn}
+                              >
+                                Reject
+                              </button>
+                            </>
+                          )}
+                          {agent.agentProfile?.idPhotoFront && (
                             <button
-                              onClick={() => handleVerifyAgent(agent._id)}
-                              style={styles.approveBtn}
+                              onClick={() => window.open(agent.agentProfile.idPhotoFront, "_blank")}
+                              style={{ ...styles.viewBtn, marginLeft: "8px" }}
                             >
-                              Verify
+                              View ID
+                            </button>
+                          )}
+                          {agent.agentProfile?.selfiePhoto && (
+                            <button
+                              onClick={() => window.open(agent.agentProfile.selfiePhoto, "_blank")}
+                              style={{ ...styles.viewBtn, marginLeft: "8px" }}
+                            >
+                              View Selfie
                             </button>
                           )}
                         </div>
@@ -1973,6 +2046,44 @@ const styles = {
   // ADDED styles
   txCode: { background: "rgba(34, 197, 94, 0.1)", color: "#22c55e", padding: "4px 10px", borderRadius: "6px", fontSize: "13px", fontFamily: "monospace" },
   smsPreview: { fontSize: "12px", color: "#64748b", maxWidth: "220px", lineHeight: "1.5" },
+  approveBtn: {
+    background: "rgba(34, 197, 94, 0.15)",
+    color: "#22c55e",
+    border: "1px solid rgba(34, 197, 94, 0.3)",
+    padding: "6px 12px",
+    borderRadius: "6px",
+    fontSize: "12px",
+    fontWeight: 700,
+    cursor: "pointer",
+    transition: "all 0.2s",
+  },
+  rejectBtn: {
+    background: "rgba(239, 68, 68, 0.15)",
+    color: "#ef4444",
+    border: "1px solid rgba(239, 68, 68, 0.3)",
+    padding: "6px 12px",
+    borderRadius: "6px",
+    fontSize: "12px",
+    fontWeight: 700,
+    cursor: "pointer",
+    transition: "all 0.2s",
+  },
+  viewBtn: {
+    background: "rgba(59, 130, 246, 0.15)",
+    color: "#3b82f6",
+    border: "1px solid rgba(59, 130, 246, 0.3)",
+    padding: "6px 12px",
+    borderRadius: "6px",
+    fontSize: "12px",
+    fontWeight: 700,
+    cursor: "pointer",
+    transition: "all 0.2s",
+  },
+  btnGroup: {
+    display: "flex",
+    gap: "8px",
+    flexWrap: "wrap",
+  },
   // END ADDED
   configContainer: {
     background: "rgba(15, 23, 42, 0.8)",

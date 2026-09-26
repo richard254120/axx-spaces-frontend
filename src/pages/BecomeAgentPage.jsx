@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import PhoneInput from "../components/PhoneInput";
 import { KENYA_COUNTIES } from "../features/accommodation";
+import { resolveMediaUrl } from "../utils/fileLinks";
 
 const counties = KENYA_COUNTIES;
 
@@ -111,9 +112,52 @@ export default function BecomeAgentPage() {
   const [phone, setPhone] = useState("");
   const [county, setCounty] = useState("");
   const [bio, setBio] = useState("");
+  const [idNumber, setIdNumber] = useState("");
+  const [idPhotoFront, setIdPhotoFront] = useState(null);
+  const [selfiePhoto, setSelfiePhoto] = useState(null);
+  const [idPhotoFrontUrl, setIdPhotoFrontUrl] = useState("");
+  const [selfiePhotoUrl, setSelfiePhotoUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const handleFileUpload = async (file, type) => {
+    if (!file) return;
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("type", "verification");
+
+    try {
+      const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
+      const response = await fetch(`${API_BASE}/uploads`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        const fileUrl = data.url || data.fileUrl || data.path;
+        if (type === "idPhotoFront") {
+          setIdPhotoFrontUrl(fileUrl);
+        } else if (type === "selfiePhoto") {
+          setSelfiePhotoUrl(fileUrl);
+        }
+      } else {
+        setError(data.error || "Failed to upload file");
+      }
+    } catch (err) {
+      setError("Failed to upload file. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -125,8 +169,8 @@ export default function BecomeAgentPage() {
       return;
     }
 
-    if (!phone || !county || !bio) {
-      setError("Please fill in all required fields.");
+    if (!phone || !county || !bio || !idNumber || !idPhotoFrontUrl || !selfiePhotoUrl) {
+      setError("Please fill in all required fields and upload both ID photo and selfie.");
       return;
     }
 
@@ -140,7 +184,14 @@ export default function BecomeAgentPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ phone, county, bio }),
+        body: JSON.stringify({
+          phone,
+          county,
+          bio,
+          idNumber,
+          idPhotoFront: idPhotoFrontUrl,
+          selfiePhoto: selfiePhotoUrl
+        }),
       });
 
       const data = await response.json();
@@ -150,6 +201,11 @@ export default function BecomeAgentPage() {
         setPhone("");
         setCounty("");
         setBio("");
+        setIdNumber("");
+        setIdPhotoFront(null);
+        setSelfiePhoto(null);
+        setIdPhotoFrontUrl("");
+        setSelfiePhotoUrl("");
       } else {
         setError(data.error || "Failed to submit application. Please try again.");
       }
@@ -169,7 +225,7 @@ export default function BecomeAgentPage() {
         </p>
 
         <div style={s.infoBox}>
-          <strong>What you'll need:</strong> A valid phone number, your county of operation, and a brief bio about your experience.
+          <strong>What you'll need:</strong> A valid phone number, your county of operation, a brief bio about your experience, your national ID number, and photos of your ID and a selfie for verification.
         </div>
 
         {error && <div style={s.error}>{error}</div>}
@@ -239,12 +295,72 @@ export default function BecomeAgentPage() {
             />
           </div>
 
+          <div style={s.field}>
+            <label style={s.label}>National ID Number *</label>
+            <input
+              style={s.input}
+              type="text"
+              value={idNumber}
+              onChange={(e) => setIdNumber(e.target.value)}
+              placeholder="Enter your national ID number"
+              required
+            />
+          </div>
+
+          <div style={s.field}>
+            <label style={s.label}>ID Photo (Front) *</label>
+            <input
+              style={s.input}
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  setIdPhotoFront(file);
+                  handleFileUpload(file, "idPhotoFront");
+                }
+              }}
+              required
+            />
+            {idPhotoFrontUrl && (
+              <img
+                src={resolveMediaUrl(idPhotoFrontUrl)}
+                alt="ID Front"
+                style={{ width: "100%", maxWidth: "200px", marginTop: "10px", borderRadius: "8px" }}
+              />
+            )}
+          </div>
+
+          <div style={s.field}>
+            <label style={s.label}>Selfie Photo *</label>
+            <input
+              style={s.input}
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  setSelfiePhoto(file);
+                  handleFileUpload(file, "selfiePhoto");
+                }
+              }}
+              required
+            />
+            {selfiePhotoUrl && (
+              <img
+                src={resolveMediaUrl(selfiePhotoUrl)}
+                alt="Selfie"
+                style={{ width: "100%", maxWidth: "200px", marginTop: "10px", borderRadius: "8px" }}
+              />
+            )}
+          </div>
+
           <button
             type="submit"
             style={s.button}
-            disabled={loading}
+            disabled={loading || uploading}
           >
-            {loading ? "Submitting..." : "Submit Application"}
+            {loading ? "Submitting..." : uploading ? "Uploading..." : "Submit Application"}
           </button>
         </form>
 

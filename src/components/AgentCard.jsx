@@ -1,16 +1,78 @@
+import { useState } from "react";
 import { resolveMediaUrl } from "../utils/fileLinks";
 import { getWhatsAppUrl } from "../utils/whatsapp";
 
-export default function AgentCard({ agent }) {
+export default function AgentCard({ agent, rentalId }) {
   if (!agent) return null;
 
   const { name, agentProfile } = agent;
-  const { phone, county, bio, verified, photo } = agentProfile || {};
+  const { phone, county, bio, verificationStatus, photo } = agentProfile || {};
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [reportDetails, setReportDetails] = useState("");
+  const [reporterContact, setReporterContact] = useState("");
+  const [submittingReport, setSubmittingReport] = useState(false);
 
-  const whatsappUrl = getWhatsAppUrl(
+  const isVerified = verificationStatus === "verified";
+
+  const whatsappUrl = isVerified && phone ? getWhatsAppUrl(
     phone,
     `Hello ${name}, I'm interested in a property you're representing.`
-  );
+  ) : null;
+
+  const handleWhatsAppClick = async (e) => {
+    if (!isVerified || !phone) return;
+
+    // Log inquiry (fire-and-forget, don't block WhatsApp redirect)
+    if (rentalId) {
+      fetch(`${process.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api"}/inquiries/log`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          rentalId,
+          agentId: agent._id,
+        }),
+      }).catch((err) => console.error("Failed to log inquiry:", err));
+    }
+  };
+
+  const handleReportSubmit = async (e) => {
+    e.preventDefault();
+    if (!reportReason || !reporterContact) {
+      alert("Please select a reason and provide your contact information");
+      return;
+    }
+
+    setSubmittingReport(true);
+    try {
+      const response = await fetch(`${process.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api"}/reports`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          agentId: agent._id,
+          rentalId: rentalId || null,
+          reason: reportReason,
+          details: reportDetails,
+          reporterContact,
+        }),
+      });
+
+      if (response.ok) {
+        alert("Report submitted successfully");
+        setShowReportModal(false);
+        setReportReason("");
+        setReportDetails("");
+        setReporterContact("");
+      } else {
+        alert("Failed to submit report");
+      }
+    } catch (err) {
+      console.error("Error submitting report:", err);
+      alert("Failed to submit report");
+    } finally {
+      setSubmittingReport(false);
+    }
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mt-6 border border-gray-200">
@@ -34,9 +96,13 @@ export default function AgentCard({ agent }) {
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h3 className="text-xl font-semibold text-gray-800">{name}</h3>
-            {verified && (
+            {isVerified ? (
               <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                Verified
+                ✓ Verified
+              </span>
+            ) : (
+              <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">
+                Verification Pending
               </span>
             )}
           </div>
@@ -51,12 +117,13 @@ export default function AgentCard({ agent }) {
             <p className="text-sm text-gray-700 mt-2 line-clamp-2">{bio}</p>
           )}
 
-          {/* WhatsApp Button */}
-          {whatsappUrl && (
+          {/* WhatsApp Button - Only show if verified */}
+          {isVerified && whatsappUrl && (
             <a
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={handleWhatsAppClick}
               className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium"
             >
               <svg
@@ -70,8 +137,91 @@ export default function AgentCard({ agent }) {
               Contact on WhatsApp
             </a>
           )}
+
+          {!isVerified && (
+            <p className="mt-4 text-sm text-gray-500 italic">
+              Contact information hidden until agent verification is complete
+            </p>
+          )}
+
+          {/* Report Agent Link */}
+          <button
+            onClick={() => setShowReportModal(true)}
+            className="mt-4 text-sm text-red-600 hover:text-red-800 underline"
+          >
+            Report this agent
+          </button>
         </div>
       </div>
+
+      {/* Report Modal */}
+      {showReportModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold mb-4">Report Agent</h3>
+            <form onSubmit={handleReportSubmit}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Reason *
+                </label>
+                <select
+                  value={reportReason}
+                  onChange={(e) => setReportReason(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  required
+                >
+                  <option value="">Select a reason</option>
+                  <option value="no_show">Agent didn't show up</option>
+                  <option value="fake_listing">Fake listing</option>
+                  <option value="payment_requested">Requested payment before viewing</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Details
+                </label>
+                <textarea
+                  value={reportDetails}
+                  onChange={(e) => setReportDetails(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  rows="3"
+                  placeholder="Please provide more details..."
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Your Contact (Phone/Email) *
+                </label>
+                <input
+                  type="text"
+                  value={reporterContact}
+                  onChange={(e) => setReporterContact(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  required
+                  placeholder="phone or email"
+                />
+              </div>
+              <div className="flex gap-2">
+                <button
+                  type="submit"
+                  disabled={submittingReport}
+                  className="flex-1 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 disabled:opacity-50"
+                >
+                  {submittingReport ? "Submitting..." : "Submit Report"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowReportModal(false)}
+                  className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
