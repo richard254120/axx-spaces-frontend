@@ -10,12 +10,14 @@ import BadgeManagement from "../components/BadgeManagement";
 import UserBadgeManagement from "../components/UserBadgeManagement";
 import { getPricelistUrl, openAdminFile, resolveMediaUrl } from "../utils/fileLinks";
 import QRGeneratorModal from "../components/QRGeneratorModal";
+import WebsitePoster from "../components/WebsitePoster";
 import "./AdminDashboard.css";
 
 // ── tiny helpers ──────────────────────────────────────────────
-const TABS = ["overview", "properties", "materials", "tourism", "movers", "sellers", "sold", "payment", "boosts", "businesses", "announcements", "verification", "requests", "listings-badges", "user-badges", "accommodations"];
+const TABS = ["overview", "website-poster", "properties", "materials", "tourism", "movers", "sellers", "sold", "payment", "boosts", "businesses", "announcements", "verification", "requests", "listings-badges", "user-badges", "accommodations"];
 const TAB_LABELS = {
   overview: " Dashboard Overview",
+  "website-poster": " Website Poster",
   properties: " Properties",
   materials: " Materials",
   tourism: " Tourism",
@@ -239,7 +241,12 @@ export default function AdminDashboard() {
       loadRequests();
     } else if (activeTab === "accommodations") {
       loadAccommodations();
-    } else if (activeTab !== "payment") {
+    } else if (
+      activeTab !== "payment" &&
+      activeTab !== "website-poster" &&
+      activeTab !== "listings-badges" &&
+      activeTab !== "user-badges"
+    ) {
       loadItems(activeTab, statusView);
       loadViewStats(activeTab);
       loadTopViewed(activeTab);
@@ -999,6 +1006,10 @@ export default function AdminDashboard() {
                   <span className="quick-action-icon"></span>
                   <span className="quick-action-text">View Sold Items</span>
                 </button>
+                <button className="btn-quick-action" onClick={() => setActiveTab("website-poster")}>
+                  <span className="quick-action-icon"></span>
+                  <span className="quick-action-text">Website QR Poster</span>
+                </button>
               </div>
             </div>
           </>
@@ -1007,7 +1018,7 @@ export default function AdminDashboard() {
         {/* Tabs rendered in Sidebar */}
 
         {/* STATUS VIEW TOGGLE */}
-        {activeTab !== "payment" && activeTab !== "sold" && activeTab !== "boosts" && (
+        {activeTab !== "payment" && activeTab !== "sold" && activeTab !== "boosts" && activeTab !== "website-poster" && activeTab !== "overview" && activeTab !== "listings-badges" && activeTab !== "user-badges" && (
           <div className="status-toggle">
             {STATUS_VIEWS.map(v => (
               <button key={v}
@@ -1020,7 +1031,7 @@ export default function AdminDashboard() {
         )}
 
         {/* SEARCH AND FILTER BAR */}
-        {activeTab !== "payment" && activeTab !== "boosts" && activeTab !== "businesses" && activeTab !== "verification" && (
+        {activeTab !== "payment" && activeTab !== "boosts" && activeTab !== "businesses" && activeTab !== "verification" && activeTab !== "website-poster" && activeTab !== "overview" && activeTab !== "listings-badges" && activeTab !== "user-badges" && (
           <div className="search-bar">
             <div className="search-input-wrapper">
               <span className="search-icon"></span>
@@ -1052,7 +1063,7 @@ export default function AdminDashboard() {
         )}
 
         {/* RESULTS COUNT */}
-        {activeTab !== "payment" && activeTab !== "boosts" && !loading && filteredItems.length > 0 && (
+        {activeTab !== "payment" && activeTab !== "boosts" && activeTab !== "website-poster" && activeTab !== "overview" && !loading && filteredItems.length > 0 && (
           <div className="results-count">
             Showing <strong>{filteredItems.length}</strong> of <strong>{displayItems.length}</strong> {activeTab}
             {(searchQuery || filterCategory) && <span className="filter-tag"> (filtered)</span>}
@@ -1067,7 +1078,9 @@ export default function AdminDashboard() {
         )}
 
         {/* CONTENT */}
-        {activeTab === "overview" ? null : activeTab === "boosts" ? (
+        {activeTab === "overview" ? null : activeTab === "website-poster" ? (
+          <WebsitePoster />
+        ) : activeTab === "boosts" ? (
           <PaymentNotifications
             pendingBoosts={pendingBoosts}
             allBoosts={allBoosts}

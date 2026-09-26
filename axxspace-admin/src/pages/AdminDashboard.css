@@ -1830,3 +1830,111 @@
     margin: 20px auto !important;
   }
 }
+
+/* Website QR Poster */
+.website-poster-page {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.website-poster-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.website-poster-title {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 800;
+  color: #fbbf24;
+}
+
+.website-poster-subtitle {
+  margin: 0;
+  max-width: 560px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #94a3b8;
+}
+
+.website-poster-subtitle strong {
+  color: #e2e8f0;
+}
+
+.website-poster-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btn-poster-download,
+.btn-poster-print {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-poster-download {
+  background: #d9383a;
+  color: #fff;
+}
+
+.btn-poster-download:hover {
+  background: #b92d2f;
+  transform: translateY(-1px);
+}
+
+.btn-poster-print {
+  background: #081A34;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn-poster-print:hover {
+  background: #0f2a4d;
+  transform: translateY(-1px);
+}
+
+.website-poster-preview-wrap {
+  display: flex;
+  justify-content: center;
+  background: #0b111e;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 20px;
+  overflow: auto;
+}
+
+.website-poster-preview {
+  width: min(100%, 520px);
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  background: #fff;
+}
+
+@media (max-width: 768px) {
+  .website-poster-page {
+    padding: 16px;
+  }
+
+  .website-poster-actions {
+    width: 100%;
+  }
+
+  .btn-poster-download,
+  .btn-poster-print {
+    flex: 1;
+    text-align: center;
+  }
+}
