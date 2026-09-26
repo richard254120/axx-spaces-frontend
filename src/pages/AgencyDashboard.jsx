@@ -101,7 +101,7 @@ const s = {
     padding: "8px 16px",
     borderRadius: "8px",
     fontSize: "13px",
-    fontWeight: 700",
+    fontWeight: "700",
     cursor: "pointer",
     border: "none",
     transition: "all 0.2s",
@@ -174,7 +174,7 @@ const s = {
 export default function AgencyDashboard() {
   const navigate = useNavigate();
   const { token, user } = useContext(AuthContext);
-  
+
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -351,11 +351,11 @@ export default function AgencyDashboard() {
                           padding: "4px 10px",
                           borderRadius: "4px",
                           fontWeight: 600,
-                          background: agent.agentProfile?.verificationStatus === "verified" 
-                            ? "rgba(34,197,94,0.12)" 
+                          background: agent.agentProfile?.verificationStatus === "verified"
+                            ? "rgba(34,197,94,0.12)"
                             : "rgba(251,191,36,0.12)",
-                          color: agent.agentProfile?.verificationStatus === "verified" 
-                            ? "#22c55e" 
+                          color: agent.agentProfile?.verificationStatus === "verified"
+                            ? "#22c55e"
                             : "#fbbf24",
                         }}>
                           {agent.agentProfile?.verificationStatus?.toUpperCase() || "PENDING"}
