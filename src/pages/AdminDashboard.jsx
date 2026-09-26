@@ -199,7 +199,20 @@ export default function AdminDashboard() {
       alert("Failed to update accommodation status");
     }
   };
-  // END ADDED
+
+  const handleToggleFeatured = async (accommodationId, currentFeatured) => {
+    try {
+      await API.patch(`/accommodations/${accommodationId}/featured`, {
+        isFeatured: !currentFeatured,
+        promotionTier: "boost-7days",
+        durationDays: 7,
+      });
+      loadAccommodations();
+      alert(currentFeatured ? "Accommodation unfeatured" : "Accommodation featured");
+    } catch (err) {
+      alert("Failed to toggle featured status");
+    }
+  };
 
   // ADDED: load agents function
   const loadAgents = async (statusFilter = null) => {
@@ -1511,6 +1524,19 @@ export default function AdminDashboard() {
                           {accommodation.description?.substring(0, 80)}...
                         </div>
                         <div style={{ marginTop: "6px", display: "flex", alignItems: "center", gap: "6px" }}>
+                          {accommodation.isFeatured && (
+                            <span style={{
+                              fontSize: "10px",
+                              padding: "2px 6px",
+                              borderRadius: "4px",
+                              fontWeight: 700,
+                              background: "rgba(251, 191, 36, 0.2)",
+                              color: "#fbbf24",
+                              border: "1px solid rgba(251, 191, 36, 0.4)",
+                            }}>
+                              ⭐ FEATURED
+                            </span>
+                          )}
                           <span style={{
                             fontSize: "11px",
                             padding: "2px 8px",
@@ -1573,12 +1599,25 @@ export default function AdminDashboard() {
                             </>
                           )}
                           {accommodation.status === "active" && (
-                            <button
-                              onClick={() => handleAccommodationStatus(accommodation._id, "inactive")}
-                              style={styles.rejectBtn}
-                            >
-                              Deactivate
-                            </button>
+                            <>
+                              <button
+                                onClick={() => handleAccommodationStatus(accommodation._id, "inactive")}
+                                style={styles.rejectBtn}
+                              >
+                                Deactivate
+                              </button>
+                              <button
+                                onClick={() => handleToggleFeatured(accommodation._id, accommodation.isFeatured)}
+                                style={{
+                                  ...styles.approveBtn,
+                                  background: accommodation.isFeatured ? "rgba(251, 191, 36, 0.15)" : "rgba(59, 130, 246, 0.15)",
+                                  color: accommodation.isFeatured ? "#fbbf24" : "#3b82f6",
+                                  border: accommodation.isFeatured ? "1px solid rgba(251, 191, 36, 0.3)" : "1px solid rgba(59, 130, 246, 0.3)",
+                                }}
+                              >
+                                {accommodation.isFeatured ? "Unfeature" : "Feature"}
+                              </button>
+                            </>
                           )}
                           {accommodation.status === "inactive" && (
                             <button
