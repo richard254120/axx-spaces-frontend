@@ -35,9 +35,6 @@ export default function NotificationPanel({
     const icons = {
       property: "",
       material: "",
-      tourism: "",
-      mover: "",
-      seller: "",
       business: "",
       announcement: "",
       item_request: ""
@@ -57,9 +54,6 @@ export default function NotificationPanel({
     const typeLabels = {
       property: "Property",
       material: "Material",
-      tourism: "Tourism",
-      mover: "Mover",
-      seller: "Seller Verification",
       business: "Business",
       announcement: "Announcement",
       item_request: "Custom Request"

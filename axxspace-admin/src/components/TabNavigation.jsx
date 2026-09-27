@@ -4,15 +4,11 @@ export default function TabNavigation({ tabs, activeTab, setActiveTab, pendingCo
     "website-poster": " Website Poster",
     properties: " Properties",
     materials: " QuickSales",
-    tourism: " Tourism",
-    movers: " Movers",
-    sellers: " QuickSales Sellers",
     sold: " Sold",
     payment: " Payment",
     boosts: " Payments",
     businesses: " Businesses",
     announcements: " Announcements",
-    verification: "✓ KYC Verification",
     requests: " User Requests",
     "listings-badges": " Listing Badges",
     "user-badges": " User Badges",
@@ -26,9 +22,6 @@ export default function TabNavigation({ tabs, activeTab, setActiveTab, pendingCo
     if (tab === "announcements") {
       return pendingCounts?.announcements > 0 ? ` (${pendingCounts.announcements})` : "";
     }
-    if (tab === "verification") {
-      return pendingCounts?.verification > 0 ? ` (${pendingCounts.verification})` : "";
-    }
     if (tab === "requests") {
       return pendingCounts?.requests > 0 ? ` (${pendingCounts.requests})` : "";
     }
@@ -37,7 +30,7 @@ export default function TabNavigation({ tabs, activeTab, setActiveTab, pendingCo
       return count > 0 ? ` (${count})` : "";
     }
     if (!pendingCounts?.allPending) return "";
-    const map = { properties: "properties", materials: "materials", tourism: "tourism", movers: "movers", sellers: "sellers", accommodations: "accommodations" };
+    const map = { properties: "properties", materials: "materials", accommodations: "accommodations" };
     const key = map[tab];
     return key && pendingCounts.allPending[key]?.length ? ` (${pendingCounts.allPending[key].length})` : "";
   };

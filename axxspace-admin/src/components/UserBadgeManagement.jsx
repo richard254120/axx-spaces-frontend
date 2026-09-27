@@ -185,8 +185,6 @@ export default function UserBadgeManagement() {
           <option value="all">All User Roles</option>
           <option value="user">Users</option>
           <option value="landlord">Landlords</option>
-          <option value="mover">Movers</option>
-          <option value="seller">Sellers</option>
           <option value="business">Business Owners</option>
         </select>
 

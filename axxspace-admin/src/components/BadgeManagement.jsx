@@ -121,8 +121,6 @@ export default function BadgeManagement() {
         return listing.title;
       case "material":
         return listing.title;
-      case "tourism":
-        return listing.name;
       case "business":
         return listing.name;
       default:
@@ -136,8 +134,6 @@ export default function BadgeManagement() {
         return listing.owner?.name || listing.owner?.email;
       case "material":
         return listing.seller?.name || listing.seller?.email;
-      case "tourism":
-        return listing.owner?.name || listing.owner?.email;
       case "business":
         return listing.owner?.name || listing.owner?.email;
       default:
@@ -178,7 +174,6 @@ export default function BadgeManagement() {
           <option value="all">All Listing Types</option>
           <option value="property">Properties</option>
           <option value="material">Materials</option>
-          <option value="tourism">Tourism</option>
           <option value="business">Businesses</option>
         </select>
 

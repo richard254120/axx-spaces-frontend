@@ -8,32 +8,13 @@ import TabNavigation from "../components/TabNavigation";
 import NotificationPanel from "../components/NotificationPanel";
 import BadgeManagement from "../components/BadgeManagement";
 import UserBadgeManagement from "../components/UserBadgeManagement";
-import { getPricelistUrl, openAdminFile, resolveMediaUrl } from "../utils/fileLinks";
+import { getPricelistUrl } from "../utils/fileLinks";
 import QRGeneratorModal from "../components/QRGeneratorModal";
 import WebsitePoster from "../components/WebsitePoster";
 import "./AdminDashboard.css";
 
 // ── tiny helpers ──────────────────────────────────────────────
-const TABS = ["overview", "website-poster", "properties", "materials", "tourism", "movers", "sellers", "sold", "payment", "boosts", "businesses", "announcements", "verification", "requests", "listings-badges", "user-badges", "accommodations"];
-const TAB_LABELS = {
-  overview: " Dashboard Overview",
-  "website-poster": " Website Poster",
-  properties: " Properties",
-  materials: " QuickSales",
-  tourism: " Tourism",
-  movers: " Movers",
-  sellers: " QuickSales Sellers",
-  sold: " Sold",
-  payment: " Payment",
-  boosts: " Payments",
-  businesses: " Businesses",
-  announcements: " Announcements",
-  verification: "✓ KYC Verification",
-  requests: " User Requests",
-  "listings-badges": " Listing Badges",
-  "user-badges": " User Badges",
-  accommodations: " Accommodations"
-};
+const TABS = ["overview", "website-poster", "properties", "materials", "sold", "payment", "boosts", "businesses", "announcements", "requests", "listings-badges", "user-badges", "accommodations"];
 const STATUS_VIEWS = ["pending", "approved", "rejected"];
 
 function formatVideoUrl(url) {
@@ -97,12 +78,6 @@ export default function AdminDashboard() {
   const [pendingAnnouncements, setPendingAnnouncements] = useState([]);
   const [announcementsLoading, setAnnouncementsLoading] = useState(false);
 
-  // ── KYC VERIFICATION STATE ─────────────────────────────────
-  const [pendingVerifications, setPendingVerifications] = useState([]);
-  const [selectedVerification, setSelectedVerification] = useState(null);
-  const [verificationLoading, setVerificationLoading] = useState(false);
-  const [rejectionReason, setRejectionReason] = useState('');
-
   // ── REQUESTS STATE ──────────────────────────────────────────
   const [requests, setRequests] = useState([]);
   const [requestsLoading, setRequestsLoading] = useState(false);
@@ -146,79 +121,12 @@ export default function AdminDashboard() {
     return () => clearInterval(interval);
   }, []);
 
-  // ── load pending KYC verifications when tab changes ─────────
-  useEffect(() => {
-    if (activeTab === "verification") {
-      loadPendingVerifications();
-    }
-  }, [activeTab, statusView]);
-
   // ── load accommodations when tab changes ─────────────────────
   useEffect(() => {
     if (activeTab === "accommodations") {
       loadAccommodations();
     }
   }, [activeTab, accommodationStatusView]);
-
-  // ── KYC VERIFICATION FUNCTIONS ───────────────────────────────
-  const loadPendingVerifications = async () => {
-    setVerificationLoading(true);
-    try {
-      const res = await API.get(`/kyc-verification/admin/pending?status=${statusView}`);
-      setPendingVerifications(res.data?.data || []);
-    } catch (err) {
-      console.error("Failed to load pending verifications:", err);
-    } finally {
-      setVerificationLoading(false);
-    }
-  };
-
-  const loadVerificationDetails = async (verificationId) => {
-    try {
-      const res = await API.get(`/kyc-verification/admin/${verificationId}`);
-      setSelectedVerification(res.data?.data);
-    } catch (err) {
-      console.error("Failed to load verification details:", err);
-    }
-  };
-
-  const handleOpenFile = async (url) => {
-    try {
-      await openAdminFile(url);
-    } catch (err) {
-      alert(err.message || "Unable to open file");
-    }
-  };
-
-  const handleApproveVerification = async (verificationId) => {
-    if (!window.confirm("Are you sure you want to approve this verification?")) return;
-    try {
-      await API.put(`/kyc-verification/admin/${verificationId}/approve`);
-      alert(" Verification approved successfully");
-      loadPendingVerifications();
-      setSelectedVerification(null);
-    } catch (err) {
-      console.error("Verification approval error:", err);
-      alert(" Failed to approve verification: " + (err.response?.data?.message || err.message));
-    }
-  };
-
-  const handleRejectVerification = async (verificationId) => {
-    if (!rejectionReason.trim()) {
-      alert("Please provide a rejection reason");
-      return;
-    }
-    if (!window.confirm("Are you sure you want to reject this verification?")) return;
-    try {
-      await API.put(`/kyc-verification/admin/${verificationId}/reject`, { rejectionReason });
-      alert(" Verification rejected successfully");
-      loadPendingVerifications();
-      setSelectedVerification(null);
-      setRejectionReason('');
-    } catch (err) {
-      alert(" Failed to reject verification");
-    }
-  };
 
   // ── reload items when tab or statusView changes ─────────────
   useEffect(() => {
@@ -227,8 +135,6 @@ export default function AdminDashboard() {
       loadViewStats();
       loadTopViewed();
       loadAllPending();
-    } else if (activeTab === "verification") {
-      loadPendingVerifications();
     } else if (activeTab === "announcements") {
       loadPendingAnnouncements();
     } else if (activeTab === "sold") {
@@ -629,7 +535,7 @@ export default function AdminDashboard() {
   const saveEdit = async () => {
     setSaving(true);
     try {
-      const endpointMap = { properties: "properties", materials: "materials", tourism: "tourism" };
+      const endpointMap = { properties: "properties", materials: "materials" };
       const ep = endpointMap[activeTab];
       if (!ep) { alert("Edit not supported for this type."); setSaving(false); return; }
       await API.patch(`/${ep}/${editData._id}`, editData);
@@ -667,7 +573,7 @@ export default function AdminDashboard() {
       return count > 0 ? ` (${count})` : "";
     }
     if (!allPending) return "";
-    const map = { properties: "properties", materials: "materials", tourism: "tourism", movers: "movers", sellers: "sellers", accommodations: "accommodations" };
+    const map = { properties: "properties", materials: "materials", accommodations: "accommodations" };
     const key = map[tab];
     return key && allPending[key]?.length ? ` (${allPending[key].length})` : "";
   };
@@ -689,7 +595,7 @@ export default function AdminDashboard() {
   const getTitle = (item) => item.title || item.name || item.businessName || "—";
   const getSub = (item) => {
     if (activeTab === "sold") {
-      const typeLabels = { property: " Property", material: " Material", tourism: " Tourism" };
+      const typeLabels = { property: " Property", material: " Material" };
       return `${typeLabels[item.itemType] || item.itemType} · ${item.category || item.county || ""}`;
     }
     return item.category || item.county || (item.businessRegNumber ? `Reg: ${item.businessRegNumber}` : "") || item.vehicleType || "—";
@@ -724,9 +630,6 @@ export default function AdminDashboard() {
     const typeLabels = {
       property: "Property",
       material: "Material",
-      tourism: "Tourism",
-      mover: "Mover",
-      seller: "Seller Verification",
       business: "Business",
       announcement: "Announcement"
     };
@@ -738,7 +641,7 @@ export default function AdminDashboard() {
       const icons = { property_booking: "", material_purchase: "", tourism_booking: "", boost: "", subscription: "" };
       return icons[type] || "";
     }
-    const icons = { property: "", material: "", tourism: "", mover: "", seller: "", business: "", announcement: "" };
+    const icons = { property: "", material: "", business: "", announcement: "" };
     return icons[type] || "";
   };
 
@@ -767,7 +670,6 @@ export default function AdminDashboard() {
             allPending,
             businesses: stats?.businesses,
             announcements: pendingAnnouncements.length,
-            verification: pendingVerifications.length,
             requests: requests.length,
             accommodations: pendingAccommodations.length || (allPending?.accommodations?.length || 0)
           }}
@@ -796,9 +698,6 @@ export default function AdminDashboard() {
                 const tabMap = {
                   property: "properties",
                   material: "materials",
-                  tourism: "tourism",
-                  mover: "movers",
-                  seller: "sellers",
                   business: "businesses",
                   announcement: "announcements",
                   item_request: "requests",
@@ -832,9 +731,6 @@ export default function AdminDashboard() {
                 { label: " Properties", total: stats.properties?.total || 0, pending: stats.properties?.pending || 0, color: "#3b82f6" },
                 { label: " QuickSales", total: stats.materials?.total || 0, pending: stats.materials?.pending || 0, color: "#22c55e" },
                 { label: " Accommodations", total: stats.accommodations?.total || 0, pending: stats.accommodations?.pending || 0, color: "#14b8a6" },
-                { label: " Movers", total: stats.movers?.total || 0, pending: stats.movers?.pending || 0, color: "#f59e0b" },
-                { label: " Tourism", total: stats.tourism?.total || 0, pending: stats.tourism?.pending || 0, color: "#8b5cf6" },
-                { label: " QuickSales Sellers", total: stats.sellers?.total || 0, pending: stats.sellers?.pending || 0, color: "#ec4899" },
                 { label: " Payments", total: allBoosts.length, pending: pendingBoosts.length, color: "#fbbf24", isPulse: pendingBoosts.length > 0 },
               ].map(s => (
                 <StatsCard
@@ -877,18 +773,6 @@ export default function AdminDashboard() {
                       ))}
                     </div>
                   )}
-                  {viewStats.tourism && viewStats.tourism.length > 0 && (
-                    <div className="view-stat-section">
-                      <h4 className="view-stat-title"> Tourism</h4>
-                      {viewStats.tourism.map(stat => (
-                        <div key={stat._id} className="view-stat-item">
-                          <span className="view-stat-label">{stat._id}</span>
-                          <span className="view-stat-value">{stat.totalViews.toLocaleString()} views</span>
-                          <span className="view-stat-meta">({stat.totalItems} items, avg {Math.round(stat.avgViews)} views)</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
               </div>
             )}
@@ -922,18 +806,6 @@ export default function AdminDashboard() {
                       ))}
                     </div>
                   )}
-                  {topViewed.tourism && topViewed.tourism.length > 0 && (
-                    <div className="view-stat-section">
-                      <h4 className="view-stat-title"> Tourism</h4>
-                      {topViewed.tourism.map(item => (
-                        <div key={item._id} className="top-view-item">
-                          <span className="top-view-title">{item.title}</span>
-                          <span className="top-view-meta">{item.location} · {item.category}</span>
-                          <span className="top-view-value">{item.views.toLocaleString()} views</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
               </div>
             )}
@@ -945,12 +817,10 @@ export default function AdminDashboard() {
                 {[
                   { label: "Properties", total: stats.properties.total, pending: stats.properties.pending, color: "#3b82f6" },
                   { label: "QuickSales", total: stats.materials.total, pending: stats.materials.pending, color: "#22c55e" },
-                  { label: "Movers", total: stats.movers.total, pending: stats.movers.pending, color: "#f59e0b" },
-                  { label: "Tourism", total: stats.tourism.total, pending: stats.tourism.pending, color: "#8b5cf6" },
-                  { label: "QuickSales Sellers", total: stats.sellers.total, pending: stats.sellers.pending, color: "#ec4899" },
+                  { label: "Accommodations", total: stats.accommodations?.total || 0, pending: stats.accommodations?.pending || 0, color: "#14b8a6" },
                   { label: "Businesses", total: stats.businesses?.total || 0, pending: stats.businesses?.pending || 0, color: "#fbbf24" },
                 ].map(s => {
-                  const maxTotal = Math.max(...[stats.properties.total, stats.materials.total, stats.movers.total, stats.tourism.total, stats.sellers.total, stats.businesses?.total || 0]);
+                  const maxTotal = Math.max(...[stats.properties.total, stats.materials.total, stats.accommodations?.total || 0, stats.businesses?.total || 0]);
                   const barWidth = maxTotal > 0 ? (s.total / maxTotal) * 100 : 0;
                   const pendingWidth = maxTotal > 0 ? (s.pending / maxTotal) * 100 : 0;
                   return (
@@ -983,11 +853,6 @@ export default function AdminDashboard() {
                   <span className="quick-action-icon"></span>
                   <span className="quick-action-text">Review QuickSales</span>
                   {stats?.materials?.pending > 0 && <span className="quick-action-badge">{stats.materials.pending}</span>}
-                </button>
-                <button className="btn-quick-action" onClick={() => { setActiveTab("tourism"); setStatusView("pending"); }}>
-                  <span className="quick-action-icon"></span>
-                  <span className="quick-action-text">Review Tourism</span>
-                  {stats?.tourism?.pending > 0 && <span className="quick-action-badge">{stats.tourism.pending}</span>}
                 </button>
                 <button className="btn-quick-action" onClick={() => { setActiveTab("businesses"); setStatusView("pending"); }}>
                   <span className="quick-action-icon"></span>
@@ -1031,7 +896,7 @@ export default function AdminDashboard() {
         )}
 
         {/* SEARCH AND FILTER BAR */}
-        {activeTab !== "payment" && activeTab !== "boosts" && activeTab !== "businesses" && activeTab !== "verification" && activeTab !== "website-poster" && activeTab !== "overview" && activeTab !== "listings-badges" && activeTab !== "user-badges" && (
+        {activeTab !== "payment" && activeTab !== "boosts" && activeTab !== "businesses" && activeTab !== "website-poster" && activeTab !== "overview" && activeTab !== "listings-badges" && activeTab !== "user-badges" && (
           <div className="search-bar">
             <div className="search-input-wrapper">
               <span className="search-icon"></span>
@@ -1043,12 +908,11 @@ export default function AdminDashboard() {
               />
               {searchQuery && <button className="btn-clear-search" onClick={() => setSearchQuery("")}>✕</button>}
             </div>
-            {(activeTab === "materials" || activeTab === "tourism" || activeTab === "properties") && (
+            {(activeTab === "materials" || activeTab === "properties") && (
               <select className="filter-select" value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
                 <option value="">All Categories</option>
                 {activeTab === "materials" && ["Furniture", "Electronics", "Appliances", "Tools", "Clothing", "Books", "Sports & Outdoors", "Home & Garden", "Beauty & Personal Care", "Toys & Games", "Construction Materials", "Vehicles & Parts", "Other"].map(cat => <option key={cat} value={cat}>{cat}</option>)}
                 {activeTab === "properties" && ["Apartment", "House", "Office", "Land", "Warehouse"].map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                {activeTab === "tourism" && ["Hotel", "Resort", "Airbnb", "Lodge", "Camping"].map(cat => <option key={cat} value={cat}>{cat}</option>)}
               </select>
             )}
             {activeTab === "accommodations" && (
@@ -1222,148 +1086,6 @@ export default function AdminDashboard() {
                         </>
                       )}
                       <button className="btn-delete" onClick={() => handleDeleteAnnouncement(announcement.businessId, announcement.announcementId)}> Delete</button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )
-        ) : activeTab === "verification" ? (
-          selectedVerification ? (
-            <div className="verification-detail">
-              <button className="btn-back" onClick={() => setSelectedVerification(null)}>← Back to List</button>
-              <div className="detail-card">
-                <h2 className="detail-title">Verification Details</h2>
-                <div className="detail-section">
-                  <p className="detail-label">User ID:</p>
-                  <p className="detail-value">{selectedVerification.user?._id || selectedVerification.user}</p>
-                </div>
-                <div className="detail-section">
-                  <p className="detail-label">Verification Level:</p>
-                  <p className="detail-value">Level {selectedVerification.verificationLevel}</p>
-                </div>
-                <div className="detail-section">
-                  <p className="detail-label">Status:</p>
-                  <p className="detail-value" style={{ color: selectedVerification.status === 'approved' ? '#22c55e' : selectedVerification.status === 'rejected' ? '#ef4444' : '#fbbf24' }}>
-                    {selectedVerification.status.toUpperCase()}
-                  </p>
-                </div>
-                {selectedVerification.idType && (
-                  <div className="detail-section">
-                    <p className="detail-label">ID Type:</p>
-                    <p className="detail-value">{selectedVerification.idType.replace(/_/g, ' ')}</p>
-                  </div>
-                )}
-                {selectedVerification.businessName && (
-                  <div className="detail-section">
-                    <p className="detail-label">Business Name:</p>
-                    <p className="detail-value">{selectedVerification.businessName}</p>
-                  </div>
-                )}
-                {selectedVerification.taxId && (
-                  <div className="detail-section">
-                    <p className="detail-label">Tax ID:</p>
-                    <p className="detail-value">{selectedVerification.taxId}</p>
-                  </div>
-                )}
-                {selectedVerification.physicalDetails && (
-                  <div className="detail-section">
-                    <p className="detail-label">Physical Address & Visitation Details:</p>
-                    <p className="detail-value" style={{ whiteSpace: 'pre-wrap', background: 'rgba(0,0,0,0.15)', padding: '10px', borderRadius: '6px' }}>
-                      {selectedVerification.physicalDetails}
-                    </p>
-                  </div>
-                )}
-                {selectedVerification.documents && selectedVerification.documents.length > 0 && (
-                  <div className="detail-section">
-                    <p className="detail-label">Documents:</p>
-                    {selectedVerification.documents.map((doc, idx) => (
-                      <div key={idx} className="document-item">
-                        <p className="doc-type">{doc.type.replace(/_/g, ' ')}</p>
-                        <button
-                          type="button"
-                          className="doc-link"
-                          onClick={() => handleOpenFile(doc.url)}
-                        >
-                          View / Download
-                        </button>
-                        <p style={{ fontSize: 11, color: '#64748b' }}>Filename: {doc.filename}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {selectedVerification.selfie && selectedVerification.selfie.url && (
-                  <div className="detail-section">
-                    <p className="detail-label">Selfie:</p>
-                    <img
-                      src={resolveMediaUrl(selectedVerification.selfie.url)}
-                      alt="Selfie"
-                      className="selfie-image"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        if (e.target.nextSibling) e.target.nextSibling.style.display = 'block';
-                      }}
-                    />
-                    <button
-                      type="button"
-                      className="doc-link"
-                      style={{ marginTop: "8px" }}
-                      onClick={() => handleOpenFile(selectedVerification.selfie.url)}
-                    >
-                      Download selfie
-                    </button>
-                    <p style={{ fontSize: 12, color: '#ef4444', display: 'none' }}>
-                      Selfie image not available (file may not exist on server)
-                    </p>
-                    <p style={{ fontSize: 11, color: '#64748b', marginTop: '8px' }}>
-                      Filename: {selectedVerification.selfie.filename}
-                    </p>
-                  </div>
-                )}
-                {selectedVerification.status === 'pending' && (
-                  <div className="action-buttons">
-                    <button className="btn-approve" onClick={() => handleApproveVerification(selectedVerification._id)}>
-                      Approve
-                    </button>
-                    <div className="reject-section">
-                      <textarea
-                        className="reject-input"
-                        placeholder="Enter rejection reason..."
-                        value={rejectionReason}
-                        onChange={(e) => setRejectionReason(e.target.value)}
-                      />
-                      <button className="btn-reject" onClick={() => handleRejectVerification(selectedVerification._id)}>
-                        Reject
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : verificationLoading ? (
-            <div className="loader">
-              <div className="spinner"></div>
-              <p> Loading verifications...</p>
-            </div>
-          ) : pendingVerifications.length === 0 ? (
-            <div className="empty">
-              <p className="empty-text"> No pending verifications found.</p>
-            </div>
-          ) : (
-            <div className="grid">
-              {pendingVerifications.map(verification => (
-                <div key={verification._id} className="card admin-card">
-                  <div className="card-body">
-                    <p className="card-title">Level {verification.verificationLevel} Verification</p>
-                    <p className="card-subtitle"> User: {verification.user?.name || verification.user?.email || 'Unknown'}</p>
-                    <p className="card-owner"> Submitted: {new Date(verification.submittedAt).toLocaleDateString()}</p>
-                    <p className="card-owner" style={{ color: '#fbbf24' }}>
-                      Status: {verification.status.toUpperCase()}
-                    </p>
-                    <div className="card-buttons">
-                      <button className="btn-view" onClick={() => loadVerificationDetails(verification._id)}>
-                        Review Verification
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -1684,8 +1406,6 @@ export default function AdminDashboard() {
                         let itemType;
                         if (activeTab === "materials") itemType = "material";
                         else if (activeTab === "properties") itemType = "property";
-                        else if (activeTab === "tourism") itemType = "tourism";
-                        else if (activeTab === "movers") itemType = "mover";
                         else itemType = activeTab.slice(0, -1);
                         handleFeatureItem(itemType, item._id, !item.isFeatured);
                       }}
@@ -2124,7 +1844,7 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
 
   // Generate QR code when modal opens for relevant tabs
   useEffect(() => {
-    if (["properties", "materials", "tourism"].includes(tab) && item._id) {
+    if (["properties", "materials"].includes(tab) && item._id) {
       generateQRCode();
     }
   }, [item, tab]);
@@ -2172,8 +1892,8 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
             {item.owner?.email && <p className="owner-line"> {item.owner.email}</p>}
           </div>
 
-          {/* QR Code Section for Properties, Materials, Tourism */}
-          {["properties", "materials", "tourism"].includes(tab) && (
+          {/* QR Code Section for Properties, Materials */}
+          {["properties", "materials"].includes(tab) && (
             <div style={{ marginTop: "20px", padding: "16px", background: "#f8fafc", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
               <h4 style={{ margin: "0 0 12px 0", fontSize: "14px", fontWeight: "600", color: "#0f1729" }}>Listing QR Code</h4>
               <div style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
@@ -2264,7 +1984,7 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
                   <button className="btn-reject" onClick={onReject}> Reject</button>
                 </>
               )}
-              {["properties", "materials", "tourism"].includes(tab) && tab !== "sold" && (
+              {["properties", "materials"].includes(tab) && tab !== "sold" && (
                 <button className="btn-edit" onClick={onEdit}> Edit</button>
               )}
               <button className="btn-delete" onClick={() => onDelete(tab, item._id, item.title || item.name || item.businessName)}> Delete</button>
