@@ -731,7 +731,8 @@ export default function AdminDashboard() {
                 { label: " Properties", total: stats.properties?.total || 0, pending: stats.properties?.pending || 0, color: "#3b82f6" },
                 { label: " QuickSales", total: stats.materials?.total || 0, pending: stats.materials?.pending || 0, color: "#22c55e" },
                 { label: " Accommodations", total: stats.accommodations?.total || 0, pending: stats.accommodations?.pending || 0, color: "#14b8a6" },
-                { label: " Payments", total: allBoosts.length, pending: pendingBoosts.length, color: "#fbbf24", isPulse: pendingBoosts.length > 0 },
+                { label: " Businesses", total: stats.businesses?.total || 0, pending: stats.businesses?.pending || 0, color: "#fbbf24" },
+                { label: " Payments", total: allBoosts.length, pending: pendingBoosts.length, color: "#f59e0b", isPulse: pendingBoosts.length > 0 },
               ].map(s => (
                 <StatsCard
                   key={s.label}
