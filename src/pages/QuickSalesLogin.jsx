@@ -14,7 +14,7 @@ const COUNTIES = [
   "Busia", "Siaya", "Kisumu", "Homa Bay", "Migori", "Kisii", "Nyamira", "Nairobi City",
 ];
 
-export default function SellerLogin() {
+export default function QuickSalesLogin() {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
   const [mode, setMode] = useState("login"); // "login" | "register"
@@ -140,7 +140,7 @@ export default function SellerLogin() {
       setSuccess(" Google login successful! Redirecting...");
 
       setTimeout(() => {
-        navigate("/seller-dashboard");
+        navigate("/quicksales-dashboard");
       }, 1000);
 
     } catch (err) {
@@ -233,7 +233,7 @@ export default function SellerLogin() {
         // Save seller token + user separately from landlord auth
         localStorage.setItem("sellerToken", data.token);
         localStorage.setItem("sellerUser", JSON.stringify(data.user));
-        navigate("/seller-dashboard");
+        navigate("/quicksales-dashboard");
       }
     } catch (err) {
       setError("Network error. Please try again.");
@@ -313,11 +313,11 @@ export default function SellerLogin() {
             {/* Header */}
             <div style={s.header}>
               <div style={s.icon}></div>
-              <h1 style={s.title}>Seller Portal</h1>
+              <h1 style={s.title}>QuickSales Portal</h1>
               <p style={s.subtitle}>
                 {mode === "login"
-                  ? "Login to manage your listings"
-                  : "Create a seller account to start selling"}
+                  ? "Login to manage your QuickSales listings"
+                  : "Create a QuickSales account to start selling"}
               </p>
             </div>
 
@@ -428,7 +428,7 @@ export default function SellerLogin() {
 
             {/* Back link */}
             <p style={s.backLink}>
-              <span style={s.link} onClick={() => navigate("/materials")}>
+              <span style={s.link} onClick={() => navigate("/quicksales")}>
                 ← Back to Marketplace
               </span>
             </p>

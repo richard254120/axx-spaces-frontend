@@ -170,7 +170,7 @@ export default function QuickSales() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleSell = () => navigate("/seller-login");
+  const handleSell = () => navigate("/quicksales-login");
 
   const formatPhone = (phone) => {
     if (!phone) return "";
@@ -242,7 +242,7 @@ export default function QuickSales() {
 
         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
           {isSeller && (
-            <button onClick={() => navigate("/seller-dashboard")} style={{ padding: "6px 12px", background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)", color: "white", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: 700, cursor: "pointer", height: "36px" }}>
+            <button onClick={() => navigate("/quicksales-dashboard")} style={{ padding: "6px 12px", background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)", color: "white", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: 700, cursor: "pointer", height: "36px" }}>
               My Dashboard
             </button>
           )}

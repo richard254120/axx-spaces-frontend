@@ -35,7 +35,7 @@ const HomeScreen = ({ navigation }) => {
     { id: 2, name: 'Hostels', icon: '🏨', screen: 'Properties' },
     { id: 3, name: 'Tourism', icon: '✈️', screen: 'Tourism' },
     { id: 4, name: 'Business', icon: '💼', screen: 'Business' },
-    { id: 5, name: 'Materials', icon: '🔨', screen: 'Materials' },
+    { id: 5, name: 'QuickSales', icon: '🔨', screen: 'Materials' },
     { id: 6, name: 'Movers', icon: '🚚', screen: 'Movers' },
   ];
 

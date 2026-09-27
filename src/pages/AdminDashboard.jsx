@@ -622,7 +622,7 @@ export default function AdminDashboard() {
 
           <div style={{ ...styles.statCard, borderTop: "3px solid #10b981" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-              <span style={styles.statTitle}>QuickSales &amp; Materials</span>
+              <span style={styles.statTitle}>QuickSales</span>
               <span style={{ fontSize: "20px" }}>📦</span>
             </div>
             <p style={{ ...styles.statValue, color: "#34d399" }}>{stats.materials?.total || 0}</p>
@@ -642,7 +642,7 @@ export default function AdminDashboard() {
 
           <div style={{ ...styles.statCard, borderTop: "3px solid #8b5cf6" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-              <span style={styles.statTitle}>Verified Sellers</span>
+              <span style={styles.statTitle}>QuickSales Sellers</span>
               <span style={{ fontSize: "20px" }}>🏷️</span>
             </div>
             <p style={{ ...styles.statValue, color: "#a78bfa" }}>{stats.sellers?.total || 0}</p>
@@ -689,8 +689,8 @@ export default function AdminDashboard() {
           { id: "accommodations", label: "Accommodations", icon: "🏨", count: pendingAccommodations?.length || (allPending?.tourism?.length || 0) },
           { id: "businesses", label: "Businesses", icon: "💼", count: pendingBusinesses?.length || 0 },
           { id: "announcements", label: "Announcements", icon: "📢", count: pendingAnnouncements.filter(a => a.status === "pending").length || 0 },
-          { id: "materials", label: "Materials", icon: "📦", count: allPending?.materials?.length || 0 },
-          { id: "sellers", label: "Sellers", icon: "🏷️", count: allPending?.sellers?.length || 0 },
+          { id: "materials", label: "QuickSales", icon: "📦", count: allPending?.materials?.length || 0 },
+          { id: "sellers", label: "QuickSales Sellers", icon: "🏷️", count: allPending?.sellers?.length || 0 },
           { id: "agents", label: "Agents", icon: "🤝", count: agents?.length || 0 },
           { id: "users", label: "Users", icon: "👥", count: users?.length || 0 },
           { id: "requests", label: "Requests", icon: "📋", count: requests?.length || 0 },
@@ -906,17 +906,17 @@ export default function AdminDashboard() {
           )}
         </div>
       ) : activeTab === "materials" ? (
-        // Materials Tab
+        // QuickSales listings tab
         !allPending?.materials || allPending.materials.length === 0 ? (
           <div style={styles.emptyCard}>
-            <p style={styles.emptyText}> All caught up! No pending materials to review.</p>
+            <p style={styles.emptyText}> All caught up! No pending QuickSales listings to review.</p>
           </div>
         ) : (
           <div style={styles.tableContainer}>
             <table style={styles.table}>
               <thead>
                 <tr style={styles.theadRow}>
-                  <th style={styles.th}>Material Details</th>
+                  <th style={styles.th}>Listing Details</th>
                   <th style={styles.th}>Seller Info</th>
                   <th style={styles.th}>Price (KES)</th>
                   <th style={styles.th}>Actions</th>
@@ -1004,10 +1004,10 @@ export default function AdminDashboard() {
           </div>
         )
       ) : activeTab === "sellers" ? (
-        // Sellers Tab
+        // QuickSales seller verification tab
         !allPending?.sellers || allPending.sellers.length === 0 ? (
           <div style={styles.emptyCard}>
-            <p style={styles.emptyText}> All caught up! No pending seller verifications to review.</p>
+            <p style={styles.emptyText}> All caught up! No pending QuickSales seller verifications to review.</p>
           </div>
         ) : (
           <div style={styles.tableContainer}>

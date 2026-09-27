@@ -128,8 +128,8 @@ const accountTypes = [
     name: "QuickSales Account",
     icon: "/assets/marketplace-icon.png",
     description: "Buy and sell goods in the marketplace",
-    loginPath: "/seller-login",
-    registerPath: "/seller-login",
+    loginPath: "/quicksales-login",
+    registerPath: "/quicksales-login",
   },
   {
     id: "accommodation",

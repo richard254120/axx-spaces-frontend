@@ -65,7 +65,7 @@ export default function VerifyEmail() {
                 if (userRole === "user") {
                   navigate("/business-login");
                 } else if (userRole === "seller") {
-                  navigate("/seller-login");
+                  navigate("/quicksales-login");
                 } else if (userRole === "mover") {
                   navigate("/movers?tab=login");
                 } else if (userRole === "landlord") {

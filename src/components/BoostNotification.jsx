@@ -72,7 +72,7 @@ export default function BoostNotification({ user, userType = "landlord" }) {
             if (userType === "landlord") {
               navigate("/dashboard");
             } else if (userType === "seller") {
-              navigate("/seller-dashboard");
+              navigate("/quicksales-dashboard");
             } else if (userType === "mover") {
               navigate("/mover-dashboard");
             }

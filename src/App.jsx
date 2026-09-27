@@ -1,5 +1,5 @@
 // App.jsx
-import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
+import { Routes, Route, useNavigate, Navigate, useParams, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDevToolsProtection } from "./hooks/useDevToolsProtection";
 
@@ -20,12 +20,12 @@ import LandlordDashboard from "./pages/LandlordDashboard";
 
 import ResetPassword from "./pages/ResetPassword";
 import AboutUs from "./pages/AboutUs";
-import SellerLogin from "./pages/SellerLogin";
-import SellerDashboard from "./pages/SellerDashboard";
+import QuickSalesLogin from "./pages/QuickSalesLogin";
+import QuickSalesDashboard from "./pages/QuickSalesDashboard";
 import PremiumPlans from "./pages/PremiumPlans";
 import Checkout from "./pages/Checkout";
-import Materials from "./pages/Materials";
-import MaterialDetailPage from "./pages/MaterialDetailPage";
+import QuickSales from "./pages/QuickSales";
+import QuickSaleDetailPage from "./pages/QuickSaleDetailPage";
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
 import TermsAndPrivacy from "./pages/TermsAndPrivacy";
@@ -118,6 +118,14 @@ function BareLayout({ children }) {
   return <>{children}</>;
 }
 
+function LegacyRedirect({ to }) {
+  const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const qs = searchParams.toString();
+  const path = id ? `${to}/${id}` : to;
+  return <Navigate to={`${path}${qs ? `?${qs}` : ""}`} replace />;
+}
+
 function App() {
   const navigate = useNavigate();
   useDevToolsProtection();
@@ -171,9 +179,12 @@ function App() {
       <Route path="/about" element={<PublicLayout><AboutUs /></PublicLayout>} />
       <Route path="/reset-password/:token" element={<PublicLayout><ResetPassword /></PublicLayout>} />
       <Route path="/verify-email/:token" element={<PublicLayout><VerifyEmail /></PublicLayout>} />
-      <Route path="/seller-login" element={<PublicLayout><SellerLogin /></PublicLayout>} />
-      <Route path="/materials" element={<PublicLayout><Materials /></PublicLayout>} />
-      <Route path="/materials/:id" element={<PublicLayout><MaterialDetailPage /></PublicLayout>} />
+      <Route path="/seller-login" element={<LegacyRedirect to="/quicksales-login" />} />
+      <Route path="/quicksales-login" element={<PublicLayout><QuickSalesLogin /></PublicLayout>} />
+      <Route path="/materials" element={<LegacyRedirect to="/quicksales" />} />
+      <Route path="/materials/:id" element={<LegacyRedirect to="/quicksales" />} />
+      <Route path="/quicksales" element={<PublicLayout><QuickSales /></PublicLayout>} />
+      <Route path="/quicksales/:id" element={<PublicLayout><QuickSaleDetailPage /></PublicLayout>} />
       <Route path="/faq" element={<PublicLayout><FAQ /></PublicLayout>} />
       <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
       <Route path="/mobile-app" element={<PublicLayout><MobileAppDownload /></PublicLayout>} />
@@ -296,10 +307,14 @@ function App() {
       {/* ── DASHBOARD ROUTES (no Navbar) ── */}
       <Route
         path="/seller-dashboard"
+        element={<LegacyRedirect to="/quicksales-dashboard" />}
+      />
+      <Route
+        path="/quicksales-dashboard"
         element={
           <DashboardLayout preferSeller>
-            <ProtectedRoute allowedRoles={["seller"]} loginPath="/seller-login" preferSeller>
-              <SellerDashboard />
+            <ProtectedRoute allowedRoles={["seller"]} loginPath="/quicksales-login" preferSeller>
+              <QuickSalesDashboard />
             </ProtectedRoute>
           </DashboardLayout>
         }

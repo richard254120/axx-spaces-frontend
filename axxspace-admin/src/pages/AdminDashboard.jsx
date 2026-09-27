@@ -19,10 +19,10 @@ const TAB_LABELS = {
   overview: " Dashboard Overview",
   "website-poster": " Website Poster",
   properties: " Properties",
-  materials: " Materials",
+  materials: " QuickSales",
   tourism: " Tourism",
   movers: " Movers",
-  sellers: " Sellers",
+  sellers: " QuickSales Sellers",
   sold: " Sold",
   payment: " Payment",
   boosts: " Payments",
@@ -830,11 +830,11 @@ export default function AdminDashboard() {
             <div className="stats-grid">
               {[
                 { label: " Properties", total: stats.properties?.total || 0, pending: stats.properties?.pending || 0, color: "#3b82f6" },
-                { label: " Materials", total: stats.materials?.total || 0, pending: stats.materials?.pending || 0, color: "#22c55e" },
+                { label: " QuickSales", total: stats.materials?.total || 0, pending: stats.materials?.pending || 0, color: "#22c55e" },
                 { label: " Accommodations", total: stats.accommodations?.total || 0, pending: stats.accommodations?.pending || 0, color: "#14b8a6" },
                 { label: " Movers", total: stats.movers?.total || 0, pending: stats.movers?.pending || 0, color: "#f59e0b" },
                 { label: " Tourism", total: stats.tourism?.total || 0, pending: stats.tourism?.pending || 0, color: "#8b5cf6" },
-                { label: " Sellers", total: stats.sellers?.total || 0, pending: stats.sellers?.pending || 0, color: "#ec4899" },
+                { label: " QuickSales Sellers", total: stats.sellers?.total || 0, pending: stats.sellers?.pending || 0, color: "#ec4899" },
                 { label: " Payments", total: allBoosts.length, pending: pendingBoosts.length, color: "#fbbf24", isPulse: pendingBoosts.length > 0 },
               ].map(s => (
                 <StatsCard
@@ -867,7 +867,7 @@ export default function AdminDashboard() {
                   )}
                   {viewStats.materials && viewStats.materials.length > 0 && (
                     <div className="view-stat-section">
-                      <h4 className="view-stat-title"> Materials</h4>
+                      <h4 className="view-stat-title"> QuickSales</h4>
                       {viewStats.materials.map(stat => (
                         <div key={stat._id} className="view-stat-item">
                           <span className="view-stat-label">{stat._id}</span>
@@ -912,7 +912,7 @@ export default function AdminDashboard() {
                   )}
                   {topViewed.materials && topViewed.materials.length > 0 && (
                     <div className="view-stat-section">
-                      <h4 className="view-stat-title"> Materials</h4>
+                      <h4 className="view-stat-title"> QuickSales</h4>
                       {topViewed.materials.map(item => (
                         <div key={item._id} className="top-view-item">
                           <span className="top-view-title">{item.title}</span>
@@ -944,10 +944,10 @@ export default function AdminDashboard() {
               <div className="chart-bars">
                 {[
                   { label: "Properties", total: stats.properties.total, pending: stats.properties.pending, color: "#3b82f6" },
-                  { label: "Materials", total: stats.materials.total, pending: stats.materials.pending, color: "#22c55e" },
+                  { label: "QuickSales", total: stats.materials.total, pending: stats.materials.pending, color: "#22c55e" },
                   { label: "Movers", total: stats.movers.total, pending: stats.movers.pending, color: "#f59e0b" },
                   { label: "Tourism", total: stats.tourism.total, pending: stats.tourism.pending, color: "#8b5cf6" },
-                  { label: "Sellers", total: stats.sellers.total, pending: stats.sellers.pending, color: "#ec4899" },
+                  { label: "QuickSales Sellers", total: stats.sellers.total, pending: stats.sellers.pending, color: "#ec4899" },
                   { label: "Businesses", total: stats.businesses?.total || 0, pending: stats.businesses?.pending || 0, color: "#fbbf24" },
                 ].map(s => {
                   const maxTotal = Math.max(...[stats.properties.total, stats.materials.total, stats.movers.total, stats.tourism.total, stats.sellers.total, stats.businesses?.total || 0]);
@@ -981,7 +981,7 @@ export default function AdminDashboard() {
                 </button>
                 <button className="btn-quick-action" onClick={() => { setActiveTab("materials"); setStatusView("pending"); }}>
                   <span className="quick-action-icon"></span>
-                  <span className="quick-action-text">Review Materials</span>
+                  <span className="quick-action-text">Review QuickSales</span>
                   {stats?.materials?.pending > 0 && <span className="quick-action-badge">{stats.materials.pending}</span>}
                 </button>
                 <button className="btn-quick-action" onClick={() => { setActiveTab("tourism"); setStatusView("pending"); }}>

@@ -2410,7 +2410,7 @@ export default function Home() {
         return featuredMaterials.map(m => ({
           ...m,
           typeText: 'QuickSale',
-          detailPath: `/materials/${m._id}`,
+          detailPath: `/quicksales/${m._id}`,
           subtitleText: `${m.location}, ${m.county}`,
           priceText: `KES ${m.price?.toLocaleString()}`,
           typeLabel: m.category || "Material",
@@ -2561,7 +2561,7 @@ export default function Home() {
                       properties: "/listings",
                       accommodation: "/accommodation",
                       businesses: "/axxbiashara",
-                      materials: "/materials"
+                      materials: "/quicksales"
                     };
                     navigate(paths[activeFeaturedTab] || "/listings");
                   }}
@@ -2593,7 +2593,7 @@ export default function Home() {
                     ? `/accommodation/property/${item._id}`
                     : activeFeaturedTab === "businesses"
                       ? `/axxbiashara?business=${item._id}`
-                      : `/materials?material=${item._id}`;
+                      : `/quicksales?material=${item._id}`;
 
                 return (
                   <div
@@ -2654,7 +2654,7 @@ export default function Home() {
                 properties: "/listings?featured=true",
                 accommodation: "/accommodation?featured=true",
                 businesses: "/axxbiashara?featured=true",
-                materials: "/materials?featured=true"
+                materials: "/quicksales?featured=true"
               };
               navigate(routes[activeFeaturedTab] || "/listings");
             }}
@@ -3061,7 +3061,7 @@ export default function Home() {
           <div className="cta-btns">
             <button className="cta-btn-gold" onClick={() => navigate("/listings")}> Browse Rentals</button>
             <button className="cta-btn-ghost" onClick={() => navigate("/accommodation")}> Explore Accommodation</button>
-            <button className="cta-btn-ghost" onClick={() => navigate("/materials")}> Shop Materials</button>
+            <button className="cta-btn-ghost" onClick={() => navigate("/quicksales")}> Shop QuickSales</button>
           </div>
           <div className="cta-divider"></div>
           <button
@@ -3091,7 +3091,7 @@ export default function Home() {
           <div className="footer-cols">
             <div className="footer-col">
               <p className="footer-col-title">Services</p>
-              {[[" Rentals", "/listings"], [" Accommodation", "/accommodation"], [" Merchants", "/materials"]].map(([l, r]) => (
+              {[[" Rentals", "/listings"], [" Accommodation", "/accommodation"], [" Merchants", "/quicksales"]].map(([l, r]) => (
                 <span key={l} className="footer-link" onClick={() => navigate(r)}>{l}</span>
               ))}
             </div>
@@ -3129,7 +3129,7 @@ export default function Home() {
               <div className="modal-services">
                 {[
                   { icon: "", title: "Landlord / Rentals", desc: "List rental properties and boost your listings", bg: `linear-gradient(135deg,${C.gold},${C.goldLight})`, route: "/login" },
-                  { icon: "", title: "Seller / QuickSales", desc: "Sell items in the materials QuickSales", bg: "linear-gradient(135deg,#0C2A3A,#103A4F)", route: "/seller-login" },
+                  { icon: "", title: "QuickSales", desc: "Sell items in QuickSales", bg: "linear-gradient(135deg,#0C2A3A,#103A4F)", route: "/quicksales-login" },
                   { icon: "", title: "Accommodation Provider", desc: "List hotels, lodges, and accommodation experiences", bg: "linear-gradient(135deg,#1B3A2A,#264D38)", route: "/accommodation/login" },
                   { icon: "", title: "Business / AxxBiashara", desc: "List professional business services", bg: "linear-gradient(135deg,#2E1B4A,#3D2566)", route: "/business-login" },
                 ].map(svc => (

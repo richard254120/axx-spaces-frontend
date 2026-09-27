@@ -402,14 +402,14 @@ export default function Profile() {
                 </button>
               )}
               {displayProfile?.role === "seller" && (
-                <button style={styles.button} onClick={() => navigate("/seller-dashboard")}>
+                <button style={styles.button} onClick={() => navigate("/quicksales-dashboard")}>
                    Seller Dashboard
                 </button>
               )}
               <button style={styles.button} onClick={() => {
                 const role = displayProfile?.role;
                 if (role === "landlord") navigate("/dashboard");
-                else if (role === "seller") navigate("/seller-dashboard");
+                else if (role === "seller") navigate("/quicksales-dashboard");
                 else if (role === "mover") navigate("/mover-dashboard");
                 else navigate("/business-dashboard");
               }}>

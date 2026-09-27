@@ -57,7 +57,7 @@ const MobileAppDownload = () => {
     { title: "Property Rentals", description: "Browse, view, and rent apartments, hostels, and residential homes in real-time." },
     { title: "Tourism & Hotels", description: "Discover top vacation rentals, hotels, safaris, and local cultural experiences." },
     { title: "AxxBiashara Directory", description: "Connect directly with verified local businesses and services across Kenya." },
-    { title: "Materials Marketplace", description: "Source quality construction materials and hardware straight from vendors." },
+    { title: "QuickSales", description: "Buy and sell goods quickly from verified sellers across Kenya." },
     { title: "Movers & Logistics", description: "Book verified relocation, moving, and delivery services effortlessly." },
     { title: "AxxWallet Payments", description: "Seamless, secure digital wallet transactions and instant booking receipts." },
   ];

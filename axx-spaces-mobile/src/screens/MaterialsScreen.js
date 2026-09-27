@@ -72,8 +72,8 @@ const MaterialsScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Materials Marketplace</Text>
-        <Text style={styles.headerSubtitle}>Construction materials & supplies</Text>
+        <Text style={styles.headerTitle}>QuickSales</Text>
+        <Text style={styles.headerSubtitle}>Buy and sell items across Kenya</Text>
       </View>
 
       <View style={styles.searchContainer}>

@@ -55,7 +55,7 @@ const resolveStatus = (material) => {
   return raw;
 };
 
-export default function SellerDashboard() {
+export default function QuickSalesDashboard() {
   const navigate = useNavigate();
   const { token: ctxToken, user: ctxUser } = useContext(AuthContext);
   const [seller, setSeller] = useState(null);
@@ -90,7 +90,7 @@ export default function SellerDashboard() {
     const storedToken = localStorage.getItem("sellerToken") || ctxToken;
     const storedUser = localStorage.getItem("sellerUser") || (ctxUser ? JSON.stringify(ctxUser) : null);
     if (!storedToken || !storedUser) {
-      navigate("/seller-login");
+      navigate("/quicksales-login");
       return;
     }
     const parsed = JSON.parse(storedUser);
@@ -446,7 +446,7 @@ export default function SellerDashboard() {
           itemType="material"
           itemId={selectedMaterialForBoost._id}
           itemName={selectedMaterialForBoost.title}
-          onSuccess={fetchMaterials}
+          onSuccess={fetchMyMaterials}
         />
       )}
     </div>

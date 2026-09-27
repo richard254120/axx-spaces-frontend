@@ -32,7 +32,7 @@ const getCategoryEmoji = (category) => {
   return emojiMap[category] || "";
 };
 
-export default function MaterialDetailPage() {
+export default function QuickSaleDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, token } = useAuth();
@@ -95,7 +95,7 @@ export default function MaterialDetailPage() {
         <h2 style={{ color: "#ef4444", margin: "0 0 8px" }}>Item Not Found</h2>
         <p style={{ color: "#64748b", margin: "0 0 24px" }}>{error || "This item doesn't exist or has been removed."}</p>
         <button
-          onClick={() => navigate("/materials")}
+          onClick={() => navigate("/quicksales")}
           style={{
             padding: "12px 28px",
             background: "#3b82f6",

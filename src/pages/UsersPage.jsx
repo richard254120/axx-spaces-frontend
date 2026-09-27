@@ -53,7 +53,7 @@ export default function UsersPage() {
   const handleViewProperties = (userId, role) => {
     switch (role) {
       case "seller":
-        navigate(`/seller-dashboard?userId=${userId}`);
+        navigate(`/quicksales-dashboard?userId=${userId}`);
         break;
       case "landlord":
         navigate(`/listings?owner=${userId}`);

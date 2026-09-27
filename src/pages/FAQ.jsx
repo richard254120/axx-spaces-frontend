@@ -82,18 +82,18 @@ const faqs = [
     ],
   },
   {
-    category: "QuickSales & Sellers",
+    category: "QuickSales",
     items: [
       {
-        q: "What is the QuickSales?",
+        q: "What is QuickSales?",
         a: "A buy-and-sell platform for new and used goods — electronics, furniture, fashion, vehicles, and more nationwide. Connect directly with sellers.",
       },
       {
-        q: "How do I become a seller?",
-        a: "Register a seller account through our Seller Login, complete verification, and start listing your products. You'll have access to a dedicated seller dashboard.",
+        q: "How do I become a QuickSales seller?",
+        a: "Register a QuickSales account through QuickSales login, complete verification, and start listing your products. You'll have access to a dedicated QuickSales dashboard.",
       },
       {
-        q: "Are there fees for selling on the QuickSales?",
+        q: "Are there fees for selling on QuickSales?",
         a: "Basic listings are free. We offer premium listing options for increased visibility. Transaction fees may apply for certain features.",
       },
     ],
@@ -116,15 +116,15 @@ const faqs = [
     ],
   },
   {
-    category: "Materials QuickSales",
+    category: "QuickSales Listings",
     items: [
       {
-        q: "What is the Materials QuickSales?",
-        a: "A dedicated section for moving materials — boxes, tape, bubble wrap, packing supplies, and more. Connect with suppliers directly.",
+        q: "What can I buy or sell on QuickSales?",
+        a: "QuickSales covers everyday goods as well as moving supplies — boxes, tape, bubble wrap, packing materials, furniture, electronics, and more. Connect with sellers and suppliers directly.",
       },
       {
-        q: "How do I buy moving materials?",
-        a: "Browse the Materials section, select the items you need, and contact suppliers directly through our platform to arrange purchase and delivery.",
+        q: "How do I buy on QuickSales?",
+        a: "Browse QuickSales, select the items you need, and contact sellers directly through our platform to arrange purchase and delivery.",
       },
     ],
   },

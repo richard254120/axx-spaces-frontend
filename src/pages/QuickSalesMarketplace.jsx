@@ -36,7 +36,7 @@ const COUNTIES = [
   "Busia", "Siaya", "Kisumu", "Homa Bay", "Migori", "Kisii", "Nyamira", "Nairobi City",
 ];
 
-export default function MaterialsMarketplace() {
+export default function QuickSalesMarketplace() {
   const navigate = useNavigate();
   const { user, token } = useAuth();
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
@@ -134,7 +134,7 @@ export default function MaterialsMarketplace() {
   };
 
   const handleInquiry = (materialId) => {
-    navigate(`/materials/${materialId}/inquire`);
+    navigate(`/quicksales/${materialId}/inquire`);
   };
 
   const handlePurchaseMaterial = (material) => {
@@ -273,7 +273,7 @@ export default function MaterialsMarketplace() {
       <section style={styles.hero}>
         <div style={styles.heroContent}>
           <div style={styles.badge}> Verified Sellers Only</div>
-          <h1 style={styles.heroTitle}>Materials Marketplace</h1>
+          <h1 style={styles.heroTitle}>QuickSales</h1>
           <p style={styles.heroSubtitle}>
             Browse construction materials, furniture, appliances, and more from verified sellers across Kenya
           </p>
@@ -579,10 +579,10 @@ export default function MaterialsMarketplace() {
             Join our verified seller network and reach thousands of buyers across Kenya
           </p>
           <button
-            onClick={() => navigate("/seller-login")}
+            onClick={() => navigate("/quicksales-login")}
             style={styles.ctaBtn}
           >
-             Become a Seller
+             Join QuickSales
           </button>
         </div>
       </section>

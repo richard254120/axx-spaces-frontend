@@ -130,7 +130,7 @@ export default function Navbar() {
           <Link to="/axxbiashara" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>AxxBiashara</span>
           </Link>
-          <Link to="/materials" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+          <Link to="/quicksales" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>QuickSales</span>
           </Link>
           <Link to="/listings" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
@@ -444,7 +444,7 @@ export default function Navbar() {
           <Link to="/axxbiashara" style={{ ...styles.navLink, ...(isActive("/axxbiashara") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
             AxxBiashara
           </Link>
-          <Link to="/materials" style={{ ...styles.navLink, ...(isActive("/materials") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
+          <Link to="/quicksales" style={{ ...styles.navLink, ...(isActive("/quicksales") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
             QuickSales
           </Link>
           <Link to="/listings" style={{ ...styles.navLink, ...(isActive("/listings") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>

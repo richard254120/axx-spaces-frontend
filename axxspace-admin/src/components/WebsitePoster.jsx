@@ -1,14 +1,29 @@
-const POSTER_SRC = "/axxspace_website_qr_poster.png";
+// Bump this when the poster PNG changes so browsers/CDNs don't serve a stale file.
+const POSTER_VERSION = "20260926b";
+const POSTER_PATH = "/axxspace_website_qr_poster_v2.png";
+const POSTER_SRC = `${POSTER_PATH}?v=${POSTER_VERSION}`;
 const POSTER_FILENAME = "axxspace_website_qr_poster.png";
 
 export default function WebsitePoster() {
-  const handleDownload = () => {
-    const link = document.createElement("a");
-    link.href = POSTER_SRC;
-    link.download = POSTER_FILENAME;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleDownload = async () => {
+    try {
+      const response = await fetch(POSTER_SRC, { cache: "no-store" });
+      if (!response.ok) throw new Error(`Failed to fetch poster (${response.status})`);
+
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = POSTER_FILENAME;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(objectUrl);
+    } catch (err) {
+      console.error(err);
+      // Fallback: open image directly if blob download fails
+      window.open(POSTER_SRC, "_blank", "noopener,noreferrer");
+    }
   };
 
   const handlePrint = () => {

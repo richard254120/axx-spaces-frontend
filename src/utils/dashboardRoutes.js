@@ -3,7 +3,7 @@ export const DASHBOARD_BY_ROLE = {
   landlord: "/dashboard",
   agent: "/agent/dashboard",
   host: "/accommodation/host-dashboard",
-  seller: "/seller-dashboard",
+  seller: "/quicksales-dashboard",
   mover: "/mover-dashboard",
   user: "/business-dashboard",
   admin: "/admin/dashboard",
@@ -15,7 +15,7 @@ export const LOGIN_BY_ROLE = {
   agent: "/agent/login",
   host: "/accommodation/login",
   landlord: "/login",
-  seller: "/seller-login",
+  seller: "/quicksales-login",
   mover: "/login",
   user: "/user-login",
   admin: "/login",
@@ -108,7 +108,7 @@ export const ACCOUNT_NAV_BY_ROLE = {
     { label: "Settings", path: "/settings" },
   ],
   seller: [
-    { label: "Dashboard", path: "/seller-dashboard" },
+    { label: "Dashboard", path: "/quicksales-dashboard" },
     { label: "Settings", path: "/settings" },
   ],
   mover: [
@@ -139,7 +139,7 @@ export function getWorkspaceBrand(role) {
   const brands = {
     agent: "Agent Portal",
     landlord: "Landlord Portal",
-    seller: "Seller Portal",
+    seller: "QuickSales Portal",
     mover: "Axx Movers",
     user: "Business Workspace",
     admin: "Admin Panel",

@@ -253,7 +253,7 @@ export default function AboutPage() {
                 description: "The ultimate QuickSales for buying and selling new and used items. From electronics to furniture, fashion to cars.",
                 features: ["New & used items", "Secure transactions", "Nationwide delivery", "Direct seller contact"],
                 color: "#38BDF8",
-                route: "/materials"
+                route: "/quicksales"
               },
               {
                 id: "requests",
@@ -521,7 +521,7 @@ export default function AboutPage() {
             </button>
             <button
               style={{ ...styles.ctaBtnSecondary, background: "#3b82f6", color: "white" }}
-              onClick={() => navigate("/materials")}
+              onClick={() => navigate("/quicksales")}
             >
               Buy Materials
             </button>
@@ -551,7 +551,7 @@ export default function AboutPage() {
             <p style={styles.footerLink} onClick={() => navigate("/axxbiashara")}> AxxBiashara</p>
             <p style={styles.footerLink} onClick={() => navigate("/accommodation")}> Accommodation</p>
             <p style={styles.footerLink} onClick={() => navigate("/")}> Home</p>
-            <p style={styles.footerLink} onClick={() => navigate("/materials")}> Materials Marketplace</p>
+            <p style={styles.footerLink} onClick={() => navigate("/quicksales")}> QuickSales</p>
           </div>
           <div style={styles.footerSection}>
             <h4 style={styles.footerTitle}>Support</h4>
