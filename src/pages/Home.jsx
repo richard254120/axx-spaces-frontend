@@ -2246,7 +2246,7 @@ export default function Home() {
           API.get("/properties?featured=true&limit=4", { timeout }).catch(() => ({ data: [] })),
           API.get("/business?featured=true&limit=4&sort=rating", { timeout }).catch(() => ({ data: { businesses: [] } })),
           API.get("/materials?featured=true&limit=4", { timeout }).catch(() => ({ data: [] })),
-          API.get("/tourism?featured=true&limit=4", { timeout }).catch(() => ({ data: [] })),
+          API.get("/accommodations?featured=true&limit=4", { timeout }).catch(() => ({ data: [] })),
           API.get("/reviews", { timeout }).catch(() => ({ data: [] }))
         ]);
 
