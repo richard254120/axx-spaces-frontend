@@ -430,6 +430,8 @@ export default function AdminDashboard() {
       // Reload current data based on active tab
       if (activeTab === 'businesses') {
         loadPendingBusinesses();
+      } else if (activeTab === 'accommodations') {
+        loadAccommodations(accommodationStatusView);
       } else {
         loadItems(activeTab, statusView);
       }
@@ -527,6 +529,24 @@ export default function AdminDashboard() {
       alert(`Accommodation ${status === "active" ? "approved" : "rejected"} successfully`);
     } catch (err) {
       alert("Failed to update accommodation status");
+    }
+  };
+
+  const handleToggleFeaturedAccommodation = async (accommodationId, currentFeatured) => {
+    try {
+      await API.patch(`/accommodations/${accommodationId}/featured`, {
+        isFeatured: !currentFeatured,
+        promotionTier: "boost-7days",
+        durationDays: 7,
+      });
+      loadAccommodations(accommodationStatusView);
+      if (selected?._id === accommodationId) {
+        setSelected((prev) => (prev ? { ...prev, isFeatured: !currentFeatured } : null));
+      }
+      alert(currentFeatured ? "Accommodation unfeatured successfully" : "Accommodation featured successfully");
+    } catch (err) {
+      console.error("Feature accommodation error:", err);
+      alert("Failed to toggle featured status: " + (err.response?.data?.error || err.message));
     }
   };
 
@@ -1265,7 +1285,8 @@ export default function AdminDashboard() {
                   const hasVideos = item.videos && item.videos.length > 0;
 
                   return (
-                    <div key={item._id} className="card admin-card" onClick={() => setSelected(item)}>
+                    <div key={item._id} className={`card admin-card ${item.isFeatured ? "featured" : ""}`} onClick={() => setSelected(item)}>
+                      {item.isFeatured && <div className="featured-banner"> FEATURED</div>}
                       {firstImg ? (
                         <div className="card-image" style={{ backgroundImage: `url(${firstImg})`, position: "relative" }}>
                           {hasVideos && (
@@ -1351,6 +1372,30 @@ export default function AdminDashboard() {
                           )}
                           {item.status !== "inactive" && (
                             <button className="btn-reject" onClick={() => handleAccommodationStatus(item._id, "inactive")}>✕ Reject</button>
+                          )}
+                          {item.status === "active" && (
+                            <button
+                              className="btn-view"
+                              style={{
+                                marginTop: "10px",
+                                width: "100%",
+                                background: item.isFeatured ? "#ef4444" : "#fbbf24",
+                                color: item.isFeatured ? "#fff" : "#0f172a",
+                                border: "none",
+                                borderRadius: "6px",
+                                cursor: "pointer",
+                                fontSize: "12px",
+                                fontWeight: "700",
+                                padding: "8px 10px",
+                              }}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleToggleFeaturedAccommodation(item._id, item.isFeatured);
+                              }}
+                            >
+                              {item.isFeatured ? " Unfeature" : " Feature"}
+                            </button>
                           )}
                           <button className="btn-delete" style={{ padding: "6px 10px", background: "#ef4444", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "12px" }} onClick={() => confirmDelete("accommodations", item._id, item.name)}>🗑 Delete</button>
                         </div>
