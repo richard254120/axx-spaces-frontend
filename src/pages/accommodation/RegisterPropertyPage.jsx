@@ -567,6 +567,7 @@ export default function RegisterPropertyPage() {
                 </div>
 
                 {/* VIDEOS UPLOAD */}
+                <h2 style={s.formTitle}>Video Walkthroughs (optional)</h2>
                 <div style={{
                   marginBottom: "28px",
                   padding: "20px",
