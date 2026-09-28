@@ -215,7 +215,7 @@ export default function MoverDetailPage() {
                   fontSize: "11px",
                   fontWeight: 700,
                 }}>
-                   Featured
+                  Featured
                 </div>
               )}
             </>
@@ -246,19 +246,19 @@ export default function MoverDetailPage() {
               {/* Key Features */}
               <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginBottom: "24px" }}>
                 <span style={{ background: "#f1f5f9", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", color: "#475569" }}>
-                   {mover.vehicleType || "Various"}
+                  {mover.vehicleType || "Various"}
                 </span>
                 <span style={{ background: "#f1f5f9", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", color: "#475569" }}>
-                   {mover.experienceYears || 0} years exp
+                  {mover.experienceYears || 0} years exp
                 </span>
                 {mover.teamInfo?.teamSize && (
                   <span style={{ background: "#f1f5f9", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", color: "#475569" }}>
-                     {mover.teamInfo.teamSize} team
+                    {mover.teamInfo.teamSize} team
                   </span>
                 )}
                 {mover.responseTime && (
                   <span style={{ background: "#f1f5f9", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", color: "#475569" }}>
-                     {mover.responseTime}
+                    {mover.responseTime}
                   </span>
                 )}
               </div>
@@ -270,17 +270,17 @@ export default function MoverDetailPage() {
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
                     {mover.insurance?.hasInsurance && (
                       <span style={{ background: "rgba(34, 197, 94, 0.15)", color: "#22c55e", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", fontWeight: 600, border: "1px solid rgba(34, 197, 94, 0.3)" }}>
-                         Insured
+                        Insured
                       </span>
                     )}
                     {mover.uniform && (
                       <span style={{ background: "#f1f5f9", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", color: "#475569" }}>
-                         Uniform
+                        Uniform
                       </span>
                     )}
                     {mover.safetyGear && (
                       <span style={{ background: "#f1f5f9", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", color: "#475569" }}>
-                         Safety Gear
+                        Safety Gear
                       </span>
                     )}
                   </div>
@@ -294,7 +294,7 @@ export default function MoverDetailPage() {
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
                     {mover.specialties.map((specialty, idx) => (
                       <span key={idx} style={{ background: "#f1f5f9", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", color: "#475569" }}>
-                         {specialty}
+                        {specialty}
                       </span>
                     ))}
                   </div>
@@ -322,7 +322,7 @@ export default function MoverDetailPage() {
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
                     {mover.languages.map((lang, idx) => (
                       <span key={idx} style={{ background: "#f1f5f9", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", color: "#475569" }}>
-                         {lang}
+                        {lang}
                       </span>
                     ))}
                   </div>
@@ -458,7 +458,8 @@ export default function MoverDetailPage() {
                   onChange={(e) => setBookingData({ ...bookingData, serviceType: e.target.value })}
                   style={{ width: "100%", padding: "10px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "14px" }}
                 >
-                  <option value="">Select service</option>
+                  <option value="">Select service
+                  </option>
                   {(mover.services || ["House Moving", "Office Moving", "Furniture Moving"]).map(service => (
                     <option key={service} value={service}>{service}</option>
                   ))}
