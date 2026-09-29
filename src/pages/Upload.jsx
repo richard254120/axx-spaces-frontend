@@ -26,7 +26,7 @@ const PROPERTY_TYPES = [
 const STEPS = [
   { id: "basic", label: "Basic Info", icon: "" },
   { id: "details", label: "Details", icon: "" },
-  { id: "images", label: "Images", icon: "" },
+  { id: "images", label: "Images & Videos", icon: "" },
   { id: "amenities", label: "Amenities", icon: "" },
 ];
 
@@ -117,6 +117,9 @@ export default function Upload() {
 
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
+  const [videos, setVideos] = useState([]);
+  const [videoPreviews, setVideoPreviews] = useState([]);
+  const [isDraggingVideo, setIsDraggingVideo] = useState(false);
   const [loading, setLoading] = useState(false);
   const [locLoading, setLocLoading] = useState(false);
   const [error, setError] = useState("");
@@ -296,6 +299,37 @@ export default function Upload() {
     setImagePreviews((prev) => [...prev, ...newPreviews]);
   };
 
+  const handleVideoChange = (fileList) => {
+    const files = Array.from(fileList);
+    const validVideos = [];
+    const oversized = [];
+    files.forEach((f) => {
+      if (f.type && f.type.startsWith("video/")) {
+        if (f.size > 100 * 1024 * 1024) {
+          oversized.push(`${f.name} (${(f.size / (1024 * 1024)).toFixed(1)}MB)`);
+        } else {
+          validVideos.push(f);
+        }
+      }
+    });
+    if (oversized.length > 0) {
+      setError(`These videos exceed 100MB and were skipped: ${oversized.join(", ")}`);
+    }
+    if (videos.length + validVideos.length > 5) {
+      setError("Maximum 5 videos allowed");
+      return;
+    }
+    setVideos((prev) => [...prev, ...validVideos]);
+    const newPreviews = validVideos.map((file) => URL.createObjectURL(file));
+    setVideoPreviews((prev) => [...prev, ...newPreviews]);
+  };
+
+  const removeVideo = (index) => {
+    if (videoPreviews[index]) URL.revokeObjectURL(videoPreviews[index]);
+    setVideos((prev) => prev.filter((_, i) => i !== index));
+    setVideoPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const removeImage = (index) => {
     if (index < existingImages.length) {
       // Removing an existing image
@@ -381,6 +415,7 @@ export default function Upload() {
       }
 
       images.forEach((image) => formDataToSend.append("images", image));
+      videos.forEach((video) => formDataToSend.append("videos", video));
 
       const url = isEditMode ? `${API_BASE}/properties/${id}` : `${API_BASE}/properties`;
       const method = isEditMode ? "PATCH" : "POST";
@@ -408,6 +443,8 @@ export default function Upload() {
         });
         setImages([]);
         setImagePreviews([]);
+        setVideos([]);
+        setVideoPreviews([]);
         setConsent(false);
         setSelectedUniversity(null);
         setCurrentStep(0);
@@ -718,16 +755,17 @@ export default function Upload() {
           </div>
         )}
 
-        {/* ── IMAGES ── */}
+        {/* ── IMAGES & VIDEOS ── */}
         {currentStep === 2 && (
           <div style={styles.section}>
-            <h2 style={styles.sectionTitle}>Images</h2>
+            <h2 style={styles.sectionTitle}>Images & Videos</h2>
             {stepErrors.length > 0 && (
               <div style={styles.stepErrorBox}>
                 Required: {stepErrors.join(", ")}
               </div>
             )}
 
+            {/* ── IMAGE UPLOAD ── */}
             <div style={styles.formGroup}>
               <label style={styles.label}>Upload Images ({images.length}/10) *</label>
               <div style={styles.imageUploadBox}>
@@ -753,6 +791,108 @@ export default function Upload() {
                   })}
                 </div>
               )}
+            </div>
+
+            {/* ── VIDEO UPLOAD ── */}
+            <div style={styles.videoSection}>
+              <div style={styles.videoSectionHeader}>
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ fontSize: "20px" }}>🎬</span>
+                    <label style={{ ...styles.label, marginBottom: 0, color: "#fbbf24" }}>
+                      Property Videos ({videos.length}/5)
+                    </label>
+                    <span style={styles.videoOptionalBadge}>Optional</span>
+                  </div>
+                  <p style={{ fontSize: "12px", color: "#64748b", marginTop: "6px", lineHeight: 1.5 }}>
+                    Upload walkthrough videos to give tenants a virtual tour. MP4, WebM, MOV • Max 100MB each.
+                  </p>
+                </div>
+                {videos.length > 0 && (
+                  <span style={styles.videoReadyBadge}>
+                    ✓ {videos.length} video{videos.length > 1 ? "s" : ""} ready
+                  </span>
+                )}
+              </div>
+
+              <div
+                style={{
+                  ...styles.videoUploadBox,
+                  borderColor: isDraggingVideo ? "#3b82f6" : "#334155",
+                  background: isDraggingVideo ? "rgba(59,130,246,0.1)" : "#1e293b",
+                }}
+                onDragOver={(e) => { e.preventDefault(); setIsDraggingVideo(true); }}
+                onDragLeave={() => setIsDraggingVideo(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setIsDraggingVideo(false);
+                  if (e.dataTransfer.files) handleVideoChange(e.dataTransfer.files);
+                }}
+              >
+                <input
+                  type="file"
+                  accept="video/*"
+                  multiple
+                  onChange={(e) => {
+                    if (e.target.files) handleVideoChange(e.target.files);
+                    e.target.value = "";
+                  }}
+                  style={{ display: "none" }}
+                  id="videoInput"
+                />
+                <label htmlFor="videoInput" style={styles.videoUploadLabel}>
+                  <span style={{ fontSize: "36px", marginBottom: "8px" }}>🎥</span>
+                  <span style={{ fontWeight: 700, fontSize: "14px", color: "#f1f5f9" }}>
+                    Click to select videos
+                  </span>
+                  <span style={{ fontSize: "12px", color: "#64748b", marginTop: "4px" }}>
+                    or drag & drop video files here
+                  </span>
+                </label>
+              </div>
+
+              {/* Video Previews */}
+              {videoPreviews.length > 0 && (
+                <div style={{ marginTop: "16px" }}>
+                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#86efac", marginBottom: "10px", display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span>▶ Preview your videos:</span>
+                  </div>
+                  <div style={styles.videoPreviewGrid}>
+                    {videos.map((file, idx) => (
+                      <div key={idx} style={styles.videoCard}>
+                        <video
+                          src={videoPreviews[idx]}
+                          controls
+                          playsInline
+                          preload="metadata"
+                          style={{ width: "100%", height: "160px", objectFit: "contain", background: "#000", borderRadius: "8px 8px 0 0" }}
+                        />
+                        <div style={styles.videoCardInfo}>
+                          <div style={{ minWidth: 0, flex: 1 }}>
+                            <div style={{ fontSize: "12px", fontWeight: 700, color: "#f1f5f9", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                              📹 {file.name}
+                            </div>
+                            <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>
+                              {(file.size / (1024 * 1024)).toFixed(1)} MB
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeVideo(idx)}
+                            style={styles.videoRemoveBtn}
+                          >
+                            ✕ Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div style={styles.videoTip}>
+                💡 <strong>Tip:</strong> Short walkthrough videos (30s–2min) showing rooms, kitchen, bathroom, and the view dramatically increase tenant interest!
+              </div>
             </div>
 
             <div style={styles.navBtns}>
@@ -822,7 +962,11 @@ export default function Upload() {
               opacity: (!isStepComplete(3) || loading) ? 0.5 : 1,
               cursor: (!isStepComplete(3) || loading) ? "not-allowed" : "pointer",
             }}>
-              {loading ? "Uploading Property..." : "Submit Property for Approval"}
+              {loading
+                ? (videos.length > 0
+                    ? `Uploading ${images.length} image(s) & ${videos.length} video(s)...`
+                    : "Uploading Property...")
+                : "Submit Property for Approval"}
             </button>
           </div>
         )}
@@ -1133,6 +1277,96 @@ const styles = {
     borderRadius: "50%",
     cursor: "pointer",
     fontSize: "10px",
+  },
+
+  // ── VIDEO UPLOAD ──
+  videoSection: {
+    marginTop: "24px",
+    padding: "20px",
+    borderRadius: "12px",
+    background: "rgba(59, 130, 246, 0.05)",
+    border: "1px solid rgba(59, 130, 246, 0.2)",
+  },
+  videoSectionHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: "14px",
+    flexWrap: "wrap",
+    gap: "8px",
+  },
+  videoOptionalBadge: {
+    fontSize: "10px",
+    fontWeight: 700,
+    background: "rgba(100, 116, 139, 0.2)",
+    color: "#94a3b8",
+    padding: "2px 8px",
+    borderRadius: "20px",
+    letterSpacing: "0.5px",
+  },
+  videoReadyBadge: {
+    background: "rgba(34, 197, 94, 0.15)",
+    color: "#86efac",
+    fontSize: "12px",
+    fontWeight: 700,
+    padding: "4px 12px",
+    borderRadius: "20px",
+    border: "1px solid rgba(34, 197, 94, 0.3)",
+  },
+  videoUploadBox: {
+    border: "2px dashed #334155",
+    borderRadius: "10px",
+    padding: "28px 16px",
+    textAlign: "center",
+    cursor: "pointer",
+    transition: "all 0.2s",
+  },
+  videoUploadLabel: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    cursor: "pointer",
+  },
+  videoPreviewGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+    gap: "14px",
+  },
+  videoCard: {
+    borderRadius: "10px",
+    overflow: "hidden",
+    border: "1px solid #334155",
+    background: "#0f1729",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+  },
+  videoCardInfo: {
+    padding: "10px 12px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "10px",
+  },
+  videoRemoveBtn: {
+    background: "rgba(239, 68, 68, 0.15)",
+    border: "1px solid rgba(239, 68, 68, 0.4)",
+    color: "#fca5a5",
+    borderRadius: "6px",
+    padding: "5px 10px",
+    fontSize: "12px",
+    fontWeight: 700,
+    cursor: "pointer",
+    flexShrink: 0,
+    fontFamily: "inherit",
+  },
+  videoTip: {
+    marginTop: "14px",
+    background: "rgba(34, 197, 94, 0.08)",
+    border: "1px solid rgba(34, 197, 94, 0.2)",
+    borderRadius: "10px",
+    padding: "12px 14px",
+    fontSize: "12px",
+    color: "#86efac",
+    lineHeight: 1.6,
   },
   amenitiesGrid: {
     display: "grid",
