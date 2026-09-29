@@ -51,7 +51,9 @@ function VideoPreviewCard({ file, index, onRemove }) {
           playsInline
           preload="metadata"
           style={{ width: "100%", height: "180px", objectFit: "contain", background: "#000" }}
-        />
+        >
+          Your browser does not support playing this video format directly.
+        </video>
       )}
       <div style={{
         padding: "10px 12px",
