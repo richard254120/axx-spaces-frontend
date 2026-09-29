@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import FloatingWhatsApp from "../components/FloatingWhatsApp";
-import AgentCard from "../components/AgentCard";
+import { resolveMediaUrl } from "../utils/fileLinks";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -13,6 +13,21 @@ const formatKenyaPhone = (phone) => {
   if (cleaned.startsWith("254")) return cleaned;
   return "254" + cleaned;
 };
+
+function formatVideoUrl(url) {
+  if (!url || typeof url !== "string") return "";
+  let cleanUrl = url.trim().replace(/^http:\/\//i, "https://");
+  if (cleanUrl.includes("cloudinary.com") && cleanUrl.includes("/video/upload/")) {
+    cleanUrl = cleanUrl.replace(/\.(mov|quicktime|mkv|avi|webm|ogv|m4v)$/i, ".mp4");
+    if (!/\.(mp4|webm)$/i.test(cleanUrl)) {
+      cleanUrl = `${cleanUrl}.mp4`;
+    }
+  }
+  if (!cleanUrl.startsWith("http")) {
+    cleanUrl = resolveMediaUrl(cleanUrl);
+  }
+  return cleanUrl;
+}
 
 export default function PropertyDetailPage() {
   const { id } = useParams();
@@ -268,10 +283,15 @@ export default function PropertyDetailPage() {
           <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "24px" }}>
             {/* Main Content */}
             <div>
-              <div style={{ marginBottom: "16px" }}>
+              <div style={{ marginBottom: "16px", display: "flex", gap: "8px", alignItems: "center" }}>
                 <span style={{ background: "#3b82f6", color: "white", padding: "4px 10px", borderRadius: "6px", fontSize: "11px", fontWeight: 600, textTransform: "uppercase" }}>
                   {property.propertyType || "Rental"}
                 </span>
+                {property.videos && property.videos.length > 0 && (
+                  <span style={{ background: "#f0fdf4", color: "#166534", padding: "4px 10px", borderRadius: "6px", fontSize: "11px", fontWeight: 700, border: "1px solid #bbf7d0", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                    <span>🎬</span> Video Tour ({property.videos.length})
+                  </span>
+                )}
               </div>
               <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#1e293b", marginBottom: "8px", lineHeight: "1.3" }}>{property.title}</h1>
               <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "20px", display: "flex", alignItems: "center", gap: "4px" }}>
@@ -308,6 +328,54 @@ export default function PropertyDetailPage() {
                         ✓ {amenity}
                       </span>
                     ))}
+                  </div>
+                </div>
+              )}
+
+              {property.videos && property.videos.length > 0 && (
+                <div style={{ marginBottom: "28px", background: "white", padding: "20px", borderRadius: "14px", border: "1px solid #e2e8f0", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                    <div>
+                      <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+                        <span>🎬 Virtual Video Walkthrough</span>
+                      </h2>
+                      <p style={{ fontSize: "13px", color: "#64748b", margin: "4px 0 0 0" }}>
+                        Take a full video tour of this property before visiting or booking.
+                      </p>
+                    </div>
+                    <span style={{ background: "#eff6ff", color: "#2563eb", padding: "4px 10px", borderRadius: "20px", fontSize: "12px", fontWeight: 700, border: "1px solid #bfdbfe" }}>
+                      {property.videos.length} {property.videos.length === 1 ? "Video" : "Videos"}
+                    </span>
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
+                    {property.videos.map((vid, idx) => {
+                      const cleanVid = formatVideoUrl(vid);
+                      return (
+                        <div key={idx} style={{ borderRadius: "12px", overflow: "hidden", background: "#000", border: "1px solid #1e293b" }}>
+                          <video
+                            src={cleanVid}
+                            controls
+                            playsInline
+                            preload="metadata"
+                            style={{ width: "100%", height: "220px", objectFit: "contain", background: "#000" }}
+                          >
+                            Your browser does not support playing this video format directly.
+                          </video>
+                          <div style={{ padding: "10px 14px", background: "#0f172a", color: "white", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <span style={{ fontSize: "12px", fontWeight: 700 }}>📹 Video Tour #{idx + 1}</span>
+                            <a
+                              href={cleanVid}
+                              target="_blank"
+                              rel="noreferrer"
+                              style={{ color: "#38bdf8", fontSize: "12px", textDecoration: "none", fontWeight: 700 }}
+                            >
+                              Fullscreen ↗
+                            </a>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
