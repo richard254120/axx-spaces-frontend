@@ -352,7 +352,7 @@ export default function AccommodationLogin() {
       const response = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, role: "landlord" }),
+        body: JSON.stringify({ email, password, role: "host" }),
       });
 
       let data;
@@ -559,8 +559,8 @@ export default function AccommodationLogin() {
 
             <div style={styles.link}>
               Don't have an account?{" "}
-              <span style={styles.linkText} onClick={() => navigate("/accommodation/register-property")}>
-                Register Your Property
+              <span style={styles.linkText} onClick={() => navigate("/accommodation/register")}>
+                Register Your Account
               </span>
             </div>
 

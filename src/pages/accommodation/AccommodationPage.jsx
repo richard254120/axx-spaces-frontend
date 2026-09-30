@@ -571,9 +571,8 @@ export default function AccommodationPage() {
   };
 
   // Format guests label
-  const guestsLabel = `${guestsCount.adults + guestsCount.children} guest${
-    guestsCount.adults + guestsCount.children > 1 ? "s" : ""
-  }, ${guestsCount.rooms} room${guestsCount.rooms > 1 ? "s" : ""}`;
+  const guestsLabel = `${guestsCount.adults + guestsCount.children} guest${guestsCount.adults + guestsCount.children > 1 ? "s" : ""
+    }, ${guestsCount.rooms} room${guestsCount.rooms > 1 ? "s" : ""}`;
 
   // Budget Planner Calculation
   const estimatedNightlyRate =
@@ -708,9 +707,9 @@ export default function AccommodationPage() {
                 <button
                   type="button"
                   className="list-property-btn"
-                  onClick={() => navigate("/accommodation/register-property")}
+                  onClick={() => navigate("/accommodation/register")}
                 >
-                  <span>List Your Property</span>
+                  <span>Register Account</span>
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M5 12h14M12 5l7 7-7 7" />
                   </svg>
@@ -1516,10 +1515,10 @@ export default function AccommodationPage() {
                   const areaQuery = plannerDestination.includes("Coast")
                     ? "Diani Beach"
                     : plannerDestination.includes("Safari")
-                    ? "Maasai Mara"
-                    : plannerDestination.includes("Nairobi")
-                    ? "Nairobi"
-                    : "Nanyuki";
+                      ? "Maasai Mara"
+                      : plannerDestination.includes("Nairobi")
+                        ? "Nairobi"
+                        : "Nanyuki";
                   navigate(`/accommodation/listings?area=${encodeURIComponent(areaQuery)}&maxPrice=${estimatedNightlyRate * 1.3}`);
                 }}
               >
