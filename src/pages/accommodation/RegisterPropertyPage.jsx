@@ -489,7 +489,7 @@ export default function RegisterPropertyPage() {
                       fontFamily: "inherit",
                     }}
                   >
-                    📍 Auto-detect Location
+                    Auto-detect Location
                   </button>
                 </div>
               </div>
@@ -537,7 +537,7 @@ export default function RegisterPropertyPage() {
                       id="image-upload"
                     />
                     <label htmlFor="image-upload" style={s.uploadBtn}>
-                      <span style={{ fontSize: "36px", marginBottom: "8px" }}>📸</span>
+                      <span style={{ fontSize: "36px", marginBottom: "8px" }}>Photo</span>
                       <span style={{ fontWeight: 800, fontSize: "15px" }}>Click to add photos</span>
                       <span style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>
                         or drag and drop your photos here
@@ -580,7 +580,7 @@ export default function RegisterPropertyPage() {
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px", flexWrap: "wrap", gap: "8px" }}>
                     <div>
                       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                        <span style={{ fontSize: "18px" }}>🎬</span>
+                        <span style={{ fontSize: "18px" }}>Video</span>
                         <label style={{ ...s.label, marginBottom: 0, fontSize: "13px", color: "#0f172a" }}>
                           Virtual Video Walkthroughs ({newVideos.length}/10)
                         </label>
@@ -868,7 +868,7 @@ export default function RegisterPropertyPage() {
                 {newVideos.length > 0 && (
                   <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "12px", padding: "14px", marginBottom: "16px" }}>
                     <div style={{ fontSize: "13px", fontWeight: 800, color: "#166534", marginBottom: "4px" }}>
-                      🎬 Virtual Video Tour Attached
+                      Virtual Video Tour Attached
                     </div>
                     <div style={{ fontSize: "12px", color: "#15803d" }}>
                       {newVideos.length} video file(s) will be uploaded to our cloud media CDN and made playable on your listing page.

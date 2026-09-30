@@ -2523,10 +2523,10 @@ export default function Home() {
         {/* TABS */}
         <div className="feat-tabs-bar">
           {[
-            { id: "properties", label: "🏠 Rentals", count: featuredProperties.length },
-            { id: "accommodation", label: "🏨 Accommodation", count: featuredAccommodation.length },
-            { id: "businesses", label: "💼 AxxBiashara", count: featuredBusinesses.length },
-            { id: "materials", label: "⚡ QuickSales", count: featuredMaterials.length },
+            { id: "properties", label: "Rentals", count: featuredProperties.length },
+            { id: "accommodation", label: "Accommodation", count: featuredAccommodation.length },
+            { id: "businesses", label: "AxxBiashara", count: featuredBusinesses.length },
+            { id: "materials", label: "QuickSales", count: featuredMaterials.length },
           ].map(tab => (
             <button
               key={tab.id}
@@ -2613,13 +2613,13 @@ export default function Home() {
                         />
                       ) : (
                         <div className="modern-card-fallback-img">
-                          <span>{activeFeaturedTab === "accommodation" ? "🏨" : activeFeaturedTab === "businesses" ? "💼" : "🏠"}</span>
+                          <span>{activeFeaturedTab === "accommodation" ? "Accommodation" : activeFeaturedTab === "businesses" ? "Business" : "Property"}</span>
                         </div>
                       )}
                       <div className="modern-card-badge-row">
                         <span className="badge-featured">★ Featured</span>
                         {hasVideos && (
-                          <span className="badge-video">🎬 Video Tour</span>
+                          <span className="badge-video">Video Tour</span>
                         )}
                       </div>
                       <div className="modern-card-gradient-overlay"></div>

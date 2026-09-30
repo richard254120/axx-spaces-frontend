@@ -160,7 +160,7 @@ export default function AccommodationDetailPage() {
       const favs = JSON.parse(localStorage.getItem("axx_accommodation_favs") || "[]");
       const updated = nextSaved ? [...new Set([...favs, id])] : favs.filter((f) => f !== id);
       localStorage.setItem("axx_accommodation_favs", JSON.stringify(updated));
-    } catch {}
+    } catch { }
     showToast(nextSaved ? "Saved to your Wishlist ❤️" : "Removed from your Wishlist");
   };
 
@@ -175,7 +175,7 @@ export default function AccommodationDetailPage() {
     if (navigator.share) {
       try {
         await navigator.share(shareData);
-      } catch {}
+      } catch { }
     } else {
       try {
         await navigator.clipboard.writeText(shareUrl);
@@ -603,7 +603,7 @@ export default function AccommodationDetailPage() {
           <a href="#overview" className={activeSection === "overview" ? "active" : ""}>Overview</a>
           <a href="#amenities" className={activeSection === "amenities" ? "active" : ""}>Amenities</a>
           {property.videos && property.videos.length > 0 && (
-            <a href="#walkthrough" className={activeSection === "walkthrough" ? "active" : ""}>🎬 Video Tour ({property.videos.length})</a>
+            <a href="#walkthrough" className={activeSection === "walkthrough" ? "active" : ""}>Video Tour ({property.videos.length})</a>
           )}
           <a href="#rooms" className={activeSection === "rooms" ? "active" : ""}>Rooms & Suites</a>
           <a href="#location" className={activeSection === "location" ? "active" : ""}>Location & Map</a>
@@ -804,7 +804,7 @@ export default function AccommodationDetailPage() {
                   </div>
                   {property.videos && property.videos.length > 0 && (
                     <span className="lux-video-count-badge">
-                      🎬 {property.videos.length} {property.videos.length === 1 ? "Video Tour" : "Video Tours"}
+                      {property.videos.length} {property.videos.length === 1 ? "Video Tour" : "Video Tours"}
                     </span>
                   )}
                 </div>

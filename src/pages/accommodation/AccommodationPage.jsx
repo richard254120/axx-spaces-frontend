@@ -1268,7 +1268,7 @@ export default function AccommodationPage() {
                       {prop.tag && <span className="prop-highlight-tag">{prop.tag}</span>}
                       {prop.videos && prop.videos.length > 0 && (
                         <span className="prop-video-tag" style={{ background: "rgba(15, 23, 42, 0.85)", color: "#38bdf8", fontWeight: 800 }}>
-                          🎬 Video Tour
+                          Video Tour
                         </span>
                       )}
                     </div>
@@ -1571,7 +1571,7 @@ export default function AccommodationPage() {
                   step: "02",
                   title: "Compare & View Photos",
                   desc: "Check real high-res room photos, exact nightly prices, guest amenities and verified physical location.",
-                  icon: "📸",
+                  icon: "Photos",
                 },
                 {
                   step: "03",
@@ -1771,7 +1771,7 @@ export default function AccommodationPage() {
                 </div>
                 <p style={s.reviewText}>"{review.text}"</p>
                 <div style={{ fontSize: "12px", color: "#4f46e5", fontWeight: 700, marginBottom: "16px" }}>
-                  📍 {review.stay}
+                  Location: {review.stay}
                 </div>
                 <div style={s.reviewAuthorRow}>
                   <img src={review.avatar} alt={review.name} style={s.reviewerAvatar} />
@@ -1929,7 +1929,7 @@ export default function AccommodationPage() {
                 <span style={{ color: "#22c55e" }}>💬</span> WhatsApp Official Concierge
               </div>
               <div style={s.footerContactItem}>
-                <span style={{ color: "#fbbf24" }}>📍</span> Nairobi, Kenya
+                <span style={{ color: "#fbbf24" }}>Location:</span> Nairobi, Kenya
               </div>
             </div>
           </div>

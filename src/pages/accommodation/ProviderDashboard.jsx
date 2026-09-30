@@ -151,7 +151,7 @@ export default function ProviderDashboard() {
                       <div>
                         <div style={{ fontSize: "15px", fontWeight: 700, color: accommodationTheme.text }}>{request.agent?.name}</div>
                         <div style={{ fontSize: "12px", color: accommodationTheme.muted }}>{request.agent?.email}</div>
-                        {request.agent?.phone && <div style={{ fontSize: "12px", color: accommodationTheme.muted }}>📞 {request.agent.phone}</div>}
+                        {request.agent?.phone && <div style={{ fontSize: "12px", color: accommodationTheme.muted }}>Phone: {request.agent.phone}</div>}
                       </div>
                     </div>
                     {request.agentMessage && (
@@ -161,7 +161,7 @@ export default function ProviderDashboard() {
                     )}
                     {request.agent?.agentProfile?.county && (
                       <div style={{ fontSize: "12px", color: accommodationTheme.muted, marginBottom: "12px" }}>
-                        📍 {request.agent.agentProfile.county}
+                        Location: {request.agent.agentProfile.county}
                       </div>
                     )}
                     {request.status === "pending" ? (
