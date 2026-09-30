@@ -65,10 +65,10 @@ function VideoPreviewCard({ file, index, onRemove }) {
       }}>
         <div style={{ minWidth: 0, flex: 1 }}>
           <div style={{ fontSize: "12px", fontWeight: 700, color: "#f8fafc", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-            📹 {file.name || `Video Walkthrough #${index + 1}`}
+            Video {file.name || `Video Walkthrough #${index + 1}`}
           </div>
           <div style={{ fontSize: "11px", color: isTooLarge ? "#f87171" : "#94a3b8", marginTop: "2px" }}>
-            {sizeMb} MB {isTooLarge ? "• ⚠️ Exceeds 100MB limit" : "• Ready to upload"}
+            {sizeMb} MB {isTooLarge ? "• Warning: Exceeds 100MB limit" : "• Ready to upload"}
           </div>
         </div>
         <button

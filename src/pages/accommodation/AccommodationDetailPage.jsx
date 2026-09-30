@@ -161,7 +161,7 @@ export default function AccommodationDetailPage() {
       const updated = nextSaved ? [...new Set([...favs, id])] : favs.filter((f) => f !== id);
       localStorage.setItem("axx_accommodation_favs", JSON.stringify(updated));
     } catch { }
-    showToast(nextSaved ? "Saved to your Wishlist ❤️" : "Removed from your Wishlist");
+    showToast(nextSaved ? "Saved to your Wishlist" : "Removed from your Wishlist");
   };
 
   // Share handler
@@ -377,7 +377,7 @@ export default function AccommodationDetailPage() {
       <div style={{ fontFamily: "'DM Sans', sans-serif", background: "#f8fafc", minHeight: "100vh" }}>
         <AccommodationNav />
         <div style={{ maxWidth: "600px", margin: "80px auto", padding: "40px 24px", textAlign: "center", background: "white", borderRadius: "24px", boxShadow: "0 10px 40px rgba(0,0,0,0.06)", border: "1px solid #e2e8f0" }}>
-          <div style={{ fontSize: "52px", marginBottom: "16px" }}>🏖️</div>
+          <div style={{ fontSize: "52px", marginBottom: "16px" }}>Beach</div>
           <h2 style={{ fontSize: "24px", fontWeight: 800, color: "#0f172a", marginBottom: "12px" }}>Accommodation Not Found</h2>
           <p style={{ color: "#64748b", lineHeight: 1.6, marginBottom: "28px" }}>
             This property listing might have been unlisted, booked out, or pending approval.
@@ -653,28 +653,28 @@ export default function AccommodationDetailPage() {
               {/* Quick Key Facts Bar */}
               <div className="lux-facts-grid">
                 <div className="lux-fact-item">
-                  <span className="lux-fact-icon">👥</span>
+                  <span className="lux-fact-icon">Guests</span>
                   <div>
                     <span className="lux-fact-value">Up to {property.maxGuests || 2} Guests</span>
                     <span className="lux-fact-sub">Occupancy limit</span>
                   </div>
                 </div>
                 <div className="lux-fact-item">
-                  <span className="lux-fact-icon">🛏️</span>
+                  <span className="lux-fact-icon">Bed</span>
                   <div>
                     <span className="lux-fact-value">{property.totalRooms || 1} Suite(s)</span>
                     <span className="lux-fact-sub">Total private rooms</span>
                   </div>
                 </div>
                 <div className="lux-fact-item">
-                  <span className="lux-fact-icon">🕑</span>
+                  <span className="lux-fact-icon">Time</span>
                   <div>
                     <span className="lux-fact-value">{property.checkInTime || "14:00"}</span>
                     <span className="lux-fact-sub">Check-in time</span>
                   </div>
                 </div>
                 <div className="lux-fact-item">
-                  <span className="lux-fact-icon">🕚</span>
+                  <span className="lux-fact-icon">Clock</span>
                   <div>
                     <span className="lux-fact-value">{property.checkOutTime || "11:00"}</span>
                     <span className="lux-fact-sub">Check-out time</span>
@@ -695,21 +695,21 @@ export default function AccommodationDetailPage() {
               {/* Highlights List */}
               <div className="lux-highlights-list">
                 <div className="lux-hl-item">
-                  <span className="lux-hl-icon">⚡</span>
+                  <span className="lux-hl-icon">Instant</span>
                   <div>
                     <strong className="lux-hl-title">Instant M-Pesa Confirmation</strong>
                     <p className="lux-hl-desc">Get your booking confirmed immediately via verified Safaricom STK prompt.</p>
                   </div>
                 </div>
                 <div className="lux-hl-item">
-                  <span className="lux-hl-icon">🛡️</span>
+                  <span className="lux-hl-icon">Shield</span>
                   <div>
                     <strong className="lux-hl-title">Verified AxxSpace Host</strong>
                     <p className="lux-hl-desc">This property has been vetted and approved for guest safety and quality standards.</p>
                   </div>
                 </div>
                 <div className="lux-hl-item">
-                  <span className="lux-hl-icon">✨</span>
+                  <span className="lux-hl-icon">Star</span>
                   <div>
                     <strong className="lux-hl-title">Sparkling Clean & Sanitized</strong>
                     <p className="lux-hl-desc">Top marks from past guests on hygiene, fresh linens, and pristine maintenance.</p>
@@ -733,7 +733,7 @@ export default function AccommodationDetailPage() {
                   : ["High-speed WiFi", "Swimming Pool", "Free Parking", "Air Conditioning", "Private Balcony", "Daily Housekeeping", "24/7 Power Backup", "Dedicated Workspace"]
                 ).map((amenity, idx) => (
                   <div key={idx} className="lux-amenity-card">
-                    <span className="lux-am-check">✓</span>
+                    <span className="lux-am-check">Check</span>
                     <span className="lux-am-name">{amenity}</span>
                   </div>
                 ))}
@@ -765,8 +765,8 @@ export default function AccommodationDetailPage() {
                         </div>
                         <p className="lux-room-desc">{room.desc}</p>
                         <div className="lux-room-specs">
-                          <span>👥 Up to {room.guests || 2} Guests</span>
-                          {room.bed && <span>🛏️ {room.bed}</span>}
+                          <span>Guests: Up to {room.guests || 2} Guests</span>
+                          {room.bed && <span>Bed: {room.bed}</span>}
                         </div>
                       </div>
 
@@ -783,7 +783,7 @@ export default function AccommodationDetailPage() {
                             setSelectedRoomIndex(rIdx);
                           }}
                         >
-                          {isSelected ? "✓ Selected" : "Select Suite"}
+                          {isSelected ? "Selected" : "Select Suite"}
                         </button>
                       </div>
                     </div>
@@ -1005,15 +1005,15 @@ export default function AccommodationDetailPage() {
                   rel="noreferrer"
                   className="lux-btn-whatsapp"
                 >
-                  <span>💬 Chat on WhatsApp</span>
+                  <span>Chat on WhatsApp</span>
                 </a>
 
                 <a href={`tel:${host.phone}`} className="lux-btn-call">
-                  <span>📞 Call Host</span>
+                  <span>Call Host</span>
                 </a>
 
                 <a href={`mailto:${host.email}`} className="lux-btn-email">
-                  <span>✉️ Email</span>
+                  <span>Email</span>
                 </a>
               </div>
 
@@ -1143,11 +1143,11 @@ export default function AccommodationDetailPage() {
               {/* Security & Guarantee Notes */}
               <div className="lux-guarantee-strip">
                 <div className="lux-g-item">
-                  <span>🔒</span>
+                  <span>Lock</span>
                   <span>Safe Safaricom Escrow Payment</span>
                 </div>
                 <div className="lux-g-item">
-                  <span>✓</span>
+                  <span>Check</span>
                   <span>Direct Host Confirmation</span>
                 </div>
               </div>
@@ -1271,13 +1271,13 @@ export default function AccommodationDetailPage() {
 
             {paymentSuccess && (
               <div className="lux-pay-alert-success">
-                ✓ {paymentSuccess}
+                Check {paymentSuccess}
               </div>
             )}
 
             {paymentError && (
               <div className="lux-pay-alert-error">
-                ⚠ {paymentError}
+                Warning {paymentError}
               </div>
             )}
 

@@ -10,18 +10,18 @@ import SocialMediaLinks from "../../components/SocialMediaLinks";
 
 // Popular Kenyan destinations for quick filter & suggestions
 const POPULAR_DESTINATIONS = [
-  { name: "Nairobi", county: "Nairobi County", type: "City & Skyline", icon: "🏙️" },
-  { name: "Diani Beach", county: "Kwale County", type: "Beach & Coast", icon: "🏖️" },
-  { name: "Mombasa", county: "Mombasa County", type: "Coastal Heritage", icon: "🌊" },
-  { name: "Maasai Mara", county: "Narok County", type: "Wildlife Safari", icon: "🦁" },
-  { name: "Naivasha", county: "Nakuru County", type: "Lakes & Geothermal", icon: "🦩" },
-  { name: "Watamu", county: "Kilifi County", type: "Marine Reserve & Coral", icon: "🐠" },
-  { name: "Nanyuki", county: "Laikipia County", type: "Mount Kenya & Wildlife", icon: "⛰️" },
-  { name: "Lamu", county: "Lamu County", type: "Swahili Cultural Island", icon: "⛵" },
-  { name: "Amboseli", county: "Kajiado County", type: "Kilimanjaro Views", icon: "🐘" },
-  { name: "Nakuru", county: "Nakuru County", type: "National Park & Rift", icon: "🌿" },
-  { name: "Malindi", county: "Kilifi County", type: "Tropical Ocean & Cuisine", icon: "🌴" },
-  { name: "Kisumu", county: "Kisumu County", type: "Lake Victoria Sunsets", icon: "⛵" },
+  { name: "Nairobi", county: "Nairobi County", type: "City & Skyline", icon: "City" },
+  { name: "Diani Beach", county: "Kwale County", type: "Beach & Coast", icon: "Beach" },
+  { name: "Mombasa", county: "Mombasa County", type: "Coastal Heritage", icon: "Coast" },
+  { name: "Maasai Mara", county: "Narok County", type: "Wildlife Safari", icon: "Safari" },
+  { name: "Naivasha", county: "Nakuru County", type: "Lakes & Geothermal", icon: "Lake" },
+  { name: "Watamu", county: "Kilifi County", type: "Marine Reserve & Coral", icon: "Marine" },
+  { name: "Nanyuki", county: "Laikipia County", type: "Mount Kenya & Wildlife", icon: "Mountain" },
+  { name: "Lamu", county: "Lamu County", type: "Swahili Cultural Island", icon: "Island" },
+  { name: "Amboseli", county: "Kajiado County", type: "Kilimanjaro Views", icon: "Elephant" },
+  { name: "Nakuru", county: "Nakuru County", type: "National Park & Rift", icon: "Park" },
+  { name: "Malindi", county: "Kilifi County", type: "Tropical Ocean & Cuisine", icon: "Palm" },
+  { name: "Kisumu", county: "Kisumu County", type: "Lake Victoria Sunsets", icon: "Boat" },
 ];
 
 const DESTINATION_NAMES = POPULAR_DESTINATIONS.map((d) => d.name);
@@ -516,7 +516,7 @@ export default function AccommodationPage() {
       showToast(`Removed from your wishlist`);
     } else {
       updated = [...favs, id];
-      showToast(`Saved "${name || 'Property'}" to wishlist ❤️`);
+      showToast(`Saved "${name || 'Property'}" to wishlist`);
     }
     setFavs(updated);
     try {
@@ -1227,10 +1227,10 @@ export default function AccommodationPage() {
             <div className="featured-category-filter-tabs">
               {[
                 { id: "all", label: "All Stays" },
-                { id: "beach", label: "🏖️ Beachfront" },
-                { id: "safari", label: "🦁 Safari & Bush" },
-                { id: "mountain", label: "⛰️ Lakes & Mountains" },
-                { id: "city", label: "🏙️ City Luxury" },
+                { id: "beach", label: "Beachfront" },
+                { id: "safari", label: "Safari & Bush" },
+                { id: "mountain", label: "Lakes & Mountains" },
+                { id: "city", label: "City Luxury" },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -1302,7 +1302,7 @@ export default function AccommodationPage() {
                     <div style={s.propAmenitiesWrap}>
                       {(prop.amenities || ["WiFi", "Pool", "Parking"]).slice(0, 3).map((am) => (
                         <span key={am} style={s.amenityChip}>
-                          ✓ {am}
+                          {am}
                         </span>
                       ))}
                       {prop.amenities && prop.amenities.length > 3 && (
@@ -1389,7 +1389,7 @@ export default function AccommodationPage() {
                   Browse Discounted Stays →
                 </button>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#fef3c7", fontSize: "13px" }}>
-                  <span>⏱️ Verified direct rates</span>
+                  <span>Verified direct rates</span>
                   <span>•</span>
                   <span>Direct WhatsApp contact</span>
                 </div>
@@ -1398,7 +1398,7 @@ export default function AccommodationPage() {
             <div className="flash-deal-right">
               <div className="deal-floating-mini-card">
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <span style={{ fontSize: "28px" }}>🏖️</span>
+                  <span style={{ fontSize: "28px" }}>Beach</span>
                   <div>
                     <div style={{ fontWeight: 800, color: "#0f172a" }}>Diani Coastal Villa</div>
                     <div style={{ fontSize: "12px", color: "#64748b" }}>3 Nights · Oceanfront</div>
@@ -1505,7 +1505,7 @@ export default function AccommodationPage() {
                   </span>
                 </div>
                 <div style={{ fontSize: "13px", color: "#16a34a", marginTop: "4px" }}>
-                  ✓ Direct host pricing · 0% AXXSpace booking surcharge
+                  Check Direct host pricing · 0% AXXSpace booking surcharge
                 </div>
               </div>
               <button
@@ -1546,14 +1546,14 @@ export default function AccommodationPage() {
                 className={`how-toggle-btn ${howItWorksTab === "guests" ? "active" : ""}`}
                 onClick={() => setHowItWorksTab("guests")}
               >
-                🏖️ For Travelers & Guests
+                Beach For Travelers & Guests
               </button>
               <button
                 type="button"
                 className={`how-toggle-btn ${howItWorksTab === "hosts" ? "active" : ""}`}
                 onClick={() => setHowItWorksTab("hosts")}
               >
-                🏢 For Property Owners & Hosts
+                Building For Property Owners & Hosts
               </button>
             </div>
           </div>
@@ -1565,7 +1565,7 @@ export default function AccommodationPage() {
                   step: "01",
                   title: "Discover Your Stay",
                   desc: "Filter through verified beach resorts, safari camps, holiday villas and city penthouses across Kenya.",
-                  icon: "🔍",
+                  icon: "Search",
                 },
                 {
                   step: "02",
@@ -1577,13 +1577,13 @@ export default function AccommodationPage() {
                   step: "03",
                   title: "Direct WhatsApp Contact",
                   desc: "Connect directly with property managers or villa owners with one tap. Ask questions and confirm dates.",
-                  icon: "💬",
+                  icon: "Chat",
                 },
                 {
                   step: "04",
                   title: "Pay Direct & Enjoy",
                   desc: "Zero hidden commission or third-party booking surcharges. Pay securely via M-Pesa or card directly to the host.",
-                  icon: "🌴",
+                  icon: "Palm",
                 },
               ].map((stepItem, idx) => (
                 <div key={stepItem.step} className="how-step-card reveal" style={{ animationDelay: `${idx * 0.1}s` }}>
@@ -1650,7 +1650,7 @@ export default function AccommodationPage() {
           <div className="why-features-matrix">
             <div className="why-matrix-card reveal">
               <div className="why-icon-bubble" style={{ background: "#e0e7ff", color: "#4f46e5" }}>
-                💰
+                Money
               </div>
               <h3 style={s.whyCardTitle}>0% Middleman Commission</h3>
               <p style={s.whyCardDesc}>
@@ -1660,7 +1660,7 @@ export default function AccommodationPage() {
 
             <div className="why-matrix-card reveal">
               <div className="why-icon-bubble" style={{ background: "#dcfce7", color: "#16a34a" }}>
-                💬
+                Chat
               </div>
               <h3 style={s.whyCardTitle}>Instant WhatsApp Host Chat</h3>
               <p style={s.whyCardDesc}>
@@ -1670,7 +1670,7 @@ export default function AccommodationPage() {
 
             <div className="why-matrix-card reveal">
               <div className="why-icon-bubble" style={{ background: "#fef3c7", color: "#d97706" }}>
-                🛡️
+                Shield
               </div>
               <h3 style={s.whyCardTitle}>Physically Verified Properties</h3>
               <p style={s.whyCardDesc}>
@@ -1680,7 +1680,7 @@ export default function AccommodationPage() {
 
             <div className="why-matrix-card reveal">
               <div className="why-icon-bubble" style={{ background: "#fee2e2", color: "#e11d48" }}>
-                🇰🇪
+                Kenya
               </div>
               <h3 style={s.whyCardTitle}>Local M-Pesa & Card Ease</h3>
               <p style={s.whyCardDesc}>
@@ -1920,13 +1920,13 @@ export default function AccommodationPage() {
             <div>
               <div style={s.footerHeading}>Direct Contact</div>
               <div style={s.footerContactItem}>
-                <span style={{ color: "#38bdf8" }}>✉️</span> accommodationaxxspace@gmail.com
+                <span style={{ color: "#38bdf8" }}>Email</span> accommodationaxxspace@gmail.com
               </div>
               <div style={s.footerContactItem}>
-                <span style={{ color: "#38bdf8" }}>📞</span> +254 745 689 773
+                <span style={{ color: "#38bdf8" }}>Phone</span> +254 745 689 773
               </div>
               <div style={s.footerContactItem}>
-                <span style={{ color: "#22c55e" }}>💬</span> WhatsApp Official Concierge
+                <span style={{ color: "#22c55e" }}>Chat</span> WhatsApp Official Concierge
               </div>
               <div style={s.footerContactItem}>
                 <span style={{ color: "#fbbf24" }}>Location:</span> Nairobi, Kenya
@@ -1970,7 +1970,7 @@ export default function AccommodationPage() {
             <div className="wishlist-drawer-body">
               {wishlistProperties.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "40px 16px", color: "#64748b" }}>
-                  <div style={{ fontSize: "40px", marginBottom: "12px" }}>❤️</div>
+                  <div style={{ fontSize: "40px", marginBottom: "12px" }}>Heart</div>
                   <div style={{ fontWeight: 700, fontSize: "16px", color: "#0f172a", marginBottom: "6px" }}>No saved stays yet</div>
                   <p style={{ fontSize: "14px", lineHeight: 1.5 }}>Click the heart icon on any accommodation card to save it for quick comparison.</p>
                 </div>
