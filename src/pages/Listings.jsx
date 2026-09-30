@@ -59,6 +59,7 @@ export default function Listings() {
   const [showSavedSearches, setShowSavedSearches] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [showUniversityHostels, setShowUniversityHostels] = useState(false);
+  const [showAgentListings, setShowAgentListings] = useState(false);
   const [selectedUniversity, setSelectedUniversity] = useState(null);
   const [universitySearch, setUniversitySearch] = useState("");
   const [universityProperties, setUniversityProperties] = useState([]);
@@ -164,6 +165,15 @@ export default function Listings() {
 
     fetchUniversityProperties();
   }, [showUniversityHostels, selectedUniversity]);
+
+  useEffect(() => {
+    if (!showAgentListings) {
+      return;
+    }
+
+    const agentProperties = properties.filter(p => p.assignedAgent && p.assignedAgent !== null);
+    setFilteredProperties(agentProperties);
+  }, [showAgentListings, properties]);
 
   const displayProperties =
     showUniversityHostels && selectedUniversity ? universityProperties : filteredProperties;
@@ -296,22 +306,29 @@ export default function Listings() {
         <div style={S.tabsSection}>
           <button
             className="tab-btn"
-            style={{ ...S.tabBtn, ...(!showUniversityHostels ? S.tabBtnActive : {}) }}
-            onClick={() => setShowUniversityHostels(false)}
+            style={{ ...S.tabBtn, ...(!showUniversityHostels && !showAgentListings ? S.tabBtnActive : {}) }}
+            onClick={() => { setShowUniversityHostels(false); setShowAgentListings(false); }}
           >
             All Rentals
           </button>
           <button
             className="tab-btn"
             style={{ ...S.tabBtn, ...(showUniversityHostels ? S.tabBtnActive : {}) }}
-            onClick={() => setShowUniversityHostels(true)}
+            onClick={() => { setShowUniversityHostels(true); setShowAgentListings(false); }}
           >
             University Hostels
           </button>
+          <button
+            className="tab-btn"
+            style={{ ...S.tabBtn, ...(showAgentListings ? S.tabBtnActive : {}) }}
+            onClick={() => { setShowUniversityHostels(false); setShowAgentListings(true); }}
+          >
+            Agent Listings
+          </button>
         </div>
 
-        {/* ── SEARCH STRIP (only show when NOT in university hostels mode) ── */}
-        {!showUniversityHostels && (
+        {/* ── SEARCH STRIP (only show when NOT in university hostels or agent listings mode) ── */}
+        {!showUniversityHostels && !showAgentListings && (
           <div style={S.searchStrip}>
             <div style={S.searchStripInner}>
               <div style={S.searchField}>
@@ -349,8 +366,8 @@ export default function Listings() {
           </div>
         )}
 
-        {/* ── EXPANDED FILTERS (only show when NOT in university hostels mode) ── */}
-        {!showUniversityHostels && filtersOpen && (
+        {/* ── EXPANDED FILTERS (only show when NOT in university hostels or agent listings mode) ── */}
+        {!showUniversityHostels && !showAgentListings && filtersOpen && (
           <div style={S.filtersPanel} className="filters-panel">
             <div style={S.filtersGrid}>
               <div style={S.filterGroup}>
@@ -398,8 +415,8 @@ export default function Listings() {
           </div>
         )}
 
-        {/* ── TOOLBAR (only show when NOT in university hostels mode) ── */}
-        {!showUniversityHostels && (
+        {/* ── TOOLBAR (only show when NOT in university hostels or agent listings mode) ── */}
+        {!showUniversityHostels && !showAgentListings && (
           <div style={S.toolbar}>
             <p style={S.resultsText}>
               <span style={S.resultsNum}>{filteredProperties.length}</span>
@@ -494,8 +511,8 @@ export default function Listings() {
           </div>
         )}
 
-        {/* ── SAVED SEARCHES (only show when NOT in university hostels mode) ── */}
-        {!showUniversityHostels && showSavedSearches && savedSearches.length > 0 && (
+        {/* ── SAVED SEARCHES (only show when NOT in university hostels or agent listings mode) ── */}
+        {!showUniversityHostels && !showAgentListings && showSavedSearches && savedSearches.length > 0 && (
           <div style={S.savedPanel}>
             <h3 style={S.savedTitle}>Saved Searches</h3>
             {savedSearches.map((s) => (
@@ -513,8 +530,8 @@ export default function Listings() {
           </div>
         )}
 
-        {/* ── MAP VIEW (only show when NOT in university hostels mode) ── */}
-        {!showUniversityHostels && showMap && <div style={S.mapWrap}><MapView properties={filteredProperties} /></div>}
+        {/* ── MAP VIEW (only show when NOT in university hostels or agent listings mode) ── */}
+        {!showUniversityHostels && !showAgentListings && showMap && <div style={S.mapWrap}><MapView properties={filteredProperties} /></div>}
 
 
 
