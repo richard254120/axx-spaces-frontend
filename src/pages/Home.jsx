@@ -1613,266 +1613,6 @@ option { background: #151936; color: #F8FAFC; }
   .footer-cols { gap: 36px; }
 }
 
-/* ── DEMOGRAPHICS DASHBOARD ── */
-.demo-section {
-  padding: 96px 28px;
-  background: #162233;
-  border-top: 1px solid rgba(201,168,76,0.1);
-  border-bottom: 1px solid rgba(201,168,76,0.1);
-}
-.demo-container {
-  max-width: 1280px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-}
-.demo-tabs-nav {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-.demo-tab-btn {
-  padding: 10px 24px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(201,168,76,0.15);
-  border-radius: 30px;
-  color: #B8AD96;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.demo-tab-btn:hover {
-  border-color: rgba(201,168,76,0.5);
-  color: #C9A84C;
-  background: rgba(201,168,76,0.05);
-}
-.demo-tab-btn.active {
-  background: linear-gradient(135deg, #C9A84C 0%, #E2C47A 100%);
-  border-color: #C9A84C;
-  color: #0D1B2A;
-  box-shadow: 0 4px 20px rgba(201,168,76,0.25);
-}
-.demo-content-grid {
-  display: grid;
-  grid-template-columns: 3fr 2fr;
-  gap: 28px;
-  min-height: 500px;
-}
-@media (max-width: 1024px) {
-  .demo-content-grid {
-    grid-template-columns: 1fr;
-  }
-}
-.demo-card {
-  background: rgba(22, 34, 51, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(201,168,76,0.14);
-  border-radius: 16px;
-  padding: 28px;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
-  position: relative;
-  overflow: hidden;
-}
-.demo-card-title {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 24px;
-  font-weight: 700;
-  color: #F0EAD8;
-  margin: 0 0 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.demo-map-wrap {
-  width: 100%;
-  height: 440px;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid rgba(201,168,76,0.1);
-  position: relative;
-}
-.demo-chart-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  position: relative;
-  min-height: 280px;
-}
-.demo-legend-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 16px;
-}
-.demo-legend-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  transition: all 0.2s;
-  cursor: pointer;
-}
-.demo-legend-item:hover {
-  background: rgba(201, 168, 76, 0.06);
-  border-color: rgba(201, 168, 76, 0.2);
-  transform: translateX(4px);
-}
-.demo-legend-label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #F0EAD8;
-}
-.demo-legend-color {
-  width: 12px;
-  height: 12px;
-  border-radius: 3px;
-}
-.demo-legend-value {
-  font-size: 14px;
-  font-weight: 700;
-  color: #B8AD96;
-}
-.donut-segment {
-  transition: stroke-width 0.3s, filter 0.3s;
-  cursor: pointer;
-}
-.donut-segment:hover {
-  stroke-width: 9;
-  filter: drop-shadow(0 0 6px rgba(201,168,76,0.5));
-}
-.demo-county-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  overflow-y: auto;
-  max-height: 380px;
-  padding-right: 8px;
-}
-.demo-county-item {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.04);
-  transition: all 0.2s;
-}
-.demo-county-item:hover {
-  background: rgba(201,168,76,0.04);
-  border-color: rgba(201,168,76,0.15);
-  transform: translateY(-2px);
-}
-.demo-county-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.demo-county-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: #F0EAD8;
-}
-.demo-county-count {
-  font-size: 13px;
-  font-weight: 700;
-  color: #C9A84C;
-  background: rgba(201,168,76,0.1);
-  padding: 2px 8px;
-  border-radius: 12px;
-  border: 1px solid rgba(201,168,76,0.2);
-}
-.demo-county-bar-bg {
-  height: 6px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 3px;
-  overflow: hidden;
-}
-.demo-county-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #C9A84C, #E2C47A);
-  border-radius: 3px;
-  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.demo-stats-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-.demo-stat-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(201, 168, 76, 0.1);
-  border-radius: 12px;
-  padding: 20px;
-  text-align: center;
-  transition: all 0.3s;
-}
-.demo-stat-card:hover {
-  border-color: rgba(201, 168, 76, 0.3);
-  background: rgba(201, 168, 76, 0.04);
-  transform: translateY(-3px);
-}
-.demo-stat-num {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 38px;
-  font-weight: 700;
-  color: #C9A84C;
-  line-height: 1.1;
-  margin-bottom: 4px;
-  display: block;
-}
-.demo-stat-lbl {
-  font-size: 11px;
-  font-weight: 600;
-  color: #7A7260;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-.demo-info-box {
-  padding: 16px;
-  background: rgba(96, 165, 250, 0.05);
-  border: 1px solid rgba(96, 165, 250, 0.15);
-  border-radius: 12px;
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-.demo-info-icon {
-  font-size: 20px;
-  color: #60A5FA;
-}
-.demo-info-text h5 {
-  font-size: 13px;
-  font-weight: 600;
-  color: #60A5FA;
-  margin: 0 0 2px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.demo-info-text p {
-  font-size: 12px;
-  color: #B8AD96;
-  margin: 0;
-  font-weight: 300;
-}
-
 /* ── FEATURED SWITCHER TABS ── */
 .feat-tabs {
   display: flex;
@@ -2171,10 +1911,6 @@ export default function Home() {
   const [showBoostModal, setShowBoostModal] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [componentError, setComponentError] = useState(null);
-  const [demographics, setDemographics] = useState(null);
-  const [loadingDemographics, setLoadingDemographics] = useState(true);
-  const [demoTab, setDemoTab] = useState("services");
-  const [hoveredService, setHoveredService] = useState(null);
   const [carouselPositions, setCarouselPositions] = useState({});
   const [carouselSteps, setCarouselSteps] = useState({});
 
@@ -2209,945 +1945,702 @@ export default function Home() {
 
 
 
-  /* ── DATA FETCHING ── */
-  useEffect(() => {
-    const fetchDemographics = async () => {
-      try {
-        setLoadingDemographics(true);
-        const res = await API.get("/analytics/demographics");
-        setDemographics(res.data?.data || null);
-      } catch (err) {
-        console.error("Failed to load demographics:", err?.message || err);
-      } finally {
-        setLoadingDemographics(false);
-      }
-    };
+}, []);
 
-    fetchDemographics();
-    // Auto-refresh every 5 minutes
-    const interval = setInterval(fetchDemographics, 300000);
-    return () => clearInterval(interval);
-  }, []);
+// Parallel loading of all featured items for better performance
+useEffect(() => {
+  const fetchAllFeatured = async () => {
+    try {
+      setFetchError(false);
+      const timeout = 5000; // Reduced to 5s for faster response
 
-  // Parallel loading of all featured items for better performance
-  useEffect(() => {
-    const fetchAllFeatured = async () => {
-      try {
-        setFetchError(false);
-        const timeout = 5000; // Reduced to 5s for faster response
+      const [
+        propertiesRes,
+        businessesRes,
+        materialsRes,
+        accommodationRes,
+        reviewsRes
+      ] = await Promise.all([
+        API.get("/properties?featured=true&limit=4", { timeout }).catch(() => ({ data: [] })),
+        API.get("/business?featured=true&limit=4&sort=rating", { timeout }).catch(() => ({ data: { businesses: [] } })),
+        API.get("/materials?featured=true&limit=4", { timeout }).catch(() => ({ data: [] })),
+        API.get("/accommodations?featured=true&limit=4", { timeout }).catch(() => ({ data: [] })),
+        API.get("/reviews", { timeout }).catch(() => ({ data: [] }))
+      ]);
 
-        const [
-          propertiesRes,
-          businessesRes,
-          materialsRes,
-          accommodationRes,
-          reviewsRes
-        ] = await Promise.all([
-          API.get("/properties?featured=true&limit=4", { timeout }).catch(() => ({ data: [] })),
-          API.get("/business?featured=true&limit=4&sort=rating", { timeout }).catch(() => ({ data: { businesses: [] } })),
-          API.get("/materials?featured=true&limit=4", { timeout }).catch(() => ({ data: [] })),
-          API.get("/accommodations?featured=true&limit=4", { timeout }).catch(() => ({ data: [] })),
-          API.get("/reviews", { timeout }).catch(() => ({ data: [] }))
-        ]);
+      // Process properties
+      const propData = propertiesRes?.data;
+      if (Array.isArray(propData)) setFeaturedProperties(propData);
+      else setFeaturedProperties([]);
 
-        // Process properties
-        const propData = propertiesRes?.data;
-        if (Array.isArray(propData)) setFeaturedProperties(propData);
-        else setFeaturedProperties([]);
+      // Process businesses
+      const busData = businessesRes?.data;
+      if (busData && Array.isArray(busData.businesses)) setFeaturedBusinesses(busData.businesses);
+      else setFeaturedBusinesses([]);
 
-        // Process businesses
-        const busData = businessesRes?.data;
-        if (busData && Array.isArray(busData.businesses)) setFeaturedBusinesses(busData.businesses);
-        else setFeaturedBusinesses([]);
+      // Process materials
+      const matData = materialsRes?.data;
+      if (Array.isArray(matData)) setFeaturedMaterials(matData);
+      else setFeaturedMaterials([]);
 
-        // Process materials
-        const matData = materialsRes?.data;
-        if (Array.isArray(matData)) setFeaturedMaterials(matData);
-        else setFeaturedMaterials([]);
+      // Process accommodation
+      const accomData = accommodationRes?.data;
+      if (Array.isArray(accomData)) setFeaturedAccommodation(accomData);
+      else setFeaturedAccommodation([]);
 
-        // Process accommodation
-        const accomData = accommodationRes?.data;
-        if (Array.isArray(accomData)) setFeaturedAccommodation(accomData);
-        else setFeaturedAccommodation([]);
+      // Process reviews
+      const revData = reviewsRes?.data;
+      if (Array.isArray(revData)) setReviews(revData.slice(0, 4));
+      else setReviews([]);
 
-        // Process reviews
-        const revData = reviewsRes?.data;
-        if (Array.isArray(revData)) setReviews(revData.slice(0, 4));
-        else setReviews([]);
-
-      } catch (err) {
-        console.error("Failed to load featured items:", err?.message || err);
-        setFetchError(true);
-        setFeaturedProperties([]);
-        setFeaturedBusinesses([]);
-        setFeaturedMaterials([]);
-        setFeaturedAccommodation([]);
-        setReviews([]);
-      } finally {
-        setLoadingFeatured(false);
-        setLoadingBusinesses(false);
-        setLoadingMaterials(false);
-        setLoadingAccommodation(false);
-        setLoadingReviews(false);
-      }
-    };
-
-    fetchAllFeatured().catch(() => setComponentError("Failed to load featured items"));
-  }, []);
-
-  const handleSearch = (ev) => {
-    ev.preventDefault();
-    const params = new URLSearchParams();
-    if (searchForm.county) params.append("county", searchForm.county);
-    if (searchForm.type) params.append("type", searchForm.type);
-    navigate(`/listings?${params.toString()}`);
-  };
-
-  const handleListProperty = () => {
-    if (!token) { setShowBoostModal(true); return; }
-    navigate("/upload");
-  };
-
-  const handleCarouselSwipe = (carouselId, direction) => {
-    setCarouselSteps(prev => {
-      const currentStep = prev[carouselId] || 0;
-      const newStep = direction === 'left' ? Math.max(0, currentStep - 1) : currentStep + 1;
-      return { ...prev, [carouselId]: newStep };
-    });
-  };
-
-  const handleMouseDown = (e, carouselId) => {
-    const track = e.currentTarget.querySelector('.cards-track');
-    track.classList.add('swiping');
-    const startX = e.clientX;
-    const scrollLeft = track.style.transform ? parseInt(track.style.transform.replace('translateX(', '').replace('px)', '')) : 0;
-
-    const handleMouseMove = (moveEvent) => {
-      const diff = moveEvent.clientX - startX;
-      track.style.transform = `translateX(${scrollLeft + diff}px)`;
-    };
-
-    const handleMouseUp = (upEvent) => {
-      track.classList.remove('swiping');
-      const diff = upEvent.clientX - startX;
-      if (Math.abs(diff) > 50) {
-        handleCarouselSwipe(carouselId, diff > 0 ? 'right' : 'left');
-      } else {
-        track.style.transform = `translateX(${scrollLeft}px)`;
-      }
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  };
-
-  const handleTouchStart = (e, carouselId) => {
-    const track = e.currentTarget.querySelector('.cards-track');
-    track.classList.add('swiping');
-    const startX = e.touches[0].clientX;
-    const scrollLeft = track.style.transform ? parseInt(track.style.transform.replace('translateX(', '').replace('px)', '')) : 0;
-
-    const handleTouchMove = (moveEvent) => {
-      const diff = moveEvent.touches[0].clientX - startX;
-      track.style.transform = `translateX(${scrollLeft + diff}px)`;
-    };
-
-    const handleTouchEnd = (upEvent) => {
-      track.classList.remove('swiping');
-      const diff = upEvent.changedTouches[0].clientX - startX;
-      if (Math.abs(diff) > 50) {
-        handleCarouselSwipe(carouselId, diff > 0 ? 'right' : 'left');
-      } else {
-        track.style.transform = `translateX(${scrollLeft}px)`;
-      }
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
-    };
-
-    document.addEventListener('touchmove', handleTouchMove);
-    document.addEventListener('touchend', handleTouchEnd);
-  };
-
-
-  /* ── ERROR BOUNDARY ── */
-  if (componentError) {
-    return (
-      <div style={{ padding: "60px 28px", textAlign: "center", fontFamily: "'DM Sans',sans-serif", background: C.navy, minHeight: "100vh" }}>
-        <h2 style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", color: C.gold, marginBottom: "12px", fontSize: "28px" }}>Something Went Wrong</h2>
-        <p style={{ color: C.textMid, marginBottom: "24px" }}>{componentError}</p>
-        <button onClick={() => window.location.reload()} style={{ padding: "12px 28px", background: `linear-gradient(135deg,${C.gold},${C.goldLight})`, color: C.navy, border: "none", borderRadius: "6px", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontWeight: 700 }}>
-          Reload Page
-        </button>
-      </div>
-    );
-  }
-
-  const getFilteredListings = () => {
-    switch (activeFeaturedTab) {
-      case "properties":
-        return featuredProperties.map(p => ({
-          ...p,
-          typeText: 'Property',
-          detailPath: `/listings/${p._id}`,
-          subtitleText: `${p.location}, ${p.county}`,
-          priceText: `KES ${p.price?.toLocaleString()}/month`,
-          typeLabel: p.propertyType || "Rental",
-          tags: [` ${p.bedrooms} bed`, ` ${p.bathrooms} bath`].filter(Boolean)
-        }));
-      case "businesses":
-        return featuredBusinesses.map(b => ({
-          ...b,
-          typeText: 'Business',
-          detailPath: `/axxbiashara?business=${b._id}`,
-          subtitleText: `${b.location?.town || "Various"}, ${b.location?.county || ""}`,
-          priceText: b.priceRange || "Contact for pricing",
-          typeLabel: b.categories?.[0] || "Business",
-          tags: [b.rating ? ` ${b.rating}` : "", b.reviewCount ? ` ${b.reviewCount} reviews` : ""].filter(Boolean)
-        }));
-      case "materials":
-        return featuredMaterials.map(m => ({
-          ...m,
-          typeText: 'QuickSale',
-          detailPath: `/quicksales/${m._id}`,
-          subtitleText: `${m.location}, ${m.county}`,
-          priceText: `KES ${m.price?.toLocaleString()}`,
-          typeLabel: m.category || "Material",
-          tags: [` ${m.views || 0} views`].filter(Boolean)
-        }));
-      case "accommodation":
-        return featuredAccommodation.map(t => ({
-          ...t,
-          typeText: 'Accommodation',
-          detailPath: `/accommodation/${t._id}`,
-          subtitleText: `${t.location}, ${t.county}`,
-          priceText: `KES ${t.price?.toLocaleString()}/night`,
-          typeLabel: t.category || "Accommodation",
-          tags: [` ${t.views || 0} views`, t.reviews?.length ? ` ${t.reviews.length} reviews` : ""].filter(Boolean)
-        }));
-      default:
-        return [];
+    } catch (err) {
+      console.error("Failed to load featured items:", err?.message || err);
+      setFetchError(true);
+      setFeaturedProperties([]);
+      setFeaturedBusinesses([]);
+      setFeaturedMaterials([]);
+      setFeaturedAccommodation([]);
+      setReviews([]);
+    } finally {
+      setLoadingFeatured(false);
+      setLoadingBusinesses(false);
+      setLoadingMaterials(false);
+      setLoadingAccommodation(false);
+      setLoadingReviews(false);
     }
   };
 
-  const allFeaturedListings = getFilteredListings();
+  fetchAllFeatured().catch(() => setComponentError("Failed to load featured items"));
+}, []);
 
-  const getListingImage = (item) => {
-    if (!item) return "";
-    if (item.typeText === 'Business') {
-      return item.images?.[0] || item.logo || "";
-    }
-    if (item.images && item.images.length > 0) {
-      const first = item.images[0];
-      return typeof first === "object" ? (first.imageUrl || first.url || "") : first;
-    }
-    return item.coverImage || item.imageUrl || "";
+const handleSearch = (ev) => {
+  ev.preventDefault();
+  const params = new URLSearchParams();
+  if (searchForm.county) params.append("county", searchForm.county);
+  if (searchForm.type) params.append("type", searchForm.type);
+  navigate(`/listings?${params.toString()}`);
+};
+
+const handleListProperty = () => {
+  if (!token) { setShowBoostModal(true); return; }
+  navigate("/upload");
+};
+
+const handleCarouselSwipe = (carouselId, direction) => {
+  setCarouselSteps(prev => {
+    const currentStep = prev[carouselId] || 0;
+    const newStep = direction === 'left' ? Math.max(0, currentStep - 1) : currentStep + 1;
+    return { ...prev, [carouselId]: newStep };
+  });
+};
+
+const handleMouseDown = (e, carouselId) => {
+  const track = e.currentTarget.querySelector('.cards-track');
+  track.classList.add('swiping');
+  const startX = e.clientX;
+  const scrollLeft = track.style.transform ? parseInt(track.style.transform.replace('translateX(', '').replace('px)', '')) : 0;
+
+  const handleMouseMove = (moveEvent) => {
+    const diff = moveEvent.clientX - startX;
+    track.style.transform = `translateX(${scrollLeft + diff}px)`;
   };
 
-  /* ════════════════════════════════════ RENDER ════════════════════════════════════ */
+  const handleMouseUp = (upEvent) => {
+    track.classList.remove('swiping');
+    const diff = upEvent.clientX - startX;
+    if (Math.abs(diff) > 50) {
+      handleCarouselSwipe(carouselId, diff > 0 ? 'right' : 'left');
+    } else {
+      track.style.transform = `translateX(${scrollLeft}px)`;
+    }
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+  };
+
+  document.addEventListener('mousemove', handleMouseMove);
+  document.addEventListener('mouseup', handleMouseUp);
+};
+
+const handleTouchStart = (e, carouselId) => {
+  const track = e.currentTarget.querySelector('.cards-track');
+  track.classList.add('swiping');
+  const startX = e.touches[0].clientX;
+  const scrollLeft = track.style.transform ? parseInt(track.style.transform.replace('translateX(', '').replace('px)', '')) : 0;
+
+  const handleTouchMove = (moveEvent) => {
+    const diff = moveEvent.touches[0].clientX - startX;
+    track.style.transform = `translateX(${scrollLeft + diff}px)`;
+  };
+
+  const handleTouchEnd = (upEvent) => {
+    track.classList.remove('swiping');
+    const diff = upEvent.changedTouches[0].clientX - startX;
+    if (Math.abs(diff) > 50) {
+      handleCarouselSwipe(carouselId, diff > 0 ? 'right' : 'left');
+    } else {
+      track.style.transform = `translateX(${scrollLeft}px)`;
+    }
+    document.removeEventListener('touchmove', handleTouchMove);
+    document.removeEventListener('touchend', handleTouchEnd);
+  };
+
+  document.addEventListener('touchmove', handleTouchMove);
+  document.addEventListener('touchend', handleTouchEnd);
+};
+
+
+/* ── ERROR BOUNDARY ── */
+if (componentError) {
   return (
-    <div className="home-root">
-      <style>{css}</style>
+    <div style={{ padding: "60px 28px", textAlign: "center", fontFamily: "'DM Sans',sans-serif", background: C.navy, minHeight: "100vh" }}>
+      <h2 style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", color: C.gold, marginBottom: "12px", fontSize: "28px" }}>Something Went Wrong</h2>
+      <p style={{ color: C.textMid, marginBottom: "24px" }}>{componentError}</p>
+      <button onClick={() => window.location.reload()} style={{ padding: "12px 28px", background: `linear-gradient(135deg,${C.gold},${C.goldLight})`, color: C.navy, border: "none", borderRadius: "6px", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontWeight: 700 }}>
+        Reload Page
+      </button>
+    </div>
+  );
+}
 
-      {/* ── TICKER ── */}
-      <div className="ticker-outer">
-        <div className="ticker-track">
-          {[...marqueeItems, ...marqueeItems].map((item, idx) => (
-            <span key={idx} className="ticker-item">
-              <span className="ticker-dot"></span>
-              {item.label} <b>{item.accent}</b>
-            </span>
-          ))}
+const getFilteredListings = () => {
+  switch (activeFeaturedTab) {
+    case "properties":
+      return featuredProperties.map(p => ({
+        ...p,
+        typeText: 'Property',
+        detailPath: `/listings/${p._id}`,
+        subtitleText: `${p.location}, ${p.county}`,
+        priceText: `KES ${p.price?.toLocaleString()}/month`,
+        typeLabel: p.propertyType || "Rental",
+        tags: [` ${p.bedrooms} bed`, ` ${p.bathrooms} bath`].filter(Boolean)
+      }));
+    case "businesses":
+      return featuredBusinesses.map(b => ({
+        ...b,
+        typeText: 'Business',
+        detailPath: `/axxbiashara?business=${b._id}`,
+        subtitleText: `${b.location?.town || "Various"}, ${b.location?.county || ""}`,
+        priceText: b.priceRange || "Contact for pricing",
+        typeLabel: b.categories?.[0] || "Business",
+        tags: [b.rating ? ` ${b.rating}` : "", b.reviewCount ? ` ${b.reviewCount} reviews` : ""].filter(Boolean)
+      }));
+    case "materials":
+      return featuredMaterials.map(m => ({
+        ...m,
+        typeText: 'QuickSale',
+        detailPath: `/quicksales/${m._id}`,
+        subtitleText: `${m.location}, ${m.county}`,
+        priceText: `KES ${m.price?.toLocaleString()}`,
+        typeLabel: m.category || "Material",
+        tags: [` ${m.views || 0} views`].filter(Boolean)
+      }));
+    case "accommodation":
+      return featuredAccommodation.map(t => ({
+        ...t,
+        typeText: 'Accommodation',
+        detailPath: `/accommodation/${t._id}`,
+        subtitleText: `${t.location}, ${t.county}`,
+        priceText: `KES ${t.price?.toLocaleString()}/night`,
+        typeLabel: t.category || "Accommodation",
+        tags: [` ${t.views || 0} views`, t.reviews?.length ? ` ${t.reviews.length} reviews` : ""].filter(Boolean)
+      }));
+    default:
+      return [];
+  }
+};
+
+const allFeaturedListings = getFilteredListings();
+
+const getListingImage = (item) => {
+  if (!item) return "";
+  if (item.typeText === 'Business') {
+    return item.images?.[0] || item.logo || "";
+  }
+  if (item.images && item.images.length > 0) {
+    const first = item.images[0];
+    return typeof first === "object" ? (first.imageUrl || first.url || "") : first;
+  }
+  return item.coverImage || item.imageUrl || "";
+};
+
+/* ════════════════════════════════════ RENDER ════════════════════════════════════ */
+return (
+  <div className="home-root">
+    <style>{css}</style>
+
+    {/* ── TICKER ── */}
+    <div className="ticker-outer">
+      <div className="ticker-track">
+        {[...marqueeItems, ...marqueeItems].map((item, idx) => (
+          <span key={idx} className="ticker-item">
+            <span className="ticker-dot"></span>
+            {item.label} <b>{item.accent}</b>
+          </span>
+        ))}
+      </div>
+    </div>
+
+    {/* ── HERO ── */}
+    <section className="hero">
+      <div className="hero-bg-fallback"></div>
+      <video
+        autoPlay muted loop playsInline
+        className="hero-bg-video"
+        onLoadedData={() => setVideoLoaded(true)}
+        onError={() => setVideoLoaded(false)}
+        style={{ opacity: videoLoaded ? 1 : 0 }}
+      >
+        <source src={bgVideo} type="video/mp4" />
+      </video>
+      <div className="hero-overlay"></div>
+
+      <div className="hero-content">
+        <div className="hero-badge">
+          <span className="badge-dot"></span>
+          Kenya's Premier Property &amp; Spaces Platform
+        </div>
+
+        <h1 className="hero-title magic-hero-title">
+          <span className="hero-title-line1 magic-shimmer-text">
+            Everything You Need
+            <span className="magic-star magic-star-top" aria-hidden="true">✦</span>
+          </span>
+          <span className="hero-title-line2 magic-aurora-text">
+            <span className="magic-star magic-star-left" aria-hidden="true">✨</span>
+            Under One Roof
+            <span className="magic-star magic-star-right" aria-hidden="true">✨</span>
+          </span>
+          <span className="magic-ambient-glow" aria-hidden="true"></span>
+        </h1>
+        <p className="hero-sub">
+          Verified Rentals · Luxury Accommodation · AxxBiashara Services · Direct QuickSales
+          <br />
+          <span style={{ color: "#94a3b8", fontSize: "14px", display: "inline-block", marginTop: "6px" }}>
+            Direct contact with owners and hosts across all 47 counties · 0% Broker Fees
+          </span>
+        </p>
+
+        {/* SCROLL DOWN INDICATOR */}
+        <div className="scroll-indicator" onClick={() => window.scrollTo({ top: window.innerHeight - 100, behavior: 'smooth' })}>
+          <div className="mouse">
+            <div className="wheel"></div>
+          </div>
+          <span>Scroll Discover</span>
         </div>
       </div>
+    </section>
 
-      {/* ── HERO ── */}
-      <section className="hero">
-        <div className="hero-bg-fallback"></div>
-        <video
-          autoPlay muted loop playsInline
-          className="hero-bg-video"
-          onLoadedData={() => setVideoLoaded(true)}
-          onError={() => setVideoLoaded(false)}
-          style={{ opacity: videoLoaded ? 1 : 0 }}
-        >
-          <source src={bgVideo} type="video/mp4" />
-        </video>
-        <div className="hero-overlay"></div>
+    {/* ── UNIFIED FEATURED SHOWCASE ── */}
+    <section className="featured-section">
+      <div className="featured-header">
+        <p className="section-eyebrow">Curated Excellence</p>
+        <h2 className="section-title">Explore Featured Listings</h2>
+        <p className="section-sub">Discover top-rated services, accommodation retreats, and verified listings handpicked for you</p>
+      </div>
 
-        <div className="hero-content">
-          <div className="hero-badge">
-            <span className="badge-dot"></span>
-            Kenya's Premier Property &amp; Spaces Platform
-          </div>
+      {/* TABS */}
+      <div className="feat-tabs-bar">
+        {[
+          { id: "properties", label: "Rentals", count: featuredProperties.length },
+          { id: "accommodation", label: "Accommodation", count: featuredAccommodation.length },
+          { id: "businesses", label: "AxxBiashara", count: featuredBusinesses.length },
+          { id: "materials", label: "QuickSales", count: featuredMaterials.length },
+        ].map(tab => (
+          <button
+            key={tab.id}
+            className={`feat-tab-btn ${activeFeaturedTab === tab.id ? 'active' : ''}`}
+            onClick={() => setActiveFeaturedTab(tab.id)}
+          >
+            <span>{tab.label}</span>
+            <span className="feat-tab-count">{tab.count}</span>
+          </button>
+        ))}
+      </div>
 
-          <h1 className="hero-title magic-hero-title">
-            <span className="hero-title-line1 magic-shimmer-text">
-              Everything You Need
-              <span className="magic-star magic-star-top" aria-hidden="true">✦</span>
-            </span>
-            <span className="hero-title-line2 magic-aurora-text">
-              <span className="magic-star magic-star-left" aria-hidden="true">✨</span>
-              Under One Roof
-              <span className="magic-star magic-star-right" aria-hidden="true">✨</span>
-            </span>
-            <span className="magic-ambient-glow" aria-hidden="true"></span>
-          </h1>
-          <p className="hero-sub">
-            Verified Rentals · Luxury Accommodation · AxxBiashara Services · Direct QuickSales
-            <br />
-            <span style={{ color: "#94a3b8", fontSize: "14px", display: "inline-block", marginTop: "6px" }}>
-              Direct contact with owners and hosts across all 47 counties · 0% Broker Fees
-            </span>
-          </p>
+      {/* FEATURED GRID */}
+      {(() => {
+        const itemsMap = {
+          properties: featuredProperties,
+          accommodation: featuredAccommodation,
+          businesses: featuredBusinesses,
+          materials: featuredMaterials,
+        };
+        const currentItems = itemsMap[activeFeaturedTab] || [];
 
-          {/* SCROLL DOWN INDICATOR */}
-          <div className="scroll-indicator" onClick={() => window.scrollTo({ top: window.innerHeight - 100, behavior: 'smooth' })}>
-            <div className="mouse">
-              <div className="wheel"></div>
-            </div>
-            <span>Scroll Discover</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ── UNIFIED FEATURED SHOWCASE ── */}
-      <section className="featured-section">
-        <div className="featured-header">
-          <p className="section-eyebrow">Curated Excellence</p>
-          <h2 className="section-title">Explore Featured Listings</h2>
-          <p className="section-sub">Discover top-rated services, accommodation retreats, and verified listings handpicked for you</p>
-        </div>
-
-        {/* TABS */}
-        <div className="feat-tabs-bar">
-          {[
-            { id: "properties", label: "Rentals", count: featuredProperties.length },
-            { id: "accommodation", label: "Accommodation", count: featuredAccommodation.length },
-            { id: "businesses", label: "AxxBiashara", count: featuredBusinesses.length },
-            { id: "materials", label: "QuickSales", count: featuredMaterials.length },
-          ].map(tab => (
-            <button
-              key={tab.id}
-              className={`feat-tab-btn ${activeFeaturedTab === tab.id ? 'active' : ''}`}
-              onClick={() => setActiveFeaturedTab(tab.id)}
-            >
-              <span>{tab.label}</span>
-              <span className="feat-tab-count">{tab.count}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* FEATURED GRID */}
-        {(() => {
-          const itemsMap = {
-            properties: featuredProperties,
-            accommodation: featuredAccommodation,
-            businesses: featuredBusinesses,
-            materials: featuredMaterials,
-          };
-          const currentItems = itemsMap[activeFeaturedTab] || [];
-
-          if (currentItems.length === 0) {
-            return (
-              <div className="no-feat-wrap" style={{ textAlign: 'center', padding: '60px 28px' }}>
-                <span className="no-feat-icon" style={{ fontSize: '48px', display: 'block', marginBottom: '12px' }}>✨</span>
-                <h4 style={{ color: "#F8FAFC", fontSize: '20px', fontWeight: 600 }}>No featured listings currently found in this category</h4>
-                <p style={{ color: "#94a3b8", fontSize: '14px', marginTop: '6px' }}>Check back soon or explore our general directory</p>
-                <button
-                  onClick={() => {
-                    const paths = {
-                      properties: "/listings",
-                      accommodation: "/accommodation",
-                      businesses: "/axxbiashara",
-                      materials: "/quicksales"
-                    };
-                    navigate(paths[activeFeaturedTab] || "/listings");
-                  }}
-                  className="magical-btn"
-                  style={{ marginTop: '20px', padding: '10px 24px', borderRadius: '8px', background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', border: 'none', color: '#fff', fontWeight: '600', cursor: 'pointer' }}
-                >
-                  Browse All {activeFeaturedTab} →
-                </button>
-              </div>
-            );
-          }
-
+        if (currentItems.length === 0) {
           return (
-            <div className="featured-modern-grid">
-              {currentItems.slice(0, 8).map((item, idx) => {
-                const image = getListingImage({ ...item, typeText: activeFeaturedTab === "businesses" ? "Business" : "Item" });
-                const hasVideos = item.videos && item.videos.length > 0;
-                const title = item.title || item.name || item.businessName || "Featured Listing";
-                const loc = item.county
-                  ? `${item.county}${item.town || item.address ? ` · ${item.town || item.address}` : ""}`
-                  : (item.location ? (typeof item.location === 'object' ? `${item.location.town || ""} · ${item.location.county || ""}` : item.location) : "Kenya");
-                const price = item.price != null
-                  ? `KES ${item.price.toLocaleString()}${activeFeaturedTab === "accommodation" ? "/night" : activeFeaturedTab === "properties" ? "/month" : ""}`
-                  : (item.basePrice != null ? `KES ${item.basePrice.toLocaleString()}/night` : (item.priceRange || "Contact for pricing"));
-
-                const detailUrl = activeFeaturedTab === "properties"
-                  ? `/listings?property=${item._id}`
-                  : activeFeaturedTab === "accommodation"
-                    ? `/accommodation/property/${item._id}`
-                    : activeFeaturedTab === "businesses"
-                      ? `/axxbiashara?business=${item._id}`
-                      : `/quicksales?material=${item._id}`;
-
-                return (
-                  <div
-                    key={item._id || idx}
-                    className="featured-modern-card"
-                    onClick={() => navigate(detailUrl)}
-                    style={{ animationDelay: `${idx * 0.08}s` }}
-                  >
-                    <div className="modern-card-img-wrap">
-                      {image ? (
-                        <img
-                          src={image}
-                          alt={title}
-                          className="modern-card-img"
-                          loading="lazy"
-                          onError={e => { e.target.src = "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=600&q=80"; }}
-                        />
-                      ) : (
-                        <div className="modern-card-fallback-img">
-                          <span>{activeFeaturedTab === "accommodation" ? "Accommodation" : activeFeaturedTab === "businesses" ? "Business" : "Property"}</span>
-                        </div>
-                      )}
-                      <div className="modern-card-badge-row">
-                        <span className="badge-featured">★ Featured</span>
-                        {hasVideos && (
-                          <span className="badge-video">Video Tour</span>
-                        )}
-                      </div>
-                      <div className="modern-card-gradient-overlay"></div>
-                    </div>
-
-                    <div className="modern-card-body">
-                      <div className="modern-card-category">
-                        {item.propertyType || item.type || item.category || item.categories?.[0] || "Verified"}
-                      </div>
-                      <h3 className="modern-card-title">{title}</h3>
-                      <p className="modern-card-location">
-                        <span>📍</span>
-                        <span>{loc}</span>
-                      </p>
-
-                      <div className="modern-card-footer">
-                        <div className="modern-card-price">{price}</div>
-                        <span className="modern-card-arrow">→</span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="no-feat-wrap" style={{ textAlign: 'center', padding: '60px 28px' }}>
+              <span className="no-feat-icon" style={{ fontSize: '48px', display: 'block', marginBottom: '12px' }}>✨</span>
+              <h4 style={{ color: "#F8FAFC", fontSize: '20px', fontWeight: 600 }}>No featured listings currently found in this category</h4>
+              <p style={{ color: "#94a3b8", fontSize: '14px', marginTop: '6px' }}>Check back soon or explore our general directory</p>
+              <button
+                onClick={() => {
+                  const paths = {
+                    properties: "/listings",
+                    accommodation: "/accommodation",
+                    businesses: "/axxbiashara",
+                    materials: "/quicksales"
+                  };
+                  navigate(paths[activeFeaturedTab] || "/listings");
+                }}
+                className="magical-btn"
+                style={{ marginTop: '20px', padding: '10px 24px', borderRadius: '8px', background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', border: 'none', color: '#fff', fontWeight: '600', cursor: 'pointer' }}
+              >
+                Browse All {activeFeaturedTab} →
+              </button>
             </div>
           );
-        })()}
+        }
 
-        <div style={{ textAlign: "center", marginTop: "36px" }}>
-          <button
-            onClick={() => {
-              const routes = {
-                properties: "/listings?featured=true",
-                accommodation: "/accommodation?featured=true",
-                businesses: "/axxbiashara?featured=true",
-                materials: "/quicksales?featured=true"
-              };
-              navigate(routes[activeFeaturedTab] || "/listings");
-            }}
-            className="view-all-modern-btn magical-btn"
-          >
-            Explore All {activeFeaturedTab.charAt(0).toUpperCase() + activeFeaturedTab.slice(1)} →
-          </button>
-        </div>
-      </section>
+        return (
+          <div className="featured-modern-grid">
+            {currentItems.slice(0, 8).map((item, idx) => {
+              const image = getListingImage({ ...item, typeText: activeFeaturedTab === "businesses" ? "Business" : "Item" });
+              const hasVideos = item.videos && item.videos.length > 0;
+              const title = item.title || item.name || item.businessName || "Featured Listing";
+              const loc = item.county
+                ? `${item.county}${item.town || item.address ? ` · ${item.town || item.address}` : ""}`
+                : (item.location ? (typeof item.location === 'object' ? `${item.location.town || ""} · ${item.location.county || ""}` : item.location) : "Kenya");
+              const price = item.price != null
+                ? `KES ${item.price.toLocaleString()}${activeFeaturedTab === "accommodation" ? "/night" : activeFeaturedTab === "properties" ? "/month" : ""}`
+                : (item.basePrice != null ? `KES ${item.basePrice.toLocaleString()}/night` : (item.priceRange || "Contact for pricing"));
 
-      {/* ── DEMOGRAPHICS SECTION ── */}
-      < section className="demo-section" >
-        <div className="section-hdr">
-          <p className="section-eyebrow">Live Analytics</p>
-          <h2 className="section-title">Platform Demographics</h2>
-          <p className="section-sub">Real-time engagement across Kenya's counties and services</p>
-        </div>
+              const detailUrl = activeFeaturedTab === "properties"
+                ? `/listings?property=${item._id}`
+                : activeFeaturedTab === "accommodation"
+                  ? `/accommodation/property/${item._id}`
+                  : activeFeaturedTab === "businesses"
+                    ? `/axxbiashara?business=${item._id}`
+                    : `/quicksales?material=${item._id}`;
 
-        <div className="demo-container">
-          {/* Navigation tabs */}
-          <div className="demo-tabs-nav">
-            <button
-              onClick={() => setDemoTab("services")}
-              className={`demo-tab-btn ${demoTab === "services" ? "active" : ""}`}
-            >
-              Service Popularity
-            </button>
-            <button
-              onClick={() => setDemoTab("counties")}
-              className={`demo-tab-btn ${demoTab === "counties" ? "active" : ""}`}
-            >
-              Top Counties
-            </button>
-          </div>
-
-          {loadingDemographics ? (
-            <div style={{ textAlign: "center", padding: "80px 28px" }}>
-              <div className="spinner" style={{ fontSize: "44px", color: "#C9A84C", marginBottom: "20px" }}>⟳</div>
-              <p style={{ color: "#7A7260", fontSize: "15px", letterSpacing: "0.05em" }}>Loading interactive demographics dashboard...</p>
-            </div>
-          ) : demographics ? (
-            <div className="demo-content-grid">
-
-              {demoTab === "services" && (
-                <div className="demo-card">
-                  <h3 className="demo-card-title"> Service Popularity</h3>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "28px", flex: 1, justifyContent: "center" }}>
-
-                    {/* SVG Pie Chart Container */}
-                    <div className="demo-chart-container">
-                      <svg width="220" height="220" viewBox="0 0 100 100">
-                        {(() => {
-                          const services = demographics.services || [];
-                          const total = services.reduce((sum, s) => sum + s.count, 0);
-                          const radius = 35;
-                          const circumference = 2 * Math.PI * radius; // ~219.91
-                          let accumulated = 0;
-                          const colors = ["#C9A84C", "#60A5FA", "#4CAF74", "#A78BFA", "#F59E0B"];
-
-                          return (
-                            <>
-                              <circle cx="50" cy="50" r={radius} fill="transparent" stroke="rgba(255,255,255,0.03)" strokeWidth="8" />
-                              {services.map((item, idx) => {
-                                const percentage = total > 0 ? (item.count / total) * 100 : 0;
-                                const strokeOffset = circumference - (item.count / total) * circumference;
-                                const angle = total > 0 ? (accumulated / total) * 360 : 0;
-                                accumulated += item.count;
-
-                                const isHovered = hoveredService === item.service;
-
-                                return (
-                                  <circle
-                                    key={item.service}
-                                    cx="50"
-                                    cy="50"
-                                    r={radius}
-                                    fill="transparent"
-                                    stroke={colors[idx % colors.length]}
-                                    strokeWidth={isHovered ? 10 : 8}
-                                    strokeDasharray={circumference}
-                                    strokeDashoffset={strokeOffset}
-                                    transform={`rotate(${angle - 90} 50 50)`}
-                                    className="donut-segment"
-                                    onMouseEnter={() => setHoveredService(item.service)}
-                                    onMouseLeave={() => setHoveredService(null)}
-                                  />
-                                );
-                              })}
-                              {/* Central Hover Tooltip display */}
-                              <circle cx="50" cy="50" r="26" fill="#162233" />
-                              <text x="50" y="47" textAnchor="middle" fill="#7A7260" fontSize="5" fontWeight="600" letterSpacing="0.05em">
-                                {hoveredService ? hoveredService.toUpperCase() : "TOTAL USERS & LISTS"}
-                              </text>
-                              <text x="50" y="58" textAnchor="middle" fill="#C9A84C" fontSize="10" fontWeight="700">
-                                {(() => {
-                                  if (hoveredService) {
-                                    const match = services.find(s => s.service === hoveredService);
-                                    return match ? match.count : 0;
-                                  }
-                                  return total;
-                                })()}
-                              </text>
-                            </>
-                          );
-                        })()}
-                      </svg>
-                    </div>
-
-                    {/* Legends & interactive triggers */}
-                    <div className="demo-legend-list">
-                      {demographics.services && demographics.services.map((item, idx) => {
-                        const colors = ["#C9A84C", "#60A5FA", "#4CAF74", "#A78BFA", "#F59E0B"];
-                        const total = demographics.services.reduce((sum, s) => sum + s.count, 0);
-                        const pct = total > 0 ? ((item.count / total) * 100).toFixed(1) : 0;
-                        const isHovered = hoveredService === item.service;
-
-                        return (
-                          <div
-                            key={item.service}
-                            className="demo-legend-item"
-                            style={isHovered ? { border: `1px solid ${colors[idx % colors.length]}`, background: "rgba(255,255,255,0.03)" } : {}}
-                            onMouseEnter={() => setHoveredService(item.service)}
-                            onMouseLeave={() => setHoveredService(null)}
-                          >
-                            <span className="demo-legend-label">
-                              <span className="demo-legend-color" style={{ background: colors[idx % colors.length] }} />
-                              {item.service}
-                            </span>
-                            <span className="demo-legend-value">
-                              {item.count} <span style={{ fontSize: '11px', color: '#7A7260', fontWeight: '400' }}>({pct}%)</span>
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {demoTab === "counties" && (
-                <div className="demo-card">
-                  <h3 className="demo-card-title"> Top Counties Rankings</h3>
-                  <div className="demo-county-list">
-                    {demographics.counties && demographics.counties.length > 0 ? (
-                      demographics.counties.slice(0, 10).map((item, idx) => {
-                        const maxCount = Math.max(...demographics.counties.map(c => c.count), 1);
-                        const percentage = (item.count / maxCount) * 100;
-                        return (
-                          <div key={item.county} className="demo-county-item">
-                            <div className="demo-county-header">
-                              <span className="demo-county-name">{idx + 1}. {item.county}</span>
-                              <span className="demo-county-count">{item.count} listings</span>
-                            </div>
-                            <div className="demo-county-bar-bg">
-                              <div
-                                className="demo-county-bar-fill"
-                                style={{ width: `${percentage}%` }}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })
-                    ) : (
-                      <p style={{ color: "#7A7260", fontSize: "14px" }}>No county distribution data available</p>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Right Panel: Shared Summary Cards & Metrics Info */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-
-                <div className="demo-card">
-                  <h3 className="demo-card-title"> Platform Overview</h3>
-                  <div className="demo-stats-grid">
-                    <div className="demo-stat-card">
-                      <span className="demo-stat-num">{demographics.totalListings || 0}</span>
-                      <span className="demo-stat-lbl">Total Listings</span>
-                    </div>
-                    <div className="demo-stat-card">
-                      <span className="demo-stat-num">{demographics.totalUsers || 0}</span>
-                      <span className="demo-stat-lbl">Total Users</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="demo-card">
-                  <h3 className="demo-card-title" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                    <span>Live Coverage</span>
-                  </h3>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <span style={{ fontSize: "14px", color: "#B8AD96" }}>Active Counties reached:</span>
-                      <strong style={{ fontSize: "16px", color: "#C9A84C" }}>
-                        {demographics.counties ? demographics.counties.length : 0} / 47
-                      </strong>
-                    </div>
-                    <div className="demo-county-bar-bg" style={{ height: "8px" }}>
-                      <div
-                        className="demo-county-bar-fill"
-                        style={{
-                          width: `${((demographics.counties ? demographics.counties.length : 0) / 47) * 100}%`,
-                          background: "linear-gradient(90deg, #60A5FA, #38BDF8)"
-                        }}
+              return (
+                <div
+                  key={item._id || idx}
+                  className="featured-modern-card"
+                  onClick={() => navigate(detailUrl)}
+                  style={{ animationDelay: `${idx * 0.08}s` }}
+                >
+                  <div className="modern-card-img-wrap">
+                    {image ? (
+                      <img
+                        src={image}
+                        alt={title}
+                        className="modern-card-img"
+                        loading="lazy"
+                        onError={e => { e.target.src = "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=600&q=80"; }}
                       />
+                    ) : (
+                      <div className="modern-card-fallback-img">
+                        <span>{activeFeaturedTab === "accommodation" ? "Accommodation" : activeFeaturedTab === "businesses" ? "Business" : "Property"}</span>
+                      </div>
+                    )}
+                    <div className="modern-card-badge-row">
+                      <span className="badge-featured">★ Featured</span>
+                      {hasVideos && (
+                        <span className="badge-video">Video Tour</span>
+                      )}
+                    </div>
+                    <div className="modern-card-gradient-overlay"></div>
+                  </div>
+
+                  <div className="modern-card-body">
+                    <div className="modern-card-category">
+                      {item.propertyType || item.type || item.category || item.categories?.[0] || "Verified"}
+                    </div>
+                    <h3 className="modern-card-title">{title}</h3>
+                    <p className="modern-card-location">
+                      <span>📍</span>
+                      <span>{loc}</span>
+                    </p>
+
+                    <div className="modern-card-footer">
+                      <div className="modern-card-price">{price}</div>
+                      <span className="modern-card-arrow">→</span>
                     </div>
                   </div>
                 </div>
-
-                <div className="demo-info-box">
-                  <span className="demo-info-icon"></span>
-                  <div className="demo-info-text">
-                    <h5>Auto-Refreshing Analytics</h5>
-                    <p>Live stats recalculate automatically every 5 minutes.</p>
-                  </div>
-                </div>
-
-              </div>
-
-            </div >
-          ) : (
-            <div className="demo-card" style={{ textAlign: "center", padding: "80px 28px" }}>
-              <span style={{ fontSize: "56px", marginBottom: "16px", display: "block" }}></span>
-              <h4 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "24px", fontWeight: 600, color: "#F0EAD8", marginBottom: "8px" }}>
-                Demographics Currently Unavailable
-              </h4>
-              <p style={{ color: "#7A7260", fontSize: "14px", fontWeight: 300 }}>
-                Unable to establish connection to the live analytics service. Please try again later.
-              </p>
-            </div>
-          )}
-        </div >
-      </section >
-
-      {/* ── HOW IT WORKS ── */}
-      < section className="how-section" >
-        <div className="section-hdr">
-          <p className="section-eyebrow">Direct & transparent</p>
-          <h2 className="section-title">How Axxspace Works</h2>
-          <p className="section-sub">Simple, secure steps to get exactly what you need with zero middleman commission</p>
-        </div>
-        <div className="steps-grid">
-          <div className="step-card">
-            <span className="step-num">01</span>
-            <span className="step-icon"></span>
-            <h3 className="step-title">Search & Discover</h3>
-            <p className="step-text">
-              Browse through verified listings across rentals, accommodation, quick sales, or business services.
-            </p>
+              );
+            })}
           </div>
-          <div className="step-card">
-            <span className="step-num">02</span>
-            <span className="step-icon"></span>
-            <h3 className="step-title">Connect Directly</h3>
-            <p className="step-text">
-              Reach landlords, sellers, or professional service providers instantly via WhatsApp or direct phone calls.
-            </p>
-          </div>
-          <div className="step-card">
-            <span className="step-num">03</span>
-            <span className="step-icon"></span>
-            <h3 className="step-title">Close the Deal</h3>
-            <p className="step-text">
-              Transact safely and securely with verified ratings, reviews, and direct communication. No broker fees.
-            </p>
-          </div>
-        </div>
-      </section >
+        );
+      })()}
 
-      {/* ── MOBILE APP SECTION ── */}
-      <section className="app-download-section">
-        <div className="app-download-container">
-          {/* Text Content */}
-          <div style={{ zIndex: 2, textAlign: 'left' }}>
-            <p className="section-eyebrow" style={{ color: "#C9A84C", letterSpacing: "0.2em", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", marginBottom: "12px" }}>Go Mobile</p>
-            <h2 className="section-title" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(32px, 4vw, 48px)", fontWeight: 600, color: "#F0EAD8", margin: "0 0 20px", lineHeight: 1.2 }}>
-              Download Axxspace App
-            </h2>
-            <p style={{ color: "#B8AD96", fontSize: "16px", lineHeight: "1.8", marginBottom: "30px", fontWeight: 300 }}>
-              Get the best mobile experience for property rentals, accommodation booking, quick sales, and business services across all 47 counties in Kenya. Fast, secure, and direct communication.
-            </p>
+      <div style={{ textAlign: "center", marginTop: "36px" }}>
+        <button
+          onClick={() => {
+            const routes = {
+              properties: "/listings?featured=true",
+              accommodation: "/accommodation?featured=true",
+              businesses: "/axxbiashara?featured=true",
+              materials: "/quicksales?featured=true"
+            };
+            navigate(routes[activeFeaturedTab] || "/listings");
+          }}
+          className="view-all-modern-btn magical-btn"
+        >
+          Explore All {activeFeaturedTab.charAt(0).toUpperCase() + activeFeaturedTab.slice(1)} →
+        </button>
+      </div>
+    </section>
 
-            <ul className="app-download-features">
-              {[
-                "Instant push notifications for new listings",
-                "Direct WhatsApp & phone calling to landlords/sellers",
-                "Built-in offline support for saved properties",
-                "GPS tracking and map navigation integration"
-              ].map((item, idx) => (
-                <li key={idx} className="app-download-feature-item">
-                  <span className="app-download-feature-icon">✓</span> {item}
-                </li>
-              ))}
-            </ul>
-
-            <div className="app-download-btn-wrapper">
-              <button
-                onClick={() => navigate("/mobile-app")}
-                className="app-download-btn magical-btn"
-              >
-                <span>📥</span> Get APK File
-              </button>
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                <span style={{ fontSize: "13px", fontWeight: 700, color: "#EDE6D6" }}>Version 1.0.0</span>
-                <span style={{ fontSize: "12px", color: "#7A7260" }}>Safe download (3.1 MB)</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Visual Showcase (Mockup) */}
-          <div className="app-download-mockup-wrapper">
-            {/* Phone mockup */}
-            <div className="app-download-phone">
-              {/* Speaker / Notch */}
-              <div className="app-download-phone-notch"></div>
-
-              {/* App Screen preview */}
-              <div className="app-download-phone-screen">
-                <div className="app-download-phone-header">
-                  <span className="app-download-phone-logo">Axxspace</span>
-                </div>
-
-                {/* Simulated Content */}
-                <div className="app-download-phone-content">
-                  <div className="app-download-phone-card">
-                    <div className="app-download-phone-card-image"></div>
-                    <div className="app-download-phone-card-title"></div>
-                    <div className="app-download-phone-card-text"></div>
-                  </div>
-
-                  <div className="app-download-phone-card-simple">
-                    <div className="app-download-phone-card-simple-title"></div>
-                    <div className="app-download-phone-card-simple-text"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── TESTIMONIALS ── */}
-      < section className="test-section" >
-        <div className="section-hdr">
-          <p className="section-eyebrow">Social Proof</p>
-          <h2 className="section-title">What Our Users Say</h2>
-          <p className="section-sub">Real stories from happy customers across all our services</p>
-        </div>
-        <div className="test-grid">
-          {loadingReviews ? (
-            <div style={{ textAlign: "center", gridColumn: "1/-1", padding: "50px" }}>
-              <div className="spinner" style={{ width: "40px", height: "40px", border: "3px solid rgba(201,168,76,0.15)", borderTop: "3px solid #C9A84C", borderRadius: "50%", margin: "0 auto" }}></div>
-              <p style={{ color: C.textDim, marginTop: "16px", fontSize: "14px" }}>Loading reviews…</p>
-            </div>
-          ) : reviews.length > 0 ? (
-            reviews.map(review => (
-              <div key={review._id} className="test-card">
-                <div className="test-top">
-                  <div className="test-avatar">{review.userName?.charAt(0).toUpperCase() || "U"}</div>
-                  <div className="test-service-tag">
-                    {review.category === "general" ? "General" : review.category.charAt(0).toUpperCase() + review.category.slice(1)}
-                  </div>
-                </div>
-                <div className="test-rating">{"".repeat(review.rating)}</div>
-                <p className="test-text">"{review.comment}"</p>
-                <div><div className="test-name">{review.userName}</div><div className="test-role">{new Date(review.createdAt).toLocaleDateString()}</div></div>
-              </div>
-            ))
-          ) : (
-            [
-              { name: "Sarah Wanjiku", role: "Tenant · Nairobi", rating: 5, text: "Found my dream apartment in 2 days! The WhatsApp feature made connecting with the landlord so easy. No agents, no hidden fees." },
-              { name: "Grace Omondi", role: "Developer · Kisumu", rating: 5, text: "The merchant listings saved me thousands on my construction project. Found roofing materials at 20% below market prices." },
-              { name: "James Kariuki", role: "Traveler · Nairobi", rating: 5, text: "Booked a luxury lodge through Axxspace Accommodation for my family vacation. Amazing experience, easy booking, and great rates!" },
-              { name: "Faith Kamau", role: "Business Owner · Mombasa", rating: 5, text: "Used AxxBiashara to find reliable legal services for my business registration. Professional and affordable." },
-            ].map(t => (
-              <div key={t.name} className="test-card">
-                <div className="test-top">
-                  <div className="test-avatar">{t.name.charAt(0)}</div>
-                  <div className="test-service-tag">{t.role.split("·")[0].trim()}</div>
-                </div>
-                <div className="test-rating">{"".repeat(t.rating)}</div>
-                <p className="test-text">"{t.text}"</p>
-                <div><div className="test-name">{t.name}</div><div className="test-role">{t.role}</div></div>
-              </div>
-            ))
-          )}
-        </div>
-        <div style={{ textAlign: "center" }}>
-          <button onClick={() => navigate("/leave-review")} className="review-btn"> Leave a Review</button>
-        </div>
-      </section >
-
-      {/* ── FINAL CTA ── */}
-      < section className="cta-section" >
-        <div className="cta-inner">
-          <div className="cta-badge">Start Your Journey Today</div>
-          <h2 className="cta-title">
-            Find Your Place<br /><em>in Kenya</em>
-          </h2>
-          <p className="cta-text">
-            Join thousands of Kenyans who find homes, move smarter, build better, and explore more — all through Axxspace.
+    {/* ── HOW IT WORKS ── */}
+    < section className="how-section" >
+      <div className="section-hdr">
+        <p className="section-eyebrow">Direct & transparent</p>
+        <h2 className="section-title">How Axxspace Works</h2>
+        <p className="section-sub">Simple, secure steps to get exactly what you need with zero middleman commission</p>
+      </div>
+      <div className="steps-grid">
+        <div className="step-card">
+          <span className="step-num">01</span>
+          <span className="step-icon"></span>
+          <h3 className="step-title">Search & Discover</h3>
+          <p className="step-text">
+            Browse through verified listings across rentals, accommodation, quick sales, or business services.
           </p>
-          <div className="cta-btns">
-            <button className="cta-btn-gold" onClick={() => navigate("/listings")}> Browse Rentals</button>
-            <button className="cta-btn-ghost" onClick={() => navigate("/accommodation")}> Explore Accommodation</button>
-            <button className="cta-btn-ghost" onClick={() => navigate("/quicksales")}> Shop QuickSales</button>
-          </div>
-          <div className="cta-divider"></div>
-          <button
-            className="cta-list-btn"
-            style={token
-              ? { background: `linear-gradient(135deg,${C.gold},${C.goldLight})`, color: C.navy, border: "none" }
-              : { background: "transparent", color: C.textMain, border: `1px solid ${C.border}` }
-            }
-            onClick={handleListProperty}
-          >
-            {token ? " List Your Property / Service" : " Login to List Your Business"}
-          </button>
-          {!token && <p className="cta-hint">Free to Join — No Credit Card Required</p>}
         </div>
-      </section >
-
-      {/* ── FOOTER ── */}
-      < footer className="footer" >
-        <div className="footer-inner">
-          <div className="footer-top">
-            <div className="footer-brand">Axx<span>space</span></div>
-            <p className="footer-tagline">Kenya's Most Trusted Property &amp; Services Platform</p>
-            <div style={{ marginTop: "20px" }}>
-              <SocialMediaLinks iconSize={20} />
-            </div>
-          </div>
-          <div className="footer-cols">
-            <div className="footer-col">
-              <p className="footer-col-title">Services</p>
-              {[[" Rentals", "/listings"], [" Accommodation", "/accommodation"], [" Merchants", "/quicksales"]].map(([l, r]) => (
-                <span key={l} className="footer-link" onClick={() => navigate(r)}>{l}</span>
-              ))}
-            </div>
-            <div className="footer-col">
-              <p className="footer-col-title">Company</p>
-              {["About Us", "How It Works", "Contact Us", "Advertise"].map(l => (
-                <span key={l} className="footer-link">{l}</span>
-              ))}
-            </div>
-            <div className="footer-col">
-              <p className="footer-col-title">Legal</p>
-              {["Terms of Service", "Privacy Policy", "FAQ", "Safety Tips"].map(l => (
-                <span key={l} className="footer-link">{l}</span>
-              ))}
-            </div>
-            <div className="footer-col">
-              <p className="footer-col-title">Contact</p>
-              <span className="footer-link"> info@axxspace.com</span>
-              <span className="footer-link"> support@axxspace.com</span>
-              <span className="footer-link"> admin@axxspace.com</span>
-            </div>
-          </div>
-          <p className="footer-copy"> 2026 Axxspace · All Rights Reserved</p>
+        <div className="step-card">
+          <span className="step-num">02</span>
+          <span className="step-icon"></span>
+          <h3 className="step-title">Connect Directly</h3>
+          <p className="step-text">
+            Reach landlords, sellers, or professional service providers instantly via WhatsApp or direct phone calls.
+          </p>
         </div>
-      </footer >
+        <div className="step-card">
+          <span className="step-num">03</span>
+          <span className="step-icon"></span>
+          <h3 className="step-title">Close the Deal</h3>
+          <p className="step-text">
+            Transact safely and securely with verified ratings, reviews, and direct communication. No broker fees.
+          </p>
+        </div>
+      </div>
+    </section >
 
-      {/* ── BOOST / SERVICE SELECTION MODAL ── */}
-      {
-        showBoostModal && (
-          <div className="modal-overlay" onClick={() => setShowBoostModal(false)}>
-            <div className="modal-box" onClick={e => e.stopPropagation()}>
-              <button className="modal-close" onClick={() => setShowBoostModal(false)}>✕</button>
-              <h2 className="modal-title">Choose Your Service</h2>
-              <p className="modal-sub">Select the type of service you want to list or boost on Axxspace</p>
-              <div className="modal-services">
-                {[
-                  { icon: "", title: "Landlord / Rentals", desc: "List rental properties and boost your listings", bg: `linear-gradient(135deg,${C.gold},${C.goldLight})`, route: "/login" },
-                  { icon: "", title: "QuickSales", desc: "Sell items in QuickSales", bg: "linear-gradient(135deg,#0C2A3A,#103A4F)", route: "/quicksales-login" },
-                  { icon: "", title: "Accommodation Provider", desc: "List hotels, lodges, and accommodation experiences", bg: "linear-gradient(135deg,#1B3A2A,#264D38)", route: "/accommodation/login" },
-                  { icon: "", title: "Business / AxxBiashara", desc: "List professional business services", bg: "linear-gradient(135deg,#2E1B4A,#3D2566)", route: "/business-login" },
-                ].map(svc => (
-                  <div key={svc.title} className="modal-svc-card" onClick={() => { setShowBoostModal(false); navigate(svc.route); }}>
-                    <div className="modal-svc-icon" style={{ background: svc.bg }}>{svc.icon}</div>
-                    <div>
-                      <p className="modal-svc-title">{svc.title}</p>
-                      <p className="modal-svc-desc">{svc.desc}</p>
-                    </div>
-                    <span className="modal-arrow">→</span>
-                  </div>
-                ))}
+    {/* ── MOBILE APP SECTION ── */}
+    < section className="app-download-section" >
+      <div className="app-download-container">
+        {/* Text Content */}
+        <div style={{ zIndex: 2, textAlign: 'left' }}>
+          <p className="section-eyebrow" style={{ color: "#C9A84C", letterSpacing: "0.2em", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", marginBottom: "12px" }}>Go Mobile</p>
+          <h2 className="section-title" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(32px, 4vw, 48px)", fontWeight: 600, color: "#F0EAD8", margin: "0 0 20px", lineHeight: 1.2 }}>
+            Download Axxspace App
+          </h2>
+          <p style={{ color: "#B8AD96", fontSize: "16px", lineHeight: "1.8", marginBottom: "30px", fontWeight: 300 }}>
+            Get the best mobile experience for property rentals, accommodation booking, quick sales, and business services across all 47 counties in Kenya. Fast, secure, and direct communication.
+          </p>
+
+          <ul className="app-download-features">
+            {[
+              "Instant push notifications for new listings",
+              "Direct WhatsApp & phone calling to landlords/sellers",
+              "Built-in offline support for saved properties",
+              "GPS tracking and map navigation integration"
+            ].map((item, idx) => (
+              <li key={idx} className="app-download-feature-item">
+                <span className="app-download-feature-icon">✓</span> {item}
+              </li>
+            ))}
+          </ul>
+
+          <div className="app-download-btn-wrapper">
+            <button
+              onClick={() => navigate("/mobile-app")}
+              className="app-download-btn magical-btn"
+            >
+              <span>📥</span> Get APK File
+            </button>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <span style={{ fontSize: "13px", fontWeight: 700, color: "#EDE6D6" }}>Version 1.0.0</span>
+              <span style={{ fontSize: "12px", color: "#7A7260" }}>Safe download (3.1 MB)</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Visual Showcase (Mockup) */}
+        <div className="app-download-mockup-wrapper">
+          {/* Phone mockup */}
+          <div className="app-download-phone">
+            {/* Speaker / Notch */}
+            <div className="app-download-phone-notch"></div>
+
+            {/* App Screen preview */}
+            <div className="app-download-phone-screen">
+              <div className="app-download-phone-header">
+                <span className="app-download-phone-logo">Axxspace</span>
+              </div>
+
+              {/* Simulated Content */}
+              <div className="app-download-phone-content">
+                <div className="app-download-phone-card">
+                  <div className="app-download-phone-card-image"></div>
+                  <div className="app-download-phone-card-title"></div>
+                  <div className="app-download-phone-card-text"></div>
+                </div>
+
+                <div className="app-download-phone-card-simple">
+                  <div className="app-download-phone-card-simple-title"></div>
+                  <div className="app-download-phone-card-simple-text"></div>
+                </div>
               </div>
             </div>
           </div>
-        )
-      }
-      <RequestItemModal isOpen={isRequestModalOpen} onClose={() => setIsRequestModalOpen(false)} />
-    </div >
-  );
+        </div>
+      </div>
+    </section >
+
+    {/* ── TESTIMONIALS ── */}
+    < section className="test-section" >
+      <div className="section-hdr">
+        <p className="section-eyebrow">Social Proof</p>
+        <h2 className="section-title">What Our Users Say</h2>
+        <p className="section-sub">Real stories from happy customers across all our services</p>
+      </div>
+      <div className="test-grid">
+        {loadingReviews ? (
+          <div style={{ textAlign: "center", gridColumn: "1/-1", padding: "50px" }}>
+            <div className="spinner" style={{ width: "40px", height: "40px", border: "3px solid rgba(201,168,76,0.15)", borderTop: "3px solid #C9A84C", borderRadius: "50%", margin: "0 auto" }}></div>
+            <p style={{ color: C.textDim, marginTop: "16px", fontSize: "14px" }}>Loading reviews…</p>
+          </div>
+        ) : reviews.length > 0 ? (
+          reviews.map(review => (
+            <div key={review._id} className="test-card">
+              <div className="test-top">
+                <div className="test-avatar">{review.userName?.charAt(0).toUpperCase() || "U"}</div>
+                <div className="test-service-tag">
+                  {review.category === "general" ? "General" : review.category.charAt(0).toUpperCase() + review.category.slice(1)}
+                </div>
+              </div>
+              <div className="test-rating">{"".repeat(review.rating)}</div>
+              <p className="test-text">"{review.comment}"</p>
+              <div><div className="test-name">{review.userName}</div><div className="test-role">{new Date(review.createdAt).toLocaleDateString()}</div></div>
+            </div>
+          ))
+        ) : (
+          [
+            { name: "Sarah Wanjiku", role: "Tenant · Nairobi", rating: 5, text: "Found my dream apartment in 2 days! The WhatsApp feature made connecting with the landlord so easy. No agents, no hidden fees." },
+            { name: "Grace Omondi", role: "Developer · Kisumu", rating: 5, text: "The merchant listings saved me thousands on my construction project. Found roofing materials at 20% below market prices." },
+            { name: "James Kariuki", role: "Traveler · Nairobi", rating: 5, text: "Booked a luxury lodge through Axxspace Accommodation for my family vacation. Amazing experience, easy booking, and great rates!" },
+            { name: "Faith Kamau", role: "Business Owner · Mombasa", rating: 5, text: "Used AxxBiashara to find reliable legal services for my business registration. Professional and affordable." },
+          ].map(t => (
+            <div key={t.name} className="test-card">
+              <div className="test-top">
+                <div className="test-avatar">{t.name.charAt(0)}</div>
+                <div className="test-service-tag">{t.role.split("·")[0].trim()}</div>
+              </div>
+              <div className="test-rating">{"".repeat(t.rating)}</div>
+              <p className="test-text">"{t.text}"</p>
+              <div><div className="test-name">{t.name}</div><div className="test-role">{t.role}</div></div>
+            </div>
+          ))
+        )}
+      </div>
+      <div style={{ textAlign: "center" }}>
+        <button onClick={() => navigate("/leave-review")} className="review-btn"> Leave a Review</button>
+      </div>
+    </section >
+
+    {/* ── FINAL CTA ── */}
+    < section className="cta-section" >
+      <div className="cta-inner">
+        <div className="cta-badge">Start Your Journey Today</div>
+        <h2 className="cta-title">
+          Find Your Place<br /><em>in Kenya</em>
+        </h2>
+        <p className="cta-text">
+          Join thousands of Kenyans who find homes, move smarter, build better, and explore more — all through Axxspace.
+        </p>
+        <div className="cta-btns">
+          <button className="cta-btn-gold" onClick={() => navigate("/listings")}> Browse Rentals</button>
+          <button className="cta-btn-ghost" onClick={() => navigate("/accommodation")}> Explore Accommodation</button>
+          <button className="cta-btn-ghost" onClick={() => navigate("/quicksales")}> Shop QuickSales</button>
+        </div>
+        <div className="cta-divider"></div>
+        <button
+          className="cta-list-btn"
+          style={token
+            ? { background: `linear-gradient(135deg,${C.gold},${C.goldLight})`, color: C.navy, border: "none" }
+            : { background: "transparent", color: C.textMain, border: `1px solid ${C.border}` }
+          }
+          onClick={handleListProperty}
+        >
+          {token ? " List Your Property / Service" : " Login to List Your Business"}
+        </button>
+        {!token && <p className="cta-hint">Free to Join — No Credit Card Required</p>}
+      </div>
+    </section >
+
+    {/* ── FOOTER ── */}
+    < footer className="footer" >
+      <div className="footer-inner">
+        <div className="footer-top">
+          <div className="footer-brand">Axx<span>space</span></div>
+          <p className="footer-tagline">Kenya's Most Trusted Property &amp; Services Platform</p>
+          <div style={{ marginTop: "20px" }}>
+            <SocialMediaLinks iconSize={20} />
+          </div>
+        </div>
+        <div className="footer-cols">
+          <div className="footer-col">
+            <p className="footer-col-title">Services</p>
+            {[[" Rentals", "/listings"], [" Accommodation", "/accommodation"], [" Merchants", "/quicksales"]].map(([l, r]) => (
+              <span key={l} className="footer-link" onClick={() => navigate(r)}>{l}</span>
+            ))}
+          </div>
+          <div className="footer-col">
+            <p className="footer-col-title">Company</p>
+            {["About Us", "How It Works", "Contact Us", "Advertise"].map(l => (
+              <span key={l} className="footer-link">{l}</span>
+            ))}
+          </div>
+          <div className="footer-col">
+            <p className="footer-col-title">Legal</p>
+            {["Terms of Service", "Privacy Policy", "FAQ", "Safety Tips"].map(l => (
+              <span key={l} className="footer-link">{l}</span>
+            ))}
+          </div>
+          <div className="footer-col">
+            <p className="footer-col-title">Contact</p>
+            <span className="footer-link"> info@axxspace.com</span>
+            <span className="footer-link"> support@axxspace.com</span>
+            <span className="footer-link"> admin@axxspace.com</span>
+          </div>
+        </div>
+        <p className="footer-copy"> 2026 Axxspace · All Rights Reserved</p>
+      </div>
+    </footer >
+
+    {/* ── BOOST / SERVICE SELECTION MODAL ── */}
+    {
+      showBoostModal && (
+        <div className="modal-overlay" onClick={() => setShowBoostModal(false)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShowBoostModal(false)}>✕</button>
+            <h2 className="modal-title">Choose Your Service</h2>
+            <p className="modal-sub">Select the type of service you want to list or boost on Axxspace</p>
+            <div className="modal-services">
+              {[
+                { icon: "", title: "Landlord / Rentals", desc: "List rental properties and boost your listings", bg: `linear-gradient(135deg,${C.gold},${C.goldLight})`, route: "/login" },
+                { icon: "", title: "QuickSales", desc: "Sell items in QuickSales", bg: "linear-gradient(135deg,#0C2A3A,#103A4F)", route: "/quicksales-login" },
+                { icon: "", title: "Accommodation Provider", desc: "List hotels, lodges, and accommodation experiences", bg: "linear-gradient(135deg,#1B3A2A,#264D38)", route: "/accommodation/login" },
+                { icon: "", title: "Business / AxxBiashara", desc: "List professional business services", bg: "linear-gradient(135deg,#2E1B4A,#3D2566)", route: "/business-login" },
+              ].map(svc => (
+                <div key={svc.title} className="modal-svc-card" onClick={() => { setShowBoostModal(false); navigate(svc.route); }}>
+                  <div className="modal-svc-icon" style={{ background: svc.bg }}>{svc.icon}</div>
+                  <div>
+                    <p className="modal-svc-title">{svc.title}</p>
+                    <p className="modal-svc-desc">{svc.desc}</p>
+                  </div>
+                  <span className="modal-arrow">→</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )
+    }
+    <RequestItemModal isOpen={isRequestModalOpen} onClose={() => setIsRequestModalOpen(false)} />
+  </div >
+);
 }
