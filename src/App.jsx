@@ -239,6 +239,8 @@ function App() {
         }
       />
       <Route path="/accommodation/:id" element={<PublicLayout><AccommodationDetailPage /></PublicLayout>} />
+      {/* Legacy alias: old links that used /accommodation/property/:id */}
+      <Route path="/accommodation/property/:id" element={<PublicLayout><AccommodationDetailPage /></PublicLayout>} />
       <Route path="/become-agent" element={<PublicLayout><BecomeAgentPage /></PublicLayout>} />
       <Route path="/register-agency" element={<PublicLayout><RegisterAgencyPage /></PublicLayout>} />
 
