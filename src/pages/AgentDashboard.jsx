@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { resolveMediaUrl } from "../utils/fileLinks";
+import QRGeneratorModal from "../components/QRGeneratorModal";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -1012,31 +1013,11 @@ export default function AgentDashboard() {
       )}
 
       {qrModalProperty && (
-        <div style={s.modal} onClick={() => setQrModalProperty(null)}>
-          <div style={{ ...s.modalContent, textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
-            <h3 style={{ ...s.modalTitle, marginBottom: "8px" }}>QR Code Poster</h3>
-            <p style={{ fontSize: "14px", color: "#6b7280", marginBottom: "20px" }}>{qrModalProperty.title}</p>
-            
-            <div style={{ background: "#f8fafc", padding: "24px", borderRadius: "12px", border: "1px solid #e2e8f0", display: "inline-block", marginBottom: "24px" }}>
-              <img 
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.origin + "/listings?property=" + qrModalProperty._id + "&ref=qr")}`} 
-                alt="QR Code" 
-                style={{ width: "200px", height: "200px", display: "block" }} 
-              />
-            </div>
-            
-            <div style={{ fontSize: "13px", color: "#64748b", marginBottom: "24px", background: "#f1f5f9", padding: "12px", borderRadius: "8px" }}>
-              <strong>Tip:</strong> Print this QR code and paste it on physical posters, business cards, or share it on social media. When someone scans it, they will be taken directly to this property and the scan will be tracked in your dashboard!
-            </div>
-            
-            <button
-              style={{ ...s.modalBtn, ...s.modalBtnSecondary, width: "100%" }}
-              onClick={() => setQrModalProperty(null)}
-            >
-              Close
-            </button>
-          </div>
-        </div>
+        <QRGeneratorModal
+          isOpen={!!qrModalProperty}
+          onClose={() => setQrModalProperty(null)}
+          property={qrModalProperty}
+        />
       )}
     </div>
   );
