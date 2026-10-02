@@ -156,6 +156,8 @@ export default function AdminDashboard() {
         res = await API.get("/admin/all", { params: { type: "properties", status: "pending" } });
       } else if (propertyFilter === "approved") {
         res = await API.get("/admin/all", { params: { type: "properties", status: "approved" } });
+      } else if (propertyFilter === "rejected") {
+        res = await API.get("/admin/all", { params: { type: "properties", status: "rejected" } });
       } else {
         res = await API.get("/admin/all", { params: { type: "properties" } });
       }
@@ -763,6 +765,7 @@ export default function AdminDashboard() {
               >
                 <option value="pending">Pending Approval</option>
                 <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
                 <option value="all">All Properties</option>
               </select>
             </div>
@@ -866,6 +869,12 @@ export default function AdminDashboard() {
                               onClick={() => handleStatusUpdate(item._id, "rejected")}
                               style={styles.rejectBtn}
                             >Reject</button>
+                          )}
+                          {item.status === "rejected" && (
+                            <button
+                              onClick={() => handleStatusUpdate(item._id, "approved")}
+                              style={styles.approveBtn}
+                            >Restore</button>
                           )}
                           {/* Agent Assignment Dropdown */}
                           {item.status === "approved" && (
