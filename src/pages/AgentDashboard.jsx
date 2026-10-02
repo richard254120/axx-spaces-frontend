@@ -392,6 +392,88 @@ const s = {
     maxWidth: "520px",
     margin: "24px auto",
   },
+  profileSection: {
+    background: "white",
+    borderRadius: "16px",
+    padding: "24px",
+    marginBottom: "24px",
+    border: "1px solid #e5e7eb",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+    display: "flex",
+    gap: "24px",
+    alignItems: "flex-start",
+    flexWrap: "wrap",
+  },
+  profileImg: {
+    width: "100px",
+    height: "100px",
+    borderRadius: "50%",
+    objectFit: "cover",
+    background: "#fbbf24",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "36px",
+    fontWeight: 700,
+    color: "#fff",
+    border: "4px solid #fff",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+  },
+  profileInfo: {
+    flex: 1,
+    minWidth: "250px",
+  },
+  profileName: {
+    fontSize: "24px",
+    fontWeight: 800,
+    color: "#1f2937",
+    marginBottom: "4px",
+  },
+  profileDetail: {
+    fontSize: "14px",
+    color: "#6b7280",
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    marginBottom: "6px",
+  },
+  statsGrid: {
+    display: "flex",
+    gap: "16px",
+    flexWrap: "wrap",
+  },
+  statBox: {
+    background: "#f8fafc",
+    border: "1px solid #e2e8f0",
+    borderRadius: "12px",
+    padding: "16px 24px",
+    textAlign: "center",
+    flex: "1",
+    minWidth: "120px",
+  },
+  statValue: {
+    fontSize: "24px",
+    fontWeight: 800,
+    color: "#3b82f6",
+    marginBottom: "4px",
+  },
+  statLabel: {
+    fontSize: "12px",
+    fontWeight: 600,
+    color: "#64748b",
+    textTransform: "uppercase",
+  },
+  qrBtn: {
+    padding: "8px 12px",
+    borderRadius: "6px",
+    border: "1px solid #fbbf24",
+    background: "#fffbeb",
+    color: "#d97706",
+    fontWeight: 600,
+    fontSize: "12px",
+    cursor: "pointer",
+    textAlign: "center",
+  },
 };
 
 export default function AgentDashboard() {
@@ -407,6 +489,7 @@ export default function AgentDashboard() {
   const [selectedProvider, setSelectedProvider] = useState(null);
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const [qrModalProperty, setQrModalProperty] = useState(null);
 
   useEffect(() => {
     if (!user || user.role !== "agent") {
@@ -550,6 +633,35 @@ export default function AgentDashboard() {
       </div>
 
       <div style={s.container}>
+        {/* Profile Overview Section */}
+        <div style={s.profileSection}>
+          {user?.profileImage ? (
+            <img src={resolveMediaUrl(user.profileImage)} alt={user.name} style={s.profileImg} />
+          ) : (
+            <div style={s.profileImg}>{user?.name?.charAt(0).toUpperCase() || "A"}</div>
+          )}
+          <div style={s.profileInfo}>
+            <div style={s.profileName}>{user?.name || "Agent"}</div>
+            <div style={s.profileDetail}><span>✉️</span> {user?.email || "No email provided"}</div>
+            <div style={s.profileDetail}><span>📞</span> {user?.phone || "No phone provided"}</div>
+            <div style={s.profileDetail}><span>📍</span> {user?.county || "Kenya"}</div>
+          </div>
+          <div style={s.statsGrid}>
+            <div style={s.statBox}>
+              <div style={s.statValue}>{myHouses.length}</div>
+              <div style={s.statLabel}>Listings</div>
+            </div>
+            <div style={s.statBox}>
+              <div style={s.statValue}>{myHouses.reduce((sum, h) => sum + (h.views || 0), 0)}</div>
+              <div style={s.statLabel}>Total Views</div>
+            </div>
+            <div style={s.statBox}>
+              <div style={s.statValue}>{myHouses.reduce((sum, h) => sum + (h.qrScans || 0), 0)}</div>
+              <div style={s.statLabel}>QR Scans</div>
+            </div>
+          </div>
+        </div>
+
         <div style={s.tabs}>
           <button
             style={{ ...s.tab, ...(activeTab === "houses" ? s.tabActive : {}) }}
@@ -652,17 +764,28 @@ export default function AgentDashboard() {
                           <span><strong>{house.totalUnits || 1}</strong> total units</span>
                           <span><strong>{house.bookedUnits || 0}</strong> booked</span>
                         </div>
+                        <div style={{ ...s.houseInfoRow, marginTop: "8px", background: "#eff6ff" }}>
+                          <span style={{ color: "#2563eb" }}><strong>{house.views || 0}</strong> Views</span>
+                          <span style={{ color: "#2563eb" }}><strong>{house.qrScans || 0}</strong> QR Scans</span>
+                        </div>
 
                         <div style={s.houseActions}>
                           {isApproved && (
                             <button
                               style={s.viewBtn}
-                              onClick={() => window.open(`/property/${house._id}`, "_blank")}
+                              onClick={() => window.open(`/listings?property=${house._id}`, "_blank")}
                               title="View live listing"
                             >
                               Live ↗
                             </button>
                           )}
+                          <button
+                            style={s.qrBtn}
+                            onClick={() => setQrModalProperty(house)}
+                            title="View QR Poster"
+                          >
+                            QR Poster
+                          </button>
                           <button
                             style={s.editBtn}
                             onClick={() => navigate(`/property/edit/${house._id}`)}
@@ -876,6 +999,34 @@ export default function AgentDashboard() {
                 {sending ? "Sending..." : "Send Request"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {qrModalProperty && (
+        <div style={s.modal} onClick={() => setQrModalProperty(null)}>
+          <div style={{ ...s.modalContent, textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ ...s.modalTitle, marginBottom: "8px" }}>QR Code Poster</h3>
+            <p style={{ fontSize: "14px", color: "#6b7280", marginBottom: "20px" }}>{qrModalProperty.title}</p>
+            
+            <div style={{ background: "#f8fafc", padding: "24px", borderRadius: "12px", border: "1px solid #e2e8f0", display: "inline-block", marginBottom: "24px" }}>
+              <img 
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.origin + "/listings?property=" + qrModalProperty._id + "&ref=qr")}`} 
+                alt="QR Code" 
+                style={{ width: "200px", height: "200px", display: "block" }} 
+              />
+            </div>
+            
+            <div style={{ fontSize: "13px", color: "#64748b", marginBottom: "24px", background: "#f1f5f9", padding: "12px", borderRadius: "8px" }}>
+              <strong>Tip:</strong> Print this QR code and paste it on physical posters, business cards, or share it on social media. When someone scans it, they will be taken directly to this property and the scan will be tracked in your dashboard!
+            </div>
+            
+            <button
+              style={{ ...s.modalBtn, ...s.modalBtnSecondary, width: "100%" }}
+              onClick={() => setQrModalProperty(null)}
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
