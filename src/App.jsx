@@ -40,7 +40,7 @@ import AdminVerification from "./pages/AdminVerification";
 import Saved from "./pages/Saved";
 import Messages from "./pages/Messages";
 import Notifications from "./pages/Notifications";
-import UsersPage from "./pages/UsersPage";
+// UsersPage removed
 import Verification from "./pages/Verification";
 
 // ─── User Account Pages ──────────────────────────────────────────────────────
@@ -189,7 +189,7 @@ function App() {
       <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
       <Route path="/mobile-app" element={<PublicLayout><MobileAppDownload /></PublicLayout>} />
       <Route path="/terms" element={<PublicLayout><TermsAndPrivacy /></PublicLayout>} />
-      <Route path="/users" element={<PublicLayout><UsersPage /></PublicLayout>} />
+      {/* Users page removed */}
 
       {/* ── NEW ACCOMMODATION BOOKING ROUTES ── */}
       <Route path="/accommodation-booking-search" element={<PublicLayout><AccommodationSearch /></PublicLayout>} />
