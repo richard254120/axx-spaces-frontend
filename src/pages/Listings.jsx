@@ -527,8 +527,12 @@ export default function Listings() {
                         <div style={S.agentCardBio}>{agent.agentProfile?.bio || "Verified agent"}</div>
                         <div style={S.agentCardPhone}>{agent.agentProfile?.phone || agent.phone}</div>
                         <div style={S.agentCardLocationDetail}>
-                          <span style={{ color: "#6b7280", fontSize: "0.75rem" }}>Working Area:</span>
-                          <span style={{ color: "#E31B1B", fontSize: "0.8rem", fontWeight: 600 }}>{agent.agentProfile?.county || "Kenya"}</span>
+                          <span style={{ color: "#6b7280", fontSize: "0.75rem" }}>Listing Locations:</span>
+                          <span style={{ color: "#E31B1B", fontSize: "0.8rem", fontWeight: 600, textAlign: "center" }}>
+                            {agent.listingLocations && agent.listingLocations.length > 0
+                              ? agent.listingLocations.slice(0, 3).join(", ") + (agent.listingLocations.length > 3 ? "..." : "")
+                              : agent.agentProfile?.county || "Kenya"}
+                          </span>
                         </div>
                       </div>
                     ))}
