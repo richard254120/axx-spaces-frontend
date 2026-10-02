@@ -975,6 +975,11 @@ export default function AgentDashboard() {
             <h3 style={s.modalTitle}>
               Send Request to {selectedProvider.name}
             </h3>
+            <div style={{ marginBottom: "16px", fontSize: "14px", color: "#4b5563", background: "#f9fafb", padding: "12px", borderRadius: "8px", border: "1px solid #e5e7eb" }}>
+              <div style={{ marginBottom: "4px" }}><strong>Email:</strong> {selectedProvider.email || "N/A"}</div>
+              <div style={{ marginBottom: "4px" }}><strong>Phone:</strong> {selectedProvider.phone || "N/A"}</div>
+              <div><strong>Location:</strong> {selectedProvider.county || selectedProvider.location || selectedProvider.agentProfile?.county || "Kenya"}</div>
+            </div>
             <textarea
               style={s.textarea}
               placeholder="Introduce yourself and explain why you'd like to work with this provider..."
