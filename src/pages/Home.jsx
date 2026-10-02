@@ -2483,12 +2483,12 @@ export default function Home() {
           <h1 className="hero-title magic-hero-title">
             <span className="hero-title-line1 magic-shimmer-text">
               Everything You Need
-              <span className="magic-star magic-star-top" aria-hidden="true">✦</span>
+              <span className="magic-star magic-star-top" aria-hidden="true">Star</span>
             </span>
             <span className="hero-title-line2 magic-aurora-text">
-              <span className="magic-star magic-star-left" aria-hidden="true">✨</span>
+              <span className="magic-star magic-star-left" aria-hidden="true">Sparkle</span>
               Under One Roof
-              <span className="magic-star magic-star-right" aria-hidden="true">✨</span>
+              <span className="magic-star magic-star-right" aria-hidden="true">Sparkle</span>
             </span>
             <span className="magic-ambient-glow" aria-hidden="true"></span>
           </h1>
@@ -2521,10 +2521,10 @@ export default function Home() {
         {/* TABS */}
         <div className="feat-tabs-bar">
           {[
-            { id: "properties", label: "🏠 Rentals", count: featuredProperties.length },
-            { id: "accommodation", label: "🏨 Accommodation", count: featuredAccommodation.length },
-            { id: "businesses", label: "💼 AxxBiashara", count: featuredBusinesses.length },
-            { id: "materials", label: "⚡ QuickSales", count: featuredMaterials.length },
+            { id: "properties", label: "Rentals", count: featuredProperties.length },
+            { id: "accommodation", label: "Accommodation", count: featuredAccommodation.length },
+            { id: "businesses", label: "AxxBiashara", count: featuredBusinesses.length },
+            { id: "materials", label: "QuickSales", count: featuredMaterials.length },
           ].map(tab => (
             <button
               key={tab.id}
@@ -2550,7 +2550,7 @@ export default function Home() {
           if (currentItems.length === 0) {
             return (
               <div className="no-feat-wrap" style={{ textAlign: 'center', padding: '60px 28px' }}>
-                <span className="no-feat-icon" style={{ fontSize: '48px', display: 'block', marginBottom: '12px' }}>✨</span>
+                <span className="no-feat-icon" style={{ fontSize: '48px', display: 'block', marginBottom: '12px' }}>Star</span>
                 <h4 style={{ color: "#F8FAFC", fontSize: '20px', fontWeight: 600 }}>No featured listings currently found in this category</h4>
                 <p style={{ color: "#94a3b8", fontSize: '14px', marginTop: '6px' }}>Check back soon or explore our general directory</p>
                 <button
@@ -2611,13 +2611,13 @@ export default function Home() {
                         />
                       ) : (
                         <div className="modern-card-fallback-img">
-                          <span>{activeFeaturedTab === "accommodation" ? "🏨" : activeFeaturedTab === "businesses" ? "💼" : "🏠"}</span>
+                          <span>{activeFeaturedTab === "accommodation" ? "Accommodation" : activeFeaturedTab === "businesses" ? "Business" : "Property"}</span>
                         </div>
                       )}
                       <div className="modern-card-badge-row">
                         <span className="badge-featured">★ Featured</span>
                         {hasVideos && (
-                          <span className="badge-video">🎬 Video Tour</span>
+                          <span className="badge-video">Video Tour</span>
                         )}
                       </div>
                       <div className="modern-card-gradient-overlay"></div>
@@ -2629,7 +2629,7 @@ export default function Home() {
                       </div>
                       <h3 className="modern-card-title">{title}</h3>
                       <p className="modern-card-location">
-                        <span>📍</span>
+                        <span>Location</span>
                         <span>{loc}</span>
                       </p>
 
@@ -2954,7 +2954,7 @@ export default function Home() {
                 onClick={() => navigate("/mobile-app")}
                 className="app-download-btn magical-btn"
               >
-                <span>📥</span> Get APK File
+                <span>Download</span> Get APK File
               </button>
               <div style={{ display: "flex", flexDirection: "column" }}>
                 <span style={{ fontSize: "13px", fontWeight: 700, color: "#EDE6D6" }}>Version 1.0.0</span>
