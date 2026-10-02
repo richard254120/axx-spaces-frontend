@@ -2207,9 +2207,6 @@ export default function Home() {
     { label: "One Platform.", accent: "Everything." },
   ];
 
-<<<<<<< HEAD
-
-
   /* ── DATA FETCHING ── */
   useEffect(() => {
     const fetchDemographics = async () => {
@@ -2229,14 +2226,6 @@ export default function Home() {
     const interval = setInterval(fetchDemographics, 300000);
     return () => clearInterval(interval);
   }, []);
-=======
-// Parallel loading of all featured items for better performance
-useEffect(() => {
-  const fetchAllFeatured = async () => {
-    try {
-      setFetchError(false);
-      const timeout = 5000; // Reduced to 5s for faster response
->>>>>>> b3691ac (update)
 
   // Parallel loading of all featured items for better performance
   useEffect(() => {
