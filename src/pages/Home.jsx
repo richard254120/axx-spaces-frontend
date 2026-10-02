@@ -2744,7 +2744,7 @@ export default function Home() {
                               {/* Central Hover Tooltip display */}
                               <circle cx="50" cy="50" r="26" fill="#162233" />
                               <text x="50" y="47" textAnchor="middle" fill="#7A7260" fontSize="5" fontWeight="600" letterSpacing="0.05em">
-                                {hoveredService ? hoveredService.toUpperCase() : "TOTAL USERS & LISTS"}
+                                {hoveredService ? (hoveredService === "tourism" ? "ACCOMMODATION" : hoveredService.toUpperCase()) : "TOTAL USERS & LISTS"}
                               </text>
                               <text x="50" y="58" textAnchor="middle" fill="#C9A84C" fontSize="10" fontWeight="700">
                                 {(() => {
@@ -2759,34 +2759,6 @@ export default function Home() {
                           );
                         })()}
                       </svg>
-                    </div>
-
-                    {/* Legends & interactive triggers */}
-                    <div className="demo-legend-list">
-                      {demographics.services && demographics.services.map((item, idx) => {
-                        const colors = ["#C9A84C", "#60A5FA", "#4CAF74", "#A78BFA", "#F59E0B"];
-                        const total = demographics.services.reduce((sum, s) => sum + s.count, 0);
-                        const pct = total > 0 ? ((item.count / total) * 100).toFixed(1) : 0;
-                        const isHovered = hoveredService === item.service;
-
-                        return (
-                          <div
-                            key={item.service}
-                            className="demo-legend-item"
-                            style={isHovered ? { border: `1px solid ${colors[idx % colors.length]}`, background: "rgba(255,255,255,0.03)" } : {}}
-                            onMouseEnter={() => setHoveredService(item.service)}
-                            onMouseLeave={() => setHoveredService(null)}
-                          >
-                            <span className="demo-legend-label">
-                              <span className="demo-legend-color" style={{ background: colors[idx % colors.length] }} />
-                              {item.service}
-                            </span>
-                            <span className="demo-legend-value">
-                              {item.count} <span style={{ fontSize: '11px', color: '#7A7260', fontWeight: '400' }}>({pct}%)</span>
-                            </span>
-                          </div>
-                        );
-                      })}
                     </div>
                   </div>
                 </div>
