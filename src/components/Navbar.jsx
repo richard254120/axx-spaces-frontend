@@ -240,7 +240,7 @@ export default function Navbar() {
             <span style={styles.dropdownIcon}>Terms & Privacy</span>
           </Link>
 
-          {token && user ? (
+          {token && user && user.role !== "guest" ? (
             <>
               <div style={styles.dropdownDivider} />
               {/* ACCOUNT SECTION */}
@@ -368,7 +368,7 @@ export default function Navbar() {
           <div style={styles.topRight}>
             <HamburgerDropdown />
             {/* Account Indicator */}
-            {token && user ? (
+            {token && user && user.role !== "guest" ? (
               <div style={styles.accountIndicator} ref={accountRef}>
                 <button
                   style={styles.accountBtn}
@@ -480,13 +480,13 @@ export default function Navbar() {
             Requests
           </button>
 
-          {token && user && (
+          {token && user && user.role !== "guest" && (
             <Link to="/settings" style={{ ...styles.navLink, ...(isActive("/settings") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
               Settings
             </Link>
           )}
 
-          {token && user && (
+          {token && user && user.role !== "guest" && (
             <>
               <Link to="/upload" style={{ ...styles.navLink, ...(isActive("/upload") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
                 Upload

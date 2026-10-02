@@ -61,6 +61,12 @@ export default function PropertyDetailPage() {
           const source = searchParams.get("source") || "generic";
           logQRScan(source);
         }
+        // Record a view
+        try {
+          await fetch(`${API_BASE}/properties/${id}/view`, { method: "PATCH" });
+        } catch (viewErr) {
+          console.error("Failed to record view:", viewErr);
+        }
       } catch (err) {
         setError(err.message);
       } finally {
@@ -294,9 +300,15 @@ export default function PropertyDetailPage() {
                 )}
               </div>
               <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#1e293b", marginBottom: "8px", lineHeight: "1.3" }}>{property.title}</h1>
-              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "20px", display: "flex", alignItems: "center", gap: "4px" }}>
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                <span>{property.location}, {property.county}</span>
+              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "20px", display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                  <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  {property.location}, {property.county}
+                </span>
+                <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                  <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  {property.views || 0} Views
+                </span>
               </p>
 
               <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", marginBottom: "24px" }}>
