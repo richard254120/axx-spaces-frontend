@@ -522,7 +522,7 @@ export default function Listings() {
                         <div style={S.universityCardName}>{agent.name}</div>
                         <div style={{ ...S.universityCardLocation, display: "flex", alignItems: "center", gap: "4px" }}>
                           <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                          <span>{agent.agentProfile?.county || "Location not specified"}</span>
+                          <span>{agent.agentProfile?.county || agent.county || "Location not specified"}</span>
                         </div>
                         <div style={S.agentCardBio}>{agent.agentProfile?.bio || "Verified agent"}</div>
                         <div style={S.agentCardPhone}>{agent.agentProfile?.phone || agent.phone}</div>
