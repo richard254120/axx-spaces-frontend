@@ -197,7 +197,13 @@ export default function Listings() {
       return;
     }
 
-    const agentProperties = properties.filter(p => p.assignedAgent && p.assignedAgent._id === selectedAgent._id);
+    const agentProperties = properties.filter(p => {
+      if (!p.assignedAgent) return false;
+
+      // Handle both cases: assignedAgent as object with _id or as string ID
+      const agentId = typeof p.assignedAgent === 'object' ? p.assignedAgent._id : p.assignedAgent;
+      return agentId === selectedAgent._id;
+    });
     setFilteredProperties(agentProperties);
   }, [showAgentListings, selectedAgent, properties]);
 
