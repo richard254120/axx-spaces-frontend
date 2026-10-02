@@ -64,6 +64,9 @@ export default function Listings() {
   const [universitySearch, setUniversitySearch] = useState("");
   const [universityProperties, setUniversityProperties] = useState([]);
   const [universityLoading, setUniversityLoading] = useState(false);
+  const [agents, setAgents] = useState([]);
+  const [selectedAgent, setSelectedAgent] = useState(null);
+  const [agentsLoading, setAgentsLoading] = useState(false);
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -171,9 +174,32 @@ export default function Listings() {
       return;
     }
 
-    const agentProperties = properties.filter(p => p.assignedAgent && p.assignedAgent !== null);
+    const fetchAgents = async () => {
+      setAgentsLoading(true);
+      try {
+        const response = await fetch(`${API_BASE}/agents/verified`);
+        if (!response.ok) throw new Error("Failed to fetch agents");
+        const data = await response.json();
+        setAgents(data);
+      } catch (err) {
+        console.error("Failed to fetch agents:", err);
+        setAgents([]);
+      } finally {
+        setAgentsLoading(false);
+      }
+    };
+
+    fetchAgents();
+  }, [showAgentListings]);
+
+  useEffect(() => {
+    if (!showAgentListings || !selectedAgent) {
+      return;
+    }
+
+    const agentProperties = properties.filter(p => p.assignedAgent && p.assignedAgent._id === selectedAgent._id);
     setFilteredProperties(agentProperties);
-  }, [showAgentListings, properties]);
+  }, [showAgentListings, selectedAgent, properties]);
 
   const displayProperties =
     showUniversityHostels && selectedUniversity ? universityProperties : filteredProperties;
@@ -183,9 +209,9 @@ export default function Listings() {
     setFilters((prev) => ({ ...prev, [name]: name === "minPrice" || name === "maxPrice" ? parseFloat(value) || 0 : value }));
   };
 
-  const openModal = async (property) => { 
-    setSelectedProperty(property); 
-    setCurrentImageIndex(0); 
+  const openModal = async (property) => {
+    setSelectedProperty(property);
+    setCurrentImageIndex(0);
     // Record a view
     try {
       await fetch(`${API_BASE}/properties/${property._id}/view`, { method: "PATCH" });
@@ -448,6 +474,81 @@ export default function Listings() {
                 {showMap ? "Hide Map" : " Map View"}
               </button>
             </div>
+          </div>
+        )}
+
+        {/* ── AGENT LISTINGS SECTION (only show when in agent listings mode) ── */}
+        {showAgentListings && (
+          <div style={S.universitySection}>
+            {/* Show agent profiles when no agent is selected */}
+            {!selectedAgent && (
+              <>
+                <div style={S.universityHeader}>
+                  <div style={S.universityBadge}> VERIFIED AGENTS</div>
+                  <h2 style={S.universityTitle}>Browse Verified Agents</h2>
+                  <p style={S.universitySub}>View profiles of verified agents and explore their property listings across Kenya</p>
+                </div>
+
+                {agentsLoading ? (
+                  <div style={{ textAlign: "center", padding: "60px 28px" }}>
+                    <div style={S.loadingSpinner} className="spinner" />
+                    <p style={S.loadingText}>Loading verified agents…</p>
+                  </div>
+                ) : agents.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: "60px 28px" }}>
+                    <p style={{ color: C.textMid, fontSize: "0.9rem" }}>No verified agents found at this time</p>
+                  </div>
+                ) : (
+                  <div style={S.universityGrid}>
+                    {agents.map((agent) => (
+                      <div
+                        key={agent._id}
+                        style={S.universityCard}
+                        onClick={() => setSelectedAgent(agent)}
+                      >
+                        <div style={S.agentCardAvatar}>
+                          {agent.profileImage ? (
+                            <img src={agent.profileImage} alt={agent.name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
+                          ) : (
+                            <span style={{ fontSize: "24px", fontWeight: 700, color: C.gold }}>{agent.name.charAt(0).toUpperCase()}</span>
+                          )}
+                        </div>
+                        <div style={S.universityCardName}>{agent.name}</div>
+                        <div style={{ ...S.universityCardLocation, display: "flex", alignItems: "center", gap: "4px" }}>
+                          <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                          <span>{agent.agentProfile?.county || "Kenya"}</span>
+                        </div>
+                        <div style={S.agentCardBio}>{agent.agentProfile?.bio || "Verified agent"}</div>
+                        <div style={S.agentCardPhone}>{agent.agentProfile?.phone || agent.phone}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Show selected agent bar when an agent is selected */}
+            {selectedAgent && (
+              <div style={S.selectedUniversityBar}>
+                <div style={S.selectedUniversityInfo}>
+                  <span style={S.selectedUniversityLabel}>Viewing listings by:</span>
+                  <span style={S.selectedUniversityName}>{selectedAgent.name}</span>
+                  <span style={{ ...S.selectedUniversityLocation, display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    {selectedAgent.agentProfile?.county || "Kenya"}
+                  </span>
+                </div>
+                <button
+                  style={S.clearUniversityBtn}
+                  onClick={() => {
+                    setSelectedAgent(null);
+                    setFilteredProperties(properties);
+                  }}
+                >
+                  Back to Agents
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -950,6 +1051,11 @@ const S = {
   toggleSectionBtn: { padding: "10px 20px", background: "transparent", border: "1px solid #e5e7eb", color: "#9ca3af", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem", fontFamily: "'DM Sans', sans-serif", transition: "all 0.2s" },
   showUniversityBar: { textAlign: "center", marginBottom: "28px" },
   showUniversityBtn: { padding: "12px 24px", background: "rgba(227, 27, 27, 0.08)", border: "1px solid #E31B1B", color: "#E31B1B", borderRadius: "8px", cursor: "pointer", fontSize: "0.9rem", fontWeight: 700, fontFamily: "'DM Sans', sans-serif", transition: "all 0.2s" },
+
+  /* Agent Card Styles */
+  agentCardAvatar: { width: "64px", height: "64px", borderRadius: "50%", background: "#f3f4f6", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", overflow: "hidden", border: "2px solid #E31B1B" },
+  agentCardBio: { color: "#6b7280", fontSize: "0.8rem", marginTop: "4px", textAlign: "center", lineHeight: 1.4, minHeight: "36px" },
+  agentCardPhone: { color: "#E31B1B", fontSize: "0.85rem", fontWeight: 600, marginTop: "8px", textAlign: "center" },
 
   /* Map */
   mapWrap: { borderRadius: "12px", overflow: "hidden", marginBottom: "28px", border: "1px solid #e5e7eb" },
