@@ -833,8 +833,8 @@ export default function AgentDashboard() {
                       </div>
                       {provider.phone && <div style={s.cardPhone}>📞 {provider.phone}</div>}
                       <div style={s.cardCounty}>🏨 Accommodation Host</div>
-                      {provider.agentProfile?.county && (
-                        <div style={s.cardCounty}>📍 {provider.agentProfile.county}</div>
+                      {(provider.county || provider.location || provider.agentProfile?.county) && (
+                        <div style={s.cardCounty}>📍 {provider.county || provider.location || provider.agentProfile?.county}</div>
                       )}
                       {status && (
                         <div
@@ -888,6 +888,9 @@ export default function AgentDashboard() {
                       </div>
                       {landlord.phone && <div style={s.cardPhone}>📞 {landlord.phone}</div>}
                       <div style={s.cardCounty}>🏠 Landlord ({landlord.landlordType || "General"})</div>
+                      {(landlord.county || landlord.location || landlord.agentProfile?.county) && (
+                        <div style={s.cardCounty}>📍 {landlord.county || landlord.location || landlord.agentProfile?.county}</div>
+                      )}
                       {status && (
                         <div
                           style={{
