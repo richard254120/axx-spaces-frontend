@@ -522,10 +522,14 @@ export default function Listings() {
                         <div style={S.universityCardName}>{agent.name}</div>
                         <div style={{ ...S.universityCardLocation, display: "flex", alignItems: "center", gap: "4px" }}>
                           <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                          <span>{agent.agentProfile?.county || "Kenya"}</span>
+                          <span>{agent.agentProfile?.county || "Kenya"} County</span>
                         </div>
                         <div style={S.agentCardBio}>{agent.agentProfile?.bio || "Verified agent"}</div>
                         <div style={S.agentCardPhone}>{agent.agentProfile?.phone || agent.phone}</div>
+                        <div style={S.agentCardLocationDetail}>
+                          <span style={{ color: "#6b7280", fontSize: "0.75rem" }}>Working Area:</span>
+                          <span style={{ color: "#E31B1B", fontSize: "0.8rem", fontWeight: 600 }}>{agent.agentProfile?.county || "Kenya"}</span>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -1062,6 +1066,7 @@ const S = {
   agentCardAvatar: { width: "64px", height: "64px", borderRadius: "50%", background: "#f3f4f6", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", overflow: "hidden", border: "2px solid #E31B1B" },
   agentCardBio: { color: "#6b7280", fontSize: "0.8rem", marginTop: "4px", textAlign: "center", lineHeight: 1.4, minHeight: "36px" },
   agentCardPhone: { color: "#E31B1B", fontSize: "0.85rem", fontWeight: 600, marginTop: "8px", textAlign: "center" },
+  agentCardLocationDetail: { display: "flex", flexDirection: "column", alignItems: "center", gap: "2px", marginTop: "8px", paddingTop: "8px", borderTop: "1px solid #f3f4f6" },
 
   /* Map */
   mapWrap: { borderRadius: "12px", overflow: "hidden", marginBottom: "28px", border: "1px solid #e5e7eb" },
