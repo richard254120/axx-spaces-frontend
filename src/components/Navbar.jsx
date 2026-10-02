@@ -173,9 +173,6 @@ export default function Navbar() {
           <Link to="/axxwallet" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>AxxWallet</span>
           </Link>
-          <Link to="/users" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>Users</span>
-          </Link>
 
           <div style={styles.dropdownDivider} />
           <div style={styles.dropdownHeader}>Jobs & Careers</div>
