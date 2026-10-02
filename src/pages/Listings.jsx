@@ -183,7 +183,16 @@ export default function Listings() {
     setFilters((prev) => ({ ...prev, [name]: name === "minPrice" || name === "maxPrice" ? parseFloat(value) || 0 : value }));
   };
 
-  const openModal = (property) => { setSelectedProperty(property); setCurrentImageIndex(0); };
+  const openModal = async (property) => { 
+    setSelectedProperty(property); 
+    setCurrentImageIndex(0); 
+    // Record a view
+    try {
+      await fetch(`${API_BASE}/properties/${property._id}/view`, { method: "PATCH" });
+    } catch (err) {
+      console.error("Failed to record view:", err);
+    }
+  };
   const closeModal = () => { setSelectedProperty(null); setCurrentImageIndex(0); };
   const nextImage = () => { if (selectedProperty?.images?.length > 0) setCurrentImageIndex((prev) => (prev + 1) % selectedProperty.images.length); };
   const prevImage = () => { if (selectedProperty?.images?.length > 0) setCurrentImageIndex((prev) => (prev - 1 + selectedProperty.images.length) % selectedProperty.images.length); };
@@ -690,9 +699,15 @@ export default function Listings() {
                 <div>
                   <div style={S.modalType}>{selectedProperty.propertyType || "Rental"}</div>
                   <h2 style={S.modalTitle}>{selectedProperty.title}</h2>
-                  <p style={{ ...S.modalLocation, display: "flex", alignItems: "center", gap: "4px" }}>
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="#E31B1B" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                    <span>{selectedProperty.county} · {selectedProperty.location}</span>
+                  <p style={{ ...S.modalLocation, display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap", marginTop: "8px" }}>
+                    <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                      <svg viewBox="0 0 24 24" width="13" height="13" stroke="#E31B1B" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                      <span>{selectedProperty.county} · {selectedProperty.location}</span>
+                    </span>
+                    <span style={{ display: "flex", alignItems: "center", gap: "6px", background: "#f8fafc", padding: "4px 10px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                      <svg viewBox="0 0 24 24" width="14" height="14" stroke="#3b82f6" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                      <span style={{ fontSize: "13px", fontWeight: 700, color: "#3b82f6" }}>{selectedProperty.views || 0} Views</span>
+                    </span>
                   </p>
                   {selectedProperty.lat && selectedProperty.lng && (
                     <a
