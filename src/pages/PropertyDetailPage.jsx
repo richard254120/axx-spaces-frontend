@@ -300,15 +300,9 @@ export default function PropertyDetailPage() {
                 )}
               </div>
               <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#1e293b", marginBottom: "8px", lineHeight: "1.3" }}>{property.title}</h1>
-              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "20px", display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-                <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                  <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                  {property.location}, {property.county}
-                </span>
-                <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                  <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                  {property.views || 0} Views
-                </span>
+              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "20px", display: "flex", alignItems: "center", gap: "4px" }}>
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span>{property.location}, {property.county}</span>
               </p>
 
               <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", marginBottom: "24px" }}>
@@ -323,6 +317,10 @@ export default function PropertyDetailPage() {
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                   <span style={{ fontSize: "20px" }}></span>
                   <span style={{ fontSize: "14px", fontWeight: 600, color: "#1e293b" }}>{property.furnished ? "Furnished" : "Unfurnished"}</span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", background: "#f8fafc", padding: "4px 10px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="#3b82f6" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  <span style={{ fontSize: "14px", fontWeight: 700, color: "#3b82f6" }}>{property.views || 0} Views</span>
                 </div>
               </div>
 
