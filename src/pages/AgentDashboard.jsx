@@ -818,7 +818,7 @@ export default function AgentDashboard() {
             onClick={() => setShowAgentQRPoster(true)}
             title="Generate My Agent QR Poster"
           >
-            🪪 {isMobile ? 'QR' : 'My QR Poster'}
+            {isMobile ? 'QR' : 'My QR Poster'}
           </button>
           <button style={{...s.logoutBtn, minHeight: '44px', padding: isMobile ? '10px 14px' : '8px 16px'}} onClick={handleLogout}>
             Logout
@@ -892,9 +892,9 @@ export default function AgentDashboard() {
               </div>
             </div>
 
-            <div style={s.profileDetail}><span>✉️</span> {user?.email || "No email provided"}</div>
-            <div style={s.profileDetail}><span>📞</span> {user?.phone || "No phone provided"}</div>
-            <div style={s.profileDetail}><span>📍</span> {user?.county || "Kenya"}</div>
+            <div style={s.profileDetail}>{user?.email || "No email provided"}</div>
+            <div style={s.profileDetail}>{user?.phone || "No phone provided"}</div>
+            <div style={s.profileDetail}>{user?.county || "Kenya"}</div>
           </div>
           <div style={{...s.statsGrid, justifyContent: isMobile ? 'center' : 'flex-start'}}>
             <div style={s.statBox}>
@@ -929,7 +929,6 @@ export default function AgentDashboard() {
             boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
           }}>
             <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px'}}>
-              <div style={{fontSize: '24px'}}>🏠</div>
               <div>
                 <div style={{fontSize: '24px', fontWeight: 800, color: '#1f2937'}}>{myHouses.length}</div>
                 <div style={{fontSize: '12px', color: '#6b7280', fontWeight: 600}}>Total Listings</div>
@@ -947,7 +946,6 @@ export default function AgentDashboard() {
             boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
           }}>
             <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px'}}>
-              <div style={{fontSize: '24px'}}>👁️</div>
               <div>
                 <div style={{fontSize: '24px', fontWeight: 800, color: '#1f2937'}}>{myHouses.reduce((sum, h) => sum + (h.views || 0), 0)}</div>
                 <div style={{fontSize: '12px', color: '#6b7280', fontWeight: 600}}>Total Views</div>
@@ -965,7 +963,6 @@ export default function AgentDashboard() {
             boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
           }}>
             <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px'}}>
-              <div style={{fontSize: '24px'}}>📱</div>
               <div>
                 <div style={{fontSize: '24px', fontWeight: 800, color: '#1f2937'}}>{myHouses.reduce((sum, h) => sum + (h.qrScans || 0), 0)}</div>
                 <div style={{fontSize: '12px', color: '#6b7280', fontWeight: 600}}>QR Scans</div>
@@ -983,7 +980,6 @@ export default function AgentDashboard() {
             boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
           }}>
             <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px'}}>
-              <div style={{fontSize: '24px'}}>📤</div>
               <div>
                 <div style={{fontSize: '24px', fontWeight: 800, color: '#1f2937'}}>{myRequests.filter(r => r.status === 'pending').length}</div>
                 <div style={{fontSize: '12px', color: '#6b7280', fontWeight: 600}}>Pending Requests</div>
@@ -997,7 +993,7 @@ export default function AgentDashboard() {
             style={{ ...s.tab, ...(activeTab === 'houses' ? s.tabActive : {}), whiteSpace: 'nowrap', padding: isMobile ? '10px 12px' : '12px 20px', minHeight: '44px', fontSize: isMobile ? '12px' : '14px' }}
             onClick={() => setActiveTab("houses")}
           >
-            🏠 My Houses ({myHouses.length})
+            My Houses ({myHouses.length})
           </button>
           <button
             style={{ ...s.tab, ...(activeTab === 'hosts' ? s.tabActive : {}), whiteSpace: 'nowrap', padding: isMobile ? '10px 12px' : '12px 20px', minHeight: '44px', fontSize: isMobile ? '12px' : '14px' }}
@@ -1107,7 +1103,6 @@ export default function AgentDashboard() {
 
             {filteredAndSortedHouses().length === 0 && myHouses.length === 0 ? (
               <div style={s.emptyCard}>
-                <div style={{ fontSize: "48px", marginBottom: "12px" }}>🏠</div>
                 <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#1f2937", marginBottom: "8px" }}>
                   No Houses Uploaded Yet
                 </h3>
@@ -1123,7 +1118,6 @@ export default function AgentDashboard() {
               </div>
             ) : filteredAndSortedHouses().length === 0 ? (
               <div style={{...s.emptyCard, border: '1px solid #e5e7eb'}}>
-                <div style={{ fontSize: "36px", marginBottom: "12px" }}>🔍</div>
                 <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#1f2937", marginBottom: "8px" }}>
                   No houses match your filters
                 </h3>
@@ -1155,8 +1149,7 @@ export default function AgentDashboard() {
                         {thumb ? (
                           <img src={thumb} alt={house.title} style={s.houseImg} />
                         ) : (
-                          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8", fontSize: "36px" }}>
-                            🏠
+                          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8", fontSize: "36px", background: "#f1f5f9" }}>
                           </div>
                         )}
                         <span style={s.houseTypePill}>{house.propertyType || "Rental"}</span>
@@ -1192,7 +1185,7 @@ export default function AgentDashboard() {
                       <div style={s.houseContent}>
                         <h3 style={s.houseTitle} title={house.title}>{house.title}</h3>
                         <div style={s.houseLocation}>
-                          <span>📍</span> {house.location || house.county || "Kenya"}
+                          {house.location || house.county || "Kenya"}
                         </div>
                         <div style={s.housePrice}>
                           KES {Number(house.price || 0).toLocaleString()} <span style={{ fontSize: "12px", fontWeight: 500, color: "#6b7280" }}>/ {house.leaseType || "month"}</span>
@@ -1244,7 +1237,7 @@ export default function AgentDashboard() {
                             title="Edit house listing"
                             aria-label="Edit house listing"
                           >
-                            Edit ✏️
+                            Edit
                           </button>
                           <button
                             style={{...s.delBtn, minHeight: '44px', transition: 'all 0.2s ease'}}
@@ -1253,7 +1246,7 @@ export default function AgentDashboard() {
                             title="Delete house listing"
                             aria-label="Delete house listing"
                           >
-                            {deleteLoading === house._id ? "..." : "Delete 🗑️"}
+                            {deleteLoading === house._id ? "..." : "Delete"}
                           </button>
                         </div>
                       </div>
@@ -1270,7 +1263,6 @@ export default function AgentDashboard() {
             <h2 style={s.sectionTitle}>Accommodation Hosts</h2>
             {providers.length === 0 ? (
               <div style={s.emptyCard}>
-                <div style={{ fontSize: "48px", marginBottom: "12px" }}>🏨</div>
                 <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#1f2937", marginBottom: "8px" }}>
                   No accommodation hosts yet
                 </h3>
@@ -1304,10 +1296,10 @@ export default function AgentDashboard() {
                           <div style={s.cardEmail}>{provider.email}</div>
                         </div>
                       </div>
-                      {provider.phone && <div style={s.cardPhone}>📞 {provider.phone}</div>}
-                      <div style={s.cardCounty}>🏨 Accommodation Host</div>
+                      {provider.phone && <div style={s.cardPhone}>{provider.phone}</div>}
+                      <div style={s.cardCounty}>Accommodation Host</div>
                       {(provider.county || provider.location || provider.agentProfile?.county) && (
-                        <div style={s.cardCounty}>📍 {provider.county || provider.location || provider.agentProfile?.county}</div>
+                        <div style={s.cardCounty}>{provider.county || provider.location || provider.agentProfile?.county}</div>
                       )}
                       {status && (
                         <div
@@ -1344,7 +1336,6 @@ export default function AgentDashboard() {
             <h2 style={s.sectionTitle}>Landlords</h2>
             {landlords.length === 0 ? (
               <div style={s.emptyCard}>
-                <div style={{ fontSize: "48px", marginBottom: "12px" }}>🏠</div>
                 <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#1f2937", marginBottom: "8px" }}>
                   No landlords found
                 </h3>
@@ -1378,10 +1369,10 @@ export default function AgentDashboard() {
                           <div style={s.cardEmail}>{landlord.email}</div>
                         </div>
                       </div>
-                      {landlord.phone && <div style={s.cardPhone}>📞 {landlord.phone}</div>}
-                      <div style={s.cardCounty}>🏠 Landlord ({landlord.landlordType || "General"})</div>
+                      {landlord.phone && <div style={s.cardPhone}>{landlord.phone}</div>}
+                      <div style={s.cardCounty}>Landlord ({landlord.landlordType || "General"})</div>
                       {(landlord.county || landlord.location || landlord.agentProfile?.county) && (
-                        <div style={s.cardCounty}>📍 {landlord.county || landlord.location || landlord.agentProfile?.county}</div>
+                        <div style={s.cardCounty}>{landlord.county || landlord.location || landlord.agentProfile?.county}</div>
                       )}
                       {status && (
                         <div
@@ -1450,7 +1441,6 @@ export default function AgentDashboard() {
 
             {myRequests.length === 0 ? (
               <div style={s.emptyCard}>
-                <div style={{ fontSize: "48px", marginBottom: "12px" }}>📤</div>
                 <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#1f2937", marginBottom: "8px" }}>
                   No requests sent
                 </h3>
