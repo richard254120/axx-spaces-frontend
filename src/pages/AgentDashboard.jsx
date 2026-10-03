@@ -656,21 +656,21 @@ export default function AgentDashboard() {
         </div>
       </div>
 
-      <div style={s.container}>
+      <div style={{...s.container, padding: isMobile ? '12px 12px' : '24px'}}>
         {/* Profile Overview Section */}
-        <div style={s.profileSection}>
+        <div style={{...s.profileSection, flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '16px' : '24px', padding: isMobile ? '16px' : '24px', alignItems: isMobile ? 'center' : 'flex-start'}}>
           {user?.profileImage ? (
-            <img src={resolveMediaUrl(user.profileImage)} alt={user.name} style={s.profileImg} />
+            <img src={resolveMediaUrl(user.profileImage)} alt={user.name} style={{...s.profileImg, width: isMobile ? '72px' : '100px', height: isMobile ? '72px' : '100px'}} />
           ) : (
-            <div style={s.profileImg}>{user?.name?.charAt(0).toUpperCase() || "A"}</div>
+            <div style={{...s.profileImg, width: isMobile ? '72px' : '100px', height: isMobile ? '72px' : '100px', fontSize: isMobile ? '26px' : '36px'}}>{user?.name?.charAt(0).toUpperCase() || "A"}</div>
           )}
           <div style={s.profileInfo}>
-            <div style={s.profileName}>{user?.name || "Agent"}</div>
+            <div style={{...s.profileName, fontSize: isMobile ? '18px' : '24px'}}>{user?.name || "Agent"}</div>
             <div style={s.profileDetail}><span>✉️</span> {user?.email || "No email provided"}</div>
             <div style={s.profileDetail}><span>📞</span> {user?.phone || "No phone provided"}</div>
             <div style={s.profileDetail}><span>📍</span> {user?.county || "Kenya"}</div>
           </div>
-          <div style={s.statsGrid}>
+          <div style={{...s.statsGrid, justifyContent: isMobile ? 'center' : 'flex-start'}}>
             <div style={s.statBox}>
               <div style={s.statValue}>{myHouses.length}</div>
               <div style={s.statLabel}>Listings</div>
@@ -686,27 +686,27 @@ export default function AgentDashboard() {
           </div>
         </div>
 
-        <div style={s.tabs}>
+        <div style={{...s.tabs, overflowX: isMobile ? 'auto' : 'visible', WebkitOverflowScrolling: 'touch', flexWrap: 'nowrap', paddingBottom: isMobile ? '2px' : '0', gap: isMobile ? '4px' : '12px'}}>
           <button
-            style={{ ...s.tab, ...(activeTab === "houses" ? s.tabActive : {}) }}
+            style={{ ...s.tab, ...(activeTab === 'houses' ? s.tabActive : {}), whiteSpace: 'nowrap', padding: isMobile ? '10px 12px' : '12px 20px', minHeight: '44px', fontSize: isMobile ? '12px' : '14px' }}
             onClick={() => setActiveTab("houses")}
           >
             🏠 My Houses ({myHouses.length})
           </button>
           <button
-            style={{ ...s.tab, ...(activeTab === "hosts" ? s.tabActive : {}) }}
+            style={{ ...s.tab, ...(activeTab === 'hosts' ? s.tabActive : {}), whiteSpace: 'nowrap', padding: isMobile ? '10px 12px' : '12px 20px', minHeight: '44px', fontSize: isMobile ? '12px' : '14px' }}
             onClick={() => setActiveTab("hosts")}
           >
             Accommodation Hosts ({providers.length})
           </button>
           <button
-            style={{ ...s.tab, ...(activeTab === "landlords" ? s.tabActive : {}) }}
+            style={{ ...s.tab, ...(activeTab === 'landlords' ? s.tabActive : {}), whiteSpace: 'nowrap', padding: isMobile ? '10px 12px' : '12px 20px', minHeight: '44px', fontSize: isMobile ? '12px' : '14px' }}
             onClick={() => setActiveTab("landlords")}
           >
             Landlords ({landlords.length})
           </button>
           <button
-            style={{ ...s.tab, ...(activeTab === "requests" ? s.tabActive : {}) }}
+            style={{ ...s.tab, ...(activeTab === 'requests' ? s.tabActive : {}), whiteSpace: 'nowrap', padding: isMobile ? '10px 12px' : '12px 20px', minHeight: '44px', fontSize: isMobile ? '12px' : '14px' }}
             onClick={() => setActiveTab("requests")}
           >
             My Requests ({myRequests.length})
@@ -715,7 +715,7 @@ export default function AgentDashboard() {
 
         {activeTab === "houses" && (
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "10px" }}>
+            <div style={{display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', marginBottom: '16px', gap: '10px'}}>
               <div>
                 <h2 style={{ ...s.sectionTitle, marginBottom: "4px" }}>My Uploaded Houses &amp; Properties</h2>
                 <p style={{ margin: 0, fontSize: "13px", color: "#6b7280" }}>
@@ -744,7 +744,7 @@ export default function AgentDashboard() {
                 </button>
               </div>
             ) : (
-              <div style={s.houseGrid}>
+              <div style={{...s.houseGrid, gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(290px, 1fr))'}}>
                 {myHouses.map((house) => {
                   const isApproved = house.status === "approved";
                   const isRejected = house.status === "rejected";
@@ -793,10 +793,10 @@ export default function AgentDashboard() {
                           <span style={{ color: "#2563eb" }}><strong>{house.qrScans || 0}</strong> QR Scans</span>
                         </div>
 
-                        <div style={s.houseActions}>
+                        <div style={{...s.houseActions, flexWrap: 'wrap'}}>
                           {isApproved && (
                             <button
-                              style={s.viewBtn}
+                              style={{...s.viewBtn, minHeight: '44px'}}
                               onClick={() => window.open(`/listings?property=${house._id}`, "_blank")}
                               title="View live listing"
                             >
@@ -804,21 +804,21 @@ export default function AgentDashboard() {
                             </button>
                           )}
                           <button
-                            style={s.qrBtn}
+                            style={{...s.qrBtn, minHeight: '44px'}}
                             onClick={() => setQrModalProperty(house)}
                             title="View QR Poster"
                           >
                             QR Poster
                           </button>
                           <button
-                            style={s.editBtn}
+                            style={{...s.editBtn, minHeight: '44px'}}
                             onClick={() => navigate(`/property/edit/${house._id}`)}
                             title="Edit house listing"
                           >
                             Edit ✏️
                           </button>
                           <button
-                            style={s.delBtn}
+                            style={{...s.delBtn, minHeight: '44px'}}
                             onClick={() => handleDeleteHouse(house._id)}
                             disabled={deleteLoading === house._id}
                             title="Delete house listing"
@@ -841,7 +841,7 @@ export default function AgentDashboard() {
             {providers.length === 0 ? (
               <div style={s.empty}>No accommodation hosts found</div>
             ) : (
-              <div style={s.grid}>
+              <div style={{...s.grid, gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))'}}>
                 {providers.map((provider) => {
                   const status = getRequestStatus(provider._id);
                   return (
@@ -876,7 +876,7 @@ export default function AgentDashboard() {
                       )}
                       {!status && (
                         <button
-                          style={s.requestBtn}
+                          style={{...s.requestBtn, minHeight: '44px'}}
                           onClick={() => setSelectedProvider(provider)}
                         >
                           Send Request
@@ -896,7 +896,7 @@ export default function AgentDashboard() {
             {landlords.length === 0 ? (
               <div style={s.empty}>No landlords found</div>
             ) : (
-              <div style={s.grid}>
+              <div style={{...s.grid, gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))'}}>
                 {landlords.map((landlord) => {
                   const status = getRequestStatus(landlord._id);
                   return (
@@ -931,7 +931,7 @@ export default function AgentDashboard() {
                       )}
                       {!status && (
                         <button
-                          style={s.requestBtn}
+                          style={{...s.requestBtn, minHeight: '44px'}}
                           onClick={() => setSelectedProvider(landlord)}
                         >
                           Send Request
@@ -951,7 +951,7 @@ export default function AgentDashboard() {
             {myRequests.length === 0 ? (
               <div style={s.empty}>No requests sent yet</div>
             ) : (
-              <div style={s.grid}>
+              <div style={{...s.grid, gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))'}}>
                 {myRequests.map((request) => (
                   <div key={request._id} style={s.card}>
                     <div style={s.cardHeader}>
@@ -997,8 +997,8 @@ export default function AgentDashboard() {
       </div>
 
       {selectedProvider && (
-        <div style={s.modal}>
-          <div style={s.modalContent}>
+        <div style={{...s.modal, alignItems: isMobile ? 'flex-end' : 'center'}}>
+          <div style={{...s.modalContent, width: isMobile ? '100%' : undefined, maxWidth: isMobile ? '100%' : '500px', margin: isMobile ? '0' : undefined, borderRadius: isMobile ? '16px 16px 0 0' : '12px'}}>
             <h3 style={s.modalTitle}>
               Send Request to {selectedProvider.name}
             </h3>
@@ -1013,9 +1013,9 @@ export default function AgentDashboard() {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
             />
-            <div style={s.modalButtons}>
+            <div style={{...s.modalButtons, flexDirection: isMobile ? 'column' : 'row'}}>
               <button
-                style={{ ...s.modalBtn, ...s.modalBtnSecondary }}
+                style={{ ...s.modalBtn, ...s.modalBtnSecondary, minHeight: '44px' }}
                 onClick={() => {
                   setSelectedProvider(null);
                   setMessage("");
@@ -1024,7 +1024,7 @@ export default function AgentDashboard() {
                 Cancel
               </button>
               <button
-                style={{ ...s.modalBtn, ...s.modalBtnPrimary }}
+                style={{ ...s.modalBtn, ...s.modalBtnPrimary, minHeight: '44px' }}
                 onClick={handleSendRequest}
                 disabled={sending || !message}
               >
