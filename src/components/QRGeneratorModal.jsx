@@ -402,44 +402,10 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
         return;
       }
 
-      const ctx = qrCanvas.getContext("2d");
-      const logoImg = new Image();
-      logoImg.src = logo;
-      logoImg.onload = () => {
-        const cardSize = 56;
-        const x = (qrCanvas.width - cardSize) / 2;
-        const y = (qrCanvas.height - cardSize) / 2;
-
-        ctx.fillStyle = "#ffffff";
-        ctx.beginPath();
-        const radius = 6;
-        ctx.moveTo(x + radius, y);
-        ctx.lineTo(x + cardSize - radius, y);
-        ctx.quadraticCurveTo(x + cardSize, y, x + cardSize, y + radius);
-        ctx.lineTo(x + cardSize, y + cardSize - radius);
-        ctx.quadraticCurveTo(x + cardSize, y + cardSize, x + cardSize - radius, y + cardSize);
-        ctx.lineTo(x + radius, y + cardSize);
-        ctx.quadraticCurveTo(x, y + cardSize, x, y + cardSize - radius);
-        ctx.lineTo(x, y + radius);
-        ctx.quadraticCurveTo(x, y, x + radius, y);
-        ctx.closePath();
-        ctx.fill();
-
-        ctx.strokeStyle = "#d9383a";
-        ctx.lineWidth = 2.5;
-        ctx.stroke();
-
-        const logoSize = 38;
-        const logoX = x + (cardSize - logoSize) / 2;
-        const logoY = y + (cardSize - logoSize) / 2;
-        ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
-
-        const dataUrl = qrCanvas.toDataURL("image/png");
-        setQrCodeDataUrl(dataUrl);
-
-        setQrLoaded(true);
-        drawDownloadableCanvases();
-      };
+      const dataUrl = qrCanvas.toDataURL("image/png");
+      setQrCodeDataUrl(dataUrl);
+      setQrLoaded(true);
+      drawDownloadableCanvases();
     });
   };
 
@@ -464,12 +430,9 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
     qrCtx.fillStyle = "#64748b";
     qrCtx.fillText("Scan to view property details", 175, 395);
 
-    const logoImg = new Image();
-    logoImg.src = logo;
-    logoImg.onload = () => {
-      // ── High-Res Poster Canvas (800x1130) ──
-      posterCtx.fillStyle = "#ffffff";
-      posterCtx.fillRect(0, 0, posterCanvas.width, posterCanvas.height);
+    // ── High-Res Poster Canvas (800x1130) ──
+    posterCtx.fillStyle = "#ffffff";
+    posterCtx.fillRect(0, 0, posterCanvas.width, posterCanvas.height);
 
       // Helper function to draw round rects
       const drawRoundRect = (ctx, x, y, width, height, radius, fill, stroke, strokeColor, strokeWidth) => {
@@ -541,16 +504,9 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
       posterCtx.closePath();
       posterCtx.fill();
 
-      // Logo Section (Centered)
-      const logoW = 100;
-      const logoH = 100;
-      const logoX = (posterCanvas.width - logoW) / 2;
-      const logoY = 50;
-      posterCtx.drawImage(logoImg, logoX, logoY, logoW, logoH);
-
       // Brand name
       posterCtx.font = "900 42px 'Inter', sans-serif";
-      const brandY = 195;
+      const brandY = 90;
       const text1 = "AXX ";
       const text2 = "SPACE";
       const w1 = posterCtx.measureText(text1).width;
@@ -568,25 +524,25 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
       posterCtx.textAlign = "center";
       posterCtx.fillStyle = "#475569";
       posterCtx.font = "500 16px 'Inter', sans-serif";
-      posterCtx.fillText("Space hunting bila stress", posterCanvas.width / 2, 222);
+      posterCtx.fillText("Space hunting bila stress", posterCanvas.width / 2, 117);
 
       // Red separator line
       posterCtx.fillStyle = "#d9383a";
-      posterCtx.fillRect(40, 240, 720, 4);
+      posterCtx.fillRect(40, 138, 720, 4);
 
       // Main title: "ROOM/HOUSE AVAILABLE"
       posterCtx.textAlign = "center";
       posterCtx.fillStyle = "#081A34";
       posterCtx.font = "900 60px 'Inter', sans-serif";
-      posterCtx.fillText("ROOM/HOUSE", posterCanvas.width / 2, 330);
+      posterCtx.fillText("ROOM/HOUSE", posterCanvas.width / 2, 228);
 
       posterCtx.fillStyle = "#d9383a";
       posterCtx.font = "900 85px 'Inter', sans-serif";
-      posterCtx.fillText("AVAILABLE", posterCanvas.width / 2, 420);
+      posterCtx.fillText("AVAILABLE", posterCanvas.width / 2, 318);
 
       // Draw scalloped stamp badge (Listed On AXXSPACE)
       const badgeX = 650;
-      const badgeY = 350;
+      const badgeY = 248;
       const badgeRadius = 45;
 
       drawScallopBadge(posterCtx, badgeX, badgeY, badgeRadius, 18, 4, "#081A34", "#d9383a", 3);
@@ -630,13 +586,13 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
       posterCtx.fillStyle = "#081A34";
       posterCtx.textAlign = "center";
       posterCtx.font = "800 20px 'Inter', sans-serif";
-      posterCtx.fillText("SCAN TO VIEW HOUSE DETAILS AND CONTACTS", posterCanvas.width / 2, 480);
+      posterCtx.fillText("SCAN TO VIEW HOUSE DETAILS AND CONTACTS", posterCanvas.width / 2, 378);
 
       // QR Code Box with red border
       const qrBoxW = 296;
       const qrBoxH = 296;
       const qrBoxX = (posterCanvas.width - qrBoxW) / 2;
-      const qrBoxY = 515;
+      const qrBoxY = 413;
       const qrBoxR = 10;
 
       // Fill white round rect
@@ -650,13 +606,13 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
       posterCtx.fillStyle = "#081A34";
       posterCtx.textAlign = "center";
       posterCtx.font = "800 16px 'Inter', sans-serif";
-      posterCtx.fillText("OR VISIT", posterCanvas.width / 2, 850);
+      posterCtx.fillText("OR VISIT", posterCanvas.width / 2, 748);
 
       // www.axxspace.com Pill
       const pillW = 280;
       const pillH = 44;
       const pillX = (posterCanvas.width - pillW) / 2;
-      const pillY = 870;
+      const pillY = 768;
       const pillR = 22;
 
       // Fill white round rect with navy border
@@ -702,7 +658,7 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
       posterCtx.fillText("www.axxspace.com", pillX + 44, pillY + 28);
 
       // Contact Footer row
-      const contactY = 960;
+      const contactY = 858;
       posterCtx.textAlign = "left";
       posterCtx.font = "800 15px 'Inter', sans-serif";
 
@@ -781,21 +737,20 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
       // Red bottom-left triangle
       posterCtx.fillStyle = "#d9383a";
       posterCtx.beginPath();
-      posterCtx.moveTo(0, posterCanvas.height - 35);
-      posterCtx.lineTo(240, posterCanvas.height);
-      posterCtx.lineTo(0, posterCanvas.height);
+      posterCtx.moveTo(0, 963);
+      posterCtx.lineTo(240, 1130);
+      posterCtx.lineTo(0, 1130);
       posterCtx.closePath();
       posterCtx.fill();
 
       // Navy bottom-right triangle
       posterCtx.fillStyle = "#081A34";
       posterCtx.beginPath();
-      posterCtx.moveTo(240, posterCanvas.height);
-      posterCtx.lineTo(posterCanvas.width, posterCanvas.height - 35);
-      posterCtx.lineTo(posterCanvas.width, posterCanvas.height);
+      posterCtx.moveTo(240, 1130);
+      posterCtx.lineTo(posterCanvas.width, 1095);
+      posterCtx.lineTo(posterCanvas.width, 1130);
       posterCtx.closePath();
       posterCtx.fill();
-    };
   };
 
   const downloadQR = () => {
