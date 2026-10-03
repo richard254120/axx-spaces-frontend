@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { resolveMediaUrl } from "../utils/fileLinks";
 import QRGeneratorModal from "../components/QRGeneratorModal";
+import AgentQRPosterModal from "../components/AgentQRPosterModal";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -491,6 +492,7 @@ export default function AgentDashboard() {
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [qrModalProperty, setQrModalProperty] = useState(null);
+  const [showAgentQRPoster, setShowAgentQRPoster] = useState(false);
 
   useEffect(() => {
     if (!user || user.role !== "agent") {
@@ -626,6 +628,20 @@ export default function AgentDashboard() {
         <div style={s.headerActions}>
           <button style={s.uploadBtn} onClick={() => navigate("/upload")}>
             + Upload House
+          </button>
+          <button
+            style={{
+              ...s.uploadBtn,
+              background: "linear-gradient(135deg,#d9383a,#b91c1c)",
+              border: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+            onClick={() => setShowAgentQRPoster(true)}
+            title="Generate My Agent QR Poster"
+          >
+            🪪 My QR Poster
           </button>
           <button style={s.logoutBtn} onClick={handleLogout}>
             Logout
@@ -1019,6 +1035,12 @@ export default function AgentDashboard() {
           property={qrModalProperty}
         />
       )}
+
+      <AgentQRPosterModal
+        isOpen={showAgentQRPoster}
+        onClose={() => setShowAgentQRPoster(false)}
+        agent={user}
+      />
     </div>
   );
 }
