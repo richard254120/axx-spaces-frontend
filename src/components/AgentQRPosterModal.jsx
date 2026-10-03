@@ -385,41 +385,10 @@ export default function AgentQRPosterModal({ isOpen, onClose, agent }) {
     }, (err) => {
       if (err) { console.error("QR error:", err); return; }
 
-      const ctx = canvas.getContext("2d");
-      const logoImg = new Image();
-      logoImg.src = logo;
-      logoImg.onload = () => {
-        const cardSize = 56;
-        const x = (canvas.width - cardSize) / 2;
-        const y = (canvas.height - cardSize) / 2;
-
-        // White rounded card background
-        ctx.fillStyle = "#ffffff";
-        ctx.beginPath();
-        const r = 6;
-        ctx.moveTo(x + r, y);
-        ctx.lineTo(x + cardSize - r, y);
-        ctx.quadraticCurveTo(x + cardSize, y, x + cardSize, y + r);
-        ctx.lineTo(x + cardSize, y + cardSize - r);
-        ctx.quadraticCurveTo(x + cardSize, y + cardSize, x + cardSize - r, y + cardSize);
-        ctx.lineTo(x + r, y + cardSize);
-        ctx.quadraticCurveTo(x, y + cardSize, x, y + cardSize - r);
-        ctx.lineTo(x, y + r);
-        ctx.quadraticCurveTo(x, y, x + r, y);
-        ctx.closePath();
-        ctx.fill();
-        ctx.strokeStyle = "#d9383a";
-        ctx.lineWidth = 2.5;
-        ctx.stroke();
-
-        const ls = 38;
-        ctx.drawImage(logoImg, x + (cardSize - ls) / 2, y + (cardSize - ls) / 2, ls, ls);
-
-        const dataUrl = canvas.toDataURL("image/png");
-        setQrCodeDataUrl(dataUrl);
-        setQrLoaded(true);
-        drawCanvases(canvas, logoImg);
-      };
+      const dataUrl = canvas.toDataURL("image/png");
+      setQrCodeDataUrl(dataUrl);
+      setQrLoaded(true);
+      drawCanvases(canvas);
     });
   };
 
@@ -453,7 +422,7 @@ export default function AgentQRPosterModal({ isOpen, onClose, agent }) {
     if (strokeCol) { ctx.strokeStyle = strokeCol; ctx.lineWidth = lw; ctx.stroke(); }
   };
 
-  const drawCanvases = (qrCanvas, logoImg) => {
+  const drawCanvases = (qrCanvas) => {
     const dlQr  = downloadQrRef.current;
     const poster = posterCanvasRef.current;
     if (!dlQr || !poster) return;
@@ -474,6 +443,12 @@ export default function AgentQRPosterModal({ isOpen, onClose, agent }) {
     qCtx.fillText("Scan to view agent profile", 175, 395);
 
     // ── High-res poster (800 × 1130) ──
+    const logoImg = new Image();
+    logoImg.src = logo;
+    logoImg.onload = () => drawPosterCanvas(poster, qrCanvas, logoImg, agentName);
+  };
+
+  const drawPosterCanvas = (poster, qrCanvas, logoImg, agentName) => {
     const pCtx = poster.getContext("2d");
     pCtx.fillStyle = "#ffffff";
     pCtx.fillRect(0, 0, poster.width, poster.height);
@@ -501,9 +476,6 @@ export default function AgentQRPosterModal({ isOpen, onClose, agent }) {
     pCtx.closePath();
     pCtx.fill();
 
-    // Logo
-    pCtx.drawImage(logoImg, (PW - 100) / 2, 50, 100, 100);
-
     // Brand name
     pCtx.font = "900 42px 'Inter', sans-serif";
     const t1 = "AXX ", t2 = "SPACE";
@@ -512,32 +484,32 @@ export default function AgentQRPosterModal({ isOpen, onClose, agent }) {
     const bx = (PW - (w1 + w2)) / 2;
     pCtx.textAlign = "left";
     pCtx.fillStyle = "#d9383a";
-    pCtx.fillText(t1, bx, 195);
+    pCtx.fillText(t1, bx, 90);
     pCtx.fillStyle = "#081A34";
-    pCtx.fillText(t2, bx + w1, 195);
+    pCtx.fillText(t2, bx + w1, 90);
 
     pCtx.textAlign = "center";
     pCtx.fillStyle = "#475569";
     pCtx.font = "500 16px 'Inter', sans-serif";
-    pCtx.fillText("Space hunting bila stress", PW / 2, 222);
+    pCtx.fillText("Space hunting bila stress", PW / 2, 118);
 
     // Red separator
     pCtx.fillStyle = "#d9383a";
-    pCtx.fillRect(40, 240, 720, 4);
+    pCtx.fillRect(40, 138, 720, 4);
 
     // "VERIFIED" in navy
     pCtx.textAlign = "center";
     pCtx.fillStyle = "#081A34";
     pCtx.font = "900 60px 'Inter', sans-serif";
-    pCtx.fillText("VERIFIED", PW / 2, 330);
+    pCtx.fillText("VERIFIED", PW / 2, 228);
 
     // "AGENT" in red
     pCtx.fillStyle = "#d9383a";
     pCtx.font = "900 85px 'Inter', sans-serif";
-    pCtx.fillText("AGENT", PW / 2, 420);
+    pCtx.fillText("AGENT", PW / 2, 318);
 
-    // Scallop badge (top-right area) — briefcase icon
-    const bx2 = 650, by2 = 350, br = 45;
+    // Scallop badge — briefcase icon
+    const bx2 = 650, by2 = 248, br = 45;
     drawScallop(pCtx, bx2, by2, br, 18, 4, "#081A34", "#d9383a", 3);
 
     // Briefcase body
@@ -571,17 +543,17 @@ export default function AgentQRPosterModal({ isOpen, onClose, agent }) {
     pCtx.fillStyle = "#081A34";
     pCtx.textAlign = "center";
     pCtx.font = "800 20px 'Inter', sans-serif";
-    pCtx.fillText("SCAN TO VIEW AGENT PROFILE AND LISTINGS", PW / 2, 480);
+    pCtx.fillText("SCAN TO VIEW AGENT PROFILE AND LISTINGS", PW / 2, 378);
 
     // QR box
     const qbW = 296, qbH = 296;
-    const qbX = (PW - qbW) / 2, qbY = 515;
+    const qbX = (PW - qbW) / 2, qbY = 413;
     pCtx.fillStyle = "#ffffff";
     drawRoundRect(pCtx, qbX, qbY, qbW, qbH, 10, true, true, "#d9383a", 4);
     pCtx.drawImage(qrCanvas, qbX + 16, qbY + 16, 264, 264);
 
     // Agent name strip
-    const stripY = 840;
+    const stripY = 738;
     pCtx.fillStyle = "#f0f4ff";
     pCtx.fillRect(0, stripY, PW, 42);
     pCtx.strokeStyle = "#dde4f0";
@@ -600,11 +572,11 @@ export default function AgentQRPosterModal({ isOpen, onClose, agent }) {
     pCtx.fillStyle = "#081A34";
     pCtx.textAlign = "center";
     pCtx.font = "800 16px 'Inter', sans-serif";
-    pCtx.fillText("OR VISIT", PW / 2, 920);
+    pCtx.fillText("OR VISIT", PW / 2, 820);
 
     // URL pill
     const pW2 = 280, pH2 = 44;
-    const pX2 = (PW - pW2) / 2, pY2 = 936;
+    const pX2 = (PW - pW2) / 2, pY2 = 836;
     pCtx.fillStyle = "#ffffff";
     drawRoundRect(pCtx, pX2, pY2, pW2, pH2, 22, true, true, "#081A34", 2);
     // Globe
