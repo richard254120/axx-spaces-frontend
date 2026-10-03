@@ -494,6 +494,13 @@ export default function AgentDashboard() {
   const [qrModalProperty, setQrModalProperty] = useState(null);
   const [showAgentQRPoster, setShowAgentQRPoster] = useState(false);
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   useEffect(() => {
     if (!user || user.role !== "agent") {
       navigate("/agent/login");
@@ -619,31 +626,31 @@ export default function AgentDashboard() {
 
   return (
     <div style={s.root}>
-      <div style={s.header}>
-        <div style={{ ...s.logo, cursor: "pointer" }} onClick={() => navigate("/")}>
+      <div style={{...s.header, flexWrap: 'wrap', gap: isMobile ? '10px' : '0', padding: isMobile ? '12px 16px' : '16px 24px'}}>
+        <div style={{...s.logo, cursor: 'pointer'}} onClick={() => navigate('/')}>
           <span style={s.logoAccent}>AXX</span>
           <span style={s.logoWord}>SPACE</span>
         </div>
-        <div style={s.headerTitle}>Agent Dashboard</div>
-        <div style={s.headerActions}>
-          <button style={s.uploadBtn} onClick={() => navigate("/upload")}>
+        <div style={{...s.headerTitle, fontSize: isMobile ? '15px' : '18px'}}>Agent Dashboard</div>
+        <div style={{...s.headerActions, flexWrap: 'wrap', gap: '8px'}}>
+          <button style={{...s.uploadBtn, padding: isMobile ? '10px 12px' : '8px 16px', fontSize: isMobile ? '12px' : '13px', minHeight: '44px'}} onClick={() => navigate('/upload')}>
             + Upload House
           </button>
           <button
-            style={{
-              ...s.uploadBtn,
-              background: "linear-gradient(135deg,#d9383a,#b91c1c)",
-              border: "none",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-            }}
+            style={{...s.uploadBtn,
+              background: 'linear-gradient(135deg,#d9383a,#b91c1c)',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: isMobile ? '10px 12px' : '8px 16px',
+              minHeight: '44px',}}
             onClick={() => setShowAgentQRPoster(true)}
             title="Generate My Agent QR Poster"
           >
-            🪪 My QR Poster
+            🪪 {isMobile ? 'QR' : 'My QR Poster'}
           </button>
-          <button style={s.logoutBtn} onClick={handleLogout}>
+          <button style={{...s.logoutBtn, minHeight: '44px', padding: isMobile ? '10px 14px' : '8px 16px'}} onClick={handleLogout}>
             Logout
           </button>
         </div>
