@@ -494,12 +494,105 @@ export default function AgentDashboard() {
   const [qrModalProperty, setQrModalProperty] = useState(null);
   const [showAgentQRPoster, setShowAgentQRPoster] = useState(false);
 
+  // New professional enhancements state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("newest");
+  const [hoveredCard, setHoveredCard] = useState(null);
+  const [hoveredProvider, setHoveredProvider] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(null);
+  const [toasts, setToasts] = useState([]);
+  const [requestStatusFilter, setRequestStatusFilter] = useState("all");
+
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Toast system functions
+  const addToast = (message, type = 'success') => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 3000);
+  };
+
+  // Relative date helper
+  const getRelativeTime = (date) => {
+    const now = new Date();
+    const then = new Date(date);
+    const diffMs = now - then;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    return then.toLocaleDateString();
+  };
+
+  // Profile completeness calculation
+  const calculateProfileCompleteness = () => {
+    let completeness = 0;
+    if (user?.name) completeness += 20;
+    if (user?.email) completeness += 20;
+    if (user?.phone) completeness += 20;
+    if (user?.county) completeness += 20;
+    if (user?.profileImage) completeness += 20;
+    return completeness;
+  };
+
+  // Filtered and sorted houses
+  const filteredAndSortedHouses = () => {
+    let filtered = [...myHouses];
+
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(h => 
+        h.title?.toLowerCase().includes(query) || 
+        h.location?.toLowerCase().includes(query) ||
+        h.county?.toLowerCase().includes(query)
+      );
+    }
+
+    // Status filter
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(h => h.status === statusFilter);
+    }
+
+    // Sort
+    if (sortBy === 'newest') {
+      filtered.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    } else if (sortBy === 'price-high') {
+      filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
+    } else if (sortBy === 'price-low') {
+      filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
+    } else if (sortBy === 'views') {
+      filtered.sort((a, b) => (b.views || 0) - (a.views || 0));
+    }
+
+    return filtered;
+  };
+
+  // Filtered requests
+  const filteredRequests = () => {
+    if (requestStatusFilter === 'all') return myRequests;
+    return myRequests.filter(r => r.status === requestStatusFilter);
+  };
+
+  // Count requests by status
+  const requestCounts = {
+    all: myRequests.length,
+    pending: myRequests.filter(r => r.status === 'pending').length,
+    accepted: myRequests.filter(r => r.status === 'accepted').length,
+    rejected: myRequests.filter(r => r.status === 'rejected').length,
+  };
 
   useEffect(() => {
     if (!user || user.role !== "agent") {
@@ -553,7 +646,12 @@ export default function AgentDashboard() {
   };
 
   const handleDeleteHouse = async (houseId) => {
-    if (!window.confirm("Are you sure you want to delete this house listing?")) return;
+    setConfirmDelete(houseId);
+  };
+
+  const confirmDeleteAction = async () => {
+    const houseId = confirmDelete;
+    setConfirmDelete(null);
     setDeleteLoading(houseId);
     try {
       const res = await fetch(`${API_BASE}/properties/${houseId}`, {
@@ -562,13 +660,14 @@ export default function AgentDashboard() {
       });
       if (res.ok) {
         setMyHouses((prev) => prev.filter((h) => h._id !== houseId));
+        addToast("House deleted successfully", "success");
       } else {
         const data = await res.json().catch(() => ({}));
-        alert(data.error || data.message || "Failed to delete listing");
+        addToast(data.error || data.message || "Failed to delete listing", "error");
       }
     } catch (err) {
       console.error("Error deleting house:", err);
-      alert("Network error while deleting house");
+      addToast("Network error while deleting house", "error");
     } finally {
       setDeleteLoading(null);
     }
@@ -602,9 +701,13 @@ export default function AgentDashboard() {
         setSelectedProvider(null);
         setMessage("");
         loadData();
+        addToast("Request sent successfully", "success");
+      } else {
+        addToast("Failed to send request", "error");
       }
     } catch (error) {
       console.error("Error sending request:", error);
+      addToast("Network error while sending request", "error");
     } finally {
       setSending(false);
     }
@@ -617,8 +720,66 @@ export default function AgentDashboard() {
   if (loading) {
     return (
       <div style={s.root}>
-        <div style={{ ...s.container, textAlign: "center", paddingTop: "100px" }}>
-          Loading...
+        <div style={s.header}>
+          <div style={s.logo}>
+            <span style={s.logoAccent}>AXX</span>
+            <span style={s.logoWord}>SPACE</span>
+          </div>
+          <div style={s.headerTitle}>Agent Dashboard</div>
+        </div>
+        <div style={{...s.container, paddingTop: '40px'}} aria-busy="true">
+          {/* Skeleton loaders */}
+          <div style={{display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px'}}>
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} style={{
+                background: 'linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%)',
+                backgroundSize: '200% 100%',
+                animation: 'shimmer 1.5s infinite',
+                height: '100px',
+                borderRadius: '12px',
+              }} />
+            ))}
+          </div>
+          <div style={{display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '20px'}}>
+            {[1, 2, 3].map(i => (
+              <div key={i} style={{
+                background: 'white',
+                borderRadius: '12px',
+                padding: '20px',
+                border: '1px solid #e5e7eb',
+              }}>
+                <div style={{
+                  background: 'linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%)',
+                  backgroundSize: '200% 100%',
+                  height: '180px',
+                  borderRadius: '8px',
+                  marginBottom: '12px',
+                }} />
+                <div style={{
+                  background: 'linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%)',
+                  backgroundSize: '200% 100%',
+                  height: '20px',
+                  borderRadius: '4px',
+                  marginBottom: '8px',
+                }} />
+                <div style={{
+                  background: 'linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%)',
+                  backgroundSize: '200% 100%',
+                  height: '16px',
+                  borderRadius: '4px',
+                  width: '60%',
+                }} />
+              </div>
+            ))}
+          </div>
+          <style>
+            {`
+              @keyframes shimmer {
+                0% { background-position: 200% 0; }
+                100% { background-position: -200% 0; }
+              }
+            `}
+          </style>
         </div>
       </div>
     );
