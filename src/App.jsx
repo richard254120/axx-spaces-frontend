@@ -72,6 +72,7 @@ import BecomeAgentPage from "./pages/BecomeAgentPage";
 import AgentRegister from "./pages/AgentRegister";
 import AgentLogin from "./pages/AgentLogin";
 import AgentDashboard from "./pages/AgentDashboard";
+import AgentProfilePage from "./pages/AgentProfilePage";
 import RegisterAgencyPage from "./pages/RegisterAgencyPage";
 import AgencyDashboard from "./pages/AgencyDashboard";
 
@@ -247,6 +248,7 @@ function App() {
       {/* ── AGENT ROUTES ── */}
       <Route path="/agent/register" element={<BareLayout><AgentRegister /></BareLayout>} />
       <Route path="/agent/login" element={<BareLayout><AgentLogin /></BareLayout>} />
+      <Route path="/agent/profile/:id" element={<PublicLayout><AgentProfilePage /></PublicLayout>} />
       <Route
         path="/agent/dashboard"
         element={
