@@ -134,49 +134,6 @@ const s = {
     color: "#6b7280",
     marginTop: "4px",
   },
-  cardBio: {
-    fontSize: "13px",
-    color: "#4b5563",
-    marginTop: "8px",
-    lineHeight: "1.5",
-  },
-  requestBtn: {
-    width: "100%",
-    padding: "10px",
-    background: "#fbbf24",
-    color: "#1f2937",
-    border: "none",
-    borderRadius: "8px",
-    fontWeight: 700,
-    fontSize: "13px",
-    cursor: "pointer",
-    marginTop: "12px",
-    transition: "all 0.2s ease",
-  },
-  requestBtnDisabled: {
-    opacity: 0.5,
-    cursor: "not-allowed",
-  },
-  statusBadge: {
-    display: "inline-block",
-    padding: "4px 10px",
-    borderRadius: "12px",
-    fontSize: "11px",
-    fontWeight: 700,
-    marginTop: "8px",
-  },
-  statusPending: {
-    background: "#fef3c7",
-    color: "#92400e",
-  },
-  statusAccepted: {
-    background: "#dcfce7",
-    color: "#166534",
-  },
-  statusRejected: {
-    background: "#fee2e2",
-    color: "#dc2626",
-  },
   modal: {
     position: "fixed",
     top: 0,
@@ -526,13 +483,7 @@ export default function AgentDashboard() {
   const [activeTab, setActiveTab] = useState("houses");
   const [myHouses, setMyHouses] = useState([]);
   const [deleteLoading, setDeleteLoading] = useState(null);
-  const [providers, setProviders] = useState([]);
-  const [landlords, setLandlords] = useState([]);
-  const [myRequests, setMyRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedProvider, setSelectedProvider] = useState(null);
-  const [message, setMessage] = useState("");
-  const [sending, setSending] = useState(false);
   const [qrModalProperty, setQrModalProperty] = useState(null);
   const [showAgentQRPoster, setShowAgentQRPoster] = useState(false);
 
@@ -541,10 +492,8 @@ export default function AgentDashboard() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [hoveredCard, setHoveredCard] = useState(null);
-  const [hoveredProvider, setHoveredProvider] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [toasts, setToasts] = useState([]);
-  const [requestStatusFilter, setRequestStatusFilter] = useState("all");
 
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   useEffect(() => {
@@ -566,22 +515,6 @@ export default function AgentDashboard() {
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id));
     }, 3000);
-  };
-
-  // Relative date helper
-  const getRelativeTime = (date) => {
-    const now = new Date();
-    const then = new Date(date);
-    const diffMs = now - then;
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-    return then.toLocaleDateString();
   };
 
   // Profile completeness calculation
@@ -628,18 +561,12 @@ export default function AgentDashboard() {
     return filtered;
   };
 
-  // Filtered requests
-  const filteredRequests = () => {
-    if (requestStatusFilter === 'all') return myRequests;
-    return myRequests.filter(r => r.status === requestStatusFilter);
-  };
-
   // Count requests by status
   const requestCounts = {
-    all: myRequests.length,
-    pending: myRequests.filter(r => r.status === 'pending').length,
-    accepted: myRequests.filter(r => r.status === 'accepted').length,
-    rejected: myRequests.filter(r => r.status === 'rejected').length,
+    all: 0,
+    pending: 0,
+    accepted: 0,
+    rejected: 0,
   };
 
   useEffect(() => {
@@ -665,26 +592,6 @@ export default function AgentDashboard() {
         }
       } catch (err) {
         console.error("Error loading agent houses:", err);
-      }
-
-      // Load all providers (hosts and landlords)
-      const providersRes = await fetch(`${API_BASE}/agent-requests/providers`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (providersRes.ok) {
-        const providersData = await providersRes.json();
-        // Split into hosts and landlords
-        setProviders(providersData.filter(p => p.role === "host"));
-        setLandlords(providersData.filter(p => p.role === "landlord"));
-      }
-
-      // Load my requests
-      const requestsRes = await fetch(`${API_BASE}/agent-requests`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (requestsRes.ok) {
-        const requestsData = await requestsRes.json();
-        setMyRequests(requestsData);
       }
     } catch (error) {
       console.error("Error loading data:", error);
@@ -718,46 +625,6 @@ export default function AgentDashboard() {
       addToast("Network error while deleting house", "error");
     } finally {
       setDeleteLoading(null);
-    }
-  };
-
-  const getRequestStatus = (providerId) => {
-    const request = myRequests.find(
-      (r) => r.provider._id === providerId || r.provider === providerId
-    );
-    return request ? request.status : null;
-  };
-
-  const handleSendRequest = async () => {
-    if (!selectedProvider || !message) return;
-
-    setSending(true);
-    try {
-      const response = await fetch(`${API_BASE}/agent-requests/send`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          providerId: selectedProvider._id,
-          message,
-        }),
-      });
-
-      if (response.ok) {
-        setSelectedProvider(null);
-        setMessage("");
-        loadData();
-        addToast("Request sent successfully", "success");
-      } else {
-        addToast("Failed to send request", "error");
-      }
-    } catch (error) {
-      console.error("Error sending request:", error);
-      addToast("Network error while sending request", "error");
-    } finally {
-      setSending(false);
     }
   };
 
@@ -1111,7 +978,7 @@ export default function AgentDashboard() {
         {/* Stats Overview Bar */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+          gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
           gap: '16px',
           marginBottom: '24px',
         }} role="status" aria-label="Dashboard statistics">
@@ -1165,23 +1032,6 @@ export default function AgentDashboard() {
               </div>
             </div>
           </div>
-          
-          <div style={{
-            background: 'white',
-            borderRadius: '12px',
-            padding: '20px',
-            border: '1px solid #e5e7eb',
-            borderTop: '3px solid',
-            borderImage: 'linear-gradient(90deg, #fbbf24, #f59e0b) 1',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-          }}>
-            <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px'}}>
-              <div>
-                <div style={{fontSize: '24px', fontWeight: 800, color: '#1f2937'}}>{myRequests.filter(r => r.status === 'pending').length}</div>
-                <div style={{fontSize: '12px', color: '#6b7280', fontWeight: 600}}>Pending Requests</div>
-              </div>
-            </div>
-          </div>
         </div>
 
         <div style={{...s.tabs, overflowX: isMobile ? 'auto' : 'visible', WebkitOverflowScrolling: 'touch', flexWrap: 'nowrap', paddingBottom: isMobile ? '2px' : '0', gap: isMobile ? '4px' : '12px'}}>
@@ -1190,24 +1040,6 @@ export default function AgentDashboard() {
             onClick={() => setActiveTab("houses")}
           >
             My Houses ({myHouses.length})
-          </button>
-          <button
-            style={{ ...s.tab, ...(activeTab === 'hosts' ? s.tabActive : {}), whiteSpace: 'nowrap', padding: isMobile ? '10px 12px' : '12px 20px', minHeight: '44px', fontSize: isMobile ? '12px' : '14px' }}
-            onClick={() => setActiveTab("hosts")}
-          >
-            Accommodation Hosts ({providers.length})
-          </button>
-          <button
-            style={{ ...s.tab, ...(activeTab === 'landlords' ? s.tabActive : {}), whiteSpace: 'nowrap', padding: isMobile ? '10px 12px' : '12px 20px', minHeight: '44px', fontSize: isMobile ? '12px' : '14px' }}
-            onClick={() => setActiveTab("landlords")}
-          >
-            Landlords ({landlords.length})
-          </button>
-          <button
-            style={{ ...s.tab, ...(activeTab === 'requests' ? s.tabActive : {}), whiteSpace: 'nowrap', padding: isMobile ? '10px 12px' : '12px 20px', minHeight: '44px', fontSize: isMobile ? '12px' : '14px' }}
-            onClick={() => setActiveTab("requests")}
-          >
-            My Requests ({myRequests.length})
           </button>
         </div>
 
@@ -1453,296 +1285,7 @@ export default function AgentDashboard() {
             )}
           </div>
         )}
-
-        {activeTab === "hosts" && (
-          <div>
-            <h2 style={s.sectionTitle}>Accommodation Hosts</h2>
-            {providers.length === 0 ? (
-              <div style={s.emptyCard}>
-                <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#1f2937", marginBottom: "8px" }}>
-                  No accommodation hosts yet
-                </h3>
-                <p style={{ fontSize: "14px", color: "#6b7280", lineHeight: 1.5, marginBottom: "20px" }}>
-                  Send requests to connect with accommodation hosts and expand your network
-                </p>
-              </div>
-            ) : (
-              <div style={{...s.grid, gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))'}}>
-                {providers.map((provider) => {
-                  const status = getRequestStatus(provider._id);
-                  const isHovered = hoveredProvider === provider._id;
-                  return (
-                    <div 
-                      key={provider._id} 
-                      style={{
-                        ...s.card,
-                        boxShadow: isHovered ? '0 8px 20px rgba(0,0,0,0.1)' : '0 2px 8px rgba(0,0,0,0.05)',
-                        transform: isHovered ? 'scale(1.02)' : 'scale(1)',
-                        transition: 'all 0.2s ease',
-                      }}
-                      onMouseEnter={() => setHoveredProvider(provider._id)}
-                      onMouseLeave={() => setHoveredProvider(null)}
-                    >
-                      <div style={s.cardHeader}>
-                        <div style={s.avatar}>
-                          {provider.name?.charAt(0).toUpperCase() || "H"}
-                        </div>
-                        <div>
-                          <div style={s.cardName}>{provider.name}</div>
-                          <div style={s.cardEmail}>{provider.email}</div>
-                        </div>
-                      </div>
-                      {provider.phone && <div style={s.cardPhone}>{provider.phone}</div>}
-                      <div style={s.cardCounty}>Accommodation Host</div>
-                      {(provider.county || provider.location || provider.agentProfile?.county) && (
-                        <div style={s.cardCounty}>{provider.county || provider.location || provider.agentProfile?.county}</div>
-                      )}
-                      {status && (
-                        <div
-                          style={{
-                            ...s.statusBadge,
-                            ...(status === "pending"
-                              ? s.statusPending
-                              : status === "accepted"
-                                ? s.statusAccepted
-                                : s.statusRejected),
-                          }}
-                        >
-                          {status.toUpperCase()}
-                        </div>
-                      )}
-                      {!status && (
-                        <button
-                          style={{...s.requestBtn, minHeight: '44px', transition: 'all 0.2s ease'}}
-                          onClick={() => setSelectedProvider(provider)}
-                        >
-                          Send Request
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === "landlords" && (
-          <div>
-            <h2 style={s.sectionTitle}>Landlords</h2>
-            {landlords.length === 0 ? (
-              <div style={s.emptyCard}>
-                <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#1f2937", marginBottom: "8px" }}>
-                  No landlords found
-                </h3>
-                <p style={{ fontSize: "14px", color: "#6b7280", lineHeight: 1.5, marginBottom: "20px" }}>
-                  Check back soon for landlord connections
-                </p>
-              </div>
-            ) : (
-              <div style={{...s.grid, gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))'}}>
-                {landlords.map((landlord) => {
-                  const status = getRequestStatus(landlord._id);
-                  const isHovered = hoveredProvider === landlord._id;
-                  return (
-                    <div 
-                      key={landlord._id} 
-                      style={{
-                        ...s.card,
-                        boxShadow: isHovered ? '0 8px 20px rgba(0,0,0,0.1)' : '0 2px 8px rgba(0,0,0,0.05)',
-                        transform: isHovered ? 'scale(1.02)' : 'scale(1)',
-                        transition: 'all 0.2s ease',
-                      }}
-                      onMouseEnter={() => setHoveredProvider(landlord._id)}
-                      onMouseLeave={() => setHoveredProvider(null)}
-                    >
-                      <div style={s.cardHeader}>
-                        <div style={s.avatar}>
-                          {landlord.name?.charAt(0).toUpperCase() || "L"}
-                        </div>
-                        <div>
-                          <div style={s.cardName}>{landlord.name}</div>
-                          <div style={s.cardEmail}>{landlord.email}</div>
-                        </div>
-                      </div>
-                      {landlord.phone && <div style={s.cardPhone}>{landlord.phone}</div>}
-                      <div style={s.cardCounty}>Landlord ({landlord.landlordType || "General"})</div>
-                      {(landlord.county || landlord.location || landlord.agentProfile?.county) && (
-                        <div style={s.cardCounty}>{landlord.county || landlord.location || landlord.agentProfile?.county}</div>
-                      )}
-                      {status && (
-                        <div
-                          style={{
-                            ...s.statusBadge,
-                            ...(status === "pending"
-                              ? s.statusPending
-                              : status === "accepted"
-                                ? s.statusAccepted
-                                : s.statusRejected),
-                          }}
-                        >
-                          {status.toUpperCase()}
-                        </div>
-                      )}
-                      {!status && (
-                        <button
-                          style={{...s.requestBtn, minHeight: '44px', transition: 'all 0.2s ease'}}
-                          onClick={() => setSelectedProvider(landlord)}
-                        >
-                          Send Request
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === "requests" && (
-          <div>
-            <h2 style={s.sectionTitle}>My Requests</h2>
-            
-            {/* Request filter buttons */}
-            {myRequests.length > 0 && (
-              <div style={{
-                display: 'flex',
-                gap: '10px',
-                marginBottom: '20px',
-                flexWrap: 'wrap',
-              }}>
-                {['all', 'pending', 'accepted', 'rejected'].map(filter => (
-                  <button
-                    key={filter}
-                    onClick={() => setRequestStatusFilter(filter)}
-                    style={{
-                      padding: '8px 16px',
-                      borderRadius: '20px',
-                      border: requestStatusFilter === filter ? '2px solid #fbbf24' : '2px solid #e5e7eb',
-                      background: requestStatusFilter === filter ? '#fbbf24' : 'white',
-                      color: requestStatusFilter === filter ? '#1f2937' : '#6b7280',
-                      fontWeight: 600,
-                      fontSize: '13px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      minHeight: '40px',
-                    }}
-                  >
-                    {filter.charAt(0).toUpperCase() + filter.slice(1)} ({requestCounts[filter]})
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {myRequests.length === 0 ? (
-              <div style={s.emptyCard}>
-                <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#1f2937", marginBottom: "8px" }}>
-                  No requests sent
-                </h3>
-                <p style={{ fontSize: "14px", color: "#6b7280", lineHeight: 1.5, marginBottom: "20px" }}>
-                  Visit the Hosts or Landlords tabs to send your first request
-                </p>
-              </div>
-            ) : (
-              <div style={{...s.grid, gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))'}}>
-                {filteredRequests().map((request) => {
-                  const isHovered = hoveredProvider === request._id;
-                  return (
-                    <div 
-                      key={request._id} 
-                      style={{
-                        ...s.card,
-                        boxShadow: isHovered ? '0 8px 20px rgba(0,0,0,0.1)' : '0 2px 8px rgba(0,0,0,0.05)',
-                        transform: isHovered ? 'scale(1.02)' : 'scale(1)',
-                        transition: 'all 0.2s ease',
-                      }}
-                      onMouseEnter={() => setHoveredProvider(request._id)}
-                      onMouseLeave={() => setHoveredProvider(null)}
-                    >
-                      <div style={s.cardHeader}>
-                        <div style={s.avatar}>
-                          {request.provider?.name?.charAt(0).toUpperCase() || "P"}
-                        </div>
-                        <div>
-                          <div style={s.cardName}>{request.provider?.name}</div>
-                          <div style={s.cardEmail}>{request.provider?.email}</div>
-                        </div>
-                      </div>
-                      {request.agentMessage && (
-                        <div style={s.cardBio}>
-                          <strong>Your message:</strong> {request.agentMessage}
-                        </div>
-                      )}
-                      {request.providerResponse && (
-                        <div style={s.cardBio}>
-                          <strong>Provider response:</strong> {request.providerResponse}
-                        </div>
-                      )}
-                      <div
-                        style={{
-                          ...s.statusBadge,
-                          ...(request.status === "pending"
-                            ? s.statusPending
-                            : request.status === "accepted"
-                              ? s.statusAccepted
-                              : s.statusRejected),
-                        }}
-                      >
-                        {request.status.toUpperCase()}
-                      </div>
-                      <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "8px", display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span>{new Date(request.requestedAt).toLocaleDateString()}</span>
-                        <span style={{color: '#d1d5db'}}>•</span>
-                        <span style={{color: '#6b7280', fontWeight: 600}}>{getRelativeTime(request.requestedAt)}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
       </div>
-
-      {selectedProvider && (
-        <div style={{...s.modal, alignItems: isMobile ? 'flex-end' : 'center'}}>
-          <div style={{...s.modalContent, width: isMobile ? '100%' : undefined, maxWidth: isMobile ? '100%' : '500px', margin: isMobile ? '0' : undefined, borderRadius: isMobile ? '16px 16px 0 0' : '12px'}}>
-            <h3 style={s.modalTitle}>
-              Send Request to {selectedProvider.name}
-            </h3>
-            <div style={{ marginBottom: "16px", fontSize: "14px", color: "#4b5563", background: "#f9fafb", padding: "12px", borderRadius: "8px", border: "1px solid #e5e7eb" }}>
-              <div style={{ marginBottom: "4px" }}><strong>Email:</strong> {selectedProvider.email || "N/A"}</div>
-              <div style={{ marginBottom: "4px" }}><strong>Phone:</strong> {selectedProvider.phone || "N/A"}</div>
-              <div><strong>Location:</strong> {selectedProvider.county || selectedProvider.location || selectedProvider.agentProfile?.county || "Kenya"}</div>
-            </div>
-            <textarea
-              style={s.textarea}
-              placeholder="Introduce yourself and explain why you'd like to work with this provider..."
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            />
-            <div style={{...s.modalButtons, flexDirection: isMobile ? 'column' : 'row'}}>
-              <button
-                style={{ ...s.modalBtn, ...s.modalBtnSecondary, minHeight: '44px' }}
-                onClick={() => {
-                  setSelectedProvider(null);
-                  setMessage("");
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                style={{ ...s.modalBtn, ...s.modalBtnPrimary, minHeight: '44px' }}
-                onClick={handleSendRequest}
-                disabled={sending || !message}
-              >
-                {sending ? "Sending..." : "Send Request"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {qrModalProperty && (
         <QRGeneratorModal
