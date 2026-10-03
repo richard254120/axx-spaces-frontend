@@ -50,6 +50,7 @@ const s = {
     fontWeight: 600,
     fontSize: "13px",
     cursor: "pointer",
+    transition: "all 0.2s ease",
   },
   container: {
     maxWidth: "1200px",
@@ -71,7 +72,7 @@ const s = {
     fontWeight: 600,
     color: "#6b7280",
     cursor: "pointer",
-    transition: "all 0.2s",
+    transition: "all 0.2s ease",
   },
   tabActive: {
     color: "#fbbf24",
@@ -94,6 +95,7 @@ const s = {
     padding: "20px",
     border: "1px solid #e5e7eb",
     boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+    transition: "all 0.2s ease",
   },
   cardHeader: {
     display: "flex",
@@ -149,6 +151,7 @@ const s = {
     fontSize: "13px",
     cursor: "pointer",
     marginTop: "12px",
+    transition: "all 0.2s ease",
   },
   requestBtnDisabled: {
     opacity: 0.5,
@@ -222,6 +225,7 @@ const s = {
     borderRadius: "8px",
     fontWeight: 600,
     cursor: "pointer",
+    transition: "all 0.2s ease",
   },
   modalBtnPrimary: {
     background: "#fbbf24",
@@ -273,6 +277,7 @@ const s = {
     boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
     display: "flex",
     flexDirection: "column",
+    transition: "all 0.2s ease",
   },
   houseImgWrap: {
     width: "100%",
@@ -363,6 +368,7 @@ const s = {
     fontSize: "12px",
     cursor: "pointer",
     textAlign: "center",
+    transition: "all 0.2s ease",
   },
   viewBtn: {
     padding: "8px 12px",
@@ -374,6 +380,7 @@ const s = {
     fontSize: "12px",
     cursor: "pointer",
     textAlign: "center",
+    transition: "all 0.2s ease",
   },
   delBtn: {
     padding: "8px 12px",
@@ -384,6 +391,7 @@ const s = {
     fontWeight: 600,
     fontSize: "12px",
     cursor: "pointer",
+    transition: "all 0.2s ease",
   },
   emptyCard: {
     background: "white",
@@ -475,6 +483,7 @@ const s = {
     fontSize: "12px",
     cursor: "pointer",
     textAlign: "center",
+    transition: "all 0.2s ease",
   },
 };
 
@@ -818,8 +827,42 @@ export default function AgentDashboard() {
       </div>
 
       <div style={{...s.container, padding: isMobile ? '12px 12px' : '24px'}}>
-        {/* Profile Overview Section */}
-        <div style={{...s.profileSection, flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '16px' : '24px', padding: isMobile ? '16px' : '24px', alignItems: isMobile ? 'center' : 'flex-start'}}>
+        {/* Toast notifications */}
+        <div style={{position: 'fixed', top: '80px', right: '24px', zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '10px'}} aria-live="polite">
+          {toasts.map(toast => (
+            <div key={toast.id} style={{
+              background: toast.type === 'success' ? '#10b981' : '#ef4444',
+              color: 'white',
+              padding: '12px 20px',
+              borderRadius: '8px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              minWidth: '280px',
+              fontSize: '14px',
+              fontWeight: 600,
+              animation: 'slideIn 0.3s ease',
+            }}>
+              {toast.message}
+            </div>
+          ))}
+        </div>
+        <style>
+          {`
+            @keyframes slideIn {
+              from { transform: translateX(100%); opacity: 0; }
+              to { transform: translateX(0); opacity: 1; }
+            }
+          `}
+        </style>
+
+        {/* Profile Overview Section with completeness */}
+        <div style={{
+          ...s.profileSection,
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: isMobile ? '16px' : '24px',
+          padding: isMobile ? '16px' : '24px',
+          alignItems: isMobile ? 'center' : 'flex-start',
+          background: 'linear-gradient(135deg, rgba(254, 243, 199, 0.3) 0%, rgba(253, 230, 138, 0.3) 100%), white',
+        }}>
           {user?.profileImage ? (
             <img src={resolveMediaUrl(user.profileImage)} alt={user.name} style={{...s.profileImg, width: isMobile ? '72px' : '100px', height: isMobile ? '72px' : '100px'}} />
           ) : (
@@ -827,6 +870,28 @@ export default function AgentDashboard() {
           )}
           <div style={s.profileInfo}>
             <div style={{...s.profileName, fontSize: isMobile ? '18px' : '24px'}}>{user?.name || "Agent"}</div>
+            
+            {/* Profile completeness bar */}
+            <div style={{marginTop: '8px', marginBottom: '12px'}}>
+              <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px'}}>
+                <span style={{fontSize: '12px', fontWeight: 600, color: '#6b7280'}}>Profile {calculateProfileCompleteness()}% Complete</span>
+              </div>
+              <div style={{
+                width: '100%',
+                height: '8px',
+                background: '#e5e7eb',
+                borderRadius: '4px',
+                overflow: 'hidden',
+              }}>
+                <div style={{
+                  width: `${calculateProfileCompleteness()}%`,
+                  height: '100%',
+                  background: 'linear-gradient(90deg, #10b981 0%, #059669 100%)',
+                  transition: 'width 0.3s ease',
+                }} />
+              </div>
+            </div>
+
             <div style={s.profileDetail}><span>✉️</span> {user?.email || "No email provided"}</div>
             <div style={s.profileDetail}><span>📞</span> {user?.phone || "No phone provided"}</div>
             <div style={s.profileDetail}><span>📍</span> {user?.county || "Kenya"}</div>
@@ -843,6 +908,86 @@ export default function AgentDashboard() {
             <div style={s.statBox}>
               <div style={s.statValue}>{myHouses.reduce((sum, h) => sum + (h.qrScans || 0), 0)}</div>
               <div style={s.statLabel}>QR Scans</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats Overview Bar */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+          gap: '16px',
+          marginBottom: '24px',
+        }} role="status" aria-label="Dashboard statistics">
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '20px',
+            border: '1px solid #e5e7eb',
+            borderTop: '3px solid',
+            borderImage: 'linear-gradient(90deg, #fbbf24, #f59e0b) 1',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+          }}>
+            <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px'}}>
+              <div style={{fontSize: '24px'}}>🏠</div>
+              <div>
+                <div style={{fontSize: '24px', fontWeight: 800, color: '#1f2937'}}>{myHouses.length}</div>
+                <div style={{fontSize: '12px', color: '#6b7280', fontWeight: 600}}>Total Listings</div>
+              </div>
+            </div>
+          </div>
+          
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '20px',
+            border: '1px solid #e5e7eb',
+            borderTop: '3px solid',
+            borderImage: 'linear-gradient(90deg, #fbbf24, #f59e0b) 1',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+          }}>
+            <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px'}}>
+              <div style={{fontSize: '24px'}}>👁️</div>
+              <div>
+                <div style={{fontSize: '24px', fontWeight: 800, color: '#1f2937'}}>{myHouses.reduce((sum, h) => sum + (h.views || 0), 0)}</div>
+                <div style={{fontSize: '12px', color: '#6b7280', fontWeight: 600}}>Total Views</div>
+              </div>
+            </div>
+          </div>
+          
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '20px',
+            border: '1px solid #e5e7eb',
+            borderTop: '3px solid',
+            borderImage: 'linear-gradient(90deg, #fbbf24, #f59e0b) 1',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+          }}>
+            <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px'}}>
+              <div style={{fontSize: '24px'}}>📱</div>
+              <div>
+                <div style={{fontSize: '24px', fontWeight: 800, color: '#1f2937'}}>{myHouses.reduce((sum, h) => sum + (h.qrScans || 0), 0)}</div>
+                <div style={{fontSize: '12px', color: '#6b7280', fontWeight: 600}}>QR Scans</div>
+              </div>
+            </div>
+          </div>
+          
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '20px',
+            border: '1px solid #e5e7eb',
+            borderTop: '3px solid',
+            borderImage: 'linear-gradient(90deg, #fbbf24, #f59e0b) 1',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+          }}>
+            <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px'}}>
+              <div style={{fontSize: '24px'}}>📤</div>
+              <div>
+                <div style={{fontSize: '24px', fontWeight: 800, color: '#1f2937'}}>{myRequests.filter(r => r.status === 'pending').length}</div>
+                <div style={{fontSize: '12px', color: '#6b7280', fontWeight: 600}}>Pending Requests</div>
+              </div>
             </div>
           </div>
         </div>
@@ -888,9 +1033,81 @@ export default function AgentDashboard() {
               </button>
             </div>
 
-            {myHouses.length === 0 ? (
+            {/* Search and Filter Bar */}
+            {myHouses.length > 0 && (
+              <div style={{
+                background: 'white',
+                padding: isMobile ? '12px' : '16px',
+                borderRadius: '12px',
+                marginBottom: '20px',
+                border: '1px solid #e5e7eb',
+                display: 'flex',
+                flexDirection: isMobile ? 'column' : 'row',
+                gap: '12px',
+                flexWrap: 'wrap',
+              }}>
+                <input
+                  type="text"
+                  placeholder="Search by title or location..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  aria-label="Search houses by title or location"
+                  style={{
+                    flex: isMobile ? '1' : '2',
+                    padding: '10px 14px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontFamily: 'inherit',
+                    minWidth: '200px',
+                  }}
+                />
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  aria-label="Filter by status"
+                  style={{
+                    flex: '1',
+                    padding: '10px 14px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontFamily: 'inherit',
+                    background: 'white',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <option value="all">All Status</option>
+                  <option value="approved">Live</option>
+                  <option value="pending">Pending</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  aria-label="Sort houses"
+                  style={{
+                    flex: '1',
+                    padding: '10px 14px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontFamily: 'inherit',
+                    background: 'white',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <option value="newest">Newest First</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="views">Most Views</option>
+                </select>
+              </div>
+            )}
+
+            {filteredAndSortedHouses().length === 0 && myHouses.length === 0 ? (
               <div style={s.emptyCard}>
-                <div style={{ fontSize: "42px", marginBottom: "12px" }}>🏠</div>
+                <div style={{ fontSize: "48px", marginBottom: "12px" }}>🏠</div>
                 <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#1f2937", marginBottom: "8px" }}>
                   No Houses Uploaded Yet
                 </h3>
@@ -904,15 +1121,36 @@ export default function AgentDashboard() {
                   + Upload Your First House
                 </button>
               </div>
+            ) : filteredAndSortedHouses().length === 0 ? (
+              <div style={{...s.emptyCard, border: '1px solid #e5e7eb'}}>
+                <div style={{ fontSize: "36px", marginBottom: "12px" }}>🔍</div>
+                <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#1f2937", marginBottom: "8px" }}>
+                  No houses match your filters
+                </h3>
+                <p style={{ fontSize: "14px", color: "#6b7280" }}>
+                  Try adjusting your search or filter criteria
+                </p>
+              </div>
             ) : (
               <div style={{...s.houseGrid, gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(290px, 1fr))'}}>
-                {myHouses.map((house) => {
+                {filteredAndSortedHouses().map((house) => {
                   const isApproved = house.status === "approved";
                   const isRejected = house.status === "rejected";
                   const thumb = house.images?.[0] ? resolveMediaUrl(house.images[0]) : "";
+                  const isHovered = hoveredCard === house._id;
 
                   return (
-                    <div key={house._id} style={s.houseCard}>
+                    <div 
+                      key={house._id} 
+                      style={{
+                        ...s.houseCard,
+                        boxShadow: isHovered ? '0 8px 24px rgba(0,0,0,0.12)' : '0 2px 8px rgba(0,0,0,0.05)',
+                        transform: isHovered ? 'translateY(-4px)' : 'translateY(0)',
+                        transition: 'all 0.2s ease',
+                      }}
+                      onMouseEnter={() => setHoveredCard(house._id)}
+                      onMouseLeave={() => setHoveredCard(null)}
+                    >
                       <div style={s.houseImgWrap}>
                         {thumb ? (
                           <img src={thumb} alt={house.title} style={s.houseImg} />
@@ -934,6 +1172,21 @@ export default function AgentDashboard() {
                         >
                           {isApproved ? "✓ LIVE" : isRejected ? "REJECTED" : "PENDING REVIEW"}
                         </span>
+                        {(house.isBoosted || house.featured) && (
+                          <span style={{
+                            position: 'absolute',
+                            top: '45px',
+                            right: '10px',
+                            background: '#fbbf24',
+                            color: '#1f2937',
+                            fontSize: '10px',
+                            fontWeight: 800,
+                            padding: '4px 8px',
+                            borderRadius: '6px',
+                          }}>
+                            ⭐ FEATURED
+                          </span>
+                        )}
                       </div>
 
                       <div style={s.houseContent}>
@@ -950,39 +1203,55 @@ export default function AgentDashboard() {
                           <span><strong>{house.bookedUnits || 0}</strong> booked</span>
                         </div>
                         <div style={{ ...s.houseInfoRow, marginTop: "8px", background: "#eff6ff" }}>
-                          <span style={{ color: "#2563eb" }}><strong>{house.views || 0}</strong> Views</span>
-                          <span style={{ color: "#2563eb" }}><strong>{house.qrScans || 0}</strong> QR Scans</span>
+                          <span style={{ color: "#2563eb", display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                              <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            <strong>{house.views || 0}</strong> Views
+                          </span>
+                          <span style={{ color: "#2563eb", display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                              <path d="M12 18h.01"/>
+                            </svg>
+                            <strong>{house.qrScans || 0}</strong> QR Scans
+                          </span>
                         </div>
 
                         <div style={{...s.houseActions, flexWrap: 'wrap'}}>
                           {isApproved && (
                             <button
-                              style={{...s.viewBtn, minHeight: '44px'}}
+                              style={{...s.viewBtn, minHeight: '44px', transition: 'all 0.2s ease'}}
                               onClick={() => window.open(`/listings?property=${house._id}`, "_blank")}
                               title="View live listing"
+                              aria-label="View live listing"
                             >
                               Live ↗
                             </button>
                           )}
                           <button
-                            style={{...s.qrBtn, minHeight: '44px'}}
+                            style={{...s.qrBtn, minHeight: '44px', transition: 'all 0.2s ease'}}
                             onClick={() => setQrModalProperty(house)}
                             title="View QR Poster"
+                            aria-label="View QR Poster"
                           >
                             QR Poster
                           </button>
                           <button
-                            style={{...s.editBtn, minHeight: '44px'}}
+                            style={{...s.editBtn, minHeight: '44px', transition: 'all 0.2s ease'}}
                             onClick={() => navigate(`/property/edit/${house._id}`)}
                             title="Edit house listing"
+                            aria-label="Edit house listing"
                           >
                             Edit ✏️
                           </button>
                           <button
-                            style={{...s.delBtn, minHeight: '44px'}}
+                            style={{...s.delBtn, minHeight: '44px', transition: 'all 0.2s ease'}}
                             onClick={() => handleDeleteHouse(house._id)}
                             disabled={deleteLoading === house._id}
                             title="Delete house listing"
+                            aria-label="Delete house listing"
                           >
                             {deleteLoading === house._id ? "..." : "Delete 🗑️"}
                           </button>
@@ -1000,13 +1269,32 @@ export default function AgentDashboard() {
           <div>
             <h2 style={s.sectionTitle}>Accommodation Hosts</h2>
             {providers.length === 0 ? (
-              <div style={s.empty}>No accommodation hosts found</div>
+              <div style={s.emptyCard}>
+                <div style={{ fontSize: "48px", marginBottom: "12px" }}>🏨</div>
+                <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#1f2937", marginBottom: "8px" }}>
+                  No accommodation hosts yet
+                </h3>
+                <p style={{ fontSize: "14px", color: "#6b7280", lineHeight: 1.5, marginBottom: "20px" }}>
+                  Send requests to connect with accommodation hosts and expand your network
+                </p>
+              </div>
             ) : (
               <div style={{...s.grid, gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))'}}>
                 {providers.map((provider) => {
                   const status = getRequestStatus(provider._id);
+                  const isHovered = hoveredProvider === provider._id;
                   return (
-                    <div key={provider._id} style={s.card}>
+                    <div 
+                      key={provider._id} 
+                      style={{
+                        ...s.card,
+                        boxShadow: isHovered ? '0 8px 20px rgba(0,0,0,0.1)' : '0 2px 8px rgba(0,0,0,0.05)',
+                        transform: isHovered ? 'scale(1.02)' : 'scale(1)',
+                        transition: 'all 0.2s ease',
+                      }}
+                      onMouseEnter={() => setHoveredProvider(provider._id)}
+                      onMouseLeave={() => setHoveredProvider(null)}
+                    >
                       <div style={s.cardHeader}>
                         <div style={s.avatar}>
                           {provider.name?.charAt(0).toUpperCase() || "H"}
@@ -1037,7 +1325,7 @@ export default function AgentDashboard() {
                       )}
                       {!status && (
                         <button
-                          style={{...s.requestBtn, minHeight: '44px'}}
+                          style={{...s.requestBtn, minHeight: '44px', transition: 'all 0.2s ease'}}
                           onClick={() => setSelectedProvider(provider)}
                         >
                           Send Request
@@ -1055,13 +1343,32 @@ export default function AgentDashboard() {
           <div>
             <h2 style={s.sectionTitle}>Landlords</h2>
             {landlords.length === 0 ? (
-              <div style={s.empty}>No landlords found</div>
+              <div style={s.emptyCard}>
+                <div style={{ fontSize: "48px", marginBottom: "12px" }}>🏠</div>
+                <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#1f2937", marginBottom: "8px" }}>
+                  No landlords found
+                </h3>
+                <p style={{ fontSize: "14px", color: "#6b7280", lineHeight: 1.5, marginBottom: "20px" }}>
+                  Check back soon for landlord connections
+                </p>
+              </div>
             ) : (
               <div style={{...s.grid, gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))'}}>
                 {landlords.map((landlord) => {
                   const status = getRequestStatus(landlord._id);
+                  const isHovered = hoveredProvider === landlord._id;
                   return (
-                    <div key={landlord._id} style={s.card}>
+                    <div 
+                      key={landlord._id} 
+                      style={{
+                        ...s.card,
+                        boxShadow: isHovered ? '0 8px 20px rgba(0,0,0,0.1)' : '0 2px 8px rgba(0,0,0,0.05)',
+                        transform: isHovered ? 'scale(1.02)' : 'scale(1)',
+                        transition: 'all 0.2s ease',
+                      }}
+                      onMouseEnter={() => setHoveredProvider(landlord._id)}
+                      onMouseLeave={() => setHoveredProvider(null)}
+                    >
                       <div style={s.cardHeader}>
                         <div style={s.avatar}>
                           {landlord.name?.charAt(0).toUpperCase() || "L"}
@@ -1092,7 +1399,7 @@ export default function AgentDashboard() {
                       )}
                       {!status && (
                         <button
-                          style={{...s.requestBtn, minHeight: '44px'}}
+                          style={{...s.requestBtn, minHeight: '44px', transition: 'all 0.2s ease'}}
                           onClick={() => setSelectedProvider(landlord)}
                         >
                           Send Request
@@ -1109,48 +1416,103 @@ export default function AgentDashboard() {
         {activeTab === "requests" && (
           <div>
             <h2 style={s.sectionTitle}>My Requests</h2>
+            
+            {/* Request filter buttons */}
+            {myRequests.length > 0 && (
+              <div style={{
+                display: 'flex',
+                gap: '10px',
+                marginBottom: '20px',
+                flexWrap: 'wrap',
+              }}>
+                {['all', 'pending', 'accepted', 'rejected'].map(filter => (
+                  <button
+                    key={filter}
+                    onClick={() => setRequestStatusFilter(filter)}
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: '20px',
+                      border: requestStatusFilter === filter ? '2px solid #fbbf24' : '2px solid #e5e7eb',
+                      background: requestStatusFilter === filter ? '#fbbf24' : 'white',
+                      color: requestStatusFilter === filter ? '#1f2937' : '#6b7280',
+                      fontWeight: 600,
+                      fontSize: '13px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      minHeight: '40px',
+                    }}
+                  >
+                    {filter.charAt(0).toUpperCase() + filter.slice(1)} ({requestCounts[filter]})
+                  </button>
+                ))}
+              </div>
+            )}
+
             {myRequests.length === 0 ? (
-              <div style={s.empty}>No requests sent yet</div>
+              <div style={s.emptyCard}>
+                <div style={{ fontSize: "48px", marginBottom: "12px" }}>📤</div>
+                <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#1f2937", marginBottom: "8px" }}>
+                  No requests sent
+                </h3>
+                <p style={{ fontSize: "14px", color: "#6b7280", lineHeight: 1.5, marginBottom: "20px" }}>
+                  Visit the Hosts or Landlords tabs to send your first request
+                </p>
+              </div>
             ) : (
               <div style={{...s.grid, gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))'}}>
-                {myRequests.map((request) => (
-                  <div key={request._id} style={s.card}>
-                    <div style={s.cardHeader}>
-                      <div style={s.avatar}>
-                        {request.provider?.name?.charAt(0).toUpperCase() || "P"}
-                      </div>
-                      <div>
-                        <div style={s.cardName}>{request.provider?.name}</div>
-                        <div style={s.cardEmail}>{request.provider?.email}</div>
-                      </div>
-                    </div>
-                    {request.agentMessage && (
-                      <div style={s.cardBio}>
-                        <strong>Your message:</strong> {request.agentMessage}
-                      </div>
-                    )}
-                    {request.providerResponse && (
-                      <div style={s.cardBio}>
-                        <strong>Provider response:</strong> {request.providerResponse}
-                      </div>
-                    )}
-                    <div
+                {filteredRequests().map((request) => {
+                  const isHovered = hoveredProvider === request._id;
+                  return (
+                    <div 
+                      key={request._id} 
                       style={{
-                        ...s.statusBadge,
-                        ...(request.status === "pending"
-                          ? s.statusPending
-                          : request.status === "accepted"
-                            ? s.statusAccepted
-                            : s.statusRejected),
+                        ...s.card,
+                        boxShadow: isHovered ? '0 8px 20px rgba(0,0,0,0.1)' : '0 2px 8px rgba(0,0,0,0.05)',
+                        transform: isHovered ? 'scale(1.02)' : 'scale(1)',
+                        transition: 'all 0.2s ease',
                       }}
+                      onMouseEnter={() => setHoveredProvider(request._id)}
+                      onMouseLeave={() => setHoveredProvider(null)}
                     >
-                      {request.status.toUpperCase()}
+                      <div style={s.cardHeader}>
+                        <div style={s.avatar}>
+                          {request.provider?.name?.charAt(0).toUpperCase() || "P"}
+                        </div>
+                        <div>
+                          <div style={s.cardName}>{request.provider?.name}</div>
+                          <div style={s.cardEmail}>{request.provider?.email}</div>
+                        </div>
+                      </div>
+                      {request.agentMessage && (
+                        <div style={s.cardBio}>
+                          <strong>Your message:</strong> {request.agentMessage}
+                        </div>
+                      )}
+                      {request.providerResponse && (
+                        <div style={s.cardBio}>
+                          <strong>Provider response:</strong> {request.providerResponse}
+                        </div>
+                      )}
+                      <div
+                        style={{
+                          ...s.statusBadge,
+                          ...(request.status === "pending"
+                            ? s.statusPending
+                            : request.status === "accepted"
+                              ? s.statusAccepted
+                              : s.statusRejected),
+                        }}
+                      >
+                        {request.status.toUpperCase()}
+                      </div>
+                      <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "8px", display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span>{new Date(request.requestedAt).toLocaleDateString()}</span>
+                        <span style={{color: '#d1d5db'}}>•</span>
+                        <span style={{color: '#6b7280', fontWeight: 600}}>{getRelativeTime(request.requestedAt)}</span>
+                      </div>
                     </div>
-                    <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "8px" }}>
-                      {new Date(request.requestedAt).toLocaleDateString()}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -1202,6 +1564,45 @@ export default function AgentDashboard() {
           onClose={() => setQrModalProperty(null)}
           property={qrModalProperty}
         />
+      )}
+
+      {/* Confirmation Delete Modal */}
+      {confirmDelete && (
+        <div style={s.modal}>
+          <div style={{...s.modalContent, maxWidth: '400px'}}>
+            <h3 style={s.modalTitle}>Delete House Listing</h3>
+            <p style={{fontSize: '14px', color: '#6b7280', marginBottom: '20px', lineHeight: 1.5}}>
+              Are you sure you want to delete this house listing? This action cannot be undone.
+            </p>
+            <div style={s.modalButtons}>
+              <button
+                style={{ 
+                  ...s.modalBtn, 
+                  ...s.modalBtnSecondary,
+                  minHeight: '44px',
+                  transition: 'all 0.2s ease',
+                }}
+                onClick={() => setConfirmDelete(null)}
+                aria-label="Cancel deletion"
+              >
+                Cancel
+              </button>
+              <button
+                style={{ 
+                  ...s.modalBtn,
+                  background: '#dc2626',
+                  color: 'white',
+                  minHeight: '44px',
+                  transition: 'all 0.2s ease',
+                }}
+                onClick={confirmDeleteAction}
+                aria-label="Confirm deletion"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       <AgentQRPosterModal
