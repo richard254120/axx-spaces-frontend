@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { resolveMediaUrl } from "../utils/fileLinks";
@@ -485,11 +485,44 @@ const s = {
     textAlign: "center",
     transition: "all 0.2s ease",
   },
+  avatarOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: "50%",
+    background: "rgba(0,0,0,0.55)",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "white",
+    fontSize: "11px",
+    fontWeight: 600,
+    opacity: 0,
+    transition: "opacity 0.2s",
+  },
+  cameraBadge: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    width: "26px",
+    height: "26px",
+    borderRadius: "50%",
+    background: "#fbbf24",
+    color: "#1f2937",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    border: "2px solid white",
+    boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
+  },
 };
 
 export default function AgentDashboard() {
   const navigate = useNavigate();
-  const { user, token, logout } = useContext(AuthContext);
+  const { user, token, logout, updateUser } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState("houses");
   const [myHouses, setMyHouses] = useState([]);
   const [deleteLoading, setDeleteLoading] = useState(null);
@@ -519,6 +552,12 @@ export default function AgentDashboard() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Profile picture upload state
+  const [uploadingProfilePicture, setUploadingProfilePicture] = useState(false);
+  const [profilePicturePreview, setProfilePicturePreview] = useState(null);
+  const [hoveredAvatar, setHoveredAvatar] = useState(false);
+  const profilePictureInputRef = useRef(null);
 
   // Toast system functions
   const addToast = (message, type = 'success') => {
@@ -726,6 +765,70 @@ export default function AgentDashboard() {
     logout("/agent/login");
   };
 
+  const handleProfilePictureChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      addToast('Only jpg, jpeg, png, gif, and webp files are allowed', 'error');
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      addToast('File size must be less than 5MB', 'error');
+      return;
+    }
+
+    // Create preview
+    const previewUrl = URL.createObjectURL(file);
+    setProfilePicturePreview(previewUrl);
+    uploadProfilePicture(file);
+  };
+
+  const uploadProfilePicture = async (file) => {
+    try {
+      setUploadingProfilePicture(true);
+      
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      const response = await fetch(`${API_BASE}/profile`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Update user in context
+        if (data.data?.user?.profileImage) {
+          updateUser({ profileImage: data.data.user.profileImage });
+          setProfilePicturePreview(null);
+        }
+        addToast('Profile picture updated successfully', 'success');
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        addToast(errorData.message || 'Failed to update profile picture', 'error');
+        setProfilePicturePreview(null);
+      }
+    } catch (error) {
+      console.error('Error uploading profile picture:', error);
+      addToast('Network error while uploading profile picture', 'error');
+      setProfilePicturePreview(null);
+    } finally {
+      setUploadingProfilePicture(false);
+      // Reset file input
+      if (profilePictureInputRef.current) {
+        profilePictureInputRef.current.value = '';
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div style={s.root}>
@@ -851,6 +954,10 @@ export default function AgentDashboard() {
               from { transform: translateX(100%); opacity: 0; }
               to { transform: translateX(0); opacity: 1; }
             }
+            @keyframes spin {
+              from { transform: rotate(0deg); }
+              to { transform: rotate(360deg); }
+            }
           `}
         </style>
 
@@ -863,11 +970,97 @@ export default function AgentDashboard() {
           alignItems: isMobile ? 'center' : 'flex-start',
           background: 'linear-gradient(135deg, rgba(254, 243, 199, 0.3) 0%, rgba(253, 230, 138, 0.3) 100%), white',
         }}>
-          {user?.profileImage ? (
-            <img src={resolveMediaUrl(user.profileImage)} alt={user.name} style={{...s.profileImg, width: isMobile ? '72px' : '100px', height: isMobile ? '72px' : '100px'}} />
-          ) : (
-            <div style={{...s.profileImg, width: isMobile ? '72px' : '100px', height: isMobile ? '72px' : '100px', fontSize: isMobile ? '26px' : '36px'}}>{user?.name?.charAt(0).toUpperCase() || "A"}</div>
-          )}
+          {/* Avatar with upload functionality */}
+          <div
+            style={{
+              position: 'relative',
+              cursor: 'pointer',
+              minWidth: isMobile ? '72px' : '100px',
+              minHeight: isMobile ? '72px' : '100px',
+            }}
+            onMouseEnter={() => setHoveredAvatar(true)}
+            onMouseLeave={() => setHoveredAvatar(false)}
+            onClick={() => profilePictureInputRef.current?.click()}
+          >
+            {profilePicturePreview || user?.profileImage ? (
+              <img 
+                src={profilePicturePreview || resolveMediaUrl(user.profileImage)} 
+                alt={user?.name}
+                style={{
+                  ...s.profileImg,
+                  width: isMobile ? '72px' : '100px',
+                  height: isMobile ? '72px' : '100px',
+                  cursor: 'pointer',
+                }}
+              />
+            ) : (
+              <div
+                style={{
+                  ...s.profileImg,
+                  width: isMobile ? '72px' : '100px',
+                  height: isMobile ? '72px' : '100px',
+                  fontSize: isMobile ? '26px' : '36px',
+                  cursor: 'pointer',
+                }}
+              >
+                {user?.name?.charAt(0).toUpperCase() || "A"}
+              </div>
+            )}
+            {/* Hover overlay */}
+            <div
+              style={{
+                ...s.avatarOverlay,
+                width: isMobile ? '72px' : '100px',
+                height: isMobile ? '72px' : '100px',
+                opacity: hoveredAvatar ? 1 : 0,
+              }}
+            >
+              📷
+              <span style={{fontSize: '9px', marginTop: '2px'}}>Upload</span>
+            </div>
+            {/* Camera badge */}
+            <div style={s.cameraBadge}>
+              📷
+            </div>
+            {/* Uploading overlay */}
+            {uploadingProfilePicture && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  borderRadius: '50%',
+                  background: 'rgba(0,0,0,0.7)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 10,
+                }}
+              >
+                <div
+                  style={{
+                    width: '24px',
+                    height: '24px',
+                    border: '3px solid rgba(255,255,255,0.3)',
+                    borderTop: '3px solid white',
+                    borderRadius: '50%',
+                    animation: 'spin 0.8s linear infinite',
+                  }}
+                />
+              </div>
+            )}
+            {/* Hidden file input */}
+            <input
+              ref={profilePictureInputRef}
+              type="file"
+              accept="image/*"
+              style={{display: 'none'}}
+              onChange={handleProfilePictureChange}
+              disabled={uploadingProfilePicture}
+            />
+          </div>
           <div style={s.profileInfo}>
             <div style={{...s.profileName, fontSize: isMobile ? '18px' : '24px'}}>{user?.name || "Agent"}</div>
             
