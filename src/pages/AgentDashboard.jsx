@@ -666,6 +666,8 @@ export default function AgentDashboard() {
       if (res.ok) {
         addToast("Pending purchase cancelled successfully", "success");
         setPendingPurchase(null);
+        // Reload pending purchase state to ensure it's cleared
+        await loadPendingPurchase();
       } else {
         const error = await res.json();
         addToast(error.error || "Failed to cancel pending purchase", "error");
