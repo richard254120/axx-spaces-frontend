@@ -666,6 +666,8 @@ export default function AgentDashboard() {
       if (res.ok) {
         addToast("Pending purchase cancelled successfully", "success");
         setPendingPurchase(null);
+        // Close the modal to force state refresh
+        setShowPackageModal(false);
         // Reload pending purchase state to ensure it's cleared
         await loadPendingPurchase();
       } else {
