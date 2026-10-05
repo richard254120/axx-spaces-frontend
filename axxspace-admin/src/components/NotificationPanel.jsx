@@ -49,6 +49,7 @@ export default function NotificationPanel({
       if (n.type === "tourism_booking") return n.tourismId?.title || "Tourism Booking";
       if (n.type === "boost") return "Listing Boost";
       if (n.type === "subscription") return "Subscription Payment";
+      if (n.type === "package_pending") return `${n.agentPackageTier || "Package"} Upgrade Payment`;
       return "Payment";
     }
     const typeLabels = {
