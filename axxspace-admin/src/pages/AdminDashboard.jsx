@@ -8,6 +8,7 @@ import TabNavigation from "../components/TabNavigation";
 import NotificationPanel from "../components/NotificationPanel";
 import BadgeManagement from "../components/BadgeManagement";
 import UserBadgeManagement from "../components/UserBadgeManagement";
+import PaymentApprovals from "../components/PaymentApprovals";
 import { getPricelistUrl } from "../utils/fileLinks";
 import QRGeneratorModal from "../components/QRGeneratorModal";
 import WebsitePoster from "../components/WebsitePoster";
@@ -87,6 +88,11 @@ export default function AdminDashboard() {
   const [accommodationsLoading, setAccommodationsLoading] = useState(false);
   const [accommodationStatusView, setAccommodationStatusView] = useState("pending_review");
 
+  // ── PACKAGE PURCHASES STATE ─────────────────────────────────
+  const [pendingPackagePurchases, setPendingPackagePurchases] = useState([]);
+  const [packagePurchasesLoading, setPackagePurchasesLoading] = useState(false);
+  const [pendingPackagePurchasesCount, setPendingPackagePurchasesCount] = useState(0);
+
   // ── POSTER / QR STATE ──────────────────────────────────────
   const [selectedPropertyForQR, setSelectedPropertyForQR] = useState(null);
   const [qrModalOpen, setQrModalOpen] = useState(false);
@@ -103,6 +109,7 @@ export default function AdminDashboard() {
     loadAllBoosts();
     loadAllNotifications();
     loadRequests();
+    loadPendingPackagePurchases();
   }, [user, navigate]);
 
   // ── load pending announcements when tab changes ─────────────
@@ -147,8 +154,9 @@ export default function AdminDashboard() {
       loadRequests();
     } else if (activeTab === "accommodations") {
       loadAccommodations();
+    } else if (activeTab === "payment") {
+      loadPendingPackagePurchases();
     } else if (
-      activeTab !== "payment" &&
       activeTab !== "website-poster" &&
       activeTab !== "listings-badges" &&
       activeTab !== "user-badges"
@@ -550,6 +558,21 @@ export default function AdminDashboard() {
     }
   };
 
+  // ── PACKAGE PURCHASES FUNCTIONS ─────────────────────────────
+  const loadPendingPackagePurchases = async () => {
+    setPackagePurchasesLoading(true);
+    try {
+      const res = await API.get("/agents/pending-purchases");
+      setPendingPackagePurchases(res.data || []);
+      setPendingPackagePurchasesCount((res.data || []).length);
+    } catch (err) {
+      console.error("Failed to load pending package purchases:", err);
+      setPendingPackagePurchasesCount(0);
+    } finally {
+      setPackagePurchasesLoading(false);
+    }
+  };
+
   // ── edit / save ────────────────────────────────────────────
   const openEdit = (item) => { setEditData({ ...item }); setEditMode(true); };
   const saveEdit = async () => {
@@ -691,7 +714,8 @@ export default function AdminDashboard() {
             businesses: stats?.businesses,
             announcements: pendingAnnouncements.length,
             requests: requests.length,
-            accommodations: pendingAccommodations.length || (allPending?.accommodations?.length || 0)
+            accommodations: pendingAccommodations.length || (allPending?.accommodations?.length || 0),
+            payment: pendingPackagePurchasesCount
           }}
           hasPendingBoosts={hasPendingBoosts}
           pendingBoosts={pendingBoosts}
@@ -976,10 +1000,7 @@ export default function AdminDashboard() {
             getNotifIcon={getNotifIcon}
           />
         ) : activeTab === "payment" ? (
-          <PaymentSettings
-            mpesaConfig={mpesaConfig} setMpesaConfig={setMpesaConfig}
-            configSaving={configSaving} configMessage={configMessage}
-            handleSave={handleSaveMpesaConfig} />
+          <PaymentApprovals onRefresh={loadPendingPackagePurchases} />
         ) : activeTab === "businesses" ? (
           businessesLoading ? (
             <div className="loader">

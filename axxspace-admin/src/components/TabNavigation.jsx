@@ -25,6 +25,9 @@ export default function TabNavigation({ tabs, activeTab, setActiveTab, pendingCo
     if (tab === "requests") {
       return pendingCounts?.requests > 0 ? ` (${pendingCounts.requests})` : "";
     }
+    if (tab === "payment") {
+      return pendingCounts?.payment > 0 ? ` (${pendingCounts.payment})` : "";
+    }
     if (tab === "accommodations") {
       const count = pendingCounts?.accommodations || pendingCounts?.allPending?.accommodations?.length || 0;
       return count > 0 ? ` (${count})` : "";

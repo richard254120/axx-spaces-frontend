@@ -11,11 +11,16 @@ function getNotifTitle(n) {
     case "tourism_booking": return "Tourism Booking";
     case "boost": return "Listing Boosted";
     case "subscription": return "Subscription Update";
+    case "package_approved": return "Package Approved";
+    case "package_rejected": return "Package Rejected";
     default: return n.title || "Notification";
   }
 }
 
 function getNotifMessage(n) {
+  if (n.type === "package_approved" || n.type === "package_rejected") {
+    return n.message || "Your payment has been processed";
+  }
   if (n.amount) return `Payment of KES ${n.amount.toLocaleString()} - ${n.status || "pending"}`;
   return n.message || "You have a new notification";
 }
@@ -84,6 +89,8 @@ export default function NotificationsPage() {
       case "tourism_booking": return "";
       case "boost": return "";
       case "subscription": return "";
+      case "package_approved": return "";
+      case "package_rejected": return "";
       case "message": return "";
       case "review": return "";
       default: return "";
@@ -97,6 +104,8 @@ export default function NotificationsPage() {
       case "tourism_booking": return "#3b82f6";
       case "boost": return "#f97316";
       case "subscription": return "#8b5cf6";
+      case "package_approved": return "#10b981";
+      case "package_rejected": return "#ef4444";
       case "message": return "#3b82f6";
       default: return "#64748b";
     }
