@@ -508,6 +508,14 @@ export default function AgentDashboard() {
   const [hoveredAvatar, setHoveredAvatar] = useState(false);
   const profilePictureInputRef = useRef(null);
 
+  // Package-related state
+  const [packages, setPackages] = useState(null);
+  const [myPackage, setMyPackage] = useState(null);
+  const [selectedPackage, setSelectedPackage] = useState(null);
+  const [paymentReference, setPaymentReference] = useState("");
+  const [purchasingPackage, setPurchasingPackage] = useState(false);
+  const [showPackageModal, setShowPackageModal] = useState(false);
+
   // Toast system functions
   const addToast = (message, type = 'success') => {
     const id = Date.now();
@@ -535,8 +543,8 @@ export default function AgentDashboard() {
     // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(h => 
-        h.title?.toLowerCase().includes(query) || 
+      filtered = filtered.filter(h =>
+        h.title?.toLowerCase().includes(query) ||
         h.location?.toLowerCase().includes(query) ||
         h.county?.toLowerCase().includes(query)
       );
@@ -575,6 +583,8 @@ export default function AgentDashboard() {
       return;
     }
     loadData();
+    loadPackages();
+    loadMyPackage();
   }, [user, navigate]);
 
   const loadData = async () => {
@@ -597,6 +607,77 @@ export default function AgentDashboard() {
       console.error("Error loading data:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadPackages = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/agents/packages`);
+      if (res.ok) {
+        const data = await res.json();
+        setPackages(data);
+      }
+    } catch (err) {
+      console.error("Error loading packages:", err);
+    }
+  };
+
+  const loadMyPackage = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/agents/my-package`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setMyPackage(data);
+      }
+    } catch (err) {
+      console.error("Error loading my package:", err);
+    }
+  };
+
+  const handlePurchasePackage = async () => {
+    if (!selectedPackage) {
+      addToast("Please select a package", "error");
+      return;
+    }
+
+    if (selectedPackage.price > 0 && !paymentReference.trim()) {
+      addToast("Payment reference is required for paid packages", "error");
+      return;
+    }
+
+    try {
+      setPurchasingPackage(true);
+      const res = await fetch(`${API_BASE}/agents/purchase-package`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          tier: selectedPackage,
+          paymentReference: paymentReference.trim(),
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        addToast("Package purchased successfully!", "success");
+        setShowPackageModal(false);
+        setSelectedPackage(null);
+        setPaymentReference("");
+        loadMyPackage();
+        updateUser(data.user);
+      } else {
+        const error = await res.json();
+        addToast(error.error || "Failed to purchase package", "error");
+      }
+    } catch (err) {
+      console.error("Error purchasing package:", err);
+      addToast("Failed to purchase package", "error");
+    } finally {
+      setPurchasingPackage(false);
     }
   };
 
@@ -658,7 +739,7 @@ export default function AgentDashboard() {
   const uploadProfilePicture = async (file) => {
     try {
       setUploadingProfilePicture(true);
-      
+
       const formData = new FormData();
       formData.append('avatar', file);
 
@@ -706,9 +787,9 @@ export default function AgentDashboard() {
           </div>
           <div style={s.headerTitle}>Agent Dashboard</div>
         </div>
-        <div style={{...s.container, paddingTop: '40px'}} aria-busy="true">
+        <div style={{ ...s.container, paddingTop: '40px' }} aria-busy="true">
           {/* Skeleton loaders */}
-          <div style={{display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px'}}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
             {[1, 2, 3, 4].map(i => (
               <div key={i} style={{
                 background: 'linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%)',
@@ -719,7 +800,7 @@ export default function AgentDashboard() {
               }} />
             ))}
           </div>
-          <div style={{display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '20px'}}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '20px' }}>
             {[1, 2, 3].map(i => (
               <div key={i} style={{
                 background: 'white',
@@ -766,39 +847,57 @@ export default function AgentDashboard() {
 
   return (
     <div style={s.root}>
-      <div style={{...s.header, flexWrap: 'wrap', gap: isMobile ? '10px' : '0', padding: isMobile ? '12px 16px' : '16px 24px'}}>
-        <div style={{...s.logo, cursor: 'pointer'}} onClick={() => navigate('/')}>
+      <div style={{ ...s.header, flexWrap: 'wrap', gap: isMobile ? '10px' : '0', padding: isMobile ? '12px 16px' : '16px 24px' }}>
+        <div style={{ ...s.logo, cursor: 'pointer' }} onClick={() => navigate('/')}>
           <span style={s.logoAccent}>AXX</span>
           <span style={s.logoWord}>SPACE</span>
         </div>
-        <div style={{...s.headerTitle, fontSize: isMobile ? '15px' : '18px'}}>Agent Dashboard</div>
-        <div style={{...s.headerActions, flexWrap: 'wrap', gap: '8px'}}>
-          <button style={{...s.uploadBtn, padding: isMobile ? '10px 12px' : '8px 16px', fontSize: isMobile ? '12px' : '13px', minHeight: '44px'}} onClick={() => navigate('/upload')}>
+        <div style={{ ...s.headerTitle, fontSize: isMobile ? '15px' : '18px' }}>Agent Dashboard</div>
+        <div style={{ ...s.headerActions, flexWrap: 'wrap', gap: '8px' }}>
+          <button style={{ ...s.uploadBtn, padding: isMobile ? '10px 12px' : '8px 16px', fontSize: isMobile ? '12px' : '13px', minHeight: '44px' }} onClick={() => navigate('/upload')}>
             + Upload House
           </button>
           <button
-            style={{...s.uploadBtn,
+            style={{
+              ...s.uploadBtn,
+              background: 'linear-gradient(135deg,#8b5cf6,#7c3aed)',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: isMobile ? '10px 12px' : '8px 16px',
+              minHeight: '44px',
+            }}
+            onClick={() => setShowPackageModal(true)}
+            title="Upgrade Package"
+          >
+            {isMobile ? 'Package' : myPackage?.package?.name || 'Upgrade Package'}
+          </button>
+          <button
+            style={{
+              ...s.uploadBtn,
               background: 'linear-gradient(135deg,#d9383a,#b91c1c)',
               border: 'none',
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
               padding: isMobile ? '10px 12px' : '8px 16px',
-              minHeight: '44px',}}
+              minHeight: '44px',
+            }}
             onClick={() => setShowAgentQRPoster(true)}
             title="Generate My Agent QR Poster"
           >
             {isMobile ? 'QR' : 'My QR Poster'}
           </button>
-          <button style={{...s.logoutBtn, minHeight: '44px', padding: isMobile ? '10px 14px' : '8px 16px'}} onClick={handleLogout}>
+          <button style={{ ...s.logoutBtn, minHeight: '44px', padding: isMobile ? '10px 14px' : '8px 16px' }} onClick={handleLogout}>
             Logout
           </button>
         </div>
       </div>
 
-      <div style={{...s.container, padding: isMobile ? '12px 12px' : '24px'}}>
+      <div style={{ ...s.container, padding: isMobile ? '12px 12px' : '24px' }}>
         {/* Toast notifications */}
-        <div style={{position: 'fixed', top: '80px', right: '24px', zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '10px'}} aria-live="polite">
+        <div style={{ position: 'fixed', top: '80px', right: '24px', zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '10px' }} aria-live="polite">
           {toasts.map(toast => (
             <div key={toast.id} style={{
               background: toast.type === 'success' ? '#10b981' : '#ef4444',
@@ -850,8 +949,8 @@ export default function AgentDashboard() {
             onClick={() => profilePictureInputRef.current?.click()}
           >
             {profilePicturePreview || user?.profileImage ? (
-              <img 
-                src={profilePicturePreview || resolveMediaUrl(user.profileImage)} 
+              <img
+                src={profilePicturePreview || resolveMediaUrl(user.profileImage)}
                 alt={user?.name}
                 style={{
                   ...s.profileImg,
@@ -883,7 +982,7 @@ export default function AgentDashboard() {
               }}
             >
               📷
-              <span style={{fontSize: '9px', marginTop: '2px'}}>Upload</span>
+              <span style={{ fontSize: '9px', marginTop: '2px' }}>Upload</span>
             </div>
             {/* Camera badge */}
             <div style={s.cameraBadge}>
@@ -926,18 +1025,18 @@ export default function AgentDashboard() {
               ref={profilePictureInputRef}
               type="file"
               accept="image/*"
-              style={{display: 'none'}}
+              style={{ display: 'none' }}
               onChange={handleProfilePictureChange}
               disabled={uploadingProfilePicture}
             />
           </div>
           <div style={s.profileInfo}>
-            <div style={{...s.profileName, fontSize: isMobile ? '18px' : '24px'}}>{user?.name || "Agent"}</div>
-            
+            <div style={{ ...s.profileName, fontSize: isMobile ? '18px' : '24px' }}>{user?.name || "Agent"}</div>
+
             {/* Profile completeness bar */}
-            <div style={{marginTop: '8px', marginBottom: '12px'}}>
-              <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px'}}>
-                <span style={{fontSize: '12px', fontWeight: 600, color: '#6b7280'}}>Profile {calculateProfileCompleteness()}% Complete</span>
+            <div style={{ marginTop: '8px', marginBottom: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <span style={{ fontSize: '12px', fontWeight: 600, color: '#6b7280' }}>Profile {calculateProfileCompleteness()}% Complete</span>
               </div>
               <div style={{
                 width: '100%',
@@ -959,7 +1058,7 @@ export default function AgentDashboard() {
             <div style={s.profileDetail}>{user?.phone || "No phone provided"}</div>
             <div style={s.profileDetail}>{user?.county || "Kenya"}</div>
           </div>
-          <div style={{...s.statsGrid, justifyContent: isMobile ? 'center' : 'flex-start'}}>
+          <div style={{ ...s.statsGrid, justifyContent: isMobile ? 'center' : 'flex-start' }}>
             <div style={s.statBox}>
               <div style={s.statValue}>{myHouses.length}</div>
               <div style={s.statLabel}>Listings</div>
@@ -991,14 +1090,14 @@ export default function AgentDashboard() {
             borderImage: 'linear-gradient(90deg, #fbbf24, #f59e0b) 1',
             boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
           }}>
-            <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px'}}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
               <div>
-                <div style={{fontSize: '24px', fontWeight: 800, color: '#1f2937'}}>{myHouses.length}</div>
-                <div style={{fontSize: '12px', color: '#6b7280', fontWeight: 600}}>Total Listings</div>
+                <div style={{ fontSize: '24px', fontWeight: 800, color: '#1f2937' }}>{myHouses.length}</div>
+                <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 600 }}>Total Listings</div>
               </div>
             </div>
           </div>
-          
+
           <div style={{
             background: 'white',
             borderRadius: '12px',
@@ -1008,14 +1107,14 @@ export default function AgentDashboard() {
             borderImage: 'linear-gradient(90deg, #fbbf24, #f59e0b) 1',
             boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
           }}>
-            <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px'}}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
               <div>
-                <div style={{fontSize: '24px', fontWeight: 800, color: '#1f2937'}}>{myHouses.reduce((sum, h) => sum + (h.views || 0), 0)}</div>
-                <div style={{fontSize: '12px', color: '#6b7280', fontWeight: 600}}>Total Views</div>
+                <div style={{ fontSize: '24px', fontWeight: 800, color: '#1f2937' }}>{myHouses.reduce((sum, h) => sum + (h.views || 0), 0)}</div>
+                <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 600 }}>Total Views</div>
               </div>
             </div>
           </div>
-          
+
           <div style={{
             background: 'white',
             borderRadius: '12px',
@@ -1025,16 +1124,16 @@ export default function AgentDashboard() {
             borderImage: 'linear-gradient(90deg, #fbbf24, #f59e0b) 1',
             boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
           }}>
-            <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px'}}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
               <div>
-                <div style={{fontSize: '24px', fontWeight: 800, color: '#1f2937'}}>{myHouses.reduce((sum, h) => sum + (h.qrScans || 0), 0)}</div>
-                <div style={{fontSize: '12px', color: '#6b7280', fontWeight: 600}}>QR Scans</div>
+                <div style={{ fontSize: '24px', fontWeight: 800, color: '#1f2937' }}>{myHouses.reduce((sum, h) => sum + (h.qrScans || 0), 0)}</div>
+                <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 600 }}>QR Scans</div>
               </div>
             </div>
           </div>
         </div>
 
-        <div style={{...s.tabs, overflowX: isMobile ? 'auto' : 'visible', WebkitOverflowScrolling: 'touch', flexWrap: 'nowrap', paddingBottom: isMobile ? '2px' : '0', gap: isMobile ? '4px' : '12px'}}>
+        <div style={{ ...s.tabs, overflowX: isMobile ? 'auto' : 'visible', WebkitOverflowScrolling: 'touch', flexWrap: 'nowrap', paddingBottom: isMobile ? '2px' : '0', gap: isMobile ? '4px' : '12px' }}>
           <button
             style={{ ...s.tab, ...(activeTab === 'houses' ? s.tabActive : {}), whiteSpace: 'nowrap', padding: isMobile ? '10px 12px' : '12px 20px', minHeight: '44px', fontSize: isMobile ? '12px' : '14px' }}
             onClick={() => setActiveTab("houses")}
@@ -1045,7 +1144,7 @@ export default function AgentDashboard() {
 
         {activeTab === "houses" && (
           <div>
-            <div style={{display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', marginBottom: '16px', gap: '10px'}}>
+            <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', marginBottom: '16px', gap: '10px' }}>
               <div>
                 <h2 style={{ ...s.sectionTitle, marginBottom: "4px" }}>My Uploaded Houses &amp; Properties</h2>
                 <p style={{ margin: 0, fontSize: "13px", color: "#6b7280" }}>
@@ -1145,7 +1244,7 @@ export default function AgentDashboard() {
                 </button>
               </div>
             ) : filteredAndSortedHouses().length === 0 ? (
-              <div style={{...s.emptyCard, border: '1px solid #e5e7eb'}}>
+              <div style={{ ...s.emptyCard, border: '1px solid #e5e7eb' }}>
                 <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#1f2937", marginBottom: "8px" }}>
                   No houses match your filters
                 </h3>
@@ -1154,7 +1253,7 @@ export default function AgentDashboard() {
                 </p>
               </div>
             ) : (
-              <div style={{...s.houseGrid, gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(290px, 1fr))'}}>
+              <div style={{ ...s.houseGrid, gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(290px, 1fr))' }}>
                 {filteredAndSortedHouses().map((house) => {
                   const isApproved = house.status === "approved";
                   const isRejected = house.status === "rejected";
@@ -1162,8 +1261,8 @@ export default function AgentDashboard() {
                   const isHovered = hoveredCard === house._id;
 
                   return (
-                    <div 
-                      key={house._id} 
+                    <div
+                      key={house._id}
                       style={{
                         ...s.houseCard,
                         boxShadow: isHovered ? '0 8px 24px rgba(0,0,0,0.12)' : '0 2px 8px rgba(0,0,0,0.05)',
@@ -1226,24 +1325,24 @@ export default function AgentDashboard() {
                         <div style={{ ...s.houseInfoRow, marginTop: "8px", background: "#eff6ff" }}>
                           <span style={{ color: "#2563eb", display: 'flex', alignItems: 'center', gap: '4px' }}>
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                              <circle cx="12" cy="12" r="3"/>
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                              <circle cx="12" cy="12" r="3" />
                             </svg>
                             <strong>{house.views || 0}</strong> Views
                           </span>
                           <span style={{ color: "#2563eb", display: 'flex', alignItems: 'center', gap: '4px' }}>
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
-                              <path d="M12 18h.01"/>
+                              <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+                              <path d="M12 18h.01" />
                             </svg>
                             <strong>{house.qrScans || 0}</strong> QR Scans
                           </span>
                         </div>
 
-                        <div style={{...s.houseActions, flexWrap: 'wrap'}}>
+                        <div style={{ ...s.houseActions, flexWrap: 'wrap' }}>
                           {isApproved && (
                             <button
-                              style={{...s.viewBtn, minHeight: '44px', transition: 'all 0.2s ease'}}
+                              style={{ ...s.viewBtn, minHeight: '44px', transition: 'all 0.2s ease' }}
                               onClick={() => window.open(`/listings?property=${house._id}`, "_blank")}
                               title="View live listing"
                               aria-label="View live listing"
@@ -1252,7 +1351,7 @@ export default function AgentDashboard() {
                             </button>
                           )}
                           <button
-                            style={{...s.qrBtn, minHeight: '44px', transition: 'all 0.2s ease'}}
+                            style={{ ...s.qrBtn, minHeight: '44px', transition: 'all 0.2s ease' }}
                             onClick={() => setQrModalProperty(house)}
                             title="View QR Poster"
                             aria-label="View QR Poster"
@@ -1260,7 +1359,7 @@ export default function AgentDashboard() {
                             QR Poster
                           </button>
                           <button
-                            style={{...s.editBtn, minHeight: '44px', transition: 'all 0.2s ease'}}
+                            style={{ ...s.editBtn, minHeight: '44px', transition: 'all 0.2s ease' }}
                             onClick={() => navigate(`/property/edit/${house._id}`)}
                             title="Edit house listing"
                             aria-label="Edit house listing"
@@ -1268,7 +1367,7 @@ export default function AgentDashboard() {
                             Edit
                           </button>
                           <button
-                            style={{...s.delBtn, minHeight: '44px', transition: 'all 0.2s ease'}}
+                            style={{ ...s.delBtn, minHeight: '44px', transition: 'all 0.2s ease' }}
                             onClick={() => handleDeleteHouse(house._id)}
                             disabled={deleteLoading === house._id}
                             title="Delete house listing"
@@ -1298,15 +1397,15 @@ export default function AgentDashboard() {
       {/* Confirmation Delete Modal */}
       {confirmDelete && (
         <div style={s.modal}>
-          <div style={{...s.modalContent, maxWidth: '400px'}}>
+          <div style={{ ...s.modalContent, maxWidth: '400px' }}>
             <h3 style={s.modalTitle}>Delete House Listing</h3>
-            <p style={{fontSize: '14px', color: '#6b7280', marginBottom: '20px', lineHeight: 1.5}}>
+            <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '20px', lineHeight: 1.5 }}>
               Are you sure you want to delete this house listing? This action cannot be undone.
             </p>
             <div style={s.modalButtons}>
               <button
-                style={{ 
-                  ...s.modalBtn, 
+                style={{
+                  ...s.modalBtn,
                   ...s.modalBtnSecondary,
                   minHeight: '44px',
                   transition: 'all 0.2s ease',
@@ -1317,7 +1416,7 @@ export default function AgentDashboard() {
                 Cancel
               </button>
               <button
-                style={{ 
+                style={{
                   ...s.modalBtn,
                   background: '#dc2626',
                   color: 'white',
@@ -1339,6 +1438,185 @@ export default function AgentDashboard() {
         onClose={() => setShowAgentQRPoster(false)}
         agent={user}
       />
+
+      {/* Package Selection Modal */}
+      {showPackageModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000,
+          padding: '20px',
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '16px',
+            maxWidth: '900px',
+            width: '100%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            padding: '32px',
+            position: 'relative',
+          }}>
+            <button
+              onClick={() => setShowPackageModal(false)}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: 'transparent',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer',
+                color: '#6b7280',
+              }}
+            >
+              ×
+            </button>
+
+            <h2 style={{
+              fontSize: '28px',
+              fontWeight: 800,
+              color: '#1f2937',
+              marginBottom: '8px',
+              fontFamily: "'DM Sans', sans-serif",
+            }}>
+              Choose Your Package
+            </h2>
+            <p style={{
+              fontSize: '16px',
+              color: '#6b7280',
+              marginBottom: '24px',
+            }}>
+              Select a package that fits your needs
+            </p>
+
+            {/* Current Package Status */}
+            {myPackage && myPackage.currentTier !== 'none' && (
+              <div style={{
+                background: myPackage.isActive ? '#dcfce7' : '#fee2e2',
+                border: `1px solid ${myPackage.isActive ? '#22c55e' : '#ef4444'}`,
+                borderRadius: '12px',
+                padding: '16px',
+                marginBottom: '24px',
+              }}>
+                <div style={{ fontSize: '14px', fontWeight: 600, color: myPackage.isActive ? '#166534' : '#dc2626', marginBottom: '4px' }}>
+                  Current Package: {myPackage.package?.name}
+                </div>
+                <div style={{ fontSize: '13px', color: myPackage.isActive ? '#15803d' : '#b91c1c' }}>
+                  {myPackage.isActive ? `Expires: ${new Date(myPackage.expiresAt).toLocaleDateString()}` : 'Package expired'}
+                </div>
+                <div style={{ fontSize: '13px', color: myPackage.isActive ? '#15803d' : '#b91c1c', marginTop: '4px' }}>
+                  Active Listings: {myPackage.activeListingsCount} / {myPackage.package?.maxActiveListings === 100 ? 'Unlimited' : myPackage.package?.maxActiveListings}
+                </div>
+              </div>
+            )}
+
+            {/* Package Cards */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '16px',
+              marginBottom: '24px',
+            }}>
+              {packages && Object.entries(packages).map(([tier, pkg]) => (
+                <div
+                  key={tier}
+                  onClick={() => setSelectedPackage(tier)}
+                  style={{
+                    border: `2px solid ${selectedPackage === tier ? '#8b5cf6' : '#e5e7eb'}`,
+                    borderRadius: '12px',
+                    padding: '20px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    background: selectedPackage === tier ? '#f5f3ff' : 'white',
+                  }}
+                >
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#1f2937', marginBottom: '4px' }}>
+                    {pkg.name}
+                  </div>
+                  <div style={{ fontSize: '24px', fontWeight: 800, color: '#8b5cf6', marginBottom: '12px' }}>
+                    {pkg.price === 0 ? 'FREE' : `KSh ${pkg.price.toLocaleString()}`}
+                  </div>
+                  <div style={{ fontSize: '13px', color: '#6b7280', marginBottom: '12px' }}>
+                    {pkg.description}
+                  </div>
+                  <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '13px', color: '#374151' }}>
+                    {pkg.features.map((feature, idx) => (
+                      <li key={idx} style={{ marginBottom: '4px' }}>{feature}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+
+            {/* Payment Reference Input */}
+            {selectedPackage && packages[selectedPackage].price > 0 && (
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#374151', marginBottom: '8px' }}>
+                  Payment Reference (M-Pesa/Transaction ID)
+                </label>
+                <input
+                  type="text"
+                  value={paymentReference}
+                  onChange={(e) => setPaymentReference(e.target.value)}
+                  placeholder="Enter payment reference"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => {
+                  setShowPackageModal(false);
+                  setSelectedPackage(null);
+                  setPaymentReference("");
+                }}
+                style={{
+                  padding: '12px 24px',
+                  background: 'transparent',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: '#6b7280',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handlePurchasePackage}
+                disabled={!selectedPackage || purchasingPackage}
+                style={{
+                  padding: '12px 24px',
+                  background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: selectedPackage && !purchasingPackage ? 'pointer' : 'not-allowed',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: 'white',
+                  opacity: selectedPackage && !purchasingPackage ? 1 : 0.5,
+                }}
+              >
+                {purchasingPackage ? 'Processing...' : selectedPackage && packages[selectedPackage].price === 0 ? 'Activate Free' : 'Purchase Package'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

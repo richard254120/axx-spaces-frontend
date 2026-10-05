@@ -65,6 +65,11 @@ export default function AdminDashboard() {
   const [agentStatusFilter, setAgentStatusFilter] = useState("");
   // END ADDED
 
+  // ADDED: agent packages tab state
+  const [agentPackages, setAgentPackages] = useState([]);
+  const [packagesLoading, setPackagesLoading] = useState(false);
+  // END ADDED
+
   useEffect(() => {
     // Security check: ensure only admins can stay on this page
     if (user?.role !== "admin") {
@@ -88,6 +93,7 @@ export default function AdminDashboard() {
     loadRequests();
     loadPendingPayments();
     loadAgents();
+    loadAgentPackages();
   };
 
   // ADDED: load pending payments when tab is selected
@@ -140,6 +146,13 @@ export default function AdminDashboard() {
       loadAgents(agentStatusFilter);
     }
   }, [activeTab, agentStatusFilter]);
+
+  // ADDED: load agent packages when tab is selected
+  useEffect(() => {
+    if (activeTab === "packages") {
+      loadAgentPackages();
+    }
+  }, [activeTab]);
 
   // ADDED: load properties when tab or filter changes
   useEffect(() => {
@@ -250,6 +263,18 @@ export default function AdminDashboard() {
       alert("Agent rejected successfully");
     } catch (err) {
       alert("Failed to reject agent");
+    }
+  };
+
+  const loadAgentPackages = async () => {
+    try {
+      setPackagesLoading(true);
+      const res = await API.get("/agents/all-packages");
+      setAgentPackages(res.data || []);
+    } catch (err) {
+      console.error("Failed to load agent packages:", err);
+    } finally {
+      setPackagesLoading(false);
     }
   };
 
@@ -694,6 +719,7 @@ export default function AdminDashboard() {
           { id: "materials", label: "QuickSales", icon: "📦", count: allPending?.materials?.length || 0 },
           { id: "sellers", label: "QuickSales Sellers", icon: "🏷️", count: allPending?.sellers?.length || 0 },
           { id: "agents", label: "Agents", icon: "🤝", count: agents?.length || 0 },
+          { id: "packages", label: "Agent Packages", icon: "📦", count: agentPackages?.length || 0 },
           { id: "users", label: "Users", icon: "👥", count: users?.length || 0 },
           { id: "requests", label: "Requests", icon: "📋", count: requests?.length || 0 },
           { id: "payments", label: "Payments", icon: "💳", count: pendingPayments?.length || 0 },
@@ -1800,6 +1826,86 @@ export default function AdminDashboard() {
                               View Selfie
                             </button>
                           )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )
+        // END ADDED
+      ) : activeTab === "packages" ? (
+        // ADDED: Agent Packages Tab
+        packagesLoading ? (
+          <div style={styles.loader}>Loading agent packages...</div>
+        ) : agentPackages.length === 0 ? (
+          <div style={styles.emptyCard}>
+            <p style={styles.emptyText}>No agents with packages yet.</p>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px", width: "100%" }}>
+            <h2 style={styles.sectionTitle}>Agent Packages</h2>
+            <div style={styles.tableContainer}>
+              <table style={styles.table}>
+                <thead>
+                  <tr style={styles.theadRow}>
+                    <th style={styles.th}>Agent Info</th>
+                    <th style={styles.th}>Current Package</th>
+                    <th style={styles.th}>Status</th>
+                    <th style={styles.th}>Expires</th>
+                    <th style={styles.th}>Active Listings</th>
+                    <th style={styles.th}>History</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {agentPackages.map((agent) => (
+                    <tr key={agent._id} style={styles.tr}>
+                      <td style={styles.td}>
+                        <div style={styles.propTitle}>{agent.name}</div>
+                        <div style={{ fontSize: "12px", color: "#94a3b8", marginTop: "4px" }}>
+                          {agent.email}
+                        </div>
+                        <div style={{ fontSize: "12px", color: "#94a3b8" }}>
+                          {agent.phone}
+                        </div>
+                      </td>
+                      <td style={styles.td}>
+                        <div style={{
+                          fontSize: "14px",
+                          fontWeight: 700,
+                          color: agent.currentTier === "verified" ? "#8b5cf6" : agent.currentTier === "pro_plus" ? "#3b82f6" : agent.currentTier === "pro" ? "#22c55e" : "#6b7280",
+                        }}>
+                          {agent.package?.name || "No Package"}
+                        </div>
+                      </td>
+                      <td style={styles.td}>
+                        <span style={{
+                          fontSize: "11px",
+                          padding: "2px 8px",
+                          borderRadius: "4px",
+                          fontWeight: 600,
+                          background: agent.isActive ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.12)",
+                          color: agent.isActive ? "#22c55e" : "#ef4444",
+                          border: `1px solid ${agent.isActive ? "rgba(34,197,94,0.3)" : "rgba(239,68,68,0.3)"}`,
+                        }}>
+                          {agent.isActive ? "ACTIVE" : "EXPIRED"}
+                        </span>
+                      </td>
+                      <td style={styles.td}>
+                        <div style={styles.propLoc}>
+                          {agent.expiresAt ? new Date(agent.expiresAt).toLocaleDateString() : "N/A"}
+                        </div>
+                      </td>
+                      <td style={styles.td}>
+                        <div style={styles.propLoc}>
+                          {agent.activeListingsCount} / {agent.package?.maxActiveListings === 100 ? "Unlimited" : agent.package?.maxActiveListings || 0}
+                        </div>
+                      </td>
+                      <td style={styles.td}>
+                        <div style={{ fontSize: "12px", color: "#94a3b8" }}>
+                          {agent.packageHistory?.length || 0} purchases
                         </div>
                       </td>
                     </tr>
