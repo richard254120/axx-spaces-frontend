@@ -669,10 +669,30 @@ export default function AgentDashboard() {
       } else {
         const error = await res.json();
         addToast(error.error || "Failed to cancel pending purchase", "error");
+        console.error("Cancel error details:", error);
       }
     } catch (err) {
       console.error("Error cancelling pending purchase:", err);
       addToast("Failed to cancel pending purchase", "error");
+    }
+  };
+
+  const handleDebugPendingPurchase = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/agents/debug-pending-purchase`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        console.log("Debug pending purchase data:", data);
+        alert(JSON.stringify(data, null, 2));
+      } else {
+        const error = await res.json();
+        console.error("Debug error:", error);
+      }
+    } catch (err) {
+      console.error("Error debugging pending purchase:", err);
     }
   };
 
@@ -1552,21 +1572,38 @@ export default function AgentDashboard() {
                 <div style={{ fontSize: '13px', color: '#b45309', lineHeight: 1.6, marginBottom: '12px' }}>
                   You have a pending purchase for <strong>{pendingPurchase.name}</strong> (KSh {pendingPurchase.amount?.toLocaleString()}) submitted on {new Date(pendingPurchase.submittedAt).toLocaleDateString()}. Please wait for admin approval.
                 </div>
-                <button
-                  onClick={handleCancelPendingPurchase}
-                  style={{
-                    padding: '8px 16px',
-                    background: '#dc2626',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                  }}
-                >
-                  Cancel Pending Purchase
-                </button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    onClick={handleCancelPendingPurchase}
+                    style={{
+                      padding: '8px 16px',
+                      background: '#dc2626',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                    }}
+                  >
+                    Cancel Pending Purchase
+                  </button>
+                  <button
+                    onClick={handleDebugPendingPurchase}
+                    style={{
+                      padding: '8px 16px',
+                      background: '#6b7280',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                    }}
+                  >
+                    Debug
+                  </button>
+                </div>
               </div>
             )}
 
