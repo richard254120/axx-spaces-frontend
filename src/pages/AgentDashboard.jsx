@@ -685,14 +685,30 @@ export default function AgentDashboard() {
 
       if (res.ok) {
         const data = await res.json();
-        console.log("Debug pending purchase data:", data);
-        alert(JSON.stringify(data, null, 2));
+        console.log("=== DEBUG PENDING PURCHASE ===");
+        console.log("Full data:", data);
+        console.log("Has pending purchase:", data.hasPendingPurchase);
+        console.log("Pending purchase:", data.pendingPurchase);
+        console.log("Full agent profile:", data.fullAgentProfile);
+        console.log("=== END DEBUG ===");
+
+        const debugText = JSON.stringify(data, null, 2);
+        alert(debugText);
+
+        // Also copy to clipboard
+        navigator.clipboard.writeText(debugText).then(() => {
+          addToast("Debug info copied to clipboard", "success");
+        }).catch(() => {
+          addToast("Debug info displayed (copy failed)", "info");
+        });
       } else {
         const error = await res.json();
         console.error("Debug error:", error);
+        alert("Debug error: " + JSON.stringify(error, null, 2));
       }
     } catch (err) {
       console.error("Error debugging pending purchase:", err);
+      alert("Error: " + err.message);
     }
   };
 
