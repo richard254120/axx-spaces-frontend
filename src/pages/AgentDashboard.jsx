@@ -511,6 +511,7 @@ export default function AgentDashboard() {
   // Package-related state
   const [packages, setPackages] = useState(null);
   const [myPackage, setMyPackage] = useState(null);
+  const [pendingPurchase, setPendingPurchase] = useState(null);
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [paymentReference, setPaymentReference] = useState("");
   const [purchasingPackage, setPurchasingPackage] = useState(false);
@@ -585,6 +586,7 @@ export default function AgentDashboard() {
     loadData();
     loadPackages();
     loadMyPackage();
+    loadPendingPurchase();
   }, [user, navigate]);
 
   const loadData = async () => {
@@ -636,6 +638,44 @@ export default function AgentDashboard() {
     }
   };
 
+  const loadPendingPurchase = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/agents/my-pending-purchase`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPendingPurchase(data.pendingPurchase);
+      }
+    } catch (err) {
+      console.error("Error loading pending purchase:", err);
+    }
+  };
+
+  const handleCancelPendingPurchase = async () => {
+    if (!confirm("Are you sure you want to cancel your pending package purchase?")) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/agents/cancel-pending-purchase`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.ok) {
+        addToast("Pending purchase cancelled successfully", "success");
+        setPendingPurchase(null);
+      } else {
+        const error = await res.json();
+        addToast(error.error || "Failed to cancel pending purchase", "error");
+      }
+    } catch (err) {
+      console.error("Error cancelling pending purchase:", err);
+      addToast("Failed to cancel pending purchase", "error");
+    }
+  };
+
   const handlePurchasePackage = async () => {
     if (!selectedPackage) {
       addToast("Please select a package", "error");
@@ -668,6 +708,7 @@ export default function AgentDashboard() {
         setSelectedPackage(null);
         setPaymentReference("");
         loadMyPackage();
+        loadPendingPurchase();
         if (data.user) {
           updateUser(data.user);
         }
@@ -1495,6 +1536,39 @@ export default function AgentDashboard() {
             }}>
               Select a package that fits your needs
             </p>
+
+            {/* Pending Purchase Warning */}
+            {pendingPurchase && (
+              <div style={{
+                background: '#fef3c7',
+                border: '1px solid #f59e0b',
+                borderRadius: '12px',
+                padding: '16px',
+                marginBottom: '24px',
+              }}>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#92400e', marginBottom: '8px' }}>
+                  ⏳ Pending Purchase
+                </div>
+                <div style={{ fontSize: '13px', color: '#b45309', lineHeight: 1.6, marginBottom: '12px' }}>
+                  You have a pending purchase for <strong>{pendingPurchase.name}</strong> (KSh {pendingPurchase.amount?.toLocaleString()}) submitted on {new Date(pendingPurchase.submittedAt).toLocaleDateString()}. Please wait for admin approval.
+                </div>
+                <button
+                  onClick={handleCancelPendingPurchase}
+                  style={{
+                    padding: '8px 16px',
+                    background: '#dc2626',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                  }}
+                >
+                  Cancel Pending Purchase
+                </button>
+              </div>
+            )}
 
             {/* Current Package Status */}
             {myPackage && myPackage.currentTier !== 'none' && (
