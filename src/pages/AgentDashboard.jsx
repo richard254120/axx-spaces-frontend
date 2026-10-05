@@ -642,8 +642,8 @@ export default function AgentDashboard() {
       return;
     }
 
-    if (selectedPackage.price > 0 && !paymentReference.trim()) {
-      addToast("Payment reference is required for paid packages", "error");
+    if (selectedPackage && packages[selectedPackage].price > 0 && !paymentReference.trim()) {
+      addToast("M-Pesa SMS confirmation message is required for paid packages", "error");
       return;
     }
 
@@ -657,18 +657,20 @@ export default function AgentDashboard() {
         },
         body: JSON.stringify({
           tier: selectedPackage,
-          paymentReference: paymentReference.trim(),
+          paymentMessage: paymentReference.trim(),
         }),
       });
 
       if (res.ok) {
         const data = await res.json();
-        addToast("Package purchased successfully!", "success");
+        addToast(data.message, "success");
         setShowPackageModal(false);
         setSelectedPackage(null);
         setPaymentReference("");
         loadMyPackage();
-        updateUser(data.user);
+        if (data.user) {
+          updateUser(data.user);
+        }
       } else {
         const error = await res.json();
         addToast(error.error || "Failed to purchase package", "error");
@@ -1553,25 +1555,54 @@ export default function AgentDashboard() {
               ))}
             </div>
 
-            {/* Payment Reference Input */}
+            {/* Payment Instructions */}
+            {selectedPackage && packages[selectedPackage].price > 0 && (
+              <div style={{
+                background: '#f0fdf4',
+                border: '1px solid #22c55e',
+                borderRadius: '12px',
+                padding: '16px',
+                marginBottom: '24px',
+              }}>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#166534', marginBottom: '8px' }}>
+                  💳 Payment Instructions
+                </div>
+                <div style={{ fontSize: '13px', color: '#15803d', lineHeight: 1.6 }}>
+                  <div>1. Go to M-Pesa menu on your phone</div>
+                  <div>2. Select <strong>Lipa na M-Pesa</strong></div>
+                  <div>3. Select <strong>Buy Goods and Services</strong></div>
+                  <div>4. Enter Till Number: <strong>6593552</strong></div>
+                  <div>5. Enter Amount: <strong>KSh {packages[selectedPackage].price.toLocaleString()}</strong></div>
+                  <div>6. Enter your M-Pesa PIN and complete payment</div>
+                  <div>7. Copy the SMS confirmation message below</div>
+                </div>
+              </div>
+            )}
+
+            {/* Payment Message Input */}
             {selectedPackage && packages[selectedPackage].price > 0 && (
               <div style={{ marginBottom: '24px' }}>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#374151', marginBottom: '8px' }}>
-                  Payment Reference (M-Pesa/Transaction ID)
+                  M-Pesa SMS Confirmation Message *
                 </label>
-                <input
-                  type="text"
+                <textarea
                   value={paymentReference}
                   onChange={(e) => setPaymentReference(e.target.value)}
-                  placeholder="Enter payment reference"
+                  placeholder="Paste the M-Pesa SMS confirmation message here..."
+                  rows={4}
                   style={{
                     width: '100%',
                     padding: '12px',
                     border: '1px solid #e5e7eb',
                     borderRadius: '8px',
                     fontSize: '14px',
+                    fontFamily: 'inherit',
+                    resize: 'vertical',
                   }}
                 />
+                <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
+                  Example: "KSh1,500.00 received from John Doe 0712345678 on 5/10/26 at 12:30 PM. Account: 6593552"
+                </div>
               </div>
             )}
 

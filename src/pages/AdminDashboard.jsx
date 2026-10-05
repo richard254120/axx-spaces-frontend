@@ -70,6 +70,11 @@ export default function AdminDashboard() {
   const [packagesLoading, setPackagesLoading] = useState(false);
   // END ADDED
 
+  // ADDED: pending package purchases state
+  const [pendingPurchases, setPendingPurchases] = useState([]);
+  const [pendingPurchasesLoading, setPendingPurchasesLoading] = useState(false);
+  // END ADDED
+
   useEffect(() => {
     // Security check: ensure only admins can stay on this page
     if (user?.role !== "admin") {
@@ -94,6 +99,7 @@ export default function AdminDashboard() {
     loadPendingPayments();
     loadAgents();
     loadAgentPackages();
+    loadPendingPurchases();
   };
 
   // ADDED: load pending payments when tab is selected
@@ -151,6 +157,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (activeTab === "packages") {
       loadAgentPackages();
+      loadPendingPurchases();
     }
   }, [activeTab]);
 
@@ -275,6 +282,42 @@ export default function AdminDashboard() {
       console.error("Failed to load agent packages:", err);
     } finally {
       setPackagesLoading(false);
+    }
+  };
+
+  const loadPendingPurchases = async () => {
+    try {
+      setPendingPurchasesLoading(true);
+      const res = await API.get("/agents/pending-purchases");
+      setPendingPurchases(res.data || []);
+    } catch (err) {
+      console.error("Failed to load pending purchases:", err);
+    } finally {
+      setPendingPurchasesLoading(false);
+    }
+  };
+
+  const handleApprovePurchase = async (userId) => {
+    try {
+      await API.put(`/agents/approve-purchase/${userId}`);
+      alert("Package purchase approved successfully");
+      loadPendingPurchases();
+      loadAgentPackages();
+    } catch (err) {
+      alert("Failed to approve purchase");
+    }
+  };
+
+  const handleRejectPurchase = async (userId) => {
+    const reason = prompt("Please provide a reason for rejection:");
+    if (!reason) return;
+
+    try {
+      await API.put(`/agents/reject-purchase/${userId}`, { reason });
+      alert("Package purchase rejected successfully");
+      loadPendingPurchases();
+    } catch (err) {
+      alert("Failed to reject purchase");
     }
   };
 
@@ -1840,79 +1883,165 @@ export default function AdminDashboard() {
         // ADDED: Agent Packages Tab
         packagesLoading ? (
           <div style={styles.loader}>Loading agent packages...</div>
-        ) : agentPackages.length === 0 ? (
-          <div style={styles.emptyCard}>
-            <p style={styles.emptyText}>No agents with packages yet.</p>
-          </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: "20px", width: "100%" }}>
-            <h2 style={styles.sectionTitle}>Agent Packages</h2>
-            <div style={styles.tableContainer}>
-              <table style={styles.table}>
-                <thead>
-                  <tr style={styles.theadRow}>
-                    <th style={styles.th}>Agent Info</th>
-                    <th style={styles.th}>Current Package</th>
-                    <th style={styles.th}>Status</th>
-                    <th style={styles.th}>Expires</th>
-                    <th style={styles.th}>Active Listings</th>
-                    <th style={styles.th}>History</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {agentPackages.map((agent) => (
-                    <tr key={agent._id} style={styles.tr}>
-                      <td style={styles.td}>
-                        <div style={styles.propTitle}>{agent.name}</div>
-                        <div style={{ fontSize: "12px", color: "#94a3b8", marginTop: "4px" }}>
-                          {agent.email}
-                        </div>
-                        <div style={{ fontSize: "12px", color: "#94a3b8" }}>
-                          {agent.phone}
-                        </div>
-                      </td>
-                      <td style={styles.td}>
-                        <div style={{
-                          fontSize: "14px",
-                          fontWeight: 700,
-                          color: agent.currentTier === "verified" ? "#8b5cf6" : agent.currentTier === "pro_plus" ? "#3b82f6" : agent.currentTier === "pro" ? "#22c55e" : "#6b7280",
-                        }}>
-                          {agent.package?.name || "No Package"}
-                        </div>
-                      </td>
-                      <td style={styles.td}>
-                        <span style={{
-                          fontSize: "11px",
-                          padding: "2px 8px",
-                          borderRadius: "4px",
-                          fontWeight: 600,
-                          background: agent.isActive ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.12)",
-                          color: agent.isActive ? "#22c55e" : "#ef4444",
-                          border: `1px solid ${agent.isActive ? "rgba(34,197,94,0.3)" : "rgba(239,68,68,0.3)"}`,
-                        }}>
-                          {agent.isActive ? "ACTIVE" : "EXPIRED"}
-                        </span>
-                      </td>
-                      <td style={styles.td}>
-                        <div style={styles.propLoc}>
-                          {agent.expiresAt ? new Date(agent.expiresAt).toLocaleDateString() : "N/A"}
-                        </div>
-                      </td>
-                      <td style={styles.td}>
-                        <div style={styles.propLoc}>
-                          {agent.activeListingsCount} / {agent.package?.maxActiveListings === 100 ? "Unlimited" : agent.package?.maxActiveListings || 0}
-                        </div>
-                      </td>
-                      <td style={styles.td}>
-                        <div style={{ fontSize: "12px", color: "#94a3b8" }}>
-                          {agent.packageHistory?.length || 0} purchases
-                        </div>
-                      </td>
+          <div style={{ display: "flex", flexDirection: "column", gap: "24px", width: "100%" }}>
+            {/* Pending Purchases Section */}
+            {pendingPurchases.length > 0 && (
+              <div style={{
+                background: "linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.1))",
+                border: "1px solid #fbbf24",
+                borderRadius: "12px",
+                padding: "20px",
+              }}>
+                <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#1f2937", marginBottom: "16px" }}>
+                  ⏳ Pending Package Purchases ({pendingPurchases.length})
+                </h3>
+                <div style={styles.tableContainer}>
+                  <table style={styles.table}>
+                    <thead>
+                      <tr style={styles.theadRow}>
+                        <th style={styles.th}>Agent Info</th>
+                        <th style={styles.th}>Package</th>
+                        <th style={styles.th}>Amount</th>
+                        <th style={styles.th}>Payment Message</th>
+                        <th style={styles.th}>Submitted</th>
+                        <th style={styles.th}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pendingPurchases.map((agent) => (
+                        <tr key={agent._id} style={styles.tr}>
+                          <td style={styles.td}>
+                            <div style={styles.propTitle}>{agent.name}</div>
+                            <div style={{ fontSize: "12px", color: "#94a3b8", marginTop: "4px" }}>
+                              {agent.email}
+                            </div>
+                            <div style={{ fontSize: "12px", color: "#94a3b8" }}>
+                              {agent.phone}
+                            </div>
+                          </td>
+                          <td style={styles.td}>
+                            <div style={{
+                              fontSize: "14px",
+                              fontWeight: 700,
+                              color: "#f59e0b",
+                            }}>
+                              {agent.pendingPurchase.tier.toUpperCase()}
+                            </div>
+                          </td>
+                          <td style={styles.td}>
+                            <div style={styles.propLoc}>
+                              KSh {agent.pendingPurchase.amount.toLocaleString()}
+                            </div>
+                          </td>
+                          <td style={styles.td}>
+                            <div style={{ maxWidth: "250px", fontSize: "12px", color: "#94a3b8", wordBreak: "break-word" }}>
+                              {agent.pendingPurchase.paymentMessage}
+                            </div>
+                          </td>
+                          <td style={styles.td}>
+                            <div style={styles.propLoc}>
+                              {new Date(agent.pendingPurchase.submittedAt).toLocaleDateString()}
+                            </div>
+                          </td>
+                          <td style={styles.td}>
+                            <div style={styles.btnGroup}>
+                              <button
+                                onClick={() => handleApprovePurchase(agent._id)}
+                                style={styles.approveBtn}
+                              >
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => handleRejectPurchase(agent._id)}
+                                style={styles.rejectBtn}
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* All Agent Packages Section */}
+            <h2 style={styles.sectionTitle}>All Agent Packages</h2>
+            {agentPackages.length === 0 ? (
+              <div style={styles.emptyCard}>
+                <p style={styles.emptyText}>No agents with packages yet.</p>
+              </div>
+            ) : (
+              <div style={styles.tableContainer}>
+                <table style={styles.table}>
+                  <thead>
+                    <tr style={styles.theadRow}>
+                      <th style={styles.th}>Agent Info</th>
+                      <th style={styles.th}>Current Package</th>
+                      <th style={styles.th}>Status</th>
+                      <th style={styles.th}>Expires</th>
+                      <th style={styles.th}>Active Listings</th>
+                      <th style={styles.th}>History</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {agentPackages.map((agent) => (
+                      <tr key={agent._id} style={styles.tr}>
+                        <td style={styles.td}>
+                          <div style={styles.propTitle}>{agent.name}</div>
+                          <div style={{ fontSize: "12px", color: "#94a3b8", marginTop: "4px" }}>
+                            {agent.email}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#94a3b8" }}>
+                            {agent.phone}
+                          </div>
+                        </td>
+                        <td style={styles.td}>
+                          <div style={{
+                            fontSize: "14px",
+                            fontWeight: 700,
+                            color: agent.currentTier === "verified" ? "#8b5cf6" : agent.currentTier === "pro_plus" ? "#3b82f6" : agent.currentTier === "pro" ? "#22c55e" : "#6b7280",
+                          }}>
+                            {agent.package?.name || "No Package"}
+                          </div>
+                        </td>
+                        <td style={styles.td}>
+                          <span style={{
+                            fontSize: "11px",
+                            padding: "2px 8px",
+                            borderRadius: "4px",
+                            fontWeight: 600,
+                            background: agent.isActive ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.12)",
+                            color: agent.isActive ? "#22c55e" : "#ef4444",
+                            border: `1px solid ${agent.isActive ? "rgba(34,197,94,0.3)" : "rgba(239,68,68,0.3)"}`,
+                          }}>
+                            {agent.isActive ? "ACTIVE" : "EXPIRED"}
+                          </span>
+                        </td>
+                        <td style={styles.td}>
+                          <div style={styles.propLoc}>
+                            {agent.expiresAt ? new Date(agent.expiresAt).toLocaleDateString() : "N/A"}
+                          </div>
+                        </td>
+                        <td style={styles.td}>
+                          <div style={styles.propLoc}>
+                            {agent.activeListingsCount} / {agent.package?.maxActiveListings === 100 ? "Unlimited" : agent.package?.maxActiveListings || 0}
+                          </div>
+                        </td>
+                        <td style={styles.td}>
+                          <div style={{ fontSize: "12px", color: "#94a3b8" }}>
+                            {agent.packageHistory?.length || 0} purchases
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )
         // END ADDED
