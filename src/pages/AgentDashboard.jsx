@@ -653,6 +653,7 @@ export default function AgentDashboard() {
         
         // If the package tier has been upgraded, update the auth context
         if (data.currentTier && user?.agentProfile?.subscriptionTier !== data.currentTier) {
+          console.log(`📦 [Package] Tier upgraded from ${user?.agentProfile?.subscriptionTier} to ${data.currentTier}`);
           updateUser({
             ...user,
             agentProfile: {
@@ -677,12 +678,22 @@ export default function AgentDashboard() {
       if (res.ok) {
         const data = await res.json();
         console.log("📊 [Polling] Pending Purchase Data:", data);
-        setPendingPurchase(data.pendingPurchase);
         
-        // If no pending purchase, clear the state
+        // If approval detected
         if (!data.pendingPurchase && data.hasPending === false) {
           console.log("✅ [Polling] Clearing pending purchase - approval detected!");
+          setPendingPurchase(null);
           addToast("Payment approved! Your package has been upgraded.", "success");
+          
+          // Force refresh the package info to show new tier
+          await loadMyPackage(currentToken);
+          
+          // Wait a moment then reload everything to ensure fresh state
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+        } else {
+          setPendingPurchase(data.pendingPurchase);
         }
       }
     } catch (err) {
