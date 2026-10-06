@@ -704,6 +704,11 @@ export default function AgentDashboard() {
           
           // Force refresh the package info to show new tier
           await loadMyPackage(currentToken);
+          
+          // Refresh page ONCE after 1 second to show all updates
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
         } else if (data.pendingPurchase) {
           // If there's a new pending purchase, clear the flag so future approvals will trigger the toast
           clearApprovalProcessedFlag();
