@@ -516,6 +516,7 @@ export default function AgentDashboard() {
   const [paymentReference, setPaymentReference] = useState("");
   const [purchasingPackage, setPurchasingPackage] = useState(false);
   const [showPackageModal, setShowPackageModal] = useState(false);
+  const [hasReloadedOnApproval, setHasReloadedOnApproval] = useState(false);
 
   // Toast system functions
   const addToast = (message, type = 'success') => {
@@ -679,20 +680,19 @@ export default function AgentDashboard() {
         const data = await res.json();
         console.log("📊 [Polling] Pending Purchase Data:", data);
         
-        // If approval detected
-        if (!data.pendingPurchase && data.hasPending === false) {
+        // If approval detected (and we haven't already processed it)
+        if (!data.pendingPurchase && data.hasPending === false && !hasReloadedOnApproval) {
           console.log("✅ [Polling] Clearing pending purchase - approval detected!");
           setPendingPurchase(null);
+          setShowPackageModal(false);
           addToast("Payment approved! Your package has been upgraded.", "success");
+          
+          // Set flag to prevent processing approval multiple times
+          setHasReloadedOnApproval(true);
           
           // Force refresh the package info to show new tier
           await loadMyPackage(currentToken);
-          
-          // Wait a moment then reload everything to ensure fresh state
-          setTimeout(() => {
-            window.location.reload();
-          }, 2000);
-        } else {
+        } else if (data.pendingPurchase) {
           setPendingPurchase(data.pendingPurchase);
         }
       }
