@@ -1,7 +1,7 @@
 # Implementation Plan
 
 ## Task Summary
-Fix profile picture persistence issue and remove unwanted sections from AgentDashboard based on user requirements.
+Fix profile picture persistence issue, remove unwanted sections from AgentDashboard, and fix the continuous page refresh issue caused by package upgrade polling.
 
 ## Investigation Findings
 
@@ -15,6 +15,13 @@ Fix profile picture persistence issue and remove unwanted sections from AgentDas
 - Contains 4 main tabs: "My Houses", "Accommodation Hosts", "Landlords", "My Requests"
 - Profile picture upload functionality is already implemented and working for upload
 - Sections to remove: Hosts tab, Landlords tab, Requests tab (includes state, API calls, UI components)
+
+### Page Refresh Issue Analysis
+- **Root Cause**: Auto-refresh polling mechanism runs every 3 seconds to check for package upgrades
+- **Issue**: When package upgrade is detected, it triggers `addToast()` and `updateUser()` causing potential infinite re-renders
+- **Location**: Lines 629-641 in AgentDashboard.jsx - useEffect with 3-second interval polling
+- **Impact**: Page keeps refreshing when "package upgraded" popup appears
+- **Solution**: Improve polling logic to prevent infinite re-renders and reduce polling frequency
 
 ## Implementation Plan
 
@@ -41,6 +48,10 @@ Fix profile picture persistence issue and remove unwanted sections from AgentDas
 - `sending` (line ~44)
 - `hoveredProvider` (line ~49)
 - `requestStatusFilter` (line ~52)
+
+**Package-Related State to Keep** (but fix polling logic):
+- `packages`, `myPackage`, `pendingPurchase`, etc. (lines 512-520) - these are needed for package functionality
+- Fix the polling mechanism instead of removing it
 
 **API Calls to Remove from loadData() function** (lines ~155-180):
 - Fetch to `/agent-requests/providers` endpoint
@@ -79,7 +90,23 @@ Fix profile picture persistence issue and remove unwanted sections from AgentDas
 - Ensure `activeTab` defaults to "houses" and only allows "houses" value
 - Remove tab validation for non-existent tabs
 
-### 4. Clean Up Imports and Dependencies
+### 4. Fix Continuous Page Refresh Issue
+**Root cause**: Auto-refresh polling mechanism causing infinite re-renders
+**Files**: `/home/oguda/Desktop/AXX/backend/axx-spaces-frontend/src/pages/AgentDashboard.jsx`
+
+**Changes needed**:
+- **Reduce polling frequency**: Change from 3 seconds to 10-15 seconds (lines 640)
+- **Add polling guards**: Prevent duplicate toast notifications and user updates
+- **Improve state management**: Use refs or flags to track when upgrades have been processed
+- **Add dependencies to useEffect**: Include relevant dependencies to prevent unnecessary polling restarts
+
+**Specific fixes**:
+- Line 640: Change `}, 3000);` to `}, 10000);` (10 seconds instead of 3)
+- Lines 693-704: Add guard to prevent duplicate toast notifications when same upgrade is detected multiple times
+- Add `useRef` to track last processed upgrade to prevent duplicate processing
+- Consider adding a flag to temporarily pause polling after upgrade detection
+
+### 5. Clean Up Imports and Dependencies
 **Files**: `/home/oguda/Desktop/AXX/backend/axx-spaces-frontend/src/pages/AgentDashboard.jsx`
 **Changes**:
 - Remove any unused imports related to request functionality
@@ -94,6 +121,12 @@ Fix profile picture persistence issue and remove unwanted sections from AgentDas
 4. Log out completely and log back in
 5. Verify profile picture is displayed correctly
 
+### For Page Refresh Fix:
+1. Log in as agent
+2. Observe browser console for polling messages
+3. Check if polling frequency is reduced to 10 seconds
+4. Verify package upgrade notifications appear only once (no duplicates)
+5. Confirm page doesn't continuously refresh when upgrade popup appears
 ### For Dashboard Cleanup:
 1. Navigate to agent dashboard
 2. Verify only "My Houses" tab is visible
@@ -108,9 +141,14 @@ Fix profile picture persistence issue and remove unwanted sections from AgentDas
 - Backend login endpoint fix (isolated change)
 - Removing unused state variables and functions
 - Removing UI components
+- Reducing polling frequency (improves performance)
+
+**Medium Risk Changes**:
+- Modifying package polling logic (requires testing to ensure upgrades still work)
 
 **No Breaking Changes Expected**:
 - Profile upload functionality remains intact
+- Package upgrade functionality preserved (just optimized)
 - Core dashboard features preserved
 - Mobile responsiveness maintained
 - All professional UI enhancements kept
@@ -118,9 +156,10 @@ Fix profile picture persistence issue and remove unwanted sections from AgentDas
 **Rollback Plan**:
 - Git commit before changes
 - Backend change is easily reversible
-- Frontend changes are removal-only (low risk)
+- Frontend changes are mostly removal-only (low risk)
+- Package polling changes can be reverted if issues arise
 
 ## File Summary
 - **Backend**: 1 file modified (`routes/auth.js`)
 - **Frontend**: 1 file modified (`pages/AgentDashboard.jsx`)
-- **Total estimated lines changed**: ~500 lines removed, ~1 line modified
+- **Total estimated lines changed**: ~500 lines removed, ~5 lines modified
