@@ -585,20 +585,26 @@ export default function AgentDashboard() {
     }
     loadData();
     loadPackages();
-    loadMyPackage();
-    loadPendingPurchase();
-  }, [user, navigate]);
+    loadMyPackage(token);
+    loadPendingPurchase(token);
+  }, [user, navigate, token]);
 
   // Auto-refresh package status every 3 seconds to detect admin approval
   useEffect(() => {
     if (!user || user.role !== "agent" || !token) return;
     
+    console.log("🔄 [Polling] Started - checking every 3 seconds");
+    
     const interval = setInterval(() => {
-      loadMyPackage();
-      loadPendingPurchase();
+      console.log("🔍 [Polling] Checking for updates...");
+      loadMyPackage(token);
+      loadPendingPurchase(token);
     }, 3000); // Check every 3 seconds for faster detection
     
-    return () => clearInterval(interval);
+    return () => {
+      console.log("🛑 [Polling] Stopped");
+      clearInterval(interval);
+    };
   }, [token]);
 
   const loadData = async () => {
@@ -636,10 +642,10 @@ export default function AgentDashboard() {
     }
   };
 
-  const loadMyPackage = async () => {
+  const loadMyPackage = async (currentToken) => {
     try {
       const res = await fetch(`${API_BASE}/agents/my-package`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${currentToken}` },
       });
       if (res.ok) {
         const data = await res.json();
@@ -663,14 +669,21 @@ export default function AgentDashboard() {
     }
   };
 
-  const loadPendingPurchase = async () => {
+  const loadPendingPurchase = async (currentToken) => {
     try {
       const res = await fetch(`${API_BASE}/agents/my-pending-purchase`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${currentToken}` },
       });
       if (res.ok) {
         const data = await res.json();
+        console.log("📊 [Polling] Pending Purchase Data:", data);
         setPendingPurchase(data.pendingPurchase);
+        
+        // If no pending purchase, clear the state
+        if (!data.pendingPurchase && data.hasPending === false) {
+          console.log("✅ [Polling] Clearing pending purchase - approval detected!");
+          addToast("Payment approved! Your package has been upgraded.", "success");
+        }
       }
     } catch (err) {
       console.error("Error loading pending purchase:", err);
@@ -694,7 +707,7 @@ export default function AgentDashboard() {
         // Close the modal to force state refresh
         setShowPackageModal(false);
         // Reload pending purchase state to ensure it's cleared
-        await loadPendingPurchase();
+        await loadPendingPurchase(token);
       } else {
         const error = await res.json();
         addToast(error.error || "Failed to cancel pending purchase", "error");
