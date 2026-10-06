@@ -508,6 +508,9 @@ export default function AgentDashboard() {
   const [hoveredAvatar, setHoveredAvatar] = useState(false);
   const profilePictureInputRef = useRef(null);
 
+  // Add ref to track last processed upgrade tier to prevent infinite loops
+  const lastProcessedTierRef = useRef(null);
+
   // Package-related state
   const [packages, setPackages] = useState(null);
   const [myPackage, setMyPackage] = useState(null);
@@ -624,19 +627,19 @@ export default function AgentDashboard() {
     loadPackages();
     loadMyPackage(token);
     loadPendingPurchase(token);
-  }, [user, navigate, token]);
+  }, [user?._id, navigate, token]);
 
-  // Auto-refresh package status every 3 seconds to detect admin approval
+  // Auto-refresh package status every 10 seconds to detect admin approval
   useEffect(() => {
     if (!user || user.role !== "agent" || !token) return;
     
-    console.log("🔄 [Polling] Started - checking every 3 seconds");
+    console.log("🔄 [Polling] Started - checking every 10 seconds");
     
     const interval = setInterval(() => {
       console.log("🔍 [Polling] Checking for updates...");
       loadMyPackage(token);
       loadPendingPurchase(token);
-    }, 3000); // Check every 3 seconds for faster detection
+    }, 10000); // Check every 10 seconds to reduce server load
     
     return () => {
       console.log("🛑 [Polling] Stopped");
@@ -689,7 +692,14 @@ export default function AgentDashboard() {
         setMyPackage(data);
         
         // If the package tier has been upgraded, update the auth context
-        if (data.currentTier && user?.agentProfile?.subscriptionTier !== data.currentTier) {
+        // Add guard to prevent infinite loops by checking if we've already processed this tier
+        if (data.currentTier && 
+            user?.agentProfile?.subscriptionTier !== data.currentTier &&
+            lastProcessedTierRef.current !== data.currentTier) {
+          
+          // Track this tier as processed
+          lastProcessedTierRef.current = data.currentTier;
+          
           console.log(`📦 [Package] Tier upgraded from ${user?.agentProfile?.subscriptionTier} to ${data.currentTier}`);
           updateUser({
             ...user,
