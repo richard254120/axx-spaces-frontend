@@ -1,7 +1,9 @@
 # Implementation Plan
 
+# Implementation Plan
+
 ## Task Summary
-Fix profile picture persistence issue, remove unwanted sections from AgentDashboard, and fix the continuous page refresh issue caused by package upgrade polling.
+Fix profile picture persistence issue, remove unwanted sections from AgentDashboard, and fix the infinite re-render loop causing continuous page refreshing.
 
 ## Investigation Findings
 
@@ -16,12 +18,18 @@ Fix profile picture persistence issue, remove unwanted sections from AgentDashbo
 - Profile picture upload functionality is already implemented and working for upload
 - Sections to remove: Hosts tab, Landlords tab, Requests tab (includes state, API calls, UI components)
 
-### Page Refresh Issue Analysis
-- **Root Cause**: Auto-refresh polling mechanism runs every 3 seconds to check for package upgrades
-- **Issue**: When package upgrade is detected, it triggers `addToast()` and `updateUser()` causing potential infinite re-renders
-- **Location**: Lines 629-641 in AgentDashboard.jsx - useEffect with 3-second interval polling
-- **Impact**: Page keeps refreshing when "package upgraded" popup appears
-- **Solution**: Improve polling logic to prevent infinite re-renders and reduce polling frequency
+### Page Refresh Issue Analysis (CRITICAL)
+- **Root Cause**: Infinite re-render loop in useEffect dependencies
+- **Issue Chain**:
+  1. useEffect at line 616 depends on `[user, navigate, token]`
+  2. When package upgrade detected, `updateUser()` is called (line 695)
+  3. `updateUser()` modifies the `user` object in AuthContext
+  4. Modified `user` triggers the first useEffect to run again
+  5. This calls `loadMyPackage()` again, which may detect upgrade again
+  6. **Result**: Infinite loop of re-renders and API calls
+- **Location**: Lines 616-628 and 682-704 in AgentDashboard.jsx
+- **Impact**: Page keeps refreshing continuously when package upgrade popup appears
+- **Solution**: Fix useEffect dependencies and add proper guards to prevent infinite loops
 
 ## Implementation Plan
 
@@ -90,21 +98,57 @@ Fix profile picture persistence issue, remove unwanted sections from AgentDashbo
 - Ensure `activeTab` defaults to "houses" and only allows "houses" value
 - Remove tab validation for non-existent tabs
 
-### 4. Fix Continuous Page Refresh Issue
-**Root cause**: Auto-refresh polling mechanism causing infinite re-renders
+### 4. Fix Infinite Re-render Loop (CRITICAL)
+**Root cause**: useEffect dependency on `user` object creates infinite loop when `updateUser()` is called
 **Files**: `/home/oguda/Desktop/AXX/backend/axx-spaces-frontend/src/pages/AgentDashboard.jsx`
 
 **Changes needed**:
-- **Reduce polling frequency**: Change from 3 seconds to 10-15 seconds (lines 640)
-- **Add polling guards**: Prevent duplicate toast notifications and user updates
-- **Improve state management**: Use refs or flags to track when upgrades have been processed
-- **Add dependencies to useEffect**: Include relevant dependencies to prevent unnecessary polling restarts
+1. **Fix useEffect dependencies** (Line 626):
+   - Change from `[user, navigate, token]` to `[user?._id, navigate, token]` 
+   - This prevents re-running when user object changes but the actual user ID stays the same
 
-**Specific fixes**:
-- Line 640: Change `}, 3000);` to `}, 10000);` (10 seconds instead of 3)
-- Lines 693-704: Add guard to prevent duplicate toast notifications when same upgrade is detected multiple times
-- Add `useRef` to track last processed upgrade to prevent duplicate processing
-- Consider adding a flag to temporarily pause polling after upgrade detection
+2. **Add upgrade detection guards** (Lines 690-704):
+   - Use `useRef` to track last processed upgrade tier
+   - Only call `updateUser()` and `addToast()` if tier actually changed from what was last processed
+   - Prevent duplicate processing of same upgrade
+
+3. **Reduce polling frequency** (Line 640):
+   - Change from 3 seconds to 10 seconds: `}, 10000);`
+
+4. **Add cleanup for polling** (Lines 630-645):
+   - Ensure polling stops when user changes or component unmounts
+   - Add proper cleanup to prevent memory leaks
+
+**Specific code changes**:
+```javascript
+// Add at the top with other useRef declarations
+const lastProcessedTierRef = useRef(null);
+
+// Line 626: Change dependencies
+}, [user?._id, navigate, token]);
+
+// Lines 690-704: Add guard for upgrade detection
+if (data.currentTier && 
+    user?.agentProfile?.subscriptionTier !== data.currentTier &&
+    lastProcessedTierRef.current !== data.currentTier) {
+  
+  lastProcessedTierRef.current = data.currentTier;
+  console.log(`📦 [Package] Tier upgraded to ${data.currentTier}`);
+  
+  updateUser({
+    ...user,
+    agentProfile: {
+      ...user.agentProfile,
+      subscriptionTier: data.currentTier,
+      subscriptionExpiresAt: data.expiresAt,
+    }
+  });
+  addToast(`Package upgraded to ${data.package?.name}!`, 'success');
+}
+
+// Line 640: Reduce polling frequency
+}, 10000); // 10 seconds instead of 3
+```
 
 ### 5. Clean Up Imports and Dependencies
 **Files**: `/home/oguda/Desktop/AXX/backend/axx-spaces-frontend/src/pages/AgentDashboard.jsx`
@@ -121,12 +165,13 @@ Fix profile picture persistence issue, remove unwanted sections from AgentDashbo
 4. Log out completely and log back in
 5. Verify profile picture is displayed correctly
 
-### For Page Refresh Fix:
-1. Log in as agent
-2. Observe browser console for polling messages
-3. Check if polling frequency is reduced to 10 seconds
-4. Verify package upgrade notifications appear only once (no duplicates)
-5. Confirm page doesn't continuously refresh when upgrade popup appears
+### For Infinite Loop Fix (CRITICAL):
+1. Log in as agent and open browser console
+2. Look for repeated console messages indicating component re-mounting
+3. Verify polling messages appear only every 10 seconds (not every 3)
+4. Test package upgrade scenario - ensure upgrade notification appears only once
+5. Confirm page stops continuously refreshing after upgrade detection
+6. Verify browser dev tools show stable component lifecycle (no infinite re-renders)
 ### For Dashboard Cleanup:
 1. Navigate to agent dashboard
 2. Verify only "My Houses" tab is visible
@@ -145,6 +190,7 @@ Fix profile picture persistence issue, remove unwanted sections from AgentDashbo
 
 **Medium Risk Changes**:
 - Modifying package polling logic (requires testing to ensure upgrades still work)
+- **CRITICAL**: Fixing useEffect dependencies (must test thoroughly to ensure no side effects)
 
 **No Breaking Changes Expected**:
 - Profile upload functionality remains intact
@@ -155,11 +201,12 @@ Fix profile picture persistence issue, remove unwanted sections from AgentDashbo
 
 **Rollback Plan**:
 - Git commit before changes
-- Backend change is easily reversible
+- Backend change is easily reversible  
 - Frontend changes are mostly removal-only (low risk)
+- **CRITICAL**: useEffect dependency changes can be reverted immediately if issues arise
 - Package polling changes can be reverted if issues arise
 
 ## File Summary
 - **Backend**: 1 file modified (`routes/auth.js`)
 - **Frontend**: 1 file modified (`pages/AgentDashboard.jsx`)
-- **Total estimated lines changed**: ~500 lines removed, ~5 lines modified
+- **Total estimated lines changed**: ~500 lines removed, ~10 lines modified (including critical useEffect fix)
