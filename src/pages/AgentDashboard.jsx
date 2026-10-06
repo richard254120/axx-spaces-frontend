@@ -520,20 +520,36 @@ export default function AgentDashboard() {
   // Check if we've already processed this approval
   const getApprovalProcessedFlag = () => {
     const userId = user?._id;
-    if (!userId) return false;
-    return localStorage.getItem(`approvalProcessed_${userId}`) === "true";
+    if (!userId) {
+      console.log("⚠️ [Flag] No user ID, skipping flag check");
+      return false;
+    }
+    const flagKey = `approvalProcessed_${userId}`;
+    const value = localStorage.getItem(flagKey) === "true";
+    console.log(`📍 [Flag] Checking ${flagKey}: ${value}`);
+    return value;
   };
 
   const setApprovalProcessedFlag = () => {
     const userId = user?._id;
-    if (!userId) return;
-    localStorage.setItem(`approvalProcessed_${userId}`, "true");
+    if (!userId) {
+      console.log("⚠️ [Flag] No user ID, cannot set flag");
+      return;
+    }
+    const flagKey = `approvalProcessed_${userId}`;
+    localStorage.setItem(flagKey, "true");
+    console.log(`✅ [Flag] Set ${flagKey} = true`);
   };
 
   const clearApprovalProcessedFlag = () => {
     const userId = user?._id;
-    if (!userId) return;
-    localStorage.removeItem(`approvalProcessed_${userId}`);
+    if (!userId) {
+      console.log("⚠️ [Flag] No user ID, cannot clear flag");
+      return;
+    }
+    const flagKey = `approvalProcessed_${userId}`;
+    localStorage.removeItem(flagKey);
+    console.log(`🗑️ [Flag] Cleared ${flagKey}`);
   };
 
   // Toast system functions
@@ -602,6 +618,11 @@ export default function AgentDashboard() {
       navigate("/agent/login");
       return;
     }
+    console.log("🚀 [Mount] AgentDashboard mounted for user:", user._id);
+    
+    // Clear old approval flags on fresh login
+    clearApprovalProcessedFlag();
+    
     loadData();
     loadPackages();
     loadMyPackage(token);
@@ -699,7 +720,8 @@ export default function AgentDashboard() {
         console.log("📊 [Polling] Pending Purchase Data:", data);
         
         // If approval detected (and we haven't already processed it for this approval)
-        if (!data.pendingPurchase && data.hasPending === false && !getApprovalProcessedFlag()) {
+        // AND there's no existing pending purchase (meaning it was just approved)
+        if (!data.pendingPurchase && data.hasPending === false && !getApprovalProcessedFlag() && pendingPurchase) {
           console.log("✅ [Polling] Clearing pending purchase - approval detected!");
           setPendingPurchase(null);
           setShowPackageModal(false);
@@ -719,6 +741,9 @@ export default function AgentDashboard() {
           // If there's a new pending purchase, clear the flag so future approvals will trigger the toast
           clearApprovalProcessedFlag();
           setPendingPurchase(data.pendingPurchase);
+        } else if (!data.pendingPurchase && data.hasPending === false) {
+          // If no pending purchase and flag already set, just clear the state
+          setPendingPurchase(null);
         }
       }
     } catch (err) {
