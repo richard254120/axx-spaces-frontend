@@ -516,7 +516,19 @@ export default function AgentDashboard() {
   const [paymentReference, setPaymentReference] = useState("");
   const [purchasingPackage, setPurchasingPackage] = useState(false);
   const [showPackageModal, setShowPackageModal] = useState(false);
-  const [hasReloadedOnApproval, setHasReloadedOnApproval] = useState(false);
+
+  // Check if we've already processed this approval
+  const getApprovalProcessedFlag = () => {
+    return localStorage.getItem("approvalProcessed") === "true";
+  };
+
+  const setApprovalProcessedFlag = () => {
+    localStorage.setItem("approvalProcessed", "true");
+  };
+
+  const clearApprovalProcessedFlag = () => {
+    localStorage.removeItem("approvalProcessed");
+  };
 
   // Toast system functions
   const addToast = (message, type = 'success') => {
@@ -680,19 +692,21 @@ export default function AgentDashboard() {
         const data = await res.json();
         console.log("📊 [Polling] Pending Purchase Data:", data);
         
-        // If approval detected (and we haven't already processed it)
-        if (!data.pendingPurchase && data.hasPending === false && !hasReloadedOnApproval) {
+        // If approval detected (and we haven't already processed it for this approval)
+        if (!data.pendingPurchase && data.hasPending === false && !getApprovalProcessedFlag()) {
           console.log("✅ [Polling] Clearing pending purchase - approval detected!");
           setPendingPurchase(null);
           setShowPackageModal(false);
           addToast("Payment approved! Your package has been upgraded.", "success");
           
-          // Set flag to prevent processing approval multiple times
-          setHasReloadedOnApproval(true);
+          // Mark this approval as processed (persists across page reloads/component remounts)
+          setApprovalProcessedFlag();
           
           // Force refresh the package info to show new tier
           await loadMyPackage(currentToken);
         } else if (data.pendingPurchase) {
+          // If there's a new pending purchase, clear the flag so future approvals will trigger the toast
+          clearApprovalProcessedFlag();
           setPendingPurchase(data.pendingPurchase);
         }
       }
