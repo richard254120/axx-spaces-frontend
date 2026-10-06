@@ -589,17 +589,17 @@ export default function AgentDashboard() {
     loadPendingPurchase();
   }, [user, navigate]);
 
-  // Auto-refresh package status every 10 seconds to detect admin approval
+  // Auto-refresh package status every 3 seconds to detect admin approval
   useEffect(() => {
-    if (!user || user.role !== "agent") return;
+    if (!user || user.role !== "agent" || !token) return;
     
     const interval = setInterval(() => {
       loadMyPackage();
       loadPendingPurchase();
-    }, 10000); // Check every 10 seconds
+    }, 3000); // Check every 3 seconds for faster detection
     
     return () => clearInterval(interval);
-  }, [user, token]);
+  }, [token]);
 
   const loadData = async () => {
     try {
