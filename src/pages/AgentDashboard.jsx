@@ -519,15 +519,21 @@ export default function AgentDashboard() {
 
   // Check if we've already processed this approval
   const getApprovalProcessedFlag = () => {
-    return localStorage.getItem("approvalProcessed") === "true";
+    const userId = user?._id;
+    if (!userId) return false;
+    return localStorage.getItem(`approvalProcessed_${userId}`) === "true";
   };
 
   const setApprovalProcessedFlag = () => {
-    localStorage.setItem("approvalProcessed", "true");
+    const userId = user?._id;
+    if (!userId) return;
+    localStorage.setItem(`approvalProcessed_${userId}`, "true");
   };
 
   const clearApprovalProcessedFlag = () => {
-    localStorage.removeItem("approvalProcessed");
+    const userId = user?._id;
+    if (!userId) return;
+    localStorage.removeItem(`approvalProcessed_${userId}`);
   };
 
   // Toast system functions
@@ -861,6 +867,7 @@ export default function AgentDashboard() {
   };
 
   const handleLogout = () => {
+    clearApprovalProcessedFlag();
     logout("/agent/login");
   };
 
