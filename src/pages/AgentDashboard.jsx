@@ -620,9 +620,6 @@ export default function AgentDashboard() {
     }
     console.log("🚀 [Mount] AgentDashboard mounted for user:", user._id);
     
-    // Clear old approval flags on fresh login
-    clearApprovalProcessedFlag();
-    
     loadData();
     loadPackages();
     loadMyPackage(token);
@@ -731,12 +728,11 @@ export default function AgentDashboard() {
           setApprovalProcessedFlag();
           
           // Force refresh the package info to show new tier
+          console.log("📦 [Polling] Refreshing package info after approval...");
           await loadMyPackage(currentToken);
           
-          // Refresh page ONCE after 1 second to show all updates
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
+          // NO PAGE RELOAD - Just update UI directly
+          console.log("✅ [Polling] Approval processed, UI updated");
         } else if (data.pendingPurchase) {
           // If there's a new pending purchase, clear the flag so future approvals will trigger the toast
           clearApprovalProcessedFlag();
