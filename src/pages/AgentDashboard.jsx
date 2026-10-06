@@ -589,6 +589,18 @@ export default function AgentDashboard() {
     loadPendingPurchase();
   }, [user, navigate]);
 
+  // Auto-refresh package status every 10 seconds to detect admin approval
+  useEffect(() => {
+    if (!user || user.role !== "agent") return;
+    
+    const interval = setInterval(() => {
+      loadMyPackage();
+      loadPendingPurchase();
+    }, 10000); // Check every 10 seconds
+    
+    return () => clearInterval(interval);
+  }, [user, token]);
+
   const loadData = async () => {
     try {
       setLoading(true);
@@ -632,6 +644,19 @@ export default function AgentDashboard() {
       if (res.ok) {
         const data = await res.json();
         setMyPackage(data);
+        
+        // If the package tier has been upgraded, update the auth context
+        if (data.currentTier && user?.agentProfile?.subscriptionTier !== data.currentTier) {
+          updateUser({
+            ...user,
+            agentProfile: {
+              ...user.agentProfile,
+              subscriptionTier: data.currentTier,
+              subscriptionExpiresAt: data.expiresAt,
+            }
+          });
+          addToast(`Package upgraded to ${data.package?.name}!`, 'success');
+        }
       }
     } catch (err) {
       console.error("Error loading my package:", err);
