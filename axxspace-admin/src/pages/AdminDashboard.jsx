@@ -59,7 +59,11 @@ export default function AdminDashboard() {
   const [boostLoading, setBoostLoading] = useState(false);
   const [boostMessage, setBoostMessage] = useState("");
 
-  // ── UNIFIED NOTIFICATIONS STATE ───────────────────────────────
+  useEffect(() => {
+    // Ensure the page starts at the top on component mount (especially on mobile)
+    window.scrollTo(0, 0);
+  }, []);
+
   const [allNotifications, setAllNotifications] = useState([]);
   const [notificationSummary, setNotificationSummary] = useState(null);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
