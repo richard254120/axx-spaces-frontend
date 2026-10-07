@@ -24,6 +24,21 @@ export default function AdminHeader({
         <p className="admin-logo-sub">Welcome back, {user?.name?.split(" ")[0]}</p>
       </div>
 
+      {/* Mobile menu toggle button */}
+      <button
+        className="mobile-menu-btn"
+        onClick={() => {
+          const sidebar = document.querySelector('.admin-sidebar');
+          if (sidebar) {
+            sidebar.style.display = sidebar.style.display === 'block' ? 'none' : 'block';
+          }
+        }}
+        style={{ display: 'none' }}
+        aria-label="Toggle sidebar"
+      >
+        ☰
+      </button>
+
       <div className="admin-header-actions">
         <button
           className="btn-logout"
