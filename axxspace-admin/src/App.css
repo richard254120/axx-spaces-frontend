@@ -1,39 +1,107 @@
 .App {
   text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  background: linear-gradient(
+    135deg,
+    #06101f 0%,
+    #0d1b3e 20%,
+    #1a0a2e 40%,
+    #16213e 60%,
+    #0f3460 80%,
+    #06101f 100%
+  );
+  background-size: 400% 400%;
+  animation: gradientShift 25s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
 }
 
-.App-link {
-  color: #61dafb;
+/* Orb animations */
+@keyframes orbFloat {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50%       { transform: translateY(-30px) scale(1.05); }
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
+@keyframes orbPulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.15); }
+}
 
-  to {
-    transform: rotate(360deg);
-  }
+@keyframes orbRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes glow {
+  0%, 100% { filter: blur(80px) drop-shadow(0 0 30px currentColor); opacity: 0.12; }
+  50% { filter: blur(100px) drop-shadow(0 0 50px currentColor); opacity: 0.18; }
+}
+
+/* Gradient shift animation defined here for app level */
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Floating animated orb / blob effect */
+.orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  opacity: 0.12;
+  animation: orbFloat 8s ease-in-out infinite, orbPulse 6s ease-in-out infinite;
+  z-index: 0;
+}
+
+.orb-gold {
+  background: #fbbf24;
+  width: 600px;
+  height: 600px;
+  top: -200px;
+  left: -200px;
+  animation-delay: 0s;
+}
+
+.orb-blue {
+  background: #3b82f6;
+  width: 500px;
+  height: 500px;
+  bottom: -150px;
+  right: -150px;
+  animation-delay: -4s;
+}
+
+.orb-teal {
+  background: #14b8a6;
+  width: 400px;
+  height: 400px;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  animation-delay: -2s;
+}
+
+/* Additional orbs for professional effect */
+.orb-purple {
+  background: #a855f7;
+  width: 450px;
+  height: 450px;
+  bottom: 20%;
+  left: 10%;
+  opacity: 0.08;
+  animation: orbFloat 12s ease-in-out infinite;
+  animation-delay: -6s;
+}
+
+.orb-cyan {
+  background: #06b6d4;
+  width: 350px;
+  height: 350px;
+  top: 20%;
+  right: 5%;
+  opacity: 0.1;
+  animation: orbFloat 10s ease-in-out infinite;
+  animation-delay: -3s;
 }
