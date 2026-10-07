@@ -63,10 +63,10 @@ export default function Login() {
       <div className="login-card">
         {showForgot ? (
           <>
-            <h1 className="login-title">🔄 Reset Password</h1>
+            <h1 className="login-title">Reset Password</h1>
             <p className="login-subtitle">Enter your email to receive a reset link</p>
             {forgotMsg && (
-              <div className={`login-error ${forgotMsg.includes("Reset link sent") || forgotMsg.includes("reset") ? "success" : ""}`}>
+              <div className={forgotMsg.includes("Reset link sent") || forgotMsg.includes("reset") ? "login-success" : "login-error"}>
                 {forgotMsg}
               </div>
             )}
@@ -84,20 +84,21 @@ export default function Login() {
               <button 
                 onClick={handleForgotPassword} 
                 disabled={forgotLoading} 
-                className="login-button"
+                className="login-btn"
               >
-                {forgotLoading ? "Sending..." : "✉️ Send Reset Link"}
+                {forgotLoading ? "Sending..." : "Send Reset Link"}
               </button>
             </div>
-            <div className="login-back-link">
-              <span onClick={() => { setShowForgot(false); setForgotMsg(""); }}>
-                ← Back to Login
-              </span>
-            </div>
+            <button 
+              onClick={() => { setShowForgot(false); setForgotMsg(""); }} 
+              className="login-back-link"
+            >
+              ← Back to Login
+            </button>
           </>
         ) : (
           <>
-            <h1 className="login-title">🔐 Axxspace Admin</h1>
+            <h1 className="login-title">Axxspace Admin</h1>
             <p className="login-subtitle">Sign in to access the admin panel</p>
             {error && <div className="login-error">{error}</div>}
             <div className="login-form">
@@ -121,18 +122,19 @@ export default function Login() {
                   className="login-input"
                   onKeyDown={(e) => e.key === "Enter" && handleLogin()}
                 />
-                <div className="login-forgot-link">
-                  <span onClick={() => { setShowForgot(true); setError(""); }}>
-                    Forgot password?
-                  </span>
-                </div>
+                <button 
+                  onClick={() => { setShowForgot(true); setError(""); }}
+                  className="login-forgot"
+                >
+                  Forgot password?
+                </button>
               </div>
               <button 
                 onClick={handleLogin} 
                 disabled={loading} 
-                className="login-button"
+                className="login-btn"
               >
-                {loading ? "Signing in..." : "🚀 Sign In"}
+                {loading ? "Signing in..." : "Sign In"}
               </button>
             </div>
           </>
