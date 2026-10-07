@@ -68,6 +68,124 @@
   100% { opacity: 1; transform: translateY(0); }
 }
 
+/* Glitter/Sparkle animations */
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0) translate(0, 0); }
+  50% { opacity: 1; transform: scale(1) translate(var(--tx, 0), var(--ty, 0)); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+@keyframes shimmerFloat {
+  0% { opacity: 0; transform: translateY(0) translateX(-50%); }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-100vh) translateX(-50%); }
+}
+
+/* Splash/Burst animations */
+@keyframes splashBurst {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--sx, 100px), var(--sy, 100px)) scale(0);
+    filter: blur(8px);
+  }
+}
+
+@keyframes splashPulse {
+  0% { 
+    box-shadow: 0 0 0 0 currentColor;
+    opacity: 0.8;
+  }
+  70% { 
+    box-shadow: 0 0 0 40px rgba(255, 255, 255, 0);
+    opacity: 0.4;
+  }
+  100% { 
+    box-shadow: 0 0 0 60px rgba(255, 255, 255, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes radiusExpand {
+  0% {
+    r: 0;
+    opacity: 1;
+  }
+  100% {
+    r: 200px;
+    opacity: 0;
+  }
+}
+
+/* Sparkle Twinkle Animation */
+@keyframes sparkle-twinkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.5) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2) rotate(180deg);
+  }
+}
+
+/* Splash Burst Animation */
+@keyframes splash-burst {
+  0% {
+    opacity: 0.8;
+    transform: scale(0);
+  }
+  70% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+/* Bell Pulse Animation */
+@keyframes bell-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px #fbbf24);
+  }
+  50% {
+    filter: drop-shadow(0 0 14px #fbbf24) drop-shadow(0 0 28px rgba(251, 191, 36, 0.5));
+  }
+}
+
+/* Bell Ring Animation */
+@keyframes bell-ring {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  15% {
+    transform: rotate(15deg);
+  }
+  30% {
+    transform: rotate(-12deg);
+  }
+  45% {
+    transform: rotate(8deg);
+  }
+  60% {
+    transform: rotate(-5deg);
+  }
+  75% {
+    transform: rotate(3deg);
+  }
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -91,7 +209,7 @@ body {
   overflow-x: hidden;
 }
 
-/* Floating orbs background effect */
+/* Glitter particles container */
 body::before {
   content: '';
   position: fixed;
@@ -120,6 +238,26 @@ body::after {
     radial-gradient(circle at 20% 60%, rgba(236, 72, 153, 0.06) 0%, transparent 50%);
   pointer-events: none;
   animation: float-orb-2 25s ease-in-out infinite;
+  z-index: -1;
+}
+
+/* Sparkle effect overlay */
+#root::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, rgba(251, 191, 36, 0.8), rgba(255, 255, 255, 0.6)),
+    radial-gradient(2px 2px at 60px 70px, rgba(59, 130, 246, 0.7), rgba(255, 255, 255, 0.5)),
+    radial-gradient(1px 1px at 50px 50px, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.8)),
+    radial-gradient(1px 1px at 130px 80px, rgba(139, 92, 246, 0.8), rgba(255, 255, 255, 0.6));
+  background-size: 200px 200px;
+  background-position: 0 0, 40px 60px, 130px 270px, 70px 100px;
+  animation: shimmerFloat 12s ease-in-out infinite;
+  pointer-events: none;
   z-index: -1;
 }
 

@@ -19,6 +19,8 @@
   position: sticky;
   top: 0;
   overflow-y: auto;
+  position: relative;
+  z-index: 1;
 }
 
 .admin-sidebar-brand {
@@ -43,6 +45,8 @@
   overflow-y: auto;
   min-width: 0;
   background: linear-gradient(135deg, #060b13, #0f1624);
+  position: relative;
+  z-index: 1;
 }
 
 /* Header */
@@ -2764,5 +2768,353 @@
   .admin-sidebar {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+  }
+}
+
+
+/* ========== GLITTER & SPARKLE EFFECTS ========== */
+
+/* Glitter particles - individual sparkles */
+.glitter-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glitter-particle.small {
+  width: 2px;
+  height: 2px;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+.glitter-particle.medium {
+  width: 4px;
+  height: 4px;
+  animation: sparkle 3s ease-in-out infinite;
+}
+
+.glitter-particle.large {
+  width: 6px;
+  height: 6px;
+  animation: sparkle 4s ease-in-out infinite;
+}
+
+.glitter-particle.gold {
+  background: #fbbf24;
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.8);
+}
+
+.glitter-particle.blue {
+  background: #3b82f6;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
+}
+
+.glitter-particle.purple {
+  background: #a855f7;
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.8);
+}
+
+.glitter-particle.cyan {
+  background: #06b6d4;
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.8);
+}
+
+.glitter-particle.white {
+  background: #ffffff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.9);
+}
+
+/* Splash burst effects */
+.splash-effect {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 50%;
+  animation: splashBurst 1.5s ease-out forwards;
+}
+
+.splash-effect.gold {
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.8) 0%, rgba(251, 191, 36, 0.2) 100%);
+}
+
+.splash-effect.blue {
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.6) 0%, rgba(59, 130, 246, 0.1) 100%);
+}
+
+.splash-effect.purple {
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.6) 0%, rgba(168, 85, 247, 0.1) 100%);
+}
+
+.splash-effect.cyan {
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.6) 0%, rgba(6, 182, 212, 0.1) 100%);
+}
+
+/* ========== BELL ICON NOTIFICATION ========== */
+
+.bell-icon {
+  display: inline-block;
+  font-size: 20px;
+  margin-right: 4px;
+  animation: bellSway 0.6s ease-in-out infinite;
+}
+
+.btn-notification.active .bell-icon {
+  animation: bellRing 0.5s ease-in-out infinite;
+}
+
+@keyframes bellSway {
+  0%, 100% {
+    transform: rotate(0deg);
+    filter: drop-shadow(0 0 0px rgba(251, 191, 36, 0));
+  }
+  25% {
+    transform: rotate(-5deg);
+  }
+  75% {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes bellRing {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+    filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.8));
+  }
+  25% {
+    transform: rotate(-12deg) scale(1.05);
+    filter: drop-shadow(0 0 12px rgba(251, 191, 36, 1));
+  }
+  75% {
+    transform: rotate(12deg) scale(1.05);
+    filter: drop-shadow(0 0 12px rgba(251, 191, 36, 1));
+  }
+}
+
+/* Enhanced notification badge with bell */
+.notification-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  border: 2px solid #06101f;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+}
+
+.notification-badge.blink {
+  animation: badgePulse 1.5s ease-in-out infinite, badgeGlow 2s ease-in-out infinite;
+}
+
+@keyframes badgeGlow {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.8);
+  }
+}
+
+/* Enhanced notification panel with bell */
+.notification-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(251, 191, 36, 0.05));
+}
+
+.notification-panel-header .bell-icon {
+  font-size: 18px;
+  margin-right: 8px;
+  animation: bellSway 0.8s ease-in-out infinite;
+}
+
+.notification-panel-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fbbf24;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Glitter burst on notification */
+.notification-item.new::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #fbbf24, transparent);
+  animation: notificationGlimmer 2s ease-in-out infinite;
+}
+
+@keyframes notificationGlimmer {
+  0%, 100% {
+    opacity: 0.3;
+    box-shadow: 0 0 0 rgba(251, 191, 36, 0);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.8);
+  }
+}
+
+/* Enhanced button with bell icon */
+.btn-notification {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.btn-notification:hover .bell-icon {
+  transform: scale(1.1) rotate(-8deg);
+  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6));
+}
+
+/* Splash effect trigger area */
+.splash-trigger {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+/* ========== GLITTER BACKGROUND ANIMATION ========== */
+
+@keyframes glitterTwinkle {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes glitterFall {
+  0% {
+    transform: translateY(-10px) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) translateX(20px);
+    opacity: 0;
+  }
+}
+
+/* Glitter container */
+.glitter-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sparkle-dot {
+  position: absolute;
+  border-radius: 50%;
+  animation: glitterTwinkle 3s ease-in-out infinite;
+}
+
+.sparkle-dot.tiny {
+  width: 1px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.sparkle-dot.small {
+  width: 2px;
+  height: 2px;
+  background: rgba(251, 191, 36, 0.7);
+}
+
+.sparkle-dot.medium {
+  width: 3px;
+  height: 3px;
+  background: rgba(59, 130, 246, 0.6);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .bell-icon {
+    font-size: 18px;
+  }
+
+  .notification-panel-header .bell-icon {
+    font-size: 16px;
+  }
+
+  .glitter-particle.small,
+  .sparkle-dot.tiny {
+    display: none;
+  }
+
+  @keyframes bellRing {
+    0%, 100% {
+      transform: rotate(0deg) scale(1);
+      filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.6));
+    }
+    25% {
+      transform: rotate(-10deg) scale(1.03);
+      filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.8));
+    }
+    75% {
+      transform: rotate(10deg) scale(1.03);
+      filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.8));
+    }
+  }
+}
+
+@keyframes bellSway {
+  0%, 100% { transform: rotate(0deg); filter: drop-shadow(0 0 0px rgba(251, 191, 36, 0)); }
+  25% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+}
+
+@keyframes bellRing {
+  0%, 100% { transform: rotate(0deg) scale(1); filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.8)); }
+  25% { transform: rotate(-12deg) scale(1.05); filter: drop-shadow(0 0 12px rgba(251, 191, 36, 1)); }
+  75% { transform: rotate(12deg) scale(1.05); filter: drop-shadow(0 0 12px rgba(251, 191, 36, 1)); }
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0) translate(0, 0); }
+  50% { opacity: 1; transform: scale(1) translate(var(--tx, 0), var(--ty, 0)); }
+}
+
+@keyframes splashBurst {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--sx, 100px), var(--sy, 100px)) scale(0);
+    filter: blur(8px);
   }
 }

@@ -9,6 +9,7 @@ import NotificationPanel from "../components/NotificationPanel";
 import BadgeManagement from "../components/BadgeManagement";
 import UserBadgeManagement from "../components/UserBadgeManagement";
 import PaymentApprovals from "../components/PaymentApprovals";
+import GlitterBackground from "../components/GlitterBackground";
 import { getPricelistUrl } from "../utils/fileLinks";
 import QRGeneratorModal from "../components/QRGeneratorModal";
 import WebsitePoster from "../components/WebsitePoster";
@@ -694,6 +695,7 @@ export default function AdminDashboard() {
   // ── render ─────────────────────────────────────────────────
   return (
     <div className="admin-dashboard-container">
+      <GlitterBackground />
       {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />}
       <aside className={`admin-sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div className="admin-sidebar-brand">

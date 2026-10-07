@@ -1,0 +1,23 @@
+/* Glitter Background Container */
+.glitter-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* Sparkle Particles */
+.sparkle {
+  position: absolute;
+  border-radius: 50%;
+  animation: sparkle-twinkle infinite;
+}
+
+/* Splash Burst Particles */
+.splash {
+  position: absolute;
+  border-radius: 50%;
+  animation: splash-burst infinite;
+  filter: blur(2px);
+}

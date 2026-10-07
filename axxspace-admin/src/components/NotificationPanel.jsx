@@ -69,7 +69,7 @@ export default function NotificationPanel({
         onClick={() => setShowNotifPanel(!showNotifPanel)}
         title={notifications.length > 0 ? `${notifications.length} notification(s) awaiting approval` : "No pending notifications"}
       >
-        
+        <span className="bell-icon">🔔</span>
         {notifications.length > 0 && (
           <span className={`notification-badge ${notifications.length > 0 ? 'blink' : ''}`}>
             {notifications.length}
@@ -80,7 +80,9 @@ export default function NotificationPanel({
       {showNotifPanel && (
         <div className="notification-panel">
           <div className="notification-panel-header">
-            <span className="notification-panel-title"> All Notifications</span>
+            <span className="notification-panel-title">
+               All Notifications
+            </span>
             <button className="btn-close-notification" onClick={() => setShowNotifPanel(false)}>✕</button>
           </div>
 

@@ -19,9 +19,23 @@
   transform: translateY(-1px);
 }
 
+.btn-notification:hover .bell-icon {
+  animation: bell-ring 0.6s ease-in-out 1;
+}
+
 .btn-notification.active {
   border-color: rgba(239, 68, 68, 0.5);
   box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-notification.active .bell-icon {
+  animation: bell-pulse 1.2s ease-in-out infinite;
+}
+
+.bell-icon {
+  display: block;
+  font-size: 22px;
+  transition: all 0.2s;
 }
 
 .notification-badge {
