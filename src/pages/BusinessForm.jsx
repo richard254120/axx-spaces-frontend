@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../api/api";
 import PhoneInput from "../components/PhoneInput";
+import { AuthContext } from "../context/AuthContext";
 
 /* ── Multi-select dropdown component ── */
 function MultiSelectDropdown({ options, selected, onChange }) {
@@ -618,6 +619,7 @@ export default function BusinessForm() {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditing = !!id;
+  const { user } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -625,13 +627,12 @@ export default function BusinessForm() {
     categories: [],
     // Essential fields
     location: { county: "", town: "", coordinates: { lat: "", lng: "" } },
-    contact: { phone: "", email: "", website: "" },
-    // Optional fields that can be updated later in dashboard
-    yearEstablished: "",
+    contact: { phone: "", email: "" },
     submitterName: "",
-    socialMedia: { facebook: "", instagram: "", twitter: "", linkedin: "", tiktok: "", whatsapp: "" },
     images: [],
     logo: "",
+    // Categories with items, prices, and optional pictures
+    categoryItems: [],
   });
 
   /* ── FIX 1: Controlled product form state (replaces uncontrolled DOM inputs) ── */
@@ -653,6 +654,7 @@ export default function BusinessForm() {
   const [uploadProgress, setUploadProgress] = useState({ photos: 0, current: 0, total: 0 });
   const [isUploading, setIsUploading] = useState(false);
   const [logoPreview, setLogoPreview] = useState("");
+  const [categoryItemImages, setCategoryItemImages] = useState({});
 
   const STEPS = [
     { id: 1, title: "Basic Info" },
@@ -661,6 +663,21 @@ export default function BusinessForm() {
     { id: 4, title: "Logo & Photos" },
     { id: 5, title: "Review" },
   ];
+
+  /* ── Auto-populate phone and email from user registration ── */
+  useEffect(() => {
+    if (user && !isEditing) {
+      setFormData(prev => ({
+        ...prev,
+        contact: {
+          ...prev.contact,
+          phone: user.phone || prev.contact.phone,
+          email: user.email || prev.contact.email,
+        },
+        submitterName: user.name || prev.submitterName,
+      }));
+    }
+  }, [user, isEditing]);
 
   /* ── Load existing business when editing ── */
   useEffect(() => {
@@ -862,6 +879,64 @@ export default function BusinessForm() {
     setFormData(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }));
   };
 
+  /* ── Category item handlers ── */
+  const addCategoryItem = () => {
+    setFormData(prev => ({
+      ...prev,
+      categoryItems: [...prev.categoryItems, { name: "", price: "", image: "" }]
+    }));
+  };
+
+  const updateCategoryItem = (index, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      categoryItems: prev.categoryItems.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      )
+    }));
+  };
+
+  const removeCategoryItem = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      categoryItems: prev.categoryItems.filter((_, i) => i !== index)
+    }));
+    setCategoryItemImages(prev => {
+      const updated = { ...prev };
+      delete updated[index];
+      return updated;
+    });
+  };
+
+  const handleCategoryItemImageUpload = async (index, e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const localUrl = URL.createObjectURL(file);
+    setCategoryItemImages(prev => ({ ...prev, [index]: localUrl }));
+
+    try {
+      const compressedFile = await compressImage(file, 600, 600, 0.7);
+      const fd = new FormData();
+      fd.append("photo", compressedFile);
+      const res = await API.post("/uploads/business-photos", fd, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+      const uploadedUrl = res.data.urls?.[0];
+      if (uploadedUrl) {
+        updateCategoryItem(index, "image", uploadedUrl);
+        setCategoryItemImages(prev => ({ ...prev, [index]: uploadedUrl }));
+      }
+    } catch {
+      setError("Failed to upload item image");
+      setCategoryItemImages(prev => {
+        const updated = { ...prev };
+        delete updated[index];
+        return updated;
+      });
+    }
+  };
+
 
   /* ── Step navigation ── */
   const validateStep = (step) => {
@@ -935,7 +1010,6 @@ export default function BusinessForm() {
     // Clean optional fields to avoid sending empty strings for enums/numbers
     const payload = {
       ...basePayload,
-      yearEstablished: basePayload.yearEstablished === "" ? undefined : basePayload.yearEstablished,
     };
 
     if (payload.location) {
@@ -1091,16 +1165,6 @@ export default function BusinessForm() {
               placeholder="Describe your business, products, and services in detail"
             />
 
-            <label style={styles.label}>Year Established</label>
-            <input
-              type="number"
-              style={styles.input}
-              value={formData.yearEstablished || ""}
-              onChange={e => setFormData(prev => ({ ...prev, yearEstablished: e.target.value }))}
-              placeholder="e.g., 2015"
-              min="1900"
-              max={new Date().getFullYear()}
-            />
 
 
             <label style={styles.label}>Categories (Select multiple) *</label>
@@ -1109,6 +1173,73 @@ export default function BusinessForm() {
               selected={formData.categories}
               onChange={(categories) => setFormData(prev => ({ ...prev, categories }))}
             />
+
+            <h3 style={{ ...styles.sectionTitle, marginTop: "30px", fontSize: "18px" }}>Category Items (Optional)</h3>
+            <p style={{ fontSize: "13px", color: "#94a3b8", marginBottom: "20px" }}>
+              Add specific items from your categories with their prices and optional pictures
+            </p>
+
+            {formData.categoryItems.map((item, index) => (
+              <div key={index} style={styles.productFormBox}>
+                <div style={styles.productFormTitle}>Item #{index + 1}</div>
+
+                <label style={styles.label}>Item Name</label>
+                <input
+                  type="text"
+                  style={styles.input}
+                  value={item.name}
+                  onChange={e => updateCategoryItem(index, "name", e.target.value)}
+                  placeholder="e.g., Men's Leather Wallet"
+                />
+
+                <label style={styles.label}>Price (KES)</label>
+                <input
+                  type="text"
+                  style={styles.input}
+                  value={item.price}
+                  onChange={e => updateCategoryItem(index, "price", e.target.value)}
+                  placeholder="e.g., 1,500"
+                />
+
+                <label style={styles.label}>Item Image (Optional)</label>
+                <input
+                  type="file"
+                  style={styles.input}
+                  accept="image/*"
+                  onChange={e => handleCategoryItemImageUpload(index, e)}
+                />
+                {categoryItemImages[index] && (
+                  <img
+                    src={categoryItemImages[index]}
+                    alt={`Item ${index + 1}`}
+                    style={{
+                      width: "80px",
+                      height: "80px",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                      marginTop: "10px",
+                      border: "1px solid rgba(255,255,255,0.1)"
+                    }}
+                  />
+                )}
+
+                <button
+                  type="button"
+                  style={styles.removeBtn}
+                  onClick={() => removeCategoryItem(index)}
+                >
+                  Remove Item
+                </button>
+              </div>
+            ))}
+
+            <button
+              type="button"
+              style={styles.addProductBtn}
+              onClick={addCategoryItem}
+            >
+              + Add Category Item
+            </button>
           </div>
         ) : null}
 
@@ -1179,74 +1310,8 @@ export default function BusinessForm() {
               style={styles.input}
               value={formData.contact.email}
               onChange={e => setFormData(prev => ({ ...prev, contact: { ...prev.contact, email: e.target.value } }))}
-            />
-
-            <label style={styles.label}>Website (Optional)</label>
-            <input
-              type="url"
-              style={styles.input}
-              value={formData.contact.website}
-              onChange={e => setFormData(prev => ({ ...prev, contact: { ...prev.contact, website: e.target.value } }))}
-              placeholder="https://example.com"
-            />
-
-            <h2 style={{ ...styles.sectionTitle, marginTop: "30px" }}>Social Media Accounts</h2>
-            <p style={{ fontSize: "13px", color: "#94a3b8", marginBottom: "20px" }}>
-              Add your social media links to help customers connect with your business
-            </p>
-
-            <label style={styles.label}>Facebook</label>
-            <input
-              type="url"
-              style={styles.input}
-              value={formData.socialMedia.facebook}
-              onChange={e => setFormData(prev => ({ ...prev, socialMedia: { ...prev.socialMedia, facebook: e.target.value } }))}
-              placeholder="https://facebook.com/yourbusiness"
-            />
-
-            <label style={styles.label}>Instagram</label>
-            <input
-              type="url"
-              style={styles.input}
-              value={formData.socialMedia.instagram}
-              onChange={e => setFormData(prev => ({ ...prev, socialMedia: { ...prev.socialMedia, instagram: e.target.value } }))}
-              placeholder="https://instagram.com/yourbusiness"
-            />
-
-            <label style={styles.label}>Twitter/X</label>
-            <input
-              type="url"
-              style={styles.input}
-              value={formData.socialMedia.twitter}
-              onChange={e => setFormData(prev => ({ ...prev, socialMedia: { ...prev.socialMedia, twitter: e.target.value } }))}
-              placeholder="https://twitter.com/yourbusiness"
-            />
-
-            <label style={styles.label}>LinkedIn</label>
-            <input
-              type="url"
-              style={styles.input}
-              value={formData.socialMedia.linkedin}
-              onChange={e => setFormData(prev => ({ ...prev, socialMedia: { ...prev.socialMedia, linkedin: e.target.value } }))}
-              placeholder="https://linkedin.com/company/yourbusiness"
-            />
-
-            <label style={styles.label}>TikTok</label>
-            <input
-              type="url"
-              style={styles.input}
-              value={formData.socialMedia.tiktok}
-              onChange={e => setFormData(prev => ({ ...prev, socialMedia: { ...prev.socialMedia, tiktok: e.target.value } }))}
-              placeholder="https://tiktok.com/@yourbusiness"
-            />
-
-            <label style={styles.label}>WhatsApp</label>
-            <input
-              type="url"
-              style={styles.input}
-              value={formData.socialMedia.whatsapp}
-              onChange={e => setFormData(prev => ({ ...prev, socialMedia: { ...prev.socialMedia, whatsapp: e.target.value } }))}
-              placeholder="https://wa.me/254XXXXXXXXXX"
+              readOnly
+              placeholder="Auto-filled from your registration"
             />
           </div>
         ) : null}
@@ -1392,10 +1457,6 @@ export default function BusinessForm() {
                 <span style={styles.reviewLabel}>Categories:</span>
                 <span style={styles.reviewValue}>{formData.categories.join(", ")}</span>
               </div>
-              <div style={styles.reviewItem}>
-                <span style={styles.reviewLabel}>Year Established:</span>
-                <span style={styles.reviewValue}>{formData.yearEstablished || "Not specified"}</span>
-              </div>
             </div>
 
             <div style={styles.reviewSection}>
@@ -1422,55 +1483,9 @@ export default function BusinessForm() {
               </div>
               <div style={styles.reviewItem}>
                 <span style={styles.reviewLabel}>Website:</span>
-                <span style={styles.reviewValue}>{formData.contact.website || "Not specified"}</span>
+                <span style={styles.reviewValue}>Not required</span>
               </div>
             </div>
-
-            <div style={styles.reviewSection}>
-              <p style={styles.reviewTitle}>Social Media</p>
-              {formData.socialMedia.facebook && (
-                <div style={styles.reviewItem}>
-                  <span style={styles.reviewLabel}>Facebook:</span>
-                  <span style={styles.reviewValue}> Added</span>
-                </div>
-              )}
-              {formData.socialMedia.instagram && (
-                <div style={styles.reviewItem}>
-                  <span style={styles.reviewLabel}>Instagram:</span>
-                  <span style={styles.reviewValue}> Added</span>
-                </div>
-              )}
-              {formData.socialMedia.twitter && (
-                <div style={styles.reviewItem}>
-                  <span style={styles.reviewLabel}>Twitter:</span>
-                  <span style={styles.reviewValue}> Added</span>
-                </div>
-              )}
-              {formData.socialMedia.linkedin && (
-                <div style={styles.reviewItem}>
-                  <span style={styles.reviewLabel}>LinkedIn:</span>
-                  <span style={styles.reviewValue}> Added</span>
-                </div>
-              )}
-              {formData.socialMedia.tiktok && (
-                <div style={styles.reviewItem}>
-                  <span style={styles.reviewLabel}>TikTok:</span>
-                  <span style={styles.reviewValue}> Added</span>
-                </div>
-              )}
-              {formData.socialMedia.whatsapp && (
-                <div style={styles.reviewItem}>
-                  <span style={styles.reviewLabel}>WhatsApp:</span>
-                  <span style={styles.reviewValue}> Added</span>
-                </div>
-              )}
-              {!formData.socialMedia.facebook && !formData.socialMedia.instagram && !formData.socialMedia.twitter &&
-                !formData.socialMedia.linkedin && !formData.socialMedia.tiktok && !formData.socialMedia.whatsapp && (
-                  <div style={styles.reviewItem}>
-                    <span style={styles.reviewLabel}>Social Media:</span>
-                    <span style={styles.reviewValue}>Not specified</span>
-                  </div>
-                )}
             </div>
 
             <div style={styles.reviewSection}>
@@ -1484,56 +1499,73 @@ export default function BusinessForm() {
                 <span style={styles.reviewValue}>{businessPhotos.length} uploaded</span>
               </div>
             </div>
-          </div>
-        ) : null}
 
-        {/* ── NAVIGATION BUTTONS (for multi-step form) ── */}
-        {!isEditing && (
-          <div style={styles.navigationButtons}>
-            {currentStep > 1 && (
-              <button
-                type="button"
-                style={styles.backButton}
-                onClick={handleBack}
-              >
-                ← Back
-              </button>
-            )}
-            {currentStep < STEPS.length ? (
-              <button
-                type="button"
-                style={styles.nextButton}
-                onClick={handleNext}
-              >
-                {currentStep === STEPS.length - 1 ? "Review" : "Next →"}
-              </button>
-            ) : (
-              <button
-                type="submit"
-                style={{ ...styles.nextButton, ...(loading ? styles.buttonDisabled : {}) }}
-                disabled={loading}
-              >
-                {loading ? "Submitting…" : "Submit Business"}
-              </button>
-            )}
+            {formData.categoryItems.length > 0 && (
+          <div style={styles.reviewSection}>
+            <p style={styles.reviewTitle}>Category Items ({formData.categoryItems.length})</p>
+            {formData.categoryItems.map((item, index) => (
+              <div key={index} style={styles.reviewItem}>
+                <span style={styles.reviewLabel}>{item.name || "Unnamed Item"}:</span>
+                <span style={styles.reviewValue}>{item.price || "No price"}</span>
+              </div>
+            ))}
           </div>
         )}
-
-        {/* ── SUBMIT BUTTON (for editing mode) ── */}
-        {isEditing && (
-          <button
-            type="submit"
-            style={{ ...styles.button, ...(loading || countdown !== null ? styles.buttonDisabled : {}) }}
-            disabled={loading || countdown !== null}
-          >
-            {loading
-              ? "Saving…"
-              : countdown !== null
-                ? `Redirecting in ${countdown}s…`
-                : "Update Business"}
-          </button>
-        )}
-      </form>
     </div>
+  ) : null
+}
+
+{/* ── NAVIGATION BUTTONS (for multi-step form) ── */ }
+{
+  !isEditing && (
+    <div style={styles.navigationButtons}>
+      {currentStep > 1 && (
+        <button
+          type="button"
+          style={styles.backButton}
+          onClick={handleBack}
+        >
+          ← Back
+        </button>
+      )}
+      {currentStep < STEPS.length ? (
+        <button
+          type="button"
+          style={styles.nextButton}
+          onClick={handleNext}
+        >
+          {currentStep === STEPS.length - 1 ? "Review" : "Next →"}
+        </button>
+      ) : (
+        <button
+          type="submit"
+          style={{ ...styles.nextButton, ...(loading ? styles.buttonDisabled : {}) }}
+          disabled={loading}
+        >
+          {loading ? "Submitting…" : "Submit Business"}
+        </button>
+      )}
+    </div>
+  )
+}
+
+{/* ── SUBMIT BUTTON (for editing mode) ── */ }
+{
+  isEditing && (
+    <button
+      type="submit"
+      style={{ ...styles.button, ...(loading || countdown !== null ? styles.buttonDisabled : {}) }}
+      disabled={loading || countdown !== null}
+    >
+      {loading
+        ? "Saving…"
+        : countdown !== null
+          ? `Redirecting in ${countdown}s…`
+          : "Update Business"}
+    </button>
+  )
+}
+      </form >
+    </div >
   );
 }
