@@ -1486,7 +1486,6 @@ export default function BusinessForm() {
                 <span style={styles.reviewValue}>Not required</span>
               </div>
             </div>
-            </div>
 
             <div style={styles.reviewSection}>
               <p style={styles.reviewTitle}>Additional Info</p>
@@ -1501,71 +1500,66 @@ export default function BusinessForm() {
             </div>
 
             {formData.categoryItems.length > 0 && (
-          <div style={styles.reviewSection}>
-            <p style={styles.reviewTitle}>Category Items ({formData.categoryItems.length})</p>
-            {formData.categoryItems.map((item, index) => (
-              <div key={index} style={styles.reviewItem}>
-                <span style={styles.reviewLabel}>{item.name || "Unnamed Item"}:</span>
-                <span style={styles.reviewValue}>{item.price || "No price"}</span>
+              <div style={styles.reviewSection}>
+                <p style={styles.reviewTitle}>Category Items ({formData.categoryItems.length})</p>
+                {formData.categoryItems.map((item, index) => (
+                  <div key={index} style={styles.reviewItem}>
+                    <span style={styles.reviewLabel}>{item.name || "Unnamed Item"}:</span>
+                    <span style={styles.reviewValue}>{item.price || "No price"}</span>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
+          </div>
+        ) : null}
+
+        {/* ── NAVIGATION BUTTONS (for multi-step form) ── */}
+        {!isEditing && (
+          <div style={styles.navigationButtons}>
+            {currentStep > 1 && (
+              <button
+                type="button"
+                style={styles.backButton}
+                onClick={handleBack}
+              >
+                ← Back
+              </button>
+            )}
+            {currentStep < STEPS.length ? (
+              <button
+                type="button"
+                style={styles.nextButton}
+                onClick={handleNext}
+              >
+                {currentStep === STEPS.length - 1 ? "Review" : "Next →"}
+              </button>
+            ) : (
+              <button
+                type="submit"
+                style={{ ...styles.nextButton, ...(loading ? styles.buttonDisabled : {}) }}
+                disabled={loading}
+              >
+                {loading ? "Submitting…" : "Submit Business"}
+              </button>
+            )}
           </div>
         )}
-    </div>
-  ) : null
-}
 
-{/* ── NAVIGATION BUTTONS (for multi-step form) ── */ }
-{
-  !isEditing && (
-    <div style={styles.navigationButtons}>
-      {currentStep > 1 && (
-        <button
-          type="button"
-          style={styles.backButton}
-          onClick={handleBack}
-        >
-          ← Back
-        </button>
-      )}
-      {currentStep < STEPS.length ? (
-        <button
-          type="button"
-          style={styles.nextButton}
-          onClick={handleNext}
-        >
-          {currentStep === STEPS.length - 1 ? "Review" : "Next →"}
-        </button>
-      ) : (
-        <button
-          type="submit"
-          style={{ ...styles.nextButton, ...(loading ? styles.buttonDisabled : {}) }}
-          disabled={loading}
-        >
-          {loading ? "Submitting…" : "Submit Business"}
-        </button>
-      )}
+        {/* ── SUBMIT BUTTON (for editing mode) ── */}
+        {isEditing && (
+          <button
+            type="submit"
+            style={{ ...styles.button, ...(loading || countdown !== null ? styles.buttonDisabled : {}) }}
+            disabled={loading || countdown !== null}
+          >
+            {loading
+              ? "Saving…"
+              : countdown !== null
+                ? `Redirecting in ${countdown}s…`
+                : "Update Business"}
+          </button>
+        )}
+      </form>
     </div>
-  )
-}
-
-{/* ── SUBMIT BUTTON (for editing mode) ── */ }
-{
-  isEditing && (
-    <button
-      type="submit"
-      style={{ ...styles.button, ...(loading || countdown !== null ? styles.buttonDisabled : {}) }}
-      disabled={loading || countdown !== null}
-    >
-      {loading
-        ? "Saving…"
-        : countdown !== null
-          ? `Redirecting in ${countdown}s…`
-          : "Update Business"}
-    </button>
-  )
-}
-      </form >
-    </div >
   );
 }
