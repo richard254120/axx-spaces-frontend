@@ -685,7 +685,10 @@ export default function BusinessForm() {
       try {
         const res = await API.get(`/business/${id}`);
         const biz = res.data.business;
-        setFormData(biz);
+        setFormData({
+          ...biz,
+          categoryItems: biz.categoryItems || []
+        });
         if (biz.images?.length) {
           setBusinessPhotos(biz.images);
         }
@@ -919,16 +922,15 @@ export default function BusinessForm() {
       const compressedFile = await compressImage(file, 600, 600, 0.7);
       const fd = new FormData();
       fd.append("photo", compressedFile);
-      const res = await API.post("/uploads/business-photo", fd, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
+      const res = await API.post("/uploads/business-photo", fd);
       const uploadedUrl = res.data.url;
       if (uploadedUrl) {
         updateCategoryItem(index, "image", uploadedUrl);
         setCategoryItemImages(prev => ({ ...prev, [index]: uploadedUrl }));
       }
-    } catch {
-      setError("Failed to upload item image");
+    } catch (err) {
+      console.error("Upload error:", err);
+      setError(err.response?.data?.error || "Failed to upload item image");
       setCategoryItemImages(prev => {
         const updated = { ...prev };
         delete updated[index];

@@ -989,6 +989,7 @@ export default function BusinessDetail() {
   const b = business;
   const images = b.images || [];
   const products = b.products || [];
+  const categoryItems = b.categoryItems || [];
   const activePromos = (b.promotions || []).filter(p => p.status === "active" && p.isFeatured);
 
   /* ════════════════════════════════════════════
@@ -1065,7 +1066,7 @@ export default function BusinessDetail() {
                 whiteSpace: "nowrap",
               }}
             >
-               Open Map
+              Open Map
             </a>
           </div>
         )}
@@ -1141,7 +1142,7 @@ export default function BusinessDetail() {
           <div>
             {/* Photo count badge */}
             <div className="bd-photo-count">
-               {images.length} {images.length === 1 ? "Photo" : "Photos"}
+              {images.length} {images.length === 1 ? "Photo" : "Photos"}
             </div>
 
             <div className="bd-gallery">
@@ -1362,7 +1363,7 @@ export default function BusinessDetail() {
 
             {/* Product count badge */}
             <div className="bd-product-count">
-               {products.length} {products.length === 1 ? "Item" : "Items"}
+              {products.length} {products.length === 1 ? "Item" : "Items"}
             </div>
 
             <div className="bd-products-grid">
@@ -1382,6 +1383,40 @@ export default function BusinessDetail() {
                     )}
                     {product.category && (
                       <div className="bd-product-cat">{product.category}</div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ══════════════════════════════════════
+          CATEGORY ITEMS — optional items with prices
+      ══════════════════════════════════════ */}
+      {categoryItems.length > 0 && (
+        <>
+          <div className="bd-divider" />
+          <div className="bd-section">
+            <p className="bd-section-title">Category Items</p>
+
+            {/* Category items count badge */}
+            <div className="bd-product-count">
+              {categoryItems.length} {categoryItems.length === 1 ? "Item" : "Items"}
+            </div>
+
+            <div className="bd-products-grid">
+              {categoryItems.map((item, i) => (
+                <div key={i} className="bd-product-card">
+                  {item.image
+                    ? <img src={item.image} alt={item.name} className="bd-product-img" loading="lazy" />
+                    : <div className="bd-product-img-placeholder"></div>
+                  }
+                  <div className="bd-product-body">
+                    <div className="bd-product-name">{item.name || "Unnamed Item"}</div>
+                    {item.price && (
+                      <div className="bd-product-price">KES {item.price}</div>
                     )}
                   </div>
                 </div>

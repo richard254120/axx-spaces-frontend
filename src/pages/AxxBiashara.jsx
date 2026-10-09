@@ -1029,6 +1029,11 @@ export default function AxxBiashara() {
                         <div style={{ display: "flex", gap: "6px", color: "#64748b" }}>
                           {biz.priceRange && <span style={{ color: "#fbbf24", fontWeight: 700 }}>{biz.priceRange}</span>}
                           {biz.yearEstablished && <span>Est. {biz.yearEstablished}</span>}
+                          {biz.categoryItems?.length > 0 && (
+                            <span style={{ color: "#22c55e", fontWeight: 700 }}>
+                              {biz.categoryItems.length} item{biz.categoryItems.length > 1 ? "s" : ""}
+                            </span>
+                          )}
                         </div>
                       </div>
 
