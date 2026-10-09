@@ -278,7 +278,7 @@ export default function BusinessDetail() {
             <span style={styles.infoLabel}>Pricelist / Menu:</span>
             <p style={styles.infoValue}>
               <a href={getPricelistUrl(business.pricelist)} target="_blank" rel="noopener noreferrer" style={{ color: "#60a5fa" }}>
-                 View / Download {business.pricelist.name ? `(${business.pricelist.name})` : ""}
+                View / Download {business.pricelist.name ? `(${business.pricelist.name})` : ""}
               </a>
             </p>
           </div>
@@ -301,8 +301,24 @@ export default function BusinessDetail() {
             <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "8px" }}>
               {business.documents.map((doc, i) => (
                 <a key={i} href={resolveMediaUrl(doc.url)} target="_blank" rel="noopener noreferrer" style={{ color: "#60a5fa" }}>
-                   {doc.name || doc.type || `Document ${i + 1}`}
+                  {doc.name || doc.type || `Document ${i + 1}`}
                 </a>
+              ))}
+            </div>
+          </div>
+        )}
+        {business.categoryItems?.length > 0 && (
+          <div style={{ marginTop: "20px" }}>
+            <span style={styles.infoLabel}>Category Items ({business.categoryItems.length}):</span>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "15px", marginTop: "10px" }}>
+              {business.categoryItems.map((item, i) => (
+                <div key={i} style={{ background: "rgba(15, 23, 42, 0.6)", borderRadius: "8px", padding: "12px", border: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                  {item.image && (
+                    <img src={resolveMediaUrl(item.image)} alt={item.name} style={{ width: "100%", height: "120px", objectFit: "cover", borderRadius: "6px", marginBottom: "8px" }} />
+                  )}
+                  <div style={{ fontSize: "14px", fontWeight: 600, color: "#f1f5f9", marginBottom: "4px" }}>{item.name || "Unnamed Item"}</div>
+                  {item.price && <div style={{ fontSize: "14px", color: "#22c55e", fontWeight: 700 }}>KES {item.price}</div>}
+                </div>
               ))}
             </div>
           </div>
@@ -327,7 +343,7 @@ export default function BusinessDetail() {
                     style={styles.deleteButton}
                     onClick={() => handleDeleteReview(review._id)}
                   >
-                     Delete
+                    Delete
                   </button>
                 </div>
                 {review.title && <div style={styles.reviewTitle}>{review.title}</div>}
