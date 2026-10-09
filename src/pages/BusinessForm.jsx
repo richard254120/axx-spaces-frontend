@@ -919,10 +919,10 @@ export default function BusinessForm() {
       const compressedFile = await compressImage(file, 600, 600, 0.7);
       const fd = new FormData();
       fd.append("photo", compressedFile);
-      const res = await API.post("/uploads/business-photos", fd, {
+      const res = await API.post("/uploads/business-photo", fd, {
         headers: { "Content-Type": "multipart/form-data" }
       });
-      const uploadedUrl = res.data.urls?.[0];
+      const uploadedUrl = res.data.url;
       if (uploadedUrl) {
         updateCategoryItem(index, "image", uploadedUrl);
         setCategoryItemImages(prev => ({ ...prev, [index]: uploadedUrl }));
@@ -1268,6 +1268,53 @@ export default function BusinessForm() {
               required
             />
 
+            <button
+              type="button"
+              onClick={() => {
+                if (navigator.geolocation) {
+                  navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        location: {
+                          ...prev.location,
+                          coordinates: {
+                            lat: position.coords.latitude.toString(),
+                            lng: position.coords.longitude.toString()
+                          }
+                        }
+                      }));
+                    },
+                    (error) => {
+                      setError("Failed to get your location. Please enable location services.");
+                    }
+                  );
+                } else {
+                  setError("Geolocation is not supported by your browser.");
+                }
+              }}
+              style={{
+                width: "100%",
+                padding: "12px 16px",
+                background: "rgba(96, 165, 250, 0.15)",
+                color: "#60a5fa",
+                border: "1px solid rgba(96, 165, 250, 0.4)",
+                borderRadius: "10px",
+                fontSize: "16px",
+                fontWeight: 700,
+                cursor: "pointer",
+                marginBottom: "15px",
+                transition: "all 0.3s",
+              }}
+              onMouseOver={(e) => {
+                e.target.style.background = "rgba(96, 165, 250, 0.25)";
+              }}
+              onMouseOut={(e) => {
+                e.target.style.background = "rgba(96, 165, 250, 0.15)";
+              }}
+            >
+              📍 Detect My Current Location
+            </button>
 
             <label style={styles.label}>GPS Latitude (optional)</label>
             <input
