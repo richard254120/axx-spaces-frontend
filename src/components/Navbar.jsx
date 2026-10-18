@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect, useRef } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { ProfileAvatar } from "../features/profile";
 import AccountTypeSelector from "./AccountTypeSelector";
@@ -8,29 +8,83 @@ import { getDashboardPath, getAccountNav, getWorkspaceBrand, isWorkspaceUser } f
 import logo from "../assets/image.png";
 import RequestItemModal from "./RequestItemModal";
 
+const TAB_LINKS = [
+  { to: "/", label: "Home" },
+  { to: "/axxbiashara", label: "AxxBiashara" },
+  { to: "/quicksales", label: "QuickSales" },
+  { to: "/listings", label: "Rentals" },
+  { to: "/accommodation", label: "Accommodation" },
+  { to: "/mobile-app", label: "Download App" },
+];
+
+const MENU_PRIMARY = [
+  { to: "/", label: "Home" },
+  { to: "/axxbiashara", label: "AxxBiashara" },
+  { to: "/quicksales", label: "QuickSales" },
+  { to: "/listings", label: "Rentals" },
+  { to: "/accommodation", label: "Accommodation" },
+  { to: "/accommodation/login", label: "Host Login" },
+  { to: "/agent/login", label: "Agent login" },
+];
+
+const MENU_SECONDARY = [
+  { to: "/about", label: "About" },
+  { to: "/faq", label: "FAQ" },
+  { to: "/mobile-app", label: "Mobile App" },
+  { to: "/axxwallet", label: "AxxWallet" },
+];
+
+const JOBS = [
+  {
+    key: "web-development",
+    label: "Web Development",
+    desc: "Custom websites, web apps, e-commerce platforms, and full-stack solutions tailored to your business needs",
+    to: "/jobs/web-development",
+  },
+  {
+    key: "marketing",
+    label: "Marketing",
+    desc: "Digital marketing, SEO, social media management, content creation, and brand strategy to grow your online presence",
+    to: "/jobs/marketing",
+  },
+  {
+    key: "ui-ux-design",
+    label: "UI/UX Design",
+    desc: "User interface design, user experience research, wireframing, prototyping, and design systems for digital products",
+    to: "/jobs/ui-ux-design",
+  },
+];
+
 export default function Navbar() {
   const { token, user, logout } = useContext(AuthContext);
-  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
-  const navigate = useNavigate();
   const location = useLocation();
+
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [accountSelectorOpen, setAccountSelectorOpen] = useState(false);
   const [accountSelectorMode, setAccountSelectorMode] = useState("login");
   const [jobDropdownOpen, setJobDropdownOpen] = useState(null);
-  const [rentalsDropdownOpen, setRentalsDropdownOpen] = useState(false);
+
   const dropdownRef = useRef(null);
   const accountRef = useRef(null);
-  const rentalsDropdownRef = useRef(null);
+  const userMenuRef = useRef(null);
 
+  const isLoggedIn = token && user && user.role !== "guest";
   const getDashboardLink = () => getDashboardPath(user?.role);
 
   const isActive = (path) => {
-    if (path === "/") {
-      return location.pathname === "/";
-    }
+    if (path === "/") return location.pathname === "/";
     return location.pathname.startsWith(path);
+  };
+
+  const closeAll = () => {
+    setMenuOpen(false);
+    setDropdownOpen(false);
+    setUserMenuOpen(false);
+    setAccountOpen(false);
   };
 
   const handleLoginClick = () => {
@@ -47,257 +101,160 @@ export default function Navbar() {
 
   const handleLogout = () => {
     logout("/");
-    setMenuOpen(false);
-    setDropdownOpen(false);
-    setAccountOpen(false);
+    closeAll();
   };
 
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setDropdownOpen(false);
-      }
-      if (accountRef.current && !accountRef.current.contains(e.target)) {
-        setAccountOpen(false);
-      }
-      if (rentalsDropdownRef.current && !rentalsDropdownRef.current.contains(e.target)) {
-        setRentalsDropdownOpen(false);
-      }
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setDropdownOpen(false);
+      if (accountRef.current && !accountRef.current.contains(e.target)) setAccountOpen(false);
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setUserMenuOpen(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Close everything on route change
+  useEffect(() => {
+    closeAll();
+  }, [location.pathname]);
+
   // Prevent background scroll when mobile dropdown is open
   useEffect(() => {
-    if (dropdownOpen || accountOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = dropdownOpen || accountOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
   }, [dropdownOpen, accountOpen]);
 
-  // ─── HAMBURGER DROPDOWN MENU (top-right icon) ────────────────────────────
-  const HamburgerDropdown = () => (
-    <div style={styles.dropdownWrapper} ref={dropdownRef}>
+  const menuLink = (item) => (
+    <Link key={item.to + item.label} to={item.to} className="ax-item" onClick={() => setDropdownOpen(false)}>
+      {item.label}
+    </Link>
+  );
+
+  // ─── HAMBURGER DROPDOWN MENU ─────────────────────────────────────────────
+  const renderMenu = () => (
+    <div className="ax-menu-wrap" ref={dropdownRef}>
       <button
-        style={styles.menuIconBtn}
+        type="button"
+        className="ax-icon-btn"
         onClick={() => setDropdownOpen(!dropdownOpen)}
-        aria-label="Open menu"
+        aria-label={dropdownOpen ? "Close menu" : "Open menu"}
+        aria-expanded={dropdownOpen}
       >
         {dropdownOpen ? "✕" : "☰"}
       </button>
 
       {dropdownOpen && (
         <>
-          <div
-            className="navbar-dropdown-backdrop"
-            onClick={() => setDropdownOpen(false)}
-          />
-          <div className="navbar-hamburger-dropdown" style={styles.dropdown}>
-            {/* MOBILE TOP TITLE BAR WITH EXPLICIT CLOSE */}
-            <div className="mobile-dropdown-title-bar">
-              <span style={{ fontWeight: 800, color: "#fbbf24", fontSize: "14px", display: "flex", alignItems: "center", gap: "6px" }}>
-                <span>☰</span> AxxSpace Navigation
-              </span>
-              <button
-                type="button"
-                onClick={() => setDropdownOpen(false)}
-                style={{
-                  background: "rgba(255,255,255,0.08)",
-                  border: "1px solid rgba(255,255,255,0.15)",
-                  borderRadius: "8px",
-                  color: "#94a3b8",
-                  padding: "5px 12px",
-                  fontSize: "12px",
-                  cursor: "pointer",
-                  fontWeight: 700,
-                }}
-              >
+          <div className="ax-backdrop" onClick={() => setDropdownOpen(false)} />
+          <div className="ax-panel ax-menu-panel">
+            <div className="ax-mobile-title">
+              <span>AxxSpace Navigation</span>
+              <button type="button" className="ax-close-btn" onClick={() => setDropdownOpen(false)}>
                 ✕ Close
               </button>
             </div>
 
-            {/* NAVIGATION SECTION */}
-            <div style={styles.dropdownHeader}>Navigation</div>
-            <Link to="/" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-              <span style={styles.dropdownIcon}>Home</span>
-            </Link>
-          <Link to="/axxbiashara" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>AxxBiashara</span>
-          </Link>
-          <Link to="/quicksales" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>QuickSales</span>
-          </Link>
-          <Link to="/listings" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>Rentals</span>
-          </Link>
-          <Link to="/accommodation" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>Accommodation</span>
-          </Link>
-          <Link to="/accommodation/login" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>Host Login</span>
-          </Link>
-          <Link to="/agent/login" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>Agent login</span>
-          </Link>
-          <button
-            style={{
-              ...styles.dropdownItem,
-              background: "rgba(251, 191, 36, 0.08)",
-              border: "none",
-              borderLeft: "3px solid #fbbf24",
-              width: "100%",
-              textAlign: "left",
-              color: "#fbbf24",
-              fontWeight: 700,
-              cursor: "pointer"
-            }}
-            onClick={() => {
-              setDropdownOpen(false);
-              setIsRequestModalOpen(true);
-            }}
-          >
-            <span style={styles.dropdownIcon}> Custom Requests</span>
-          </button>
-          <Link to="/about" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>About</span>
-          </Link>
-          <Link to="/faq" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>FAQ</span>
-          </Link>
-          <Link to="/mobile-app" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>Mobile App</span>
-          </Link>
-          <Link to="/axxwallet" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>AxxWallet</span>
-          </Link>
+            <div className="ax-heading">Navigation</div>
+            {MENU_PRIMARY.map(menuLink)}
+            <button
+              type="button"
+              className="ax-item ax-item-highlight"
+              onClick={() => {
+                setDropdownOpen(false);
+                setIsRequestModalOpen(true);
+              }}
+            >
+              Custom Requests
+            </button>
+            {MENU_SECONDARY.map(menuLink)}
 
-          <div style={styles.dropdownDivider} />
-          <div style={styles.dropdownHeader}>Jobs & Careers</div>
-          <button
-            style={styles.dropdownItem}
-            onClick={() => setJobDropdownOpen(jobDropdownOpen === 'web-development' ? null : 'web-development')}
-          >
-            <div style={styles.jobItem}>
-              <span style={styles.dropdownIcon}>Web Development</span>
-              <span style={styles.dropdownArrow}>{jobDropdownOpen === 'web-development' ? '▼' : ''}</span>
-            </div>
-          </button>
-          {jobDropdownOpen === 'web-development' && (
-            <div style={styles.jobDropdownContent}>
-              <span style={styles.jobDesc}>Custom websites, web apps, e-commerce platforms, and full-stack solutions tailored to your business needs</span>
-              <Link to="/jobs/web-development" style={styles.jobLink} onClick={() => { setDropdownOpen(false); setJobDropdownOpen(null); }}>
-                View Jobs →
-              </Link>
-            </div>
-          )}
-          <button
-            style={styles.dropdownItem}
-            onClick={() => setJobDropdownOpen(jobDropdownOpen === 'marketing' ? null : 'marketing')}
-          >
-            <div style={styles.jobItem}>
-              <span style={styles.dropdownIcon}>Marketing</span>
-              <span style={styles.dropdownArrow}>{jobDropdownOpen === 'marketing' ? '▼' : ''}</span>
-            </div>
-          </button>
-          {jobDropdownOpen === 'marketing' && (
-            <div style={styles.jobDropdownContent}>
-              <span style={styles.jobDesc}>Digital marketing, SEO, social media management, content creation, and brand strategy to grow your online presence</span>
-              <Link to="/jobs/marketing" style={styles.jobLink} onClick={() => { setDropdownOpen(false); setJobDropdownOpen(null); }}>
-                View Jobs →
-              </Link>
-            </div>
-          )}
-          <button
-            style={styles.dropdownItem}
-            onClick={() => setJobDropdownOpen(jobDropdownOpen === 'ui-ux-design' ? null : 'ui-ux-design')}
-          >
-            <div style={styles.jobItem}>
-              <span style={styles.dropdownIcon}>UI/UX Design</span>
-              <span style={styles.dropdownArrow}>{jobDropdownOpen === 'ui-ux-design' ? '▼' : ''}</span>
-            </div>
-          </button>
-          {jobDropdownOpen === 'ui-ux-design' && (
-            <div style={styles.jobDropdownContent}>
-              <span style={styles.jobDesc}>User interface design, user experience research, wireframing, prototyping, and design systems for digital products</span>
-              <Link to="/jobs/ui-ux-design" style={styles.jobLink} onClick={() => { setDropdownOpen(false); setJobDropdownOpen(null); }}>
-                View Jobs →
-              </Link>
-            </div>
-          )}
+            <div className="ax-divider" />
+            <div className="ax-heading">Jobs &amp; Careers</div>
+            {JOBS.map((job) => {
+              const open = jobDropdownOpen === job.key;
+              return (
+                <div key={job.key}>
+                  <button
+                    type="button"
+                    className="ax-item"
+                    aria-expanded={open}
+                    onClick={() => setJobDropdownOpen(open ? null : job.key)}
+                  >
+                    <span>{job.label}</span>
+                    <span className="ax-chevron">{open ? "▲" : "▼"}</span>
+                  </button>
+                  {open && (
+                    <div className="ax-job-content">
+                      <span className="ax-job-desc">{job.desc}</span>
+                      <Link
+                        to={job.to}
+                        className="ax-job-link"
+                        onClick={() => {
+                          setDropdownOpen(false);
+                          setJobDropdownOpen(null);
+                        }}
+                      >
+                        View Jobs →
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
 
-          <div style={styles.dropdownDivider} />
-          <div style={styles.dropdownHeader}>Help & Legal</div>
-          <Link to="/contact" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>Contact & Support</span>
-          </Link>
-          <Link to="/terms" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>Terms & Privacy</span>
-          </Link>
+            <div className="ax-divider" />
+            <div className="ax-heading">Help &amp; Legal</div>
+            {menuLink({ to: "/contact", label: "Contact & Support" })}
+            {menuLink({ to: "/terms", label: "Terms & Privacy" })}
 
-          {token && user && user.role !== "guest" ? (
-            <>
-              <div style={styles.dropdownDivider} />
-              {/* ACCOUNT SECTION */}
-              <div style={styles.dropdownHeader}>Account</div>
-              <Link to="/messages" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                <span style={styles.dropdownIcon}>Messages</span>
-                <span style={styles.notifDot} />
-              </Link>
-              <Link to="/notifications" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                <span style={styles.dropdownIcon}>Notifications</span>
-                <span style={styles.notifDot} />
-              </Link>
-              <Link to="/saved" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                <span style={styles.dropdownIcon}>Saved Listings</span>
-              </Link>
-              <Link to="/axxwallet" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                <span style={styles.dropdownIcon}>AxxWallet</span>
-              </Link>
-              <Link to="/upload" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                <span style={styles.dropdownIcon}>Upload Property</span>
-              </Link>
-              <Link to={getDashboardLink()} style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                <span style={styles.dropdownIcon}>Dashboard</span>
-              </Link>
-              <Link to="/profile" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                <span style={styles.dropdownIcon}>Profile</span>
-              </Link>
-              <Link to="/settings" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                <span style={styles.dropdownIcon}>Settings</span>
-              </Link>
-              <div style={styles.dropdownDivider} />
-              <button style={styles.dropdownItemDanger} onClick={handleLogout}>
-                <span style={styles.dropdownIcon}>Logout</span>
-              </button>
-            </>
-          ) : (
-            <>
-              <div style={styles.dropdownDivider} />
-              <div style={styles.dropdownHeader}>Account</div>
-              <button style={styles.dropdownItem} onClick={handleLoginClick}>
-                <span style={styles.dropdownIcon}>Login</span>
-              </button>
-              <button style={styles.dropdownItem} onClick={handleRegisterClick}>
-                <span style={styles.dropdownIcon}>Register</span>
-              </button>
-            </>
-          )}
-        </div>
-      </>
-    )}
-
-      <AccountTypeSelector
-        isOpen={accountSelectorOpen}
-        onClose={() => setAccountSelectorOpen(false)}
-        mode={accountSelectorMode}
-      />
+            <div className="ax-divider" />
+            <div className="ax-heading">Account</div>
+            {isLoggedIn ? (
+              <>
+                <Link to="/messages" className="ax-item" onClick={() => setDropdownOpen(false)}>
+                  <span>Messages</span>
+                  <span className="ax-dot" />
+                </Link>
+                <Link to="/notifications" className="ax-item" onClick={() => setDropdownOpen(false)}>
+                  <span>Notifications</span>
+                  <span className="ax-dot" />
+                </Link>
+                {menuLink({ to: "/saved", label: "Saved Listings" })}
+                {menuLink({ to: "/axxwallet", label: "AxxWallet" })}
+                {menuLink({ to: "/upload", label: "Upload Property" })}
+                {menuLink({ to: getDashboardLink(), label: "Dashboard" })}
+                {menuLink({ to: "/profile", label: "Profile" })}
+                {menuLink({ to: "/settings", label: "Settings" })}
+                <div className="ax-divider" />
+                <button type="button" className="ax-item ax-item-danger" onClick={handleLogout}>
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <button type="button" className="ax-item" onClick={handleLoginClick}>
+                  Login
+                </button>
+                <button type="button" className="ax-item" onClick={handleRegisterClick}>
+                  Register
+                </button>
+              </>
+            )}
+          </div>
+        </>
+      )}
     </div>
+  );
+
+  const renderBrand = (to, name, alt) => (
+    <Link to={to} className="ax-brand" onClick={closeAll}>
+      <img src={logo} alt={alt} className="ax-logo" />
+      <span className="ax-brand-name">{name}</span>
+    </Link>
   );
 
   // ─── WORKSPACE NAVBAR (landlord, seller, mover, business, admin) ─────────
@@ -307,109 +264,78 @@ export default function Navbar() {
     const brand = getWorkspaceBrand(user.role);
 
     return (
-      <nav style={styles.navbar}>
+      <header className="ax-nav">
         <style>{css}</style>
 
-        <div style={styles.topSection}>
-          <Link to={dashboardPath} style={styles.logoContainer}>
-            <img src={logo} alt="Axxspace" style={styles.logo} />
-            <div style={styles.titleSection}>
-              <span style={styles.brandName}>{brand}</span>
-            </div>
-          </Link>
-
-          <div style={styles.topRight}>
-            <button
-              style={styles.hamburger}
-              onClick={() => setMenuOpen(!menuOpen)}
-            >
-              {menuOpen ? "✕" : "☰"}
-            </button>
-          </div>
-        </div>
-
-        <div style={{ ...styles.navLinksContainer, ...(menuOpen && styles.navLinksContainerOpen) }}>
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              style={{ ...styles.navLink, ...(isActive(item.path) && styles.navLinkActive) }}
-              onClick={() => setMenuOpen(false)}
-            >
-              {item.label}
-            </Link>
-          ))}
-          <div style={styles.userSection}>
+        <div className="ax-top">
+          {renderBrand(dashboardPath, brand, "Axxspace")}
+          <div className="ax-top-right">
             <ProfileAvatar user={user} size={32} />
-            <span style={styles.userName}>{user?.name}</span>
-            <button style={styles.logoutBtn} onClick={handleLogout} title="Log out" aria-label="Log out">
+            <span className="ax-username">{user?.name}</span>
+            <button type="button" className="ax-logout" onClick={handleLogout} aria-label="Log out">
               Logout
             </button>
           </div>
         </div>
-      </nav>
+
+        <nav className="ax-tabs" aria-label="Workspace">
+          <div className="ax-tabs-inner">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`ax-tab${isActive(item.path) ? " is-active" : ""}`}
+                onClick={() => setMenuOpen(false)}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </nav>
+      </header>
     );
   }
 
   // ─── REGULAR NAVBAR (guests & renters browsing the site) ─────────────────
   return (
     <>
-      <nav style={styles.navbar}>
+      <header className="ax-nav">
         <style>{css}</style>
 
-        <div style={styles.topSection}>
-          <Link to="/" style={styles.logoContainer}>
-            <img src={logo} alt="AxxSpace" style={styles.logo} />
-            <div style={styles.titleSection}>
-              <span style={styles.brandName}>AxxSpace</span>
-            </div>
-          </Link>
+        <div className="ax-top">
+          {renderBrand("/", "AxxSpace", "AxxSpace")}
 
-          <div style={styles.topRight}>
-            <HamburgerDropdown />
-            {/* Account Indicator */}
-            {token && user && user.role !== "guest" ? (
-              <div style={styles.accountIndicator} ref={accountRef}>
+          <div className="ax-top-right">
+            {isLoggedIn ? (
+              <div className="ax-account" ref={accountRef}>
                 <button
-                  style={styles.accountBtn}
+                  type="button"
+                  className="ax-account-btn"
                   onClick={() => setAccountOpen(!accountOpen)}
+                  aria-expanded={accountOpen}
                 >
                   <ProfileAvatar user={user} size={28} />
-                  <span style={styles.accountStatus}>In Account</span>
+                  <span className="ax-account-label">In Account</span>
                 </button>
                 {accountOpen && (
                   <>
-                    <div
-                      className="navbar-dropdown-backdrop"
-                      onClick={() => setAccountOpen(false)}
-                    />
-                    <div className="navbar-account-dropdown" style={styles.accountDropdown}>
-                      <div style={styles.accountHeader}>
+                    <div className="ax-backdrop" onClick={() => setAccountOpen(false)} />
+                    <div className="ax-panel ax-account-panel">
+                      <div className="ax-account-head">
                         <ProfileAvatar user={user} size={40} />
                         <div>
-                          <div style={styles.accountName}>{user.name}</div>
-                          <div style={styles.accountRole}>{user.role?.toUpperCase() || "USER"}</div>
+                          <div className="ax-account-name">{user.name}</div>
+                          <div className="ax-account-role">{user.role?.toUpperCase() || "USER"}</div>
                         </div>
                       </div>
-                      <div style={styles.accountDivider} />
-                      <Link
-                        to="/profile"
-                        style={styles.accountItem}
-                        onClick={() => { setAccountOpen(false); setMenuOpen(false); }}
-                      >
+                      <div className="ax-divider" />
+                      <Link to="/profile" className="ax-item" onClick={() => setAccountOpen(false)}>
                         My Profile
                       </Link>
-                      <Link
-                        to="/settings"
-                        style={styles.accountItem}
-                        onClick={() => { setAccountOpen(false); setMenuOpen(false); }}
-                      >
+                      <Link to="/settings" className="ax-item" onClick={() => setAccountOpen(false)}>
                         Settings
                       </Link>
-                      <button
-                        style={styles.accountLogout}
-                        onClick={() => { handleLogout(); setAccountOpen(false); setMenuOpen(false); }}
-                      >
+                      <button type="button" className="ax-item ax-item-danger" onClick={handleLogout}>
                         Logout
                       </button>
                     </div>
@@ -417,834 +343,455 @@ export default function Navbar() {
                 )}
               </div>
             ) : (
-              <button
-                className="guest-signin-btn"
-                onClick={() => setAccountSelectorOpen(true)}
-              >
-                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" className="guest-signin-icon">
+              <button type="button" className="ax-signin" onClick={() => setAccountSelectorOpen(true)}>
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                   <circle cx="12" cy="7" r="4" />
                 </svg>
                 <span>Sign In</span>
               </button>
             )}
-            <button
-              style={styles.hamburger}
-              onClick={() => setMenuOpen(!menuOpen)}
-            >
-              {menuOpen ? "✕" : "☰"}
-            </button>
+            {renderMenu()}
           </div>
         </div>
 
-        <div style={{ ...styles.navLinksContainer, ...(menuOpen && styles.navLinksContainerOpen) }}>
-          <Link to="/" style={{ ...styles.navLink, ...(isActive("/") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
-            Home
-          </Link>
-          <Link to="/axxbiashara" style={{ ...styles.navLink, ...(isActive("/axxbiashara") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
-            AxxBiashara
-          </Link>
-          <Link to="/quicksales" style={{ ...styles.navLink, ...(isActive("/quicksales") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
-            QuickSales
-          </Link>
-          <Link to="/listings" style={{ ...styles.navLink, ...(isActive("/listings") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
-            Rentals
-          </Link>
-          <Link to="/accommodation" style={{ ...styles.navLink, ...(isActive("/accommodation") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
-            Accommodation
-          </Link>
-          <Link to="/mobile-app" style={{ ...styles.navLink, ...(isActive("/mobile-app") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
-            Download App
-          </Link>
-          <button
-            style={{
-              ...styles.navLink,
-              background: "rgba(251, 191, 36, 0.1)",
-              border: "1px solid rgba(251, 191, 36, 0.3)",
-              color: "#fbbf24",
-              padding: "5px 12px",
-              borderRadius: "8px",
-              fontWeight: 700,
-              cursor: "pointer",
-              outline: "none",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "4px",
-              transition: "all 0.2s ease"
-            }}
-            onClick={() => {
-              setMenuOpen(false);
-              setIsRequestModalOpen(true);
-            }}
-          >
-            Requests
-          </button>
-
-          {token && user && user.role !== "guest" && (
-            <Link to="/settings" style={{ ...styles.navLink, ...(isActive("/settings") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
-              Settings
-            </Link>
-          )}
-
-          {token && user && user.role !== "guest" && (
-            <>
-              <Link to="/upload" style={{ ...styles.navLink, ...(isActive("/upload") && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
-                Upload
+        <nav className="ax-tabs" aria-label="Primary">
+          <div className="ax-tabs-inner">
+            {TAB_LINKS.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className={`ax-tab${isActive(item.to) ? " is-active" : ""}`}
+                onClick={() => setMenuOpen(false)}
+              >
+                {item.label}
               </Link>
-              <Link to={getDashboardLink()} style={{ ...styles.navLink, ...(isActive(getDashboardLink()) && styles.navLinkActive) }} onClick={() => setMenuOpen(false)}>
-                Dashboard
-              </Link>
-              <div style={styles.userSection}>
-                <NotificationBell />
-                <div style={styles.userDropdownWrapper} ref={dropdownRef}>
-                  <button
-                    style={styles.userDropdownBtn}
-                    onClick={() => setDropdownOpen(!dropdownOpen)}
-                  >
-                    <ProfileAvatar user={user} size={32} />
-                    <span style={styles.userName}>{user.name}</span>
-                    <span style={styles.dropdownArrow}>{dropdownOpen ? "▲" : "▼"}</span>
-                  </button>
-                  {dropdownOpen && (
-                    <div style={styles.userDropdown}>
-                      <Link
-                        to="/payment-history"
-                        style={styles.dropdownItem}
-                        onClick={() => { setDropdownOpen(false); setMenuOpen(false); }}
-                      >
-                        Payment History
-                      </Link>
-                      <Link
-                        to={getDashboardLink()}
-                        style={styles.dropdownItem}
-                        onClick={() => { setDropdownOpen(false); setMenuOpen(false); }}
-                      >
-                        Dashboard
-                      </Link>
-                      <button
-                        style={styles.dropdownItem}
-                        onClick={() => { handleLogout(); setDropdownOpen(false); setMenuOpen(false); }}
-                      >
-                        Logout
-                      </button>
-                    </div>
-                  )}
+            ))}
+
+            <button
+              type="button"
+              className="ax-request-btn"
+              onClick={() => {
+                setMenuOpen(false);
+                setIsRequestModalOpen(true);
+              }}
+            >
+              Requests
+            </button>
+
+            {isLoggedIn && (
+              <>
+                <Link to="/settings" className={`ax-tab${isActive("/settings") ? " is-active" : ""}`} onClick={() => setMenuOpen(false)}>
+                  Settings
+                </Link>
+                <Link to="/upload" className={`ax-tab${isActive("/upload") ? " is-active" : ""}`} onClick={() => setMenuOpen(false)}>
+                  Upload
+                </Link>
+                <Link
+                  to={getDashboardLink()}
+                  className={`ax-tab${isActive(getDashboardLink()) ? " is-active" : ""}`}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+
+                <div className="ax-tabs-user">
+                  <NotificationBell />
+                  <div className="ax-user-wrap" ref={userMenuRef}>
+                    <button
+                      type="button"
+                      className="ax-user-btn"
+                      onClick={() => setUserMenuOpen(!userMenuOpen)}
+                      aria-expanded={userMenuOpen}
+                    >
+                      <ProfileAvatar user={user} size={28} />
+                      <span className="ax-user-name">{user.name}</span>
+                      <span className="ax-chevron">{userMenuOpen ? "▲" : "▼"}</span>
+                    </button>
+                    {userMenuOpen && (
+                      <div className="ax-panel ax-user-panel">
+                        <Link to="/payment-history" className="ax-item" onClick={() => setUserMenuOpen(false)}>
+                          Payment History
+                        </Link>
+                        <Link to={getDashboardLink()} className="ax-item" onClick={() => setUserMenuOpen(false)}>
+                          Dashboard
+                        </Link>
+                        <button type="button" className="ax-item ax-item-danger" onClick={handleLogout}>
+                          Logout
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </>
-          )}
-        </div>
-      </nav>
+              </>
+            )}
+          </div>
+        </nav>
+      </header>
+
+      <AccountTypeSelector
+        isOpen={accountSelectorOpen}
+        onClose={() => setAccountSelectorOpen(false)}
+        mode={accountSelectorMode}
+      />
       <RequestItemModal isOpen={isRequestModalOpen} onClose={() => setIsRequestModalOpen(false)} />
     </>
   );
 }
 
-const styles = {
-  navbar: {
-    background: "linear-gradient(135deg, #1e293b 0%, #0f1729 100%)",
-    color: "#f1f5f9",
-    boxShadow: "0 2px 12px rgba(0, 0, 0, 0.15)",
-    fontFamily: "'DM Sans', sans-serif",
-    position: "sticky",
-    top: 0,
-    zIndex: 1000,
-    padding: "12px 16px",
-  },
-
-  topSection: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: "12px",
-  },
-
-  topRight: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-  },
-
-  logoContainer: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-    textDecoration: "none",
-    cursor: "pointer",
-    padding: "6px 12px",
-    background: "linear-gradient(135deg, rgba(251, 36, 36, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%)",
-    border: "1px solid rgba(251, 36, 36, 0.2)",
-    borderRadius: "12px",
-    transition: "all 0.3s ease",
-  },
-
-  logo: {
-    height: "36px",
-    width: "auto",
-    borderRadius: "8px",
-    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
-  },
-
-  titleSection: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "1px",
-  },
-
-  brandName: {
-    fontSize: "18px",
-    fontWeight: 900,
-    background: "linear-gradient(135deg, #FB2424 0%, #F59E0B 100%)",
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent",
-    backgroundClip: "text",
-    letterSpacing: "0.8px",
-    textTransform: "uppercase",
-  },
-
-  hamburger: {
-    display: "none",
-    background: "linear-gradient(135deg, rgba(251,191,36,0.1) 0%, rgba(245,158,11,0.05) 100%)",
-    border: "1px solid rgba(251,191,36,0.3)",
-    color: "#fbbf24",
-    fontSize: "24px",
-    cursor: "pointer",
-    padding: "8px 12px",
-    borderRadius: "10px",
-    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-    boxShadow: "0 2px 8px rgba(251,191,36,0.1)",
-  },
-
-  navLinksContainer: {
-    display: "flex",
-    alignItems: "center",
-    gap: "4px",
-    flexWrap: "nowrap",
-    listStyle: "none",
-    margin: 0,
-    padding: 0,
-    overflowX: "auto",
-  },
-
-  navLinksContainerOpen: {
-    display: "flex",
-  },
-
-  navLink: {
-    color: "#cbd5e1",
-    textDecoration: "none",
-    fontSize: "12px",
-    fontWeight: 700,
-    transition: "all 0.2s",
-    cursor: "pointer",
-    padding: "6px 8px",
-    borderRadius: "6px",
-    whiteSpace: "nowrap",
-    position: "relative",
-  },
-
-  navLinkActive: {
-    color: "#fbbf24",
-    paddingBottom: "4px",
-    borderBottom: "2px solid #fbbf24",
-  },
-
-  userSection: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-    borderLeft: "1px solid #334155",
-    paddingLeft: "8px",
-    marginLeft: "8px",
-  },
-
-  userDropdownWrapper: {
-    position: "relative",
-  },
-
-  userDropdownBtn: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-    background: "transparent",
-    border: "none",
-    cursor: "pointer",
-    padding: "4px 8px",
-    borderRadius: "8px",
-    transition: "all 0.2s",
-  },
-
-  dropdownArrow: {
-    fontSize: "10px",
-    color: "#94a3b8",
-  },
-
-  userDropdown: {
-    position: "absolute",
-    right: 0,
-    top: "calc(100% + 8px)",
-    background: "linear-gradient(180deg, rgba(30,41,59,0.98) 0%, rgba(15,23,41,0.98) 100%)",
-    border: "1px solid #334155",
-    borderRadius: "12px",
-    minWidth: "200px",
-    zIndex: 1000,
-    boxShadow: "0 10px 40px rgba(0,0,0,0.4)",
-    overflow: "hidden",
-  },
-
-  userName: {
-    fontSize: "13px",
-    fontWeight: 700,
-    color: "#fbbf24",
-  },
-
-  logoutBtn: {
-    padding: "4px 8px",
-    background: "rgba(239, 68, 68, 0.2)",
-    color: "#fca5a5",
-    border: "1px solid rgba(239, 68, 68, 0.3)",
-    borderRadius: "6px",
-    cursor: "pointer",
-    fontSize: "12px",
-    fontWeight: 700,
-    transition: "all 0.2s",
-  },
-
-  // ─── HAMBURGER DROPDOWN STYLES ────────────────────────────────────────────
-
-  dropdownWrapper: {
-    position: "relative",
-    zIndex: 1000,
-  },
-
-  menuIconBtn: {
-    background: "linear-gradient(135deg, rgba(251,191,36,0.1) 0%, rgba(245,158,11,0.05) 100%)",
-    border: "1px solid rgba(251,191,36,0.3)",
-    color: "#fbbf24",
-    fontSize: "18px",
-    cursor: "pointer",
-    padding: "8px 12px",
-    borderRadius: "10px",
-    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-    lineHeight: 1,
-    boxShadow: "0 2px 8px rgba(251,191,36,0.1)",
-  },
-
-  dropdown: {
-    position: "absolute",
-    right: 0,
-    top: "calc(100% + 12px)",
-    background: "linear-gradient(180deg, #1e293b 0%, #0f172a 100%)",
-    border: "1px solid rgba(251, 191, 36, 0.35)",
-    borderRadius: "16px",
-    minWidth: "280px",
-    maxWidth: "calc(100vw - 20px)",
-    zIndex: 99999,
-    maxHeight: "80vh",
-    overflowY: "auto",
-    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.75), 0 0 20px rgba(251, 191, 36, 0.12)",
-    backdropFilter: "blur(20px)",
-    WebkitBackdropFilter: "blur(20px)",
-    padding: "6px 0 24px 0",
-    boxSizing: "border-box",
-    overscrollBehavior: "contain",
-    WebkitOverflowScrolling: "touch",
-  },
-
-  dropdownHeader: {
-    padding: "14px 20px 8px",
-    fontSize: "10px",
-    fontWeight: 800,
-    color: "#fbbf24",
-    textTransform: "uppercase",
-    letterSpacing: "1.5px",
-    borderBottom: "1px solid rgba(51, 65, 85, 0.25)",
-    background: "rgba(251, 191, 36, 0.02)",
-  },
-
-  dropdownItem: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "12px 20px",
-    color: "#cbd5e1",
-    fontSize: "13px",
-    fontWeight: 600,
-    textDecoration: "none",
-    cursor: "pointer",
-    transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
-    borderBottom: "1px solid rgba(51, 65, 85, 0.1)",
-    position: "relative",
-    background: "transparent",
-    borderLeft: "3px solid transparent",
-  },
-
-  dropdownItemDanger: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    width: "100%",
-    padding: "12px 20px",
-    color: "#fca5a5",
-    fontSize: "13px",
-    fontWeight: 700,
-    background: "linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%)",
-    border: "none",
-    textAlign: "left",
-    cursor: "pointer",
-    transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
-    borderTop: "1px solid rgba(239, 68, 68, 0.25)",
-    borderLeft: "3px solid transparent",
-  },
-
-  dropdownIcon: {
-    fontSize: "13px",
-    fontWeight: 600,
-    color: "inherit",
-    flexShrink: 0,
-  },
-
-  jobItem: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
-  },
-
-  jobDesc: {
-    fontSize: "11px",
-    color: "#94a3b8",
-    fontWeight: 500,
-    lineHeight: "1.4",
-  },
-
-  jobDropdownContent: {
-    padding: "12px 16px",
-    background: "rgba(15, 23, 42, 0.45)",
-    borderBottom: "1px solid rgba(51, 65, 85, 0.15)",
-    borderLeft: "2px solid #fbbf24",
-    marginLeft: "18px",
-    marginRight: "18px",
-    borderRadius: "8px",
-    marginTop: "4px",
-    marginBottom: "8px",
-    display: "flex",
-    flexDirection: "column",
-    gap: "6px",
-  },
-
-  jobLink: {
-    display: "inline-block",
-    color: "#fbbf24",
-    fontSize: "11px",
-    fontWeight: 700,
-    textDecoration: "none",
-    transition: "all 0.2s ease",
-    alignSelf: "flex-start",
-  },
-
-  dropdownDivider: {
-    height: "1px",
-    background: "rgba(51, 65, 85, 0.25)",
-    margin: "4px 0",
-  },
-
-  notifDot: {
-    display: "inline-block",
-    width: "7px",
-    height: "7px",
-    background: "#a244ef",
-    borderRadius: "50%",
-    marginLeft: "auto",
-    flexShrink: 0,
-  },
-
-  // ─── ACCOUNT INDICATOR STYLES ───────────────────────────────────────────────
-
-  accountIndicator: {
-    position: "relative",
-  },
-
-  accountBtn: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-    padding: "8px 14px",
-    background: "linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(251, 191, 36, 0.08) 100%)",
-    border: "1px solid rgba(251, 191, 36, 0.3)",
-    borderRadius: "20px",
-    color: "#fbbf24",
-    fontSize: "13px",
-    fontWeight: 600,
-    cursor: "pointer",
-    transition: "all 0.2s ease",
-  },
-
-  accountStatus: {
-    fontSize: "12px",
-    fontWeight: 600,
-    letterSpacing: "0.5px",
-  },
-
-  accountDropdown: {
-    position: "absolute",
-    top: "calc(100% + 12px)",
-    right: 0,
-    background: "linear-gradient(180deg, rgba(30,41,59,0.98) 0%, rgba(15,23,41,0.98) 100%)",
-    border: "1px solid rgba(251, 191, 36, 0.3)",
-    borderRadius: "16px",
-    minWidth: "240px",
-    zIndex: 300,
-    overflow: "hidden",
-    boxShadow: "0 20px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(251,191,36,0.15)",
-    backdropFilter: "blur(12px)",
-  },
-
-  accountHeader: {
-    padding: "16px 20px",
-    borderBottom: "1px solid rgba(51, 65, 85, 0.3)",
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    background: "linear-gradient(180deg, rgba(251,191,36,0.05) 0%, transparent 100%)",
-  },
-
-  accountName: {
-    fontSize: "15px",
-    fontWeight: 700,
-    color: "#f1f5f9",
-    marginBottom: "4px",
-  },
-
-  accountRole: {
-    fontSize: "11px",
-    fontWeight: 600,
-    color: "#fbbf24",
-    letterSpacing: "0.5px",
-    textTransform: "uppercase",
-  },
-
-  accountDivider: {
-    height: "1px",
-    background: "linear-gradient(90deg, transparent 0%, rgba(51,65,85,0.5) 20%, rgba(51,65,85,0.5) 80%, transparent 100%)",
-    margin: "6px 0",
-    border: "none",
-  },
-
-  accountItem: {
-    display: "block",
-    padding: "12px 20px",
-    color: "#e2e8f0",
-    fontSize: "14px",
-    fontWeight: 600,
-    textDecoration: "none",
-    cursor: "pointer",
-    transition: "all 0.2s ease",
-    borderBottom: "1px solid rgba(51,65,85,0.2)",
-  },
-
-  accountLogout: {
-    display: "block",
-    width: "100%",
-    padding: "12px 20px",
-    color: "#fca5a5",
-    fontSize: "14px",
-    fontWeight: 700,
-    background: "linear-gradient(135deg, rgba(239,68,68,0.15) 0%, rgba(220,38,38,0.08) 100%)",
-    border: "none",
-    textAlign: "left",
-    cursor: "pointer",
-    transition: "all 0.2s ease",
-    borderTop: "1px solid rgba(239,68,68,0.3)",
-  },
-
-  guestAccountBtn: {
-    padding: "8px 18px",
-    background: "linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(251, 191, 36, 0.08) 100%)",
-    border: "1px solid rgba(251, 191, 36, 0.3)",
-    borderRadius: "20px",
-    color: "#fbbf24",
-    fontSize: "13px",
-    fontWeight: 600,
-    cursor: "pointer",
-    transition: "all 0.2s ease",
-  },
-
-  // ─── ACCOUNT TAB DROPDOWN STYLES ─────────────────────────────────────────
-
-  accountWrapper: {
-    position: "relative",
-  },
-
-  // ─── RENTALS DROPDOWN STYLES ─────────────────────────────────────────────
-
-  rentalsDropdownWrapper: {
-    position: "relative",
-  },
-
-  rentalsDropdown: {
-    position: "absolute",
-    top: "calc(100% + 8px)",
-    left: 0,
-    background: "linear-gradient(180deg, rgba(30,41,59,0.98) 0%, rgba(15,23,41,0.98) 100%)",
-    border: "1px solid rgba(251,191,36,0.3)",
-    borderRadius: "12px",
-    minWidth: "180px",
-    zIndex: 1000,
-    overflow: "hidden",
-    boxShadow: "0 10px 40px rgba(0,0,0,0.4)",
-    backdropFilter: "blur(12px)",
-  },
-
-  rentalsDropdownItem: {
-    display: "block",
-    padding: "12px 16px",
-    color: "#cbd5e1",
-    fontSize: "13px",
-    fontWeight: 600,
-    textDecoration: "none",
-    transition: "all 0.2s ease",
-    borderBottom: "1px solid rgba(51,65,85,0.2)",
-  },
-
-  rentalsDropdownHeader: {
-    padding: "8px 14px 4px",
-    fontSize: "10px",
-    fontWeight: 700,
-    color: "#64748b",
-    textTransform: "uppercase",
-    letterSpacing: "1px",
-  },
-
-  rentalsDropdownDivider: {
-    height: "1px",
-    background: "#334155",
-    margin: "8px 0 4px",
-  },
-
-  accountDropdownTitle: {
-    fontSize: "14px",
-    fontWeight: 700,
-    color: "#f1f5f9",
-    marginBottom: "2px",
-  },
-
-  accountDropdownSubtitle: {
-    fontSize: "12px",
-    color: "#64748b",
-    marginBottom: "14px",
-  },
-
-  accountBtn: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-    width: "100%",
-    padding: "9px 14px",
-    background: "#fbbf24",
-    color: "#0f1729",
-    borderRadius: "8px",
-    textDecoration: "none",
-    fontSize: "13px",
-    fontWeight: 700,
-    marginBottom: "8px",
-    transition: "all 0.2s",
-  },
-
-  accountBtnOutline: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-    width: "100%",
-    padding: "9px 14px",
-    background: "transparent",
-    color: "#cbd5e1",
-    border: "1px solid #334155",
-    borderRadius: "8px",
-    textDecoration: "none",
-    fontSize: "13px",
-    fontWeight: 700,
-    transition: "all 0.2s",
-  },
-};
-
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
 
-  .guest-signin-btn {
+  .ax-nav {
+    --ink: #0f172a;
+    --ink-2: #1e293b;
+    --paper: #ffffff;
+    --mist: #f1f5f9;
+    --line: #e2e8f0;
+    --muted: #64748b;
+    --gold: #f59e0b;
+    --gold-soft: #fbbf24;
+    --red: #fb2424;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.12);
+  }
+  .ax-nav *, .ax-nav *::before, .ax-nav *::after { box-sizing: border-box; }
+  .ax-nav button { font-family: inherit; }
+  .ax-nav a:focus-visible, .ax-nav button:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+
+  /* ── Top bar (light, so the blue logo reads clearly) ── */
+  .ax-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 20px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+  .ax-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    min-width: 0;
+  }
+  .ax-logo {
+    height: 42px;
+    width: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.18);
+    flex-shrink: 0;
+  }
+  .ax-brand-name {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, var(--red) 0%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ax-top-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* ── Buttons in the top bar ── */
+  .ax-icon-btn {
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    color: var(--ink);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background .2s, border-color .2s;
+  }
+  .ax-icon-btn:hover { background: var(--mist); border-color: var(--gold); }
+
+  .ax-signin {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 20px;
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.12) 0%, rgba(245, 158, 11, 0.05) 100%) !important;
-    border: 1px solid rgba(251, 191, 36, 0.35) !important;
-    border-radius: 30px !important;
-    color: #fbbf24 !important;
-    font-size: 13px !important;
-    fontWeight: 700 !important;
-    font-family: 'DM Sans', sans-serif !important;
+    padding: 10px 20px;
+    background: var(--ink);
+    color: #fff;
+    border: 1px solid var(--ink);
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-    outline: none !important;
+    transition: background .2s, color .2s, border-color .2s;
   }
+  .ax-signin:hover { background: var(--gold); border-color: var(--gold); color: var(--ink); }
 
-  .guest-signin-btn:hover {
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.25) 0%, rgba(245, 158, 11, 0.15) 100%) !important;
-    border-color: #fbbf24 !important;
-    color: #ffffff !important;
-    box-shadow: 0 6px 20px rgba(251, 191, 36, 0.25) !important;
-    transform: translateY(-2px) !important;
+  .ax-account-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px 6px 6px;
+    background: var(--mist);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: border-color .2s;
   }
+  .ax-account-btn:hover { border-color: var(--gold); }
 
-  .guest-signin-icon {
-    font-size: 14px;
-    transition: transform 0.3s ease !important;
-    flex-shrink: 0;
+  .ax-username { font-size: 13px; font-weight: 700; color: var(--ink); }
+  .ax-logout {
+    padding: 8px 14px;
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .2s;
   }
+  .ax-logout:hover { background: #fee2e2; }
 
-  .guest-signin-btn:hover .guest-signin-icon {
-    transform: scale(1.15) !important;
+  /* ── Tabs band (dark, gold active indicator) ── */
+  .ax-tabs {
+    background: linear-gradient(90deg, var(--ink) 0%, var(--ink-2) 100%);
+    border-top: 2px solid var(--gold);
   }
-
-  a[style*="color: #cbd5e1"]:hover {
-    background: rgba(251, 191, 36, 0.1) !important;
-    color: #fbbf24 !important;
+  .ax-tabs-inner {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
   }
+  .ax-tabs-inner::-webkit-scrollbar { display: none; }
 
-  button[style*="background: rgba(239"]:hover {
-    background: rgba(239, 68, 68, 0.3) !important;
+  .ax-tab {
+    position: relative;
+    padding: 14px 14px;
+    color: #cbd5e1;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color .2s, background .2s;
   }
-
-  button[style*="border: 1px solid #334155"]:hover {
-    background: rgba(251, 191, 36, 0.1) !important;
-    border-color: #fbbf24 !important;
+  .ax-tab::after {
+    content: "";
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 0;
+    height: 3px;
+    border-radius: 3px 3px 0 0;
+    background: var(--gold-soft);
+    transform: scaleX(0);
+    transition: transform .2s ease;
   }
+  .ax-tab:hover { color: #fff; background: rgba(255, 255, 255, 0.05); }
+  .ax-tab.is-active { color: #fff; }
+  .ax-tab.is-active::after, .ax-tab:hover::after { transform: scaleX(1); }
 
-  a[style*="color: #cbd5e1"][style*="display: flex"]:hover,
-  button[style*="color: #cbd5e1"]:hover {
-    background: linear-gradient(90deg, rgba(251, 191, 36, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%) !important;
-    color: #fbbf24 !important;
-    border-left: 3px solid #fbbf24 !important;
-    padding-left: 17px !important;
+  .ax-request-btn {
+    margin: 0 6px;
+    padding: 7px 16px;
+    background: var(--gold-soft);
+    color: var(--ink);
+    border: none;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background .2s;
   }
+  .ax-request-btn:hover { background: #fff; }
 
-  button[style*="color: #fca5a5"]:hover {
-    background: rgba(239, 68, 68, 0.2) !important;
-    border-left: 3px solid #ef4444 !important;
-    padding-left: 17px !important;
+  .ax-tabs-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+    padding-left: 12px;
+    border-left: 1px solid rgba(255, 255, 255, 0.15);
   }
-
-  .mobile-dropdown-title-bar {
-    display: none;
+  .ax-user-wrap { position: relative; }
+  .ax-user-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .2s;
   }
+  .ax-user-btn:hover { background: rgba(255, 255, 255, 0.08); }
+  .ax-user-name { font-size: 13px; font-weight: 700; color: var(--gold-soft); }
+  .ax-chevron { font-size: 10px; color: var(--muted); }
 
+  /* ── Dropdown panels ── */
+  .ax-menu-wrap, .ax-account { position: relative; }
+  .ax-panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--gold);
+    border-radius: 14px;
+    box-shadow: 0 24px 50px -12px rgba(15, 23, 42, 0.35);
+    z-index: 99999;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .ax-menu-panel { min-width: 290px; max-height: 80vh; padding-bottom: 12px; }
+  .ax-account-panel { min-width: 250px; }
+  .ax-user-panel { min-width: 210px; top: calc(100% + 8px); }
+  .ax-backdrop { display: none; }
+  .ax-mobile-title { display: none; }
+
+  .ax-heading {
+    padding: 14px 20px 6px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+  }
+  .ax-divider { height: 1px; background: var(--line); margin: 6px 0; }
+
+  .ax-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    padding: 11px 20px;
+    background: transparent;
+    border: none;
+    border-left: 3px solid transparent;
+    color: var(--ink-2);
+    font-size: 13.5px;
+    font-weight: 600;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .15s, border-color .15s, color .15s;
+  }
+  .ax-item:hover { background: var(--mist); border-left-color: var(--gold); color: var(--ink); }
+  .ax-item-highlight { background: #fffbeb; border-left-color: var(--gold); color: #92400e; font-weight: 700; }
+  .ax-item-highlight:hover { background: #fef3c7; }
+  .ax-item-danger { color: #b91c1c; font-weight: 700; }
+  .ax-item-danger:hover { background: #fef2f2; border-left-color: #ef4444; color: #b91c1c; }
+
+  .ax-dot { width: 8px; height: 8px; border-radius: 50%; background: #a244ef; flex-shrink: 0; }
+
+  .ax-job-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 2px 18px 8px;
+    padding: 12px 14px;
+    background: var(--mist);
+    border-left: 3px solid var(--gold);
+    border-radius: 8px;
+  }
+  .ax-job-desc { font-size: 12px; line-height: 1.5; color: var(--muted); }
+  .ax-job-link { align-self: flex-start; font-size: 12px; font-weight: 700; color: #b45309; text-decoration: none; }
+  .ax-job-link:hover { text-decoration: underline; }
+
+  .ax-account-head { display: flex; align-items: center; gap: 12px; padding: 16px 20px 10px; }
+  .ax-account-name { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+  .ax-account-role { font-size: 11px; font-weight: 700; color: #b45309; letter-spacing: 0.4px; }
+
+  /* ── Mobile ── */
   @media (max-width: 768px) {
-    .mobile-dropdown-title-bar {
-      display: flex !important;
-      align-items: center !important;
-      justify-content: space-between !important;
-      padding: 12px 18px !important;
-      border-bottom: 1px solid rgba(251, 191, 36, 0.25) !important;
-      background: rgba(15, 23, 42, 0.95) !important;
-      position: sticky !important;
-      top: 0 !important;
-      z-index: 10 !important;
-      backdrop-filter: blur(12px) !important;
-    }
+    .ax-top { padding: 8px 12px; }
+    .ax-logo { height: 36px; }
+    .ax-brand-name { font-size: 16px; }
+    .ax-account-label, .ax-username { display: none; }
+    .ax-signin { padding: 9px 14px; }
+    .ax-icon-btn { width: 40px; height: 40px; }
+    .ax-tabs-inner { padding: 0 8px; }
+    .ax-tab { padding: 13px 10px; font-size: 12px; }
+    .ax-tab::after { left: 10px; right: 10px; }
+    .ax-tabs-user .ax-user-name { display: none; }
 
-    .navbar-dropdown-backdrop {
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      bottom: 0 !important;
-      background: rgba(0, 0, 0, 0.7) !important;
-      backdrop-filter: blur(4px) !important;
-      -webkit-backdrop-filter: blur(4px) !important;
-      z-index: 99998 !important;
+    .ax-backdrop {
+      display: block;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      z-index: 99998;
     }
-
-    .navbar-hamburger-dropdown {
-      position: fixed !important;
-      top: 64px !important;
-      left: 10px !important;
-      right: 10px !important;
-      width: auto !important;
-      min-width: unset !important;
-      max-width: calc(100vw - 20px) !important;
-      max-height: calc(100dvh - 78px) !important;
-      max-height: calc(100vh - 78px) !important;
-      border-radius: 16px !important;
-      z-index: 99999 !important;
-      box-sizing: border-box !important;
-      overflow-y: auto !important;
-      overscroll-behavior: contain !important;
-      -webkit-overflow-scrolling: touch !important;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 25px rgba(251, 191, 36, 0.15) !important;
-      padding-bottom: 40px !important;
+    .ax-menu-panel, .ax-account-panel {
+      position: fixed;
+      top: 62px;
+      left: 10px;
+      right: 10px;
+      min-width: 0;
+      max-width: none;
+      max-height: calc(100vh - 76px);
+      max-height: calc(100dvh - 76px);
+      padding-bottom: 32px;
     }
-
-    .navbar-account-dropdown {
-      position: fixed !important;
-      top: 64px !important;
-      left: 12px !important;
-      right: 12px !important;
-      width: auto !important;
-      min-width: unset !important;
-      max-width: calc(100vw - 24px) !important;
-      z-index: 99999 !important;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85) !important;
+    .ax-mobile-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding: 12px 18px;
+      background: var(--ink);
+      color: var(--gold-soft);
+      font-size: 14px;
+      font-weight: 800;
     }
-
-    [style*="display: none"][style*="background: none"][style*="border: none"] {
-      display: block !important;
-    }
-
-    [style*="display: flex"][style*="gap: 4px"][style*="flexWrap: nowrap"] {
-      display: flex !important;
-      gap: 2px !important;
-    }
-
-    [style*="display: flex"][style*="gap: 4px"][style*="flexWrap: nowrap"] a {
-      padding: 6px 6px !important;
-      font-size: 11px !important;
+    .ax-close-btn {
+      padding: 5px 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: #e2e8f0;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
     }
   }
 
   @media (max-width: 480px) {
-    .navbar-hamburger-dropdown {
-      top: 56px !important;
-      left: 6px !important;
-      right: 6px !important;
-      max-width: calc(100vw - 12px) !important;
-      max-height: calc(100dvh - 66px) !important;
-      max-height: calc(100vh - 66px) !important;
-      padding-bottom: 50px !important;
-    }
+    .ax-menu-panel, .ax-account-panel { top: 56px; left: 6px; right: 6px; }
+  }
 
-    [style*="display: flex"][style*="gap: 4px"][style*="flexWrap: nowrap"] {
-      gap: 3px !important;
-    }
-
-    [style*="display: flex"][style*="gap: 4px"][style*="flexWrap: nowrap"] a {
-      padding: 6px 5px !important;
-      font-size: 11px !important;
-      min-width: fit-content !important;
-    }
-
-    img[style*="height: 40px"] {
-      height: 32px !important;
-      width: auto !important;
-    }
-
-    [style*="background: linear-gradient(135deg, rgba(251, 36, 36, 0.1)"] {
-      padding: 4px 8px !important;
-    }
-
-    [style*="background: linear-gradient(135deg, #FB2424"] {
-      font-size: 15px !important;
-    }
+  @media (prefers-reduced-motion: reduce) {
+    .ax-nav * { transition: none !important; }
   }
 `;
