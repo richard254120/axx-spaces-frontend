@@ -676,7 +676,7 @@ export default function AccommodationPage() {
               <span className="wishlist-badge-count">{favs.length}</span>
             </button>
 
-            {user ? (
+            {user && user.role !== "guest" ? (
               <div style={s.userGroup}>
                 <button
                   type="button"
@@ -748,7 +748,7 @@ export default function AccommodationPage() {
               Help & FAQ
             </button>
             <div style={{ height: "1px", background: "#e2e8f0", margin: "8px 0" }} />
-            {user ? (
+            {user && user.role !== "guest" ? (
               <button type="button" className="mobile-action-highlight" onClick={() => { navigate("/accommodation/dashboard"); setMobileMenuOpen(false); }}>
                 Go to Dashboard
               </button>
@@ -756,6 +756,9 @@ export default function AccommodationPage() {
               <>
                 <button type="button" onClick={() => { navigate("/accommodation/login"); setMobileMenuOpen(false); }}>
                   Sign In
+                </button>
+                <button type="button" onClick={() => { navigate("/accommodation/register"); setMobileMenuOpen(false); }}>
+                  Register Account
                 </button>
                 <button type="button" className="mobile-action-highlight" onClick={() => { navigate("/accommodation/register-property"); setMobileMenuOpen(false); }}>
                   List Your Property (Host)

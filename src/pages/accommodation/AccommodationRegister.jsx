@@ -8,6 +8,7 @@ import {
   accommodationTheme,
 } from "../../features/accommodation";
 import { AuthContext } from "../../context/AuthContext";
+import logo from "../../assets/image.png";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -141,13 +142,14 @@ const css = `
 `;
 
 export default function AccommodationRegister() {
-  if (isAccommodationLoggedIn()) {
-    const navigate = useNavigate();
-    navigate("/accommodation");
-  }
-
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (isAccommodationLoggedIn()) {
+      navigate("/accommodation/dashboard");
+    }
+  }, [navigate]);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -226,6 +228,7 @@ export default function AccommodationRegister() {
 
       <div style={styles.card}>
         <div style={styles.logo}>
+          <img src={logo} alt="Axxspace" style={{ width: "52px", height: "52px", borderRadius: "12px", margin: "0 auto 10px", display: "block", boxShadow: "0 4px 12px rgba(2, 39, 83, 0.15)" }} />
           <span style={styles.logoAccent}>AXX</span>
           <span style={styles.logoWord}>SPACE</span>
         </div>

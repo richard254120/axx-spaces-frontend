@@ -45,9 +45,12 @@ export default function AccommodationNav({
               <span style={s.userChip}> {userName}</span>
             </>
           ) : (
-            <button type="button" style={s.navBtnPrimary} onClick={() => navigate("/accommodation/register-property")}>
-              Get started
-            </button>
+            <>
+              <button type="button" style={s.navLink} onClick={() => navigate("/accommodation/login")}>Sign in</button>
+              <button type="button" style={s.navBtnPrimary} onClick={() => navigate("/accommodation/register")}>
+                Register
+              </button>
+            </>
           )}
           {extraActions}
         </nav>
@@ -82,9 +85,14 @@ export default function AccommodationNav({
               <span style={{ ...s.userChip, display: "block", padding: "12px 0" }}> {userName}</span>
             </>
           ) : (
-            <button type="button" style={{ ...s.navBtnPrimary, display: "block", width: "100%", padding: "12px" }} onClick={() => { navigate("/accommodation/register-property"); setMobileMenuOpen(false); }}>
-              Get started
-            </button>
+            <>
+              <button type="button" style={{ ...s.navLink, display: "block", width: "100%", textAlign: "left", padding: "12px 0" }} onClick={() => { navigate("/accommodation/login"); setMobileMenuOpen(false); }}>
+                Sign in
+              </button>
+              <button type="button" style={{ ...s.navBtnPrimary, display: "block", width: "100%", padding: "12px" }} onClick={() => { navigate("/accommodation/register"); setMobileMenuOpen(false); }}>
+                Register Host Account
+              </button>
+            </>
           )}
           {extraActions}
         </nav>

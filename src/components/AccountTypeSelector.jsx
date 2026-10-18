@@ -137,7 +137,7 @@ const accountTypes = [
     icon: "/assets/tourism-icon.png",
     description: "List and manage accommodation properties",
     loginPath: "/accommodation/login",
-    registerPath: "/accommodation/register-property",
+    registerPath: "/accommodation/register",
   },
 ];
 

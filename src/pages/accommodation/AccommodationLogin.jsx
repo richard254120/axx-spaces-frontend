@@ -8,6 +8,7 @@ import {
   ACCOMMODATION_FONT_CSS,
   accommodationTheme,
 } from "../../features/accommodation";
+import logo from "../../assets/image.png";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -377,6 +378,8 @@ export default function AccommodationLogin() {
         throw new Error("This login is for accommodation providers only");
       }
 
+      setAccommodationSession(data.token, data.user);
+
       login(data.token, {
         _id: data.user._id,
         name: data.user.name,
@@ -427,6 +430,7 @@ export default function AccommodationLogin() {
         {showForgot ? (
           <>
             <div style={styles.logo}>
+              <img src={logo} alt="Axxspace" style={{ width: "52px", height: "52px", borderRadius: "12px", margin: "0 auto 10px", display: "block", boxShadow: "0 4px 12px rgba(2, 39, 83, 0.15)" }} />
               <span style={styles.logoAccent}>AXX</span>
               <span style={styles.logoWord}>SPACE</span>
             </div>
@@ -471,6 +475,7 @@ export default function AccommodationLogin() {
         ) : (
           <>
             <div style={styles.logo}>
+              <img src={logo} alt="Axxspace" style={{ width: "52px", height: "52px", borderRadius: "12px", margin: "0 auto 10px", display: "block", boxShadow: "0 4px 12px rgba(2, 39, 83, 0.15)" }} />
               <span style={styles.logoAccent}>AXX</span>
               <span style={styles.logoWord}>SPACE</span>
             </div>
