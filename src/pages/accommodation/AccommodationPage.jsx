@@ -9,275 +9,21 @@ import {
 import SocialMediaLinks from "../../components/SocialMediaLinks";
 
 // Popular Kenyan destinations for quick filter & suggestions
-const POPULAR_DESTINATIONS = [
-  { name: "Nairobi", county: "Nairobi County", type: "City & Skyline" },
-  { name: "Diani Beach", county: "Kwale County", type: "Beach & Coast" },
-  { name: "Mombasa", county: "Mombasa County", type: "Coastal Heritage" },
-  { name: "Maasai Mara", county: "Narok County", type: "Wildlife Safari" },
-  { name: "Naivasha", county: "Nakuru County", type: "Lakes & Geothermal" },
-  { name: "Watamu", county: "Kilifi County", type: "Marine Reserve & Coral" },
-  { name: "Nanyuki", county: "Laikipia County", type: "Mount Kenya & Wildlife" },
-  { name: "Lamu", county: "Lamu County", type: "Swahili Cultural Island" },
-  { name: "Amboseli", county: "Kajiado County", type: "Kilimanjaro Views" },
-  { name: "Nakuru", county: "Nakuru County", type: "National Park & Rift" },
-  { name: "Malindi", county: "Kilifi County", type: "Tropical Ocean & Cuisine" },
-  { name: "Kisumu", county: "Kisumu County", type: "Lake Victoria Sunsets" },
-];
+const POPULAR_DESTINATIONS = [];
 
 const DESTINATION_NAMES = POPULAR_DESTINATIONS.map((d) => d.name);
 
 // Curated stay categories with high-definition imagery and stay counts
-const STAY_CATEGORIES = [
-  {
-    id: "beach-resorts",
-    name: "Beach Resorts & Villas",
-    filterName: "Beach Resort",
-    count: "68+ Stays",
-    tag: "Coastal Luxury",
-    desc: "Indian Ocean shores, private infinity pools & Swahili hospitality",
-    image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80",
-    color: "#06b6d4",
-  },
-  {
-    id: "safari-camps",
-    name: "Safari Camps & Game Lodges",
-    filterName: "Safari Camp",
-    count: "54+ Stays",
-    tag: "Big Five Wildlife",
-    desc: "Luxury tented camps in Maasai Mara, Amboseli & Samburu",
-    image: "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=800&q=80",
-    color: "#16a34a",
-  },
-  {
-    id: "mountain-lodges",
-    name: "Mountain Lodges & Cabins",
-    filterName: "Mountain Lodge",
-    count: "32+ Stays",
-    tag: "Highland Retreats",
-    desc: "Cozy timber fireplaces under Mount Kenya & the Aberdares",
-    image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80",
-    color: "#8b5cf6",
-  },
-  {
-    id: "city-hotels",
-    name: "City Hotels & Penthouses",
-    filterName: "City Hotel",
-    count: "95+ Stays",
-    tag: "Metropolitan",
-    desc: "Sleek suites, high-speed WiFi & skyline views in Nairobi & Mombasa",
-    image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80",
-    color: "#f59e0b",
-  },
-  {
-    id: "eco-lodges",
-    name: "Eco-Lodges & Glamping",
-    filterName: "Eco Lodge",
-    count: "29+ Stays",
-    tag: "Nature Escapes",
-    desc: "Off-grid serenity and geothermal spas around Lake Naivasha & Elementaita",
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
-    color: "#059669",
-  },
-  {
-    id: "boutique-villas",
-    name: "Boutique Villas & Airbnb",
-    filterName: "Boutique Hotel",
-    count: "110+ Stays",
-    tag: "Private Getaways",
-    desc: "Entire homes, serviced holiday rentals and private chef villas",
-    image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=800&q=80",
-    color: "#ec4899",
-  },
-];
+const STAY_CATEGORIES = [];
 
 // Rich fallback properties for Kenya when API is warming up or empty
-const CURATED_KENYA_PROPERTIES = [
-  {
-    _id: "1",
-    id: "1",
-    name: "Serena Beach Resort & Spa",
-    category: "Beach Resort",
-    type: "Beach Resort",
-    location: "Nyali Beach, Mombasa",
-    county: "Mombasa County",
-    price: 12500,
-    basePrice: 12500,
-    rating: 4.8,
-    reviews: 312,
-    tag: "Top Rated",
-    badge: "Verified Host",
-    amenities: ["Ocean View", "Pool", "Free WiFi", "Spa", "Breakfast"],
-    image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80",
-    whatsapp: "254700123456",
-    color: "#0284c7",
-    categoryTab: "beach",
-    description: "Swahili-styled coastal architecture fringed with coconut palms along Nyali's white sands.",
-  },
-  {
-    _id: "2",
-    id: "2",
-    name: "Fairmont Mount Kenya Safari Club",
-    category: "Mountain Lodge",
-    type: "Mountain Lodge",
-    location: "Nanyuki, Equator",
-    county: "Laikipia County",
-    price: 28000,
-    basePrice: 28000,
-    rating: 4.9,
-    reviews: 198,
-    tag: "Luxury",
-    badge: "Premier Stay",
-    amenities: ["Equator Walk", "Heated Pool", "Fireplace", "Game Drives", "Fine Dining"],
-    image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80",
-    whatsapp: "254722987654",
-    color: "#16a34a",
-    categoryTab: "mountain",
-    description: "Perched 7,000 feet on the equator with manicured grounds facing snow-capped Mount Kenya peaks.",
-  },
-  {
-    _id: "4",
-    id: "4",
-    name: "Ol Pejeta Bush Camp",
-    category: "Safari Camp",
-    type: "Safari Camp",
-    location: "Ol Pejeta Conservancy",
-    county: "Laikipia County",
-    price: 18000,
-    basePrice: 18000,
-    rating: 4.9,
-    reviews: 87,
-    tag: "Wildlife Haven",
-    badge: "Eco-Certified",
-    amenities: ["Big Five Safaris", "Rhino Sanctuary", "Bush Dinners", "Solar Power", "Guide Included"],
-    image: "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=800&q=80",
-    whatsapp: "254711554433",
-    color: "#d97706",
-    categoryTab: "safari",
-    description: "Intimate eco-camp along the Ewaso Nyiro River with access to Africa's largest black rhino sanctuary.",
-  },
-  {
-    _id: "5",
-    id: "5",
-    name: "Diani Palm Breeze Private Villa",
-    category: "Beach Resort",
-    type: "Beach Villa",
-    location: "Diani Beach",
-    county: "Kwale County",
-    price: 15500,
-    basePrice: 15500,
-    rating: 4.9,
-    reviews: 142,
-    tag: "Best Value",
-    badge: "Superhost",
-    amenities: ["Private Chef", "Private Pool", "Beach Walk 2min", "High-speed WiFi", "AC"],
-    image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=800&q=80",
-    whatsapp: "254745689773",
-    color: "#06b6d4",
-    categoryTab: "beach",
-    description: "A private 3-bedroom Swahili sanctuary with swimming pool, sun loungers and personal chef service.",
-  },
-  {
-    _id: "6",
-    id: "6",
-    name: "Enashipai Resort & Geothermal Spa",
-    category: "Eco Lodge",
-    type: "Lakeside Resort",
-    location: "Moi South Lake Rd, Naivasha",
-    county: "Nakuru County",
-    price: 17200,
-    basePrice: 17200,
-    rating: 4.7,
-    reviews: 264,
-    tag: "Weekend Favorite",
-    badge: "Verified Host",
-    amenities: ["Lake Boat Trips", "Siyara Spa", "Night Club", "Tennis Court", "Kids Play Area"],
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
-    whatsapp: "254705345678",
-    color: "#059669",
-    categoryTab: "mountain",
-    description: "Lakeside luxury surrounded by lush gardens, flamingo waters and Kenya's premier geothermal spa.",
-  },
-  {
-    _id: "7",
-    id: "7",
-    name: "Tribe Luxury Suites & Residences",
-    category: "City Hotel",
-    type: "Boutique City Hotel",
-    location: "Gigiri, Diplomatic Blue Zone",
-    county: "Nairobi County",
-    price: 24000,
-    basePrice: 24000,
-    rating: 4.9,
-    reviews: 410,
-    tag: "Diplomatic Choice",
-    badge: "5-Star Standard",
-    amenities: ["Rooftop Bar", "High Security", "Heated Pool", "Jomo Gourmet", "Fast Fiber WiFi"],
-    image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80",
-    whatsapp: "254733998877",
-    color: "#6366f1",
-    categoryTab: "city",
-    description: "Award-winning boutique design hotel adjacent to the Village Market with handcrafted African art.",
-  },
-];
+const CURATED_KENYA_PROPERTIES = [];
 
 // Verified Guest Testimonials
-const GUEST_TESTIMONIALS = [
-  {
-    name: "Wanjiru Mwangi",
-    location: "Nairobi, Kenya",
-    stay: "Stayed at Serena Beach Resort, Mombasa",
-    text: "Booking directly with the resort via AXXSpace saved us over KSh 8,000 in agency fees! The host responded on WhatsApp within two minutes. Check-in was flawless and the ocean views were breathtaking.",
-    rating: 5,
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80",
-    verified: true,
-  },
-  {
-    name: "Dr. Kevin Ochieng",
-    location: "Kisumu, Kenya",
-    stay: "Stayed at Ol Pejeta Bush Camp, Nanyuki",
-    text: "The direct communication with the lodge manager gave us real-time road updates during the rainy season. Seeing the northern white rhinos was a spiritual experience. AXXSpace is our go-to for safari bookings!",
-    rating: 5,
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80",
-    verified: true,
-  },
-  {
-    name: "Elena & Marcus Becker",
-    location: "Berlin, Germany",
-    stay: "Stayed at Diani Palm Breeze Villa",
-    text: "We wanted a verified private villa for 10 days in Diani. The photos matched 100%, the private chef cooked mouth-watering Swahili fish curry, and M-Pesa payment was secure and simple. 10/10 experience!",
-    rating: 5,
-    avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&q=80",
-    verified: true,
-  },
-];
+const GUEST_TESTIMONIALS = [];
 
 // Frequently Asked Questions
-const FAQS = [
-  {
-    q: "How does booking through AXXSpace Accommodation work?",
-    a: "AXXSpace connects you directly with verified property owners, managers, and hospitality providers in Kenya. You can browse stays, review room types and amenities, and contact the host directly via WhatsApp or phone call with 0% middleman commission. You negotiate and pay directly to the verified accommodation!",
-  },
-  {
-    q: "Are the properties and hosts physically verified?",
-    a: "Yes. Every property listed under AXXSpace undergoes verification by our Kenyan field agents. We verify physical location, real photo accuracy, host identity, and valid hospitality operating permits before listings go live.",
-  },
-  {
-    q: "Can I pay using M-Pesa or Card?",
-    a: "Absolutely! Most Kenyan properties support direct Lipa na M-Pesa (Buy Goods Till / Paybill) as well as Visa, Mastercard, and bank wire transfers. Because you deal directly with the host, you receive immediate official payment receipts.",
-  },
-  {
-    q: "How can I list my hotel, villa, or Airbnb on AXXSpace?",
-    a: "Listing takes only 3 minutes! Click 'List Your Property' at the top, create your host profile, upload high-resolution photos, set your room rates, and provide your WhatsApp contact number. Our team reviews and activates your listing within 24 hours.",
-  },
-  {
-    q: "What is the cancellation policy?",
-    a: "Each property publishes its own transparent cancellation policy on its detail page (typically free cancellation up to 48 or 72 hours before check-in). Since you are in direct contact with the host on WhatsApp, rescheduling dates is flexible and hassle-free.",
-  },
-  {
-    q: "Do guests pay any service charges or hidden fees?",
-    a: "No! Unlike foreign booking portals that add 15% to 20% in guest service fees at checkout, AXXSpace charges guests ZERO commission. The price you agree with the host is the exact price you pay.",
-  },
-];
+const FAQS = [];
 
 // Helper: Count up animation on scroll
 function AnimatedCounter({ value, duration = 1600 }) {
@@ -357,9 +103,9 @@ export default function AccommodationPage() {
   const [favs, setFavs] = useState(() => {
     try {
       const stored = localStorage.getItem("axx_accommodation_favs");
-      return stored ? JSON.parse(stored) : ["1", "4"];
+      return stored ? JSON.parse(stored) : [];
     } catch {
-      return ["1", "4"];
+      return [];
     }
   });
   const [wishlistDrawerOpen, setWishlistDrawerOpen] = useState(false);
