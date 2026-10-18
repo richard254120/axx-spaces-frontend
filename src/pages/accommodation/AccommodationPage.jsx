@@ -912,57 +912,6 @@ export default function AccommodationPage() {
         </div>
       </section>
 
-      {/* ── CATEGORIES SHOWCASE SECTION ── */}
-      <section id="categories-section" style={s.section}>
-        <div style={s.sectionInner}>
-          <div className="section-head-split reveal">
-            <div>
-              <span className="section-eyebrow">CURATED BY TRAVEL EXPERIENCE</span>
-              <h2 style={s.sectionHeading}>Browse Stays by Stay Type & Vibe</h2>
-              <p style={s.sectionSubheading}>
-                Whether you crave powdery Indian Ocean sand, Big Five safari dawns, or a serene mountain cabin with a fireplace.
-              </p>
-            </div>
-            <button
-              type="button"
-              className="view-all-pill-btn"
-              onClick={() => navigate("/accommodation/listings")}
-            >
-              Explore All Categories →
-            </button>
-          </div>
-
-          <div className="category-cards-grid">
-            {STAY_CATEGORIES.map((cat, idx) => (
-              <div
-                key={cat.id}
-                className="stay-cat-card reveal"
-                style={{ animationDelay: `${idx * 0.08}s` }}
-                onClick={() => handleCategorySelect(cat)}
-              >
-                <div className="stay-cat-img-wrapper">
-                  <img src={cat.image} alt={cat.name} className="stay-cat-bg-img" loading="lazy" />
-                  <div className="stay-cat-gradient-overlay" />
-                  <div className="stay-cat-tag-pill" style={{ background: cat.color }}>
-                    {cat.tag}
-                  </div>
-                  <div className="stay-cat-count-badge">{cat.count}</div>
-                </div>
-                <div className="stay-cat-info">
-                  <h3 style={s.catCardTitle}>{cat.name}</h3>
-                  <p style={s.catCardDesc}>{cat.desc}</p>
-                  <div className="cat-explore-link">
-                    <span>View properties</span>
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ── FEATURED ACCOMMODATIONS WITH IN-PLACE TABS ── */}
       <section id="featured-section" style={{ ...s.section, background: "#f8fafc" }}>
