@@ -77,13 +77,7 @@ export default function AboutPage() {
       desc: "Discover and book verified hotels, lodges, luxury resorts, beach villas in Diani and Watamu, and safari camps across Kenya. Direct host contacts, date availability, and zero guest booking surcharges.",
       items: ["Hotels & Safari Lodges", "Luxury Beach Resorts", "Direct Host WhatsApp & Call", "Date Availability Calendar", "Verified Guest Reviews"],
     },
-    {
-      icon: "",
-      title: "Relocation & Moving Services",
-      color: "#f97316",
-      desc: "Connect with verified, professional moving companies and logistics operators across Kenya for seamless household and office relocations with clear pricing.",
-      items: ["Verified Movers", "Household & Office Relocation", "Transparent Quotes", "Careful Handling & Transit"],
-    },
+
     {
       icon: "",
       title: "AxxBiashara & Hardware Directory",
@@ -111,7 +105,7 @@ export default function AboutPage() {
     { icon: "", title: "Innovation", text: "Building modern solutions for everyday problems." },
     { icon: "", title: "Accessibility", text: "Making services and opportunities easier to reach for everyone." },
     { icon: "", title: "Transparency", text: "Encouraging accurate listings, honest reviews, and responsible engagement." },
-    { icon: "", title: "Community Growth", text: "Supporting landlords, tenants, merchants, movers, and entrepreneurs together." },
+    { icon: "", title: "Community Growth", text: "Supporting landlords, tenants, merchants, and entrepreneurs together." },
   ];
 
   const trustElements = [
@@ -135,8 +129,8 @@ export default function AboutPage() {
           <div style={styles.badge}> About Axxspace</div>
           <h1 style={styles.heroTitle}>Spaces. Services.<br />Businesses. All in One.</h1>
           <p style={styles.heroSubtitle}>
-            A digital ecosystem connecting tenants, landlords, business owners, movers, tourism providers, and
-            second-hand merchants through technology — built by young innovators in Kenya. Discover trusted businesses with AxxBiashara.
+            A digital ecosystem connecting tenants, landlords, business owners, tourism providers, and
+            merchants through technology — built by young innovators in Kenya. Discover trusted businesses with AxxBiashara.
           </p>
         </div>
       </section>
@@ -147,9 +141,9 @@ export default function AboutPage() {
           <div style={styles.whoLabel}>Who We Are</div>
           <h2 style={styles.whoTitle}>More Than a Platform</h2>
           <p style={styles.whoText}>
-            Axxspace is a digital platform designed to simplify how people find spaces, services, tourism experiences, and essential
-            moving solutions in one place. What started as a house-hunting solution has expanded into a broader
-            ecosystem connecting tenants, landlords, business owners, movers, tourism providers, and second-hand merchants through technology.
+            Axxspace is a digital platform designed to simplify how people find spaces, services, and tourism experiences
+            in one place. What started as a house-hunting solution has expanded into a broader
+            ecosystem connecting tenants, landlords, business owners, tourism providers, and merchants through technology.
           </p>
           <p style={styles.whoText}>
             Founded by young innovators and university students in Kenya, Axxspace was created to solve everyday
@@ -165,14 +159,14 @@ export default function AboutPage() {
             <div style={styles.missionIcon}></div>
             <h2 style={styles.missionTitle}>Our Mission</h2>
             <p style={styles.missionText}>
-              To simplify access to spaces, tourism experiences, relocation services, and affordable marketplaces through technology.
+              To simplify access to spaces, tourism experiences, verified services, and affordable marketplaces through technology.
             </p>
           </div>
           <div style={styles.missionCard}>
             <div style={styles.missionIcon}></div>
             <h2 style={styles.missionTitle}>Our Vision</h2>
             <p style={styles.missionText}>
-              To become Africa's leading digital platform for spaces, tourism, moving services, and community-driven commerce.
+              To become Africa's leading digital platform for spaces, tourism, verified business services, and community-driven commerce.
             </p>
           </div>
         </div>
@@ -237,15 +231,7 @@ export default function AboutPage() {
                 color: "#4CAF74",
                 route: "/accommodation"
               },
-              {
-                id: "movers",
-                title: "Relocation & Movers",
-                tagline: "Hassle-free household & office moving",
-                description: "Connect with vetted, licensed moving companies and transport logistics teams. Get transparent quotes and stress-free relocation across Kenya.",
-                features: ["Verified Moving Companies", "Residential & Commercial Moving", "Transparent Itemized Quotations", "Safe Transit & Careful Handling"],
-                color: "#F59E0B",
-                route: "/movers"
-              },
+
               {
                 id: "axxbiashara",
                 title: "AxxBiashara & Hardware",
@@ -296,14 +282,6 @@ export default function AboutPage() {
                       <path d="M16 10h.01"></path>
                       <path d="M8 14h.01"></path>
                       <path d="M16 14h.01"></path>
-                    </svg>
-                  )}
-                  {cat.id === "movers" && (
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={cat.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="1" y="3" width="15" height="13"></rect>
-                      <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
-                      <circle cx="5.5" cy="18.5" r="2.5"></circle>
-                      <circle cx="18.5" cy="18.5" r="2.5"></circle>
                     </svg>
                   )}
                   {cat.id === "axxbiashara" && (
@@ -502,7 +480,7 @@ export default function AboutPage() {
             <div>
               <h3 style={styles.noticeTitle}>Important Notice</h3>
               <p style={styles.noticeText}>
-                Axxspace acts as a digital connection platform between users, landlords, businesses, movers, tourism providers, and merchants.
+                Axxspace acts as a digital connection platform between users, landlords, businesses, tourism providers, and merchants.
                 Information displayed on the platform is provided by the respective owners or service providers.
                 Users are encouraged to verify products, services, pricing, and property details independently before
                 making payments or final decisions. Availability of spaces, services, or products may change without prior notice.
