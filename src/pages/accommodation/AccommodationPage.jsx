@@ -336,73 +336,36 @@ export default function AccommodationPage() {
       {/* ── TOP NAVIGATION ── */}
       <header className={`main-nav ${scrolled ? "scrolled" : ""}`}>
         <div style={s.navInner}>
-          {/* Logo */}
+          {/* ── LOGO ── */}
           <div style={s.logoWrapper} onClick={() => navigate("/accommodation")}>
-            <img
-              src="/tourism.png"
-              alt="AXX Tourism"
-              style={s.logoImg}
-              onError={(e) => {
-                e.target.style.display = "none";
-              }}
-            />
+            {/* Icon badge */}
+            <div style={s.logoBadge}>
+              <svg viewBox="0 0 32 32" width="22" height="22" fill="none">
+                <path d="M16 3L3 12v17h9v-9h8v9h9V12L16 3z" fill="#fff" fillOpacity="0.95" />
+                <path d="M16 3L3 12v17h9v-9h8v9h9V12L16 3z" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
+              </svg>
+            </div>
+            {/* Wordmark */}
             <div style={s.logoTextGroup}>
               <div style={s.logoTitle}>
-                <span style={s.logoAxx}>AXX</span>
-                <span style={s.logoSpace}>SPACE</span>
+                <span style={s.logoAxx}>AXX</span><span style={s.logoSpace}>Space</span>
               </div>
               <span style={s.logoSubline}>Accommodation</span>
             </div>
-            <span className="county-badge">Kenya · 47 Counties</span>
           </div>
 
           {/* Desktop Nav Links */}
           <nav className="desktop-nav-links">
-            <button
-              type="button"
-              className="nav-link-btn"
-              onClick={() => navigate("/accommodation/listings")}
-            >
+            <button type="button" className="nav-link-btn" onClick={() => navigate("/accommodation/listings")}>
               Explore Stays
             </button>
-            <button
-              type="button"
-              className="nav-link-btn"
-              onClick={() => {
-                const el = document.getElementById("categories-section");
-                if (el) el.scrollIntoView({ behavior: "smooth" });
-              }}
-            >
-              Experiences
-            </button>
-            <button
-              type="button"
-              className="nav-link-btn"
-              onClick={() => {
-                const el = document.getElementById("budget-planner");
-                if (el) el.scrollIntoView({ behavior: "smooth" });
-              }}
-            >
+            <button type="button" className="nav-link-btn" onClick={() => { const el = document.getElementById("budget-planner"); if (el) el.scrollIntoView({ behavior: "smooth" }); }}>
               Budget Planner
             </button>
-            <button
-              type="button"
-              className="nav-link-btn"
-              onClick={() => {
-                const el = document.getElementById("packages-section");
-                if (el) el.scrollIntoView({ behavior: "smooth" });
-              }}
-            >
+            <button type="button" className="nav-link-btn" onClick={() => { const el = document.getElementById("packages-section"); if (el) el.scrollIntoView({ behavior: "smooth" }); }}>
               For Hosts
             </button>
-            <button
-              type="button"
-              className="nav-link-btn"
-              onClick={() => {
-                const el = document.getElementById("faq-section");
-                if (el) el.scrollIntoView({ behavior: "smooth" });
-              }}
-            >
+            <button type="button" className="nav-link-btn" onClick={() => { const el = document.getElementById("faq-section"); if (el) el.scrollIntoView({ behavior: "smooth" }); }}>
               FAQ
             </button>
           </nav>
@@ -1817,42 +1780,49 @@ const s = {
     gap: "10px",
     cursor: "pointer",
     userSelect: "none",
+    textDecoration: "none",
   },
-  logoImg: {
-    width: "42px",
-    height: "42px",
-    borderRadius: "50%",
-    objectFit: "cover",
-    border: "2px solid rgba(79, 70, 229, 0.2)",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+  logoBadge: {
+    width: "38px",
+    height: "38px",
+    borderRadius: "10px",
+    background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "0 4px 12px rgba(79,70,229,0.35)",
+    flexShrink: 0,
   },
   logoTextGroup: {
     display: "flex",
     flexDirection: "column",
-    lineHeight: 1.1,
+    lineHeight: 1.15,
   },
   logoTitle: {
     display: "flex",
-    alignItems: "center",
+    alignItems: "baseline",
+    gap: "1px",
   },
   logoAxx: {
-    fontSize: "18px",
-    fontWeight: 900,
-    color: "#fbbf24",
-    letterSpacing: "-0.5px",
-  },
-  logoSpace: {
-    fontSize: "18px",
+    fontSize: "17px",
     fontWeight: 900,
     color: "#0f172a",
     letterSpacing: "-0.5px",
+    fontFamily: "'Inter', 'DM Sans', sans-serif",
+  },
+  logoSpace: {
+    fontSize: "17px",
+    fontWeight: 400,
+    color: "#4f46e5",
+    letterSpacing: "-0.3px",
+    fontFamily: "'Inter', 'DM Sans', sans-serif",
   },
   logoSubline: {
-    fontSize: "11px",
-    fontWeight: 700,
-    color: "#4f46e5",
+    fontSize: "9.5px",
+    fontWeight: 600,
+    color: "#94a3b8",
     textTransform: "uppercase",
-    letterSpacing: "0.08em",
+    letterSpacing: "0.14em",
   },
   navRightGroup: {
     display: "flex",
@@ -2390,50 +2360,68 @@ const customStyles = `
 
   /* Sticky Navigation */
   .main-nav {
-    background: #ffffff;
-    border-bottom: 1px solid #e2e8f0;
+    background: rgba(255, 255, 255, 0.98);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
     position: sticky;
     top: 0;
     z-index: 500;
     transition: all 0.3s ease;
   }
   .main-nav.scrolled {
-    background: rgba(255, 255, 255, 0.94);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.06), 0 8px 24px -8px rgba(0,0,0,0.07);
   }
 
   .county-badge {
-    background: #f1f5f9;
-    color: #475569;
-    font-size: 11px;
+    background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%);
+    color: #4f46e5;
+    font-size: 10.5px;
     font-weight: 700;
-    padding: 4px 10px;
+    padding: 3px 9px;
     border-radius: 999px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid rgba(79,70,229,0.2);
+    letter-spacing: 0.03em;
   }
 
   .desktop-nav-links {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 2px;
   }
   .nav-link-btn {
     background: transparent;
     border: none;
-    color: #334155;
+    color: #475569;
     font-size: 13.5px;
-    font-weight: 700;
-    padding: 8px 12px;
+    font-weight: 600;
+    padding: 8px 14px;
     border-radius: 8px;
     cursor: pointer;
     font-family: inherit;
-    transition: all 0.2s ease;
+    transition: all 0.18s ease;
+    position: relative;
+    letter-spacing: 0.01em;
+  }
+  .nav-link-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 14px;
+    right: 14px;
+    height: 2px;
+    background: #4f46e5;
+    border-radius: 2px;
+    transform: scaleX(0);
+    transition: transform 0.2s ease;
   }
   .nav-link-btn:hover {
     color: #4f46e5;
-    background: #f8fafc;
+    background: #f5f3ff;
+  }
+  .nav-link-btn:hover::after {
+    transform: scaleX(1);
   }
 
   .wishlist-trigger-btn {
@@ -2463,40 +2451,43 @@ const customStyles = `
 
   .sign-in-btn {
     background: transparent;
-    border: 1px solid #cbd5e1;
+    border: 1.5px solid #e2e8f0;
     color: #334155;
     font-size: 13px;
-    font-weight: 700;
-    padding: 8px 14px;
+    font-weight: 600;
+    padding: 8px 16px;
     border-radius: 10px;
     cursor: pointer;
     font-family: inherit;
     transition: all 0.2s;
+    letter-spacing: 0.01em;
   }
   .sign-in-btn:hover {
     border-color: #4f46e5;
     color: #4f46e5;
+    background: #f5f3ff;
   }
 
   .list-property-btn {
-    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
     color: #ffffff;
     border: none;
     border-radius: 10px;
     padding: 9px 18px;
     font-size: 13px;
-    font-weight: 800;
+    font-weight: 700;
     cursor: pointer;
     font-family: inherit;
     display: flex;
     align-items: center;
     gap: 6px;
-    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
     transition: all 0.25s ease;
+    letter-spacing: 0.01em;
   }
   .list-property-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.45);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.42);
   }
 
   .mobile-toggle-btn {
