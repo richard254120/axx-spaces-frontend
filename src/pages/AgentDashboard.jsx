@@ -524,35 +524,35 @@ export default function AgentDashboard() {
   const getApprovalProcessedFlag = () => {
     const userId = user?._id;
     if (!userId) {
-      console.log("⚠️ [Flag] No user ID, skipping flag check");
+      console.log("[Flag] No user ID, skipping flag check");
       return false;
     }
     const flagKey = `approvalProcessed_${userId}`;
     const value = localStorage.getItem(flagKey) === "true";
-    console.log(`📍 [Flag] Checking ${flagKey}: ${value}`);
+    console.log(`[Flag] Checking ${flagKey}: ${value}`);
     return value;
   };
 
   const setApprovalProcessedFlag = () => {
     const userId = user?._id;
     if (!userId) {
-      console.log("⚠️ [Flag] No user ID, cannot set flag");
+      console.log("[Flag] No user ID, cannot set flag");
       return;
     }
     const flagKey = `approvalProcessed_${userId}`;
     localStorage.setItem(flagKey, "true");
-    console.log(`✅ [Flag] Set ${flagKey} = true`);
+    console.log(`[Flag] Set ${flagKey} = true`);
   };
 
   const clearApprovalProcessedFlag = () => {
     const userId = user?._id;
     if (!userId) {
-      console.log("⚠️ [Flag] No user ID, cannot clear flag");
+      console.log("[Flag] No user ID, cannot clear flag");
       return;
     }
     const flagKey = `approvalProcessed_${userId}`;
     localStorage.removeItem(flagKey);
-    console.log(`🗑️ [Flag] Cleared ${flagKey}`);
+    console.log(`[Flag] Cleared ${flagKey}`);
   };
 
   // Toast system functions
@@ -621,7 +621,7 @@ export default function AgentDashboard() {
       navigate("/agent/login");
       return;
     }
-    console.log("🚀 [Mount] AgentDashboard mounted for user:", user._id);
+    console.log("[Mount] AgentDashboard mounted for user:", user._id);
     
     loadData();
     loadPackages();
@@ -633,16 +633,16 @@ export default function AgentDashboard() {
   useEffect(() => {
     if (!user || user.role !== "agent" || !token) return;
     
-    console.log("🔄 [Polling] Started - checking every 10 seconds");
+    console.log("[Polling] Started - checking every 10 seconds");
     
     const interval = setInterval(() => {
-      console.log("🔍 [Polling] Checking for updates...");
+      console.log("[Polling] Checking for updates...");
       loadMyPackage(token);
       loadPendingPurchase(token);
     }, 10000); // Check every 10 seconds to reduce server load
     
     return () => {
-      console.log("🛑 [Polling] Stopped");
+      console.log("[Polling] Stopped");
       clearInterval(interval);
     };
   }, [token]);
@@ -700,7 +700,7 @@ export default function AgentDashboard() {
           // Track this tier as processed
           lastProcessedTierRef.current = data.currentTier;
           
-          console.log(`📦 [Package] Tier upgraded from ${user?.agentProfile?.subscriptionTier} to ${data.currentTier}`);
+          console.log(`[Package] Tier upgraded from ${user?.agentProfile?.subscriptionTier} to ${data.currentTier}`);
           updateUser({
             ...user,
             agentProfile: {
@@ -724,12 +724,12 @@ export default function AgentDashboard() {
       });
       if (res.ok) {
         const data = await res.json();
-        console.log("📊 [Polling] Pending Purchase Data:", data);
+        console.log("[Polling] Pending Purchase Data:", data);
         
         // If approval detected (and we haven't already processed it for this approval)
         // AND there's no existing pending purchase (meaning it was just approved)
         if (!data.pendingPurchase && data.hasPending === false && !getApprovalProcessedFlag() && pendingPurchase) {
-          console.log("✅ [Polling] Clearing pending purchase - approval detected!");
+          console.log("[Polling] Clearing pending purchase - approval detected!");
           setPendingPurchase(null);
           setShowPackageModal(false);
           addToast("Payment approved! Your package has been upgraded.", "success");
@@ -738,11 +738,11 @@ export default function AgentDashboard() {
           setApprovalProcessedFlag();
           
           // Force refresh the package info to show new tier
-          console.log("📦 [Polling] Refreshing package info after approval...");
+          console.log("[Polling] Refreshing package info after approval...");
           await loadMyPackage(currentToken);
           
           // NO PAGE RELOAD - Just update UI directly
-          console.log("✅ [Polling] Approval processed, UI updated");
+          console.log("[Polling] Approval processed, UI updated");
         } else if (data.pendingPurchase) {
           // If there's a new pending purchase, clear the flag so future approvals will trigger the toast
           clearApprovalProcessedFlag();
@@ -1170,7 +1170,7 @@ export default function AgentDashboard() {
                 opacity: hoveredAvatar ? 1 : 0,
               }}
             >
-              📷
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
               <span style={{ fontSize: '9px', marginTop: '2px' }}>Upload</span>
             </div>
             {/* Camera badge */}
@@ -1801,8 +1801,9 @@ export default function AgentDashboard() {
                 padding: '16px',
                 marginBottom: '24px',
               }}>
-                <div style={{ fontSize: '14px', fontWeight: 700, color: '#166534', marginBottom: '8px' }}>
-                  💳 Payment Instructions
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#166534', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                  <span>Payment Instructions</span>
                 </div>
                 <div style={{ fontSize: '13px', color: '#15803d', lineHeight: 1.6 }}>
                   <div>1. Go to M-Pesa menu on your phone</div>

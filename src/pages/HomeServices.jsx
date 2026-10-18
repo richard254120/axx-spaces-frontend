@@ -23,14 +23,14 @@ const C = {
 };
 
 const categories = [
-  { id: "cleaning", name: "Cleaning", icon: "🧹", description: "Professional cleaning services" },
-  { id: "plumbing", name: "Plumbing", icon: "🔧", description: "Pipe repair and installation" },
-  { id: "electrical", name: "Electrical", icon: "⚡", description: "Electrical work and repairs" },
-  { id: "carpentry", name: "Carpentry", icon: "🪚", description: "Woodwork and furniture repair" },
-  { id: "painting", name: "Painting", icon: "🎨", description: "Interior and exterior painting" },
-  { id: "gardening", name: "Gardening", icon: "🌱", description: "Landscaping and garden care" },
-  { id: "pest-control", name: "Pest Control", icon: "🐀", description: "Pest elimination and prevention" },
-  { id: "hvac", name: "HVAC", icon: "❄️", description: "Heating and cooling services" }
+  { id: "cleaning", name: "Cleaning", description: "Professional cleaning services" },
+  { id: "plumbing", name: "Plumbing", description: "Pipe repair and installation" },
+  { id: "electrical", name: "Electrical", description: "Electrical work and repairs" },
+  { id: "carpentry", name: "Carpentry", description: "Woodwork and furniture repair" },
+  { id: "painting", name: "Painting", description: "Interior and exterior painting" },
+  { id: "gardening", name: "Gardening", description: "Landscaping and garden care" },
+  { id: "pest-control", name: "Pest Control", description: "Pest elimination and prevention" },
+  { id: "hvac", name: "HVAC", description: "Heating and cooling services" }
 ];
 
 export default function HomeServices() {
@@ -186,9 +186,11 @@ export default function HomeServices() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "48px"
           }}>
-            {categories.find(c => c.id === service.category)?.icon || "🏠"}
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={C.gold} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
           </div>
         )}
       </div>
@@ -242,12 +244,13 @@ export default function HomeServices() {
           {service.description}
         </p>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
-          <span style={{ fontSize: "12px", color: C.textDim }}>
-            📍 {service.location.city}
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+          <span style={{ fontSize: "12px", color: C.textDim, display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <span>{service.location.city}</span>
           </span>
           <span style={{ fontSize: "12px", color: C.textDim }}>
-            ⏱️ {service.availability.responseTime}
+            {service.availability.responseTime}
           </span>
         </div>
 
@@ -519,7 +522,6 @@ export default function HomeServices() {
                   gap: "6px"
                 }}
               >
-                <span>{cat.icon}</span>
                 <span>{cat.name}</span>
               </button>
             ))}
@@ -536,7 +538,9 @@ export default function HomeServices() {
             </div>
           ) : filteredServices.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px" }}>
-              <div style={{ fontSize: "48px", marginBottom: "16px" }}>🔍</div>
+              <div style={{ width: "64px", height: "64px", borderRadius: "50%", background: "rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={C.gold} strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </div>
               <h3 style={{ fontSize: "20px", marginBottom: "8px" }}>No services found</h3>
               <p style={{ color: C.textDim }}>
                 Try adjusting your filters or search terms

@@ -10,18 +10,18 @@ import SocialMediaLinks from "../../components/SocialMediaLinks";
 
 // Popular Kenyan destinations for quick filter & suggestions
 const POPULAR_DESTINATIONS = [
-  { name: "Nairobi", county: "Nairobi County", type: "City & Skyline", icon: "🏙️" },
-  { name: "Diani Beach", county: "Kwale County", type: "Beach & Coast", icon: "🏖️" },
-  { name: "Mombasa", county: "Mombasa County", type: "Coastal Heritage", icon: "🌊" },
-  { name: "Maasai Mara", county: "Narok County", type: "Wildlife Safari", icon: "🦁" },
-  { name: "Naivasha", county: "Nakuru County", type: "Lakes & Geothermal", icon: "🦩" },
-  { name: "Watamu", county: "Kilifi County", type: "Marine Reserve & Coral", icon: "🐠" },
-  { name: "Nanyuki", county: "Laikipia County", type: "Mount Kenya & Wildlife", icon: "⛰️" },
-  { name: "Lamu", county: "Lamu County", type: "Swahili Cultural Island", icon: "⛵" },
-  { name: "Amboseli", county: "Kajiado County", type: "Kilimanjaro Views", icon: "🐘" },
-  { name: "Nakuru", county: "Nakuru County", type: "National Park & Rift", icon: "🌿" },
-  { name: "Malindi", county: "Kilifi County", type: "Tropical Ocean & Cuisine", icon: "🌴" },
-  { name: "Kisumu", county: "Kisumu County", type: "Lake Victoria Sunsets", icon: "⛵" },
+  { name: "Nairobi", county: "Nairobi County", type: "City & Skyline" },
+  { name: "Diani Beach", county: "Kwale County", type: "Beach & Coast" },
+  { name: "Mombasa", county: "Mombasa County", type: "Coastal Heritage" },
+  { name: "Maasai Mara", county: "Narok County", type: "Wildlife Safari" },
+  { name: "Naivasha", county: "Nakuru County", type: "Lakes & Geothermal" },
+  { name: "Watamu", county: "Kilifi County", type: "Marine Reserve & Coral" },
+  { name: "Nanyuki", county: "Laikipia County", type: "Mount Kenya & Wildlife" },
+  { name: "Lamu", county: "Lamu County", type: "Swahili Cultural Island" },
+  { name: "Amboseli", county: "Kajiado County", type: "Kilimanjaro Views" },
+  { name: "Nakuru", county: "Nakuru County", type: "National Park & Rift" },
+  { name: "Malindi", county: "Kilifi County", type: "Tropical Ocean & Cuisine" },
+  { name: "Kisumu", county: "Kisumu County", type: "Lake Victoria Sunsets" },
 ];
 
 const DESTINATION_NAMES = POPULAR_DESTINATIONS.map((d) => d.name);
@@ -510,7 +510,7 @@ export default function AccommodationPage() {
       showToast(`Removed from your wishlist`);
     } else {
       updated = [...favs, id];
-      showToast(`Saved "${name || 'Property'}" to wishlist ❤️`);
+      showToast(`Saved "${name || 'Property'}" to wishlist`);
     }
     setFavs(updated);
     try {
@@ -780,7 +780,12 @@ export default function AccommodationPage() {
           {/* Trust Floating Tag */}
           <div className="hero-in i1" style={{ display: "inline-flex", justifyContent: "center" }}>
             <div style={s.heroBadgePill}>
-              <span style={{ fontSize: "14px" }}>🇰🇪</span>
+              <span style={{ display: "inline-flex", alignItems: "center" }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+              </span>
               <span>Direct Bookings · Verified Kenyan Hosts · 0% Hidden Commission</span>
             </div>
           </div>
@@ -842,7 +847,7 @@ export default function AccommodationPage() {
                 {showDestDropdown && (
                   <div className="dest-dropdown-popover">
                     <div style={s.destDropdownHeader}>
-                      <span>🔥 POPULAR KENYAN DESTINATIONS</span>
+                      <span>POPULAR KENYAN DESTINATIONS</span>
                     </div>
                     <div style={s.destDropdownList}>
                       {POPULAR_DESTINATIONS.filter(
@@ -859,7 +864,12 @@ export default function AccommodationPage() {
                             setShowDestDropdown(false);
                           }}
                         >
-                          <span style={{ fontSize: "20px" }}>{dest.icon}</span>
+                          <span style={{ display: "inline-flex", alignItems: "center" }}>
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="#4f46e5" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                              <circle cx="12" cy="10" r="3" />
+                            </svg>
+                          </span>
                           <div style={{ flex: 1 }}>
                             <div style={{ fontWeight: 700, color: "#0f172a", fontSize: "14px" }}>{dest.name}</div>
                             <div style={{ fontSize: "12px", color: "#64748b" }}>{dest.county} · {dest.type}</div>
@@ -1224,10 +1234,10 @@ export default function AccommodationPage() {
             <div className="featured-category-filter-tabs">
               {[
                 { id: "all", label: "All Stays" },
-                { id: "beach", label: "🏖️ Beachfront" },
-                { id: "safari", label: "🦁 Safari & Bush" },
-                { id: "mountain", label: "⛰️ Lakes & Mountains" },
-                { id: "city", label: "🏙️ City Luxury" },
+                { id: "beach", label: "Beachfront" },
+                { id: "safari", label: "Safari & Bush" },
+                { id: "mountain", label: "Lakes & Mountains" },
+                { id: "city", label: "City Luxury" },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -1245,7 +1255,14 @@ export default function AccommodationPage() {
           <div className="properties-listing-grid">
             {displayedProperties.length === 0 ? (
               <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "60px 20px" }}>
-                <div style={{ fontSize: "52px", marginBottom: "16px" }}>🏨</div>
+                <div style={{ width: "64px", height: "64px", borderRadius: "50%", background: "#f3f4f6", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"></path>
+                    <path d="M9 22v-4h6v4"></path>
+                    <path d="M8 6h.01"></path>
+                    <path d="M16 6h.01"></path>
+                  </svg>
+                </div>
                 <h3 style={{ fontSize: "20px", fontWeight: 800, color: "#0f172a", marginBottom: "8px" }}>
                   Listings Coming Soon
                 </h3>
@@ -1283,8 +1300,9 @@ export default function AccommodationPage() {
                         <span className="prop-category-tag">{prop.type || prop.category}</span>
                         {prop.tag && <span className="prop-highlight-tag">{prop.tag}</span>}
                         {prop.videos && prop.videos.length > 0 && (
-                          <span className="prop-video-tag" style={{ background: "rgba(15, 23, 42, 0.85)", color: "#38bdf8", fontWeight: 800 }}>
-                            🎬 Video Tour
+                          <span className="prop-video-tag" style={{ background: "rgba(15, 23, 42, 0.85)", color: "#38bdf8", fontWeight: 800, display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                            Video Tour
                           </span>
                         )}
                       </div>
@@ -1395,7 +1413,7 @@ export default function AccommodationPage() {
         <div style={s.sectionInner}>
           <div className="flash-deal-banner-card reveal">
             <div className="flash-deal-left">
-              <div className="deal-badge-pill">⚡ LIMITED WEEKEND ESCAPES</div>
+              <div className="deal-badge-pill">LIMITED WEEKEND ESCAPES</div>
               <h2 className="deal-title">Save Up to 25% on Direct Bookings This Month</h2>
               <p className="deal-desc">
                 Exclusive direct host specials in Diani Beach, Naivasha, and the Maasai Mara. Connect directly, avoid third-party agency surcharges, and enjoy complimentary breakfast or sunset game drives.
@@ -1409,7 +1427,7 @@ export default function AccommodationPage() {
                   Browse Discounted Stays →
                 </button>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#fef3c7", fontSize: "13px" }}>
-                  <span>⏱️ Verified direct rates</span>
+                  <span>Verified direct rates</span>
                   <span>•</span>
                   <span>Direct WhatsApp contact</span>
                 </div>
@@ -1418,7 +1436,12 @@ export default function AccommodationPage() {
             <div className="flash-deal-right">
               <div className="deal-floating-mini-card">
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <span style={{ fontSize: "28px" }}>🏖️</span>
+                  <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "#e0f2fe", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0284c7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                      <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                  </div>
                   <div>
                     <div style={{ fontWeight: 800, color: "#0f172a" }}>Diani Coastal Villa</div>
                     <div style={{ fontSize: "12px", color: "#64748b" }}>3 Nights · Oceanfront</div>
@@ -1566,14 +1589,14 @@ export default function AccommodationPage() {
                 className={`how-toggle-btn ${howItWorksTab === "guests" ? "active" : ""}`}
                 onClick={() => setHowItWorksTab("guests")}
               >
-                🏖️ For Travelers & Guests
+                For Travelers & Guests
               </button>
               <button
                 type="button"
                 className={`how-toggle-btn ${howItWorksTab === "hosts" ? "active" : ""}`}
                 onClick={() => setHowItWorksTab("hosts")}
               >
-                🏢 For Property Owners & Hosts
+                For Property Owners & Hosts
               </button>
             </div>
           </div>
@@ -1585,25 +1608,44 @@ export default function AccommodationPage() {
                   step: "01",
                   title: "Discover Your Stay",
                   desc: "Filter through verified beach resorts, safari camps, holiday villas and city penthouses across Kenya.",
-                  icon: "🔍",
+                  icon: (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                  ),
                 },
                 {
                   step: "02",
                   title: "Compare & View Photos",
                   desc: "Check real high-res room photos, exact nightly prices, guest amenities and verified physical location.",
-                  icon: "📸",
+                  icon: (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                      <circle cx="12" cy="13" r="4"></circle>
+                    </svg>
+                  ),
                 },
                 {
                   step: "03",
                   title: "Direct WhatsApp Contact",
                   desc: "Connect directly with property managers or villa owners with one tap. Ask questions and confirm dates.",
-                  icon: "💬",
+                  icon: (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                    </svg>
+                  ),
                 },
                 {
                   step: "04",
                   title: "Pay Direct & Enjoy",
                   desc: "Zero hidden commission or third-party booking surcharges. Pay securely via M-Pesa or card directly to the host.",
-                  icon: "🌴",
+                  icon: (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                      <line x1="1" y1="10" x2="23" y2="10"></line>
+                    </svg>
+                  ),
                 },
               ].map((stepItem, idx) => (
                 <div key={stepItem.step} className="how-step-card reveal" style={{ animationDelay: `${idx * 0.1}s` }}>
@@ -1621,25 +1663,50 @@ export default function AccommodationPage() {
                   step: "01",
                   title: "Register Your Property",
                   desc: "Sign up in 3 minutes as a hotelier, Airbnb host, or property manager. No lengthy onboarding paperwork.",
-                  icon: "📝",
+                  icon: (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <line x1="16" y1="13" x2="8" y2="13"></line>
+                      <line x1="16" y1="17" x2="8" y2="17"></line>
+                      <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                  ),
                 },
                 {
                   step: "02",
                   title: "Add Photos & Pricing",
                   desc: "Upload high-res photos, set room types, seasonal rates, amenities, and your direct WhatsApp contact number.",
-                  icon: "🏨",
+                  icon: (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2Z"></path>
+                      <path d="M9 22v-4h6v4"></path>
+                      <path d="M8 6h.01"></path>
+                      <path d="M16 6h.01"></path>
+                    </svg>
+                  ),
                 },
                 {
                   step: "03",
                   title: "Get Verified Fast",
                   desc: "Our Kenyan inspection team verifies your listing details within 24 hours to award you the Verified Host Badge.",
-                  icon: "✅",
+                  icon: (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                  ),
                 },
                 {
                   step: "04",
                   title: "Receive Direct Bookings",
                   desc: "Travelers reach you directly on your phone. You retain 100% of your earnings with zero middleman deductions.",
-                  icon: "💰",
+                  icon: (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="12" y1="1" x2="12" y2="23"></line>
+                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                  ),
                 },
               ].map((stepItem, idx) => (
                 <div key={stepItem.step} className="how-step-card reveal" style={{ animationDelay: `${idx * 0.1}s` }}>
@@ -1670,7 +1737,11 @@ export default function AccommodationPage() {
           <div className="why-features-matrix">
             <div className="why-matrix-card reveal">
               <div className="why-icon-bubble" style={{ background: "#e0e7ff", color: "#4f46e5" }}>
-                💰
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="19" y1="5" x2="5" y2="19"></line>
+                  <circle cx="6.5" cy="6.5" r="2.5"></circle>
+                  <circle cx="17.5" cy="17.5" r="2.5"></circle>
+                </svg>
               </div>
               <h3 style={s.whyCardTitle}>0% Middleman Commission</h3>
               <p style={s.whyCardDesc}>
@@ -1680,7 +1751,9 @@ export default function AccommodationPage() {
 
             <div className="why-matrix-card reveal">
               <div className="why-icon-bubble" style={{ background: "#dcfce7", color: "#16a34a" }}>
-                💬
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                </svg>
               </div>
               <h3 style={s.whyCardTitle}>Instant WhatsApp Host Chat</h3>
               <p style={s.whyCardDesc}>
@@ -1690,7 +1763,9 @@ export default function AccommodationPage() {
 
             <div className="why-matrix-card reveal">
               <div className="why-icon-bubble" style={{ background: "#fef3c7", color: "#d97706" }}>
-                🛡️
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
               </div>
               <h3 style={s.whyCardTitle}>Physically Verified Properties</h3>
               <p style={s.whyCardDesc}>
@@ -1700,7 +1775,10 @@ export default function AccommodationPage() {
 
             <div className="why-matrix-card reveal">
               <div className="why-icon-bubble" style={{ background: "#fee2e2", color: "#e11d48" }}>
-                🇰🇪
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                  <line x1="2" y1="10" x2="22" y2="10"></line>
+                </svg>
               </div>
               <h3 style={s.whyCardTitle}>Local M-Pesa & Card Ease</h3>
               <p style={s.whyCardDesc}>
@@ -1790,8 +1868,9 @@ export default function AccommodationPage() {
                   {"★".repeat(review.rating)}
                 </div>
                 <p style={s.reviewText}>"{review.text}"</p>
-                <div style={{ fontSize: "12px", color: "#4f46e5", fontWeight: 700, marginBottom: "16px" }}>
-                  📍 {review.stay}
+                <div style={{ fontSize: "12px", color: "#4f46e5", fontWeight: 700, marginBottom: "16px", display: "flex", alignItems: "center", gap: "4px" }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  <span>{review.stay}</span>
                 </div>
                 <div style={s.reviewAuthorRow}>
                   <img src={review.avatar} alt={review.name} style={s.reviewerAvatar} />
@@ -1940,16 +2019,28 @@ export default function AccommodationPage() {
             <div>
               <div style={s.footerHeading}>Direct Contact</div>
               <div style={s.footerContactItem}>
-                <span style={{ color: "#38bdf8" }}>✉️</span> accommodationaxxspace@gmail.com
+                <span style={{ color: "#38bdf8", display: "inline-flex", alignItems: "center" }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                </span>
+                <span>accommodationaxxspace@gmail.com</span>
               </div>
               <div style={s.footerContactItem}>
-                <span style={{ color: "#38bdf8" }}>📞</span> +254 745 689 773
+                <span style={{ color: "#38bdf8", display: "inline-flex", alignItems: "center" }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                </span>
+                <span>+254 745 689 773</span>
               </div>
               <div style={s.footerContactItem}>
-                <span style={{ color: "#22c55e" }}>💬</span> WhatsApp Official Concierge
+                <span style={{ color: "#22c55e", display: "inline-flex", alignItems: "center" }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                </span>
+                <span>WhatsApp Official Concierge</span>
               </div>
               <div style={s.footerContactItem}>
-                <span style={{ color: "#fbbf24" }}>📍</span> Nairobi, Kenya
+                <span style={{ color: "#fbbf24", display: "inline-flex", alignItems: "center" }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                </span>
+                <span>Nairobi, Kenya</span>
               </div>
             </div>
           </div>
@@ -1990,7 +2081,9 @@ export default function AccommodationPage() {
             <div className="wishlist-drawer-body">
               {wishlistProperties.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "40px 16px", color: "#64748b" }}>
-                  <div style={{ fontSize: "40px", marginBottom: "12px" }}>❤️</div>
+                  <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e11d48" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                  </div>
                   <div style={{ fontWeight: 700, fontSize: "16px", color: "#0f172a", marginBottom: "6px" }}>No saved stays yet</div>
                   <p style={{ fontSize: "14px", lineHeight: 1.5 }}>Click the heart icon on any accommodation card to save it for quick comparison.</p>
                 </div>

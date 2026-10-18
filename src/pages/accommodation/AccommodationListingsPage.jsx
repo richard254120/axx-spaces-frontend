@@ -107,7 +107,7 @@ export default function TourismListingsPage() {
 
       {error && offline && (
         <div style={{ maxWidth: "1400px", margin: "12px auto", padding: "0 16px" }}>
-          <ErrorAlert message={`Could not reach server: ${error}. Showing sample listings.`} />
+          <ErrorAlert message={`Could not reach server: ${error}. Please check your connection.`} />
         </div>
       )}
 

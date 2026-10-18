@@ -1315,7 +1315,7 @@ export default function BusinessForm() {
                 e.target.style.background = "rgba(96, 165, 250, 0.15)";
               }}
             >
-              📍 Detect My Current Location
+              Detect My Current Location
             </button>
 
             <label style={styles.label}>GPS Latitude (optional)</label>

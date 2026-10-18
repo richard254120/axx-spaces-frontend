@@ -171,7 +171,7 @@ export default function Navbar() {
             <span style={styles.dropdownIcon}>FAQ</span>
           </Link>
           <Link to="/mobile-app" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-            <span style={styles.dropdownIcon}>📱 Mobile App</span>
+            <span style={styles.dropdownIcon}>Mobile App</span>
           </Link>
           <Link to="/axxwallet" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
             <span style={styles.dropdownIcon}>AxxWallet</span>

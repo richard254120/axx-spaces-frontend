@@ -16,10 +16,13 @@ export default function VerificationBadges({ userId, userType = "landlord" }) {
     const verificationKey = `verifications_${userId}`;
     const saved = localStorage.getItem(verificationKey);
     if (saved) {
-      setVerifications(JSON.parse(saved));
+      try {
+        setVerifications(JSON.parse(saved));
+      } catch {
+        setVerifications({ email: false, phone: false, id: false, business: false });
+      }
     } else {
-      // Default to email verified for demo
-      setVerifications({ email: true, phone: false, id: false, business: false });
+      setVerifications({ email: false, phone: false, id: false, business: false });
     }
   };
 

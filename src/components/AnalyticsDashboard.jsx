@@ -17,88 +17,47 @@ export default function AnalyticsDashboard({ userType = "landlord", userId = nul
       if (res.data && res.data.success && res.data.data) {
         setAnalytics(res.data.data);
       } else {
-        const mockData = generateMockAnalytics(userType, timeRange, userId);
-        setAnalytics(mockData);
+        setAnalytics(getBaselineAnalytics(userType));
       }
     } catch (err) {
-      console.error("Error loading real analytics:", err);
-      const mockData = generateMockAnalytics(userType, timeRange, userId);
-      setAnalytics(mockData);
+      console.error("Error loading analytics:", err);
+      setAnalytics(getBaselineAnalytics(userType));
     } finally {
       setLoading(false);
     }
   };
 
-  const getSeedFromString = (str) => {
-    let hash = 0;
-    if (!str) return 12345;
-    for (let i = 0; i < str.length; i++) {
-      hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return Math.abs(hash);
-  };
-
-  const getSeededRandom = (seed) => {
-    const x = Math.sin(seed) * 10000;
-    return x - Math.floor(x);
-  };
-
-  const generateMockAnalytics = (type, range, uid) => {
-    const seedBase = getSeedFromString(uid || userId || "demo-user");
-    const multiplier = range === "7d" ? 1 : range === "30d" ? 4 : 12;
-
-    const r1 = getSeededRandom(seedBase + 1);
-    const r2 = getSeededRandom(seedBase + 2);
-    const r3 = getSeededRandom(seedBase + 3);
-    const r4 = getSeededRandom(seedBase + 4);
-    const r5 = getSeededRandom(seedBase + 5);
-
-    const views = Math.floor(r1 * 400 * multiplier) + 80;
-    const inquiries = Math.floor(r2 * 45 * multiplier) + 8;
-    const bookings = Math.max(1, Math.floor(r3 * 15 * multiplier));
-    const revenue = Math.floor(r4 * 80000 * multiplier) + 5000;
-    const conversionRate = (r5 * 8 + 2).toFixed(1);
-
-    // Mock QR scans and inquiries
-    const qrScans = Math.floor(r1 * 80 * multiplier) + 5;
-    const qrInquiries = Math.floor(r2 * 12 * multiplier) + 1;
-
+  const getBaselineAnalytics = (type) => {
     const baseData = {
-      views,
-      inquiries,
-      bookings,
-      revenue,
-      conversionRate,
+      views: 0,
+      inquiries: 0,
+      bookings: 0,
+      revenue: 0,
+      conversionRate: "0.0",
     };
 
     if (type === "landlord") {
-      const r6 = getSeededRandom(seedBase + 6);
-      const r7 = getSeededRandom(seedBase + 7);
       return {
         ...baseData,
-        propertiesListed: Math.floor(r6 * 6) + 1,
-        averageResponseTime: Math.floor(r7 * 40) + 10,
-        topProperty: "Axx Space Premier",
-        qrScans,
-        qrInquiries,
+        propertiesListed: 0,
+        averageResponseTime: 0,
+        topProperty: "No listings yet",
+        qrScans: 0,
+        qrInquiries: 0,
       };
     } else if (type === "mover") {
-      const r6 = getSeededRandom(seedBase + 6);
-      const r7 = getSeededRandom(seedBase + 7);
       return {
         ...baseData,
-        jobsCompleted: Math.max(1, Math.floor(r6 * 20 * multiplier)),
-        averageRating: (r7 * 1.2 + 3.8).toFixed(1),
-        repeatCustomers: Math.floor(r7 * 20) + 5,
+        jobsCompleted: 0,
+        averageRating: "0.0",
+        repeatCustomers: 0,
       };
     } else if (type === "seller") {
-      const r6 = getSeededRandom(seedBase + 6);
-      const r7 = getSeededRandom(seedBase + 7);
       return {
         ...baseData,
-        itemsSold: Math.floor(r6 * 35 * multiplier) + 5,
-        averageOrderValue: Math.floor(r7 * 4000) + 800,
-        totalListings: Math.floor(r6 * 12) + 2,
+        itemsSold: 0,
+        averageOrderValue: 0,
+        totalListings: 0,
       };
     }
 
@@ -392,8 +351,8 @@ function generateChartData(range, userId, totalViews = 100) {
 
   let distributedSum = 0;
   for (let i = 0; i < days; i++) {
-    const share = totalViews * (weights[i] / totalWeight);
-    const value = Math.max(1, Math.round(share));
+    const share = totalViews > 0 ? (totalViews * (weights[i] / totalWeight)) : 0;
+    const value = totalViews > 0 ? Math.max(0, Math.round(share)) : 0;
     distributedSum += value;
     data.push({
       label: labels[i] || `Day ${i + 1}`,

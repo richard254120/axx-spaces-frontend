@@ -669,7 +669,7 @@ export default function AgentQRPosterModal({ isOpen, onClose, agent }) {
         {/* Header */}
         <div style={ms.header}>
           <div>
-            <h2 style={ms.title}>🪪 Agent QR Poster</h2>
+            <h2 style={ms.title}>Agent QR Poster</h2>
             <p style={ms.subtitle}>{agent?.name || agent?.username || "Agent"}</p>
           </div>
           <button style={ms.closeBtn} onClick={onClose}>&times;</button>
@@ -703,9 +703,9 @@ export default function AgentQRPosterModal({ isOpen, onClose, agent }) {
         <div style={ms.footer}>
           <button style={ms.cancelBtn} onClick={onClose}>Close</button>
           <div style={ms.actionBtns}>
-            <button style={ms.dlBtn} onClick={downloadQR}    disabled={!qrLoaded}>⬇ QR Code (PNG)</button>
-            <button style={ms.dlBtn} onClick={downloadPoster} disabled={!qrLoaded}>⬇ Poster (PNG)</button>
-            <button style={ms.printBtn} onClick={() => window.print()} disabled={!qrLoaded}>🖨 Print (A4)</button>
+            <button style={ms.dlBtn} onClick={downloadQR}    disabled={!qrLoaded}>Download QR Code (PNG)</button>
+            <button style={ms.dlBtn} onClick={downloadPoster} disabled={!qrLoaded}>Download Poster (PNG)</button>
+            <button style={ms.printBtn} onClick={() => window.print()} disabled={!qrLoaded}>Print (A4)</button>
           </div>
         </div>
       </div>

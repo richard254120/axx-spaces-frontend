@@ -215,7 +215,16 @@ export default function AccommodationSearch() {
 
           {accommodations.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px 20px", background: "white", borderRadius: "12px", border: "1px solid #e5e7eb" }}>
-              <div style={{ fontSize: "48px", marginBottom: "16px" }}>🏨</div>
+              <div style={{ width: "64px", height: "64px", borderRadius: "50%", background: "#f3f4f6", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"></path>
+                  <path d="M9 22v-4h6v4"></path>
+                  <path d="M8 6h.01"></path>
+                  <path d="M16 6h.01"></path>
+                  <path d="M8 10h.01"></path>
+                  <path d="M16 10h.01"></path>
+                </svg>
+              </div>
               <h3 style={{ fontSize: "20px", fontWeight: 800, color: "#374151", marginBottom: "8px" }}>No accommodations found</h3>
               <p style={{ fontSize: "14px", color: "#6b7280" }}>Try adjusting your filters or search terms</p>
             </div>
@@ -243,8 +252,15 @@ export default function AccommodationSearch() {
                             style={{ width: "100%", height: "100%", objectFit: "cover" }}
                           />
                         ) : (
-                          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", fontSize: "48px" }}>
-                            🏨
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"></path>
+                              <path d="M9 22v-4h6v4"></path>
+                              <path d="M8 6h.01"></path>
+                              <path d="M16 6h.01"></path>
+                              <path d="M8 10h.01"></path>
+                              <path d="M16 10h.01"></path>
+                            </svg>
                           </div>
                         )}
                         {accommodation.isFeatured && (

@@ -10,30 +10,17 @@ export default function BookingCalendar({ propertyId, availableUnits = 1, onDate
   }, [propertyId, currentMonth]);
 
   const loadBookedDates = () => {
-    // Load booked dates from localStorage (simulated backend)
     const bookedKey = `booked_dates_${propertyId}`;
     const savedBooked = localStorage.getItem(bookedKey);
     if (savedBooked) {
-      setBookedDates(JSON.parse(savedBooked));
-    } else {
-      // Generate some sample booked dates for demo
-      const sampleBooked = generateSampleBookedDates();
-      setBookedDates(sampleBooked);
-      localStorage.setItem(bookedKey, JSON.stringify(sampleBooked));
-    }
-  };
-
-  const generateSampleBookedDates = () => {
-    const dates = [];
-    const today = new Date();
-    for (let i = 0; i < 30; i++) {
-      const randomDate = new Date(today);
-      randomDate.setDate(today.getDate() + Math.floor(Math.random() * 60));
-      if (Math.random() > 0.7) {
-        dates.push(randomDate.toISOString().split('T')[0]);
+      try {
+        setBookedDates(JSON.parse(savedBooked));
+      } catch {
+        setBookedDates([]);
       }
+    } else {
+      setBookedDates([]);
     }
-    return dates;
   };
 
   const getDaysInMonth = (date) => {

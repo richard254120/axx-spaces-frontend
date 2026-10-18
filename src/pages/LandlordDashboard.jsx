@@ -683,7 +683,7 @@ export default function LandlordDashboard() {
                       <div>
                         <div style={{ fontSize: "15px", fontWeight: 700, color: "#1f2937" }}>{request.agent?.name}</div>
                         <div style={{ fontSize: "12px", color: "#6b7280" }}>{request.agent?.email}</div>
-                        {request.agent?.phone && <div style={{ fontSize: "12px", color: "#6b7280" }}>📞 {request.agent.phone}</div>}
+                        {request.agent?.phone && <div style={{ fontSize: "12px", color: "#6b7280" }}>Tel: {request.agent.phone}</div>}
                       </div>
                     </div>
                     {request.agentMessage && (
@@ -693,7 +693,7 @@ export default function LandlordDashboard() {
                     )}
                     {request.agent?.agentProfile?.county && (
                       <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}>
-                        📍 {request.agent.agentProfile.county}
+                        County: {request.agent.agentProfile.county}
                       </div>
                     )}
                     {request.status === "pending" ? (
@@ -1075,46 +1075,13 @@ export default function LandlordDashboard() {
                   </div>
                 </div>
 
-                {/* Mock CRM Contact Feed */}
                 <div style={styles.tableCard}>
                   <h3 style={styles.tableCardHeader}>Recent QR Prospects & Channels</h3>
-                  <div style={styles.leadsFeed}>
-                    <div style={styles.feedItem}>
-                      <div style={styles.feedAvatar}>DK</div>
-                      <div style={styles.feedDetail}>
-                        <div style={styles.feedRow1}>
-                          <span style={styles.feedName}>David Kiprop</span>
-                          <span style={styles.feedTime}>2 hours ago</span>
-                        </div>
-                        <p style={styles.feedText}>
-                          Scanned <strong>Gate Poster</strong> on property and contacted via <strong>WhatsApp</strong>.
-                        </p>
-                      </div>
-                    </div>
-                    <div style={styles.feedItem}>
-                      <div style={styles.feedAvatar}>AM</div>
-                      <div style={styles.feedDetail}>
-                        <div style={styles.feedRow1}>
-                          <span style={styles.feedName}>Alice Mutua</span>
-                          <span style={styles.feedTime}>5 hours ago</span>
-                        </div>
-                        <p style={styles.feedText}>
-                          Scanned <strong>Noticeboard Poster</strong> and initiated <strong>Direct Call</strong>.
-                        </p>
-                      </div>
-                    </div>
-                    <div style={styles.feedItem}>
-                      <div style={styles.feedAvatar}>JO</div>
-                      <div style={styles.feedDetail}>
-                        <div style={styles.feedRow1}>
-                          <span style={styles.feedName}>Julius Onyango</span>
-                          <span style={styles.feedTime}>Yesterday</span>
-                        </div>
-                        <p style={styles.feedText}>
-                          Scanned <strong>Vacancy Signboard</strong> and booked a viewing unit.
-                        </p>
-                      </div>
-                    </div>
+                  <div style={{ padding: "24px", textAlign: "center", color: "#94a3b8", fontSize: "14px" }}>
+                    <p style={{ margin: 0, fontWeight: 500 }}>No QR prospect inquiries recorded yet.</p>
+                    <p style={{ margin: "6px 0 0", fontSize: "12px", color: "#64748b" }}>
+                      When prospective tenants scan your printed gate or noticeboard posters, their channel interactions will appear here in real time.
+                    </p>
                   </div>
                 </div>
               </div>

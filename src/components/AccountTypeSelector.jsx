@@ -141,6 +141,48 @@ const accountTypes = [
   },
 ];
 
+const renderAccountIcon = (id) => {
+  if (id === "user") {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+    );
+  }
+  if (id === "landlord") {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+    );
+  }
+  if (id === "axxbiashara") {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+      </svg>
+    );
+  }
+  if (id === "marketplace") {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f472b6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="9" cy="21" r="1"></circle>
+        <circle cx="20" cy="21" r="1"></circle>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+      </svg>
+    );
+  }
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 2h-3a3 3 0 0 0-3 3v14H3v2h18v-2h-3V5a3 3 0 0 0-3-3z"></path>
+      <path d="M9 10h.01M9 14h.01M15 6h.01M15 10h.01M15 14h.01"></path>
+    </svg>
+  );
+};
+
 export default function AccountTypeSelector({ isOpen, onClose, mode = "login" }) {
   const navigate = useNavigate();
 
@@ -186,7 +228,7 @@ export default function AccountTypeSelector({ isOpen, onClose, mode = "login" })
               }}
             >
               <div style={styles.accountIcon}>
-                <span style={{ fontSize: "24px" }}>{account.id === "user" ? "👤" : account.id === "landlord" ? "🏠" : account.id === "axxbiashara" ? "💼" : account.id === "marketplace" ? "🛒" : "🏨"}</span>
+                {renderAccountIcon(account.id)}
               </div>
               <div style={styles.accountInfo}>
                 <div style={styles.accountName}>{account.name}</div>

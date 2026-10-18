@@ -634,7 +634,12 @@ export default function RegisterPropertyPage() {
                       id="video-upload"
                     />
                     <label htmlFor="video-upload" style={s.uploadBtn}>
-                      <span style={{ fontSize: "38px", marginBottom: "8px" }}>🎥</span>
+                      <span style={{ marginBottom: "8px", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                          <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                        </svg>
+                      </span>
                       <span style={{ fontWeight: 800, fontSize: "15px", color: "#0f172a" }}>
                         Click to select video walkthrough(s)
                       </span>
@@ -679,8 +684,9 @@ export default function RegisterPropertyPage() {
                   )}
                 </div>
 
-                <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "12px", padding: "14px 16px", fontSize: "13px", color: "#166534", lineHeight: 1.6 }}>
-                  💡 <strong>Pro-Tip:</strong> Verified virtual tours dramatically increase guest bookings! You can also manage, add or replace videos at any time from your owner dashboard.
+                <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "12px", padding: "14px 16px", fontSize: "13px", color: "#166534", lineHeight: 1.6, display: "flex", alignItems: "center", gap: "10px" }}>
+                  <span style={{ fontWeight: 800, background: "#166534", color: "white", padding: "2px 8px", borderRadius: "6px", fontSize: "11px", letterSpacing: "0.5px" }}>PRO-TIP</span>
+                  <span>Verified virtual tours dramatically increase guest bookings! You can also manage, add or replace videos at any time from your owner dashboard.</span>
                 </div>
               </div>
             )}

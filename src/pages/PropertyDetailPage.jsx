@@ -294,8 +294,9 @@ export default function PropertyDetailPage() {
                   {property.propertyType || "Rental"}
                 </span>
                 {property.videos && property.videos.length > 0 && (
-                  <span style={{ background: "#f0fdf4", color: "#166534", padding: "4px 10px", borderRadius: "6px", fontSize: "11px", fontWeight: 700, border: "1px solid #bbf7d0", display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                    <span>🎬</span> Video Tour ({property.videos.length})
+                  <span style={{ background: "#f0fdf4", color: "#166534", padding: "4px 10px", borderRadius: "6px", fontSize: "11px", fontWeight: 700, border: "1px solid #bbf7d0", display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                    <span>Video Tour ({property.videos.length})</span>
                   </span>
                 )}
               </div>
@@ -347,7 +348,8 @@ export default function PropertyDetailPage() {
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
                     <div>
                       <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
-                        <span>🎬 Virtual Video Walkthrough</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                        <span>Virtual Video Walkthrough</span>
                       </h2>
                       <p style={{ fontSize: "13px", color: "#64748b", margin: "4px 0 0 0" }}>
                         Take a full video tour of this property before visiting or booking.
@@ -373,7 +375,7 @@ export default function PropertyDetailPage() {
                             Your browser does not support playing this video format directly.
                           </video>
                           <div style={{ padding: "10px 14px", background: "#0f172a", color: "white", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                            <span style={{ fontSize: "12px", fontWeight: 700 }}>📹 Video Tour #{idx + 1}</span>
+                            <span style={{ fontSize: "12px", fontWeight: 700 }}>Video Tour #{idx + 1}</span>
                             <a
                               href={cleanVid}
                               target="_blank"

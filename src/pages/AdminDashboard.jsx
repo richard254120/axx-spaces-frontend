@@ -632,17 +632,20 @@ export default function AdminDashboard() {
 
         <div style={styles.topRightControls}>
           <button onClick={handleRefreshAll} style={styles.refreshBtn} title="Sync database records">
-            <span>🔄</span> Sync Data
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+            <span>Sync Data</span>
           </button>
           <button onClick={() => navigate("/admin/verification")} style={styles.verificationBtn}>
-            <span>🛡️</span> KYC Verification
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span>KYC Verification</span>
           </button>
           <div style={styles.adminUserPill}>
             <span style={styles.userRoleBadge}>SUPERADMIN</span>
             <span style={styles.userEmail}>{user?.name || user?.email || "Admin"}</span>
           </div>
           <button onClick={() => navigate("/")} style={styles.exitBtn} title="View public site">
-            <span>🌐</span> Site
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            <span>Site</span>
           </button>
         </div>
       </div>
@@ -653,7 +656,7 @@ export default function AdminDashboard() {
           <div style={{ ...styles.statCard, borderTop: "3px solid #f59e0b" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
               <span style={styles.statTitle}>Rental Properties</span>
-              <span style={{ fontSize: "20px" }}>🏢</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="9" y1="6" x2="9" y2="6.01"></line><line x1="15" y1="6" x2="15" y2="6.01"></line><line x1="9" y1="10" x2="9" y2="10.01"></line><line x1="15" y1="10" x2="15" y2="10.01"></line><line x1="9" y1="14" x2="9" y2="14.01"></line><line x1="15" y1="14" x2="15" y2="14.01"></line><line x1="9" y1="18" x2="15" y2="18"></line></svg>
             </div>
             <p style={styles.statValue}>{stats.properties?.total || 0}</p>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
@@ -673,7 +676,7 @@ export default function AdminDashboard() {
           <div style={{ ...styles.statCard, borderTop: "3px solid #3b82f6" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
               <span style={styles.statTitle}>Accommodations</span>
-              <span style={{ fontSize: "20px" }}>🏨</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2"><path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"></path><path d="M9 22v-4h6v4"></path></svg>
             </div>
             <p style={{ ...styles.statValue, color: "#60a5fa" }}>{stats.tourism?.total || pendingAccommodations.length || 0}</p>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
@@ -693,7 +696,7 @@ export default function AdminDashboard() {
           <div style={{ ...styles.statCard, borderTop: "3px solid #10b981" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
               <span style={styles.statTitle}>QuickSales</span>
-              <span style={{ fontSize: "20px" }}>📦</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
             </div>
             <p style={{ ...styles.statValue, color: "#34d399" }}>{stats.materials?.total || 0}</p>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
@@ -713,7 +716,7 @@ export default function AdminDashboard() {
           <div style={{ ...styles.statCard, borderTop: "3px solid #8b5cf6" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
               <span style={styles.statTitle}>QuickSales Sellers</span>
-              <span style={{ fontSize: "20px" }}>🏷️</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
             </div>
             <p style={{ ...styles.statValue, color: "#a78bfa" }}>{stats.sellers?.total || 0}</p>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
@@ -733,7 +736,7 @@ export default function AdminDashboard() {
           <div style={{ ...styles.statCard, borderTop: "3px solid #ec4899" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
               <span style={styles.statTitle}>Pending Payments</span>
-              <span style={{ fontSize: "20px" }}>💳</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ec4899" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
             </div>
             <p style={{ ...styles.statValue, color: "#f472b6" }}>{pendingPayments?.length || 0}</p>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
@@ -755,18 +758,18 @@ export default function AdminDashboard() {
       {/* MODERN TAB PILLS BAR */}
       <div style={styles.tabs}>
         {[
-          { id: "properties", label: "Properties", icon: "🏢", count: allPending?.properties?.length || 0 },
-          { id: "accommodations", label: "Accommodations", icon: "🏨", count: pendingAccommodations?.length || (allPending?.tourism?.length || 0) },
-          { id: "businesses", label: "Businesses", icon: "💼", count: pendingBusinesses?.length || 0 },
-          { id: "announcements", label: "Announcements", icon: "📢", count: pendingAnnouncements.filter(a => a.status === "pending").length || 0 },
-          { id: "materials", label: "QuickSales", icon: "📦", count: allPending?.materials?.length || 0 },
-          { id: "sellers", label: "QuickSales Sellers", icon: "🏷️", count: allPending?.sellers?.length || 0 },
-          { id: "agents", label: "Agents", icon: "🤝", count: agents?.length || 0 },
-          { id: "packages", label: "Agent Packages", icon: "📦", count: agentPackages?.length || 0 },
-          { id: "users", label: "Users", icon: "👥", count: users?.length || 0 },
-          { id: "requests", label: "Requests", icon: "📋", count: requests?.length || 0 },
-          { id: "payments", label: "Payments", icon: "💳", count: pendingPayments?.length || 0 },
-          { id: "payment", label: "Payment Settings", icon: "⚙️" },
+          { id: "properties", label: "Properties", count: allPending?.properties?.length || 0 },
+          { id: "accommodations", label: "Accommodations", count: pendingAccommodations?.length || (allPending?.tourism?.length || 0) },
+          { id: "businesses", label: "Businesses", count: pendingBusinesses?.length || 0 },
+          { id: "announcements", label: "Announcements", count: pendingAnnouncements.filter(a => a.status === "pending").length || 0 },
+          { id: "materials", label: "QuickSales", count: allPending?.materials?.length || 0 },
+          { id: "sellers", label: "QuickSales Sellers", count: allPending?.sellers?.length || 0 },
+          { id: "agents", label: "Agents", count: agents?.length || 0 },
+          { id: "packages", label: "Agent Packages", count: agentPackages?.length || 0 },
+          { id: "users", label: "Users", count: users?.length || 0 },
+          { id: "requests", label: "Requests", count: requests?.length || 0 },
+          { id: "payments", label: "Payments", count: pendingPayments?.length || 0 },
+          { id: "payment", label: "Payment Settings" },
         ].map((t) => {
           const isActive = activeTab === t.id || (t.id === "accommodations" && activeTab === "tourism");
           return (
@@ -779,7 +782,6 @@ export default function AdminDashboard() {
               }}
               onClick={() => setActiveTab(t.id)}
             >
-              <span>{t.icon}</span>
               <span>{t.label}</span>
               {t.count !== undefined && t.count > 0 && (
                 <span
@@ -802,10 +804,13 @@ export default function AdminDashboard() {
             background: "rgba(245, 158, 11, 0.12)",
             borderColor: "rgba(245, 158, 11, 0.3)",
             color: "#fbbf24",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "6px"
           }}
           onClick={() => navigate("/admin/verification")}
         >
-          <span>🛡️</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
           <span>KYC Verifications</span>
           <span style={{ fontSize: "11px", opacity: 0.8 }}>→</span>
         </button>

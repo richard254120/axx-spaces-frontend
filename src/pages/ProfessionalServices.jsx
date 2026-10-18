@@ -23,14 +23,14 @@ const C = {
 };
 
 const categories = [
-  { id: "legal", name: "Legal", icon: "⚖️", description: "Lawyers and legal services" },
-  { id: "accounting", name: "Accounting", icon: "📊", description: "Financial and tax services" },
-  { id: "consulting", name: "Consulting", icon: "💼", description: "Business and strategy consulting" },
-  { id: "tutoring", name: "Tutoring", icon: "📚", description: "Education and tutoring services" },
-  { id: "medical", name: "Medical", icon: "🏥", description: "Healthcare professionals" },
-  { id: "engineering", name: "Engineering", icon: "🔬", description: "Engineering services" },
-  { id: "architecture", name: "Architecture", icon: "🏛️", description: "Design and architecture" },
-  { id: "other", name: "Other", icon: "🔧", description: "Other professional services" }
+  { id: "legal", name: "Legal", description: "Lawyers and legal services" },
+  { id: "accounting", name: "Accounting", description: "Financial and tax services" },
+  { id: "consulting", name: "Consulting", description: "Business and strategy consulting" },
+  { id: "tutoring", name: "Tutoring", description: "Education and tutoring services" },
+  { id: "medical", name: "Medical", description: "Healthcare professionals" },
+  { id: "engineering", name: "Engineering", description: "Engineering services" },
+  { id: "architecture", name: "Architecture", description: "Design and architecture" },
+  { id: "other", name: "Other", description: "Other professional services" }
 ];
 
 export default function ProfessionalServices() {
@@ -213,9 +213,11 @@ export default function ProfessionalServices() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "48px"
           }}>
-            {categories.find(c => c.id === service.category)?.icon || "👨‍💼"}
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={C.gold} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
           </div>
         )}
       </div>
@@ -305,15 +307,16 @@ export default function ProfessionalServices() {
         )}
 
         <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
-          <span style={{ fontSize: "12px", color: C.textDim }}>
-            📍 {service.location.city}
+          <span style={{ fontSize: "12px", color: C.textDim, display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <span>{service.location.city}</span>
           </span>
           <span style={{ fontSize: "12px", color: C.textDim }}>
-            🎓 {service.professionalInfo.experience} yrs exp
+            {service.professionalInfo.experience} yrs exp
           </span>
           {service.location.remoteConsultation && (
             <span style={{ fontSize: "12px", color: C.teal }}>
-              📹 Remote available
+              Remote available
             </span>
           )}
         </div>
@@ -631,7 +634,6 @@ export default function ProfessionalServices() {
                   gap: "6px"
                 }}
               >
-                <span>{cat.icon}</span>
                 <span>{cat.name}</span>
               </button>
             ))}
@@ -648,7 +650,9 @@ export default function ProfessionalServices() {
             </div>
           ) : filteredServices.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px" }}>
-              <div style={{ fontSize: "48px", marginBottom: "16px" }}>🔍</div>
+              <div style={{ width: "64px", height: "64px", borderRadius: "50%", background: "rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={C.gold} strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </div>
               <h3 style={{ fontSize: "20px", marginBottom: "8px" }}>No professionals found</h3>
               <p style={{ color: C.textDim }}>
                 Try adjusting your filters or search terms

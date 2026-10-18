@@ -39,7 +39,9 @@ export default function AgentProfilePage() {
   /* ── Error ── */
   if (error || !agent) return (
     <div style={s.loadWrap}>
-      <div style={{ fontSize: 56, marginBottom: 16 }}>🔍</div>
+      <div style={{ width: 64, height: 64, borderRadius: "50%", background: "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      </div>
       <h2 style={s.errTitle}>Agent Not Found</h2>
       <p style={s.errSub}>This agent profile doesn't exist or has been removed.</p>
       <button style={s.homeBtn} onClick={() => navigate("/")}>Go Home</button>
@@ -91,9 +93,14 @@ export default function AgentProfilePage() {
           <h1 style={s.name}>{agent.name}</h1>
           <div style={s.statusRow}>
             <span style={{ ...s.badge, ...(verified ? s.badgeGreen : s.badgePending) }}>
-              {verified ? "✓ Verified Agent" : "⏳ Pending Verification"}
+              {verified ? "✓ Verified Agent" : "Pending Verification"}
             </span>
-            {county && <span style={s.countyPill}>📍 {county}</span>}
+            {county && (
+              <span style={{ ...s.countyPill, display: "inline-flex", alignItems: "center", gap: 4 }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span>{county}</span>
+              </span>
+            )}
           </div>
 
           {/* Bio */}
@@ -107,7 +114,7 @@ export default function AgentProfilePage() {
                   href={`tel:${phone}`}
                   style={{ ...s.contactBtn, ...s.callBtn }}
                 >
-                  📞 Call Agent
+                  Call Agent
                 </a>
                 <a
                   href={`https://wa.me/${phone.replace(/\D/g, "")}?text=Hi%20${encodeURIComponent(agent.name)}%2C%20I%20scanned%20your%20Axxspace%20QR%20poster%20and%20I%27m%20interested%20in%20your%20listings.`}
@@ -149,7 +156,7 @@ export default function AgentProfilePage() {
         {agent.listings && agent.listings.length > 0 ? (
           <div style={s.listingsSection}>
             <h2 style={s.sectionTitle}>
-              🏠 Active Listings
+              Active Listings
               <span style={s.countChip}>{agent.listings.length}</span>
             </h2>
             <div style={s.grid}>
@@ -177,14 +184,14 @@ export default function AgentProfilePage() {
                           onError={e => { e.target.style.display = "none"; }}
                         />
                       ) : (
-                        <div style={s.propImgFallback}>🏠</div>
+                        <div style={s.propImgFallback}>AXX</div>
                       )}
                       <div style={s.propTypeTag}>{prop.propertyType || "Rental"}</div>
                     </div>
                     <div style={s.propBody}>
                       <h3 style={s.propTitle}>{prop.title}</h3>
                       <p style={s.propLoc}>
-                        📍 {[prop.location, prop.county].filter(Boolean).join(", ")}
+                        {[prop.location, prop.county].filter(Boolean).join(", ")}
                       </p>
                       <div style={s.propFooter}>
                         <span style={s.propPrice}>{price}</span>
@@ -198,7 +205,6 @@ export default function AgentProfilePage() {
           </div>
         ) : (
           <div style={s.noListings}>
-            <span style={{ fontSize: 40 }}>🏡</span>
             <p style={s.noListingsTxt}>No active listings at the moment.</p>
             <p style={s.noListingsSub}>Check back soon or contact the agent directly.</p>
           </div>

@@ -65,45 +65,45 @@ export default function AboutPage() {
   const whatWeDo = [
     {
       icon: "",
-      title: "AxxBiashara",
-      color: "#fbbf24",
-      desc: "Kenya's premier business directory connecting users with trusted businesses across all sectors. Features reviews, ratings, advanced search, business comparison, and premium listings.",
-      items: ["Reviews & Ratings", "Favorites & Bookmarks", "Business Analytics", "Events & Promotions", "Verification Badges", "Business Subscriptions"],
-    },
-    {
-      icon: "",
-      title: "Rental Space",
+      title: "Rental Spaces & University Hostels",
       color: "#22c55e",
-      desc: "We help users discover available rental houses and business spaces — compare pricing and locations, connect directly with landlords and caretakers, and access property information more conveniently.",
-      items: ["GPS Mapping", "Direct Landlord Contact", "Premium Boost Plans", "University Hostels", "Property Verification"],
+      desc: "Discover verified residential houses, apartments, bedsitters, and student hostels near major Kenyan universities. Direct landlord and caretaker contacts with zero broker fee surcharges and interactive GPS mapping.",
+      items: ["GPS Mapping", "Direct Landlord & Caretaker Contact", "Campus Hostels Directory", "0% Broker / Viewing Fees", "Property Verification"],
     },
     {
       icon: "",
-      title: "Business Space",
-      color: "#3b82f6",
-      desc: "We help entrepreneurs and businesses find spaces that match their operational needs and budgets.",
-      items: ["Shops", "Offices", "Commercial spaces", "Small business locations"],
-    },
-    {
-      icon: "",
-      title: "Accommodation",
+      title: "Accommodation & Tourism",
       color: "#a855f7",
-      desc: "Discover and book amazing hotels, lodges, resorts, and accommodation experiences across Kenya. Property owners advertise their properties with flexible subscription packages.",
-      items: ["Hotels & Lodges", "Luxury Resorts", "Budget Stays", "Guest Houses", "Apartments", "Instant Booking"],
+      desc: "Discover and book verified hotels, lodges, luxury resorts, beach villas in Diani and Watamu, and safari camps across Kenya. Direct host contacts, date availability, and zero guest booking surcharges.",
+      items: ["Hotels & Safari Lodges", "Luxury Beach Resorts", "Direct Host WhatsApp & Call", "Date Availability Calendar", "Verified Guest Reviews"],
     },
     {
       icon: "",
-      title: "Marketplace",
+      title: "Relocation & Moving Services",
+      color: "#f97316",
+      desc: "Connect with verified, professional moving companies and logistics operators across Kenya for seamless household and office relocations with clear pricing.",
+      items: ["Verified Movers", "Household & Office Relocation", "Transparent Quotes", "Careful Handling & Transit"],
+    },
+    {
+      icon: "",
+      title: "AxxBiashara & Hardware Directory",
+      color: "#fbbf24",
+      desc: "Kenya's premier business and hardware directory connecting customers with trusted local businesses, hardware suppliers, building materials, and skilled professionals.",
+      items: ["Hardware & Building Materials", "Verified Trust Badges", "Business Ratings & Reviews", "Direct WhatsApp Inquiries", "Business Subscriptions"],
+    },
+    {
+      icon: "",
+      title: "QuickSales Marketplace",
       color: "#ec4899",
-      desc: "A buy-and-sell platform for new and used goods — electronics, furniture, fashion, vehicles, and more nationwide. Connect directly with sellers.",
-      items: ["Seller Dashboard", "Product Listings", "Direct Messaging", "Secure Transactions", "Premium Visibility"],
+      desc: "A verified buy-and-sell marketplace for electronics, furniture, household goods, vehicles, and student essentials nationwide. Connect directly with sellers with zero middlemen.",
+      items: ["Direct Seller Contact", "Household & Electronics Listings", "47 Counties Search", "Zero Brokerage"],
     },
     {
       icon: "",
-      title: "AxxWallet",
-      color: "#f59e0b",
-      desc: "Your digital wallet for seamless transactions on the platform. Deposit funds, make payments for premium services, withdraw money, and transfer funds to other users.",
-      items: ["Secure Deposits", "Easy Withdrawals", "Payment History", "M-Pesa Integration", "Fund Transfers"],
+      title: "AxxWallet & Smart Billing",
+      color: "#3b82f6",
+      desc: "Digital wallet and automated M-Pesa STK Push payment infrastructure powering instant listing boosts, transparent receipts, and landlord subscription management.",
+      items: ["M-Pesa STK Push Integration", "Listing Boost Plans", "Payment History & Receipts", "Landlord CRM Tools"],
     },
   ];
 
@@ -221,47 +221,56 @@ export default function AboutPage() {
             {[
               {
                 id: "rentals",
-                title: "Rentals",
-                tagline: "Find your next home",
-                description: "Browse verified rental properties across all 47 counties. Bedsitters, apartments, maisonettes & more — no agents, no hidden fees.",
-                features: ["Verified landlords", "All property types", "GPS-mapped locations", "Direct WhatsApp contact"],
+                title: "Rental Spaces & Hostels",
+                tagline: "Verified homes across 47 counties",
+                description: "Browse verified residential rentals, student hostels near major universities, bedsitters, and commercial spaces. Zero broker fees, GPS mapping, and direct landlord contacts.",
+                features: ["Direct Landlord & Caretaker Contacts", "Campus Hostels with Distance Filters", "Interactive GPS Mapping", "0% Broker / Viewing Fee Surcharges"],
                 color: "#C9A84C",
                 route: "/listings"
               },
               {
                 id: "accommodation",
-                title: "Accommodation",
-                tagline: "Comfortable stays everywhere",
-                description: "Discover premium hotels, lodges, resorts, and unique stays across Kenya's 47 counties. From luxury suites to cozy guesthouses — find your perfect getaway.",
-                features: ["Hotels & lodges", "Luxury resorts", "Budget-friendly stays", "Instant booking"],
+                title: "Accommodation & Tourism",
+                tagline: "Stays, lodges & resorts nationwide",
+                description: "Book verified hotels, safari lodges in Maasai Mara & Amboseli, beach resorts in Diani & Watamu, and serviced apartments in Nairobi with zero booking fees.",
+                features: ["Safari Lodges & Coastal Resorts", "Direct Host WhatsApp & Phone Concierge", "Interactive Date Availability", "Verified Guest Ratings & Virtual Tours"],
                 color: "#4CAF74",
                 route: "/accommodation"
               },
               {
+                id: "movers",
+                title: "Relocation & Movers",
+                tagline: "Hassle-free household & office moving",
+                description: "Connect with vetted, licensed moving companies and transport logistics teams. Get transparent quotes and stress-free relocation across Kenya.",
+                features: ["Verified Moving Companies", "Residential & Commercial Moving", "Transparent Itemized Quotations", "Safe Transit & Careful Handling"],
+                color: "#F59E0B",
+                route: "/movers"
+              },
+              {
                 id: "axxbiashara",
-                title: "AxxBiashara",
-                tagline: "Business solutions",
-                description: "Access professional business services, from company registration to accounting, legal support, and digital solutions.",
-                features: ["Business registration", "Accounting & tax", "Legal services", "Digital solutions"],
+                title: "AxxBiashara & Hardware",
+                tagline: "Verified businesses & building materials",
+                description: "Kenya's premier business and hardware directory. Connect with verified construction supply shops, hardware stores, technical professionals, and local enterprises.",
+                features: ["Hardware & Building Materials", "Verified Business Badges", "Customer Reviews & Contact Info", "Direct WhatsApp Inquiries"],
                 color: "#A78BFA",
                 route: "/axxbiashara"
               },
               {
                 id: "marketplace",
-                title: "QuickSales",
-                tagline: "Buy & sell anything",
-                description: "The ultimate QuickSales for buying and selling new and used items. From electronics to furniture, fashion to cars.",
-                features: ["New & used items", "Secure transactions", "Nationwide delivery", "Direct seller contact"],
+                title: "QuickSales Marketplace",
+                tagline: "Buy & sell verified pre-owned & new items",
+                description: "Buy and sell electronics, furniture, household goods, vehicles, and student essentials directly with verified community members without middlemen.",
+                features: ["Direct Buyer-to-Seller WhatsApp/Call", "Zero Listing Brokerage", "Electronics, Furniture & Appliances", "Instant Search & County Filtering"],
                 color: "#38BDF8",
                 route: "/quicksales"
               },
               {
-                id: "requests",
-                title: "Requests",
-                tagline: "Can't find what you need?",
-                description: "Submit a custom request. Our administrators and verified providers will search across all of AxxSpace to locate it for you!",
-                features: ["Search assistance", "All services covered", "Admin review", "Verified responses"],
-                color: "#fbbf24",
+                id: "agents",
+                title: "QR Agent Network & CRM",
+                tagline: "Smart technology for property marketing",
+                description: "Property managers and landlords access modern CRM tools, automated M-Pesa billing, listing analytics, and QR-coded smart marketing posters for physical properties.",
+                features: ["Printable QR Code Property Posters", "Landlord CRM & Tenant Analytics", "Automated M-Pesa STK Push", "Direct WhatsApp Lead Forwarding"],
+                color: "#10B981",
                 route: "/about"
               }
             ].map(cat => (
@@ -270,8 +279,54 @@ export default function AboutPage() {
                 style={styles.categoryCard}
                 onClick={() => navigate(cat.route)}
               >
-                <div style={{ ...styles.categoryIcon, background: cat.color + "20", border: `2px solid ${cat.color}40` }}>
-                  <span style={{ fontSize: "24px" }}>{cat.id === "rentals" ? "🏠" : cat.id === "accommodation" ? "🏨" : cat.id === "axxbiashara" ? "💼" : cat.id === "marketplace" ? "🛒" : "🔍"}</span>
+                <div style={{ ...styles.categoryIcon, background: cat.color + "20", border: `2px solid ${cat.color}40`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  {cat.id === "rentals" && (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={cat.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                      <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                  )}
+                  {cat.id === "accommodation" && (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={cat.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"></path>
+                      <path d="M9 22v-4h6v4"></path>
+                      <path d="M8 6h.01"></path>
+                      <path d="M16 6h.01"></path>
+                      <path d="M8 10h.01"></path>
+                      <path d="M16 10h.01"></path>
+                      <path d="M8 14h.01"></path>
+                      <path d="M16 14h.01"></path>
+                    </svg>
+                  )}
+                  {cat.id === "movers" && (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={cat.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="1" y="3" width="15" height="13"></rect>
+                      <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                      <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                      <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                    </svg>
+                  )}
+                  {cat.id === "axxbiashara" && (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={cat.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                    </svg>
+                  )}
+                  {cat.id === "marketplace" && (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={cat.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                      <line x1="3" y1="6" x2="21" y2="6"></line>
+                      <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                  )}
+                  {cat.id === "agents" && (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={cat.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="14" width="7" height="7"></rect>
+                      <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                  )}
                 </div>
                 <h3 style={{ ...styles.categoryTitle, color: cat.color }}>{cat.title}</h3>
                 <p style={styles.categoryTagline}>{cat.tagline}</p>

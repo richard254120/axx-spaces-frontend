@@ -41,7 +41,14 @@ const customPinIcon = L.divIcon({
       box-shadow: 0 8px 24px rgba(14, 165, 233, 0.45);
       border: 3px solid white;
     ">
-      <span style="transform: rotate(45deg); font-size: 18px;">🏨</span>
+      <svg style="transform: rotate(45deg); width: 20px; height: 20px;" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"></path>
+        <path d="M9 22v-4h6v4"></path>
+        <path d="M8 6h.01"></path>
+        <path d="M16 6h.01"></path>
+        <path d="M8 10h.01"></path>
+        <path d="M16 10h.01"></path>
+      </svg>
     </div>
   `,
   iconSize: [42, 42],
@@ -179,7 +186,7 @@ export default function AccommodationDetailPage() {
     } else {
       try {
         await navigator.clipboard.writeText(shareUrl);
-        showToast("Listing link copied to clipboard! 📋");
+        showToast("Listing link copied to clipboard!");
       } catch {
         showToast("Link: " + shareUrl);
       }
@@ -831,7 +838,7 @@ export default function AccommodationDetailPage() {
                           </div>
                           <div className="lux-video-info-bar">
                             <div className="lux-video-title">
-                              <span>🎥 Tour {idx + 1} of {property.videos.length}</span>
+                              <span>Tour {idx + 1} of {property.videos.length}</span>
                               <span className="lux-video-hd-pill">HD Video Tour</span>
                             </div>
                             <a
@@ -853,7 +860,7 @@ export default function AccommodationDetailPage() {
                 {property.audio && property.audio.length > 0 && (
                   <div className="lux-audio-wrap" style={{ marginTop: "20px" }}>
                     <div style={{ fontSize: "13px", fontWeight: 700, color: "#1e293b", marginBottom: "8px" }}>
-                      🎧 Audio Tour & Ambience:
+                      Audio Tour & Ambience:
                     </div>
                     {property.audio.map((audUrl, idx) => (
                       <audio key={idx} src={audUrl} controls className="lux-audio-player" />
@@ -1103,7 +1110,11 @@ export default function AccommodationDetailPage() {
                   className="lux-btn-mpesa"
                   onClick={() => setShowPaymentModal(true)}
                 >
-                  <span className="mpesa-shield">⚡</span>
+                  <span className="mpesa-shield" style={{ display: "inline-flex", alignItems: "center" }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                  </span>
                   <span>Instant Book with M-Pesa</span>
                 </button>
 
@@ -1207,7 +1218,10 @@ export default function AccommodationDetailPage() {
                 setShowPaymentModal(true);
               }}
             >
-              ⚡ Proceed with M-Pesa
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: "6px" }}>
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+              <span>Proceed with M-Pesa</span>
             </button>
           </div>
         </div>

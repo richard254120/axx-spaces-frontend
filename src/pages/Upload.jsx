@@ -798,7 +798,9 @@ export default function Upload() {
               <div style={styles.videoSectionHeader}>
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <span style={{ fontSize: "20px" }}>🎬</span>
+                    <span style={{ display: "inline-flex", alignItems: "center" }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                    </span>
                     <label style={{ ...styles.label, marginBottom: 0, color: "#fbbf24" }}>
                       Property Videos ({videos.length}/5)
                     </label>
@@ -841,7 +843,9 @@ export default function Upload() {
                   id="videoInput"
                 />
                 <label htmlFor="videoInput" style={styles.videoUploadLabel}>
-                  <span style={{ fontSize: "36px", marginBottom: "8px" }}>🎥</span>
+                  <span style={{ marginBottom: "8px", display: "inline-flex", alignItems: "center" }}>
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                  </span>
                   <span style={{ fontWeight: 700, fontSize: "14px", color: "#f1f5f9" }}>
                     Click to select videos
                   </span>
@@ -870,7 +874,7 @@ export default function Upload() {
                         <div style={styles.videoCardInfo}>
                           <div style={{ minWidth: 0, flex: 1 }}>
                             <div style={{ fontSize: "12px", fontWeight: 700, color: "#f1f5f9", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                              📹 {file.name}
+                              {file.name}
                             </div>
                             <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>
                               {(file.size / (1024 * 1024)).toFixed(1)} MB
@@ -890,8 +894,9 @@ export default function Upload() {
                 </div>
               )}
 
-              <div style={styles.videoTip}>
-                💡 <strong>Tip:</strong> Short walkthrough videos (30s–2min) showing rooms, kitchen, bathroom, and the view dramatically increase tenant interest!
+              <div style={{ ...styles.videoTip, display: "flex", alignItems: "center", gap: "8px" }}>
+                <span style={{ fontWeight: 800, background: "#38bdf8", color: "#0f172a", padding: "2px 6px", borderRadius: "4px", fontSize: "10px" }}>TIP</span>
+                <span>Short walkthrough videos (30s–2min) showing rooms, kitchen, bathroom, and the view dramatically increase tenant interest!</span>
               </div>
             </div>
 

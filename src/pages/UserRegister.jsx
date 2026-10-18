@@ -79,7 +79,7 @@ export default function UserRegister() {
       // Registration successful & auto-login
       if (data.token && data.user) {
         login(data.token, data.user);
-        setSuccess("🎉 Welcome to AxxSpace! Your account is active. Redirecting...");
+        setSuccess("Welcome to AxxSpace! Your account is active. Redirecting...");
         setTimeout(() => {
           navigate("/");
         }, 1000);

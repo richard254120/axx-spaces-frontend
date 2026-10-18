@@ -167,45 +167,34 @@ export default function Notifications() {
   const loadNotifications = async () => {
     setLoading(true);
     try {
-      // Mock notifications for now - replace with actual API call when backend is ready
-      const mockNotifications = [
-        {
-          id: 1,
-          title: "Welcome to AxxSpace!",
-          message: "Thank you for joining AxxSpace. Start exploring properties and services today.",
-          type: "success",
-          icon: "",
-          time: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-          read: false,
-        },
-        {
-          id: 2,
-          title: "Profile Complete",
-          message: "Your profile has been set up successfully. You can now book properties and connect with service providers.",
-          type: "info",
-          icon: "",
-          time: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-          read: false,
-        },
-        {
-          id: 3,
-          title: "New Listings Available",
-          message: "Check out the latest properties added in your area. New rentals are waiting for you!",
-          type: "info",
-          icon: "",
-          time: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-          read: true,
-        },
-      ];
-      setNotifications(mockNotifications);
+      const res = await API.get("/notifications/my");
+      if (res.data && res.data.success && Array.isArray(res.data.notifications)) {
+        const formatted = res.data.notifications.map((n) => ({
+          id: n._id,
+          title: n.title || (n.type ? n.type.replace(/_/g, " ").toUpperCase() : "Notification"),
+          message: n.message || (n.amount ? `Transaction of KSh ${n.amount.toLocaleString()} - Status: ${n.status}` : "System notification"),
+          type: n.status === "confirmed" ? "success" : n.status === "rejected" ? "error" : "info",
+          time: n.createdAt || new Date().toISOString(),
+          read: n.status === "confirmed",
+        }));
+        setNotifications(formatted);
+      } else {
+        setNotifications([]);
+      }
     } catch (err) {
-      console.error("Failed to load notifications:", err);
+      console.error("Failed to load real notifications:", err);
+      setNotifications([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const markAsRead = (id) => {
+  const markAsRead = async (id) => {
+    try {
+      await API.put(`/notifications/${id}/read`);
+    } catch (err) {
+      console.error("Failed to mark notification as read:", err);
+    }
     setNotifications(prev =>
       prev.map(notif =>
         notif.id === id ? { ...notif, read: true } : notif

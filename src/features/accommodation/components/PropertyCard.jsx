@@ -37,7 +37,9 @@ export default function PropertyCard({ property: p, onOpen }) {
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         ) : (
-          <span style={{ fontSize: "52px" }}>{p.emoji || "🏨"}</span>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5">
+            <path d="M3 21h18M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16M9 9h1M9 13h1M9 17h1M14 9h1M14 13h1M14 17h1" />
+          </svg>
         )}
         {p.tag && (
           <div style={{ position: "absolute", top: "10px", left: "10px", background: cardColor, color: "white", fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "20px", zIndex: 1 }}>
@@ -86,7 +88,9 @@ export default function PropertyCard({ property: p, onOpen }) {
             border: "1px solid rgba(14, 165, 233, 0.2)"
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
-              <span style={{ fontSize: 11 }}>🛡️</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" strokeWidth="2.5">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
               <span style={{ fontSize: 10, fontWeight: 600, color: "#0ea5e9" }}>Verified Owner</span>
             </div>
             <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
