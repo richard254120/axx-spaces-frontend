@@ -32,20 +32,13 @@ import TermsAndPrivacy from "./pages/TermsAndPrivacy";
 import LeaveReview from "./pages/LeaveReview";
 import VerifyEmail from "./pages/VerifyEmail";
 import PaymentHistory from "./pages/PaymentHistory";
-import Profile from "./pages/Profile";
-import Settings from "./pages/Settings";
-import Wallet from "./pages/Wallet";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminVerification from "./pages/AdminVerification";
-import Saved from "./pages/Saved";
-import Messages from "./pages/Messages";
-import Notifications from "./pages/Notifications";
 // UsersPage removed
 import Verification from "./pages/Verification";
 
 // ─── User Account Pages ──────────────────────────────────────────────────────
 import ProfilePage from "./pages/ProfilePage";
-import SettingsPage from "./pages/SettingsPage";
 import WalletPage from "./pages/WalletPage";
 import AxxWallet from "./pages/AxxWallet";
 import SavedListingsPage from "./pages/SavedListingsPage";

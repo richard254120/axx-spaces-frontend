@@ -1,13 +1,10 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import ReviewsSection from "../components/ReviewsSection";
 
 import RequestItemModal from "../components/RequestItemModal";
 import ShareProperty from "../components/ShareProperty";
 import MapView from "../components/MapView";
 import MessagingSystem from "../components/MessagingSystem";
-import ReviewRatingSystem from "../components/ReviewRatingSystem";
-import BookingCalendar from "../components/BookingCalendar";
 import { useAuth } from "../context/AuthContext";
 import PhoneInput from "../components/PhoneInput";
 import { kenyanUniversities, searchUniversities } from "../data/kenyanUniversities";
@@ -510,6 +507,7 @@ export default function Listings() {
                       <div
                         key={agent._id}
                         style={S.universityCard}
+                        className="university-card"
                         onClick={() => setSelectedAgent(agent)}
                       >
                         <div style={S.agentCardAvatar}>
@@ -594,6 +592,7 @@ export default function Listings() {
                     <div
                       key={university.id}
                       style={S.universityCard}
+                      className="university-card"
                       onClick={() => setSelectedUniversity(university)}
                     >
                       <div style={S.universityCardIcon}></div>
@@ -711,13 +710,16 @@ export default function Listings() {
         {(!showUniversityHostels || selectedUniversity) && displayProperties.length > 0 && (
           <div className="properties-grid">
             {displayProperties.map((property, i) => (
-              <article key={property._id} data-property-id={property._id} style={S.card} className="prop-card" onClick={() => openModal(property)}>
+              <article key={property._id} data-property-id={property._id} style={{ ...S.card, "--i": i }} className="prop-card" onClick={() => openModal(property)}>
                 {/* Image */}
                 <div style={S.cardImg}>
                   {property.images?.length > 0
-                    ? <img src={property.images[0]} alt={property.title} style={S.cardImgEl} className="card-img-el" />
+                    ? <img src={property.images[0]} alt={property.title} style={S.cardImgEl} className="card-img-el" loading="lazy" />
                     : <div style={S.cardImgFallback}>No Photo</div>
                   }
+                  {property.images?.length > 1 && (
+                    <img src={property.images[1]} alt="" style={S.cardImgEl} className="card-img-alt" loading="lazy" />
+                  )}
                   {/* Badges */}
                   <div style={{ ...S.availBadge, ...(property.availableUnits > 0 ? S.availBadgeGreen : S.availBadgeRed) }}>
                     {property.availableUnits > 0 ? `${property.availableUnits} Available` : "Fully Occupied"}
@@ -727,7 +729,7 @@ export default function Listings() {
                   )}
                   {/* Favourite */}
                   <button style={S.favBtn} className="fav-btn" onClick={(e) => { e.stopPropagation(); toggleFavorite(property._id); }}>
-                    {favorites.includes(property._id) ? "" : "♡"}
+                    {favorites.includes(property._id) ? "♥" : "♡"}
                   </button>
                   <div style={S.cardImgGrad} />
                 </div>
@@ -735,13 +737,29 @@ export default function Listings() {
                 {/* Content */}
                 <div style={S.cardBody}>
                   <div style={S.cardType}>{property.propertyType || "Rental"}</div>
+                  <h3 style={S.cardTitle}>{property.title}</h3>
                   <p style={{ ...S.cardLocation, display: "flex", alignItems: "center", gap: "4px" }}>
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                     <span>{property.county} · {property.location}</span>
                   </p>
-                  <p style={{ ...S.cardClickHint, marginTop: "8px", fontSize: "12px", color: "#6b7280", fontStyle: "italic" }}>
-                    Click to view details
-                  </p>
+                  <div style={S.cardSpecs}>
+                    <span style={S.cardSpec}>{property.bedrooms} Bed</span><span style={S.specDot}>●</span>
+                    <span style={S.cardSpec}>{property.bathrooms} Bath</span><span style={S.specDot}>●</span>
+                    <span style={S.cardSpec}>{property.furnished ? "Furnished" : "Unfurnished"}</span>
+                  </div>
+                  {property.amenities?.length > 0 && (
+                    <div style={S.cardAmenities}>
+                      {property.amenities.slice(0, 3).map((a, idx) => <span key={idx} style={S.cardAmenityTag}>{a}</span>)}
+                      {property.amenities.length > 3 && <span style={S.cardAmenityMore}>+{property.amenities.length - 3}</span>}
+                    </div>
+                  )}
+                  <div style={S.cardFooter}>
+                    <div>
+                      <div style={S.cardPrice}>KES {property.price?.toLocaleString()}</div>
+                      <div style={S.cardPriceSub}>per month</div>
+                    </div>
+                    <button type="button" style={S.cardCta} className="card-cta">View Details</button>
+                  </div>
                 </div>
               </article>
             ))}
@@ -751,8 +769,8 @@ export default function Listings() {
 
       {/* ═══════════════════════════════ MODAL ═══════════════════════════════ */}
       {selectedProperty && (
-        <div style={S.modalBackdrop} onClick={closeModal}>
-          <div style={S.modal} onClick={(e) => e.stopPropagation()}>
+        <div style={S.modalBackdrop} className="backdrop-anim" onClick={closeModal}>
+          <div style={S.modal} className="modal-anim" onClick={(e) => e.stopPropagation()}>
             <button style={S.modalClose} className="modal-close" onClick={closeModal}>✕</button>
 
             {/* Payment Modal */}
@@ -1107,6 +1125,7 @@ const S = {
 
   cardBody: { padding: "14px 16px 16px", display: "flex", flexDirection: "column", flex: 1 },
   cardType: { fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#E31B1B", marginBottom: "4px", fontWeight: 700 },
+  cardTitle: { fontFamily: "'DM Sans', sans-serif", fontSize: "1.05rem", fontWeight: 800, color: "#0B2140", margin: "0 0 6px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" },
   cardLocation: { color: "#6b7280", fontSize: "0.8rem", margin: "0 0 4px" },
   cardClickHint: { color: "#9ca3af", fontSize: "0.75rem", margin: "0", fontStyle: "italic" },
   cardSpecs: { display: "flex", alignItems: "center", gap: "6px", marginBottom: "10px", flexWrap: "wrap" },
@@ -1295,4 +1314,33 @@ const css = `
     .search - strip - inner {flex - direction: column; }
       .search-divider {display: none; }
   }
+
+      /* ── Listings polish (added) ── */
+      .properties-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 28px; }
+      @media (max-width: 640px) { .properties-grid { grid-template-columns: 1fr; gap: 20px; } }
+
+      @keyframes cardIn { from { opacity: 0; transform: translateY(28px) scale(.97); } to { opacity: 1; transform: none; } }
+      .prop-card { animation: cardIn .6s cubic-bezier(.16,1,.3,1) backwards; animation-delay: calc(min(var(--i, 0), 11) * 70ms); }
+      .prop-card:hover {
+        transform: translateY(-8px) !important;
+        background: #fff !important;
+        box-shadow: 0 20px 40px rgba(11,33,64,.14), 0 0 0 1px rgba(227,27,27,.25) !important;
+      }
+
+      .card-img-alt { position: absolute; inset: 0; opacity: 0; transition: opacity .5s ease, transform .4s ease; }
+      .prop-card:hover .card-img-alt { opacity: 1; transform: scale(1.06); }
+      .fav-btn:active { transform: scale(.8) !important; }
+
+      .tab-btn:hover { border-color: #E31B1B !important; color: #E31B1B !important; transform: translateY(-1px); }
+      .university-card { animation: cardIn .5s cubic-bezier(.16,1,.3,1) backwards; }
+      .university-card:hover { transform: translateY(-4px); border-color: #E31B1B !important; box-shadow: 0 12px 30px rgba(11,33,64,.12); }
+
+      @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes modalIn { from { opacity: 0; transform: translateY(24px) scale(.97); } to { opacity: 1; transform: none; } }
+      .backdrop-anim { animation: backdropIn .25s ease; }
+      .modal-anim { animation: modalIn .35s cubic-bezier(.16,1,.3,1); }
+
+      @media (prefers-reduced-motion: reduce) {
+        .prop-card, .university-card, .backdrop-anim, .modal-anim { animation: none; }
+      }
       `;
