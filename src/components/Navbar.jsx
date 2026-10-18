@@ -150,7 +150,7 @@ export default function Navbar() {
       {dropdownOpen && (
         <>
           <div className="ax-backdrop" onClick={() => setDropdownOpen(false)} />
-          <div className="ax-panel ax-menu-panel">
+          <div className="ax-nav-panel ax-menu-panel">
             <div className="ax-mobile-title">
               <span>AxxSpace Navigation</span>
               <button type="button" className="ax-close-btn" onClick={() => setDropdownOpen(false)}>
@@ -320,7 +320,7 @@ export default function Navbar() {
                 {accountOpen && (
                   <>
                     <div className="ax-backdrop" onClick={() => setAccountOpen(false)} />
-                    <div className="ax-panel ax-account-panel">
+                    <div className="ax-nav-panel ax-account-panel">
                       <div className="ax-account-head">
                         <ProfileAvatar user={user} size={40} />
                         <div>
@@ -409,7 +409,7 @@ export default function Navbar() {
                       <span className="ax-chevron">{userMenuOpen ? "▲" : "▼"}</span>
                     </button>
                     {userMenuOpen && (
-                      <div className="ax-panel ax-user-panel">
+                      <div className="ax-nav-panel ax-user-panel">
                         <Link to="/payment-history" className="ax-item" onClick={() => setUserMenuOpen(false)}>
                           Payment History
                         </Link>
@@ -467,7 +467,7 @@ const css = `
   }
 
   /* ── Top bar (light, so the blue logo reads clearly) ── */
-  .ax-top {
+  .ax-nav .ax-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -476,21 +476,21 @@ const css = `
     background: var(--paper);
     border-bottom: 1px solid var(--line);
   }
-  .ax-brand {
+  .ax-nav .ax-brand {
     display: flex;
     align-items: center;
     gap: 12px;
     text-decoration: none;
     min-width: 0;
   }
-  .ax-logo {
+  .ax-nav .ax-logo {
     height: 42px;
     width: auto;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(15, 23, 42, 0.18);
     flex-shrink: 0;
   }
-  .ax-brand-name {
+  .ax-nav .ax-brand-name {
     font-size: 20px;
     font-weight: 800;
     letter-spacing: 0.6px;
@@ -503,14 +503,14 @@ const css = `
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .ax-top-right {
+  .ax-nav .ax-top-right {
     display: flex;
     align-items: center;
     gap: 10px;
   }
 
   /* ── Buttons in the top bar ── */
-  .ax-icon-btn {
+  .ax-nav .ax-icon-btn {
     width: 42px;
     height: 42px;
     display: inline-flex;
@@ -525,9 +525,9 @@ const css = `
     cursor: pointer;
     transition: background .2s, border-color .2s;
   }
-  .ax-icon-btn:hover { background: var(--mist); border-color: var(--gold); }
+  .ax-nav .ax-icon-btn:hover { background: var(--mist); border-color: var(--gold); }
 
-  .ax-signin {
+  .ax-nav .ax-signin {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -541,9 +541,9 @@ const css = `
     cursor: pointer;
     transition: background .2s, color .2s, border-color .2s;
   }
-  .ax-signin:hover { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+  .ax-nav .ax-signin:hover { background: var(--gold); border-color: var(--gold); color: var(--ink); }
 
-  .ax-account-btn {
+  .ax-nav .ax-account-btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -557,10 +557,10 @@ const css = `
     cursor: pointer;
     transition: border-color .2s;
   }
-  .ax-account-btn:hover { border-color: var(--gold); }
+  .ax-nav .ax-account-btn:hover { border-color: var(--gold); }
 
-  .ax-username { font-size: 13px; font-weight: 700; color: var(--ink); }
-  .ax-logout {
+  .ax-nav .ax-username { font-size: 13px; font-weight: 700; color: var(--ink); }
+  .ax-nav .ax-logout {
     padding: 8px 14px;
     background: #fef2f2;
     color: #b91c1c;
@@ -571,14 +571,14 @@ const css = `
     cursor: pointer;
     transition: background .2s;
   }
-  .ax-logout:hover { background: #fee2e2; }
+  .ax-nav .ax-logout:hover { background: #fee2e2; }
 
   /* ── Tabs band (dark, gold active indicator) ── */
-  .ax-tabs {
+  .ax-nav .ax-tabs {
     background: linear-gradient(90deg, var(--ink) 0%, var(--ink-2) 100%);
     border-top: 2px solid var(--gold);
   }
-  .ax-tabs-inner {
+  .ax-nav .ax-tabs-inner {
     display: flex;
     align-items: center;
     gap: 4px;
@@ -587,19 +587,24 @@ const css = `
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
   }
-  .ax-tabs-inner::-webkit-scrollbar { display: none; }
+  .ax-nav .ax-tabs-inner::-webkit-scrollbar { display: none; }
 
-  .ax-tab {
+  .ax-nav .ax-tab {
     position: relative;
     padding: 14px 14px;
-    color: #cbd5e1;
+    color: #cbd5e1 !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
     font-size: 13px;
     font-weight: 600;
     text-decoration: none;
     white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
     transition: color .2s, background .2s;
   }
-  .ax-tab::after {
+  .ax-nav .ax-tab::after {
     content: "";
     position: absolute;
     left: 14px;
@@ -611,11 +616,19 @@ const css = `
     transform: scaleX(0);
     transition: transform .2s ease;
   }
-  .ax-tab:hover { color: #fff; background: rgba(255, 255, 255, 0.05); }
-  .ax-tab.is-active { color: #fff; }
-  .ax-tab.is-active::after, .ax-tab:hover::after { transform: scaleX(1); }
+  .ax-nav .ax-tab:hover {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: transparent !important;
+  }
+  .ax-nav .ax-tab.is-active {
+    color: #ffffff !important;
+  }
+  .ax-nav .ax-tab.is-active::after, .ax-nav .ax-tab:hover::after {
+    transform: scaleX(1);
+  }
 
-  .ax-request-btn {
+  .ax-nav .ax-request-btn {
     margin: 0 6px;
     padding: 7px 16px;
     background: var(--gold-soft);
@@ -628,9 +641,9 @@ const css = `
     cursor: pointer;
     transition: background .2s;
   }
-  .ax-request-btn:hover { background: #fff; }
+  .ax-nav .ax-request-btn:hover { background: #fff; }
 
-  .ax-tabs-user {
+  .ax-nav .ax-tabs-user {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -638,8 +651,8 @@ const css = `
     padding-left: 12px;
     border-left: 1px solid rgba(255, 255, 255, 0.15);
   }
-  .ax-user-wrap { position: relative; }
-  .ax-user-btn {
+  .ax-nav .ax-user-wrap { position: relative; }
+  .ax-nav .ax-user-btn {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -650,13 +663,13 @@ const css = `
     cursor: pointer;
     transition: background .2s;
   }
-  .ax-user-btn:hover { background: rgba(255, 255, 255, 0.08); }
-  .ax-user-name { font-size: 13px; font-weight: 700; color: var(--gold-soft); }
-  .ax-chevron { font-size: 10px; color: var(--muted); }
+  .ax-nav .ax-user-btn:hover { background: rgba(255, 255, 255, 0.08); }
+  .ax-nav .ax-user-name { font-size: 13px; font-weight: 700; color: var(--gold-soft); }
+  .ax-nav .ax-chevron { font-size: 10px; color: var(--muted); }
 
   /* ── Dropdown panels ── */
-  .ax-menu-wrap, .ax-account { position: relative; }
-  .ax-panel {
+  .ax-nav .ax-menu-wrap, .ax-nav .ax-account { position: relative; }
+  .ax-nav .ax-nav-panel {
     position: absolute;
     top: calc(100% + 10px);
     right: 0;
@@ -670,22 +683,22 @@ const css = `
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
   }
-  .ax-menu-panel { min-width: 290px; max-height: 80vh; padding-bottom: 12px; }
-  .ax-account-panel { min-width: 250px; }
-  .ax-user-panel { min-width: 210px; top: calc(100% + 8px); }
-  .ax-backdrop { display: none; }
-  .ax-mobile-title { display: none; }
+  .ax-nav .ax-menu-panel { min-width: 290px; max-height: 80vh; padding-bottom: 12px; }
+  .ax-nav .ax-account-panel { min-width: 250px; }
+  .ax-nav .ax-user-panel { min-width: 210px; top: calc(100% + 8px); }
+  .ax-nav .ax-backdrop { display: none; }
+  .ax-nav .ax-mobile-title { display: none; }
 
-  .ax-heading {
+  .ax-nav .ax-heading {
     padding: 14px 20px 6px;
     color: var(--muted);
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.4px;
   }
-  .ax-divider { height: 1px; background: var(--line); margin: 6px 0; }
+  .ax-nav .ax-divider { height: 1px; background: var(--line); margin: 6px 0; }
 
-  .ax-item {
+  .ax-nav .ax-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -703,15 +716,15 @@ const css = `
     cursor: pointer;
     transition: background .15s, border-color .15s, color .15s;
   }
-  .ax-item:hover { background: var(--mist); border-left-color: var(--gold); color: var(--ink); }
-  .ax-item-highlight { background: #fffbeb; border-left-color: var(--gold); color: #92400e; font-weight: 700; }
-  .ax-item-highlight:hover { background: #fef3c7; }
-  .ax-item-danger { color: #b91c1c; font-weight: 700; }
-  .ax-item-danger:hover { background: #fef2f2; border-left-color: #ef4444; color: #b91c1c; }
+  .ax-nav .ax-item:hover { background: var(--mist); border-left-color: var(--gold); color: var(--ink); }
+  .ax-nav .ax-item-highlight { background: #fffbeb; border-left-color: var(--gold); color: #92400e; font-weight: 700; }
+  .ax-nav .ax-item-highlight:hover { background: #fef3c7; }
+  .ax-nav .ax-item-danger { color: #b91c1c; font-weight: 700; }
+  .ax-nav .ax-item-danger:hover { background: #fef2f2; border-left-color: #ef4444; color: #b91c1c; }
 
-  .ax-dot { width: 8px; height: 8px; border-radius: 50%; background: #a244ef; flex-shrink: 0; }
+  .ax-nav .ax-dot { width: 8px; height: 8px; border-radius: 50%; background: #a244ef; flex-shrink: 0; }
 
-  .ax-job-content {
+  .ax-nav .ax-job-content {
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -721,28 +734,28 @@ const css = `
     border-left: 3px solid var(--gold);
     border-radius: 8px;
   }
-  .ax-job-desc { font-size: 12px; line-height: 1.5; color: var(--muted); }
-  .ax-job-link { align-self: flex-start; font-size: 12px; font-weight: 700; color: #b45309; text-decoration: none; }
-  .ax-job-link:hover { text-decoration: underline; }
+  .ax-nav .ax-job-desc { font-size: 12px; line-height: 1.5; color: var(--muted); }
+  .ax-nav .ax-job-link { align-self: flex-start; font-size: 12px; font-weight: 700; color: #b45309; text-decoration: none; }
+  .ax-nav .ax-job-link:hover { text-decoration: underline; }
 
-  .ax-account-head { display: flex; align-items: center; gap: 12px; padding: 16px 20px 10px; }
-  .ax-account-name { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
-  .ax-account-role { font-size: 11px; font-weight: 700; color: #b45309; letter-spacing: 0.4px; }
+  .ax-nav .ax-account-head { display: flex; align-items: center; gap: 12px; padding: 16px 20px 10px; }
+  .ax-nav .ax-account-name { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+  .ax-nav .ax-account-role { font-size: 11px; font-weight: 700; color: #b45309; letter-spacing: 0.4px; }
 
   /* ── Mobile ── */
   @media (max-width: 768px) {
-    .ax-top { padding: 8px 12px; }
-    .ax-logo { height: 36px; }
-    .ax-brand-name { font-size: 16px; }
-    .ax-account-label, .ax-username { display: none; }
-    .ax-signin { padding: 9px 14px; }
-    .ax-icon-btn { width: 40px; height: 40px; }
-    .ax-tabs-inner { padding: 0 8px; }
-    .ax-tab { padding: 13px 10px; font-size: 12px; }
-    .ax-tab::after { left: 10px; right: 10px; }
-    .ax-tabs-user .ax-user-name { display: none; }
+    .ax-nav .ax-top { padding: 8px 12px; }
+    .ax-nav .ax-logo { height: 36px; }
+    .ax-nav .ax-brand-name { font-size: 16px; }
+    .ax-nav .ax-account-label, .ax-nav .ax-username { display: none; }
+    .ax-nav .ax-signin { padding: 9px 14px; }
+    .ax-nav .ax-icon-btn { width: 40px; height: 40px; }
+    .ax-nav .ax-tabs-inner { padding: 0 8px; }
+    .ax-nav .ax-tab { padding: 13px 10px; font-size: 12px; }
+    .ax-nav .ax-tab::after { left: 10px; right: 10px; }
+    .ax-nav .ax-tabs-user .ax-user-name { display: none; }
 
-    .ax-backdrop {
+    .ax-nav .ax-backdrop {
       display: block;
       position: fixed;
       inset: 0;
@@ -751,7 +764,7 @@ const css = `
       -webkit-backdrop-filter: blur(3px);
       z-index: 99998;
     }
-    .ax-menu-panel, .ax-account-panel {
+    .ax-nav .ax-nav-panel.ax-menu-panel, .ax-nav .ax-nav-panel.ax-account-panel {
       position: fixed;
       top: 62px;
       left: 10px;
@@ -762,7 +775,7 @@ const css = `
       max-height: calc(100dvh - 76px);
       padding-bottom: 32px;
     }
-    .ax-mobile-title {
+    .ax-nav .ax-mobile-title {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -775,7 +788,7 @@ const css = `
       font-size: 14px;
       font-weight: 800;
     }
-    .ax-close-btn {
+    .ax-nav .ax-close-btn {
       padding: 5px 12px;
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -788,7 +801,7 @@ const css = `
   }
 
   @media (max-width: 480px) {
-    .ax-menu-panel, .ax-account-panel { top: 56px; left: 6px; right: 6px; }
+    .ax-nav .ax-nav-panel.ax-menu-panel, .ax-nav .ax-nav-panel.ax-account-panel { top: 56px; left: 6px; right: 6px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
