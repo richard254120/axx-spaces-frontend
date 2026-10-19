@@ -515,70 +515,35 @@ Please contact me back with viewing details. Thank you!`;
         <div className="ambient-orb orb-navy" />
         <div className="hero-grid-pattern" />
 
-        <div className="hero-container">
-          {/* Trust Banner Pill */}
-          <div className="hero-badge-wrap">
-            <span className="hero-badge-pill">
-              <span className="badge-sparkle">✦</span>
-              <span>VERIFIED KENYAN RENTALS · 0% BROKERAGE FEES · DIRECT LANDLORDS</span>
-            </span>
+        <div className="hero-compact-header">
+          <div className="hero-compact-left">
+            <h1 className="hero-compact-title">AxxSpace Rentals</h1>
+            <p className="hero-compact-sub">Verified residential rentals across all 47 counties</p>
           </div>
 
-          {/* Grand Headline */}
-          <h1 className="hero-main-title">
-            Discover Your Next Home in Kenya
-            <span className="title-gradient-accent">Verified Apartments, Bedsitters & Hostels</span>
-          </h1>
-
-          {/* Subtitle */}
-          <p className="hero-subtext">
-            Transparent pricing, confirmed GPS directions, and instant WhatsApp contact with property owners across Nairobi, Kiambu, Mombasa, Eldoret, and all 47 counties.
-          </p>
-
-          {/* Trust & Key Highlights Chips */}
-          <div className="hero-highlights-row">
-            <div className="highlight-pill">
-              <span className="pill-icon">🛡️</span>
-              <span>100% Direct Landlords</span>
-            </div>
-            <div className="highlight-pill">
-              <span className="pill-icon">📍</span>
-              <span>Pinpoint GPS Coordinates</span>
-            </div>
-            <div className="highlight-pill">
-              <span className="pill-icon">💬</span>
-              <span>Instant WhatsApp Viewing</span>
-            </div>
-            <div className="highlight-pill">
-              <span className="pill-icon">🎓</span>
-              <span>40+ Campus Hostels</span>
-            </div>
-          </div>
-
-          {/* Host / Landlord CTA strip */}
-          <div className="hero-actions-strip">
+          <div className="hero-compact-actions">
             {!user ? (
-              <a href="/register" className="hero-btn-primary">
-                <span>List Your Property For Free</span>
+              <a href="/register" className="hero-compact-btn-primary">
+                <span>List Property</span>
                 <span className="btn-arrow">→</span>
               </a>
             ) : user.role === "landlord" ? (
-              <a href="/dashboard" className="hero-btn-primary">
-                <span>Landlord Management Portal</span>
+              <a href="/dashboard" className="hero-compact-btn-primary">
+                <span>Landlord Portal</span>
                 <span className="btn-arrow">→</span>
               </a>
             ) : null}
 
             <button
               type="button"
-              className="hero-btn-secondary"
+              className="hero-compact-btn-secondary"
               onClick={() => {
                 setModalQuery(filters.location || "");
                 setModalService("rental");
                 setIsRequestModalOpen(true);
               }}
             >
-              <span>Can't Find It? Request A Custom Rental</span>
+              <span>Request Rental</span>
             </button>
           </div>
         </div>
@@ -1866,7 +1831,7 @@ const css = `
     position: relative;
     background: radial-gradient(circle at 50% 20%, #112035 0%, var(--bg-dark) 80%);
     color: #FFFFFF;
-    padding: 70px 24px 110px;
+    padding: 24px 20px 40px;
     overflow: hidden;
     isolation: isolate;
   }
@@ -1922,150 +1887,83 @@ const css = `
     z-index: -1;
   }
 
-  .hero-container {
-    max-width: 1100px;
-    margin: 0 auto;
-    text-align: center;
+  .hero-compact-header {
+    max-width: 1200px;
+    margin: 0 auto 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
     position: relative;
     z-index: 2;
   }
-
-  .hero-badge-wrap {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-  }
-  .hero-badge-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 7px 18px;
-    border-radius: 999px;
-    background: rgba(227, 27, 27, 0.15);
-    border: 1px solid rgba(227, 27, 27, 0.4);
-    color: #FFA2A2;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 4px 15px rgba(227, 27, 27, 0.15);
-  }
-  .badge-sparkle {
-    color: #FFD700;
-  }
-
-  .hero-main-title {
+  .hero-compact-title {
     font-family: 'Outfit', sans-serif;
-    font-size: clamp(2.3rem, 5.5vw, 3.8rem);
+    font-size: 1.6rem;
     font-weight: 800;
-    line-height: 1.15;
-    letter-spacing: -0.03em;
-    margin-bottom: 18px;
     color: #FFFFFF;
+    letter-spacing: -0.02em;
+    margin-bottom: 2px;
   }
-  .title-gradient-accent {
-    display: block;
-    background: linear-gradient(135deg, #FF6B6B 0%, #FFA84A 50%, #FFD166 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-top: 6px;
+  .hero-compact-sub {
+    color: #94A3B8;
+    font-size: 0.85rem;
+    font-weight: 500;
   }
-
-  .hero-subtext {
-    font-size: clamp(0.95rem, 1.8vw, 1.15rem);
-    color: #CBD5E1;
-    max-width: 760px;
-    margin: 0 auto 30px;
-    line-height: 1.6;
-    font-weight: 400;
-  }
-
-  .hero-highlights-row {
+  .hero-compact-actions {
     display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 34px;
-  }
-  .highlight-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    padding: 8px 16px;
-    border-radius: 999px;
-    font-size: 0.82rem;
-    color: #E2E8F0;
-    backdrop-filter: blur(8px);
-    transition: all 0.25s ease;
-  }
-  .highlight-pill:hover {
-    background: rgba(255, 255, 255, 0.14);
-    border-color: rgba(255, 255, 255, 0.3);
-    transform: translateY(-2px);
-  }
-  .pill-icon {
-    font-size: 0.95rem;
-  }
-
-  .hero-actions-strip {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 14px;
-  }
-  .hero-btn-primary {
-    display: inline-flex;
     align-items: center;
     gap: 10px;
+    flex-wrap: wrap;
+  }
+  .hero-compact-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     background: linear-gradient(135deg, #E31B1B 0%, #C41414 100%);
     color: #FFFFFF;
     text-decoration: none;
-    padding: 13px 26px;
-    border-radius: 12px;
-    font-size: 0.92rem;
+    padding: 9px 18px;
+    border-radius: 10px;
+    font-size: 0.85rem;
     font-weight: 700;
-    box-shadow: 0 10px 25px rgba(227, 27, 27, 0.4);
-    transition: all 0.25s ease;
+    box-shadow: 0 4px 15px rgba(227, 27, 27, 0.35);
+    transition: all 0.2s ease;
   }
-  .hero-btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 30px rgba(227, 27, 27, 0.55);
-    filter: brightness(1.05);
+  .hero-compact-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(227, 27, 27, 0.45);
   }
   .btn-arrow {
     transition: transform 0.2s ease;
   }
-  .hero-btn-primary:hover .btn-arrow {
-    transform: translateX(4px);
+  .hero-compact-btn-primary:hover .btn-arrow {
+    transform: translateX(3px);
   }
-
-  .hero-btn-secondary {
+  .hero-compact-btn-secondary {
     display: inline-flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     color: #FFFFFF;
-    padding: 13px 22px;
-    border-radius: 12px;
-    font-size: 0.92rem;
+    padding: 9px 16px;
+    border-radius: 10px;
+    font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
     backdrop-filter: blur(8px);
-    transition: all 0.25s ease;
+    transition: all 0.2s ease;
   }
-  .hero-btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.4);
-    transform: translateY(-2px);
+  .hero-compact-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.35);
   }
 
   /* ── 2. SEARCH CONSOLE ── */
   .search-console-wrapper {
     max-width: 1200px;
-    margin: 44px auto 0;
+    margin: 0 auto;
     position: relative;
     z-index: 10;
   }
