@@ -560,13 +560,7 @@ export default function HomePro() {
             </form>
           </div>
 
-          {demographics && (
-            <div className="ax-stats">
-              <div className="ax-stat"><strong>{demographics.totalListings || 0}</strong><span>Listings</span></div>
-              <div className="ax-stat"><strong>{demographics.totalUsers || 0}</strong><span>Users</span></div>
-              <div className="ax-stat"><strong>{counties.length} / 47</strong><span>Counties reached</span></div>
-            </div>
-          )}
+
         </div>
       </header>
 
