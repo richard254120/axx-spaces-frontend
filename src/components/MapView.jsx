@@ -161,7 +161,7 @@ export default function MapView({ properties = [] }) {
                   <div style={S.cardFooter}>
                     <span style={{ ...S.dot, background: available ? "#22c55e" : "#ef4444" }} />
                     <span style={S.availText}>
-                      {available ? `${p.availableUnits} avail.` : "Fully booked"}
+                      {available ? "Available" : "Fully booked"}
                     </span>
                     {rating && <span style={S.rating}> {rating}</span>}
                   </div>
@@ -246,7 +246,7 @@ export default function MapView({ properties = [] }) {
                             display: "inline-block",
                           }} />
                           {p.availableUnits > 0
-                            ? `${p.availableUnits} unit(s) available`
+                            ? "Available"
                             : "Fully booked"}
                           {avgRating(p.reviews) &&
                             <span style={{ marginLeft: "auto" }}>

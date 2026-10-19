@@ -557,7 +557,7 @@ ${property.title}
 Location: ${property.county || ""} - ${property.location || ""}
 Rent: KES ${property.price?.toLocaleString()}/month
 Bedrooms: ${property.bedrooms} | Bathrooms: ${property.bathrooms}
-Available Units: ${property.availableUnits}
+Status: ${property.availableUnits > 0 ? "Available" : "Fully Occupied"}
 
 Please contact me back with viewing details. Thank you!`;
     window.open(`sms:${phoneNumber}?body=${encodeURIComponent(message)}`, "_blank");
@@ -1453,7 +1453,7 @@ Please contact me back with viewing details. Thank you!`;
                     <span className="live-dot" />
                     <span>
                       {property.availableUnits > 0
-                        ? `${property.availableUnits} Unit${property.availableUnits > 1 ? "s" : ""} Available`
+                        ? "Available"
                         : "Fully Occupied"}
                     </span>
                   </div>
@@ -1753,8 +1753,10 @@ Please contact me back with viewing details. Thank you!`;
                 </div>
                 <div className="spec-divider" />
                 <div className="spec-unit">
-                  <span className="spec-val">{selectedProperty.availableUnits}</span>
-                  <span className="spec-name">Units Free</span>
+                  <span className="spec-val" style={{ color: selectedProperty.availableUnits > 0 ? "#10b981" : "#ef4444" }}>
+                    {selectedProperty.availableUnits > 0 ? "Available" : "Occupied"}
+                  </span>
+                  <span className="spec-name">Status</span>
                 </div>
                 <div className="spec-divider" />
                 <div className="spec-unit">

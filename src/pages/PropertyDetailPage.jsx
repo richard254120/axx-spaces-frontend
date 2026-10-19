@@ -411,7 +411,7 @@ export default function PropertyDetailPage() {
                 <div style={{ marginBottom: "16px" }}>
                   <div style={{ fontSize: "13px", color: "#64748b", marginBottom: "6px" }}>Availability</div>
                   <div style={{ fontSize: "14px", fontWeight: 600, color: property.availableUnits > 0 ? "#22c55e" : "#ef4444" }}>
-                    {property.availableUnits > 0 ? `${property.availableUnits} units available` : "Fully Booked"}
+                    {property.availableUnits > 0 ? "Available" : "Fully Booked"}
                   </div>
                 </div>
 

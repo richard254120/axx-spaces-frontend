@@ -17,7 +17,7 @@ export default function ShareProperty({ property }) {
     ` ${property.county} - ${property.location}\n` +
     ` KES ${property.price?.toLocaleString()}/month\n` +
     ` ${property.bedrooms} Bed |  ${property.bathrooms} Bath\n` +
-    ` ${property.availableUnits} unit(s) available\n\n` +
+    ` ${property.availableUnits > 0 ? "Available" : "Fully Occupied"}\n\n` +
     `View it here: ${shareUrl}`;
 
   const handleWhatsApp = () => {
