@@ -1,8 +1,9 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import PhoneInput from "../components/PhoneInput";
 import { KENYA_COUNTIES } from "../features/accommodation";
+import { useGoogleSignIn, GOOGLE_CLIENT_ID } from "../hooks/useGoogleSignIn";
 
 const counties = KENYA_COUNTIES;
 
@@ -154,6 +155,52 @@ export default function AgentRegister() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [googleError, setGoogleError] = useState("");
+
+  const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
+
+  const handleGoogleCredential = useCallback(async (googleUser) => {
+    try {
+      setLoading(true);
+      setError("");
+      setGoogleError("");
+
+      const res = await fetch(`${API_BASE}/auth/google`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          googleId: googleUser.sub,
+          email: googleUser.email,
+          name: googleUser.name,
+          picture: googleUser.picture,
+          role: "agent",
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Google registration failed");
+      if (!data.token || !data.user) throw new Error("Invalid response from server");
+
+      login(data.token, data.user);
+      setSuccess(" Google registration successful! Redirecting to agent dashboard...");
+      setTimeout(() => {
+        navigate("/agent/dashboard");
+      }, 900);
+    } catch (err) {
+      setGoogleError(err.message || "Google registration failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, [API_BASE, login, navigate]);
+
+  const handleGoogleError = useCallback((message) => {
+    setGoogleError(message);
+  }, []);
+
+  const { buttonRef: googleButtonRef } = useGoogleSignIn({
+    onCredential: handleGoogleCredential,
+    onError: handleGoogleError,
+  });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -190,7 +237,6 @@ export default function AgentRegister() {
     setLoading(true);
 
     try {
-      const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
       const response = await fetch(`${API_BASE}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -252,6 +298,22 @@ export default function AgentRegister() {
 
         {error && <div style={s.error}>{error}</div>}
         {success && <div style={s.success}>{success}</div>}
+        {googleError && <div style={s.error}>{googleError}</div>}
+
+        {GOOGLE_CLIENT_ID ? (
+          <div style={{ marginBottom: "20px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <p style={{ fontSize: "12px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "12px" }}>
+              Sign Up With Google
+            </p>
+            <div ref={googleButtonRef} style={{ width: "100%", display: "flex", justifyContent: "center", minHeight: "44px" }}></div>
+          </div>
+        ) : null}
+
+        <div style={{ display: "flex", alignItems: "center", margin: "20px 0", color: "#9ca3af", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+          <div style={{ flex: 1, height: "1px", background: "#e5e7eb" }}></div>
+          <span style={{ padding: "0 12px" }}>or register with email</span>
+          <div style={{ flex: 1, height: "1px", background: "#e5e7eb" }}></div>
+        </div>
 
         <form onSubmit={handleSubmit}>
           <div style={s.field}>

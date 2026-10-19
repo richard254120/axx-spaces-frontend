@@ -1,6 +1,7 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import { useGoogleSignIn, GOOGLE_CLIENT_ID } from "../hooks/useGoogleSignIn";
 
 const s = {
   root: {
@@ -42,7 +43,44 @@ const s = {
     fontSize: "14px",
     color: "#6b7280",
     textAlign: "center",
-    marginBottom: "32px",
+    marginBottom: "24px",
+  },
+  googleSection: {
+    marginBottom: "20px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  googleLabel: {
+    fontSize: "12px",
+    fontWeight: 600,
+    color: "#6b7280",
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
+    marginBottom: "12px",
+  },
+  googleButtonContainer: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    minHeight: "44px",
+  },
+  divider: {
+    display: "flex",
+    alignItems: "center",
+    margin: "20px 0",
+    color: "#9ca3af",
+    fontSize: "12px",
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
+  },
+  dividerLine: {
+    flex: 1,
+    height: "1px",
+    background: "#e5e7eb",
+  },
+  dividerText: {
+    padding: "0 12px",
   },
   field: {
     marginBottom: "20px",
@@ -89,6 +127,14 @@ const s = {
     fontSize: "13px",
     marginBottom: "16px",
   },
+  success: {
+    background: "#dcfce7",
+    color: "#15803d",
+    padding: "12px",
+    borderRadius: "8px",
+    fontSize: "13px",
+    marginBottom: "16px",
+  },
   link: {
     textAlign: "center",
     marginTop: "20px",
@@ -121,6 +167,51 @@ export default function AgentLogin() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [googleError, setGoogleError] = useState("");
+
+  const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
+
+  const handleGoogleCredential = useCallback(async (googleUser) => {
+    try {
+      setLoading(true);
+      setError("");
+      setGoogleError("");
+
+      const res = await fetch(`${API_BASE}/auth/google`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          googleId: googleUser.sub,
+          email: googleUser.email,
+          name: googleUser.name,
+          picture: googleUser.picture,
+          role: "agent",
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Google authentication failed");
+      if (!data.token || !data.user) throw new Error("Invalid response from server");
+
+      login(data.token, data.user);
+      setSuccess(" Google login successful! Redirecting...");
+      setTimeout(() => navigate("/agent/dashboard"), 800);
+    } catch (err) {
+      setGoogleError(err.message || "Google authentication failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, [API_BASE, login, navigate]);
+
+  const handleGoogleError = useCallback((message) => {
+    setGoogleError(message);
+  }, []);
+
+  const { buttonRef: googleButtonRef } = useGoogleSignIn({
+    onCredential: handleGoogleCredential,
+    onError: handleGoogleError,
+  });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -129,6 +220,7 @@ export default function AgentLogin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setGoogleError("");
 
     if (!formData.email || !formData.password) {
       setError("Please fill in all fields");
@@ -138,7 +230,6 @@ export default function AgentLogin() {
     setLoading(true);
 
     try {
-      const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
       const response = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -181,6 +272,21 @@ export default function AgentLogin() {
         <p style={s.subtitle}>Access your agent dashboard</p>
 
         {error && <div style={s.error}>{error}</div>}
+        {success && <div style={s.success}>{success}</div>}
+        {googleError && <div style={s.error}>{googleError}</div>}
+
+        {GOOGLE_CLIENT_ID ? (
+          <div style={s.googleSection}>
+            <p style={s.googleLabel}>Sign In With Google</p>
+            <div ref={googleButtonRef} style={s.googleButtonContainer}></div>
+          </div>
+        ) : null}
+
+        <div style={s.divider}>
+          <div style={s.dividerLine}></div>
+          <span style={s.dividerText}>or continue with email</span>
+          <div style={s.dividerLine}></div>
+        </div>
 
         <form onSubmit={handleSubmit}>
           <div style={s.field}>

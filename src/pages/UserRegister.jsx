@@ -1,8 +1,9 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import PhoneInput from "../components/PhoneInput";
 import { COLORS, buttonStyles, inputStyles, pageStyles } from "../styles/theme";
+import { useGoogleSignIn, GOOGLE_CLIENT_ID } from "../hooks/useGoogleSignIn";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -20,6 +21,50 @@ export default function UserRegister() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [googleError, setGoogleError] = useState("");
+
+  const handleGoogleCredential = useCallback(async (googleUser) => {
+    try {
+      setLoading(true);
+      setError("");
+      setGoogleError("");
+
+      const res = await fetch(`${API_BASE}/auth/google`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          googleId: googleUser.sub,
+          email: googleUser.email,
+          name: googleUser.name,
+          picture: googleUser.picture,
+          role: "user",
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Google registration failed");
+      if (!data.token || !data.user) throw new Error("Invalid response from server");
+
+      login(data.token, data.user);
+      setSuccess(" Welcome to AxxSpace! Redirecting...");
+      setTimeout(() => {
+        navigate("/");
+      }, 900);
+    } catch (err) {
+      setGoogleError(err.message || "Google registration failed. Please try again or use the form.");
+    } finally {
+      setLoading(false);
+    }
+  }, [login, navigate]);
+
+  const handleGoogleError = useCallback((message) => {
+    setGoogleError(message);
+  }, []);
+
+  const { buttonRef: googleButtonRef } = useGoogleSignIn({
+    onCredential: handleGoogleCredential,
+    onError: handleGoogleError,
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -109,6 +154,22 @@ export default function UserRegister() {
 
           {error && <div style={styles.error}>{error}</div>}
           {success && <div style={styles.success}>{success}</div>}
+          {googleError && <div style={styles.error}>{googleError}</div>}
+
+          {GOOGLE_CLIENT_ID ? (
+            <div style={{ marginBottom: "20px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <p style={{ fontSize: "12px", fontWeight: 600, color: COLORS.textMutedLight, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "12px" }}>
+                Quick Sign Up With Google
+              </p>
+              <div ref={googleButtonRef} style={{ width: "100%", display: "flex", justifyContent: "center", minHeight: "44px" }}></div>
+            </div>
+          ) : null}
+
+          <div style={{ display: "flex", alignItems: "center", margin: "20px 0", color: COLORS.textMutedLight, fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+            <div style={{ flex: 1, height: "1px", background: COLORS.border }}></div>
+            <span style={{ padding: "0 12px" }}>or register with email</span>
+            <div style={{ flex: 1, height: "1px", background: COLORS.border }}></div>
+          </div>
 
           <form onSubmit={handleSubmit} style={styles.form}>
             <div style={styles.formGroup}>

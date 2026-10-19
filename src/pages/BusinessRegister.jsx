@@ -1,8 +1,9 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
 import PhoneInput from "../components/PhoneInput";
+import { useGoogleSignIn, GOOGLE_CLIENT_ID } from "../hooks/useGoogleSignIn";
 
 const styles = {
   container: {
@@ -126,6 +127,52 @@ export default function BusinessRegister() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [googleError, setGoogleError] = useState("");
+
+  const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
+
+  const handleGoogleCredential = useCallback(async (googleUser) => {
+    try {
+      setLoading(true);
+      setError("");
+      setGoogleError("");
+
+      const res = await fetch(`${API_BASE}/auth/google`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          googleId: googleUser.sub,
+          email: googleUser.email,
+          name: googleUser.name,
+          picture: googleUser.picture,
+          role: "user",
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Google registration failed");
+      if (!data.token || !data.user) throw new Error("Invalid response from server");
+
+      login(data.token, data.user);
+      setSuccess(" Google registration successful! Redirecting...");
+      setTimeout(() => {
+        navigate("/business-dashboard");
+      }, 900);
+    } catch (err) {
+      setGoogleError(err.message || "Google registration failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, [API_BASE, login, navigate]);
+
+  const handleGoogleError = useCallback((message) => {
+    setGoogleError(message);
+  }, []);
+
+  const { buttonRef: googleButtonRef } = useGoogleSignIn({
+    onCredential: handleGoogleCredential,
+    onError: handleGoogleError,
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -186,6 +233,22 @@ export default function BusinessRegister() {
 
         {error && <div style={styles.error}>{error}</div>}
         {success && <div style={styles.success}>{success}</div>}
+        {googleError && <div style={styles.error}>{googleError}</div>}
+
+        {GOOGLE_CLIENT_ID ? (
+          <div style={{ marginBottom: "20px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <p style={{ fontSize: "12px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "12px" }}>
+              Sign Up With Google
+            </p>
+            <div ref={googleButtonRef} style={{ width: "100%", display: "flex", justifyContent: "center", minHeight: "44px" }}></div>
+          </div>
+        ) : null}
+
+        <div style={{ display: "flex", alignItems: "center", margin: "20px 0", color: "#94a3b8", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+          <div style={{ flex: 1, height: "1px", background: "rgba(255, 255, 255, 0.1)" }}></div>
+          <span style={{ padding: "0 12px" }}>or register with email</span>
+          <div style={{ flex: 1, height: "1px", background: "rgba(255, 255, 255, 0.1)" }}></div>
+        </div>
 
         <form onSubmit={handleSubmit}>
           <label style={styles.label}>Full Name</label>

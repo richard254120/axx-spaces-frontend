@@ -1,5 +1,6 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useGoogleSignIn, GOOGLE_CLIENT_ID } from "../../hooks/useGoogleSignIn";
 
 import {
   setAccommodationSession,
@@ -159,6 +160,51 @@ export default function AccommodationRegister() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [googleError, setGoogleError] = useState("");
+
+  const handleGoogleCredential = useCallback(async (googleUser) => {
+    try {
+      setLoading(true);
+      setError("");
+      setGoogleError("");
+
+      const res = await fetch(`${API_BASE}/auth/google`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          googleId: googleUser.sub,
+          email: googleUser.email,
+          name: googleUser.name,
+          picture: googleUser.picture,
+          role: "host",
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Google authentication failed");
+      if (!data.token || !data.user) throw new Error("Invalid response from server");
+
+      setAccommodationSession(data.token, data.user);
+      login(data.token, data.user);
+      setSuccess(" Google registration successful! Redirecting...");
+      setTimeout(() => {
+        navigate("/accommodation/dashboard");
+      }, 900);
+    } catch (err) {
+      setGoogleError(err.message || "Google registration failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, [login, navigate]);
+
+  const handleGoogleError = useCallback((message) => {
+    setGoogleError(message);
+  }, []);
+
+  const { buttonRef: googleButtonRef } = useGoogleSignIn({
+    onCredential: handleGoogleCredential,
+    onError: handleGoogleError,
+  });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -238,6 +284,22 @@ export default function AccommodationRegister() {
 
         {error && <div style={styles.error}>{error}</div>}
         {success && <div style={styles.success}>{success}</div>}
+        {googleError && <div style={styles.error}>{googleError}</div>}
+
+        {GOOGLE_CLIENT_ID ? (
+          <div style={{ marginBottom: "20px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <p style={{ fontSize: "12px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "12px" }}>
+              Sign Up With Google
+            </p>
+            <div ref={googleButtonRef} style={{ width: "100%", display: "flex", justifyContent: "center", minHeight: "44px" }}></div>
+          </div>
+        ) : null}
+
+        <div style={{ display: "flex", alignItems: "center", margin: "20px 0", color: "#9ca3af", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+          <div style={{ flex: 1, height: "1px", background: "#e5e7eb" }}></div>
+          <span style={{ padding: "0 12px" }}>or continue with email</span>
+          <div style={{ flex: 1, height: "1px", background: "#e5e7eb" }}></div>
+        </div>
 
         <form onSubmit={handleSubmit} style={styles.form}>
           <div>

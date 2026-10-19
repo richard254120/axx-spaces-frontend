@@ -289,9 +289,7 @@ export default function AccommodationLogin() {
         throw new Error("This login is for accommodation providers only");
       }
 
-      if (!data.user.isApproved) {
-        throw new Error("Your account is pending admin approval. Approval typically takes less than 5 hours. Please wait for approval email before logging in.");
-      }
+      setAccommodationSession(data.token, data.user);
 
       login(data.token, {
         _id: data.user._id,

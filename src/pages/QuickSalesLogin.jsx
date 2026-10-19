@@ -136,6 +136,8 @@ export default function QuickSalesLogin() {
         throw new Error(data.error || "Google authentication failed");
       }
 
+      localStorage.setItem("sellerToken", data.token);
+      localStorage.setItem("sellerUser", JSON.stringify(data.user));
       login(data.token, data.user);
       setSuccess(" Google login successful! Redirecting...");
 
