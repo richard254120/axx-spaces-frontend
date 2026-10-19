@@ -1,9 +1,9 @@
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import "./AdminHeader.css";
 
 export default function AdminHeader({
+  onToggleSidebar,
   showNotifPanel,
   setShowNotifPanel,
   notificationCount,
@@ -11,7 +11,6 @@ export default function AdminHeader({
   children
 }) {
   const { user, logout } = useContext(AuthContext);
-  const navigate = useNavigate();
 
   const handleLogout = () => {
     logout("/login");
@@ -19,34 +18,40 @@ export default function AdminHeader({
 
   return (
     <header className="admin-header">
-      <div className="admin-logo-section">
-        <h1 className="admin-logo"> Axxspace Admin</h1>
-        <p className="admin-logo-sub">Welcome back, {user?.name?.split(" ")[0]}</p>
+      <div className="admin-header-left">
+        {onToggleSidebar && (
+          <button
+            type="button"
+            className="mobile-sidebar-toggle-btn"
+            onClick={onToggleSidebar}
+            aria-label="Open sidebar menu"
+          >
+            <span className="hamburger-icon">☰</span>
+            <span className="hamburger-text">Menu</span>
+          </button>
+        )}
+        <div className="admin-logo-section">
+          <div className="admin-logo-wrapper">
+            <span className="live-status-dot" title="System Operational" />
+            <h1 className="admin-logo">AXXSPACE ADMIN</h1>
+          </div>
+          <p className="admin-logo-sub">
+            Logged in as <strong className="user-highlight">{user?.name || "Administrator"}</strong>
+          </p>
+        </div>
       </div>
 
-      {/* Mobile menu toggle button */}
-      <button
-        className="mobile-menu-btn"
-        onClick={() => {
-          const sidebar = document.querySelector('.admin-sidebar');
-          if (sidebar) {
-            sidebar.style.display = sidebar.style.display === 'block' ? 'none' : 'block';
-          }
-        }}
-        style={{ display: 'none' }}
-        aria-label="Toggle sidebar"
-      >
-        ☰
-      </button>
-
       <div className="admin-header-actions">
+        {children}
         <button
+          type="button"
           className="btn-logout"
           onClick={handleLogout}
+          title="Sign out of Admin Portal"
         >
-           Logout
+          <span className="logout-text">Logout</span>
+          <span className="logout-icon" aria-hidden="true">🚪</span>
         </button>
-        {children}
       </div>
     </header>
   );

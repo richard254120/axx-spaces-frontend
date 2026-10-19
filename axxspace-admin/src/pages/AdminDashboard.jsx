@@ -728,15 +728,8 @@ export default function AdminDashboard() {
         />
       </aside>
       <main className="admin-main-content">
-        <div className="mobile-header-bar">
-          <button className="btn-toggle-sidebar" onClick={() => setIsSidebarOpen(true)}>
-            ☰ Menu
-          </button>
-          <span className="mobile-logo-text"> AXXSPACE</span>
-        </div>
-
         {/* HEADER */}
-        <AdminHeader>
+        <AdminHeader onToggleSidebar={() => setIsSidebarOpen(true)}>
           <NotificationPanel
             showNotifPanel={showNotifPanel}
             setShowNotifPanel={setShowNotifPanel}
@@ -772,6 +765,36 @@ export default function AdminDashboard() {
             }}
           />
         </AdminHeader>
+
+        {/* MOBILE HORIZONTAL QUICK PILLS */}
+        <div className="mobile-quick-pills-bar" aria-label="Mobile quick tabs">
+          {[
+            { id: "overview", label: "Overview", icon: "📊" },
+            { id: "properties", label: "Properties", icon: "🏠", count: allPending?.properties?.length || 0 },
+            { id: "materials", label: "QuickSales", icon: "📦", count: allPending?.materials?.length || 0 },
+            { id: "accommodations", label: "Stays", icon: "🏨", count: pendingAccommodations.length || (allPending?.accommodations?.length || 0) },
+            { id: "payment", label: "Payments", icon: "💳", count: pendingPackagePurchasesCount || 0 },
+            { id: "boosts", label: "Boosts", icon: "⚡", count: pendingBoosts.length || 0 },
+            { id: "businesses", label: "Businesses", icon: "💼", count: stats?.businesses?.pending || 0 },
+            { id: "requests", label: "Requests", icon: "📝", count: requests.length || 0 },
+            { id: "website-poster", label: "Poster", icon: "🎨" },
+            { id: "announcements", label: "Notices", icon: "📢", count: pendingAnnouncements.length || 0 },
+          ].map((item) => (
+            <button
+              key={`quick-${item.id}`}
+              type="button"
+              className={`mobile-quick-pill ${activeTab === item.id ? "active" : ""}`}
+              onClick={() => {
+                setActiveTab(item.id);
+                if (item.id !== "sold" && item.id !== "payment" && item.id !== "boosts") setStatusView("pending");
+              }}
+            >
+              <span className="pill-icon">{item.icon}</span>
+              <span className="pill-text">{item.label}</span>
+              {item.count > 0 && <span className="pill-count-badge">{item.count}</span>}
+            </button>
+          ))}
+        </div>
 
         {/* STATS */}
         {activeTab === "overview" && stats && (
