@@ -755,15 +755,6 @@ export default function HomePro() {
                         {hovered ? services.find((s) => s.service === hovered)?.count ?? 0 : serviceTotal}
                       </text>
                     </svg>
-                    <div className="ax-legend">
-                      {services.map((s, i) => (
-                        <div key={s.service} className={hovered === s.service ? "on" : ""}
-                          onMouseEnter={() => setHovered(s.service)} onMouseLeave={() => setHovered(null)}>
-                          <span><i style={{ background: DONUT_COLORS[i % DONUT_COLORS.length] }} />{label(s.service)}</span>
-                          <strong>{s.count}</strong>
-                        </div>
-                      ))}
-                    </div>
                   </div>
                 ) : counties.length ? (
                   <div>
