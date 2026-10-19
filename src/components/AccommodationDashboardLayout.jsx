@@ -198,17 +198,29 @@ const css = `
       flex-direction: column;
       align-items: stretch;
       order: 4;
+      gap: 4px;
     }
     .tourism-nav-open {
       display: flex !important;
+    }
+    .tourism-nav a {
+      padding: 12px 16px !important;
+      font-size: 15px !important;
+      border-radius: 8px !important;
     }
     .tourism-user {
       width: 100%;
       justify-content: space-between;
       order: 5;
-      padding-top: 8px;
+      padding-top: 10px;
       border-top: 1px solid rgba(255,255,255,0.2);
       margin-left: 0 !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .tourism-user span:first-child {
+      display: none; /* hide greeting on tiny phones */
     }
   }
 `;

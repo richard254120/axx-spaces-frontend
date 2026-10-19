@@ -456,7 +456,7 @@ export default function AccommodationPage() {
             <button type="button" onClick={() => { document.getElementById("faq-section")?.scrollIntoView({ behavior: "smooth" }); setMobileMenuOpen(false); }}>
               Help & FAQ
             </button>
-            <div style={{ height: "1px", background: "#e2e8f0", margin: "8px 0" }} />
+            <div className="mobile-nav-divider" />
             {user && user.role !== "guest" ? (
               <button type="button" className="mobile-action-highlight" onClick={() => { navigate("/accommodation/dashboard"); setMobileMenuOpen(false); }}>
                 Go to Dashboard
@@ -1768,11 +1768,12 @@ const s = {
   navInner: {
     maxWidth: "1400px",
     margin: "0 auto",
-    padding: "12px 20px",
+    padding: "10px 16px",
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: "16px",
+    gap: "8px",
+    minWidth: 0,
   },
   logoWrapper: {
     display: "flex",
@@ -2461,6 +2462,7 @@ const customStyles = `
     font-family: inherit;
     transition: all 0.2s;
     letter-spacing: 0.01em;
+    white-space: nowrap;
   }
   .sign-in-btn:hover {
     border-color: #4f46e5;
@@ -2484,6 +2486,7 @@ const customStyles = `
     box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
     transition: all 0.25s ease;
     letter-spacing: 0.01em;
+    white-space: nowrap;
   }
   .list-property-btn:hover {
     transform: translateY(-1px);
@@ -2497,33 +2500,54 @@ const customStyles = `
     color: #0f172a;
     cursor: pointer;
     padding: 6px;
+    flex-shrink: 0;
   }
 
   .mobile-dropdown-menu {
     display: none;
     background: #ffffff;
-    border-top: 1px solid #e2e8f0;
-    padding: 16px 20px;
+    border-top: 2px solid #e2e8f0;
+    padding: 12px 16px 20px;
     flex-direction: column;
-    gap: 12px;
+    gap: 4px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
   }
   .mobile-dropdown-menu button {
     background: transparent;
     border: none;
     text-align: left;
     font-size: 15px;
-    font-weight: 700;
+    font-weight: 600;
     color: #1e293b;
-    padding: 8px 0;
+    padding: 12px 8px;
     cursor: pointer;
     font-family: inherit;
+    border-radius: 8px;
+    width: 100%;
+    transition: background 0.15s;
+  }
+  .mobile-dropdown-menu button:hover {
+    background: #f8fafc;
+    color: #4f46e5;
   }
   .mobile-action-highlight {
-    background: #4f46e5 !important;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
     color: #ffffff !important;
-    padding: 12px !important;
+    padding: 13px 12px !important;
     border-radius: 10px !important;
     text-align: center !important;
+    font-weight: 700 !important;
+    justify-content: center !important;
+    box-shadow: 0 4px 14px rgba(79,70,229,0.3) !important;
+  }
+  .mobile-action-highlight:hover {
+    background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%) !important;
+    color: #ffffff !important;
+  }
+  .mobile-nav-divider {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 4px 0;
   }
 
   /* Hero Animations & Elements */
@@ -3719,6 +3743,10 @@ const customStyles = `
     .desktop-nav-links { display: none; }
     .mobile-toggle-btn { display: block; }
     .mobile-dropdown-menu { display: flex; }
+    /* Hide desktop auth buttons — they appear in the mobile dropdown */
+    .sign-in-btn { display: none; }
+    .list-property-btn { display: none; }
+    .wishlist-trigger-btn { display: none; }
     .searchBarInner { flex-direction: column; gap: 8px; }
     .search-segment-box { width: 100%; }
     .hero-search-submit-btn { width: 100%; justify-content: center; }
@@ -3741,5 +3769,21 @@ const customStyles = `
     .footerLinksGrid { grid-template-columns: 1fr; }
     .county-badge { display: none; }
     .featured-category-filter-tabs { width: 100%; overflow-x: auto; flex-wrap: nowrap; }
+  }
+
+  @media (max-width: 480px) {
+    /* Tighten nav for very small phones */
+    .mobile-toggle-btn { padding: 4px; }
+    .mobile-dropdown-menu { padding: 10px 12px 16px; }
+    .mobile-dropdown-menu button { font-size: 14px; padding: 11px 6px; }
+    /* Shrink logo text on tiny screens */
+    .accommodation-logo-title { font-size: 14px !important; }
+    .accommodation-logo-subline { display: none; }
+    /* Stack search bar sections */
+    .search-segment-box { border-radius: 12px !important; margin-bottom: 4px; }
+    /* Compact hero */
+    .hero-search-submit-btn { font-size: 14px; padding: 14px 12px; }
+    /* Full-width planner result */
+    .planner-result-banner { gap: 12px; }
   }
 `;
