@@ -495,10 +495,7 @@ const css = `
     font-weight: 800;
     letter-spacing: 0.6px;
     text-transform: uppercase;
-    background: linear-gradient(135deg, var(--red) 0%, var(--gold) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #fb2424;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
