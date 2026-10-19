@@ -19,6 +19,127 @@ const formatKenyaPhone = (phone) => {
   return "254" + cleaned;
 };
 
+// ── Professional Icons (SVG) ──
+const IconHome = ({ size = 16, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+    <polyline points="9 22 9 12 15 12 15 22" />
+  </svg>
+);
+
+const IconBuilding = ({ size = 15, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
+    <path d="M9 22v-4h6v4" />
+    <path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01" />
+  </svg>
+);
+
+const IconApartment = ({ size = 15, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <path d="M3 9h18M9 21V9" />
+  </svg>
+);
+
+const IconBed = ({ size = 15, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8v9" />
+  </svg>
+);
+
+const IconSparkles = ({ size = 15, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <path d="M12 2l2.4 5 5.6.8-4 4 1 5.6-5-2.6-5 2.6 1-5.6-4-4 5.6-.8z" />
+  </svg>
+);
+
+const IconPaw = ({ size = 15, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <circle cx="11" cy="4" r="2" />
+    <circle cx="18" cy="8" r="2" />
+    <circle cx="20" cy="16" r="2" />
+    <path d="M9 10a5 5 0 0 1 5 5v3a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-3a5 5 0 0 1 5-5z" />
+  </svg>
+);
+
+const IconTag = ({ size = 15, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+    <line x1="7" y1="7" x2="7.01" y2="7" />
+  </svg>
+);
+
+const IconHeart = ({ size = 15, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+  </svg>
+);
+
+const IconGraduationCap = ({ size = 16, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+  </svg>
+);
+
+const IconBriefcase = ({ size = 16, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+  </svg>
+);
+
+const IconMapPin = ({ size = 14, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+    <circle cx="12" cy="10" r="3" />
+  </svg>
+);
+
+const IconShieldCheck = ({ size = 14, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    <polyline points="9 12 11 14 15 10" />
+  </svg>
+);
+
+const IconCamera = ({ size = 12, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+    <circle cx="12" cy="13" r="4" />
+  </svg>
+);
+
+const IconEye = ({ size = 14, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+const IconCompass = ({ size = 14, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <circle cx="12" cy="12" r="10" />
+    <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+  </svg>
+);
+
+const IconAlertTriangle = ({ size = 16, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+    <line x1="12" y1="9" x2="12" y2="13" />
+    <line x1="12" y1="17" x2="12.01" y2="17" />
+  </svg>
+);
+
+const IconSearch = ({ size = 28, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <circle cx="11" cy="11" r="8" />
+    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+  </svg>
+);
+
 export default function Listings() {
   const { user, token } = useAuth();
   const [searchParams] = useSearchParams();
@@ -697,49 +818,56 @@ Please contact me back with viewing details. Thank you!`;
                   className={`quick-chip ${quickCategory === "all" ? "active" : ""}`}
                   onClick={() => { setQuickCategory("all"); setFilters((p) => ({ ...p, propertyType: "" })); }}
                 >
-                  🏢 All Rentals
+                  <IconBuilding size={14} />
+                  <span>All Rentals</span>
                 </button>
                 <button
                   type="button"
                   className={`quick-chip ${quickCategory === "apartment" ? "active" : ""}`}
                   onClick={() => { setQuickCategory("apartment"); setFilters((p) => ({ ...p, propertyType: "apartment" })); }}
                 >
-                  🏙️ Apartments
+                  <IconApartment size={14} />
+                  <span>Apartments</span>
                 </button>
                 <button
                   type="button"
                   className={`quick-chip ${quickCategory === "bedsitter" ? "active" : ""}`}
                   onClick={() => { setQuickCategory("bedsitter"); setFilters((p) => ({ ...p, propertyType: "bedsitter" })); }}
                 >
-                  🛋️ Bedsitters
+                  <IconBed size={14} />
+                  <span>Bedsitters</span>
                 </button>
                 <button
                   type="button"
                   className={`quick-chip ${quickCategory === "maisonette" ? "active" : ""}`}
                   onClick={() => { setQuickCategory("maisonette"); setFilters((p) => ({ ...p, propertyType: "maisonette" })); }}
                 >
-                  🏡 Maisonettes
+                  <IconHome size={14} />
+                  <span>Maisonettes</span>
                 </button>
                 <button
                   type="button"
                   className={`quick-chip ${quickCategory === "furnished" ? "active" : ""}`}
                   onClick={() => setQuickCategory(quickCategory === "furnished" ? "all" : "furnished")}
                 >
-                  ✨ Furnished
+                  <IconSparkles size={14} />
+                  <span>Furnished</span>
                 </button>
                 <button
                   type="button"
                   className={`quick-chip ${quickCategory === "pet" ? "active" : ""}`}
                   onClick={() => setQuickCategory(quickCategory === "pet" ? "all" : "pet")}
                 >
-                  🐾 Pet Friendly
+                  <IconPaw size={14} />
+                  <span>Pet Friendly</span>
                 </button>
                 <button
                   type="button"
                   className={`quick-chip ${quickCategory === "budget" ? "active" : ""}`}
                   onClick={() => setQuickCategory(quickCategory === "budget" ? "all" : "budget")}
                 >
-                  💰 Under KES 25K
+                  <IconTag size={14} />
+                  <span>Under KES 25K</span>
                 </button>
                 {favorites.length > 0 && (
                   <button
@@ -747,7 +875,8 @@ Please contact me back with viewing details. Thank you!`;
                     className={`quick-chip ${quickCategory === "favorites" ? "active" : ""}`}
                     onClick={() => setQuickCategory(quickCategory === "favorites" ? "all" : "favorites")}
                   >
-                    ❤️ Saved ({favorites.length})
+                    <IconHeart size={14} />
+                    <span>Saved ({favorites.length})</span>
                   </button>
                 )}
               </div>
@@ -879,7 +1008,8 @@ Please contact me back with viewing details. Thank you!`;
       <main className="listings-main-canvas">
         {error && (
           <div className="error-alert-banner">
-            <span>⚠️ {error}</span>
+            <IconAlertTriangle size={18} />
+            <span>{error}</span>
           </div>
         )}
 
@@ -894,7 +1024,7 @@ Please contact me back with viewing details. Thank you!`;
                 setShowAgentListings(false);
               }}
             >
-              <span className="tab-icon">🏠</span>
+              <span className="tab-icon"><IconHome size={16} /></span>
               <span className="tab-text">All Residential Rentals</span>
               <span className="tab-counter">{properties.length}</span>
             </button>
@@ -907,7 +1037,7 @@ Please contact me back with viewing details. Thank you!`;
                 setShowAgentListings(false);
               }}
             >
-              <span className="tab-icon">🎓</span>
+              <span className="tab-icon"><IconGraduationCap size={16} /></span>
               <span className="tab-text">University Hostels</span>
               <span className="tab-badge-new">Student Hub</span>
             </button>
@@ -920,7 +1050,7 @@ Please contact me back with viewing details. Thank you!`;
                 setShowAgentListings(true);
               }}
             >
-              <span className="tab-icon">👔</span>
+              <span className="tab-icon"><IconBriefcase size={16} /></span>
               <span className="tab-text">Verified Agents</span>
               <span className="tab-badge-verified">Certified</span>
             </button>
@@ -1029,7 +1159,7 @@ Please contact me back with viewing details. Thank you!`;
         {!showUniversityHostels && !showAgentListings && showMap && (
           <div className="map-view-shell">
             <div className="map-view-header">
-              <span className="map-pin-icon">📍</span>
+              <span className="map-pin-icon"><IconMapPin size={16} /></span>
               <span>Interactive GPS Map View ({filteredProperties.length} Properties Located)</span>
             </div>
             <MapView properties={filteredProperties} />
@@ -1105,7 +1235,7 @@ Please contact me back with viewing details. Thank you!`;
                   <span className="campus-indicator-badge">ACTIVE CAMPUS FILTER</span>
                   <h3 className="selected-campus-name">{selectedUniversity.name}</h3>
                   <p className="selected-campus-meta">
-                    📍 {selectedUniversity.location}, {selectedUniversity.county} County · Code: {selectedUniversity.code}
+                    <IconMapPin size={13} /> {selectedUniversity.location}, {selectedUniversity.county} County · Code: {selectedUniversity.code}
                   </p>
                 </div>
                 <button
@@ -1166,7 +1296,8 @@ Please contact me back with viewing details. Thank you!`;
 
                         <h4 className="agent-name">{agent.name}</h4>
                         <div className="agent-county-pill">
-                          📍 {agent.agentProfile?.county || agent.county || "Kenya"}
+                          <IconMapPin size={12} />
+                          <span>{agent.agentProfile?.county || agent.county || "Kenya"}</span>
                         </div>
 
                         <p className="agent-bio">
@@ -1199,7 +1330,7 @@ Please contact me back with viewing details. Thank you!`;
                   <span className="campus-indicator-badge">AGENT LISTINGS</span>
                   <h3 className="selected-campus-name">Properties by {selectedAgent.name}</h3>
                   <p className="selected-campus-meta">
-                    📍 {selectedAgent.agentProfile?.county || "Kenya"} · Phone: {selectedAgent.agentProfile?.phone || selectedAgent.phone}
+                    <IconMapPin size={13} /> {selectedAgent.agentProfile?.county || "Kenya"} · Phone: {selectedAgent.agentProfile?.phone || selectedAgent.phone}
                   </p>
                 </div>
                 <button
@@ -1229,7 +1360,7 @@ Please contact me back with viewing details. Thank you!`;
 
         {showUniversityHostels && selectedUniversity && !universityLoading && displayProperties.length === 0 && (
           <div className="empty-results-box">
-            <div className="empty-icon-wrap">🎓</div>
+            <div className="empty-icon-wrap"><IconGraduationCap size={44} /></div>
             <h3 className="empty-title">No Hostels Currently Listed Near {selectedUniversity.name}</h3>
             <p className="empty-desc">
               Landlords near {selectedUniversity.location} are actively uploading new units. Check back shortly or submit a custom housing request.
@@ -1250,7 +1381,7 @@ Please contact me back with viewing details. Thank you!`;
 
         {!showUniversityHostels && displayProperties.length === 0 && (
           <div className="empty-results-box">
-            <div className="empty-icon-wrap">🔍</div>
+            <div className="empty-icon-wrap"><IconSearch size={44} /></div>
             <h3 className="empty-title">No Rentals Match Your Specific Search Criteria</h3>
             <p className="empty-desc">
               Try broadening your budget range, resetting bedroom filters, or submitting a custom housing request to have landlords contact you directly.
@@ -1335,7 +1466,8 @@ Please contact me back with viewing details. Thank you!`;
                   {/* Photo Count Tag */}
                   {property.images?.length > 1 && (
                     <div className="card-photo-count">
-                      📷 {property.images.length}
+                      <IconCamera size={12} />
+                      <span>{property.images.length}</span>
                     </div>
                   )}
 
@@ -1413,7 +1545,7 @@ Please contact me back with viewing details. Thank you!`;
 
                   {/* Landlord Verified Line */}
                   <div className="card-landlord-verify-line">
-                    <span className="verify-shield">🛡️</span>
+                    <IconShieldCheck size={14} className="verify-shield" />
                     <span className="verify-text">
                       {property.assignedAgent ? "Managed by Verified Agent" : "Direct Landlord Listing"}
                     </span>
@@ -1477,7 +1609,7 @@ Please contact me back with viewing details. Thank you!`;
               <div className="mpesa-dialog-overlay">
                 <div className="mpesa-dialog-box">
                   <div className="mpesa-badge-header">
-                    <span className="mpesa-logo-dot">🟢</span>
+                    <IconShieldCheck size={14} />
                     <span>LIPA NA M-PESA ONLINE</span>
                   </div>
                   <h3 className="mpesa-dialog-title">Secure Booking Deposit</h3>
@@ -1584,10 +1716,10 @@ Please contact me back with viewing details. Thank you!`;
                   <h2 className="modal-main-title">{selectedProperty.title}</h2>
                   <div className="modal-location-tags">
                     <span className="location-pin-chip">
-                      📍 {selectedProperty.county} · {selectedProperty.location}
+                      <IconMapPin size={13} /> {selectedProperty.county} · {selectedProperty.location}
                     </span>
                     <span className="views-counter-chip">
-                      👁️ {selectedProperty.views || 1} Views
+                      <IconEye size={13} /> {selectedProperty.views || 1} Views
                     </span>
                     {selectedProperty.lat && selectedProperty.lng && (
                       <a
@@ -1596,7 +1728,7 @@ Please contact me back with viewing details. Thank you!`;
                         rel="noreferrer"
                         className="google-maps-link"
                       >
-                        🧭 View on Google Maps →
+                        <IconCompass size={13} /> View on Google Maps →
                       </a>
                     )}
                   </div>
@@ -2151,6 +2283,9 @@ const css = `
     height: 4px;
   }
   .quick-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     padding: 7px 15px;
     border-radius: 999px;
     border: 1px solid #E2E8F0;
