@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
 import SplashScreen from "./components/SplashScreen";
 import AppUpdateNotifier from "./components/AppUpdateNotifier";
+import DownloadNotification from "./components/DownloadNotification";
 
 import Home from "./pages/Home";
 import Listings from "./pages/Listings";
@@ -90,6 +91,7 @@ function PublicLayout({ children }) {
   return (
     <>
       <Navbar />
+      <DownloadNotification />
       {children}
       <FloatingWhatsApp />
       <AppUpdateNotifier />
