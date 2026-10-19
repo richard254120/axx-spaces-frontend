@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import RequestItemModal from "../components/RequestItemModal";
@@ -22,14 +22,27 @@ const formatKenyaPhone = (phone) => {
 export default function Listings() {
   const { user, token } = useAuth();
   const [searchParams] = useSearchParams();
+
+  // Modals & Popups
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [modalQuery, setModalQuery] = useState("");
   const [modalService, setModalService] = useState("rental");
+  const [selectedProperty, setSelectedProperty] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Data states
   const [properties, setProperties] = useState([]);
   const [filteredProperties, setFilteredProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showMap, setShowMap] = useState(false);
+
+  // Sorting & Quick Category
+  const [sortBy, setSortBy] = useState("recommended");
+  const [quickCategory, setQuickCategory] = useState("all");
+
+  // Filters
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState({
     location: "",
     minPrice: 0,
@@ -42,40 +55,45 @@ export default function Listings() {
     petFriendly: "",
     availableFrom: "",
   });
-  const [selectedProperty, setSelectedProperty] = useState(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Payment Modal
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentPhone, setPaymentPhone] = useState("");
   const [paymentAmount, setPaymentAmount] = useState("");
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentError, setPaymentError] = useState("");
   const [paymentSuccess, setPaymentSuccess] = useState("");
+
+  // Favorites & Saved Searches
   const [favorites, setFavorites] = useState([]);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [savedSearches, setSavedSearches] = useState([]);
   const [showSavedSearches, setShowSavedSearches] = useState(false);
-  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  // University Hostels state
   const [showUniversityHostels, setShowUniversityHostels] = useState(false);
-  const [showAgentListings, setShowAgentListings] = useState(false);
   const [selectedUniversity, setSelectedUniversity] = useState(null);
   const [universitySearch, setUniversitySearch] = useState("");
   const [universityProperties, setUniversityProperties] = useState([]);
   const [universityLoading, setUniversityLoading] = useState(false);
+
+  // Agent Listings state
+  const [showAgentListings, setShowAgentListings] = useState(false);
   const [agents, setAgents] = useState([]);
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [agentsLoading, setAgentsLoading] = useState(false);
 
+  // Fetch properties on mount
   useEffect(() => {
     const fetchProperties = async () => {
       try {
         const response = await fetch(`${API_BASE}/properties`);
         if (!response.ok) throw new Error("Failed to fetch properties");
         const data = await response.json();
-        const processedProperties = data.map(prop => ({
+        const processedProperties = data.map((prop) => ({
           ...prop,
-          availableUnits: Math.max(0, (prop.totalUnits || 1) - (prop.bookedUnits || 0))
+          availableUnits: Math.max(0, (prop.totalUnits || 1) - (prop.bookedUnits || 0)),
         }));
-        // Include ALL properties (including fully booked) — landlord info is hidden in the modal
         setProperties(processedProperties);
         setFilteredProperties(processedProperties);
       } catch (err) {
@@ -85,54 +103,139 @@ export default function Listings() {
       }
     };
     fetchProperties();
+
     const savedFavorites = localStorage.getItem("axxspace_favorites");
     if (savedFavorites) setFavorites(JSON.parse(savedFavorites));
     const savedSearchesData = localStorage.getItem("axxspace_saved_searches");
     if (savedSearchesData) setSavedSearches(JSON.parse(savedSearchesData));
   }, []);
 
-  // Handle property query parameter to select specific property
+  // Handle URL property query parameter to highlight specific property
   useEffect(() => {
-    const propertyId = searchParams.get('property');
+    const propertyId = searchParams.get("property");
     if (propertyId && properties.length > 0) {
-      const property = properties.find(p => p._id === propertyId);
+      const property = properties.find((p) => p._id === propertyId);
       if (property) {
         setSelectedProperty(property);
         setCurrentImageIndex(0);
-        // Scroll to property card and highlight it
         setTimeout(() => {
           const propertyCard = document.querySelector(`[data-property-id="${propertyId}"]`);
           if (propertyCard) {
-            propertyCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            // Highlight the card
-            propertyCard.style.boxShadow = "0 0 20px rgba(201, 168, 76, 0.5)";
+            propertyCard.scrollIntoView({ behavior: "smooth", block: "center" });
+            propertyCard.style.boxShadow = "0 0 25px rgba(227, 27, 27, 0.6)";
             propertyCard.style.transform = "scale(1.02)";
             setTimeout(() => {
               propertyCard.style.boxShadow = "";
               propertyCard.style.transform = "";
-            }, 2000);
+            }, 2500);
           }
-        }, 100);
+        }, 150);
       }
     }
   }, [searchParams, properties]);
 
+  // Main Filtering & Sorting Engine
   useEffect(() => {
-    // Include all properties (fully booked ones show without landlord info)
     let filtered = [...properties];
-    if (filters.location) filtered = filtered.filter((p) => (p.location + " " + (p.county || "")).toLowerCase().includes(filters.location.toLowerCase()));
-    if (filters.bedrooms) filtered = filtered.filter((p) => p.bedrooms === parseInt(filters.bedrooms));
-    if (filters.bathrooms) filtered = filtered.filter((p) => p.bathrooms === parseInt(filters.bathrooms));
-    if (filters.furnished !== "") filtered = filtered.filter((p) => p.furnished === (filters.furnished === "true"));
-    if (filters.propertyType) filtered = filtered.filter((p) => (p.propertyType || "").toLowerCase() === filters.propertyType.toLowerCase());
-    if (filters.amenities) filtered = filtered.filter((p) => p.amenities?.some((a) => a.toLowerCase().includes(filters.amenities.toLowerCase())));
-    if (filters.petFriendly !== "") filtered = filtered.filter((p) => p.petFriendly === (filters.petFriendly === "true"));
-    if (filters.availableFrom) filtered = filtered.filter((p) => { if (!p.availableFrom) return true; return new Date(p.availableFrom) <= new Date(filters.availableFrom); });
-    if (showFavoritesOnly) filtered = filtered.filter((p) => favorites.includes(p._id));
-    filtered = filtered.filter((p) => p.price >= filters.minPrice && p.price <= filters.maxPrice);
-    setFilteredProperties(filtered);
-  }, [filters, properties, favorites, showFavoritesOnly]);
 
+    // Location / County
+    if (filters.location) {
+      const q = filters.location.toLowerCase();
+      filtered = filtered.filter(
+        (p) =>
+          (p.location || "").toLowerCase().includes(q) ||
+          (p.county || "").toLowerCase().includes(q) ||
+          (p.title || "").toLowerCase().includes(q)
+      );
+    }
+
+    // Quick category or Property type
+    const activeType = filters.propertyType || (quickCategory !== "all" && quickCategory !== "favorites" && quickCategory !== "furnished" && quickCategory !== "pet" && quickCategory !== "budget" ? quickCategory : "");
+    if (activeType) {
+      filtered = filtered.filter(
+        (p) => (p.propertyType || "").toLowerCase() === activeType.toLowerCase()
+      );
+    }
+
+    if (quickCategory === "furnished") {
+      filtered = filtered.filter((p) => p.furnished === true);
+    } else if (quickCategory === "pet") {
+      filtered = filtered.filter((p) => p.petFriendly === true);
+    } else if (quickCategory === "budget") {
+      filtered = filtered.filter((p) => p.price <= 25000);
+    } else if (quickCategory === "favorites") {
+      filtered = filtered.filter((p) => favorites.includes(p._id));
+    }
+
+    // Bedrooms
+    if (filters.bedrooms) {
+      if (filters.bedrooms === "4+") {
+        filtered = filtered.filter((p) => (p.bedrooms || 0) >= 4);
+      } else {
+        filtered = filtered.filter((p) => p.bedrooms === parseInt(filters.bedrooms));
+      }
+    }
+
+    // Bathrooms
+    if (filters.bathrooms) {
+      if (filters.bathrooms === "3+") {
+        filtered = filtered.filter((p) => (p.bathrooms || 0) >= 3);
+      } else {
+        filtered = filtered.filter((p) => p.bathrooms === parseInt(filters.bathrooms));
+      }
+    }
+
+    // Furnished
+    if (filters.furnished !== "") {
+      filtered = filtered.filter((p) => p.furnished === (filters.furnished === "true"));
+    }
+
+    // Pet friendly
+    if (filters.petFriendly !== "") {
+      filtered = filtered.filter((p) => p.petFriendly === (filters.petFriendly === "true"));
+    }
+
+    // Amenities
+    if (filters.amenities) {
+      const am = filters.amenities.toLowerCase();
+      filtered = filtered.filter((p) =>
+        p.amenities?.some((a) => a.toLowerCase().includes(am))
+      );
+    }
+
+    // Available from
+    if (filters.availableFrom) {
+      filtered = filtered.filter((p) => {
+        if (!p.availableFrom) return true;
+        return new Date(p.availableFrom) <= new Date(filters.availableFrom);
+      });
+    }
+
+    // Price range
+    filtered = filtered.filter(
+      (p) => (p.price || 0) >= filters.minPrice && (p.price || 0) <= filters.maxPrice
+    );
+
+    // Favorites only toggle
+    if (showFavoritesOnly) {
+      filtered = filtered.filter((p) => favorites.includes(p._id));
+    }
+
+    // Sorting
+    if (sortBy === "price-asc") {
+      filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
+    } else if (sortBy === "price-desc") {
+      filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
+    } else if (sortBy === "bedrooms-desc") {
+      filtered.sort((a, b) => (b.bedrooms || 0) - (a.bedrooms || 0));
+    } else if (sortBy === "newest") {
+      filtered.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    }
+
+    setFilteredProperties(filtered);
+  }, [filters, properties, favorites, showFavoritesOnly, quickCategory, sortBy]);
+
+  // University Hostels logic
   useEffect(() => {
     if (!showUniversityHostels || !selectedUniversity?.id) {
       setUniversityProperties([]);
@@ -166,10 +269,9 @@ export default function Listings() {
     fetchUniversityProperties();
   }, [showUniversityHostels, selectedUniversity]);
 
+  // Agent Listings logic
   useEffect(() => {
-    if (!showAgentListings) {
-      return;
-    }
+    if (!showAgentListings) return;
 
     const fetchAgents = async () => {
       setAgentsLoading(true);
@@ -190,15 +292,12 @@ export default function Listings() {
   }, [showAgentListings]);
 
   useEffect(() => {
-    if (!showAgentListings || !selectedAgent) {
-      return;
-    }
+    if (!showAgentListings || !selectedAgent) return;
 
-    const agentProperties = properties.filter(p => {
+    const agentProperties = properties.filter((p) => {
       if (!p.assignedAgent) return false;
-
-      // Handle both cases: assignedAgent as object with _id or as string ID
-      const agentId = typeof p.assignedAgent === 'object' ? p.assignedAgent._id : p.assignedAgent;
+      const agentId =
+        typeof p.assignedAgent === "object" ? p.assignedAgent._id : p.assignedAgent;
       return agentId === selectedAgent._id;
     });
     setFilteredProperties(agentProperties);
@@ -207,34 +306,92 @@ export default function Listings() {
   const displayProperties =
     showUniversityHostels && selectedUniversity ? universityProperties : filteredProperties;
 
+  // Active filter count for badge
+  const activeFiltersCount = useMemo(() => {
+    let count = 0;
+    if (filters.location) count++;
+    if (filters.propertyType) count++;
+    if (filters.bedrooms) count++;
+    if (filters.bathrooms) count++;
+    if (filters.furnished !== "") count++;
+    if (filters.petFriendly !== "") count++;
+    if (filters.amenities) count++;
+    if (filters.availableFrom) count++;
+    if (filters.minPrice > 0) count++;
+    if (filters.maxPrice < 1000000) count++;
+    return count;
+  }, [filters]);
+
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: name === "minPrice" || name === "maxPrice" ? parseFloat(value) || 0 : value }));
+    setFilters((prev) => ({
+      ...prev,
+      [name]:
+        name === "minPrice" || name === "maxPrice"
+          ? parseFloat(value) || 0
+          : value,
+    }));
+  };
+
+  const resetAllFilters = () => {
+    setFilters({
+      location: "",
+      minPrice: 0,
+      maxPrice: 1000000,
+      bedrooms: "",
+      bathrooms: "",
+      furnished: "",
+      propertyType: "",
+      amenities: "",
+      petFriendly: "",
+      availableFrom: "",
+    });
+    setQuickCategory("all");
+    setShowFavoritesOnly(false);
   };
 
   const openModal = async (property) => {
     setSelectedProperty(property);
     setCurrentImageIndex(0);
-    // Record a view
     try {
       await fetch(`${API_BASE}/properties/${property._id}/view`, { method: "PATCH" });
     } catch (err) {
       console.error("Failed to record view:", err);
     }
   };
-  const closeModal = () => { setSelectedProperty(null); setCurrentImageIndex(0); };
-  const nextImage = () => { if (selectedProperty?.images?.length > 0) setCurrentImageIndex((prev) => (prev + 1) % selectedProperty.images.length); };
-  const prevImage = () => { if (selectedProperty?.images?.length > 0) setCurrentImageIndex((prev) => (prev - 1 + selectedProperty.images.length) % selectedProperty.images.length); };
 
-  const handleContactLandlord = (property) => {
+  const closeModal = () => {
+    setSelectedProperty(null);
+    setCurrentImageIndex(0);
+  };
+
+  const nextImage = () => {
+    if (selectedProperty?.images?.length > 0) {
+      setCurrentImageIndex((prev) => (prev + 1) % selectedProperty.images.length);
+    }
+  };
+
+  const prevImage = () => {
+    if (selectedProperty?.images?.length > 0) {
+      setCurrentImageIndex(
+        (prev) => (prev - 1 + selectedProperty.images.length) % selectedProperty.images.length
+      );
+    }
+  };
+
+  const handleContactLandlord = (property, e) => {
+    if (e) e.stopPropagation();
     const phoneNumber = formatKenyaPhone(property.owner?.phone || property.phone || "");
     const landlordName = property.owner?.name || "Landlord";
-    const message = `Hi ${landlordName}, I'm interested in your property "${property.title}" located in ${property.location}. Can you provide more details?`;
+    const message = `Hi ${landlordName}, I'm interested in your property "${property.title}" located in ${property.county || ""} ${property.location || ""}. Is it currently available for viewing?`;
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
   const handleBookNow = (property) => {
-    if (!user) { alert("Please log in to book this property"); return; }
+    if (!user) {
+      alert("Please log in to book this property");
+      return;
+    }
     setPaymentAmount(property.price?.toString() || "");
     setPaymentPhone(user.phone || "");
     setShowPaymentModal(true);
@@ -249,17 +406,24 @@ export default function Listings() {
       const response = await fetch(`${API_BASE}/payment/book-property`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ propertyId: selectedProperty._id, phone: paymentPhone, amount: paymentAmount }),
+        body: JSON.stringify({
+          propertyId: selectedProperty._id,
+          phone: paymentPhone,
+          amount: paymentAmount,
+        }),
       });
       const data = await response.json();
       if (response.ok) {
-        setPaymentSuccess(" M-Pesa prompt sent! Check your phone to complete payment.");
-        setTimeout(() => { setShowPaymentModal(false); setPaymentSuccess(""); }, 3000);
+        setPaymentSuccess("M-Pesa STK prompt sent! Please enter your PIN on your phone to complete.");
+        setTimeout(() => {
+          setShowPaymentModal(false);
+          setPaymentSuccess("");
+        }, 3500);
       } else {
-        setPaymentError(data.error || " Payment failed. Please try again.");
+        setPaymentError(data.error || "Payment prompt could not be sent. Please retry.");
       }
     } catch (err) {
-      setPaymentError(" Payment failed. Please try again.");
+      setPaymentError("Payment failed. Please check network connection and try again.");
     } finally {
       setPaymentLoading(false);
     }
@@ -267,31 +431,55 @@ export default function Listings() {
 
   const handleSendSMS = (property) => {
     const phoneNumber = formatKenyaPhone(property.owner?.phone || property.phone || "");
-    const message = `Hello, I want to BOOK this property:\n${property.title}\n${property.county} - ${property.location}\nKES ${property.price?.toLocaleString()}/month\n${property.bedrooms} Bed | ${property.bathrooms} Bath\nAvailable: ${property.availableUnits} units\n\nPlease reply with availability and booking details. Thank you!`;
+    const message = `Hello, I am inquiring about booking this rental:
+${property.title}
+Location: ${property.county || ""} - ${property.location || ""}
+Rent: KES ${property.price?.toLocaleString()}/month
+Bedrooms: ${property.bedrooms} | Bathrooms: ${property.bathrooms}
+Available Units: ${property.availableUnits}
+
+Please contact me back with viewing details. Thank you!`;
     window.open(`sms:${phoneNumber}?body=${encodeURIComponent(message)}`, "_blank");
   };
 
-  const toggleFavorite = (propertyId) => {
-    const newFavorites = favorites.includes(propertyId) ? favorites.filter(id => id !== propertyId) : [...favorites, propertyId];
+  const toggleFavorite = (propertyId, e) => {
+    if (e) e.stopPropagation();
+    const newFavorites = favorites.includes(propertyId)
+      ? favorites.filter((id) => id !== propertyId)
+      : [...favorites, propertyId];
     setFavorites(newFavorites);
     localStorage.setItem("axxspace_favorites", JSON.stringify(newFavorites));
   };
 
   const saveCurrentSearch = () => {
-    const hasActiveFilters = Object.values(filters).some(v => v !== "" && v !== 0 && v !== 1000000);
-    if (!hasActiveFilters) { alert("Please apply some filters before saving a search"); return; }
-    const searchName = prompt("Name this search (e.g., 'Nairobi 2-bedroom apartments'):");
+    const hasActiveFilters = Object.values(filters).some(
+      (v) => v !== "" && v !== 0 && v !== 1000000
+    );
+    if (!hasActiveFilters) {
+      alert("Please adjust some filters (e.g. location, budget, bedrooms) before saving.");
+      return;
+    }
+    const searchName = prompt("Give this search a name (e.g., 'Westlands 2 Bedroom Apartments'):");
     if (!searchName) return;
-    const newSearch = { id: Date.now(), name: searchName, filters: { ...filters }, createdAt: new Date().toISOString() };
+    const newSearch = {
+      id: Date.now(),
+      name: searchName,
+      filters: { ...filters },
+      createdAt: new Date().toISOString(),
+    };
     const updatedSearches = [...savedSearches, newSearch];
     setSavedSearches(updatedSearches);
     localStorage.setItem("axxspace_saved_searches", JSON.stringify(updatedSearches));
-    alert(" Search saved successfully!");
+    alert("Search preference saved! Access it anytime from the Saved menu.");
   };
 
-  const applySavedSearch = (search) => { setFilters(search.filters); setShowSavedSearches(false); };
+  const applySavedSearch = (search) => {
+    setFilters(search.filters);
+    setShowSavedSearches(false);
+  };
+
   const deleteSavedSearch = (searchId) => {
-    const updatedSearches = savedSearches.filter(s => s.id !== searchId);
+    const updatedSearches = savedSearches.filter((s) => s.id !== searchId);
     setSavedSearches(updatedSearches);
     localStorage.setItem("axxspace_saved_searches", JSON.stringify(updatedSearches));
   };
@@ -300,238 +488,738 @@ export default function Listings() {
 
   if (loading) {
     return (
-      <div style={S.page}>
+      <div className="ax-listings-root">
         <style>{css}</style>
-        <div style={S.loadingWrap}>
-          <div style={S.loadingSpinner} className="spinner" />
-          <p style={S.loadingText}>Curating exceptional properties…</p>
+        <div className="loading-container">
+          <div className="loading-pulsar">
+            <div className="loading-inner-core" />
+          </div>
+          <h3 className="loading-title">Curating Kenya's Finest Rentals</h3>
+          <p className="loading-sub">Connecting directly with verified landlords and property managers…</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={S.page}>
+    <div className="ax-listings-root">
       <style>{css}</style>
 
-      {/* ── COMPACT HEADER ── */}
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "24px 28px 12px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
-          <div>
-            <h1 style={{ fontSize: "26px", fontWeight: 800, color: C.gold, margin: 0, fontFamily: "'Cormorant Garamond', 'Georgia', serif", letterSpacing: "0.02em" }}>
-              AxxSpace Rentals
-            </h1>
-            <p style={{ color: C.textMid, fontSize: "0.85rem", margin: "4px 0 0" }}>Curated rentals across Kenya's finest locations</p>
+      {/* ═════════════════════════════════════════════════════════════
+          1. ULTRA LUXURY HERO SECTION WITH AMBIENT GRADIENT MESH
+      ═════════════════════════════════════════════════════════════ */}
+      <section className="listings-hero">
+        {/* Ambient atmospheric glows */}
+        <div className="ambient-orb orb-crimson" />
+        <div className="ambient-orb orb-amber" />
+        <div className="ambient-orb orb-navy" />
+        <div className="hero-grid-pattern" />
+
+        <div className="hero-container">
+          {/* Trust Banner Pill */}
+          <div className="hero-badge-wrap">
+            <span className="hero-badge-pill">
+              <span className="badge-sparkle">✦</span>
+              <span>VERIFIED KENYAN RENTALS · 0% BROKERAGE FEES · DIRECT LANDLORDS</span>
+            </span>
           </div>
 
-          {!user ? (
-            <button className="btn-gold" style={{ ...S.btnGold, padding: "8px 18px", fontSize: "0.8rem" }} onClick={() => window.location.href = "/register"}>List Your Property</button>
-          ) : (
-            <div style={{ display: "flex", gap: "10px" }}>
-              {user.role === "landlord" && (
-                <button className="btn-gold" style={{ ...S.btnGold, padding: "8px 18px", fontSize: "0.8rem" }} onClick={() => window.location.href = "/dashboard"}>Landlord Dashboard</button>
-              )}
+          {/* Grand Headline */}
+          <h1 className="hero-main-title">
+            Discover Your Next Home in Kenya
+            <span className="title-gradient-accent">Verified Apartments, Bedsitters & Hostels</span>
+          </h1>
+
+          {/* Subtitle */}
+          <p className="hero-subtext">
+            Transparent pricing, confirmed GPS directions, and instant WhatsApp contact with property owners across Nairobi, Kiambu, Mombasa, Eldoret, and all 47 counties.
+          </p>
+
+          {/* Trust & Key Highlights Chips */}
+          <div className="hero-highlights-row">
+            <div className="highlight-pill">
+              <span className="pill-icon">🛡️</span>
+              <span>100% Direct Landlords</span>
             </div>
-          )}
+            <div className="highlight-pill">
+              <span className="pill-icon">📍</span>
+              <span>Pinpoint GPS Coordinates</span>
+            </div>
+            <div className="highlight-pill">
+              <span className="pill-icon">💬</span>
+              <span>Instant WhatsApp Viewing</span>
+            </div>
+            <div className="highlight-pill">
+              <span className="pill-icon">🎓</span>
+              <span>40+ Campus Hostels</span>
+            </div>
+          </div>
+
+          {/* Host / Landlord CTA strip */}
+          <div className="hero-actions-strip">
+            {!user ? (
+              <a href="/register" className="hero-btn-primary">
+                <span>List Your Property For Free</span>
+                <span className="btn-arrow">→</span>
+              </a>
+            ) : user.role === "landlord" ? (
+              <a href="/dashboard" className="hero-btn-primary">
+                <span>Landlord Management Portal</span>
+                <span className="btn-arrow">→</span>
+              </a>
+            ) : null}
+
+            <button
+              type="button"
+              className="hero-btn-secondary"
+              onClick={() => {
+                setModalQuery(filters.location || "");
+                setModalService("rental");
+                setIsRequestModalOpen(true);
+              }}
+            >
+              <span>Can't Find It? Request A Custom Rental</span>
+            </button>
+          </div>
         </div>
-      </div>
 
-      <div style={S.mainBody}>
+        {/* ═════════════════════════════════════════════════════════════
+            2. FLOATING REAL ESTATE SEARCH & FILTER CONSOLE
+        ═════════════════════════════════════════════════════════════ */}
+        <div className="search-console-wrapper">
+          <div className="search-console-card">
+            {/* Primary Search Inputs Row */}
+            <div className="search-inputs-grid">
+              {/* Location Input */}
+              <div className="search-segment">
+                <label className="segment-label">WHERE IN KENYA?</label>
+                <div className="segment-input-wrap">
+                  <svg className="segment-svg-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  <input
+                    type="text"
+                    name="location"
+                    placeholder="Search Nairobi, Juja, Westlands, Kisumu…"
+                    value={filters.location}
+                    onChange={handleFilterChange}
+                    className="segment-text-input"
+                  />
+                  {filters.location && (
+                    <button
+                      type="button"
+                      className="segment-clear-btn"
+                      onClick={() => setFilters((prev) => ({ ...prev, location: "" }))}
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              </div>
 
-        {error && <div style={S.errorBar}>{error}</div>}
+              {/* Property Type Dropdown */}
+              <div className="search-segment">
+                <label className="segment-label">PROPERTY TYPE</label>
+                <div className="segment-input-wrap">
+                  <svg className="segment-svg-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                  </svg>
+                  <select
+                    name="propertyType"
+                    value={filters.propertyType}
+                    onChange={handleFilterChange}
+                    className="segment-select-input"
+                  >
+                    <option value="">All Property Types</option>
+                    <option value="apartment">Apartment</option>
+                    <option value="bedsitter">Bedsitter</option>
+                    <option value="maisonette">Maisonette</option>
+                    <option value="studio">Studio</option>
+                    <option value="house">Single House / Bungalow</option>
+                    <option value="hostel">Student Hostel</option>
+                    <option value="commercial">Commercial Unit</option>
+                  </select>
+                </div>
+              </div>
 
-        {/* ── TABS SECTION ── */}
-        <div style={S.tabsSection}>
-          <button
-            className="tab-btn"
-            style={{ ...S.tabBtn, ...(!showUniversityHostels && !showAgentListings ? S.tabBtnActive : {}) }}
-            onClick={() => { setShowUniversityHostels(false); setShowAgentListings(false); }}
-          >
-            All Rentals
-          </button>
-          <button
-            className="tab-btn"
-            style={{ ...S.tabBtn, ...(showUniversityHostels ? S.tabBtnActive : {}) }}
-            onClick={() => { setShowUniversityHostels(true); setShowAgentListings(false); }}
-          >
-            University Hostels
-          </button>
-          <button
-            className="tab-btn"
-            style={{ ...S.tabBtn, ...(showAgentListings ? S.tabBtnActive : {}) }}
-            onClick={() => { setShowUniversityHostels(false); setShowAgentListings(true); }}
-          >
-            Agent Listings
-          </button>
+              {/* Bedrooms Dropdown */}
+              <div className="search-segment">
+                <label className="segment-label">BEDROOMS</label>
+                <div className="segment-input-wrap">
+                  <svg className="segment-svg-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8v9" />
+                  </svg>
+                  <select
+                    name="bedrooms"
+                    value={filters.bedrooms}
+                    onChange={handleFilterChange}
+                    className="segment-select-input"
+                  >
+                    <option value="">Any Bedrooms</option>
+                    <option value="1">1 Bedroom</option>
+                    <option value="2">2 Bedrooms</option>
+                    <option value="3">3 Bedrooms</option>
+                    <option value="4+">4+ Bedrooms</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Max Budget Dropdown */}
+              <div className="search-segment">
+                <label className="segment-label">MAX MONTHLY RENT</label>
+                <div className="segment-input-wrap">
+                  <span className="currency-prefix">KES</span>
+                  <select
+                    name="maxPrice"
+                    value={filters.maxPrice >= 1000000 ? "" : filters.maxPrice}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        maxPrice: e.target.value ? parseFloat(e.target.value) : 1000000,
+                      }))
+                    }
+                    className="segment-select-input"
+                  >
+                    <option value="">Any Budget</option>
+                    <option value="10000">Up to KES 10,000</option>
+                    <option value="20000">Up to KES 20,000</option>
+                    <option value="35000">Up to KES 35,000</option>
+                    <option value="50000">Up to KES 50,000</option>
+                    <option value="80000">Up to KES 80,000</option>
+                    <option value="150000">Up to KES 150,000</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Action Buttons: More Filters & Reset */}
+              <div className="search-actions-segment">
+                <button
+                  type="button"
+                  className={`more-filters-trigger ${filtersOpen ? "active" : ""}`}
+                  onClick={() => setFiltersOpen((v) => !v)}
+                >
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2">
+                    <line x1="4" y1="21" x2="4" y2="14"></line>
+                    <line x1="4" y1="10" x2="4" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12" y2="3"></line>
+                    <line x1="20" y1="21" x2="20" y2="16"></line>
+                    <line x1="20" y1="12" x2="20" y2="3"></line>
+                    <line x1="1" y1="14" x2="7" y2="14"></line>
+                    <line x1="9" y1="8" x2="15" y2="8"></line>
+                    <line x1="17" y1="16" x2="23" y2="16"></line>
+                  </svg>
+                  <span>{filtersOpen ? "Hide Filters" : "Filters"}</span>
+                  {activeFiltersCount > 0 && <span className="active-filter-badge">{activeFiltersCount}</span>}
+                </button>
+
+                {activeFiltersCount > 0 && (
+                  <button type="button" className="reset-filters-btn" onClick={resetAllFilters} title="Reset all filters">
+                    Reset
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Quick Category Chips Strip */}
+            <div className="quick-category-strip">
+              <span className="quick-cat-label">Explore:</span>
+              <div className="quick-cat-scroll">
+                <button
+                  type="button"
+                  className={`quick-chip ${quickCategory === "all" ? "active" : ""}`}
+                  onClick={() => { setQuickCategory("all"); setFilters((p) => ({ ...p, propertyType: "" })); }}
+                >
+                  🏢 All Rentals
+                </button>
+                <button
+                  type="button"
+                  className={`quick-chip ${quickCategory === "apartment" ? "active" : ""}`}
+                  onClick={() => { setQuickCategory("apartment"); setFilters((p) => ({ ...p, propertyType: "apartment" })); }}
+                >
+                  🏙️ Apartments
+                </button>
+                <button
+                  type="button"
+                  className={`quick-chip ${quickCategory === "bedsitter" ? "active" : ""}`}
+                  onClick={() => { setQuickCategory("bedsitter"); setFilters((p) => ({ ...p, propertyType: "bedsitter" })); }}
+                >
+                  🛋️ Bedsitters
+                </button>
+                <button
+                  type="button"
+                  className={`quick-chip ${quickCategory === "maisonette" ? "active" : ""}`}
+                  onClick={() => { setQuickCategory("maisonette"); setFilters((p) => ({ ...p, propertyType: "maisonette" })); }}
+                >
+                  🏡 Maisonettes
+                </button>
+                <button
+                  type="button"
+                  className={`quick-chip ${quickCategory === "furnished" ? "active" : ""}`}
+                  onClick={() => setQuickCategory(quickCategory === "furnished" ? "all" : "furnished")}
+                >
+                  ✨ Furnished
+                </button>
+                <button
+                  type="button"
+                  className={`quick-chip ${quickCategory === "pet" ? "active" : ""}`}
+                  onClick={() => setQuickCategory(quickCategory === "pet" ? "all" : "pet")}
+                >
+                  🐾 Pet Friendly
+                </button>
+                <button
+                  type="button"
+                  className={`quick-chip ${quickCategory === "budget" ? "active" : ""}`}
+                  onClick={() => setQuickCategory(quickCategory === "budget" ? "all" : "budget")}
+                >
+                  💰 Under KES 25K
+                </button>
+                {favorites.length > 0 && (
+                  <button
+                    type="button"
+                    className={`quick-chip ${quickCategory === "favorites" ? "active" : ""}`}
+                    onClick={() => setQuickCategory(quickCategory === "favorites" ? "all" : "favorites")}
+                  >
+                    ❤️ Saved ({favorites.length})
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Expandable Advanced Filter Drawer */}
+            {filtersOpen && (
+              <div className="advanced-filter-drawer">
+                <div className="drawer-header">
+                  <h4 className="drawer-title">Detailed Search Parameters</h4>
+                  <button type="button" className="drawer-close-text" onClick={() => setFiltersOpen(false)}>
+                    Close ✕
+                  </button>
+                </div>
+
+                <div className="drawer-grid">
+                  {/* Bathrooms */}
+                  <div className="drawer-group">
+                    <label className="drawer-label">Bathrooms</label>
+                    <select name="bathrooms" value={filters.bathrooms} onChange={handleFilterChange} className="drawer-select">
+                      <option value="">Any Bathrooms</option>
+                      <option value="1">1 Bathroom</option>
+                      <option value="2">2 Bathrooms</option>
+                      <option value="3+">3+ Bathrooms</option>
+                    </select>
+                  </div>
+
+                  {/* Furnished Status */}
+                  <div className="drawer-group">
+                    <label className="drawer-label">Furnished Status</label>
+                    <select name="furnished" value={filters.furnished} onChange={handleFilterChange} className="drawer-select">
+                      <option value="">Either Furnished or Unfurnished</option>
+                      <option value="true">Fully Furnished</option>
+                      <option value="false">Unfurnished</option>
+                    </select>
+                  </div>
+
+                  {/* Pet Policy */}
+                  <div className="drawer-group">
+                    <label className="drawer-label">Pet Policy</label>
+                    <select name="petFriendly" value={filters.petFriendly} onChange={handleFilterChange} className="drawer-select">
+                      <option value="">Any Pet Policy</option>
+                      <option value="true">Pet Friendly Allowed</option>
+                      <option value="false">No Pets</option>
+                    </select>
+                  </div>
+
+                  {/* Amenities Keyword */}
+                  <div className="drawer-group">
+                    <label className="drawer-label">Key Amenities (WiFi, Parking, Borehole…)</label>
+                    <input
+                      type="text"
+                      name="amenities"
+                      placeholder="e.g. WiFi, Parking, CCTV, Balcony, Security"
+                      value={filters.amenities}
+                      onChange={handleFilterChange}
+                      className="drawer-input"
+                    />
+                  </div>
+
+                  {/* Min Price */}
+                  <div className="drawer-group">
+                    <label className="drawer-label">Min Price (KES)</label>
+                    <input
+                      type="number"
+                      name="minPrice"
+                      placeholder="0"
+                      value={filters.minPrice || ""}
+                      onChange={handleFilterChange}
+                      className="drawer-input"
+                    />
+                  </div>
+
+                  {/* Max Price */}
+                  <div className="drawer-group">
+                    <label className="drawer-label">Max Price (KES)</label>
+                    <input
+                      type="number"
+                      name="maxPrice"
+                      placeholder="1,000,000"
+                      value={filters.maxPrice >= 1000000 ? "" : filters.maxPrice}
+                      onChange={handleFilterChange}
+                      className="drawer-input"
+                    />
+                  </div>
+
+                  {/* Available From Date */}
+                  <div className="drawer-group">
+                    <label className="drawer-label">Available Move-in Date</label>
+                    <input
+                      type="date"
+                      name="availableFrom"
+                      value={filters.availableFrom}
+                      onChange={handleFilterChange}
+                      className="drawer-input"
+                    />
+                  </div>
+                </div>
+
+                {/* Popular Amenity Tags Shortcuts */}
+                <div className="popular-amenities-shortcuts">
+                  <span className="shortcuts-label">Quick Amenity Filters:</span>
+                  {["WiFi", "Borehole Water", "Parking", "24/7 Security", "CCTV", "Balcony", "Gym", "Backup Generator"].map((amenity) => (
+                    <button
+                      key={amenity}
+                      type="button"
+                      className={`amenity-shortcut-pill ${filters.amenities?.toLowerCase().includes(amenity.toLowerCase()) ? "active" : ""}`}
+                      onClick={() =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          amenities: prev.amenities === amenity ? "" : amenity,
+                        }))
+                      }
+                    >
+                      {filters.amenities?.toLowerCase().includes(amenity.toLowerCase()) ? "✓ " : "+ "}
+                      {amenity}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* ═════════════════════════════════════════════════════════════
+          3. MAIN CONTENT BODY & DISCOVERY WORKSPACE
+      ═════════════════════════════════════════════════════════════ */}
+      <main className="listings-main-canvas">
+        {error && (
+          <div className="error-alert-banner">
+            <span>⚠️ {error}</span>
+          </div>
+        )}
+
+        {/* ── HIGH LEVEL NAVIGATION TABS ── */}
+        <div className="segmented-discovery-nav">
+          <div className="discovery-tabs-cluster">
+            <button
+              type="button"
+              className={`discovery-tab ${!showUniversityHostels && !showAgentListings ? "active" : ""}`}
+              onClick={() => {
+                setShowUniversityHostels(false);
+                setShowAgentListings(false);
+              }}
+            >
+              <span className="tab-icon">🏠</span>
+              <span className="tab-text">All Residential Rentals</span>
+              <span className="tab-counter">{properties.length}</span>
+            </button>
+
+            <button
+              type="button"
+              className={`discovery-tab ${showUniversityHostels ? "active" : ""}`}
+              onClick={() => {
+                setShowUniversityHostels(true);
+                setShowAgentListings(false);
+              }}
+            >
+              <span className="tab-icon">🎓</span>
+              <span className="tab-text">University Hostels</span>
+              <span className="tab-badge-new">Student Hub</span>
+            </button>
+
+            <button
+              type="button"
+              className={`discovery-tab ${showAgentListings ? "active" : ""}`}
+              onClick={() => {
+                setShowUniversityHostels(false);
+                setShowAgentListings(true);
+              }}
+            >
+              <span className="tab-icon">👔</span>
+              <span className="tab-text">Verified Agents</span>
+              <span className="tab-badge-verified">Certified</span>
+            </button>
+          </div>
         </div>
 
-        {/* ── SEARCH STRIP (only show when NOT in university hostels or agent listings mode) ── */}
+        {/* ── TOOLBAR: RESULTS COUNT, SORTING, MAP VIEW & SAVED (Standard Mode) ── */}
         {!showUniversityHostels && !showAgentListings && (
-          <div style={S.searchStrip}>
-            <div style={S.searchStripInner}>
-              <div style={S.searchField}>
-                <span style={S.searchIcon}>⌖</span>
-                <input type="text" name="location" placeholder="Location or county…" value={filters.location} onChange={handleFilterChange} style={S.searchInput} className="search-inp" />
-              </div>
-              <div style={S.searchDivider} />
-              <div style={S.searchField}>
-                <span style={S.searchIcon}>⊞</span>
-                <select name="propertyType" value={filters.propertyType} onChange={handleFilterChange} style={S.searchSelect} className="search-inp">
-                  <option value="">Property Type</option>
-                  <option value="apartment">Apartment</option>
-                  <option value="bedsitter">Bedsitter</option>
-                  <option value="maisonette">Maisonette</option>
-                  <option value="studio">Studio</option>
-                  <option value="house">House</option>
+          <div className="listings-toolbar">
+            <div className="toolbar-left">
+              <h2 className="results-headline">
+                <span className="results-bold-num">{displayProperties.length}</span>
+                <span>{displayProperties.length === 1 ? " Verified Home Found" : " Verified Homes Found"}</span>
+                {filters.location && <span className="results-location-tag">in "{filters.location}"</span>}
+              </h2>
+            </div>
+
+            <div className="toolbar-right">
+              {/* Sort Selector */}
+              <div className="sort-box">
+                <span className="sort-label">Sort:</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="sort-select"
+                >
+                  <option value="recommended">Featured / Recommended</option>
+                  <option value="price-asc">Price: Low to High</option>
+                  <option value="price-desc">Price: High to Low</option>
+                  <option value="bedrooms-desc">Bedrooms: Most to Least</option>
+                  <option value="newest">Recently Added</option>
                 </select>
               </div>
-              <div style={S.searchDivider} />
-              <div style={S.searchField}>
-                <span style={S.searchIcon}></span>
-                <select name="bedrooms" value={filters.bedrooms} onChange={handleFilterChange} style={S.searchSelect} className="search-inp">
-                  <option value="">Bedrooms</option>
-                  <option value="1">1 Bedroom</option>
-                  <option value="2">2 Bedrooms</option>
-                  <option value="3">3 Bedrooms</option>
-                  <option value="4">4+ Bedrooms</option>
-                </select>
-              </div>
-              <div style={S.searchDivider} />
-              <button className="btn-gold" style={{ ...S.btnGold, padding: "0 28px", fontSize: "0.85rem", borderRadius: "6px" }} onClick={() => setFiltersOpen(v => !v)}>
-                {filtersOpen ? "Close Filters" : "More Filters"}
+
+              {/* Map View Toggle */}
+              <button
+                type="button"
+                className={`toolbar-btn ${showMap ? "active" : ""}`}
+                onClick={() => setShowMap((v) => !v)}
+              >
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" strokeWidth="2.2" fill="none">
+                  <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+                  <line x1="8" y1="2" x2="8" y2="18"></line>
+                  <line x1="16" y1="6" x2="16" y2="22"></line>
+                </svg>
+                <span>{showMap ? "Hide Map" : "Map View"}</span>
               </button>
-            </div>
-          </div>
-        )}
 
-        {/* ── EXPANDED FILTERS (only show when NOT in university hostels or agent listings mode) ── */}
-        {!showUniversityHostels && !showAgentListings && filtersOpen && (
-          <div style={S.filtersPanel} className="filters-panel">
-            <div style={S.filtersGrid}>
-              <div style={S.filterGroup}>
-                <label style={S.filterLabel}>Bathrooms</label>
-                <select name="bathrooms" value={filters.bathrooms} onChange={handleFilterChange} style={S.filterCtrl} className="filter-ctrl">
-                  <option value="">Any</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3+</option>
-                </select>
-              </div>
-              <div style={S.filterGroup}>
-                <label style={S.filterLabel}>Furnished</label>
-                <select name="furnished" value={filters.furnished} onChange={handleFilterChange} style={S.filterCtrl} className="filter-ctrl">
-                  <option value="">Either</option>
-                  <option value="true">Furnished</option>
-                  <option value="false">Unfurnished</option>
-                </select>
-              </div>
-              <div style={S.filterGroup}>
-                <label style={S.filterLabel}>Pet Policy</label>
-                <select name="petFriendly" value={filters.petFriendly} onChange={handleFilterChange} style={S.filterCtrl} className="filter-ctrl">
-                  <option value="">Any</option>
-                  <option value="true">Pet Friendly</option>
-                  <option value="false">No Pets</option>
-                </select>
-              </div>
-              <div style={S.filterGroup}>
-                <label style={S.filterLabel}>Amenity</label>
-                <input type="text" name="amenities" placeholder="WiFi, Parking…" value={filters.amenities} onChange={handleFilterChange} style={S.filterCtrl} className="filter-ctrl" />
-              </div>
-              <div style={S.filterGroup}>
-                <label style={S.filterLabel}>Available From</label>
-                <input type="date" name="availableFrom" value={filters.availableFrom} onChange={handleFilterChange} style={S.filterCtrl} className="filter-ctrl" />
-              </div>
-              <div style={S.filterGroup}>
-                <label style={S.filterLabel}>Min Price (KES)</label>
-                <input type="number" name="minPrice" placeholder="0" value={filters.minPrice} onChange={handleFilterChange} style={S.filterCtrl} className="filter-ctrl" />
-              </div>
-              <div style={S.filterGroup}>
-                <label style={S.filterLabel}>Max Price (KES)</label>
-                <input type="number" name="maxPrice" placeholder="1,000,000" value={filters.maxPrice} onChange={handleFilterChange} style={S.filterCtrl} className="filter-ctrl" />
-              </div>
-            </div>
-          </div>
-        )}
+              {/* Save Search Button */}
+              <button
+                type="button"
+                className="toolbar-btn"
+                onClick={saveCurrentSearch}
+                title="Save current filters"
+              >
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" strokeWidth="2.2" fill="none">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                  <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                  <polyline points="7 3 7 8 15 8"></polyline>
+                </svg>
+                <span>Save Search</span>
+              </button>
 
-        {/* ── TOOLBAR (only show when NOT in university hostels or agent listings mode) ── */}
-        {!showUniversityHostels && !showAgentListings && (
-          <div style={S.toolbar}>
-            <p style={S.resultsText}>
-              <span style={S.resultsNum}>{filteredProperties.length}</span>
-              {filteredProperties.length === 1 ? " property found" : " properties found"}
-              {favorites.length > 0 && <span style={S.toolbarBit}> ·  {favorites.length} saved</span>}
-            </p>
-            <div style={S.toolbarActions}>
-              <button className="tool-btn" style={S.toolBtn} onClick={saveCurrentSearch}> Save Search</button>
+              {/* Saved Searches Drawer Toggle */}
               {savedSearches.length > 0 && (
-                <button className="tool-btn" style={{ ...S.toolBtn, ...(showSavedSearches ? S.toolBtnActive : {}) }} onClick={() => setShowSavedSearches(!showSavedSearches)}>
-                  Saved ({savedSearches.length})
+                <button
+                  type="button"
+                  className={`toolbar-btn ${showSavedSearches ? "active" : ""}`}
+                  onClick={() => setShowSavedSearches(!showSavedSearches)}
+                >
+                  <span>Saved ({savedSearches.length})</span>
                 </button>
               )}
-              {favorites.length > 0 && (
-                <button className="tool-btn" style={{ ...S.toolBtn, ...(showFavoritesOnly ? S.toolBtnActive : {}) }} onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}>
-                  {showFavoritesOnly ? "Show All" : " Favourites"}
-                </button>
-              )}
-              <button className="tool-btn" style={{ ...S.toolBtn, ...(showMap ? S.toolBtnActive : {}) }} onClick={() => setShowMap(v => !v)}>
-                {showMap ? "Hide Map" : " Map View"}
-              </button>
             </div>
           </div>
         )}
 
-        {/* ── AGENT LISTINGS SECTION (only show when in agent listings mode) ── */}
+        {/* Saved Searches Panel */}
+        {!showUniversityHostels && !showAgentListings && showSavedSearches && savedSearches.length > 0 && (
+          <div className="saved-searches-box">
+            <h3 className="saved-searches-title">Your Saved Search Alerts</h3>
+            <div className="saved-searches-grid">
+              {savedSearches.map((s) => (
+                <div key={s.id} className="saved-search-item">
+                  <div>
+                    <h5 className="saved-item-name">{s.name}</h5>
+                    <p className="saved-item-date">
+                      Saved on {new Date(s.createdAt).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" })}
+                    </p>
+                  </div>
+                  <div className="saved-item-actions">
+                    <button type="button" className="saved-apply-btn" onClick={() => applySavedSearch(s)}>
+                      Apply
+                    </button>
+                    <button type="button" className="saved-del-btn" onClick={() => deleteSavedSearch(s.id)}>
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── MAP VIEW EMBED ── */}
+        {!showUniversityHostels && !showAgentListings && showMap && (
+          <div className="map-view-shell">
+            <div className="map-view-header">
+              <span className="map-pin-icon">📍</span>
+              <span>Interactive GPS Map View ({filteredProperties.length} Properties Located)</span>
+            </div>
+            <MapView properties={filteredProperties} />
+          </div>
+        )}
+
+        {/* ═════════════════════════════════════════════════════════════
+            4. UNIVERSITY HOSTELS TAB SECTION
+        ═════════════════════════════════════════════════════════════ */}
+        {showUniversityHostels && (
+          <div className="university-hub-container">
+            {!selectedUniversity && (
+              <>
+                <div className="hub-hero-header">
+                  <div className="hub-badge">CAMPUS HOUSING HUB</div>
+                  <h2 className="hub-title">Find Hostels Walking Distance to Campus</h2>
+                  <p className="hub-subtitle">
+                    Select your university or college across Kenya to view vetted bedsitters, single rooms, sharing hostels, and private apartments with zero agent fees.
+                  </p>
+
+                  <div className="university-search-control">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="#E31B1B" strokeWidth="2.2" fill="none">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input
+                      type="text"
+                      placeholder="Type university name (e.g. UON, Kenyatta University, JKUAT, Strathmore, Moi, Egerton)…"
+                      value={universitySearch}
+                      onChange={(e) => setUniversitySearch(e.target.value)}
+                      className="university-search-input"
+                    />
+                    {universitySearch && (
+                      <button type="button" className="clear-uni-btn" onClick={() => setUniversitySearch("")}>
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="university-cards-grid">
+                  {(universitySearch ? searchUniversities(universitySearch) : kenyanUniversities).map((university) => (
+                    <div
+                      key={university.id}
+                      className="university-card"
+                      onClick={() => setSelectedUniversity(university)}
+                    >
+                      <div className="uni-card-header">
+                        <span className="uni-code-badge">{university.code}</span>
+                        <span className="uni-county-tag">{university.county} County</span>
+                      </div>
+                      <h4 className="uni-name">{university.name}</h4>
+                      <p className="uni-location">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" strokeWidth="2.2" fill="none">
+                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                          <circle cx="12" cy="10" r="3" />
+                        </svg>
+                        <span>{university.location} ({university.campus})</span>
+                      </p>
+                      <div className="uni-card-footer">
+                        <span className="uni-cta-text">View Campus Hostels →</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* When a university is actively selected */}
+            {selectedUniversity && (
+              <div className="selected-campus-banner">
+                <div className="selected-campus-left">
+                  <span className="campus-indicator-badge">ACTIVE CAMPUS FILTER</span>
+                  <h3 className="selected-campus-name">{selectedUniversity.name}</h3>
+                  <p className="selected-campus-meta">
+                    📍 {selectedUniversity.location}, {selectedUniversity.county} County · Code: {selectedUniversity.code}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="change-campus-btn"
+                  onClick={() => {
+                    setSelectedUniversity(null);
+                    setUniversityProperties([]);
+                  }}
+                >
+                  ← Select Another University
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ═════════════════════════════════════════════════════════════
+            5. VERIFIED AGENT DIRECTORY TAB SECTION
+        ═════════════════════════════════════════════════════════════ */}
         {showAgentListings && (
-          <div style={S.universitySection}>
-            {/* Show agent profiles when no agent is selected */}
+          <div className="agent-directory-container">
             {!selectedAgent && (
               <>
-                <div style={S.universityHeader}>
-                  <div style={S.universityBadge}> VERIFIED AGENTS</div>
-                  <h2 style={S.universityTitle}>Browse Verified Agents</h2>
-                  <p style={S.universitySub}>View profiles of verified agents and explore their property listings across Kenya</p>
+                <div className="hub-hero-header">
+                  <div className="hub-badge">CERTIFIED AGENTS</div>
+                  <h2 className="hub-title">Connect with Verified Property Agents</h2>
+                  <p className="hub-subtitle">
+                    Explore profiles of AxxSpace-verified agents managing prime rental houses, apartments, and estates across all 47 counties.
+                  </p>
                 </div>
 
                 {agentsLoading ? (
-                  <div style={{ textAlign: "center", padding: "60px 28px" }}>
-                    <div style={S.loadingSpinner} className="spinner" />
-                    <p style={S.loadingText}>Loading verified agents…</p>
+                  <div className="loading-state-block">
+                    <div className="loading-pulsar" />
+                    <p>Loading verified rental agents…</p>
                   </div>
                 ) : agents.length === 0 ? (
-                  <div style={{ textAlign: "center", padding: "60px 28px" }}>
-                    <p style={{ color: C.textMid, fontSize: "0.9rem" }}>No verified agents found at this time</p>
+                  <div className="empty-results-box">
+                    <p>No verified agents found at this time.</p>
                   </div>
                 ) : (
-                  <div style={S.universityGrid}>
+                  <div className="agent-cards-grid">
                     {agents.map((agent) => (
                       <div
                         key={agent._id}
-                        style={S.universityCard}
-                        className="university-card"
+                        className="agent-card"
                         onClick={() => setSelectedAgent(agent)}
                       >
-                        <div style={S.agentCardAvatar}>
+                        <div className="agent-avatar-wrap">
                           {agent.profileImage ? (
-                            <img src={agent.profileImage} alt={agent.name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
+                            <img src={agent.profileImage} alt={agent.name} className="agent-avatar-img" />
                           ) : (
-                            <span style={{ fontSize: "24px", fontWeight: 700, color: C.gold }}>{agent.name.charAt(0).toUpperCase()}</span>
+                            <div className="agent-avatar-initial">{agent.name?.charAt(0).toUpperCase()}</div>
                           )}
+                          <span className="agent-verified-shield" title="Verified Agent">✓</span>
                         </div>
-                        <div style={S.universityCardName}>{agent.name}</div>
-                        <div style={{ ...S.universityCardLocation, display: "flex", alignItems: "center", gap: "4px" }}>
-                          <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                          <span>{agent.agentProfile?.county || agent.county || (agent.listingLocations && agent.listingLocations[0]) || "Location not specified"}</span>
+
+                        <h4 className="agent-name">{agent.name}</h4>
+                        <div className="agent-county-pill">
+                          📍 {agent.agentProfile?.county || agent.county || "Kenya"}
                         </div>
-                        <div style={S.agentCardBio}>{agent.agentProfile?.bio || "Verified agent"}</div>
-                        <div style={S.agentCardPhone}>{agent.agentProfile?.phone || agent.phone}</div>
-                        <div style={S.agentCardLocationDetail}>
-                          <span style={{ color: "#6b7280", fontSize: "0.75rem" }}>Listing Locations:</span>
-                          <span style={{ color: "#E31B1B", fontSize: "0.8rem", fontWeight: 600, textAlign: "center" }}>
+
+                        <p className="agent-bio">
+                          {agent.agentProfile?.bio || "Certified AxxSpace real estate agent specialized in residential rentals and property management."}
+                        </p>
+
+                        <div className="agent-locations-list">
+                          <span className="agent-locations-label">Active Listing Areas:</span>
+                          <span className="agent-locations-val">
                             {agent.listingLocations && agent.listingLocations.length > 0
-                              ? agent.listingLocations.slice(0, 3).join(", ") + (agent.listingLocations.length > 3 ? "..." : "")
-                              : "No listings yet"}
+                              ? agent.listingLocations.slice(0, 3).join(", ")
+                              : "Nairobi & neighboring counties"}
                           </span>
                         </div>
+
+                        <button type="button" className="agent-view-listings-cta">
+                          View Available Listings →
+                        </button>
                       </div>
                     ))}
                   </div>
@@ -539,412 +1227,577 @@ export default function Listings() {
               </>
             )}
 
-            {/* Show selected agent bar when an agent is selected */}
+            {/* When an agent is selected */}
             {selectedAgent && (
-              <div style={S.selectedUniversityBar}>
-                <div style={S.selectedUniversityInfo}>
-                  <span style={S.selectedUniversityLabel}>Viewing listings by:</span>
-                  <span style={S.selectedUniversityName}>{selectedAgent.name}</span>
-                  <span style={{ ...S.selectedUniversityLocation, display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                    {selectedAgent.agentProfile?.county || "Kenya"}
-                  </span>
+              <div className="selected-campus-banner">
+                <div className="selected-campus-left">
+                  <span className="campus-indicator-badge">AGENT LISTINGS</span>
+                  <h3 className="selected-campus-name">Properties by {selectedAgent.name}</h3>
+                  <p className="selected-campus-meta">
+                    📍 {selectedAgent.agentProfile?.county || "Kenya"} · Phone: {selectedAgent.agentProfile?.phone || selectedAgent.phone}
+                  </p>
                 </div>
                 <button
-                  style={S.clearUniversityBtn}
+                  type="button"
+                  className="change-campus-btn"
                   onClick={() => {
                     setSelectedAgent(null);
                     setFilteredProperties(properties);
                   }}
                 >
-                  Back to Agents
+                  ← Back to All Agents
                 </button>
               </div>
             )}
           </div>
         )}
 
-        {/* ── UNIVERSITY HOSTEL SECTION (only show when in university hostels mode) ── */}
-        {showUniversityHostels && (
-          <div style={S.universitySection}>
-            {/* Show university selection when no university is selected */}
-            {!selectedUniversity && (
-              <>
-                <div style={S.universityHeader}>
-                  <div style={S.universityBadge}> STUDENT HOUSING</div>
-                  <h2 style={S.universityTitle}>Find Hostels Near Your University</h2>
-                  <p style={S.universitySub}>Browse universities across all 47 counties in Kenya and discover affordable hostels nearby</p>
-                </div>
-
-                <div style={S.universitySearchBox}>
-                  <span style={S.searchIcon}></span>
-                  <input
-                    type="text"
-                    placeholder="Search your university (e.g., Nairobi, Kenyatta, JKUAT)..."
-                    value={universitySearch}
-                    onChange={(e) => setUniversitySearch(e.target.value)}
-                    style={S.universitySearchInput}
-                  />
-                </div>
-
-                <div style={S.universityGrid}>
-                  {(universitySearch ? searchUniversities(universitySearch) : kenyanUniversities).map((university) => (
-                    <div
-                      key={university.id}
-                      style={S.universityCard}
-                      className="university-card"
-                      onClick={() => setSelectedUniversity(university)}
-                    >
-                      <div style={S.universityCardIcon}></div>
-                      <div style={S.universityCardName}>{university.name}</div>
-                      <div style={{ ...S.universityCardLocation, display: "flex", alignItems: "center", gap: "4px" }}>
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        <span>{university.location}</span>
-                        <span style={S.universityCardCounty}>{university.county} County</span>
-                      </div>
-                      <div style={S.universityCardCode}>{university.code}</div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-
-            {/* Show selected university bar when a university is selected */}
-            {selectedUniversity && (
-              <div style={S.selectedUniversityBar}>
-                <div style={S.selectedUniversityInfo}>
-                  <span style={S.selectedUniversityLabel}>Showing hostels near:</span>
-                  <span style={S.selectedUniversityName}>{selectedUniversity.name}</span>
-                  <span style={{ ...S.selectedUniversityLocation, display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                    {selectedUniversity.location}, {selectedUniversity.county}
-                  </span>
-                </div>
-                <button
-                  style={S.clearUniversityBtn}
-                  onClick={() => {
-                    setSelectedUniversity(null);
-                    setUniversityProperties([]);
-                  }}
-                >
-                  ← Back to Universities
-                </button>
-              </div>
-            )}
+        {/* ═════════════════════════════════════════════════════════════
+            6. EMPTY STATES & LOADING INDICATORS
+        ═════════════════════════════════════════════════════════════ */}
+        {showUniversityHostels && selectedUniversity && universityLoading && (
+          <div className="loading-state-block">
+            <div className="loading-pulsar" />
+            <p>Loading available hostels near {selectedUniversity.name}…</p>
           </div>
         )}
 
-        {/* ── SAVED SEARCHES (only show when NOT in university hostels or agent listings mode) ── */}
-        {!showUniversityHostels && !showAgentListings && showSavedSearches && savedSearches.length > 0 && (
-          <div style={S.savedPanel}>
-            <h3 style={S.savedTitle}>Saved Searches</h3>
-            {savedSearches.map((s) => (
-              <div key={s.id} style={S.savedRow}>
-                <div>
-                  <p style={S.savedName}>{s.name}</p>
-                  <p style={S.savedDate}>{new Date(s.createdAt).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" })}</p>
-                </div>
-                <div style={{ display: "flex", gap: "8px" }}>
-                  <button style={S.savedApply} onClick={() => applySavedSearch(s)}>Apply</button>
-                  <button style={S.savedDelete} onClick={() => deleteSavedSearch(s.id)}>Delete</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* ── MAP VIEW (only show when NOT in university hostels or agent listings mode) ── */}
-        {!showUniversityHostels && !showAgentListings && showMap && <div style={S.mapWrap}><MapView properties={filteredProperties} /></div>}
-
-
-
-        {/* ── EMPTY STATE (only show when NOT in university hostels mode) ── */}
-        {!showUniversityHostels && filteredProperties.length === 0 && (
-          <div style={S.empty}>
-            <div style={S.emptyIcon}></div>
-            <p style={S.emptyTitle}>No properties match your search</p>
-            <p style={S.emptySub}>Try adjusting your filters to broaden your results</p>
+        {showUniversityHostels && selectedUniversity && !universityLoading && displayProperties.length === 0 && (
+          <div className="empty-results-box">
+            <div className="empty-icon-wrap">🎓</div>
+            <h3 className="empty-title">No Hostels Currently Listed Near {selectedUniversity.name}</h3>
+            <p className="empty-desc">
+              Landlords near {selectedUniversity.location} are actively uploading new units. Check back shortly or submit a custom housing request.
+            </p>
             <button
+              type="button"
+              className="empty-cta-btn"
               onClick={() => {
-                setModalQuery(filters.location || "");
+                setModalQuery(`${selectedUniversity.name} hostel`);
                 setModalService("rental");
                 setIsRequestModalOpen(true);
               }}
-              style={{
-                marginTop: "16px",
-                padding: "12px 24px",
-                background: "linear-gradient(135deg, #C9A84C 0%, #E2C47A 100%)",
-                border: "none",
-                borderRadius: "6px",
-                color: "#0D1B2A",
-                fontWeight: 700,
-                fontSize: "13px",
-                cursor: "pointer",
-                textTransform: "uppercase",
-                letterSpacing: "0.06em",
-                boxShadow: "0 4px 15px rgba(201, 168, 76, 0.25)",
-                transition: "all 0.2s",
-              }}
             >
-              Submit Custom Request
+              Request A Hostel Near This Campus
             </button>
           </div>
         )}
 
-        {showUniversityHostels && selectedUniversity && universityLoading && (
-          <div style={S.empty}>
-            <p style={S.emptyTitle}>Loading listings near {selectedUniversity.name}...</p>
+        {!showUniversityHostels && displayProperties.length === 0 && (
+          <div className="empty-results-box">
+            <div className="empty-icon-wrap">🔍</div>
+            <h3 className="empty-title">No Rentals Match Your Specific Search Criteria</h3>
+            <p className="empty-desc">
+              Try broadening your budget range, resetting bedroom filters, or submitting a custom housing request to have landlords contact you directly.
+            </p>
+            <div className="empty-actions-row">
+              <button type="button" className="empty-reset-btn" onClick={resetAllFilters}>
+                Clear All Filters
+              </button>
+              <button
+                type="button"
+                className="empty-cta-btn"
+                onClick={() => {
+                  setModalQuery(filters.location || "");
+                  setModalService("rental");
+                  setIsRequestModalOpen(true);
+                }}
+              >
+                Submit Custom Rental Request
+              </button>
+            </div>
           </div>
         )}
 
-        {/* ── EMPTY STATE FOR UNIVERSITY HOSTELS (no hostels found) ── */}
-        {showUniversityHostels && selectedUniversity && !universityLoading && displayProperties.length === 0 && (
-          <div style={S.empty}>
-            <div style={S.emptyIcon}></div>
-            <p style={S.emptyTitle}>No hostels found near {selectedUniversity.name}</p>
-            <p style={S.emptySub}>Landlords near this campus can list here. Check back soon or try another university.</p>
-          </div>
-        )}
-
-        {/* ── PROPERTY GRID (show when NOT in university hostels mode, OR when university is selected) ── */}
+        {/* ═════════════════════════════════════════════════════════════
+            7. WORLD-CLASS PROPERTY CARDS GRID
+        ═════════════════════════════════════════════════════════════ */}
         {(!showUniversityHostels || selectedUniversity) && displayProperties.length > 0 && (
-          <div className="properties-grid">
-            {displayProperties.map((property, i) => (
-              <article key={property._id} data-property-id={property._id} style={{ ...S.card, "--i": i }} className="prop-card" onClick={() => openModal(property)}>
-                {/* Image */}
-                <div style={S.cardImg}>
-                  {property.images?.length > 0
-                    ? <img src={property.images[0]} alt={property.title} style={S.cardImgEl} className="card-img-el" loading="lazy" />
-                    : <div style={S.cardImgFallback}>No Photo</div>
-                  }
-                  {property.images?.length > 1 && (
-                    <img src={property.images[1]} alt="" style={S.cardImgEl} className="card-img-alt" loading="lazy" />
+          <div className="properties-modern-grid">
+            {displayProperties.map((property, idx) => (
+              <article
+                key={property._id}
+                data-property-id={property._id}
+                className="property-card"
+                onClick={() => openModal(property)}
+              >
+                {/* Media Presentation Box */}
+                <div className="card-media-box">
+                  {property.images?.length > 0 ? (
+                    <img
+                      src={property.images[0]}
+                      alt={property.title}
+                      className="card-primary-img"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="card-no-photo">
+                      <span>No Photos Uploaded</span>
+                    </div>
                   )}
-                  {/* Badges */}
-                  <div style={{ ...S.availBadge, ...(property.availableUnits > 0 ? S.availBadgeGreen : S.availBadgeRed) }}>
-                    {property.availableUnits > 0 ? `${property.availableUnits} Available` : "Fully Occupied"}
+
+                  {property.images?.length > 1 && (
+                    <img
+                      src={property.images[1]}
+                      alt=""
+                      className="card-hover-alt-img"
+                      loading="lazy"
+                    />
+                  )}
+
+                  {/* Gradient shadow overlay */}
+                  <div className="card-img-gradient-overlay" />
+
+                  {/* Availability Badge */}
+                  <div
+                    className={`card-avail-badge ${
+                      property.availableUnits > 0 ? "avail-green" : "avail-red"
+                    }`}
+                  >
+                    <span className="live-dot" />
+                    <span>
+                      {property.availableUnits > 0
+                        ? `${property.availableUnits} Unit${property.availableUnits > 1 ? "s" : ""} Available`
+                        : "Fully Occupied"}
+                    </span>
                   </div>
+
+                  {/* Property Type Badge */}
+                  <div className="card-type-badge">
+                    {property.propertyType || "Rental"}
+                  </div>
+
+                  {/* Photo Count Tag */}
                   {property.images?.length > 1 && (
-                    <div style={S.photoBadge}>{property.images.length} Photos</div>
+                    <div className="card-photo-count">
+                      📷 {property.images.length}
+                    </div>
                   )}
-                  {/* Favourite */}
-                  <button style={S.favBtn} className="fav-btn" onClick={(e) => { e.stopPropagation(); toggleFavorite(property._id); }}>
-                    {favorites.includes(property._id) ? "♥" : "♡"}
+
+                  {/* Wishlist Favorite Heart Button */}
+                  <button
+                    type="button"
+                    className={`card-fav-btn ${favorites.includes(property._id) ? "is-favorite" : ""}`}
+                    onClick={(e) => toggleFavorite(property._id, e)}
+                    title="Save to favorites"
+                  >
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill={favorites.includes(property._id) ? "#E31B1B" : "none"} stroke={favorites.includes(property._id) ? "#E31B1B" : "#1e293b"} strokeWidth="2.2">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
                   </button>
-                  <div style={S.cardImgGrad} />
                 </div>
 
-                {/* Content */}
-                <div style={S.cardBody}>
-                  <div style={S.cardType}>{property.propertyType || "Rental"}</div>
-                  <h3 style={S.cardTitle}>{property.title}</h3>
-                  <p style={{ ...S.cardLocation, display: "flex", alignItems: "center", gap: "4px" }}>
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                    <span>{property.county} · {property.location}</span>
-                  </p>
-                  <div style={S.cardSpecs}>
-                    <span style={S.cardSpec}>{property.bedrooms} Bed</span><span style={S.specDot}>●</span>
-                    <span style={S.cardSpec}>{property.bathrooms} Bath</span><span style={S.specDot}>●</span>
-                    <span style={S.cardSpec}>{property.furnished ? "Furnished" : "Unfurnished"}</span>
+                {/* Card Content & Details */}
+                <div className="card-content-box">
+                  {/* Location Row */}
+                  <div className="card-location-row">
+                    <svg className="location-pin-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#E31B1B" strokeWidth="2.5">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                      <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    <span className="location-text">
+                      {property.county ? `${property.county} · ` : ""}{property.location}
+                    </span>
                   </div>
+
+                  {/* Property Title */}
+                  <h3 className="card-property-title">{property.title}</h3>
+
+                  {/* Specifications Icons Bar */}
+                  <div className="card-specs-bar">
+                    <div className="spec-item" title="Bedrooms">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8v9" />
+                      </svg>
+                      <span>{property.bedrooms || 1} Bed{property.bedrooms > 1 ? "s" : ""}</span>
+                    </div>
+
+                    <span className="spec-separator">|</span>
+
+                    <div className="spec-item" title="Bathrooms">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M9 6h6M7 10h10M4 14h16a2 2 0 0 1 2 2v2H2v-2a2 2 0 0 1 2-2z" />
+                      </svg>
+                      <span>{property.bathrooms || 1} Bath{property.bathrooms > 1 ? "s" : ""}</span>
+                    </div>
+
+                    <span className="spec-separator">|</span>
+
+                    <div className="spec-item" title="Furnishing">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                      </svg>
+                      <span>{property.furnished ? "Furnished" : "Unfurnished"}</span>
+                    </div>
+                  </div>
+
+                  {/* Amenities Preview Chips */}
                   {property.amenities?.length > 0 && (
-                    <div style={S.cardAmenities}>
-                      {property.amenities.slice(0, 3).map((a, idx) => <span key={idx} style={S.cardAmenityTag}>{a}</span>)}
-                      {property.amenities.length > 3 && <span style={S.cardAmenityMore}>+{property.amenities.length - 3}</span>}
+                    <div className="card-amenities-wrap">
+                      {property.amenities.slice(0, 3).map((amenity, amIdx) => (
+                        <span key={amIdx} className="amenity-chip-tag">
+                          {amenity}
+                        </span>
+                      ))}
+                      {property.amenities.length > 3 && (
+                        <span className="amenity-more-tag">+{property.amenities.length - 3}</span>
+                      )}
                     </div>
                   )}
-                  <div style={S.cardFooter}>
-                    <div>
-                      <div style={S.cardPrice}>KES {property.price?.toLocaleString()}</div>
-                      <div style={S.cardPriceSub}>per month</div>
+
+                  {/* Landlord Verified Line */}
+                  <div className="card-landlord-verify-line">
+                    <span className="verify-shield">🛡️</span>
+                    <span className="verify-text">
+                      {property.assignedAgent ? "Managed by Verified Agent" : "Direct Landlord Listing"}
+                    </span>
+                  </div>
+
+                  {/* Card Bottom: Pricing & Fast Contact */}
+                  <div className="card-bottom-bar">
+                    <div className="card-price-stack">
+                      <div className="card-rent-amount">
+                        KES {property.price?.toLocaleString()}
+                      </div>
+                      <div className="card-rent-period">
+                        per month {property.deposit ? `· KES ${property.deposit.toLocaleString()} dep` : ""}
+                      </div>
                     </div>
-                    <button type="button" style={S.cardCta} className="card-cta">View Details</button>
+
+                    <div className="card-cta-group" onClick={(e) => e.stopPropagation()}>
+                      {/* WhatsApp Direct Connect */}
+                      <button
+                        type="button"
+                        className="quick-whatsapp-cta"
+                        onClick={(e) => handleContactLandlord(property, e)}
+                        title="Chat on WhatsApp with owner"
+                      >
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                        </svg>
+                      </button>
+
+                      {/* View Details Button */}
+                      <button
+                        type="button"
+                        className="view-details-cta"
+                        onClick={() => openModal(property)}
+                      >
+                        <span>Details</span>
+                        <span>→</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </article>
             ))}
           </div>
         )}
-      </div>
+      </main>
 
-      {/* ═══════════════════════════════ MODAL ═══════════════════════════════ */}
+      {/* ═════════════════════════════════════════════════════════════
+          8. ULTRA LUXURY PROPERTY DETAIL MODAL
+      ═════════════════════════════════════════════════════════════ */}
       {selectedProperty && (
-        <div style={S.modalBackdrop} className="backdrop-anim" onClick={closeModal}>
-          <div style={S.modal} className="modal-anim" onClick={(e) => e.stopPropagation()}>
-            <button style={S.modalClose} className="modal-close" onClick={closeModal}>✕</button>
+        <div className="modal-overlay-backdrop backdrop-anim" onClick={closeModal}>
+          <div className="property-detail-modal modal-anim" onClick={(e) => e.stopPropagation()}>
+            {/* Modal Close Button */}
+            <button type="button" className="modal-close-round" onClick={closeModal} title="Close window">
+              ✕
+            </button>
 
-            {/* Payment Modal */}
+            {/* In-Modal M-Pesa Booking Modal */}
             {showPaymentModal && (
-              <div style={S.payBackdrop}>
-                <div style={S.payBox}>
-                  <h3 style={S.payTitle}>M-Pesa Booking</h3>
-                  <p style={S.paySub}>{selectedProperty.title} · KES {paymentAmount}</p>
-                  {paymentSuccess && <div style={S.paySuccess}>{paymentSuccess}</div>}
-                  {paymentError && <div style={S.payError}>{paymentError}</div>}
+              <div className="mpesa-dialog-overlay">
+                <div className="mpesa-dialog-box">
+                  <div className="mpesa-badge-header">
+                    <span className="mpesa-logo-dot">🟢</span>
+                    <span>LIPA NA M-PESA ONLINE</span>
+                  </div>
+                  <h3 className="mpesa-dialog-title">Secure Booking Deposit</h3>
+                  <p className="mpesa-dialog-sub">
+                    {selectedProperty.title} · KES {Number(paymentAmount).toLocaleString()}
+                  </p>
+
+                  {paymentSuccess && <div className="mpesa-success-box">{paymentSuccess}</div>}
+                  {paymentError && <div className="mpesa-error-box">{paymentError}</div>}
+
                   {!paymentSuccess && (
-                    <form onSubmit={handlePaymentSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                      <div style={S.payField}>
-                        <label style={S.payLabel}>M-Pesa Phone</label>
-                        <PhoneInput value={paymentPhone} onChange={(v) => setPaymentPhone(v)} style={S.payInput} required />
+                    <form onSubmit={handlePaymentSubmit} className="mpesa-form-body">
+                      <div className="mpesa-form-group">
+                        <label className="mpesa-form-label">M-Pesa Safaricom Phone Number</label>
+                        <PhoneInput
+                          value={paymentPhone}
+                          onChange={(v) => setPaymentPhone(v)}
+                          required
+                        />
                       </div>
-                      <div style={S.payField}>
-                        <label style={S.payLabel}>Amount (KES)</label>
-                        <input type="number" value={paymentAmount} onChange={(e) => setPaymentAmount(e.target.value)} style={S.payInput} required className="pay-inp" />
+
+                      <div className="mpesa-form-group">
+                        <label className="mpesa-form-label">Amount (KES)</label>
+                        <input
+                          type="number"
+                          value={paymentAmount}
+                          onChange={(e) => setPaymentAmount(e.target.value)}
+                          className="mpesa-form-input"
+                          required
+                        />
                       </div>
-                      <button type="submit" style={S.paySubmit} disabled={paymentLoading}>{paymentLoading ? "Processing…" : "Pay with M-Pesa"}</button>
-                      <button type="button" style={S.payCancel} onClick={() => setShowPaymentModal(false)}>Cancel</button>
+
+                      <button
+                        type="submit"
+                        className="mpesa-submit-btn"
+                        disabled={paymentLoading}
+                      >
+                        {paymentLoading ? "Sending STK Prompt…" : "Send M-Pesa Prompt"}
+                      </button>
+
+                      <button
+                        type="button"
+                        className="mpesa-cancel-btn"
+                        onClick={() => setShowPaymentModal(false)}
+                      >
+                        Cancel
+                      </button>
                     </form>
                   )}
                 </div>
               </div>
             )}
 
-            {/* Images */}
-            <div style={S.modalGallery}>
+            {/* Gallery Section */}
+            <div className="modal-gallery-shell">
               {selectedProperty.images?.length > 0 ? (
                 <>
-                  <img src={selectedProperty.images[currentImageIndex]} alt={selectedProperty.title} style={S.modalMainImg} />
+                  <img
+                    src={selectedProperty.images[currentImageIndex]}
+                    alt={selectedProperty.title}
+                    className="modal-featured-image"
+                  />
+
                   {selectedProperty.images.length > 1 && (
                     <>
-                      <button style={S.gallPrev} onClick={prevImage}>‹</button>
-                      <button style={S.gallNext} onClick={nextImage}>›</button>
-                      <div style={S.gallCounter}>{currentImageIndex + 1} / {selectedProperty.images.length}</div>
+                      <button type="button" className="gallery-nav-btn nav-prev" onClick={prevImage}>
+                        ‹
+                      </button>
+                      <button type="button" className="gallery-nav-btn nav-next" onClick={nextImage}>
+                        ›
+                      </button>
+                      <div className="gallery-counter-pill">
+                        {currentImageIndex + 1} / {selectedProperty.images.length}
+                      </div>
                     </>
                   )}
-                  <div style={S.modalGallGrad} />
                 </>
               ) : (
-                <div style={S.modalNoImg}>No Images Available</div>
+                <div className="modal-no-image-placeholder">No Photos Provided</div>
               )}
             </div>
 
+            {/* Gallery Thumbnails */}
             {selectedProperty.images?.length > 1 && (
-              <div style={S.thumbRow}>
+              <div className="modal-thumbnails-strip">
                 {selectedProperty.images.map((img, idx) => (
-                  <img key={idx} src={img} alt="" style={{ ...S.thumb, ...(idx === currentImageIndex ? S.thumbActive : {}) }} onClick={() => setCurrentImageIndex(idx)} />
+                  <img
+                    key={idx}
+                    src={img}
+                    alt=""
+                    className={`modal-thumb-img ${idx === currentImageIndex ? "active" : ""}`}
+                    onClick={() => setCurrentImageIndex(idx)}
+                  />
                 ))}
               </div>
             )}
 
-            {/* Details */}
-            <div style={S.modalDetails}>
-              <div style={S.modalHeader}>
+            {/* Modal Body & Specifications */}
+            <div className="modal-body-content">
+              {/* Top Meta Info */}
+              <div className="modal-headline-block">
                 <div>
-                  <div style={S.modalType}>{selectedProperty.propertyType || "Rental"}</div>
-                  <h2 style={S.modalTitle}>{selectedProperty.title}</h2>
-                  <p style={{ ...S.modalLocation, display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap", marginTop: "8px" }}>
-                    <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                      <svg viewBox="0 0 24 24" width="13" height="13" stroke="#E31B1B" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                      <span>{selectedProperty.county} · {selectedProperty.location}</span>
+                  <div className="modal-category-tag">{selectedProperty.propertyType || "Rental"}</div>
+                  <h2 className="modal-main-title">{selectedProperty.title}</h2>
+                  <div className="modal-location-tags">
+                    <span className="location-pin-chip">
+                      📍 {selectedProperty.county} · {selectedProperty.location}
                     </span>
-                    <span style={{ display: "flex", alignItems: "center", gap: "6px", background: "#f8fafc", padding: "4px 10px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-                      <svg viewBox="0 0 24 24" width="14" height="14" stroke="#3b82f6" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                      <span style={{ fontSize: "13px", fontWeight: 700, color: "#3b82f6" }}>{selectedProperty.views || 0} Views</span>
+                    <span className="views-counter-chip">
+                      👁️ {selectedProperty.views || 1} Views
                     </span>
-                  </p>
-                  {selectedProperty.lat && selectedProperty.lng && (
-                    <a
-                      href={`https://www.google.com/maps?q=${selectedProperty.lat},${selectedProperty.lng}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      style={{ color: "#E31B1B", fontSize: "0.85rem", textDecoration: "none", fontWeight: 600, marginTop: "4px", display: "inline-block" }}
-                    >
-                      View on Map →
-                    </a>
-                  )}
+                    {selectedProperty.lat && selectedProperty.lng && (
+                      <a
+                        href={`https://www.google.com/maps?q=${selectedProperty.lat},${selectedProperty.lng}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="google-maps-link"
+                      >
+                        🧭 View on Google Maps →
+                      </a>
+                    )}
+                  </div>
                 </div>
-                <div style={S.modalPriceBlock}>
-                  <div style={S.modalPrice}>KES {selectedProperty.price?.toLocaleString()}</div>
-                  <div style={S.modalPriceSub}>/month</div>
+
+                <div className="modal-pricing-box">
+                  <div className="modal-price-big">KES {selectedProperty.price?.toLocaleString()}</div>
+                  <div className="modal-price-term">per month</div>
                 </div>
               </div>
 
-              <div style={S.modalSpecsRow}>
-                <div style={S.modalSpec}><span style={S.modalSpecNum}>{selectedProperty.bedrooms}</span><span style={S.modalSpecLbl}>Beds</span></div>
-                <div style={S.modalSpecDiv} />
-                <div style={S.modalSpec}><span style={S.modalSpecNum}>{selectedProperty.bathrooms}</span><span style={S.modalSpecLbl}>Baths</span></div>
-                <div style={S.modalSpecDiv} />
-                <div style={S.modalSpec}><span style={S.modalSpecNum}>{selectedProperty.availableUnits}</span><span style={S.modalSpecLbl}>Available</span></div>
-                <div style={S.modalSpecDiv} />
-                <div style={S.modalSpec}><span style={S.modalSpecNum}>{selectedProperty.furnished ? "Yes" : "No"}</span><span style={S.modalSpecLbl}>Furnished</span></div>
+              {/* Specifications Pill Bar */}
+              <div className="modal-specs-strip">
+                <div className="spec-unit">
+                  <span className="spec-val">{selectedProperty.bedrooms || 1}</span>
+                  <span className="spec-name">Bedrooms</span>
+                </div>
+                <div className="spec-divider" />
+                <div className="spec-unit">
+                  <span className="spec-val">{selectedProperty.bathrooms || 1}</span>
+                  <span className="spec-name">Bathrooms</span>
+                </div>
+                <div className="spec-divider" />
+                <div className="spec-unit">
+                  <span className="spec-val">{selectedProperty.availableUnits}</span>
+                  <span className="spec-name">Units Free</span>
+                </div>
+                <div className="spec-divider" />
+                <div className="spec-unit">
+                  <span className="spec-val">{selectedProperty.furnished ? "Yes" : "No"}</span>
+                  <span className="spec-name">Furnished</span>
+                </div>
               </div>
 
-              {/* Pricing info */}
+              {/* Deposit and Lease info */}
               {(selectedProperty.deposit > 0 || selectedProperty.leaseType) && (
-                <div style={{ display: "flex", gap: "12px", marginBottom: "20px", flexWrap: "wrap" }}>
+                <div className="modal-deposit-row">
                   {selectedProperty.deposit > 0 && (
-                    <div style={{ background: "#f9fafb", padding: "10px 16px", borderRadius: "8px", fontSize: "0.85rem" }}>
-                      <span style={{ color: "#6b7280", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.08em" }}>Deposit</span>
-                      <span style={{ color: "#0B2140", fontWeight: 700, marginLeft: "8px" }}>KES {selectedProperty.deposit?.toLocaleString()}</span>
+                    <div className="deposit-info-pill">
+                      <span className="deposit-lbl">Security Deposit:</span>
+                      <span className="deposit-val">KES {selectedProperty.deposit?.toLocaleString()}</span>
                     </div>
                   )}
                   {selectedProperty.leaseType && (
-                    <div style={{ background: "#f9fafb", padding: "10px 16px", borderRadius: "8px", fontSize: "0.85rem" }}>
-                      <span style={{ color: "#6b7280", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.08em" }}>Lease</span>
-                      <span style={{ color: "#0B2140", fontWeight: 700, marginLeft: "8px" }}>{leaseLabel[selectedProperty.leaseType] || selectedProperty.leaseType}</span>
+                    <div className="deposit-info-pill">
+                      <span className="deposit-lbl">Lease Term:</span>
+                      <span className="deposit-val">
+                        {leaseLabel[selectedProperty.leaseType] || selectedProperty.leaseType}
+                      </span>
                     </div>
                   )}
                 </div>
               )}
 
-              <p style={S.modalDesc}>{selectedProperty.description}</p>
+              {/* Description */}
+              <div className="modal-section-wrap">
+                <h4 className="modal-section-title">Property Description</h4>
+                <p className="modal-description-paragraph">
+                  {selectedProperty.description || "No specific description added by the owner for this listing."}
+                </p>
+              </div>
 
-              {/* Amenities */}
+              {/* Amenities Grid */}
               {selectedProperty.amenities?.length > 0 && (
-                <div style={S.section}>
-                  <h4 style={S.sectionHead}>Amenities</h4>
-                  <div style={S.amenGrid}>
-                    {selectedProperty.amenities.map((a, idx) => (
-                      <span key={idx} style={S.amenChip}>✓ {a}</span>
+                <div className="modal-section-wrap">
+                  <h4 className="modal-section-title">Features & Amenities</h4>
+                  <div className="modal-amenities-cloud">
+                    {selectedProperty.amenities.map((item, idx) => (
+                      <span key={idx} className="modal-amenity-pill">
+                        ✓ {item}
+                      </span>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Rules */}
+              {/* House Rules */}
               {selectedProperty.rules && (
-                <div style={S.rulesBox}>
-                  <h4 style={S.sectionHead}>House Rules</h4>
-                  <p style={S.rulesText}>{selectedProperty.rules}</p>
+                <div className="modal-rules-box">
+                  <h4 className="modal-rules-title">House Policies & Guidelines</h4>
+                  <p className="modal-rules-text">{selectedProperty.rules}</p>
                 </div>
               )}
 
-              {/* Contact Info & CTA */}
+              {/* Landlord Contact & Direct Actions */}
               {selectedProperty.availableUnits > 0 ? (
-                <>
-                  <div style={{ background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "16px 18px", marginBottom: "16px" }}>
-                    <div style={{ fontSize: "0.68rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "#6b7280", marginBottom: "8px" }}>Contact</div>
-                    <div style={{ color: "#0B2140", fontSize: "1rem", fontWeight: 700, marginBottom: "4px" }}>{selectedProperty.owner?.name || "—"}</div>
-                    <div style={{ color: "#6b7280", fontSize: "0.87rem" }}>{selectedProperty.owner?.phone || "—"}</div>
+                <div className="landlord-connect-card">
+                  <div className="landlord-card-header">
+                    <div>
+                      <span className="landlord-role-tag">LISTING CONTACT</span>
+                      <h4 className="landlord-person-name">
+                        {selectedProperty.owner?.name || "Verified Landlord"}
+                      </h4>
+                      <p className="landlord-phone-num">
+                        {selectedProperty.owner?.phone || selectedProperty.phone || "Direct Phone Listed"}
+                      </p>
+                    </div>
+
                     {selectedProperty.assignedAgent && (
-                      <div style={{ marginTop: "12px", paddingTop: "12px", borderTop: "1px solid #e5e7eb" }}>
-                        <div style={{ fontSize: "0.68rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "#6b7280", marginBottom: "8px" }}>Agent</div>
-                        <div style={{ color: "#0B2140", fontSize: "0.95rem", fontWeight: 600 }}>{selectedProperty.assignedAgent?.name}</div>
-                        <div style={{ color: "#6b7280", fontSize: "0.85rem" }}>{selectedProperty.assignedAgent?.phone}</div>
+                      <div className="assigned-agent-badge-box">
+                        <span className="agent-badge-lbl">ASSIGNED AGENT</span>
+                        <div className="agent-badge-name">{selectedProperty.assignedAgent?.name}</div>
+                        <div className="agent-badge-phone">{selectedProperty.assignedAgent?.phone}</div>
                       </div>
                     )}
                   </div>
 
-                  <ShareProperty property={selectedProperty} />
-
-                  <div style={S.ctaGrid}>
-                    <button style={{ ...S.ctaBtn, ...S.ctaWa }} onClick={() => handleContactLandlord(selectedProperty)}>WhatsApp</button>
-                    <button style={{ ...S.ctaBtn, ...S.ctaCall }} onClick={() => window.open(`tel:${selectedProperty.owner?.phone || selectedProperty.phone}`)}>Call</button>
-                    <button style={{ ...S.ctaBtn, ...S.ctaSms }} onClick={() => handleSendSMS(selectedProperty)}>SMS</button>
-                    <button style={{ ...S.ctaBtn, ...S.ctaBook }} onClick={() => handleBookNow(selectedProperty)}>Book Now</button>
+                  <div className="share-property-inline">
+                    <ShareProperty property={selectedProperty} />
                   </div>
-                </>
+
+                  {/* 4 Direct Contact Buttons */}
+                  <div className="modal-cta-buttons-grid">
+                    <button
+                      type="button"
+                      className="cta-btn cta-whatsapp"
+                      onClick={() => handleContactLandlord(selectedProperty)}
+                    >
+                      <span>WhatsApp Landlord</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="cta-btn cta-call"
+                      onClick={() =>
+                        window.open(`tel:${selectedProperty.owner?.phone || selectedProperty.phone}`)
+                      }
+                    >
+                      <span>Direct Phone Call</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="cta-btn cta-sms"
+                      onClick={() => handleSendSMS(selectedProperty)}
+                    >
+                      <span>Send SMS</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="cta-btn cta-book"
+                      onClick={() => handleBookNow(selectedProperty)}
+                    >
+                      <span>Book via M-Pesa</span>
+                    </button>
+                  </div>
+                </div>
               ) : (
-                <div style={{ background: "rgba(224,82,82,0.1)", border: "1px solid rgba(224,82,82,0.25)", borderRadius: "10px", padding: "18px 20px", textAlign: "center" }}>
-                  <div style={{ color: "#dc2626", fontWeight: 700, fontSize: "1rem", marginBottom: "4px" }}>Fully Occupied</div>
-                  <div style={{ color: "#6b7280", fontSize: "0.88rem" }}>All units are currently occupied. Check back later for availability.</div>
+                <div className="modal-occupied-banner">
+                  <h4>This Property is Currently Fully Occupied</h4>
+                  <p>All units are rented out. You can bookmark it to receive availability updates.</p>
                 </div>
               )}
 
+              {/* In-Modal Direct Messaging */}
               {user && selectedProperty.availableUnits > 0 && (
-                <div style={S.section}>
-                  <h4 style={S.sectionHead}>Send Message</h4>
-                  <MessagingSystem recipientId={selectedProperty.owner?._id || selectedProperty.owner?.id} recipientName={selectedProperty.owner?.name || "Landlord"} recipientType="landlord" propertyId={selectedProperty._id} propertyTitle={selectedProperty.title} />
+                <div className="modal-section-wrap in-modal-chat">
+                  <h4 className="modal-section-title">Send Direct Platform Message</h4>
+                  <MessagingSystem
+                    recipientId={selectedProperty.owner?._id || selectedProperty.owner?.id}
+                    recipientName={selectedProperty.owner?.name || "Landlord"}
+                    recipientType="landlord"
+                    propertyId={selectedProperty._id}
+                    propertyTitle={selectedProperty.title}
+                  />
                 </div>
               )}
             </div>
@@ -952,395 +1805,2144 @@ export default function Listings() {
         </div>
       )}
 
+      {/* Custom Item / Housing Request Modal */}
       <RequestItemModal
         isOpen={isRequestModalOpen}
         onClose={() => setIsRequestModalOpen(false)}
         initialQuery={modalQuery}
         defaultService={modalService}
       />
-    </div >
+    </div>
   );
 }
 
-/* ════════════════════════════════════════════════
-   DESIGN SYSTEM  — Luxury Real Estate
-   Palette: Deep Navy · Champagne Gold · Ivory Cream
-   Font: Cormorant Garamond (headings) + DM Sans (body)
-════════════════════════════════════════════════ */
-const C = {
-  navy: "#0D1B2A",
-  navyMid: "#162233",
-  navyLight: "#1E3148",
-  gold: "#C9A84C",
-  goldLight: "#E2C47A",
-  goldDim: "rgba(201,168,76,0.15)",
-  cream: "#F5F0E8",
-  creamDim: "#EDE6D6",
-  white: "#FFFFFF",
-  textMain: "#F0EAD8",
-  textMid: "#B8AD96",
-  textDim: "#7A7260",
-  green: "#4CAF74",
-  red: "#E05252",
-  border: "rgba(201,168,76,0.18)",
-  borderSoft: "rgba(255,255,255,0.08)",
-};
-
-const S = {
-  /* Page */
-  page: { minHeight: "100vh", background: "#ffffff", fontFamily: "'DM Sans', sans-serif", color: "#0B2140" },
-
-  /* Loading */
-  loadingWrap: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh", gap: "20px" },
-  loadingSpinner: { width: "48px", height: "48px", border: `3px solid ${C.goldDim}`, borderTop: `3px solid ${C.gold}`, borderRadius: "50%" },
-  loadingText: { color: C.textMid, fontSize: "1rem", letterSpacing: "0.15em", textTransform: "uppercase" },
-
-  /* Hero */
-  hero: { position: "relative", background: "#ffffff", padding: "40px 20px 60px", overflow: "hidden", textAlign: "center" },
-  heroOverlay: { position: "absolute", inset: 0, background: "transparent", pointerEvents: "none" },
-  heroInner: { position: "relative", zIndex: 2, maxWidth: "800px", margin: "0 auto" },
-  heroBadge: { display: "inline-block", border: `1px solid #E31B1B`, color: "#E31B1B", fontSize: "0.7rem", letterSpacing: "0.22em", padding: "6px 18px", borderRadius: "20px", marginBottom: "20px", textTransform: "uppercase", fontWeight: 700 },
-  heroTitle: { margin: 0, lineHeight: 1 },
-  heroTitleLine1: { display: "block", fontFamily: "'DM Sans', sans-serif", fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 800, color: "#0B2140", letterSpacing: "-0.02em" },
-  heroTitleLine2: { display: "block", fontFamily: "'DM Sans', sans-serif", fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 800, color: "#E31B1B", letterSpacing: "-0.02em" },
-  heroSub: { color: "#6b7280", fontSize: "1rem", marginTop: "12px", letterSpacing: "0.02em" },
-  partnerNotice: { display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "10px", border: `1px solid #e5e7eb`, borderRadius: "30px", padding: "8px 20px", marginTop: "16px", fontSize: "0.85rem", color: "#6b7280", letterSpacing: "0.02em" },
-  partnerIcon: { color: "#E31B1B", fontSize: "1rem" },
-  heroButtons: { display: "flex", gap: "14px", justifyContent: "center", marginTop: "24px" },
-  heroDecor1: { display: "none" },
-  heroDecor2: { display: "none" },
-
-  /* Shared Buttons */
-  btnGold: { background: `linear-gradient(135deg, #E31B1B 0%, #c41e1e 100%)`, color: "white", border: "none", borderRadius: "8px", fontWeight: 700, cursor: "pointer", fontSize: "0.9rem", padding: "12px 28px", letterSpacing: "0.02em", fontFamily: "'DM Sans', sans-serif", transition: "all 0.25s ease" },
-  btnGhost: { background: "transparent", color: "#0B2140", border: `1px solid #e5e7eb`, borderRadius: "8px", fontWeight: 600, cursor: "pointer", fontSize: "0.9rem", padding: "12px 28px", fontFamily: "'DM Sans', sans-serif", transition: "all 0.25s ease" },
-
-  /* Main Body */
-  mainBody: { maxWidth: "1280px", margin: "0 auto", padding: "0 28px 80px" },
-  errorBar: { background: "rgba(224,82,82,0.12)", border: "1px solid rgba(224,82,82,0.3)", color: "#F28B8B", padding: "12px 18px", borderRadius: "8px", margin: "24px 0", textAlign: "center" },
-
-  /* Tabs Section */
-  tabsSection: { display: "flex", gap: "8px", marginBottom: "24px", borderBottom: "1px solid #e5e7eb", paddingBottom: "16px" },
-  tabBtn: { padding: "10px 20px", background: "transparent", border: "1px solid #e5e7eb", color: "#6b7280", borderRadius: "8px", cursor: "pointer", fontSize: "0.9rem", fontWeight: 600, fontFamily: "'DM Sans', sans-serif", transition: "all 0.2s" },
-  tabBtnActive: { background: "rgba(227, 27, 27, 0.08)", borderColor: "#E31B1B", color: "#E31B1B" },
-
-  /* Search Strip */
-  searchStrip: { background: "white", border: "1px solid #e5e7eb", borderRadius: "12px", margin: "0 auto 24px", position: "relative", zIndex: 10, boxShadow: "0 2px 8px rgba(0,0,0,0.06)" },
-  searchStripInner: { display: "flex", alignItems: "center", padding: "6px 12px", flexWrap: "wrap", gap: "4px" },
-  searchField: { display: "flex", alignItems: "center", gap: "10px", flex: 1, minWidth: "160px", padding: "10px 12px" },
-  searchIcon: { color: "#E31B1B", fontSize: "1.1rem", flexShrink: 0 },
-  searchInput: { background: "transparent", border: "none", outline: "none", color: "#0B2140", fontSize: "0.92rem", width: "100%", fontFamily: "'DM Sans', sans-serif" },
-  searchSelect: { background: "transparent", border: "none", outline: "none", color: "#0B2140", fontSize: "0.92rem", width: "100%", fontFamily: "'DM Sans', sans-serif", cursor: "pointer" },
-  searchDivider: { width: "1px", height: "32px", background: "#e5e7eb", flexShrink: 0 },
-
-  /* Expanded Filters */
-  filtersPanel: { background: "white", border: "1px solid #e5e7eb", borderRadius: "12px", padding: "24px", marginBottom: "28px" },
-  filtersGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "16px" },
-  filterGroup: { display: "flex", flexDirection: "column", gap: "6px" },
-  filterLabel: { fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#E31B1B", fontWeight: 600 },
-  filterCtrl: { background: "white", border: "1px solid #e5e7eb", borderRadius: "8px", color: "#0B2140", padding: "9px 12px", fontSize: "0.9rem", outline: "none", fontFamily: "'DM Sans', sans-serif", transition: "border-color 0.2s" },
-
-  /* Toolbar */
-  toolbar: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px", flexWrap: "wrap", gap: "12px" },
-  resultsText: { color: "#6b7280", fontSize: "0.9rem", margin: 0 },
-  resultsNum: { color: "#E31B1B", fontWeight: 700, fontSize: "1.05rem" },
-  toolbarBit: { color: "#9ca3af" },
-  toolbarActions: { display: "flex", gap: "8px", flexWrap: "wrap" },
-  toolBtn: { padding: "8px 16px", background: "transparent", border: "1px solid #e5e7eb", color: "#6b7280", borderRadius: "8px", cursor: "pointer", fontSize: "0.82rem", fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.04em", transition: "all 0.2s" },
-  toolBtnActive: { background: "rgba(227, 27, 27, 0.08)", borderColor: "#E31B1B", color: "#E31B1B" },
-
-  /* Saved Searches */
-  savedPanel: { background: "white", border: "1px solid #e5e7eb", borderRadius: "12px", padding: "20px", marginBottom: "28px" },
-  savedTitle: { color: "#0B2140", fontSize: "0.95rem", fontWeight: 600, margin: "0 0 14px", letterSpacing: "0.05em" },
-  savedRow: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px", background: "#f9fafb", borderRadius: "8px", marginBottom: "8px" },
-  savedName: { color: "#0B2140", margin: 0, fontSize: "0.9rem", fontWeight: 500 },
-  savedDate: { color: "#9ca3af", margin: 0, fontSize: "0.78rem", marginTop: "3px" },
-  savedApply: { padding: "6px 14px", background: "rgba(227, 27, 27, 0.08)", border: "1px solid #E31B1B", color: "#E31B1B", borderRadius: "5px", cursor: "pointer", fontSize: "0.8rem", fontFamily: "'DM Sans', sans-serif" },
-  savedDelete: { padding: "6px 14px", background: "rgba(224,82,82,0.1)", border: "1px solid rgba(224,82,82,0.3)", color: "#dc2626", borderRadius: "5px", cursor: "pointer", fontSize: "0.8rem", fontFamily: "'DM Sans', sans-serif" },
-
-  /* University Section */
-  universitySection: { background: "white", border: "1px solid #e5e7eb", borderRadius: "16px", padding: "32px 28px", marginBottom: "36px", position: "relative", overflow: "hidden" },
-  universityHeader: { textAlign: "center", marginBottom: "28px", position: "relative", zIndex: 2 },
-  universityBadge: { display: "inline-block", background: "rgba(227, 27, 27, 0.08)", border: "1px solid #E31B1B", color: "#E31B1B", fontSize: "0.7rem", letterSpacing: "0.18em", padding: "6px 18px", borderRadius: "20px", marginBottom: "16px", textTransform: "uppercase", fontWeight: 700 },
-  universityTitle: { fontFamily: "'DM Sans', sans-serif", fontSize: "clamp(1.8rem, 3vw, 2.4rem)", fontWeight: 800, color: "#0B2140", margin: "0 0 10px", letterSpacing: "-0.02em" },
-  universitySub: { color: "#6b7280", fontSize: "0.95rem", margin: 0, maxWidth: "500px", marginInline: "auto", lineHeight: 1.6 },
-  universitySearchBox: { display: "flex", alignItems: "center", gap: "12px", background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "14px 18px", marginBottom: "28px", maxWidth: "600px", marginInline: "auto" },
-  universitySearchInput: { background: "transparent", border: "none", outline: "none", color: "#0B2140", fontSize: "1rem", width: "100%", fontFamily: "'DM Sans', sans-serif" },
-  universityGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px", marginBottom: "24px" },
-  universityCard: { background: "white", border: "1px solid #e5e7eb", borderRadius: "12px", padding: "20px", cursor: "pointer", transition: "all 0.3s ease", position: "relative", overflow: "hidden" },
-  universityCardActive: { background: "rgba(227, 27, 27, 0.08)", borderColor: "#E31B1B", transform: "translateY(-4px)", boxShadow: "0 12px 40px rgba(227, 27, 27, 0.15)" },
-  universityCardIcon: { fontSize: "2rem", marginBottom: "12px" },
-  universityCardName: { fontFamily: "'DM Sans', sans-serif", fontSize: "1.1rem", fontWeight: 700, color: "#0B2140", marginBottom: "8px", lineHeight: 1.3 },
-  universityCardLocation: { display: "flex", flexDirection: "column", gap: "4px", marginBottom: "12px" },
-  universityCardCounty: { fontSize: "0.8rem", color: "#9ca3af", fontWeight: 500 },
-  universityCardCode: { display: "inline-block", background: "#f9fafb", border: "1px solid #e5e7eb", color: "#E31B1B", padding: "4px 12px", borderRadius: "6px", fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.08em" },
-  selectedUniversityBar: { display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(227, 27, 27, 0.08)", border: "1px solid #E31B1B", borderRadius: "10px", padding: "16px 20px", marginBottom: "20px", flexWrap: "wrap", gap: "12px" },
-  selectedUniversityInfo: { display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" },
-  selectedUniversityLabel: { color: "#9ca3af", fontSize: "0.85rem", fontWeight: 500 },
-  selectedUniversityName: { color: "#E31B1B", fontSize: "1rem", fontWeight: 700, fontFamily: "'DM Sans', sans-serif" },
-  selectedUniversityLocation: { color: "#6b7280", fontSize: "0.85rem" },
-  clearUniversityBtn: { padding: "8px 16px", background: "transparent", border: "1px solid #E31B1B", color: "#E31B1B", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem", fontWeight: 600, fontFamily: "'DM Sans', sans-serif", transition: "all 0.2s" },
-  universityFooter: { textAlign: "center", marginTop: "20px" },
-  toggleSectionBtn: { padding: "10px 20px", background: "transparent", border: "1px solid #e5e7eb", color: "#9ca3af", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem", fontFamily: "'DM Sans', sans-serif", transition: "all 0.2s" },
-  showUniversityBar: { textAlign: "center", marginBottom: "28px" },
-  showUniversityBtn: { padding: "12px 24px", background: "rgba(227, 27, 27, 0.08)", border: "1px solid #E31B1B", color: "#E31B1B", borderRadius: "8px", cursor: "pointer", fontSize: "0.9rem", fontWeight: 700, fontFamily: "'DM Sans', sans-serif", transition: "all 0.2s" },
-
-  /* Agent Card Styles */
-  agentCardAvatar: { width: "64px", height: "64px", borderRadius: "50%", background: "#f3f4f6", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", overflow: "hidden", border: "2px solid #E31B1B" },
-  agentCardBio: { color: "#6b7280", fontSize: "0.8rem", marginTop: "4px", textAlign: "center", lineHeight: 1.4, minHeight: "36px" },
-  agentCardPhone: { color: "#E31B1B", fontSize: "0.85rem", fontWeight: 600, marginTop: "8px", textAlign: "center" },
-  agentCardLocationDetail: { display: "flex", flexDirection: "column", alignItems: "center", gap: "2px", marginTop: "8px", paddingTop: "8px", borderTop: "1px solid #f3f4f6" },
-
-  /* Map */
-  mapWrap: { borderRadius: "12px", overflow: "hidden", marginBottom: "28px", border: "1px solid #e5e7eb" },
-
-  /* Empty */
-  empty: { textAlign: "center", padding: "80px 20px", border: "2px dashed #e5e7eb", borderRadius: "12px", background: "#f9fafb" },
-  emptyIcon: { fontSize: "2.5rem", marginBottom: "16px" },
-  emptyTitle: { color: "#0B2140", fontSize: "1.1rem", fontWeight: 600, margin: "0 0 8px" },
-  emptySub: { color: "#6b7280", fontSize: "0.9rem", margin: 0 },
-
-  /* Property Grid */
-  card: {
-    background: "white",
-    border: "1px solid #e5e7eb",
-    borderRadius: "12px",
-    overflow: "hidden",
-    cursor: "pointer",
-    transition: "all 0.3s ease",
-    display: "flex",
-    flexDirection: "column",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-  },
-
-  cardImg: { position: "relative", aspectRatio: "1/1", overflow: "hidden", background: "#f3f4f6", flexShrink: 0 },
-  cardImgEl: { width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.4s ease" },
-  cardImgFallback: { display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#9ca3af", fontSize: "0.9rem" },
-  cardImgGrad: { position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.3) 0%, transparent 50%)", pointerEvents: "none" },
-
-  availBadge: { position: "absolute", top: "10px", left: "10px", padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.04em", backdropFilter: "blur(4px)", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" },
-  availBadgeGreen: { background: "#10b981", color: "#fff", border: "1px solid rgba(16,185,129,0.2)" },
-  availBadgeRed: { background: "#dc2626", color: "#fff", border: "1px solid rgba(220,38,38,0.2)" },
-  photoBadge: { position: "absolute", bottom: "10px", right: "10px", background: "rgba(0,0,0,0.6)", color: "white", padding: "3px 8px", borderRadius: "4px", fontSize: "0.7rem", backdropFilter: "blur(4px)" },
-  favBtn: { position: "absolute", top: "10px", right: "10px", background: "rgba(255,255,255,0.9)", border: "1px solid #e5e7eb", color: "#E31B1B", width: "32px", height: "32px", borderRadius: "50%", cursor: "pointer", fontSize: "1rem", display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)", transition: "all 0.2s" },
-
-  cardBody: { padding: "14px 16px 16px", display: "flex", flexDirection: "column", flex: 1 },
-  cardType: { fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#E31B1B", marginBottom: "4px", fontWeight: 700 },
-  cardTitle: { fontFamily: "'DM Sans', sans-serif", fontSize: "1.05rem", fontWeight: 800, color: "#0B2140", margin: "0 0 6px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" },
-  cardLocation: { color: "#6b7280", fontSize: "0.8rem", margin: "0 0 4px" },
-  cardClickHint: { color: "#9ca3af", fontSize: "0.75rem", margin: "0", fontStyle: "italic" },
-  cardSpecs: { display: "flex", alignItems: "center", gap: "6px", marginBottom: "10px", flexWrap: "wrap" },
-  cardSpec: { color: "#6b7280", fontSize: "0.8rem" },
-  specDot: { color: "#9ca3af", fontSize: "0.7rem" },
-  cardAmenities: { display: "flex", flexWrap: "wrap", gap: "4px", marginBottom: "12px" },
-  cardAmenityTag: { background: "#f3f4f6", border: "1px solid #e5e7eb", color: "#6b7280", padding: "2px 8px", borderRadius: "4px", fontSize: "0.7rem" },
-  cardAmenityMore: { background: "rgba(227, 27, 27, 0.08)", border: "1px solid #E31B1B", color: "#E31B1B", padding: "2px 8px", borderRadius: "4px", fontSize: "0.7rem" },
-  cardFooter: { display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginTop: "auto", paddingTop: "10px", borderTop: "1px solid #f3f4f6" },
-  cardPrice: { color: "#E31B1B", fontSize: "1.1rem", fontWeight: 800, fontFamily: "'DM Sans', sans-serif" },
-  cardPriceSub: { color: "#9ca3af", fontSize: "0.7rem", marginTop: "2px" },
-  cardCta: { padding: "8px 16px", background: "#E31B1B", color: "white", border: "none", borderRadius: "8px", fontWeight: 700, cursor: "pointer", fontSize: "0.8rem", letterSpacing: "0.02em", fontFamily: "'DM Sans', sans-serif", transition: "all 0.25s" },
-  cardCtaDisabled: { opacity: 0.4, cursor: "not-allowed" },
-
-  /* Modal */
-  modalBackdrop: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000, padding: "20px", backdropFilter: "blur(4px)" },
-  modal: { background: "white", borderRadius: "12px", maxWidth: "660px", width: "100%", maxHeight: "92vh", overflowY: "auto", border: "1px solid #e5e7eb", position: "relative", boxShadow: "0 10px 40px rgba(0,0,0,0.1)" },
-  modalClose: { position: "absolute", top: "12px", right: "12px", background: "rgba(255,255,255,0.9)", border: "1px solid #e5e7eb", color: "#6b7280", width: "32px", height: "32px", borderRadius: "50%", cursor: "pointer", fontSize: "1rem", zIndex: 1001, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" },
-
-  /* Gallery */
-  modalGallery: { position: "relative", height: "320px", background: "#f3f4f6", overflow: "hidden", borderRadius: "12px 12px 0 0" },
-  modalMainImg: { width: "100%", height: "100%", objectFit: "cover" },
-  modalGallGrad: { position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 50%)", pointerEvents: "none" },
-  modalNoImg: { display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#9ca3af" },
-  gallPrev: { position: "absolute", top: "50%", left: "12px", transform: "translateY(-50%)", background: "rgba(255,255,255,0.9)", border: "1px solid #e5e7eb", color: "#0B2140", width: "40px", height: "40px", borderRadius: "50%", cursor: "pointer", fontSize: "1.4rem", display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" },
-  gallNext: { position: "absolute", top: "50%", right: "12px", transform: "translateY(-50%)", background: "rgba(255,255,255,0.9)", border: "1px solid #e5e7eb", color: "#0B2140", width: "40px", height: "40px", borderRadius: "50%", cursor: "pointer", fontSize: "1.4rem", display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" },
-  gallCounter: { position: "absolute", bottom: "12px", left: "50%", transform: "translateX(-50%)", background: "rgba(0,0,0,0.6)", color: "white", padding: "4px 12px", borderRadius: "8px", fontSize: "0.8rem", backdropFilter: "blur(4px)" },
-
-  thumbRow: { display: "flex", gap: "8px", padding: "12px 16px", overflowX: "auto", background: "#f9fafb" },
-  thumb: { width: "64px", height: "64px", objectFit: "cover", borderRadius: "6px", cursor: "pointer", opacity: 0.5, border: "2px solid transparent", flexShrink: 0, transition: "all 0.2s" },
-  thumbActive: { opacity: 1, borderColor: "#E31B1B" },
-
-  /* Modal Details */
-  modalDetails: { padding: "24px" },
-  modalHeader: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "20px", marginBottom: "20px", flexWrap: "wrap" },
-  modalType: { fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#E31B1B", marginBottom: "4px", fontWeight: 700 },
-  modalTitle: { fontFamily: "'DM Sans', sans-serif", fontSize: "1.5rem", fontWeight: 800, color: "#0B2140", margin: "0 0 4px", lineHeight: 1.2 },
-  modalLocation: { color: "#6b7280", fontSize: "0.85rem", margin: 0 },
-  modalPriceBlock: { textAlign: "right", flexShrink: 0 },
-  modalPrice: { fontFamily: "'DM Sans', sans-serif", fontSize: "1.5rem", fontWeight: 800, color: "#E31B1B" },
-  modalPriceSub: { color: "#9ca3af", fontSize: "0.8rem" },
-
-  /* GPS Coordinates */
-  gpsBox: { background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "14px 18px", marginBottom: "20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" },
-  gpsCoords: { display: "flex", gap: "24px", alignItems: "center" },
-  gpsCoordItem: { display: "flex", flexDirection: "column", gap: "3px" },
-  gpsLabel: { fontSize: "0.68rem", fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em" },
-  gpsValue: { fontSize: "0.9rem", fontWeight: 600, color: "#0B2140", fontFamily: "monospace" },
-  mapLink: { background: "#E31B1B", color: "white", border: "none", borderRadius: "6px", padding: "8px 16px", fontSize: "0.82rem", fontWeight: 700, cursor: "pointer", textDecoration: "none", whiteSpace: "nowrap" },
-
-  modalSpecsRow: { display: "flex", alignItems: "center", background: "#f9fafb", borderRadius: "10px", padding: "16px 20px", marginBottom: "20px", flexWrap: "wrap", gap: "0" },
-  modalSpec: { flex: 1, textAlign: "center", display: "flex", flexDirection: "column", gap: "4px", minWidth: "70px" },
-  modalSpecNum: { fontFamily: "'DM Sans', sans-serif", fontSize: "1.3rem", fontWeight: 800, color: "#0B2140" },
-  modalSpecLbl: { fontSize: "0.7rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280" },
-  modalSpecDiv: { width: "1px", height: "36px", background: "#e5e7eb", flexShrink: 0 },
-
-  pricingRow: { display: "flex", gap: "12px", marginBottom: "20px", flexWrap: "wrap" },
-  pricingBox: { flex: 1, background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "14px", textAlign: "center", minWidth: "100px" },
-  pricingLbl: { display: "block", color: "#6b7280", fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "6px" },
-  pricingVal: { display: "block", color: "#E31B1B", fontWeight: 800, fontFamily: "'DM Sans', sans-serif", fontSize: "1.05rem" },
-
-  modalDesc: { color: "#6b7280", lineHeight: 1.7, marginBottom: "20px", fontSize: "0.92rem" },
-
-  section: { marginBottom: "20px" },
-  sectionHead: { fontFamily: "'DM Sans', sans-serif", fontSize: "0.95rem", fontWeight: 700, color: "#0B2140", letterSpacing: "0.04em", textTransform: "uppercase", margin: "0 0 12px", borderBottom: "1px solid #e5e7eb", paddingBottom: "8px" },
-
-  rulesBox: { background: "#f9fafb", borderLeft: "3px solid #E31B1B", borderRadius: "0 8px 8px 0", padding: "14px 16px", marginBottom: "20px" },
-  rulesText: { color: "#6b7280", fontSize: "0.88rem", lineHeight: 1.6, margin: 0 },
-
-  amenGrid: { display: "flex", flexWrap: "wrap", gap: "8px" },
-  amenChip: { background: "#f9fafb", border: "1px solid #e5e7eb", color: "#6b7280", padding: "5px 12px", borderRadius: "5px", fontSize: "0.8rem" },
-
-  unitGrid: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" },
-  unitBox: { background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "14px", textAlign: "center" },
-  unitLbl: { color: "#6b7280", fontSize: "0.75rem", margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.08em" },
-  unitNum: { color: "#0B2140", fontSize: "1.5rem", fontWeight: 800, margin: 0, fontFamily: "'DM Sans', sans-serif" },
-
-  contactCard: { background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "16px 18px", marginBottom: "16px" },
-  contactCardLabel: { fontSize: "0.68rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "#6b7280", marginBottom: "6px" },
-  contactCardName: { color: "#0B2140", fontSize: "1rem", fontWeight: 700, fontFamily: "'DM Sans', sans-serif" },
-  contactCardPhone: { color: "#6b7280", fontSize: "0.87rem", marginTop: "4px" },
-
-  agentWaBtn: { flex: 1, padding: "10px 16px", background: "rgba(76,175,116,0.15)", border: "1px solid rgba(76,175,116,0.4)", color: "#10b981", borderRadius: "7px", cursor: "pointer", fontSize: "0.85rem", fontFamily: "'DM Sans', sans-serif", fontWeight: 600 },
-  agentCallBtn: { flex: 1, padding: "10px 16px", background: "#f9fafb", border: "1px solid #e5e7eb", color: "#0B2140", borderRadius: "7px", cursor: "pointer", fontSize: "0.85rem", fontFamily: "'DM Sans', sans-serif", fontWeight: 600 },
-
-  ctaGrid: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "10px", margin: "22px 0" },
-  ctaBtn: { padding: "13px 16px", border: "none", borderRadius: "8px", fontWeight: 700, cursor: "pointer", fontSize: "0.9rem", letterSpacing: "0.04em", fontFamily: "'DM Sans', sans-serif", transition: "all 0.25s" },
-  ctaWa: { background: "linear-gradient(135deg, #22a55e 0%, #1a8b4e 100%)", color: "white" },
-  ctaCall: { background: "linear-gradient(135deg, #2563EB 0%, #1E4DB7 100%)", color: "white" },
-  ctaSms: { background: "linear-gradient(135deg, #D97706 0%, #B45309 100%)", color: "white" },
-  ctaBook: { background: "linear-gradient(135deg, #E31B1B 0%, #c41e1e 100%)", color: "white" },
-  ctaDisabled: { opacity: 0.4, cursor: "not-allowed" },
-
-  /* Payment Modal */
-  payBackdrop: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 2000, padding: "20px", backdropFilter: "blur(4px)" },
-  payBox: { background: "white", border: "1px solid #e5e7eb", borderRadius: "12px", maxWidth: "380px", width: "100%", padding: "28px", boxShadow: "0 10px 40px rgba(0,0,0,0.1)" },
-  payTitle: { fontFamily: "'DM Sans', sans-serif", fontSize: "1.4rem", color: "#0B2140", textAlign: "center", margin: "0 0 8px", fontWeight: 800 },
-  paySub: { color: "#6b7280", textAlign: "center", marginBottom: "20px", fontSize: "0.87rem" },
-  payField: { display: "flex", flexDirection: "column", gap: "6px" },
-  payLabel: { fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#E31B1B", fontWeight: 600 },
-  payInput: { background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: "8px", color: "#0B2140", padding: "10px 12px", fontSize: "0.9rem", outline: "none", fontFamily: "'DM Sans', sans-serif" },
-  paySubmit: { padding: "13px 16px", background: "linear-gradient(135deg, #E31B1B 0%, #c41e1e 100%)", color: "white", border: "none", borderRadius: "8px", fontWeight: 700, cursor: "pointer", fontSize: "0.95rem", fontFamily: "'DM Sans', sans-serif" },
-  payCancel: { padding: "11px 16px", background: "transparent", color: "#6b7280", border: "1px solid #e5e7eb", borderRadius: "8px", cursor: "pointer", fontSize: "0.9rem", fontFamily: "'DM Sans', sans-serif" },
-  paySuccess: { background: "rgba(76,175,116,0.12)", border: "1px solid rgba(76,175,116,0.3)", color: "#10b981", padding: "12px", borderRadius: "6px", marginBottom: "16px", textAlign: "center", fontSize: "0.88rem" },
-  payError: { background: "rgba(224,82,82,0.12)", border: "1px solid rgba(224,82,82,0.3)", color: "#dc2626", padding: "12px", borderRadius: "6px", marginBottom: "16px", textAlign: "center", fontSize: "0.88rem" },
-};
-
+/* ══════════════════════════════════════════════════════════════════
+   HIGH-END MODERN STYLING: AXXSPACE LUXURY REAL ESTATE
+   Palette: Deep Midnight Executive (#08101D) · Signature Crimson (#E31B1B)
+   Clean White Card Elevation · Emerald Live Indicators (#10B981)
+══════════════════════════════════════════════════════════════════ */
 const css = `
-      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
-      * {box - sizing: border-box; margin: 0; padding: 0; }
-      ::placeholder {color: #7A7260 !important; }
-      option {background: #162233; color: #F0EAD8; }
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap');
 
-      .spinner {animation: spin 0.9s linear infinite; }
-      @keyframes spin {to {transform: rotate(360deg); } }
+  .ax-listings-root {
+    --bg-dark: #08101D;
+    --bg-dark-secondary: #0D1B2A;
+    --canvas-light: #F8FAFC;
+    --card-bg: #FFFFFF;
+    --brand-red: #E31B1B;
+    --brand-red-hover: #c41414;
+    --brand-red-light: rgba(227, 27, 27, 0.08);
+    --gold: #F59E0B;
+    --emerald: #10B981;
+    --emerald-light: rgba(16, 185, 129, 0.12);
+    --navy-ink: #0F172A;
+    --text-muted: #64748B;
+    --text-light: #94A3B8;
+    --border-soft: #E2E8F0;
+    --border-dark: rgba(255, 255, 255, 0.1);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --shadow-subtle: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
+    --shadow-elevated: 0 20px 40px -15px rgba(15, 23, 42, 0.12);
+    --shadow-glow-red: 0 10px 30px -5px rgba(227, 27, 27, 0.3);
 
-      .filters-panel {animation: slideDown 0.25s ease; }
-      @keyframes slideDown {from {opacity: 0; transform: translateY(-10px); } to {opacity: 1; transform: translateY(0); } }
-
-      .partner-shimmer {
-        background: linear-gradient(120deg, rgba(201,168,76,0.05) 30%, rgba(201,168,76,0.18) 40%, rgba(201,168,76,0.18) 60%, rgba(201,168,76,0.05) 70%);
-      background-size: 200% auto;
-      animation: shine 4s linear infinite;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    color: var(--navy-ink);
+    background-color: var(--canvas-light);
+    min-height: 100vh;
+    overflow-x: hidden;
   }
-      @keyframes shine {
-        to {background - position: 200% center; }
+
+  .ax-listings-root * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
   }
 
-      .properties-grid {
-        display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 32px;
-      margin-top: 10px;
+  /* ── 1. HERO ATMOSPHERE ── */
+  .listings-hero {
+    position: relative;
+    background: radial-gradient(circle at 50% 20%, #112035 0%, var(--bg-dark) 80%);
+    color: #FFFFFF;
+    padding: 70px 24px 110px;
+    overflow: hidden;
+    isolation: isolate;
   }
-      @media (max-width: 768px) {
-    .properties - grid {
-        grid - template - columns: repeat(2, 1fr);
-      gap: 20px;
+
+  .ambient-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    pointer-events: none;
+    z-index: -2;
+    opacity: 0.6;
+    animation: orbFloat 10s ease-in-out infinite alternate;
+  }
+  .orb-crimson {
+    top: -100px;
+    left: 10%;
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, rgba(227, 27, 27, 0.35) 0%, transparent 70%);
+  }
+  .orb-amber {
+    top: 40px;
+    right: 5%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, transparent 70%);
+    animation-delay: -3s;
+  }
+  .orb-navy {
+    bottom: -150px;
+    left: 40%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, transparent 70%);
+    animation-delay: -6s;
+  }
+
+  @keyframes orbFloat {
+    0% { transform: translateY(0) scale(1); }
+    100% { transform: translateY(30px) scale(1.1); }
+  }
+
+  .hero-grid-pattern {
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(circle at 50% 40%, black 30%, transparent 80%);
+    -webkit-mask-image: radial-gradient(circle at 50% 40%, black 30%, transparent 80%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .hero-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-badge-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .hero-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 18px;
+    border-radius: 999px;
+    background: rgba(227, 27, 27, 0.15);
+    border: 1px solid rgba(227, 27, 27, 0.4);
+    color: #FFA2A2;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 15px rgba(227, 27, 27, 0.15);
+  }
+  .badge-sparkle {
+    color: #FFD700;
+  }
+
+  .hero-main-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(2.3rem, 5.5vw, 3.8rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    margin-bottom: 18px;
+    color: #FFFFFF;
+  }
+  .title-gradient-accent {
+    display: block;
+    background: linear-gradient(135deg, #FF6B6B 0%, #FFA84A 50%, #FFD166 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-top: 6px;
+  }
+
+  .hero-subtext {
+    font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+    color: #CBD5E1;
+    max-width: 760px;
+    margin: 0 auto 30px;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  .hero-highlights-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 34px;
+  }
+  .highlight-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    color: #E2E8F0;
+    backdrop-filter: blur(8px);
+    transition: all 0.25s ease;
+  }
+  .highlight-pill:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+  }
+  .pill-icon {
+    font-size: 0.95rem;
+  }
+
+  .hero-actions-strip {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .hero-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #E31B1B 0%, #C41414 100%);
+    color: #FFFFFF;
+    text-decoration: none;
+    padding: 13px 26px;
+    border-radius: 12px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    box-shadow: 0 10px 25px rgba(227, 27, 27, 0.4);
+    transition: all 0.25s ease;
+  }
+  .hero-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px rgba(227, 27, 27, 0.55);
+    filter: brightness(1.05);
+  }
+  .btn-arrow {
+    transition: transform 0.2s ease;
+  }
+  .hero-btn-primary:hover .btn-arrow {
+    transform: translateX(4px);
+  }
+
+  .hero-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #FFFFFF;
+    padding: 13px 22px;
+    border-radius: 12px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.25s ease;
+  }
+  .hero-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+  }
+
+  /* ── 2. SEARCH CONSOLE ── */
+  .search-console-wrapper {
+    max-width: 1200px;
+    margin: 44px auto 0;
+    position: relative;
+    z-index: 10;
+  }
+  .search-console-card {
+    background: #FFFFFF;
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(226, 232, 240, 0.8);
+    color: var(--navy-ink);
+  }
+
+  .search-inputs-grid {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1.3fr 1.4fr auto;
+    gap: 12px;
+    align-items: center;
+  }
+  @media (max-width: 1024px) {
+    .search-inputs-grid {
+      grid-template-columns: 1fr 1fr;
     }
   }
-      @media (max-width: 580px) {
-    .properties - grid {
-        grid - template - columns: 1fr;
-      gap: 20px;
+  @media (max-width: 640px) {
+    .search-inputs-grid {
+      grid-template-columns: 1fr;
     }
   }
 
-      .prop-card {
-        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  .search-segment {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .search-segment:focus-within {
+    border-color: var(--brand-red);
+    box-shadow: 0 0 0 3px rgba(227, 27, 27, 0.1);
+    background: #FFFFFF;
   }
 
-      .prop-card:hover {
-        transform: translateY(-8px) !important;
-      background: rgba(22, 34, 51, 0.7) !important;
-      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(201, 168, 76, 0.35) !important;
+  .segment-label {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: #64748B;
+    text-transform: uppercase;
   }
-      .prop-card:hover .card-img-el {transform: scale(1.06) !important; }
-
-      .btn-gold:hover {transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,0.35); filter: brightness(1.05); }
-      .btn-ghost:hover {border - color: rgba(201,168,76,0.5); color: #C9A84C; }
-
-      .tool-btn:hover {background: rgba(201,168,76,0.08); border-color: rgba(201,168,76,0.4); color: #C9A84C; }
-      .fav-btn:hover {transform: scale(1.15); background: rgba(201,168,76,0.15) !important; }
-
-      .university-card:hover {transform: translateY(-4px); border-color: rgba(201,168,76,0.5); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
-      .clear-university-btn:hover {background: rgba(201,168,76,0.15); }
-      .toggle-section-btn:hover {border - color: rgba(201,168,76,0.4); color: #C9A84C; }
-      .show-university-btn:hover {background: rgba(201,168,76,0.2); transform: translateY(-2px); }
-
-      .search-inp::placeholder {color: #7A7260; }
-      .search-inp:focus {outline: none; }
-      .filter-ctrl:focus {border - color: #C9A84C !important; }
-      .pay-inp:focus {border - color: #C9A84C !important; }
-
-      .card-cta:hover:not(:disabled) {transform: translateY(-2px); box-shadow: 0 6px 18px rgba(201,168,76,0.35); filter: brightness(1.08); }
-
-      .modal-close:hover {background: rgba(201,168,76,0.15) !important; color: #C9A84C !important; }
-
-      /* Scrollbar styling */
-      ::-webkit-scrollbar {width: 6px; height: 6px; }
-      ::-webkit-scrollbar-track {background: #0D1B2A; }
-      ::-webkit-scrollbar-thumb {background: rgba(201,168,76,0.3); border-radius: 3px; }
-      ::-webkit-scrollbar-thumb:hover {background: rgba(201,168,76,0.6); }
-
-      @media (max-width: 700px) {
-    .search - strip - inner {flex - direction: column; }
-      .search-divider {display: none; }
+  .segment-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+  }
+  .segment-svg-icon {
+    color: var(--brand-red);
+    flex-shrink: 0;
+  }
+  .currency-prefix {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--brand-red);
+  }
+  .segment-text-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--navy-ink);
+    width: 100%;
+  }
+  .segment-text-input::placeholder {
+    color: #94A3B8;
+    font-weight: 400;
+  }
+  .segment-clear-btn {
+    border: none;
+    background: #E2E8F0;
+    color: #64748B;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-      /* ── Listings polish (added) ── */
-      .properties-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 28px; }
-      @media (max-width: 640px) { .properties-grid { grid-template-columns: 1fr; gap: 20px; } }
+  .segment-select-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--navy-ink);
+    width: 100%;
+    cursor: pointer;
+  }
 
-      @keyframes cardIn { from { opacity: 0; transform: translateY(28px) scale(.97); } to { opacity: 1; transform: none; } }
-      .prop-card { animation: cardIn .6s cubic-bezier(.16,1,.3,1) backwards; animation-delay: calc(min(var(--i, 0), 11) * 70ms); }
-      .prop-card:hover {
-        transform: translateY(-8px) !important;
-        background: #fff !important;
-        box-shadow: 0 20px 40px rgba(11,33,64,.14), 0 0 0 1px rgba(227,27,27,.25) !important;
-      }
+  .search-actions-segment {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .more-filters-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 58px;
+    padding: 0 20px;
+    border-radius: var(--radius-md);
+    background: #F1F5F9;
+    border: 1px solid #CBD5E1;
+    color: var(--navy-ink);
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+  }
+  .more-filters-trigger:hover, .more-filters-trigger.active {
+    background: var(--brand-red-light);
+    border-color: var(--brand-red);
+    color: var(--brand-red);
+  }
+  .active-filter-badge {
+    background: var(--brand-red);
+    color: #FFFFFF;
+    font-size: 0.75rem;
+    padding: 2px 7px;
+    border-radius: 999px;
+  }
 
-      .card-img-alt { position: absolute; inset: 0; opacity: 0; transition: opacity .5s ease, transform .4s ease; }
-      .prop-card:hover .card-img-alt { opacity: 1; transform: scale(1.06); }
-      .fav-btn:active { transform: scale(.8) !important; }
+  .reset-filters-btn {
+    border: 1px solid #E2E8F0;
+    background: #FFFFFF;
+    color: #64748B;
+    padding: 0 14px;
+    height: 58px;
+    border-radius: var(--radius-md);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .reset-filters-btn:hover {
+    color: var(--brand-red);
+    border-color: var(--brand-red);
+  }
 
-      .tab-btn:hover { border-color: #E31B1B !important; color: #E31B1B !important; transform: translateY(-1px); }
-      .university-card { animation: cardIn .5s cubic-bezier(.16,1,.3,1) backwards; }
-      .university-card:hover { transform: translateY(-4px); border-color: #E31B1B !important; box-shadow: 0 12px 30px rgba(11,33,64,.12); }
+  /* Quick Category Chips */
+  .quick-category-strip {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid #F1F5F9;
+    overflow-x: auto;
+  }
+  .quick-cat-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #94A3B8;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
+  }
+  .quick-cat-scroll {
+    display: flex;
+    gap: 8px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .quick-cat-scroll::-webkit-scrollbar {
+    height: 4px;
+  }
+  .quick-chip {
+    padding: 7px 15px;
+    border-radius: 999px;
+    border: 1px solid #E2E8F0;
+    background: #F8FAFC;
+    color: #475569;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .quick-chip:hover {
+    border-color: var(--brand-red);
+    color: var(--brand-red);
+    transform: translateY(-1px);
+  }
+  .quick-chip.active {
+    background: var(--brand-red);
+    border-color: var(--brand-red);
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(227, 27, 27, 0.25);
+  }
 
-      @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
-      @keyframes modalIn { from { opacity: 0; transform: translateY(24px) scale(.97); } to { opacity: 1; transform: none; } }
-      .backdrop-anim { animation: backdropIn .25s ease; }
-      .modal-anim { animation: modalIn .35s cubic-bezier(.16,1,.3,1); }
+  /* Expandable Drawer */
+  .advanced-filter-drawer {
+    margin-top: 20px;
+    padding: 24px;
+    background: #F8FAFC;
+    border-radius: var(--radius-lg);
+    border: 1px solid #E2E8F0;
+    animation: drawerSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes drawerSlide {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-      @media (prefers-reduced-motion: reduce) {
-        .prop-card, .university-card, .backdrop-anim, .modal-anim { animation: none; }
-      }
-      `;
+  .drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+  .drawer-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--navy-ink);
+  }
+  .drawer-close-text {
+    border: none;
+    background: transparent;
+    color: #64748B;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .drawer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .drawer-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .drawer-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .drawer-select, .drawer-input {
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    color: var(--navy-ink);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .drawer-select:focus, .drawer-input:focus {
+    border-color: var(--brand-red);
+  }
+
+  .popular-amenities-shortcuts {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 14px;
+    border-top: 1px solid #E2E8F0;
+  }
+  .shortcuts-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748B;
+    margin-right: 4px;
+  }
+  .amenity-shortcut-pill {
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    color: #475569;
+    font-size: 0.76rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .amenity-shortcut-pill:hover, .amenity-shortcut-pill.active {
+    border-color: var(--brand-red);
+    color: var(--brand-red);
+    background: var(--brand-red-light);
+  }
+
+  /* ── 3. MAIN CONTENT BODY ── */
+  .listings-main-canvas {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 40px 24px 100px;
+  }
+
+  .error-alert-banner {
+    background: #FEE2E2;
+    border: 1px solid #FCA5A5;
+    color: #B91C1C;
+    padding: 14px 20px;
+    border-radius: var(--radius-md);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+
+  /* Segmented Discovery Nav */
+  .segmented-discovery-nav {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 32px;
+  }
+  .discovery-tabs-cluster {
+    display: inline-flex;
+    background: #FFFFFF;
+    padding: 6px;
+    border-radius: 999px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+    border: 1px solid #E2E8F0;
+    gap: 4px;
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  .discovery-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    border-radius: 999px;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #64748B;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.25s ease;
+  }
+  .discovery-tab:hover {
+    color: var(--navy-ink);
+  }
+  .discovery-tab.active {
+    background: var(--navy-ink);
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+  }
+  .tab-icon {
+    font-size: 1.05rem;
+  }
+  .tab-counter {
+    background: #F1F5F9;
+    color: #475569;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 999px;
+  }
+  .discovery-tab.active .tab-counter {
+    background: rgba(255, 255, 255, 0.2);
+    color: #FFFFFF;
+  }
+  .tab-badge-new {
+    background: #FEF3C7;
+    color: #B45309;
+    font-size: 0.7rem;
+    padding: 2px 7px;
+    border-radius: 999px;
+  }
+  .discovery-tab.active .tab-badge-new {
+    background: #F59E0B;
+    color: #FFFFFF;
+  }
+  .tab-badge-verified {
+    background: #DCFCE7;
+    color: #15803D;
+    font-size: 0.7rem;
+    padding: 2px 7px;
+    border-radius: 999px;
+  }
+  .discovery-tab.active .tab-badge-verified {
+    background: #10B981;
+    color: #FFFFFF;
+  }
+
+  /* Listings Toolbar */
+  .listings-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #E2E8F0;
+  }
+  .results-headline {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #475569;
+  }
+  .results-bold-num {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--brand-red);
+    margin-right: 6px;
+  }
+  .results-location-tag {
+    font-size: 0.95rem;
+    color: #0F172A;
+    font-weight: 700;
+    margin-left: 6px;
+  }
+
+  .toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .sort-box {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+  }
+  .sort-label {
+    font-size: 0.78rem;
+    color: #64748B;
+    font-weight: 600;
+  }
+  .sort-select {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--navy-ink);
+    cursor: pointer;
+  }
+
+  .toolbar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: var(--radius-sm);
+    color: #475569;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .toolbar-btn:hover, .toolbar-btn.active {
+    background: var(--brand-red-light);
+    border-color: var(--brand-red);
+    color: var(--brand-red);
+  }
+
+  /* Saved Searches Panel */
+  .saved-searches-box {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: var(--radius-md);
+    padding: 20px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow-subtle);
+  }
+  .saved-searches-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+  .saved-searches-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+  }
+  .saved-search-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+  }
+  .saved-item-name {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--navy-ink);
+  }
+  .saved-item-date {
+    font-size: 0.72rem;
+    color: #94A3B8;
+  }
+  .saved-item-actions {
+    display: flex;
+    gap: 6px;
+  }
+  .saved-apply-btn {
+    background: var(--brand-red);
+    color: #FFFFFF;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .saved-del-btn {
+    background: transparent;
+    border: 1px solid #CBD5E1;
+    color: #94A3B8;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  /* Map View Shell */
+  .map-view-shell {
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 32px;
+    box-shadow: var(--shadow-elevated);
+  }
+  .map-view-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 18px;
+    background: #F1F5F9;
+    border-bottom: 1px solid #E2E8F0;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #334155;
+  }
+
+  /* ── 4. MODERN PROPERTY CARDS GRID ── */
+  .properties-modern-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 28px;
+  }
+  @media (max-width: 640px) {
+    .properties-modern-grid {
+      grid-template-columns: 1fr;
+      gap: 22px;
+    }
+  }
+
+  .property-card {
+    background: #FFFFFF;
+    border-radius: var(--radius-lg);
+    border: 1px solid #E2E8F0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+    cursor: pointer;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+  }
+  .property-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 24px 45px -12px rgba(15, 23, 42, 0.16), 0 0 0 1px rgba(227, 27, 27, 0.25);
+    border-color: rgba(227, 27, 27, 0.3);
+  }
+
+  .card-media-box {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: #0F172A;
+  }
+  .card-primary-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .property-card:hover .card-primary-img {
+    transform: scale(1.06);
+  }
+  .card-hover-alt-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.5s ease;
+  }
+  .property-card:hover .card-hover-alt-img {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+
+  .card-no-photo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #94A3B8;
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+  .card-img-gradient-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(15, 23, 42, 0.55) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* Card Badges */
+  .card-avail-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 2;
+  }
+  .avail-green {
+    background: rgba(16, 185, 129, 0.95);
+    color: #FFFFFF;
+  }
+  .avail-red {
+    background: rgba(220, 38, 38, 0.95);
+    color: #FFFFFF;
+  }
+  .live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    box-shadow: 0 0 8px #FFFFFF;
+    animation: livePulse 1.8s infinite;
+  }
+  @keyframes livePulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.6; }
+  }
+
+  .card-type-badge {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    background: rgba(15, 23, 42, 0.75);
+    color: #FFFFFF;
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    backdrop-filter: blur(6px);
+  }
+
+  .card-photo-count {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: rgba(15, 23, 42, 0.75);
+    color: #FFFFFF;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    backdrop-filter: blur(6px);
+  }
+
+  .card-fav-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+    z-index: 2;
+  }
+  .card-fav-btn:hover {
+    transform: scale(1.15);
+    background: #FFFFFF;
+  }
+
+  /* Card Content */
+  .card-content-box {
+    padding: 18px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .card-location-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .location-pin-icon {
+    flex-shrink: 0;
+  }
+  .location-text {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--brand-red);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .card-property-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--navy-ink);
+    line-height: 1.35;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-specs-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #F8FAFC;
+    border: 1px solid #F1F5F9;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 12px;
+  }
+  .spec-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #475569;
+  }
+  .spec-separator {
+    color: #CBD5E1;
+    font-size: 0.75rem;
+  }
+
+  .card-amenities-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 14px;
+  }
+  .amenity-chip-tag {
+    background: #F1F5F9;
+    color: #64748B;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .amenity-more-tag {
+    background: var(--brand-red-light);
+    color: var(--brand-red);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 6px;
+    border-radius: 4px;
+  }
+
+  .card-landlord-verify-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748B;
+    margin-bottom: 16px;
+  }
+  .verify-shield {
+    font-size: 0.82rem;
+  }
+
+  .card-bottom-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 14px;
+    border-top: 1px solid #F1F5F9;
+    margin-top: auto;
+  }
+
+  .card-price-stack {
+    display: flex;
+    flex-direction: column;
+  }
+  .card-rent-amount {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: var(--brand-red);
+    line-height: 1;
+  }
+  .card-rent-period {
+    font-size: 0.72rem;
+    color: #94A3B8;
+    margin-top: 3px;
+    font-weight: 500;
+  }
+
+  .card-cta-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .quick-whatsapp-cta {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #25D366;
+    color: #FFFFFF;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+    transition: all 0.2s ease;
+  }
+  .quick-whatsapp-cta:hover {
+    transform: scale(1.08);
+    background: #20BA5A;
+  }
+
+  .view-details-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: 10px;
+    background: var(--navy-ink);
+    color: #FFFFFF;
+    border: none;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .view-details-cta:hover {
+    background: var(--brand-red);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-glow-red);
+  }
+
+  /* ── 5. UNIVERSITY HOSTEL SECTION ── */
+  .university-hub-container {
+    background: #FFFFFF;
+    border-radius: var(--radius-xl);
+    border: 1px solid #E2E8F0;
+    padding: 40px 32px;
+    box-shadow: var(--shadow-elevated);
+    margin-bottom: 40px;
+  }
+  .hub-hero-header {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 36px;
+  }
+  .hub-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: #FEF3C7;
+    color: #B45309;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    margin-bottom: 14px;
+  }
+  .hub-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+    font-weight: 800;
+    color: var(--navy-ink);
+    margin-bottom: 12px;
+  }
+  .hub-subtitle {
+    font-size: 0.95rem;
+    color: #64748B;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .university-search-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #F8FAFC;
+    border: 2px solid #E2E8F0;
+    border-radius: var(--radius-md);
+    padding: 12px 18px;
+    max-width: 600px;
+    margin: 0 auto;
+    transition: all 0.2s ease;
+  }
+  .university-search-control:focus-within {
+    border-color: var(--brand-red);
+    background: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(227, 27, 27, 0.1);
+  }
+  .university-search-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--navy-ink);
+    width: 100%;
+  }
+  .clear-uni-btn {
+    border: none;
+    background: transparent;
+    color: #94A3B8;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  .university-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .university-card {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  .university-card:hover {
+    background: #FFFFFF;
+    border-color: var(--brand-red);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(227, 27, 27, 0.12);
+  }
+
+  .uni-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .uni-code-badge {
+    background: #0F172A;
+    color: #FFFFFF;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 6px;
+    letter-spacing: 0.06em;
+  }
+  .uni-county-tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--brand-red);
+  }
+
+  .uni-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--navy-ink);
+    margin-bottom: 8px;
+    line-height: 1.35;
+  }
+  .uni-location {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #64748B;
+    font-size: 0.82rem;
+    margin-bottom: 18px;
+  }
+  .uni-card-footer {
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid #E2E8F0;
+  }
+  .uni-cta-text {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--brand-red);
+  }
+
+  .selected-campus-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(227, 27, 27, 0.08) 0%, rgba(245, 158, 11, 0.08) 100%);
+    border: 1px solid var(--brand-red);
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .campus-indicator-badge {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: var(--brand-red);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .selected-campus-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--navy-ink);
+  }
+  .selected-campus-meta {
+    font-size: 0.85rem;
+    color: #64748B;
+    margin-top: 4px;
+  }
+  .change-campus-btn {
+    padding: 10px 18px;
+    border-radius: var(--radius-md);
+    background: #FFFFFF;
+    border: 1px solid var(--brand-red);
+    color: var(--brand-red);
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .change-campus-btn:hover {
+    background: var(--brand-red);
+    color: #FFFFFF;
+  }
+
+  /* ── 6. AGENT DIRECTORY SECTION ── */
+  .agent-directory-container {
+    background: #FFFFFF;
+    border-radius: var(--radius-xl);
+    border: 1px solid #E2E8F0;
+    padding: 40px 32px;
+    box-shadow: var(--shadow-elevated);
+    margin-bottom: 40px;
+  }
+  .agent-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 24px;
+  }
+  .agent-card {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: var(--radius-lg);
+    padding: 28px 22px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .agent-card:hover {
+    background: #FFFFFF;
+    border-color: var(--brand-red);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.1);
+  }
+
+  .agent-avatar-wrap {
+    position: relative;
+    width: 76px;
+    height: 76px;
+    margin-bottom: 14px;
+  }
+  .agent-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid var(--brand-red);
+  }
+  .agent-avatar-initial {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: #0F172A;
+    color: #FFFFFF;
+    font-size: 1.8rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--brand-red);
+  }
+  .agent-verified-shield {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #10B981;
+    color: #FFFFFF;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 900;
+    border: 2px solid #FFFFFF;
+  }
+
+  .agent-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--navy-ink);
+    margin-bottom: 6px;
+  }
+  .agent-county-pill {
+    background: #F1F5F9;
+    color: #475569;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-bottom: 12px;
+  }
+  .agent-bio {
+    color: #64748B;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    margin-bottom: 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .agent-locations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-bottom: 18px;
+    font-size: 0.78rem;
+  }
+  .agent-locations-label {
+    color: #94A3B8;
+  }
+  .agent-locations-val {
+    font-weight: 700;
+    color: var(--brand-red);
+  }
+  .agent-view-listings-cta {
+    margin-top: auto;
+    width: 100%;
+    padding: 10px;
+    background: #0F172A;
+    color: #FFFFFF;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .agent-card:hover .agent-view-listings-cta {
+    background: var(--brand-red);
+  }
+
+  /* ── 7. EMPTY & LOADING STATES ── */
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    padding: 40px;
+    text-align: center;
+  }
+  .loading-pulsar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 4px solid #E2E8F0;
+    border-top-color: var(--brand-red);
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 20px;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .loading-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--navy-ink);
+    margin-bottom: 8px;
+  }
+  .loading-sub {
+    color: #64748B;
+    font-size: 0.95rem;
+  }
+
+  .loading-state-block {
+    text-align: center;
+    padding: 60px 20px;
+    color: #64748B;
+    font-size: 0.95rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .empty-results-box {
+    background: #FFFFFF;
+    border: 2px dashed #CBD5E1;
+    border-radius: var(--radius-xl);
+    padding: 60px 24px;
+    text-align: center;
+    max-width: 600px;
+    margin: 40px auto;
+  }
+  .empty-icon-wrap {
+    font-size: 3rem;
+    margin-bottom: 16px;
+  }
+  .empty-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--navy-ink);
+    margin-bottom: 10px;
+  }
+  .empty-desc {
+    color: #64748B;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+  .empty-actions-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .empty-reset-btn {
+    padding: 10px 20px;
+    background: #F1F5F9;
+    border: 1px solid #CBD5E1;
+    border-radius: var(--radius-sm);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #475569;
+    cursor: pointer;
+  }
+  .empty-cta-btn {
+    padding: 10px 22px;
+    background: var(--brand-red);
+    color: #FFFFFF;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(227, 27, 27, 0.3);
+  }
+
+  /* ── 8. PROPERTY DETAIL MODAL ── */
+  .modal-overlay-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 16, 29, 0.75);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    padding: 20px;
+  }
+  .property-detail-modal {
+    background: #FFFFFF;
+    border-radius: var(--radius-xl);
+    max-width: 760px;
+    width: 100%;
+    max-height: 92vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+    border: 1px solid #E2E8F0;
+  }
+
+  .modal-close-round {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #E2E8F0;
+    color: var(--navy-ink);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: all 0.2s;
+  }
+  .modal-close-round:hover {
+    background: var(--brand-red);
+    color: #FFFFFF;
+  }
+
+  .modal-gallery-shell {
+    position: relative;
+    height: 380px;
+    background: #0F172A;
+    overflow: hidden;
+  }
+  @media (max-width: 640px) {
+    .modal-gallery-shell {
+      height: 260px;
+    }
+  }
+  .modal-featured-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .modal-no-image-placeholder {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94A3B8;
+  }
+
+  .gallery-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    color: var(--navy-ink);
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    backdrop-filter: blur(6px);
+  }
+  .nav-prev { left: 16px; }
+  .nav-next { right: 16px; }
+  .gallery-counter-pill {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 23, 42, 0.8);
+    color: #FFFFFF;
+    padding: 4px 14px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .modal-thumbnails-strip {
+    display: flex;
+    gap: 8px;
+    padding: 12px 20px;
+    background: #F8FAFC;
+    overflow-x: auto;
+    border-bottom: 1px solid #E2E8F0;
+  }
+  .modal-thumb-img {
+    width: 68px;
+    height: 52px;
+    object-fit: cover;
+    border-radius: 6px;
+    cursor: pointer;
+    opacity: 0.6;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .modal-thumb-img.active {
+    opacity: 1;
+    border-color: var(--brand-red);
+  }
+
+  .modal-body-content {
+    padding: 28px;
+  }
+
+  .modal-headline-block {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+  }
+  .modal-category-tag {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: var(--brand-red);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .modal-main-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--navy-ink);
+    line-height: 1.25;
+    margin-bottom: 10px;
+  }
+  .modal-location-tags {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .location-pin-chip {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #475569;
+  }
+  .views-counter-chip {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #2563EB;
+    background: #EFF6FF;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+  .google-maps-link {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--brand-red);
+    text-decoration: none;
+  }
+
+  .modal-pricing-box {
+    text-align: right;
+  }
+  .modal-price-big {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.7rem;
+    font-weight: 900;
+    color: var(--brand-red);
+  }
+  .modal-price-term {
+    font-size: 0.82rem;
+    color: #64748B;
+  }
+
+  .modal-specs-strip {
+    display: flex;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: var(--radius-md);
+    padding: 14px 20px;
+    margin-bottom: 22px;
+  }
+  .spec-unit {
+    flex: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .spec-val {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--navy-ink);
+  }
+  .spec-name {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748B;
+    text-transform: uppercase;
+  }
+  .spec-divider {
+    width: 1px;
+    background: #E2E8F0;
+  }
+
+  .modal-deposit-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+  }
+  .deposit-info-pill {
+    background: #F1F5F9;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    display: flex;
+    gap: 6px;
+  }
+  .deposit-lbl { color: #64748B; }
+  .deposit-val { font-weight: 700; color: var(--navy-ink); }
+
+  .modal-section-wrap {
+    margin-bottom: 22px;
+  }
+  .modal-section-title {
+    font-size: 0.92rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--navy-ink);
+    margin-bottom: 10px;
+    border-bottom: 1px solid #F1F5F9;
+    padding-bottom: 6px;
+  }
+  .modal-description-paragraph {
+    color: #475569;
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
+  .modal-amenities-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .modal-amenity-pill {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    color: #334155;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .modal-rules-box {
+    background: #FFFBEB;
+    border-left: 4px solid #F59E0B;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+  }
+  .modal-rules-title {
+    color: #92400E;
+    font-size: 0.88rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .modal-rules-text {
+    color: #78350F;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  .landlord-connect-card {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    margin-bottom: 22px;
+  }
+  .landlord-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .landlord-role-tag {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: #64748B;
+  }
+  .landlord-person-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--navy-ink);
+  }
+  .landlord-phone-num {
+    color: #64748B;
+    font-size: 0.88rem;
+  }
+
+  .assigned-agent-badge-box {
+    text-align: right;
+  }
+  .agent-badge-lbl {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--brand-red);
+    letter-spacing: 0.1em;
+  }
+  .agent-badge-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--navy-ink);
+  }
+  .agent-badge-phone {
+    font-size: 0.82rem;
+    color: #64748B;
+  }
+
+  .share-property-inline {
+    margin-bottom: 16px;
+  }
+
+  .modal-cta-buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  @media (max-width: 640px) {
+    .modal-cta-buttons-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .cta-btn {
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .cta-whatsapp {
+    background: #25D366;
+    color: #FFFFFF;
+  }
+  .cta-whatsapp:hover {
+    background: #20BA5A;
+  }
+  .cta-call {
+    background: #2563EB;
+    color: #FFFFFF;
+  }
+  .cta-call:hover {
+    background: #1D4ED8;
+  }
+  .cta-sms {
+    background: #D97706;
+    color: #FFFFFF;
+  }
+  .cta-sms:hover {
+    background: #B45309;
+  }
+  .cta-book {
+    background: var(--brand-red);
+    color: #FFFFFF;
+  }
+  .cta-book:hover {
+    background: var(--brand-red-hover);
+  }
+
+  .modal-occupied-banner {
+    background: #FEF2F2;
+    border: 1px solid #FCA5A5;
+    padding: 18px;
+    border-radius: var(--radius-md);
+    text-align: center;
+    color: #991B1B;
+  }
+
+  /* In Modal Chat */
+  .in-modal-chat {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid #E2E8F0;
+  }
+
+  /* ── 9. M-PESA POPUP DIALOG ── */
+  .mpesa-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 16, 29, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    padding: 20px;
+  }
+  .mpesa-dialog-box {
+    background: #FFFFFF;
+    border-radius: var(--radius-lg);
+    max-width: 420px;
+    width: 100%;
+    padding: 28px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  }
+  .mpesa-badge-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #16A34A;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+  .mpesa-dialog-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--navy-ink);
+    margin-bottom: 4px;
+  }
+  .mpesa-dialog-sub {
+    color: #64748B;
+    font-size: 0.88rem;
+    margin-bottom: 20px;
+  }
+  .mpesa-form-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .mpesa-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .mpesa-form-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+  }
+  .mpesa-form-input {
+    border: 1px solid #CBD5E1;
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    font-weight: 600;
+  }
+  .mpesa-submit-btn {
+    padding: 13px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: #16A34A;
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3);
+  }
+  .mpesa-submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .mpesa-cancel-btn {
+    border: 1px solid #CBD5E1;
+    background: transparent;
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 0.88rem;
+    color: #64748B;
+    cursor: pointer;
+  }
+  .mpesa-success-box {
+    background: #DCFCE7;
+    border: 1px solid #86EFAC;
+    color: #166534;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    font-size: 0.88rem;
+    margin-bottom: 16px;
+  }
+  .mpesa-error-box {
+    background: #FEE2E2;
+    border: 1px solid #FCA5A5;
+    color: #991B1B;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    font-size: 0.88rem;
+    margin-bottom: 16px;
+  }
+
+  /* ── 10. ANIMATIONS ── */
+  @keyframes backdropIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: translateY(30px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .backdrop-anim {
+    animation: backdropIn 0.25s ease;
+  }
+  .modal-anim {
+    animation: modalIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ambient-orb, .live-dot, .backdrop-anim, .modal-anim {
+      animation: none !important;
+    }
+  }
+`;
