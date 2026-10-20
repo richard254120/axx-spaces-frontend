@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from "react";
+
 export default function PropertyCard({ property: p, onOpen }) {
   const BADGE_IMAGES = {
     student_verified: "/Student Verified.png",
@@ -9,7 +11,22 @@ export default function PropertyCard({ property: p, onOpen }) {
   };
 
   const propId = p._id || p.id;
-  const primaryImg = p.images?.[0]?.imageUrl || (typeof p.images?.[0] === "string" ? p.images[0] : null);
+  const rawImages = Array.isArray(p.images) ? p.images : [];
+  const images = rawImages
+    .map((img) => (typeof img === "object" ? img?.imageUrl || img?.url : img))
+    .filter(Boolean);
+
+  const [activeImgIdx, setActiveImgIdx] = useState(0);
+
+  // Auto-cycle through photos continuously
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const timer = setInterval(() => {
+      setActiveImgIdx((prev) => (prev + 1) % images.length);
+    }, 3200);
+    return () => clearInterval(timer);
+  }, [images.length]);
+
   const locationText = typeof p.location === "object"
     ? (p.address || p.county || "Kenya")
     : (p.location || p.address || "Kenya");
@@ -30,16 +47,125 @@ export default function PropertyCard({ property: p, onOpen }) {
         borderRadius: "12px 12px 0 0",
         overflow: "hidden",
       }}>
-        {primaryImg ? (
-          <img
-            src={primaryImg}
-            alt={p.name}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          />
+        {images.length > 0 ? (
+          images.map((imgSrc, idx) => (
+            <img
+              key={idx}
+              src={imgSrc}
+              alt={`${p.name} photo ${idx + 1}`}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                opacity: idx === activeImgIdx ? 1 : 0,
+                transition: "opacity 0.5s ease-in-out",
+                pointerEvents: "none"
+              }}
+              onError={(e) => { e.currentTarget.style.display = "none"; }}
+            />
+          ))
         ) : (
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5">
             <path d="M3 21h18M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16M9 9h1M9 13h1M9 17h1M14 9h1M14 13h1M14 17h1" />
           </svg>
+        )}
+
+        {/* Carousel controls for multi-image listings */}
+        {images.length > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveImgIdx((prev) => (prev - 1 + images.length) % images.length);
+              }}
+              style={{
+                position: "absolute",
+                left: "6px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                width: "24px",
+                height: "24px",
+                borderRadius: "50%",
+                background: "rgba(15, 23, 42, 0.75)",
+                color: "#fff",
+                border: "none",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                zIndex: 2,
+                fontSize: "14px",
+                lineHeight: "1",
+                padding: 0
+              }}
+              aria-label="Previous photo"
+            >
+              ‹
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveImgIdx((prev) => (prev + 1) % images.length);
+              }}
+              style={{
+                position: "absolute",
+                right: "6px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                width: "24px",
+                height: "24px",
+                borderRadius: "50%",
+                background: "rgba(15, 23, 42, 0.75)",
+                color: "#fff",
+                border: "none",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                zIndex: 2,
+                fontSize: "14px",
+                lineHeight: "1",
+                padding: 0
+              }}
+              aria-label="Next photo"
+            >
+              ›
+            </button>
+            <div
+              style={{
+                position: "absolute",
+                bottom: "6px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                display: "flex",
+                gap: "4px",
+                zIndex: 2
+              }}
+            >
+              {images.map((_, idx) => (
+                <span
+                  key={idx}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveImgIdx(idx);
+                  }}
+                  style={{
+                    width: idx === activeImgIdx ? "14px" : "5px",
+                    height: "5px",
+                    borderRadius: "10px",
+                    background: idx === activeImgIdx ? "#38bdf8" : "rgba(255,255,255,0.65)",
+                    cursor: "pointer",
+                    transition: "all 0.3s ease"
+                  }}
+                />
+              ))}
+            </div>
+          </>
         )}
         {p.tag && (
           <div style={{ position: "absolute", top: "10px", left: "10px", background: cardColor, color: "white", fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "20px", zIndex: 1 }}>

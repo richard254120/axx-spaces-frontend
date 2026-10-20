@@ -343,13 +343,180 @@ const normalise = (item, tab) => {
     materials: `/quicksales/${item._id}`,
   }[tab];
 
+  const rawImages = Array.isArray(item.images) ? item.images : [];
+  let images = rawImages
+    .map((img) => (typeof img === "object" ? img?.imageUrl || img?.url : img))
+    .filter(Boolean);
+  if (!images.length) {
+    const single = getImage(item, tab);
+    if (single) images = [single];
+  }
+
   return {
     id: item._id, title, loc, price, detail,
     cat: item.propertyType || item.type || item.category || item.categories?.[0] || "Verified",
     img: getImage(item, tab),
+    images,
     video: !!item.videos?.length,
   };
 };
+
+function HomeCardMedia({ item, activeLabel }) {
+  const [activeIdx, setActiveIdx] = useState(0);
+  const images = Array.isArray(item.images) && item.images.length > 0 
+    ? item.images 
+    : (item.img ? [item.img] : []);
+
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const interval = setInterval(() => {
+      setActiveIdx((prev) => (prev + 1) % images.length);
+    }, 3200);
+    return () => clearInterval(interval);
+  }, [images.length]);
+
+  if (!images.length) {
+    return <div className="ph">{activeLabel}</div>;
+  }
+
+  return (
+    <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
+      {images.map((imgUrl, idx) => (
+        <img
+          key={idx}
+          src={imgUrl}
+          alt={item.title}
+          loading={idx === 0 ? "eager" : "lazy"}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            opacity: idx === activeIdx ? 1 : 0,
+            transition: "opacity 0.6s ease-in-out",
+          }}
+          onError={(e) => { e.currentTarget.style.display = "none"; }}
+        />
+      ))}
+
+      {images.length > 1 && (
+        <>
+          <span
+            role="button"
+            tabIndex={0}
+            onClick={(e) => {
+              e.stopPropagation();
+              setActiveIdx((prev) => (prev - 1 + images.length) % images.length);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.stopPropagation();
+                setActiveIdx((prev) => (prev - 1 + images.length) % images.length);
+              }
+            }}
+            style={{
+              position: "absolute",
+              left: "8px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              width: "24px",
+              height: "24px",
+              borderRadius: "50%",
+              background: "rgba(15, 23, 42, 0.75)",
+              color: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              zIndex: 4,
+              fontSize: "14px",
+              lineHeight: 1,
+              userSelect: "none",
+            }}
+            aria-label="Previous photo"
+          >
+            ‹
+          </span>
+          <span
+            role="button"
+            tabIndex={0}
+            onClick={(e) => {
+              e.stopPropagation();
+              setActiveIdx((prev) => (prev + 1) % images.length);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.stopPropagation();
+                setActiveIdx((prev) => (prev + 1) % images.length);
+              }
+            }}
+            style={{
+              position: "absolute",
+              right: "8px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              width: "24px",
+              height: "24px",
+              borderRadius: "50%",
+              background: "rgba(15, 23, 42, 0.75)",
+              color: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              zIndex: 4,
+              fontSize: "14px",
+              lineHeight: 1,
+              userSelect: "none",
+            }}
+            aria-label="Next photo"
+          >
+            ›
+          </span>
+          <div
+            style={{
+              position: "absolute",
+              bottom: "8px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              display: "flex",
+              gap: "4px",
+              zIndex: 4,
+            }}
+          >
+            {images.map((_, idx) => (
+              <span
+                key={idx}
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveIdx(idx);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.stopPropagation();
+                    setActiveIdx(idx);
+                  }
+                }}
+                style={{
+                  width: idx === activeIdx ? "14px" : "5px",
+                  height: "5px",
+                  borderRadius: "10px",
+                  background: idx === activeIdx ? "#22c55e" : "rgba(255,255,255,0.7)",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                }}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 const Icon = ({ children, size = 22 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -607,12 +774,7 @@ export default function HomePro() {
               ) : (
                 <button key={it.id || idx} className="ax-card" onClick={() => navigate(it.detail)}>
                   <div className="ax-card-img">
-                    {it.img ? (
-                      <img src={it.img} alt={it.title} loading="lazy"
-                        onError={(e) => { e.currentTarget.style.display = "none"; }} />
-                    ) : (
-                      <div className="ph">{activeMeta.label}</div>
-                    )}
+                    <HomeCardMedia item={it} activeLabel={activeMeta.label} />
                     <span className="ax-chip">Featured</span>
                     {it.video && <span className="ax-chip v">Video tour</span>}
                   </div>
