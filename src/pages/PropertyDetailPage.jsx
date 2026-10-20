@@ -47,6 +47,13 @@ export default function PropertyDetailPage() {
   const [bookingLoading, setBookingLoading] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState("");
 
+  // Waitlist state
+  const [showWaitlistModal, setShowWaitlistModal] = useState(false);
+  const [waitlistData, setWaitlistData] = useState({ name: "", email: "", phone: "", message: "" });
+  const [waitlistLoading, setWaitlistLoading] = useState(false);
+  const [waitlistSuccess, setWaitlistSuccess] = useState("");
+  const [waitlistError, setWaitlistError] = useState("");
+
   useEffect(() => {
     const fetchProperty = async () => {
       try {
@@ -172,6 +179,32 @@ export default function PropertyDetailPage() {
       alert("Redirect to WhatsApp failed: " + err.message);
     } finally {
       setBookingLoading(false);
+    }
+  };
+
+  const handleWaitlistSubmit = async (e) => {
+    e.preventDefault();
+    setWaitlistLoading(true);
+    setWaitlistError("");
+    setWaitlistSuccess("");
+    try {
+      const response = await fetch(`${API_BASE}/waitlist/${id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(waitlistData),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to join waitlist");
+      setWaitlistSuccess(data.message || "You have been added to the waitlist!");
+      setTimeout(() => {
+        setShowWaitlistModal(false);
+        setWaitlistData({ name: "", email: "", phone: "", message: "" });
+        setWaitlistSuccess("");
+      }, 3000);
+    } catch (err) {
+      setWaitlistError(err.message);
+    } finally {
+      setWaitlistLoading(false);
     }
   };
 
@@ -415,7 +448,7 @@ export default function PropertyDetailPage() {
                   </div>
                 </div>
 
-                {property.availableUnits > 0 && (
+                {property.availableUnits > 0 ? (
                   <>
                     <button
                       onClick={() => setShowBookingModal(true)}
@@ -467,6 +500,51 @@ export default function PropertyDetailPage() {
                     >
                       Call Landlord
                     </button>
+                  </>
+                ) : (
+                  <>
+                    {/* FULLY BOOKED — show waitlist CTA */}
+                    <div style={{
+                      background: "#fef2f2",
+                      border: "1px solid #fecaca",
+                      borderRadius: "10px",
+                      padding: "14px",
+                      marginBottom: "12px",
+                      textAlign: "center",
+                    }}>
+                      <div style={{ fontSize: "20px", marginBottom: "4px" }}>🔒</div>
+                      <div style={{ fontSize: "13px", fontWeight: 700, color: "#dc2626" }}>Fully Booked</div>
+                      <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>All units are currently occupied</div>
+                    </div>
+                    <button
+                      id="join-waitlist-btn"
+                      onClick={() => setShowWaitlistModal(true)}
+                      style={{
+                        width: "100%",
+                        padding: "14px",
+                        background: "linear-gradient(135deg, #7c3aed, #6d28d9)",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "8px",
+                        fontWeight: 700,
+                        fontSize: "14px",
+                        cursor: "pointer",
+                        marginBottom: "10px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px",
+                      }}
+                    >
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+                        <line x1="19" y1="8" x2="19" y2="14" /><line x1="22" y1="11" x2="16" y2="11" />
+                      </svg>
+                      Join Waitlist
+                    </button>
+                    <p style={{ fontSize: "11px", color: "#9ca3af", textAlign: "center", margin: "0", lineHeight: "1.5" }}>
+                      Be the first to know when a unit becomes available. The landlord will contact you directly.
+                    </p>
                   </>
                 )}
               </div>
@@ -544,6 +622,105 @@ export default function PropertyDetailPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── WAITLIST MODAL ─────────────────────────────────────────────── */}
+      {showWaitlistModal && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "16px" }}>
+          <div style={{ background: "white", borderRadius: "16px", padding: "28px 24px", maxWidth: "480px", width: "100%", maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
+            {/* Header */}
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "6px" }}>
+              <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "linear-gradient(135deg,#7c3aed,#6d28d9)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+                  <line x1="19" y1="8" x2="19" y2="14" /><line x1="22" y1="11" x2="16" y2="11" />
+                </svg>
+              </div>
+              <div>
+                <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b", margin: 0 }}>Join the Waitlist</h2>
+                <p style={{ fontSize: "12px", color: "#64748b", margin: 0 }}>for <strong>{property.title}</strong></p>
+              </div>
+            </div>
+
+            <p style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.6", margin: "12px 0 20px 0", padding: "12px", background: "#f8fafc", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+              Leave your details below. The landlord will contact you personally as soon as a unit becomes available. Requests are handled in order of submission — first come, first served.
+            </p>
+
+            {waitlistSuccess && (
+              <div style={{ background: "#dcfce7", border: "1px solid #bbf7d0", color: "#166534", padding: "14px", borderRadius: "10px", marginBottom: "16px", textAlign: "center", fontWeight: 600 }}>
+                ✅ {waitlistSuccess}
+              </div>
+            )}
+            {waitlistError && (
+              <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#dc2626", padding: "12px", borderRadius: "10px", marginBottom: "16px", fontSize: "13px" }}>
+                ⚠️ {waitlistError}
+              </div>
+            )}
+
+            {!waitlistSuccess && (
+              <form onSubmit={handleWaitlistSubmit}>
+                <div style={{ marginBottom: "14px" }}>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#1e293b", marginBottom: "6px" }}>Full Name *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Jane Wanjiru"
+                    value={waitlistData.name}
+                    onChange={(e) => setWaitlistData({ ...waitlistData, name: e.target.value })}
+                    style={{ width: "100%", padding: "11px 12px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "14px", boxSizing: "border-box" }}
+                  />
+                </div>
+                <div style={{ marginBottom: "14px" }}>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#1e293b", marginBottom: "6px" }}>Email Address *</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="e.g. jane@gmail.com"
+                    value={waitlistData.email}
+                    onChange={(e) => setWaitlistData({ ...waitlistData, email: e.target.value })}
+                    style={{ width: "100%", padding: "11px 12px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "14px", boxSizing: "border-box" }}
+                  />
+                </div>
+                <div style={{ marginBottom: "14px" }}>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#1e293b", marginBottom: "6px" }}>Phone Number *</label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="e.g. 0712 345 678"
+                    value={waitlistData.phone}
+                    onChange={(e) => setWaitlistData({ ...waitlistData, phone: e.target.value })}
+                    style={{ width: "100%", padding: "11px 12px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "14px", boxSizing: "border-box" }}
+                  />
+                </div>
+                <div style={{ marginBottom: "20px" }}>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#1e293b", marginBottom: "6px" }}>Additional Message <span style={{ color: "#94a3b8", fontWeight: 400 }}>(optional)</span></label>
+                  <textarea
+                    value={waitlistData.message}
+                    onChange={(e) => setWaitlistData({ ...waitlistData, message: e.target.value })}
+                    style={{ width: "100%", padding: "11px 12px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "14px", minHeight: "72px", resize: "vertical", boxSizing: "border-box" }}
+                    placeholder="Any preferences or notes for the landlord..."
+                  />
+                </div>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <button
+                    type="button"
+                    onClick={() => { setShowWaitlistModal(false); setWaitlistError(""); }}
+                    style={{ flex: 1, padding: "12px", background: "#f1f5f9", color: "#475569", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", fontSize: "14px" }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={waitlistLoading}
+                    style={{ flex: 2, padding: "12px", background: "linear-gradient(135deg,#7c3aed,#6d28d9)", color: "white", border: "none", borderRadius: "8px", fontWeight: 700, cursor: waitlistLoading ? "not-allowed" : "pointer", fontSize: "14px", opacity: waitlistLoading ? 0.7 : 1 }}
+                  >
+                    {waitlistLoading ? "Joining..." : "Join Waitlist"}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}

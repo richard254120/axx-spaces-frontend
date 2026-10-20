@@ -101,6 +101,14 @@ const LogoutIcon = () => (
   </svg>
 );
 
+const WaitlistIcon = () => (
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+    <line x1="19" y1="8" x2="19" y2="14" /><line x1="22" y1="11" x2="16" y2="11" />
+  </svg>
+);
+
+
 export default function LandlordDashboard() {
   const { token, user, logout, login } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -134,6 +142,13 @@ export default function LandlordDashboard() {
   const [enquiriesData, setEnquiriesData] = useState([]);
   const [enquiriesLoading, setEnquiriesLoading] = useState(false);
 
+  // Waitlist state
+  const [waitlistEntries, setWaitlistEntries] = useState([]);
+  const [waitlistLoading, setWaitlistLoading] = useState(false);
+  const [selectedWaitlistEntry, setSelectedWaitlistEntry] = useState(null);
+  const [notifyingId, setNotifyingId] = useState(null);
+  const [notifyResult, setNotifyResult] = useState(null); // { emailSent, whatsappUrl, message }
+
   useEffect(() => {
     if (!token) {
       navigate("/login");
@@ -158,6 +173,9 @@ export default function LandlordDashboard() {
   useEffect(() => {
     if (activeSidebarTab === "enquiries" && properties.length > 0) {
       fetchAllPropertiesStats();
+    }
+    if (activeSidebarTab === "waitlist") {
+      fetchWaitlist();
     }
   }, [activeSidebarTab, properties]);
 
@@ -379,6 +397,7 @@ export default function LandlordDashboard() {
     { id: "dashboard", label: "Dashboard", icon: DashboardIcon },
     { id: "my-properties", label: "My Properties", icon: MyPropertiesIcon },
     { id: "add-property", label: "Add Property", icon: AddPropertyIcon },
+    { id: "waitlist", label: "Waitlist", icon: WaitlistIcon },
     { id: "enquiries", label: "Enquiries", icon: EnquiriesIcon },
     { id: "bookings", label: "Bookings", icon: BookingsIcon },
     { id: "promote-property", label: "Promote Property", icon: PromoteIcon },
@@ -387,6 +406,60 @@ export default function LandlordDashboard() {
     { id: "settings", label: "Settings", icon: SettingsIcon },
     { id: "logout", label: "Logout", icon: LogoutIcon }
   ];
+
+  // ── Fetch all waitlist entries for this landlord
+  const fetchWaitlist = async () => {
+    setWaitlistLoading(true);
+    try {
+      const response = await fetch(`${API_BASE}/waitlist/landlord/all`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) throw new Error("Failed to fetch waitlist");
+      const data = await response.json();
+      setWaitlistEntries(data.entries || []);
+    } catch (err) {
+      console.error("Waitlist fetch error:", err);
+    } finally {
+      setWaitlistLoading(false);
+    }
+  };
+
+  // ── Send availability notification (email + return WhatsApp URL)
+  const handleNotifyWaitlistEntry = async (entry) => {
+    setNotifyingId(entry._id);
+    setNotifyResult(null);
+    try {
+      const response = await fetch(`${API_BASE}/waitlist/${entry._id}/notify`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Notification failed");
+      setNotifyResult({ ...data, entryId: entry._id });
+      // refresh list
+      fetchWaitlist();
+    } catch (err) {
+      setNotifyResult({ emailSent: false, message: err.message, entryId: entry._id });
+    } finally {
+      setNotifyingId(null);
+    }
+  };
+
+  // ── Remove a person from the waitlist
+  const handleRemoveWaitlistEntry = async (id) => {
+    if (!window.confirm("Remove this person from the waitlist?")) return;
+    try {
+      const response = await fetch(`${API_BASE}/waitlist/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) throw new Error("Failed to remove");
+      setWaitlistEntries(prev => prev.filter(e => e._id !== id));
+      if (selectedWaitlistEntry?._id === id) setSelectedWaitlistEntry(null);
+    } catch (err) {
+      alert("Could not remove: " + err.message);
+    }
+  };
 
   // Helper component for Promote Property Screen
   function PromotePropertyTab({ propertiesList }) {
@@ -1115,6 +1188,226 @@ export default function LandlordDashboard() {
                 ✓ Syncing with Axxspace Rent Payment system
               </div>
             </div>
+          </div>
+        )}
+
+        {/* ── WAITLIST SCREEN ── */}
+        {activeSidebarTab === "waitlist" && (
+          <div style={styles.tabContentSection}>
+            {/* Header */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px", flexWrap: "wrap", gap: "12px" }}>
+              <div>
+                <h2 style={styles.contentTitle}>Waitlist</h2>
+                <p style={styles.contentSubtitle}>People waiting to rent one of your fully-booked properties — listed in order of request (first-come, first-served).</p>
+              </div>
+              <button
+                onClick={fetchWaitlist}
+                style={{ background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "8px 16px", fontWeight: 600, fontSize: "13px", cursor: "pointer", color: "#374151" }}
+              >
+                ↻ Refresh
+              </button>
+            </div>
+
+            {waitlistLoading ? (
+              <div style={{ textAlign: "center", padding: "60px", color: "#94a3b8" }}>Loading waitlist...</div>
+            ) : waitlistEntries.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "60px 24px", background: "#f8fafc", borderRadius: "16px", border: "2px dashed #e2e8f0" }}>
+                <div style={{ fontSize: "48px", marginBottom: "12px" }}>🎉</div>
+                <p style={{ fontWeight: 700, color: "#1e293b", fontSize: "16px", margin: "0 0 8px" }}>No one on the waitlist</p>
+                <p style={{ color: "#94a3b8", fontSize: "14px", margin: 0 }}>When a fully-booked property gets a waitlist request, it will appear here.</p>
+              </div>
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: selectedWaitlistEntry ? "1fr 1fr" : "1fr", gap: "20px" }}>
+
+                {/* LEFT: FIFO List */}
+                <div>
+                  <p style={{ fontSize: "13px", color: "#64748b", marginBottom: "12px", fontWeight: 600 }}>
+                    {waitlistEntries.length} {waitlistEntries.length === 1 ? "person" : "people"} waiting · Click a name to view details
+                  </p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                    {waitlistEntries.map((entry, index) => (
+                      <div
+                        key={entry._id}
+                        onClick={() => { setSelectedWaitlistEntry(entry); setNotifyResult(null); }}
+                        style={{
+                          background: selectedWaitlistEntry?._id === entry._id ? "#eff6ff" : "white",
+                          border: `1px solid ${selectedWaitlistEntry?._id === entry._id ? "#bfdbfe" : "#e2e8f0"}`,
+                          borderRadius: "12px",
+                          padding: "14px 16px",
+                          cursor: "pointer",
+                          transition: "all 0.15s ease",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "14px",
+                        }}
+                      >
+                        {/* Position badge */}
+                        <div style={{
+                          width: "34px",
+                          height: "34px",
+                          borderRadius: "50%",
+                          background: index === 0 ? "linear-gradient(135deg,#f59e0b,#d97706)" : "#f1f5f9",
+                          color: index === 0 ? "white" : "#475569",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontWeight: 700,
+                          fontSize: "13px",
+                          flexShrink: 0,
+                        }}>
+                          {index + 1}
+                        </div>
+
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "2px" }}>
+                            <span style={{ fontWeight: 700, color: "#1e293b", fontSize: "14px" }}>{entry.name}</span>
+                            {index === 0 && <span style={{ background: "#fef3c7", color: "#92400e", fontSize: "10px", fontWeight: 700, padding: "2px 7px", borderRadius: "20px" }}>NEXT IN LINE</span>}
+                            {entry.status === "notified" && <span style={{ background: "#dcfce7", color: "#166534", fontSize: "10px", fontWeight: 700, padding: "2px 7px", borderRadius: "20px" }}>NOTIFIED</span>}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#64748b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {entry.property?.title || "—"} · {new Date(entry.position).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" })}
+                          </div>
+                        </div>
+
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                          <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* RIGHT: Detail Panel */}
+                {selectedWaitlistEntry && (
+                  <div style={{ background: "white", border: "1px solid #e2e8f0", borderRadius: "16px", padding: "24px", position: "sticky", top: "80px", alignSelf: "start" }}>
+                    {/* Close */}
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+                      <h3 style={{ fontWeight: 700, color: "#1e293b", fontSize: "16px", margin: 0 }}>Applicant Details</h3>
+                      <button onClick={() => { setSelectedWaitlistEntry(null); setNotifyResult(null); }} style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8", fontSize: "18px", lineHeight: 1 }}>✕</button>
+                    </div>
+
+                    {/* Avatar + name */}
+                    <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "20px", padding: "16px", background: "#f8fafc", borderRadius: "12px" }}>
+                      <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "linear-gradient(135deg,#7c3aed,#6d28d9)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 700, fontSize: "18px" }}>
+                        {selectedWaitlistEntry.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 700, color: "#1e293b", fontSize: "16px" }}>{selectedWaitlistEntry.name}</div>
+                        <div style={{ fontSize: "12px", color: "#94a3b8" }}>
+                          Joined {new Date(selectedWaitlistEntry.position).toLocaleDateString("en-KE", { day: "numeric", month: "long", year: "numeric" })}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Contact info */}
+                    <div style={{ marginBottom: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "14px" }}>
+                        <span style={{ fontSize: "16px" }}>✉️</span>
+                        <a href={`mailto:${selectedWaitlistEntry.email}`} style={{ color: "#3b82f6", textDecoration: "none", fontWeight: 500 }}>{selectedWaitlistEntry.email}</a>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "14px" }}>
+                        <span style={{ fontSize: "16px" }}>📞</span>
+                        <a href={`tel:${selectedWaitlistEntry.phone}`} style={{ color: "#3b82f6", textDecoration: "none", fontWeight: 500 }}>{selectedWaitlistEntry.phone}</a>
+                      </div>
+                      {selectedWaitlistEntry.property && (
+                        <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", fontSize: "14px" }}>
+                          <span style={{ fontSize: "16px" }}>🏠</span>
+                          <span style={{ color: "#475569" }}>{selectedWaitlistEntry.property.title}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Message from user */}
+                    {selectedWaitlistEntry.message && (
+                      <div style={{ marginBottom: "20px", background: "#f8fafc", borderRadius: "10px", padding: "14px", border: "1px solid #e2e8f0" }}>
+                        <p style={{ fontSize: "12px", color: "#64748b", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.5px" }}>Message from applicant</p>
+                        <p style={{ fontSize: "14px", color: "#374151", margin: 0, lineHeight: 1.6 }}>{selectedWaitlistEntry.message}</p>
+                      </div>
+                    )}
+
+                    {/* Notify result feedback */}
+                    {notifyResult && notifyResult.entryId === selectedWaitlistEntry._id && (
+                      <div style={{ marginBottom: "16px", padding: "14px", borderRadius: "10px", background: notifyResult.emailSent ? "#dcfce7" : "#fef9c3", border: `1px solid ${notifyResult.emailSent ? "#bbf7d0" : "#fde68a"}` }}>
+                        <p style={{ fontSize: "13px", fontWeight: 600, color: "#1e293b", margin: "0 0 10px" }}>
+                          {notifyResult.emailSent ? "✅ Email sent!" : "⚠️ Email not sent"}
+                        </p>
+                        <p style={{ fontSize: "12px", color: "#475569", margin: "0 0 12px" }}>{notifyResult.message}</p>
+                        {notifyResult.whatsappUrl && (
+                          <a
+                            href={notifyResult.whatsappUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "8px",
+                              background: "#25d366",
+                              color: "white",
+                              padding: "10px 18px",
+                              borderRadius: "8px",
+                              fontWeight: 700,
+                              fontSize: "13px",
+                              textDecoration: "none",
+                            }}
+                          >
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                            Send WhatsApp Message
+                          </a>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Action Buttons */}
+                    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                      <button
+                        onClick={() => handleNotifyWaitlistEntry(selectedWaitlistEntry)}
+                        disabled={notifyingId === selectedWaitlistEntry._id}
+                        style={{
+                          width: "100%",
+                          padding: "13px",
+                          background: "linear-gradient(135deg,#7c3aed,#6d28d9)",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "10px",
+                          fontWeight: 700,
+                          fontSize: "14px",
+                          cursor: notifyingId === selectedWaitlistEntry._id ? "not-allowed" : "pointer",
+                          opacity: notifyingId === selectedWaitlistEntry._id ? 0.7 : 1,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "8px",
+                        }}
+                      >
+                        {notifyingId === selectedWaitlistEntry._id ? "Sending..." : (
+                          <>
+                            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>
+                            Send Availability Notification
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        onClick={() => handleRemoveWaitlistEntry(selectedWaitlistEntry._id)}
+                        style={{
+                          width: "100%",
+                          padding: "11px",
+                          background: "white",
+                          color: "#ef4444",
+                          border: "1px solid #fecaca",
+                          borderRadius: "10px",
+                          fontWeight: 600,
+                          fontSize: "13px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Remove from Waitlist
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
