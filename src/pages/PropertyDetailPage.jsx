@@ -242,6 +242,19 @@ export default function PropertyDetailPage() {
 
   return (
     <>
+      <style>{`
+        .property-detail-grid {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) 320px;
+          gap: 24px;
+          align-items: start;
+        }
+        @media (max-width: 768px) {
+          .property-detail-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
       <div style={{ minHeight: "100vh", background: "#f8fafc", paddingBottom: "60px" }}>
         {/* Image Gallery */}
         <div style={{ position: "relative", height: "300px", background: "#e2e8f0" }}>
@@ -319,7 +332,7 @@ export default function PropertyDetailPage() {
 
         {/* Content */}
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "24px 16px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "24px" }}>
+          <div className="property-detail-grid">
             {/* Main Content */}
             <div>
               <div style={{ marginBottom: "16px", display: "flex", gap: "8px", alignItems: "center" }}>
@@ -362,6 +375,55 @@ export default function PropertyDetailPage() {
                 <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b", marginBottom: "12px" }}>Description</h2>
                 <p style={{ fontSize: "14px", color: "#475569", lineHeight: "1.7" }}>{property.description || "No description provided."}</p>
               </div>
+
+              {/* ── FULLY BOOKED BANNER — shown prominently in main content when no units ── */}
+              {!(property.availableUnits > 0) && (
+                <div style={{
+                  background: "linear-gradient(135deg, #3b0764, #4c1d95)",
+                  borderRadius: "14px",
+                  padding: "24px",
+                  marginBottom: "24px",
+                  color: "white",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "14px",
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <div style={{ fontSize: "28px" }}>🔒</div>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: "17px" }}>This property is fully booked</div>
+                      <div style={{ fontSize: "13px", color: "#c4b5fd", marginTop: "2px" }}>All units are currently occupied</div>
+                    </div>
+                  </div>
+                  <p style={{ fontSize: "13px", color: "#ddd6fe", margin: 0, lineHeight: "1.6" }}>
+                    Join the waitlist and the landlord will contact you directly when a unit becomes free.
+                    Requests are handled first-come, first-served.
+                  </p>
+                  <button
+                    onClick={() => setShowWaitlistModal(true)}
+                    style={{
+                      background: "white",
+                      color: "#6d28d9",
+                      border: "none",
+                      borderRadius: "10px",
+                      padding: "13px 24px",
+                      fontWeight: 700,
+                      fontSize: "14px",
+                      cursor: "pointer",
+                      alignSelf: "flex-start",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+                      <line x1="19" y1="8" x2="19" y2="14" /><line x1="22" y1="11" x2="16" y2="11" />
+                    </svg>
+                    Join the Waitlist
+                  </button>
+                </div>
+              )}
 
               {property.amenities?.length > 0 && (
                 <div style={{ marginBottom: "24px" }}>
