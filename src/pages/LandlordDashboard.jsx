@@ -671,11 +671,7 @@ export default function LandlordDashboard() {
       </header>
 
       {/* SIDEBAR NAVIGATION */}
-      <aside style={{
-        ...styles.sidebar,
-        transform: mobileMenuOpen ? "translateX(0)" : "translateX(-100%)",
-        left: mobileMenuOpen ? "0" : "-260px",
-      }} className="axx-sidebar">
+      <aside style={styles.sidebar} className={`axx-sidebar${mobileMenuOpen ? " open" : ""}`}>
         <div style={styles.sidebarHeader}>
           <div style={styles.logoRow}>
             <img src={logo} alt="Axxspace Logo" style={styles.logoImg} />
@@ -2447,6 +2443,11 @@ const cssStyles = `
       top: 60px !important;
       height: calc(100vh - 60px) !important;
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      left: 0 !important;
+      transform: translateX(-100%);
+    }
+    .axx-sidebar.open {
+      transform: translateX(0) !important;
     }
     main[style*="mainContent"] {
       padding: 20px !important;
