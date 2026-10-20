@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { useSearchParams } from "react-router-dom";
 
 import RequestItemModal from "../components/RequestItemModal";
@@ -348,6 +349,50 @@ export default function Listings() {
   const [agents, setAgents] = useState([]);
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [agentsLoading, setAgentsLoading] = useState(false);
+
+  // Waitlist
+  const [showWaitlistModal, setShowWaitlistModal] = useState(false);
+  const [waitlistData, setWaitlistData] = useState({ name: "", email: "", phone: "", message: "" });
+  const [waitlistLoading, setWaitlistLoading] = useState(false);
+  const [waitlistSuccess, setWaitlistSuccess] = useState("");
+  const [waitlistError, setWaitlistError] = useState("");
+
+  const openWaitlist = () => {
+    setWaitlistData({
+      name: user?.name || "",
+      email: user?.email || "",
+      phone: user?.phone || "",
+      message: "",
+    });
+    setWaitlistError("");
+    setWaitlistSuccess("");
+    setShowWaitlistModal(true);
+  };
+
+  const handleWaitlistSubmit = async (e) => {
+    e.preventDefault();
+    setWaitlistLoading(true);
+    setWaitlistError("");
+    setWaitlistSuccess("");
+    try {
+      const response = await fetch(`${API_BASE}/waitlist/${selectedProperty._id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(waitlistData),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to join waitlist");
+      setWaitlistSuccess(data.message || "You have been added to the waitlist!");
+      setTimeout(() => {
+        setShowWaitlistModal(false);
+        setWaitlistSuccess("");
+      }, 2500);
+    } catch (err) {
+      setWaitlistError(err.message);
+    } finally {
+      setWaitlistLoading(false);
+    }
+  };
 
   // Fetch properties on mount
   useEffect(() => {
@@ -1988,10 +2033,87 @@ Please contact me back with viewing details. Thank you!`;
                   </div>
                 </div>
               ) : (
-                <div className="modal-occupied-banner">
-                  <h4>This Property is Currently Fully Occupied</h4>
-                  <p>All units are rented out. You can bookmark it to receive availability updates.</p>
-                </div>
+                <>
+                  <div className="modal-occupied-banner">
+                    <h4>This Property is Currently Fully Occupied</h4>
+                    <p>All units are rented out. Join the waitlist and the landlord will contact you when a unit becomes free.</p>
+                    <button
+                      type="button"
+                      id="join-waitlist-btn"
+                      onClick={openWaitlist}
+                      style={{ marginTop: 10, padding: "12px 20px", background: "linear-gradient(135deg,#7c3aed,#6d28d9)", color: "#fff", border: "none", borderRadius: 8, fontWeight: 700, cursor: "pointer", width: "100%" }}
+                    >
+                      Join Waitlist
+                    </button>
+                  </div>
+
+                  {showWaitlistModal &&
+                    createPortal(
+                      <div
+                        style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 100000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}
+                        onClick={() => setShowWaitlistModal(false)}
+                      >
+                        <div
+                          style={{ background: "#fff", borderRadius: 12, padding: 24, width: "100%", maxWidth: 420, maxHeight: "90vh", overflowY: "auto" }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <h3 style={{ margin: "0 0 4px", color: "#1e293b" }}>Join the Waitlist</h3>
+                          <p style={{ margin: "0 0 16px", color: "#64748b", fontSize: 14 }}>{selectedProperty.title}</p>
+
+                          {waitlistSuccess && (
+                            <div style={{ background: "#dcfce7", color: "#166534", padding: 10, borderRadius: 8 }}>✅ {waitlistSuccess}</div>
+                          )}
+                          {waitlistError && (
+                            <div style={{ background: "#fee2e2", color: "#991b1b", padding: 10, borderRadius: 8, marginBottom: 10 }}>⚠️ {waitlistError}</div>
+                          )}
+
+                          {!waitlistSuccess && (
+                            <form onSubmit={handleWaitlistSubmit}>
+                              {[
+                                ["name", "Full name", "text"],
+                                ["email", "Email", "email"],
+                                ["phone", "Phone (e.g. 0712345678)", "tel"],
+                              ].map(([key, label, type]) => (
+                                <input
+                                  key={key}
+                                  type={type}
+                                  required
+                                  placeholder={label}
+                                  value={waitlistData[key]}
+                                  onChange={(e) => setWaitlistData({ ...waitlistData, [key]: e.target.value })}
+                                  style={{ width: "100%", padding: 12, marginBottom: 10, border: "1px solid #cbd5e1", borderRadius: 8, boxSizing: "border-box", color: "#1e293b", background: "#fff" }}
+                                />
+                              ))}
+                              <textarea
+                                placeholder="Message (optional)"
+                                rows={3}
+                                value={waitlistData.message}
+                                onChange={(e) => setWaitlistData({ ...waitlistData, message: e.target.value })}
+                                style={{ width: "100%", padding: 12, marginBottom: 12, border: "1px solid #cbd5e1", borderRadius: 8, boxSizing: "border-box", color: "#1e293b", background: "#fff" }}
+                              />
+                              <div style={{ display: "flex", gap: 8 }}>
+                                <button
+                                  type="button"
+                                  onClick={() => setShowWaitlistModal(false)}
+                                  style={{ flex: 1, padding: 12, borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#1e293b", cursor: "pointer" }}
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  type="submit"
+                                  disabled={waitlistLoading}
+                                  style={{ flex: 2, padding: 12, borderRadius: 8, border: "none", background: "linear-gradient(135deg,#7c3aed,#6d28d9)", color: "#fff", fontWeight: 700, cursor: waitlistLoading ? "not-allowed" : "pointer", opacity: waitlistLoading ? 0.7 : 1 }}
+                                >
+                                  {waitlistLoading ? "Joining..." : "Join Waitlist"}
+                                </button>
+                              </div>
+                            </form>
+                          )}
+                        </div>
+                      </div>,
+                      document.body
+                    )}
+                </>
               )}
 
               {/* In-Modal Direct Messaging */}
