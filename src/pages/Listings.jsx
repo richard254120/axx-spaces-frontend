@@ -1995,7 +1995,7 @@ Please contact me back with viewing details. Thank you!`;
                     <ShareProperty property={selectedProperty} />
                   </div>
 
-                  {/* 4 Direct Contact Buttons */}
+                  {/* Direct Contact Buttons */}
                   <div className="modal-cta-buttons-grid">
                     <button
                       type="button"
@@ -2021,14 +2021,6 @@ Please contact me back with viewing details. Thank you!`;
                       onClick={() => handleSendSMS(selectedProperty)}
                     >
                       <span>Send SMS</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      className="cta-btn cta-book"
-                      onClick={() => handleBookNow(selectedProperty)}
-                    >
-                      <span>Book via M-Pesa</span>
                     </button>
                   </div>
                 </div>
@@ -4084,12 +4076,12 @@ const css = `
 
   .modal-cta-buttons-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
   }
   @media (max-width: 640px) {
     .modal-cta-buttons-grid {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
     }
   }
 
