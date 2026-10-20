@@ -2091,7 +2091,7 @@ export default function AdminDashboard() {
                         <div style={styles.propLoc}>{req.email}</div>
                         {req.phone && (
                           <div style={{ fontSize: "12px", color: "#38bdf8", marginTop: "2px" }}>
-                            📞 {req.phone}
+                            Tel: {req.phone}
                           </div>
                         )}
                         {req.preferredContact && (
@@ -2107,7 +2107,7 @@ export default function AdminDashboard() {
                             color: req.preferredContact === "whatsapp" ? "#4ade80" : "#cbd5e1",
                             border: req.preferredContact === "whatsapp" ? "1px solid rgba(34,197,94,0.3)" : "1px solid rgba(255,255,255,0.1)"
                           }}>
-                            Prefers: {req.preferredContact}
+                            Channel: {req.preferredContact}
                           </span>
                         )}
                       </td>
@@ -2136,7 +2136,7 @@ export default function AdminDashboard() {
                               color: uStyle.text,
                               border: `1px solid ${uStyle.border}`
                             }}>
-                              {req.urgency === "immediate" ? "⚡ Immediate" : req.urgency.replace("_", " ")}
+                              {req.urgency === "immediate" ? "Immediate" : req.urgency.replace("_", " ")}
                             </span>
                           )}
                         </div>
@@ -2152,22 +2152,12 @@ export default function AdminDashboard() {
                       <td style={styles.td}>
                         {req.targetLocation && (
                           <div style={{ fontSize: "12px", color: "#e2e8f0", marginBottom: "4px" }}>
-                            📍 {req.targetLocation}
-                          </div>
-                        )}
-                        {req.pickupLocation && (
-                          <div style={{ fontSize: "11px", color: "#94a3b8" }}>
-                            📦 From: {req.pickupLocation}
-                          </div>
-                        )}
-                        {req.dropoffLocation && (
-                          <div style={{ fontSize: "11px", color: "#94a3b8", marginBottom: "4px" }}>
-                            🏁 To: {req.dropoffLocation}
+                            Location: {req.targetLocation}
                           </div>
                         )}
                         {(req.budgetMin || req.budgetMax) ? (
                           <div style={{ fontSize: "12px", color: "#34d399", fontWeight: 700 }}>
-                            💰 {req.budgetCurrency || "KES"} {req.budgetMin ? Number(req.budgetMin).toLocaleString() : "0"} - {req.budgetMax ? Number(req.budgetMax).toLocaleString() : "Flex"}{req.budgetPeriod === "monthly" ? " / mo" : ""}
+                            {req.budgetCurrency || "KES"} {req.budgetMin ? Number(req.budgetMin).toLocaleString() : "0"} - {req.budgetMax ? Number(req.budgetMax).toLocaleString() : "Flex"}{req.budgetPeriod === "monthly" ? " / mo" : ""}
                           </div>
                         ) : (
                           <span style={{ fontSize: "11px", color: "#64748b" }}>Budget open</span>
@@ -2231,13 +2221,10 @@ export default function AdminDashboard() {
                                   borderRadius: "6px",
                                   fontSize: "11px",
                                   fontWeight: 700,
-                                  textDecoration: "none",
-                                  display: "inline-flex",
-                                  alignItems: "center",
-                                  gap: "4px"
+                                  textDecoration: "none"
                                 }}
                               >
-                                💬 WhatsApp
+                                WhatsApp
                               </a>
                             )}
                             {req.phone && (
@@ -2254,7 +2241,7 @@ export default function AdminDashboard() {
                                   textDecoration: "none"
                                 }}
                               >
-                                📞 Call
+                                Call
                               </a>
                             )}
                             <a
@@ -2270,7 +2257,7 @@ export default function AdminDashboard() {
                                 textDecoration: "none"
                               }}
                             >
-                              ✉️ Email
+                              Email
                             </a>
                           </div>
                         </div>

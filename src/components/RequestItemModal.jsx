@@ -2,22 +2,121 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
 
+// Professional SVG Icons
+const Icons = {
+  rental: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <polyline points="9 22 9 12 15 12 15 22" />
+    </svg>
+  ),
+  quicksale: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+      <line x1="7" y1="7" x2="7.01" y2="7" />
+    </svg>
+  ),
+  accommodation: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 4v16" />
+      <path d="M2 8h18a2 2 0 0 1 2 2v10" />
+      <path d="M2 17h20" />
+      <path d="M6 8v9" />
+    </svg>
+  ),
+  business: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+    </svg>
+  ),
+  other: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="12 2 2 7 12 12 22 7 12 2" />
+      <polyline points="2 17 12 22 22 17" />
+      <polyline points="2 12 12 17 22 12" />
+    </svg>
+  ),
+  pin: (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
+  ),
+  zap: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+    </svg>
+  ),
+  calendar: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+    </svg>
+  ),
+  clock: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  ),
+  whatsapp: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.067-2.228-.567-1.959-.811-3.21-2.809-3.308-2.938-.096-.13-1.015-1.349-1.015-2.574 0-1.226.643-1.828.871-2.074.228-.246.498-.308.664-.308.166 0 .332.002.477.01.155.008.363-.058.568.435.213.513.727 1.77.79 1.899.063.13.104.283.018.455-.087.172-.131.28-.26.433-.129.153-.271.34-.388.457-.13.13-.265.27-.114.529.15.26 0.669 1.103 1.436 1.785.986.877 1.817 1.149 2.077 1.278.26.13.411.11.564-.066.155-.176.662-.771.84-1.036.177-.265.353-.221.593-.132.24.088 1.527.72 1.79.851.263.131.438.196.503.306.066.11.066.64-.078 1.045zM12 2C6.477 2 2 6.477 2 12c0 1.891.524 3.662 1.435 5.179L2 22l4.953-1.401A9.957 9.957 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/>
+    </svg>
+  ),
+  phone: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+    </svg>
+  ),
+  mail: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+      <polyline points="22,6 12,13 2,6" />
+    </svg>
+  ),
+  send: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="22" y1="2" x2="11" y2="13" />
+      <polygon points="22 2 15 22 11 13 2 9 22 2" />
+    </svg>
+  ),
+  check: (
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  ),
+  sparkle: (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 0l2.5 8.5L23 11l-8.5 2.5L12 22l-2.5-8.5L1 11l8.5-2.5z" />
+    </svg>
+  ),
+  alert: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="16" x2="12.01" y2="16" />
+    </svg>
+  )
+};
+
 const SERVICE_CATEGORIES = [
-  { id: "rental", label: "Rental & Spaces", icon: "🏠", hint: "Apartments, villas, bedsitters, hostels & commercial spaces" },
-  { id: "mover", label: "Movers & Logistics", icon: "🚚", hint: "House moves, office relocation & cargo haulage" },
-  { id: "material", label: "Building Materials", icon: "🧱", hint: "Cement, iron sheets, timber, tiles & hardware" },
-  { id: "business", label: "Biashara Services", icon: "💼", hint: "Retail spaces, stalls, office supplies & machinery" },
-  { id: "tourism", label: "Tourism & Travel", icon: "✈️", hint: "Holiday homes, safari packages & tour bookings" },
-  { id: "other", label: "Custom Sourcing", icon: "📦", hint: "Any specific item or service not listed on the platform" },
+  { id: "rental", label: "Rentals & Properties", icon: Icons.rental, hint: "Apartments, villas, bedsitters, hostels & commercial spaces" },
+  { id: "quicksale", label: "QuickSales", icon: Icons.quicksale, hint: "Electronics, vehicles, household items, furniture & fast deals" },
+  { id: "accommodation", label: "Accommodation", icon: Icons.accommodation, hint: "Hotels, holiday stays, BNBs, guest houses & executive suites" },
+  { id: "business", label: "Biashara Services", icon: Icons.business, hint: "Retail spaces, stalls, office supplies & commercial equipment" },
+  { id: "other", label: "Others", icon: Icons.other, hint: "Any general item, specialized tool, or bespoke service" },
 ];
 
 const CATEGORY_QUICK_TAGS = {
-  rental: ["1 Bedroom", "2 Bedrooms", "3+ Bedrooms", "Bedsitter", "Furnished Apartment", "Commercial Office", "Student Hostel"],
-  mover: ["Pickup Truck (1-2 Ton)", "Canter (3-5 Ton)", "Full House Relocation", "Office Moving", "With Loading Crew"],
-  material: ["Simba Cement 32.5R", "Box Profile Mabati (28G)", "Treated Timber 2x4", "Porcelain Floor Tiles", "Steel TMT Bars"],
-  business: ["Retail Stall / Shop", "Office Furniture", "Point of Sale (POS)", "Commercial Kitchen Equipment"],
-  tourism: ["Maasai Mara Safari", "Diani Beach Villa", "Weekend Getaway", "Mount Kenya Trekking"],
-  other: ["Electronics", "Solar Backup System", "Farm Equipment", "Catering Equipment"]
+  rental: ["1 Bedroom", "2 Bedrooms", "3+ Bedrooms", "Bedsitter", "Furnished Apartment", "Commercial Office", "Hostel Room"],
+  quicksale: ["Smartphones & Laptops", "Home Furniture", "Vehicles & Motorbikes", "Electronics & TVs", "Household Appliances", "Land & Plots"],
+  accommodation: ["BNB / Short Stay", "Executive Hotel Suite", "Holiday Villa", "Guest House", "Weekend Getaway", "Furnished Studio"],
+  business: ["Retail Stall / Shop", "Office Furniture", "Point of Sale (POS)", "Commercial Kitchen Equipment", "Display Racks"],
+  other: ["Specialized Equipment", "Event Supplies", "Hardware Tools", "Custom Procurement"]
 };
 
 const POPULAR_LOCATIONS = ["Nairobi", "Kilimani", "Westlands", "Ruaka", "Mombasa", "Nakuru", "Eldoret", "Kisumu", "Kiambu"];
@@ -37,13 +136,11 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [details, setDetails] = useState("");
   const [targetLocation, setTargetLocation] = useState("");
-  const [pickupLocation, setPickupLocation] = useState("");
-  const [dropoffLocation, setDropoffLocation] = useState("");
   const [budgetMin, setBudgetMin] = useState("");
   const [budgetMax, setBudgetMax] = useState("");
   const [budgetCurrency, setBudgetCurrency] = useState("KES");
   const [budgetPeriod, setBudgetPeriod] = useState("monthly");
-  const [urgency, setUrgency] = useState("flexible");
+  const [urgency, setUrgency] = useState("this_week");
   const [preferredContact, setPreferredContact] = useState("whatsapp");
 
   // Contact info
@@ -58,16 +155,20 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
 
   useEffect(() => {
     if (isOpen) {
-      setServiceType(defaultService || "rental");
+      // Map previous defaults if legacy value passed
+      let initCat = defaultService;
+      if (initCat === "mover") initCat = "quicksale";
+      if (initCat === "material") initCat = "accommodation";
+      if (initCat === "tourism") initCat = "accommodation";
+
+      setServiceType(initCat || "rental");
       setSearchQuery(initialQuery || "");
       setDetails("");
       setTargetLocation("");
-      setPickupLocation("");
-      setDropoffLocation("");
       setBudgetMin("");
       setBudgetMax("");
       setBudgetCurrency("KES");
-      setBudgetPeriod(defaultService === "rental" ? "monthly" : "total");
+      setBudgetPeriod(initCat === "rental" ? "monthly" : "total");
       setUrgency("this_week");
       setPreferredContact("whatsapp");
       setErrorMsg("");
@@ -91,6 +192,8 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
   useEffect(() => {
     if (serviceType === "rental") {
       setBudgetPeriod("monthly");
+    } else if (serviceType === "accommodation") {
+      setBudgetPeriod("daily");
     } else {
       setBudgetPeriod("total");
     }
@@ -118,13 +221,7 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
   };
 
   const handleAddLocation = (loc) => {
-    if (serviceType === "mover") {
-      if (!pickupLocation) setPickupLocation(loc);
-      else if (!dropoffLocation) setDropoffLocation(loc);
-      else setDropoffLocation(loc);
-    } else {
-      setTargetLocation(loc);
-    }
+    setTargetLocation(loc);
   };
 
   const handleSubmit = async (e) => {
@@ -134,7 +231,7 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
     // Name validation
     const trimmedName = name.trim();
     if (!trimmedName || trimmedName.toLowerCase().startsWith("guest")) {
-      setErrorMsg("Please enter your actual full name (not a guest identifier).");
+      setErrorMsg("Please enter your actual full name.");
       return;
     }
 
@@ -174,8 +271,6 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
         searchQuery: searchQuery.trim(),
         details: details.trim(),
         targetLocation: targetLocation.trim(),
-        pickupLocation: pickupLocation.trim(),
-        dropoffLocation: dropoffLocation.trim(),
         budgetMin: budgetMin ? Number(budgetMin) : null,
         budgetMax: budgetMax ? Number(budgetMax) : null,
         budgetCurrency,
@@ -213,7 +308,10 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
         {/* Header Bar */}
         <div className="ax-req-header">
           <div className="ax-req-header-left">
-            <span className="ax-req-badge">✨ AxxSpace Concierge Sourcing</span>
+            <span className="ax-req-badge">
+              <span className="ax-req-badge-icon">{Icons.sparkle}</span>
+              AxxSpace Concierge Sourcing
+            </span>
             <h2 className="ax-req-title">Can't Find What You Need?</h2>
             <p className="ax-req-subtitle">
               Submit a custom request. Our administrators and verified providers across Kenya will locate and match it directly for you.
@@ -228,9 +326,9 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
           /* SUCCESS CONFIRMATION VIEW */
           <div className="ax-req-success-view">
             <div className="ax-req-success-icon-wrap">
-              <span className="ax-req-success-check">✓</span>
+              {Icons.check}
             </div>
-            <h3 className="ax-req-success-title">Request Successfully Broadcast!</h3>
+            <h3 className="ax-req-success-title">Request Successfully Broadcast</h3>
             <p className="ax-req-success-desc">
               Thank you, <strong style={{ color: "#fbbf24" }}>{submittedData.name}</strong>. Your custom request for{" "}
               <strong style={{ color: "#ffffff" }}>"{submittedData.searchQuery}"</strong> has been submitted to our concierge desk and verified providers.
@@ -254,7 +352,7 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
             </div>
 
             <p className="ax-req-success-note">
-              💡 We are currently checking availability. Our verified partner or admin will reach out to you shortly via your preferred channel.
+              We are currently checking availability. Our verified partner or admin will reach out to you shortly via your preferred channel.
             </p>
 
             <button type="button" className="ax-req-submit-btn" onClick={onClose} style={{ marginTop: "12px" }}>
@@ -266,7 +364,8 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
           <form onSubmit={handleSubmit} className="ax-req-form">
             {errorMsg && (
               <div className="ax-req-alert-error">
-                <span>⚠️ {errorMsg}</span>
+                <span className="ax-req-alert-icon">{Icons.alert}</span>
+                <span>{errorMsg}</span>
               </div>
             )}
 
@@ -307,13 +406,13 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
                 placeholder={
                   serviceType === "rental"
                     ? "e.g., 2 Bedroom Apartment in Kilimani with Balcony"
-                    : serviceType === "mover"
-                    ? "e.g., 2-Bedroom House Relocation with Packing"
-                    : serviceType === "material"
-                    ? "e.g., 100 Bags Simba Cement 32.5R & Binding Wire"
+                    : serviceType === "quicksale"
+                    ? "e.g., iPhone 14 Pro Max 256GB, 55-inch Smart TV, 5-seater Sofa"
+                    : serviceType === "accommodation"
+                    ? "e.g., 2-Night Stay Executive Suite in Westlands with Pool"
                     : serviceType === "business"
-                    ? "e.g., Prime Retail Stall near Tom Mboya St"
-                    : "e.g., Specify item, machine or exact service name"
+                    ? "e.g., Prime Retail Stall near Tom Mboya St or Commercial POS System"
+                    : "e.g., Specify item, equipment or bespoke service required"
                 }
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -340,61 +439,36 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
               )}
             </div>
 
-            {/* SECTION 3: Location / Route Details */}
+            {/* SECTION 3: Location Details */}
             <div className="ax-req-section">
               <label className="ax-req-section-label">
-                <span className="ax-req-step-num">3</span> Target Location & Route
+                <span className="ax-req-step-num">3</span> Target Location & Area
               </label>
-
-              {serviceType === "mover" ? (
-                <div className="ax-req-grid-2">
-                  <div className="ax-req-field">
-                    <span className="ax-req-input-sublabel">📦 Moving From (Pickup) *</span>
-                    <input
-                      type="text"
-                      className="ax-req-input"
-                      placeholder="e.g. Westlands, Nairobi"
-                      value={pickupLocation}
-                      onChange={(e) => setPickupLocation(e.target.value)}
-                    />
-                  </div>
-                  <div className="ax-req-field">
-                    <span className="ax-req-input-sublabel">🏁 Moving To (Destination) *</span>
-                    <input
-                      type="text"
-                      className="ax-req-input"
-                      placeholder="e.g. Ruaka / Kiambu"
-                      value={dropoffLocation}
-                      onChange={(e) => setDropoffLocation(e.target.value)}
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="ax-req-field">
-                  <input
-                    type="text"
-                    className="ax-req-input"
-                    placeholder="e.g., Kilimani, Nairobi or Mombasa Road, Machakos"
-                    value={targetLocation}
-                    onChange={(e) => setTargetLocation(e.target.value)}
-                  />
-                  <div className="ax-req-tags-wrap" style={{ marginTop: "6px" }}>
-                    <span className="ax-req-tags-label">Popular areas:</span>
-                    <div className="ax-req-tags-list">
-                      {POPULAR_LOCATIONS.map((loc) => (
-                        <button
-                          key={loc}
-                          type="button"
-                          className="ax-req-tag-btn"
-                          onClick={() => handleAddLocation(loc)}
-                        >
-                          📍 {loc}
-                        </button>
-                      ))}
-                    </div>
+              <div className="ax-req-field">
+                <input
+                  type="text"
+                  className="ax-req-input"
+                  placeholder="e.g., Kilimani, Nairobi or Mombasa Road, Machakos"
+                  value={targetLocation}
+                  onChange={(e) => setTargetLocation(e.target.value)}
+                />
+                <div className="ax-req-tags-wrap" style={{ marginTop: "6px" }}>
+                  <span className="ax-req-tags-label">Popular areas:</span>
+                  <div className="ax-req-tags-list">
+                    {POPULAR_LOCATIONS.map((loc) => (
+                      <button
+                        key={loc}
+                        type="button"
+                        className="ax-req-tag-btn"
+                        onClick={() => handleAddLocation(loc)}
+                      >
+                        <span className="ax-req-tag-icon">{Icons.pin}</span>
+                        {loc}
+                      </button>
+                    ))}
                   </div>
                 </div>
-              )}
+              </div>
             </div>
 
             {/* SECTION 4: Budget & Urgency */}
@@ -405,7 +479,7 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
 
               <div className="ax-req-grid-3">
                 <div className="ax-req-field">
-                  <span className="ax-req-input-sublabel">Currency & Scope</span>
+                  <span className="ax-req-input-sublabel">Currency & Frequency</span>
                   <div className="ax-req-input-group">
                     <select
                       className="ax-req-select"
@@ -423,7 +497,7 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
                     >
                       <option value="monthly">Per Month</option>
                       <option value="total">Total Budget</option>
-                      <option value="daily">Per Day</option>
+                      <option value="daily">Per Day / Night</option>
                       <option value="unit">Per Unit</option>
                     </select>
                   </div>
@@ -458,13 +532,13 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
 
               {/* Urgency Selector */}
               <div className="ax-req-field" style={{ marginTop: "12px" }}>
-                <span className="ax-req-input-sublabel">How soon is this needed?</span>
+                <span className="ax-req-input-sublabel">Required Timeline</span>
                 <div className="ax-req-urgency-grid">
                   {[
-                    { id: "immediate", label: "⚡ Immediate", sub: "Within 24-48 hrs" },
-                    { id: "this_week", label: "📅 This Week", sub: "Next 3-7 days" },
-                    { id: "this_month", label: "🗓️ This Month", sub: "Planning ahead" },
-                    { id: "flexible", label: "🕒 Flexible", sub: "Just exploring" },
+                    { id: "immediate", label: "Immediate", sub: "Within 24-48 hrs", icon: Icons.zap },
+                    { id: "this_week", label: "This Week", sub: "Next 3-7 days", icon: Icons.calendar },
+                    { id: "this_month", label: "This Month", sub: "Planning ahead", icon: Icons.calendar },
+                    { id: "flexible", label: "Flexible", sub: "Just exploring", icon: Icons.clock },
                   ].map((u) => (
                     <button
                       key={u.id}
@@ -472,7 +546,10 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
                       className={`ax-req-urgency-btn ${urgency === u.id ? "active" : ""}`}
                       onClick={() => setUrgency(u.id)}
                     >
-                      <span className="ax-req-urgency-title">{u.label}</span>
+                      <span className="ax-req-urgency-title">
+                        <span className="ax-req-urgency-icon">{u.icon}</span>
+                        {u.label}
+                      </span>
                       <span className="ax-req-urgency-sub">{u.sub}</span>
                     </button>
                   ))}
@@ -492,10 +569,10 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
                 placeholder={
                   serviceType === "rental"
                     ? "Specify preferred floor level, amenities (backup generator, borehole, balcony, lift), parking slots, pet policy, or move-in date..."
-                    : serviceType === "mover"
-                    ? "List major items: beds, fridge, TV, boxes, stairs or elevator at pickup/destination, packing services needed..."
-                    : serviceType === "material"
-                    ? "Specify required quantities, brand preference, grade, dimensions, and whether site delivery or offloading is needed..."
+                    : serviceType === "quicksale"
+                    ? "Specify model, condition (brand new or lightly used), storage capacity, warranty requirement, or accessories needed..."
+                    : serviceType === "accommodation"
+                    ? "Specify check-in date, number of guests, meal plans (bed & breakfast), pool, parking, or special arrangements..."
                     : "Provide detailed specifications, dimensions, brand, or any unique requirements..."
                 }
                 value={details}
@@ -508,7 +585,7 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
               </div>
             </div>
 
-            {/* SECTION 6: Requester Contact Details (FIXES GUEST BUG) */}
+            {/* SECTION 6: Requester Contact Details (No anonymous guest names) */}
             <div className="ax-req-section ax-req-contact-section">
               <div className="ax-req-contact-header">
                 <label className="ax-req-section-label" style={{ marginBottom: 0 }}>
@@ -520,7 +597,7 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
                     className="ax-req-text-btn"
                     onClick={() => setCustomizingContact(true)}
                   >
-                    ✏️ Change details
+                    Change details
                   </button>
                 )}
               </div>
@@ -572,7 +649,7 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
                   <div className="ax-req-field" style={{ marginTop: "10px" }}>
                     <span className="ax-req-input-sublabel">Phone / WhatsApp Number *</span>
                     <div className="ax-req-phone-wrap">
-                      <span className="ax-req-phone-prefix">🇰🇪 +254</span>
+                      <span className="ax-req-phone-prefix">+254</span>
                       <input
                         type="tel"
                         className="ax-req-input ax-req-phone-input"
@@ -588,12 +665,12 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
 
               {/* Preferred Contact Mode */}
               <div className="ax-req-field" style={{ marginTop: "14px" }}>
-                <span className="ax-req-input-sublabel">How would you prefer to be contacted?</span>
+                <span className="ax-req-input-sublabel">Preferred Contact Channel</span>
                 <div className="ax-req-pref-grid">
                   {[
-                    { id: "whatsapp", label: "💬 WhatsApp", desc: "Fastest response" },
-                    { id: "phone", label: "📞 Direct Call", desc: "Voice conversation" },
-                    { id: "email", label: "✉️ Email", desc: "Written quotes" },
+                    { id: "whatsapp", label: "WhatsApp", desc: "Fastest response", icon: Icons.whatsapp },
+                    { id: "phone", label: "Direct Call", desc: "Voice conversation", icon: Icons.phone },
+                    { id: "email", label: "Email", desc: "Written offers", icon: Icons.mail },
                   ].map((p) => (
                     <button
                       key={p.id}
@@ -601,7 +678,10 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
                       className={`ax-req-pref-btn ${preferredContact === p.id ? "active" : ""}`}
                       onClick={() => setPreferredContact(p.id)}
                     >
-                      <span className="ax-req-pref-title">{p.label}</span>
+                      <span className="ax-req-pref-title">
+                        <span className="ax-req-pref-icon">{p.icon}</span>
+                        {p.label}
+                      </span>
                       <span className="ax-req-pref-sub">{p.desc}</span>
                     </button>
                   ))}
@@ -621,7 +701,9 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
                     <span className="ax-req-spinner" /> Submitting Request...
                   </span>
                 ) : (
-                  <span>🚀 Broadcast Custom Request</span>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+                    {Icons.send} Broadcast Custom Request
+                  </span>
                 )}
               </button>
 
@@ -695,17 +777,23 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
         }
 
         .ax-req-badge {
-          display: inline-block;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
           font-size: 11px;
           font-weight: 700;
           color: #fbbf24;
           background: rgba(251, 191, 36, 0.12);
           border: 1px solid rgba(251, 191, 36, 0.3);
-          padding: 3px 10px;
+          padding: 4px 10px;
           border-radius: 20px;
           text-transform: uppercase;
           letter-spacing: 0.8px;
           margin-bottom: 8px;
+        }
+        .ax-req-badge-icon {
+          display: inline-flex;
+          color: #fbbf24;
         }
 
         .ax-req-title {
@@ -797,12 +885,12 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
           background: rgba(26, 38, 57, 0.6);
           border: 1px solid rgba(255, 255, 255, 0.08);
           border-radius: 12px;
-          padding: 12px 10px;
+          padding: 14px 10px;
           display: flex;
           flex-direction: column;
           align-items: center;
           text-align: center;
-          gap: 6px;
+          gap: 8px;
           cursor: pointer;
           transition: all 0.2s ease;
           color: #cbd5e1;
@@ -820,11 +908,18 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
         }
 
         .ax-req-cat-icon {
-          font-size: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #fbbf24;
+        }
+        .ax-req-cat-card.selected .ax-req-cat-icon {
+          color: #fbbf24;
         }
         .ax-req-cat-name {
           font-size: 12px;
           font-weight: 700;
+          line-height: 1.3;
         }
 
         /* Inputs & Fields */
@@ -914,6 +1009,13 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
           border-radius: 14px;
           cursor: pointer;
           transition: all 0.15s;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .ax-req-tag-icon {
+          display: inline-flex;
+          color: #fbbf24;
         }
         .ax-req-tag-btn:hover {
           background: rgba(251, 191, 36, 0.15);
@@ -940,7 +1042,7 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 3px;
+          gap: 4px;
           cursor: pointer;
           transition: all 0.2s;
         }
@@ -956,6 +1058,13 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
           font-size: 12px;
           font-weight: 700;
           color: #f8fafc;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+        }
+        .ax-req-urgency-icon {
+          display: inline-flex;
+          color: #fbbf24;
         }
         .ax-req-urgency-sub {
           font-size: 10px;
@@ -1078,7 +1187,7 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 2px;
+          gap: 4px;
           cursor: pointer;
           transition: all 0.2s;
         }
@@ -1094,6 +1203,12 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
           font-size: 13px;
           font-weight: 700;
           color: #ffffff;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .ax-req-pref-icon {
+          display: inline-flex;
         }
         .ax-req-pref-sub {
           font-size: 10px;
@@ -1172,6 +1287,13 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
           border-radius: 10px;
           font-size: 13px;
           line-height: 1.4;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .ax-req-alert-icon {
+          display: inline-flex;
+          color: #ef4444;
         }
 
         /* Success View */
@@ -1191,13 +1313,9 @@ export default function RequestItemModal({ isOpen, onClose, initialQuery = "", d
           display: flex;
           align-items: center;
           justify-content: center;
+          color: #22c55e;
           margin-bottom: 20px;
           animation: axReqPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .ax-req-success-check {
-          color: #22c55e;
-          font-size: 32px;
-          font-weight: 900;
         }
         .ax-req-success-title {
           font-size: 22px;
