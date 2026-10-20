@@ -117,7 +117,7 @@ const MobileAppDownload = () => {
                   onClick={handleManagerDownload}
                   id="download-manager-apk-btn"
                 >
-                  Download Manager App (86 MB)
+                  Download Manager App
                 </button>
 
                 <button

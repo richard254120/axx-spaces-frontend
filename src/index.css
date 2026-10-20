@@ -164,3 +164,13 @@ div[style*="overflowY: auto"]::-webkit-scrollbar-thumb {
 div[style*="overflowY: auto"]::-webkit-scrollbar-thumb:hover {
   background: #b30000;
 }
+/* ---- Prevent horizontal scrolling on all devices ---- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body, #root {
+  max-width: 100%;
+  overflow-x: hidden;   /* fallback for older browsers */
+  overflow-x: clip;     /* modern: doesn't break position: sticky */
+}
+img, video { max-width: 100%; height: auto; }
+svg, canvas, iframe { max-width: 100%; }
+pre, code { white-space: pre-wrap; word-break: break-word; }
