@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 import { getPricelistUrl } from "../utils/fileLinks";
 import QRGeneratorModal from "../components/QRGeneratorModal";
+import AdminPropertyImageModal from "../components/AdminPropertyImageModal";
 
 export default function AdminDashboard() {
   const { token, user } = useContext(AuthContext);
@@ -14,6 +15,8 @@ export default function AdminDashboard() {
   const [propertyFilter, setPropertyFilter] = useState("pending");
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [selectedPropertyForQR, setSelectedPropertyForQR] = useState(null);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [selectedPropertyForImages, setSelectedPropertyForImages] = useState(null);
   const [pendingProviders, setPendingProviders] = useState([]);
   const [stats, setStats] = useState(null);
   const [allPending, setAllPending] = useState(null);
@@ -866,10 +869,37 @@ export default function AdminDashboard() {
                   {propertiesList.map((item) => (
                     <tr key={item._id} style={styles.tr}>
                       <td style={styles.td}>
-                        <div style={styles.propTitle}>{item.title}</div>
-                        <div style={{ ...styles.propLoc, display: "flex", alignItems: "center", gap: "4px" }}>
-                          <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                          <span>{item.location || `${item.area}, ${item.county}`}</span>
+                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                          {item.images?.[0] ? (
+                            <img
+                              src={typeof item.images[0] === "object" ? item.images[0]?.imageUrl || item.images[0]?.url : item.images[0]}
+                              alt=""
+                              style={{ width: "48px", height: "48px", borderRadius: "8px", objectFit: "cover", flexShrink: 0, border: "1px solid #e2e8f0", cursor: "pointer" }}
+                              onClick={() => {
+                                setSelectedPropertyForImages(item);
+                                setImageModalOpen(true);
+                              }}
+                              title="Click to edit property pictures"
+                            />
+                          ) : (
+                            <div
+                              style={{ width: "48px", height: "48px", borderRadius: "8px", background: "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8", fontSize: "10px", fontWeight: 700, flexShrink: 0, cursor: "pointer" }}
+                              onClick={() => {
+                                setSelectedPropertyForImages(item);
+                                setImageModalOpen(true);
+                              }}
+                              title="Click to add property pictures"
+                            >
+                              No Photo
+                            </div>
+                          )}
+                          <div>
+                            <div style={styles.propTitle}>{item.title}</div>
+                            <div style={{ ...styles.propLoc, display: "flex", alignItems: "center", gap: "4px" }}>
+                              <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                              <span>{item.location || `${item.area}, ${item.county}`}</span>
+                            </div>
+                          </div>
                         </div>
                         {/* Status & Availability Badges */}
                         <div style={{ marginTop: "6px", display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
@@ -912,6 +942,27 @@ export default function AdminDashboard() {
                       </td>
                       <td style={styles.td}>
                         <div style={styles.btnGroup}>
+                          <button
+                            onClick={() => {
+                              setSelectedPropertyForImages(item);
+                              setImageModalOpen(true);
+                            }}
+                            style={{
+                              background: "rgba(14, 165, 233, 0.15)",
+                              color: "#0284c7",
+                              border: "1px solid rgba(14, 165, 233, 0.3)",
+                              padding: "8px 14px", borderRadius: "8px", fontWeight: 700, cursor: "pointer",
+                              display: "inline-flex", alignItems: "center", gap: "6px"
+                            }}
+                            title="Edit or manage property images"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                              <circle cx="8.5" cy="8.5" r="1.5" />
+                              <polyline points="21 15 16 10 5 21" />
+                            </svg>
+                            Images ({item.images?.length || 0})
+                          </button>
                           <button
                             onClick={() => {
                               setSelectedPropertyForQR(item);
@@ -2278,6 +2329,26 @@ export default function AdminDashboard() {
           onClose={() => {
             setQrModalOpen(false);
             setSelectedPropertyForQR(null);
+          }}
+        />
+      )}
+
+      {imageModalOpen && selectedPropertyForImages && (
+        <AdminPropertyImageModal
+          isOpen={imageModalOpen}
+          onClose={() => {
+            setImageModalOpen(false);
+            setSelectedPropertyForImages(null);
+          }}
+          property={selectedPropertyForImages}
+          onSaved={(updatedProp) => {
+            setPropertiesList((prev) =>
+              prev.map((p) =>
+                p._id === updatedProp._id
+                  ? { ...p, images: updatedProp.images }
+                  : p
+              )
+            );
           }}
         />
       )}
