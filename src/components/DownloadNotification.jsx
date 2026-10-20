@@ -8,9 +8,10 @@ import React, { useState, useEffect } from "react";
  */
 const DownloadNotification = () => {
   const [visible, setVisible] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
-    // Inject slide-down animation only once
+    // Inject slide-down and slide-up animations only once
     const styleId = "download-notif-style";
     if (!document.getElementById(styleId)) {
       const style = document.createElement("style");
@@ -20,18 +21,43 @@ const DownloadNotification = () => {
           from { transform: translateY(-100%); opacity: 0; }
           to   { transform: translateY(0);    opacity: 1; }
         }
+        @keyframes slideUp {
+          from { transform: translateY(0);    opacity: 1; }
+          to   { transform: translateY(-100%); opacity: 0; }
+        }
       `;
       document.head.appendChild(style);
     }
 
+    let hideTimer;
+    let removeTimer;
+
     const dismissed = localStorage.getItem("axx_download_notification_dismissed_v2");
     if (dismissed !== "true") {
       setVisible(true);
+
+      // Auto-dismiss after 10 seconds
+      hideTimer = setTimeout(() => {
+        setIsClosing(true);
+        removeTimer = setTimeout(() => {
+          setVisible(false);
+          setIsClosing(false);
+        }, 400);
+      }, 10000);
     }
+
+    return () => {
+      if (hideTimer) clearTimeout(hideTimer);
+      if (removeTimer) clearTimeout(removeTimer);
+    };
   }, []);
 
   const handleClose = () => {
-    setVisible(false);
+    setIsClosing(true);
+    setTimeout(() => {
+      setVisible(false);
+      setIsClosing(false);
+    }, 400);
     localStorage.setItem("axx_download_notification_dismissed_v2", "true");
   };
 
@@ -55,7 +81,7 @@ const DownloadNotification = () => {
         boxShadow: "0 2px 12px rgba(79,70,229,0.35)",
         position: "relative",
         zIndex: 1100,
-        animation: "slideDown 0.4s ease-out",
+        animation: isClosing ? "slideUp 0.4s ease-in forwards" : "slideDown 0.4s ease-out",
       }}
     >
       {/* 📱 Icon + Text */}
