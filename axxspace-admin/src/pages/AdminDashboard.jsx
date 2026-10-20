@@ -2071,6 +2071,29 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
                   ))}
                 </div>
               )}
+              {tab === "properties" && !editMode && (
+                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
+                  <button
+                    type="button"
+                    onClick={onEdit}
+                    style={{
+                      padding: "6px 14px",
+                      background: "#f0fdf4",
+                      color: "#15803d",
+                      border: "1px solid #bbf7d0",
+                      borderRadius: "6px",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px"
+                    }}
+                  >
+                    Edit Property Photos
+                  </button>
+                </div>
+              )}
             </div>
           )}
           {item.videos && item.videos.length > 0 && (
@@ -2147,16 +2170,96 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
             </div>
           )}
           {editMode ? (
-            <div className="edit-grid">
-              {Object.entries(editData)
-                .filter(([k]) => !["_id", "__v", "password", "owner", "seller", "images", "photos", "coverImage", "image", "emailVerificationToken", "resetPasswordToken"].includes(k))
-                .map(([k, v]) => (
-                  typeof v === "object" ? null :
-                    <div key={k} className="edit-field">
-                      <label className="edit-label">{k}</label>
-                      <input className="edit-input" value={v ?? ""} onChange={e => setEditData({ ...editData, [k]: e.target.value })} />
-                    </div>
-                ))}
+            <div>
+              {/* Property Images Editor in Edit Mode */}
+              {tab === "properties" && (
+                <div style={{ marginBottom: "20px", padding: "16px", background: "#f8fafc", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                    <h4 style={{ margin: 0, fontSize: "14px", fontWeight: 700, color: "#0f172a" }}>
+                      Property Images ({(editData.images || []).length})
+                    </h4>
+                    <span style={{ fontSize: "12px", color: "#64748b" }}>
+                      First photo is the main cover
+                    </span>
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))", gap: "10px", marginBottom: "12px" }}>
+                    {(editData.images || []).map((img, i) => {
+                      const src = typeof img === "object" ? img?.imageUrl || img?.url : img;
+                      return (
+                        <div key={i} style={{ position: "relative", borderRadius: "8px", overflow: "hidden", border: i === 0 ? "2px solid #0ea5e9" : "1px solid #cbd5e1", aspectRatio: "4/3", background: "#0f172a" }}>
+                          <img src={src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          {i === 0 ? (
+                            <span style={{ position: "absolute", top: 3, left: 3, background: "#0ea5e9", color: "#fff", fontSize: "9px", fontWeight: 800, padding: "1px 5px", borderRadius: "3px" }}>Cover</span>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const selected = (editData.images || [])[i];
+                                const rem = (editData.images || []).filter((_, idx) => idx !== i);
+                                setEditData({ ...editData, images: [selected, ...rem] });
+                              }}
+                              style={{ position: "absolute", top: 3, left: 3, background: "rgba(0,0,0,0.75)", color: "#fff", border: "none", fontSize: "9px", fontWeight: 700, padding: "2px 5px", borderRadius: "3px", cursor: "pointer" }}
+                            >
+                              Cover
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditData({
+                                ...editData,
+                                images: (editData.images || []).filter((_, idx) => idx !== i)
+                              });
+                            }}
+                            style={{ position: "absolute", top: 3, right: 3, background: "rgba(220, 38, 38, 0.9)", color: "#fff", border: "none", borderRadius: "50%", width: "20px", height: "20px", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center" }}
+                            title="Delete photo"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <input
+                      type="text"
+                      placeholder="Paste image URL (https://...)"
+                      id="adminNewImageUrl"
+                      style={{ flex: 1, padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "13px" }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const input = document.getElementById("adminNewImageUrl");
+                        const val = input ? input.value.trim() : "";
+                        if (val && /^https?:\/\//i.test(val)) {
+                          setEditData({ ...editData, images: [...(editData.images || []), val] });
+                          if (input) input.value = "";
+                        } else {
+                          alert("Please enter a valid URL starting with http:// or https://");
+                        }
+                      }}
+                      style={{ padding: "8px 14px", background: "#0ea5e9", color: "#fff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 700, cursor: "pointer" }}
+                    >
+                      + Add Photo
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="edit-grid">
+                {Object.entries(editData)
+                  .filter(([k]) => !["_id", "__v", "password", "owner", "seller", "images", "photos", "coverImage", "image", "emailVerificationToken", "resetPasswordToken"].includes(k))
+                  .map(([k, v]) => (
+                    typeof v === "object" ? null :
+                      <div key={k} className="edit-field">
+                        <label className="edit-label">{k}</label>
+                        <input className="edit-input" value={v ?? ""} onChange={e => setEditData({ ...editData, [k]: e.target.value })} />
+                      </div>
+                  ))}
+              </div>
             </div>
           ) : (
             <div className="fields-grid">
