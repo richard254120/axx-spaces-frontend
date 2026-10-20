@@ -2003,6 +2003,33 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
   const images = getImages(item);
   const [imgIdx, setImgIdx] = useState(0);
   const [qrCodeUrl, setQrCodeUrl] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imageUploadError, setImageUploadError] = useState("");
+
+  const handleDeviceImageUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    setImageUploadError("");
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append("remainingImages", JSON.stringify(editData.images || []));
+      files.forEach((file) => {
+        formData.append("images", file);
+      });
+      const res = await API.patch(`/properties/${editData._id}/images`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      const updated = res.data?.images || res.data?.property?.images || [];
+      setEditData({ ...editData, images: updated });
+    } catch (err) {
+      console.error("Failed to upload device images:", err);
+      setImageUploadError(err?.response?.data?.error || err.message || "Failed to upload image(s) from device");
+    } finally {
+      setUploadingImage(false);
+      e.target.value = "";
+    }
+  };
   const fields = Object.entries(item).filter(([k]) =>
     !["_id", "__v", "password", "emailVerificationToken", "resetPasswordToken",
       "images", "photos", "coverImage", "image", "owner", "seller"].includes(k)
@@ -2222,29 +2249,48 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
                     })}
                   </div>
 
-                  <div style={{ display: "flex", gap: "8px" }}>
+                  {imageUploadError && (
+                    <div style={{ color: "#dc2626", fontSize: "12px", marginBottom: "8px", fontWeight: 600 }}>
+                      ⚠️ {imageUploadError}
+                    </div>
+                  )}
+
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
                     <input
-                      type="text"
-                      placeholder="Paste image URL (https://...)"
-                      id="adminNewImageUrl"
-                      style={{ flex: 1, padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "13px" }}
+                      type="file"
+                      id="admin-device-image-input"
+                      multiple
+                      accept="image/*"
+                      onChange={handleDeviceImageUpload}
+                      disabled={uploadingImage}
+                      style={{ display: "none" }}
                     />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const input = document.getElementById("adminNewImageUrl");
-                        const val = input ? input.value.trim() : "";
-                        if (val && /^https?:\/\//i.test(val)) {
-                          setEditData({ ...editData, images: [...(editData.images || []), val] });
-                          if (input) input.value = "";
-                        } else {
-                          alert("Please enter a valid URL starting with http:// or https://");
-                        }
+                    <label
+                      htmlFor="admin-device-image-input"
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        padding: "9px 16px",
+                        background: uploadingImage ? "#94a3b8" : "#0ea5e9",
+                        color: "#fff",
+                        borderRadius: "7px",
+                        fontSize: "13px",
+                        fontWeight: 700,
+                        cursor: uploadingImage ? "not-allowed" : "pointer",
+                        boxShadow: "0 2px 5px rgba(14, 165, 233, 0.3)",
                       }}
-                      style={{ padding: "8px 14px", background: "#0ea5e9", color: "#fff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 700, cursor: "pointer" }}
                     >
-                      + Add Photo
-                    </button>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" y1="3" x2="12" y2="15" />
+                      </svg>
+                      {uploadingImage ? "Uploading from Device..." : "Pick Pictures from Device"}
+                    </label>
+                    <span style={{ fontSize: "12px", color: "#64748b" }}>
+                      Select photos directly from your phone, laptop, or computer gallery
+                    </span>
                   </div>
                 </div>
               )}

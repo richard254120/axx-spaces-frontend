@@ -13,7 +13,7 @@ export default function AdminPropertyImageModal({ isOpen, onClose, property, onS
   const [images, setImages] = useState(initialImages);
   const [newFiles, setNewFiles] = useState([]);
   const [newPreviews, setNewPreviews] = useState([]);
-  const [urlInput, setUrlInput] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -26,7 +26,6 @@ export default function AdminPropertyImageModal({ isOpen, onClose, property, onS
     setImages(normalized);
     setNewFiles([]);
     setNewPreviews([]);
-    setUrlInput("");
     setError("");
     setSuccess("");
   }, [property]);
@@ -50,9 +49,9 @@ export default function AdminPropertyImageModal({ isOpen, onClose, property, onS
     });
   };
 
-  const handleFileSelect = (e) => {
+  const processFiles = (incomingFiles) => {
     setError("");
-    const files = Array.from(e.target.files || []);
+    const files = Array.from(incomingFiles || []);
     if (!files.length) return;
 
     const totalCount = images.length + newFiles.length + files.length;
@@ -63,12 +62,36 @@ export default function AdminPropertyImageModal({ isOpen, onClose, property, onS
 
     const validFiles = files.filter((f) => f.type.startsWith("image/"));
     if (validFiles.length !== files.length) {
-      setError("Only image files (JPG, PNG, WEBP, etc.) are accepted");
+      setError("Only image files (JPG, PNG, WEBP, etc.) from your device are accepted");
     }
+
+    if (validFiles.length === 0) return;
 
     const previews = validFiles.map((f) => URL.createObjectURL(f));
     setNewFiles((prev) => [...prev, ...validFiles]);
     setNewPreviews((prev) => [...prev, ...previews]);
+  };
+
+  const handleFileChange = (e) => {
+    processFiles(e.target.files);
+    e.target.value = "";
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer && e.dataTransfer.files) {
+      processFiles(e.dataTransfer.files);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
   };
 
   const handleRemoveNew = (indexToRemove) => {
@@ -77,26 +100,6 @@ export default function AdminPropertyImageModal({ isOpen, onClose, property, onS
     }
     setNewFiles((prev) => prev.filter((_, idx) => idx !== indexToRemove));
     setNewPreviews((prev) => prev.filter((_, idx) => idx !== indexToRemove));
-  };
-
-  const handleAddUrl = (e) => {
-    e.preventDefault();
-    setError("");
-    const trimmed = urlInput.trim();
-    if (!trimmed) return;
-
-    if (!/^https?:\/\//i.test(trimmed)) {
-      setError("Please provide a valid image URL starting with http:// or https://");
-      return;
-    }
-
-    if (images.length + newFiles.length >= 15) {
-      setError("Maximum 15 photos allowed");
-      return;
-    }
-
-    setImages((prev) => [...prev, trimmed]);
-    setUrlInput("");
   };
 
   const handleSave = async () => {
@@ -264,114 +267,86 @@ export default function AdminPropertyImageModal({ isOpen, onClose, property, onS
 
         {/* Body Content */}
         <div style={{ padding: "20px 24px", overflowY: "auto", flex: 1 }}>
-          {/* Upload and URL input row */}
+          {/* Pick Pictures from Device Card */}
           <div
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
             style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "16px",
               marginBottom: "20px",
-              background: "#f8fafc",
-              padding: "16px",
-              borderRadius: "12px",
-              border: "1px dashed #cbd5e1",
+              background: isDragging ? "#e0f2fe" : "#f8fafc",
+              border: isDragging ? "2px dashed #0284c7" : "2px dashed #cbd5e1",
+              borderRadius: "14px",
+              padding: "24px 20px",
+              textAlign: "center",
+              transition: "all 0.2s ease-in-out",
             }}
           >
-            {/* File Upload Box */}
-            <div>
-              <label
+            <input
+              id="admin-property-file-input"
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleFileChange}
+              style={{ display: "none" }}
+            />
+            <label
+              htmlFor="admin-property-file-input"
+              style={{
+                display: "inline-flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "10px",
+                cursor: "pointer",
+                width: "100%",
+              }}
+            >
+              <div
                 style={{
-                  display: "block",
-                  fontSize: "12px",
-                  fontWeight: 700,
-                  color: "#334155",
-                  marginBottom: "6px",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.5px",
-                }}
-              >
-                Upload from Device
-              </label>
-              <label
-                style={{
+                  width: "56px",
+                  height: "56px",
+                  borderRadius: "50%",
+                  background: isDragging ? "#bae6fd" : "#e0f2fe",
+                  color: "#0284c7",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  gap: "8px",
-                  padding: "12px",
-                  background: "#ffffff",
-                  border: "1.5px solid #0284c7",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  color: "#0284c7",
-                  fontSize: "13px",
-                  fontWeight: 700,
-                  transition: "all 0.2s",
+                  boxShadow: "0 4px 12px rgba(2, 132, 199, 0.15)",
                 }}
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                   <polyline points="17 8 12 3 7 8" />
                   <line x1="12" y1="3" x2="12" y2="15" />
                 </svg>
-                Select Photos
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleFileSelect}
-                  style={{ display: "none" }}
-                />
-              </label>
-            </div>
+              </div>
 
-            {/* URL Input Form */}
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: "12px",
-                  fontWeight: 700,
-                  color: "#334155",
-                  marginBottom: "6px",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.5px",
-                }}
-              >
-                Or Paste Image Link
-              </label>
-              <form onSubmit={handleAddUrl} style={{ display: "flex", gap: "8px" }}>
-                <input
-                  type="url"
-                  placeholder="https://example.com/house.jpg"
-                  value={urlInput}
-                  onChange={(e) => setUrlInput(e.target.value)}
+              <div>
+                <span
                   style={{
-                    flex: 1,
-                    padding: "10px 12px",
+                    display: "inline-block",
+                    padding: "9px 22px",
+                    background: "#0284c7",
+                    color: "#ffffff",
                     borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                    fontSize: "13px",
-                    outline: "none",
-                  }}
-                />
-                <button
-                  type="submit"
-                  style={{
-                    padding: "10px 16px",
-                    background: "#0f172a",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "8px",
+                    fontSize: "14px",
                     fontWeight: 700,
-                    fontSize: "13px",
-                    cursor: "pointer",
+                    boxShadow: "0 2px 6px rgba(2, 132, 199, 0.3)",
+                    marginBottom: "6px",
                   }}
                 >
-                  + Add
-                </button>
-              </form>
-            </div>
+                  Choose Pictures from Device
+                </span>
+                <p style={{ margin: "4px 0 0", fontSize: "13px", color: "#64748b" }}>
+                  Click to browse photos from your phone, laptop, or computer gallery (JPG, PNG, WEBP)
+                </p>
+                {newFiles.length > 0 && (
+                  <p style={{ margin: "8px 0 0", fontSize: "13px", color: "#16a34a", fontWeight: 700 }}>
+                    ✓ {newFiles.length} new {newFiles.length === 1 ? "picture" : "pictures"} picked from device ready to save
+                  </p>
+                )}
+              </div>
+            </label>
           </div>
 
           {/* Photos Grid Header */}
@@ -556,7 +531,7 @@ export default function AdminPropertyImageModal({ isOpen, onClose, property, onS
                       borderRadius: "4px",
                     }}
                   >
-                    New File
+                    From Device
                   </div>
 
                   {/* Delete newly added photo */}
