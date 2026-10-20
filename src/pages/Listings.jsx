@@ -140,6 +140,151 @@ const IconSearch = ({ size = 28, className = "" }) => (
   </svg>
 );
 
+function PropertyCardMedia({ property, favorites, toggleFavorite }) {
+  const rawImages = Array.isArray(property.images) ? property.images : [];
+  const images = rawImages
+    .map((img) => (typeof img === "object" ? img?.imageUrl || img?.url : img))
+    .filter(Boolean);
+
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  // Keep changing images automatically showing the next picture
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const interval = setInterval(() => {
+      setActiveIdx((prev) => (prev + 1) % images.length);
+    }, 3200);
+    return () => clearInterval(interval);
+  }, [images.length]);
+
+  const handlePrev = (e) => {
+    e.stopPropagation();
+    setActiveIdx((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const handleNext = (e) => {
+    e.stopPropagation();
+    setActiveIdx((prev) => (prev + 1) % images.length);
+  };
+
+  const handleDotClick = (e, idx) => {
+    e.stopPropagation();
+    setActiveIdx(idx);
+  };
+
+  const isFav = favorites.includes(property._id);
+
+  return (
+    <div className="card-media-box">
+      {images.length > 0 ? (
+        <div className="card-carousel-track">
+          {images.map((imgUrl, idx) => (
+            <img
+              key={idx}
+              src={imgUrl}
+              alt={`${property.title} - photo ${idx + 1}`}
+              className={`card-carousel-slide ${idx === activeIdx ? "active" : ""}`}
+              loading={idx === 0 ? "eager" : "lazy"}
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="card-no-photo">
+          <span>No Photos Uploaded</span>
+        </div>
+      )}
+
+      {/* Prev / Next Arrows */}
+      {images.length > 1 && (
+        <>
+          <button
+            type="button"
+            className="card-carousel-arrow card-carousel-prev"
+            onClick={handlePrev}
+            aria-label="Previous photo"
+            title="Previous photo"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            className="card-carousel-arrow card-carousel-next"
+            onClick={handleNext}
+            aria-label="Next photo"
+            title="Next photo"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+        </>
+      )}
+
+      {/* Progress Indicator Dots */}
+      {images.length > 1 && (
+        <div className="card-carousel-dots">
+          {images.map((_, idx) => (
+            <button
+              key={idx}
+              type="button"
+              className={`card-carousel-dot ${idx === activeIdx ? "active" : ""}`}
+              onClick={(e) => handleDotClick(e, idx)}
+              aria-label={`Show photo ${idx + 1}`}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Gradient shadow overlay */}
+      <div className="card-img-gradient-overlay" />
+
+      {/* Availability Badge */}
+      <div
+        className={`card-avail-badge ${
+          property.availableUnits > 0 ? "avail-green" : "avail-red"
+        }`}
+      >
+        <span className="live-dot" />
+        <span>
+          {property.availableUnits > 0
+            ? "Available"
+            : "Fully Occupied"}
+        </span>
+      </div>
+
+      {/* Property Type Badge */}
+      <div className="card-type-badge">
+        {property.propertyType || "Rental"}
+      </div>
+
+      {/* Photo Count & Live Index Tag */}
+      {images.length > 1 && (
+        <div className="card-photo-count">
+          <IconCamera size={12} />
+          <span>{activeIdx + 1} / {images.length}</span>
+        </div>
+      )}
+
+      {/* Wishlist Favorite Heart Button */}
+      <button
+        type="button"
+        className={`card-fav-btn ${isFav ? "is-favorite" : ""}`}
+        onClick={(e) => toggleFavorite(property._id, e)}
+        title="Save to favorites"
+      >
+        <svg viewBox="0 0 24 24" width="16" height="16" fill={isFav ? "#E31B1B" : "none"} stroke={isFav ? "#E31B1B" : "#1e293b"} strokeWidth="2.2">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+      </button>
+    </div>
+  );
+}
+
 export default function Listings() {
   const { user, token } = useAuth();
   const [searchParams] = useSearchParams();
@@ -1313,6 +1458,29 @@ Please contact me back with viewing details. Thank you!`;
                           </span>
                         </div>
 
+                        {agent.agentProfile?.offersHouseHunting !== false && Number(agent.agentProfile?.houseHuntingFee || 0) > 0 && (
+                          <div style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            background: "rgba(16, 185, 129, 0.12)",
+                            border: "1px solid rgba(16, 185, 129, 0.3)",
+                            color: "#059669",
+                            padding: "4px 10px",
+                            borderRadius: "6px",
+                            fontSize: "11px",
+                            fontWeight: 700,
+                            marginTop: "6px",
+                            marginBottom: "10px",
+                            width: "fit-content"
+                          }}>
+                            <span>House Hunting: KES {Number(agent.agentProfile.houseHuntingFee).toLocaleString()}</span>
+                            <span style={{ fontSize: "10px", opacity: 0.85, fontWeight: 500 }}>
+                              ({agent.agentProfile.houseHuntingFeeTerms || "Per viewing trip"})
+                            </span>
+                          </div>
+                        )}
+
                         <button type="button" className="agent-view-listings-cta">
                           View Available Listings →
                         </button>
@@ -1417,72 +1585,12 @@ Please contact me back with viewing details. Thank you!`;
                 className="property-card"
                 onClick={() => openModal(property)}
               >
-                {/* Media Presentation Box */}
-                <div className="card-media-box">
-                  {property.images?.length > 0 ? (
-                    <img
-                      src={property.images[0]}
-                      alt={property.title}
-                      className="card-primary-img"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="card-no-photo">
-                      <span>No Photos Uploaded</span>
-                    </div>
-                  )}
-
-                  {property.images?.length > 1 && (
-                    <img
-                      src={property.images[1]}
-                      alt=""
-                      className="card-hover-alt-img"
-                      loading="lazy"
-                    />
-                  )}
-
-                  {/* Gradient shadow overlay */}
-                  <div className="card-img-gradient-overlay" />
-
-                  {/* Availability Badge */}
-                  <div
-                    className={`card-avail-badge ${
-                      property.availableUnits > 0 ? "avail-green" : "avail-red"
-                    }`}
-                  >
-                    <span className="live-dot" />
-                    <span>
-                      {property.availableUnits > 0
-                        ? "Available"
-                        : "Fully Occupied"}
-                    </span>
-                  </div>
-
-                  {/* Property Type Badge */}
-                  <div className="card-type-badge">
-                    {property.propertyType || "Rental"}
-                  </div>
-
-                  {/* Photo Count Tag */}
-                  {property.images?.length > 1 && (
-                    <div className="card-photo-count">
-                      <IconCamera size={12} />
-                      <span>{property.images.length}</span>
-                    </div>
-                  )}
-
-                  {/* Wishlist Favorite Heart Button */}
-                  <button
-                    type="button"
-                    className={`card-fav-btn ${favorites.includes(property._id) ? "is-favorite" : ""}`}
-                    onClick={(e) => toggleFavorite(property._id, e)}
-                    title="Save to favorites"
-                  >
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill={favorites.includes(property._id) ? "#E31B1B" : "none"} stroke={favorites.includes(property._id) ? "#E31B1B" : "#1e293b"} strokeWidth="2.2">
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
-                  </button>
-                </div>
+                {/* Media Presentation Box with Auto-changing image carousel */}
+                <PropertyCardMedia
+                  property={property}
+                  favorites={favorites}
+                  toggleFavorite={toggleFavorite}
+                />
 
                 {/* Card Content & Details */}
                 <div className="card-content-box">
@@ -2706,27 +2814,97 @@ const css = `
     overflow: hidden;
     background: #0F172A;
   }
-  .card-primary-img {
+  .card-carousel-track {
+    position: relative;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .property-card:hover .card-primary-img {
-    transform: scale(1.06);
-  }
-  .card-hover-alt-img {
+  .card-carousel-slide {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
     opacity: 0;
-    transition: opacity 0.4s ease, transform 0.5s ease;
+    transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: scale(1);
+    pointer-events: none;
   }
-  .property-card:hover .card-hover-alt-img {
+  .card-carousel-slide.active {
     opacity: 1;
-    transform: scale(1.06);
+    pointer-events: auto;
+  }
+  .property-card:hover .card-carousel-slide.active {
+    transform: scale(1.05);
+  }
+
+  /* Carousel Navigation Arrows */
+  .card-carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.82);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  }
+  .card-carousel-prev {
+    left: 8px;
+  }
+  .card-carousel-next {
+    right: 8px;
+  }
+  .property-card:hover .card-carousel-arrow {
+    opacity: 1;
+  }
+  .card-carousel-arrow:hover {
+    background: #E31B1B;
+    border-color: #E31B1B;
+    transform: translateY(-50%) scale(1.12);
+  }
+
+  /* Carousel Indicators */
+  .card-carousel-dots {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    z-index: 4;
+    padding: 3px 6px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+    max-width: 90px;
+    overflow: hidden;
+  }
+  .card-carousel-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+  }
+  .card-carousel-dot.active {
+    background: #E31B1B;
+    width: 12px;
+    border-radius: 3px;
   }
 
   .card-no-photo {

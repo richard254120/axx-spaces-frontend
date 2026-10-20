@@ -1178,112 +1178,216 @@ export default function AdminDashboard() {
               <table style={{ width: "100%", borderCollapse: "collapse", color: "#f1f5f9" }}>
                 <thead>
                   <tr style={{ background: "rgba(251, 191, 36, 0.1)" }}>
-                    <th style={{ padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" }}>Requester Info</th>
-                    <th style={{ padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" }}>Category</th>
-                    <th style={{ padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" }}>Search Query</th>
-                    <th style={{ padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" }}>Details & Requirements</th>
+                    <th style={{ padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" }}>Requester & Channel</th>
+                    <th style={{ padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" }}>Category & Timeline</th>
+                    <th style={{ padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" }}>Item / Requirements</th>
+                    <th style={{ padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" }}>Location & Budget</th>
                     <th style={{ padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" }}>Status</th>
                     <th style={{ padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {requests.map((req) => (
-                    <tr key={req._id} style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                      <td style={{ padding: "18px" }}>
-                        <div style={{ fontWeight: 700, fontSize: "16px", marginBottom: "4px" }}>{req.name}</div>
-                        <div style={{ fontSize: "13px", color: "#94a3b8" }}>{req.email}</div>
-                        {req.phone && <div style={{ fontSize: "12px", color: "#94a3b8" }}> {req.phone}</div>}
-                      </td>
-                      <td style={{ padding: "18px" }}>
-                        <span style={{
-                          padding: "4px 8px",
-                          borderRadius: "4px",
-                          fontSize: "12px",
-                          fontWeight: 600,
-                          textTransform: "uppercase",
-                          background: req.serviceType === "rental" ? "rgba(251, 191, 36, 0.15)" : "rgba(30,41,59,0.8)",
-                          color: req.serviceType === "rental" ? "#fbbf24" : "#94a3b8",
-                          border: req.serviceType === "rental" ? "1px solid #fbbf24" : "1px solid #334155"
-                        }}>
-                          {req.serviceType}
-                        </span>
-                      </td>
-                      <td style={{ padding: "18px" }}>
-                        <strong style={{ color: "#f1f5f9" }}>"{req.searchQuery}"</strong>
-                      </td>
-                      <td style={{ padding: "18px" }}>
-                        <div style={{ maxWidth: "300px", whiteSpace: "normal", wordBreak: "break-word", fontSize: "13px", color: "#94a3b8" }}>
-                          {req.details}
-                        </div>
-                      </td>
-                      <td style={{ padding: "18px" }}>
-                        <span style={{
-                          padding: "4px 8px",
-                          borderRadius: "4px",
-                          fontSize: "11px",
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          background: req.status === "resolved" ? "rgba(34,197,94,0.15)" : req.status === "contacted" ? "rgba(251,191,36,0.15)" : "rgba(239,68,68,0.15)",
-                          color: req.status === "resolved" ? "#22c55e" : req.status === "contacted" ? "#fbbf24" : "#ef4444",
-                        }}>
-                          {req.status}
-                        </span>
-                      </td>
-                      <td style={{ padding: "18px" }}>
-                        <div style={{ display: "flex", gap: "10px" }}>
-                          {req.status === "pending" && (
-                            <button
-                              onClick={() => handleRequestStatus(req._id, "contacted")}
-                              style={{
-                                background: "#fbbf24",
-                                color: "#000",
-                                border: "none",
-                                padding: "8px 16px",
-                                borderRadius: "8px",
-                                fontWeight: 700,
-                                cursor: "pointer"
-                              }}
-                            >
-                              Contacted
-                            </button>
+                  {requests.map((req) => {
+                    const cleanPhone = (req.phone || "").replace(/[^0-9]/g, "");
+                    const waPhone = cleanPhone.startsWith("0") ? `254${cleanPhone.slice(1)}` : cleanPhone;
+                    const urgencyColors = {
+                      immediate: { bg: "rgba(239, 68, 68, 0.2)", text: "#f87171", border: "#ef4444" },
+                      this_week: { bg: "rgba(245, 158, 11, 0.2)", text: "#fbbf24", border: "#f59e0b" },
+                      this_month: { bg: "rgba(59, 130, 246, 0.2)", text: "#60a5fa", border: "#3b82f6" },
+                      flexible: { bg: "rgba(148, 163, 184, 0.2)", text: "#94a3b8", border: "#64748b" }
+                    };
+                    const uStyle = urgencyColors[req.urgency] || urgencyColors.flexible;
+
+                    return (
+                      <tr key={req._id} style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                        <td style={{ padding: "18px" }}>
+                          <div style={{ fontWeight: 700, fontSize: "15px", marginBottom: "4px", color: "#ffffff" }}>
+                            {req.name || "Client"}
+                          </div>
+                          <div style={{ fontSize: "13px", color: "#94a3b8" }}>{req.email}</div>
+                          {req.phone && (
+                            <div style={{ fontSize: "12px", color: "#38bdf8", marginTop: "2px" }}>
+                              Tel: {req.phone}
+                            </div>
                           )}
-                          {req.status !== "resolved" && (
-                            <button
-                              onClick={() => handleRequestStatus(req._id, "resolved")}
-                              style={{
-                                background: "#22c55e",
-                                color: "white",
-                                border: "none",
-                                padding: "8px 16px",
-                                borderRadius: "8px",
-                                fontWeight: 700,
-                                cursor: "pointer"
-                              }}
-                            >
-                              Resolve
-                            </button>
-                          )}
-                          <a
-                            href={`mailto:${req.email}?subject=AxxSpace Request regarding: ${encodeURIComponent(req.searchQuery)}`}
-                            style={{
+                          {req.preferredContact && (
+                            <span style={{
                               display: "inline-block",
-                              padding: "8px 16px",
-                              background: "transparent",
-                              color: "#fbbf24",
-                              border: "1px solid #fbbf24",
-                              borderRadius: "8px",
-                              fontSize: "12px",
+                              marginTop: "4px",
+                              padding: "2px 6px",
+                              borderRadius: "4px",
+                              fontSize: "10px",
                               fontWeight: 700,
-                              textDecoration: "none",
-                              textAlign: "center"
-                            }}
-                          >
-                            Email
-                          </a>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                              textTransform: "uppercase",
+                              background: req.preferredContact === "whatsapp" ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.06)",
+                              color: req.preferredContact === "whatsapp" ? "#4ade80" : "#cbd5e1",
+                              border: req.preferredContact === "whatsapp" ? "1px solid rgba(34,197,94,0.3)" : "1px solid rgba(255,255,255,0.1)"
+                            }}>
+                              Channel: {req.preferredContact}
+                            </span>
+                          )}
+                        </td>
+                        <td style={{ padding: "18px" }}>
+                          <div style={{ display: "flex", flexDirection: "column", gap: "6px", alignItems: "flex-start" }}>
+                            <span style={{
+                              padding: "4px 8px",
+                              borderRadius: "4px",
+                              fontSize: "11px",
+                              fontWeight: 700,
+                              textTransform: "uppercase",
+                              background: req.serviceType === "rental" ? "rgba(251, 191, 36, 0.15)" : "rgba(30,41,59,0.8)",
+                              color: req.serviceType === "rental" ? "#fbbf24" : "#94a3b8",
+                              border: req.serviceType === "rental" ? "1px solid #fbbf24" : "1px solid #334155"
+                            }}>
+                              {req.serviceType}
+                            </span>
+                            {req.urgency && (
+                              <span style={{
+                                padding: "2px 6px",
+                                borderRadius: "4px",
+                                fontSize: "10px",
+                                fontWeight: 700,
+                                textTransform: "uppercase",
+                                background: uStyle.bg,
+                                color: uStyle.text,
+                                border: `1px solid ${uStyle.border}`
+                              }}>
+                                {req.urgency === "immediate" ? "Immediate" : req.urgency.replace("_", " ")}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td style={{ padding: "18px" }}>
+                          <strong style={{ color: "#f1f5f9", display: "block", marginBottom: "4px", fontSize: "14px" }}>
+                            "{req.searchQuery}"
+                          </strong>
+                          <div style={{ maxWidth: "260px", whiteSpace: "normal", wordBreak: "break-word", fontSize: "12px", color: "#94a3b8", lineHeight: 1.4 }}>
+                            {req.details}
+                          </div>
+                        </td>
+                        <td style={{ padding: "18px" }}>
+                          {req.targetLocation && (
+                            <div style={{ fontSize: "12px", color: "#e2e8f0", marginBottom: "4px" }}>
+                              Location: {req.targetLocation}
+                            </div>
+                          )}
+                          {(req.budgetMin || req.budgetMax) ? (
+                            <div style={{ fontSize: "12px", color: "#34d399", fontWeight: 700 }}>
+                              {req.budgetCurrency || "KES"} {req.budgetMin ? Number(req.budgetMin).toLocaleString() : "0"} - {req.budgetMax ? Number(req.budgetMax).toLocaleString() : "Flex"}{req.budgetPeriod === "monthly" ? " / mo" : ""}
+                            </div>
+                          ) : (
+                            <span style={{ fontSize: "11px", color: "#64748b" }}>Budget open</span>
+                          )}
+                        </td>
+                        <td style={{ padding: "18px" }}>
+                          <span style={{
+                            padding: "4px 8px",
+                            borderRadius: "4px",
+                            fontSize: "11px",
+                            fontWeight: 700,
+                            textTransform: "uppercase",
+                            background: req.status === "resolved" ? "rgba(34,197,94,0.15)" : req.status === "contacted" ? "rgba(251,191,36,0.15)" : "rgba(239,68,68,0.15)",
+                            color: req.status === "resolved" ? "#22c55e" : req.status === "contacted" ? "#fbbf24" : "#ef4444",
+                          }}>
+                            {req.status}
+                          </span>
+                        </td>
+                        <td style={{ padding: "18px" }}>
+                          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                            <div style={{ display: "flex", gap: "6px" }}>
+                              {req.status === "pending" && (
+                                <button
+                                  onClick={() => handleRequestStatus(req._id, "contacted")}
+                                  style={{
+                                    background: "#fbbf24",
+                                    color: "#000",
+                                    border: "none",
+                                    padding: "6px 12px",
+                                    borderRadius: "6px",
+                                    fontWeight: 700,
+                                    fontSize: "11px",
+                                    cursor: "pointer"
+                                  }}
+                                >
+                                  Contacted
+                                </button>
+                              )}
+                              {req.status !== "resolved" && (
+                                <button
+                                  onClick={() => handleRequestStatus(req._id, "resolved")}
+                                  style={{
+                                    background: "#22c55e",
+                                    color: "white",
+                                    border: "none",
+                                    padding: "6px 12px",
+                                    borderRadius: "6px",
+                                    fontWeight: 700,
+                                    fontSize: "11px",
+                                    cursor: "pointer"
+                                  }}
+                                >
+                                  Resolve
+                                </button>
+                              )}
+                            </div>
+                            <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                              {waPhone && (
+                                <a
+                                  href={`https://wa.me/${waPhone}?text=${encodeURIComponent(`Hello ${req.name || ""}, I am contacting you from AxxSpace regarding your request: "${req.searchQuery}"`)}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  style={{
+                                    padding: "5px 10px",
+                                    background: "rgba(34,197,94,0.15)",
+                                    color: "#4ade80",
+                                    border: "1px solid rgba(34,197,94,0.3)",
+                                    borderRadius: "6px",
+                                    fontSize: "11px",
+                                    fontWeight: 700,
+                                    textDecoration: "none"
+                                  }}
+                                >
+                                  WhatsApp
+                                </a>
+                              )}
+                              {req.phone && (
+                                <a
+                                  href={`tel:${req.phone}`}
+                                  style={{
+                                    padding: "5px 10px",
+                                    background: "rgba(56,189,248,0.15)",
+                                    color: "#38bdf8",
+                                    border: "1px solid rgba(56,189,248,0.3)",
+                                    borderRadius: "6px",
+                                    fontSize: "11px",
+                                    fontWeight: 700,
+                                    textDecoration: "none"
+                                  }}
+                                >
+                                  Call
+                                </a>
+                              )}
+                              <a
+                                href={`mailto:${req.email}?subject=AxxSpace Request: ${encodeURIComponent(req.searchQuery)}`}
+                                style={{
+                                  padding: "5px 10px",
+                                  background: "transparent",
+                                  color: "#fbbf24",
+                                  border: "1px solid rgba(251, 191, 36, 0.4)",
+                                  borderRadius: "6px",
+                                  fontSize: "11px",
+                                  fontWeight: 700,
+                                  textDecoration: "none"
+                                }}
+                              >
+                                Email
+                              </a>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

@@ -520,6 +520,71 @@ export default function AgentDashboard() {
   const [purchasingPackage, setPurchasingPackage] = useState(false);
   const [showPackageModal, setShowPackageModal] = useState(false);
 
+  // House Hunting Fee state
+  const [houseHuntingFee, setHouseHuntingFee] = useState(
+    user?.agentProfile?.houseHuntingFee ?? 0
+  );
+  const [houseHuntingFeeTerms, setHouseHuntingFeeTerms] = useState(
+    user?.agentProfile?.houseHuntingFeeTerms || "Per viewing trip"
+  );
+  const [offersHouseHunting, setOffersHouseHunting] = useState(
+    user?.agentProfile?.offersHouseHunting !== false
+  );
+  const [showFeeModal, setShowFeeModal] = useState(false);
+  const [savingFee, setSavingFee] = useState(false);
+
+  useEffect(() => {
+    if (user?.agentProfile) {
+      if (user.agentProfile.houseHuntingFee !== undefined) {
+        setHouseHuntingFee(user.agentProfile.houseHuntingFee);
+      }
+      if (user.agentProfile.houseHuntingFeeTerms) {
+        setHouseHuntingFeeTerms(user.agentProfile.houseHuntingFeeTerms);
+      }
+      if (user.agentProfile.offersHouseHunting !== undefined) {
+        setOffersHouseHunting(user.agentProfile.offersHouseHunting);
+      }
+    }
+  }, [user]);
+
+  const handleSaveHuntingFee = async (e) => {
+    if (e) e.preventDefault();
+    setSavingFee(true);
+    try {
+      const res = await fetch(`${API_BASE}/agents/house-hunting-fee`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          houseHuntingFee: Number(houseHuntingFee) || 0,
+          houseHuntingFeeTerms,
+          offersHouseHunting,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to update house hunting fee");
+      }
+      addToast("House hunting fee saved successfully!", "success");
+      updateUser({
+        ...user,
+        agentProfile: {
+          ...(user?.agentProfile || {}),
+          houseHuntingFee: data.houseHuntingFee,
+          houseHuntingFeeTerms: data.houseHuntingFeeTerms,
+          offersHouseHunting: data.offersHouseHunting,
+        },
+      });
+      setShowFeeModal(false);
+    } catch (err) {
+      addToast(err.message || "Failed to save house hunting fee", "error");
+    } finally {
+      setSavingFee(false);
+    }
+  };
+
   // Check if we've already processed this approval
   const getApprovalProcessedFlag = () => {
     const userId = user?._id;
@@ -1266,7 +1331,7 @@ export default function AgentDashboard() {
         {/* Stats Overview Bar */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+          gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
           gap: '16px',
           marginBottom: '24px',
         }} role="status" aria-label="Dashboard statistics">
@@ -1320,6 +1385,63 @@ export default function AgentDashboard() {
               </div>
             </div>
           </div>
+
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '20px',
+            border: '1px solid #e5e7eb',
+            borderTop: '3px solid',
+            borderImage: 'linear-gradient(90deg, #10b981, #059669) 1',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: 600 }}>House Hunting Fee</span>
+                <span style={{
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  padding: '2px 7px',
+                  borderRadius: '12px',
+                  background: offersHouseHunting ? '#dcfce7' : '#f3f4f6',
+                  color: offersHouseHunting ? '#15803d' : '#6b7280'
+                }}>
+                  {offersHouseHunting ? "Active" : "Paused"}
+                </span>
+              </div>
+              <div style={{ fontSize: '22px', fontWeight: 800, color: '#1f2937' }}>
+                {Number(houseHuntingFee) > 0 ? `KES ${Number(houseHuntingFee).toLocaleString()}` : "Not Set"}
+              </div>
+              <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {offersHouseHunting ? (houseHuntingFeeTerms || "Per viewing trip") : "Service paused"}
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowFeeModal(true)}
+              style={{
+                marginTop: '10px',
+                background: '#f0fdf4',
+                border: '1px solid #bbf7d0',
+                borderRadius: '6px',
+                padding: '6px 10px',
+                fontSize: '12px',
+                fontWeight: 700,
+                color: '#15803d',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '5px'
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+              Set / Edit Fee
+            </button>
+          </div>
         </div>
 
         <div style={{ ...s.tabs, overflowX: isMobile ? 'auto' : 'visible', WebkitOverflowScrolling: 'touch', flexWrap: 'nowrap', paddingBottom: isMobile ? '2px' : '0', gap: isMobile ? '4px' : '12px' }}>
@@ -1328,6 +1450,12 @@ export default function AgentDashboard() {
             onClick={() => setActiveTab("houses")}
           >
             My Houses ({myHouses.length})
+          </button>
+          <button
+            style={{ ...s.tab, ...(activeTab === 'hunting-fee' ? s.tabActive : {}), whiteSpace: 'nowrap', padding: isMobile ? '10px 12px' : '12px 20px', minHeight: '44px', fontSize: isMobile ? '12px' : '14px' }}
+            onClick={() => setActiveTab("hunting-fee")}
+          >
+            House Hunting Fee {Number(houseHuntingFee) > 0 && `(KES ${Number(houseHuntingFee).toLocaleString()})`}
           </button>
         </div>
 
@@ -1573,6 +1701,263 @@ export default function AgentDashboard() {
             )}
           </div>
         )}
+
+        {activeTab === "hunting-fee" && (
+          <div style={{ background: "white", borderRadius: "16px", padding: isMobile ? "20px" : "32px", border: "1px solid #e5e7eb", boxShadow: "0 2px 10px rgba(0,0,0,0.04)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "24px", flexWrap: "wrap", gap: "16px" }}>
+              <div>
+                <h2 style={{ fontSize: "22px", fontWeight: 800, color: "#1f2937", margin: "0 0 6px" }}>
+                  House Hunting &amp; Viewing Fee
+                </h2>
+                <p style={{ margin: 0, fontSize: "14px", color: "#6b7280" }}>
+                  Configure what you charge clients for conducting guided property viewings and house hunting tours.
+                </p>
+              </div>
+              <div style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                background: offersHouseHunting ? "#f0fdf4" : "#fef2f2",
+                border: `1px solid ${offersHouseHunting ? "#bbf7d0" : "#fecaca"}`,
+                padding: "8px 14px",
+                borderRadius: "30px",
+              }}>
+                <span style={{
+                  width: "10px",
+                  height: "10px",
+                  borderRadius: "50%",
+                  background: offersHouseHunting ? "#22c55e" : "#ef4444"
+                }} />
+                <span style={{ fontSize: "13px", fontWeight: 700, color: offersHouseHunting ? "#15803d" : "#991b1b" }}>
+                  {offersHouseHunting ? "Service Active on Profile" : "Service Currently Paused"}
+                </span>
+              </div>
+            </div>
+
+            <form onSubmit={handleSaveHuntingFee}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1.1fr 0.9fr", gap: "28px", marginBottom: "28px" }}>
+                {/* Left Column: Form Controls */}
+                <div>
+                  <div style={{
+                    background: "#f9fafb",
+                    padding: "16px",
+                    borderRadius: "12px",
+                    border: "1px solid #e5e7eb",
+                    marginBottom: "20px"
+                  }}>
+                    <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", userSelect: "none" }}>
+                      <input
+                        type="checkbox"
+                        checked={offersHouseHunting}
+                        onChange={(e) => setOffersHouseHunting(e.target.checked)}
+                        style={{ width: "18px", height: "18px", accentColor: "#10b981", cursor: "pointer" }}
+                      />
+                      <span style={{ fontSize: "15px", fontWeight: 700, color: "#1f2937" }}>
+                        Offer House Hunting / Guided Viewing Services
+                      </span>
+                    </label>
+                    <p style={{ margin: "6px 0 0 28px", fontSize: "12px", color: "#6b7280", lineHeight: 1.5 }}>
+                      When turned on, your house hunting fee is displayed to prospective tenants looking for properties in your county.
+                    </p>
+                  </div>
+
+                  <div style={{ marginBottom: "22px" }}>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#374151", marginBottom: "8px" }}>
+                      House Hunting Fee (KES)
+                    </label>
+                    <div style={{ position: "relative" }}>
+                      <span style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", fontSize: "14px", fontWeight: 700, color: "#6b7280" }}>
+                        KES
+                      </span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="50"
+                        value={houseHuntingFee}
+                        onChange={(e) => setHouseHuntingFee(e.target.value)}
+                        placeholder="e.g. 1000"
+                        disabled={!offersHouseHunting}
+                        style={{
+                          width: "100%",
+                          padding: "12px 14px 12px 55px",
+                          borderRadius: "10px",
+                          border: "1.5px solid #d1d5db",
+                          fontSize: "16px",
+                          fontWeight: 700,
+                          color: "#1f2937",
+                          background: offersHouseHunting ? "#ffffff" : "#f3f4f6",
+                          outline: "none",
+                          boxSizing: "border-box",
+                        }}
+                      />
+                    </div>
+
+                    {/* Quick Presets */}
+                    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "10px" }}>
+                      <span style={{ fontSize: "11px", color: "#6b7280", fontWeight: 600, alignSelf: "center" }}>Quick presets:</span>
+                      {[500, 1000, 1500, 2000, 2500, 3000].map((amt) => (
+                        <button
+                          key={amt}
+                          type="button"
+                          disabled={!offersHouseHunting}
+                          onClick={() => setHouseHuntingFee(amt)}
+                          style={{
+                            background: Number(houseHuntingFee) === amt ? "#1f2937" : "#f3f4f6",
+                            color: Number(houseHuntingFee) === amt ? "#ffffff" : "#374151",
+                            border: "1px solid #e5e7eb",
+                            borderRadius: "6px",
+                            padding: "4px 10px",
+                            fontSize: "12px",
+                            fontWeight: 700,
+                            cursor: offersHouseHunting ? "pointer" : "not-allowed",
+                            transition: "all 0.15s ease",
+                          }}
+                        >
+                          KES {amt.toLocaleString()}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div style={{ marginBottom: "20px" }}>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#374151", marginBottom: "8px" }}>
+                      Fee Terms &amp; Scope (What the fee covers)
+                    </label>
+                    <input
+                      type="text"
+                      value={houseHuntingFeeTerms}
+                      onChange={(e) => setHouseHuntingFeeTerms(e.target.value)}
+                      placeholder="e.g. Per viewing trip (covers up to 4 houses)"
+                      disabled={!offersHouseHunting}
+                      style={{
+                        width: "100%",
+                        padding: "12px 14px",
+                        borderRadius: "10px",
+                        border: "1.5px solid #d1d5db",
+                        fontSize: "14px",
+                        color: "#1f2937",
+                        background: offersHouseHunting ? "#ffffff" : "#f3f4f6",
+                        outline: "none",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                    <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginTop: "8px" }}>
+                      {[
+                        "Per viewing trip",
+                        "Up to 3 houses",
+                        "Up to 5 houses",
+                        "Full day accompaniment",
+                        "Transport included",
+                      ].map((term) => (
+                        <span
+                          key={term}
+                          onClick={() => offersHouseHunting && setHouseHuntingFeeTerms(term)}
+                          style={{
+                            fontSize: "11px",
+                            background: "#eff6ff",
+                            color: "#1d4ed8",
+                            padding: "3px 8px",
+                            borderRadius: "4px",
+                            cursor: offersHouseHunting ? "pointer" : "default",
+                            border: "1px solid #bfdbfe",
+                          }}
+                        >
+                          + {term}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column: Live Client Preview Card */}
+                <div>
+                  <div style={{ fontSize: "12px", fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "8px" }}>
+                    Live Preview (How Clients See It)
+                  </div>
+                  <div style={{
+                    background: "linear-gradient(135deg, #1f2937 0%, #111827 100%)",
+                    borderRadius: "14px",
+                    padding: "20px",
+                    color: "white",
+                    boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
+                      <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "#fbbf24", color: "#1f2937", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: "14px" }}>
+                        {user?.name?.[0]?.toUpperCase() || "A"}
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "15px", fontWeight: 700 }}>{user?.name || "Agent"}</div>
+                        <div style={{ fontSize: "12px", color: "#9ca3af" }}>{user?.county || "Kenya"} · Certified Agent</div>
+                      </div>
+                    </div>
+
+                    <div style={{
+                      background: offersHouseHunting ? "rgba(16, 185, 129, 0.15)" : "rgba(239, 68, 68, 0.15)",
+                      border: `1px solid ${offersHouseHunting ? "rgba(16, 185, 129, 0.3)" : "rgba(239, 68, 68, 0.3)"}`,
+                      borderRadius: "10px",
+                      padding: "14px",
+                      marginBottom: "14px",
+                    }}>
+                      <div style={{ fontSize: "11px", fontWeight: 700, color: offersHouseHunting ? "#6ee7b7" : "#fca5a5", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                        {offersHouseHunting ? "House Hunting & Viewing Service" : "House Hunting Paused"}
+                      </div>
+                      <div style={{ fontSize: "22px", fontWeight: 800, color: "#ffffff", marginTop: "4px" }}>
+                        {offersHouseHunting && Number(houseHuntingFee) > 0 ? (
+                          <>
+                            KES {Number(houseHuntingFee).toLocaleString()}
+                            <span style={{ fontSize: "12px", fontWeight: 500, color: "#9ca3af", marginLeft: "6px" }}>
+                              ({houseHuntingFeeTerms || "Per viewing trip"})
+                            </span>
+                          </>
+                        ) : offersHouseHunting ? (
+                          "Free / Contact for Viewing"
+                        ) : (
+                          "Not Currently Available"
+                        )}
+                      </div>
+                    </div>
+
+                    <div style={{
+                      width: "100%",
+                      padding: "10px",
+                      background: offersHouseHunting ? "#10b981" : "#4b5563",
+                      color: "white",
+                      borderRadius: "8px",
+                      fontWeight: 700,
+                      fontSize: "13px",
+                      textAlign: "center",
+                      opacity: 0.9,
+                    }}>
+                      {offersHouseHunting ? "Book House Hunting" : "Service Currently Unavailable"}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", paddingTop: "16px", borderTop: "1px solid #e5e7eb" }}>
+                <button
+                  type="submit"
+                  disabled={savingFee}
+                  style={{
+                    padding: "12px 28px",
+                    background: "#10b981",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "10px",
+                    fontWeight: 700,
+                    fontSize: "14px",
+                    cursor: savingFee ? "not-allowed" : "pointer",
+                    boxShadow: "0 2px 8px rgba(16, 185, 129, 0.3)",
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  {savingFee ? "Saving Fee..." : "Save House Hunting Fee"}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
       </div>
 
       {qrModalProperty && (
@@ -1581,6 +1966,187 @@ export default function AgentDashboard() {
           onClose={() => setQrModalProperty(null)}
           property={qrModalProperty}
         />
+      )}
+
+      {/* House Hunting Fee Quick Modal */}
+      {showFeeModal && (
+        <div style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(0,0,0,0.5)",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 1000,
+          padding: "20px",
+        }}>
+          <div style={{
+            background: "white",
+            borderRadius: "16px",
+            maxWidth: "520px",
+            width: "100%",
+            padding: "28px",
+            position: "relative",
+            boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
+          }}>
+            <button
+              onClick={() => setShowFeeModal(false)}
+              style={{
+                position: "absolute",
+                top: "16px",
+                right: "16px",
+                background: "transparent",
+                border: "none",
+                fontSize: "24px",
+                cursor: "pointer",
+                color: "#6b7280",
+                lineHeight: 1,
+              }}
+            >
+              ×
+            </button>
+
+            <h3 style={{ fontSize: "20px", fontWeight: 800, color: "#1f2937", margin: "0 0 6px" }}>
+              House Hunting Fee
+            </h3>
+            <p style={{ margin: "0 0 20px", fontSize: "13px", color: "#6b7280" }}>
+              Set the fee you charge clients for house hunting and guided property tours.
+            </p>
+
+            <form onSubmit={handleSaveHuntingFee}>
+              <div style={{
+                background: "#f9fafb",
+                padding: "14px",
+                borderRadius: "10px",
+                border: "1px solid #e5e7eb",
+                marginBottom: "16px"
+              }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={offersHouseHunting}
+                    onChange={(e) => setOffersHouseHunting(e.target.checked)}
+                    style={{ width: "18px", height: "18px", accentColor: "#10b981", cursor: "pointer" }}
+                  />
+                  <span style={{ fontSize: "14px", fontWeight: 700, color: "#1f2937" }}>
+                    Enable House Hunting Services
+                  </span>
+                </label>
+              </div>
+
+              <div style={{ marginBottom: "16px" }}>
+                <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#374151", marginBottom: "6px" }}>
+                  Fee Amount (KES)
+                </label>
+                <div style={{ position: "relative" }}>
+                  <span style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", fontSize: "14px", fontWeight: 700, color: "#6b7280" }}>
+                    KES
+                  </span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="50"
+                    value={houseHuntingFee}
+                    onChange={(e) => setHouseHuntingFee(e.target.value)}
+                    disabled={!offersHouseHunting}
+                    placeholder="e.g. 1000"
+                    style={{
+                      width: "100%",
+                      padding: "10px 14px 10px 52px",
+                      borderRadius: "8px",
+                      border: "1.5px solid #d1d5db",
+                      fontSize: "16px",
+                      fontWeight: 700,
+                      color: "#1f2937",
+                      background: offersHouseHunting ? "#ffffff" : "#f3f4f6",
+                      boxSizing: "border-box",
+                    }}
+                  />
+                </div>
+                <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginTop: "8px" }}>
+                  {[500, 1000, 1500, 2000, 2500].map((amt) => (
+                    <button
+                      key={amt}
+                      type="button"
+                      disabled={!offersHouseHunting}
+                      onClick={() => setHouseHuntingFee(amt)}
+                      style={{
+                        background: Number(houseHuntingFee) === amt ? "#1f2937" : "#f3f4f6",
+                        color: Number(houseHuntingFee) === amt ? "#ffffff" : "#374151",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "5px",
+                        padding: "3px 8px",
+                        fontSize: "11px",
+                        fontWeight: 700,
+                        cursor: offersHouseHunting ? "pointer" : "not-allowed",
+                      }}
+                    >
+                      KES {amt.toLocaleString()}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ marginBottom: "22px" }}>
+                <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#374151", marginBottom: "6px" }}>
+                  Terms / Scope
+                </label>
+                <input
+                  type="text"
+                  value={houseHuntingFeeTerms}
+                  onChange={(e) => setHouseHuntingFeeTerms(e.target.value)}
+                  placeholder="e.g. Per viewing trip (covers up to 4 houses)"
+                  disabled={!offersHouseHunting}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: "8px",
+                    border: "1.5px solid #d1d5db",
+                    fontSize: "13px",
+                    color: "#1f2937",
+                    background: offersHouseHunting ? "#ffffff" : "#f3f4f6",
+                    boxSizing: "border-box",
+                  }}
+                />
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+                <button
+                  type="button"
+                  onClick={() => setShowFeeModal(false)}
+                  style={{
+                    padding: "10px 18px",
+                    background: "#f3f4f6",
+                    color: "#4b5563",
+                    border: "none",
+                    borderRadius: "8px",
+                    fontWeight: 600,
+                    fontSize: "13px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingFee}
+                  style={{
+                    padding: "10px 22px",
+                    background: "#10b981",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "8px",
+                    fontWeight: 700,
+                    fontSize: "13px",
+                    cursor: savingFee ? "not-allowed" : "pointer",
+                  }}
+                >
+                  {savingFee ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
 
       {/* Confirmation Delete Modal */}
