@@ -24,7 +24,7 @@ const DownloadNotification = () => {
       document.head.appendChild(style);
     }
 
-    const dismissed = localStorage.getItem("axx_download_notification_dismissed");
+    const dismissed = localStorage.getItem("axx_download_notification_dismissed_v2");
     if (dismissed !== "true") {
       setVisible(true);
     }
@@ -32,7 +32,7 @@ const DownloadNotification = () => {
 
   const handleClose = () => {
     setVisible(false);
-    localStorage.setItem("axx_download_notification_dismissed", "true");
+    localStorage.setItem("axx_download_notification_dismissed_v2", "true");
   };
 
   if (!visible) return null;
@@ -90,6 +90,29 @@ const DownloadNotification = () => {
           onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
         >
           Download App
+        </a>
+        <a
+          id="download-notification-manager-cta"
+          href="/downloads/axx-spaces-manager-v1.0.0.apk"
+          download
+          style={{
+            background: "white",
+            color: "#4f46e5",
+            border: "none",
+            borderRadius: "6px",
+            padding: "7px 16px",
+            fontWeight: 700,
+            cursor: "pointer",
+            textDecoration: "none",
+            fontSize: "0.85rem",
+            letterSpacing: "0.02em",
+            transition: "opacity 0.2s",
+            whiteSpace: "nowrap",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
+          onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+        >
+          Manager App
         </a>
         <button
           id="download-notification-close"

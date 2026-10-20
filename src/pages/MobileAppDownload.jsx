@@ -49,6 +49,15 @@ const MobileAppDownload = () => {
     }, 1500);
   };
 
+  const handleManagerDownload = () => {
+    const link = document.createElement('a');
+    link.href = "/downloads/axx-spaces-manager-v1.0.0.apk";
+    link.download = "axx-spaces-manager-v1.0.0.apk";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleOpenWebApp = () => {
     window.open("https://axxspace.com", "_blank", "noopener,noreferrer");
   };
@@ -101,6 +110,14 @@ const MobileAppDownload = () => {
                       Download Android APK
                     </>
                   )}
+                </button>
+
+                <button
+                  className="download-btn primary"
+                  onClick={handleManagerDownload}
+                  id="download-manager-apk-btn"
+                >
+                  Download Manager App (86 MB)
                 </button>
 
                 <button
