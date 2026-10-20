@@ -106,6 +106,73 @@ export default function AgentProfilePage() {
           {/* Bio */}
           {bio && <p style={s.bio}>{bio}</p>}
 
+          {/* House Hunting Fee Box */}
+          {agent.agentProfile?.offersHouseHunting !== false && Number(agent.agentProfile?.houseHuntingFee || 0) > 0 && (
+            <div style={{
+              margin: "16px 0",
+              padding: "14px 18px",
+              background: "linear-gradient(135deg, rgba(251, 191, 36, 0.12) 0%, rgba(245, 158, 11, 0.05) 100%)",
+              border: "1px solid rgba(245, 158, 11, 0.3)",
+              borderRadius: "12px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "12px",
+              flexWrap: "wrap",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "10px",
+                  background: "#fbbf24",
+                  color: "#1f2937",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <circle cx="12" cy="13" r="3" />
+                  </svg>
+                </div>
+                <div>
+                  <div style={{ fontSize: "11px", fontWeight: 700, color: "#92400e", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    House Hunting Fee
+                  </div>
+                  <div style={{ fontSize: "18px", fontWeight: 800, color: "#1f2937" }}>
+                    KES {Number(agent.agentProfile.houseHuntingFee).toLocaleString()}
+                    <span style={{ fontSize: "12px", fontWeight: 500, color: "#6b7280", marginLeft: "6px" }}>
+                      ({agent.agentProfile.houseHuntingFeeTerms || "Per viewing trip"})
+                    </span>
+                  </div>
+                </div>
+              </div>
+              {phone && (
+                <a
+                  href={`https://wa.me/${phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Hi ${agent.name}, I found your profile on AxxSpace and I would like to book your House Hunting & Viewing services in ${county || "Kenya"}.`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    padding: "8px 16px",
+                    background: "#1f2937",
+                    color: "#ffffff",
+                    borderRadius: "8px",
+                    fontSize: "13px",
+                    fontWeight: 700,
+                    textDecoration: "none",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
+                >
+                  Book House Hunting
+                </a>
+              )}
+            </div>
+          )}
+
           {/* Contact buttons */}
           <div style={s.contactRow}>
             {phone && (

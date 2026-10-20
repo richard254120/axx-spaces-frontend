@@ -1458,6 +1458,29 @@ Please contact me back with viewing details. Thank you!`;
                           </span>
                         </div>
 
+                        {agent.agentProfile?.offersHouseHunting !== false && Number(agent.agentProfile?.houseHuntingFee || 0) > 0 && (
+                          <div style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            background: "rgba(16, 185, 129, 0.12)",
+                            border: "1px solid rgba(16, 185, 129, 0.3)",
+                            color: "#059669",
+                            padding: "4px 10px",
+                            borderRadius: "6px",
+                            fontSize: "11px",
+                            fontWeight: 700,
+                            marginTop: "6px",
+                            marginBottom: "10px",
+                            width: "fit-content"
+                          }}>
+                            <span>House Hunting: KES {Number(agent.agentProfile.houseHuntingFee).toLocaleString()}</span>
+                            <span style={{ fontSize: "10px", opacity: 0.85, fontWeight: 500 }}>
+                              ({agent.agentProfile.houseHuntingFeeTerms || "Per viewing trip"})
+                            </span>
+                          </div>
+                        )}
+
                         <button type="button" className="agent-view-listings-cta">
                           View Available Listings →
                         </button>
