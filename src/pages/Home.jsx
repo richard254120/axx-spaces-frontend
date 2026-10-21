@@ -738,38 +738,29 @@ export default function HomePro() {
       </section>
 
       {/* ── ADVERTISING ── */}
-      <section className="ax-adband" aria-label="Sponsored">
-        <div className="ax-wrap">
-          {banner && (
-            <>
-              <button className={`ax-ad ${banner.imageUrl ? "" : "noimg"}`} onClick={() => openAd(banner)}>
-                {banner.imageUrl && <img src={banner.imageUrl} alt="" loading="lazy" />}
-                <div className="ax-ad-text">
-                  <span className="ax-ad-tag">Sponsored{banner.sponsor ? ` by ${banner.sponsor}` : ""}</span>
-                  <h3>{banner.title}</h3>
-                  {banner.description && <p>{banner.description}</p>}
-                  <span className="ax-ad-cta">{banner.cta || "Learn more"}</span>
-                </div>
-              </button>
-              {bannerAds.length > 1 && (
-                <div className="ax-dots">
-                  {bannerAds.map((a, i) => (
-                    <button key={a._id || i} aria-label={`Show ad ${i + 1}`}
-                      aria-current={i === adIdx % bannerAds.length} onClick={() => setAdIdx(i)} />
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-          <div className="ax-advertise">
-            <div>
-              <h3>Advertise on Axxspace</h3>
-              <p>Put your rental, stay, business or product in front of users across all 47 counties.</p>
-            </div>
-            <button className="ax-btn" onClick={() => navigate("/advertise")}>Start advertising</button>
+      {banner && (
+        <section className="ax-adband" aria-label="Sponsored">
+          <div className="ax-wrap">
+            <button className={`ax-ad ${banner.imageUrl ? "" : "noimg"}`} onClick={() => openAd(banner)}>
+              {banner.imageUrl && <img src={banner.imageUrl} alt="" loading="lazy" />}
+              <div className="ax-ad-text">
+                <span className="ax-ad-tag">Sponsored{banner.sponsor ? ` by ${banner.sponsor}` : ""}</span>
+                <h3>{banner.title}</h3>
+                {banner.description && <p>{banner.description}</p>}
+                <span className="ax-ad-cta">{banner.cta || "Learn more"}</span>
+              </div>
+            </button>
+            {bannerAds.length > 1 && (
+              <div className="ax-dots">
+                {bannerAds.map((a, i) => (
+                  <button key={a._id || i} aria-label={`Show ad ${i + 1}`}
+                    aria-current={i === adIdx % bannerAds.length} onClick={() => setAdIdx(i)} />
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── SERVICES ── */}
       <section className="ax-section">
