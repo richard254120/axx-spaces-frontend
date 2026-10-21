@@ -42,7 +42,7 @@ const css = `
 .ax-root .ax-hero video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;transition:opacity .8s}
 .ax-root .ax-hero::after{content:"";position:absolute;inset:0;z-index:-1;
   background:linear-gradient(100deg,rgba(7,19,13,.92) 0%,rgba(7,19,13,.72) 55%,rgba(7,19,13,.45) 100%)}
-.ax-root .ax-hero-inner{padding:96px 24px 72px;max-width:1200px;margin:0 auto}
+.ax-root .ax-hero-inner{padding:110px 24px 100px;max-width:1200px;margin:0 auto}
 .ax-root .ax-hero h1{font-size:clamp(38px,6.2vw,72px);font-weight:800;max-width:860px}
 .ax-root .ax-hero-sub{margin-top:20px;font-size:clamp(16px,1.7vw,19px);max-width:560px;color:#D5E3DB}
 
@@ -528,7 +528,6 @@ export default function HomePro() {
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
 
-  const [search, setSearch] = useState({ tab: "properties", county: "", type: "", q: "" });
   const [featured, setFeatured] = useState({ properties: [], accommodation: [], businesses: [], materials: [] });
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -609,23 +608,7 @@ export default function HomePro() {
     else if (link) navigate(link);
   };
 
-  /* ── ACTIONS ── */
-  const activeSearchTab = TABS.find((t) => t.id === search.tab);
-  const isRentals = search.tab === "properties";
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    const params = new URLSearchParams();
-    if (isRentals) {
-      if (search.county) params.append("county", search.county);
-      if (search.type) params.append("type", search.type);
-    } else {
-      if (search.county && search.tab === "accommodation") params.append("county", search.county);
-      if (search.q.trim()) params.append("search", search.q.trim());
-    }
-    const qs = params.toString();
-    navigate(`${activeSearchTab.path}${qs ? `?${qs}` : ""}`);
-  };
 
   const handleListProperty = () => {
     if (!token) { setShowBoostModal(true); return; }
@@ -685,49 +668,6 @@ export default function HomePro() {
           <p className="ax-hero-sub">
             Verified rentals, accommodation, business services and quick sales in one place. Talk to owners and hosts yourself and pay no broker fees.
           </p>
-
-          <div className="ax-search">
-            <div className="ax-search-tabs" role="tablist" aria-label="Search category">
-              {TABS.map((t) => (
-                <button key={t.id} role="tab" aria-selected={search.tab === t.id}
-                  onClick={() => setSearch((s) => ({ ...s, tab: t.id }))}>
-                  {t.label}
-                </button>
-              ))}
-            </div>
-
-            <form className={`ax-search-body ${isRentals ? "" : "single"}`} onSubmit={handleSearch}>
-              {isRentals ? (
-                <>
-                  <div className="ax-field">
-                    <label htmlFor="ax-county">County</label>
-                    <select id="ax-county" value={search.county}
-                      onChange={(e) => setSearch((s) => ({ ...s, county: e.target.value }))}>
-                      <option value="">All counties</option>
-                      {COUNTIES.map((c) => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                  </div>
-                  <div className="ax-field">
-                    <label htmlFor="ax-type">House type</label>
-                    <select id="ax-type" value={search.type}
-                      onChange={(e) => setSearch((s) => ({ ...s, type: e.target.value }))}>
-                      <option value="">Any type</option>
-                      {TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
-                    </select>
-                  </div>
-                </>
-              ) : (
-                <div className="ax-field">
-                  <label htmlFor="ax-q">{activeSearchTab.hint}</label>
-                  <input id="ax-q" type="text" value={search.q} placeholder={`Search ${activeSearchTab.label}`}
-                    onChange={(e) => setSearch((s) => ({ ...s, q: e.target.value }))} />
-                </div>
-              )}
-              <button type="submit" className="ax-btn">Search {activeSearchTab.label}</button>
-            </form>
-          </div>
-
-
         </div>
       </header>
 
