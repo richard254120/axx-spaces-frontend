@@ -8,11 +8,31 @@ const HOSTEL_PROPERTY_TYPE = "Hostel Room";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
-const AMENITIES_LIST = [
-  "WiFi", "Parking", "AC/Cooler", "Water Tank", "Generator", "Security Fence",
-  "Balcony", "TV", "Refrigerator", "Cooking Stove", "Bed", "Sofa", "Dining Table",
-  "Shower", "Kitchen Cabinet", "Wardrobes", "Ceiling Fans", "Lights",
-  "24/7 Security", "Swimming Pool", "Gym", "Garden", "Workspace", "Pet Friendly",
+const AMENITIES_DATA = [
+  { name: "WiFi", icon: "📶" },
+  { name: "Parking", icon: "🅿️" },
+  { name: "24/7 Security", icon: "🛡️" },
+  { name: "Water Tank", icon: "💧" },
+  { name: "Generator", icon: "⚡" },
+  { name: "Security Fence", icon: "🧱" },
+  { name: "Balcony", icon: "🌇" },
+  { name: "AC/Cooler", icon: "❄️" },
+  { name: "TV", icon: "📺" },
+  { name: "Refrigerator", icon: "🧊" },
+  { name: "Cooking Stove", icon: "🍳" },
+  { name: "Bed", icon: "🛏️" },
+  { name: "Sofa", icon: "🛋️" },
+  { name: "Dining Table", icon: "🪑" },
+  { name: "Shower", icon: "🚿" },
+  { name: "Kitchen Cabinet", icon: "🗄️" },
+  { name: "Wardrobes", icon: "🚪" },
+  { name: "Ceiling Fans", icon: "💨" },
+  { name: "Lights", icon: "💡" },
+  { name: "Swimming Pool", icon: "🏊" },
+  { name: "Gym", icon: "🏋️" },
+  { name: "Garden", icon: "🌿" },
+  { name: "Workspace", icon: "💻" },
+  { name: "Pet Friendly", icon: "🐾" },
 ];
 
 const PROPERTY_TYPES = [
@@ -24,10 +44,10 @@ const PROPERTY_TYPES = [
 ];
 
 const STEPS = [
-  { id: "basic", label: "Basic Info", icon: "" },
-  { id: "details", label: "Details", icon: "" },
-  { id: "images", label: "Images & Videos", icon: "" },
-  { id: "amenities", label: "Amenities", icon: "" },
+  { id: "basic", label: "Basic Info", icon: "📋", desc: "Title & Location" },
+  { id: "details", label: "Pricing & Details", icon: "🏷️", desc: "Rent & Terms" },
+  { id: "images", label: "Photos & Media", icon: "📸", desc: "Images & Video" },
+  { id: "amenities", label: "Amenities & Publish", icon: "✨", desc: "Features & Submit" },
 ];
 
 function needsUniversityLink(data, landlordType) {
@@ -49,9 +69,6 @@ function validateDetails(data) {
   const missing = [];
   if (!data.description?.trim()) missing.push("Description");
   if (!data.price || Number(data.price) <= 0) missing.push("Price");
-  // Bedrooms and bathrooms are now optional for single rooms
-  // if (data.bedrooms === "" || Number(data.bedrooms) < 0) missing.push("Bedrooms");
-  // if (data.bathrooms === "" || Number(data.bathrooms) < 0) missing.push("Bathrooms");
   if (data.bookedUnits > data.totalUnits) missing.push("Booked units cannot exceed total units");
   return missing;
 }
@@ -88,6 +105,8 @@ const COUNTIES = [
 export default function Upload() {
   const { token, user } = useContext(AuthContext);
   const navigate = useNavigate();
+  const { id } = useParams();
+  const isEditMode = Boolean(id);
 
   const landlordType = user?.landlordType || "general";
 
@@ -119,29 +138,30 @@ export default function Upload() {
   });
 
   const [images, setImages] = useState([]);
+  const [existingImages, setExistingImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
+
   const [videos, setVideos] = useState([]);
   const [videoPreviews, setVideoPreviews] = useState([]);
   const [isDraggingVideo, setIsDraggingVideo] = useState(false);
+
+  const [consent, setConsent] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [locLoading, setLocLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [locLoading, setLocLoading] = useState(false);
+  const [selectedUniversity, setSelectedUniversity] = useState(null);
+
   const [currentStep, setCurrentStep] = useState(0);
   const [maxUnlockedStep, setMaxUnlockedStep] = useState(0);
   const [stepErrors, setStepErrors] = useState([]);
-  const [consent, setConsent] = useState(false);
-  const [selectedUniversity, setSelectedUniversity] = useState(null);
+  const [showManualGps, setShowManualGps] = useState(false);
 
-  const { id } = useParams();
-  const isEditMode = !!id;
-  const [existingImages, setExistingImages] = useState([]);
-
+  // Load existing property data for Edit mode
   useEffect(() => {
     if (isEditMode && token) {
       const fetchProperty = async () => {
         try {
-          setLoading(true);
           const response = await fetch(`${API_BASE}/properties/${id}`, {
             headers: { Authorization: `Bearer ${token}` }
           });
@@ -179,17 +199,15 @@ export default function Upload() {
             });
           }
 
+          if (data.lat || data.lng) {
+            setShowManualGps(true);
+          }
+
           setExistingImages(data.images || []);
           setImagePreviews(data.images || []);
-          setConsent(true); // already agreed on upload
-
-          // In edit mode, unlock all steps immediately
           setMaxUnlockedStep(3);
-
         } catch (err) {
-          setError(err.message || "Error loading property for editing");
-        } finally {
-          setLoading(false);
+          setError(err.message || "Failed to load property data");
         }
       };
       fetchProperty();
@@ -222,7 +240,7 @@ export default function Upload() {
     const missing = runStepValidation(currentStep);
     if (missing.length > 0) {
       setStepErrors(missing);
-      setError(`Complete required fields: ${missing.join(", ")}`);
+      setError(`Please complete the required fields: ${missing.join(", ")}`);
       return;
     }
     setStepErrors([]);
@@ -231,6 +249,7 @@ export default function Upload() {
     if (next < STEPS.length) {
       setCurrentStep(next);
       setMaxUnlockedStep((prev) => Math.max(prev, next));
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -238,6 +257,7 @@ export default function Upload() {
     setStepErrors([]);
     setError("");
     setCurrentStep((prev) => Math.max(0, prev - 1));
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleUniversityPick = (uni) => {
@@ -254,7 +274,7 @@ export default function Upload() {
       setStepErrors([]);
       setError("");
     }
-  }, [formData, images, consent, currentStep]);
+  }, [formData, images, existingImages, consent, currentStep]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -275,7 +295,7 @@ export default function Upload() {
       [name]: type === "checkbox"
         ? checked
         : floatFields.includes(name)
-          ? value  // keep as string so user can type freely
+          ? value
           : intFields.includes(name)
             ? parseInt(value) || ""
             : value,
@@ -294,7 +314,7 @@ export default function Upload() {
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     if (files.length + images.length + existingImages.length > 10) {
-      setError("Maximum 10 images allowed");
+      setError("Maximum 10 images allowed per listing");
       return;
     }
     setImages((prev) => [...prev, ...files]);
@@ -305,40 +325,40 @@ export default function Upload() {
   const handleVideoChange = (fileList) => {
     const files = Array.from(fileList);
     const validVideos = [];
-    const oversized = [];
-    files.forEach((f) => {
-      if (f.type && f.type.startsWith("video/")) {
-        if (f.size > 100 * 1024 * 1024) {
-          oversized.push(`${f.name} (${(f.size / (1024 * 1024)).toFixed(1)}MB)`);
-        } else {
-          validVideos.push(f);
-        }
-      }
-    });
-    if (oversized.length > 0) {
-      setError(`These videos exceed 100MB and were skipped: ${oversized.join(", ")}`);
-    }
-    if (videos.length + validVideos.length > 5) {
-      setError("Maximum 5 videos allowed");
+    const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB
+
+    if (videos.length + files.length > 5) {
+      setError("Maximum 5 videos allowed per listing");
       return;
     }
+
+    for (const file of files) {
+      if (!file.type.startsWith("video/")) {
+        setError(`"${file.name}" is not a valid video file`);
+        return;
+      }
+      if (file.size > MAX_VIDEO_SIZE) {
+        setError(`"${file.name}" exceeds the 100MB limit`);
+        return;
+      }
+      validVideos.push(file);
+    }
+
     setVideos((prev) => [...prev, ...validVideos]);
     const newPreviews = validVideos.map((file) => URL.createObjectURL(file));
     setVideoPreviews((prev) => [...prev, ...newPreviews]);
+    setError("");
   };
 
   const removeVideo = (index) => {
-    if (videoPreviews[index]) URL.revokeObjectURL(videoPreviews[index]);
     setVideos((prev) => prev.filter((_, i) => i !== index));
     setVideoPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
   const removeImage = (index) => {
     if (index < existingImages.length) {
-      // Removing an existing image
       setExistingImages((prev) => prev.filter((_, i) => i !== index));
     } else {
-      // Removing a newly added image file
       const newFileIndex = index - existingImages.length;
       setImages((prev) => prev.filter((_, i) => i !== newFileIndex));
     }
@@ -347,7 +367,7 @@ export default function Upload() {
 
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
-      setError("Geolocation not supported by your browser");
+      setError("Geolocation is not supported by your browser");
       return;
     }
     setLocLoading(true);
@@ -362,7 +382,7 @@ export default function Upload() {
         setLocLoading(false);
       },
       () => {
-        setError("Unable to get location. Please enter coordinates manually.");
+        setError("Unable to retrieve location. You may enter coordinates manually.");
         setLocLoading(false);
       }
     );
@@ -374,7 +394,7 @@ export default function Upload() {
     setSuccess("");
 
     if (!consent) {
-      setError("Please agree to the terms and conditions");
+      setError("Please agree to the terms and conditions before submitting");
       setCurrentStep(3);
       setStepErrors(["Terms agreement"]);
       return;
@@ -388,7 +408,7 @@ export default function Upload() {
       ...validateAmenities(formData, consent),
     ];
     if (allMissing.length > 0) {
-      setError(`Complete all steps before submitting: ${allMissing.join(", ")}`);
+      setError(`Please complete all required steps: ${allMissing.join(", ")}`);
       if (!isStepComplete(0)) setCurrentStep(0);
       else if (!isStepComplete(1)) setCurrentStep(1);
       else if (!isStepComplete(2)) setCurrentStep(2);
@@ -444,7 +464,7 @@ export default function Upload() {
         throw new Error(errorData.message || errorData.error || "Submission failed");
       }
 
-      setSuccess(isEditMode ? "Property updated successfully!" : "Property submitted! Pending admin approval.");
+      setSuccess(isEditMode ? "Property updated successfully!" : "Property submitted successfully! Pending approval.");
 
       if (!isEditMode) {
         setFormData({
@@ -466,7 +486,7 @@ export default function Upload() {
       }
 
       const redirectPath = user?.role === "admin" ? "/admin/dashboard" : user?.role === "agent" ? "/agent/dashboard" : "/dashboard";
-      setTimeout(() => navigate(redirectPath), 2800);
+      setTimeout(() => navigate(redirectPath), 2200);
     } catch (err) {
       setError(err.message || "Error submitting property");
     } finally {
@@ -478,1070 +498,1489 @@ export default function Upload() {
     return (
       <div style={styles.container}>
         <style>{cssStyles}</style>
-        <div style={styles.unauth}>
-          <p>Login to upload a property</p>
-          <button onClick={() => navigate("/login")} style={styles.loginBtn}>Go to Login</button>
+        <div style={styles.unauthCard}>
+          <div style={{ fontSize: "40px", marginBottom: "12px" }}>🔒</div>
+          <h2 style={{ fontSize: "20px", fontWeight: 700, margin: "0 0 8px", color: "#f8fafc" }}>
+            Sign In Required
+          </h2>
+          <p style={{ color: "#94a3b8", fontSize: "14px", margin: "0 0 20px" }}>
+            Please log in with your landlord or agent account to publish a property.
+          </p>
+          <button onClick={() => navigate("/login")} style={styles.primaryBtn}>
+            Go to Login
+          </button>
         </div>
       </div>
     );
   }
 
+  const currentStepData = STEPS[currentStep];
+  const progressPercent = ((currentStep) / (STEPS.length - 1)) * 100;
+
   return (
     <div style={styles.container}>
       <style>{cssStyles}</style>
 
-      <div style={styles.header}>
-        <h1 style={styles.heading}>{isEditMode ? "Edit Property" : "Upload Property"}</h1>
-        <button style={styles.backBtn} onClick={() => navigate(user?.role === "admin" ? "/admin/dashboard" : "/dashboard")}>←</button>
-      </div>
-
-      {error && <div style={styles.errorBox}>{error}</div>}
-      {success && <div style={styles.successBox}>{success}</div>}
-
-      {/* STEP PROGRESS */}
-      <div style={styles.stepProgress} className="upload-step-progress">
-        {STEPS.map((step, index) => {
-          const unlocked = index <= maxUnlockedStep;
-          const complete = index < currentStep && isStepComplete(index);
-          const active = index === currentStep;
-          return (
-            <button
-              key={step.id}
-              type="button"
-              disabled={!unlocked}
-              onClick={() => goToStep(index)}
-              style={{
-                ...styles.stepItem,
-                ...(active && styles.stepItemActive),
-                ...(complete && styles.stepItemComplete),
-                ...(!unlocked && styles.stepItemLocked),
-              }}
-            >
-              <span style={styles.stepNumber}>
-                {complete ? "✓" : index + 1}
-              </span>
-              <span style={styles.stepLabel}>
-                {step.icon} {step.label}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      <div style={styles.stepHint}>
-        Step {currentStep + 1} of {STEPS.length} — complete this section to unlock the next
-      </div>
-
-      <form onSubmit={handleSubmit} style={styles.form}>
-
-        {/* ── BASIC INFO ── */}
-        {currentStep === 0 && (
-          <div style={styles.section}>
-            <h2 style={styles.sectionTitle}>Basic Info</h2>
-            {stepErrors.length > 0 && (
-              <div style={styles.stepErrorBox}>
-                Required: {stepErrors.join(", ")}
-              </div>
-            )}
-
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Title *</label>
-              <input type="text" name="title" placeholder="Modern 2BR Apartment" value={formData.title} onChange={handleChange} style={styles.input} required />
-            </div>
-
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Property Type *</label>
-              <select name="propertyType" value={formData.propertyType} onChange={handleChange} style={styles.input} required>
-                <option value="">Select Type</option>
-                {PROPERTY_TYPES.map(type => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
-            </div>
-
-            <div style={styles.formGroup}>
-              <label style={styles.label}>County *</label>
-              <select name="county" value={formData.county} onChange={handleChange} style={styles.input} required>
-                <option value="">Select County</option>
-                {COUNTIES.map(county => (
-                  <option key={county} value={county}>{county}</option>
-                ))}
-              </select>
-            </div>
-
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Location *</label>
-              <input type="text" name="location" placeholder="e.g., Westlands" value={formData.location} onChange={handleChange} style={styles.input} required />
-            </div>
-
-            <div style={styles.formGroup}>
-              <UniversityPicker
-                value={selectedUniversity}
-                onChange={handleUniversityPick}
-                required={universityRequired}
-                label={universityRequired ? "Nearby University" : "Nearby University (Optional)"}
-                hint={
-                  universityRequired
-                    ? "Required — students browsing this university will see your listing after admin approval."
-                    : "Optional — link your property to a campus so students can find it under University Hostels."
-                }
-              />
-            </div>
-
-            {universityRequired && (
-              <div style={styles.universityNotice}>
-                <strong> Campus listing</strong>
-                <p style={{ margin: "6px 0 0", lineHeight: 1.5 }}>
-                  {formData.propertyType === HOSTEL_PROPERTY_TYPE
-                    ? "Hostel listings must be linked to a university so students can find them when they select that campus."
-                    : "As a near-university landlord, every property must be linked to the campus you serve."}
-                </p>
-              </div>
-            )}
-
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Number of Units *</label>
-              <input type="number" name="totalUnits" min="1" value={formData.totalUnits} onChange={handleChange} style={styles.input} required />
-            </div>
-
-            {/* ── GPS COORDINATES ── */}
-            <div style={styles.gpsCard}>
-              <div style={styles.gpsHeader}>
-                <span style={styles.gpsTitle}> GPS Coordinates</span>
-                <span style={styles.gpsBadge}>Recommended</span>
-              </div>
-              <p style={styles.gpsHint}>
-                Adding coordinates pins your property on the map, making it easier for tenants to find.
-              </p>
-
-              <button
-                type="button"
-                onClick={getCurrentLocation}
-                disabled={locLoading}
-                style={styles.gpsBtn}
-              >
-                {locLoading ? " Detecting..." : " Use My Current Location"}
-              </button>
-
-              {(formData.lat || formData.lng) && (
-                <div style={styles.coordsDisplay}>
-                  {formData.lat}, {formData.lng}
-                  <button
-                    type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, lat: "", lng: "" }))}
-                    style={styles.clearCoordsBtn}
-                  >
-                    ✕
-                  </button>
-                </div>
-              )}
-
-              <p style={styles.gpsOrDivider}>— or enter manually —</p>
-
-              <div style={styles.twoCol}>
-                <div style={styles.formGroup}>
-                  <label style={styles.label}>Latitude</label>
-                  <input
-                    type="number"
-                    name="lat"
-                    step="any"
-                    placeholder="-1.292066"
-                    value={formData.lat}
-                    onChange={handleChange}
-                    style={styles.input}
-                  />
-                </div>
-                <div style={styles.formGroup}>
-                  <label style={styles.label}>Longitude</label>
-                  <input
-                    type="number"
-                    name="lng"
-                    step="any"
-                    placeholder="36.821945"
-                    value={formData.lng}
-                    onChange={handleChange}
-                    style={styles.input}
-                  />
-                </div>
-              </div>
-
-              <p style={styles.gpsTip}>
-                Not sure? Open Google Maps, long-press your property location, and copy the coordinates shown.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleNextStep}
-              disabled={!isStepComplete(0)}
-              style={{
-                ...styles.nextBtn,
-                opacity: isStepComplete(0) ? 1 : 0.5,
-                cursor: isStepComplete(0) ? "pointer" : "not-allowed",
-              }}
-            >
-              Next →
-            </button>
+      <div style={styles.wrapper}>
+        {/* TOP BAR / BREADCRUMB */}
+        <div style={styles.topNav}>
+          <button
+            type="button"
+            style={styles.backBtn}
+            onClick={() => navigate(user?.role === "admin" ? "/admin/dashboard" : "/dashboard")}
+          >
+            ← Back to Dashboard
+          </button>
+          <div style={styles.badgeLive}>
+            <span style={styles.badgeDot} />
+            {isEditMode ? "Editing Property" : "Direct Listing"}
           </div>
-        )}
+        </div>
 
-        {/* ── DETAILS ── */}
-        {currentStep === 1 && (
-          <div style={styles.section}>
-            <h2 style={styles.sectionTitle}>Details</h2>
-            {stepErrors.length > 0 && (
-              <div style={styles.stepErrorBox}>
-                Required: {stepErrors.join(", ")}
-              </div>
-            )}
+        {/* HERO TITLE */}
+        <div style={styles.headerArea}>
+          <h1 style={styles.heading}>
+            {isEditMode ? "Edit Property Listing" : "List Your Property"}
+          </h1>
+          <p style={styles.subheading}>
+            Reach thousands of verified tenants across Kenya with transparent pricing and zero broker hassle.
+          </p>
+        </div>
 
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Description *</label>
-              <textarea name="description" placeholder="Describe your property..." value={formData.description} onChange={handleChange} style={styles.textarea} rows="4" required />
-            </div>
-
-            <div style={styles.twoCol}>
-              <div style={styles.formGroup}>
-                <label style={styles.label}>Price (KES) *</label>
-                <input type="number" name="price" placeholder="50000" value={formData.price} onChange={handleChange} style={styles.input} required />
-              </div>
-              <div style={styles.formGroup}>
-                <label style={styles.label}>Deposit (KES)</label>
-                <input type="number" name="deposit" placeholder="50000" value={formData.deposit} onChange={handleChange} style={styles.input} />
-              </div>
-            </div>
-
-            <div style={styles.twoCol}>
-              <div style={styles.formGroup}>
-                <label style={styles.label}>
-                  Listing Reference
-                  <span style={{ marginLeft: "6px", fontSize: "11px", padding: "2px 6px", background: "#ecfdf5", color: "#047857", borderRadius: "4px", fontWeight: 700 }}>Auto</span>
-                </label>
-                <input
-                  type="text"
-                  value={isEditMode && id ? `AXX-${id.slice(-4).toUpperCase()}` : autoRefCode}
-                  readOnly
-                  style={{ ...styles.input, background: "#f8fafc", color: "#334155", cursor: "default", fontWeight: 700, letterSpacing: "0.5px" }}
-                />
-              </div>
-              <div style={styles.formGroup}>
-                <label style={styles.label}>
-                  Date Listed
-                  <span style={{ marginLeft: "6px", fontSize: "11px", padding: "2px 6px", background: "#ecfdf5", color: "#047857", borderRadius: "4px", fontWeight: 700 }}>Auto</span>
-                </label>
-                <input
-                  type="text"
-                  value={todayDateFormatted}
-                  readOnly
-                  style={{ ...styles.input, background: "#f8fafc", color: "#334155", cursor: "default", fontWeight: 600 }}
-                />
-              </div>
-            </div>
-
-            <div style={styles.twoCol}>
-              <div style={styles.formGroup}>
-                <label style={styles.label}>Furnished</label>
-                <select name="furnished" value={String(formData.furnished)} onChange={handleChange} style={styles.input}>
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </select>
-              </div>
-              <div style={styles.formGroup}>
-                <label style={styles.label}>Lease Type</label>
-                <select name="leaseType" value={formData.leaseType} onChange={handleChange} style={styles.input}>
-                  <option value="monthly">Monthly</option>
-                  <option value="6months">6 Months</option>
-                  <option value="yearly">Yearly</option>
-                </select>
-              </div>
-            </div>
-
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Available From</label>
-              <input type="date" name="availableFrom" value={formData.availableFrom} onChange={handleChange} style={styles.input} />
-            </div>
-
-            <div style={styles.formGroup}>
-              <label style={styles.label}>House Rules</label>
-              <textarea name="rules" placeholder="e.g., No pets..." value={formData.rules} onChange={handleChange} style={styles.textarea} rows="3" />
-            </div>
-
-            <div style={styles.navBtns}>
-              <button type="button" onClick={handlePrevStep} style={styles.prevBtn}>← Back</button>
-              <button
-                type="button"
-                onClick={handleNextStep}
-                disabled={!isStepComplete(1)}
-                style={{
-                  ...styles.nextBtn,
-                  opacity: isStepComplete(1) ? 1 : 0.5,
-                  cursor: isStepComplete(1) ? "pointer" : "not-allowed",
-                }}
-              >
-                Next →
-              </button>
-            </div>
+        {/* STEPPER PROGRESS */}
+        <div style={styles.stepperCard}>
+          <div style={styles.stepperTrackWrap}>
+            <div style={{ ...styles.stepperTrackFill, width: `${progressPercent}%` }} />
           </div>
-        )}
 
-        {/* ── IMAGES & VIDEOS ── */}
-        {currentStep === 2 && (
-          <div style={styles.section}>
-            <h2 style={styles.sectionTitle}>Images & Videos</h2>
-            {stepErrors.length > 0 && (
-              <div style={styles.stepErrorBox}>
-                Required: {stepErrors.join(", ")}
-              </div>
-            )}
+          <div style={styles.stepGrid}>
+            {STEPS.map((step, index) => {
+              const unlocked = index <= maxUnlockedStep;
+              const complete = index < currentStep && isStepComplete(index);
+              const active = index === currentStep;
 
-            {/* ── IMAGE UPLOAD ── */}
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Upload Images ({images.length}/10) *</label>
-              <div style={styles.imageUploadBox}>
-                <input type="file" multiple accept="image/*" onChange={handleImageChange} style={styles.fileInput} id="imageInput" />
-                <label htmlFor="imageInput" style={styles.fileLabel}>
-                  <div style={styles.uploadIcon}></div>
-                  <p>Tap to select images</p>
-                </label>
-              </div>
-
-              {imagePreviews.length > 0 && (
-                <div style={styles.previewContainer}>
-                  {imagePreviews.map((preview, index) => {
-                    const src = (String(preview).startsWith("blob:") || String(preview).startsWith("data:"))
-                      ? preview
-                      : resolveMediaUrl(preview);
-                    return (
-                      <div key={index} style={styles.previewBox}>
-                        <img src={src} alt={`Preview ${index + 1}`} style={styles.previewImg} />
-                        <button type="button" onClick={() => removeImage(index)} style={styles.removeBtn}>✕</button>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* ── VIDEO UPLOAD ── */}
-            <div style={styles.videoSection}>
-              <div style={styles.videoSectionHeader}>
-                <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <span style={{ display: "inline-flex", alignItems: "center" }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
-                    </span>
-                    <label style={{ ...styles.label, marginBottom: 0, color: "#fbbf24" }}>
-                      Property Videos ({videos.length}/5)
-                    </label>
-                    <span style={styles.videoOptionalBadge}>Optional</span>
-                  </div>
-                  <p style={{ fontSize: "12px", color: "#64748b", marginTop: "6px", lineHeight: 1.5 }}>
-                    Upload walkthrough videos to give tenants a virtual tour. MP4, WebM, MOV • Max 100MB each.
-                  </p>
-                </div>
-                {videos.length > 0 && (
-                  <span style={styles.videoReadyBadge}>
-                    ✓ {videos.length} video{videos.length > 1 ? "s" : ""} ready
-                  </span>
-                )}
-              </div>
-
-              <div
-                style={{
-                  ...styles.videoUploadBox,
-                  borderColor: isDraggingVideo ? "#3b82f6" : "#334155",
-                  background: isDraggingVideo ? "rgba(59,130,246,0.1)" : "#1e293b",
-                }}
-                onDragOver={(e) => { e.preventDefault(); setIsDraggingVideo(true); }}
-                onDragLeave={() => setIsDraggingVideo(false)}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  setIsDraggingVideo(false);
-                  if (e.dataTransfer.files) handleVideoChange(e.dataTransfer.files);
-                }}
-              >
-                <input
-                  type="file"
-                  accept="video/*"
-                  multiple
-                  onChange={(e) => {
-                    if (e.target.files) handleVideoChange(e.target.files);
-                    e.target.value = "";
+              return (
+                <button
+                  key={step.id}
+                  type="button"
+                  disabled={!unlocked}
+                  onClick={() => goToStep(index)}
+                  style={{
+                    ...styles.stepBtn,
+                    ...(active ? styles.stepBtnActive : {}),
+                    ...(complete ? styles.stepBtnComplete : {}),
+                    ...(!unlocked ? styles.stepBtnLocked : {}),
                   }}
-                  style={{ display: "none" }}
-                  id="videoInput"
-                />
-                <label htmlFor="videoInput" style={styles.videoUploadLabel}>
-                  <span style={{ marginBottom: "8px", display: "inline-flex", alignItems: "center" }}>
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
-                  </span>
-                  <span style={{ fontWeight: 700, fontSize: "14px", color: "#f1f5f9" }}>
-                    Click to select videos
-                  </span>
-                  <span style={{ fontSize: "12px", color: "#64748b", marginTop: "4px" }}>
-                    or drag & drop video files here
-                  </span>
-                </label>
-              </div>
-
-              {/* Video Previews */}
-              {videoPreviews.length > 0 && (
-                <div style={{ marginTop: "16px" }}>
-                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#86efac", marginBottom: "10px", display: "flex", alignItems: "center", gap: "6px" }}>
-                    <span>▶ Preview your videos:</span>
+                >
+                  <div style={{
+                    ...styles.stepNumberBadge,
+                    ...(active ? styles.stepNumberBadgeActive : {}),
+                    ...(complete ? styles.stepNumberBadgeComplete : {}),
+                  }}>
+                    {complete ? "✓" : index + 1}
                   </div>
-                  <div style={styles.videoPreviewGrid}>
-                    {videos.map((file, idx) => (
-                      <div key={idx} style={styles.videoCard}>
-                        <video
-                          src={videoPreviews[idx]}
-                          controls
-                          playsInline
-                          preload="metadata"
-                          style={{ width: "100%", height: "160px", objectFit: "contain", background: "#000", borderRadius: "8px 8px 0 0" }}
-                        />
-                        <div style={styles.videoCardInfo}>
-                          <div style={{ minWidth: 0, flex: 1 }}>
-                            <div style={{ fontSize: "12px", fontWeight: 700, color: "#f1f5f9", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                              {file.name}
-                            </div>
-                            <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>
-                              {(file.size / (1024 * 1024)).toFixed(1)} MB
-                            </div>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => removeVideo(idx)}
-                            style={styles.videoRemoveBtn}
-                          >
-                            ✕ Remove
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                  <div style={styles.stepTextWrap}>
+                    <span style={styles.stepTitleText}>{step.label}</span>
+                    <span style={styles.stepSubText}>{step.desc}</span>
                   </div>
-                </div>
-              )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-              <div style={{ ...styles.videoTip, display: "flex", alignItems: "center", gap: "8px" }}>
-                <span style={{ fontWeight: 800, background: "#38bdf8", color: "#0f172a", padding: "2px 6px", borderRadius: "4px", fontSize: "10px" }}>TIP</span>
-                <span>Short walkthrough videos (30s–2min) showing rooms, kitchen, bathroom, and the view dramatically increase tenant interest!</span>
-              </div>
-            </div>
-
-            <div style={styles.navBtns}>
-              <button type="button" onClick={handlePrevStep} style={styles.prevBtn}>← Back</button>
-              <button
-                type="button"
-                onClick={handleNextStep}
-                disabled={!isStepComplete(2)}
-                style={{
-                  ...styles.nextBtn,
-                  opacity: isStepComplete(2) ? 1 : 0.5,
-                  cursor: isStepComplete(2) ? "pointer" : "not-allowed",
-                }}
-              >
-                Next →
-              </button>
-            </div>
+        {/* ALERTS */}
+        {error && (
+          <div style={styles.errorBanner}>
+            <span style={{ fontSize: "16px" }}>⚠️</span>
+            <span>{error}</span>
+          </div>
+        )}
+        {success && (
+          <div style={styles.successBanner}>
+            <span style={{ fontSize: "16px" }}>✅</span>
+            <span>{success}</span>
           </div>
         )}
 
-        {/* ── AMENITIES ── */}
-        {currentStep === 3 && (
-          <div style={styles.section}>
-            <h2 style={styles.sectionTitle}>Amenities</h2>
-            {stepErrors.length > 0 && (
-              <div style={styles.stepErrorBox}>
-                Required: {stepErrors.join(", ")}
+        {/* MAIN FORM CARD */}
+        <div style={styles.formCard}>
+          <div style={styles.formCardHeader}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <span style={{ fontSize: "22px" }}>{currentStepData.icon}</span>
+              <div>
+                <h2 style={styles.cardStepTitle}>{currentStepData.label}</h2>
+                <span style={styles.cardStepIndicator}>
+                  Step {currentStep + 1} of {STEPS.length}
+                </span>
               </div>
+            </div>
+            {stepErrors.length > 0 && (
+              <span style={styles.stepReqPill}>
+                {stepErrors.length} field{stepErrors.length > 1 ? "s" : ""} required
+              </span>
             )}
+          </div>
 
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Select Amenities * ({formData.amenities.length})</label>
-              <div style={styles.amenitiesGrid}>
-                {AMENITIES_LIST.map((amenity) => (
+          <form onSubmit={handleSubmit} style={styles.formContent}>
+
+            {/* ═══════════════════════════════════════════════════════
+                STEP 0: BASIC INFO
+            ═══════════════════════════════════════════════════════ */}
+            {currentStep === 0 && (
+              <div style={styles.stepSection}>
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>
+                    Property Title <span style={styles.reqStar}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    placeholder="e.g., Spacious 2-Bedroom Master Ensuite Apartment"
+                    value={formData.title}
+                    onChange={handleChange}
+                    style={styles.input}
+                    required
+                  />
+                  <span style={styles.helperText}>A descriptive title helps your listing stand out in search results.</span>
+                </div>
+
+                <div style={styles.gridTwo}>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>
+                      Property Type <span style={styles.reqStar}>*</span>
+                    </label>
+                    <select
+                      name="propertyType"
+                      value={formData.propertyType}
+                      onChange={handleChange}
+                      style={styles.select}
+                      required
+                    >
+                      <option value="">Select Property Type</option>
+                      {PROPERTY_TYPES.map((type) => (
+                        <option key={type} value={type}>{type}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>
+                      County <span style={styles.reqStar}>*</span>
+                    </label>
+                    <select
+                      name="county"
+                      value={formData.county}
+                      onChange={handleChange}
+                      style={styles.select}
+                      required
+                    >
+                      <option value="">Select County</option>
+                      {COUNTIES.map((county) => (
+                        <option key={county} value={county}>{county}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div style={styles.gridTwo}>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>
+                      Area / Neighborhood <span style={styles.reqStar}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="location"
+                      placeholder="e.g., Westlands, Kilimani, Juja"
+                      value={formData.location}
+                      onChange={handleChange}
+                      style={styles.input}
+                      required
+                    />
+                  </div>
+
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>
+                      Total Units Available <span style={styles.reqStar}>*</span>
+                    </label>
+                    <input
+                      type="number"
+                      name="totalUnits"
+                      min="1"
+                      value={formData.totalUnits}
+                      onChange={handleChange}
+                      style={styles.input}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* University Picker */}
+                <div style={styles.universityBox}>
+                  <UniversityPicker
+                    value={selectedUniversity}
+                    onChange={handleUniversityPick}
+                    required={universityRequired}
+                    label={universityRequired ? "Linked Campus / University *" : "Nearby University (Optional)"}
+                    hint={
+                      universityRequired
+                        ? "Required for hostel listings and campus landlords so students find your property."
+                        : "Link your property to a nearby campus to appear in student hostel searches."
+                    }
+                  />
+                </div>
+
+                {/* GPS Coordinates Section */}
+                <div style={styles.gpsContainer}>
+                  <div style={styles.gpsTopRow}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span style={{ fontSize: "18px" }}>📍</span>
+                      <div>
+                        <span style={styles.gpsCardTitle}>GPS Map Pin</span>
+                        <span style={styles.recBadge}>Recommended</span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={getCurrentLocation}
+                      disabled={locLoading}
+                      style={styles.gpsLocateBtn}
+                    >
+                      {locLoading ? "Detecting GPS..." : "📍 Auto-Detect Location"}
+                    </button>
+                  </div>
+
+                  {(formData.lat || formData.lng) ? (
+                    <div style={styles.gpsDetectedPill}>
+                      <span>✓ Pinned at {formData.lat}, {formData.lng}</span>
+                      <button
+                        type="button"
+                        onClick={() => setFormData((prev) => ({ ...prev, lat: "", lng: "" }))}
+                        style={styles.gpsClearBtn}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "8px" }}>
+                      <span style={styles.gpsInfoText}>
+                        Pinning your property enables map view so tenants find you faster.
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setShowManualGps(!showManualGps)}
+                        style={styles.textLinkBtn}
+                      >
+                        {showManualGps ? "Hide coordinates" : "Enter manually"}
+                      </button>
+                    </div>
+                  )}
+
+                  {showManualGps && (
+                    <div style={{ ...styles.gridTwo, marginTop: "12px" }}>
+                      <div>
+                        <label style={styles.smallLabel}>Latitude</label>
+                        <input
+                          type="number"
+                          name="lat"
+                          step="any"
+                          placeholder="-1.292066"
+                          value={formData.lat}
+                          onChange={handleChange}
+                          style={styles.smallInput}
+                        />
+                      </div>
+                      <div>
+                        <label style={styles.smallLabel}>Longitude</label>
+                        <input
+                          type="number"
+                          name="lng"
+                          step="any"
+                          placeholder="36.821945"
+                          value={formData.lng}
+                          onChange={handleChange}
+                          style={styles.smallInput}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div style={styles.actionsBar}>
+                  <div />
                   <button
-                    key={amenity}
                     type="button"
-                    onClick={() => handleAmenityToggle(amenity)}
+                    onClick={handleNextStep}
+                    disabled={!isStepComplete(0)}
                     style={{
-                      ...styles.amenityBtn,
-                      ...(formData.amenities.includes(amenity) ? styles.amenityBtnSelected : styles.amenityBtnUnselected),
+                      ...styles.primaryBtn,
+                      opacity: isStepComplete(0) ? 1 : 0.5,
+                      cursor: isStepComplete(0) ? "pointer" : "not-allowed",
                     }}
                   >
-                    {formData.amenities.includes(amenity) ? "✓" : "○"} {amenity}
+                    Continue to Details →
                   </button>
-                ))}
+                </div>
               </div>
-            </div>
+            )}
 
-            <div style={styles.consentBox}>
-              <label style={styles.consentLabel}>
-                <input
-                  type="checkbox"
-                  checked={consent}
-                  onChange={(e) => setConsent(e.target.checked)}
-                />
-                I confirm that all information provided is accurate and I agree to the terms and conditions of Axxspace.
-              </label>
-            </div>
+            {/* ═══════════════════════════════════════════════════════
+                STEP 1: PRICING & DETAILS
+            ═══════════════════════════════════════════════════════ */}
+            {currentStep === 1 && (
+              <div style={styles.stepSection}>
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>
+                    Property Description <span style={styles.reqStar}>*</span>
+                  </label>
+                  <textarea
+                    name="description"
+                    placeholder="Highlight main features, finishes, security, water availability, nearby transit, and what makes your property special..."
+                    value={formData.description}
+                    onChange={handleChange}
+                    style={styles.textarea}
+                    rows="4"
+                    required
+                  />
+                </div>
 
-            <div style={styles.navBtns}>
-              <button type="button" onClick={handlePrevStep} style={styles.prevBtn}>← Back</button>
-            </div>
+                {/* Pricing Row */}
+                <div style={styles.gridTwo}>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>
+                      Monthly Rent (KES) <span style={styles.reqStar}>*</span>
+                    </label>
+                    <div style={styles.prefixInputWrap}>
+                      <span style={styles.inputPrefix}>KES</span>
+                      <input
+                        type="number"
+                        name="price"
+                        placeholder="25000"
+                        value={formData.price}
+                        onChange={handleChange}
+                        style={styles.prefixInput}
+                        required
+                      />
+                    </div>
+                  </div>
 
-            <button type="submit" disabled={loading || !isStepComplete(3)} style={{
-              ...styles.submitBtn,
-              opacity: (!isStepComplete(3) || loading) ? 0.5 : 1,
-              cursor: (!isStepComplete(3) || loading) ? "not-allowed" : "pointer",
-            }}>
-              {loading
-                ? (videos.length > 0
-                    ? `Uploading ${images.length} image(s) & ${videos.length} video(s)...`
-                    : "Uploading Property...")
-                : "Submit Property for Approval"}
-            </button>
-          </div>
-        )}
-      </form>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Security Deposit (KES)</label>
+                    <div style={styles.prefixInputWrap}>
+                      <span style={styles.inputPrefix}>KES</span>
+                      <input
+                        type="number"
+                        name="deposit"
+                        placeholder="25000"
+                        value={formData.deposit}
+                        onChange={handleChange}
+                        style={styles.prefixInput}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Auto Reference & Date Row */}
+                <div style={styles.gridTwo}>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>
+                      Listing Reference <span style={styles.autoTag}>Auto</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={isEditMode && id ? `AXX-${id.slice(-4).toUpperCase()}` : autoRefCode}
+                      readOnly
+                      style={styles.readOnlyInput}
+                    />
+                    <span style={styles.helperText}>Unique verification reference for your property.</span>
+                  </div>
+
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>
+                      Date Listed <span style={styles.autoTag}>Auto</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={todayDateFormatted}
+                      readOnly
+                      style={styles.readOnlyInput}
+                    />
+                    <span style={styles.helperText}>Official timestamp when listing was created.</span>
+                  </div>
+                </div>
+
+                {/* Furnished & Lease Type */}
+                <div style={styles.gridTwo}>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Furnished</label>
+                    <select
+                      name="furnished"
+                      value={String(formData.furnished)}
+                      onChange={handleChange}
+                      style={styles.select}
+                    >
+                      <option value="true">Yes</option>
+                      <option value="false">No</option>
+                    </select>
+                  </div>
+
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Lease Type</label>
+                    <select
+                      name="leaseType"
+                      value={formData.leaseType}
+                      onChange={handleChange}
+                      style={styles.select}
+                    >
+                      <option value="monthly">Monthly</option>
+                      <option value="6months">6 Months</option>
+                      <option value="yearly">Yearly</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style={styles.gridTwo}>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Available From</label>
+                    <input
+                      type="date"
+                      name="availableFrom"
+                      value={formData.availableFrom}
+                      onChange={handleChange}
+                      style={styles.input}
+                    />
+                  </div>
+
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>House Rules (Optional)</label>
+                    <input
+                      type="text"
+                      name="rules"
+                      placeholder="e.g., No smoking inside, Quiet hours after 10 PM"
+                      value={formData.rules}
+                      onChange={handleChange}
+                      style={styles.input}
+                    />
+                  </div>
+                </div>
+
+                <div style={styles.actionsBar}>
+                  <button type="button" onClick={handlePrevStep} style={styles.secondaryBtn}>
+                    ← Back
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleNextStep}
+                    disabled={!isStepComplete(1)}
+                    style={{
+                      ...styles.primaryBtn,
+                      opacity: isStepComplete(1) ? 1 : 0.5,
+                      cursor: isStepComplete(1) ? "pointer" : "not-allowed",
+                    }}
+                  >
+                    Continue to Media →
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ═══════════════════════════════════════════════════════
+                STEP 2: PHOTOS & MEDIA
+            ═══════════════════════════════════════════════════════ */}
+            {currentStep === 2 && (
+              <div style={styles.stepSection}>
+                {/* Images Upload */}
+                <div style={styles.formGroup}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                    <label style={{ ...styles.label, marginBottom: 0 }}>
+                      Property Photos <span style={styles.reqStar}>*</span>
+                    </label>
+                    <span style={styles.countBadge}>
+                      {imagePreviews.length}/10 Photos
+                    </span>
+                  </div>
+
+                  <div style={styles.uploadDropzone}>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      id="imageInput"
+                      style={{ display: "none" }}
+                    />
+                    <label htmlFor="imageInput" style={styles.dropzoneLabel}>
+                      <span style={{ fontSize: "36px", marginBottom: "8px" }}>📸</span>
+                      <span style={{ fontWeight: 700, fontSize: "15px", color: "#f8fafc" }}>
+                        Click to select photos
+                      </span>
+                      <span style={{ fontSize: "12px", color: "#94a3b8", marginTop: "4px" }}>
+                        Upload up to 10 high-quality photos (JPG, PNG, WEBP)
+                      </span>
+                    </label>
+                  </div>
+
+                  {imagePreviews.length > 0 && (
+                    <div style={styles.previewGrid}>
+                      {imagePreviews.map((preview, index) => {
+                        const src = (String(preview).startsWith("blob:") || String(preview).startsWith("data:"))
+                          ? preview
+                          : resolveMediaUrl(preview);
+                        const isCover = index === 0;
+
+                        return (
+                          <div key={index} style={styles.previewCard}>
+                            <img src={src} alt={`Property preview ${index + 1}`} style={styles.previewImage} />
+                            {isCover && <span style={styles.coverBadge}>Cover Photo</span>}
+                            <button
+                              type="button"
+                              onClick={() => removeImage(index)}
+                              style={styles.trashBtn}
+                              title="Remove photo"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Walkthrough Video Upload */}
+                <div style={styles.videoCardBox}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span style={{ fontSize: "20px" }}>🎥</span>
+                      <div>
+                        <span style={{ fontWeight: 700, fontSize: "14px", color: "#f8fafc" }}>
+                          Walkthrough Video
+                        </span>
+                        <span style={styles.optBadge}>Optional</span>
+                      </div>
+                    </div>
+                    {videos.length > 0 && (
+                      <span style={styles.readyBadge}>
+                        ✓ {videos.length} video{videos.length > 1 ? "s" : ""} selected
+                      </span>
+                    )}
+                  </div>
+
+                  <div
+                    style={{
+                      ...styles.videoDropzone,
+                      borderColor: isDraggingVideo ? "#38bdf8" : "#334155",
+                      background: isDraggingVideo ? "rgba(56, 189, 248, 0.08)" : "#0b1324",
+                    }}
+                    onDragOver={(e) => { e.preventDefault(); setIsDraggingVideo(true); }}
+                    onDragLeave={() => setIsDraggingVideo(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setIsDraggingVideo(false);
+                      if (e.dataTransfer.files) handleVideoChange(e.dataTransfer.files);
+                    }}
+                  >
+                    <input
+                      type="file"
+                      accept="video/*"
+                      multiple
+                      onChange={(e) => {
+                        if (e.target.files) handleVideoChange(e.target.files);
+                        e.target.value = "";
+                      }}
+                      id="videoInput"
+                      style={{ display: "none" }}
+                    />
+                    <label htmlFor="videoInput" style={styles.dropzoneLabel}>
+                      <span style={{ fontSize: "28px", marginBottom: "6px" }}>📹</span>
+                      <span style={{ fontWeight: 600, fontSize: "14px", color: "#e2e8f0" }}>
+                        Click to add walkthrough video
+                      </span>
+                      <span style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>
+                        MP4, WebM or MOV • Max 100MB
+                      </span>
+                    </label>
+                  </div>
+
+                  {videoPreviews.length > 0 && (
+                    <div style={styles.videoList}>
+                      {videos.map((file, idx) => (
+                        <div key={idx} style={styles.videoItem}>
+                          <video
+                            src={videoPreviews[idx]}
+                            controls
+                            playsInline
+                            style={styles.videoPlayer}
+                          />
+                          <div style={styles.videoMeta}>
+                            <span style={styles.videoFileName}>{file.name}</span>
+                            <span style={styles.videoFileSize}>
+                              {(file.size / (1024 * 1024)).toFixed(1)} MB
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => removeVideo(idx)}
+                              style={styles.videoDeleteBtn}
+                            >
+                              Remove video
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div style={styles.actionsBar}>
+                  <button type="button" onClick={handlePrevStep} style={styles.secondaryBtn}>
+                    ← Back
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleNextStep}
+                    disabled={!isStepComplete(2)}
+                    style={{
+                      ...styles.primaryBtn,
+                      opacity: isStepComplete(2) ? 1 : 0.5,
+                      cursor: isStepComplete(2) ? "pointer" : "not-allowed",
+                    }}
+                  >
+                    Continue to Amenities →
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ═══════════════════════════════════════════════════════
+                STEP 3: AMENITIES & SUBMISSION
+            ═══════════════════════════════════════════════════════ */}
+            {currentStep === 3 && (
+              <div style={styles.stepSection}>
+                <div style={styles.formGroup}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                    <label style={{ ...styles.label, marginBottom: 0 }}>
+                      Select Property Amenities <span style={styles.reqStar}>*</span>
+                    </label>
+                    <span style={styles.countBadge}>
+                      {formData.amenities.length} Selected
+                    </span>
+                  </div>
+
+                  <div style={styles.amenitiesGrid}>
+                    {AMENITIES_DATA.map((item) => {
+                      const selected = formData.amenities.includes(item.name);
+                      return (
+                        <button
+                          key={item.name}
+                          type="button"
+                          onClick={() => handleAmenityToggle(item.name)}
+                          style={{
+                            ...styles.amenityChip,
+                            ...(selected ? styles.amenityChipSelected : {}),
+                          }}
+                        >
+                          <span style={{ fontSize: "16px" }}>{item.icon}</span>
+                          <span style={{ flex: 1, textAlign: "left" }}>{item.name}</span>
+                          <span style={{
+                            ...styles.amenityCheck,
+                            ...(selected ? styles.amenityCheckSelected : {}),
+                          }}>
+                            {selected ? "✓" : "+"}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Agreement Checkbox */}
+                <div style={styles.termsCard}>
+                  <label style={styles.termsLabel}>
+                    <input
+                      type="checkbox"
+                      checked={consent}
+                      onChange={(e) => setConsent(e.target.checked)}
+                      style={styles.checkboxInput}
+                    />
+                    <span style={styles.termsText}>
+                      I confirm that all property details, rent, and photos provided are accurate, genuine, and comply with AXX Spaces platform guidelines.
+                    </span>
+                  </label>
+                </div>
+
+                <div style={styles.actionsBar}>
+                  <button type="button" onClick={handlePrevStep} style={styles.secondaryBtn}>
+                    ← Back
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading || !isStepComplete(3)}
+                    style={{
+                      ...styles.submitBtn,
+                      opacity: (!isStepComplete(3) || loading) ? 0.6 : 1,
+                      cursor: (!isStepComplete(3) || loading) ? "not-allowed" : "pointer",
+                    }}
+                  >
+                    {loading ? (
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+                        <span className="upload-spinner" /> Publishing Property...
+                      </span>
+                    ) : (
+                      <span>🚀 {isEditMode ? "Save Changes" : "Publish Property Listing"}</span>
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+          </form>
+        </div>
+      </div>
     </div>
   );
 }
 
 const styles = {
   container: {
-    background: "#06101f",
     minHeight: "100vh",
-    fontFamily: "'DM Sans', sans-serif",
-    color: "#f1f5f9",
-    padding: "0",
+    background: "#080e1a",
+    color: "#f8fafc",
+    fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif",
+    padding: "24px 16px 60px",
+    boxSizing: "border-box",
   },
-  header: {
+  wrapper: {
+    maxWidth: "800px",
+    margin: "0 auto",
+  },
+  topNav: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "16px",
-    borderBottom: "1px solid #1e293b",
-    background: "#0f1729",
-  },
-  heading: {
-    margin: 0,
-    fontSize: "20px",
-    fontWeight: 800,
-    color: "#fbbf24",
+    marginBottom: "16px",
   },
   backBtn: {
-    background: "#1e293b",
-    border: "none",
-    color: "#fbbf24",
-    fontSize: "20px",
-    padding: "8px 12px",
-    borderRadius: "6px",
+    background: "rgba(255, 255, 255, 0.05)",
+    border: "1px solid rgba(255, 255, 255, 0.12)",
+    color: "#cbd5e1",
+    fontSize: "13px",
+    fontWeight: 600,
+    padding: "8px 14px",
+    borderRadius: "8px",
     cursor: "pointer",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    transition: "all 0.2s ease",
   },
-  sectionTabs: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr 1fr 1fr",
-    gap: "0",
-    padding: "12px",
+  badgeLive: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    background: "rgba(16, 185, 129, 0.12)",
+    border: "1px solid rgba(16, 185, 129, 0.3)",
+    color: "#34d399",
+    fontSize: "12px",
+    fontWeight: 700,
+    padding: "4px 10px",
+    borderRadius: "20px",
+  },
+  badgeDot: {
+    width: "7px",
+    height: "7px",
+    borderRadius: "50%",
+    background: "#10b981",
+  },
+  headerArea: {
+    marginBottom: "24px",
+  },
+  heading: {
+    fontSize: "26px",
+    fontWeight: 800,
+    color: "#ffffff",
+    margin: "0 0 6px",
+    letterSpacing: "-0.5px",
+  },
+  subheading: {
+    fontSize: "14px",
+    color: "#94a3b8",
+    margin: 0,
+    lineHeight: 1.5,
+  },
+
+  // ── STEPPER ──
+  stepperCard: {
+    background: "#0f172a",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderRadius: "14px",
+    padding: "16px",
+    marginBottom: "20px",
+    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.25)",
+  },
+  stepperTrackWrap: {
+    width: "100%",
+    height: "4px",
     background: "#1e293b",
+    borderRadius: "4px",
+    overflow: "hidden",
+    marginBottom: "14px",
   },
-  stepProgress: {
+  stepperTrackFill: {
+    height: "100%",
+    background: "linear-gradient(90deg, #3b82f6 0%, #10b981 100%)",
+    borderRadius: "4px",
+    transition: "width 0.3s ease",
+  },
+  stepGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(4, 1fr)",
     gap: "8px",
-    padding: "12px",
-    background: "#1e293b",
   },
-  stepItem: {
+  stepBtn: {
     display: "flex",
-    flexDirection: "column",
     alignItems: "center",
-    gap: "4px",
-    padding: "10px 6px",
-    background: "#0f1729",
-    border: "1px solid #334155",
+    gap: "10px",
+    padding: "8px 10px",
     borderRadius: "8px",
-    color: "#94a3b8",
+    background: "transparent",
+    border: "1px solid transparent",
     cursor: "pointer",
+    textAlign: "left",
+    transition: "all 0.2s ease",
     fontFamily: "inherit",
-    transition: "all 0.2s",
   },
-  stepItemActive: {
-    background: "#fbbf24",
-    color: "#0f1729",
-    borderColor: "#fbbf24",
-    fontWeight: 700,
+  stepBtnActive: {
+    background: "rgba(59, 130, 246, 0.12)",
+    borderColor: "rgba(59, 130, 246, 0.35)",
   },
-  stepItemComplete: {
-    borderColor: "#22c55e",
-    color: "#86efac",
+  stepBtnComplete: {
+    background: "rgba(16, 185, 129, 0.08)",
   },
-  stepItemLocked: {
+  stepBtnLocked: {
     opacity: 0.45,
     cursor: "not-allowed",
   },
-  stepNumber: {
-    width: "24px",
-    height: "24px",
+  stepNumberBadge: {
+    width: "26px",
+    height: "26px",
     borderRadius: "50%",
-    background: "rgba(0,0,0,0.2)",
+    background: "#1e293b",
+    color: "#94a3b8",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     fontSize: "12px",
-    fontWeight: 800,
-  },
-  stepLabel: {
-    fontSize: "10px",
-    fontWeight: 600,
-    textAlign: "center",
-    lineHeight: 1.2,
-  },
-  stepHint: {
-    padding: "8px 16px",
-    fontSize: "12px",
-    color: "#64748b",
-    background: "#0f1729",
-    borderBottom: "1px solid #1e293b",
-  },
-  stepErrorBox: {
-    background: "rgba(239, 68, 68, 0.15)",
-    border: "1px solid #ef4444",
-    color: "#fca5a5",
-    padding: "10px 12px",
-    borderRadius: "8px",
-    fontSize: "13px",
-    marginBottom: "16px",
-  },
-  sectionTab: {
-    background: "#0f1729",
-    border: "none",
-    color: "#94a3b8",
-    padding: "12px 8px",
-    fontSize: "20px",
-    cursor: "pointer",
-    transition: "all 0.2s",
-  },
-  sectionTabActive: {
-    background: "#fbbf24",
-    color: "#0f1729",
-  },
-  form: { padding: "16px" },
-  section: { animation: "fadeIn 0.3s ease" },
-  sectionTitle: {
-    margin: "0 0 16px",
-    fontSize: "18px",
     fontWeight: 700,
-    color: "#fbbf24",
+    flexShrink: 0,
   },
-  formGroup: { marginBottom: "16px" },
+  stepNumberBadgeActive: {
+    background: "#3b82f6",
+    color: "#ffffff",
+    boxShadow: "0 0 10px rgba(59, 130, 246, 0.4)",
+  },
+  stepNumberBadgeComplete: {
+    background: "#10b981",
+    color: "#ffffff",
+  },
+  stepTextWrap: {
+    display: "flex",
+    flexDirection: "column",
+    overflow: "hidden",
+  },
+  stepTitleText: {
+    fontSize: "12px",
+    fontWeight: 700,
+    color: "#f1f5f9",
+    whiteSpace: "nowrap",
+  },
+  stepSubText: {
+    fontSize: "10px",
+    color: "#64748b",
+    whiteSpace: "nowrap",
+  },
+
+  // ── FORM CARD ──
+  formCard: {
+    background: "#0f172a",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderRadius: "16px",
+    overflow: "hidden",
+    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.35)",
+  },
+  formCardHeader: {
+    padding: "16px 20px",
+    borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
+    background: "rgba(255, 255, 255, 0.02)",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  cardStepTitle: {
+    margin: 0,
+    fontSize: "17px",
+    fontWeight: 700,
+    color: "#f8fafc",
+  },
+  cardStepIndicator: {
+    fontSize: "11px",
+    color: "#94a3b8",
+    fontWeight: 600,
+  },
+  stepReqPill: {
+    fontSize: "11px",
+    fontWeight: 700,
+    padding: "3px 8px",
+    borderRadius: "12px",
+    background: "rgba(239, 68, 68, 0.15)",
+    color: "#fca5a5",
+    border: "1px solid rgba(239, 68, 68, 0.3)",
+  },
+  formContent: {
+    padding: "24px 20px",
+  },
+  stepSection: {
+    animation: "fadeIn 0.25s ease-out",
+  },
+
+  // ── INPUTS & TYPOGRAPHY ──
+  formGroup: {
+    marginBottom: "18px",
+  },
+  gridTwo: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "14px",
+  },
   label: {
     display: "block",
-    fontSize: "12px",
+    fontSize: "13px",
     fontWeight: 700,
-    color: "#cbd5e1",
-    marginBottom: "6px",
-    textTransform: "uppercase",
+    color: "#e2e8f0",
+    marginBottom: "7px",
+    letterSpacing: "0.2px",
   },
-  hint: {
+  reqStar: {
+    color: "#ef4444",
+  },
+  helperText: {
+    display: "block",
     fontSize: "11px",
     color: "#64748b",
-    marginTop: "4px",
-    marginBottom: "0",
-  },
-  universityNotice: {
-    background: "rgba(59, 130, 246, 0.12)",
-    border: "1px solid #3b82f6",
-    borderRadius: "10px",
-    padding: "14px 16px",
-    marginBottom: "16px",
-    fontSize: "13px",
-    color: "#93c5fd",
+    marginTop: "5px",
   },
   input: {
     width: "100%",
-    padding: "12px",
-    background: "#1e293b",
-    border: "1px solid #334155",
-    borderRadius: "8px",
-    color: "#f1f5f9",
+    padding: "11px 14px",
+    background: "#162032",
+    border: "1px solid #293548",
+    borderRadius: "9px",
+    color: "#f8fafc",
     fontSize: "14px",
     fontFamily: "inherit",
     boxSizing: "border-box",
+    transition: "border-color 0.2s, box-shadow 0.2s",
+  },
+  select: {
+    width: "100%",
+    padding: "11px 14px",
+    background: "#162032",
+    border: "1px solid #293548",
+    borderRadius: "9px",
+    color: "#f8fafc",
+    fontSize: "14px",
+    fontFamily: "inherit",
+    boxSizing: "border-box",
+    cursor: "pointer",
   },
   textarea: {
     width: "100%",
-    padding: "12px",
-    background: "#1e293b",
-    border: "1px solid #334155",
-    borderRadius: "8px",
-    color: "#f1f5f9",
+    padding: "12px 14px",
+    background: "#162032",
+    border: "1px solid #293548",
+    borderRadius: "9px",
+    color: "#f8fafc",
     fontSize: "14px",
     fontFamily: "inherit",
     boxSizing: "border-box",
     resize: "vertical",
+    lineHeight: 1.5,
   },
-  twoCol: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "12px",
+  prefixInputWrap: {
+    display: "flex",
+    alignItems: "center",
+    background: "#162032",
+    border: "1px solid #293548",
+    borderRadius: "9px",
+    overflow: "hidden",
+  },
+  inputPrefix: {
+    padding: "11px 12px",
+    background: "#1e293b",
+    color: "#94a3b8",
+    fontSize: "12px",
+    fontWeight: 700,
+    borderRight: "1px solid #293548",
+  },
+  prefixInput: {
+    flex: 1,
+    padding: "11px 14px",
+    background: "transparent",
+    border: "none",
+    color: "#f8fafc",
+    fontSize: "14px",
+    fontFamily: "inherit",
+    outline: "none",
+  },
+  readOnlyInput: {
+    width: "100%",
+    padding: "11px 14px",
+    background: "#0c1322",
+    border: "1px solid #243042",
+    borderRadius: "9px",
+    color: "#94a3b8",
+    fontSize: "14px",
+    fontWeight: 700,
+    fontFamily: "inherit",
+    cursor: "not-allowed",
+    boxSizing: "border-box",
+  },
+  autoTag: {
+    marginLeft: "6px",
+    fontSize: "10px",
+    padding: "2px 6px",
+    background: "rgba(16, 185, 129, 0.15)",
+    color: "#34d399",
+    borderRadius: "4px",
+    fontWeight: 700,
   },
 
-  // ── GPS CARD ──
-  gpsCard: {
-    background: "rgba(251,191,36,0.05)",
-    border: "1px solid rgba(251,191,36,0.25)",
+  // ── GPS CONTAINER ──
+  gpsContainer: {
+    background: "rgba(15, 23, 42, 0.6)",
+    border: "1px solid rgba(59, 130, 246, 0.2)",
     borderRadius: "12px",
-    padding: "16px",
+    padding: "14px",
     marginBottom: "20px",
   },
-  gpsHeader: {
+  gpsTopRow: {
     display: "flex",
-    alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: "6px",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: "10px",
   },
-  gpsTitle: {
-    fontSize: "14px",
-    fontWeight: 700,
-    color: "#fbbf24",
-  },
-  gpsBadge: {
-    fontSize: "10px",
-    fontWeight: 700,
-    background: "rgba(251,191,36,0.15)",
-    color: "#fbbf24",
-    padding: "2px 8px",
-    borderRadius: "20px",
-    letterSpacing: "0.5px",
-  },
-  gpsHint: {
-    fontSize: "12px",
-    color: "#94a3b8",
-    marginBottom: "12px",
-    lineHeight: 1.5,
-  },
-  gpsBtn: {
-    width: "100%",
-    padding: "11px",
-    background: "#fbbf24",
-    color: "#0f1729",
-    border: "none",
-    borderRadius: "8px",
+  gpsCardTitle: {
     fontWeight: 700,
     fontSize: "13px",
+    color: "#f8fafc",
+    marginRight: "6px",
+  },
+  recBadge: {
+    fontSize: "10px",
+    fontWeight: 700,
+    padding: "2px 6px",
+    background: "rgba(59, 130, 246, 0.15)",
+    color: "#60a5fa",
+    borderRadius: "10px",
+  },
+  gpsLocateBtn: {
+    background: "rgba(59, 130, 246, 0.15)",
+    border: "1px solid #3b82f6",
+    color: "#60a5fa",
+    padding: "6px 12px",
+    borderRadius: "6px",
+    fontSize: "12px",
+    fontWeight: 700,
     cursor: "pointer",
     fontFamily: "inherit",
-    marginBottom: "10px",
   },
-  coordsDisplay: {
+  gpsDetectedPill: {
+    marginTop: "10px",
     display: "flex",
-    alignItems: "center",
     justifyContent: "space-between",
-    background: "rgba(34,197,94,0.1)",
-    border: "1px solid rgba(34,197,94,0.3)",
-    borderRadius: "8px",
+    alignItems: "center",
+    background: "rgba(16, 185, 129, 0.1)",
+    border: "1px solid rgba(16, 185, 129, 0.3)",
     padding: "8px 12px",
-    fontSize: "13px",
+    borderRadius: "8px",
+    fontSize: "12px",
     color: "#86efac",
     fontWeight: 600,
-    marginBottom: "10px",
   },
-  clearCoordsBtn: {
-    background: "none",
+  gpsClearBtn: {
+    background: "transparent",
     border: "none",
-    color: "#86efac",
-    cursor: "pointer",
-    fontSize: "14px",
-    padding: "0 4px",
-  },
-  gpsOrDivider: {
-    textAlign: "center",
+    color: "#fca5a5",
     fontSize: "11px",
-    color: "#475569",
-    margin: "8px 0",
-  },
-  gpsTip: {
-    fontSize: "11px",
-    color: "#475569",
-    marginTop: "8px",
-    lineHeight: 1.5,
-  },
-
-  imageUploadBox: {
-    border: "2px dashed #334155",
-    borderRadius: "8px",
-    padding: "24px 12px",
-    textAlign: "center",
-    background: "#1e293b",
     cursor: "pointer",
+    textDecoration: "underline",
   },
-  fileInput: { display: "none" },
-  fileLabel: {
-    cursor: "pointer",
-    display: "block",
-    color: "#94a3b8",
-  },
-  uploadIcon: { fontSize: "32px", marginBottom: "8px" },
-  previewContainer: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(70px, 1fr))",
-    gap: "10px",
-    marginTop: "12px",
-  },
-  previewBox: {
-    position: "relative",
-    aspectRatio: "1",
-    borderRadius: "8px",
-    overflow: "hidden",
-    background: "#334155",
-  },
-  previewImg: { width: "100%", height: "100%", objectFit: "cover" },
-  removeBtn: {
-    position: "absolute",
-    top: "2px",
-    right: "2px",
-    background: "#ef4444",
-    border: "none",
-    color: "white",
-    width: "20px",
-    height: "20px",
-    borderRadius: "50%",
-    cursor: "pointer",
-    fontSize: "10px",
-  },
-
-  // ── VIDEO UPLOAD ──
-  videoSection: {
-    marginTop: "24px",
-    padding: "20px",
-    borderRadius: "12px",
-    background: "rgba(59, 130, 246, 0.05)",
-    border: "1px solid rgba(59, 130, 246, 0.2)",
-  },
-  videoSectionHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: "14px",
-    flexWrap: "wrap",
-    gap: "8px",
-  },
-  videoOptionalBadge: {
-    fontSize: "10px",
-    fontWeight: 700,
-    background: "rgba(100, 116, 139, 0.2)",
-    color: "#94a3b8",
-    padding: "2px 8px",
-    borderRadius: "20px",
-    letterSpacing: "0.5px",
-  },
-  videoReadyBadge: {
-    background: "rgba(34, 197, 94, 0.15)",
-    color: "#86efac",
+  gpsInfoText: {
     fontSize: "12px",
-    fontWeight: 700,
-    padding: "4px 12px",
-    borderRadius: "20px",
-    border: "1px solid rgba(34, 197, 94, 0.3)",
+    color: "#64748b",
   },
-  videoUploadBox: {
-    border: "2px dashed #334155",
-    borderRadius: "10px",
-    padding: "28px 16px",
-    textAlign: "center",
+  textLinkBtn: {
+    background: "transparent",
+    border: "none",
+    color: "#38bdf8",
+    fontSize: "12px",
     cursor: "pointer",
-    transition: "all 0.2s",
+    textDecoration: "underline",
+    padding: 0,
   },
-  videoUploadLabel: {
+  smallLabel: {
+    fontSize: "11px",
+    color: "#94a3b8",
+    display: "block",
+    marginBottom: "4px",
+    fontWeight: 600,
+  },
+  smallInput: {
+    width: "100%",
+    padding: "8px 10px",
+    background: "#162032",
+    border: "1px solid #293548",
+    borderRadius: "6px",
+    color: "#f8fafc",
+    fontSize: "13px",
+    fontFamily: "inherit",
+    boxSizing: "border-box",
+  },
+  universityBox: {
+    marginBottom: "18px",
+  },
+
+  // ── MEDIA DROPZONE ──
+  uploadDropzone: {
+    border: "2px dashed #293548",
+    borderRadius: "12px",
+    padding: "32px 16px",
+    textAlign: "center",
+    background: "#131c2d",
+    cursor: "pointer",
+    transition: "border-color 0.2s, background 0.2s",
+  },
+  dropzoneLabel: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     cursor: "pointer",
   },
-  videoPreviewGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-    gap: "14px",
+  countBadge: {
+    fontSize: "12px",
+    fontWeight: 700,
+    color: "#38bdf8",
+    background: "rgba(56, 189, 248, 0.1)",
+    padding: "2px 8px",
+    borderRadius: "10px",
   },
-  videoCard: {
+  previewGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))",
+    gap: "10px",
+    marginTop: "16px",
+  },
+  previewCard: {
+    position: "relative",
+    aspectRatio: "1",
     borderRadius: "10px",
     overflow: "hidden",
-    border: "1px solid #334155",
-    background: "#0f1729",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+    border: "1px solid #293548",
+    background: "#0f172a",
   },
-  videoCardInfo: {
-    padding: "10px 12px",
+  previewImage: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+  },
+  coverBadge: {
+    position: "absolute",
+    bottom: "4px",
+    left: "4px",
+    background: "#10b981",
+    color: "#ffffff",
+    fontSize: "9px",
+    fontWeight: 800,
+    padding: "2px 5px",
+    borderRadius: "4px",
+    letterSpacing: "0.4px",
+  },
+  trashBtn: {
+    position: "absolute",
+    top: "4px",
+    right: "4px",
+    background: "rgba(0, 0, 0, 0.7)",
+    border: "none",
+    color: "#fca5a5",
+    width: "22px",
+    height: "22px",
+    borderRadius: "50%",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "11px",
+    transition: "all 0.15s",
+  },
+
+  // ── VIDEO CARD ──
+  videoCardBox: {
+    marginTop: "24px",
+    padding: "16px",
+    borderRadius: "12px",
+    background: "rgba(15, 23, 42, 0.6)",
+    border: "1px solid #1e293b",
+  },
+  optBadge: {
+    marginLeft: "6px",
+    fontSize: "10px",
+    padding: "2px 6px",
+    background: "rgba(148, 163, 184, 0.15)",
+    color: "#94a3b8",
+    borderRadius: "10px",
+    fontWeight: 600,
+  },
+  readyBadge: {
+    fontSize: "12px",
+    color: "#34d399",
+    fontWeight: 700,
+  },
+  videoDropzone: {
+    border: "2px dashed #293548",
+    borderRadius: "10px",
+    padding: "20px 12px",
+    textAlign: "center",
+    cursor: "pointer",
+  },
+  videoList: {
+    marginTop: "14px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+  },
+  videoItem: {
+    display: "flex",
+    gap: "12px",
+    padding: "10px",
+    background: "#0b1324",
+    border: "1px solid #1e293b",
+    borderRadius: "8px",
+    alignItems: "center",
+  },
+  videoPlayer: {
+    width: "120px",
+    height: "75px",
+    objectFit: "cover",
+    borderRadius: "6px",
+    background: "#000",
+  },
+  videoMeta: {
+    flex: 1,
+    minWidth: 0,
+    display: "flex",
+    flexDirection: "column",
+    gap: "2px",
+  },
+  videoFileName: {
+    fontSize: "12px",
+    fontWeight: 700,
+    color: "#f1f5f9",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+  },
+  videoFileSize: {
+    fontSize: "11px",
+    color: "#64748b",
+  },
+  videoDeleteBtn: {
+    alignSelf: "flex-start",
+    marginTop: "4px",
+    background: "transparent",
+    border: "none",
+    color: "#fca5a5",
+    fontSize: "11px",
+    cursor: "pointer",
+    padding: 0,
+    textDecoration: "underline",
+  },
+
+  // ── AMENITIES ──
+  amenitiesGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+    gap: "8px",
+  },
+  amenityChip: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "9px 12px",
+    background: "#131c2d",
+    border: "1px solid #233044",
+    borderRadius: "8px",
+    color: "#cbd5e1",
+    fontSize: "13px",
+    fontWeight: 600,
+    cursor: "pointer",
+    fontFamily: "inherit",
+    transition: "all 0.15s ease",
+  },
+  amenityChipSelected: {
+    background: "rgba(59, 130, 246, 0.18)",
+    borderColor: "#3b82f6",
+    color: "#60a5fa",
+  },
+  amenityCheck: {
+    fontSize: "12px",
+    color: "#64748b",
+    fontWeight: 700,
+  },
+  amenityCheckSelected: {
+    color: "#38bdf8",
+  },
+
+  // ── TERMS & ACTIONS ──
+  termsCard: {
+    marginTop: "20px",
+    padding: "14px",
+    background: "rgba(16, 185, 129, 0.05)",
+    border: "1px solid rgba(16, 185, 129, 0.2)",
+    borderRadius: "10px",
+  },
+  termsLabel: {
+    display: "flex",
+    alignItems: "flex-start",
+    gap: "10px",
+    cursor: "pointer",
+  },
+  checkboxInput: {
+    marginTop: "3px",
+    width: "16px",
+    height: "16px",
+    accentColor: "#10b981",
+    cursor: "pointer",
+  },
+  termsText: {
+    fontSize: "13px",
+    color: "#cbd5e1",
+    lineHeight: 1.5,
+  },
+  actionsBar: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    gap: "10px",
+    marginTop: "28px",
+    paddingTop: "16px",
+    borderTop: "1px solid rgba(255, 255, 255, 0.06)",
   },
-  videoRemoveBtn: {
-    background: "rgba(239, 68, 68, 0.15)",
-    border: "1px solid rgba(239, 68, 68, 0.4)",
-    color: "#fca5a5",
-    borderRadius: "6px",
-    padding: "5px 10px",
-    fontSize: "12px",
+  primaryBtn: {
+    padding: "12px 24px",
+    background: "#3b82f6",
+    color: "#ffffff",
+    border: "none",
+    borderRadius: "9px",
+    fontSize: "14px",
     fontWeight: 700,
     cursor: "pointer",
-    flexShrink: 0,
     fontFamily: "inherit",
+    transition: "all 0.2s",
+    boxShadow: "0 4px 14px rgba(59, 130, 246, 0.35)",
   },
-  videoTip: {
-    marginTop: "14px",
-    background: "rgba(34, 197, 94, 0.08)",
-    border: "1px solid rgba(34, 197, 94, 0.2)",
-    borderRadius: "10px",
-    padding: "12px 14px",
-    fontSize: "12px",
-    color: "#86efac",
-    lineHeight: 1.6,
-  },
-  amenitiesGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "8px",
-  },
-  amenityBtn: {
-    padding: "10px 8px",
-    border: "1px solid #334155",
-    borderRadius: "6px",
-    fontSize: "12px",
+  secondaryBtn: {
+    padding: "12px 20px",
+    background: "rgba(255, 255, 255, 0.06)",
+    color: "#cbd5e1",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    borderRadius: "9px",
+    fontSize: "14px",
     fontWeight: 600,
     cursor: "pointer",
-    transition: "all 0.2s",
-    background: "#1e293b",
-    color: "#cbd5e1",
-    fontFamily: "inherit",
-  },
-  amenityBtnSelected: {
-    background: "#3b82f6",
-    color: "white",
-    border: "1px solid #3b82f6",
-  },
-  amenityBtnUnselected: {
-    background: "#1e293b",
-    color: "#cbd5e1",
-  },
-  navBtns: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "10px",
-    marginTop: "20px",
-  },
-  prevBtn: {
-    padding: "12px",
-    background: "#334155",
-    color: "#f1f5f9",
-    border: "none",
-    borderRadius: "8px",
-    fontWeight: 700,
-    cursor: "pointer",
-    fontSize: "14px",
-    fontFamily: "inherit",
-  },
-  nextBtn: {
-    padding: "12px",
-    background: "#3b82f6",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    fontWeight: 700,
-    cursor: "pointer",
-    fontSize: "14px",
     fontFamily: "inherit",
   },
   submitBtn: {
-    width: "100%",
-    padding: "14px",
-    background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
-    color: "white",
+    padding: "13px 28px",
+    background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+    color: "#ffffff",
     border: "none",
-    borderRadius: "8px",
+    borderRadius: "9px",
     fontSize: "15px",
     fontWeight: 700,
     cursor: "pointer",
-    marginTop: "16px",
     fontFamily: "inherit",
+    boxShadow: "0 4px 16px rgba(16, 185, 129, 0.35)",
   },
-  errorBox: {
-    background: "rgba(239, 68, 68, 0.2)",
-    border: "1px solid #ef4444",
+  errorBanner: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    background: "rgba(239, 68, 68, 0.12)",
+    border: "1px solid rgba(239, 68, 68, 0.3)",
     color: "#fca5a5",
     padding: "12px 16px",
-    margin: "16px",
-    borderRadius: "8px",
+    borderRadius: "10px",
     fontSize: "13px",
+    marginBottom: "16px",
   },
-  successBox: {
-    background: "rgba(34, 197, 94, 0.2)",
-    border: "1px solid #22c55e",
+  successBanner: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    background: "rgba(16, 185, 129, 0.15)",
+    border: "1px solid rgba(16, 185, 129, 0.35)",
     color: "#86efac",
     padding: "12px 16px",
-    margin: "16px",
-    borderRadius: "8px",
+    borderRadius: "10px",
     fontSize: "13px",
+    marginBottom: "16px",
   },
-  unauth: {
+  unauthCard: {
+    maxWidth: "420px",
+    margin: "80px auto",
     textAlign: "center",
-    padding: "60px 20px",
-    color: "#94a3b8",
-  },
-  loginBtn: {
-    marginTop: "20px",
-    padding: "12px 24px",
-    background: "#3b82f6",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer",
-    fontWeight: 700,
-    fontFamily: "inherit",
-  },
-  consentBox: {
-    margin: "20px 0",
-    padding: "12px",
-    background: "rgba(251,191,36,0.1)",
-    border: "1px solid #fbbf24",
-    borderRadius: "8px",
-  },
-  consentLabel: {
-    fontSize: "13px",
-    color: "#cbd5e1",
-    display: "flex",
-    alignItems: "flex-start",
-    gap: "8px",
-    cursor: "pointer",
+    background: "#0f172a",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderRadius: "16px",
+    padding: "36px 24px",
   },
 };
 
 const cssStyles = `
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap');
 
   input:focus, textarea:focus, select:focus {
     border-color: #3b82f6 !important;
-    background: #334155 !important;
-    outline: none;
+    background: #19253b !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18) !important;
   }
 
-  button:hover:not(:disabled) {
-    opacity: 0.9;
-    transform: translateY(-1px);
+  .upload-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    display: inline-block;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
-  @media (max-width: 600px) {
-    .upload-step-progress {
+  @media (max-width: 640px) {
+    .stepGrid {
       grid-template-columns: repeat(2, 1fr) !important;
+    }
+    div[style*="gridTemplateColumns: 1fr 1fr"],
+    div[style*="grid-template-columns: 1fr 1fr"] {
+      grid-template-columns: 1fr !important;
     }
   }
 `;
