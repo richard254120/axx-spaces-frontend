@@ -91,6 +91,9 @@ export default function Upload() {
 
   const landlordType = user?.landlordType || "general";
 
+  const [autoRefCode] = useState(() => `AXX-${Math.floor(1000 + Math.random() * 9000)}`);
+  const todayDateFormatted = new Date().toISOString().split("T")[0];
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -98,10 +101,10 @@ export default function Upload() {
     price: "",
     deposit: "",
     bedrooms: "",
-    bathrooms: "",
+    bathrooms: 1,
     amenities: [],
     totalUnits: 1,
-    furnished: false,
+    furnished: true,
     leaseType: "monthly",
     availableFrom: "",
     rules: "",
@@ -152,10 +155,10 @@ export default function Upload() {
             price: data.price || "",
             deposit: data.deposit || "",
             bedrooms: data.bedrooms !== undefined ? data.bedrooms : "",
-            bathrooms: data.bathrooms !== undefined ? data.bathrooms : "",
+            bathrooms: data.bathrooms !== undefined ? data.bathrooms : 1,
             amenities: data.amenities || [],
             totalUnits: data.totalUnits || 1,
-            furnished: data.furnished || false,
+            furnished: data.furnished !== undefined ? data.furnished : true,
             leaseType: data.leaseType || "monthly",
             availableFrom: data.availableFrom ? new Date(data.availableFrom).toISOString().split('T')[0] : "",
             rules: data.rules || "",
@@ -402,6 +405,16 @@ export default function Upload() {
         if (formData[key] !== undefined && formData[key] !== null) {
           if (key === "amenities") {
             formDataToSend.append("amenities", JSON.stringify(formData.amenities));
+          } else if (key === "bedrooms") {
+            const numBedrooms = formData.bedrooms !== "" && formData.bedrooms !== undefined
+              ? formData.bedrooms
+              : (formData.propertyType?.match(/(\d+)\+?\s*Bedroom/i)?.[1] || 0);
+            formDataToSend.append("bedrooms", String(numBedrooms));
+          } else if (key === "bathrooms") {
+            const numBathrooms = formData.bathrooms !== "" && formData.bathrooms !== undefined
+              ? formData.bathrooms
+              : 1;
+            formDataToSend.append("bathrooms", String(numBathrooms));
           } else if (key === "furnished" || key === "initiallyBooked") {
             formDataToSend.append(key, String(formData[key]));
           } else {
@@ -436,8 +449,8 @@ export default function Upload() {
       if (!isEditMode) {
         setFormData({
           title: "", description: "", location: "", price: "", deposit: "",
-          bedrooms: "", bathrooms: "", amenities: [], totalUnits: 1,
-          furnished: false, leaseType: "monthly", availableFrom: "", rules: "",
+          bedrooms: "", bathrooms: 1, amenities: [], totalUnits: 1,
+          furnished: true, leaseType: "monthly", availableFrom: "", rules: "",
           propertyType: "", county: "", lat: "", lng: "",
           bookedUnits: 0, initiallyBooked: false, university: "", universityId: "",
         });
@@ -700,12 +713,28 @@ export default function Upload() {
 
             <div style={styles.twoCol}>
               <div style={styles.formGroup}>
-                <label style={styles.label}>Bedrooms</label>
-                <input type="number" name="bedrooms" placeholder="2" value={formData.bedrooms} onChange={handleChange} style={styles.input} />
+                <label style={styles.label}>
+                  Listing Reference
+                  <span style={{ marginLeft: "6px", fontSize: "11px", padding: "2px 6px", background: "#ecfdf5", color: "#047857", borderRadius: "4px", fontWeight: 700 }}>Auto</span>
+                </label>
+                <input
+                  type="text"
+                  value={isEditMode && id ? `AXX-${id.slice(-4).toUpperCase()}` : autoRefCode}
+                  readOnly
+                  style={{ ...styles.input, background: "#f8fafc", color: "#334155", cursor: "default", fontWeight: 700, letterSpacing: "0.5px" }}
+                />
               </div>
               <div style={styles.formGroup}>
-                <label style={styles.label}>Bathrooms</label>
-                <input type="number" name="bathrooms" placeholder="1" value={formData.bathrooms} onChange={handleChange} style={styles.input} />
+                <label style={styles.label}>
+                  Date Listed
+                  <span style={{ marginLeft: "6px", fontSize: "11px", padding: "2px 6px", background: "#ecfdf5", color: "#047857", borderRadius: "4px", fontWeight: 700 }}>Auto</span>
+                </label>
+                <input
+                  type="text"
+                  value={todayDateFormatted}
+                  readOnly
+                  style={{ ...styles.input, background: "#f8fafc", color: "#334155", cursor: "default", fontWeight: 600 }}
+                />
               </div>
             </div>
 
@@ -713,8 +742,8 @@ export default function Upload() {
               <div style={styles.formGroup}>
                 <label style={styles.label}>Furnished</label>
                 <select name="furnished" value={String(formData.furnished)} onChange={handleChange} style={styles.input}>
-                  <option value="false">Unfurnished</option>
-                  <option value="true">Furnished</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
                 </select>
               </div>
               <div style={styles.formGroup}>
