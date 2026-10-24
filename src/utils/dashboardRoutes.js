@@ -1,6 +1,7 @@
 /** Dashboard home path for each account role */
 export const DASHBOARD_BY_ROLE = {
   member: "/member",
+  user: "/member",
   landlord: "/dashboard",
   provider: "/dashboard",
   agent: "/agent/dashboard",
@@ -33,11 +34,10 @@ export function normalizeRole(role) {
 
 export function getDashboardPath(role) {
   const key = normalizeRole(role);
-  if (key === "member") {
+  if (key === "member" || key === "user") {
     return "/member";
   }
-  // Regular community members exploring spaces return to home/listings, not a provider workspace
-  if (key === "user" || key === "guest") {
+  if (key === "guest") {
     return "/";
   }
   return DASHBOARD_BY_ROLE[key] || "/";

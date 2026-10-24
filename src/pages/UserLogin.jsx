@@ -10,8 +10,8 @@ export default function UserLogin({ defaultTab }) {
   const [searchParams] = useSearchParams();
   const { login } = useContext(AuthContext);
 
-  // Read return destination if available
-  const redirectPath = searchParams.get("redirect") || searchParams.get("returnUrl") || "/";
+  // Read return destination if available, defaulting to Member / User Activities Dashboard
+  const redirectPath = searchParams.get("redirect") || searchParams.get("returnUrl") || "/member";
 
   // Tab: 'login' or 'register'. Default to register if 'tab=register' or defaultTab specified, otherwise login
   const [tab, setTab] = useState(

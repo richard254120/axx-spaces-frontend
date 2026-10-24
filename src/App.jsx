@@ -323,7 +323,7 @@ function App() {
         path="/member"
         element={
           <PublicLayout>
-            <ProtectedRoute loginPath="/user-login" allowedRoles={["member"]}>
+            <ProtectedRoute loginPath="/user-login" allowedRoles={["member", "user"]}>
               <MemberDashboard />
             </ProtectedRoute>
           </PublicLayout>
