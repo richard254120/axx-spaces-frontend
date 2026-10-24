@@ -13,7 +13,7 @@ export default function UserLogin({ defaultTab }) {
   // Read return destination if available
   const redirectPath = searchParams.get("redirect") || searchParams.get("returnUrl") || "/";
 
-  // Tab: 'login' or 'register'
+  // Tab: 'login' or 'register'. Default to register if 'tab=register' or defaultTab specified, otherwise login
   const [tab, setTab] = useState(
     defaultTab || (searchParams.get("tab") === "register" ? "register" : "login")
   );
@@ -53,7 +53,7 @@ export default function UserLogin({ defaultTab }) {
     }
   }, [searchParams]);
 
-  // Google Sign-In handler
+  // Google Sign-In handler (Works for both exploring & returning members)
   const handleGoogleCredential = useCallback(async (googleUser) => {
     try {
       setLoading(true);
@@ -77,7 +77,7 @@ export default function UserLogin({ defaultTab }) {
       if (!data.token || !data.user) throw new Error("Invalid response from server");
 
       login(data.token, data.user);
-      setSuccess(data.isNewMember ? "Welcome to AxxSpace! Your account is ready." : "Welcome back! Signing you in...");
+      setSuccess(data.isNewMember ? "Welcome to AxxSpace! Your explorer account is ready." : "Welcome back! Signing you in...");
       setTimeout(() => {
         navigate(redirectPath, { replace: true });
       }, 600);
@@ -139,7 +139,7 @@ export default function UserLogin({ defaultTab }) {
           (data.error && data.error.toLowerCase().includes("not found"))
         ) {
           setUnregisteredEmail(loginData.email.trim());
-          throw new Error("No AxxSpace account found with this email.");
+          throw new Error("No AxxSpace explorer account found with this email.");
         }
         throw new Error(data.error || "Invalid email or password");
       }
@@ -149,10 +149,10 @@ export default function UserLogin({ defaultTab }) {
       }
 
       login(data.token, data.user);
-      setSuccess("✓ Login successful! Redirecting...");
+      setSuccess("✓ Welcome back! Exploring spaces...");
       setTimeout(() => navigate(redirectPath, { replace: true }), 500);
     } catch (err) {
-      setError(err.message || "Login failed. Please check your credentials.");
+      setError(err.message || "Sign in failed. Please check your credentials.");
     } finally {
       setLoading(false);
     }
@@ -165,7 +165,7 @@ export default function UserLogin({ defaultTab }) {
     setSuccess("");
 
     if (!registerData.name || !registerData.email || !registerData.password || !registerData.phone) {
-      setError("All fields are required to create your membership");
+      setError("Please fill in all fields to create your explorer account");
       return;
     }
 
@@ -207,7 +207,7 @@ export default function UserLogin({ defaultTab }) {
       // If token is returned, sign in immediately!
       if (data.token && data.user) {
         login(data.token, data.user);
-        setSuccess("Welcome to AxxSpace! Your membership is active.");
+        setSuccess("Welcome to AxxSpace! Your explorer membership is active.");
         setTimeout(() => navigate(redirectPath, { replace: true }), 700);
       } else {
         setSuccess("Account created successfully! Please sign in.");
@@ -263,20 +263,20 @@ export default function UserLogin({ defaultTab }) {
 
   return (
     <div className="axx-auth-wrapper">
-      <style>{splitScreenCss}</style>
+      <style>{explorerCss}</style>
 
-      {/* ── LEFT HERO PANEL (BRAND & VALUE SHOWCASE) ── */}
+      {/* ── LEFT HERO PANEL (EXPLORER VALUE & DISCOVERY) ── */}
       <div className="axx-hero-panel">
         <div className="axx-hero-ambient-glow glow-1"></div>
         <div className="axx-hero-ambient-glow glow-2"></div>
 
         <div className="axx-hero-content">
           {/* Top Brand Tag */}
-          <Link to="/" className="axx-hero-brand">
-            <img src="/logo.png" alt="Axx Spaces" className="axx-hero-logo" />
+          <Link to="/" className="axx-hero-brand" title="AxxSpace Home">
+            <img src="/logo.png" alt="Axx Spaces Logo" className="axx-hero-logo" />
             <div className="axx-hero-brand-text">
               <span className="axx-hero-brand-name">AXX SPACES</span>
-              <span className="axx-hero-brand-sub">Living & Student Housing</span>
+              <span className="axx-hero-brand-sub">Community &amp; Spaces Explorer</span>
             </div>
           </Link>
 
@@ -284,28 +284,40 @@ export default function UserLogin({ defaultTab }) {
           <div className="axx-hero-headline-group">
             <div className="axx-hero-pill">
               <span className="axx-hero-pill-dot"></span>
-              <span>KENYA&apos;S #1 TRUSTED LIVING NETWORK</span>
+              <span>100% FREE EXPLORER ACCOUNT · NO LISTINGS REQUIRED</span>
             </div>
             <h1 className="axx-hero-title">
-              Find, book &amp; live in <span className="highlight-text">verified spaces</span>.
+              Your gateway to discover <span className="highlight-text">exceptional spaces</span> across Kenya.
             </h1>
             <p className="axx-hero-desc">
-              Explore curated student hostels, urban apartments, and verified accommodations near your campus or workplace with zero hidden broker fees.
+              Join thousands of students, remote professionals, and travelers exploring verified hostels, rentals, and stays. Save your favorites, chat directly with owners, and unlock exclusive community perks.
             </p>
           </div>
 
-          {/* Feature Highlights */}
+          {/* 4 Feature Highlights Specific to Users/Explorers */}
           <div className="axx-feature-cards">
             <div className="axx-feature-card">
               <div className="axx-feature-icon-box">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                  <polyline points="9 12 11 14 15 10"></polyline>
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
               </div>
               <div className="axx-feature-text">
-                <h4>100% Vetted &amp; Verified Spaces</h4>
-                <p>Inspected properties with genuine photos and transparent terms.</p>
+                <h4>Browse &amp; Compare Rentals</h4>
+                <p>Discover student hostels, serviced studios, and modern apartments with transparent rates.</p>
+              </div>
+            </div>
+
+            <div className="axx-feature-card">
+              <div className="axx-feature-icon-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ec4899" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+              </div>
+              <div className="axx-feature-text">
+                <h4>Bookmark &amp; Share Favorites</h4>
+                <p>Save properties you love to your personal wishlist and share with friends or family.</p>
               </div>
             </div>
 
@@ -316,50 +328,50 @@ export default function UserLogin({ defaultTab }) {
                 </svg>
               </div>
               <div className="axx-feature-text">
-                <h4>Direct Host &amp; Landlord Chat</h4>
-                <p>Instant messaging, scheduled viewings, and real-time support.</p>
+                <h4>Direct Messaging · Zero Middleman Fees</h4>
+                <p>Inquire directly with property owners and hosts. Never pay unfair broker commissions.</p>
               </div>
             </div>
 
             <div className="axx-feature-card">
               <div className="axx-feature-icon-box">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polyline points="12 6 12 12 16 14"></polyline>
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                 </svg>
               </div>
               <div className="axx-feature-text">
-                <h4>Save Favorites &amp; Instant Alerts</h4>
-                <p>Bookmark rental spaces and get notified when new vacancies drop.</p>
+                <h4>First-Look Vacancy Alerts</h4>
+                <p>Get notified immediately when prices drop or spaces open up near your university or office.</p>
               </div>
             </div>
           </div>
 
-          {/* Social Proof Testimonial Card */}
-          <div className="axx-testimonial-card">
-            <div className="axx-testimonial-stars">
-              {"★★★★★".split("").map((s, i) => (
-                <span key={i} className="star">★</span>
-              ))}
-              <span className="rating-num">4.9 / 5</span>
-            </div>
-            <p className="axx-testimonial-quote">
-              &ldquo;Finding a safe studio apartment near Strathmore was so easy with AxxSpace. No sketchy middlemen or fake listings!&rdquo;
-            </p>
-            <div className="axx-testimonial-author">
-              <div className="author-avatar">FK</div>
-              <div className="author-meta">
-                <div className="author-name">Faith K.</div>
-                <div className="author-role">Student · Nairobi</div>
+          {/* Social Proof & Reassurance Badge */}
+          <div className="axx-explorer-proof-card">
+            <div className="proof-header">
+              <div className="avatar-group">
+                <span className="mini-avatar av1">JK</span>
+                <span className="mini-avatar av2">MW</span>
+                <span className="mini-avatar av3">AO</span>
+                <span className="mini-count">+5k</span>
               </div>
+              <div className="proof-stat">
+                <div className="stat-num">5,000+ Members</div>
+                <div className="stat-sub">Exploring &amp; booking on AxxSpace</div>
+              </div>
+            </div>
+            <div className="proof-reassurance">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>No landlord commitments · You never need to list anything to use AxxSpace</span>
             </div>
           </div>
 
           {/* Hero Bottom Footer */}
           <div className="axx-hero-footer">
-            <span>🔒 Bank-grade 256-bit SSL encrypted auth</span>
+            <span>🛡️ Verified &amp; Secure Explorer Experience</span>
             <span>·</span>
-            <span>Nairobi · Juja · Eldoret · Mombasa</span>
+            <span>Nairobi · Juja · Eldoret · Mombasa · Nakuru</span>
           </div>
         </div>
       </div>
@@ -374,12 +386,12 @@ export default function UserLogin({ defaultTab }) {
                 <line x1="19" y1="12" x2="5" y2="12"></line>
                 <polyline points="12 19 5 12 12 5"></polyline>
               </svg>
-              <span>Back to explore</span>
+              <span>Explore website without sign in</span>
             </Link>
 
             <div className="axx-member-badge">
               <span className="axx-member-dot"></span>
-              <span>FREE USER ACCESS</span>
+              <span>COMMUNITY ACCESS</span>
             </div>
           </div>
 
@@ -397,7 +409,7 @@ export default function UserLogin({ defaultTab }) {
                   </div>
                   <h2 className="axx-auth-title">Reset Your Password</h2>
                   <p className="axx-auth-sub">
-                    Enter the email associated with your AxxSpace account and we&apos;ll send you a secure recovery link.
+                    Enter the email associated with your AxxSpace account and we&apos;ll send you a password recovery link.
                   </p>
                 </div>
 
@@ -450,17 +462,17 @@ export default function UserLogin({ defaultTab }) {
                 </div>
               </div>
             ) : (
-              /* ── MAIN AUTH (SIGN IN & REGISTER) ── */
+              /* ── MAIN AUTH (EXPLORE SIGN IN & CREATE FREE ACCOUNT) ── */
               <div className="axx-main-auth-view">
-                {/* Header Greetings */}
+                {/* Header Greetings tailored to Community Explorers */}
                 <div className="axx-auth-header">
                   <h2 className="axx-auth-title">
-                    {tab === "login" ? "Welcome Back 👋" : "Create Free Account ✨"}
+                    {tab === "login" ? "Welcome Back Explorer 👋" : "Join the Community ✨"}
                   </h2>
                   <p className="axx-auth-sub">
                     {tab === "login"
-                      ? "Sign in to view saved properties, active bookings, and messages."
-                      : "Join AxxSpace to bookmark listings, book accommodations, and contact hosts."}
+                      ? "Sign in to access your saved spaces, active inquiries, and booking history."
+                      : "Create a free explorer account. You don't need anything to list—just search, save, and connect."}
                   </p>
                 </div>
 
@@ -486,7 +498,7 @@ export default function UserLogin({ defaultTab }) {
                     }}
                     className={`axx-tab-btn ${tab === "register" ? "active" : ""}`}
                   >
-                    Create Account
+                    Create Free Account
                   </button>
                 </div>
 
@@ -498,7 +510,7 @@ export default function UserLogin({ defaultTab }) {
                     </div>
                   ) : (
                     <div className="axx-google-fallback-note">
-                      Continue with email and password below
+                      Continue with your email below
                     </div>
                   )}
                   {googleError && <div className="axx-alert axx-alert-error">{googleError}</div>}
@@ -541,7 +553,7 @@ export default function UserLogin({ defaultTab }) {
                         <input
                           type="email"
                           name="email"
-                          placeholder="e.g. user@example.com"
+                          placeholder="e.g. explorer@example.com"
                           value={loginData.email}
                           onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
                           className="axx-input"
@@ -602,7 +614,7 @@ export default function UserLogin({ defaultTab }) {
                           onChange={(e) => setRememberMe(e.target.checked)}
                           className="axx-checkbox"
                         />
-                        <span>Remember this device</span>
+                        <span>Stay signed in on this device</span>
                       </label>
                     </div>
 
@@ -617,12 +629,12 @@ export default function UserLogin({ defaultTab }) {
                           <span>Signing in...</span>
                         </span>
                       ) : (
-                        "Sign In to AxxSpace"
+                        "Sign In & Start Exploring"
                       )}
                     </button>
 
                     <div className="axx-switch-tip">
-                      Don&apos;t have an account yet?{" "}
+                      New to AxxSpace?{" "}
                       <button
                         type="button"
                         onClick={() => {
@@ -631,15 +643,23 @@ export default function UserLogin({ defaultTab }) {
                         }}
                         className="axx-switch-action"
                       >
-                        Create one in 30 seconds
+                        Create your free explorer account
                       </button>
                     </div>
                   </form>
                 ) : (
-                  /* ── CREATE ACCOUNT FORM ── */
+                  /* ── CREATE ACCOUNT FORM (FOR NEW EXPLORERS) ── */
                   <form onSubmit={handleRegisterSubmit} className="axx-form">
+                    <div className="axx-free-notice-card">
+                      <span className="free-icon">🎉</span>
+                      <div className="free-text">
+                        <strong>100% Free Explorer Membership</strong>
+                        <span>No fees, no listings required. Enjoy full access to browse and save spaces.</span>
+                      </div>
+                    </div>
+
                     <div className="axx-input-group">
-                      <label className="axx-label">Full Name</label>
+                      <label className="axx-label">Your Name</label>
                       <div className="axx-input-wrapper">
                         <span className="axx-input-icon">
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
@@ -647,7 +667,7 @@ export default function UserLogin({ defaultTab }) {
                         <input
                           type="text"
                           name="name"
-                          placeholder="e.g. Joy Wanjiku"
+                          placeholder="e.g. Kevin Otieno"
                           value={registerData.name}
                           onChange={(e) => setRegisterData({ ...registerData, name: e.target.value })}
                           className="axx-input"
@@ -666,7 +686,7 @@ export default function UserLogin({ defaultTab }) {
                         <input
                           type="email"
                           name="email"
-                          placeholder="e.g. joy@example.com"
+                          placeholder="e.g. kevin@example.com"
                           value={registerData.email}
                           onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
                           className="axx-input"
@@ -677,7 +697,7 @@ export default function UserLogin({ defaultTab }) {
                     </div>
 
                     <div className="axx-input-group">
-                      <label className="axx-label">Phone Number (M-Pesa / WhatsApp)</label>
+                      <label className="axx-label">Phone Number (For Host Inquiries &amp; WhatsApp)</label>
                       <div className="axx-input-wrapper">
                         <span className="axx-input-icon">
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
@@ -696,7 +716,7 @@ export default function UserLogin({ defaultTab }) {
                     </div>
 
                     <div className="axx-input-group">
-                      <label className="axx-label">Create Password</label>
+                      <label className="axx-label">Password</label>
                       <div className="axx-input-wrapper">
                         <span className="axx-input-icon">
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
@@ -704,7 +724,7 @@ export default function UserLogin({ defaultTab }) {
                         <input
                           type={showRegisterPassword ? "text" : "password"}
                           name="password"
-                          placeholder="At least 6 characters with letters & numbers"
+                          placeholder="Min 6 characters (mix letters & numbers)"
                           value={registerData.password}
                           onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
                           className="axx-input"
@@ -749,12 +769,16 @@ export default function UserLogin({ defaultTab }) {
                       {loading ? (
                         <span className="axx-btn-loading">
                           <span className="axx-spinner"></span>
-                          <span>Creating Membership...</span>
+                          <span>Creating Explorer Account...</span>
                         </span>
                       ) : (
-                        "Join AxxSpace for Free"
+                        "Create Free Explorer Account"
                       )}
                     </button>
+
+                    <p className="axx-terms-micro">
+                      By joining, you agree to AxxSpace Terms of Service. No listing requirements.
+                    </p>
 
                     <div className="axx-switch-tip">
                       Already have an account?{" "}
@@ -772,21 +796,22 @@ export default function UserLogin({ defaultTab }) {
                   </form>
                 )}
 
-                {/* Other Portals Switcher */}
-                <div className="axx-other-portals-wrap">
-                  <span className="other-label">Are you a property owner or partner?</span>
-                  <div className="portal-links">
-                    <Link to="/login" className="portal-link">
-                      Landlords &amp; Hosts
-                    </Link>
-                    <span className="portal-sep">·</span>
-                    <Link to="/agent/login" className="portal-link">
-                      Field Agents
-                    </Link>
-                    <span className="portal-sep">·</span>
-                    <Link to="/business-login" className="portal-link">
-                      AxxBiashara
-                    </Link>
+                {/* Clear distinction for Providers / Landlords */}
+                <div className="axx-provider-bridge">
+                  <div className="provider-box">
+                    <span className="provider-tag">ARE YOU A PROPERTY OWNER?</span>
+                    <p className="provider-desc">
+                      Looking to list student hostels, apartments, or holiday stays?
+                    </p>
+                    <div className="provider-links">
+                      <Link to="/login" className="provider-link">
+                        Landlord / Host Portal →
+                      </Link>
+                      <span className="provider-sep">|</span>
+                      <Link to="/agent/login" className="provider-link">
+                        Agent Portal →
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -798,48 +823,48 @@ export default function UserLogin({ defaultTab }) {
   );
 }
 
-const splitScreenCss = `
+const explorerCss = `
   @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
   .axx-auth-wrapper {
     min-height: 100vh;
     display: flex;
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #090d16;
+    background: #080c14;
     color: #f1f5f9;
     overflow-x: hidden;
   }
 
   /* ── LEFT HERO PANEL ── */
   .axx-hero-panel {
-    flex: 1.05;
+    flex: 1.1;
     position: relative;
-    background: linear-gradient(145deg, #0f172a 0%, #090d16 60%, #030712 100%);
-    border-right: 1px solid rgba(255, 255, 255, 0.07);
+    background: linear-gradient(145deg, #0f172a 0%, #090e1a 55%, #030712 100%);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     flex-direction: column;
     justifyContent: space-between;
-    padding: 48px 56px;
+    padding: 44px 52px;
     overflow: hidden;
   }
 
   .axx-hero-ambient-glow {
     position: absolute;
     border-radius: 50%;
-    filter: blur(100px);
+    filter: blur(110px);
     pointer-events: none;
     z-index: 0;
   }
   .glow-1 {
-    width: 380px;
-    height: 380px;
-    background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, transparent 70%);
-    top: -50px;
-    left: -50px;
+    width: 420px;
+    height: 420px;
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.17) 0%, transparent 70%);
+    top: -60px;
+    left: -60px;
   }
   .glow-2 {
-    width: 440px;
-    height: 440px;
+    width: 460px;
+    height: 460px;
     background: radial-gradient(circle, rgba(16, 185, 129, 0.14) 0%, transparent 70%);
     bottom: -100px;
     right: -100px;
@@ -848,10 +873,10 @@ const splitScreenCss = `
   .axx-hero-content {
     position: relative;
     z-index: 1;
-    max-width: 540px;
+    max-width: 530px;
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 28px;
     height: 100%;
     justifyContent: space-between;
   }
@@ -864,19 +889,19 @@ const splitScreenCss = `
     color: inherit;
   }
   .axx-hero-logo {
-    width: 44px;
-    height: 44px;
+    width: 46px;
+    height: 46px;
     border-radius: 12px;
     object-fit: cover;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   }
   .axx-hero-brand-text {
     display: flex;
     flex-direction: column;
   }
   .axx-hero-brand-name {
-    font-size: 19px;
+    font-size: 20px;
     font-weight: 800;
     letter-spacing: -0.5px;
     color: #f8fafc;
@@ -898,38 +923,38 @@ const splitScreenCss = `
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: rgba(245, 158, 11, 0.12);
-    border: 1px solid rgba(245, 158, 11, 0.3);
-    color: #fbbf24;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #34d399;
     padding: 6px 14px;
     border-radius: 20px;
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.6px;
+    letter-spacing: 0.5px;
     width: fit-content;
   }
   .axx-hero-pill-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #10b981;
-    box-shadow: 0 0 8px #10b981;
+    background: #34d399;
+    box-shadow: 0 0 8px #34d399;
   }
   .axx-hero-title {
-    font-size: 38px;
+    font-size: 36px;
     font-weight: 800;
     color: #ffffff;
-    line-height: 1.2;
+    line-height: 1.22;
     letter-spacing: -0.8px;
     margin: 0;
   }
   .highlight-text {
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 60%, #ea580c 100%);
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 55%, #10b981 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
   .axx-hero-desc {
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1.6;
     color: #94a3b8;
     margin: 0;
@@ -939,7 +964,7 @@ const splitScreenCss = `
   .axx-feature-cards {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
   }
   .axx-feature-card {
     display: flex;
@@ -947,21 +972,21 @@ const splitScreenCss = `
     gap: 14px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.06);
-    padding: 14px 18px;
-    border-radius: 14px;
+    padding: 12px 16px;
+    border-radius: 12px;
     backdrop-filter: blur(8px);
     transition: transform 0.2s ease, border-color 0.2s ease;
   }
   .axx-feature-card:hover {
     transform: translateX(4px);
-    border-color: rgba(245, 158, 11, 0.25);
+    border-color: rgba(245, 158, 11, 0.3);
     background: rgba(255, 255, 255, 0.05);
   }
   .axx-feature-icon-box {
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
     border-radius: 10px;
-    background: rgba(15, 23, 42, 0.8);
+    background: rgba(15, 23, 42, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     align-items: center;
@@ -969,10 +994,10 @@ const splitScreenCss = `
     flex-shrink: 0;
   }
   .axx-feature-text h4 {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     color: #f1f5f9;
-    margin: 0 0 3px 0;
+    margin: 0 0 2px 0;
   }
   .axx-feature-text p {
     font-size: 12px;
@@ -981,61 +1006,73 @@ const splitScreenCss = `
     line-height: 1.4;
   }
 
-  /* Testimonial */
-  .axx-testimonial-card {
-    background: rgba(15, 23, 42, 0.65);
-    border: 1px solid rgba(255, 255, 255, 0.09);
-    padding: 18px 22px;
-    border-radius: 16px;
+  /* Explorer proof card */
+  .axx-explorer-proof-card {
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 16px 20px;
+    border-radius: 14px;
     backdrop-filter: blur(12px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-  }
-  .axx-testimonial-stars {
     display: flex;
-    align-items: center;
-    gap: 3px;
-    color: #f59e0b;
-    font-size: 14px;
-    margin-bottom: 8px;
-  }
-  .rating-num {
-    font-size: 12px;
-    font-weight: 700;
-    color: #cbd5e1;
-    margin-left: 6px;
-  }
-  .axx-testimonial-quote {
-    font-size: 13px;
-    line-height: 1.5;
-    color: #e2e8f0;
-    font-style: italic;
-    margin: 0 0 12px 0;
-  }
-  .axx-testimonial-author {
-    display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 10px;
   }
-  .author-avatar {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: #ffffff;
+  .proof-header {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-weight: 700;
+    gap: 14px;
   }
-  .author-name {
-    font-size: 12px;
+  .avatar-group {
+    display: flex;
+    align-items: center;
+  }
+  .mini-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #ffffff;
+    border: 2px solid #0f172a;
+    margin-left: -6px;
+  }
+  .mini-avatar:first-child { margin-left: 0; }
+  .av1 { background: #3b82f6; }
+  .av2 { background: #10b981; }
+  .av3 { background: #f59e0b; }
+  .mini-count {
+    background: #475569;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    color: #ffffff;
+    border: 2px solid #0f172a;
+    margin-left: -6px;
+  }
+  .proof-stat .stat-num {
+    font-size: 13px;
     font-weight: 700;
     color: #f8fafc;
   }
-  .author-role {
+  .proof-stat .stat-sub {
     font-size: 11px;
     color: #94a3b8;
+  }
+  .proof-reassurance {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: #a7f3d0;
+    line-height: 1.4;
   }
 
   .axx-hero-footer {
@@ -1044,7 +1081,7 @@ const splitScreenCss = `
     gap: 10px;
     font-size: 11px;
     color: #64748b;
-    padding-top: 12px;
+    padding-top: 10px;
   }
 
   /* ── RIGHT AUTH PANEL ── */
@@ -1054,7 +1091,7 @@ const splitScreenCss = `
     align-items: center;
     justify-content: center;
     padding: 32px 24px;
-    background: #090d16;
+    background: #080c14;
     overflow-y: auto;
   }
 
@@ -1063,7 +1100,7 @@ const splitScreenCss = `
     max-width: 460px;
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 16px;
   }
 
   .axx-auth-nav {
@@ -1090,9 +1127,9 @@ const splitScreenCss = `
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.25);
-    color: #34d399;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    color: #fbbf24;
     padding: 4px 10px;
     border-radius: 20px;
     font-size: 10px;
@@ -1103,21 +1140,21 @@ const splitScreenCss = `
     width: 5px;
     height: 5px;
     border-radius: 50%;
-    background: #34d399;
-    box-shadow: 0 0 6px #34d399;
+    background: #fbbf24;
+    box-shadow: 0 0 6px #fbbf24;
   }
 
   .axx-auth-card {
     background: rgba(15, 23, 42, 0.75);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 20px;
-    padding: 34px 30px;
+    padding: 32px 28px;
     backdrop-filter: blur(16px);
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
   }
 
   .axx-auth-header {
-    margin-bottom: 22px;
+    margin-bottom: 20px;
   }
   .axx-auth-icon-circle {
     width: 48px;
@@ -1131,7 +1168,7 @@ const splitScreenCss = `
     margin-bottom: 14px;
   }
   .axx-auth-title {
-    font-size: 24px;
+    font-size: 23px;
     font-weight: 800;
     color: #ffffff;
     margin: 0 0 6px 0;
@@ -1144,6 +1181,33 @@ const splitScreenCss = `
     line-height: 1.45;
   }
 
+  /* Free notice banner */
+  .axx-free-notice-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 2px;
+  }
+  .free-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .free-text {
+    display: flex;
+    flex-direction: column;
+    font-size: 12px;
+    color: #cbd5e1;
+    line-height: 1.35;
+  }
+  .free-text strong {
+    color: #34d399;
+    font-size: 12px;
+  }
+
   /* Tab Pill Switcher */
   .axx-tab-pill-box {
     display: flex;
@@ -1151,11 +1215,11 @@ const splitScreenCss = `
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
     padding: 4px;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
   }
   .axx-tab-btn {
     flex: 1;
-    padding: 10px 14px;
+    padding: 10px 12px;
     border-radius: 9px;
     border: none;
     background: transparent;
@@ -1173,7 +1237,7 @@ const splitScreenCss = `
 
   /* Google Button */
   .axx-google-block {
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
   .axx-google-btn-container {
     display: flex;
@@ -1194,7 +1258,7 @@ const splitScreenCss = `
     display: flex;
     align-items: center;
     gap: 12px;
-    margin: 18px 0;
+    margin: 16px 0;
   }
   .axx-divider-line {
     flex: 1;
@@ -1246,7 +1310,7 @@ const splitScreenCss = `
   .axx-form {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 15px;
   }
   .axx-input-group {
     display: flex;
@@ -1415,11 +1479,19 @@ const splitScreenCss = `
     to { transform: rotate(360deg); }
   }
 
+  .axx-terms-micro {
+    font-size: 11px;
+    color: #64748b;
+    text-align: center;
+    margin: 2px 0 0 0;
+    line-height: 1.4;
+  }
+
   .axx-switch-tip {
     text-align: center;
     font-size: 13px;
     color: #94a3b8;
-    margin-top: 4px;
+    margin-top: 2px;
   }
   .axx-switch-action {
     background: none;
@@ -1435,37 +1507,53 @@ const splitScreenCss = `
     color: #f59e0b;
   }
 
-  /* Other Portals Wrap */
-  .axx-other-portals-wrap {
-    margin-top: 24px;
-    padding-top: 18px;
+  /* Provider bridge */
+  .axx-provider-bridge {
+    margin-top: 22px;
+    padding-top: 16px;
     border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+  .provider-box {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 12px 14px;
     text-align: center;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 5px;
   }
-  .other-label {
-    font-size: 12px;
-    color: #64748b;
+  .provider-tag {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    color: #fbbf24;
+    text-transform: uppercase;
   }
-  .portal-links {
+  .provider-desc {
+    font-size: 11px;
+    color: #94a3b8;
+    margin: 0;
+  }
+  .provider-links {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     font-size: 12px;
+    margin-top: 2px;
   }
-  .portal-link {
-    color: #94a3b8;
+  .provider-link {
+    color: #38bdf8;
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 700;
     transition: color 0.15s ease;
   }
-  .portal-link:hover {
-    color: #fbbf24;
+  .provider-link:hover {
+    color: #7dd3fc;
+    text-decoration: underline;
   }
-  .portal-sep {
+  .provider-sep {
     color: #475569;
   }
 
@@ -1489,23 +1577,23 @@ const splitScreenCss = `
     }
     .axx-hero-panel {
       flex: none;
-      padding: 32px 24px;
+      padding: 30px 20px;
       border-right: none;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
     .axx-hero-title {
-      font-size: 28px;
+      font-size: 26px;
     }
     .axx-feature-cards,
-    .axx-testimonial-card,
+    .axx-explorer-proof-card,
     .axx-hero-footer {
       display: none;
     }
     .axx-auth-panel {
-      padding: 32px 18px;
+      padding: 28px 16px;
     }
     .axx-auth-card {
-      padding: 24px 20px;
+      padding: 22px 18px;
     }
   }
 `;
