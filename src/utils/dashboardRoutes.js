@@ -5,7 +5,7 @@ export const DASHBOARD_BY_ROLE = {
   host: "/accommodation/host-dashboard",
   seller: "/quicksales-dashboard",
   mover: "/mover-dashboard",
-  user: "/business-dashboard",
+  business: "/business-dashboard",
   admin: "/admin/dashboard",
   team: "/admin/verification",
 };
@@ -17,6 +17,7 @@ export const LOGIN_BY_ROLE = {
   landlord: "/login",
   seller: "/quicksales-login",
   mover: "/login",
+  business: "/business-login",
   user: "/user-login",
   admin: "/login",
   team: "/login",
@@ -28,6 +29,10 @@ export function normalizeRole(role) {
 
 export function getDashboardPath(role) {
   const key = normalizeRole(role);
+  // Regular community members exploring spaces return to home/listings, not a provider workspace
+  if (key === "user" || key === "guest") {
+    return "/";
+  }
   return DASHBOARD_BY_ROLE[key] || "/";
 }
 
@@ -88,7 +93,10 @@ export function roleIsAllowed(userRole, allowedRoles = []) {
 
 /** Roles that use a dedicated workspace (not the public marketing site) */
 export function isWorkspaceUser(role) {
-  return Boolean(DASHBOARD_BY_ROLE[normalizeRole(role)]);
+  const key = normalizeRole(role);
+  // 'user' and 'guest' are community members exploring spaces, NOT workspace providers!
+  if (key === "user" || key === "guest" || !key) return false;
+  return Boolean(DASHBOARD_BY_ROLE[key]);
 }
 
 export const ACCOUNT_NAV_BY_ROLE = {
@@ -115,7 +123,7 @@ export const ACCOUNT_NAV_BY_ROLE = {
     { label: "Dashboard", path: "/mover-dashboard" },
     { label: "Settings", path: "/settings" },
   ],
-  user: [
+  business: [
     { label: "Dashboard", path: "/business-dashboard" },
     { label: "Add Business", path: "/business/create" },
     { label: "Settings", path: "/settings" },
@@ -141,7 +149,7 @@ export function getWorkspaceBrand(role) {
     landlord: "Landlord Portal",
     seller: "QuickSales Portal",
     mover: "Axx Movers",
-    user: "Business Workspace",
+    business: "Business Workspace",
     admin: "Admin Panel",
     team: "Admin Panel",
     host: "Accommodation Host Portal",

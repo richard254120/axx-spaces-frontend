@@ -325,16 +325,28 @@ export default function Navbar() {
                         <ProfileAvatar user={user} size={40} />
                         <div>
                           <div className="ax-account-name">{user.name}</div>
-                          <div className="ax-account-role">{user.role?.toUpperCase() || "USER"}</div>
+                          <div className="ax-account-role">
+                            {user.role === "user" ? "COMMUNITY EXPLORER" : (user.role?.toUpperCase() || "MEMBER")}
+                          </div>
                         </div>
                       </div>
                       <div className="ax-divider" />
+                      <Link to="/saved-listings" className="ax-item" onClick={() => setAccountOpen(false)}>
+                        Saved Spaces
+                      </Link>
+                      <Link to="/accommodation/guest-dashboard" className="ax-item" onClick={() => setAccountOpen(false)}>
+                        My Bookings
+                      </Link>
+                      <Link to="/messages" className="ax-item" onClick={() => setAccountOpen(false)}>
+                        Messages
+                      </Link>
                       <Link to="/profile" className="ax-item" onClick={() => setAccountOpen(false)}>
                         My Profile
                       </Link>
                       <Link to="/settings" className="ax-item" onClick={() => setAccountOpen(false)}>
                         Settings
                       </Link>
+                      <div className="ax-divider" />
                       <button type="button" className="ax-item ax-item-danger" onClick={handleLogout}>
                         Logout
                       </button>
