@@ -170,8 +170,8 @@ function App() {
 
       <Route path="/login" element={<PublicLayout><Login /></PublicLayout>} />
       <Route path="/register" element={<PublicLayout><Register /></PublicLayout>} />
-      <Route path="/user-login" element={<PublicLayout><UserLogin /></PublicLayout>} />
-      <Route path="/user-register" element={<PublicLayout><UserRegister /></PublicLayout>} />
+      <Route path="/user-login" element={<BareLayout><UserLogin /></BareLayout>} />
+      <Route path="/user-register" element={<BareLayout><UserLogin defaultTab="register" /></BareLayout>} />
       <Route path="/about" element={<PublicLayout><AboutUs /></PublicLayout>} />
       <Route path="/reset-password/:token" element={<PublicLayout><ResetPassword /></PublicLayout>} />
       <Route path="/verify-email/:token" element={<PublicLayout><VerifyEmail /></PublicLayout>} />
