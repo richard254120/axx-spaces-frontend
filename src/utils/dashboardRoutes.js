@@ -4,7 +4,7 @@ export const DASHBOARD_BY_ROLE = {
   landlord: "/dashboard",
   provider: "/dashboard",
   agent: "/agent/dashboard",
-  host: "/accommodation/host-dashboard",
+  host: "/accommodation/dashboard",
   seller: "/quicksales-dashboard",
   mover: "/mover-dashboard",
   business: "/business-dashboard",

@@ -1,12 +1,10 @@
-import { useState, useContext, useEffect, useRef } from "react";
+import { useState, useContext, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import { accommodationLogin } from "../../api/accommodation";
+import { useGoogleSignIn, GOOGLE_CLIENT_ID } from "../../hooks/useGoogleSignIn";
 import {
   setAccommodationSession,
   isAccommodationLoggedIn,
-  ACCOMMODATION_FONT_CSS,
-  accommodationTheme,
 } from "../../features/accommodation";
 import logo from "../../assets/image.png";
 
@@ -20,108 +18,160 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    padding: "20px",
+    padding: "24px 16px",
   },
   card: {
     background: "white",
     borderRadius: "20px",
-    padding: "40px",
-    maxWidth: "420px",
+    padding: "36px 32px",
+    maxWidth: "440px",
     width: "100%",
     border: "1px solid #e5e7eb",
     boxShadow: "0 20px 60px rgba(0,0,0,0.08)",
   },
   logo: {
     textAlign: "center",
-    marginBottom: "24px",
+    marginBottom: "20px",
   },
   logoAccent: {
     color: "#fbbf24",
     fontWeight: 800,
-    fontSize: "28px",
+    fontSize: "26px",
   },
   logoWord: {
     color: "#1f2937",
     fontWeight: 800,
-    fontSize: "28px",
+    fontSize: "26px",
+  },
+  badge: {
+    display: "inline-block",
+    padding: "4px 12px",
+    background: "#fef3c7",
+    color: "#92400e",
+    fontSize: "12px",
+    fontWeight: 700,
+    borderRadius: "999px",
+    marginBottom: "12px",
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
   },
   title: {
-    fontSize: "24px",
+    fontSize: "22px",
     fontWeight: 800,
     color: "#1f2937",
-    marginBottom: "8px",
+    marginBottom: "6px",
     textAlign: "center",
   },
   subtitle: {
-    fontSize: "14px",
+    fontSize: "13.5px",
     color: "#6b7280",
-    marginBottom: "32px",
+    marginBottom: "24px",
     textAlign: "center",
+    lineHeight: "1.45",
   },
   form: {
     display: "flex",
     flexDirection: "column",
-    gap: "20px",
+    gap: "16px",
   },
   label: {
     fontSize: "13px",
     fontWeight: 600,
     color: "#374151",
     marginBottom: "6px",
+    display: "block",
+  },
+  inputWrapper: {
+    position: "relative",
+    display: "flex",
+    alignItems: "center",
   },
   input: {
     width: "100%",
-    padding: "12px 16px",
+    padding: "12px 14px",
     border: "1px solid #e5e7eb",
     borderRadius: "10px",
     fontSize: "14px",
     fontFamily: "inherit",
     outline: "none",
-    transition: "border-color 0.2s",
+    transition: "border-color 0.2s, box-shadow 0.2s",
+    background: "#fff",
+    color: "#1f2937",
+  },
+  eyeBtn: {
+    position: "absolute",
+    right: "12px",
+    background: "none",
+    border: "none",
+    color: "#9ca3af",
+    cursor: "pointer",
+    padding: "4px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
   button: {
     background: "#fbbf24",
     color: "#1f2937",
     border: "none",
     borderRadius: "10px",
-    padding: "14px",
+    padding: "13px",
     fontWeight: 800,
     fontSize: "15px",
     cursor: "pointer",
     fontFamily: "inherit",
-    transition: "opacity 0.2s",
+    transition: "all 0.2s ease",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "8px",
+    boxShadow: "0 4px 14px rgba(251, 191, 36, 0.35)",
   },
   buttonDisabled: {
-    opacity: 0.5,
+    opacity: 0.6,
     cursor: "not-allowed",
+    boxShadow: "none",
   },
   error: {
     background: "#fef2f2",
     border: "1px solid #fecaca",
     color: "#dc2626",
-    padding: "12px",
-    borderRadius: "8px",
+    padding: "12px 14px",
+    borderRadius: "10px",
     fontSize: "13px",
-    textAlign: "center",
+    lineHeight: "1.4",
+    marginBottom: "16px",
+  },
+  success: {
+    background: "#f0fdf4",
+    border: "1px solid #bbf7d0",
+    color: "#16a34a",
+    padding: "12px 14px",
+    borderRadius: "10px",
+    fontSize: "13px",
+    lineHeight: "1.4",
+    marginBottom: "16px",
   },
   link: {
     textAlign: "center",
-    marginTop: "20px",
+    marginTop: "16px",
     fontSize: "13px",
     color: "#6b7280",
   },
   linkText: {
-    color: "#fbbf24",
-    fontWeight: 600,
+    color: "#d97706",
+    fontWeight: 700,
     cursor: "pointer",
     textDecoration: "none",
   },
   divider: {
     display: "flex",
     alignItems: "center",
-    margin: "20px 0",
-    color: "#6b7280",
-    fontSize: "14px",
+    margin: "20px 0 16px",
+    color: "#9ca3af",
+    fontSize: "12px",
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
   },
   dividerLine: {
     flex: 1,
@@ -129,143 +179,57 @@ const styles = {
     background: "#e5e7eb",
   },
   dividerText: {
-    padding: "0 10px",
+    padding: "0 12px",
   },
-  googleButtonContainer: {
+  googleContainer: {
     width: "100%",
     minHeight: "44px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
   },
-  googleButton: {
-    width: "100%",
-    padding: "14px",
-    background: "white",
-    color: "#1f2937",
-    border: "1px solid #e5e7eb",
-    borderRadius: "10px",
-    fontSize: "15px",
-    fontWeight: 700,
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "10px",
-    transition: "all 0.2s",
-  },
 };
 
 const css = `
   input:focus {
     border-color: #fbbf24 !important;
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2) !important;
   }
   button:hover:not(:disabled) {
-    opacity: 0.8;
+    transform: translateY(-1px);
+    opacity: 0.95;
   }
 `;
 
 export default function AccommodationLogin() {
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   useEffect(() => {
     if (isAccommodationLoggedIn()) {
-      navigate("/accommodation/dashboard");
+      navigate("/accommodation/dashboard", { replace: true });
     }
   }, [navigate]);
-  const { login } = useContext(AuthContext);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const [showResend, setShowResend] = useState(false);
-  const [resendEmail, setResendEmail] = useState("");
-  const [resendLoading, setResendLoading] = useState(false);
-
-  // Forgot password state
+  // Forgot password modal/toggle state
   const [showForgot, setShowForgot] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotMsg, setForgotMsg] = useState("");
 
-  // Google Sign-In button ref
-  const googleButtonRef = useRef(null);
-
-  // Initialize Google Sign-In on component mount
-  useEffect(() => {
-    if (import.meta.env.VITE_GOOGLE_CLIENT_ID) {
-      handleGoogleLogin();
-    }
-  }, []);
-
-  const handleGoogleLogin = async () => {
-    setGoogleLoading(true);
-    setError("");
-
+  // Google sign in integration
+  const handleGoogleCredential = useCallback(async (googleUser) => {
     try {
-      if (!window.google) {
-        // Load Google Identity Services script
-        const script = document.createElement('script');
-        script.src = 'https://accounts.google.com/gsi/client';
-        script.async = true;
-        script.defer = true;
-        script.crossOrigin = 'anonymous';
-        script.onload = () => {
-          console.log('Google Sign-In script loaded successfully');
-          initializeGoogleSignIn();
-        };
-        script.onerror = () => {
-          console.error('Failed to load Google Sign-In script');
-          setError("Failed to load Google Sign-In. Please check your internet connection or use email/password.");
-          setGoogleLoading(false);
-        };
-        document.head.appendChild(script);
-      } else {
-        initializeGoogleSignIn();
-      }
-    } catch (err) {
-      console.error('Google Sign-In error:', err);
-      setError("Google Sign-In is not configured. Please use email/password.");
-      setGoogleLoading(false);
-    }
-  };
-
-  const initializeGoogleSignIn = () => {
-    try {
-      window.google.accounts.id.initialize({
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID",
-        callback: handleGoogleCredentialResponse,
-        auto_select: false,
-      });
-
-      // Render the Google Sign-In button instead of using prompt
-      if (googleButtonRef.current) {
-        window.google.accounts.id.renderButton(googleButtonRef.current, {
-          theme: 'outline',
-          size: 'large',
-          text: 'signin_with',
-          width: '100%',
-        });
-        setGoogleLoading(false);
-      }
-    } catch (err) {
-      setError("Google Sign-In initialization failed. Please use email/password.");
-      setGoogleLoading(false);
-    }
-  };
-
-  const handleGoogleCredentialResponse = async (response) => {
-    try {
-      const base64Url = response.credential.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
-
-      const googleUser = JSON.parse(jsonPayload);
+      setLoading(true);
+      setError("");
+      setSuccess("");
 
       const res = await fetch(`${API_BASE}/auth/google`, {
         method: "POST",
@@ -280,114 +244,94 @@ export default function AccommodationLogin() {
       });
 
       const data = await res.json();
-
       if (!res.ok) {
         throw new Error(data.error || "Google authentication failed");
       }
-
-      if (data.user.role !== "host") {
-        throw new Error("This login is for accommodation providers only");
+      if (!data.token || !data.user) {
+        throw new Error("Invalid response received from server");
       }
 
       setAccommodationSession(data.token, data.user);
+      login(data.token, data.user);
 
-      login(data.token, {
-        _id: data.user._id,
-        name: data.user.name,
-        email: data.user.email,
-        role: data.user.role,
-      });
-
-      setSuccess(" Google login successful! Redirecting...");
+      setSuccess("Google sign-in successful! Entering host dashboard...");
       setTimeout(() => {
         navigate("/accommodation/dashboard");
-      }, 1000);
-
+      }, 700);
     } catch (err) {
-      setError(err.message || "Google authentication failed. Please try again.");
+      setError(err.message || "Google sign-in failed. Please use email and password.");
     } finally {
-      setGoogleLoading(false);
+      setLoading(false);
     }
-  };
+  }, [login, navigate]);
 
-  const handleResendVerification = async () => {
-    setResendLoading(true);
-    setError("");
-    setSuccess("");
+  const handleGoogleError = useCallback((message) => {
+    setError(message || "Google sign-in is unavailable. Please sign in with email.");
+  }, []);
 
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE}/api/auth/resend-verification`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: resendEmail, role: "landlord" }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to resend verification email");
-      }
-
-      setSuccess(" " + (data.message || "Verification email sent successfully! Please check your inbox."));
-      setShowResend(false);
-    } catch (err) {
-      setError(" " + (err.message || "Failed to resend verification email. Please try again."));
-    } finally {
-      setResendLoading(false);
-    }
-  };
+  const { buttonRef: googleButtonRef } = useGoogleSignIn({
+    onCredential: handleGoogleCredential,
+    onError: handleGoogleError,
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password) {
-      setError("Please fill in all fields");
+    const cleanEmail = email.trim().toLowerCase();
+
+    if (!cleanEmail || !password) {
+      setError("Please provide both email and password.");
       return;
     }
 
     setLoading(true);
     setError("");
-    setShowResend(false);
+    setSuccess("");
 
     try {
       const response = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, role: "host" }),
+        body: JSON.stringify({
+          email: cleanEmail,
+          password,
+          role: "host",
+        }),
       });
 
       let data;
       try {
         data = await response.json();
-      } catch (jsonError) {
-        // If JSON parsing fails, try to get text
-        const text = await response.text();
-        throw new Error(text || "Server returned an invalid response");
+      } catch {
+        throw new Error("Unable to parse server response. Please try again.");
       }
 
       if (!response.ok) {
-        // Email verification check disabled - no longer show resend button
-        // if (data.requiresVerification) {
-        //   setShowResend(true);
-        //   setResendEmail(data.email || email);
-        // }
-        throw new Error(data.error || "Login failed");
+        throw new Error(data.error || "Login failed. Please check your credentials.");
       }
 
-      if (data.user.role !== "host") {
-        throw new Error("This login is for accommodation providers only");
+      const userRole = data.user?.role;
+      // Host, admin, or landlord are authorized to manage accommodation
+      if (userRole !== "host" && userRole !== "admin" && userRole !== "landlord") {
+        throw new Error(
+          `Your account is registered as a ${userRole}. Please register as an Accommodation Host or sign in through your user portal.`
+        );
       }
 
       setAccommodationSession(data.token, data.user);
-
       login(data.token, {
         _id: data.user._id,
         name: data.user.name,
         email: data.user.email,
         role: data.user.role,
+        phone: data.user.phone,
       });
 
-      navigate("/accommodation/dashboard");
+      setSuccess("Login successful! Redirecting to host dashboard...");
+      setTimeout(() => {
+        navigate("/accommodation/dashboard");
+      }, 600);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -396,25 +340,29 @@ export default function AccommodationLogin() {
   const handleForgotPassword = async (e) => {
     e.preventDefault();
     setForgotMsg("");
+    const cleanForgotEmail = forgotEmail.trim().toLowerCase();
 
-    if (!forgotEmail) {
-      setForgotMsg(" Please enter your email address.");
+    if (!cleanForgotEmail) {
+      setForgotMsg("Please enter your registered email address.");
       return;
     }
 
     setForgotLoading(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE}/api/auth/forgot-password`, {
+      const response = await fetch(`${API_BASE}/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: forgotEmail, role: "landlord" }),
+        body: JSON.stringify({
+          email: cleanForgotEmail,
+          role: "host",
+        }),
       });
 
       const data = await response.json();
-      setForgotMsg(data.message || " Reset link sent! Check your inbox.");
-    } catch (err) {
-      setForgotMsg(" Failed to send reset email. Try again.");
+      setForgotMsg(data.message || "Password reset link sent! Please check your inbox.");
+    } catch {
+      setForgotMsg("Failed to send reset email. Please verify your connection and try again.");
     } finally {
       setForgotLoading(false);
     }
@@ -425,34 +373,61 @@ export default function AccommodationLogin() {
       <style>{css}</style>
 
       <div style={styles.card}>
+        <div style={styles.logo}>
+          <img
+            src={logo}
+            alt="Axxspace"
+            style={{
+              width: "48px",
+              height: "48px",
+              borderRadius: "12px",
+              margin: "0 auto 10px",
+              display: "block",
+              boxShadow: "0 4px 12px rgba(2, 39, 83, 0.15)",
+            }}
+          />
+          <div>
+            <span style={styles.logoAccent}>AXX</span>
+            <span style={styles.logoWord}>SPACE</span>
+          </div>
+        </div>
+
         {showForgot ? (
           <>
-            <div style={styles.logo}>
-              <img src={logo} alt="Axxspace" style={{ width: "52px", height: "52px", borderRadius: "12px", margin: "0 auto 10px", display: "block", boxShadow: "0 4px 12px rgba(2, 39, 83, 0.15)" }} />
-              <span style={styles.logoAccent}>AXX</span>
-              <span style={styles.logoWord}>SPACE</span>
+            <div style={{ textAlign: "center", marginBottom: "8px" }}>
+              <span style={styles.badge}>Host Account Recovery</span>
             </div>
-
-            <h1 style={styles.title}> Reset Password</h1>
-            <p style={styles.subtitle}>Enter your email to receive a reset link</p>
+            <h1 style={styles.title}>Reset Host Password</h1>
+            <p style={styles.subtitle}>
+              Enter your registered host email address to receive password reset instructions.
+            </p>
 
             {forgotMsg && (
-              <div style={forgotMsg.includes("") ? styles.error : { ...styles.error, background: "#f0fdf4", borderColor: "#22c55e", color: "#16a34a" }}>
+              <div
+                style={
+                  forgotMsg.toLowerCase().includes("sent") || forgotMsg.toLowerCase().includes("check")
+                    ? styles.success
+                    : styles.error
+                }
+              >
                 {forgotMsg}
               </div>
             )}
 
             <form onSubmit={handleForgotPassword} style={styles.form}>
               <div>
-                <label style={styles.label}>Email</label>
-                <input
-                  type="email"
-                  style={styles.input}
-                  placeholder="Enter your registered email"
-                  value={forgotEmail}
-                  onChange={(e) => setForgotEmail(e.target.value)}
-                  required
-                />
+                <label style={styles.label}>Registered Host Email</label>
+                <div style={styles.inputWrapper}>
+                  <input
+                    type="email"
+                    style={styles.input}
+                    placeholder="host@example.com"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    autoComplete="email"
+                    required
+                  />
+                </div>
               </div>
 
               <button
@@ -460,84 +435,99 @@ export default function AccommodationLogin() {
                 style={{ ...styles.button, ...(forgotLoading ? styles.buttonDisabled : {}) }}
                 disabled={forgotLoading}
               >
-                {forgotLoading ? "Sending..." : " Send Reset Link"}
+                {forgotLoading ? "Sending Link..." : "Send Reset Link"}
               </button>
             </form>
 
             <div style={styles.link}>
-              <span style={styles.linkText} onClick={() => { setShowForgot(false); setForgotMsg(""); }}>
-                ← Back to Login
+              <span
+                style={styles.linkText}
+                onClick={() => {
+                  setShowForgot(false);
+                  setForgotMsg("");
+                }}
+              >
+                ← Back to Host Login
               </span>
             </div>
           </>
         ) : (
           <>
-            <div style={styles.logo}>
-              <img src={logo} alt="Axxspace" style={{ width: "52px", height: "52px", borderRadius: "12px", margin: "0 auto 10px", display: "block", boxShadow: "0 4px 12px rgba(2, 39, 83, 0.15)" }} />
-              <span style={styles.logoAccent}>AXX</span>
-              <span style={styles.logoWord}>SPACE</span>
+            <div style={{ textAlign: "center", marginBottom: "8px" }}>
+              <span style={styles.badge}>Accommodation Portal</span>
             </div>
-
-            <h1 style={styles.title}>Accommodation Provider Login</h1>
-            <p style={styles.subtitle}>Access your accommodation property dashboard</p>
+            <h1 style={styles.title}>Host Sign In</h1>
+            <p style={styles.subtitle}>
+              Access your accommodation dashboard, manage bookings & listings.
+            </p>
 
             {error && <div style={styles.error}>{error}</div>}
-            {success && <div style={{ ...styles.error, background: "#f0fdf4", borderColor: "#22c55e", color: "#16a34a" }}>{success}</div>}
-
-            {showResend && (
-              <div style={{ textAlign: "center", marginBottom: "20px" }}>
-                <button
-                  type="button"
-                  onClick={handleResendVerification}
-                  disabled={resendLoading}
-                  style={{
-                    background: "rgba(251, 191, 36, 0.15)",
-                    color: "#fbbf24",
-                    border: "1px solid rgba(251, 191, 36, 0.3)",
-                    borderRadius: "10px",
-                    padding: "10px 18px",
-                    fontSize: "14px",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    width: "100%",
-                    transition: "all 0.2s"
-                  }}
-                >
-                  {resendLoading ? " Sending..." : " Resend Verification Email"}
-                </button>
-              </div>
-            )}
+            {success && <div style={styles.success}>{success}</div>}
 
             <form onSubmit={handleSubmit} style={styles.form}>
               <div>
-                <label style={styles.label}>Email</label>
-                <input
-                  type="email"
-                  style={styles.input}
-                  placeholder="your@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
+                <label style={styles.label}>Email Address</label>
+                <div style={styles.inputWrapper}>
+                  <input
+                    type="email"
+                    style={styles.input}
+                    placeholder="host@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="email"
+                    required
+                  />
+                </div>
               </div>
 
               <div>
-                <label style={styles.label}>Password</label>
-                <input
-                  type="password"
-                  style={styles.input}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-                <div style={{ textAlign: "right", marginTop: "8px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <label style={styles.label}>Password</label>
                   <span
-                    onClick={() => { setShowForgot(true); setError(""); }}
-                    style={{ color: "#fbbf24", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}
+                    onClick={() => {
+                      setShowForgot(true);
+                      setError("");
+                      setForgotEmail(email);
+                    }}
+                    style={{
+                      color: "#d97706",
+                      cursor: "pointer",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      marginBottom: "6px",
+                    }}
                   >
                     Forgot password?
                   </span>
+                </div>
+                <div style={styles.inputWrapper}>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    style={{ ...styles.input, paddingRight: "40px" }}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="current-password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    style={styles.eyeBtn}
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    title={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                        <line x1="1" y1="1" x2="23" y2="23" />
+                      </svg>
+                    ) : (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    )}
+                  </button>
                 </div>
               </div>
 
@@ -546,30 +536,32 @@ export default function AccommodationLogin() {
                 style={{ ...styles.button, ...(loading ? styles.buttonDisabled : {}) }}
                 disabled={loading}
               >
-                {loading ? "Logging in..." : "Login"}
+                {loading ? "Signing In..." : "Sign In to Dashboard"}
               </button>
             </form>
 
-            <div style={{ ...styles.link, marginTop: "24px" }}>
-              <div style={styles.divider}>
-                <div style={styles.dividerLine}></div>
-                <span style={styles.dividerText}>or</span>
-                <div style={styles.dividerLine}></div>
-              </div>
+            {GOOGLE_CLIENT_ID ? (
+              <div style={{ marginTop: "16px" }}>
+                <div style={styles.divider}>
+                  <div style={styles.dividerLine}></div>
+                  <span style={styles.dividerText}>or sign in with</span>
+                  <div style={styles.dividerLine}></div>
+                </div>
 
-              <div ref={googleButtonRef} style={styles.googleButtonContainer}></div>
-            </div>
+                <div ref={googleButtonRef} style={styles.googleContainer}></div>
+              </div>
+            ) : null}
 
             <div style={styles.link}>
-              Don't have an account?{" "}
+              New accommodation host?{" "}
               <span style={styles.linkText} onClick={() => navigate("/accommodation/register")}>
-                Register Your Account
+                Create Host Account
               </span>
             </div>
 
             <div style={styles.link}>
               <span style={styles.linkText} onClick={() => navigate("/accommodation")}>
-                ← Back to Accommodation
+                ← Back to Accommodations
               </span>
             </div>
           </>
