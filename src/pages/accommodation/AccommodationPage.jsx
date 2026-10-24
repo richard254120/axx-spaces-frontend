@@ -80,6 +80,7 @@ function AnimatedCounter({ value, duration = 1600 }) {
 export default function AccommodationPage() {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
+  const isHostUser = Boolean(user && (user.role === "host" || user.role === "admin"));
   const { featured: backendFeatured, stats: heroStats } = useAccommodationHome();
 
   // Search Bar State
@@ -385,14 +386,14 @@ export default function AccommodationPage() {
               <span className="wishlist-badge-count">{favs.length}</span>
             </button>
 
-            {user && user.role !== "guest" ? (
+            {isHostUser ? (
               <div style={s.userGroup}>
                 <button
                   type="button"
                   style={s.dashboardBtn}
                   onClick={() => navigate("/accommodation/dashboard")}
                 >
-                  Dashboard
+                  Host Dashboard
                 </button>
                 <div style={s.userAvatar} title={user.name || "User"}>
                   {(user.name || "U")[0].toUpperCase()}
@@ -403,19 +404,26 @@ export default function AccommodationPage() {
                 <button
                   type="button"
                   className="sign-in-btn"
-                  onClick={() => navigate("/accommodation/login")}
+                  onClick={() => navigate("/accommodation/login?tab=login")}
                 >
-                  Sign In
+                  Host Sign In
                 </button>
                 <button
                   type="button"
                   className="list-property-btn"
-                  onClick={() => navigate("/accommodation/register")}
+                  onClick={() => navigate("/accommodation/register?tab=register")}
                 >
                   <span>Register Account</span>
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M5 12h14M12 5l7 7-7 7" />
                   </svg>
+                </button>
+                <button
+                  type="button"
+                  className="mobile-header-auth-btn"
+                  onClick={() => navigate("/accommodation/login?tab=login")}
+                >
+                  Host Portal
                 </button>
               </>
             )}
@@ -457,17 +465,17 @@ export default function AccommodationPage() {
               Help & FAQ
             </button>
             <div className="mobile-nav-divider" />
-            {user && user.role !== "guest" ? (
+            {isHostUser ? (
               <button type="button" className="mobile-action-highlight" onClick={() => { navigate("/accommodation/dashboard"); setMobileMenuOpen(false); }}>
-                Go to Dashboard
+                Go to Host Dashboard →
               </button>
             ) : (
               <>
-                <button type="button" onClick={() => { navigate("/accommodation/login"); setMobileMenuOpen(false); }}>
-                  Sign In
+                <button type="button" onClick={() => { navigate("/accommodation/login?tab=login"); setMobileMenuOpen(false); }}>
+                  Host Sign In
                 </button>
-                <button type="button" onClick={() => { navigate("/accommodation/register"); setMobileMenuOpen(false); }}>
-                  Register Account
+                <button type="button" onClick={() => { navigate("/accommodation/register?tab=register"); setMobileMenuOpen(false); }}>
+                  Register Host Account
                 </button>
                 <button type="button" className="mobile-action-highlight" onClick={() => { navigate("/accommodation/register-property"); setMobileMenuOpen(false); }}>
                   List Your Property (Host)
@@ -2493,6 +2501,22 @@ const customStyles = `
     box-shadow: 0 6px 20px rgba(79, 70, 229, 0.42);
   }
 
+  .mobile-header-auth-btn {
+    display: none;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    color: #1e1b4b;
+    border: none;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 6px 12px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25);
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+    font-family: inherit;
+  }
+
   .mobile-toggle-btn {
     display: none;
     background: transparent;
@@ -3746,6 +3770,7 @@ const customStyles = `
     /* Hide desktop auth buttons — they appear in the mobile dropdown */
     .sign-in-btn { display: none; }
     .list-property-btn { display: none; }
+    .mobile-header-auth-btn { display: inline-flex; }
     .wishlist-trigger-btn { display: none; }
     .searchBarInner { flex-direction: column; gap: 8px; }
     .search-segment-box { width: 100%; }

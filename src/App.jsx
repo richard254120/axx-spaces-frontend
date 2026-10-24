@@ -211,8 +211,8 @@ function App() {
       {/* ── ACCOMMODATION ROUTES (have Navbar) ── */}
       {/* IMPORTANT: specific /accommodation/* paths must come before /accommodation/:id */}
       <Route path="/accommodation" element={<PublicLayout><AccommodationPage /></PublicLayout>} />
-      <Route path="/accommodation/login" element={<BareLayout><AccommodationLogin /></BareLayout>} />
-      <Route path="/accommodation/register" element={<BareLayout><AccommodationRegister /></BareLayout>} />
+      <Route path="/accommodation/login" element={<BareLayout><AccommodationLogin defaultTab="login" /></BareLayout>} />
+      <Route path="/accommodation/register" element={<BareLayout><AccommodationLogin defaultTab="register" /></BareLayout>} />
       <Route path="/accommodation/listings" element={<PublicLayout><AccommodationListingsPage /></PublicLayout>} />
       <Route path="/accommodation/register-property" element={<PublicLayout><RegisterPropertyPage /></PublicLayout>} />
       <Route

@@ -23,7 +23,8 @@ const MENU_PRIMARY = [
   { to: "/quicksales", label: "QuickSales" },
   { to: "/listings", label: "Rentals" },
   { to: "/accommodation", label: "Accommodation" },
-  { to: "/accommodation/login", label: "Host Login" },
+  { to: "/accommodation/login?tab=login", label: "Host Sign In" },
+  { to: "/accommodation/register?tab=register", label: "Host Register" },
   { to: "/agent/login", label: "Agent login" },
 ];
 

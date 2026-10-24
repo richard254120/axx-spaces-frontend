@@ -46,8 +46,8 @@ export default function AccommodationNav({
             </>
           ) : (
             <>
-              <button type="button" style={s.navLink} onClick={() => navigate("/accommodation/login")}>Sign in</button>
-              <button type="button" style={s.navBtnPrimary} onClick={() => navigate("/accommodation/register")}>
+              <button type="button" style={s.navLink} onClick={() => navigate("/accommodation/login?tab=login")}>Sign in</button>
+              <button type="button" style={s.navBtnPrimary} onClick={() => navigate("/accommodation/register?tab=register")}>
                 Register
               </button>
             </>
@@ -86,10 +86,10 @@ export default function AccommodationNav({
             </>
           ) : (
             <>
-              <button type="button" style={{ ...s.navLink, display: "block", width: "100%", textAlign: "left", padding: "12px 0" }} onClick={() => { navigate("/accommodation/login"); setMobileMenuOpen(false); }}>
+              <button type="button" style={{ ...s.navLink, display: "block", width: "100%", textAlign: "left", padding: "12px 0" }} onClick={() => { navigate("/accommodation/login?tab=login"); setMobileMenuOpen(false); }}>
                 Sign in
               </button>
-              <button type="button" style={{ ...s.navBtnPrimary, display: "block", width: "100%", padding: "12px" }} onClick={() => { navigate("/accommodation/register"); setMobileMenuOpen(false); }}>
+              <button type="button" style={{ ...s.navBtnPrimary, display: "block", width: "100%", padding: "12px" }} onClick={() => { navigate("/accommodation/register?tab=register"); setMobileMenuOpen(false); }}>
                 Register Host Account
               </button>
             </>

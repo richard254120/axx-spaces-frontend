@@ -133,11 +133,11 @@ const accountTypes = [
   },
   {
     id: "accommodation",
-    name: "Accommodation Account",
+    name: "Accommodation Host Account",
     icon: "/assets/tourism-icon.png",
-    description: "List and manage accommodation properties",
-    loginPath: "/accommodation/login",
-    registerPath: "/accommodation/register",
+    description: "List and manage accommodation properties, lodges & stays",
+    loginPath: "/accommodation/login?tab=login",
+    registerPath: "/accommodation/register?tab=register",
   },
 ];
 
