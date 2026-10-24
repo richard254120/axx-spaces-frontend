@@ -1,6 +1,8 @@
 /** Dashboard home path for each account role */
 export const DASHBOARD_BY_ROLE = {
+  member: "/member",
   landlord: "/dashboard",
+  provider: "/dashboard",
   agent: "/agent/dashboard",
   host: "/accommodation/host-dashboard",
   seller: "/quicksales-dashboard",
@@ -12,9 +14,11 @@ export const DASHBOARD_BY_ROLE = {
 
 /** Login page when that dashboard requires auth */
 export const LOGIN_BY_ROLE = {
+  member: "/user-login",
   agent: "/agent/login",
   host: "/accommodation/login",
   landlord: "/login",
+  provider: "/login",
   seller: "/quicksales-login",
   mover: "/login",
   business: "/business-login",
@@ -29,6 +33,9 @@ export function normalizeRole(role) {
 
 export function getDashboardPath(role) {
   const key = normalizeRole(role);
+  if (key === "member") {
+    return "/member";
+  }
   // Regular community members exploring spaces return to home/listings, not a provider workspace
   if (key === "user" || key === "guest") {
     return "/";
@@ -94,8 +101,8 @@ export function roleIsAllowed(userRole, allowedRoles = []) {
 /** Roles that use a dedicated workspace (not the public marketing site) */
 export function isWorkspaceUser(role) {
   const key = normalizeRole(role);
-  // 'user' and 'guest' are community members exploring spaces, NOT workspace providers!
-  if (key === "user" || key === "guest" || !key) return false;
+  // 'member', 'user', and 'guest' are community members exploring spaces, NOT workspace providers!
+  if (key === "member" || key === "user" || key === "guest" || !key) return false;
   return Boolean(DASHBOARD_BY_ROLE[key]);
 }
 

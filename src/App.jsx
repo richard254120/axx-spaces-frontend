@@ -18,6 +18,7 @@ import UserLogin from "./pages/UserLogin";
 import UserRegister from "./pages/UserRegister";
 import Upload from "./pages/Upload";
 import LandlordDashboard from "./pages/LandlordDashboard";
+import MemberDashboard from "./pages/MemberDashboard";
 
 import ResetPassword from "./pages/ResetPassword";
 import AboutUs from "./pages/AboutUs";
@@ -319,10 +320,20 @@ function App() {
         }
       />
       <Route
+        path="/member"
+        element={
+          <PublicLayout>
+            <ProtectedRoute loginPath="/user-login" allowedRoles={["member"]}>
+              <MemberDashboard />
+            </ProtectedRoute>
+          </PublicLayout>
+        }
+      />
+      <Route
         path="/dashboard"
         element={
           <DashboardLayout>
-            <ProtectedRoute allowedRoles={["landlord"]}>
+            <ProtectedRoute allowedRoles={["landlord", "provider"]}>
               <LandlordDashboard />
             </ProtectedRoute>
           </DashboardLayout>

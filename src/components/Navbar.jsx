@@ -225,8 +225,10 @@ export default function Navbar() {
                 </Link>
                 {menuLink({ to: "/saved", label: "Saved Listings" })}
                 {menuLink({ to: "/axxwallet", label: "AxxWallet" })}
-                {menuLink({ to: "/upload", label: "Upload Property" })}
-                {menuLink({ to: getDashboardLink(), label: "Dashboard" })}
+                {user?.role !== "member" && menuLink({ to: "/upload", label: "Upload Property" })}
+                {user?.role === "member"
+                  ? menuLink({ to: "/member", label: "Member Dashboard" })
+                  : menuLink({ to: getDashboardLink(), label: "Dashboard" })}
                 {menuLink({ to: "/profile", label: "Profile" })}
                 {menuLink({ to: "/settings", label: "Settings" })}
                 <div className="ax-divider" />
@@ -326,11 +328,16 @@ export default function Navbar() {
                         <div>
                           <div className="ax-account-name">{user.name}</div>
                           <div className="ax-account-role">
-                            {user.role === "user" ? "COMMUNITY EXPLORER" : (user.role?.toUpperCase() || "MEMBER")}
+                            {user.role === "member" ? "MEMBER" : (user.role === "user" ? "COMMUNITY EXPLORER" : (user.role?.toUpperCase() || "USER"))}
                           </div>
                         </div>
                       </div>
                       <div className="ax-divider" />
+                      {user.role === "member" && (
+                        <Link to="/member" className="ax-item" style={{ color: "#fbbf24", fontWeight: 700 }} onClick={() => setAccountOpen(false)}>
+                          Member Dashboard
+                        </Link>
+                      )}
                       <Link to="/saved-listings" className="ax-item" onClick={() => setAccountOpen(false)}>
                         Saved Spaces
                       </Link>

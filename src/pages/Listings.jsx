@@ -766,11 +766,30 @@ Please contact me back with viewing details. Thank you!`;
 
   const toggleFavorite = (propertyId, e) => {
     if (e) e.stopPropagation();
-    const newFavorites = favorites.includes(propertyId)
+    const isFav = favorites.includes(propertyId);
+    const newFavorites = isFav
       ? favorites.filter((id) => id !== propertyId)
       : [...favorites, propertyId];
     setFavorites(newFavorites);
     localStorage.setItem("axxspace_favorites", JSON.stringify(newFavorites));
+
+    if (token) {
+      if (isFav) {
+        fetch(`${API_BASE}/members/favorites/${propertyId}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }).catch(() => {});
+      } else {
+        fetch(`${API_BASE}/members/favorites`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ propertyId }),
+        }).catch(() => {});
+      }
+    }
   };
 
   const saveCurrentSearch = () => {
