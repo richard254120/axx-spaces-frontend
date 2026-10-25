@@ -1,5 +1,5 @@
-import { useState, useEffect, useContext, useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect, useContext, useCallback, useMemo } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { ProfileAvatar } from "../features/profile";
 
@@ -375,16 +375,47 @@ const styles = {
   },
 };
 
+function formatTimeAgo(dateInput) {
+  if (!dateInput) return "Recently";
+  const date = new Date(dateInput);
+  if (isNaN(date.getTime())) return "Recently";
+  const now = new Date();
+  const diffSec = Math.floor((now - date) / 1000);
+  if (diffSec < 60) return "Just now";
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr}h ago`;
+  const diffDays = Math.floor(diffHr / 24);
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString("en-KE", { month: "short", day: "numeric" });
+}
+
 export default function MemberDashboard() {
   const { user, token, updateUser, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get("tab");
 
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState(tabFromUrl || "overview");
   const [favorites, setFavorites] = useState([]);
   const [enquiries, setEnquiries] = useState([]);
   const [bookings, setBookings] = useState({ accommodations: [], services: [] });
-  const [stats, setStats] = useState({ favoritesCount: 0, enquiriesCount: 0, bookingsCount: 0 });
+  const [itemRequests, setItemRequests] = useState([]);
+  const [stats, setStats] = useState({ favoritesCount: 0, enquiriesCount: 0, bookingsCount: 0, requestsCount: 0 });
   const [loading, setLoading] = useState(true);
+
+  // Sync tab if URL changes
+  useEffect(() => {
+    if (tabFromUrl && tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [tabFromUrl, activeTab]);
+
+  const handleTabChange = (newTab) => {
+    setActiveTab(newTab);
+    setSearchParams({ tab: newTab });
+  };
 
   // Profile Form state
   const [profileName, setProfileName] = useState(user?.name || "");
@@ -407,20 +438,49 @@ export default function MemberDashboard() {
   const loadActivities = useCallback(async () => {
     if (!token) return;
     try {
-      setLoading(true);
       const res = await fetch(`${API_BASE}/members/activities`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (res.ok) {
         const data = await res.json();
-        setFavorites(data.favorites || []);
+
+        // Merge backend favorites with local accommodation wishlists
+        let combinedFavs = data.favorites || [];
+        try {
+          const localAccFavs = JSON.parse(localStorage.getItem("axx_accommodation_favs") || "[]");
+          if (Array.isArray(localAccFavs) && localAccFavs.length > 0) {
+            localAccFavs.forEach((item) => {
+              if (item && item.id && !combinedFavs.some((f) => f._id === item.id || f.property?._id === item.id)) {
+                combinedFavs.push({
+                  _id: `local-acc-${item.id}`,
+                  isLocal: true,
+                  property: {
+                    _id: item.id,
+                    title: item.name || item.title || "Holiday Stay",
+                    price: item.price,
+                    location: { address: item.county || item.location || "Kenya" },
+                    images: item.image ? [item.image] : [],
+                    category: "accommodation",
+                  },
+                  createdAt: new Date().toISOString(),
+                });
+              }
+            });
+          }
+        } catch (e) {
+          console.warn("Local favs parse error", e);
+        }
+
+        setFavorites(combinedFavs);
         setEnquiries(data.enquiries || []);
         setBookings(data.bookings || { accommodations: [], services: [] });
+        setItemRequests(data.itemRequests || []);
         setStats(data.stats || {
-          favoritesCount: (data.favorites || []).length,
+          favoritesCount: combinedFavs.length,
           enquiriesCount: (data.enquiries || []).length,
           bookingsCount: ((data.bookings?.accommodations || []).length + (data.bookings?.services || []).length),
+          requestsCount: (data.itemRequests || []).length,
         });
       } else {
         // Fallback to separate endpoints if /activities isn't ready
@@ -450,6 +510,21 @@ export default function MemberDashboard() {
       return;
     }
     loadActivities();
+
+    // Auto-refresh activities every 20 seconds for real-time responsiveness
+    const timer = setInterval(() => {
+      loadActivities();
+    }, 20000);
+
+    const onFocus = () => loadActivities();
+    window.addEventListener("focus", onFocus);
+    window.addEventListener("storage", onFocus);
+
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("storage", onFocus);
+    };
   }, [token, loadActivities, navigate]);
 
   useEffect(() => {

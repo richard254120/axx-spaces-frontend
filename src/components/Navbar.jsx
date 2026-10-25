@@ -216,10 +216,6 @@ export default function Navbar() {
             <div className="ax-heading">Account</div>
             {isLoggedIn ? (
               <>
-                <Link to="/messages" className="ax-item" onClick={() => setDropdownOpen(false)}>
-                  <span>Messages</span>
-                  <span className="ax-dot" />
-                </Link>
                 <Link to="/notifications" className="ax-item" onClick={() => setDropdownOpen(false)}>
                   <span>Notifications</span>
                   <span className="ax-dot" />
@@ -353,9 +349,6 @@ export default function Navbar() {
                       </Link>
                       <Link to="/my-bookings" className="ax-item" onClick={() => setAccountOpen(false)}>
                         My Bookings
-                      </Link>
-                      <Link to="/messages" className="ax-item" onClick={() => setAccountOpen(false)}>
-                        Messages
                       </Link>
                       <Link to="/notifications" className="ax-item" onClick={() => setAccountOpen(false)}>
                         Notifications

@@ -11,7 +11,7 @@ export default function ProfilePage() {
   const { token, user, updateUser, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [profile, setProfile] = useState(user);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!user);
   const [error, setError] = useState("");
   const [activityStats, setActivityStats] = useState({
     favoritesCount: 0,
@@ -23,6 +23,12 @@ export default function ProfilePage() {
   const isProvider = ["landlord", "agent", "host", "seller", "mover", "business", "admin", "team"].includes(activeRole);
 
   useEffect(() => {
+    if (user) {
+      setProfile((prev) => ({ ...prev, ...user }));
+    }
+  }, [user]);
+
+  useEffect(() => {
     if (!token) {
       navigate("/user-login");
       return;
@@ -31,7 +37,7 @@ export default function ProfilePage() {
     let isMounted = true;
     (async () => {
       try {
-        setLoading(true);
+        if (!user && !profile) setLoading(true);
         const [profileData, activitiesRes] = await Promise.allSettled([
           fetchUserProfile(token),
           fetch(`${API_BASE}/members/activities`, {
@@ -43,7 +49,6 @@ export default function ProfilePage() {
 
         if (profileData.status === "fulfilled" && profileData.value) {
           setProfile(profileData.value);
-          updateUser(profileData.value);
         }
 
         if (activitiesRes.status === "fulfilled" && activitiesRes.value) {
@@ -66,7 +71,7 @@ export default function ProfilePage() {
     return () => {
       isMounted = false;
     };
-  }, [token, navigate, updateUser]);
+  }, [token, navigate]);
 
   const getRoleConfig = (role) => {
     const map = {
@@ -249,14 +254,14 @@ export default function ProfilePage() {
               <div style={styles.statSub}>Stays & accommodation visits</div>
             </Link>
 
-            <Link to="/messages" style={styles.statCard}>
+            <Link to="/member" style={styles.statCard}>
               <div style={{ ...styles.statIconWrap, background: "rgba(168, 85, 247, 0.12)", color: "#c084fc" }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                 </svg>
               </div>
               <div style={styles.statNumber}>{activityStats.enquiriesCount}</div>
-              <div style={styles.statLabel}>Direct Messages</div>
+              <div style={styles.statLabel}>Space Enquiries</div>
               <div style={styles.statSub}>Inquiries with hosts & agents</div>
             </Link>
 
@@ -381,18 +386,6 @@ export default function ProfilePage() {
             )}
 
             {/* Common links for all users */}
-            <Link to="/messages" style={styles.actionCard}>
-              <div style={{ ...styles.actionIcon, color: "#c084fc", background: "rgba(192, 132, 252, 0.1)" }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                </svg>
-              </div>
-              <div>
-                <div style={styles.actionTitle}>Messages & Chat</div>
-                <div style={styles.actionDesc}>Direct messages with space providers and clients</div>
-              </div>
-            </Link>
-
             <Link to="/notifications" style={styles.actionCard}>
               <div style={{ ...styles.actionIcon, color: "#facc15", background: "rgba(250, 204, 21, 0.1)" }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
