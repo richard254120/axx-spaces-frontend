@@ -45,7 +45,15 @@ export default function UserLogin({ defaultTab }) {
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotMsg, setForgotMsg] = useState("");
 
+  // Verification resend state
+  const [showResend, setShowResend] = useState(false);
+  const [resendEmail, setResendEmail] = useState("");
+  const [resendLoading, setResendLoading] = useState(false);
+
   useEffect(() => {
+    if (searchParams.get("verified") === "true") {
+      setSuccess("✓ Email verified successfully! Please sign in to your explorer account.");
+    }
     if (searchParams.get("tab") === "register") {
       setTab("register");
     } else if (searchParams.get("tab") === "login") {
@@ -133,6 +141,10 @@ export default function UserLogin({ defaultTab }) {
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.requiresVerification) {
+          setShowResend(true);
+          setResendEmail(data.email || loginData.email.trim());
+        }
         if (
           data.userNotFound ||
           response.status === 404 ||
@@ -163,6 +175,7 @@ export default function UserLogin({ defaultTab }) {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setShowResend(false);
 
     if (!registerData.name || !registerData.email || !registerData.password || !registerData.phone) {
       setError("Please fill in all fields to create your explorer account");
@@ -204,7 +217,13 @@ export default function UserLogin({ defaultTab }) {
         throw new Error(data.error || data.message || "Registration failed");
       }
 
-      // If token is returned, sign in immediately!
+      if (data.requiresVerification) {
+        setSuccess("Registration successful! A verification email has been sent to " + registerData.email + ". Please check your inbox and verify your email before logging in.");
+        setTab("login");
+        setLoginData({ email: registerData.email, password: "" });
+        return;
+      }
+
       if (data.token && data.user) {
         login(data.token, data.user);
         setSuccess("Welcome to AxxSpace! Your explorer membership is active.");
@@ -218,6 +237,28 @@ export default function UserLogin({ defaultTab }) {
       setError(err.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Resend verification email
+  const handleResendVerification = async () => {
+    setResendLoading(true);
+    setError("");
+    setSuccess("");
+    try {
+      const response = await fetch(`${API_BASE}/auth/resend-verification`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: resendEmail || loginData.email.trim() }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to resend verification email");
+      setSuccess("✓ " + (data.message || "Verification email sent successfully! Please check your inbox."));
+      setShowResend(false);
+    } catch (err) {
+      setError(err.message || "Failed to resend verification email");
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -540,6 +581,29 @@ export default function UserLogin({ defaultTab }) {
                 )}
 
                 {success && <div className="axx-alert axx-alert-success">{success}</div>}
+
+                {showResend && (
+                  <div style={{ marginBottom: "16px", textAlign: "center" }}>
+                    <button
+                      type="button"
+                      onClick={handleResendVerification}
+                      disabled={resendLoading}
+                      style={{
+                        background: "rgba(251, 191, 36, 0.15)",
+                        color: "#b45309",
+                        border: "1px solid rgba(251, 191, 36, 0.5)",
+                        borderRadius: "8px",
+                        padding: "10px 18px",
+                        fontSize: "14px",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        width: "100%",
+                      }}
+                    >
+                      {resendLoading ? "Sending verification email..." : "Resend Verification Email"}
+                    </button>
+                  </div>
+                )}
 
                 {/* ── SIGN IN FORM ── */}
                 {tab === "login" ? (

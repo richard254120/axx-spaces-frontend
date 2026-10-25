@@ -109,14 +109,23 @@ export default function Register() {
           throw new Error(data.error || data.message || "Member registration failed");
         }
 
+        if (data.requiresVerification) {
+          setSuccess("Registration successful! A verification email has been sent to " + formData.email + ". Please check your inbox and verify your email before logging in.");
+          setFormData({ name: "", email: "", password: "", phone: "" });
+          setTimeout(() => {
+            navigate("/user-login");
+          }, 3000);
+          return;
+        }
+
         if (data.token && data.user) {
           login(data.token, data.user);
+          setSuccess("Welcome to Axxspace! Member account created. Redirecting...");
+          setTimeout(() => {
+            navigate("/member");
+          }, 1200);
+          return;
         }
-        setSuccess("Welcome to Axxspace! Member account created. Redirecting...");
-        setTimeout(() => {
-          navigate("/member");
-        }, 1200);
-        return;
       }
 
       const payload = {

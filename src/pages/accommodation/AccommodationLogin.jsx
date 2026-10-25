@@ -227,6 +227,15 @@ export default function AccommodationLogin({ defaultTab }) {
         throw new Error(data.error || "Registration failed. Please check your information.");
       }
 
+      if (data.requiresVerification) {
+        setSuccess("Host account created! A verification link has been sent to " + cleanEmail + ". Please check your inbox and verify your email before logging in.");
+        setTimeout(() => {
+          handleTabChange("login");
+          setLoginEmail(cleanEmail);
+        }, 3000);
+        return;
+      }
+
       if (data.token && data.user) {
         setAccommodationSession(data.token, data.user);
         login(data.token, {

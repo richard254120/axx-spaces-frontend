@@ -233,11 +233,10 @@ export default function BusinessLogin() {
         navigate(getDashboardPath(user?.role));
       }, 1500);
     } catch (err) {
-      // Email verification check disabled - no longer show resend button
-      // if (err.response?.data?.requiresVerification) {
-      //   setShowResend(true);
-      //   setResendEmail(err.response.data.email || formData.email);
-      // }
+      if (err.response?.data?.requiresVerification) {
+        setShowResend(true);
+        setResendEmail(err.response.data.email || formData.email);
+      }
       setError(err.response?.data?.error || "Login failed. Please check your credentials.");
     } finally {
       setLoading(false);

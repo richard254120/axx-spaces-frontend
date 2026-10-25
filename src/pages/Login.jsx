@@ -12,12 +12,13 @@ export default function Login() {
   const { login } = useContext(AuthContext);
   const [searchParams] = useSearchParams();
   const loginType = searchParams.get("type");
+  const isVerifiedParam = searchParams.get("verified") === "true";
 
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [googleError, setGoogleError] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [success, setSuccess] = useState(isVerifiedParam ? "✓ Email verified successfully! Please log in to your account." : "");
 
   const [showResend, setShowResend] = useState(false);
   const [resendEmail, setResendEmail] = useState("");
@@ -122,11 +123,10 @@ export default function Login() {
       const data = await response.json();
 
       if (!response.ok) {
-        // Email verification check disabled - no longer show resend button
-        // if (data.requiresVerification) {
-        //   setShowResend(true);
-        //   setResendEmail(data.email || formData.email);
-        // }
+        if (data.requiresVerification) {
+          setShowResend(true);
+          setResendEmail(data.email || formData.email);
+        }
         throw new Error(data.error || "Login failed");
       }
 
