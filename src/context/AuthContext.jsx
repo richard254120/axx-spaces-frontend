@@ -18,7 +18,36 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("splash") === "true") return true;
+      // If already seen in this session (e.g. user refreshed the page), skip animation
+      return !sessionStorage.getItem("axx_splash_seen");
+    } catch {
+      return false;
+    }
+  });
+
+  const handleSplashComplete = useCallback(() => {
+    try {
+      sessionStorage.setItem("axx_splash_seen", "true");
+    } catch {
+      // ignore
+    }
+    setShowSplash(false);
+  }, []);
+
+  useEffect(() => {
+    window.resetSplash = () => {
+      try {
+        sessionStorage.removeItem("axx_splash_seen");
+      } catch {
+        // ignore
+      }
+      window.location.reload();
+    };
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -117,7 +146,7 @@ export const AuthProvider = ({ children }) => {
       {showSplash && (
         <SplashScreen
           isReady={isAuthReady}
-          onComplete={() => setShowSplash(false)}
+          onComplete={handleSplashComplete}
         />
       )}
     </AuthContext.Provider>

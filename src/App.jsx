@@ -128,6 +128,11 @@ function App() {
   // Reset helper for testing (call from browser console: window.resetSplash())
   useEffect(() => {
     window.resetSplash = () => {
+      try {
+        sessionStorage.removeItem("axx_splash_seen");
+      } catch {
+        // ignore
+      }
       window.location.reload();
     };
   }, []);
