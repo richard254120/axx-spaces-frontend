@@ -7,24 +7,24 @@ import {
 } from "../../features/accommodation";
 import SocialMediaLinks from "../../components/SocialMediaLinks";
 
-// Popular Kenyan destinations for quick filter & suggestions
+// Popular Kenyan destinations for quick filter & suggestions (No emojis)
 const POPULAR_DESTINATIONS = [
-  { name: "Diani Beach", county: "Kwale County", type: "Beach & Coast", icon: "🏖️" },
-  { name: "Maasai Mara", county: "Narok County", type: "Safari & Bush", icon: "🦁" },
-  { name: "Naivasha", county: "Nakuru County", type: "Lakes & Escapes", icon: "🦩" },
-  { name: "Nairobi", county: "Nairobi County", type: "City & Skyline", icon: "🏙️" },
-  { name: "Watamu", county: "Kilifi County", type: "Marine & Beach", icon: "🌊" },
-  { name: "Nanyuki", county: "Laikipia County", type: "Mt. Kenya Escapes", icon: "⛰️" },
-  { name: "Amboseli", county: "Kajiado County", type: "Kilimanjaro Views", icon: "🐘" },
-  { name: "Lamu Island", county: "Lamu County", type: "Historical Coast", icon: "⛵" },
+  { name: "Diani Beach", county: "Kwale County", type: "Beach & Coast" },
+  { name: "Maasai Mara", county: "Narok County", type: "Safari & Bush" },
+  { name: "Naivasha", county: "Nakuru County", type: "Lakes & Escapes" },
+  { name: "Nairobi", county: "Nairobi County", type: "City & Skyline" },
+  { name: "Watamu", county: "Kilifi County", type: "Marine & Beach" },
+  { name: "Nanyuki", county: "Laikipia County", type: "Mt. Kenya Escapes" },
+  { name: "Amboseli", county: "Kajiado County", type: "Kilimanjaro Views" },
+  { name: "Lamu Island", county: "Lamu County", type: "Historical Coast" },
 ];
 
 // Curated stay categories with high-definition imagery and stay counts
 const STAY_CATEGORIES = [
-  { name: "Beachfront Villas", filterName: "beach", count: 42, icon: "🏖️", desc: "Private pools & direct ocean access in Diani & Watamu" },
-  { name: "Safari Lodges", filterName: "safari", count: 35, icon: "🦁", desc: "Game drives & luxury bush camps in Mara & Amboseli" },
-  { name: "Lake & Rift Retreats", filterName: "mountain", count: 28, icon: "🦩", desc: "Serene lakeside cottages in Naivasha & Elementaita" },
-  { name: "City Skyline Suites", filterName: "city", count: 64, icon: "🏙️", desc: "High-floor penthouses in Westlands, Kilimani & CBD" },
+  { name: "Beachfront Villas", filterName: "beach", count: 42, desc: "Private pools & direct ocean access in Diani & Watamu" },
+  { name: "Safari Lodges", filterName: "safari", count: 35, desc: "Game drives & luxury bush camps in Mara & Amboseli" },
+  { name: "Lake & Rift Retreats", filterName: "mountain", count: 28, desc: "Serene lakeside cottages in Naivasha & Elementaita" },
+  { name: "City Skyline Suites", filterName: "city", count: 64, desc: "High-floor penthouses in Westlands, Kilimani & CBD" },
 ];
 
 // Verified Guest Testimonials
@@ -79,63 +79,11 @@ const FAQS = [
   },
 ];
 
-// Helper: Count up animation on scroll
-function AnimatedCounter({ value, duration = 1600 }) {
-  const [display, setDisplay] = useState("0");
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const rawStr = String(value);
-    const match = rawStr.match(/^([\d.]+)(.*)$/);
-    if (!match) {
-      setDisplay(rawStr);
-      return;
-    }
-    const target = parseFloat(match[1]);
-    const suffix = match[2] || "";
-    const decimals = (match[1].split(".")[1] || "").length;
-
-    let startTime = null;
-    let frameId = null;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        observer.disconnect();
-
-        const step = (time) => {
-          if (!startTime) startTime = time;
-          const progress = Math.min((time - startTime) / duration, 1);
-          // Ease out cubic
-          const current = target * (1 - Math.pow(1 - progress, 3));
-          setDisplay(current.toFixed(decimals) + suffix);
-          if (progress < 1) {
-            frameId = requestAnimationFrame(step);
-          } else {
-            setDisplay(target.toFixed(decimals) + suffix);
-          }
-        };
-        frameId = requestAnimationFrame(step);
-      },
-      { threshold: 0.2 }
-    );
-
-    if (ref.current) observer.observe(ref.current);
-
-    return () => {
-      observer.disconnect();
-      if (frameId) cancelAnimationFrame(frameId);
-    };
-  }, [value, duration]);
-
-  return <span ref={ref}>{display}</span>;
-}
-
 export default function AccommodationPage() {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const isHostUser = Boolean(user && (user.role === "host" || user.role === "admin"));
-  const { featured: backendFeatured, stats: heroStats } = useAccommodationHome();
+  const { featured: backendFeatured } = useAccommodationHome();
 
   // Search Bar State
   const [destination, setDestination] = useState("");
@@ -166,10 +114,6 @@ export default function AccommodationPage() {
   });
   const [wishlistDrawerOpen, setWishlistDrawerOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
-
-  // Marquee pause & drag state
-  const [marqueePaused, setMarqueePaused] = useState(false);
-  const marqueeRef = useRef(null);
   const searchContainerRef = useRef(null);
 
   // Budget Planner State
@@ -544,7 +488,7 @@ export default function AccommodationPage() {
       </header>
 
       {/* ═════════════════════════════════════════════════════════════
-          1. ULTRA LUXURY HERO SECTION (Resembling Rentals/Property)
+          1. ULTRA LUXURY HERO SECTION (Matching Rentals/Property)
       ═════════════════════════════════════════════════════════════ */}
       <section className="listings-hero">
         {/* Ambient atmospheric glowing orbs */}
@@ -654,7 +598,7 @@ export default function AccommodationPage() {
                   )}
                 </div>
 
-                {/* Destination Suggestions Popover */}
+                {/* Destination Suggestions Popover (Clean SVG icons, zero emojis) */}
                 {showDestDropdown && (
                   <div className="dest-dropdown-popover" onClick={(e) => e.stopPropagation()}>
                     <div className="dest-dropdown-header">
@@ -675,7 +619,10 @@ export default function AccommodationPage() {
                             setShowDestDropdown(false);
                           }}
                         >
-                          <span className="dest-item-icon">{dest.icon}</span>
+                          <svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--brand-red)" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                            <circle cx="12" cy="10" r="3" />
+                          </svg>
                           <div style={{ flex: 1 }}>
                             <div className="dest-item-name">{dest.name}</div>
                             <div className="dest-item-county">{dest.county} · {dest.type}</div>
@@ -851,7 +798,7 @@ export default function AccommodationPage() {
               </div>
             </form>
 
-            {/* Quick Category Chips Strip (Matching Rentals) */}
+            {/* Quick Category Chips Strip (Zero Emojis) */}
             <div className="quick-category-strip">
               <span className="quick-cat-label">Explore Hotspots:</span>
               <div className="quick-cat-scroll">
@@ -869,7 +816,6 @@ export default function AccommodationPage() {
                     className={`quick-chip ${destination === d.name ? "active" : ""}`}
                     onClick={() => handleDestinationSelect(d.name)}
                   >
-                    <span>{d.icon}</span>
                     <span>{d.name}</span>
                   </button>
                 ))}
@@ -879,7 +825,9 @@ export default function AccommodationPage() {
                     className="quick-chip"
                     onClick={() => setWishlistDrawerOpen(true)}
                   >
-                    <span>❤️</span>
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="var(--brand-red)" stroke="var(--brand-red)" strokeWidth="2">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    </svg>
                     <span>Saved ({favs.length})</span>
                   </button>
                 )}
@@ -889,84 +837,71 @@ export default function AccommodationPage() {
         </div>
       </section>
 
-      {/* ── STATS / TRUST BAR ── */}
-      <section className="stats-bar-section">
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-icon-box stat-red">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--brand-red)" strokeWidth="2.2">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                <polyline points="9 22 9 12 15 12 15 22" />
-              </svg>
-            </div>
-            <div>
-              <div className="stat-number">
-                <AnimatedCounter value={heroStats?.totalProperties || 240} />+
-              </div>
-              <div className="stat-title">Verified Stays</div>
-              <div className="stat-sub">Across Beach, Bush & Cities</div>
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-icon-box stat-emerald">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" strokeWidth="2.2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                <circle cx="12" cy="10" r="3" />
-              </svg>
-            </div>
-            <div>
-              <div className="stat-number">
-                <AnimatedCounter value={47} />
-              </div>
-              <div className="stat-title">Counties Covered</div>
-              <div className="stat-sub">Coast to Lake Victoria</div>
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-icon-box stat-amber">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2.2">
-                <path d="M12 2l2.4 5 5.6.8-4 4 1 5.6-5-2.6-5 2.6 1-5.6-4-4 5.6-.8z" />
-              </svg>
-            </div>
-            <div>
-              <div className="stat-number">
-                <AnimatedCounter value={4.8} />★
-              </div>
-              <div className="stat-title">Average Host Rating</div>
-              <div className="stat-sub">From 18,000+ Verified Guests</div>
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-icon-box stat-navy">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2.2">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-              </svg>
-            </div>
-            <div>
-              <div className="stat-number">0%</div>
-              <div className="stat-title">Commission Fees</div>
-              <div className="stat-sub">Direct WhatsApp With Host</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ═════════════════════════════════════════════════════════════
-          3. MAIN CONTENT BODY & DISCOVERY WORKSPACE (Matching Rentals)
+          2. MAIN CONTENT BODY & DISCOVERY WORKSPACE (Matching Rentals)
       ═════════════════════════════════════════════════════════════ */}
       <main className="accommodation-main-canvas" id="featured-section">
-        {/* ── HIGH LEVEL NAVIGATION TABS (Segmented Discovery Nav like Rentals) ── */}
+        {/* ── HIGH LEVEL NAVIGATION TABS (Segmented Discovery Nav with Clean SVGs) ── */}
         <div className="segmented-discovery-nav">
           <div className="discovery-tabs-cluster">
             {[
-              { id: "all", label: "All Stays & Escapes", icon: "🏡" },
-              { id: "beach", label: "Beachfront Villas", icon: "🏖️" },
-              { id: "safari", label: "Safari & Bush Camps", icon: "🦁" },
-              { id: "mountain", label: "Lakes & Mountains", icon: "⛰️" },
-              { id: "city", label: "City Luxury Suites", icon: "🏙️" },
+              {
+                id: "all",
+                label: "All Stays & Escapes",
+                icon: (
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                  </svg>
+                ),
+              },
+              {
+                id: "beach",
+                label: "Beachfront Villas",
+                icon: (
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <circle cx="12" cy="12" r="5" />
+                    <line x1="12" y1="1" x2="12" y2="3" />
+                    <line x1="12" y1="21" x2="12" y2="23" />
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                    <line x1="1" y1="12" x2="3" y2="12" />
+                    <line x1="21" y1="12" x2="23" y2="12" />
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                  </svg>
+                ),
+              },
+              {
+                id: "safari",
+                label: "Safari & Bush Camps",
+                icon: (
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <circle cx="12" cy="12" r="10" />
+                    <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+                  </svg>
+                ),
+              },
+              {
+                id: "mountain",
+                label: "Lakes & Mountains",
+                icon: (
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <path d="M8 3l4 8 5-5 5 15H2L8 3z" />
+                  </svg>
+                ),
+              },
+              {
+                id: "city",
+                label: "City Luxury Suites",
+                icon: (
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
+                    <path d="M9 22v-4h6v4" />
+                    <path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01" />
+                  </svg>
+                ),
+              },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -1035,7 +970,7 @@ export default function AccommodationPage() {
           </div>
         </div>
 
-        {/* ── 4. MODERN PROPERTY CARDS GRID (Matching Rentals/Property) ── */}
+        {/* ── 3. MODERN PROPERTY CARDS GRID (Matching Rentals/Property) ── */}
         <div className="properties-modern-grid">
           {displayedProperties.length === 0 ? (
             <div className="empty-results-box">
@@ -1675,7 +1610,7 @@ export default function AccommodationPage() {
         <div className="footer-bottom-bar">
           <div>© {new Date().getFullYear()} AxxSpace Limited. All rights reserved. Kenya's Direct Property & Stay Platform.</div>
           <div style={{ display: "flex", gap: "16px" }}>
-            <span style={{ color: "var(--emerald)", fontWeight: 700 }}>● All 47 Counties Active</span>
+            <span style={{ color: "var(--emerald)", fontWeight: 700 }}>All 47 Counties Active</span>
           </div>
         </div>
       </footer>
@@ -1710,7 +1645,9 @@ export default function AccommodationPage() {
           <div className="wishlist-drawer-content" onClick={(e) => e.stopPropagation()}>
             <div className="wishlist-drawer-header">
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <span style={{ fontSize: "18px" }}>❤️</span>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="var(--brand-red)" stroke="var(--brand-red)" strokeWidth="2">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg>
                 <h4 style={{ fontWeight: 800, margin: 0, fontSize: "16px", color: "var(--navy-ink)" }}>
                   Saved Stays ({favs.length})
                 </h4>
@@ -1727,7 +1664,11 @@ export default function AccommodationPage() {
             <div className="wishlist-drawer-body">
               {wishlistProperties.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "40px 10px", color: "#64748B" }}>
-                  <div style={{ fontSize: "36px", marginBottom: "12px" }}>🏖️</div>
+                  <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#F1F5F9", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", color: "var(--brand-red)" }}>
+                    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    </svg>
+                  </div>
                   <div style={{ fontWeight: 700, color: "var(--navy-ink)" }}>No saved stays yet</div>
                   <p style={{ fontSize: "13px", marginTop: "6px" }}>Click the heart icon on any accommodation to build your Kenyan getaway wishlist.</p>
                 </div>
@@ -2480,9 +2421,6 @@ const css = `
   .dest-dropdown-item:hover {
     background: var(--brand-red-light);
   }
-  .dest-item-icon {
-    font-size: 1.1rem;
-  }
   .dest-item-name {
     font-weight: 700;
     color: var(--navy-ink);
@@ -2565,56 +2503,7 @@ const css = `
     cursor: pointer;
   }
 
-  /* ── 4. STATS BAR ── */
-  .stats-bar-section {
-    background: #FFFFFF;
-    border-bottom: 1px solid #E2E8F0;
-    padding: 30px 20px;
-  }
-  .stats-grid {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-  }
-  .stat-card {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-  .stat-icon-box {
-    width: 50px;
-    height: 50px;
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .stat-red { background: rgba(227, 27, 27, 0.08); }
-  .stat-emerald { background: rgba(16, 185, 129, 0.1); }
-  .stat-amber { background: rgba(245, 158, 11, 0.1); }
-  .stat-navy { background: rgba(37, 99, 235, 0.1); }
-  .stat-number {
-    font-family: 'Outfit', sans-serif;
-    font-size: 1.7rem;
-    font-weight: 900;
-    color: var(--navy-ink);
-    line-height: 1.1;
-  }
-  .stat-title {
-    font-size: 0.85rem;
-    font-weight: 800;
-    color: #334155;
-    margin-top: 1px;
-  }
-  .stat-sub {
-    font-size: 0.75rem;
-    color: #64748B;
-  }
-
-  /* ── 5. MAIN DISCOVERY WORKSPACE & TOOLBAR ── */
+  /* ── 4. MAIN DISCOVERY WORKSPACE & TOOLBAR ── */
   .accommodation-main-canvas {
     max-width: 1200px;
     margin: 0 auto;
@@ -2660,7 +2549,8 @@ const css = `
     box-shadow: 0 4px 15px rgba(227, 27, 27, 0.25);
   }
   .tab-icon {
-    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
   }
   .tab-counter {
     background: rgba(0, 0, 0, 0.08);
@@ -2753,7 +2643,7 @@ const css = `
     color: var(--brand-red);
   }
 
-  /* ── 6. PROPERTY CARDS GRID (Matching Rentals/Property) ── */
+  /* ── 5. PROPERTY CARDS GRID (Matching Rentals/Property) ── */
   .properties-modern-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -3091,7 +2981,7 @@ const css = `
     cursor: pointer;
   }
 
-  /* ── 7. SPECIAL DEALS BANNER (Executive Dark) ── */
+  /* ── 6. SPECIAL DEALS BANNER (Executive Dark) ── */
   .deals-banner-section {
     max-width: 1200px;
     margin: 0 auto 60px;
@@ -3207,7 +3097,7 @@ const css = `
     font-weight: 800;
   }
 
-  /* ── 8. BUDGET PLANNER SECTION ── */
+  /* ── 7. BUDGET PLANNER SECTION ── */
   .planner-section {
     padding: 40px 20px 60px;
     background: var(--canvas-light);
@@ -3358,7 +3248,7 @@ const css = `
     box-shadow: 0 6px 18px rgba(227, 27, 27, 0.35);
   }
 
-  /* ── 9. HOW IT WORKS ── */
+  /* ── 8. HOW IT WORKS ── */
   .how-it-works-section {
     padding: 60px 20px;
     background: #FFFFFF;
@@ -3435,7 +3325,7 @@ const css = `
     line-height: 1.6;
   }
 
-  /* ── 10. WHY CHOOSE US ── */
+  /* ── 9. WHY CHOOSE US ── */
   .why-choose-section {
     padding: 60px 20px;
     background: var(--canvas-light);
@@ -3478,7 +3368,7 @@ const css = `
     line-height: 1.65;
   }
 
-  /* ── 11. HOST PACKAGES ── */
+  /* ── 10. HOST PACKAGES ── */
   .packages-section {
     padding: 60px 20px;
     background: #FFFFFF;
@@ -3576,7 +3466,7 @@ const css = `
     color: #FFFFFF;
   }
 
-  /* ── 12. TESTIMONIALS & FAQ ── */
+  /* ── 11. TESTIMONIALS & FAQ ── */
   .testimonials-section {
     padding: 60px 20px;
     background: var(--canvas-light);
@@ -3692,7 +3582,7 @@ const css = `
     line-height: 1.65;
   }
 
-  /* ── 13. BOTTOM CTA SECTION (Midnight Atmosphere) ── */
+  /* ── 12. BOTTOM CTA SECTION (Midnight Atmosphere) ── */
   .bottom-cta-section {
     position: relative;
     background: radial-gradient(circle at 50% 20%, #112035 0%, var(--bg-dark) 80%);
@@ -3763,7 +3653,7 @@ const css = `
     background: rgba(255, 255, 255, 0.18);
   }
 
-  /* ── 14. FOOTER (Executive Dark) ── */
+  /* ── 13. FOOTER (Executive Dark) ── */
   .accommodation-footer {
     background: var(--bg-dark);
     color: #94A3B8;
@@ -3844,7 +3734,7 @@ const css = `
     color: #64748B;
   }
 
-  /* ── 15. FLOATING WHATSAPP & SCROLL TOP ── */
+  /* ── 14. FLOATING WHATSAPP & SCROLL TOP ── */
   .wa-floating-concierge {
     position: fixed;
     right: 20px;
@@ -4055,11 +3945,7 @@ const css = `
     .guests-dropdown-popover { width: 100%; right: auto; left: 0; }
   }
 
-  @media (max-width: 640px) {
-    .stats-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
-  }
   @media (max-width: 480px) {
-    .stats-grid { grid-template-columns: 1fr; }
     .hero-compact-header { flex-direction: column; align-items: flex-start; }
     .hero-compact-actions { width: 100%; }
     .hero-compact-btn-primary, .hero-compact-btn-secondary { width: 100%; justify-content: center; }
