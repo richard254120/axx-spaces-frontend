@@ -5,6 +5,122 @@ import { ProfileAvatar } from "../features/profile";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
+const IconActivity = ({ size = 20, color = "currentColor", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+  </svg>
+);
+
+const IconHeart = ({ size = 20, color = "currentColor", style, filled = false }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? color : "none"} stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+  </svg>
+);
+
+const IconCalendar = ({ size = 20, color = "currentColor", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+    <line x1="16" y1="2" x2="16" y2="6" />
+    <line x1="8" y1="2" x2="8" y2="6" />
+    <line x1="3" y1="10" x2="21" y2="10" />
+  </svg>
+);
+
+const IconMessageSquare = ({ size = 20, color = "currentColor", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+  </svg>
+);
+
+const IconUser = ({ size = 20, color = "currentColor", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+);
+
+const IconRefresh = ({ size = 13, color = "currentColor", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <polyline points="23 4 23 10 17 10" />
+    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+  </svg>
+);
+
+const IconBuilding = ({ size = 18, color = "currentColor", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
+    <line x1="9" y1="22" x2="9" y2="22.01" />
+    <line x1="8" y1="6" x2="8" y2="6.01" />
+    <line x1="16" y1="6" x2="16" y2="6.01" />
+    <line x1="8" y1="10" x2="8" y2="10.01" />
+    <line x1="16" y1="10" x2="16" y2="10.01" />
+    <line x1="8" y1="14" x2="8" y2="14.01" />
+    <line x1="16" y1="14" x2="16" y2="14.01" />
+  </svg>
+);
+
+const IconMapPin = ({ size = 14, color = "currentColor", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+    <circle cx="12" cy="10" r="3" />
+  </svg>
+);
+
+const IconCompass = ({ size = 36, color = "currentColor", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <circle cx="12" cy="12" r="10" />
+    <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+  </svg>
+);
+
+const IconBed = ({ size = 36, color = "currentColor", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <path d="M2 4v16" />
+    <path d="M2 8h18a2 2 0 0 1 2 2v10" />
+    <path d="M2 17h20" />
+    <path d="M6 8v9" />
+  </svg>
+);
+
+const IconTruck = ({ size = 16, color = "currentColor", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <rect x="1" y="3" width="15" height="13" />
+    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+    <circle cx="5.5" cy="18.5" r="2.5" />
+    <circle cx="18.5" cy="18.5" r="2.5" />
+  </svg>
+);
+
+const IconArrowUpRight = ({ size = 13, color = "currentColor", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <line x1="7" y1="17" x2="17" y2="7" />
+    <polyline points="7 7 17 7 17 17" />
+  </svg>
+);
+
+const IconArrowRight = ({ size = 13, color = "currentColor", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <line x1="5" y1="12" x2="19" y2="12" />
+    <polyline points="12 5 19 12 12 19" />
+  </svg>
+);
+
+const IconClose = ({ size = 18, color = "currentColor", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
+
+const IconPackage = ({ size = 18, color = "currentColor", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <path d="M16.5 9.4 7.55 4.24a1.8 1.8 0 0 0-1.8 0L3.5 5.5" />
+    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+    <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+    <line x1="12" y1="22.08" x2="12" y2="12" />
+  </svg>
+);
+
 const styles = {
   page: {
     minHeight: "100vh",
@@ -126,6 +242,15 @@ const styles = {
     color: "#64748b",
     marginTop: "4px",
   },
+  statIconWrap: {
+    width: "40px",
+    height: "40px",
+    borderRadius: "10px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: "12px",
+  },
   tabBar: {
     display: "flex",
     gap: "8px",
@@ -145,6 +270,9 @@ const styles = {
     cursor: "pointer",
     whiteSpace: "nowrap",
     transition: "all 0.2s",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "8px",
   },
   tabBtnActive: {
     background: "rgba(251, 191, 36, 0.15)",
@@ -641,18 +769,21 @@ export default function MemberDashboard() {
           </div>
 
           <div style={styles.headerActions}>
-            <Link to="/listings" style={styles.exploreBtn}>
-              Browse Spaces ↗
+            <Link to="/listings" style={{ ...styles.exploreBtn, display: "inline-flex", alignItems: "center", gap: "6px" }}>
+              <span>Browse Spaces</span>
+              <IconArrowUpRight size={13} />
             </Link>
-            <Link to="/accommodation" style={styles.exploreBtn}>
-              Book Stays ↗
+            <Link to="/accommodation" style={{ ...styles.exploreBtn, display: "inline-flex", alignItems: "center", gap: "6px" }}>
+              <span>Book Stays</span>
+              <IconArrowUpRight size={13} />
             </Link>
             <button
               type="button"
-              style={styles.providerBtn}
+              style={{ ...styles.providerBtn, display: "inline-flex", alignItems: "center", gap: "6px" }}
               onClick={() => setShowProviderModal(true)}
             >
-              List Space / Provider →
+              <span>List Space / Provider</span>
+              <IconArrowRight size={13} />
             </button>
           </div>
         </div>
@@ -663,7 +794,9 @@ export default function MemberDashboard() {
             style={{ ...styles.statCard, ...(activeTab === "overview" ? styles.statCardActive : {}) }}
             onClick={() => setActiveTab("overview")}
           >
-            <div style={{ fontSize: "20px" }}>🌟</div>
+            <div style={{ ...styles.statIconWrap, background: "rgba(56, 189, 248, 0.12)", color: "#38bdf8" }}>
+              <IconActivity size={20} />
+            </div>
             <div style={styles.statNumber}>
               {(favorites.length + enquiries.length + totalBookingsCount)}
             </div>
@@ -675,7 +808,9 @@ export default function MemberDashboard() {
             style={{ ...styles.statCard, ...(activeTab === "favorites" ? styles.statCardActive : {}) }}
             onClick={() => setActiveTab("favorites")}
           >
-            <div style={{ fontSize: "20px" }}>❤️</div>
+            <div style={{ ...styles.statIconWrap, background: "rgba(244, 63, 94, 0.12)", color: "#f43f5e" }}>
+              <IconHeart size={20} filled />
+            </div>
             <div style={styles.statNumber}>{favorites.length}</div>
             <div style={styles.statLabel}>Saved Spaces</div>
             <div style={styles.statSub}>Bookmarked listings & properties</div>
@@ -685,7 +820,9 @@ export default function MemberDashboard() {
             style={{ ...styles.statCard, ...(activeTab === "bookings" ? styles.statCardActive : {}) }}
             onClick={() => setActiveTab("bookings")}
           >
-            <div style={{ fontSize: "20px" }}>📅</div>
+            <div style={{ ...styles.statIconWrap, background: "rgba(251, 191, 36, 0.12)", color: "#fbbf24" }}>
+              <IconCalendar size={20} />
+            </div>
             <div style={styles.statNumber}>{totalBookingsCount}</div>
             <div style={styles.statLabel}>Stays & Bookings</div>
             <div style={styles.statSub}>Accommodations & services</div>
@@ -695,7 +832,9 @@ export default function MemberDashboard() {
             style={{ ...styles.statCard, ...(activeTab === "enquiries" ? styles.statCardActive : {}) }}
             onClick={() => setActiveTab("enquiries")}
           >
-            <div style={{ fontSize: "20px" }}>💬</div>
+            <div style={{ ...styles.statIconWrap, background: "rgba(192, 132, 252, 0.12)", color: "#c084fc" }}>
+              <IconMessageSquare size={20} />
+            </div>
             <div style={styles.statNumber}>{enquiries.length}</div>
             <div style={styles.statLabel}>Enquiries Sent</div>
             <div style={styles.statSub}>Waitlists & questions to hosts</div>
@@ -709,35 +848,40 @@ export default function MemberDashboard() {
             style={{ ...styles.tabBtn, ...(activeTab === "overview" ? styles.tabBtnActive : {}) }}
             onClick={() => setActiveTab("overview")}
           >
-            🌟 Activity Feed
+            <IconActivity size={16} />
+            <span>Activity Feed</span>
           </button>
           <button
             type="button"
             style={{ ...styles.tabBtn, ...(activeTab === "favorites" ? styles.tabBtnActive : {}) }}
             onClick={() => setActiveTab("favorites")}
           >
-            ❤️ Saved Spaces ({favorites.length})
+            <IconHeart size={16} filled={activeTab === "favorites"} />
+            <span>Saved Spaces ({favorites.length})</span>
           </button>
           <button
             type="button"
             style={{ ...styles.tabBtn, ...(activeTab === "bookings" ? styles.tabBtnActive : {}) }}
             onClick={() => setActiveTab("bookings")}
           >
-            📅 My Bookings & Stays ({totalBookingsCount})
+            <IconCalendar size={16} />
+            <span>My Bookings &amp; Stays ({totalBookingsCount})</span>
           </button>
           <button
             type="button"
             style={{ ...styles.tabBtn, ...(activeTab === "enquiries" ? styles.tabBtnActive : {}) }}
             onClick={() => setActiveTab("enquiries")}
           >
-            💬 Space Enquiries ({enquiries.length})
+            <IconMessageSquare size={16} />
+            <span>Space Enquiries ({enquiries.length})</span>
           </button>
           <button
             type="button"
             style={{ ...styles.tabBtn, ...(activeTab === "profile" ? styles.tabBtnActive : {}) }}
             onClick={() => setActiveTab("profile")}
           >
-            ⚙️ Account Profile
+            <IconUser size={16} />
+            <span>Account Profile</span>
           </button>
         </div>
 
@@ -760,9 +904,13 @@ export default function MemberDashboard() {
                   padding: "6px 12px",
                   fontSize: "12px",
                   cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
                 }}
               >
-                ↻ Refresh Feed
+                <IconRefresh size={12} />
+                <span>Refresh Feed</span>
               </button>
             </div>
 
@@ -770,7 +918,9 @@ export default function MemberDashboard() {
               <p style={{ color: "#94a3b8", padding: "20px 0" }}>Loading your activity feed...</p>
             ) : favorites.length === 0 && enquiries.length === 0 && totalBookingsCount === 0 ? (
               <div style={styles.emptyBox}>
-                <div style={{ fontSize: "36px", marginBottom: "12px" }}>🚀</div>
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: "12px", color: "#64748b" }}>
+                  <IconCompass size={40} />
+                </div>
                 <h3 style={{ margin: "0 0 6px 0", color: "#ffffff", fontSize: "17px" }}>
                   Your Axxspace journey begins here
                 </h3>
@@ -792,7 +942,9 @@ export default function MemberDashboard() {
                 {/* Bookings events */}
                 {bookings.accommodations?.map((b) => (
                   <div key={b._id} style={styles.timelineItem}>
-                    <div style={styles.timelineDot}>🏨</div>
+                    <div style={{ ...styles.timelineDot, background: "rgba(251, 191, 36, 0.12)", color: "#fbbf24", borderColor: "rgba(251, 191, 36, 0.3)" }}>
+                      <IconBuilding size={16} />
+                    </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "6px" }}>
                         <span style={{ fontWeight: 700, color: "#ffffff", fontSize: "14.5px" }}>
@@ -801,7 +953,7 @@ export default function MemberDashboard() {
                         <span style={styles.statusBadge(b.status)}>{b.status}</span>
                       </div>
                       <p style={{ margin: "4px 0 0 0", color: "#94a3b8", fontSize: "13px" }}>
-                        Check-in: {b.checkIn ? new Date(b.checkIn).toLocaleDateString() : "TBD"} · Total: KES {Number(b.totalPrice || 0).toLocaleString()}
+                        Check-in: {b.checkIn ? new Date(b.checkIn).toLocaleDateString() : "TBD"} &bull; Total: KES {Number(b.totalPrice || 0).toLocaleString()}
                       </p>
                     </div>
                   </div>
@@ -810,7 +962,9 @@ export default function MemberDashboard() {
                 {/* Enquiries events */}
                 {enquiries.map((enq) => (
                   <div key={enq._id} style={styles.timelineItem}>
-                    <div style={styles.timelineDot}>💬</div>
+                    <div style={{ ...styles.timelineDot, background: "rgba(192, 132, 252, 0.12)", color: "#c084fc", borderColor: "rgba(192, 132, 252, 0.3)" }}>
+                      <IconMessageSquare size={16} />
+                    </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "6px" }}>
                         <span style={{ fontWeight: 700, color: "#ffffff", fontSize: "14.5px" }}>
@@ -836,7 +990,9 @@ export default function MemberDashboard() {
                   if (!item) return null;
                   return (
                     <div key={fav._id} style={styles.timelineItem}>
-                      <div style={styles.timelineDot}>❤️</div>
+                      <div style={{ ...styles.timelineDot, background: "rgba(244, 63, 94, 0.12)", color: "#f43f5e", borderColor: "rgba(244, 63, 94, 0.3)" }}>
+                        <IconHeart size={16} filled />
+                      </div>
                       <div style={{ flex: 1 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "6px" }}>
                           <span style={{ fontWeight: 700, color: "#ffffff", fontSize: "14.5px" }}>
@@ -845,7 +1001,7 @@ export default function MemberDashboard() {
                           <span style={styles.roleBadge}>Saved</span>
                         </div>
                         <p style={{ margin: "4px 0 0 0", color: "#94a3b8", fontSize: "13px" }}>
-                          {item.location?.address || item.county || "Kenya"} · {item.price ? `KES ${Number(item.price).toLocaleString()}` : ""}
+                          {item.location?.address || item.county || "Kenya"} &bull; {item.price ? `KES ${Number(item.price).toLocaleString()}` : ""}
                         </p>
                       </div>
                     </div>
@@ -897,7 +1053,10 @@ export default function MemberDashboard() {
                       <div style={styles.cardBody}>
                         <div>
                           <h3 style={styles.cardTitle}>{title}</h3>
-                          <p style={styles.cardLocation}>📍 {location}</p>
+                          <p style={{ ...styles.cardLocation, display: "flex", alignItems: "center", gap: "4px" }}>
+                            <IconMapPin size={13} color="#94a3b8" />
+                            <span>{location}</span>
+                          </p>
                           {price && <p style={styles.cardPrice}>{price}</p>}
                         </div>
                         <div style={styles.cardActions}>
@@ -941,7 +1100,9 @@ export default function MemberDashboard() {
               <p style={{ color: "#94a3b8" }}>Loading bookings...</p>
             ) : totalBookingsCount === 0 ? (
               <div style={styles.emptyBox}>
-                <div style={{ fontSize: "36px", marginBottom: "10px" }}>🏖️</div>
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: "12px", color: "#64748b" }}>
+                  <IconBed size={40} />
+                </div>
                 <h3 style={{ margin: "0 0 6px 0", color: "#ffffff", fontSize: "16px" }}>
                   No active bookings found
                 </h3>
@@ -958,14 +1119,15 @@ export default function MemberDashboard() {
                 {bookings.accommodations?.map((b) => (
                   <div key={b._id} style={styles.bookingCard}>
                     <div>
-                      <h4 style={{ margin: "0 0 6px 0", color: "#ffffff", fontSize: "16px" }}>
-                        🏨 {b.accommodation?.title || "Accommodation Stay"}
+                      <h4 style={{ margin: "0 0 6px 0", color: "#ffffff", fontSize: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
+                        <IconBuilding size={18} color="#fbbf24" />
+                        <span>{b.accommodation?.title || "Accommodation Stay"}</span>
                       </h4>
                       <p style={{ margin: "0 0 4px 0", color: "#cbd5e1", fontSize: "13px" }}>
-                        Check-in: {b.checkIn ? new Date(b.checkIn).toLocaleDateString() : "TBD"} → Check-out: {b.checkOut ? new Date(b.checkOut).toLocaleDateString() : "TBD"}
+                        Check-in: {b.checkIn ? new Date(b.checkIn).toLocaleDateString() : "TBD"} &bull; Check-out: {b.checkOut ? new Date(b.checkOut).toLocaleDateString() : "TBD"}
                       </p>
                       <p style={{ margin: 0, color: "#94a3b8", fontSize: "12.5px" }}>
-                        Guests: {b.numberOfGuests || 1} · Total:{" "}
+                        Guests: {b.numberOfGuests || 1} &bull; Total:{" "}
                         <strong style={{ color: "#fbbf24" }}>KES {Number(b.totalPrice || 0).toLocaleString()}</strong>
                       </p>
                     </div>
@@ -976,9 +1138,10 @@ export default function MemberDashboard() {
                         <div style={{ marginTop: "10px" }}>
                           <Link
                             to={`/accommodation/property/${b.accommodation._id}`}
-                            style={{ ...styles.exploreBtn, fontSize: "12px", padding: "6px 12px" }}
+                            style={{ ...styles.exploreBtn, fontSize: "12px", padding: "6px 12px", display: "inline-flex", alignItems: "center", gap: "6px" }}
                           >
-                            View Details →
+                            <span>View Details</span>
+                            <IconArrowRight size={12} />
                           </Link>
                         </div>
                       )}
@@ -990,14 +1153,15 @@ export default function MemberDashboard() {
                 {bookings.services?.map((s) => (
                   <div key={s._id} style={styles.bookingCard}>
                     <div>
-                      <h4 style={{ margin: "0 0 6px 0", color: "#ffffff", fontSize: "16px" }}>
-                        🚚 Service: {s.description || s.serviceType}
+                      <h4 style={{ margin: "0 0 6px 0", color: "#ffffff", fontSize: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
+                        <IconTruck size={18} color="#38bdf8" />
+                        <span>Service: {s.description || s.serviceType}</span>
                       </h4>
                       <p style={{ margin: "0 0 4px 0", color: "#cbd5e1", fontSize: "13px" }}>
                         Date: {s.date ? new Date(s.date).toLocaleDateString() : ""} at {s.time}
                       </p>
                       <p style={{ margin: 0, color: "#94a3b8", fontSize: "12.5px" }}>
-                        Address: {s.address} · Est: KES {Number(s.estimatedCost || 0).toLocaleString()}
+                        Address: {s.address} &bull; Est: KES {Number(s.estimatedCost || 0).toLocaleString()}
                       </p>
                     </div>
 
@@ -1138,9 +1302,9 @@ export default function MemberDashboard() {
               <button
                 type="button"
                 onClick={() => setShowProviderModal(false)}
-                style={{ background: "none", border: "none", color: "#94a3b8", fontSize: "20px", cursor: "pointer" }}
+                style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: "4px" }}
               >
-                ✕
+                <IconClose size={20} />
               </button>
             </div>
 

@@ -146,7 +146,12 @@ export default function ProfilePage() {
 
       {error && (
         <div style={styles.errorAlert}>
-          <span>⚠️ {error}</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <span>{error}</span>
         </div>
       )}
 
@@ -468,10 +473,18 @@ export default function ProfilePage() {
             </div>
             <div style={styles.partnerActions}>
               <Link to="/accommodation/register" style={styles.hostBtn}>
-                Register as Host →
+                <span>Register as Host</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: "6px" }}>
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
               </Link>
               <Link to="/register" style={styles.landlordBtn}>
-                Landlord Portal →
+                <span>Landlord Portal</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: "6px" }}>
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
               </Link>
             </div>
           </div>
@@ -496,7 +509,14 @@ export default function ProfilePage() {
               <div style={styles.trustItemHeader}>
                 <span style={styles.trustLabel}>Email Verification</span>
                 <span style={profile?.isEmailVerified ? styles.pillSuccess : styles.pillWarn}>
-                  {profile?.isEmailVerified ? "Verified ✓" : "Pending"}
+                  {profile?.isEmailVerified ? (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                      <span>Verified</span>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </span>
+                  ) : "Pending"}
                 </span>
               </div>
               <div style={styles.trustItemVal}>{profile?.email}</div>
@@ -506,7 +526,14 @@ export default function ProfilePage() {
               <div style={styles.trustItemHeader}>
                 <span style={styles.trustLabel}>Phone Verification</span>
                 <span style={profile?.phone ? styles.pillSuccess : styles.pillWarn}>
-                  {profile?.phone ? "Connected ✓" : "Not Provided"}
+                  {profile?.phone ? (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                      <span>Connected</span>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </span>
+                  ) : "Not Provided"}
                 </span>
               </div>
               <div style={styles.trustItemVal}>{profile?.phone || "Add in settings"}</div>
@@ -515,9 +542,16 @@ export default function ProfilePage() {
             <div style={styles.trustItem}>
               <div style={styles.trustItemHeader}>
                 <span style={styles.trustLabel}>Account Standing</span>
-                <span style={styles.pillSuccess}>Good Standing ✓</span>
+                <span style={styles.pillSuccess}>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                    <span>Good Standing</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </span>
+                </span>
               </div>
-              <div style={styles.trustItemVal}>Zero policy flags · 100% Secure</div>
+              <div style={styles.trustItemVal}>Zero policy flags &bull; 100% Secure</div>
             </div>
           </div>
         </div>
