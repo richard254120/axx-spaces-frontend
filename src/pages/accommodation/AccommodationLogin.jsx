@@ -5,6 +5,7 @@ import { useGoogleSignIn, GOOGLE_CLIENT_ID } from "../../hooks/useGoogleSignIn";
 import {
   setAccommodationSession,
   isAccommodationLoggedIn,
+  getAccommodationUser,
 } from "../../features/accommodation";
 import logo from "../../assets/image.png";
 
@@ -29,11 +30,8 @@ export default function AccommodationLogin({ defaultTab }) {
     }
   }, [paramTab]);
 
-  useEffect(() => {
-    if (isAccommodationLoggedIn()) {
-      navigate("/accommodation/dashboard", { replace: true });
-    }
-  }, [navigate]);
+  const alreadyLoggedIn = isAccommodationLoggedIn();
+  const currentUser = alreadyLoggedIn ? getAccommodationUser() : null;
 
   // Login form state
   const [loginEmail, setLoginEmail] = useState("");
@@ -313,6 +311,19 @@ export default function AccommodationLogin({ defaultTab }) {
             <span className="acc-pulse-dot"></span>
             <span>HOST PORTAL</span>
           </div>
+
+          {alreadyLoggedIn && (
+            <div className="acc-logged-in-banner">
+              <span>Signed in as <strong>{currentUser?.name || currentUser?.email || "Host"}</strong></span>
+              <button
+                type="button"
+                className="acc-logged-in-btn"
+                onClick={() => navigate("/accommodation/dashboard")}
+              >
+                Go to Host Dashboard →
+              </button>
+            </div>
+          )}
 
           <h1 className="acc-card-title">
             {showForgot
@@ -772,6 +783,34 @@ const css = `
     height: 6px;
     border-radius: 50%;
     background: #d97706;
+  }
+  .acc-logged-in-banner {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #065f46;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .acc-logged-in-btn {
+    align-self: flex-start;
+    background: #059669;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s ease;
+  }
+  .acc-logged-in-btn:hover {
+    background: #047857;
   }
   .acc-card-title {
     font-size: 26px;

@@ -213,6 +213,9 @@ function App() {
       <Route path="/accommodation" element={<PublicLayout><AccommodationPage /></PublicLayout>} />
       <Route path="/accommodation/login" element={<BareLayout><AccommodationLogin defaultTab="login" /></BareLayout>} />
       <Route path="/accommodation/register" element={<BareLayout><AccommodationLogin defaultTab="register" /></BareLayout>} />
+      <Route path="/host-login" element={<BareLayout><AccommodationLogin defaultTab="login" /></BareLayout>} />
+      <Route path="/host-register" element={<BareLayout><AccommodationLogin defaultTab="register" /></BareLayout>} />
+      <Route path="/host-portal" element={<BareLayout><AccommodationLogin defaultTab="login" /></BareLayout>} />
       <Route path="/accommodation/listings" element={<PublicLayout><AccommodationListingsPage /></PublicLayout>} />
       <Route path="/accommodation/register-property" element={<PublicLayout><RegisterPropertyPage /></PublicLayout>} />
       <Route
