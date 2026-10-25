@@ -1700,7 +1700,7 @@ Please contact me back with viewing details. Thank you!`;
                   <div className="card-landlord-verify-line">
                     <IconShieldCheck size={14} className="verify-shield" />
                     <span className="verify-text">
-                      {property.assignedAgent ? "Managed by Verified Agent" : "Direct Landlord Listing"}
+                      {property.assignedAgent ? "Listed by an Agent" : "Direct Landlord Listing"}
                     </span>
                   </div>
 

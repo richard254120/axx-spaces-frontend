@@ -221,6 +221,14 @@ const s = {
     background: "#dcfce7",
     color: "#166534",
   },
+  statusRejected: {
+    background: "#fee2e2",
+    color: "#dc2626",
+  },
+  statusPending: {
+    background: "#fef3c7",
+    color: "#92400e",
+  },
   houseGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))",
@@ -2280,21 +2288,7 @@ export default function AgentDashboard() {
                   >
                     Cancel Pending Purchase
                   </button>
-                  <button
-                    onClick={handleDebugPendingPurchase}
-                    style={{
-                      padding: '8px 16px',
-                      background: '#6b7280',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      fontSize: '13px',
-                      fontWeight: 600,
-                    }}
-                  >
-                    Debug
-                  </button>
+
                 </div>
               </div>
             )}

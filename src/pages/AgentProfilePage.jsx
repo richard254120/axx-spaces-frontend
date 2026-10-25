@@ -26,6 +26,9 @@ export default function AgentProfilePage() {
       })
       .then(data => { setAgent(data); setLoading(false); })
       .catch(err => { setError(err.message); setLoading(false); });
+
+    // Track QR scan — fire-and-forget, this page is the destination of the agent's QR poster
+    fetch(`${API_BASE}/agents/${id}/qr-scan`, { method: "POST" }).catch(() => {});
   }, [id]);
 
   /* ── Loading ── */
