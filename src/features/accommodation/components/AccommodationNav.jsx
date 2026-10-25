@@ -76,7 +76,7 @@ export default function AccommodationNav({
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <nav className="mobile-nav" style={{ display: "none", padding: "16px", borderTop: "1px solid #e5e7eb", background: "#fff" }}>
+        <nav className="mobile-nav" style={{ display: "none", padding: "16px", borderTop: "1px solid rgba(255, 255, 255, 0.08)", background: "#08101D" }}>
           <button type="button" style={{ ...s.navLink, display: "block", width: "100%", textAlign: "left", padding: "12px 0" }} onClick={() => { navigate("/accommodation/listings"); setMobileMenuOpen(false); }}>Explore</button>
           <button type="button" style={{ ...s.navLink, display: "block", width: "100%", textAlign: "left", padding: "12px 0" }} onClick={() => { navigate("/accommodation/register-property"); setMobileMenuOpen(false); }}>List property</button>
           {loggedIn ? (
