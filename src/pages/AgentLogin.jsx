@@ -1,208 +1,66 @@
 import { useState, useContext, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import { useGoogleSignIn, GOOGLE_CLIENT_ID } from "../hooks/useGoogleSignIn";
+import { useGoogleSignIn } from "../hooks/useGoogleSignIn";
+import AuthLayout from "../components/AuthLayout";
 
-const s = {
-  root: {
-    fontFamily: "'DM Sans', sans-serif",
-    background: "linear-gradient(135deg, #fef9c3 0%, #fde68a 100%)",
-    minHeight: "100vh",
-    padding: "20px",
-  },
-  container: {
-    maxWidth: "420px",
-    margin: "0 auto",
-    background: "white",
-    borderRadius: "20px",
-    boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
-    padding: "40px 30px",
-  },
-  logo: {
-    textAlign: "center",
-    marginBottom: "24px",
-  },
-  logoAccent: {
-    color: "#fbbf24",
-    fontWeight: 800,
-    fontSize: "28px",
-  },
-  logoWord: {
-    color: "#1f2937",
-    fontWeight: 800,
-    fontSize: "28px",
-  },
-  title: {
-    fontSize: "24px",
-    fontWeight: 800,
-    color: "#1f2937",
-    marginBottom: "8px",
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: "14px",
-    color: "#6b7280",
-    textAlign: "center",
-    marginBottom: "24px",
-  },
-  googleSection: {
-    marginBottom: "20px",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-  },
-  googleLabel: {
-    fontSize: "12px",
-    fontWeight: 600,
-    color: "#6b7280",
-    textTransform: "uppercase",
-    letterSpacing: "0.5px",
-    marginBottom: "12px",
-  },
-  googleButtonContainer: {
-    width: "100%",
-    display: "flex",
-    justifyContent: "center",
-    minHeight: "44px",
-  },
-  divider: {
-    display: "flex",
-    alignItems: "center",
-    margin: "20px 0",
-    color: "#9ca3af",
-    fontSize: "12px",
-    textTransform: "uppercase",
-    letterSpacing: "0.5px",
-  },
-  dividerLine: {
-    flex: 1,
-    height: "1px",
-    background: "#e5e7eb",
-  },
-  dividerText: {
-    padding: "0 12px",
-  },
-  field: {
-    marginBottom: "20px",
-  },
-  label: {
-    display: "block",
-    fontSize: "13px",
-    fontWeight: 700,
-    color: "#374151",
-    marginBottom: "6px",
-  },
-  input: {
-    width: "100%",
-    padding: "12px 16px",
-    border: "2px solid #e5e7eb",
-    borderRadius: "10px",
-    fontSize: "14px",
-    fontFamily: "inherit",
-    transition: "border-color 0.2s",
-    boxSizing: "border-box",
-  },
-  button: {
-    width: "100%",
-    padding: "14px",
-    background: "#fbbf24",
-    color: "#1f2937",
-    border: "none",
-    borderRadius: "10px",
-    fontSize: "16px",
-    fontWeight: 800,
-    cursor: "pointer",
-    fontFamily: "inherit",
-    transition: "background 0.2s",
-  },
-  buttonDisabled: {
-    opacity: 0.5,
-    cursor: "not-allowed",
-  },
-  error: {
-    background: "#fee2e2",
-    color: "#dc2626",
-    padding: "12px",
-    borderRadius: "8px",
-    fontSize: "13px",
-    marginBottom: "16px",
-  },
-  success: {
-    background: "#dcfce7",
-    color: "#15803d",
-    padding: "12px",
-    borderRadius: "8px",
-    fontSize: "13px",
-    marginBottom: "16px",
-  },
-  link: {
-    textAlign: "center",
-    marginTop: "20px",
-    fontSize: "13px",
-    color: "#6b7280",
-  },
-  linkText: {
-    color: "#fbbf24",
-    fontWeight: 600,
-    cursor: "pointer",
-    textDecoration: "none",
-  },
-};
-
-const css = `
-  input:focus {
-    border-color: #fbbf24 !important;
-  }
-  button:hover:not(:disabled) {
-    opacity: 0.8;
-  }
-`;
+const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
 export default function AgentLogin() {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [googleError, setGoogleError] = useState("");
 
-  const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
+  const [showResend, setShowResend] = useState(false);
+  const [resendEmail, setResendEmail] = useState("");
+  const [resendLoading, setResendLoading] = useState(false);
 
-  const handleGoogleCredential = useCallback(async (googleUser) => {
-    try {
-      setLoading(true);
-      setError("");
-      setGoogleError("");
+  // Forgot password state
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotMsg, setForgotMsg] = useState("");
 
-      const res = await fetch(`${API_BASE}/auth/google`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          googleId: googleUser.sub,
-          email: googleUser.email,
-          name: googleUser.name,
-          picture: googleUser.picture,
-          role: "agent",
-        }),
-      });
+  const handleGoogleCredential = useCallback(
+    async (googleUser) => {
+      try {
+        setLoading(true);
+        setError("");
+        setGoogleError("");
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Google authentication failed");
-      if (!data.token || !data.user) throw new Error("Invalid response from server");
+        const res = await fetch(`${API_BASE}/auth/google`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            googleId: googleUser.sub,
+            email: googleUser.email,
+            name: googleUser.name,
+            picture: googleUser.picture,
+            role: "agent",
+          }),
+        });
 
-      login(data.token, data.user);
-      setSuccess(" Google login successful! Redirecting...");
-      setTimeout(() => navigate("/agent/dashboard"), 800);
-    } catch (err) {
-      setGoogleError(err.message || "Google authentication failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }, [API_BASE, login, navigate]);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Google authentication failed");
+        if (!data.token || !data.user) throw new Error("Invalid response from server");
+
+        login(data.token, data.user);
+        setSuccess("✓ Google login successful! Redirecting to agent dashboard...");
+        setTimeout(() => navigate("/agent/dashboard"), 900);
+      } catch (err) {
+        setGoogleError(err.message || "Google authentication failed. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [login, navigate]
+  );
 
   const handleGoogleError = useCallback((message) => {
     setGoogleError(message);
@@ -215,6 +73,31 @@ export default function AgentLogin() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError("");
+  };
+
+  const handleResendVerification = async () => {
+    setResendLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const res = await fetch(`${API_BASE}/auth/resend-verification`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: resendEmail, role: "agent" }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to resend verification email");
+
+      setSuccess("✓ " + (data.message || "Verification email sent successfully! Please check your inbox."));
+      setShowResend(false);
+    } catch (err) {
+      setError("✗ " + (err.message || "Failed to resend verification email. Please try again."));
+    } finally {
+      setResendLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -223,7 +106,7 @@ export default function AgentLogin() {
     setGoogleError("");
 
     if (!formData.email || !formData.password) {
-      setError("Please fill in all fields");
+      setError("Please fill in both email and password.");
       return;
     }
 
@@ -239,104 +122,456 @@ export default function AgentLogin() {
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.requiresVerification) {
+          setShowResend(true);
+          setResendEmail(data.email || formData.email);
+        }
         throw new Error(data.error || "Login failed");
       }
 
-      // Check if user is an agent
       if (data.user.role !== "agent") {
-        setError("This login is for agents only. Please use the appropriate login page.");
+        setError("This login is designated for registered Agents. Please use the appropriate portal.");
         setLoading(false);
         return;
       }
 
       login(data.token, data.user);
-      navigate("/agent/dashboard");
+      setSuccess("✓ Login successful! Redirecting to agent dashboard...");
+      setTimeout(() => navigate("/agent/dashboard"), 800);
     } catch (err) {
-      setError(err.message || "Login failed. Please try again.");
+      setError(err.message || "Login failed. Please check your credentials.");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setForgotMsg("");
+
+    if (!forgotEmail) {
+      setForgotMsg("Please enter your registered agent email.");
+      return;
+    }
+
+    setForgotLoading(true);
+
+    try {
+      const res = await fetch(`${API_BASE}/auth/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail, role: "agent" }),
+      });
+
+      const data = await res.json();
+      setForgotMsg(data.message || "Reset link sent! Please check your inbox.");
+    } catch (err) {
+      setForgotMsg("Failed to send reset email. Please try again.");
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
+  const features = [
+    {
+      title: "Exclusive Mandates & Direct Deals",
+      desc: "Connect directly with verified landlords and property developers looking for professional listing representation.",
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+      ),
+    },
+    {
+      title: "Fast Commission Tracking",
+      desc: "Transparent tenancy placements, automated invoicing, and digital record keeping.",
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <line x1="12" y1="1" x2="12" y2="23"></line>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+        </svg>
+      ),
+    },
+    {
+      title: "Certified Agent Credential",
+      desc: "Distinguish yourself with accredited profile badges and verified client testimonials.",
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <path d="M9 12l2 2 4-4"></path>
+        </svg>
+      ),
+    },
+  ];
+
+  const stats = [
+    { value: "1,200+", label: "Verified Agents" },
+    { value: "47", label: "Counties" },
+    { value: "KES 50M+", label: "Brokered Value" },
+  ];
+
   return (
-    <div style={s.root}>
-      <style>{css}</style>
+    <AuthLayout
+      portalBadge="Axx Verified Agent Network"
+      portalTitle="Kenya's Premier Property Agent Community"
+      portalSubtitle="Access exclusive landlord mandates, client inquiries, automated commission tracking, and agency tools."
+      accentColor="#10b981"
+      accentGlow="rgba(16, 185, 129, 0.2)"
+      features={features}
+      stats={stats}
+      backLink="/"
+      backText="Back to Home"
+    >
+      <div style={localStyles.container}>
+        {showForgot ? (
+          <>
+            <div style={localStyles.header}>
+              <h2 style={localStyles.title}>Reset Agent Password</h2>
+              <p style={localStyles.subtitle}>
+                Enter your registered agent email to receive a password reset link.
+              </p>
+            </div>
 
-      <div style={s.container}>
-        <div style={s.logo}>
-          <span style={s.logoAccent}>AXX</span>
-          <span style={s.logoWord}>SPACE</span>
-        </div>
+            {forgotMsg && (
+              <div
+                style={
+                  forgotMsg.includes("Failed") || forgotMsg.includes("Please enter")
+                    ? localStyles.errorAlert
+                    : localStyles.successAlert
+                }
+              >
+                {forgotMsg}
+              </div>
+            )}
 
-        <h1 style={s.title}>Agent Login</h1>
-        <p style={s.subtitle}>Access your agent dashboard</p>
+            <form onSubmit={handleForgotPassword} style={localStyles.form}>
+              <div style={localStyles.fieldGroup}>
+                <label style={localStyles.label}>Registered Email</label>
+                <input
+                  type="email"
+                  placeholder="agent@example.com"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  style={localStyles.input}
+                  required
+                />
+              </div>
 
-        {error && <div style={s.error}>{error}</div>}
-        {success && <div style={s.success}>{success}</div>}
-        {googleError && <div style={s.error}>{googleError}</div>}
+              <button
+                type="submit"
+                style={localStyles.primaryBtn}
+                disabled={forgotLoading}
+              >
+                {forgotLoading ? "Sending Link..." : "Send Reset Link"}
+              </button>
+            </form>
 
-        {GOOGLE_CLIENT_ID ? (
-          <div style={s.googleSection}>
-            <p style={s.googleLabel}>Sign In With Google</p>
-            <div ref={googleButtonRef} style={s.googleButtonContainer}></div>
-          </div>
-        ) : null}
+            <p style={localStyles.footerText}>
+              <span
+                style={localStyles.inlineLink}
+                onClick={() => {
+                  setShowForgot(false);
+                  setForgotMsg("");
+                }}
+              >
+                ← Back to Login
+              </span>
+            </p>
+          </>
+        ) : (
+          <>
+            <div style={localStyles.header}>
+              <h2 style={localStyles.title}>Agent Sign In</h2>
+              <p style={localStyles.subtitle}>
+                Access your agent dashboard, landlord mandates, and client inquiries.
+              </p>
+            </div>
 
-        <div style={s.divider}>
-          <div style={s.dividerLine}></div>
-          <span style={s.dividerText}>or continue with email</span>
-          <div style={s.dividerLine}></div>
-        </div>
+            {error && <div style={localStyles.errorAlert}>{error}</div>}
+            {success && <div style={localStyles.successAlert}>{success}</div>}
+            {googleError && <div style={localStyles.errorAlert}>{googleError}</div>}
 
-        <form onSubmit={handleSubmit}>
-          <div style={s.field}>
-            <label style={s.label}>Email</label>
-            <input
-              type="email"
-              name="email"
-              style={s.input}
-              placeholder="your@email.com"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
+            {showResend && (
+              <div style={localStyles.resendBox}>
+                <p style={localStyles.resendText}>
+                  Need a new verification link sent to <strong>{resendEmail}</strong>?
+                </p>
+                <button
+                  type="button"
+                  onClick={handleResendVerification}
+                  disabled={resendLoading}
+                  style={localStyles.resendBtn}
+                >
+                  {resendLoading ? "Sending Verification..." : "Resend Verification Email"}
+                </button>
+              </div>
+            )}
 
-          <div style={s.field}>
-            <label style={s.label}>Password</label>
-            <input
-              type="password"
-              name="password"
-              style={s.input}
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
+            <form onSubmit={handleSubmit} style={localStyles.form}>
+              <div style={localStyles.fieldGroup}>
+                <label style={localStyles.label}>Email Address</label>
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="agent@example.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  style={localStyles.input}
+                  required
+                />
+              </div>
 
-          <button
-            type="submit"
-            style={{ ...s.button, ...(loading ? s.buttonDisabled : {}) }}
-            disabled={loading}
-          >
-            {loading ? "Logging in..." : "Log In"}
-          </button>
-        </form>
+              <div style={localStyles.fieldGroup}>
+                <div style={localStyles.labelRow}>
+                  <label style={localStyles.label}>Password</label>
+                  <span
+                    onClick={() => {
+                      setShowForgot(true);
+                      setError("");
+                    }}
+                    style={localStyles.forgotLink}
+                  >
+                    Forgot password?
+                  </span>
+                </div>
+                <div style={localStyles.passwordWrapper}>
+                  <input
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={handleChange}
+                    style={{ ...localStyles.input, paddingRight: "46px" }}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={localStyles.eyeBtn}
+                    aria-label="Toggle password visibility"
+                  >
+                    {showPassword ? (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                      </svg>
+                    ) : (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                    )}
+                  </button>
+                </div>
+              </div>
 
-        <div style={s.link}>
-          Don't have an agent account?{" "}
-          <span style={s.linkText} onClick={() => navigate("/agent/register")}>
-            Register
-          </span>
-        </div>
+              <button
+                type="submit"
+                disabled={loading}
+                style={localStyles.primaryBtn}
+              >
+                {loading ? "Authenticating..." : "Sign In to Agent Portal"}
+              </button>
+            </form>
 
-        <div style={s.link}>
-          <span style={s.linkText} onClick={() => navigate("/")}>
-            ← Back to Home
-          </span>
-        </div>
+            <div style={localStyles.divider}>
+              <div style={localStyles.dividerLine} />
+              <span style={localStyles.dividerText}>or continue with</span>
+              <div style={localStyles.dividerLine} />
+            </div>
+
+            <div ref={googleButtonRef} style={localStyles.googleBtnBox} />
+
+            <div style={localStyles.bottomSwitch}>
+              <span style={{ color: "#94a3b8", fontSize: "14px" }}>
+                Not registered as an agent?{" "}
+              </span>
+              <Link to="/agent/register" style={localStyles.registerLink}>
+                Apply as an Agent
+              </Link>
+            </div>
+          </>
+        )}
       </div>
-    </div>
+    </AuthLayout>
   );
 }
+
+const localStyles = {
+  container: {
+    display: "flex",
+    flexDirection: "column",
+  },
+  header: {
+    marginBottom: "24px",
+  },
+  title: {
+    margin: 0,
+    fontSize: "26px",
+    fontWeight: 800,
+    color: "#f8fafc",
+    letterSpacing: "-0.5px",
+  },
+  subtitle: {
+    margin: "8px 0 0 0",
+    fontSize: "14px",
+    color: "#94a3b8",
+    lineHeight: 1.5,
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "18px",
+  },
+  fieldGroup: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "6px",
+  },
+  labelRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  label: {
+    fontSize: "13px",
+    fontWeight: 600,
+    color: "#cbd5e1",
+  },
+  forgotLink: {
+    fontSize: "12px",
+    color: "#10b981",
+    cursor: "pointer",
+    fontWeight: 500,
+  },
+  input: {
+    width: "100%",
+    padding: "12px 14px",
+    background: "rgba(15, 23, 42, 0.8)",
+    border: "1px solid rgba(255, 255, 255, 0.12)",
+    borderRadius: "10px",
+    color: "#f8fafc",
+    fontSize: "14px",
+    outline: "none",
+    boxSizing: "border-box",
+  },
+  passwordWrapper: {
+    position: "relative",
+    display: "flex",
+    alignItems: "center",
+  },
+  eyeBtn: {
+    position: "absolute",
+    right: "12px",
+    background: "none",
+    border: "none",
+    color: "#94a3b8",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "4px",
+  },
+  primaryBtn: {
+    marginTop: "6px",
+    padding: "14px",
+    background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+    color: "#ffffff",
+    border: "none",
+    borderRadius: "10px",
+    fontSize: "15px",
+    fontWeight: 800,
+    cursor: "pointer",
+    boxShadow: "0 4px 16px rgba(16, 185, 129, 0.3)",
+    transition: "transform 0.2s ease, box-shadow 0.2s ease",
+  },
+  errorAlert: {
+    background: "rgba(239, 68, 68, 0.15)",
+    border: "1px solid rgba(239, 68, 68, 0.35)",
+    color: "#fca5a5",
+    padding: "12px 14px",
+    borderRadius: "10px",
+    fontSize: "13px",
+    marginBottom: "16px",
+    lineHeight: 1.4,
+  },
+  successAlert: {
+    background: "rgba(16, 185, 129, 0.15)",
+    border: "1px solid rgba(16, 185, 129, 0.35)",
+    color: "#6ee7b7",
+    padding: "12px 14px",
+    borderRadius: "10px",
+    fontSize: "13px",
+    marginBottom: "16px",
+    lineHeight: 1.4,
+  },
+  resendBox: {
+    background: "rgba(16, 185, 129, 0.1)",
+    border: "1px solid rgba(16, 185, 129, 0.25)",
+    borderRadius: "10px",
+    padding: "12px 14px",
+    marginBottom: "16px",
+  },
+  resendText: {
+    margin: "0 0 10px 0",
+    color: "#a7f3d0",
+    fontSize: "13px",
+  },
+  resendBtn: {
+    width: "100%",
+    padding: "9px 14px",
+    background: "rgba(16, 185, 129, 0.2)",
+    color: "#6ee7b7",
+    border: "1px solid rgba(16, 185, 129, 0.4)",
+    borderRadius: "8px",
+    fontWeight: 700,
+    fontSize: "13px",
+    cursor: "pointer",
+  },
+  divider: {
+    display: "flex",
+    alignItems: "center",
+    margin: "20px 0 16px 0",
+  },
+  dividerLine: {
+    flex: 1,
+    height: "1px",
+    background: "rgba(255, 255, 255, 0.08)",
+  },
+  dividerText: {
+    padding: "0 12px",
+    fontSize: "12px",
+    color: "#64748b",
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
+  },
+  googleBtnBox: {
+    width: "100%",
+    minHeight: "44px",
+    display: "flex",
+    justifyContent: "center",
+    marginBottom: "18px",
+  },
+  bottomSwitch: {
+    textAlign: "center",
+    marginTop: "8px",
+  },
+  registerLink: {
+    color: "#10b981",
+    fontWeight: 700,
+    textDecoration: "none",
+  },
+  footerText: {
+    textAlign: "center",
+    marginTop: "20px",
+    fontSize: "14px",
+  },
+  inlineLink: {
+    color: "#10b981",
+    cursor: "pointer",
+    fontWeight: 600,
+  },
+};

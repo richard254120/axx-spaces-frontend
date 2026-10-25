@@ -2,8 +2,8 @@ import { useState, useContext, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import PhoneInput from "../components/PhoneInput";
-import { COLORS, buttonStyles, inputStyles, pageStyles } from "../styles/theme";
-import { useGoogleSignIn, GOOGLE_CLIENT_ID } from "../hooks/useGoogleSignIn";
+import { useGoogleSignIn } from "../hooks/useGoogleSignIn";
+import AuthLayout from "../components/AuthLayout";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -17,45 +17,48 @@ export default function UserRegister() {
     password: "",
     phone: "",
   });
-
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [googleError, setGoogleError] = useState("");
 
-  const handleGoogleCredential = useCallback(async (googleUser) => {
-    try {
-      setLoading(true);
-      setError("");
-      setGoogleError("");
+  const handleGoogleCredential = useCallback(
+    async (googleUser) => {
+      try {
+        setLoading(true);
+        setError("");
+        setGoogleError("");
 
-      const res = await fetch(`${API_BASE}/auth/google`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          googleId: googleUser.sub,
-          email: googleUser.email,
-          name: googleUser.name,
-          picture: googleUser.picture,
-          role: "user",
-        }),
-      });
+        const res = await fetch(`${API_BASE}/auth/google`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            googleId: googleUser.sub,
+            email: googleUser.email,
+            name: googleUser.name,
+            picture: googleUser.picture,
+            role: "user",
+          }),
+        });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Google registration failed");
-      if (!data.token || !data.user) throw new Error("Invalid response from server");
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Google registration failed");
+        if (!data.token || !data.user) throw new Error("Invalid response from server");
 
-      login(data.token, data.user);
-      setSuccess(" Welcome to AxxSpace! Redirecting...");
-      setTimeout(() => {
-        navigate("/");
-      }, 900);
-    } catch (err) {
-      setGoogleError(err.message || "Google registration failed. Please try again or use the form.");
-    } finally {
-      setLoading(false);
-    }
-  }, [login, navigate]);
+        login(data.token, data.user);
+        setSuccess("✓ Google registration successful! Redirecting...");
+        setTimeout(() => {
+          navigate("/");
+        }, 900);
+      } catch (err) {
+        setGoogleError(err.message || "Google registration failed. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [login, navigate]
+  );
 
   const handleGoogleError = useCallback((message) => {
     setGoogleError(message);
@@ -69,6 +72,7 @@ export default function UserRegister() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setError("");
   };
 
   const handleSubmit = async (e) => {
@@ -76,13 +80,12 @@ export default function UserRegister() {
     setError("");
     setSuccess("");
 
-    // Basic Validation
     if (!formData.name || !formData.email || !formData.password || !formData.phone) {
-      setError("All fields are required");
+      setError("Please fill in all required fields.");
       return;
     }
     if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters");
+      setError("Password must be at least 6 characters.");
       return;
     }
     const hasLetter = /[a-zA-Z]/.test(formData.password);
@@ -95,281 +98,358 @@ export default function UserRegister() {
     setLoading(true);
 
     try {
-      const payload = {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        phone: formData.phone,
-        role: "user",
-      };
-
-      console.log("Sending registration payload:", payload);
-      console.log("API URL:", `${API_BASE}/auth/register`);
-
       const response = await fetch(`${API_BASE}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          ...formData,
+          role: "user",
+        }),
       });
 
       const data = await response.json();
-
-      console.log("Backend response:", data);
-      console.log("Status:", response.status);
 
       if (!response.ok) {
         throw new Error(data.error || data.message || "Registration failed");
       }
 
       if (data.requiresVerification) {
-        setSuccess(data.message || "Registration successful! A verification email has been sent to your inbox. Please verify before logging in.");
+        setSuccess(
+          data.message ||
+            "Registration successful! We've sent a verification link to your inbox. Please verify before signing in."
+        );
         setTimeout(() => {
           navigate("/user-login");
         }, 3000);
       } else if (data.token && data.user) {
         login(data.token, data.user);
-        setSuccess("Welcome to AxxSpace! Your account is active. Redirecting...");
+        setSuccess("✓ Welcome to AxxSpace! Your account is active. Redirecting...");
         setTimeout(() => {
           navigate("/");
         }, 1000);
       } else {
-        setSuccess(data.message || "Registration successful! You can now log in.");
+        setSuccess("✓ Registration successful! You can now log in.");
         setTimeout(() => {
           navigate("/user-login");
         }, 1500);
       }
-
     } catch (err) {
-      console.error("Registration error:", err);
       setError(err.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
+  const features = [
+    {
+      title: "Seamless Property Search",
+      desc: "Explore thousands of verified apartments, bedsitters, hostels, and commercial properties across Kenya.",
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+      ),
+    },
+    {
+      title: "Direct Landlord Contact",
+      desc: "Book viewings and chat directly with verified landlords and agents without unverified middlemen.",
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+      ),
+    },
+    {
+      title: "Verified Security",
+      desc: "Your data and inquiries are safeguarded with bank-grade encryption and vetted property listings.",
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <path d="M9 12l2 2 4-4"></path>
+        </svg>
+      ),
+    },
+  ];
+
+  const stats = [
+    { value: "50,000+", label: "Happy Tenants" },
+    { value: "15,000+", label: "Verified Spaces" },
+    { value: "47", label: "Counties" },
+  ];
+
   return (
-    <div style={styles.root}>
-      <style>{css}</style>
+    <AuthLayout
+      portalBadge="AxxSpace Explorer Portal"
+      portalTitle="Find Your Next Home, Office or Store"
+      portalSubtitle="Join thousands discovering verified properties, hardware deals, and trusted local businesses."
+      accentColor="#fbbf24"
+      accentGlow="rgba(251, 191, 36, 0.2)"
+      features={features}
+      stats={stats}
+      backLink="/"
+      backText="Back to Home"
+    >
+      <div style={localStyles.container}>
+        <div style={localStyles.header}>
+          <h2 style={localStyles.title}>Create Your Account</h2>
+          <p style={localStyles.subtitle}>
+            Sign up to bookmark properties, contact verified owners, and receive updates.
+          </p>
+        </div>
 
-      <div style={styles.container}>
-        <div style={styles.formBox}>
-          <h1 style={styles.title}>Create Account</h1>
-          <p style={styles.subtitle}>Join Axxspace to explore properties and services</p>
+        {error && <div style={localStyles.errorAlert}>{error}</div>}
+        {success && <div style={localStyles.successAlert}>{success}</div>}
+        {googleError && <div style={localStyles.errorAlert}>{googleError}</div>}
 
-          {error && <div style={styles.error}>{error}</div>}
-          {success && <div style={styles.success}>{success}</div>}
-          {googleError && <div style={styles.error}>{googleError}</div>}
-
-          {GOOGLE_CLIENT_ID ? (
-            <div style={{ marginBottom: "20px", display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <p style={{ fontSize: "12px", fontWeight: 600, color: COLORS.textMutedLight, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "12px" }}>
-                Quick Sign Up With Google
-              </p>
-              <div ref={googleButtonRef} style={{ width: "100%", display: "flex", justifyContent: "center", minHeight: "44px" }}></div>
-            </div>
-          ) : null}
-
-          <div style={{ display: "flex", alignItems: "center", margin: "20px 0", color: COLORS.textMutedLight, fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-            <div style={{ flex: 1, height: "1px", background: COLORS.border }}></div>
-            <span style={{ padding: "0 12px" }}>or register with email</span>
-            <div style={{ flex: 1, height: "1px", background: COLORS.border }}></div>
+        <form onSubmit={handleSubmit} style={localStyles.form}>
+          <div style={localStyles.fieldGroup}>
+            <label style={localStyles.label}>Full Name</label>
+            <input
+              name="name"
+              type="text"
+              placeholder="e.g., Sarah Wanjiku"
+              value={formData.name}
+              onChange={handleChange}
+              style={localStyles.input}
+              required
+            />
           </div>
 
-          <form onSubmit={handleSubmit} style={styles.form}>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Full Name</label>
-              <input
-                type="text"
-                name="name"
-                placeholder="e.g., John Doe"
-                value={formData.name}
-                onChange={handleChange}
-                style={styles.input}
-                required
-              />
-            </div>
+          <div style={localStyles.fieldGroup}>
+            <label style={localStyles.label}>Email Address</label>
+            <input
+              name="email"
+              type="email"
+              placeholder="sarah@example.com"
+              value={formData.email}
+              onChange={handleChange}
+              style={localStyles.input}
+              required
+            />
+          </div>
 
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Email Address</label>
-              <input
-                type="email"
-                name="email"
-                placeholder="e.g., user@example.com"
-                value={formData.email}
-                onChange={handleChange}
-                style={styles.input}
-                required
-              />
-            </div>
+          <div style={localStyles.fieldGroup}>
+            <label style={localStyles.label}>Phone Number</label>
+            <PhoneInput
+              name="phone"
+              value={formData.phone}
+              onChange={(value) => setFormData((prev) => ({ ...prev, phone: value }))}
+              style={localStyles.input}
+              required
+            />
+          </div>
 
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Phone Number</label>
-              <PhoneInput
-                name="phone"
-                value={formData.phone}
-                onChange={(value) => setFormData((prev) => ({ ...prev, phone: value }))}
-                style={styles.input}
-                required
-              />
-            </div>
-
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Password</label>
+          <div style={localStyles.fieldGroup}>
+            <label style={localStyles.label}>Password</label>
+            <div style={localStyles.passwordWrapper}>
               <input
-                type="password"
                 name="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Min 6 chars with letters & numbers"
                 value={formData.password}
                 onChange={handleChange}
-                style={styles.input}
+                style={{ ...localStyles.input, paddingRight: "46px" }}
                 required
               />
-              {formData.password && (formData.password.length < 6 || !/[a-zA-Z]/.test(formData.password) || !/[0-9]/.test(formData.password)) && (
-                <div style={{ color: "#fca5a5", fontSize: "11px", marginTop: "4px" }}>
-                  Password must contain both letters and numbers.
-                </div>
-              )}
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={localStyles.eyeBtn}
+                aria-label="Toggle password visibility"
+              >
+                {showPassword ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                  </svg>
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                )}
+              </button>
             </div>
+            {formData.password && (
+              <div style={localStyles.strengthNotice}>
+                {formData.password.length < 6 ||
+                !/[a-zA-Z]/.test(formData.password) ||
+                !/[0-9]/.test(formData.password) ? (
+                  <span style={{ color: "#f87171" }}>
+                    ✗ Must contain at least 6 characters with both letters &amp; numbers
+                  </span>
+                ) : (
+                  <span style={{ color: "#34d399" }}>
+                    ✓ Strong password format
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                ...styles.submitBtn,
-                opacity: loading ? 0.7 : 1,
-                cursor: loading ? "not-allowed" : "pointer",
-              }}
-            >
-              {loading ? "Creating Account..." : "Create Account"}
-            </button>
-          </form>
+          <button
+            type="submit"
+            disabled={loading}
+            style={localStyles.primaryBtn}
+          >
+            {loading ? "Creating Account..." : "Create Free Account"}
+          </button>
+        </form>
 
-          <div style={styles.divider}></div>
+        <div style={localStyles.divider}>
+          <div style={localStyles.dividerLine} />
+          <span style={localStyles.dividerText}>or register with</span>
+          <div style={localStyles.dividerLine} />
+        </div>
 
-          <p style={styles.footer}>
+        <div ref={googleButtonRef} style={localStyles.googleBtnBox} />
+
+        <div style={localStyles.bottomSwitch}>
+          <span style={{ color: "#94a3b8", fontSize: "14px" }}>
             Already have an account?{" "}
-            <Link to="/user-login" style={styles.link}>Sign In</Link>
-          </p>
-          <p style={styles.footerSmall}>
-            Are you a landlord?{" "}
-            <Link to="/register" style={styles.link}>Landlord Registration</Link>
-          </p>
+          </span>
+          <Link to="/user-login" style={localStyles.registerLink}>
+            Sign In Here
+          </Link>
         </div>
       </div>
-    </div>
+    </AuthLayout>
   );
 }
 
-const styles = {
-  root: {
-    ...pageStyles.dark,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "20px",
-  },
+const localStyles = {
   container: {
-    width: "100%",
-    maxWidth: "450px",
+    display: "flex",
+    flexDirection: "column",
   },
-  formBox: {
-    background: COLORS.bgLight,
-    border: `1px solid ${COLORS.border}`,
-    borderRadius: "16px",
-    padding: "40px 32px",
-    boxShadow: "0 10px 40px rgba(0, 0, 0, 0.3)",
+  header: {
+    marginBottom: "24px",
   },
   title: {
+    margin: 0,
     fontSize: "26px",
     fontWeight: 800,
-    color: COLORS.textLight,
-    margin: "0 0 8px",
-    textAlign: "center",
+    color: "#f8fafc",
+    letterSpacing: "-0.5px",
   },
   subtitle: {
+    margin: "8px 0 0 0",
     fontSize: "14px",
-    color: COLORS.textMutedLight,
-    margin: "0 0 30px",
-    textAlign: "center",
-  },
-  error: {
-    background: "rgba(239, 68, 68, 0.15)",
-    border: "1px solid rgba(239, 68, 68, 0.3)",
-    color: "#fca5a5",
-    padding: "12px 16px",
-    borderRadius: "8px",
-    marginBottom: "20px",
-    fontSize: "14px",
-    fontWeight: 500,
-  },
-  success: {
-    background: "rgba(34, 197, 94, 0.15)",
-    border: "1px solid rgba(34, 197, 94, 0.3)",
-    color: "#86efac",
-    padding: "12px 16px",
-    borderRadius: "8px",
-    marginBottom: "20px",
-    fontSize: "14px",
-    fontWeight: 500,
+    color: "#94a3b8",
+    lineHeight: 1.5,
   },
   form: {
     display: "flex",
     flexDirection: "column",
-    gap: "20px",
+    gap: "16px",
   },
-  formGroup: {
+  fieldGroup: {
     display: "flex",
     flexDirection: "column",
     gap: "6px",
   },
   label: {
     fontSize: "13px",
-    fontWeight: 700,
-    color: COLORS.textMutedLight,
+    fontWeight: 600,
+    color: "#cbd5e1",
+  },
+  input: {
+    width: "100%",
+    padding: "12px 14px",
+    background: "rgba(15, 23, 42, 0.8)",
+    border: "1px solid rgba(255, 255, 255, 0.12)",
+    borderRadius: "10px",
+    color: "#f8fafc",
+    fontSize: "14px",
+    outline: "none",
+    boxSizing: "border-box",
+  },
+  passwordWrapper: {
+    position: "relative",
+    display: "flex",
+    alignItems: "center",
+  },
+  eyeBtn: {
+    position: "absolute",
+    right: "12px",
+    background: "none",
+    border: "none",
+    color: "#94a3b8",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "4px",
+  },
+  strengthNotice: {
+    fontSize: "12px",
+    marginTop: "4px",
+  },
+  primaryBtn: {
+    marginTop: "6px",
+    padding: "14px",
+    background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
+    color: "#0f172a",
+    border: "none",
+    borderRadius: "10px",
+    fontSize: "15px",
+    fontWeight: 800,
+    cursor: "pointer",
+    boxShadow: "0 4px 16px rgba(251, 191, 36, 0.25)",
+    transition: "transform 0.2s ease, box-shadow 0.2s ease",
+  },
+  errorAlert: {
+    background: "rgba(239, 68, 68, 0.15)",
+    border: "1px solid rgba(239, 68, 68, 0.35)",
+    color: "#fca5a5",
+    padding: "12px 14px",
+    borderRadius: "10px",
+    fontSize: "13px",
+    marginBottom: "16px",
+    lineHeight: 1.4,
+  },
+  successAlert: {
+    background: "rgba(16, 185, 129, 0.15)",
+    border: "1px solid rgba(16, 185, 129, 0.35)",
+    color: "#6ee7b7",
+    padding: "12px 14px",
+    borderRadius: "10px",
+    fontSize: "13px",
+    marginBottom: "16px",
+    lineHeight: 1.4,
+  },
+  divider: {
+    display: "flex",
+    alignItems: "center",
+    margin: "20px 0 16px 0",
+  },
+  dividerLine: {
+    flex: 1,
+    height: "1px",
+    background: "rgba(255, 255, 255, 0.08)",
+  },
+  dividerText: {
+    padding: "0 12px",
+    fontSize: "12px",
+    color: "#64748b",
     textTransform: "uppercase",
     letterSpacing: "0.5px",
   },
-  input: inputStyles.dark,
-  submitBtn: buttonStyles.primary,
-  divider: {
-    height: "1px",
-    background: COLORS.border,
-    margin: "20px 0",
+  googleBtnBox: {
+    width: "100%",
+    minHeight: "44px",
+    display: "flex",
+    justifyContent: "center",
+    marginBottom: "18px",
   },
-  footer: {
+  bottomSwitch: {
     textAlign: "center",
-    color: COLORS.textMutedLight,
-    fontSize: "14px",
+    marginTop: "8px",
   },
-  footerSmall: {
-    textAlign: "center",
-    color: COLORS.textMutedLight,
-    fontSize: "12px",
-    marginTop: "10px",
-  },
-  link: {
-    color: COLORS.accent,
-    textDecoration: "none",
+  registerLink: {
+    color: "#fbbf24",
     fontWeight: 700,
+    textDecoration: "none",
   },
 };
-
-const css = `
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
-
-  input:focus {
-    outline: none;
-    border-color: ${COLORS.accent} !important;
-    background: rgba(15,23,41,0.9) !important;
-    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.12);
-  }
-  
-  button:hover:not(:disabled) {
-    transform: translateY(-2px);
-    opacity: 0.9;
-  }
-  
-  a[style*="color: #fbbf24"]:hover {
-    opacity: 0.8;
-  }
-`;

@@ -2,9 +2,9 @@ import { useState, useContext, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import PhoneInput from "../components/PhoneInput";
-import { COLORS, buttonStyles, inputStyles, pageStyles } from "../styles/theme";
 import { getDashboardPath } from "../utils/dashboardRoutes";
 import { useGoogleSignIn } from "../hooks/useGoogleSignIn";
+import AuthLayout from "../components/AuthLayout";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -19,12 +19,12 @@ export default function Register() {
     phone: "",
   });
 
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [landlordType, setLandlordType] = useState("general");
-
-  const [accountChoice, setAccountChoice] = useState("member");
+  const [accountChoice, setAccountChoice] = useState("landlord"); // "landlord" | "member"
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,10 +50,10 @@ export default function Register() {
       if (!res.ok) throw new Error(data.error || "Google authentication failed");
 
       login(data.token, data.user);
-      setSuccess(" Google registration successful! Redirecting...");
+      setSuccess("✓ Google registration successful! Redirecting...");
       setTimeout(() => navigate(getDashboardPath(data.user?.role)), 1000);
     } catch (err) {
-      setError(err.message || "Google authentication failed. Please try again.");
+      setError(err.message || "Google registration failed. Please try again.");
     }
   }, [accountChoice, landlordType, login, navigate]);
 
@@ -71,19 +71,18 @@ export default function Register() {
     setError("");
     setSuccess("");
 
-    // Basic Validation
     if (!formData.name || !formData.email || !formData.password || !formData.phone) {
-      setError(" All fields are required");
+      setError("All fields are required");
       return;
     }
     if (formData.password.length < 6) {
-      setError(" Password must be at least 6 characters");
+      setError("Password must be at least 6 characters");
       return;
     }
     const hasLetter = /[a-zA-Z]/.test(formData.password);
     const hasNumber = /[0-9]/.test(formData.password);
     if (!hasLetter || !hasNumber) {
-      setError(" Password must contain a mixture of both letters and numbers.");
+      setError("Password must contain a mixture of both letters and numbers.");
       return;
     }
 
@@ -120,7 +119,7 @@ export default function Register() {
 
         if (data.token && data.user) {
           login(data.token, data.user);
-          setSuccess("Welcome to Axxspace! Member account created. Redirecting...");
+          setSuccess("Welcome to AxxSpace! Member account created. Redirecting...");
           setTimeout(() => {
             navigate("/member");
           }, 1200);
@@ -129,16 +128,13 @@ export default function Register() {
       }
 
       const payload = {
-        name: formData.name,
-        email: formData.email,
+        name: formData.name.trim(),
+        email: formData.email.trim(),
         password: formData.password,
-        phone: formData.phone,
+        phone: formData.phone.trim(),
         role: "landlord",
         landlordType,
       };
-
-      console.log(" Sending registration payload:", payload);
-      console.log(" API URL:", `${API_BASE}/auth/register`);
 
       const response = await fetch(`${API_BASE}/auth/register`, {
         method: "POST",
@@ -148,17 +144,12 @@ export default function Register() {
 
       const data = await response.json();
 
-      console.log(" Backend response:", data);
-      console.log("Status:", response.status);
-
       if (!response.ok) {
         throw new Error(data.error || data.message || "Registration failed");
       }
 
-      // Registration successful but email verification required
-      setSuccess(data.message || " Registration successful! Please check your email to verify your account.");
+      setSuccess(data.message || "Registration successful! Please check your email to verify your account.");
 
-      // Clear form
       setFormData({
         name: "",
         email: "",
@@ -166,377 +157,382 @@ export default function Register() {
         phone: "",
       });
 
-      // Redirect to login after 3 seconds
       setTimeout(() => {
         navigate("/login");
       }, 3000);
 
     } catch (err) {
-      console.error(" Registration error:", err);
       setError(err.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div style={styles.root}>
-      <style>{css}</style>
+  const registerFeatures = [
+    {
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+        </svg>
+      ),
+      title: "List Hostels & General Rentals",
+      desc: "Promote your rooms directly to college students, young professionals, and families.",
+    },
+    {
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+      ),
+      title: "Faster Occupancy & Lower Vacancies",
+      desc: "Over 80% of properties on AxxSpace receive booking inquiries within the first 72 hours.",
+    },
+    {
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      ),
+      title: "Verified Owner Status",
+      desc: "Get the gold verified badge to gain trust, boost rankings, and prevent impersonation.",
+    },
+  ];
 
-      <div style={styles.container}>
-        <div style={styles.formBox}>
-          {/* STEP 1: ACCOUNT TYPE CHOICE */}
-          <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
-            <button
-              type="button"
-              style={{
-                flex: 1,
-                padding: "12px",
-                borderRadius: "10px",
-                border: accountChoice === "member" ? "2px solid #fbbf24" : "1px solid #334155",
-                background: accountChoice === "member" ? "rgba(251, 191, 36, 0.15)" : "#1e293b",
-                color: accountChoice === "member" ? "#fbbf24" : "#94a3b8",
-                fontWeight: 700,
-                fontSize: "13px",
-                cursor: "pointer",
-              }}
-              onClick={() => setAccountChoice("member")}
-            >
-              Join as Member
-            </button>
-            <button
-              type="button"
-              style={{
-                flex: 1,
-                padding: "12px",
-                borderRadius: "10px",
-                border: accountChoice === "provider" ? "2px solid #fbbf24" : "1px solid #334155",
-                background: accountChoice === "provider" ? "rgba(251, 191, 36, 0.15)" : "#1e293b",
-                color: accountChoice === "provider" ? "#fbbf24" : "#94a3b8",
-                fontWeight: 700,
-                fontSize: "13px",
-                cursor: "pointer",
-              }}
-              onClick={() => setAccountChoice("provider")}
-            >
-              List a business/service
-            </button>
+  const registerStats = [
+    { value: "48 Hrs", label: "Avg First Inquiry" },
+    { value: "0%", label: "Setup Fee" },
+    { value: "24/7", label: "Owner Assistance" },
+  ];
+
+  return (
+    <AuthLayout
+      portalBadge="Landlord Registration"
+      portalTitle="Start Listing & Monetizing Your Space Today"
+      portalSubtitle="Join thousands of Kenyan property owners who manage, rent out, and track income on AxxSpace with zero monthly fixed costs."
+      accentColor="#fbbf24"
+      accentGlow="rgba(251, 191, 36, 0.22)"
+      features={registerFeatures}
+      stats={registerStats}
+      backLink="/login"
+      backText="Back to Login"
+    >
+      <div>
+        {/* Account Choice Switcher */}
+        <div style={s.tabGroup}>
+          <button
+            type="button"
+            onClick={() => setAccountChoice("landlord")}
+            style={{
+              ...s.tabButton,
+              ...(accountChoice === "landlord" ? s.tabButtonActive : {}),
+            }}
+          >
+            🏢 Landlord / Owner
+          </button>
+          <button
+            type="button"
+            onClick={() => setAccountChoice("member")}
+            style={{
+              ...s.tabButton,
+              ...(accountChoice === "member" ? s.tabButtonActive : {}),
+            }}
+          >
+            🌟 Member / Explorer
+          </button>
+        </div>
+
+        {/* Title */}
+        <div style={{ textAlign: "center", marginBottom: "22px" }}>
+          <h2 style={{ fontSize: "24px", fontWeight: 800, color: "#ffffff", margin: "0 0 6px" }}>
+            {accountChoice === "landlord" ? "Create Owner Account" : "Create Member Account"}
+          </h2>
+          <p style={{ fontSize: "14px", color: "#94a3b8", margin: 0 }}>
+            {accountChoice === "landlord"
+              ? "List your property and connect with tenants directly"
+              : "Explore verified spaces, save favorites, and book easily"}
+          </p>
+        </div>
+
+        {error && <div style={s.alertError}>{error}</div>}
+        {success && <div style={s.alertSuccess}>{success}</div>}
+
+        {/* Landlord Type Picker */}
+        {accountChoice === "landlord" && (
+          <div style={{ marginBottom: "20px" }}>
+            <label style={s.label}>Property Specialty</label>
+            <div style={s.typeGrid}>
+              <button
+                type="button"
+                onClick={() => setLandlordType("general")}
+                style={{
+                  ...s.typeCard,
+                  ...(landlordType === "general" ? s.typeCardActive : {}),
+                }}
+              >
+                <div style={s.typeCardTitle}>🏡 General Rentals</div>
+                <div style={s.typeCardDesc}>Apartments, villas, family homes, commercial spaces</div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setLandlordType("university")}
+                style={{
+                  ...s.typeCard,
+                  ...(landlordType === "university" ? s.typeCardActive : {}),
+                }}
+              >
+                <div style={s.typeCardTitle}>🎓 Campus &amp; Hostels</div>
+                <div style={s.typeCardDesc}>Student rooms near colleges and university campuses</div>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div>
+            <label style={s.label}>Full Name</label>
+            <input
+              type="text"
+              name="name"
+              placeholder="e.g., Joseph Mwangi"
+              value={formData.name}
+              onChange={handleChange}
+              style={s.input}
+              required
+            />
           </div>
 
-          <h1 style={styles.title}>
-            {accountChoice === "member" ? "Member Sign Up" : "List Your Space or Business"}
-          </h1>
-          <p style={styles.subtitle}>
-            {accountChoice === "member"
-              ? "Join Axxspace to explore verified spaces and save favorites"
-              : "Choose how you list, then create your provider account"}
-          </p>
+          <div>
+            <label style={s.label}>Email Address</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="e.g., mwangi@example.com"
+              value={formData.email}
+              onChange={handleChange}
+              style={s.input}
+              required
+            />
+          </div>
 
-          {error && <div style={styles.error}>{error}</div>}
-          {success && <div style={styles.success}>{success}</div>}
+          <div>
+            <label style={s.label}>Phone Number (M-Pesa registered preferred)</label>
+            <PhoneInput
+              name="phone"
+              value={formData.phone}
+              onChange={(value) => setFormData((prev) => ({ ...prev, phone: value }))}
+              style={s.input}
+              required
+            />
+          </div>
 
-          {accountChoice === "provider" && (
-            <div style={styles.typeRow}>
-              <button
-                type="button"
-                style={{ ...styles.typeCard, ...(landlordType === "general" ? styles.typeCardActive : {}) }}
-                onClick={() => setLandlordType("general")}
-              >
-                <span style={styles.typeIcon}></span>
-                <strong>General Landlord</strong>
-                <span style={styles.typeDesc}>List rentals anywhere in Kenya</span>
-              </button>
-              <button
-                type="button"
-                style={{ ...styles.typeCard, ...(landlordType === "university" ? styles.typeCardActive : {}) }}
-                onClick={() => setLandlordType("university")}
-              >
-                <span style={styles.typeIcon}></span>
-                <strong>Near University</strong>
-                <span style={styles.typeDesc}>List hostels/rooms near a campus — shown to students</span>
-              </button>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} style={styles.form}>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Full Name</label>
+          <div>
+            <label style={s.label}>Password (Min 6 chars, letters &amp; numbers)</label>
+            <div style={{ position: "relative" }}>
               <input
-                type="text"
-                name="name"
-                placeholder="e.g., John Doe"
-                value={formData.name}
-                onChange={handleChange}
-                style={styles.input}
-                required
-              />
-            </div>
-
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Email Address</label>
-              <input
-                type="email"
-                name="email"
-                placeholder="e.g., landlord@example.com"
-                value={formData.email}
-                onChange={handleChange}
-                style={styles.input}
-                required
-              />
-            </div>
-
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Phone Number</label>
-              <PhoneInput
-                name="phone"
-                value={formData.phone}
-                onChange={(value) => setFormData((prev) => ({ ...prev, phone: value }))}
-                style={styles.input}
-                required
-              />
-            </div>
-
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Password</label>
-              <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
-                placeholder="Min 6 chars with letters & numbers"
+                placeholder="Create a strong password"
                 value={formData.password}
                 onChange={handleChange}
-                style={styles.input}
+                style={s.input}
                 required
               />
-              {formData.password && (formData.password.length < 6 || !/[a-zA-Z]/.test(formData.password) || !/[0-9]/.test(formData.password)) && (
-                <div style={{ color: "#fca5a5", fontSize: "11px", marginTop: "4px" }}>
-                  Password must contain both letters and numbers.
-                </div>
-              )}
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={s.passwordToggle}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
             </div>
+            {formData.password && (formData.password.length < 6 || !/[a-zA-Z]/.test(formData.password) || !/[0-9]/.test(formData.password)) && (
+              <p style={{ color: "#fca5a5", fontSize: "11px", margin: "4px 0 0" }}>
+                Password must contain both letters and numbers.
+              </p>
+            )}
+          </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                ...styles.submitBtn,
-                opacity: loading ? 0.7 : 1,
-                cursor: loading ? "not-allowed" : "pointer",
-              }}
-            >
-              {loading ? "Creating Account..." : "Create Landlord Account"}
-            </button>
-          </form>
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              ...s.submitBtn,
+              opacity: loading ? 0.7 : 1,
+              cursor: loading ? "not-allowed" : "pointer",
+            }}
+          >
+            {loading ? "Creating Account..." : accountChoice === "landlord" ? "Create Owner Account" : "Create Member Account"}
+          </button>
+        </form>
 
-          <div style={styles.divider}></div>
+        <div style={s.divider}>
+          <div style={s.dividerLine} />
+          <span style={s.dividerText}>or register with</span>
+          <div style={s.dividerLine} />
+        </div>
 
-          {/* Google Login Button */}
-          <div ref={googleButtonRef} style={styles.googleButtonContainer}></div>
+        <div ref={googleButtonRef} style={s.googleButtonContainer}></div>
 
-          <div style={styles.divider}></div>
-
-          <p style={styles.footer}>
-            Already have an account?{" "}
-            <Link to="/login" style={styles.link}>Login here</Link>
-          </p>
-          <p style={styles.footerSmall}>
-            Are you a mover?{" "}
-            <Link to="/movers" style={styles.link}>Join our Mover Network</Link>
+        <div style={{ marginTop: "24px", paddingTop: "18px", borderTop: "1px solid rgba(255,255,255,0.08)", textAlign: "center" }}>
+          <p style={{ color: "#94a3b8", fontSize: "14px", margin: 0 }}>
+            Already registered?{" "}
+            <Link to="/login" style={{ color: "#fbbf24", fontWeight: 700, textDecoration: "none" }}>
+              Sign In Here &rarr;
+            </Link>
           </p>
         </div>
       </div>
-    </div>
+    </AuthLayout>
   );
 }
 
-const styles = {
-  root: {
-    ...pageStyles.dark,
+const s = {
+  tabGroup: {
     display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "20px",
+    background: "rgba(15, 23, 42, 0.8)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    borderRadius: "14px",
+    padding: "4px",
+    marginBottom: "20px",
+    gap: "6px",
   },
-  container: {
+  tabButton: {
+    flex: 1,
+    padding: "11px 12px",
+    borderRadius: "10px",
+    border: "none",
+    background: "transparent",
+    color: "#94a3b8",
+    fontSize: "13px",
+    fontWeight: 700,
+    cursor: "pointer",
+    transition: "all 0.2s",
+  },
+  tabButtonActive: {
+    background: "rgba(251, 191, 36, 0.15)",
+    color: "#fbbf24",
+    border: "1px solid rgba(251, 191, 36, 0.4)",
+  },
+  typeGrid: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "10px",
+  },
+  typeCard: {
+    background: "rgba(15, 23, 42, 0.6)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    borderRadius: "12px",
+    padding: "12px",
+    textAlign: "left",
+    cursor: "pointer",
+    transition: "all 0.2s",
+  },
+  typeCardActive: {
+    borderColor: "#fbbf24",
+    background: "rgba(251, 191, 36, 0.08)",
+  },
+  typeCardTitle: {
+    fontSize: "13px",
+    fontWeight: 700,
+    color: "#f8fafc",
+    marginBottom: "3px",
+  },
+  typeCardDesc: {
+    fontSize: "11px",
+    color: "#94a3b8",
+    lineHeight: 1.35,
+  },
+  label: {
+    display: "block",
+    fontSize: "12px",
+    fontWeight: 700,
+    color: "#cbd5e1",
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
+    marginBottom: "6px",
+  },
+  input: {
     width: "100%",
-    maxWidth: "450px",
-  },
-  logoSection: {
-    textAlign: "center",
-    marginBottom: "30px",
-  },
-  logo: {
-    height: "70px",
-    width: "auto",
-  },
-  formBox: {
-    background: COLORS.bgLight,
-    border: `1px solid ${COLORS.border}`,
-    borderRadius: "16px",
-    padding: "40px 32px",
-    boxShadow: "0 10px 40px rgba(0, 0, 0, 0.3)",
-  },
-  title: {
-    fontSize: "26px",
-    fontWeight: 800,
-    color: COLORS.textLight,
-    margin: "0 0 8px",
-    textAlign: "center",
-  },
-  subtitle: {
+    padding: "12px 14px",
+    background: "rgba(15, 23, 42, 0.65)",
+    border: "1px solid rgba(255, 255, 255, 0.12)",
+    borderRadius: "10px",
+    color: "#f8fafc",
     fontSize: "14px",
-    color: COLORS.textMutedLight,
-    margin: "0 0 30px",
-    textAlign: "center",
+    boxSizing: "border-box",
+    transition: "all 0.2s",
   },
-  error: {
+  passwordToggle: {
+    position: "absolute",
+    right: "12px",
+    top: "50%",
+    transform: "translateY(-50%)",
+    background: "transparent",
+    border: "none",
+    color: "#94a3b8",
+    fontSize: "12px",
+    fontWeight: 700,
+    cursor: "pointer",
+  },
+  submitBtn: {
+    width: "100%",
+    padding: "14px",
+    background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
+    color: "#0B2140",
+    border: "none",
+    borderRadius: "12px",
+    fontSize: "15px",
+    fontWeight: 800,
+    cursor: "pointer",
+    boxShadow: "0 4px 14px rgba(251, 191, 36, 0.35)",
+    transition: "all 0.2s",
+    marginTop: "6px",
+  },
+  alertError: {
     background: "rgba(239, 68, 68, 0.15)",
     border: "1px solid rgba(239, 68, 68, 0.3)",
     color: "#fca5a5",
     padding: "12px 16px",
-    borderRadius: "8px",
-    marginBottom: "20px",
-    fontSize: "14px",
-    fontWeight: 500,
+    borderRadius: "10px",
+    fontSize: "13px",
+    textAlign: "center",
+    marginBottom: "16px",
   },
-  success: {
+  alertSuccess: {
     background: "rgba(34, 197, 94, 0.15)",
     border: "1px solid rgba(34, 197, 94, 0.3)",
     color: "#86efac",
     padding: "12px 16px",
-    borderRadius: "8px",
-    marginBottom: "20px",
-    fontSize: "14px",
-    fontWeight: 500,
+    borderRadius: "10px",
+    fontSize: "13px",
+    textAlign: "center",
+    marginBottom: "16px",
   },
-  form: {
+  googleButtonContainer: {
+    width: "100%",
+    minHeight: "44px",
     display: "flex",
-    flexDirection: "column",
-    gap: "20px",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  typeRow: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
+  divider: {
+    display: "flex",
+    alignItems: "center",
+    margin: "18px 0 16px",
     gap: "12px",
-    marginBottom: "24px",
   },
-  typeCard: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    gap: "6px",
-    padding: "14px 12px",
-    background: COLORS.bgDark,
-    border: `1px solid ${COLORS.border}`,
-    borderRadius: "12px",
-    cursor: "pointer",
-    textAlign: "left",
-    color: COLORS.textLight,
-    fontSize: "13px",
-    transition: "border-color 0.2s, background 0.2s",
+  dividerLine: {
+    flex: 1,
+    height: "1px",
+    background: "rgba(255, 255, 255, 0.1)",
   },
-  typeCardActive: {
-    borderColor: COLORS.primary,
-    background: "rgba(251, 191, 36, 0.08)",
-  },
-  typeIcon: { fontSize: "1.4rem" },
-  typeDesc: {
+  dividerText: {
+    color: "#64748b",
     fontSize: "11px",
-    color: COLORS.textMutedLight,
-    lineHeight: 1.4,
-    fontWeight: 400,
-  },
-  formGroup: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "6px",
-  },
-  label: {
-    fontSize: "13px",
-    fontWeight: 700,
-    color: COLORS.textMutedLight,
+    fontWeight: 600,
     textTransform: "uppercase",
     letterSpacing: "0.5px",
   },
-  input: inputStyles.dark,
-  submitBtn: buttonStyles.primary,
-  googleButtonContainer: {
-    width: "100%",
-    minHeight: "50px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-    zIndex: "5",
-    overflow: "visible",
-    margin: "8px 0",
-  },
-  googleBtn: {
-    width: "100%",
-    background: "white",
-    color: "#1f2937",
-    border: "1px solid #e5e7eb",
-    borderRadius: "10px",
-    padding: "14px",
-    fontSize: "15px",
-    fontWeight: 700,
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "10px",
-    transition: "all 0.2s",
-  },
-  divider: {
-    height: "1px",
-    background: COLORS.border,
-    margin: "20px 0",
-  },
-  footer: {
-    textAlign: "center",
-    color: COLORS.textMutedLight,
-    fontSize: "14px",
-  },
-  footerSmall: {
-    textAlign: "center",
-    color: COLORS.textMutedLight,
-    fontSize: "12px",
-    marginTop: "10px",
-  },
-  link: {
-    color: COLORS.accent,
-    textDecoration: "none",
-    fontWeight: 700,
-  },
 };
-
-const css = `
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
-
-  input:focus {
-    outline: none;
-    border-color: ${COLORS.accent} !important;
-    background: rgba(15,23,41,0.9) !important;
-    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.12);
-  }
-  
-  button:hover:not(:disabled) {
-    transform: translateY(-2px);
-    opacity: 0.9;
-  }
-  
-  a[style*="color: #fbbf24"]:hover {
-    opacity: 0.8;
-  }
-
-  /* Google Sign-In Button Fixes */
-  .googleButtonContainer iframe {
-    position: relative !important;
-    z-index: 100 !important;
-  }
-
-  .googleButtonContainer > div {
-    display: flex !important;
-    justify-content: center !important;
-    width: 100% !important;
-  }
-`;

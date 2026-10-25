@@ -1,149 +1,17 @@
 import { useState, useContext, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import PhoneInput from "../components/PhoneInput";
 import { KENYA_COUNTIES } from "../features/accommodation";
-import { useGoogleSignIn, GOOGLE_CLIENT_ID } from "../hooks/useGoogleSignIn";
+import { useGoogleSignIn } from "../hooks/useGoogleSignIn";
+import AuthLayout from "../components/AuthLayout";
 
-const counties = KENYA_COUNTIES;
-
-const s = {
-  root: {
-    fontFamily: "'DM Sans', sans-serif",
-    background: "linear-gradient(135deg, #fef9c3 0%, #fde68a 100%)",
-    minHeight: "100vh",
-    padding: "20px",
-  },
-  container: {
-    maxWidth: "500px",
-    margin: "0 auto",
-    background: "white",
-    borderRadius: "20px",
-    boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
-    padding: "40px 30px",
-  },
-  logo: {
-    textAlign: "center",
-    marginBottom: "24px",
-  },
-  logoAccent: {
-    color: "#fbbf24",
-    fontWeight: 800,
-    fontSize: "28px",
-  },
-  logoWord: {
-    color: "#1f2937",
-    fontWeight: 800,
-    fontSize: "28px",
-  },
-  title: {
-    fontSize: "24px",
-    fontWeight: 800,
-    color: "#1f2937",
-    marginBottom: "8px",
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: "14px",
-    color: "#6b7280",
-    textAlign: "center",
-    marginBottom: "32px",
-  },
-  field: {
-    marginBottom: "20px",
-  },
-  label: {
-    display: "block",
-    fontSize: "13px",
-    fontWeight: 700,
-    color: "#374151",
-    marginBottom: "6px",
-  },
-  input: {
-    width: "100%",
-    padding: "12px 16px",
-    border: "2px solid #e5e7eb",
-    borderRadius: "10px",
-    fontSize: "14px",
-    fontFamily: "inherit",
-    transition: "border-color 0.2s",
-    boxSizing: "border-box",
-  },
-  textarea: {
-    width: "100%",
-    padding: "12px 16px",
-    border: "2px solid #e5e7eb",
-    borderRadius: "10px",
-    fontSize: "14px",
-    fontFamily: "inherit",
-    minHeight: "120px",
-    resize: "vertical",
-    boxSizing: "border-box",
-  },
-  button: {
-    width: "100%",
-    padding: "14px",
-    background: "#fbbf24",
-    color: "#1f2937",
-    border: "none",
-    borderRadius: "10px",
-    fontSize: "16px",
-    fontWeight: 800,
-    cursor: "pointer",
-    fontFamily: "inherit",
-    transition: "background 0.2s",
-  },
-  buttonDisabled: {
-    opacity: 0.5,
-    cursor: "not-allowed",
-  },
-  error: {
-    background: "#fee2e2",
-    color: "#dc2626",
-    padding: "12px",
-    borderRadius: "8px",
-    fontSize: "13px",
-    marginBottom: "16px",
-  },
-  success: {
-    background: "#dcfce7",
-    color: "#16a34a",
-    padding: "12px",
-    borderRadius: "8px",
-    fontSize: "13px",
-    marginBottom: "16px",
-  },
-  link: {
-    textAlign: "center",
-    marginTop: "20px",
-    fontSize: "13px",
-    color: "#6b7280",
-  },
-  linkText: {
-    color: "#fbbf24",
-    fontWeight: 600,
-    cursor: "pointer",
-    textDecoration: "none",
-  },
-  hint: {
-    fontSize: "11px",
-    color: "#9ca3af",
-    marginTop: "4px",
-  },
-};
-
-const css = `
-  input:focus, textarea:focus, select:focus {
-    border-color: #fbbf24 !important;
-  }
-  button:hover:not(:disabled) {
-    opacity: 0.8;
-  }
-`;
+const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
 export default function AgentRegister() {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -152,46 +20,48 @@ export default function AgentRegister() {
     county: "",
     bio: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [googleError, setGoogleError] = useState("");
 
-  const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
+  const handleGoogleCredential = useCallback(
+    async (googleUser) => {
+      try {
+        setLoading(true);
+        setError("");
+        setGoogleError("");
 
-  const handleGoogleCredential = useCallback(async (googleUser) => {
-    try {
-      setLoading(true);
-      setError("");
-      setGoogleError("");
+        const res = await fetch(`${API_BASE}/auth/google`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            googleId: googleUser.sub,
+            email: googleUser.email,
+            name: googleUser.name,
+            picture: googleUser.picture,
+            role: "agent",
+          }),
+        });
 
-      const res = await fetch(`${API_BASE}/auth/google`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          googleId: googleUser.sub,
-          email: googleUser.email,
-          name: googleUser.name,
-          picture: googleUser.picture,
-          role: "agent",
-        }),
-      });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Google registration failed");
+        if (!data.token || !data.user) throw new Error("Invalid response from server");
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Google registration failed");
-      if (!data.token || !data.user) throw new Error("Invalid response from server");
-
-      login(data.token, data.user);
-      setSuccess(" Google registration successful! Redirecting to agent dashboard...");
-      setTimeout(() => {
-        navigate("/agent/dashboard");
-      }, 900);
-    } catch (err) {
-      setGoogleError(err.message || "Google registration failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }, [API_BASE, login, navigate]);
+        login(data.token, data.user);
+        setSuccess("✓ Google registration successful! Redirecting to agent dashboard...");
+        setTimeout(() => {
+          navigate("/agent/dashboard");
+        }, 900);
+      } catch (err) {
+        setGoogleError(err.message || "Google registration failed. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [login, navigate]
+  );
 
   const handleGoogleError = useCallback((message) => {
     setGoogleError(message);
@@ -203,7 +73,8 @@ export default function AgentRegister() {
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setError("");
   };
 
   const validatePassword = (password) => {
@@ -229,8 +100,8 @@ export default function AgentRegister() {
       return;
     }
 
-    if (!formData.name || !formData.email || !formData.phone || !formData.password || !formData.county || !formData.bio) {
-      setError("Please fill in all fields");
+    if (!formData.name || !formData.email || !formData.phone || !formData.county || !formData.bio) {
+      setError("Please fill in all required fields.");
       return;
     }
 
@@ -253,37 +124,19 @@ export default function AgentRegister() {
       }
 
       if (data.requiresVerification) {
-        setSuccess("Registration successful! A verification link has been sent to " + formData.email + ". Please verify your email before logging in.");
+        setSuccess("✓ Account created! We've sent a verification email to " + formData.email + ". Please verify before logging in.");
         setTimeout(() => {
           navigate("/agent/login");
         }, 3000);
         return;
       }
 
-      // Auto-login after registration
-      const loginResponse = await fetch(`${API_BASE}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
-
-      const loginData = await loginResponse.json();
-
-      if (loginResponse.ok) {
-        login(loginData.token, loginData.user);
-        setSuccess("Registration successful! Redirecting to agent dashboard...");
-        setTimeout(() => {
-          navigate("/agent/dashboard");
-        }, 2000);
-      } else {
-        setSuccess("Registration successful! Please log in.");
-        setTimeout(() => {
-          navigate("/agent/login");
-        }, 2000);
-      }
+      // Auto login if no verification required
+      login(data.token, data.user);
+      setSuccess("✓ Registration successful! Redirecting to your agent dashboard...");
+      setTimeout(() => {
+        navigate("/agent/dashboard");
+      }, 1500);
     } catch (err) {
       setError(err.message || "Registration failed. Please try again.");
     } finally {
@@ -291,102 +144,120 @@ export default function AgentRegister() {
     }
   };
 
+  const features = [
+    {
+      title: "Direct Landlord Mandates",
+      desc: "Gain authorized access to manage property listings, arrange viewings, and close deals directly.",
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+      ),
+    },
+    {
+      title: "Automated Commission Tracking",
+      desc: "Keep precise records of tenant deposits, agency fees, and escrow payments seamlessly.",
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <line x1="12" y1="1" x2="12" y2="23"></line>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+        </svg>
+      ),
+    },
+    {
+      title: "Verified Agent Credential",
+      desc: "Receive digital badges and client ratings that put you ahead in your county of operation.",
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <path d="M9 12l2 2 4-4"></path>
+        </svg>
+      ),
+    },
+  ];
+
+  const stats = [
+    { value: "1,200+", label: "Verified Agents" },
+    { value: "47", label: "Counties" },
+    { value: "0%", label: "Platform Cut on Fees" },
+  ];
+
   return (
-    <div style={s.root}>
-      <style>{css}</style>
-
-      <div style={s.container}>
-        <div style={s.logo}>
-          <span style={s.logoAccent}>AXX</span>
-          <span style={s.logoWord}>SPACE</span>
+    <AuthLayout
+      portalBadge="Axx Verified Agent Network"
+      portalTitle="Join Kenya's Premier Real Estate Agent Network"
+      portalSubtitle="Build your professional portfolio, earn direct commissions, and manage landlord properties effortlessly."
+      accentColor="#10b981"
+      accentGlow="rgba(16, 185, 129, 0.2)"
+      features={features}
+      stats={stats}
+      backLink="/"
+      backText="Back to Home"
+    >
+      <div style={localStyles.container}>
+        <div style={localStyles.header}>
+          <h2 style={localStyles.title}>Apply as an Agent</h2>
+          <p style={localStyles.subtitle}>
+            Register your credentials to start managing properties and securing tenant placements.
+          </p>
         </div>
 
-        <h1 style={s.title}>Agent Registration</h1>
-        <p style={s.subtitle}>Create your agent account to connect with accommodation providers</p>
+        {error && <div style={localStyles.errorAlert}>{error}</div>}
+        {success && <div style={localStyles.successAlert}>{success}</div>}
+        {googleError && <div style={localStyles.errorAlert}>{googleError}</div>}
 
-        {error && <div style={s.error}>{error}</div>}
-        {success && <div style={s.success}>{success}</div>}
-        {googleError && <div style={s.error}>{googleError}</div>}
-
-        {GOOGLE_CLIENT_ID ? (
-          <div style={{ marginBottom: "20px", display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <p style={{ fontSize: "12px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "12px" }}>
-              Sign Up With Google
-            </p>
-            <div ref={googleButtonRef} style={{ width: "100%", display: "flex", justifyContent: "center", minHeight: "44px" }}></div>
-          </div>
-        ) : null}
-
-        <div style={{ display: "flex", alignItems: "center", margin: "20px 0", color: "#9ca3af", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-          <div style={{ flex: 1, height: "1px", background: "#e5e7eb" }}></div>
-          <span style={{ padding: "0 12px" }}>or register with email</span>
-          <div style={{ flex: 1, height: "1px", background: "#e5e7eb" }}></div>
-        </div>
-
-        <form onSubmit={handleSubmit}>
-          <div style={s.field}>
-            <label style={s.label}>Full Name *</label>
+        <form onSubmit={handleSubmit} style={localStyles.form}>
+          <div style={localStyles.fieldGroup}>
+            <label style={localStyles.label}>Full Legal Name</label>
             <input
-              type="text"
               name="name"
-              style={s.input}
-              placeholder="Your full name"
+              type="text"
+              placeholder="e.g., Alex Kiprono"
               value={formData.name}
               onChange={handleChange}
+              style={localStyles.input}
               required
             />
           </div>
 
-          <div style={s.field}>
-            <label style={s.label}>Email *</label>
+          <div style={localStyles.fieldGroup}>
+            <label style={localStyles.label}>Professional Email</label>
             <input
-              type="email"
               name="email"
-              style={s.input}
-              placeholder="your@email.com"
+              type="email"
+              placeholder="agent@example.com"
               value={formData.email}
               onChange={handleChange}
+              style={localStyles.input}
               required
             />
           </div>
 
-          <div style={s.field}>
-            <label style={s.label}>Phone Number *</label>
+          <div style={localStyles.fieldGroup}>
+            <label style={localStyles.label}>Phone Number</label>
             <PhoneInput
+              name="phone"
               value={formData.phone}
-              onChange={(value) => setFormData({ ...formData, phone: value })}
-              placeholder="e.g. 0712 345 678"
+              onChange={(value) => setFormData((prev) => ({ ...prev, phone: value }))}
+              style={localStyles.input}
               required
             />
           </div>
 
-          <div style={s.field}>
-            <label style={s.label}>Password *</label>
-            <input
-              type="password"
-              name="password"
-              style={s.input}
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-            <div style={s.hint}>
-              Must be at least 6 characters with letters and numbers
-            </div>
-          </div>
-
-          <div style={s.field}>
-            <label style={s.label}>County of Operation *</label>
+          <div style={localStyles.fieldGroup}>
+            <label style={localStyles.label}>Primary County of Operation</label>
             <select
-              style={s.input}
               name="county"
               value={formData.county}
               onChange={handleChange}
+              style={localStyles.select}
               required
             >
-              <option value="">Select county...</option>
-              {counties.map((c) => (
+              <option value="">Select County</option>
+              {KENYA_COUNTIES.map((c) => (
                 <option key={c} value={c}>
                   {c}
                 </option>
@@ -394,40 +265,253 @@ export default function AgentRegister() {
             </select>
           </div>
 
-          <div style={s.field}>
-            <label style={s.label}>Bio / Experience *</label>
+          <div style={localStyles.fieldGroup}>
+            <label style={localStyles.label}>Professional Bio &amp; Specialization</label>
             <textarea
-              style={s.textarea}
               name="bio"
+              placeholder="Briefly state your experience, areas of specialization (residential, commercial, rentals), or agency affiliation..."
               value={formData.bio}
               onChange={handleChange}
-              placeholder="Tell us about your experience in the rental market, areas you specialize in, and what makes you a great agent..."
+              style={localStyles.textarea}
+              rows={3}
               required
             />
           </div>
 
+          <div style={localStyles.fieldGroup}>
+            <label style={localStyles.label}>Password</label>
+            <div style={localStyles.passwordWrapper}>
+              <input
+                name="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Min 6 chars with letters & numbers"
+                value={formData.password}
+                onChange={handleChange}
+                style={{ ...localStyles.input, paddingRight: "46px" }}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={localStyles.eyeBtn}
+                aria-label="Toggle password visibility"
+              >
+                {showPassword ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                  </svg>
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                )}
+              </button>
+            </div>
+            {formData.password && (
+              <div style={localStyles.strengthNotice}>
+                {formData.password.length < 6 ||
+                !/[a-zA-Z]/.test(formData.password) ||
+                !/[0-9]/.test(formData.password) ? (
+                  <span style={{ color: "#f87171" }}>
+                    ✗ Must contain at least 6 characters with both letters &amp; numbers
+                  </span>
+                ) : (
+                  <span style={{ color: "#34d399" }}>
+                    ✓ Strong password format
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+
           <button
             type="submit"
-            style={{ ...s.button, ...(loading ? s.buttonDisabled : {}) }}
             disabled={loading}
+            style={localStyles.primaryBtn}
           >
-            {loading ? "Creating Account..." : "Create Agent Account"}
+            {loading ? "Submitting Application..." : "Submit Agent Application"}
           </button>
         </form>
 
-        <div style={s.link}>
-          Already have an agent account?{" "}
-          <span style={s.linkText} onClick={() => navigate("/agent/login")}>
-            Log In
-          </span>
+        <div style={localStyles.divider}>
+          <div style={localStyles.dividerLine} />
+          <span style={localStyles.dividerText}>or register with</span>
+          <div style={localStyles.dividerLine} />
         </div>
 
-        <div style={s.link}>
-          <span style={s.linkText} onClick={() => navigate("/")}>
-            ← Back to Home
+        <div ref={googleButtonRef} style={localStyles.googleBtnBox} />
+
+        <div style={localStyles.bottomSwitch}>
+          <span style={{ color: "#94a3b8", fontSize: "14px" }}>
+            Already an accredited agent?{" "}
           </span>
+          <Link to="/agent/login" style={localStyles.registerLink}>
+            Sign In Here
+          </Link>
         </div>
       </div>
-    </div>
+    </AuthLayout>
   );
 }
+
+const localStyles = {
+  container: {
+    display: "flex",
+    flexDirection: "column",
+  },
+  header: {
+    marginBottom: "24px",
+  },
+  title: {
+    margin: 0,
+    fontSize: "26px",
+    fontWeight: 800,
+    color: "#f8fafc",
+    letterSpacing: "-0.5px",
+  },
+  subtitle: {
+    margin: "8px 0 0 0",
+    fontSize: "14px",
+    color: "#94a3b8",
+    lineHeight: 1.5,
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "16px",
+  },
+  fieldGroup: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "6px",
+  },
+  label: {
+    fontSize: "13px",
+    fontWeight: 600,
+    color: "#cbd5e1",
+  },
+  input: {
+    width: "100%",
+    padding: "12px 14px",
+    background: "rgba(15, 23, 42, 0.8)",
+    border: "1px solid rgba(255, 255, 255, 0.12)",
+    borderRadius: "10px",
+    color: "#f8fafc",
+    fontSize: "14px",
+    outline: "none",
+    boxSizing: "border-box",
+  },
+  select: {
+    width: "100%",
+    padding: "12px 14px",
+    background: "#0f172a",
+    border: "1px solid rgba(255, 255, 255, 0.12)",
+    borderRadius: "10px",
+    color: "#f8fafc",
+    fontSize: "14px",
+    outline: "none",
+    boxSizing: "border-box",
+  },
+  textarea: {
+    width: "100%",
+    padding: "12px 14px",
+    background: "rgba(15, 23, 42, 0.8)",
+    border: "1px solid rgba(255, 255, 255, 0.12)",
+    borderRadius: "10px",
+    color: "#f8fafc",
+    fontSize: "14px",
+    outline: "none",
+    boxSizing: "border-box",
+    resize: "vertical",
+    fontFamily: "inherit",
+  },
+  passwordWrapper: {
+    position: "relative",
+    display: "flex",
+    alignItems: "center",
+  },
+  eyeBtn: {
+    position: "absolute",
+    right: "12px",
+    background: "none",
+    border: "none",
+    color: "#94a3b8",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "4px",
+  },
+  strengthNotice: {
+    fontSize: "12px",
+    marginTop: "4px",
+  },
+  primaryBtn: {
+    marginTop: "6px",
+    padding: "14px",
+    background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+    color: "#ffffff",
+    border: "none",
+    borderRadius: "10px",
+    fontSize: "15px",
+    fontWeight: 800,
+    cursor: "pointer",
+    boxShadow: "0 4px 16px rgba(16, 185, 129, 0.3)",
+    transition: "transform 0.2s ease, box-shadow 0.2s ease",
+  },
+  errorAlert: {
+    background: "rgba(239, 68, 68, 0.15)",
+    border: "1px solid rgba(239, 68, 68, 0.35)",
+    color: "#fca5a5",
+    padding: "12px 14px",
+    borderRadius: "10px",
+    fontSize: "13px",
+    marginBottom: "16px",
+    lineHeight: 1.4,
+  },
+  successAlert: {
+    background: "rgba(16, 185, 129, 0.15)",
+    border: "1px solid rgba(16, 185, 129, 0.35)",
+    color: "#6ee7b7",
+    padding: "12px 14px",
+    borderRadius: "10px",
+    fontSize: "13px",
+    marginBottom: "16px",
+    lineHeight: 1.4,
+  },
+  divider: {
+    display: "flex",
+    alignItems: "center",
+    margin: "20px 0 16px 0",
+  },
+  dividerLine: {
+    flex: 1,
+    height: "1px",
+    background: "rgba(255, 255, 255, 0.08)",
+  },
+  dividerText: {
+    padding: "0 12px",
+    fontSize: "12px",
+    color: "#64748b",
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
+  },
+  googleBtnBox: {
+    width: "100%",
+    minHeight: "44px",
+    display: "flex",
+    justifyContent: "center",
+    marginBottom: "18px",
+  },
+  bottomSwitch: {
+    textAlign: "center",
+    marginTop: "8px",
+  },
+  registerLink: {
+    color: "#10b981",
+    fontWeight: 700,
+    textDecoration: "none",
+  },
+};
