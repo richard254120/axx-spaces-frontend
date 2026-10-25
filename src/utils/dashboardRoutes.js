@@ -107,6 +107,22 @@ export function isWorkspaceUser(role) {
 }
 
 export const ACCOUNT_NAV_BY_ROLE = {
+  member: [
+    { label: "My Hub", path: "/member" },
+    { label: "Saved Spaces", path: "/saved" },
+    { label: "My Bookings", path: "/my-bookings" },
+    { label: "Messages", path: "/messages" },
+    { label: "Profile", path: "/profile" },
+    { label: "Settings", path: "/settings" },
+  ],
+  user: [
+    { label: "My Hub", path: "/member" },
+    { label: "Saved Spaces", path: "/saved" },
+    { label: "My Bookings", path: "/my-bookings" },
+    { label: "Messages", path: "/messages" },
+    { label: "Profile", path: "/profile" },
+    { label: "Settings", path: "/settings" },
+  ],
   landlord: [
     { label: "Dashboard", path: "/dashboard" },
     { label: "Upload", path: "/upload" },
@@ -120,6 +136,7 @@ export const ACCOUNT_NAV_BY_ROLE = {
   ],
   host: [
     { label: "Dashboard", path: "/accommodation/dashboard" },
+    { label: "Add Listing", path: "/accommodation/register-property" },
     { label: "Settings", path: "/settings" },
   ],
   seller: [
@@ -147,7 +164,7 @@ export const ACCOUNT_NAV_BY_ROLE = {
 };
 
 export function getAccountNav(role) {
-  return ACCOUNT_NAV_BY_ROLE[normalizeRole(role)] || ACCOUNT_NAV_BY_ROLE.landlord;
+  return ACCOUNT_NAV_BY_ROLE[normalizeRole(role)] || ACCOUNT_NAV_BY_ROLE.member;
 }
 
 export function getWorkspaceBrand(role) {
@@ -160,6 +177,8 @@ export function getWorkspaceBrand(role) {
     admin: "Admin Panel",
     team: "Admin Panel",
     host: "Accommodation Host Portal",
+    member: "Member Account",
+    user: "Member Account",
   };
   return brands[normalizeRole(role)] || "My Account";
 }

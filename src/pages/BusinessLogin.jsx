@@ -175,7 +175,7 @@ export default function BusinessLogin() {
           email: googleUser.email,
           name: googleUser.name,
           picture: googleUser.picture,
-          role: "user",
+          role: "business",
         }),
       });
 
@@ -223,7 +223,7 @@ export default function BusinessLogin() {
     setShowResend(false);
 
     try {
-      const res = await API.post("/auth/login", { ...formData, role: "user" });
+      const res = await API.post("/auth/login", { ...formData, role: "business" });
       const { token, user } = res.data;
 
       login(token, user);

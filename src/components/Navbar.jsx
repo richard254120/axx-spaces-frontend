@@ -226,9 +226,9 @@ export default function Navbar() {
                 </Link>
                 {menuLink({ to: "/saved", label: "Saved Listings" })}
                 {menuLink({ to: "/axxwallet", label: "AxxWallet" })}
-                {user?.role !== "member" && user?.role !== "user" && menuLink({ to: "/upload", label: "Upload Property" })}
+                {["landlord", "agent", "host"].includes(user?.role?.toLowerCase()) && menuLink({ to: "/upload", label: "Upload Property" })}
                 {(user?.role === "member" || user?.role === "user")
-                  ? menuLink({ to: "/member", label: "My Activities & Spaces" })
+                  ? menuLink({ to: "/member", label: "My Hub & Activities" })
                   : menuLink({ to: getDashboardLink(), label: "Dashboard" })}
                 {menuLink({ to: "/profile", label: "Profile" })}
                 {menuLink({ to: "/settings", label: "Settings" })}
@@ -336,13 +336,13 @@ export default function Navbar() {
                       <div className="ax-divider" />
                       {(user.role === "member" || user.role === "user") && (
                         <Link to="/member" className="ax-item" style={{ color: "#fbbf24", fontWeight: 700 }} onClick={() => setAccountOpen(false)}>
-                          My Activities & Dashboard
+                          My Activities & Hub
                         </Link>
                       )}
-                      <Link to="/saved-listings" className="ax-item" onClick={() => setAccountOpen(false)}>
+                      <Link to="/saved" className="ax-item" onClick={() => setAccountOpen(false)}>
                         Saved Spaces
                       </Link>
-                      <Link to="/accommodation/guest-dashboard" className="ax-item" onClick={() => setAccountOpen(false)}>
+                      <Link to="/my-bookings" className="ax-item" onClick={() => setAccountOpen(false)}>
                         My Bookings
                       </Link>
                       <Link to="/messages" className="ax-item" onClick={() => setAccountOpen(false)}>
@@ -404,16 +404,30 @@ export default function Navbar() {
                 <Link to="/settings" className={`ax-tab${isActive("/settings") ? " is-active" : ""}`} onClick={() => setMenuOpen(false)}>
                   Settings
                 </Link>
-                <Link to="/upload" className={`ax-tab${isActive("/upload") ? " is-active" : ""}`} onClick={() => setMenuOpen(false)}>
-                  Upload
-                </Link>
-                <Link
-                  to={getDashboardLink()}
-                  className={`ax-tab${isActive(getDashboardLink()) ? " is-active" : ""}`}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  Dashboard
-                </Link>
+                {/* Upload ONLY for landlords, agents, hosts */}
+                {user?.role && ["landlord", "agent", "host"].includes(user.role.toLowerCase()) && (
+                  <Link to="/upload" className={`ax-tab${isActive("/upload") ? " is-active" : ""}`} onClick={() => setMenuOpen(false)}>
+                    Upload
+                  </Link>
+                )}
+                {/* Regular members see My Hub instead of provider Dashboard */}
+                {user?.role && (user.role.toLowerCase() === "member" || user.role.toLowerCase() === "user") ? (
+                  <Link
+                    to="/member"
+                    className={`ax-tab${isActive("/member") ? " is-active" : ""}`}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    My Hub
+                  </Link>
+                ) : (
+                  <Link
+                    to={getDashboardLink()}
+                    className={`ax-tab${isActive(getDashboardLink()) ? " is-active" : ""}`}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                )}
 
                 <div className="ax-tabs-user">
                   <NotificationBell />
@@ -430,11 +444,29 @@ export default function Navbar() {
                     </button>
                     {userMenuOpen && (
                       <div className="ax-nav-panel ax-user-panel">
+                        <Link to="/profile" className="ax-item" onClick={() => setUserMenuOpen(false)}>
+                          My Profile
+                        </Link>
+                        {user?.role && (user.role.toLowerCase() === "member" || user.role.toLowerCase() === "user") ? (
+                          <Link to="/member" className="ax-item" onClick={() => setUserMenuOpen(false)}>
+                            My Hub & Activities
+                          </Link>
+                        ) : (
+                          <Link to={getDashboardLink()} className="ax-item" onClick={() => setUserMenuOpen(false)}>
+                            Dashboard
+                          </Link>
+                        )}
+                        <Link to="/saved" className="ax-item" onClick={() => setUserMenuOpen(false)}>
+                          Saved Spaces
+                        </Link>
+                        <Link to="/my-bookings" className="ax-item" onClick={() => setUserMenuOpen(false)}>
+                          My Bookings
+                        </Link>
                         <Link to="/payment-history" className="ax-item" onClick={() => setUserMenuOpen(false)}>
                           Payment History
                         </Link>
-                        <Link to={getDashboardLink()} className="ax-item" onClick={() => setUserMenuOpen(false)}>
-                          Dashboard
+                        <Link to="/settings" className="ax-item" onClick={() => setUserMenuOpen(false)}>
+                          Settings
                         </Link>
                         <button type="button" className="ax-item ax-item-danger" onClick={handleLogout}>
                           Logout

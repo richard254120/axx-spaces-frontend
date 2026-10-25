@@ -217,7 +217,16 @@ function App() {
       <Route path="/host-register" element={<BareLayout><AccommodationLogin defaultTab="register" /></BareLayout>} />
       <Route path="/host-portal" element={<BareLayout><AccommodationLogin defaultTab="login" /></BareLayout>} />
       <Route path="/accommodation/listings" element={<PublicLayout><AccommodationListingsPage /></PublicLayout>} />
-      <Route path="/accommodation/register-property" element={<PublicLayout><RegisterPropertyPage /></PublicLayout>} />
+      <Route
+        path="/accommodation/register-property"
+        element={
+          <DashboardLayout>
+            <ProtectedRoute allowedRoles={["host", "admin"]} loginPath="/accommodation/login">
+              <RegisterPropertyPage />
+            </ProtectedRoute>
+          </DashboardLayout>
+        }
+      />
       <Route
         path="/accommodation/dashboard"
         element={
@@ -279,7 +288,7 @@ function App() {
         path="/business/create"
         element={
           <DashboardLayout>
-            <ProtectedRoute loginPath="/business-login" allowedRoles={["user"]}>
+            <ProtectedRoute loginPath="/business-login" allowedRoles={["business", "admin"]}>
               <BusinessForm />
             </ProtectedRoute>
           </DashboardLayout>
@@ -289,7 +298,7 @@ function App() {
         path="/business/edit/:id"
         element={
           <DashboardLayout>
-            <ProtectedRoute loginPath="/business-login" allowedRoles={["user"]}>
+            <ProtectedRoute loginPath="/business-login" allowedRoles={["business", "admin"]}>
               <BusinessForm />
             </ProtectedRoute>
           </DashboardLayout>
@@ -300,7 +309,7 @@ function App() {
         path="/business-dashboard"
         element={
           <DashboardLayout>
-            <ProtectedRoute loginPath="/business-login" allowedRoles={["user"]}>
+            <ProtectedRoute loginPath="/business-login" allowedRoles={["business", "admin"]}>
               <UserDashboard />
             </ProtectedRoute>
           </DashboardLayout>
@@ -391,7 +400,7 @@ function App() {
         path="/profile"
         element={
           <DashboardLayout>
-            <ProtectedRoute><ProfilePage /></ProtectedRoute>
+            <ProtectedRoute loginPath="/user-login"><ProfilePage /></ProtectedRoute>
           </DashboardLayout>
         }
       />
@@ -399,7 +408,7 @@ function App() {
         path="/settings"
         element={
           <DashboardLayout>
-            <Verification />
+            <ProtectedRoute loginPath="/user-login"><Verification /></ProtectedRoute>
           </DashboardLayout>
         }
       />
@@ -407,7 +416,7 @@ function App() {
         path="/wallet"
         element={
           <DashboardLayout>
-            <ProtectedRoute><WalletPage /></ProtectedRoute>
+            <ProtectedRoute loginPath="/user-login"><WalletPage /></ProtectedRoute>
           </DashboardLayout>
         }
       />
@@ -415,7 +424,7 @@ function App() {
         path="/verification"
         element={
           <DashboardLayout>
-            <Verification />
+            <ProtectedRoute loginPath="/user-login"><Verification /></ProtectedRoute>
           </DashboardLayout>
         }
       />
@@ -431,7 +440,7 @@ function App() {
         path="/saved"
         element={
           <DashboardLayout>
-            <ProtectedRoute><SavedListingsPage /></ProtectedRoute>
+            <ProtectedRoute loginPath="/user-login"><SavedListingsPage /></ProtectedRoute>
           </DashboardLayout>
         }
       />
@@ -439,7 +448,7 @@ function App() {
         path="/messages"
         element={
           <DashboardLayout>
-            <ProtectedRoute><MessagesPage /></ProtectedRoute>
+            <ProtectedRoute loginPath="/user-login"><MessagesPage /></ProtectedRoute>
           </DashboardLayout>
         }
       />
@@ -447,7 +456,7 @@ function App() {
         path="/notifications"
         element={
           <DashboardLayout>
-            <ProtectedRoute><NotificationsPage /></ProtectedRoute>
+            <ProtectedRoute loginPath="/user-login"><NotificationsPage /></ProtectedRoute>
           </DashboardLayout>
         }
       />
@@ -455,7 +464,7 @@ function App() {
         path="/payment-history"
         element={
           <DashboardLayout>
-            <ProtectedRoute><PaymentHistory /></ProtectedRoute>
+            <ProtectedRoute loginPath="/user-login"><PaymentHistory /></ProtectedRoute>
           </DashboardLayout>
         }
       />
