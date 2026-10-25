@@ -14,9 +14,10 @@ const css = `
 @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap');
 
 .ax-root{
-  --ink:#101614; --ink-2:#2B3532; --mute:#617069; --line:#E3E7E3;
-  --paper:#FAFAF7; --card:#FFFFFF; --green:#0B5D3B; --green-d:#073F29;
-  --green-l:#E4F1EA; --red:#B3261E; --amber:#F2A33A;
+  --ink:#0F172A; --ink-2:#1E293B; --mute:#64748B; --line:#E2E8F0;
+  --paper:#F8FAFC; --card:#FFFFFF; --green:#0B5D3B; --green-d:#073F29;
+  --green-l:#E4F1EA; --red:#E31B1B; --amber:#F59E0B;
+  --bg-dark:#08101D; --navy-dark:#0F172A;
   font-family:'Instrument Sans',system-ui,sans-serif; color:var(--ink);
   background:var(--paper); min-height:100vh; overflow-x:hidden; line-height:1.5;
 }
@@ -32,17 +33,95 @@ const css = `
 .ax-root .ax-sec-head p{color:var(--mute);max-width:460px;font-size:16px}
 
 /* trust bar */
-.ax-root .ax-trust{background:var(--green-d);color:#CFE6DA;font-size:13px}
+.ax-root .ax-trust{background:#0B1322;color:#94A3B8;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.08)}
 .ax-root .ax-trust .ax-wrap{display:flex;gap:28px;justify-content:center;flex-wrap:wrap;padding-block:9px}
 .ax-root .ax-trust span{display:inline-flex;align-items:center;gap:8px}
 .ax-root .ax-trust i{width:6px;height:6px;border-radius:50%;background:var(--amber);display:inline-block}
 
+/* Ambient mesh & glowing orbs (Matching Rentals/Property & Accommodation) */
+.ambient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  pointer-events: none;
+  z-index: -2;
+  opacity: 0.6;
+  animation: orbFloat 10s ease-in-out infinite alternate;
+}
+.orb-crimson {
+  top: -100px;
+  left: 10%;
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(227, 27, 27, 0.35) 0%, transparent 70%);
+}
+.orb-amber {
+  top: 40px;
+  right: 5%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, transparent 70%);
+  animation-delay: -3s;
+}
+.orb-navy {
+  bottom: -150px;
+  left: 40%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, transparent 70%);
+  animation-delay: -6s;
+}
+
+@keyframes orbFloat {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(30px) scale(1.1); }
+}
+
+.hero-grid-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(circle at 50% 40%, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(circle at 50% 40%, black 30%, transparent 80%);
+  pointer-events: none;
+  z-index: -1;
+}
+
 /* hero */
-.ax-root .ax-hero{position:relative;color:#fff;background:#07130D;isolation:isolate}
-.ax-root .ax-hero video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;transition:opacity .8s}
-.ax-root .ax-hero::after{content:"";position:absolute;inset:0;z-index:-1;
-  background:linear-gradient(100deg,rgba(7,19,13,.92) 0%,rgba(7,19,13,.72) 55%,rgba(7,19,13,.45) 100%)}
-.ax-root .ax-hero-inner{padding:110px 24px 100px;max-width:1200px;margin:0 auto}
+.ax-root .ax-hero{
+  position:relative;
+  color:#fff;
+  background: radial-gradient(circle at 50% 20%, #112035 0%, var(--bg-dark) 80%);
+  overflow:hidden;
+  isolation:isolate;
+}
+.ax-root .ax-hero video{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:-2;
+  transition:opacity .8s;
+  mix-blend-mode:luminosity;
+}
+.ax-root .ax-hero::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  background: radial-gradient(circle at 50% 20%, rgba(17, 32, 53, 0.72) 0%, rgba(8, 16, 29, 0.92) 80%);
+}
+.ax-root .ax-hero-inner{
+  padding:110px 24px 100px;
+  max-width:1200px;
+  margin:0 auto;
+  position:relative;
+  z-index:2;
+}
 .ax-root .ax-hero h1{font-size:clamp(38px,6.2vw,72px);font-weight:800;max-width:860px}
 .ax-root .ax-hero-sub{margin-top:20px;font-size:clamp(16px,1.7vw,19px);max-width:560px;color:#D5E3DB}
 
@@ -174,16 +253,31 @@ const css = `
 .ax-root .ax-who span{font-size:13px;color:var(--mute)}
 
 /* cta */
-.ax-root .ax-cta{background:var(--green-d);color:#fff;border-radius:24px;padding:64px 32px;text-align:center}
+.ax-root .ax-cta{
+  background: radial-gradient(circle at 50% 20%, #112035 0%, var(--bg-dark) 80%);
+  color:#fff;
+  border-radius:24px;
+  padding:64px 32px;
+  text-align:center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  overflow: hidden;
+}
 .ax-root .ax-cta h2{font-size:clamp(30px,4.4vw,52px);margin-bottom:14px}
-.ax-root .ax-cta p{color:#BFD8CB;max-width:520px;margin:0 auto 30px}
-.ax-root .ax-cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-.ax-root .ax-cta .ax-btn.ghost{color:#fff;border-color:rgba(255,255,255,.4)}
+.ax-root .ax-cta p{color:#94A3B8;max-width:520px;margin:0 auto 30px}
+.ax-root .ax-cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative;z-index:2}
+.ax-root .ax-cta .ax-btn.ghost{color:#fff;border-color:rgba(255,255,255,.3)}
 .ax-root .ax-cta .ax-btn.ghost:hover{background:rgba(255,255,255,.1)}
-.ax-root .ax-cta small{display:block;margin-top:18px;color:#8FB6A2;font-size:13px}
+.ax-root .ax-cta small{display:block;margin-top:18px;color:#64748B;font-size:13px}
 
 /* footer */
-.ax-root .ax-footer{background:var(--ink);color:#9BA8A2;padding:60px 0 28px;margin-top:88px}
+.ax-root .ax-footer{
+  background: var(--bg-dark);
+  color: #94A3B8;
+  padding: 60px 0 28px;
+  margin-top: 88px;
+  border-top: 1px solid #1E293B;
+}
 .ax-root .ax-foot-grid{display:grid;grid-template-columns:1.5fr repeat(4,1fr);gap:36px;margin-bottom:40px}
 .ax-root .ax-foot-brand{font:800 26px 'Bricolage Grotesque',sans-serif;color:#fff;margin-bottom:10px}
 .ax-root .ax-foot-brand span{color:var(--amber)}
@@ -191,7 +285,7 @@ const css = `
 .ax-root .ax-foot-col a,.ax-root .ax-foot-col button{display:block;background:none;border:0;color:inherit;font-size:14px;margin-bottom:10px;
   text-align:left;text-decoration:none;cursor:pointer}
 .ax-root .ax-foot-col a:hover,.ax-root .ax-foot-col button:hover{color:#fff}
-.ax-root .ax-copy{border-top:1px solid #26302C;padding-top:22px;font-size:13px;text-align:center}
+.ax-root .ax-copy{border-top:1px solid #1E293B;padding-top:22px;font-size:13px;text-align:center}
 
 /* modal */
 .ax-root .ax-modal-bg{position:fixed;inset:0;background:rgba(7,19,13,.7);display:grid;place-items:center;z-index:9999;padding:20px;backdrop-filter:blur(4px)}
@@ -656,10 +750,16 @@ export default function HomePro() {
 
       {/* ── HERO ── */}
       <header className="ax-hero">
+        {/* Ambient atmospheric glows & grid mesh */}
+        <div className="ambient-orb orb-crimson" />
+        <div className="ambient-orb orb-amber" />
+        <div className="ambient-orb orb-navy" />
+        <div className="hero-grid-pattern" />
+
         <video autoPlay muted loop playsInline
           onLoadedData={() => setVideoLoaded(true)}
           onError={() => setVideoLoaded(false)}
-          style={{ opacity: videoLoaded ? 1 : 0 }}>
+          style={{ opacity: videoLoaded ? 0.35 : 0 }}>
           <source src={bgVideo} type="video/mp4" />
         </video>
 
