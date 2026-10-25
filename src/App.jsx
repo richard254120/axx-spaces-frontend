@@ -36,8 +36,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import PaymentHistory from "./pages/PaymentHistory";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminVerification from "./pages/AdminVerification";
-// UsersPage removed
-import Verification from "./pages/Verification";
+import Settings from "./pages/Settings";
 
 // ─── User Account Pages ──────────────────────────────────────────────────────
 import ProfilePage from "./pages/ProfilePage";
@@ -408,7 +407,7 @@ function App() {
         path="/settings"
         element={
           <DashboardLayout>
-            <ProtectedRoute loginPath="/user-login"><Verification /></ProtectedRoute>
+            <ProtectedRoute loginPath="/user-login"><Settings /></ProtectedRoute>
           </DashboardLayout>
         }
       />
@@ -422,11 +421,7 @@ function App() {
       />
       <Route
         path="/verification"
-        element={
-          <DashboardLayout>
-            <ProtectedRoute loginPath="/user-login"><Verification /></ProtectedRoute>
-          </DashboardLayout>
-        }
+        element={<Navigate to="/settings" replace />}
       />
       <Route
         path="/axxwallet"

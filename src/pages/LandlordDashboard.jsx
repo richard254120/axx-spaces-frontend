@@ -3,8 +3,6 @@ import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import QRCode from "qrcode";
 import { UserProfileEditor } from "../features/profile";
-import VerificationBadges from "../components/VerificationBadges";
-import VerificationStatus from "../components/VerificationStatus";
 import AnalyticsDashboard from "../components/AnalyticsDashboard";
 import BoostNotification from "../components/BoostNotification";
 import QuickBoostModal from "../components/QuickBoostModal";
@@ -821,7 +819,7 @@ export default function LandlordDashboard() {
           <div style={styles.tabContentSection}>
             <div style={styles.header}>
               <h2 style={styles.contentTitle}>Performance Dashboard</h2>
-              <p style={styles.contentSubtitle}>Real-time overview of listing views, verification status, and conversion tracking.</p>
+              <p style={styles.contentSubtitle}>Real-time overview of listing views, engagement, and conversion tracking.</p>
             </div>
 
             {/* Summary stat cards */}
@@ -838,11 +836,6 @@ export default function LandlordDashboard() {
                 <div style={styles.statValue}>{counts.booked}</div>
                 <div style={styles.statName}>Units Occupied</div>
               </div>
-            </div>
-
-            {/* Verification Status */}
-            <div style={{ marginBottom: "28px" }}>
-              <VerificationStatus />
             </div>
 
             {/* Custom Interactive charts / graphs via analytics component */}
@@ -1517,11 +1510,7 @@ export default function LandlordDashboard() {
           <div style={styles.tabContentSection}>
             <div style={styles.header}>
               <h2 style={styles.contentTitle}>My Profile</h2>
-              <p style={styles.contentSubtitle}>Update your personal profile, credentials, and verification badges.</p>
-            </div>
-
-            <div style={{ marginBottom: "28px" }}>
-              <VerificationBadges userId={user?._id || user?.id} userType="landlord" />
+              <p style={styles.contentSubtitle}>Update your personal profile, contact information, and avatar.</p>
             </div>
 
             <UserProfileEditor

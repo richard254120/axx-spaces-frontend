@@ -2,8 +2,6 @@ import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { UserProfileEditor, ProfileAvatar } from "../features/profile";
-import VerificationStatus from "../components/VerificationStatus";
-import VerificationBadges from "../components/VerificationBadges";
 import BoostNotification from "../components/BoostNotification";
 import AnalyticsDashboard from "../components/AnalyticsDashboard";
 import QuickBoostModal from "../components/QuickBoostModal";
@@ -257,10 +255,6 @@ export default function QuickSalesDashboard() {
         </div>
       </div>
 
-      <div style={{ marginBottom: '24px' }}>
-        <VerificationStatus />
-      </div>
-
       {view === "listings" && (
         <div style={{ marginBottom: '24px' }}>
           <AnalyticsDashboard userType="seller" userId={seller?._id || seller?.id} />
@@ -298,7 +292,6 @@ export default function QuickSalesDashboard() {
 
       {view === "profile" ? (
         <div>
-          <VerificationBadges userId={seller?._id || seller?.id} userType="seller" />
           <AnalyticsDashboard userType="seller" userId={seller?._id || seller?.id} />
           <UserProfileEditor
             token={token}

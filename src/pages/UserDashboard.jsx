@@ -2,10 +2,8 @@ import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
-import VerificationStatus from "../components/VerificationStatus";
 import QuickBoostModal from "../components/QuickBoostModal";
 import { UserProfileEditor, ProfileAvatar } from "../features/profile";
-import VerificationBadges from "../components/VerificationBadges";
 import AnalyticsDashboard from "../components/AnalyticsDashboard";
 
 import { getDashboardPath } from "../utils/dashboardRoutes";
@@ -188,12 +186,7 @@ export default function UserDashboard() {
                 <h1 style={s.bannerTitle}>
                   {getGreeting()}, {user?.name?.split(" ")[0] || "User"}! 
                 </h1>
-                <p style={s.bannerSubtitle}>Monitor your listings, active items, and KYC verification tier from one unified space.</p>
-              </div>
-              <div style={s.bannerRight}>
-                <div style={s.badgeCard}>
-                  <VerificationBadges userId={user?._id || user?.id} />
-                </div>
+                <p style={s.bannerSubtitle}>Monitor your listings, inquiries, and directory items from one unified space.</p>
               </div>
             </div>
 
@@ -303,11 +296,6 @@ export default function UserDashboard() {
                   if (updatedUser) login(token, updatedUser);
                 }}
               />
-            </div>
-
-            <div style={s.panelCard}>
-              <h2 style={s.tabTitle}> Identity & Verification status</h2>
-              <VerificationStatus />
             </div>
           </div>
         )}

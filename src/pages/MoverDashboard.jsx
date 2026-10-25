@@ -1,9 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import VerificationStatus from "../components/VerificationStatus";
 import { UserProfileEditor } from "../features/profile";
-import VerificationBadges from "../components/VerificationBadges";
 import BoostNotification from "../components/BoostNotification";
 import AnalyticsDashboard from "../components/AnalyticsDashboard";
 import QuickBoostModal from "../components/QuickBoostModal";
@@ -400,12 +398,6 @@ export default function MoverDashboard() {
                   </div>
                 </div>
               ))}
-            </div>
-
-            <div style={{ marginBottom: '24px' }}>
-              <VerificationStatus />
-            </div>
-
             <div style={{ marginBottom: '24px' }}>
               <AnalyticsDashboard userType="mover" userId={user?._id || user?.id} />
             </div>
@@ -492,7 +484,6 @@ export default function MoverDashboard() {
         {/* ── PROFILE TAB ── */}
         {activeTab === "profile" && (
           <section>
-            <VerificationBadges userId={user?._id || user?.id} userType="mover" />
             <AnalyticsDashboard userType="mover" userId={user?._id || user?.id} />
 
             {/* Portfolio Management */}
