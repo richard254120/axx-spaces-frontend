@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import logo from "../assets/image.png";
 
-export default function SplashScreen({ isReady = true, onComplete, minDuration = 2100 }) {
+export default function SplashScreen({ isReady = true, onComplete, minDuration = 4000 }) {
   const [canExit, setCanExit] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
-    // Ensure the animation has full cinematic runtime before fading out
+    // Show animation for about 4 seconds
     const minTimer = setTimeout(() => {
       setCanExit(true);
     }, minDuration);
@@ -18,7 +18,7 @@ export default function SplashScreen({ isReady = true, onComplete, minDuration =
       setIsExiting(true);
       const exitTimer = setTimeout(() => {
         if (onComplete) onComplete();
-      }, 550); // Matches the CSS exit transition
+      }, 600); // Smooth exit fade
       return () => clearTimeout(exitTimer);
     }
   }, [canExit, isReady, isExiting, onComplete]);
@@ -31,55 +31,53 @@ export default function SplashScreen({ isReady = true, onComplete, minDuration =
       aria-live="polite"
     >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;800&family=Instrument+Sans:wght@500;600;700&display=swap');
-
         .axx-splash-root {
           position: fixed;
           inset: 0;
           z-index: 999999;
-          background: radial-gradient(circle at 50% 35%, #0e1a30 0%, #070d19 55%, #03060c 100%);
+          background: radial-gradient(circle at 50% 45%, #0e1a30 0%, #070d19 55%, #03060c 100%);
           display: flex;
           align-items: center;
           justify-content: center;
           overflow: hidden;
           opacity: 1;
           transform: scale(1);
-          transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
-                      transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
-                      filter 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                      transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                      filter 0.6s cubic-bezier(0.16, 1, 0.3, 1);
           pointer-events: auto;
           user-select: none;
         }
 
         .axx-splash-leave {
           opacity: 0 !important;
-          transform: scale(1.04) !important;
-          filter: blur(8px) !important;
+          transform: scale(1.05) !important;
+          filter: blur(10px) !important;
           pointer-events: none !important;
         }
 
         /* Ambient glowing orbs */
         .axx-splash-orb-gold {
           position: absolute;
-          width: 520px;
-          height: 520px;
+          width: 580px;
+          height: 580px;
           border-radius: 50%;
-          background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, rgba(217, 119, 6, 0.06) 45%, transparent 70%);
-          filter: blur(60px);
+          background: radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, rgba(217, 119, 6, 0.08) 45%, transparent 70%);
+          filter: blur(70px);
           top: 50%;
           left: 50%;
-          transform: translate(-50%, -55%);
+          transform: translate(-50%, -50%);
           animation: axxOrbPulse 4s ease-in-out infinite alternate;
           pointer-events: none;
         }
 
         .axx-splash-orb-blue {
           position: absolute;
-          width: 650px;
-          height: 650px;
+          width: 700px;
+          height: 700px;
           border-radius: 50%;
-          background: radial-gradient(circle, rgba(37, 99, 235, 0.12) 0%, transparent 65%);
-          filter: blur(80px);
+          background: radial-gradient(circle, rgba(37, 99, 235, 0.14) 0%, transparent 65%);
+          filter: blur(90px);
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
@@ -93,9 +91,9 @@ export default function SplashScreen({ isReady = true, onComplete, minDuration =
           background-image:
             linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
             linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-          background-size: 48px 48px;
-          mask-image: radial-gradient(circle at 50% 50%, black 25%, transparent 75%);
-          -webkit-mask-image: radial-gradient(circle at 50% 50%, black 25%, transparent 75%);
+          background-size: 52px 52px;
+          mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 80%);
+          -webkit-mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 80%);
           pointer-events: none;
         }
 
@@ -106,137 +104,128 @@ export default function SplashScreen({ isReady = true, onComplete, minDuration =
           display: flex;
           flex-direction: column;
           align-items: center;
+          justify-content: center;
           text-align: center;
           padding: 24px;
-          animation: axxCardEnter 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* Logo Emblem Container */
+        /* App Logo Pedestal Container */
         .axx-splash-emblem {
           position: relative;
-          width: 84px;
-          height: 84px;
-          border-radius: 24px;
-          background: linear-gradient(145deg, rgba(30, 41, 59, 0.75), rgba(15, 23, 42, 0.9));
-          border: 1px solid rgba(245, 158, 11, 0.35);
-          box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45), 0 0 40px rgba(245, 158, 11, 0.22);
+          width: 120px;
+          height: 120px;
+          border-radius: 34px;
+          background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.95));
+          border: 1.5px solid rgba(245, 158, 11, 0.4);
+          box-shadow:
+            0 20px 50px rgba(0, 0, 0, 0.55),
+            0 0 60px rgba(245, 158, 11, 0.28),
+            inset 0 1px 1px rgba(255, 255, 255, 0.2);
           display: flex;
           align-items: center;
           justify-content: center;
-          margin-bottom: 22px;
-          animation: axxEmblemPop 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          animation: axxEmblemEntrance 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+                     axxEmblemFloat 4s ease-in-out 1.2s infinite alternate;
         }
 
         .axx-splash-emblem img {
-          width: 52px;
-          height: 52px;
+          width: 76px;
+          height: 76px;
           object-fit: contain;
-          filter: drop-shadow(0 2px 10px rgba(0,0,0,0.5));
+          filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.6));
+          animation: axxLogoShine 3s ease-in-out infinite;
         }
 
+        /* Luminous orbital rings */
         .axx-splash-emblem-ring {
           position: absolute;
-          inset: -4px;
-          border-radius: 28px;
-          border: 1px solid rgba(251, 191, 36, 0.2);
-          animation: axxRingRotate 8s linear infinite;
+          inset: -7px;
+          border-radius: 40px;
+          border: 1px dashed rgba(251, 191, 36, 0.3);
+          animation: axxRingRotate 12s linear infinite;
         }
 
-        /* Brand Typography */
-        .axx-splash-title {
-          font-family: 'Bricolage Grotesque', sans-serif;
-          font-size: clamp(38px, 6.5vw, 62px);
-          font-weight: 800;
-          line-height: 1;
-          margin: 0;
-          letter-spacing: 0.18em;
-          text-indent: 0.18em;
-          background: linear-gradient(
-            110deg,
-            #d97706 0%,
-            #fbbf24 20%,
-            #fffbeb 45%,
-            #ffffff 50%,
-            #fffbeb 55%,
-            #fbbf24 80%,
-            #d97706 100%
-          );
-          background-size: 240% 100%;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          animation: axxShimmer 3.2s ease-in-out infinite, axxLetterSpread 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-          filter: drop-shadow(0 4px 20px rgba(245, 158, 11, 0.35));
+        .axx-splash-emblem-halo {
+          position: absolute;
+          inset: -20px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(245, 158, 11, 0.3) 0%, transparent 70%);
+          filter: blur(14px);
+          pointer-events: none;
+          animation: axxHaloBreathe 3s ease-in-out infinite alternate;
         }
 
-        /* Gold Laser Divider */
-        .axx-splash-laser {
-          height: 2px;
-          width: 0;
-          margin: 16px 0 14px;
-          background: linear-gradient(90deg, transparent 0%, rgba(245, 158, 11, 0.9) 50%, transparent 100%);
-          box-shadow: 0 0 12px rgba(245, 158, 11, 0.7);
-          animation: axxLaserGrow 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
-        }
-
-        /* Tagline */
-        .axx-splash-tagline {
-          font-family: 'Instrument Sans', sans-serif;
-          font-size: clamp(10px, 1.4vw, 12px);
-          font-weight: 600;
-          letter-spacing: 0.32em;
-          text-indent: 0.32em;
-          color: #94a3b8;
-          text-transform: uppercase;
-          margin: 0 0 28px;
-          opacity: 0;
-          transform: translateY(6px);
-          animation: axxTaglineFade 1s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
-        }
-
-        /* Micro Progress Track */
+        /* Minimal Luxury Micro-Progress Beam */
         .axx-splash-progress-wrap {
-          width: 140px;
-          height: 3px;
+          width: 130px;
+          height: 2.5px;
           background: rgba(255, 255, 255, 0.08);
           border-radius: 999px;
           overflow: hidden;
-          position: relative;
+          margin-top: 36px;
           opacity: 0;
-          animation: axxFadeIn 0.6s ease 0.6s forwards;
+          animation: axxFadeIn 0.8s ease 0.4s forwards;
         }
 
         .axx-splash-progress-bar {
           height: 100%;
           width: 0%;
           background: linear-gradient(90deg, #d97706, #fbbf24, #ffffff);
-          box-shadow: 0 0 10px rgba(251, 191, 36, 0.7);
+          box-shadow: 0 0 12px rgba(251, 191, 36, 0.85);
           border-radius: 999px;
-          animation: axxProgress 1.9s cubic-bezier(0.4, 0, 0.2, 1) 0.2s forwards;
+          animation: axxProgress 3.8s cubic-bezier(0.3, 0, 0.2, 1) 0.2s forwards;
         }
 
         /* Keyframes */
-        @keyframes axxCardEnter {
+        @keyframes axxEmblemEntrance {
           0% {
             opacity: 0;
-            transform: translateY(18px) scale(0.96);
+            transform: scale(0.65) translateY(24px);
+            filter: blur(12px);
+          }
+          65% {
+            transform: scale(1.06) translateY(-4px);
+            filter: blur(0px);
           }
           100% {
             opacity: 1;
-            transform: translateY(0) scale(1);
+            transform: scale(1) translateY(0);
+            filter: blur(0px);
           }
         }
 
-        @keyframes axxEmblemPop {
+        @keyframes axxEmblemFloat {
           0% {
-            opacity: 0;
-            transform: scale(0.7) rotate(-6deg);
-          }
-          60% {
-            transform: scale(1.05) rotate(1deg);
+            transform: translateY(0) scale(1);
+            box-shadow:
+              0 20px 50px rgba(0, 0, 0, 0.55),
+              0 0 50px rgba(245, 158, 11, 0.25);
           }
           100% {
-            opacity: 1;
-            transform: scale(1) rotate(0deg);
+            transform: translateY(-8px) scale(1.03);
+            box-shadow:
+              0 26px 60px rgba(0, 0, 0, 0.65),
+              0 0 75px rgba(245, 158, 11, 0.38);
+          }
+        }
+
+        @keyframes axxLogoShine {
+          0%, 100% {
+            filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.6)) brightness(1);
+          }
+          50% {
+            filter: drop-shadow(0 6px 22px rgba(245, 158, 11, 0.6)) brightness(1.12);
+          }
+        }
+
+        @keyframes axxHaloBreathe {
+          0% {
+            opacity: 0.45;
+            transform: scale(0.9);
+          }
+          100% {
+            opacity: 0.9;
+            transform: scale(1.15);
           }
         }
 
@@ -246,37 +235,8 @@ export default function SplashScreen({ isReady = true, onComplete, minDuration =
         }
 
         @keyframes axxOrbPulse {
-          0% { transform: translate(-50%, -55%) scale(0.92); opacity: 0.6; }
-          100% { transform: translate(-50%, -55%) scale(1.1); opacity: 0.9; }
-        }
-
-        @keyframes axxShimmer {
-          0% { background-position: 180% 0; }
-          100% { background-position: -60% 0; }
-        }
-
-        @keyframes axxLetterSpread {
-          0% {
-            letter-spacing: 0.12em;
-            text-indent: 0.12em;
-            filter: blur(4px);
-          }
-          100% {
-            letter-spacing: 0.24em;
-            text-indent: 0.24em;
-            filter: blur(0px);
-          }
-        }
-
-        @keyframes axxLaserGrow {
-          0% { width: 0px; opacity: 0; }
-          50% { opacity: 1; }
-          100% { width: 220px; opacity: 0.9; }
-        }
-
-        @keyframes axxTaglineFade {
-          0% { opacity: 0; transform: translateY(8px); }
-          100% { opacity: 0.85; transform: translateY(0); }
+          0% { transform: translate(-50%, -50%) scale(0.92); opacity: 0.65; }
+          100% { transform: translate(-50%, -50%) scale(1.12); opacity: 0.95; }
         }
 
         @keyframes axxFadeIn {
@@ -286,8 +246,9 @@ export default function SplashScreen({ isReady = true, onComplete, minDuration =
 
         @keyframes axxProgress {
           0% { width: 0%; }
-          30% { width: 45%; }
-          75% { width: 85%; }
+          30% { width: 35%; }
+          70% { width: 75%; }
+          95% { width: 96%; }
           100% { width: 100%; }
         }
       `}</style>
@@ -297,19 +258,15 @@ export default function SplashScreen({ isReady = true, onComplete, minDuration =
       <div className="axx-splash-orb-blue" />
       <div className="axx-splash-grid" />
 
-      {/* Content */}
+      {/* Content: App Logo centered without text */}
       <div className="axx-splash-card">
         <div className="axx-splash-emblem">
+          <div className="axx-splash-emblem-halo" />
           <div className="axx-splash-emblem-ring" />
-          <img src={logo} alt="Axxspace Emblem" />
+          <img src={logo} alt="Axxspace Logo" />
         </div>
 
-        <h1 className="axx-splash-title">AXXSPACE</h1>
-
-        <div className="axx-splash-laser" />
-
-        <p className="axx-splash-tagline">KENYA'S PROPERTY &amp; SPACES NETWORK</p>
-
+        {/* Minimalist 4-second loading beam */}
         <div className="axx-splash-progress-wrap">
           <div className="axx-splash-progress-bar" />
         </div>
