@@ -1,10 +1,12 @@
-import { useState, useEffect, useContext, useMemo } from "react";
+import { useState, useEffect, useContext, useMemo, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
 import bgVideo from "../assets/AXX Homepage video.mp4";
 import SocialMediaLinks from "../components/SocialMediaLinks";
 import RequestItemModal from "../components/RequestItemModal";
+
+const AxxspaceCar = lazy(() => import("../components/AxxspaceCar"));
 
 /* ════════════════════════════════════════════════
    HOMEPRO — all styles are scoped under .ax-root
@@ -1046,6 +1048,11 @@ export default function HomePro() {
           </div>
         </div>
       </section>
+
+      {/* ── AXXSPACE BRAND CAR ── */}
+      <Suspense fallback={null}>
+        <AxxspaceCar />
+      </Suspense>
 
       {/* ── FOOTER ── */}
       <footer className="ax-footer">
