@@ -432,17 +432,17 @@ export default function AccommodationPage() {
             {/* Mobile Hamburger Toggle */}
             <button
               type="button"
-              className="mobile-toggle-btn"
+              className={`mobile-toggle-btn ${mobileMenuOpen ? "is-active" : ""}`}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Toggle Navigation"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileMenuOpen}
             >
-              <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" strokeWidth="2.2" fill="none">
-                {mobileMenuOpen ? (
-                  <path d="M18 6L6 18M6 6l12 12" />
-                ) : (
-                  <path d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
+              <span className="mobile-toggle-bars">
+                <span className="mobile-toggle-bar bar-1" />
+                <span className="mobile-toggle-bar bar-2" />
+                <span className="mobile-toggle-bar bar-3" />
+              </span>
+              <span className="mobile-toggle-label">{mobileMenuOpen ? "Close" : "Menu"}</span>
             </button>
           </div>
         </div>
@@ -450,39 +450,170 @@ export default function AccommodationPage() {
         {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
           <div className="mobile-dropdown-menu">
-            <button type="button" onClick={() => { navigate("/accommodation/listings"); setMobileMenuOpen(false); }}>
-              Explore All Stays
-            </button>
-            <button type="button" onClick={() => { document.getElementById("featured-section")?.scrollIntoView({ behavior: "smooth" }); setMobileMenuOpen(false); }}>
-              Featured Kenyan Stays
-            </button>
-            <button type="button" onClick={() => { document.getElementById("budget-planner")?.scrollIntoView({ behavior: "smooth" }); setMobileMenuOpen(false); }}>
-              Stay Budget Estimator
-            </button>
-            <button type="button" onClick={() => { document.getElementById("packages-section")?.scrollIntoView({ behavior: "smooth" }); setMobileMenuOpen(false); }}>
-              Host Pricing & Advertising
-            </button>
-            <button type="button" onClick={() => { document.getElementById("faq-section")?.scrollIntoView({ behavior: "smooth" }); setMobileMenuOpen(false); }}>
-              Help & FAQ
-            </button>
-            <div className="mobile-nav-divider" />
-            {isHostUser ? (
-              <button type="button" className="mobile-action-highlight" onClick={() => { navigate("/accommodation/dashboard"); setMobileMenuOpen(false); }}>
-                Go to Host Dashboard →
+            <div className="mobile-menu-header-bar">
+              <div className="mobile-menu-brand-tag">
+                <span className="mobile-menu-brand-dot" />
+                <span>ACCOMMODATION NAVIGATION</span>
+              </div>
+              <button
+                type="button"
+                className="mobile-menu-close-action"
+                onClick={() => setMobileMenuOpen(false)}
+                aria-label="Close menu"
+              >
+                ✕
               </button>
-            ) : (
-              <>
-                <button type="button" onClick={() => { navigate("/accommodation/login?tab=login"); setMobileMenuOpen(false); }}>
-                  Host Sign In
+            </div>
+
+            <div className="mobile-menu-nav-links">
+              <button
+                type="button"
+                className="mobile-menu-nav-btn"
+                onClick={() => { navigate("/accommodation/listings"); setMobileMenuOpen(false); }}
+              >
+                <div className="mobile-nav-icon-wrap icon-amber">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+                  </svg>
+                </div>
+                <div className="mobile-nav-text-group">
+                  <span className="mobile-nav-text-main">Explore All Stays</span>
+                  <span className="mobile-nav-text-sub">Villas, Safari Cottages &amp; Apartments</span>
+                </div>
+                <span className="mobile-nav-arrow">→</span>
+              </button>
+
+              <button
+                type="button"
+                className="mobile-menu-nav-btn"
+                onClick={() => { document.getElementById("featured-section")?.scrollIntoView({ behavior: "smooth" }); setMobileMenuOpen(false); }}
+              >
+                <div className="mobile-nav-icon-wrap icon-rose">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                  </svg>
+                </div>
+                <div className="mobile-nav-text-group">
+                  <span className="mobile-nav-text-main">Featured Kenyan Stays</span>
+                  <span className="mobile-nav-text-sub">Top-rated vacation homes &amp; getaways</span>
+                </div>
+                <span className="mobile-nav-arrow">→</span>
+              </button>
+
+              <button
+                type="button"
+                className="mobile-menu-nav-btn"
+                onClick={() => { document.getElementById("budget-planner")?.scrollIntoView({ behavior: "smooth" }); setMobileMenuOpen(false); }}
+              >
+                <div className="mobile-nav-icon-wrap icon-blue">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="4" y="2" width="16" height="20" rx="2" />
+                    <line x1="8" y1="6" x2="16" y2="6" />
+                    <line x1="16" y1="14" x2="16" y2="18" />
+                    <path d="M16 10h.01" />
+                    <path d="M12 10h.01" />
+                    <path d="M8 10h.01" />
+                    <path d="M12 14h.01" />
+                    <path d="M8 14h.01" />
+                    <path d="M12 18h.01" />
+                    <path d="M8 18h.01" />
+                  </svg>
+                </div>
+                <div className="mobile-nav-text-group">
+                  <span className="mobile-nav-text-main">Stay Budget Estimator</span>
+                  <span className="mobile-nav-text-sub">Calculate stay costs by duration &amp; guests</span>
+                </div>
+                <span className="mobile-nav-arrow">→</span>
+              </button>
+
+              <button
+                type="button"
+                className="mobile-menu-nav-btn"
+                onClick={() => { document.getElementById("packages-section")?.scrollIntoView({ behavior: "smooth" }); setMobileMenuOpen(false); }}
+              >
+                <div className="mobile-nav-icon-wrap icon-emerald">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2l2.4 5 5 2.4-5 2.4-2.4 5-2.4-5-5-2.4 5-2.4z" />
+                  </svg>
+                </div>
+                <div className="mobile-nav-text-group">
+                  <span className="mobile-nav-text-main">Host Pricing &amp; Advertising</span>
+                  <span className="mobile-nav-text-sub">Plans for vacation rental owners</span>
+                </div>
+                <span className="mobile-nav-arrow">→</span>
+              </button>
+
+              <button
+                type="button"
+                className="mobile-menu-nav-btn"
+                onClick={() => { document.getElementById("faq-section")?.scrollIntoView({ behavior: "smooth" }); setMobileMenuOpen(false); }}
+              >
+                <div className="mobile-nav-icon-wrap icon-purple">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                  </svg>
+                </div>
+                <div className="mobile-nav-text-group">
+                  <span className="mobile-nav-text-main">Help &amp; FAQ</span>
+                  <span className="mobile-nav-text-sub">Host rules, guest protection &amp; payments</span>
+                </div>
+                <span className="mobile-nav-arrow">→</span>
+              </button>
+            </div>
+
+            <div className="mobile-nav-divider" />
+
+            <div className="mobile-menu-auth-group">
+              {isHostUser ? (
+                <button
+                  type="button"
+                  className="mobile-menu-action-btn host-action-primary"
+                  onClick={() => { navigate("/accommodation/dashboard"); setMobileMenuOpen(false); }}
+                >
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
+                  </svg>
+                  <span>Go to Host Dashboard →</span>
                 </button>
-                <button type="button" onClick={() => { navigate("/accommodation/register?tab=register"); setMobileMenuOpen(false); }}>
-                  Register Host Account
-                </button>
-                <button type="button" className="mobile-action-highlight" onClick={() => { navigate("/accommodation/register-property"); setMobileMenuOpen(false); }}>
-                  List Your Property (Host) →
-                </button>
-              </>
-            )}
+              ) : (
+                <>
+                  <div className="mobile-auth-duo-row">
+                    <button
+                      type="button"
+                      className="mobile-auth-duo-btn duo-signin"
+                      onClick={() => { navigate("/accommodation/login?tab=login"); setMobileMenuOpen(false); }}
+                    >
+                      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                        <polyline points="10 17 15 12 10 7" />
+                        <line x1="15" y1="12" x2="3" y2="12" />
+                      </svg>
+                      <span>Host Sign In</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="mobile-auth-duo-btn duo-register"
+                      onClick={() => { navigate("/accommodation/register?tab=register"); setMobileMenuOpen(false); }}
+                    >
+                      <span>Register Host</span>
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    className="mobile-menu-action-btn host-action-primary"
+                    onClick={() => { navigate("/accommodation/register-property"); setMobileMenuOpen(false); }}
+                  >
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    <span>List Your Property (Host) →</span>
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         )}
       </header>
@@ -1981,39 +2112,233 @@ const css = `
   }
   .mobile-toggle-btn {
     display: none;
-    background: transparent;
-    border: none;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 999px;
     color: #FFFFFF;
     cursor: pointer;
-    padding: 4px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+  }
+  .mobile-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  .mobile-toggle-btn.is-active {
+    background: #E31B1B;
+    border-color: #E31B1B;
+  }
+  .mobile-toggle-bars {
+    width: 16px;
+    height: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+  }
+  .mobile-toggle-bar {
+    width: 100%;
+    height: 2px;
+    background: #FFFFFF;
+    border-radius: 2px;
+    transition: all 0.22s ease;
+    transform-origin: center;
+  }
+  .mobile-toggle-btn.is-active .bar-1 {
+    transform: translateY(5px) rotate(45deg);
+  }
+  .mobile-toggle-btn.is-active .bar-2 {
+    opacity: 0;
+  }
+  .mobile-toggle-btn.is-active .bar-3 {
+    transform: translateY(-5px) rotate(-45deg);
   }
 
   .mobile-dropdown-menu {
     display: flex;
     flex-direction: column;
-    padding: 12px 18px 20px;
-    background: #0B1320;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 16px 18px 24px;
+    background: linear-gradient(180deg, #0B1320 0%, #060B14 100%);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+    animation: axAccDrop 0.22s ease;
   }
-  .mobile-dropdown-menu button {
+  @keyframes axAccDrop {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .mobile-menu-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .mobile-menu-brand-tag {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 10px;
+    font-weight: 800;
+    color: #94A3B8;
+    letter-spacing: 0.6px;
+  }
+  .mobile-menu-brand-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--brand-red);
+  }
+  .mobile-menu-close-action {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94A3B8;
+    cursor: pointer;
+    font-size: 11px;
+  }
+  .mobile-menu-close-action:hover {
+    color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .mobile-menu-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .mobile-menu-nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 12px;
     background: transparent;
     border: none;
     color: #CBD5E1;
     font-family: inherit;
-    font-size: 0.95rem;
-    font-weight: 600;
     text-align: left;
-    padding: 10px 0;
     cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
   }
+  .mobile-menu-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #FFFFFF;
+  }
+  .mobile-nav-icon-wrap {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .mobile-nav-text-group {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .mobile-nav-text-main {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #FFFFFF;
+  }
+  .mobile-nav-text-sub {
+    font-size: 11px;
+    color: #94A3B8;
+    margin-top: 1px;
+  }
+  .mobile-nav-arrow {
+    font-size: 12px;
+    color: #64748B;
+    transition: transform 0.15s ease;
+  }
+  .mobile-menu-nav-btn:hover .mobile-nav-arrow {
+    transform: translateX(3px);
+    color: #FFFFFF;
+  }
+
   .mobile-nav-divider {
     height: 1px;
-    background: rgba(255, 255, 255, 0.1);
-    margin: 10px 0;
+    background: rgba(255, 255, 255, 0.08);
+    margin: 12px 0 14px;
   }
-  .mobile-action-highlight {
-    color: var(--brand-red) !important;
-    font-weight: 800 !important;
+
+  .mobile-menu-auth-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .mobile-auth-duo-row {
+    display: flex;
+    gap: 8px;
+  }
+  .mobile-auth-duo-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .duo-signin {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: #FFFFFF;
+  }
+  .duo-signin:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+  .duo-register {
+    background: #0f172a;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #F8FAFC;
+  }
+  .duo-register:hover {
+    background: #1e293b;
+  }
+  .mobile-menu-action-btn {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .host-action-primary {
+    background: linear-gradient(135deg, #E31B1B 0%, #B91C1C 100%);
+    border: none;
+    color: #FFFFFF;
+    box-shadow: 0 4px 14px rgba(227, 27, 27, 0.3);
+  }
+  .host-action-primary:hover {
+    box-shadow: 0 6px 18px rgba(227, 27, 27, 0.45);
+    transform: translateY(-1px);
   }
 
   /* ── 2. HERO ATMOSPHERE (Matching Rentals/Property) ── */
@@ -3937,7 +4262,7 @@ const css = `
   /* Responsive Rules */
   @media (max-width: 900px) {
     .desktop-nav-links { display: none; }
-    .mobile-toggle-btn { display: block; }
+    .mobile-toggle-btn { display: inline-flex; }
     .sign-in-btn { display: none; }
     .list-property-btn { display: none; }
     .mobile-header-auth-btn { display: inline-flex; }
