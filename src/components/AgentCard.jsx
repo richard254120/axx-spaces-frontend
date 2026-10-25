@@ -25,7 +25,7 @@ export default function AgentCard({ agent, rentalId }) {
 
     // Log inquiry (fire-and-forget, don't block WhatsApp redirect)
     if (rentalId) {
-      fetch(`${process.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api"}/inquiries/log`, {
+      fetch(`${import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api"}/inquiries/log`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -45,7 +45,7 @@ export default function AgentCard({ agent, rentalId }) {
 
     setSubmittingReport(true);
     try {
-      const response = await fetch(`${process.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api"}/reports`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api"}/reports`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

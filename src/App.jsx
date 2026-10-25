@@ -1,11 +1,10 @@
 // App.jsx
 import { Routes, Route, useNavigate, Navigate, useParams, useSearchParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDevToolsProtection } from "./hooks/useDevToolsProtection";
 
 import Navbar from "./components/Navbar";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
-import SplashScreen from "./components/SplashScreen";
 import AppUpdateNotifier from "./components/AppUpdateNotifier";
 import DownloadNotification from "./components/DownloadNotification";
 
@@ -125,40 +124,13 @@ function LegacyRedirect({ to }) {
 function App() {
   const navigate = useNavigate();
   useDevToolsProtection();
-  const [showSplash, setShowSplash] = useState(true);
 
-  useEffect(() => {
-    // Temporarily disable splash screen for debugging
-    setShowSplash(false);
-
-    // Check if this is the first visit or if forced via URL parameter
-    // const hasVisited = localStorage.getItem('axxspace_visited');
-    // const urlParams = new URLSearchParams(window.location.search);
-    // const forceSplash = urlParams.get('splash') === 'true';
-
-    // Only skip if explicitly visited AND not forced
-    // If hasVisited is null (first time ever), show the splash
-    // if (hasVisited === 'true' && !forceSplash) {
-    //   setShowSplash(false);
-    // } else {
-    //   // Only set the flag if not forced
-    //   if (!forceSplash) {
-    //     localStorage.setItem('axxspace_visited', 'true');
-    //   }
-    // }
-  }, []);
-
-  // Function to reset splash screen for testing (call from browser console: window.resetSplash())
+  // Reset helper for testing (call from browser console: window.resetSplash())
   useEffect(() => {
     window.resetSplash = () => {
-      localStorage.removeItem('axxspace_visited');
       window.location.reload();
     };
   }, []);
-
-  if (showSplash) {
-    return <SplashScreen onComplete={() => setShowSplash(false)} />;
-  }
 
   return (
     <Routes>
