@@ -164,9 +164,12 @@ export const INITIAL_REGISTER_FORM = {
 };
 
 export const STATUS_LABELS = {
-  pending: { label: "Under review", color: "#f59e0b", bg: "#fffbeb" },
-  approved: { label: "Live", color: "#16a34a", bg: "#f0fdf4" },
-  rejected: { label: "Rejected", color: "#dc2626", bg: "#fee2e2" },
+  pending: { label: "Under review", color: "#f59e0b", bg: "rgba(245, 158, 11, 0.15)" },
+  pending_review: { label: "Under review", color: "#f59e0b", bg: "rgba(245, 158, 11, 0.15)" },
+  approved: { label: "Live", color: "#10b981", bg: "rgba(16, 185, 129, 0.15)" },
+  active: { label: "Live", color: "#10b981", bg: "rgba(16, 185, 129, 0.15)" },
+  rejected: { label: "Needs Revision", color: "#ef4444", bg: "rgba(239, 68, 68, 0.15)" },
+  inactive: { label: "Inactive", color: "#ef4444", bg: "rgba(239, 68, 68, 0.15)" },
 };
 
 /** Used when API is unavailable - now empty to only show approved backend data */

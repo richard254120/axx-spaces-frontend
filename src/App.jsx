@@ -220,11 +220,11 @@ function App() {
       <Route
         path="/accommodation/register-property"
         element={
-          <DashboardLayout>
+          <BareLayout>
             <ProtectedRoute allowedRoles={["host", "admin"]} loginPath="/accommodation/login">
               <RegisterPropertyPage />
             </ProtectedRoute>
-          </DashboardLayout>
+          </BareLayout>
         }
       />
       <Route
