@@ -8,7 +8,7 @@ export function useOwnerProfile() {
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
-    const token = getAccommodationToken();
+    const token = getAccommodationToken() || localStorage.getItem("token");
     if (!token) {
       setError("Please sign in to view your profile.");
       setLoading(false);

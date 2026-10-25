@@ -101,9 +101,9 @@ const styles = {
 const accountTypes = [
   {
     id: "user",
-    name: "User Account",
+    name: "Explorer & Community Member",
     icon: "/assets/user-icon.png",
-    description: "Browse properties and services as a regular user",
+    description: "Explore verified spaces, save favorites & chat with hosts (Free · No listings needed)",
     loginPath: "/user-login",
     registerPath: "/user-register",
   },
@@ -133,11 +133,11 @@ const accountTypes = [
   },
   {
     id: "accommodation",
-    name: "Accommodation Account",
+    name: "Accommodation Host Account",
     icon: "/assets/tourism-icon.png",
-    description: "List and manage accommodation properties",
-    loginPath: "/accommodation/login",
-    registerPath: "/accommodation/register",
+    description: "List and manage accommodation properties, lodges & stays",
+    loginPath: "/accommodation/login?tab=login",
+    registerPath: "/accommodation/register?tab=register",
   },
 ];
 

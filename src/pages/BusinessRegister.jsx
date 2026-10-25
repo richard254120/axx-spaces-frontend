@@ -145,7 +145,7 @@ export default function BusinessRegister() {
           email: googleUser.email,
           name: googleUser.name,
           picture: googleUser.picture,
-          role: "user",
+          role: "business",
         }),
       });
 
@@ -210,7 +210,7 @@ export default function BusinessRegister() {
         email: formData.email,
         phone: formData.phone,
         password: formData.password,
-        role: "user",
+        role: "business",
       });
 
       setSuccess(" Registration successful! Please check your email to verify your account, then login.");

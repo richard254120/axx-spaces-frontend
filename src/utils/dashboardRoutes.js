@@ -1,22 +1,28 @@
 /** Dashboard home path for each account role */
 export const DASHBOARD_BY_ROLE = {
+  member: "/member",
+  user: "/member",
   landlord: "/dashboard",
+  provider: "/dashboard",
   agent: "/agent/dashboard",
-  host: "/accommodation/host-dashboard",
+  host: "/accommodation/dashboard",
   seller: "/quicksales-dashboard",
   mover: "/mover-dashboard",
-  user: "/business-dashboard",
+  business: "/business-dashboard",
   admin: "/admin/dashboard",
   team: "/admin/verification",
 };
 
 /** Login page when that dashboard requires auth */
 export const LOGIN_BY_ROLE = {
+  member: "/user-login",
   agent: "/agent/login",
   host: "/accommodation/login",
   landlord: "/login",
+  provider: "/login",
   seller: "/quicksales-login",
   mover: "/login",
+  business: "/business-login",
   user: "/user-login",
   admin: "/login",
   team: "/login",
@@ -28,6 +34,12 @@ export function normalizeRole(role) {
 
 export function getDashboardPath(role) {
   const key = normalizeRole(role);
+  if (key === "member" || key === "user") {
+    return "/member";
+  }
+  if (key === "guest") {
+    return "/";
+  }
   return DASHBOARD_BY_ROLE[key] || "/";
 }
 
@@ -88,10 +100,27 @@ export function roleIsAllowed(userRole, allowedRoles = []) {
 
 /** Roles that use a dedicated workspace (not the public marketing site) */
 export function isWorkspaceUser(role) {
-  return Boolean(DASHBOARD_BY_ROLE[normalizeRole(role)]);
+  const key = normalizeRole(role);
+  // 'member', 'user', and 'guest' are community members exploring spaces, NOT workspace providers!
+  if (key === "member" || key === "user" || key === "guest" || !key) return false;
+  return Boolean(DASHBOARD_BY_ROLE[key]);
 }
 
 export const ACCOUNT_NAV_BY_ROLE = {
+  member: [
+    { label: "My Hub", path: "/member" },
+    { label: "Saved Spaces", path: "/saved" },
+    { label: "My Bookings", path: "/my-bookings" },
+    { label: "Profile", path: "/profile" },
+    { label: "Settings", path: "/settings" },
+  ],
+  user: [
+    { label: "My Hub", path: "/member" },
+    { label: "Saved Spaces", path: "/saved" },
+    { label: "My Bookings", path: "/my-bookings" },
+    { label: "Profile", path: "/profile" },
+    { label: "Settings", path: "/settings" },
+  ],
   landlord: [
     { label: "Dashboard", path: "/dashboard" },
     { label: "Upload", path: "/upload" },
@@ -105,6 +134,7 @@ export const ACCOUNT_NAV_BY_ROLE = {
   ],
   host: [
     { label: "Dashboard", path: "/accommodation/dashboard" },
+    { label: "Add Listing", path: "/accommodation/register-property" },
     { label: "Settings", path: "/settings" },
   ],
   seller: [
@@ -115,7 +145,7 @@ export const ACCOUNT_NAV_BY_ROLE = {
     { label: "Dashboard", path: "/mover-dashboard" },
     { label: "Settings", path: "/settings" },
   ],
-  user: [
+  business: [
     { label: "Dashboard", path: "/business-dashboard" },
     { label: "Add Business", path: "/business/create" },
     { label: "Settings", path: "/settings" },
@@ -132,7 +162,7 @@ export const ACCOUNT_NAV_BY_ROLE = {
 };
 
 export function getAccountNav(role) {
-  return ACCOUNT_NAV_BY_ROLE[normalizeRole(role)] || ACCOUNT_NAV_BY_ROLE.landlord;
+  return ACCOUNT_NAV_BY_ROLE[normalizeRole(role)] || ACCOUNT_NAV_BY_ROLE.member;
 }
 
 export function getWorkspaceBrand(role) {
@@ -141,10 +171,12 @@ export function getWorkspaceBrand(role) {
     landlord: "Landlord Portal",
     seller: "QuickSales Portal",
     mover: "Axx Movers",
-    user: "Business Workspace",
+    business: "Business Workspace",
     admin: "Admin Panel",
     team: "Admin Panel",
     host: "Accommodation Host Portal",
+    member: "Member Account",
+    user: "Member Account",
   };
   return brands[normalizeRole(role)] || "My Account";
 }

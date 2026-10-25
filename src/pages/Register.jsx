@@ -24,6 +24,8 @@ export default function Register() {
   const [success, setSuccess] = useState("");
   const [landlordType, setLandlordType] = useState("general");
 
+  const [accountChoice, setAccountChoice] = useState("member");
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -39,7 +41,8 @@ export default function Register() {
           email: googleUser.email,
           name: googleUser.name,
           picture: googleUser.picture,
-          landlordType,
+          role: accountChoice === "member" ? "member" : "landlord",
+          landlordType: accountChoice === "member" ? undefined : landlordType,
         }),
       });
 
@@ -52,7 +55,7 @@ export default function Register() {
     } catch (err) {
       setError(err.message || "Google authentication failed. Please try again.");
     }
-  }, [landlordType, login, navigate]);
+  }, [accountChoice, landlordType, login, navigate]);
 
   const handleGoogleError = useCallback((message) => {
     setError(message);
@@ -87,6 +90,44 @@ export default function Register() {
     setLoading(true);
 
     try {
+      if (accountChoice === "member") {
+        const memberPayload = {
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          password: formData.password,
+        };
+
+        const response = await fetch(`${API_BASE}/auth/register-member`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(memberPayload),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || data.message || "Member registration failed");
+        }
+
+        if (data.requiresVerification) {
+          setSuccess("Registration successful! A verification email has been sent to " + formData.email + ". Please check your inbox and verify your email before logging in.");
+          setFormData({ name: "", email: "", password: "", phone: "" });
+          setTimeout(() => {
+            navigate("/user-login");
+          }, 3000);
+          return;
+        }
+
+        if (data.token && data.user) {
+          login(data.token, data.user);
+          setSuccess("Welcome to Axxspace! Member account created. Redirecting...");
+          setTimeout(() => {
+            navigate("/member");
+          }, 1200);
+          return;
+        }
+      }
+
       const payload = {
         name: formData.name,
         email: formData.email,
@@ -144,32 +185,78 @@ export default function Register() {
 
       <div style={styles.container}>
         <div style={styles.formBox}>
-          <h1 style={styles.title}>Landlord Sign Up</h1>
-          <p style={styles.subtitle}>Choose how you list, then create your account</p>
+          {/* STEP 1: ACCOUNT TYPE CHOICE */}
+          <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+            <button
+              type="button"
+              style={{
+                flex: 1,
+                padding: "12px",
+                borderRadius: "10px",
+                border: accountChoice === "member" ? "2px solid #fbbf24" : "1px solid #334155",
+                background: accountChoice === "member" ? "rgba(251, 191, 36, 0.15)" : "#1e293b",
+                color: accountChoice === "member" ? "#fbbf24" : "#94a3b8",
+                fontWeight: 700,
+                fontSize: "13px",
+                cursor: "pointer",
+              }}
+              onClick={() => setAccountChoice("member")}
+            >
+              Join as Member
+            </button>
+            <button
+              type="button"
+              style={{
+                flex: 1,
+                padding: "12px",
+                borderRadius: "10px",
+                border: accountChoice === "provider" ? "2px solid #fbbf24" : "1px solid #334155",
+                background: accountChoice === "provider" ? "rgba(251, 191, 36, 0.15)" : "#1e293b",
+                color: accountChoice === "provider" ? "#fbbf24" : "#94a3b8",
+                fontWeight: 700,
+                fontSize: "13px",
+                cursor: "pointer",
+              }}
+              onClick={() => setAccountChoice("provider")}
+            >
+              List a business/service
+            </button>
+          </div>
+
+          <h1 style={styles.title}>
+            {accountChoice === "member" ? "Member Sign Up" : "List Your Space or Business"}
+          </h1>
+          <p style={styles.subtitle}>
+            {accountChoice === "member"
+              ? "Join Axxspace to explore verified spaces and save favorites"
+              : "Choose how you list, then create your provider account"}
+          </p>
 
           {error && <div style={styles.error}>{error}</div>}
           {success && <div style={styles.success}>{success}</div>}
 
-          <div style={styles.typeRow}>
-            <button
-              type="button"
-              style={{ ...styles.typeCard, ...(landlordType === "general" ? styles.typeCardActive : {}) }}
-              onClick={() => setLandlordType("general")}
-            >
-              <span style={styles.typeIcon}></span>
-              <strong>General Landlord</strong>
-              <span style={styles.typeDesc}>List rentals anywhere in Kenya</span>
-            </button>
-            <button
-              type="button"
-              style={{ ...styles.typeCard, ...(landlordType === "university" ? styles.typeCardActive : {}) }}
-              onClick={() => setLandlordType("university")}
-            >
-              <span style={styles.typeIcon}></span>
-              <strong>Near University</strong>
-              <span style={styles.typeDesc}>List hostels/rooms near a campus — shown to students</span>
-            </button>
-          </div>
+          {accountChoice === "provider" && (
+            <div style={styles.typeRow}>
+              <button
+                type="button"
+                style={{ ...styles.typeCard, ...(landlordType === "general" ? styles.typeCardActive : {}) }}
+                onClick={() => setLandlordType("general")}
+              >
+                <span style={styles.typeIcon}></span>
+                <strong>General Landlord</strong>
+                <span style={styles.typeDesc}>List rentals anywhere in Kenya</span>
+              </button>
+              <button
+                type="button"
+                style={{ ...styles.typeCard, ...(landlordType === "university" ? styles.typeCardActive : {}) }}
+                onClick={() => setLandlordType("university")}
+              >
+                <span style={styles.typeIcon}></span>
+                <strong>Near University</strong>
+                <span style={styles.typeDesc}>List hostels/rooms near a campus — shown to students</span>
+              </button>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} style={styles.form}>
             <div style={styles.formGroup}>

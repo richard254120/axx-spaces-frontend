@@ -1313,6 +1313,30 @@ export default function LandlordDashboard() {
                       )}
                     </div>
 
+                    {/* Rental Preferences */}
+                    {(selectedWaitlistEntry.moveInDate || selectedWaitlistEntry.leaseDuration || selectedWaitlistEntry.occupants) && (
+                      <div style={{ marginBottom: "18px", padding: "12px 14px", background: "#f8fafc", borderRadius: "10px", border: "1px solid #e2e8f0", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                        {selectedWaitlistEntry.moveInDate && (
+                          <div>
+                            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>Move-in Target</span>
+                            <div style={{ fontSize: "13px", fontWeight: 600, color: "#0f172a", marginTop: "2px" }}>{selectedWaitlistEntry.moveInDate}</div>
+                          </div>
+                        )}
+                        {selectedWaitlistEntry.leaseDuration && (
+                          <div>
+                            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>Lease Term</span>
+                            <div style={{ fontSize: "13px", fontWeight: 600, color: "#0f172a", marginTop: "2px" }}>{selectedWaitlistEntry.leaseDuration}</div>
+                          </div>
+                        )}
+                        {selectedWaitlistEntry.occupants && (
+                          <div style={{ gridColumn: "span 2" }}>
+                            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>Occupancy</span>
+                            <div style={{ fontSize: "13px", fontWeight: 600, color: "#0f172a", marginTop: "2px" }}>{selectedWaitlistEntry.occupants}</div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     {/* Message from user */}
                     {selectedWaitlistEntry.message && (
                       <div style={{ marginBottom: "20px", background: "#f8fafc", borderRadius: "10px", padding: "14px", border: "1px solid #e2e8f0" }}>

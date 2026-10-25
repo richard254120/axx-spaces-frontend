@@ -252,6 +252,14 @@ export default function AgentRegister() {
         throw new Error(data.error || "Registration failed");
       }
 
+      if (data.requiresVerification) {
+        setSuccess("Registration successful! A verification link has been sent to " + formData.email + ". Please verify your email before logging in.");
+        setTimeout(() => {
+          navigate("/agent/login");
+        }, 3000);
+        return;
+      }
+
       // Auto-login after registration
       const loginResponse = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",

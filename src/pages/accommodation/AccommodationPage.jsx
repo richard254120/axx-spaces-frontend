@@ -3,84 +3,87 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import {
   useAccommodationHome,
-  DEFAULT_CATEGORIES,
   ADVERTISING_PACKAGES,
 } from "../../features/accommodation";
 import SocialMediaLinks from "../../components/SocialMediaLinks";
 
-// Popular Kenyan destinations for quick filter & suggestions
-const POPULAR_DESTINATIONS = [];
-
-const DESTINATION_NAMES = POPULAR_DESTINATIONS.map((d) => d.name);
+// Popular Kenyan destinations for quick filter & suggestions (No emojis)
+const POPULAR_DESTINATIONS = [
+  { name: "Diani Beach", county: "Kwale County", type: "Beach & Coast" },
+  { name: "Maasai Mara", county: "Narok County", type: "Safari & Bush" },
+  { name: "Naivasha", county: "Nakuru County", type: "Lakes & Escapes" },
+  { name: "Nairobi", county: "Nairobi County", type: "City & Skyline" },
+  { name: "Watamu", county: "Kilifi County", type: "Marine & Beach" },
+  { name: "Nanyuki", county: "Laikipia County", type: "Mt. Kenya Escapes" },
+  { name: "Amboseli", county: "Kajiado County", type: "Kilimanjaro Views" },
+  { name: "Lamu Island", county: "Lamu County", type: "Historical Coast" },
+];
 
 // Curated stay categories with high-definition imagery and stay counts
-const STAY_CATEGORIES = [];
-
-// Rich fallback properties for Kenya when API is warming up or empty
-const CURATED_KENYA_PROPERTIES = [];
+const STAY_CATEGORIES = [
+  { name: "Beachfront Villas", filterName: "beach", count: 42, desc: "Private pools & direct ocean access in Diani & Watamu" },
+  { name: "Safari Lodges", filterName: "safari", count: 35, desc: "Game drives & luxury bush camps in Mara & Amboseli" },
+  { name: "Lake & Rift Retreats", filterName: "mountain", count: 28, desc: "Serene lakeside cottages in Naivasha & Elementaita" },
+  { name: "City Skyline Suites", filterName: "city", count: 64, desc: "High-floor penthouses in Westlands, Kilimani & CBD" },
+];
 
 // Verified Guest Testimonials
-const GUEST_TESTIMONIALS = [];
+const GUEST_TESTIMONIALS = [
+  {
+    name: "Brian Odhiambo",
+    role: "Tech Lead, Nairobi",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80",
+    rating: 5,
+    stay: "Ocean Villa in Diani Beach",
+    text: "Directly chatting with the host on WhatsApp made check-in seamless. Zero middleman fees and the beach villa looked exactly like the photos.",
+  },
+  {
+    name: "Wanjiku Mwangi",
+    role: "Photographer & Traveler",
+    avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&q=80",
+    rating: 5,
+    stay: "Naivasha Lakeview Lodge",
+    text: "We booked a weekend getaway in Naivasha for our family. Fast response, verified host, and completely transparent rates without hidden surprises.",
+  },
+  {
+    name: "Kevin Kiprop",
+    role: "Business Consultant",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80",
+    rating: 5,
+    stay: "Westlands Luxury Penthouse",
+    text: "AxxSpace Accommodation is now my go-to for staycations and work retreats in Kenya. Clean, reliable, and premium quality throughout.",
+  },
+];
 
 // Frequently Asked Questions
-const FAQS = [];
-
-// Helper: Count up animation on scroll
-function AnimatedCounter({ value, duration = 1600 }) {
-  const [display, setDisplay] = useState("0");
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const rawStr = String(value);
-    const match = rawStr.match(/^([\d.]+)(.*)$/);
-    if (!match) {
-      setDisplay(rawStr);
-      return;
-    }
-    const target = parseFloat(match[1]);
-    const suffix = match[2] || "";
-    const decimals = (match[1].split(".")[1] || "").length;
-
-    let startTime = null;
-    let frameId = null;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        observer.disconnect();
-
-        const step = (time) => {
-          if (!startTime) startTime = time;
-          const progress = Math.min((time - startTime) / duration, 1);
-          // Ease out cubic
-          const current = target * (1 - Math.pow(1 - progress, 3));
-          setDisplay(current.toFixed(decimals) + suffix);
-          if (progress < 1) {
-            frameId = requestAnimationFrame(step);
-          } else {
-            setDisplay(target.toFixed(decimals) + suffix);
-          }
-        };
-        frameId = requestAnimationFrame(step);
-      },
-      { threshold: 0.2 }
-    );
-
-    if (ref.current) observer.observe(ref.current);
-
-    return () => {
-      observer.disconnect();
-      if (frameId) cancelAnimationFrame(frameId);
-    };
-  }, [value, duration]);
-
-  return <span ref={ref}>{display}</span>;
-}
+const FAQS = [
+  {
+    q: "How do I book an accommodation on AxxSpace?",
+    a: "Simply browse our verified Kenyan stays, select your dates and number of guests, and click 'View Details' or 'WhatsApp' to connect directly with the verified host. There are zero agency commissions.",
+  },
+  {
+    q: "Are the property owners and hosts verified?",
+    a: "Yes. Every accommodation listing undergoes identity, physical location, and quality verification before receiving the Emerald Verified Host badge.",
+  },
+  {
+    q: "Can I inspect the stay or chat before making any payment?",
+    a: "Absolutely. We encourage direct communication via WhatsApp and video tours so you can confirm all amenities, check-in instructions, and cancellation policies directly with the host.",
+  },
+  {
+    q: "How do I list my hotel, villa, or Airbnb as a host?",
+    a: "Click 'List Property (Host)' at the top of the page, sign up for a host account, and submit your property photos, amenities, and nightly rates. Our moderation team reviews and approves listings promptly.",
+  },
+  {
+    q: "What payment methods are supported?",
+    a: "Direct booking arrangements are agreed between you and the host, typically via M-Pesa or bank transfer directly with no platform surcharges.",
+  },
+];
 
 export default function AccommodationPage() {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
-  const { featured: backendFeatured, stats: heroStats } = useAccommodationHome();
+  const isHostUser = Boolean(user && (user.role === "host" || user.role === "admin"));
+  const { featured: backendFeatured } = useAccommodationHome();
 
   // Search Bar State
   const [destination, setDestination] = useState("");
@@ -96,6 +99,7 @@ export default function AccommodationPage() {
   const [showTopBtn, setShowTopBtn] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeCategoryTab, setActiveCategoryTab] = useState("all");
+  const [sortBy, setSortBy] = useState("recommended");
   const [howItWorksTab, setHowItWorksTab] = useState("guests"); // "guests" | "hosts"
   const [openFaqIndex, setOpenFaqIndex] = useState(0);
 
@@ -110,10 +114,6 @@ export default function AccommodationPage() {
   });
   const [wishlistDrawerOpen, setWishlistDrawerOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
-
-  // Marquee pause & drag state
-  const [marqueePaused, setMarqueePaused] = useState(false);
-  const marqueeRef = useRef(null);
   const searchContainerRef = useRef(null);
 
   // Budget Planner State
@@ -121,11 +121,10 @@ export default function AccommodationPage() {
   const [plannerNights, setPlannerNights] = useState(3);
   const [plannerStyle, setPlannerStyle] = useState("comfort"); // "budget" | "comfort" | "luxury"
 
-  // Only show real backend properties — never mix in placeholder/curated data
-  // (curated data has fake IDs like "1","2" that break the detail page)
+  // Only show real backend properties
   const allProperties = useMemo(() => {
     if (backendFeatured && backendFeatured.length > 0) {
-      return backendFeatured.map((p, idx) => ({
+      return backendFeatured.map((p) => ({
         _id: p._id || p.id,
         id: p._id || p.id,
         name: p.name || "Kenyan Stay",
@@ -139,22 +138,23 @@ export default function AccommodationPage() {
         reviews: p.reviews || 24,
         tag: p.tag || "Verified",
         badge: "Verified Host",
-        amenities: p.amenities && p.amenities.length > 0 ? p.amenities.slice(0, 5) : ["WiFi", "Pool", "Parking"],
-        image: p.images && p.images[0]?.imageUrl ? p.images[0].imageUrl : (typeof p.images?.[0] === 'string' ? p.images[0] : (p.image || null)),
+        amenities: p.amenities && p.amenities.length > 0 ? p.amenities.slice(0, 5) : ["WiFi", "Pool", "Parking", "Air Conditioning"],
+        image: p.images && p.images[0]?.imageUrl ? p.images[0].imageUrl : (typeof p.images?.[0] === "string" ? p.images[0] : (p.image || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80")),
         whatsapp: p.whatsapp || p.phone || "254745689773",
-        color: p.color || "#4f46e5",
+        color: p.color || "#E31B1B",
         categoryTab: (p.category || p.type || "")?.toLowerCase().includes("beach") ? "beach" : (p.category || p.type || "")?.toLowerCase().includes("safari") ? "safari" : (p.category || p.type || "")?.toLowerCase().includes("mountain") || (p.category || p.type || "")?.toLowerCase().includes("lake") ? "mountain" : "city",
         description: p.description || "Comfortable stay with verified Kenyan hospitality.",
+        videos: p.videos || [],
       }));
     }
     return [];
   }, [backendFeatured]);
 
-  // Filtered properties based on in-place category tab
+  // Filtered properties based on category tab and sorting
   const displayedProperties = useMemo(() => {
-    if (activeCategoryTab === "all") return allProperties;
+    let list = allProperties;
     if (activeCategoryTab === "beach") {
-      return allProperties.filter(
+      list = allProperties.filter(
         (p) =>
           p.categoryTab === "beach" ||
           p.category?.toLowerCase().includes("beach") ||
@@ -162,19 +162,18 @@ export default function AccommodationPage() {
           p.location?.toLowerCase().includes("diani") ||
           p.location?.toLowerCase().includes("watamu")
       );
-    }
-    if (activeCategoryTab === "safari") {
-      return allProperties.filter(
+    } else if (activeCategoryTab === "safari") {
+      list = allProperties.filter(
         (p) =>
           p.categoryTab === "safari" ||
           p.category?.toLowerCase().includes("safari") ||
           p.category?.toLowerCase().includes("camp") ||
           p.location?.toLowerCase().includes("mara") ||
-          p.location?.toLowerCase().includes("laikipia")
+          p.location?.toLowerCase().includes("laikipia") ||
+          p.location?.toLowerCase().includes("amboseli")
       );
-    }
-    if (activeCategoryTab === "mountain") {
-      return allProperties.filter(
+    } else if (activeCategoryTab === "mountain") {
+      list = allProperties.filter(
         (p) =>
           p.categoryTab === "mountain" ||
           p.category?.toLowerCase().includes("mountain") ||
@@ -182,17 +181,26 @@ export default function AccommodationPage() {
           p.location?.toLowerCase().includes("naivasha") ||
           p.location?.toLowerCase().includes("nanyuki")
       );
-    }
-    if (activeCategoryTab === "city") {
-      return allProperties.filter(
+    } else if (activeCategoryTab === "city") {
+      list = allProperties.filter(
         (p) =>
           p.categoryTab === "city" ||
           p.category?.toLowerCase().includes("city") ||
           p.location?.toLowerCase().includes("nairobi")
       );
     }
-    return allProperties;
-  }, [allProperties, activeCategoryTab]);
+
+    if (sortBy === "price-asc") {
+      return [...list].sort((a, b) => (a.price || 0) - (b.price || 0));
+    }
+    if (sortBy === "price-desc") {
+      return [...list].sort((a, b) => (b.price || 0) - (a.price || 0));
+    }
+    if (sortBy === "rating-desc") {
+      return [...list].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    }
+    return list;
+  }, [allProperties, activeCategoryTab, sortBy]);
 
   // Wishlist items detailed list
   const wishlistProperties = useMemo(() => {
@@ -253,10 +261,10 @@ export default function AccommodationPage() {
     let updated;
     if (favs.includes(id)) {
       updated = favs.filter((x) => x !== id);
-      showToast(`Removed from your wishlist`);
+      showToast(`Removed from your saved stays`);
     } else {
       updated = [...favs, id];
-      showToast(`Saved "${name || 'Property'}" to wishlist`);
+      showToast(`Saved "${name || "Property"}" to wishlist`);
     }
     setFavs(updated);
     try {
@@ -295,11 +303,6 @@ export default function AccommodationPage() {
     navigate(`/accommodation/listings?area=${encodeURIComponent(destName)}&search=${encodeURIComponent(destName)}`);
   };
 
-  // Category Card click
-  const handleCategorySelect = (categoryOption) => {
-    navigate(`/accommodation/listings?category=${encodeURIComponent(categoryOption.filterName || categoryOption.name)}`);
-  };
-
   // Direct WhatsApp contact with pre-filled message
   const handleWhatsAppContact = (e, prop) => {
     e.stopPropagation();
@@ -311,8 +314,7 @@ export default function AccommodationPage() {
   };
 
   // Format guests label
-  const guestsLabel = `${guestsCount.adults + guestsCount.children} guest${guestsCount.adults + guestsCount.children > 1 ? "s" : ""
-    }, ${guestsCount.rooms} room${guestsCount.rooms > 1 ? "s" : ""}`;
+  const guestsLabel = `${guestsCount.adults + guestsCount.children} guest${guestsCount.adults + guestsCount.children > 1 ? "s" : ""}, ${guestsCount.rooms} room${guestsCount.rooms > 1 ? "s" : ""}`;
 
   // Budget Planner Calculation
   const estimatedNightlyRate =
@@ -320,8 +322,8 @@ export default function AccommodationPage() {
   const totalEstimatedStay = estimatedNightlyRate * plannerNights;
 
   return (
-    <div className="accommodation-root" style={s.root}>
-      <style>{customStyles}</style>
+    <div className="ax-accommodation-root">
+      <style>{css}</style>
 
       {/* ── TOP SCROLL PROGRESS BAR ── */}
       <div className="scroll-progress-bar" style={{ width: `${scrollProgress}%` }} />
@@ -333,24 +335,23 @@ export default function AccommodationPage() {
         </div>
       )}
 
-      {/* ── TOP NAVIGATION ── */}
+      {/* ── TOP NAVIGATION HEADER (Executive Midnight Theme) ── */}
       <header className={`main-nav ${scrolled ? "scrolled" : ""}`}>
-        <div style={s.navInner}>
-          {/* ── LOGO ── */}
-          <div style={s.logoWrapper} onClick={() => navigate("/accommodation")}>
-            {/* Icon badge */}
-            <div style={s.logoBadge}>
-              <svg viewBox="0 0 32 32" width="22" height="22" fill="none">
-                <path d="M16 3L3 12v17h9v-9h8v9h9V12L16 3z" fill="#fff" fillOpacity="0.95" />
-                <path d="M16 3L3 12v17h9v-9h8v9h9V12L16 3z" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
+        <div className="nav-inner-container">
+          {/* BRAND */}
+          <div className="nav-logo-group" onClick={() => navigate("/accommodation")}>
+            <div className="nav-logo-badge">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#FFFFFF" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <polyline points="9 22 9 12 15 12 15 22" />
               </svg>
             </div>
-            {/* Wordmark */}
-            <div style={s.logoTextGroup}>
-              <div style={s.logoTitle}>
-                <span style={s.logoAxx}>AXX</span><span style={s.logoSpace}>Space</span>
+            <div className="nav-logo-text">
+              <div className="nav-logo-wordmark">
+                <span className="logo-brand-white">AXX</span>
+                <span className="logo-brand-red">Space</span>
               </div>
-              <span style={s.logoSubline}>Accommodation</span>
+              <span className="nav-logo-sub">Accommodation</span>
             </div>
           </div>
 
@@ -359,19 +360,22 @@ export default function AccommodationPage() {
             <button type="button" className="nav-link-btn" onClick={() => navigate("/accommodation/listings")}>
               Explore Stays
             </button>
-            <button type="button" className="nav-link-btn" onClick={() => { const el = document.getElementById("budget-planner"); if (el) el.scrollIntoView({ behavior: "smooth" }); }}>
+            <button type="button" className="nav-link-btn" onClick={() => document.getElementById("featured-section")?.scrollIntoView({ behavior: "smooth" })}>
+              Featured Stays
+            </button>
+            <button type="button" className="nav-link-btn" onClick={() => document.getElementById("budget-planner")?.scrollIntoView({ behavior: "smooth" })}>
               Budget Planner
             </button>
-            <button type="button" className="nav-link-btn" onClick={() => { const el = document.getElementById("packages-section"); if (el) el.scrollIntoView({ behavior: "smooth" }); }}>
+            <button type="button" className="nav-link-btn" onClick={() => document.getElementById("packages-section")?.scrollIntoView({ behavior: "smooth" })}>
               For Hosts
             </button>
-            <button type="button" className="nav-link-btn" onClick={() => { const el = document.getElementById("faq-section"); if (el) el.scrollIntoView({ behavior: "smooth" }); }}>
+            <button type="button" className="nav-link-btn" onClick={() => document.getElementById("faq-section")?.scrollIntoView({ behavior: "smooth" })}>
               FAQ
             </button>
           </nav>
 
           {/* Right Action Buttons */}
-          <div style={s.navRightGroup}>
+          <div className="nav-actions-group">
             {/* Wishlist Button with Counter */}
             <button
               type="button"
@@ -379,23 +383,23 @@ export default function AccommodationPage() {
               onClick={() => setWishlistDrawerOpen(true)}
               title="Saved Stays"
             >
-              <svg viewBox="0 0 24 24" width="18" height="18" fill={favs.length > 0 ? "#e11d48" : "none"} stroke={favs.length > 0 ? "#e11d48" : "currentColor"} strokeWidth="2">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill={favs.length > 0 ? "var(--brand-red)" : "none"} stroke={favs.length > 0 ? "var(--brand-red)" : "currentColor"} strokeWidth="2">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
               </svg>
               <span className="wishlist-badge-count">{favs.length}</span>
             </button>
 
-            {user && user.role !== "guest" ? (
-              <div style={s.userGroup}>
+            {isHostUser ? (
+              <div className="user-nav-box">
                 <button
                   type="button"
-                  style={s.dashboardBtn}
+                  className="dashboard-nav-btn"
                   onClick={() => navigate("/accommodation/dashboard")}
                 >
-                  Dashboard
+                  Host Dashboard
                 </button>
-                <div style={s.userAvatar} title={user.name || "User"}>
-                  {(user.name || "U")[0].toUpperCase()}
+                <div className="user-avatar-circle" title={user.name || "Host"}>
+                  {(user.name || "H")[0].toUpperCase()}
                 </div>
               </div>
             ) : (
@@ -403,19 +407,24 @@ export default function AccommodationPage() {
                 <button
                   type="button"
                   className="sign-in-btn"
-                  onClick={() => navigate("/accommodation/login")}
+                  onClick={() => navigate("/accommodation/login?tab=login")}
                 >
-                  Sign In
+                  Host Sign In
                 </button>
                 <button
                   type="button"
                   className="list-property-btn"
-                  onClick={() => navigate("/accommodation/register")}
+                  onClick={() => navigate("/accommodation/register?tab=register")}
                 >
-                  <span>Register Account</span>
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
+                  <span>List Property (Host)</span>
+                  <span className="btn-arrow">→</span>
+                </button>
+                <button
+                  type="button"
+                  className="mobile-header-auth-btn"
+                  onClick={() => navigate("/accommodation/login?tab=login")}
+                >
+                  Host Portal
                 </button>
               </>
             )}
@@ -444,33 +453,33 @@ export default function AccommodationPage() {
             <button type="button" onClick={() => { navigate("/accommodation/listings"); setMobileMenuOpen(false); }}>
               Explore All Stays
             </button>
-            <button type="button" onClick={() => { document.getElementById("categories-section")?.scrollIntoView({ behavior: "smooth" }); setMobileMenuOpen(false); }}>
-              Categories & Escapes
+            <button type="button" onClick={() => { document.getElementById("featured-section")?.scrollIntoView({ behavior: "smooth" }); setMobileMenuOpen(false); }}>
+              Featured Kenyan Stays
             </button>
             <button type="button" onClick={() => { document.getElementById("budget-planner")?.scrollIntoView({ behavior: "smooth" }); setMobileMenuOpen(false); }}>
-              Kenya Stay Budget Estimator
+              Stay Budget Estimator
             </button>
             <button type="button" onClick={() => { document.getElementById("packages-section")?.scrollIntoView({ behavior: "smooth" }); setMobileMenuOpen(false); }}>
-              Host Pricing & Plans
+              Host Pricing & Advertising
             </button>
             <button type="button" onClick={() => { document.getElementById("faq-section")?.scrollIntoView({ behavior: "smooth" }); setMobileMenuOpen(false); }}>
               Help & FAQ
             </button>
             <div className="mobile-nav-divider" />
-            {user && user.role !== "guest" ? (
+            {isHostUser ? (
               <button type="button" className="mobile-action-highlight" onClick={() => { navigate("/accommodation/dashboard"); setMobileMenuOpen(false); }}>
-                Go to Dashboard
+                Go to Host Dashboard →
               </button>
             ) : (
               <>
-                <button type="button" onClick={() => { navigate("/accommodation/login"); setMobileMenuOpen(false); }}>
-                  Sign In
+                <button type="button" onClick={() => { navigate("/accommodation/login?tab=login"); setMobileMenuOpen(false); }}>
+                  Host Sign In
                 </button>
-                <button type="button" onClick={() => { navigate("/accommodation/register"); setMobileMenuOpen(false); }}>
-                  Register Account
+                <button type="button" onClick={() => { navigate("/accommodation/register?tab=register"); setMobileMenuOpen(false); }}>
+                  Register Host Account
                 </button>
                 <button type="button" className="mobile-action-highlight" onClick={() => { navigate("/accommodation/register-property"); setMobileMenuOpen(false); }}>
-                  List Your Property (Host)
+                  List Your Property (Host) →
                 </button>
               </>
             )}
@@ -478,87 +487,124 @@ export default function AccommodationPage() {
         )}
       </header>
 
-      {/* ── HERO SECTION ── */}
-      <section style={s.heroSection}>
-        {/* Dynamic ambient mesh gradients */}
-        <div className="hero-glow-blob blob-top-left" />
-        <div className="hero-glow-blob blob-bottom-right" />
-        <div className="hero-glow-blob blob-center" />
+      {/* ═════════════════════════════════════════════════════════════
+          1. ULTRA LUXURY HERO SECTION (Matching Rentals/Property)
+      ═════════════════════════════════════════════════════════════ */}
+      <section className="listings-hero">
+        {/* Ambient atmospheric glowing orbs */}
+        <div className="ambient-orb orb-crimson" />
+        <div className="ambient-orb orb-amber" />
+        <div className="ambient-orb orb-navy" />
+        <div className="hero-grid-pattern" />
 
-        <div style={s.heroContainer}>
-          {/* Trust Floating Tag */}
-          <div className="hero-in i1" style={{ display: "inline-flex", justifyContent: "center" }}>
-            <div style={s.heroBadgePill}>
-              <span style={{ display: "inline-flex", alignItems: "center" }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                </svg>
-              </span>
-              <span>Direct Bookings · Verified Kenyan Hosts · 0% Hidden Commission</span>
-            </div>
+        {/* Compact Hero Header (Matching Rentals/Property) */}
+        <div className="hero-compact-header">
+          <div className="hero-compact-left">
+            <h1 className="hero-compact-title">AxxSpace Accommodations</h1>
+            <p className="hero-compact-sub">Verified vacation homes, safari lodges & luxury stays across 47 counties</p>
           </div>
 
-          {/* Majestic Hero Headline */}
-          <h1 className="hero-in i2" style={s.heroHeading}>
+          <div className="hero-compact-actions">
+            {!user ? (
+              <button
+                type="button"
+                className="hero-compact-btn-primary"
+                onClick={() => navigate("/accommodation/register?tab=register")}
+              >
+                <span>List Stay (Host)</span>
+                <span className="btn-arrow">→</span>
+              </button>
+            ) : isHostUser ? (
+              <button
+                type="button"
+                className="hero-compact-btn-primary"
+                onClick={() => navigate("/accommodation/dashboard")}
+              >
+                <span>Host Dashboard</span>
+                <span className="btn-arrow">→</span>
+              </button>
+            ) : null}
+
+            <button
+              type="button"
+              className="hero-compact-btn-secondary"
+              onClick={() => navigate("/accommodation/login?tab=login")}
+            >
+              <span>Host Portal</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Central Hero Tagline */}
+        <div className="hero-center-content">
+          <div className="hero-trust-badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <span>Direct Bookings · Verified Kenyan Hosts · 0% Hidden Commissions</span>
+          </div>
+
+          <h2 className="hero-main-headline">
             Discover Kenya's <br />
             <span className="shimmering-gradient-text">Finest Stays & Hidden Escapes</span>
-          </h1>
+          </h2>
 
-          {/* Subtitle */}
-          <p className="hero-in i3" style={s.heroSubtitle}>
-            From sun-kissed Diani beachfront villas and Great Rift Valley safari lodges to chic Nairobi skyline penthouses. Connect directly with verified owners on WhatsApp with zero middleman markups.
+          <p className="hero-main-sub">
+            From sun-kissed Diani beachfront villas and Great Rift Valley safari lodges to chic Nairobi skyline penthouses. Connect directly with verified hosts on WhatsApp with zero middleman markups.
           </p>
+        </div>
 
-          {/* ── MULTI-SEGMENT SEARCH ENGINE ── */}
-          <div ref={searchContainerRef} className="search-bar-shell hero-in i4">
-            <form onSubmit={handleSearchSubmit} style={s.searchBarInner}>
+        {/* ═════════════════════════════════════════════════════════════
+            2. FLOATING REAL ESTATE SEARCH & FILTER CONSOLE
+        ═════════════════════════════════════════════════════════════ */}
+        <div className="search-console-wrapper" ref={searchContainerRef}>
+          <div className="search-console-card">
+            <form onSubmit={handleSearchSubmit} className="search-inputs-grid">
               {/* Segment 1: Destination */}
               <div
-                className="search-segment-box"
+                className="search-segment"
                 onClick={() => {
                   setShowDestDropdown(!showDestDropdown);
                   setShowGuestsDropdown(false);
                 }}
               >
-                <div style={s.segmentIconHolder}>
-                  <svg viewBox="0 0 24 24" width="20" height="20" stroke="#4f46e5" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                <label className="segment-label">WHERE TO?</label>
+                <div className="segment-input-wrap">
+                  <svg className="segment-svg-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                     <circle cx="12" cy="10" r="3" />
                   </svg>
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={s.segmentLabel}>WHERE TO?</div>
                   <input
                     type="text"
                     placeholder="Search city, beach, or safari park…"
                     value={destination}
                     onChange={(e) => setDestination(e.target.value)}
-                    style={s.segmentInputField}
+                    className="segment-text-input"
                     onClick={(e) => e.stopPropagation()}
                     onFocus={() => setShowDestDropdown(true)}
                   />
+                  {destination && (
+                    <button
+                      type="button"
+                      className="segment-clear-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDestination("");
+                      }}
+                    >
+                      ✕
+                    </button>
+                  )}
                 </div>
-                {destination && (
-                  <button
-                    type="button"
-                    style={s.clearInputBtn}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setDestination("");
-                    }}
-                  >
-                    ✕
-                  </button>
-                )}
 
-                {/* Destination Suggestions Popover */}
+                {/* Destination Suggestions Popover (Clean SVG icons, zero emojis) */}
                 {showDestDropdown && (
-                  <div className="dest-dropdown-popover">
-                    <div style={s.destDropdownHeader}>
+                  <div className="dest-dropdown-popover" onClick={(e) => e.stopPropagation()}>
+                    <div className="dest-dropdown-header">
                       <span>POPULAR KENYAN DESTINATIONS</span>
                     </div>
-                    <div style={s.destDropdownList}>
+                    <div className="dest-dropdown-list">
                       {POPULAR_DESTINATIONS.filter(
                         (d) =>
                           !destination ||
@@ -573,17 +619,15 @@ export default function AccommodationPage() {
                             setShowDestDropdown(false);
                           }}
                         >
-                          <span style={{ display: "inline-flex", alignItems: "center" }}>
-                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="#4f46e5" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                              <circle cx="12" cy="10" r="3" />
-                            </svg>
-                          </span>
+                          <svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--brand-red)" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                            <circle cx="12" cy="10" r="3" />
+                          </svg>
                           <div style={{ flex: 1 }}>
-                            <div style={{ fontWeight: 700, color: "#0f172a", fontSize: "14px" }}>{dest.name}</div>
-                            <div style={{ fontSize: "12px", color: "#64748b" }}>{dest.county} · {dest.type}</div>
+                            <div className="dest-item-name">{dest.name}</div>
+                            <div className="dest-item-county">{dest.county} · {dest.type}</div>
                           </div>
-                          <span style={{ fontSize: "11px", color: "#4f46e5", fontWeight: 700 }}>Select →</span>
+                          <span className="dest-select-arrow">Select →</span>
                         </div>
                       ))}
                     </div>
@@ -592,69 +636,63 @@ export default function AccommodationPage() {
               </div>
 
               {/* Segment 2: Check-In */}
-              <div className="search-segment-box">
-                <div style={s.segmentIconHolder}>
-                  <svg viewBox="0 0 24 24" width="20" height="20" stroke="#4f46e5" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+              <div className="search-segment">
+                <label className="segment-label">CHECK-IN</label>
+                <div className="segment-input-wrap">
+                  <svg className="segment-svg-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                     <line x1="16" y1="2" x2="16" y2="6" />
                     <line x1="8" y1="2" x2="8" y2="6" />
                     <line x1="3" y1="10" x2="21" y2="10" />
                   </svg>
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={s.segmentLabel}>CHECK-IN</div>
                   <input
                     type="date"
                     value={checkIn}
                     min={new Date().toISOString().split("T")[0]}
                     onChange={(e) => setCheckIn(e.target.value)}
-                    style={s.segmentInputField}
+                    className="segment-text-input"
                   />
                 </div>
               </div>
 
               {/* Segment 3: Check-Out */}
-              <div className="search-segment-box">
-                <div style={s.segmentIconHolder}>
-                  <svg viewBox="0 0 24 24" width="20" height="20" stroke="#4f46e5" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+              <div className="search-segment">
+                <label className="segment-label">CHECK-OUT</label>
+                <div className="segment-input-wrap">
+                  <svg className="segment-svg-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                     <line x1="16" y1="2" x2="16" y2="6" />
                     <line x1="8" y1="2" x2="8" y2="6" />
                     <line x1="3" y1="10" x2="21" y2="10" />
                     <path d="M12 14l2 2 4-4" />
                   </svg>
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={s.segmentLabel}>CHECK-OUT</div>
                   <input
                     type="date"
                     value={checkOut}
                     min={checkIn || new Date().toISOString().split("T")[0]}
                     onChange={(e) => setCheckOut(e.target.value)}
-                    style={s.segmentInputField}
+                    className="segment-text-input"
                   />
                 </div>
               </div>
 
               {/* Segment 4: Guests & Rooms */}
               <div
-                className="search-segment-box"
+                className="search-segment"
                 onClick={() => {
                   setShowGuestsDropdown(!showGuestsDropdown);
                   setShowDestDropdown(false);
                 }}
               >
-                <div style={s.segmentIconHolder}>
-                  <svg viewBox="0 0 24 24" width="20" height="20" stroke="#4f46e5" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                <label className="segment-label">GUESTS & ROOMS</label>
+                <div className="segment-input-wrap">
+                  <svg className="segment-svg-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                     <circle cx="9" cy="7" r="4" />
                     <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
                     <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                   </svg>
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={s.segmentLabel}>GUESTS & ROOMS</div>
-                  <div style={{ ...s.segmentInputField, display: "flex", alignItems: "center" }}>
+                  <div className="segment-text-display">
                     {guestsLabel}
                   </div>
                 </div>
@@ -662,75 +700,75 @@ export default function AccommodationPage() {
                 {/* Guests Popover Stepper */}
                 {showGuestsDropdown && (
                   <div className="guests-dropdown-popover" onClick={(e) => e.stopPropagation()}>
-                    <div style={s.guestStepperRow}>
+                    <div className="guest-stepper-row">
                       <div>
-                        <div style={{ fontWeight: 700, fontSize: "14px", color: "#0f172a" }}>Adults</div>
-                        <div style={{ fontSize: "12px", color: "#64748b" }}>Age 13 or above</div>
+                        <div className="stepper-title">Adults</div>
+                        <div className="stepper-sub">Age 13 or above</div>
                       </div>
-                      <div style={s.stepperControls}>
+                      <div className="stepper-controls">
                         <button
                           type="button"
                           disabled={guestsCount.adults <= 1}
                           onClick={() => setGuestsCount((g) => ({ ...g, adults: Math.max(1, g.adults - 1) }))}
-                          style={s.stepperBtn}
+                          className="stepper-btn"
                         >
                           -
                         </button>
-                        <span style={s.stepperNum}>{guestsCount.adults}</span>
+                        <span className="stepper-num">{guestsCount.adults}</span>
                         <button
                           type="button"
                           onClick={() => setGuestsCount((g) => ({ ...g, adults: g.adults + 1 }))}
-                          style={s.stepperBtn}
+                          className="stepper-btn"
                         >
                           +
                         </button>
                       </div>
                     </div>
 
-                    <div style={s.guestStepperRow}>
+                    <div className="guest-stepper-row">
                       <div>
-                        <div style={{ fontWeight: 700, fontSize: "14px", color: "#0f172a" }}>Children</div>
-                        <div style={{ fontSize: "12px", color: "#64748b" }}>Ages 0 - 12</div>
+                        <div className="stepper-title">Children</div>
+                        <div className="stepper-sub">Ages 0 - 12</div>
                       </div>
-                      <div style={s.stepperControls}>
+                      <div className="stepper-controls">
                         <button
                           type="button"
                           disabled={guestsCount.children <= 0}
                           onClick={() => setGuestsCount((g) => ({ ...g, children: Math.max(0, g.children - 1) }))}
-                          style={s.stepperBtn}
+                          className="stepper-btn"
                         >
                           -
                         </button>
-                        <span style={s.stepperNum}>{guestsCount.children}</span>
+                        <span className="stepper-num">{guestsCount.children}</span>
                         <button
                           type="button"
                           onClick={() => setGuestsCount((g) => ({ ...g, children: g.children + 1 }))}
-                          style={s.stepperBtn}
+                          className="stepper-btn"
                         >
                           +
                         </button>
                       </div>
                     </div>
 
-                    <div style={s.guestStepperRow}>
+                    <div className="guest-stepper-row">
                       <div>
-                        <div style={{ fontWeight: 700, fontSize: "14px", color: "#0f172a" }}>Rooms</div>
-                        <div style={{ fontSize: "12px", color: "#64748b" }}>Bedrooms / Suites</div>
+                        <div className="stepper-title">Rooms</div>
+                        <div className="stepper-sub">Bedrooms / Suites</div>
                       </div>
-                      <div style={s.stepperControls}>
+                      <div className="stepper-controls">
                         <button
                           type="button"
                           disabled={guestsCount.rooms <= 1}
                           onClick={() => setGuestsCount((g) => ({ ...g, rooms: Math.max(1, g.rooms - 1) }))}
-                          style={s.stepperBtn}
+                          className="stepper-btn"
                         >
                           -
                         </button>
-                        <span style={s.stepperNum}>{guestsCount.rooms}</span>
+                        <span className="stepper-num">{guestsCount.rooms}</span>
                         <button
                           type="button"
                           onClick={() => setGuestsCount((g) => ({ ...g, rooms: g.rooms + 1 }))}
-                          style={s.stepperBtn}
+                          className="stepper-btn"
                         >
                           +
                         </button>
@@ -739,7 +777,7 @@ export default function AccommodationPage() {
 
                     <button
                       type="button"
-                      style={s.guestsDoneBtn}
+                      className="guests-done-btn"
                       onClick={() => setShowGuestsDropdown(false)}
                     >
                       Done
@@ -749,429 +787,507 @@ export default function AccommodationPage() {
               </div>
 
               {/* Submit Search Button */}
-              <button type="submit" className="hero-search-submit-btn">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="8" />
-                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                </svg>
-                <span>Search Stays</span>
-              </button>
-            </form>
-          </div>
-
-          {/* Quick Search Tag Pills under Search */}
-          <div className="hero-quick-tags hero-in i4">
-            <span style={{ color: "rgba(255,255,255,0.7)", fontSize: "13px", fontWeight: 600 }}>Quick Hotspots:</span>
-            {["Diani Beach", "Maasai Mara", "Naivasha", "Nairobi Suites", "Watamu", "Nanyuki"].map((h) => (
-              <button
-                key={h}
-                type="button"
-                className="quick-hotspot-pill"
-                onClick={() => handleDestinationSelect(h)}
-              >
-                {h}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── DESTINATIONS TICKER / MARQUEE ── */}
-      <section
-        className="destinations-marquee-section"
-        ref={marqueeRef}
-        onMouseEnter={() => setMarqueePaused(true)}
-        onMouseLeave={() => setMarqueePaused(false)}
-      >
-        <div className="marquee-outer-container">
-          <div className="marquee-label-chip">POPULAR ACROSS KENYA</div>
-          <div
-            className="marquee-track-scroll"
-            style={{ animationPlayState: marqueePaused ? "paused" : "running" }}
-          >
-            {[...POPULAR_DESTINATIONS, ...POPULAR_DESTINATIONS].map((item, idx) => (
-              <button
-                key={`${item.name}-${idx}`}
-                type="button"
-                className="marquee-pill-btn"
-                onClick={() => handleDestinationSelect(item.name)}
-              >
-                <span style={{ marginRight: "6px" }}>{item.icon}</span>
-                <span style={{ fontWeight: 700 }}>{item.name}</span>
-                <span className="marquee-county-tag">{item.county.replace(" County", "")}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-
-      {/* ── FEATURED ACCOMMODATIONS WITH IN-PLACE TABS ── */}
-      <section id="featured-section" style={{ ...s.section, background: "#f8fafc" }}>
-        <div style={s.sectionInner}>
-          <div className="section-head-split reveal">
-            <div>
-              <span className="section-eyebrow">HANDPICKED FOR EXCELLENCE</span>
-              <h2 style={s.sectionHeading}>Featured Kenyan Accommodations</h2>
-              <p style={s.sectionSubheading}>
-                Top-rated properties with verified host status, direct WhatsApp contact, and glowing guest ratings.
-              </p>
-            </div>
-
-            {/* In-Place Category Filter Tabs */}
-            <div className="featured-category-filter-tabs">
-              {[
-                { id: "all", label: "All Stays" },
-                { id: "beach", label: "Beachfront" },
-                { id: "safari", label: "Safari & Bush" },
-                { id: "mountain", label: "Lakes & Mountains" },
-                { id: "city", label: "City Luxury" },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  className={`filter-tab-pill ${activeCategoryTab === tab.id ? "active" : ""}`}
-                  onClick={() => setActiveCategoryTab(tab.id)}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Property Cards Grid */}
-          <div className="properties-listing-grid">
-            {displayedProperties.length === 0 ? (
-              <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "60px 20px" }}>
-                <div style={{ width: "64px", height: "64px", borderRadius: "50%", background: "#f3f4f6", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"></path>
-                    <path d="M9 22v-4h6v4"></path>
-                    <path d="M8 6h.01"></path>
-                    <path d="M16 6h.01"></path>
+              <div className="search-submit-segment">
+                <button type="submit" className="hero-search-submit-btn">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
                   </svg>
-                </div>
-                <h3 style={{ fontSize: "20px", fontWeight: 800, color: "#0f172a", marginBottom: "8px" }}>
-                  Listings Coming Soon
-                </h3>
-                <p style={{ color: "#64748b", marginBottom: "24px", maxWidth: "400px", margin: "0 auto 24px" }}>
-                  We're reviewing accommodation properties for this category. Be the first to list yours!
-                </p>
-                <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
-                  <button type="button" className="view-all-stays-cta" onClick={() => navigate("/accommodation/listings")}>
-                    Browse All Stays
-                  </button>
-                  <button type="button" className="view-all-stays-cta" style={{ background: "white", color: "#0ea5e9", border: "2px solid #0ea5e9" }} onClick={() => navigate("/accommodation/register-property")}>
-                    List Your Property
-                  </button>
-                </div>
+                  <span>Search Stays</span>
+                </button>
               </div>
-            ) : (
-              displayedProperties.map((prop, idx) => {
-                const isFav = favs.includes(prop._id || prop.id);
-                return (
-                  <div
-                    key={prop._id || prop.id || idx}
-                    className="property-card-deluxe reveal"
-                    style={{ animationDelay: `${(idx % 3) * 0.12}s` }}
-                    onClick={() => navigate(`/accommodation/${prop._id || prop.id}`)}
-                  >
-                    {/* Card Image Banner */}
-                    <div className="prop-image-frame">
-                      <img
-                        src={prop.image || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80"}
-                        alt={prop.name}
-                        className="prop-main-photo"
-                        loading="lazy"
-                      />
-                      <div className="prop-badge-strip">
-                        <span className="prop-category-tag">{prop.type || prop.category}</span>
-                        {prop.tag && <span className="prop-highlight-tag">{prop.tag}</span>}
-                        {prop.videos && prop.videos.length > 0 && (
-                          <span className="prop-video-tag" style={{ background: "rgba(15, 23, 42, 0.85)", color: "#38bdf8", fontWeight: 800, display: "inline-flex", alignItems: "center", gap: "5px" }}>
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
-                            Video Tour
-                          </span>
-                        )}
-                      </div>
+            </form>
 
-                      {/* Wishlist Heart Button */}
-                      <button
-                        type="button"
-                        className={`prop-fav-button ${isFav ? "active" : ""}`}
-                        onClick={(e) => toggleFavorite(e, prop._id || prop.id, prop.name)}
-                        aria-label="Save to Wishlist"
-                      >
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill={isFav ? "#e11d48" : "none"} stroke={isFav ? "#e11d48" : "currentColor"} strokeWidth="2.4">
-                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            {/* Quick Category Chips Strip (Zero Emojis) */}
+            <div className="quick-category-strip">
+              <span className="quick-cat-label">Explore Hotspots:</span>
+              <div className="quick-cat-scroll">
+                <button
+                  type="button"
+                  className={`quick-chip ${!destination ? "active" : ""}`}
+                  onClick={() => setDestination("")}
+                >
+                  <span>All Stays</span>
+                </button>
+                {POPULAR_DESTINATIONS.map((d) => (
+                  <button
+                    key={d.name}
+                    type="button"
+                    className={`quick-chip ${destination === d.name ? "active" : ""}`}
+                    onClick={() => handleDestinationSelect(d.name)}
+                  >
+                    <span>{d.name}</span>
+                  </button>
+                ))}
+                {favs.length > 0 && (
+                  <button
+                    type="button"
+                    className="quick-chip"
+                    onClick={() => setWishlistDrawerOpen(true)}
+                  >
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="var(--brand-red)" stroke="var(--brand-red)" strokeWidth="2">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    </svg>
+                    <span>Saved ({favs.length})</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═════════════════════════════════════════════════════════════
+          2. MAIN CONTENT BODY & DISCOVERY WORKSPACE (Matching Rentals)
+      ═════════════════════════════════════════════════════════════ */}
+      <main className="accommodation-main-canvas" id="featured-section">
+        {/* ── HIGH LEVEL NAVIGATION TABS (Segmented Discovery Nav with Clean SVGs) ── */}
+        <div className="segmented-discovery-nav">
+          <div className="discovery-tabs-cluster">
+            {[
+              {
+                id: "all",
+                label: "All Stays & Escapes",
+                icon: (
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                  </svg>
+                ),
+              },
+              {
+                id: "beach",
+                label: "Beachfront Villas",
+                icon: (
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <circle cx="12" cy="12" r="5" />
+                    <line x1="12" y1="1" x2="12" y2="3" />
+                    <line x1="12" y1="21" x2="12" y2="23" />
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                    <line x1="1" y1="12" x2="3" y2="12" />
+                    <line x1="21" y1="12" x2="23" y2="12" />
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                  </svg>
+                ),
+              },
+              {
+                id: "safari",
+                label: "Safari & Bush Camps",
+                icon: (
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <circle cx="12" cy="12" r="10" />
+                    <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+                  </svg>
+                ),
+              },
+              {
+                id: "mountain",
+                label: "Lakes & Mountains",
+                icon: (
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <path d="M8 3l4 8 5-5 5 15H2L8 3z" />
+                  </svg>
+                ),
+              },
+              {
+                id: "city",
+                label: "City Luxury Suites",
+                icon: (
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
+                    <path d="M9 22v-4h6v4" />
+                    <path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01" />
+                  </svg>
+                ),
+              },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                className={`discovery-tab ${activeCategoryTab === tab.id ? "active" : ""}`}
+                onClick={() => setActiveCategoryTab(tab.id)}
+              >
+                <span className="tab-icon">{tab.icon}</span>
+                <span className="tab-text">{tab.label}</span>
+                {tab.id === "all" && <span className="tab-counter">{allProperties.length}</span>}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ── TOOLBAR: RESULTS COUNT, SORTING, MAP VIEW & SAVED ── */}
+        <div className="listings-toolbar">
+          <div className="toolbar-left">
+            <h2 className="results-headline">
+              <span className="results-bold-num">{displayedProperties.length}</span>
+              <span>{displayedProperties.length === 1 ? " Verified Stay Found" : " Verified Stays Found in Kenya"}</span>
+              {destination && <span className="results-location-tag">in "{destination}"</span>}
+            </h2>
+          </div>
+
+          <div className="toolbar-right">
+            {/* Sort Selector */}
+            <div className="sort-box">
+              <span className="sort-label">Sort:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="sort-select"
+              >
+                <option value="recommended">Featured / Recommended</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="rating-desc">Highest Rated</option>
+              </select>
+            </div>
+
+            {/* Trip Planner Jump */}
+            <button
+              type="button"
+              className="toolbar-btn"
+              onClick={() => document.getElementById("budget-planner")?.scrollIntoView({ behavior: "smooth" })}
+            >
+              <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" strokeWidth="2.2" fill="none">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 6v6l4 2" />
+              </svg>
+              <span>Stay Estimator</span>
+            </button>
+
+            {/* Wishlist Button */}
+            <button
+              type="button"
+              className={`toolbar-btn ${wishlistDrawerOpen ? "active" : ""}`}
+              onClick={() => setWishlistDrawerOpen(true)}
+            >
+              <svg viewBox="0 0 24 24" width="15" height="15" fill={favs.length > 0 ? "var(--brand-red)" : "none"} stroke={favs.length > 0 ? "var(--brand-red)" : "currentColor"} strokeWidth="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+              <span>Saved ({favs.length})</span>
+            </button>
+          </div>
+        </div>
+
+        {/* ── 3. MODERN PROPERTY CARDS GRID (Matching Rentals/Property) ── */}
+        <div className="properties-modern-grid">
+          {displayedProperties.length === 0 ? (
+            <div className="empty-results-box">
+              <div className="empty-icon-circle">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"></path>
+                  <path d="M9 22v-4h6v4"></path>
+                </svg>
+              </div>
+              <h3 className="empty-title">Accommodations Coming Soon</h3>
+              <p className="empty-desc">
+                We're reviewing stays for this category. Browse all available stays or list your property today!
+              </p>
+              <div className="empty-actions">
+                <button type="button" className="btn-primary-red" onClick={() => navigate("/accommodation/listings")}>
+                  Browse All Stays
+                </button>
+                <button type="button" className="btn-secondary-outline" onClick={() => navigate("/accommodation/register-property")}>
+                  List Your Property
+                </button>
+              </div>
+            </div>
+          ) : (
+            displayedProperties.map((prop, idx) => {
+              const isFav = favs.includes(prop._id || prop.id);
+              return (
+                <article
+                  key={prop._id || prop.id || idx}
+                  className="property-card reveal"
+                  style={{ animationDelay: `${(idx % 3) * 0.1}s` }}
+                  onClick={() => navigate(`/accommodation/${prop._id || prop.id}`)}
+                >
+                  {/* Card Media Shell */}
+                  <div className="card-media-shell">
+                    <img
+                      src={prop.image}
+                      alt={prop.name}
+                      className="card-main-image"
+                      loading="lazy"
+                    />
+
+                    {/* Badge Overlay */}
+                    <div className="card-badges-overlay">
+                      <span className="badge-category-tag">{prop.type || prop.category}</span>
+                      <span className="badge-verified-host">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                         </svg>
-                      </button>
+                        <span>Verified Host</span>
+                      </span>
+                      {prop.videos && prop.videos.length > 0 && (
+                        <span className="badge-video-tour">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                          </svg>
+                          <span>Video Tour</span>
+                        </span>
+                      )}
                     </div>
 
+                    {/* Wishlist Button */}
+                    <button
+                      type="button"
+                      className={`card-wishlist-btn ${isFav ? "active" : ""}`}
+                      onClick={(e) => toggleFavorite(e, prop._id || prop.id, prop.name)}
+                      aria-label="Save to Wishlist"
+                    >
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill={isFav ? "var(--brand-red)" : "none"} stroke={isFav ? "var(--brand-red)" : "currentColor"} strokeWidth="2.4">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                      </svg>
+                    </button>
+                  </div>
 
                   {/* Card Content Body */}
-                  <div style={s.propCardBody}>
-                    <div style={s.propLocationRow}>
-                      <svg viewBox="0 0 24 24" width="14" height="14" stroke="#4f46e5" strokeWidth="2.5" fill="none">
+                  <div className="card-content-body">
+                    {/* Location Pin */}
+                    <div className="card-location-row">
+                      <svg viewBox="0 0 24 24" width="14" height="14" stroke="var(--brand-red)" strokeWidth="2.4" fill="none">
                         <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                         <circle cx="12" cy="10" r="3" />
                       </svg>
-                      <span style={s.propLocationText}>{prop.location}</span>
+                      <span className="card-location-text">{prop.location}</span>
                     </div>
 
-                    <h3 style={s.propCardName}>{prop.name}</h3>
+                    {/* Property Title */}
+                    <h3 className="card-property-title">{prop.name}</h3>
 
-                    {/* Amenity tags */}
-                    <div style={s.propAmenitiesWrap}>
+                    {/* Amenities Chips */}
+                    <div className="card-amenities-row">
                       {(prop.amenities || ["WiFi", "Pool", "Parking"]).slice(0, 3).map((am) => (
-                        <span key={am} style={s.amenityChip}>
+                        <span key={am} className="card-amenity-chip">
                           ✓ {am}
                         </span>
                       ))}
                       {prop.amenities && prop.amenities.length > 3 && (
-                        <span style={s.amenityChipMore}>+{prop.amenities.length - 3} more</span>
+                        <span className="card-amenity-more">+{prop.amenities.length - 3}</span>
                       )}
                     </div>
 
-                    <div style={s.propCardDivider} />
+                    <div className="card-body-divider" />
 
                     {/* Price and Rating row */}
-                    <div style={s.propPriceRatingRow}>
+                    <div className="card-bottom-row">
                       <div>
-                        <span style={s.propPriceText}>KSh {(prop.price || prop.basePrice || 0).toLocaleString()}</span>
-                        <span style={s.propPerNight}>/ night</span>
+                        <div className="card-price-amount">
+                          KSh {(prop.price || prop.basePrice || 0).toLocaleString()}
+                        </div>
+                        <div className="card-price-frequency">per night</div>
                       </div>
-                      <div style={s.propRatingBadge}>
-                        <span style={{ color: "#f59e0b", fontSize: "14px" }}>★</span>
-                        <span style={{ fontWeight: 800, color: "#0f172a" }}>{prop.rating || "4.8"}</span>
-                        <span style={{ color: "#64748b", fontSize: "12px" }}>({prop.reviews || "24"})</span>
+
+                      <div className="card-rating-badge">
+                        <span className="star-gold">★</span>
+                        <span className="rating-num">{prop.rating || "4.8"}</span>
+                        <span className="rating-count">({prop.reviews || "24"})</span>
                       </div>
                     </div>
 
-                    {/* Dual Action Buttons */}
-                    <div style={s.cardActionsRow}>
+                    {/* Action CTAs */}
+                    <div className="card-actions-grid" onClick={(e) => e.stopPropagation()}>
                       <button
                         type="button"
-                        className="card-primary-view-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/accommodation/${prop._id || prop.id}`);
-                        }}
+                        className="btn-card-details"
+                        onClick={() => navigate(`/accommodation/${prop._id || prop.id}`)}
                       >
-                        View Details
+                        <span>View Details</span>
+                        <span className="arrow-icon">→</span>
                       </button>
+
                       <button
                         type="button"
-                        className="card-whatsapp-direct-btn"
-                        title="Inquire directly on WhatsApp"
+                        className="btn-card-whatsapp"
+                        title="Chat directly on WhatsApp"
                         onClick={(e) => handleWhatsAppContact(e, prop)}
                       >
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                           <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.23 8.23 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24m4.52 11.66c-.25.7-.72 1.33-1.37 1.57-.45.17-.98.24-3.16-.62-2.34-.92-3.83-3.32-3.95-3.48-.12-.16-.95-1.26-.95-2.4 0-1.14.6-1.7.81-1.93.21-.23.46-.29.62-.29.15 0 .31 0 .44.01.14.01.32-.05.5.38.18.44.62 1.51.68 1.62.06.12.1.25.02.4-.08.15-.12.25-.24.39-.12.14-.25.31-.36.42-.12.12-.24.25-.1.5.14.24.62 1.02 1.33 1.65.91.81 1.67 1.06 1.91 1.18.24.12.38.1.52-.06.14-.16.6-.7.76-.94.16-.24.32-.2.54-.12.22.08 1.4.66 1.64.78.24.12.4.18.46.28.06.1.06.6-.19 1.3z" />
                         </svg>
                         <span>WhatsApp</span>
                       </button>
                     </div>
                   </div>
-                </div>
-                );
-              })
-            )}
+                </article>
+              );
+            })
+          )}
+        </div>
+
+        {/* View All Button */}
+        <div className="section-footer-cta">
+          <button
+            type="button"
+            className="btn-browse-all"
+            onClick={() => navigate("/accommodation/listings")}
+          >
+            <span>Explore All 500+ Verified Stays in Kenya</span>
+            <span className="arrow-icon">→</span>
+          </button>
+        </div>
+      </main>
+
+      {/* ── SPECIAL DEALS & FLASH OFFERS BANNER (Executive Atmosphere) ── */}
+      <section className="deals-banner-section">
+        <div className="deals-banner-card reveal">
+          <div className="ambient-orb orb-crimson" style={{ top: "-60px", left: "10%", opacity: 0.4 }} />
+          <div className="ambient-orb orb-amber" style={{ bottom: "-60px", right: "10%", opacity: 0.3 }} />
+
+          <div className="deals-content-left">
+            <div className="deal-badge-pill">LIMITED WEEKEND ESCAPES</div>
+            <h3 className="deal-title">Save Up to 25% on Direct Bookings This Month</h3>
+            <p className="deal-desc">
+              Exclusive direct host specials in Diani Beach, Naivasha, and the Maasai Mara. Connect directly, avoid third-party agency surcharges, and enjoy complimentary breakfast or sunset safari drives.
+            </p>
+            <div className="deal-actions-row">
+              <button
+                type="button"
+                className="btn-claim-deal"
+                onClick={() => navigate("/accommodation/listings?sort=Price:+Low+to+High")}
+              >
+                Browse Discounted Stays →
+              </button>
+              <div className="deal-guarantees">
+                <span>✓ Verified Direct Rates</span>
+                <span>•</span>
+                <span>✓ Direct WhatsApp Contact</span>
+              </div>
+            </div>
           </div>
 
-
-
-          <div style={{ textAlign: "center", marginTop: "44px" }}>
-            <button
-              type="button"
-              className="view-all-stays-cta"
-              onClick={() => navigate("/accommodation/listings")}
-            >
-              <span>Explore All 500+ Verified Stays in Kenya</span>
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </button>
+          <div className="deals-preview-right">
+            <div className="deal-mini-card">
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div className="deal-icon-square">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--brand-red)" strokeWidth="2.2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                  </svg>
+                </div>
+                <div>
+                  <div style={{ fontWeight: 800, color: "var(--navy-ink)", fontSize: "15px" }}>Diani Coastal Villa</div>
+                  <div style={{ fontSize: "12px", color: "#64748B" }}>3 Nights · Oceanfront Private Pool</div>
+                </div>
+              </div>
+              <div style={{ marginTop: "14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ color: "var(--brand-red)", fontWeight: 800, fontSize: "16px" }}>Save KSh 9,000</span>
+                <span className="deal-pill-tag">25% OFF DIRECT</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── SPECIAL DEALS & FLASH OFFERS BANNER ── */}
-      <section style={{ ...s.section, paddingTop: 0, paddingBottom: "60px" }}>
-        <div style={s.sectionInner}>
-          <div className="flash-deal-banner-card reveal">
-            <div className="flash-deal-left">
-              <div className="deal-badge-pill">LIMITED WEEKEND ESCAPES</div>
-              <h2 className="deal-title">Save Up to 25% on Direct Bookings This Month</h2>
-              <p className="deal-desc">
-                Exclusive direct host specials in Diani Beach, Naivasha, and the Maasai Mara. Connect directly, avoid third-party agency surcharges, and enjoy complimentary breakfast or sunset game drives.
-              </p>
-              <div className="deal-cta-row">
-                <button
-                  type="button"
-                  className="deal-claim-btn"
-                  onClick={() => navigate("/accommodation/listings?sort=Price:+Low+to+High")}
-                >
-                  Browse Discounted Stays →
-                </button>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#fef3c7", fontSize: "13px" }}>
-                  <span>Verified direct rates</span>
-                  <span>•</span>
-                  <span>Direct WhatsApp contact</span>
-                </div>
-              </div>
-            </div>
-            <div className="flash-deal-right">
-              <div className="deal-floating-mini-card">
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "#e0f2fe", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0284c7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                      <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                    </svg>
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: 800, color: "#0f172a" }}>Diani Coastal Villa</div>
-                    <div style={{ fontSize: "12px", color: "#64748b" }}>3 Nights · Oceanfront</div>
-                  </div>
-                </div>
-                <div style={{ marginTop: "12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ color: "#e11d48", fontWeight: 800, fontSize: "16px" }}>Save KSh 9,000</span>
-                  <span style={{ fontSize: "12px", background: "#fef2f2", color: "#e11d48", padding: "4px 8px", borderRadius: "6px", fontWeight: 700 }}>25% OFF</span>
-                </div>
-              </div>
-            </div>
+      {/* ── KENYA STAY BUDGET ESTIMATOR ── */}
+      <section id="budget-planner" className="planner-section">
+        <div className="planner-inner-shell reveal">
+          <div className="planner-header">
+            <span className="section-eyebrow">SMART COST CALCULATOR</span>
+            <h3 className="section-title">Kenya Stay Budget Estimator</h3>
+            <p className="section-subtitle">
+              Plan your getaway budget based on real market rates across Kenya's top vacation and business destinations.
+            </p>
           </div>
-        </div>
-      </section>
 
-      {/* ── INTERACTIVE KENYA STAY BUDGET ESTIMATOR ── */}
-      <section id="budget-planner" style={{ ...s.section, background: "#ffffff" }}>
-        <div style={s.sectionInner}>
-          <div className="planner-container-box reveal">
-            <div className="planner-header">
-              <span className="section-eyebrow" style={{ color: "#4f46e5" }}>TRIP PLANNER</span>
-              <h2 style={{ fontSize: "28px", fontWeight: 900, color: "#0f172a", marginBottom: "8px" }}>
-                Kenya Stay Budget Estimator
-              </h2>
-              <p style={{ color: "#64748b", fontSize: "15px", maxWidth: "600px", margin: "0 auto" }}>
-                Select your destination region, duration, and comfort preference to see realistic accommodation rates.
-              </p>
-            </div>
-
+          <div className="planner-card">
             <div className="planner-controls-grid">
-              {/* Region Selector */}
-              <div className="planner-card-input">
-                <label className="planner-input-label">Destination Region</label>
+              {/* Destination Selector */}
+              <div className="planner-group">
+                <label className="planner-label">Destination Region</label>
                 <select
                   value={plannerDestination}
                   onChange={(e) => setPlannerDestination(e.target.value)}
                   className="planner-select"
                 >
-                  <option value="Coast (Diani / Mombasa)">Coast (Diani, Mombasa, Watamu)</option>
-                  <option value="Rift Valley & Safari (Mara / Naivasha)">Safari & Rift (Mara, Naivasha, Nakuru)</option>
-                  <option value="Mount Kenya (Nanyuki / Aberdares)">Mount Kenya & Highlands (Nanyuki)</option>
-                  <option value="Nairobi Capital & Metropolis">Nairobi Metropolitan</option>
-                  <option value="Western & Lake Victoria">Western Kenya (Kisumu)</option>
+                  <option value="Coast (Diani / Mombasa)">Coast (Diani Beach / Mombasa)</option>
+                  <option value="Rift Valley (Naivasha / Nakuru)">Rift Valley (Naivasha / Nakuru)</option>
+                  <option value="Maasai Mara / Safari">Maasai Mara / Amboseli Bush</option>
+                  <option value="Nairobi Luxury Penthouses">Nairobi Luxury Penthouses</option>
+                  <option value="Mt. Kenya (Nanyuki)">Mt. Kenya (Nanyuki / Laikipia)</option>
                 </select>
               </div>
 
-              {/* Nights Stepper */}
-              <div className="planner-card-input">
-                <label className="planner-input-label">Duration of Stay</label>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "6px" }}>
-                  <input
-                    type="range"
-                    min="1"
-                    max="14"
-                    value={plannerNights}
-                    onChange={(e) => setPlannerNights(Number(e.target.value))}
-                    style={{ flex: 1, accentColor: "#4f46e5" }}
-                  />
-                  <span style={{ fontWeight: 800, color: "#0f172a", minWidth: "75px" }}>
-                    {plannerNights} {plannerNights === 1 ? "Night" : "Nights"}
-                  </span>
+              {/* Number of Nights */}
+              <div className="planner-group">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <label className="planner-label">Length of Stay</label>
+                  <span className="planner-val-badge">{plannerNights} Night{plannerNights > 1 ? "s" : ""}</span>
                 </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="14"
+                  value={plannerNights}
+                  onChange={(e) => setPlannerNights(Number(e.target.value))}
+                  className="planner-slider"
+                />
               </div>
 
-              {/* Travel Style */}
-              <div className="planner-card-input">
-                <label className="planner-input-label">Travel Style</label>
-                <div className="planner-style-buttons">
-                  <button
-                    type="button"
-                    className={`style-btn ${plannerStyle === "budget" ? "selected" : ""}`}
-                    onClick={() => setPlannerStyle("budget")}
-                  >
-                    Budget Saver
-                  </button>
-                  <button
-                    type="button"
-                    className={`style-btn ${plannerStyle === "comfort" ? "selected" : ""}`}
-                    onClick={() => setPlannerStyle("comfort")}
-                  >
-                    Comfort Stay
-                  </button>
-                  <button
-                    type="button"
-                    className={`style-btn ${plannerStyle === "luxury" ? "selected" : ""}`}
-                    onClick={() => setPlannerStyle("luxury")}
-                  >
-                    Luxury Safari
-                  </button>
+              {/* Style of Travel */}
+              <div className="planner-group">
+                <label className="planner-label">Stay Style</label>
+                <div className="planner-styles-cluster">
+                  {[
+                    { id: "budget", label: "Cozy / Budget", desc: "~KSh 4.5K/night" },
+                    { id: "comfort", label: "Comfort / Villa", desc: "~KSh 12K/night" },
+                    { id: "luxury", label: "Luxury / Resort", desc: "~KSh 28K/night" },
+                  ].map((st) => (
+                    <button
+                      key={st.id}
+                      type="button"
+                      className={`planner-style-btn ${plannerStyle === st.id ? "active" : ""}`}
+                      onClick={() => setPlannerStyle(st.id)}
+                    >
+                      <div style={{ fontWeight: 800 }}>{st.label}</div>
+                      <div style={{ fontSize: "11px", opacity: 0.8 }}>{st.desc}</div>
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
 
-            {/* Calculated Results Card */}
+            {/* Calculated Result Banner */}
             <div className="planner-result-banner">
-              <div className="planner-result-left">
-                <div style={{ fontSize: "13px", color: "#64748b", fontWeight: 700, textTransform: "uppercase" }}>
-                  Estimated Accommodation Cost
-                </div>
-                <div className="planner-total-cost">
+              <div>
+                <div style={{ fontSize: "12px", color: "#64748B", fontWeight: 700, textTransform: "uppercase" }}>Estimated Total Stay Cost</div>
+                <div className="planner-total-amount">
                   KSh {totalEstimatedStay.toLocaleString()}
-                  <span style={{ fontSize: "14px", color: "#64748b", fontWeight: 500 }}>
-                    {" "}(~KSh {estimatedNightlyRate.toLocaleString()}/night)
-                  </span>
+                  <span style={{ fontSize: "14px", color: "#64748B", fontWeight: 500 }}> for {plannerNights} nights</span>
                 </div>
-                <div style={{ fontSize: "13px", color: "#16a34a", marginTop: "4px" }}>
-                  ✓ Direct host pricing · 0% AXXSpace booking surcharge
+                <div style={{ fontSize: "12px", color: "var(--emerald)", fontWeight: 700, marginTop: "4px" }}>
+                  ✓ Direct host pricing · Zero middleman commissions
                 </div>
               </div>
+
               <button
                 type="button"
                 className="planner-find-btn"
-                onClick={() => {
-                  const areaQuery = plannerDestination.includes("Coast")
-                    ? "Diani Beach"
-                    : plannerDestination.includes("Safari")
-                      ? "Maasai Mara"
-                      : plannerDestination.includes("Nairobi")
-                        ? "Nairobi"
-                        : "Nanyuki";
-                  navigate(`/accommodation/listings?area=${encodeURIComponent(areaQuery)}&maxPrice=${estimatedNightlyRate * 1.3}`);
-                }}
+                onClick={() => navigate(`/accommodation/listings?maxPrice=${estimatedNightlyRate + 4000}`)}
               >
-                Find Stays in {plannerDestination.split(" ")[0]} →
+                Find Stays in This Range →
               </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── HOW IT WORKS: DUAL VIEW (GUESTS VS HOSTS) ── */}
-      <section style={{ ...s.section, background: "#f8fafc" }}>
-        <div style={s.sectionInner}>
-          <div style={{ textAlign: "center", marginBottom: "40px" }} className="reveal">
-            <span className="section-eyebrow">SIMPLE & TRANSPARENT</span>
-            <h2 style={s.sectionHeading}>How AXXSpace Works</h2>
-            <p style={s.sectionSubheading}>
-              Connecting holiday travelers and Kenyan hospitality hosts with direct ease.
+      {/* ── HOW IT WORKS SECTION ── */}
+      <section className="how-it-works-section">
+        <div className="content-container reveal">
+          <div style={{ textAlign: "center", marginBottom: "36px" }}>
+            <span className="section-eyebrow">SEAMLESS HOSPITALITY</span>
+            <h3 className="section-title">How AxxSpace Accommodation Works</h3>
+            <p className="section-subtitle">
+              Connecting travelers and corporate guests directly with verified property hosts across Kenya.
             </p>
 
-            {/* Dual Mode Switch */}
-            <div className="how-it-works-toggle-pill">
+            {/* Tab switch: Guests vs Hosts */}
+            <div className="how-tab-toggle">
               <button
                 type="button"
                 className={`how-toggle-btn ${howItWorksTab === "guests" ? "active" : ""}`}
@@ -1184,287 +1300,190 @@ export default function AccommodationPage() {
                 className={`how-toggle-btn ${howItWorksTab === "hosts" ? "active" : ""}`}
                 onClick={() => setHowItWorksTab("hosts")}
               >
-                For Property Owners & Hosts
+                For Property Hosts
               </button>
             </div>
           </div>
 
-          {howItWorksTab === "guests" ? (
-            <div className="how-steps-grid">
-              {[
-                {
-                  step: "01",
-                  title: "Discover Your Stay",
-                  desc: "Filter through verified beach resorts, safari camps, holiday villas and city penthouses across Kenya.",
-                  icon: (
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="11" cy="11" r="8"></circle>
-                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                  ),
-                },
-                {
-                  step: "02",
-                  title: "Compare & View Photos",
-                  desc: "Check real high-res room photos, exact nightly prices, guest amenities and verified physical location.",
-                  icon: (
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                      <circle cx="12" cy="13" r="4"></circle>
-                    </svg>
-                  ),
-                },
-                {
-                  step: "03",
-                  title: "Direct WhatsApp Contact",
-                  desc: "Connect directly with property managers or villa owners with one tap. Ask questions and confirm dates.",
-                  icon: (
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-                    </svg>
-                  ),
-                },
-                {
-                  step: "04",
-                  title: "Pay Direct & Enjoy",
-                  desc: "Zero hidden commission or third-party booking surcharges. Pay securely via M-Pesa or card directly to the host.",
-                  icon: (
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                      <line x1="1" y1="10" x2="23" y2="10"></line>
-                    </svg>
-                  ),
-                },
-              ].map((stepItem, idx) => (
-                <div key={stepItem.step} className="how-step-card reveal" style={{ animationDelay: `${idx * 0.1}s` }}>
-                  <div className="how-step-badge">{stepItem.step}</div>
-                  <div className="how-step-icon">{stepItem.icon}</div>
-                  <h3 style={s.howStepTitle}>{stepItem.title}</h3>
-                  <p style={s.howStepDesc}>{stepItem.desc}</p>
+          <div className="how-steps-grid">
+            {howItWorksTab === "guests" ? (
+              <>
+                <div className="how-step-card">
+                  <div className="step-num-pill">01</div>
+                  <h4 className="step-card-title">Explore Verified Stays</h4>
+                  <p className="step-card-desc">
+                    Search by destination, view verified photos, high-definition video walkthroughs, and confirmed amenities.
+                  </p>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="how-steps-grid">
-              {[
-                {
-                  step: "01",
-                  title: "Register Your Property",
-                  desc: "Sign up in 3 minutes as a hotelier, Airbnb host, or property manager. No lengthy onboarding paperwork.",
-                  icon: (
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                      <polyline points="14 2 14 8 20 8"></polyline>
-                      <line x1="16" y1="13" x2="8" y2="13"></line>
-                      <line x1="16" y1="17" x2="8" y2="17"></line>
-                      <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                  ),
-                },
-                {
-                  step: "02",
-                  title: "Add Photos & Pricing",
-                  desc: "Upload high-res photos, set room types, seasonal rates, amenities, and your direct WhatsApp contact number.",
-                  icon: (
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2Z"></path>
-                      <path d="M9 22v-4h6v4"></path>
-                      <path d="M8 6h.01"></path>
-                      <path d="M16 6h.01"></path>
-                    </svg>
-                  ),
-                },
-                {
-                  step: "03",
-                  title: "Get Verified Fast",
-                  desc: "Our Kenyan inspection team verifies your listing details within 24 hours to award you the Verified Host Badge.",
-                  icon: (
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                    </svg>
-                  ),
-                },
-                {
-                  step: "04",
-                  title: "Receive Direct Bookings",
-                  desc: "Travelers reach you directly on your phone. You retain 100% of your earnings with zero middleman deductions.",
-                  icon: (
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="12" y1="1" x2="12" y2="23"></line>
-                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                    </svg>
-                  ),
-                },
-              ].map((stepItem, idx) => (
-                <div key={stepItem.step} className="how-step-card reveal" style={{ animationDelay: `${idx * 0.1}s` }}>
-                  <div className="how-step-badge" style={{ background: "linear-gradient(135deg, #10b981 0%, #059669 100%)" }}>
-                    {stepItem.step}
-                  </div>
-                  <div className="how-step-icon">{stepItem.icon}</div>
-                  <h3 style={s.howStepTitle}>{stepItem.title}</h3>
-                  <p style={s.howStepDesc}>{stepItem.desc}</p>
+                <div className="how-step-card">
+                  <div className="step-num-pill">02</div>
+                  <h4 className="step-card-title">Chat Directly on WhatsApp</h4>
+                  <p className="step-card-desc">
+                    Inquire about dates, negotiated rates, and special requests straight with the owner. Zero broker markups.
+                  </p>
                 </div>
-              ))}
-            </div>
-          )}
+                <div className="how-step-card">
+                  <div className="step-num-pill">03</div>
+                  <h4 className="step-card-title">Seamless Check-In</h4>
+                  <p className="step-card-desc">
+                    Receive verified GPS coordinates, self-check-in lockbox codes, and host hospitality instructions.
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="how-step-card">
+                  <div className="step-num-pill">01</div>
+                  <h4 className="step-card-title">List Your Stay Free</h4>
+                  <p className="step-card-desc">
+                    Create an account, upload photos, set nightly rates, and specify house rules for vacationers and corporate clients.
+                  </p>
+                </div>
+                <div className="how-step-card">
+                  <div className="step-num-pill">02</div>
+                  <h4 className="step-card-title">Get Verified</h4>
+                  <p className="step-card-desc">
+                    Our team verifies physical location and ownership, awarding your listing the Emerald Verified Host badge.
+                  </p>
+                </div>
+                <div className="how-step-card">
+                  <div className="step-num-pill">03</div>
+                  <h4 className="step-card-title">Receive Direct Inquiries</h4>
+                  <p className="step-card-desc">
+                    Receive direct bookings and WhatsApp inquiries from thousands of travelers visiting Kenya each month.
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </section>
 
-      {/* ── WHY CHOOSE AXXSPACE TRUST MATRIX ── */}
-      <section style={s.section}>
-        <div style={s.sectionInner}>
-          <div style={{ textAlign: "center", marginBottom: "48px" }} className="reveal">
+      {/* ── WHY CHOOSE AXXSPACE ACCOMMODATION ── */}
+      <section className="why-choose-section">
+        <div className="content-container reveal">
+          <div style={{ textAlign: "center", marginBottom: "40px" }}>
             <span className="section-eyebrow">THE AXXSPACE ADVANTAGE</span>
-            <h2 style={s.sectionHeading}>Why Kenya Chooses AXXSpace Accommodation</h2>
-            <p style={s.sectionSubheading}>
-              Crafted specifically for the East African travel landscape — direct, local, and transparent.
+            <h3 className="section-title">Why Book & List on AxxSpace</h3>
+            <p className="section-subtitle">
+              Engineered specifically for the Kenyan hospitality ecosystem with unmatched transparency.
             </p>
           </div>
 
-          <div className="why-features-matrix">
-            <div className="why-matrix-card reveal">
-              <div className="why-icon-bubble" style={{ background: "#e0e7ff", color: "#4f46e5" }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="19" y1="5" x2="5" y2="19"></line>
-                  <circle cx="6.5" cy="6.5" r="2.5"></circle>
-                  <circle cx="17.5" cy="17.5" r="2.5"></circle>
+          <div className="why-cards-grid">
+            <div className="why-feature-card">
+              <div className="why-icon-bubble">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--brand-red)" strokeWidth="2.2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  <path d="M9 12l2 2 4-4" />
                 </svg>
               </div>
-              <h3 style={s.whyCardTitle}>0% Middleman Commission</h3>
-              <p style={s.whyCardDesc}>
-                Foreign booking agencies charge guests up to 20% in hidden booking fees. On AXXSpace, you connect and book directly with the host, ensuring the best rates in Kenya.
+              <h4 className="why-title">100% Verified Hosts</h4>
+              <p className="why-desc">
+                We physically and digitally verify host identities and property locations so you can book with total confidence.
               </p>
             </div>
 
-            <div className="why-matrix-card reveal">
-              <div className="why-icon-bubble" style={{ background: "#dcfce7", color: "#16a34a" }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+            <div className="why-feature-card">
+              <div className="why-icon-bubble">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--brand-red)" strokeWidth="2.2">
+                  <rect x="2" y="4" width="20" height="16" rx="2" />
+                  <path d="M7 15h0M2 9.5h20" />
                 </svg>
               </div>
-              <h3 style={s.whyCardTitle}>Instant WhatsApp Host Chat</h3>
-              <p style={s.whyCardDesc}>
-                Don't wait hours for automated email confirmations. Chat directly with the villa manager or lodge concierge on WhatsApp to arrange special requests, diet preferences, or airport pick-up.
+              <h4 className="why-title">Zero Broker Fees</h4>
+              <p className="why-desc">
+                Cut out arbitrary travel agency commissions. Talk to the actual host and negotiate the most authentic Kenyan rates.
               </p>
             </div>
 
-            <div className="why-matrix-card reveal">
-              <div className="why-icon-bubble" style={{ background: "#fef3c7", color: "#d97706" }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <div className="why-feature-card">
+              <div className="why-icon-bubble">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--brand-red)" strokeWidth="2.2">
+                  <polygon points="23 7 16 12 23 17 23 7" />
+                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
                 </svg>
               </div>
-              <h3 style={s.whyCardTitle}>Physically Verified Properties</h3>
-              <p style={s.whyCardDesc}>
-                No catfishing or ghost listings. Our boots-on-the-ground field team verifies physical locations, real amenities, and ownership credentials before any property is featured.
-              </p>
-            </div>
-
-            <div className="why-matrix-card reveal">
-              <div className="why-icon-bubble" style={{ background: "#fee2e2", color: "#e11d48" }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="2" y="5" width="20" height="14" rx="2"></rect>
-                  <line x1="2" y1="10" x2="22" y2="10"></line>
-                </svg>
-              </div>
-              <h3 style={s.whyCardTitle}>Local M-Pesa & Card Ease</h3>
-              <p style={s.whyCardDesc}>
-                Direct payment to the host via official Lipa na M-Pesa Till/Paybill numbers or bank cards. Receive immediate SMS transaction confirmations with zero currency conversion losses.
+              <h4 className="why-title">Verified Video Walkthroughs</h4>
+              <p className="why-desc">
+                Experience raw, authentic video tours of bedrooms, pools, and ocean views before you pay a single shilling.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── FOR PROPERTY HOSTS / ADVERTISING PACKAGES ── */}
-      <section id="packages-section" style={{ ...s.section, background: "#0f172a", color: "#ffffff" }}>
-        <div style={s.sectionInner}>
-          <div style={{ textAlign: "center", marginBottom: "48px" }} className="reveal">
-            <span className="section-eyebrow" style={{ color: "#38bdf8" }}>FOR PROPERTY OWNERS & MANAGERS</span>
-            <h2 style={{ ...s.sectionHeading, color: "#ffffff" }}>List Your Property & Reach Thousands of Travelers</h2>
-            <p style={{ ...s.sectionSubheading, color: "#94a3b8" }}>
-              Join 300+ hotels, safari camps, and holiday homes already scaling their direct guest bookings with AXXSpace.
+      {/* ── HOST ADVERTISING PACKAGES (Resembling Rentals) ── */}
+      <section id="packages-section" className="packages-section">
+        <div className="content-container reveal">
+          <div style={{ textAlign: "center", marginBottom: "40px" }}>
+            <span className="section-eyebrow">HOST PARTNER PROGRAM</span>
+            <h3 className="section-title">List Your Stay & Reach More Guests</h3>
+            <p className="section-subtitle">
+              Transparent host advertising packages designed to maximize occupancy and direct inquiries.
             </p>
           </div>
 
-          <div className="pricing-packages-grid">
-            {ADVERTISING_PACKAGES.map((pkg, idx) => (
+          <div className="packages-cards-grid">
+            {ADVERTISING_PACKAGES.map((pkg) => (
               <div
                 key={pkg.name}
-                className={`pricing-package-card reveal ${pkg.popular ? "popular-card" : ""}`}
-                style={{ animationDelay: `${idx * 0.1}s` }}
+                className={`pricing-card ${pkg.popular ? "popular-highlight" : ""}`}
               >
-                {pkg.popular && <div className="popular-badge-ribbon">MOST POPULAR</div>}
-                <div style={{ fontSize: "20px", fontWeight: 800, color: pkg.popular ? "#38bdf8" : "#ffffff", marginBottom: "6px" }}>
-                  {pkg.name} Plan
+                {pkg.popular && <div className="popular-ribbon">MOST POPULAR</div>}
+                <div className="pricing-pkg-name">{pkg.name}</div>
+                <div className="pricing-pkg-price">
+                  KSh {pkg.price.toLocaleString()}
+                  <span className="pricing-pkg-dur"> / {pkg.duration}</span>
                 </div>
-                <div style={{ fontSize: "13px", color: "#94a3b8", marginBottom: "20px" }}>{pkg.desc}</div>
+                <p className="pricing-pkg-desc">{pkg.desc}</p>
 
-                <div style={{ display: "flex", alignItems: "baseline", gap: "6px", marginBottom: "24px" }}>
-                  <span style={{ fontSize: "36px", fontWeight: 900, color: "#ffffff" }}>
-                    KSh {pkg.price.toLocaleString()}
-                  </span>
-                  <span style={{ fontSize: "14px", color: "#94a3b8" }}>/ {pkg.duration}</span>
-                </div>
-
-                <ul className="package-features-list">
-                  <li>✓ Direct WhatsApp inquiry link</li>
-                  <li>✓ Verified Host trust badge</li>
-                  <li>✓ Full photo gallery & amenities</li>
-                  {pkg.popular && <li>✓ Priority search ranking placement</li>}
-                  {pkg.popular && <li>✓ Homepage featured carousel spotlight</li>}
-                  {pkg.name === "Premium" && <li>✓ Dedicated account manager & social media push</li>}
-                  {pkg.name === "Premium" && <li>✓ Unlimited listing updates & lead analytics</li>}
+                <ul className="pricing-features-list">
+                  <li>✓ Direct WhatsApp inquiries</li>
+                  <li>✓ Verified Host Emerald badge</li>
+                  <li>✓ High-definition photo gallery</li>
+                  <li>✓ GPS location mapping</li>
+                  {pkg.name !== "Starter" && <li>✓ Featured homepage carousel slot</li>}
+                  {pkg.name === "Premium" && <li>✓ Video tour & priority ranking</li>}
                 </ul>
 
                 <button
                   type="button"
-                  className={`package-action-btn ${pkg.popular ? "btn-popular" : "btn-standard"}`}
-                  onClick={() => navigate("/accommodation/register-property")}
+                  className={`pricing-action-btn ${pkg.popular ? "btn-red-popular" : "btn-dark-standard"}`}
+                  onClick={() => navigate("/accommodation/register?tab=register")}
                 >
-                  Get Started with {pkg.name}
+                  Get Started as Host →
                 </button>
               </div>
             ))}
           </div>
-
-          <div style={{ textAlign: "center", marginTop: "36px", color: "#94a3b8", fontSize: "14px" }}>
-            Need a custom corporate or multi-chain hotel package?{" "}
-            <a href="https://wa.me/254745689773" target="_blank" rel="noopener noreferrer" style={{ color: "#38bdf8", fontWeight: 700, textDecoration: "none" }}>
-              Speak with our Host Relations Team on WhatsApp →
-            </a>
-          </div>
         </div>
       </section>
 
-      {/* ── VERIFIED GUEST REVIEWS / TESTIMONIALS ── */}
-      <section style={s.section}>
-        <div style={s.sectionInner}>
-          <div style={{ textAlign: "center", marginBottom: "48px" }} className="reveal">
-            <span className="section-eyebrow">AUTHENTIC TRAVELER EXPERIENCES</span>
-            <h2 style={s.sectionHeading}>Loved by Guests Across Kenya & Beyond</h2>
-            <p style={s.sectionSubheading}>
-              See what travelers say about discovering stays and connecting with hosts directly through AXXSpace.
+      {/* ── TESTIMONIALS ── */}
+      <section className="testimonials-section">
+        <div className="content-container reveal">
+          <div style={{ textAlign: "center", marginBottom: "40px" }}>
+            <span className="section-eyebrow">TRUSTED REVIEWS</span>
+            <h3 className="section-title">Loved by Kenyan Travelers</h3>
+            <p className="section-subtitle">
+              Read authentic feedback from travelers who booked direct accommodations on AxxSpace.
             </p>
           </div>
 
-          <div className="guest-reviews-grid">
-            {GUEST_TESTIMONIALS.map((review, idx) => (
-              <div key={review.name} className="guest-review-card reveal" style={{ animationDelay: `${idx * 0.12}s` }}>
-                <div style={{ display: "flex", gap: "2px", color: "#f59e0b", fontSize: "16px", marginBottom: "16px" }}>
-                  {"★".repeat(review.rating)}
+          <div className="testimonials-grid">
+            {GUEST_TESTIMONIALS.map((t, idx) => (
+              <div key={idx} className="testimonial-card">
+                <div style={{ color: "var(--gold)", fontSize: "16px", marginBottom: "12px" }}>
+                  {"★".repeat(t.rating)}
                 </div>
-                <p style={s.reviewText}>"{review.text}"</p>
-                <div style={{ fontSize: "12px", color: "#4f46e5", fontWeight: 700, marginBottom: "16px", display: "flex", alignItems: "center", gap: "4px" }}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                  <span>{review.stay}</span>
-                </div>
-                <div style={s.reviewAuthorRow}>
-                  <img src={review.avatar} alt={review.name} style={s.reviewerAvatar} />
+                <p className="testimonial-text">"{t.text}"</p>
+                <div className="testimonial-stay-badge">Stayed at {t.stay}</div>
+                <div className="testimonial-author-row">
+                  <img src={t.avatar} alt={t.name} className="testimonial-avatar" />
                   <div>
-                    <div style={{ fontWeight: 800, color: "#0f172a", fontSize: "14px" }}>{review.name}</div>
-                    <div style={{ fontSize: "12px", color: "#64748b" }}>{review.location} · Verified Guest ✓</div>
+                    <div style={{ fontWeight: 800, color: "var(--navy-ink)", fontSize: "14px" }}>{t.name}</div>
+                    <div style={{ fontSize: "12px", color: "#64748B" }}>{t.role}</div>
                   </div>
                 </div>
               </div>
@@ -1473,40 +1492,33 @@ export default function AccommodationPage() {
         </div>
       </section>
 
-      {/* ── FREQUENTLY ASKED QUESTIONS (ACCORDION) ── */}
-      <section id="faq-section" style={{ ...s.section, background: "#f8fafc" }}>
-        <div style={{ ...s.sectionInner, maxWidth: "900px" }}>
-          <div style={{ textAlign: "center", marginBottom: "40px" }} className="reveal">
-            <span className="section-eyebrow">HELP & CLARITY</span>
-            <h2 style={s.sectionHeading}>Frequently Asked Questions</h2>
-            <p style={s.sectionSubheading}>
-              Everything you need to know about booking stays or listing your property on AXXSpace.
+      {/* ── FREQUENTLY ASKED QUESTIONS ── */}
+      <section id="faq-section" className="faq-section">
+        <div className="content-container reveal" style={{ maxWidth: "860px" }}>
+          <div style={{ textAlign: "center", marginBottom: "36px" }}>
+            <span className="section-eyebrow">HELP & SUPPORT</span>
+            <h3 className="section-title">Frequently Asked Questions</h3>
+            <p className="section-subtitle">
+              Everything you need to know about booking and hosting on AxxSpace Accommodation.
             </p>
           </div>
 
           <div className="faq-accordion-list">
-            {FAQS.map((faq, index) => {
-              const isOpen = openFaqIndex === index;
+            {FAQS.map((faq, idx) => {
+              const isOpen = openFaqIndex === idx;
               return (
-                <div key={faq.q} className="faq-accordion-item reveal">
+                <div key={idx} className={`faq-card ${isOpen ? "open" : ""}`}>
                   <button
                     type="button"
                     className="faq-question-btn"
-                    onClick={() => setOpenFaqIndex(isOpen ? -1 : index)}
-                    aria-expanded={isOpen}
+                    onClick={() => setOpenFaqIndex(isOpen ? -1 : idx)}
                   >
-                    <span style={{ fontWeight: 700, fontSize: "16px", color: isOpen ? "#4f46e5" : "#0f172a", textAlign: "left" }}>
-                      {faq.q}
-                    </span>
-                    <span className={`faq-chevron ${isOpen ? "open" : ""}`}>
-                      <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2.2" fill="none">
-                        <polyline points="6 9 12 15 18 9" />
-                      </svg>
-                    </span>
+                    <span className="faq-question-text">{faq.q}</span>
+                    <span className={`faq-chevron ${isOpen ? "rotate" : ""}`}>▼</span>
                   </button>
                   {isOpen && (
                     <div className="faq-answer-pane">
-                      <p style={{ color: "#475569", lineHeight: 1.7, fontSize: "14px" }}>{faq.a}</p>
+                      <p className="faq-answer-text">{faq.a}</p>
                     </div>
                   )}
                 </div>
@@ -1516,146 +1528,129 @@ export default function AccommodationPage() {
         </div>
       </section>
 
-      {/* ── HIGH-CONVERTING BOTTOM CALL TO ACTION ── */}
-      <section style={s.bottomCtaSection}>
-        <div style={s.ctaContainer}>
-          <h2 style={s.ctaHeading}>Ready for Your Next Kenyan Getaway?</h2>
-          <p style={s.ctaSubtext}>
-            Join thousands of travelers exploring Kenya with verified stays, direct host negotiation, and 0% booking fees.
+      {/* ── BOTTOM CTA SECTION (Midnight & Crimson Atmosphere) ── */}
+      <section className="bottom-cta-section">
+        <div className="ambient-orb orb-crimson" style={{ top: "-100px", left: "20%", opacity: 0.5 }} />
+        <div className="ambient-orb orb-navy" style={{ bottom: "-100px", right: "20%", opacity: 0.4 }} />
+        <div className="hero-grid-pattern" />
+
+        <div className="bottom-cta-content reveal">
+          <h3 className="bottom-cta-headline">Ready for an Unforgettable Kenyan Stay?</h3>
+          <p className="bottom-cta-sub">
+            Browse hundreds of verified beach resorts, game lodges, and executive apartments across Kenya, or list your stay today.
           </p>
-          <div style={s.ctaButtonsGroup}>
+          <div className="bottom-cta-buttons">
             <button
               type="button"
-              className="cta-primary-btn"
+              className="btn-cta-crimson"
               onClick={() => navigate("/accommodation/listings")}
             >
-              Explore 500+ Properties Now
+              Explore Verified Stays →
             </button>
             <button
               type="button"
-              className="cta-secondary-btn"
-              onClick={() => navigate("/accommodation/register-property")}
+              className="btn-cta-glass"
+              onClick={() => navigate("/accommodation/register?tab=register")}
             >
-              List Your Property as a Host
+              List Your Property as Host
             </button>
           </div>
         </div>
       </section>
 
-      {/* ── FOOTER ── */}
-      <footer style={s.footer}>
-        <div style={s.footerInner}>
-          <div style={s.footerBrandCol}>
-            <div style={s.logoWrapper}>
-              <span style={{ fontSize: "20px", fontWeight: 900, color: "#fbbf24" }}>AXX</span>
-              <span style={{ fontSize: "20px", fontWeight: 900, color: "#ffffff" }}>SPACE</span>
-              <span style={{ color: "#475569", margin: "0 6px" }}>|</span>
-              <span style={{ color: "#94a3b8", fontSize: "13px", fontWeight: 700 }}>Accommodation</span>
+      {/* ── FOOTER (Executive Dark) ── */}
+      <footer className="accommodation-footer">
+        <div className="footer-inner">
+          <div className="footer-brand-col">
+            <div className="nav-logo-wordmark" style={{ fontSize: "22px" }}>
+              <span className="logo-brand-white">AXX</span>
+              <span className="logo-brand-red">Space</span>
             </div>
-            <p style={s.footerBio}>
-              Kenya's premier direct-to-host accommodation directory. Connecting travelers to verified hotels, safari camps, coastal villas, and homestays across all 47 counties.
+            <p className="footer-desc">
+              Kenya's premier property & accommodation marketplace. Connecting travelers, corporate clients, and hosts directly with verified listings and zero agency markups.
             </p>
-            <div style={{ marginTop: "16px" }}>
-              <SocialMediaLinks iconSize={20} />
+            <div style={{ marginTop: "12px" }}>
+              <SocialMediaLinks />
             </div>
           </div>
 
-          <div style={s.footerLinksGrid}>
+          <div className="footer-links-grid">
             <div>
-              <div style={s.footerHeading}>Explore Escapes</div>
-              <ul style={s.footerUl}>
-                {["Beach Resorts in Diani", "Maasai Mara Safari Camps", "Naivasha Lakeside Lodges", "Nairobi Luxury Suites", "Watamu Ocean Villas", "Mount Kenya Cabins"].map((item) => (
-                  <li key={item}>
-                    <button
-                      type="button"
-                      style={s.footerTextBtn}
-                      onClick={() => navigate(`/accommodation/listings?search=${encodeURIComponent(item.split(" in ")[1] || item)}`)}
-                    >
-                      {item}
-                    </button>
-                  </li>
-                ))}
+              <h5 className="footer-col-title">Explore Kenya</h5>
+              <ul className="footer-links-list">
+                <li><button type="button" onClick={() => handleDestinationSelect("Diani Beach")}>Diani Beachfront</button></li>
+                <li><button type="button" onClick={() => handleDestinationSelect("Maasai Mara")}>Maasai Mara Safari</button></li>
+                <li><button type="button" onClick={() => handleDestinationSelect("Naivasha")}>Naivasha Lakeside</button></li>
+                <li><button type="button" onClick={() => handleDestinationSelect("Nairobi")}>Nairobi Penthouses</button></li>
               </ul>
             </div>
 
             <div>
-              <div style={s.footerHeading}>For Hosts</div>
-              <ul style={s.footerUl}>
-                <li>
-                  <button type="button" style={s.footerTextBtn} onClick={() => navigate("/accommodation/register-property")}>
-                    List Your Property
-                  </button>
-                </li>
-                <li>
-                  <button type="button" style={s.footerTextBtn} onClick={() => navigate("/accommodation/dashboard")}>
-                    Host Dashboard
-                  </button>
-                </li>
-                <li>
-                  <button type="button" style={s.footerTextBtn} onClick={() => navigate("/accommodation/login")}>
-                    Host Login
-                  </button>
-                </li>
-                <li>
-                  <button type="button" style={s.footerTextBtn} onClick={() => { document.getElementById("packages-section")?.scrollIntoView({ behavior: "smooth" }); }}>
-                    Advertising Packages
-                  </button>
-                </li>
+              <h5 className="footer-col-title">For Hosts</h5>
+              <ul className="footer-links-list">
+                <li><button type="button" onClick={() => navigate("/accommodation/register-property")}>Add Listing</button></li>
+                <li><button type="button" onClick={() => navigate("/accommodation/login?tab=login")}>Host Portal</button></li>
+                <li><button type="button" onClick={() => document.getElementById("packages-section")?.scrollIntoView({ behavior: "smooth" })}>Advertising Rates</button></li>
+                <li><button type="button" onClick={() => navigate("/faq")}>Hosting Guidelines</button></li>
               </ul>
             </div>
 
             <div>
-              <div style={s.footerHeading}>Direct Contact</div>
-              <div style={s.footerContactItem}>
-                <span style={{ color: "#38bdf8", display: "inline-flex", alignItems: "center" }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                </span>
-                <span>accommodationaxxspace@gmail.com</span>
-              </div>
-              <div style={s.footerContactItem}>
-                <span style={{ color: "#38bdf8", display: "inline-flex", alignItems: "center" }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                </span>
-                <span>+254 745 689 773</span>
-              </div>
-              <div style={s.footerContactItem}>
-                <span style={{ color: "#22c55e", display: "inline-flex", alignItems: "center" }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-                </span>
-                <span>WhatsApp Official Concierge</span>
-              </div>
-              <div style={s.footerContactItem}>
-                <span style={{ color: "#fbbf24", display: "inline-flex", alignItems: "center" }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                </span>
-                <span>Nairobi, Kenya</span>
-              </div>
+              <h5 className="footer-col-title">Platform</h5>
+              <ul className="footer-links-list">
+                <li><button type="button" onClick={() => navigate("/listings")}>Rentals / Property</button></li>
+                <li><button type="button" onClick={() => navigate("/about")}>About AxxSpace</button></li>
+                <li><button type="button" onClick={() => navigate("/terms")}>Terms & Privacy</button></li>
+                <li><button type="button" onClick={() => navigate("/contact")}>Direct Contact</button></li>
+              </ul>
             </div>
           </div>
         </div>
 
-        <div style={s.footerBottomBar}>
-          <div>© {new Date().getFullYear()} AXXSpace Accommodation. All rights reserved.</div>
-          <div style={{ display: "flex", gap: "18px" }}>
-            <span style={{ color: "#64748b" }}>Privacy Policy</span>
-            <span style={{ color: "#64748b" }}>•</span>
-            <span style={{ color: "#64748b" }}>Terms of Service</span>
-            <span style={{ color: "#64748b" }}>•</span>
-            <span style={{ color: "#64748b" }}>Verified Safe Stays Kenya</span>
+        <div className="footer-bottom-bar">
+          <div>© {new Date().getFullYear()} AxxSpace Limited. All rights reserved. Kenya's Direct Property & Stay Platform.</div>
+          <div style={{ display: "flex", gap: "16px" }}>
+            <span style={{ color: "var(--emerald)", fontWeight: 700 }}>All 47 Counties Active</span>
           </div>
         </div>
       </footer>
 
-      {/* ── WISHLIST SLIDE-OVER DRAWER ── */}
+      {/* ── FLOATING WHATSAPP BUTTON ── */}
+      <a
+        href="https://wa.me/254745689773?text=Hi%20AXXSpace%20Accommodation%20Concierge,%20I%20need%20assistance%20finding%20a%20verified%20stay"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="wa-floating-concierge"
+        aria-label="Direct WhatsApp Concierge"
+      >
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
+          <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.23 8.23 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24m4.52 11.66c-.25.7-.72 1.33-1.37 1.57-.45.17-.98.24-3.16-.62-2.34-.92-3.83-3.32-3.95-3.48-.12-.16-.95-1.26-.95-2.4 0-1.14.6-1.7.81-1.93.21-.23.46-.29.62-.29.15 0 .31 0 .44.01.14.01.32-.05.5.38.18.44.62 1.51.68 1.62.06.12.1.25.02.4-.08.15-.12.25-.24.39-.12.14-.25.31-.36.42-.12.12-.24.25-.1.5.14.24.62 1.02 1.33 1.65.91.81 1.67 1.06 1.91 1.18.24.12.38.1.52-.06.14-.16.6-.7.76-.94.16-.24.32-.2.54-.12.22.08 1.4.66 1.64.78.24.12.4.18.46.28.06.1.06.6-.19 1.3z" />
+        </svg>
+        <span className="wa-tooltip-label">Direct Concierge</span>
+      </a>
+
+      {/* ── SCROLL TO TOP ── */}
+      <button
+        type="button"
+        className={`scroll-to-top-button ${showTopBtn ? "visible" : ""}`}
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        aria-label="Scroll to top"
+      >
+        ▲
+      </button>
+
+      {/* ── WISHLIST DRAWER OVERLAY ── */}
       {wishlistDrawerOpen && (
         <div className="wishlist-overlay" onClick={() => setWishlistDrawerOpen(false)}>
           <div className="wishlist-drawer-content" onClick={(e) => e.stopPropagation()}>
             <div className="wishlist-drawer-header">
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="#e11d48" stroke="#e11d48" strokeWidth="2">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="var(--brand-red)" stroke="var(--brand-red)" strokeWidth="2">
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                 </svg>
-                <h3 style={{ fontSize: "18px", fontWeight: 800, color: "#0f172a" }}>Your Saved Stays ({favs.length})</h3>
+                <h4 style={{ fontWeight: 800, margin: 0, fontSize: "16px", color: "var(--navy-ink)" }}>
+                  Saved Stays ({favs.length})
+                </h4>
               </div>
               <button
                 type="button"
@@ -1668,15 +1663,17 @@ export default function AccommodationPage() {
 
             <div className="wishlist-drawer-body">
               {wishlistProperties.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "40px 16px", color: "#64748b" }}>
-                  <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e11d48" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                <div style={{ textAlign: "center", padding: "40px 10px", color: "#64748B" }}>
+                  <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#F1F5F9", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", color: "var(--brand-red)" }}>
+                    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    </svg>
                   </div>
-                  <div style={{ fontWeight: 700, fontSize: "16px", color: "#0f172a", marginBottom: "6px" }}>No saved stays yet</div>
-                  <p style={{ fontSize: "14px", lineHeight: 1.5 }}>Click the heart icon on any accommodation card to save it for quick comparison.</p>
+                  <div style={{ fontWeight: 700, color: "var(--navy-ink)" }}>No saved stays yet</div>
+                  <p style={{ fontSize: "13px", marginTop: "6px" }}>Click the heart icon on any accommodation to build your Kenyan getaway wishlist.</p>
                 </div>
               ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                   {wishlistProperties.map((p) => (
                     <div
                       key={p._id || p.id}
@@ -1688,19 +1685,19 @@ export default function AccommodationPage() {
                     >
                       <img src={p.image} alt={p.name} className="wishlist-item-thumbnail" />
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 700, fontSize: "14px", color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        <div style={{ fontWeight: 800, fontSize: "13px", color: "var(--navy-ink)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                           {p.name}
                         </div>
-                        <div style={{ fontSize: "12px", color: "#64748b" }}>{p.location}</div>
-                        <div style={{ fontWeight: 800, color: "#4f46e5", fontSize: "13px", marginTop: "4px" }}>
+                        <div style={{ fontSize: "11px", color: "#64748B" }}>{p.location}</div>
+                        <div style={{ fontWeight: 800, color: "var(--brand-red)", fontSize: "13px", marginTop: "2px" }}>
                           KSh {(p.price || p.basePrice || 0).toLocaleString()} / night
                         </div>
                       </div>
                       <button
                         type="button"
                         className="wishlist-remove-btn"
-                        title="Remove from saved"
                         onClick={(e) => toggleFavorite(e, p._id || p.id, p.name)}
+                        title="Remove"
                       >
                         ✕
                       </button>
@@ -1710,1851 +1707,2061 @@ export default function AccommodationPage() {
               )}
             </div>
 
-            {wishlistProperties.length > 0 && (
-              <div className="wishlist-drawer-footer">
-                <button
-                  type="button"
-                  className="drawer-browse-all-btn"
-                  onClick={() => {
-                    setWishlistDrawerOpen(false);
-                    navigate("/accommodation/listings");
-                  }}
-                >
-                  Compare All in Listings
-                </button>
-              </div>
-            )}
+            <div className="wishlist-drawer-footer">
+              <button
+                type="button"
+                className="drawer-browse-all-btn"
+                onClick={() => {
+                  setWishlistDrawerOpen(false);
+                  navigate("/accommodation/listings");
+                }}
+              >
+                Browse All Kenyan Stays →
+              </button>
+            </div>
           </div>
         </div>
       )}
-
-      {/* ── FLOATING WHATSAPP CONCIERGE & SCROLL TO TOP ── */}
-      <a
-        className="wa-floating-concierge"
-        href="https://wa.me/254745689773?text=Hi!%20I%20need%20assistance%20finding%20an%20accommodation%20in%20Kenya%20on%20AXXSpace."
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Direct WhatsApp Concierge"
-      >
-        <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
-          <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.23 8.23 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24m4.52 11.66c-.25.7-.72 1.33-1.37 1.57-.45.17-.98.24-3.16-.62-2.34-.92-3.83-3.32-3.95-3.48-.12-.16-.95-1.26-.95-2.4 0-1.14.6-1.7.81-1.93.21-.23.46-.29.62-.29.15 0 .31 0 .44.01.14.01.32-.05.5.38.18.44.62 1.51.68 1.62.06.12.1.25.02.4-.08.15-.12.25-.24.39-.12.14-.25.31-.36.42-.12.12-.24.25-.1.5.14.24.62 1.02 1.33 1.65.91.81 1.67 1.06 1.91 1.18.24.12.38.1.52-.06.14-.16.6-.7.76-.94.16-.24.32-.2.54-.12.22.08 1.4.66 1.64.78.24.12.4.18.46.28.06.1.06.6-.19 1.3z" />
-        </svg>
-        <span className="wa-tooltip-label">Chat Concierge</span>
-      </a>
-
-      <button
-        type="button"
-        className={`scroll-to-top-button ${showTopBtn ? "visible" : ""}`}
-        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        aria-label="Back to top"
-      >
-        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2.5" fill="none">
-          <polyline points="18 15 12 9 6 15" />
-        </svg>
-      </button>
     </div>
   );
 }
 
-// ── INLINE STYLES FOR CORE SKELETON ──
-const s = {
-  root: {
-    fontFamily: "'Plus Jakarta Sans', 'DM Sans', -apple-system, sans-serif",
-    background: "#ffffff",
-    color: "#0f172a",
-    overflowX: "hidden",
-    minHeight: "100vh",
-  },
-  navInner: {
-    maxWidth: "1400px",
-    margin: "0 auto",
-    padding: "10px 16px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: "8px",
-    minWidth: 0,
-  },
-  logoWrapper: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-    cursor: "pointer",
-    userSelect: "none",
-    textDecoration: "none",
-  },
-  logoBadge: {
-    width: "38px",
-    height: "38px",
-    borderRadius: "10px",
-    background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    boxShadow: "0 4px 12px rgba(79,70,229,0.35)",
-    flexShrink: 0,
-  },
-  logoTextGroup: {
-    display: "flex",
-    flexDirection: "column",
-    lineHeight: 1.15,
-  },
-  logoTitle: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: "1px",
-  },
-  logoAxx: {
-    fontSize: "17px",
-    fontWeight: 900,
-    color: "#0f172a",
-    letterSpacing: "-0.5px",
-    fontFamily: "'Inter', 'DM Sans', sans-serif",
-  },
-  logoSpace: {
-    fontSize: "17px",
-    fontWeight: 400,
-    color: "#4f46e5",
-    letterSpacing: "-0.3px",
-    fontFamily: "'Inter', 'DM Sans', sans-serif",
-  },
-  logoSubline: {
-    fontSize: "9.5px",
-    fontWeight: 600,
-    color: "#94a3b8",
-    textTransform: "uppercase",
-    letterSpacing: "0.14em",
-  },
-  navRightGroup: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-  },
-  userGroup: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-  },
-  dashboardBtn: {
-    background: "#f1f5f9",
-    color: "#0f172a",
-    border: "none",
-    borderRadius: "10px",
-    padding: "8px 14px",
-    fontSize: "13px",
-    fontWeight: 700,
-    cursor: "pointer",
-    fontFamily: "inherit",
-  },
-  userAvatar: {
-    width: "36px",
-    height: "36px",
-    borderRadius: "50%",
-    background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
-    color: "#ffffff",
-    fontWeight: 800,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "14px",
-    boxShadow: "0 2px 8px rgba(79, 70, 229, 0.25)",
-  },
+/* ══════════════════════════════════════════════════════════════════
+   HIGH-END MODERN STYLING: AXXSPACE LUXURY REAL ESTATE PALETTE
+   Palette: Deep Midnight Executive (#08101D) · Signature Crimson (#E31B1B)
+   Clean White Card Elevation · Emerald Live Indicators (#10B981)
+══════════════════════════════════════════════════════════════════ */
+const css = `
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap');
 
-  // Hero Section
-  heroSection: {
-    position: "relative",
-    overflow: "hidden",
-    background: "linear-gradient(135deg, #090e1a 0%, #1e1b4b 45%, #2e1065 100%)",
-    padding: "80px 20px 90px",
-    minHeight: "680px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  heroContainer: {
-    maxWidth: "1100px",
-    margin: "0 auto",
-    textAlign: "center",
-    position: "relative",
-    zIndex: 2,
-    width: "100%",
-  },
-  heroBadgePill: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "8px",
-    background: "rgba(255, 255, 255, 0.12)",
-    backdropFilter: "blur(12px)",
-    border: "1px solid rgba(255, 255, 255, 0.2)",
-    borderRadius: "999px",
-    padding: "8px 18px",
-    color: "#ffffff",
-    fontSize: "13px",
-    fontWeight: 700,
-    letterSpacing: "0.02em",
-    marginBottom: "24px",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
-  },
-  heroHeading: {
-    fontSize: "clamp(34px, 5.5vw, 62px)",
-    fontWeight: 900,
-    color: "#ffffff",
-    lineHeight: 1.15,
-    marginBottom: "20px",
-    letterSpacing: "-1.5px",
-  },
-  heroSubtitle: {
-    fontSize: "clamp(15px, 2vw, 18px)",
-    color: "rgba(255, 255, 255, 0.85)",
-    maxWidth: "760px",
-    margin: "0 auto 42px",
-    lineHeight: 1.7,
-    fontWeight: 400,
-  },
-  searchBarInner: {
-    display: "flex",
-    alignItems: "center",
-    gap: "4px",
-    width: "100%",
-    flexWrap: "nowrap",
-  },
-  segmentIconHolder: {
-    width: "36px",
-    height: "36px",
-    borderRadius: "10px",
-    background: "#eef2ff",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-  },
-  segmentLabel: {
-    fontSize: "10px",
-    fontWeight: 800,
-    color: "#64748b",
-    letterSpacing: "0.08em",
-    marginBottom: "2px",
-    textAlign: "left",
-  },
-  segmentInputField: {
-    width: "100%",
-    border: "none",
-    outline: "none",
-    background: "transparent",
-    fontSize: "14px",
-    fontWeight: 700,
-    color: "#0f172a",
-    fontFamily: "inherit",
-    padding: 0,
-    cursor: "pointer",
-  },
-  clearInputBtn: {
-    background: "#f1f5f9",
-    border: "none",
-    borderRadius: "50%",
-    width: "20px",
-    height: "20px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "11px",
-    color: "#64748b",
-    cursor: "pointer",
-  },
-  destDropdownHeader: {
-    padding: "10px 14px",
-    fontSize: "11px",
-    fontWeight: 800,
-    color: "#64748b",
-    borderBottom: "1px solid #f1f5f9",
-    background: "#f8fafc",
-  },
-  destDropdownList: {
-    maxHeight: "280px",
-    overflowY: "auto",
-  },
-  guestStepperRow: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "12px 0",
-    borderBottom: "1px solid #f1f5f9",
-  },
-  stepperControls: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-  },
-  stepperBtn: {
-    width: "32px",
-    height: "32px",
-    borderRadius: "8px",
-    border: "1px solid #cbd5e1",
-    background: "#ffffff",
-    color: "#0f172a",
-    fontSize: "16px",
-    fontWeight: 700,
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  stepperNum: {
-    fontSize: "15px",
-    fontWeight: 800,
-    color: "#0f172a",
-    minWidth: "18px",
-    textAlign: "center",
-  },
-  guestsDoneBtn: {
-    width: "100%",
-    marginTop: "14px",
-    background: "#4f46e5",
-    color: "#ffffff",
-    border: "none",
-    borderRadius: "10px",
-    padding: "10px",
-    fontWeight: 800,
-    fontSize: "14px",
-    cursor: "pointer",
-  },
+  .ax-accommodation-root {
+    --bg-dark: #08101D;
+    --bg-dark-secondary: #0D1B2A;
+    --canvas-light: #F8FAFC;
+    --card-bg: #FFFFFF;
+    --brand-red: #E31B1B;
+    --brand-red-hover: #c41414;
+    --brand-red-light: rgba(227, 27, 27, 0.08);
+    --gold: #F59E0B;
+    --emerald: #10B981;
+    --emerald-light: rgba(16, 185, 129, 0.12);
+    --navy-ink: #0F172A;
+    --text-muted: #64748B;
+    --text-light: #94A3B8;
+    --border-soft: #E2E8F0;
+    --border-dark: rgba(255, 255, 255, 0.1);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --shadow-subtle: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
+    --shadow-elevated: 0 20px 40px -15px rgba(15, 23, 42, 0.12);
+    --shadow-glow-red: 0 10px 30px -5px rgba(227, 27, 27, 0.3);
 
-  // Stats Bar
-  statsBarSection: {
-    background: "#ffffff",
-    borderBottom: "1px solid #e2e8f0",
-    padding: "36px 20px",
-  },
-  statsGrid: {
-    maxWidth: "1400px",
-    margin: "0 auto",
-    display: "grid",
-    gridTemplateColumns: "repeat(4, 1fr)",
-    gap: "24px",
-  },
-  statIconBox: {
-    width: "56px",
-    height: "56px",
-    borderRadius: "16px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-  },
-  statValueNumber: {
-    fontSize: "32px",
-    fontWeight: 900,
-    color: "#0f172a",
-    lineHeight: 1.1,
-  },
-  statLabelText: {
-    fontSize: "14px",
-    fontWeight: 800,
-    color: "#334155",
-    marginTop: "2px",
-  },
-  statSubText: {
-    fontSize: "12px",
-    color: "#64748b",
-    marginTop: "2px",
-  },
-
-  // Generic Section
-  section: {
-    padding: "90px 20px",
-  },
-  sectionInner: {
-    maxWidth: "1400px",
-    margin: "0 auto",
-  },
-  sectionHeading: {
-    fontSize: "clamp(26px, 3.5vw, 38px)",
-    fontWeight: 900,
-    color: "#0f172a",
-    letterSpacing: "-0.5px",
-    marginTop: "6px",
-    marginBottom: "10px",
-  },
-  sectionSubheading: {
-    fontSize: "16px",
-    color: "#64748b",
-    maxWidth: "680px",
-    lineHeight: 1.6,
-  },
-
-  // Category Cards
-  catCardTitle: {
-    fontSize: "17px",
-    fontWeight: 800,
-    color: "#0f172a",
-    marginBottom: "6px",
-  },
-  catCardDesc: {
-    fontSize: "13px",
-    color: "#64748b",
-    lineHeight: 1.5,
-    marginBottom: "14px",
-  },
-
-  // Property Card Body
-  propCardBody: {
-    padding: "20px",
-    display: "flex",
-    flexDirection: "column",
-    flex: 1,
-  },
-  propLocationRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: "6px",
-    marginBottom: "8px",
-  },
-  propLocationText: {
-    fontSize: "13px",
-    color: "#64748b",
-    fontWeight: 600,
-  },
-  propCardName: {
-    fontSize: "18px",
-    fontWeight: 800,
-    color: "#0f172a",
-    lineHeight: 1.3,
-    marginBottom: "12px",
-    minHeight: "46px",
-  },
-  propAmenitiesWrap: {
-    display: "flex",
-    alignItems: "center",
-    gap: "6px",
-    flexWrap: "wrap",
-    marginBottom: "14px",
-  },
-  amenityChip: {
-    fontSize: "11px",
-    fontWeight: 600,
-    background: "#f1f5f9",
-    color: "#475569",
-    padding: "3px 8px",
-    borderRadius: "6px",
-  },
-  amenityChipMore: {
-    fontSize: "11px",
-    fontWeight: 600,
-    color: "#64748b",
-  },
-  propCardDivider: {
-    height: "1px",
-    background: "#f1f5f9",
-    margin: "4px 0 14px",
-  },
-  propPriceRatingRow: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: "16px",
-  },
-  propPriceText: {
-    fontSize: "20px",
-    fontWeight: 900,
-    color: "#4f46e5",
-  },
-  propPerNight: {
-    fontSize: "12px",
-    color: "#64748b",
-    fontWeight: 600,
-    marginLeft: "4px",
-  },
-  propRatingBadge: {
-    display: "flex",
-    alignItems: "center",
-    gap: "4px",
-    background: "#fef3c7",
-    padding: "4px 8px",
-    borderRadius: "8px",
-  },
-  cardActionsRow: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "8px",
-    marginTop: "auto",
-  },
-
-  // How it works
-  howStepTitle: {
-    fontSize: "17px",
-    fontWeight: 800,
-    color: "#0f172a",
-    marginBottom: "8px",
-  },
-  howStepDesc: {
-    fontSize: "14px",
-    color: "#64748b",
-    lineHeight: 1.6,
-  },
-
-  // Why choose us
-  whyCardTitle: {
-    fontSize: "18px",
-    fontWeight: 800,
-    color: "#0f172a",
-    marginBottom: "10px",
-  },
-  whyCardDesc: {
-    fontSize: "14px",
-    color: "#64748b",
-    lineHeight: 1.65,
-  },
-
-  // Testimonials
-  reviewText: {
-    fontSize: "15px",
-    color: "#334155",
-    lineHeight: 1.7,
-    fontStyle: "italic",
-    marginBottom: "14px",
-    flex: 1,
-  },
-  reviewAuthorRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    borderTop: "1px solid #f1f5f9",
-    paddingTop: "14px",
-  },
-  reviewerAvatar: {
-    width: "44px",
-    height: "44px",
-    borderRadius: "50%",
-    objectFit: "cover",
-  },
-
-  // Bottom CTA
-  bottomCtaSection: {
-    background: "linear-gradient(135deg, #312e81 0%, #4338ca 50%, #6366f1 100%)",
-    padding: "80px 20px",
-    textAlign: "center",
-    color: "#ffffff",
-  },
-  ctaContainer: {
-    maxWidth: "800px",
-    margin: "0 auto",
-  },
-  ctaHeading: {
-    fontSize: "clamp(28px, 4vw, 44px)",
-    fontWeight: 900,
-    color: "#ffffff",
-    marginBottom: "16px",
-    letterSpacing: "-0.5px",
-  },
-  ctaSubtext: {
-    fontSize: "17px",
-    color: "rgba(255, 255, 255, 0.88)",
-    lineHeight: 1.7,
-    marginBottom: "36px",
-  },
-  ctaButtonsGroup: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "16px",
-    flexWrap: "wrap",
-  },
-
-  // Footer
-  footer: {
-    background: "#090d16",
-    color: "#94a3b8",
-    padding: "70px 20px 30px",
-  },
-  footerInner: {
-    maxWidth: "1400px",
-    margin: "0 auto",
-    display: "grid",
-    gridTemplateColumns: "340px 1fr",
-    gap: "60px",
-    marginBottom: "50px",
-  },
-  footerBrandCol: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "12px",
-  },
-  footerBio: {
-    fontSize: "13px",
-    lineHeight: 1.7,
-    color: "#94a3b8",
-  },
-  footerLinksGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
-    gap: "36px",
-  },
-  footerHeading: {
-    fontSize: "12px",
-    fontWeight: 800,
-    color: "#ffffff",
-    textTransform: "uppercase",
-    letterSpacing: "0.1em",
-    marginBottom: "16px",
-  },
-  footerUl: {
-    listStyle: "none",
-    padding: 0,
-    margin: 0,
-    display: "flex",
-    flexDirection: "column",
-    gap: "10px",
-  },
-  footerTextBtn: {
-    background: "transparent",
-    border: "none",
-    color: "#94a3b8",
-    fontSize: "13px",
-    cursor: "pointer",
-    padding: 0,
-    fontFamily: "inherit",
-    textAlign: "left",
-    transition: "color 0.2s",
-  },
-  footerContactItem: {
-    fontSize: "13px",
-    color: "#cbd5e1",
-    marginBottom: "10px",
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-  },
-  footerBottomBar: {
-    maxWidth: "1400px",
-    margin: "0 auto",
-    borderTop: "1px solid #1e293b",
-    paddingTop: "24px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    fontSize: "13px",
-    color: "#64748b",
-    flexWrap: "wrap",
-    gap: "12px",
-  },
-};
-
-// ── CUSTOM CSS FOR ANIMATIONS, RESPONSIVENESS & MICRO-INTERACTIONS ──
-const customStyles = `
-  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
-
-  /* Global baseline */
-  .accommodation-root * {
-    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    color: var(--navy-ink);
+    background-color: var(--canvas-light);
+    min-height: 100vh;
+    overflow-x: hidden;
   }
 
-  /* Scroll Progress */
+  .ax-accommodation-root * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Scroll Progress Bar */
   .scroll-progress-bar {
     position: fixed;
     top: 0;
     left: 0;
-    height: 3.5px;
-    background: linear-gradient(90deg, #4f46e5 0%, #ec4899 50%, #fbbf24 100%);
-    z-index: 9999;
-    transition: width 0.1s linear;
+    height: 3px;
+    background: linear-gradient(90deg, #E31B1B, #F59E0B);
+    z-index: 1001;
+    transition: width 0.1s;
   }
 
-  /* Sticky Navigation */
+  /* ── 1. TOP NAV HEADER (Midnight Executive Theme) ── */
   .main-nav {
-    background: rgba(255, 255, 255, 0.98);
-    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
     position: sticky;
     top: 0;
-    z-index: 500;
-    transition: all 0.3s ease;
+    z-index: 200;
+    background: rgba(8, 16, 29, 0.94);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.25s ease;
   }
   .main-nav.scrolled {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    box-shadow: 0 1px 0 rgba(0,0,0,0.06), 0 8px 24px -8px rgba(0,0,0,0.07);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
   }
-
-  .county-badge {
-    background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%);
-    color: #4f46e5;
-    font-size: 10.5px;
+  .nav-inner-container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .nav-logo-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+  }
+  .nav-logo-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #E31B1B 0%, #C41414 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(227, 27, 27, 0.35);
+  }
+  .nav-logo-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+  }
+  .nav-logo-wordmark {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+  }
+  .logo-brand-white { color: #FFFFFF; }
+  .logo-brand-red { color: var(--brand-red); margin-left: 1px; }
+  .nav-logo-sub {
+    font-size: 0.65rem;
     font-weight: 700;
-    padding: 3px 9px;
-    border-radius: 999px;
-    border: 1px solid rgba(79,70,229,0.2);
-    letter-spacing: 0.03em;
+    color: #94A3B8;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
   }
 
   .desktop-nav-links {
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 6px;
   }
   .nav-link-btn {
     background: transparent;
     border: none;
-    color: #475569;
-    font-size: 13.5px;
+    color: #CBD5E1;
+    font-family: inherit;
+    font-size: 0.88rem;
     font-weight: 600;
     padding: 8px 14px;
     border-radius: 8px;
     cursor: pointer;
-    font-family: inherit;
-    transition: all 0.18s ease;
-    position: relative;
-    letter-spacing: 0.01em;
-  }
-  .nav-link-btn::after {
-    content: '';
-    position: absolute;
-    bottom: 4px;
-    left: 14px;
-    right: 14px;
-    height: 2px;
-    background: #4f46e5;
-    border-radius: 2px;
-    transform: scaleX(0);
-    transition: transform 0.2s ease;
+    transition: all 0.2s ease;
   }
   .nav-link-btn:hover {
-    color: #4f46e5;
-    background: #f5f3ff;
-  }
-  .nav-link-btn:hover::after {
-    transform: scaleX(1);
+    color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.08);
   }
 
-  .wishlist-trigger-btn {
-    background: #fff1f2;
-    border: 1px solid #fecdd3;
-    border-radius: 10px;
-    padding: 8px 12px;
+  .nav-actions-group {
     display: flex;
     align-items: center;
-    gap: 6px;
-    color: #e11d48;
+    gap: 12px;
+  }
+  .wishlist-trigger-btn {
+    position: relative;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF;
     cursor: pointer;
-    font-family: inherit;
-    transition: transform 0.2s;
+    transition: all 0.2s ease;
   }
   .wishlist-trigger-btn:hover {
+    background: rgba(255, 255, 255, 0.16);
     transform: scale(1.05);
   }
   .wishlist-badge-count {
-    font-size: 12px;
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: var(--brand-red);
+    color: #FFFFFF;
+    font-size: 0.68rem;
     font-weight: 800;
-    background: #e11d48;
-    color: #ffffff;
+    min-width: 18px;
+    height: 18px;
     border-radius: 999px;
-    padding: 1px 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    box-shadow: 0 2px 6px rgba(227, 27, 27, 0.4);
   }
 
   .sign-in-btn {
-    background: transparent;
-    border: 1.5px solid #e2e8f0;
-    color: #334155;
-    font-size: 13px;
-    font-weight: 600;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
     padding: 8px 16px;
     border-radius: 10px;
     cursor: pointer;
-    font-family: inherit;
     transition: all 0.2s;
-    letter-spacing: 0.01em;
-    white-space: nowrap;
   }
   .sign-in-btn:hover {
-    border-color: #4f46e5;
-    color: #4f46e5;
-    background: #f5f3ff;
+    background: rgba(255, 255, 255, 0.16);
   }
-
   .list-property-btn {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-    color: #ffffff;
-    border: none;
-    border-radius: 10px;
-    padding: 9px 18px;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    font-family: inherit;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
-    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
-    transition: all 0.25s ease;
-    letter-spacing: 0.01em;
-    white-space: nowrap;
+    background: linear-gradient(135deg, #E31B1B 0%, #C41414 100%);
+    color: #FFFFFF;
+    border: none;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 8px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(227, 27, 27, 0.35);
+    transition: all 0.2s;
   }
   .list-property-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.42);
+    box-shadow: 0 6px 20px rgba(227, 27, 27, 0.45);
   }
-
+  .user-nav-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .dashboard-nav-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 7px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .user-avatar-circle {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #E31B1B 0%, #C41414 100%);
+    color: #FFFFFF;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+  }
+  .mobile-header-auth-btn {
+    display: none;
+    background: linear-gradient(135deg, #E31B1B 0%, #C41414 100%);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
   .mobile-toggle-btn {
     display: none;
     background: transparent;
     border: none;
-    color: #0f172a;
+    color: #FFFFFF;
     cursor: pointer;
-    padding: 6px;
-    flex-shrink: 0;
+    padding: 4px;
   }
 
   .mobile-dropdown-menu {
-    display: none;
-    background: #ffffff;
-    border-top: 2px solid #e2e8f0;
-    padding: 12px 16px 20px;
+    display: flex;
     flex-direction: column;
-    gap: 4px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    padding: 12px 18px 20px;
+    background: #0B1320;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
   .mobile-dropdown-menu button {
     background: transparent;
     border: none;
-    text-align: left;
-    font-size: 15px;
-    font-weight: 600;
-    color: #1e293b;
-    padding: 12px 8px;
-    cursor: pointer;
+    color: #CBD5E1;
     font-family: inherit;
-    border-radius: 8px;
-    width: 100%;
-    transition: background 0.15s;
-  }
-  .mobile-dropdown-menu button:hover {
-    background: #f8fafc;
-    color: #4f46e5;
-  }
-  .mobile-action-highlight {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
-    color: #ffffff !important;
-    padding: 13px 12px !important;
-    border-radius: 10px !important;
-    text-align: center !important;
-    font-weight: 700 !important;
-    justify-content: center !important;
-    box-shadow: 0 4px 14px rgba(79,70,229,0.3) !important;
-  }
-  .mobile-action-highlight:hover {
-    background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%) !important;
-    color: #ffffff !important;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 0;
+    cursor: pointer;
   }
   .mobile-nav-divider {
     height: 1px;
-    background: #e2e8f0;
-    margin: 4px 0;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 10px 0;
+  }
+  .mobile-action-highlight {
+    color: var(--brand-red) !important;
+    font-weight: 800 !important;
   }
 
-  /* Hero Animations & Elements */
-  .hero-glow-blob {
+  /* ── 2. HERO ATMOSPHERE (Matching Rentals/Property) ── */
+  .listings-hero {
+    position: relative;
+    background: radial-gradient(circle at 50% 20%, #112035 0%, var(--bg-dark) 80%);
+    color: #FFFFFF;
+    padding: 24px 20px 48px;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .ambient-orb {
     position: absolute;
     border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.35;
+    filter: blur(100px);
     pointer-events: none;
+    z-index: -2;
+    opacity: 0.6;
+    animation: orbFloat 10s ease-in-out infinite alternate;
   }
-  .blob-top-left {
+  .orb-crimson {
+    top: -100px;
+    left: 10%;
     width: 450px;
     height: 450px;
-    background: #6366f1;
-    top: -100px;
-    left: -100px;
-    animation: pulseBlob 9s infinite alternate;
+    background: radial-gradient(circle, rgba(227, 27, 27, 0.35) 0%, transparent 70%);
   }
-  .blob-bottom-right {
-    width: 480px;
-    height: 480px;
-    background: #ec4899;
-    bottom: -120px;
-    right: -100px;
-    animation: pulseBlob 12s infinite alternate-reverse;
+  .orb-amber {
+    top: 40px;
+    right: 5%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, transparent 70%);
+    animation-delay: -3s;
   }
-  .blob-center {
-    width: 380px;
-    height: 380px;
-    background: #fbbf24;
-    top: 30%;
-    left: 45%;
-    opacity: 0.15;
-  }
-  @keyframes pulseBlob {
-    0% { transform: scale(1) translate(0, 0); }
-    100% { transform: scale(1.2) translate(40px, 30px); }
+  .orb-navy {
+    bottom: -150px;
+    left: 40%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, transparent 70%);
+    animation-delay: -6s;
   }
 
-  .shimmering-gradient-text {
-    background: linear-gradient(90deg, #fbbf24 0%, #ffffff 35%, #fbbf24 70%, #ec4899 100%);
-    background-size: 250% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: textShimmer 6s linear infinite;
-  }
-  @keyframes textShimmer {
-    to { background-position: -250% 0; }
+  @keyframes orbFloat {
+    0% { transform: translateY(0) scale(1); }
+    100% { transform: translateY(30px) scale(1.1); }
   }
 
-  .hero-in {
-    animation: heroFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-  }
-  .hero-in.i1 { animation-delay: 0.1s; }
-  .hero-in.i2 { animation-delay: 0.25s; }
-  .hero-in.i3 { animation-delay: 0.4s; }
-  .hero-in.i4 { animation-delay: 0.55s; }
-
-  @keyframes heroFadeUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .hero-grid-pattern {
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(circle at 50% 40%, black 30%, transparent 80%);
+    -webkit-mask-image: radial-gradient(circle at 50% 40%, black 30%, transparent 80%);
+    pointer-events: none;
+    z-index: -1;
   }
 
-  /* Segmented Search Engine Box */
-  .search-bar-shell {
-    background: #ffffff;
-    border-radius: 20px;
-    padding: 8px;
-    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.15);
-    margin: 0 auto;
-    max-width: 1060px;
+  .hero-compact-header {
+    max-width: 1200px;
+    margin: 0 auto 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
     position: relative;
-    z-index: 30;
+    z-index: 2;
   }
-  .search-segment-box {
-    flex: 1;
+  .hero-compact-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #FFFFFF;
+    letter-spacing: -0.02em;
+    margin-bottom: 2px;
+  }
+  .hero-compact-sub {
+    color: #94A3B8;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .hero-compact-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .hero-compact-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #E31B1B 0%, #C41414 100%);
+    color: #FFFFFF;
+    border: none;
+    font-family: inherit;
+    text-decoration: none;
+    padding: 9px 18px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(227, 27, 27, 0.35);
+    transition: all 0.2s ease;
+  }
+  .hero-compact-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(227, 27, 27, 0.45);
+  }
+  .btn-arrow {
+    transition: transform 0.2s ease;
+  }
+  .hero-compact-btn-primary:hover .btn-arrow {
+    transform: translateX(3px);
+  }
+  .hero-compact-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #FFFFFF;
+    font-family: inherit;
+    padding: 9px 16px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+  }
+  .hero-compact-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.35);
+  }
+
+  .hero-center-content {
+    max-width: 900px;
+    margin: 0 auto 28px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+  .hero-trust-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(12px);
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+  .hero-main-headline {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 900;
+    color: #FFFFFF;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    margin-bottom: 14px;
+  }
+  .shimmering-gradient-text {
+    background: linear-gradient(90deg, #FFFFFF 0%, #F59E0B 45%, #E31B1B 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero-main-sub {
+    font-size: 0.95rem;
+    color: #CBD5E1;
+    max-width: 720px;
+    margin: 0 auto;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  /* ── 3. SEARCH CONSOLE (Matching Rentals/Property) ── */
+  .search-console-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10;
+  }
+  .search-console-card {
+    background: #FFFFFF;
+    border-radius: var(--radius-xl);
+    padding: 22px;
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(226, 232, 240, 0.8);
+    color: var(--navy-ink);
+  }
+  .search-inputs-grid {
+    display: grid;
+    grid-template-columns: 2fr 1.3fr 1.3fr 1.5fr auto;
+    gap: 10px;
+    align-items: center;
+  }
+  @media (max-width: 1024px) {
+    .search-inputs-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width: 640px) {
+    .search-inputs-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .search-segment {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: var(--radius-md);
+    padding: 9px 12px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+  .search-segment:focus-within {
+    border-color: var(--brand-red);
+    box-shadow: 0 0 0 3px rgba(227, 27, 27, 0.1);
+    background: #FFFFFF;
+  }
+  .segment-label {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: #64748B;
+    text-transform: uppercase;
+  }
+  .segment-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+  }
+  .segment-svg-icon {
+    color: var(--brand-red);
+    flex-shrink: 0;
+  }
+  .segment-text-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--navy-ink);
+    width: 100%;
+  }
+  .segment-text-input::placeholder {
+    color: #94A3B8;
+    font-weight: 400;
+  }
+  .segment-text-display {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--navy-ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .segment-clear-btn {
+    border: none;
+    background: #E2E8F0;
+    color: #64748B;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Search Submit Button */
+  .search-submit-segment {
+    display: flex;
+    align-items: center;
+  }
+  .hero-search-submit-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 54px;
+    padding: 0 24px;
+    background: linear-gradient(135deg, #E31B1B 0%, #C41414 100%);
+    color: #FFFFFF;
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(227, 27, 27, 0.35);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    width: 100%;
+  }
+  .hero-search-submit-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(227, 27, 27, 0.45);
+  }
+
+  /* Quick Category Chips Strip */
+  .quick-category-strip {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 18px;
-    border-radius: 14px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    transition: all 0.2s ease;
-    cursor: pointer;
-    position: relative;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #F1F5F9;
+    overflow-x: auto;
   }
-  .search-segment-box:hover,
-  .search-segment-box:focus-within {
-    background: #ffffff;
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  .quick-cat-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #94A3B8;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
+  }
+  .quick-cat-scroll {
+    display: flex;
+    gap: 8px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+  .quick-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid #E2E8F0;
+    background: #F8FAFC;
+    color: #475569;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .quick-chip:hover {
+    border-color: var(--brand-red);
+    color: var(--brand-red);
+    transform: translateY(-1px);
+  }
+  .quick-chip.active {
+    background: var(--brand-red);
+    border-color: var(--brand-red);
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(227, 27, 27, 0.25);
   }
 
+  /* Popover Dropdowns */
   .dest-dropdown-popover {
     position: absolute;
     top: calc(100% + 8px);
     left: 0;
-    width: 360px;
-    background: #ffffff;
-    border-radius: 16px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
-    z-index: 100;
+    width: 320px;
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: var(--radius-md);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    z-index: 50;
     overflow: hidden;
-    animation: popoverFade 0.2s ease;
+  }
+  .dest-dropdown-header {
+    padding: 10px 14px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: #64748B;
+    background: #F8FAFC;
+    border-bottom: 1px solid #E2E8F0;
+  }
+  .dest-dropdown-list {
+    max-height: 260px;
+    overflow-y: auto;
   }
   .dest-dropdown-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    border-bottom: 1px solid #f8fafc;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid #F1F5F9;
     cursor: pointer;
     transition: background 0.15s;
-    text-align: left;
   }
   .dest-dropdown-item:hover {
-    background: #f1f5f9;
+    background: var(--brand-red-light);
+  }
+  .dest-item-name {
+    font-weight: 700;
+    color: var(--navy-ink);
+    font-size: 0.88rem;
+  }
+  .dest-item-county {
+    font-size: 0.75rem;
+    color: #64748B;
+  }
+  .dest-select-arrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--brand-red);
   }
 
   .guests-dropdown-popover {
     position: absolute;
     top: calc(100% + 8px);
     right: 0;
-    width: 310px;
-    background: #ffffff;
-    border-radius: 16px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
-    padding: 18px;
-    z-index: 100;
-    animation: popoverFade 0.2s ease;
-  }
-  @keyframes popoverFade {
-    from { opacity: 0; transform: translateY(-8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .hero-search-submit-btn {
-    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #7c3aed 100%);
-    color: #ffffff;
-    border: none;
-    border-radius: 14px;
-    padding: 16px 28px;
-    font-size: 15px;
-    font-weight: 800;
-    cursor: pointer;
-    font-family: inherit;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-    transition: all 0.25s ease;
-    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
-  }
-  .hero-search-submit-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 28px rgba(79, 70, 229, 0.55);
-  }
-
-  .hero-quick-tags {
-    margin-top: 24px;
-    display: flex;
-    align-items: center;
-    justifyContent: center;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  .quick-hotspot-pill {
-    background: rgba(255, 255, 255, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #ffffff;
-    border-radius: 999px;
-    padding: 6px 14px;
-    font-size: 12.5px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
-    backdrop-filter: blur(6px);
-    transition: all 0.2s;
-  }
-  .quick-hotspot-pill:hover {
-    background: #fbbf24;
-    color: #0f172a;
-    border-color: #fbbf24;
-    transform: translateY(-2px);
-  }
-
-  /* Marquee ticker */
-  .destinations-marquee-section {
-    background: #0f172a;
-    padding: 14px 0;
-    border-bottom: 1px solid #1e293b;
-    overflow: hidden;
-  }
-  .marquee-outer-container {
-    display: flex;
-    align-items: center;
-  }
-  .marquee-label-chip {
-    background: #1e293b;
-    color: #94a3b8;
-    font-size: 11px;
-    font-weight: 800;
-    padding: 6px 16px;
-    border-radius: 0 20px 20px 0;
-    white-space: nowrap;
-    margin-right: 16px;
-    letter-spacing: "0.08em";
-    z-index: 10;
-  }
-  .marquee-track-scroll {
-    display: flex;
-    gap: 12px;
-    width: max-content;
-    animation: scrollMarquee 40s linear infinite;
-  }
-  @keyframes scrollMarquee {
-    to { transform: translateX(-50%); }
-  }
-  .marquee-pill-btn {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: #e2e8f0;
-    border-radius: 999px;
-    padding: 7px 16px;
-    font-size: 13px;
-    font-family: inherit;
-    cursor: pointer;
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    transition: all 0.2s;
-  }
-  .marquee-pill-btn:hover {
-    background: #4f46e5;
-    color: #ffffff;
-    border-color: #4f46e5;
-    transform: translateY(-2px);
-  }
-  .marquee-county-tag {
-    font-size: 11px;
-    color: #94a3b8;
-    margin-left: 6px;
-  }
-
-  /* Stats Section Items */
-  .stat-card-item {
-    display: flex;
-    align-items: center;
-    gap: 18px;
+    width: 290px;
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: var(--radius-md);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
     padding: 16px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 18px;
-    transition: all 0.25s ease;
+    z-index: 50;
   }
-  .stat-card-item:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.06);
-    background: #ffffff;
-  }
-
-  /* Section Headings */
-  .section-eyebrow {
-    font-size: 12px;
-    font-weight: 800;
-    color: #4f46e5;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    display: block;
-    margin-bottom: 4px;
-  }
-  .section-head-split {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 40px;
-    flex-wrap: wrap;
-    gap: 20px;
-  }
-  .view-all-pill-btn {
-    background: transparent;
-    border: 1.5px solid #4f46e5;
-    color: #4f46e5;
-    padding: 10px 20px;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 800;
-    cursor: pointer;
-    font-family: inherit;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-  .view-all-pill-btn:hover {
-    background: #4f46e5;
-    color: #ffffff;
-    transform: translateY(-2px);
-  }
-
-  /* Stay Category Cards */
-  .category-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-  }
-  .stay-cat-card {
-    background: #ffffff;
-    border-radius: 20px;
-    border: 1px solid #e2e8f0;
-    overflow: hidden;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-  }
-  .stay-cat-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-    border-color: #cbd5e1;
-  }
-  .stay-cat-img-wrapper {
-    position: relative;
-    height: 200px;
-    overflow: hidden;
-  }
-  .stay-cat-bg-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.6s ease;
-  }
-  .stay-cat-card:hover .stay-cat-bg-img {
-    transform: scale(1.08);
-  }
-  .stay-cat-gradient-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 100%);
-  }
-  .stay-cat-tag-pill {
-    position: absolute;
-    top: 14px;
-    left: 14px;
-    color: #ffffff;
-    font-size: 11px;
-    font-weight: 800;
-    padding: 4px 10px;
-    border-radius: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-  .stay-cat-count-badge {
-    position: absolute;
-    bottom: 14px;
-    right: 14px;
-    background: rgba(0, 0, 0, 0.65);
-    backdrop-filter: blur(8px);
-    color: #ffffff;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 8px;
-  }
-  .stay-cat-info {
-    padding: 20px;
-  }
-  .cat-explore-link {
+  .guest-stepper-row {
     display: flex;
     align-items: center;
-    gap: 6px;
-    color: #4f46e5;
-    font-size: 13px;
-    font-weight: 800;
-    transition: gap 0.2s;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #F1F5F9;
   }
-  .stay-cat-card:hover .cat-explore-link {
+  .stepper-title {
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--navy-ink);
+  }
+  .stepper-sub {
+    font-size: 0.72rem;
+    color: #64748B;
+  }
+  .stepper-controls {
+    display: flex;
+    align-items: center;
     gap: 10px;
   }
-
-  /* Featured Stays Category Tabs */
-  .featured-category-filter-tabs {
-    display: flex;
-    gap: 8px;
-    background: #ffffff;
-    padding: 6px;
-    border-radius: 14px;
-    border: 1px solid #e2e8f0;
-    flex-wrap: wrap;
-  }
-  .filter-tab-pill {
-    background: transparent;
-    border: none;
-    border-radius: 10px;
-    padding: 8px 16px;
-    font-size: 13px;
-    font-weight: 700;
-    color: #475569;
-    cursor: pointer;
-    font-family: inherit;
-    transition: all 0.2s;
-  }
-  .filter-tab-pill.active {
-    background: #4f46e5;
-    color: #ffffff;
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
-  }
-
-  /* Property Listing Grid */
-  .properties-listing-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 26px;
-  }
-  .property-card-deluxe {
-    background: #ffffff;
-    border-radius: 20px;
-    border: 1px solid #e2e8f0;
-    overflow: hidden;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  }
-  .property-card-deluxe:hover {
-    transform: translateY(-7px);
-    box-shadow: 0 24px 45px rgba(0, 0, 0, 0.1);
-    border-color: #cbd5e1;
-  }
-  .prop-image-frame {
-    position: relative;
-    height: 230px;
-    overflow: hidden;
-  }
-  .prop-main-photo {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.6s ease;
-  }
-  .property-card-deluxe:hover .prop-main-photo {
-    transform: scale(1.06);
-  }
-  .prop-badge-strip {
-    position: absolute;
-    top: 14px;
-    left: 14px;
-    display: flex;
-    gap: 6px;
-  }
-  .prop-category-tag {
-    background: rgba(15, 23, 42, 0.8);
-    backdrop-filter: blur(8px);
-    color: #ffffff;
-    font-size: 11px;
-    font-weight: 800;
-    padding: 5px 10px;
-    border-radius: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-  .prop-highlight-tag {
-    background: #fbbf24;
-    color: #0f172a;
-    font-size: 11px;
-    font-weight: 800;
-    padding: 5px 10px;
-    border-radius: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-  .prop-fav-button {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(255, 255, 255, 0.92);
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    transition: transform 0.2s ease;
-  }
-  .prop-fav-button:hover {
-    transform: scale(1.15);
-  }
-  .prop-fav-button.active {
-    animation: heartBounce 0.4s ease;
-  }
-  @keyframes heartBounce {
-    40% { transform: scale(1.35); }
-    100% { transform: scale(1); }
-  }
-
-  .card-primary-view-btn {
-    background: #f1f5f9;
-    color: #0f172a;
-    border: none;
-    border-radius: 10px;
-    padding: 10px;
-    font-size: 13px;
+  .stepper-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid #CBD5E1;
+    background: #FFFFFF;
+    color: var(--navy-ink);
+    font-size: 1rem;
     font-weight: 700;
     cursor: pointer;
-    font-family: inherit;
-    transition: all 0.2s;
-  }
-  .card-primary-view-btn:hover {
-    background: #e2e8f0;
-    color: #000000;
-  }
-  .card-whatsapp-direct-btn {
-    background: #25d366;
-    color: #ffffff;
-    border: none;
-    border-radius: 10px;
-    padding: 10px;
-    font-size: 13px;
-    font-weight: 800;
-    cursor: pointer;
-    font-family: inherit;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    transition: all 0.2s;
   }
-  .card-whatsapp-direct-btn:hover {
-    background: #20bd5a;
-    transform: translateY(-1px);
+  .stepper-num {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--navy-ink);
+    min-width: 16px;
+    text-align: center;
+  }
+  .guests-done-btn {
+    width: 100%;
+    margin-top: 12px;
+    background: var(--navy-ink);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    padding: 9px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
   }
 
-  .view-all-stays-cta {
-    background: #0f172a;
-    color: #ffffff;
-    border: none;
-    border-radius: 14px;
-    padding: 16px 36px;
-    font-size: 15px;
-    font-weight: 800;
-    cursor: pointer;
-    font-family: inherit;
-    display: inline-flex;
+  /* ── 4. MAIN DISCOVERY WORKSPACE & TOOLBAR ── */
+  .accommodation-main-canvas {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 36px 20px 60px;
+  }
+
+  /* Segmented Discovery Nav */
+  .segmented-discovery-nav {
+    margin-bottom: 24px;
+    overflow-x: auto;
+  }
+  .discovery-tabs-cluster {
+    display: flex;
     align-items: center;
     gap: 10px;
-    transition: all 0.25s ease;
-    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2);
+    padding-bottom: 4px;
   }
-  .view-all-stays-cta:hover {
-    background: #4f46e5;
-    transform: translateY(-2px);
-    box-shadow: 0 14px 30px rgba(79, 70, 229, 0.4);
+  .discovery-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: var(--radius-md);
+    border: 1px solid #E2E8F0;
+    background: #FFFFFF;
+    color: #475569;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: var(--shadow-subtle);
+    transition: all 0.2s ease;
+  }
+  .discovery-tab:hover {
+    border-color: var(--brand-red);
+    color: var(--brand-red);
+  }
+  .discovery-tab.active {
+    background: var(--brand-red);
+    border-color: var(--brand-red);
+    color: #FFFFFF;
+    box-shadow: 0 4px 15px rgba(227, 27, 27, 0.25);
+  }
+  .tab-icon {
+    display: flex;
+    align-items: center;
+  }
+  .tab-counter {
+    background: rgba(0, 0, 0, 0.08);
+    font-size: 0.72rem;
+    padding: 2px 7px;
+    border-radius: 999px;
+  }
+  .discovery-tab.active .tab-counter {
+    background: rgba(255, 255, 255, 0.25);
+    color: #FFFFFF;
   }
 
-  /* Flash Deal Banner */
-  .flash-deal-banner-card {
-    background: linear-gradient(135deg, #831843 0%, #be185d 50%, #db2777 100%);
-    border-radius: 24px;
-    padding: 48px;
-    color: #ffffff;
+  /* Listings Toolbar */
+  .listings-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #E2E8F0;
+  }
+  .results-headline {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #475569;
+  }
+  .results-bold-num {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--brand-red);
+    margin-right: 6px;
+  }
+  .results-location-tag {
+    font-size: 0.95rem;
+    color: #0F172A;
+    font-weight: 700;
+    margin-left: 6px;
+  }
+  .toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .sort-box {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    padding: 7px 12px;
+    border-radius: var(--radius-sm);
+  }
+  .sort-label {
+    font-size: 0.78rem;
+    color: #64748B;
+    font-weight: 600;
+  }
+  .sort-select {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--navy-ink);
+    cursor: pointer;
+  }
+  .toolbar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: var(--radius-sm);
+    color: #475569;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .toolbar-btn:hover, .toolbar-btn.active {
+    background: var(--brand-red-light);
+    border-color: var(--brand-red);
+    color: var(--brand-red);
+  }
+
+  /* ── 5. PROPERTY CARDS GRID (Matching Rentals/Property) ── */
+  .properties-modern-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 26px;
+  }
+  @media (max-width: 640px) {
+    .properties-modern-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+  }
+
+  .property-card {
+    background: #FFFFFF;
+    border-radius: var(--radius-lg);
+    border: 1px solid #E2E8F0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+    cursor: pointer;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .property-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.12);
+    border-color: #CBD5E1;
+  }
+
+  .card-media-shell {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    background: #0B1320;
+    overflow: hidden;
+  }
+  .card-main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+  .property-card:hover .card-main-image {
+    transform: scale(1.04);
+  }
+
+  .card-badges-overlay {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    z-index: 2;
+  }
+  .badge-category-tag {
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(8px);
+    color: #FFFFFF;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 6px;
+    text-transform: capitalize;
+  }
+  .badge-verified-host {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #DCFCE7;
+    color: #15803D;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 6px;
+    border: 1px solid #BBF7D0;
+  }
+  .badge-video-tour {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(15, 23, 42, 0.85);
+    color: #38BDF8;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 6px;
+  }
+
+  .card-wishlist-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(8px);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748B;
+    cursor: pointer;
+    transition: all 0.2s;
+    z-index: 2;
+  }
+  .card-wishlist-btn:hover {
+    transform: scale(1.1);
+    background: #FFFFFF;
+  }
+  .card-wishlist-btn.active {
+    color: var(--brand-red);
+    background: #FFFFFF;
+  }
+
+  .card-content-body {
+    padding: 18px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .card-location-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .card-location-text {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #64748B;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .card-property-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--navy-ink);
+    margin-bottom: 10px;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-amenities-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .card-amenity-chip {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #475569;
+    background: #F1F5F9;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+  .card-amenity-more {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #94A3B8;
+  }
+
+  .card-body-divider {
+    height: 1px;
+    background: #F1F5F9;
+    margin-bottom: 14px;
+  }
+
+  .card-bottom-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .card-price-amount {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: var(--navy-ink);
+    line-height: 1.1;
+  }
+  .card-price-frequency {
+    font-size: 0.75rem;
+    color: #64748B;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .card-rating-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.82rem;
+  }
+  .star-gold { color: var(--gold); }
+  .rating-num { font-weight: 800; color: var(--navy-ink); }
+  .rating-count { color: #64748B; font-size: 0.75rem; }
+
+  /* Dual Action CTAs */
+  .card-actions-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    margin-top: auto;
+  }
+  .btn-card-details {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, #E31B1B 0%, #C41414 100%);
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(227, 27, 27, 0.25);
+    transition: all 0.2s;
+  }
+  .btn-card-details:hover {
+    box-shadow: 0 6px 16px rgba(227, 27, 27, 0.35);
+    transform: translateY(-1px);
+  }
+  .btn-card-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    background: #10B981;
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-card-whatsapp:hover {
+    background: #059669;
+  }
+
+  .btn-browse-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    border-radius: var(--radius-md);
+    background: #FFFFFF;
+    color: var(--navy-ink);
+    border: 1px solid #CBD5E1;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: var(--shadow-subtle);
+    transition: all 0.2s;
+  }
+  .btn-browse-all:hover {
+    border-color: var(--brand-red);
+    color: var(--brand-red);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-elevated);
+  }
+  .section-footer-cta {
+    text-align: center;
+    margin-top: 40px;
+  }
+
+  /* Empty state */
+  .empty-results-box {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    background: #FFFFFF;
+    border-radius: var(--radius-lg);
+    border: 1px solid #E2E8F0;
+  }
+  .empty-icon-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #F1F5F9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+  }
+  .empty-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--navy-ink);
+    margin-bottom: 8px;
+  }
+  .empty-desc {
+    color: #64748B;
+    max-width: 440px;
+    margin: 0 auto 20px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .empty-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn-primary-red {
+    background: linear-gradient(135deg, #E31B1B 0%, #C41414 100%);
+    color: #FFFFFF;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 10px 20px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .btn-secondary-outline {
+    background: #FFFFFF;
+    border: 1.5px solid #CBD5E1;
+    color: var(--navy-ink);
+    border-radius: var(--radius-sm);
+    padding: 10px 20px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  /* ── 6. SPECIAL DEALS BANNER (Executive Dark) ── */
+  .deals-banner-section {
+    max-width: 1200px;
+    margin: 0 auto 60px;
+    padding: 0 20px;
+  }
+  .deals-banner-card {
+    position: relative;
+    background: radial-gradient(circle at 50% 20%, #112035 0%, var(--bg-dark) 80%);
+    color: #FFFFFF;
+    border-radius: var(--radius-xl);
+    padding: 40px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 36px;
-    position: relative;
     overflow: hidden;
-    box-shadow: 0 20px 40px rgba(190, 24, 93, 0.25);
+    isolation: isolate;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: var(--shadow-elevated);
+  }
+  @media (max-width: 900px) {
+    .deals-banner-card { flex-direction: column; padding: 28px 20px; }
+  }
+  .deals-content-left {
+    flex: 1;
+    z-index: 2;
   }
   .deal-badge-pill {
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: #ffffff;
     display: inline-block;
-    padding: 6px 14px;
-    border-radius: 999px;
-    font-size: 12px;
+    background: rgba(227, 27, 27, 0.2);
+    border: 1px solid rgba(227, 27, 27, 0.4);
+    color: #FCA5A5;
+    font-size: 0.72rem;
     font-weight: 800;
-    margin-bottom: 16px;
-  }
-  .deal-title {
-    font-size: clamp(24px, 3.5vw, 36px);
-    font-weight: 900;
-    line-height: 1.2;
+    letter-spacing: 0.1em;
+    padding: 4px 12px;
+    border-radius: 999px;
     margin-bottom: 14px;
   }
-  .deal-desc {
-    font-size: 15px;
-    color: rgba(255, 255, 255, 0.9);
-    max-width: 600px;
-    line-height: 1.6;
-    margin-bottom: 24px;
+  .deal-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(1.4rem, 2.8vw, 2.2rem);
+    font-weight: 800;
+    color: #FFFFFF;
+    line-height: 1.2;
+    margin-bottom: 12px;
   }
-  .deal-cta-row {
+  .deal-desc {
+    font-size: 0.92rem;
+    color: #CBD5E1;
+    line-height: 1.6;
+    margin-bottom: 22px;
+    max-width: 580px;
+  }
+  .deal-actions-row {
     display: flex;
     align-items: center;
-    gap: 18px;
+    gap: 16px;
     flex-wrap: wrap;
   }
-  .deal-claim-btn {
-    background: #ffffff;
-    color: #be185d;
+  .btn-claim-deal {
+    background: linear-gradient(135deg, #E31B1B 0%, #C41414 100%);
+    color: #FFFFFF;
     border: none;
-    border-radius: 12px;
-    padding: 14px 24px;
-    font-size: 14px;
-    font-weight: 800;
-    cursor: pointer;
     font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 800;
+    padding: 12px 24px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(227, 27, 27, 0.35);
     transition: all 0.2s;
   }
-  .deal-claim-btn:hover {
-    background: #fdf2f8;
+  .btn-claim-deal:hover {
     transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(227, 27, 27, 0.5);
   }
-  .deal-floating-mini-card {
-    background: #ffffff;
-    border-radius: 18px;
-    padding: 24px;
-    width: 290px;
-    box-shadow: 0 20px 35px rgba(0, 0, 0, 0.25);
+  .deal-guarantees {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #94A3B8;
+    font-size: 0.8rem;
+    font-weight: 600;
   }
 
-  /* Trip Budget Planner */
-  .planner-container-box {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 24px;
-    padding: 40px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  .deals-preview-right {
+    z-index: 2;
+    width: 320px;
+    max-width: 100%;
+  }
+  .deal-mini-card {
+    background: #FFFFFF;
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+  }
+  .deal-icon-square {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: rgba(227, 27, 27, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .deal-pill-tag {
+    font-size: 0.72rem;
+    background: #FEE2E2;
+    color: var(--brand-red);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 800;
+  }
+
+  /* ── 7. BUDGET PLANNER SECTION ── */
+  .planner-section {
+    padding: 40px 20px 60px;
+    background: var(--canvas-light);
+  }
+  .planner-inner-shell {
+    max-width: 1000px;
+    margin: 0 auto;
   }
   .planner-header {
     text-align: center;
-    margin-bottom: 32px;
+    margin-bottom: 30px;
+  }
+  .section-eyebrow {
+    display: inline-block;
+    background: var(--brand-red-light);
+    color: var(--brand-red);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    padding: 4px 12px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 800;
+    color: var(--navy-ink);
+    margin-bottom: 8px;
+  }
+  .section-subtitle {
+    font-size: 0.95rem;
+    color: #64748B;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .planner-card {
+    background: #FFFFFF;
+    border-radius: var(--radius-xl);
+    border: 1px solid #E2E8F0;
+    padding: 30px;
+    box-shadow: var(--shadow-subtle);
   }
   .planner-controls-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
-    margin-bottom: 28px;
+    margin-bottom: 24px;
   }
-  .planner-card-input {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 18px;
+  @media (max-width: 900px) {
+    .planner-controls-grid { grid-template-columns: 1fr; }
   }
-  .planner-input-label {
-    font-size: 12px;
+  .planner-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .planner-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #334155;
+  }
+  .planner-val-badge {
+    font-size: 0.78rem;
     font-weight: 800;
-    color: #475569;
-    text-transform: uppercase;
-    display: block;
-    margin-bottom: 8px;
+    color: var(--brand-red);
+    background: var(--brand-red-light);
+    padding: 2px 8px;
+    border-radius: 999px;
   }
   .planner-select {
-    width: 100%;
-    border: 1px solid #cbd5e1;
-    border-radius: 10px;
-    padding: 10px 12px;
-    font-size: 14px;
-    font-weight: 700;
-    color: #0f172a;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid #CBD5E1;
+    background: #FFFFFF;
     font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--navy-ink);
     outline: none;
-    background: #ffffff;
   }
-  .planner-style-buttons {
+  .planner-slider {
+    accent-color: var(--brand-red);
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  .planner-styles-cluster {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr;
     gap: 6px;
   }
-  .style-btn {
-    background: #f1f5f9;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 9px 4px;
-    font-size: 11px;
-    font-weight: 700;
+  .planner-style-btn {
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid #E2E8F0;
+    background: #F8FAFC;
     color: #475569;
-    cursor: pointer;
     font-family: inherit;
+    font-size: 0.82rem;
+    text-align: left;
+    cursor: pointer;
     transition: all 0.2s;
   }
-  .style-btn.selected {
-    background: #4f46e5;
-    color: #ffffff;
-    border-color: #4f46e5;
+  .planner-style-btn.active {
+    background: var(--brand-red-light);
+    border-color: var(--brand-red);
+    color: var(--brand-red);
   }
+
   .planner-result-banner {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
-    border-radius: 18px;
-    padding: 24px 30px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 20px;
-    flex-wrap: wrap;
+    padding: 20px;
+    background: #F8FAFC;
+    border-radius: var(--radius-lg);
+    border: 1px solid #E2E8F0;
   }
-  .planner-total-cost {
-    font-size: 32px;
+  @media (max-width: 640px) {
+    .planner-result-banner { flex-direction: column; align-items: flex-start; }
+  }
+  .planner-total-amount {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.8rem;
     font-weight: 900;
-    color: #0f172a;
-    line-height: 1.2;
-    margin-top: 4px;
+    color: var(--brand-red);
+    line-height: 1.1;
   }
   .planner-find-btn {
-    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-    color: #ffffff;
+    background: linear-gradient(135deg, #E31B1B 0%, #C41414 100%);
+    color: #FFFFFF;
     border: none;
-    border-radius: 12px;
-    padding: 15px 28px;
-    font-size: 15px;
-    font-weight: 800;
-    cursor: pointer;
     font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 800;
+    padding: 12px 24px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(227, 27, 27, 0.25);
     transition: all 0.2s;
+    white-space: nowrap;
   }
   .planner-find-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(227, 27, 27, 0.35);
   }
 
-  /* How it works toggle pill */
-  .how-it-works-toggle-pill {
+  /* ── 8. HOW IT WORKS ── */
+  .how-it-works-section {
+    padding: 60px 20px;
+    background: #FFFFFF;
+    border-top: 1px solid #E2E8F0;
+  }
+  .content-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .how-tab-toggle {
     display: inline-flex;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: #F1F5F9;
     border-radius: 999px;
-    padding: 5px;
-    margin-top: 14px;
+    padding: 4px;
+    margin-top: 16px;
   }
   .how-toggle-btn {
-    background: transparent;
     border: none;
-    padding: 10px 24px;
-    border-radius: 999px;
-    font-size: 13.5px;
-    font-weight: 800;
-    color: #64748b;
-    cursor: pointer;
+    background: transparent;
     font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 8px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    color: #64748B;
     transition: all 0.2s;
   }
   .how-toggle-btn.active {
-    background: #0f172a;
-    color: #ffffff;
+    background: #FFFFFF;
+    color: var(--navy-ink);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   }
   .how-steps-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 24px;
+    margin-top: 20px;
+  }
+  @media (max-width: 800px) {
+    .how-steps-grid { grid-template-columns: 1fr; }
   }
   .how-step-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 20px;
-    padding: 30px 24px;
-    text-align: center;
-    position: relative;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: var(--radius-lg);
+    padding: 28px 24px;
   }
-  .how-step-badge {
-    position: absolute;
-    top: -14px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-    color: #ffffff;
-    font-size: 12px;
-    font-weight: 900;
-    padding: 4px 14px;
-    border-radius: 20px;
-  }
-  .how-step-icon {
-    font-size: 38px;
-    margin: 10px auto 16px;
-  }
-
-  /* Why choose us matrix */
-  .why-features-matrix {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
-  }
-  .why-matrix-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 20px;
-    padding: 32px 24px;
-    transition: all 0.25s ease;
-  }
-  .why-matrix-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 16px 35px rgba(0, 0, 0, 0.08);
-  }
-  .why-icon-bubble {
-    width: 58px;
-    height: 58px;
-    border-radius: 16px;
+  .step-num-pill {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #E31B1B 0%, #C41414 100%);
+    color: #FFFFFF;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 26px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 10px rgba(227, 27, 27, 0.25);
   }
-
-  /* Pricing Packages */
-  .pricing-packages-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 26px;
-    max-width: 1100px;
-    margin: 0 auto;
-    align-items: stretch;
-  }
-  .pricing-package-card {
-    background: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 24px;
-    padding: 36px 30px;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    transition: transform 0.25s ease;
-  }
-  .pricing-package-card.popular-card {
-    background: #0f172a;
-    border: 2px solid #38bdf8;
-    box-shadow: 0 20px 45px rgba(56, 189, 248, 0.2);
-    transform: scale(1.03);
-  }
-  .popular-badge-ribbon {
-    position: absolute;
-    top: -12px;
-    right: 24px;
-    background: #38bdf8;
-    color: #0f172a;
-    font-size: 11px;
-    font-weight: 900;
-    padding: 4px 12px;
-    border-radius: 999px;
-    letter-spacing: 0.05em;
-  }
-  .package-features-list {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    font-size: 14px;
-    color: #cbd5e1;
-    flex: 1;
-  }
-  .package-action-btn {
-    width: 100%;
-    padding: 14px;
-    border-radius: 12px;
-    font-size: 14px;
+  .step-card-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.15rem;
     font-weight: 800;
-    cursor: pointer;
-    font-family: inherit;
-    transition: all 0.2s;
-    border: none;
+    color: var(--navy-ink);
+    margin-bottom: 8px;
   }
-  .btn-popular {
-    background: #38bdf8;
-    color: #0f172a;
-  }
-  .btn-popular:hover {
-    background: #7dd3fc;
-  }
-  .btn-standard {
-    background: #334155;
-    color: #ffffff;
-  }
-  .btn-standard:hover {
-    background: #475569;
+  .step-card-desc {
+    font-size: 0.88rem;
+    color: #64748B;
+    line-height: 1.6;
   }
 
-  /* Testimonials */
-  .guest-reviews-grid {
+  /* ── 9. WHY CHOOSE US ── */
+  .why-choose-section {
+    padding: 60px 20px;
+    background: var(--canvas-light);
+  }
+  .why-cards-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 24px;
   }
-  .guest-review-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 20px;
+  @media (max-width: 800px) {
+    .why-cards-grid { grid-template-columns: 1fr; }
+  }
+  .why-feature-card {
+    background: #FFFFFF;
+    border-radius: var(--radius-lg);
+    border: 1px solid #E2E8F0;
     padding: 30px;
+    box-shadow: var(--shadow-subtle);
+  }
+  .why-icon-bubble {
+    width: 50px;
+    height: 50px;
+    border-radius: var(--radius-md);
+    background: var(--brand-red-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+  }
+  .why-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--navy-ink);
+    margin-bottom: 8px;
+  }
+  .why-desc {
+    font-size: 0.88rem;
+    color: #64748B;
+    line-height: 1.65;
+  }
+
+  /* ── 10. HOST PACKAGES ── */
+  .packages-section {
+    padding: 60px 20px;
+    background: #FFFFFF;
+    border-top: 1px solid #E2E8F0;
+  }
+  .packages-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 900px) {
+    .packages-cards-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
+  }
+  .pricing-card {
+    position: relative;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: var(--radius-xl);
+    padding: 32px 24px;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    transition: all 0.25s;
+  }
+  .pricing-card.popular-highlight {
+    background: #FFFFFF;
+    border: 2px solid var(--brand-red);
+    box-shadow: 0 15px 35px rgba(227, 27, 27, 0.12);
+    transform: translateY(-4px);
+  }
+  .popular-ribbon {
+    position: absolute;
+    top: -12px;
+    right: 20px;
+    background: var(--brand-red);
+    color: #FFFFFF;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    padding: 4px 12px;
+    border-radius: 999px;
+  }
+  .pricing-pkg-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--navy-ink);
+    margin-bottom: 8px;
+  }
+  .pricing-pkg-price {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.9rem;
+    font-weight: 900;
+    color: var(--navy-ink);
+    margin-bottom: 8px;
+  }
+  .pricing-pkg-dur {
+    font-size: 0.85rem;
+    color: #64748B;
+    font-weight: 500;
+  }
+  .pricing-pkg-desc {
+    font-size: 0.85rem;
+    color: #64748B;
+    margin-bottom: 20px;
+  }
+  .pricing-features-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: #334155;
+    flex: 1;
+  }
+  .pricing-action-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 800;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+  .btn-red-popular {
+    background: linear-gradient(135deg, #E31B1B 0%, #C41414 100%);
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(227, 27, 27, 0.3);
+  }
+  .btn-dark-standard {
+    background: #0F172A;
+    color: #FFFFFF;
+  }
+
+  /* ── 11. TESTIMONIALS & FAQ ── */
+  .testimonials-section {
+    padding: 60px 20px;
+    background: var(--canvas-light);
+  }
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 800px) {
+    .testimonials-grid { grid-template-columns: 1fr; }
+  }
+  .testimonial-card {
+    background: #FFFFFF;
+    border-radius: var(--radius-lg);
+    border: 1px solid #E2E8F0;
+    padding: 26px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-subtle);
+  }
+  .testimonial-text {
+    font-size: 0.92rem;
+    color: #334155;
+    line-height: 1.65;
+    font-style: italic;
+    margin-bottom: 14px;
+    flex: 1;
+  }
+  .testimonial-stay-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--brand-red);
+    background: var(--brand-red-light);
+    padding: 3px 8px;
+    border-radius: 4px;
+    align-self: flex-start;
+    margin-bottom: 14px;
+  }
+  .testimonial-author-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-top: 1px solid #F1F5F9;
+    padding-top: 14px;
+  }
+  .testimonial-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
   }
 
   /* FAQ Accordion */
+  .faq-section {
+    padding: 60px 20px 80px;
+    background: #FFFFFF;
+    border-top: 1px solid #E2E8F0;
+  }
   .faq-accordion-list {
     display: flex;
     flex-direction: column;
     gap: 12px;
   }
-  .faq-accordion-item {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
+  .faq-card {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: var(--radius-md);
     overflow: hidden;
-    transition: border-color 0.2s;
+    transition: all 0.2s;
+  }
+  .faq-card.open {
+    border-color: var(--brand-red);
+    background: #FFFFFF;
   }
   .faq-question-btn {
     width: 100%;
     background: transparent;
     border: none;
-    padding: 20px 24px;
+    padding: 18px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 14px;
     cursor: pointer;
     font-family: inherit;
+    text-align: left;
+  }
+  .faq-question-text {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--navy-ink);
+  }
+  .faq-card.open .faq-question-text {
+    color: var(--brand-red);
   }
   .faq-chevron {
-    color: #64748b;
-    transition: transform 0.25s ease;
+    color: #64748B;
+    font-size: 0.8rem;
+    transition: transform 0.2s;
   }
-  .faq-chevron.open {
+  .faq-chevron.rotate {
     transform: rotate(180deg);
-    color: #4f46e5;
+    color: var(--brand-red);
   }
   .faq-answer-pane {
-    padding: 0 24px 22px;
-    border-top: 1px solid #f8fafc;
+    padding: 0 20px 18px;
+    border-top: 1px solid #F1F5F9;
+  }
+  .faq-answer-text {
+    font-size: 0.88rem;
+    color: #475569;
+    line-height: 1.65;
   }
 
-  /* Bottom CTA */
-  .cta-primary-btn {
-    background: #ffffff;
-    color: #312e81;
+  /* ── 12. BOTTOM CTA SECTION (Midnight Atmosphere) ── */
+  .bottom-cta-section {
+    position: relative;
+    background: radial-gradient(circle at 50% 20%, #112035 0%, var(--bg-dark) 80%);
+    color: #FFFFFF;
+    padding: 80px 20px;
+    text-align: center;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .bottom-cta-content {
+    max-width: 760px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+  }
+  .bottom-cta-headline {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(2rem, 3.5vw, 2.8rem);
+    font-weight: 900;
+    color: #FFFFFF;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  .bottom-cta-sub {
+    font-size: 1rem;
+    color: #CBD5E1;
+    line-height: 1.65;
+    margin-bottom: 32px;
+  }
+  .bottom-cta-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .btn-cta-crimson {
+    background: linear-gradient(135deg, #E31B1B 0%, #C41414 100%);
+    color: #FFFFFF;
     border: none;
-    border-radius: 14px;
-    padding: 16px 32px;
-    font-size: 15px;
-    font-weight: 800;
-    cursor: pointer;
     font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 800;
+    padding: 14px 28px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(227, 27, 27, 0.4);
     transition: all 0.2s;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
   }
-  .cta-primary-btn:hover {
-    background: #f8fafc;
+  .btn-cta-crimson:hover {
     transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(227, 27, 27, 0.55);
   }
-  .cta-secondary-btn {
-    background: rgba(255, 255, 255, 0.15);
-    color: #ffffff;
-    border: 1.5px solid rgba(255, 255, 255, 0.4);
-    border-radius: 14px;
-    padding: 16px 32px;
-    font-size: 15px;
-    font-weight: 800;
-    cursor: pointer;
+  .btn-cta-glass {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    color: #FFFFFF;
     font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 800;
+    padding: 14px 28px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    backdrop-filter: blur(8px);
     transition: all 0.2s;
   }
-  .cta-secondary-btn:hover {
-    background: rgba(255, 255, 255, 0.25);
+  .btn-cta-glass:hover {
+    background: rgba(255, 255, 255, 0.18);
   }
 
-  /* Floating WhatsApp */
+  /* ── 13. FOOTER (Executive Dark) ── */
+  .accommodation-footer {
+    background: var(--bg-dark);
+    color: #94A3B8;
+    padding: 60px 20px 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 50px;
+    margin-bottom: 40px;
+  }
+  @media (max-width: 900px) {
+    .footer-inner { grid-template-columns: 1fr; gap: 30px; }
+  }
+  .footer-brand-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .footer-desc {
+    font-size: 0.85rem;
+    line-height: 1.65;
+    color: #94A3B8;
+  }
+  .footer-links-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+  }
+  @media (max-width: 600px) {
+    .footer-links-grid { grid-template-columns: 1fr; gap: 20px; }
+  }
+  .footer-col-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #FFFFFF;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 14px;
+  }
+  .footer-links-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .footer-links-list button {
+    background: transparent;
+    border: none;
+    color: #94A3B8;
+    font-family: inherit;
+    font-size: 0.85rem;
+    text-align: left;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.15s;
+  }
+  .footer-links-list button:hover {
+    color: #FFFFFF;
+  }
+  .footer-bottom-bar {
+    max-width: 1200px;
+    margin: 0 auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 0.8rem;
+    color: #64748B;
+  }
+
+  /* ── 14. FLOATING WHATSAPP & SCROLL TOP ── */
   .wa-floating-concierge {
     position: fixed;
     right: 20px;
     bottom: 24px;
-    background: #25d366;
-    color: #ffffff;
-    width: 60px;
-    height: 60px;
+    background: #25D366;
+    color: #FFFFFF;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 30px rgba(37, 211, 102, 0.5);
+    box-shadow: 0 8px 25px rgba(37, 211, 102, 0.45);
     z-index: 400;
     text-decoration: none;
     transition: all 0.25s ease;
     animation: waPulse 2.4s infinite;
   }
   .wa-floating-concierge:hover {
-    transform: scale(1.1);
+    transform: scale(1.08);
   }
   .wa-tooltip-label {
     position: absolute;
-    right: 70px;
-    background: #0f172a;
-    color: #ffffff;
-    font-size: 12px;
+    right: 68px;
+    background: #0F172A;
+    color: #FFFFFF;
+    font-size: 0.75rem;
     font-weight: 700;
     padding: 6px 12px;
     border-radius: 8px;
@@ -3572,17 +3779,16 @@ const customStyles = `
     100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
   }
 
-  /* Scroll To Top */
   .scroll-to-top-button {
     position: fixed;
-    right: 28px;
-    bottom: 96px;
-    width: 44px;
-    height: 44px;
+    right: 26px;
+    bottom: 92px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
-    background: #0f172a;
-    color: #ffffff;
-    border: none;
+    background: #0F172A;
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.15);
     display: grid;
     place-items: center;
     cursor: pointer;
@@ -3591,7 +3797,7 @@ const customStyles = `
     transform: translateY(14px);
     pointer-events: none;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
   }
   .scroll-to-top-button.visible {
     opacity: 1;
@@ -3599,23 +3805,23 @@ const customStyles = `
     pointer-events: auto;
   }
   .scroll-to-top-button:hover {
-    background: #4f46e5;
+    background: var(--brand-red);
   }
 
   /* Wishlist Drawer */
   .wishlist-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(4px);
     z-index: 1000;
     display: flex;
     justify-content: flex-end;
   }
   .wishlist-drawer-content {
-    background: #ffffff;
+    background: #FFFFFF;
     width: 100%;
-    max-width: 420px;
+    max-width: 400px;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -3626,21 +3832,21 @@ const customStyles = `
     to { transform: translateX(0); }
   }
   .wishlist-drawer-header {
-    padding: 20px;
-    border-bottom: 1px solid #e2e8f0;
+    padding: 18px 20px;
+    border-bottom: 1px solid #E2E8F0;
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
   .drawer-close-btn {
-    background: #f1f5f9;
+    background: #F1F5F9;
     border: none;
     border-radius: 50%;
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     cursor: pointer;
-    font-size: 14px;
-    color: #64748b;
+    font-size: 0.85rem;
+    color: #64748B;
   }
   .wishlist-drawer-body {
     padding: 20px;
@@ -3651,47 +3857,48 @@ const customStyles = `
     display: flex;
     align-items: center;
     gap: 12px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: var(--radius-md);
     padding: 10px;
     cursor: pointer;
     transition: background 0.15s;
   }
   .wishlist-item-row:hover {
-    background: #f1f5f9;
+    background: #F1F5F9;
   }
   .wishlist-item-thumbnail {
-    width: 60px;
-    height: 60px;
-    border-radius: 10px;
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
     object-fit: cover;
   }
   .wishlist-remove-btn {
     background: transparent;
     border: none;
-    color: #94a3b8;
-    font-size: 16px;
+    color: #94A3B8;
+    font-size: 0.9rem;
     padding: 6px;
     cursor: pointer;
   }
   .wishlist-remove-btn:hover {
-    color: #e11d48;
+    color: var(--brand-red);
   }
   .wishlist-drawer-footer {
-    padding: 20px;
-    border-top: 1px solid #e2e8f0;
+    padding: 18px 20px;
+    border-top: 1px solid #E2E8F0;
   }
   .drawer-browse-all-btn {
     width: 100%;
-    background: #4f46e5;
-    color: #ffffff;
+    background: linear-gradient(135deg, #E31B1B 0%, #C41414 100%);
+    color: #FFFFFF;
     border: none;
-    border-radius: 12px;
-    padding: 14px;
-    font-size: 14px;
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    font-size: 0.9rem;
     font-weight: 800;
     cursor: pointer;
+    box-shadow: 0 4px 12px rgba(227, 27, 27, 0.25);
   }
 
   /* Toast notification */
@@ -3700,15 +3907,16 @@ const customStyles = `
     top: 75px;
     left: 50%;
     transform: translateX(-50%);
-    background: #0f172a;
-    color: #ffffff;
-    padding: 12px 24px;
+    background: var(--navy-ink);
+    color: #FFFFFF;
+    padding: 10px 22px;
     border-radius: 999px;
-    font-size: 14px;
+    font-size: 0.85rem;
     font-weight: 700;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
     z-index: 9999;
     animation: toastPop 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.15);
   }
   @keyframes toastPop {
     from { opacity: 0; transform: translate(-50%, -10px); }
@@ -3718,8 +3926,8 @@ const customStyles = `
   /* Reveal Animations */
   .reveal {
     opacity: 0;
-    transform: translateY(28px);
-    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(24px);
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .reveal.in {
     opacity: 1;
@@ -3727,63 +3935,19 @@ const customStyles = `
   }
 
   /* Responsive Rules */
-  @media (max-width: 1100px) {
-    .category-cards-grid { grid-template-columns: repeat(2, 1fr); }
-    .properties-listing-grid { grid-template-columns: repeat(2, 1fr); }
-    .statsGrid { grid-template-columns: repeat(2, 1fr); }
-    .how-steps-grid { grid-template-columns: repeat(2, 1fr); }
-    .why-features-matrix { grid-template-columns: repeat(2, 1fr); }
-    .pricing-packages-grid { grid-template-columns: 1fr; max-width: 500px; }
-    .pricing-package-card.popular-card { transform: none; }
-    .guest-reviews-grid { grid-template-columns: 1fr; }
-    .footerInner { grid-template-columns: 1fr; gap: 40px; }
-  }
-
   @media (max-width: 900px) {
     .desktop-nav-links { display: none; }
     .mobile-toggle-btn { display: block; }
-    .mobile-dropdown-menu { display: flex; }
-    /* Hide desktop auth buttons — they appear in the mobile dropdown */
     .sign-in-btn { display: none; }
     .list-property-btn { display: none; }
-    .wishlist-trigger-btn { display: none; }
-    .searchBarInner { flex-direction: column; gap: 8px; }
-    .search-segment-box { width: 100%; }
-    .hero-search-submit-btn { width: 100%; justify-content: center; }
+    .mobile-header-auth-btn { display: inline-flex; }
     .dest-dropdown-popover { width: 100%; }
     .guests-dropdown-popover { width: 100%; right: auto; left: 0; }
-    .flash-deal-banner-card { flex-direction: column; padding: 32px 24px; }
-    .flash-deal-right { width: 100%; }
-    .deal-floating-mini-card { width: 100%; }
-    .planner-controls-grid { grid-template-columns: 1fr; }
-    .planner-result-banner { flex-direction: column; align-items: flex-start; }
-    .planner-find-btn { width: 100%; text-align: center; }
-  }
-
-  @media (max-width: 640px) {
-    .category-cards-grid { grid-template-columns: 1fr; }
-    .properties-listing-grid { grid-template-columns: 1fr; }
-    .statsGrid { grid-template-columns: 1fr; }
-    .how-steps-grid { grid-template-columns: 1fr; }
-    .why-features-matrix { grid-template-columns: 1fr; }
-    .footerLinksGrid { grid-template-columns: 1fr; }
-    .county-badge { display: none; }
-    .featured-category-filter-tabs { width: 100%; overflow-x: auto; flex-wrap: nowrap; }
   }
 
   @media (max-width: 480px) {
-    /* Tighten nav for very small phones */
-    .mobile-toggle-btn { padding: 4px; }
-    .mobile-dropdown-menu { padding: 10px 12px 16px; }
-    .mobile-dropdown-menu button { font-size: 14px; padding: 11px 6px; }
-    /* Shrink logo text on tiny screens */
-    .accommodation-logo-title { font-size: 14px !important; }
-    .accommodation-logo-subline { display: none; }
-    /* Stack search bar sections */
-    .search-segment-box { border-radius: 12px !important; margin-bottom: 4px; }
-    /* Compact hero */
-    .hero-search-submit-btn { font-size: 14px; padding: 14px 12px; }
-    /* Full-width planner result */
-    .planner-result-banner { gap: 12px; }
+    .hero-compact-header { flex-direction: column; align-items: flex-start; }
+    .hero-compact-actions { width: 100%; }
+    .hero-compact-btn-primary, .hero-compact-btn-secondary { width: 100%; justify-content: center; }
   }
 `;

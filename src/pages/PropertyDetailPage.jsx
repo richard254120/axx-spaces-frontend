@@ -49,10 +49,33 @@ export default function PropertyDetailPage() {
 
   // Waitlist state
   const [showWaitlistModal, setShowWaitlistModal] = useState(false);
-  const [waitlistData, setWaitlistData] = useState({ name: "", email: "", phone: "", message: "" });
+  const [waitlistData, setWaitlistData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    moveInDate: "Immediately",
+    leaseDuration: "1 Year+",
+    occupants: "1 Person",
+    message: "",
+  });
   const [waitlistLoading, setWaitlistLoading] = useState(false);
   const [waitlistSuccess, setWaitlistSuccess] = useState("");
   const [waitlistError, setWaitlistError] = useState("");
+
+  const openWaitlist = () => {
+    setWaitlistData({
+      name: user?.name || "",
+      email: user?.email || "",
+      phone: user?.phone || "",
+      moveInDate: "Immediately",
+      leaseDuration: "1 Year+",
+      occupants: "1 Person",
+      message: "",
+    });
+    setWaitlistError("");
+    setWaitlistSuccess("");
+    setShowWaitlistModal(true);
+  };
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -400,7 +423,7 @@ export default function PropertyDetailPage() {
                     Requests are handled first-come, first-served.
                   </p>
                   <button
-                    onClick={() => setShowWaitlistModal(true)}
+                    onClick={openWaitlist}
                     style={{
                       background: "white",
                       color: "#6d28d9",
@@ -580,7 +603,7 @@ export default function PropertyDetailPage() {
                     </div>
                     <button
                       id="join-waitlist-btn"
-                      onClick={() => setShowWaitlistModal(true)}
+                      onClick={openWaitlist}
                       style={{
                         width: "100%",
                         padding: "14px",
@@ -690,95 +713,215 @@ export default function PropertyDetailPage() {
 
       {/* ── WAITLIST MODAL ─────────────────────────────────────────────── */}
       {showWaitlistModal && (
-        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "16px" }}>
-          <div style={{ background: "white", borderRadius: "16px", padding: "28px 24px", maxWidth: "480px", width: "100%", maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.75)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "16px" }}>
+          <div style={{ background: "white", borderRadius: "20px", padding: "28px 26px", maxWidth: "520px", width: "100%", maxHeight: "92vh", overflowY: "auto", boxShadow: "0 25px 60px -15px rgba(0,0,0,0.3)", border: "1px solid #e2e8f0", boxSizing: "border-box" }}>
+            
             {/* Header */}
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "6px" }}>
-              <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "linear-gradient(135deg,#7c3aed,#6d28d9)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
-                  <line x1="19" y1="8" x2="19" y2="14" /><line x1="22" y1="11" x2="16" y2="11" />
-                </svg>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "14px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: "linear-gradient(135deg, #10b981 0%, #059669 100%)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "20px", flexShrink: 0, boxShadow: "0 4px 12px rgba(16, 185, 129, 0.3)" }}>
+                  📋
+                </div>
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <h2 style={{ fontSize: "19px", fontWeight: 800, color: "#0f172a", margin: 0, letterSpacing: "-0.3px" }}>Priority Waitlist</h2>
+                    <span style={{ fontSize: "10px", fontWeight: 700, background: "#ecfdf5", color: "#047857", padding: "2px 7px", borderRadius: "10px", border: "1px solid #a7f3d0" }}>Active Queue</span>
+                  </div>
+                  <p style={{ fontSize: "12px", color: "#64748b", margin: "2px 0 0" }}>
+                    {property.title} · <span style={{ color: "#059669", fontWeight: 600 }}>KES {property.price?.toLocaleString()}/mo</span>
+                  </p>
+                </div>
               </div>
-              <div>
-                <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b", margin: 0 }}>Join the Waitlist</h2>
-                <p style={{ fontSize: "12px", color: "#64748b", margin: 0 }}>for <strong>{property.title}</strong></p>
+              <button
+                type="button"
+                onClick={() => { setShowWaitlistModal(false); setWaitlistError(""); }}
+                style={{ background: "#f1f5f9", border: "none", width: "32px", height: "32px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#64748b", fontSize: "16px", transition: "all 0.15s" }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Reassurance Banner */}
+            <div style={{ padding: "11px 14px", background: "rgba(16, 185, 129, 0.08)", borderRadius: "10px", border: "1px solid rgba(16, 185, 129, 0.2)", marginBottom: "18px", display: "flex", alignItems: "flex-start", gap: "10px" }}>
+              <span style={{ fontSize: "16px", marginTop: "1px" }}>⚡</span>
+              <div style={{ fontSize: "12px", color: "#065f46", lineHeight: 1.5 }}>
+                <strong>First-come, first-served queue.</strong> The landlord contacts waitlisted tenants via WhatsApp/Call the moment a vacancy opens up.
               </div>
             </div>
 
-            <p style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.6", margin: "12px 0 20px 0", padding: "12px", background: "#f8fafc", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-              Leave your details below. The landlord will contact you personally as soon as a unit becomes available. Requests are handled in order of submission — first come, first served.
-            </p>
-
             {waitlistSuccess && (
-              <div style={{ background: "#dcfce7", border: "1px solid #bbf7d0", color: "#166534", padding: "14px", borderRadius: "10px", marginBottom: "16px", textAlign: "center", fontWeight: 600 }}>
-                ✅ {waitlistSuccess}
+              <div style={{ padding: "24px 16px", textAlign: "center" }}>
+                <div style={{ fontSize: "44px", marginBottom: "12px" }}>🎉</div>
+                <h3 style={{ fontSize: "18px", fontWeight: 800, color: "#0f172a", margin: "0 0 6px" }}>You're on the Waitlist!</h3>
+                <p style={{ fontSize: "13px", color: "#64748b", margin: "0 0 16px", lineHeight: 1.6 }}>
+                  {waitlistSuccess}
+                </p>
+                <div style={{ background: "#f8fafc", borderRadius: "12px", padding: "14px", border: "1px solid #e2e8f0", marginBottom: "20px", textAlign: "left", fontSize: "12px", color: "#334155", display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <div><strong>Applicant:</strong> {waitlistData.name}</div>
+                  <div><strong>Contact:</strong> {waitlistData.phone} ({waitlistData.email})</div>
+                  <div><strong>Target Move-in:</strong> {waitlistData.moveInDate || "Immediately"}</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => { setShowWaitlistModal(false); setWaitlistSuccess(""); }}
+                  style={{ width: "100%", padding: "12px", background: "#0f172a", color: "white", border: "none", borderRadius: "9px", fontWeight: 700, cursor: "pointer", fontSize: "14px" }}
+                >
+                  Close
+                </button>
               </div>
             )}
+
             {waitlistError && (
-              <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#dc2626", padding: "12px", borderRadius: "10px", marginBottom: "16px", fontSize: "13px" }}>
-                ⚠️ {waitlistError}
+              <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#b91c1c", padding: "11px 14px", borderRadius: "9px", marginBottom: "16px", fontSize: "13px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <span>⚠️</span>
+                <span>{waitlistError}</span>
               </div>
             )}
 
             {!waitlistSuccess && (
               <form onSubmit={handleWaitlistSubmit}>
+                {/* Contact Information */}
                 <div style={{ marginBottom: "14px" }}>
-                  <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#1e293b", marginBottom: "6px" }}>Full Name *</label>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#334155", marginBottom: "5px", textTransform: "uppercase", letterSpacing: "0.3px" }}>
+                    Full Name *
+                  </label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Jane Wanjiru"
+                    placeholder="e.g., Brian Kamau"
                     value={waitlistData.name}
                     onChange={(e) => setWaitlistData({ ...waitlistData, name: e.target.value })}
-                    style={{ width: "100%", padding: "11px 12px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "14px", boxSizing: "border-box" }}
+                    style={{ width: "100%", padding: "10px 13px", border: "1px solid #cbd5e1", borderRadius: "8px", fontSize: "14px", boxSizing: "border-box", outline: "none", color: "#0f172a" }}
                   />
                 </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "14px" }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#334155", marginBottom: "5px", textTransform: "uppercase", letterSpacing: "0.3px" }}>
+                      Phone / WhatsApp *
+                    </label>
+                    <div style={{ display: "flex", border: "1px solid #cbd5e1", borderRadius: "8px", overflow: "hidden" }}>
+                      <span style={{ padding: "10px 10px", background: "#f8fafc", color: "#64748b", fontSize: "13px", fontWeight: 700, borderRight: "1px solid #cbd5e1" }}>🇰🇪 +254</span>
+                      <input
+                        type="tel"
+                        required
+                        placeholder="712345678"
+                        value={waitlistData.phone}
+                        onChange={(e) => setWaitlistData({ ...waitlistData, phone: e.target.value })}
+                        style={{ width: "100%", padding: "10px 10px", border: "none", fontSize: "14px", outline: "none", color: "#0f172a" }}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#334155", marginBottom: "5px", textTransform: "uppercase", letterSpacing: "0.3px" }}>
+                      Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="e.g. brian@gmail.com"
+                      value={waitlistData.email}
+                      onChange={(e) => setWaitlistData({ ...waitlistData, email: e.target.value })}
+                      style={{ width: "100%", padding: "10px 13px", border: "1px solid #cbd5e1", borderRadius: "8px", fontSize: "14px", boxSizing: "border-box", outline: "none", color: "#0f172a" }}
+                    />
+                  </div>
+                </div>
+
+                {/* Rental Preferences */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "14px" }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#334155", marginBottom: "5px", textTransform: "uppercase", letterSpacing: "0.3px" }}>
+                      Target Move-in
+                    </label>
+                    <select
+                      value={waitlistData.moveInDate}
+                      onChange={(e) => setWaitlistData({ ...waitlistData, moveInDate: e.target.value })}
+                      style={{ width: "100%", padding: "10px 12px", border: "1px solid #cbd5e1", borderRadius: "8px", fontSize: "13px", background: "white", boxSizing: "border-box", color: "#0f172a", cursor: "pointer" }}
+                    >
+                      <option value="Immediately">Immediately</option>
+                      <option value="Within 2 Weeks">Within 2 Weeks</option>
+                      <option value="Next Month (1st)">Next Month (1st)</option>
+                      <option value="Within 1-2 Months">Within 1–2 Months</option>
+                      <option value="Flexible">Flexible</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#334155", marginBottom: "5px", textTransform: "uppercase", letterSpacing: "0.3px" }}>
+                      Lease Duration
+                    </label>
+                    <select
+                      value={waitlistData.leaseDuration}
+                      onChange={(e) => setWaitlistData({ ...waitlistData, leaseDuration: e.target.value })}
+                      style={{ width: "100%", padding: "10px 12px", border: "1px solid #cbd5e1", borderRadius: "8px", fontSize: "13px", background: "white", boxSizing: "border-box", color: "#0f172a", cursor: "pointer" }}
+                    >
+                      <option value="1 Year+">1 Year+ (Standard)</option>
+                      <option value="6 Months">6 Months</option>
+                      <option value="3-6 Months">3–6 Months</option>
+                      <option value="Flexible">Flexible / Month-to-Month</option>
+                    </select>
+                  </div>
+                </div>
+
                 <div style={{ marginBottom: "14px" }}>
-                  <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#1e293b", marginBottom: "6px" }}>Email Address *</label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="e.g. jane@gmail.com"
-                    value={waitlistData.email}
-                    onChange={(e) => setWaitlistData({ ...waitlistData, email: e.target.value })}
-                    style={{ width: "100%", padding: "11px 12px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "14px", boxSizing: "border-box" }}
-                  />
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#334155", marginBottom: "5px", textTransform: "uppercase", letterSpacing: "0.3px" }}>
+                    Number of Occupants
+                  </label>
+                  <select
+                    value={waitlistData.occupants}
+                    onChange={(e) => setWaitlistData({ ...waitlistData, occupants: e.target.value })}
+                    style={{ width: "100%", padding: "10px 12px", border: "1px solid #cbd5e1", borderRadius: "8px", fontSize: "13px", background: "white", boxSizing: "border-box", color: "#0f172a", cursor: "pointer" }}
+                  >
+                    <option value="1 Person">1 Person (Solo)</option>
+                    <option value="2 People">2 People (Couple / Flatmates)</option>
+                    <option value="Family / 3+ People">Family / 3+ People</option>
+                  </select>
                 </div>
-                <div style={{ marginBottom: "14px" }}>
-                  <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#1e293b", marginBottom: "6px" }}>Phone Number *</label>
-                  <input
-                    type="tel"
-                    required
-                    placeholder="e.g. 0712 345 678"
-                    value={waitlistData.phone}
-                    onChange={(e) => setWaitlistData({ ...waitlistData, phone: e.target.value })}
-                    style={{ width: "100%", padding: "11px 12px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "14px", boxSizing: "border-box" }}
-                  />
-                </div>
-                <div style={{ marginBottom: "20px" }}>
-                  <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#1e293b", marginBottom: "6px" }}>Additional Message <span style={{ color: "#94a3b8", fontWeight: 400 }}>(optional)</span></label>
+
+                <div style={{ marginBottom: "18px" }}>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#334155", marginBottom: "5px", textTransform: "uppercase", letterSpacing: "0.3px" }}>
+                    Special Requests / Notes <span style={{ color: "#94a3b8", fontWeight: 400 }}>(optional)</span>
+                  </label>
                   <textarea
                     value={waitlistData.message}
                     onChange={(e) => setWaitlistData({ ...waitlistData, message: e.target.value })}
-                    style={{ width: "100%", padding: "11px 12px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "14px", minHeight: "72px", resize: "vertical", boxSizing: "border-box" }}
-                    placeholder="Any preferences or notes for the landlord..."
+                    style={{ width: "100%", padding: "10px 12px", border: "1px solid #cbd5e1", borderRadius: "8px", fontSize: "13px", minHeight: "60px", resize: "vertical", boxSizing: "border-box", outline: "none", color: "#0f172a" }}
+                    placeholder="e.g., Preferred floor, car parking required, have pets, etc."
                   />
                 </div>
+
+                <div style={{ fontSize: "11px", color: "#94a3b8", marginBottom: "18px", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>🔒</span>
+                  <span>Your details are kept strictly confidential and used only to notify you of openings.</span>
+                </div>
+
                 <div style={{ display: "flex", gap: "10px" }}>
                   <button
                     type="button"
                     onClick={() => { setShowWaitlistModal(false); setWaitlistError(""); }}
-                    style={{ flex: 1, padding: "12px", background: "#f1f5f9", color: "#475569", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", fontSize: "14px" }}
+                    style={{ flex: 1, padding: "12px", background: "#f1f5f9", color: "#475569", border: "1px solid #e2e8f0", borderRadius: "9px", fontWeight: 600, cursor: "pointer", fontSize: "14px" }}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={waitlistLoading}
-                    style={{ flex: 2, padding: "12px", background: "linear-gradient(135deg,#7c3aed,#6d28d9)", color: "white", border: "none", borderRadius: "8px", fontWeight: 700, cursor: waitlistLoading ? "not-allowed" : "pointer", fontSize: "14px", opacity: waitlistLoading ? 0.7 : 1 }}
+                    style={{
+                      flex: 2,
+                      padding: "12px 18px",
+                      background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "9px",
+                      fontWeight: 700,
+                      cursor: waitlistLoading ? "not-allowed" : "pointer",
+                      fontSize: "14px",
+                      boxShadow: "0 4px 14px rgba(16, 185, 129, 0.35)",
+                      opacity: waitlistLoading ? 0.75 : 1,
+                    }}
                   >
-                    {waitlistLoading ? "Joining..." : "Join Waitlist"}
+                    {waitlistLoading ? "Joining Priority Queue..." : "Join Priority Waitlist"}
                   </button>
                 </div>
               </form>

@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useContext } from "react";
+import { createContext, useState, useEffect, useContext, useCallback } from "react";
 import { clearSellerSession } from "../utils/dashboardRoutes";
 
 const defaultAuth = {
@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }) => {
     initAuth();
   }, []);
 
-  const login = (newToken, userData) => {
+  const login = useCallback((newToken, userData) => {
     if (!newToken || !userData) {
       console.error("Login called without token or user");
       return;
@@ -64,21 +64,31 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
     localStorage.setItem("token", newToken);
     localStorage.setItem("user", JSON.stringify(userData));
-  };
+  }, []);
 
-  const updateUser = (partial) => {
+  const updateUser = useCallback((partial) => {
+    if (!partial || typeof partial !== "object") return;
     setUser((prev) => {
+      // Check if shallow equal to avoid unnecessary state updates
+      let changed = false;
+      for (const key of Object.keys(partial)) {
+        if (prev?.[key] !== partial[key]) {
+          changed = true;
+          break;
+        }
+      }
+      if (!changed && prev) return prev;
       const next = { ...prev, ...partial };
       localStorage.setItem("user", JSON.stringify(next));
       return next;
     });
-  };
+  }, []);
 
-  const logout = (redirectTo = "/axxbiashara") => {
+  const logout = useCallback((redirectTo = "/axxbiashara") => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     window.location.replace(redirectTo);
-  };
+  }, []);
 
   if (loading) {
     return (

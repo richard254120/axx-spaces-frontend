@@ -23,7 +23,8 @@ const MENU_PRIMARY = [
   { to: "/quicksales", label: "QuickSales" },
   { to: "/listings", label: "Rentals" },
   { to: "/accommodation", label: "Accommodation" },
-  { to: "/accommodation/login", label: "Host Login" },
+  { to: "/accommodation/login?tab=login", label: "Host Sign In" },
+  { to: "/accommodation/register?tab=register", label: "Host Register" },
   { to: "/agent/login", label: "Agent login" },
 ];
 
@@ -215,18 +216,16 @@ export default function Navbar() {
             <div className="ax-heading">Account</div>
             {isLoggedIn ? (
               <>
-                <Link to="/messages" className="ax-item" onClick={() => setDropdownOpen(false)}>
-                  <span>Messages</span>
-                  <span className="ax-dot" />
-                </Link>
                 <Link to="/notifications" className="ax-item" onClick={() => setDropdownOpen(false)}>
                   <span>Notifications</span>
                   <span className="ax-dot" />
                 </Link>
                 {menuLink({ to: "/saved", label: "Saved Listings" })}
                 {menuLink({ to: "/axxwallet", label: "AxxWallet" })}
-                {menuLink({ to: "/upload", label: "Upload Property" })}
-                {menuLink({ to: getDashboardLink(), label: "Dashboard" })}
+                {["landlord", "agent", "host"].includes(user?.role?.toLowerCase()) && menuLink({ to: "/upload", label: "Upload Property" })}
+                {(user?.role === "member" || user?.role === "user")
+                  ? menuLink({ to: "/member", label: "My Hub & Activities" })
+                  : menuLink({ to: getDashboardLink(), label: "Dashboard" })}
                 {menuLink({ to: "/profile", label: "Profile" })}
                 {menuLink({ to: "/settings", label: "Settings" })}
                 <div className="ax-divider" />
@@ -313,28 +312,62 @@ export default function Navbar() {
                   className="ax-account-btn"
                   onClick={() => setAccountOpen(!accountOpen)}
                   aria-expanded={accountOpen}
+                  aria-label="User Account Menu"
                 >
                   <ProfileAvatar user={user} size={28} />
-                  <span className="ax-account-label">In Account</span>
+                  <span className="ax-account-label">{user?.name ? user.name.split(" ")[0] : "Account"}</span>
+                  <span style={{ fontSize: "10px", opacity: 0.6, marginLeft: "2px" }}>{accountOpen ? "▲" : "▼"}</span>
                 </button>
                 {accountOpen && (
                   <>
                     <div className="ax-backdrop" onClick={() => setAccountOpen(false)} />
                     <div className="ax-nav-panel ax-account-panel">
                       <div className="ax-account-head">
-                        <ProfileAvatar user={user} size={40} />
-                        <div>
-                          <div className="ax-account-name">{user.name}</div>
-                          <div className="ax-account-role">{user.role?.toUpperCase() || "USER"}</div>
+                        <ProfileAvatar user={user} size={42} />
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <div className="ax-account-name">{user?.name || "Member"}</div>
+                          <div className="ax-account-role">
+                            {user?.role === "member" ? "COMMUNITY MEMBER" : (user?.role === "user" ? "COMMUNITY EXPLORER" : (user?.role?.toUpperCase() || "MEMBER"))}
+                          </div>
                         </div>
                       </div>
                       <div className="ax-divider" />
                       <Link to="/profile" className="ax-item" onClick={() => setAccountOpen(false)}>
                         My Profile
                       </Link>
-                      <Link to="/settings" className="ax-item" onClick={() => setAccountOpen(false)}>
-                        Settings
+                      {(user?.role === "member" || user?.role === "user") ? (
+                        <Link to="/member" className="ax-item" style={{ color: "#fbbf24", fontWeight: 700 }} onClick={() => setAccountOpen(false)}>
+                          My Hub & Activities
+                        </Link>
+                      ) : (
+                        <Link to={getDashboardLink()} className="ax-item" style={{ color: "#fbbf24", fontWeight: 700 }} onClick={() => setAccountOpen(false)}>
+                          Dashboard
+                        </Link>
+                      )}
+                      <Link to="/saved" className="ax-item" onClick={() => setAccountOpen(false)}>
+                        Saved Spaces
                       </Link>
+                      <Link to="/my-bookings" className="ax-item" onClick={() => setAccountOpen(false)}>
+                        My Bookings
+                      </Link>
+                      <Link to="/notifications" className="ax-item" onClick={() => setAccountOpen(false)}>
+                        Notifications
+                      </Link>
+                      <Link to="/wallet" className="ax-item" onClick={() => setAccountOpen(false)}>
+                        AxxWallet
+                      </Link>
+                      <Link to="/payment-history" className="ax-item" onClick={() => setAccountOpen(false)}>
+                        Payment History
+                      </Link>
+                      {["landlord", "agent", "host"].includes((user?.role || "").toLowerCase()) && (
+                        <Link to="/upload" className="ax-item" onClick={() => setAccountOpen(false)}>
+                          Upload Property
+                        </Link>
+                      )}
+                      <Link to="/settings" className="ax-item" onClick={() => setAccountOpen(false)}>
+                        Settings & Security
+                      </Link>
+                      <div className="ax-divider" />
                       <button type="button" className="ax-item ax-item-danger" onClick={handleLogout}>
                         Logout
                       </button>
@@ -378,53 +411,6 @@ export default function Navbar() {
             >
               Requests
             </button>
-
-            {isLoggedIn && (
-              <>
-                <Link to="/settings" className={`ax-tab${isActive("/settings") ? " is-active" : ""}`} onClick={() => setMenuOpen(false)}>
-                  Settings
-                </Link>
-                <Link to="/upload" className={`ax-tab${isActive("/upload") ? " is-active" : ""}`} onClick={() => setMenuOpen(false)}>
-                  Upload
-                </Link>
-                <Link
-                  to={getDashboardLink()}
-                  className={`ax-tab${isActive(getDashboardLink()) ? " is-active" : ""}`}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  Dashboard
-                </Link>
-
-                <div className="ax-tabs-user">
-                  <NotificationBell />
-                  <div className="ax-user-wrap" ref={userMenuRef}>
-                    <button
-                      type="button"
-                      className="ax-user-btn"
-                      onClick={() => setUserMenuOpen(!userMenuOpen)}
-                      aria-expanded={userMenuOpen}
-                    >
-                      <ProfileAvatar user={user} size={28} />
-                      <span className="ax-user-name">{user.name}</span>
-                      <span className="ax-chevron">{userMenuOpen ? "▲" : "▼"}</span>
-                    </button>
-                    {userMenuOpen && (
-                      <div className="ax-nav-panel ax-user-panel">
-                        <Link to="/payment-history" className="ax-item" onClick={() => setUserMenuOpen(false)}>
-                          Payment History
-                        </Link>
-                        <Link to={getDashboardLink()} className="ax-item" onClick={() => setUserMenuOpen(false)}>
-                          Dashboard
-                        </Link>
-                        <button type="button" className="ax-item ax-item-danger" onClick={handleLogout}>
-                          Logout
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </>
-            )}
           </div>
         </nav>
       </header>

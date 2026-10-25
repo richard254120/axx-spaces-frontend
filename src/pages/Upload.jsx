@@ -157,6 +157,12 @@ export default function Upload() {
   const [stepErrors, setStepErrors] = useState([]);
   const [showManualGps, setShowManualGps] = useState(false);
 
+  useEffect(() => {
+    if (user && !["landlord", "agent", "admin"].includes((user.role || "").toLowerCase())) {
+      navigate("/member", { replace: true });
+    }
+  }, [user, navigate]);
+
   // Load existing property data for Edit mode
   useEffect(() => {
     if (isEditMode && token) {

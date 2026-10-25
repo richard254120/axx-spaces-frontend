@@ -218,17 +218,16 @@ export default function QuickSalesLogin() {
       const data = await res.json();
 
       if (!res.ok) {
-        // Email verification check disabled - no longer show resend button
-        // if (data.requiresVerification) {
-        //   setShowResend(true);
-        //   setResendEmail(data.email || form.email);
-        // }
+        if (data.requiresVerification) {
+          setShowResend(true);
+          setResendEmail(data.email || form.email);
+        }
         setError(data.error || "Something went wrong");
         return;
       }
 
       if (mode === "register") {
-        setSuccess(" Account created! You can now login.");
+        setSuccess(data.message || "Account created! Please check your email to verify your account before logging in.");
         setMode("login");
         setForm({ name: "", email: "", password: "", phone: "", county: "" });
       } else {

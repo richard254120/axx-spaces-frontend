@@ -175,7 +175,7 @@ export default function BusinessLogin() {
           email: googleUser.email,
           name: googleUser.name,
           picture: googleUser.picture,
-          role: "user",
+          role: "business",
         }),
       });
 
@@ -223,7 +223,7 @@ export default function BusinessLogin() {
     setShowResend(false);
 
     try {
-      const res = await API.post("/auth/login", { ...formData, role: "user" });
+      const res = await API.post("/auth/login", { ...formData, role: "business" });
       const { token, user } = res.data;
 
       login(token, user);
@@ -233,11 +233,10 @@ export default function BusinessLogin() {
         navigate(getDashboardPath(user?.role));
       }, 1500);
     } catch (err) {
-      // Email verification check disabled - no longer show resend button
-      // if (err.response?.data?.requiresVerification) {
-      //   setShowResend(true);
-      //   setResendEmail(err.response.data.email || formData.email);
-      // }
+      if (err.response?.data?.requiresVerification) {
+        setShowResend(true);
+        setResendEmail(err.response.data.email || formData.email);
+      }
       setError(err.response?.data?.error || "Login failed. Please check your credentials.");
     } finally {
       setLoading(false);

@@ -121,8 +121,12 @@ export default function UserRegister() {
         throw new Error(data.error || data.message || "Registration failed");
       }
 
-      // Registration successful & auto-login
-      if (data.token && data.user) {
+      if (data.requiresVerification) {
+        setSuccess(data.message || "Registration successful! A verification email has been sent to your inbox. Please verify before logging in.");
+        setTimeout(() => {
+          navigate("/user-login");
+        }, 3000);
+      } else if (data.token && data.user) {
         login(data.token, data.user);
         setSuccess("Welcome to AxxSpace! Your account is active. Redirecting...");
         setTimeout(() => {
