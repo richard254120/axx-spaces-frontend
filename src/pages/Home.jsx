@@ -7,7 +7,6 @@ import SocialMediaLinks from "../components/SocialMediaLinks";
 import RequestItemModal from "../components/RequestItemModal";
 
 const AxxspaceCar = lazy(() => import("../components/AxxspaceCar"));
-const AnimatedBackdrop = lazy(() => import("../components/AnimatedBackdrop"));
 
 /* ════════════════════════════════════════════════
    HOMEPRO — all styles are scoped under .ax-root
@@ -740,11 +739,6 @@ export default function HomePro() {
   return (
     <div className="ax-root">
       <style>{css}</style>
-
-      {/* ── AMBIENT SERVICE BACKDROP ── */}
-      <Suspense fallback={null}>
-        <AnimatedBackdrop variant="all" mode="fixed" videoSrc={bgVideo} />
-      </Suspense>
 
       {/* ── TRUST BAR ── */}
       <div className="ax-trust">
