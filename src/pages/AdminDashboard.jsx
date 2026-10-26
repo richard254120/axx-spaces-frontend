@@ -78,6 +78,10 @@ export default function AdminDashboard() {
   const [pendingPurchasesLoading, setPendingPurchasesLoading] = useState(false);
   // END ADDED
 
+  // Responsive mobile states
+  const [mobileStatsCollapsed, setMobileStatsCollapsed] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   useEffect(() => {
     // Security check: ensure only admins can stay on this page
     if (user?.role !== "admin") {
@@ -91,6 +95,7 @@ export default function AdminDashboard() {
   }, []);
 
   const handleRefreshAll = () => {
+    setIsRefreshing(true);
     loadStats();
     loadAllPending();
     fetchProperties();
@@ -103,6 +108,7 @@ export default function AdminDashboard() {
     loadAgents();
     loadAgentPackages();
     loadPendingPurchases();
+    setTimeout(() => setIsRefreshing(false), 700);
   };
 
   // ADDED: load pending payments when tab is selected
@@ -615,60 +621,98 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div style={styles.container}>
+    <div style={styles.container} className="admin-dashboard-root">
       <style dangerouslySetInnerHTML={{ __html: cssStyles }} />
 
       {/* ENTERPRISE TOP ADMIN BAR */}
-      <div style={styles.topAdminBar}>
-        <div style={styles.brandGroup}>
-          <div style={styles.brandLogo}>AXX</div>
+      <div style={styles.topAdminBar} className="admin-top-bar">
+        <div style={styles.brandGroup} className="admin-brand-group">
+          <div style={styles.brandLogo} className="admin-brand-logo">AXX</div>
           <div>
-            <div style={styles.brandTitleRow}>
-              <h1 style={styles.brandTitle}>AxxSpace Command Center</h1>
-              <span style={styles.liveBadge}>
-                <span style={styles.pulsingDot}></span> Production Active
+            <div style={styles.brandTitleRow} className="admin-brand-title-row">
+              <h1 style={styles.brandTitle} className="admin-brand-title">AxxSpace Admin</h1>
+              <span style={styles.liveBadge} className="admin-live-badge">
+                <span style={styles.pulsingDot}></span> <span className="admin-live-text">Live Operations</span>
               </span>
             </div>
-            <p style={styles.brandSubtitle}>Centralized Portal Operations, Moderation &amp; Gateway Management</p>
+            <p style={styles.brandSubtitle} className="admin-brand-subtitle">Centralized Portal Operations, Moderation &amp; Gateway Management</p>
           </div>
         </div>
 
-        <div style={styles.topRightControls}>
-          <button onClick={handleRefreshAll} style={styles.refreshBtn} title="Sync database records">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-            <span>Sync Data</span>
+        <div style={styles.topRightControls} className="admin-top-controls">
+          <button
+            onClick={() => setMobileStatsCollapsed(!mobileStatsCollapsed)}
+            style={{
+              ...styles.refreshBtn,
+              background: mobileStatsCollapsed ? "rgba(245, 158, 11, 0.2)" : "rgba(30, 41, 59, 0.7)",
+              borderColor: mobileStatsCollapsed ? "rgba(245, 158, 11, 0.45)" : "rgba(255, 255, 255, 0.12)",
+              color: mobileStatsCollapsed ? "#fbbf24" : "#f1f5f9",
+            }}
+            title={mobileStatsCollapsed ? "Show KPIs" : "Hide KPIs for max data space"}
+            className="admin-kpi-toggle-btn"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span className="admin-btn-label">{mobileStatsCollapsed ? "Show KPIs" : "KPIs"}</span>
           </button>
-          <button onClick={() => navigate("/admin/verification")} style={styles.verificationBtn}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-            <span>KYC Verification</span>
+
+          <button onClick={handleRefreshAll} style={styles.refreshBtn} title="Sync database records" className="admin-control-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={isRefreshing ? "spin-sync" : ""}>
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+            <span className="admin-btn-label">Sync</span>
           </button>
-          <div style={styles.adminUserPill}>
-            <span style={styles.userRoleBadge}>SUPERADMIN</span>
-            <span style={styles.userEmail}>{user?.name || user?.email || "Admin"}</span>
+
+          <button onClick={() => navigate("/admin/verification")} style={styles.verificationBtn} className="admin-control-btn" title="KYC Verification Portal">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            <span className="admin-btn-label">KYC</span>
+          </button>
+
+          <div style={styles.adminUserPill} className="admin-user-pill">
+            <span style={styles.userRoleBadge}>ADMIN</span>
+            <span style={styles.userEmail}>{user?.name || user?.email?.split("@")[0] || "Admin"}</span>
           </div>
-          <button onClick={() => navigate("/")} style={styles.exitBtn} title="View public site">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-            <span>Site</span>
+
+          <button onClick={() => navigate("/")} style={styles.exitBtn} title="View public site" className="admin-control-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+            <span className="admin-btn-label">Site</span>
           </button>
         </div>
       </div>
 
       {/* EXECUTIVE KPI OVERVIEW */}
-      {stats && (
-        <div style={styles.statsGrid}>
-          <div style={{ ...styles.statCard, borderTop: "3px solid #f59e0b" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-              <span style={styles.statTitle}>Rental Properties</span>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="9" y1="6" x2="9" y2="6.01"></line><line x1="15" y1="6" x2="15" y2="6.01"></line><line x1="9" y1="10" x2="9" y2="10.01"></line><line x1="15" y1="10" x2="15" y2="10.01"></line><line x1="9" y1="14" x2="9" y2="14.01"></line><line x1="15" y1="14" x2="15" y2="14.01"></line><line x1="9" y1="18" x2="15" y2="18"></line></svg>
+      {stats && !mobileStatsCollapsed && (
+        <div style={styles.statsGrid} className="admin-stats-strip">
+          <div
+            style={{ ...styles.statCard, borderTop: "3px solid #f59e0b" }}
+            className="admin-stat-card"
+            onClick={() => setActiveTab("properties")}
+            title="Click to view Properties"
+          >
+            <div className="stat-card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+              <span style={styles.statTitle} className="admin-stat-title">Rental Properties</span>
+              <svg className="admin-stat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="9" y1="6" x2="9" y2="6.01"></line><line x1="15" y1="6" x2="15" y2="6.01"></line><line x1="9" y1="10" x2="9" y2="10.01"></line><line x1="15" y1="10" x2="15" y2="10.01"></line><line x1="9" y1="14" x2="9" y2="14.01"></line><line x1="15" y1="14" x2="15" y2="14.01"></line><line x1="9" y1="18" x2="15" y2="18"></line></svg>
             </div>
-            <p style={styles.statValue}>{stats.properties?.total || 0}</p>
+            <p style={styles.statValue} className="admin-stat-value">{stats.properties?.total || 0}</p>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <span style={{
-                fontSize: "12px",
+              <span className="admin-stat-badge" style={{
+                fontSize: "11px",
                 fontWeight: 700,
                 color: (stats.properties?.pending || 0) > 0 ? "#ef4444" : "#22c55e",
-                background: (stats.properties?.pending || 0) > 0 ? "rgba(239, 68, 68, 0.12)" : "rgba(34, 197, 94, 0.12)",
-                padding: "2px 8px",
+                background: (stats.properties?.pending || 0) > 0 ? "rgba(239, 68, 68, 0.15)" : "rgba(34, 197, 94, 0.15)",
+                padding: "2px 6px",
                 borderRadius: "4px"
               }}>
                 {stats.properties?.pending || 0} pending review
@@ -676,19 +720,24 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div style={{ ...styles.statCard, borderTop: "3px solid #3b82f6" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-              <span style={styles.statTitle}>Accommodations</span>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2"><path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"></path><path d="M9 22v-4h6v4"></path></svg>
+          <div
+            style={{ ...styles.statCard, borderTop: "3px solid #3b82f6" }}
+            className="admin-stat-card"
+            onClick={() => setActiveTab("accommodations")}
+            title="Click to view Accommodations"
+          >
+            <div className="stat-card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+              <span style={styles.statTitle} className="admin-stat-title">Accommodations</span>
+              <svg className="admin-stat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2"><path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"></path><path d="M9 22v-4h6v4"></path></svg>
             </div>
-            <p style={{ ...styles.statValue, color: "#60a5fa" }}>{stats.tourism?.total || pendingAccommodations.length || 0}</p>
+            <p style={{ ...styles.statValue, color: "#60a5fa" }} className="admin-stat-value">{stats.tourism?.total || pendingAccommodations.length || 0}</p>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <span style={{
-                fontSize: "12px",
+              <span className="admin-stat-badge" style={{
+                fontSize: "11px",
                 fontWeight: 700,
                 color: (stats.tourism?.pending || 0) > 0 ? "#ef4444" : "#22c55e",
-                background: (stats.tourism?.pending || 0) > 0 ? "rgba(239, 68, 68, 0.12)" : "rgba(34, 197, 94, 0.12)",
-                padding: "2px 8px",
+                background: (stats.tourism?.pending || 0) > 0 ? "rgba(239, 68, 68, 0.15)" : "rgba(34, 197, 94, 0.15)",
+                padding: "2px 6px",
                 borderRadius: "4px"
               }}>
                 {stats.tourism?.pending || 0} pending review
@@ -696,19 +745,24 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div style={{ ...styles.statCard, borderTop: "3px solid #10b981" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-              <span style={styles.statTitle}>QuickSales</span>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          <div
+            style={{ ...styles.statCard, borderTop: "3px solid #10b981" }}
+            className="admin-stat-card"
+            onClick={() => setActiveTab("materials")}
+            title="Click to view QuickSales"
+          >
+            <div className="stat-card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+              <span style={styles.statTitle} className="admin-stat-title">QuickSales</span>
+              <svg className="admin-stat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
             </div>
-            <p style={{ ...styles.statValue, color: "#34d399" }}>{stats.materials?.total || 0}</p>
+            <p style={{ ...styles.statValue, color: "#34d399" }} className="admin-stat-value">{stats.materials?.total || 0}</p>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <span style={{
-                fontSize: "12px",
+              <span className="admin-stat-badge" style={{
+                fontSize: "11px",
                 fontWeight: 700,
                 color: (stats.materials?.pending || 0) > 0 ? "#ef4444" : "#22c55e",
-                background: (stats.materials?.pending || 0) > 0 ? "rgba(239, 68, 68, 0.12)" : "rgba(34, 197, 94, 0.12)",
-                padding: "2px 8px",
+                background: (stats.materials?.pending || 0) > 0 ? "rgba(239, 68, 68, 0.15)" : "rgba(34, 197, 94, 0.15)",
+                padding: "2px 6px",
                 borderRadius: "4px"
               }}>
                 {stats.materials?.pending || 0} pending review
@@ -716,19 +770,24 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div style={{ ...styles.statCard, borderTop: "3px solid #8b5cf6" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-              <span style={styles.statTitle}>QuickSales Sellers</span>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+          <div
+            style={{ ...styles.statCard, borderTop: "3px solid #8b5cf6" }}
+            className="admin-stat-card"
+            onClick={() => setActiveTab("sellers")}
+            title="Click to view QuickSales Sellers"
+          >
+            <div className="stat-card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+              <span style={styles.statTitle} className="admin-stat-title">QuickSales Sellers</span>
+              <svg className="admin-stat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
             </div>
-            <p style={{ ...styles.statValue, color: "#a78bfa" }}>{stats.sellers?.total || 0}</p>
+            <p style={{ ...styles.statValue, color: "#a78bfa" }} className="admin-stat-value">{stats.sellers?.total || 0}</p>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <span style={{
-                fontSize: "12px",
+              <span className="admin-stat-badge" style={{
+                fontSize: "11px",
                 fontWeight: 700,
                 color: (stats.sellers?.pending || 0) > 0 ? "#ef4444" : "#22c55e",
-                background: (stats.sellers?.pending || 0) > 0 ? "rgba(239, 68, 68, 0.12)" : "rgba(34, 197, 94, 0.12)",
-                padding: "2px 8px",
+                background: (stats.sellers?.pending || 0) > 0 ? "rgba(239, 68, 68, 0.15)" : "rgba(34, 197, 94, 0.15)",
+                padding: "2px 6px",
                 borderRadius: "4px"
               }}>
                 {stats.sellers?.pending || 0} pending review
@@ -736,19 +795,24 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div style={{ ...styles.statCard, borderTop: "3px solid #ec4899" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-              <span style={styles.statTitle}>Pending Payments</span>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ec4899" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+          <div
+            style={{ ...styles.statCard, borderTop: "3px solid #ec4899" }}
+            className="admin-stat-card"
+            onClick={() => setActiveTab("payments")}
+            title="Click to view Pending Payments"
+          >
+            <div className="stat-card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+              <span style={styles.statTitle} className="admin-stat-title">Pending Payments</span>
+              <svg className="admin-stat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ec4899" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
             </div>
-            <p style={{ ...styles.statValue, color: "#f472b6" }}>{pendingPayments?.length || 0}</p>
+            <p style={{ ...styles.statValue, color: "#f472b6" }} className="admin-stat-value">{pendingPayments?.length || 0}</p>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <span style={{
-                fontSize: "12px",
+              <span className="admin-stat-badge" style={{
+                fontSize: "11px",
                 fontWeight: 700,
                 color: (pendingPayments?.length || 0) > 0 ? "#ef4444" : "#22c55e",
-                background: (pendingPayments?.length || 0) > 0 ? "rgba(239, 68, 68, 0.12)" : "rgba(34, 197, 94, 0.12)",
-                padding: "2px 8px",
+                background: (pendingPayments?.length || 0) > 0 ? "rgba(239, 68, 68, 0.15)" : "rgba(34, 197, 94, 0.15)",
+                padding: "2px 6px",
                 borderRadius: "4px"
               }}>
                 {(pendingPayments?.length || 0) > 0 ? "Action required" : "All cleared"}
@@ -759,7 +823,7 @@ export default function AdminDashboard() {
       )}
 
       {/* MODERN TAB PILLS BAR */}
-      <div style={styles.tabs}>
+      <div style={styles.tabs} className="admin-tabs-track">
         {[
           { id: "properties", label: "Properties", count: allPending?.properties?.length || 0 },
           { id: "accommodations", label: "Accommodations", count: pendingAccommodations?.length || (allPending?.tourism?.length || 0) },
@@ -778,7 +842,7 @@ export default function AdminDashboard() {
           return (
             <button
               key={t.id}
-              className="admin-tab-btn"
+              className={`admin-tab-btn ${isActive ? "active" : ""}`}
               style={{
                 ...styles.tab,
                 ...(isActive ? styles.tabActive : {}),
@@ -2356,37 +2420,40 @@ export default function AdminDashboard() {
   );
 }
 
-/* ==================== STYLES (Midnight Blue & Gold Theme) ==================== */
+/* ==================== STYLES (Ultra Glassmorphism & Gold Theme) ==================== */
 const styles = {
   container: {
     minHeight: "100vh",
-    background: "linear-gradient(135deg, #040914 0%, #071224 50%, #0b1a33 100%)",
-    padding: "36px 4%",
+    background: "radial-gradient(ellipse at 15% 10%, rgba(245, 158, 11, 0.08) 0%, transparent 45%), radial-gradient(ellipse at 85% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 45%), radial-gradient(ellipse at 50% 90%, rgba(139, 92, 246, 0.06) 0%, transparent 50%), linear-gradient(135deg, #030712 0%, #061124 50%, #0a172e 100%)",
+    padding: "24px 3%",
     color: "#f1f5f9",
-    fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif",
+    fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    position: "relative",
   },
   topAdminBar: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    background: "rgba(15, 23, 42, 0.75)",
-    backdropFilter: "blur(16px)",
-    border: "1px solid rgba(255, 255, 255, 0.08)",
+    background: "rgba(15, 23, 42, 0.65)",
+    backdropFilter: "blur(20px) saturate(180%)",
+    WebkitBackdropFilter: "blur(20px) saturate(180%)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    borderTop: "1px solid rgba(255, 255, 255, 0.2)",
     borderRadius: "16px",
-    padding: "18px 24px",
-    marginBottom: "28px",
+    padding: "14px 20px",
+    marginBottom: "18px",
     flexWrap: "wrap",
-    gap: "16px",
-    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.35)",
+    gap: "12px",
+    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
   },
   brandGroup: {
     display: "flex",
     alignItems: "center",
-    gap: "16px",
+    gap: "14px",
   },
   brandLogo: {
-    width: "44px",
-    height: "44px",
+    width: "40px",
+    height: "40px",
     borderRadius: "12px",
     background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
     display: "flex",
@@ -2394,22 +2461,23 @@ const styles = {
     justifyContent: "center",
     fontWeight: 900,
     color: "#0f172a",
-    fontSize: "17px",
+    fontSize: "16px",
     letterSpacing: "1px",
-    boxShadow: "0 4px 15px rgba(245, 158, 11, 0.35)",
+    boxShadow: "0 4px 16px rgba(245, 158, 11, 0.4)",
+    flexShrink: 0,
   },
   brandTitleRow: {
     display: "flex",
     alignItems: "center",
-    gap: "12px",
+    gap: "10px",
     flexWrap: "wrap",
   },
   brandTitle: {
-    fontSize: "22px",
+    fontSize: "20px",
     fontWeight: 800,
     color: "#f8fafc",
     margin: 0,
-    letterSpacing: "-0.5px",
+    letterSpacing: "-0.4px",
   },
   liveBadge: {
     display: "inline-flex",
@@ -2418,11 +2486,11 @@ const styles = {
     background: "rgba(34, 197, 94, 0.12)",
     border: "1px solid rgba(34, 197, 94, 0.3)",
     color: "#4ade80",
-    padding: "3px 10px",
+    padding: "2px 8px",
     borderRadius: "9999px",
     fontSize: "11px",
     fontWeight: 700,
-    letterSpacing: "0.4px",
+    letterSpacing: "0.3px",
     textTransform: "uppercase",
   },
   pulsingDot: {
@@ -2434,56 +2502,61 @@ const styles = {
     display: "inline-block",
   },
   brandSubtitle: {
-    fontSize: "13px",
+    fontSize: "12px",
     color: "#94a3b8",
-    margin: "4px 0 0 0",
+    margin: "3px 0 0 0",
     fontWeight: 500,
   },
   topRightControls: {
     display: "flex",
     alignItems: "center",
-    gap: "10px",
+    gap: "8px",
     flexWrap: "wrap",
   },
   refreshBtn: {
-    background: "rgba(30, 41, 59, 0.8)",
+    background: "rgba(30, 41, 59, 0.7)",
+    backdropFilter: "blur(12px)",
     color: "#f1f5f9",
     border: "1px solid rgba(255, 255, 255, 0.12)",
-    padding: "9px 16px",
+    padding: "8px 14px",
     borderRadius: "10px",
-    fontSize: "13px",
+    fontSize: "12px",
     fontWeight: 700,
     cursor: "pointer",
-    display: "flex",
+    display: "inline-flex",
     alignItems: "center",
     gap: "6px",
     transition: "all 0.2s ease",
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
   },
   verificationBtn: {
     background: "rgba(245, 158, 11, 0.15)",
+    backdropFilter: "blur(12px)",
     color: "#fbbf24",
-    border: "1px solid rgba(245, 158, 11, 0.3)",
-    padding: "9px 16px",
+    border: "1px solid rgba(245, 158, 11, 0.35)",
+    padding: "8px 14px",
     borderRadius: "10px",
-    fontSize: "13px",
+    fontSize: "12px",
     fontWeight: 700,
     cursor: "pointer",
-    display: "flex",
+    display: "inline-flex",
     alignItems: "center",
     gap: "6px",
     transition: "all 0.2s ease",
+    boxShadow: "0 4px 12px rgba(245, 158, 11, 0.15)",
   },
   adminUserPill: {
     display: "flex",
     alignItems: "center",
     gap: "8px",
-    background: "rgba(15, 23, 42, 0.9)",
+    background: "rgba(15, 23, 42, 0.85)",
+    backdropFilter: "blur(12px)",
     border: "1px solid rgba(255, 255, 255, 0.1)",
-    padding: "6px 14px",
+    padding: "6px 12px",
     borderRadius: "10px",
   },
   userRoleBadge: {
-    background: "#f59e0b",
+    background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
     color: "#0f172a",
     fontSize: "10px",
     fontWeight: 800,
@@ -2495,119 +2568,606 @@ const styles = {
     fontSize: "12px",
     color: "#e2e8f0",
     fontWeight: 600,
+    maxWidth: "140px",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
   },
   exitBtn: {
-    background: "transparent",
+    background: "rgba(30, 41, 59, 0.5)",
+    backdropFilter: "blur(12px)",
     color: "#94a3b8",
     border: "1px solid rgba(255, 255, 255, 0.1)",
-    padding: "8px 14px",
+    padding: "8px 12px",
     borderRadius: "10px",
     fontSize: "12px",
     fontWeight: 600,
     cursor: "pointer",
-    display: "flex",
+    display: "inline-flex",
     alignItems: "center",
     gap: "6px",
     transition: "all 0.2s ease",
   },
-  // ADDED styles
-  txCode: { background: "rgba(34, 197, 94, 0.1)", color: "#22c55e", padding: "4px 10px", borderRadius: "6px", fontSize: "13px", fontFamily: "monospace" },
-  smsPreview: { fontSize: "12px", color: "#64748b", maxWidth: "220px", lineHeight: "1.5" },
-  approveBtn: {
-    background: "rgba(34, 197, 94, 0.15)",
+
+  /* Stats Cards (KPI Strip) */
+  statsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+    gap: "12px",
+    marginBottom: "16px",
+  },
+  statCard: {
+    background: "rgba(15, 23, 42, 0.65)",
+    backdropFilter: "blur(16px)",
+    WebkitBackdropFilter: "blur(16px)",
+    padding: "14px 16px",
+    borderRadius: "14px",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.12)",
+    cursor: "pointer",
+    transition: "transform 0.2s ease, box-shadow 0.2s ease",
+  },
+  statTitle: {
+    fontSize: "11px",
+    color: "#94a3b8",
+    margin: 0,
+    fontWeight: 700,
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
+  },
+  statValue: {
+    fontSize: "24px",
+    fontWeight: 800,
+    color: "#fbbf24",
+    margin: "4px 0 6px 0",
+    letterSpacing: "-0.5px",
+  },
+
+  /* Navigation Tabs */
+  tabs: {
+    display: "flex",
+    gap: "8px",
+    marginBottom: "16px",
+    overflowX: "auto",
+    WebkitOverflowScrolling: "touch",
+    paddingBottom: "4px",
+    scrollbarWidth: "none",
+  },
+  tab: {
+    background: "rgba(15, 23, 42, 0.6)",
+    backdropFilter: "blur(12px)",
+    WebkitBackdropFilter: "blur(12px)",
+    color: "#94a3b8",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    padding: "8px 16px",
+    borderRadius: "10px",
+    fontSize: "13px",
+    fontWeight: 700,
+    cursor: "pointer",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "8px",
+    whiteSpace: "nowrap",
+    flexShrink: 0,
+    transition: "all 0.2s ease",
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+  },
+  tabActive: {
+    background: "rgba(245, 158, 11, 0.18)",
+    color: "#fbbf24",
+    border: "1px solid rgba(245, 158, 11, 0.45)",
+    boxShadow: "0 0 16px rgba(245, 158, 11, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.18)",
+  },
+  tabBadge: {
+    fontSize: "10px",
+    fontWeight: 800,
+    padding: "2px 6px",
+    borderRadius: "9999px",
+  },
+  tabBadgeActive: {
+    background: "#f59e0b",
+    color: "#0f172a",
+  },
+  tabBadgePending: {
+    background: "rgba(239, 68, 68, 0.2)",
+    color: "#ef4444",
+    border: "1px solid rgba(239, 68, 68, 0.35)",
+  },
+
+  /* Section Titles & Layout */
+  sectionTitle: {
+    fontSize: "18px",
+    fontWeight: 800,
+    color: "#f8fafc",
+    letterSpacing: "-0.4px",
+    margin: 0,
+  },
+  loader: {
+    textAlign: "center",
+    padding: "50px 20px",
+    color: "#fbbf24",
+    fontSize: "14px",
+    fontWeight: 600,
+    background: "rgba(15, 23, 42, 0.5)",
+    backdropFilter: "blur(12px)",
+    borderRadius: "14px",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+  },
+  emptyCard: {
+    background: "rgba(15, 23, 42, 0.5)",
+    backdropFilter: "blur(16px)",
+    padding: "40px 20px",
+    borderRadius: "14px",
+    textAlign: "center",
+    border: "1px dashed rgba(245, 158, 11, 0.25)",
+  },
+  emptyText: {
+    color: "#94a3b8",
+    fontSize: "14px",
+    margin: 0,
+    fontWeight: 500,
+  },
+
+  /* Glass Data Tables */
+  tableContainer: {
+    background: "rgba(15, 23, 42, 0.65)",
+    backdropFilter: "blur(20px) saturate(180%)",
+    WebkitBackdropFilter: "blur(20px) saturate(180%)",
+    borderRadius: "16px",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderTop: "1px solid rgba(255, 255, 255, 0.18)",
+    boxShadow: "0 12px 36px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
+    overflowX: "auto",
+    WebkitOverflowScrolling: "touch",
+    width: "100%",
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    textAlign: "left",
+  },
+  theadRow: {
+    background: "rgba(245, 158, 11, 0.08)",
+    borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+  },
+  th: {
+    padding: "12px 16px",
+    color: "#fbbf24",
+    fontSize: "12px",
+    fontWeight: 700,
+    textTransform: "uppercase",
+    letterSpacing: "0.8px",
+    whiteSpace: "nowrap",
+  },
+  tr: {
+    borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+    transition: "background 0.2s ease",
+  },
+  td: {
+    padding: "12px 16px",
+    verticalAlign: "middle",
+    fontSize: "13px",
+    color: "#e2e8f0",
+  },
+
+  /* Row content helpers */
+  propTitle: {
+    fontWeight: 700,
+    fontSize: "14px",
+    color: "#f8fafc",
+    marginBottom: "3px",
+  },
+  propLoc: {
+    fontSize: "12px",
+    color: "#94a3b8",
+  },
+  ownerName: {
+    fontWeight: 600,
+    fontSize: "13px",
+    color: "#f1f5f9",
+  },
+  ownerContact: {
+    fontSize: "12px",
+    color: "#64748b",
+    marginTop: "2px",
+  },
+  priceBadge: {
+    background: "rgba(59, 130, 246, 0.12)",
+    color: "#60a5fa",
+    border: "1px solid rgba(59, 130, 246, 0.25)",
+    padding: "4px 8px",
+    borderRadius: "6px",
+    fontWeight: 700,
+    fontSize: "12px",
+    display: "inline-block",
+  },
+  roleBadge: {
+    background: "rgba(245, 158, 11, 0.12)",
+    color: "#fbbf24",
+    border: "1px solid rgba(245, 158, 11, 0.25)",
+    padding: "3px 8px",
+    borderRadius: "6px",
+    fontWeight: 700,
+    fontSize: "11px",
+    textTransform: "uppercase",
+  },
+  badges: {
+    display: "flex",
+    gap: "6px",
+    flexWrap: "wrap",
+  },
+  badge: {
+    fontSize: "11px",
+    fontWeight: 700,
+    padding: "3px 8px",
+    borderRadius: "6px",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "4px",
+  },
+  select: {
+    padding: "8px 12px",
+    backgroundColor: "rgba(15, 23, 42, 0.8)",
+    border: "1px solid rgba(255, 255, 255, 0.12)",
+    borderRadius: "8px",
+    color: "#f8fafc",
+    fontSize: "13px",
+    fontWeight: 600,
+    outline: "none",
+    cursor: "pointer",
+    backdropFilter: "blur(12px)",
+  },
+  actionButtons: {
+    display: "flex",
+    gap: "8px",
+    alignItems: "center",
+    flexWrap: "wrap",
+  },
+
+  /* Buttons & Transaction info */
+  txCode: {
+    background: "rgba(34, 197, 94, 0.1)",
     color: "#22c55e",
-    border: "1px solid rgba(34, 197, 94, 0.3)",
+    border: "1px solid rgba(34, 197, 94, 0.25)",
+    padding: "4px 8px",
+    borderRadius: "6px",
+    fontSize: "12px",
+    fontFamily: "monospace",
+  },
+  smsPreview: {
+    fontSize: "12px",
+    color: "#64748b",
+    maxWidth: "220px",
+    lineHeight: "1.4",
+  },
+  approveBtn: {
+    background: "rgba(34, 197, 94, 0.16)",
+    color: "#22c55e",
+    border: "1px solid rgba(34, 197, 94, 0.35)",
     padding: "6px 12px",
     borderRadius: "6px",
     fontSize: "12px",
     fontWeight: 700,
     cursor: "pointer",
-    transition: "all 0.2s",
+    transition: "all 0.2s ease",
   },
   rejectBtn: {
-    background: "rgba(239, 68, 68, 0.15)",
+    background: "rgba(239, 68, 68, 0.16)",
     color: "#ef4444",
-    border: "1px solid rgba(239, 68, 68, 0.3)",
+    border: "1px solid rgba(239, 68, 68, 0.35)",
     padding: "6px 12px",
     borderRadius: "6px",
     fontSize: "12px",
     fontWeight: 700,
     cursor: "pointer",
-    transition: "all 0.2s",
+    transition: "all 0.2s ease",
   },
   viewBtn: {
-    background: "rgba(59, 130, 246, 0.15)",
+    background: "rgba(59, 130, 246, 0.16)",
     color: "#3b82f6",
-    border: "1px solid rgba(59, 130, 246, 0.3)",
+    border: "1px solid rgba(59, 130, 246, 0.35)",
     padding: "6px 12px",
     borderRadius: "6px",
     fontSize: "12px",
     fontWeight: 700,
     cursor: "pointer",
-    transition: "all 0.2s",
+    transition: "all 0.2s ease",
   },
   btnGroup: {
     display: "flex",
-    gap: "8px",
+    gap: "6px",
     flexWrap: "wrap",
+    alignItems: "center",
   },
-  // END ADDED
+
+  /* M-Pesa Settings Form */
   configContainer: {
-    background: "rgba(15, 23, 42, 0.8)",
+    background: "rgba(15, 23, 42, 0.65)",
+    backdropFilter: "blur(20px)",
     borderRadius: "16px",
-    padding: "40px",
-    border: "1px solid rgba(255,255,255,0.05)",
-    maxWidth: "700px",
+    padding: "28px",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderTop: "1px solid rgba(255, 255, 255, 0.18)",
+    boxShadow: "0 12px 36px rgba(0, 0, 0, 0.4)",
+    maxWidth: "650px",
     margin: "0 auto",
   },
-  configTitle: { fontSize: "24px", fontWeight: 800, color: "#fbbf24", marginBottom: "8px" },
-  configSubtitle: { color: "#94a3b8", fontSize: "14px", marginBottom: "24px" },
-  configForm: { display: "flex", flexDirection: "column", gap: "20px", marginBottom: "32px" },
-  configField: { display: "flex", flexDirection: "column", gap: "6px" },
-  configLabel: { fontSize: "13px", fontWeight: 700, color: "#f1f5f9", textTransform: "uppercase", letterSpacing: "0.5px" },
+  configTitle: { fontSize: "20px", fontWeight: 800, color: "#fbbf24", marginBottom: "6px" },
+  configSubtitle: { color: "#94a3b8", fontSize: "13px", marginBottom: "20px" },
+  configForm: { display: "flex", flexDirection: "column", gap: "16px", marginBottom: "24px" },
+  configField: { display: "flex", flexDirection: "column", gap: "5px" },
+  configLabel: { fontSize: "12px", fontWeight: 700, color: "#f1f5f9", textTransform: "uppercase", letterSpacing: "0.5px" },
   configInput: {
-    padding: "12px 16px",
+    padding: "10px 14px",
     borderRadius: "8px",
-    border: "1px solid rgba(255,255,255,0.1)",
+    border: "1px solid rgba(255, 255, 255, 0.12)",
     background: "rgba(30, 41, 59, 0.6)",
     color: "#f1f5f9",
-    fontSize: "14px",
+    fontSize: "13px",
     outline: "none",
     transition: "0.2s",
   },
-  configHint: { fontSize: "12px", color: "#64748b", margin: 0 },
+  configHint: { fontSize: "11px", color: "#64748b", margin: 0 },
   saveConfigBtn: {
-    padding: "14px 24px",
-    background: "#fbbf24",
-    color: "#1f2937",
+    padding: "12px 20px",
+    background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+    color: "#0f172a",
     border: "none",
     borderRadius: "8px",
-    fontWeight: 700,
-    fontSize: "14px",
+    fontWeight: 800,
+    fontSize: "13px",
     cursor: "pointer",
     transition: "0.2s",
+    boxShadow: "0 4px 14px rgba(245, 158, 11, 0.35)",
   },
   configMessage: {
-    padding: "12px 16px",
+    padding: "10px 14px",
     borderRadius: "8px",
     border: "1px solid",
-    fontSize: "13px",
+    fontSize: "12px",
     fontWeight: 600,
-    marginBottom: "20px",
+    marginBottom: "16px",
   },
   configInfo: {
     background: "rgba(30, 41, 59, 0.4)",
-    padding: "20px",
-    borderRadius: "12px",
+    padding: "16px",
+    borderRadius: "10px",
     border: "1px dashed rgba(251, 191, 36, 0.3)",
   },
-  configInfoTitle: { fontSize: "14px", fontWeight: 700, color: "#fbbf24", marginBottom: "12px" },
-  configInfoList: { margin: 0, paddingLeft: "20px", color: "#94a3b8", fontSize: "13px", lineHeight: "1.8" },
+  configInfoTitle: { fontSize: "13px", fontWeight: 700, color: "#fbbf24", marginBottom: "8px" },
+  configInfoList: { margin: 0, paddingLeft: "18px", color: "#94a3b8", fontSize: "12px", lineHeight: "1.7" },
   configLink: { color: "#3b82f6", textDecoration: "none" },
 };
 
 const cssStyles = `
-  tr:hover { background: rgba(255,255,255,0.02); }
-  button:active { transform: scale(0.95); }
-  button:hover { opacity: 0.9; }
+  /* Ambient glowing background */
+  .admin-dashboard-root {
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  .spin-sync {
+    animation: adminSpin 0.75s linear infinite;
+  }
+  @keyframes adminSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* Custom Glass Scrollbars */
+  .admin-tabs-track::-webkit-scrollbar,
+  .admin-stats-strip::-webkit-scrollbar {
+    height: 4px;
+  }
+  .admin-tabs-track::-webkit-scrollbar-thumb,
+  .admin-stats-strip::-webkit-scrollbar-thumb {
+    background: rgba(245, 158, 11, 0.3);
+    border-radius: 999px;
+  }
+  .admin-table-container::-webkit-scrollbar,
+  div[style*="overflow-x: auto"]::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+  }
+  .admin-table-container::-webkit-scrollbar-thumb,
+  div[style*="overflow-x: auto"]::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 999px;
+  }
+  .admin-table-container::-webkit-scrollbar-track,
+  div[style*="overflow-x: auto"]::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  /* Glass hover & active effects */
+  .admin-tab-btn {
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  .admin-tab-btn:hover {
+    background: rgba(30, 41, 59, 0.8) !important;
+    border-color: rgba(245, 158, 11, 0.3) !important;
+    transform: translateY(-1px);
+  }
+  .admin-tab-btn.active {
+    background: rgba(245, 158, 11, 0.18) !important;
+    border-color: rgba(245, 158, 11, 0.5) !important;
+    color: #fbbf24 !important;
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+  }
+
+  .admin-stat-card {
+    transition: all 0.2s ease !important;
+  }
+  .admin-stat-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.18) !important;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+  }
+
+  tr:hover {
+    background: rgba(255, 255, 255, 0.035) !important;
+  }
+  button:active {
+    transform: scale(0.96);
+  }
+  button:hover {
+    opacity: 0.95;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: rgba(245, 158, 11, 0.5) !important;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25) !important;
+  }
+
+  /* ============================================================
+     MOBILE PHONE VIEW (Max Width 768px)
+     Fits screen fully so Admin sees DATA immediately without scrolling!
+     ============================================================ */
+  @media (max-width: 768px) {
+    .admin-dashboard-root {
+      padding: 8px 8px 24px 8px !important;
+      min-height: 100vh !important;
+    }
+
+    /* Ultra-compact top admin bar (takes ~44px height) */
+    .admin-top-bar {
+      padding: 6px 10px !important;
+      margin-bottom: 6px !important;
+      border-radius: 12px !important;
+      flex-wrap: nowrap !important;
+      justify-content: space-between !important;
+      gap: 6px !important;
+    }
+    .admin-brand-group {
+      gap: 8px !important;
+      flex: 1 1 auto !important;
+      min-width: 0 !important;
+    }
+    .admin-brand-logo {
+      width: 30px !important;
+      height: 30px !important;
+      font-size: 12px !important;
+      border-radius: 8px !important;
+      flex-shrink: 0 !important;
+    }
+    .admin-brand-title {
+      font-size: 14px !important;
+      line-height: 1.1 !important;
+      margin: 0 !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+    .admin-brand-subtitle {
+      display: none !important;
+    }
+    .admin-live-badge {
+      padding: 1px 6px !important;
+      font-size: 9px !important;
+    }
+    .admin-live-text {
+      display: none !important;
+    }
+    .admin-top-controls {
+      gap: 4px !important;
+      flex-shrink: 0 !important;
+    }
+    .admin-top-controls button {
+      padding: 5px 8px !important;
+      font-size: 11px !important;
+      border-radius: 8px !important;
+    }
+    .admin-btn-label {
+      display: none !important;
+    }
+    .admin-user-pill {
+      display: none !important;
+    }
+
+    /* Ultra-compact horizontal swipeable KPI stats (takes ~52px height) */
+    .admin-stats-strip {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      gap: 6px !important;
+      padding: 2px 2px 6px 2px !important;
+      margin-bottom: 6px !important;
+      scrollbar-width: none !important;
+    }
+    .admin-stats-strip::-webkit-scrollbar {
+      display: none !important;
+    }
+    .admin-stat-card {
+      min-width: 120px !important;
+      max-width: 135px !important;
+      flex: 0 0 auto !important;
+      padding: 6px 9px !important;
+      border-radius: 10px !important;
+    }
+    .admin-stat-title {
+      font-size: 10px !important;
+      white-space: nowrap !important;
+    }
+    .admin-stat-value {
+      font-size: 16px !important;
+      margin: 1px 0 2px 0 !important;
+    }
+    .admin-stat-badge {
+      font-size: 9px !important;
+      padding: 1px 5px !important;
+      white-space: nowrap !important;
+    }
+    .admin-stat-icon {
+      width: 13px !important;
+      height: 13px !important;
+    }
+
+    /* Horizontal swipeable tabs track (takes ~36px height) */
+    .admin-tabs-track {
+      display: flex !important;
+      flex-wrap: nowrap !important;
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      gap: 5px !important;
+      padding: 2px 2px 6px 2px !important;
+      margin-bottom: 8px !important;
+      justify-content: flex-start !important;
+      scrollbar-width: none !important;
+    }
+    .admin-tabs-track::-webkit-scrollbar {
+      display: none !important;
+    }
+    .admin-tab-btn {
+      flex: 0 0 auto !important;
+      padding: 6px 11px !important;
+      font-size: 12px !important;
+      border-radius: 8px !important;
+      white-space: nowrap !important;
+    }
+
+    /* Data Table Container fits phone screen */
+    .admin-table-container,
+    div[style*="border-radius: 16px"] {
+      border-radius: 12px !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      margin-bottom: 12px !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+    th, td {
+      padding: 9px 10px !important;
+      font-size: 12px !important;
+    }
+    img[style*="width: 48px"] {
+      width: 36px !important;
+      height: 36px !important;
+    }
+    div[style*="width: 48px"] {
+      width: 36px !important;
+      height: 36px !important;
+    }
+  }
 `;
