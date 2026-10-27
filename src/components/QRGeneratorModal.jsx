@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import QRCode from "qrcode";
-import logo from "../assets/image.png";
+// Original AxXspace logo. Served from /public so the poster, the live preview
+// and the canvas export all use the same brand asset (and stay same-origin).
+const logo = "/logo.png";
 
 const SOURCES = [
   { value: "generic", label: "General / Digital Link" },
@@ -200,6 +202,26 @@ const getScallopPath = (cx, cy, r, numScallops, depth) => {
   return path;
 };
 
+/* ── Pin-shaped QR frame ──────────────────────────────────────
+   The QR sits inside a frame cut in the AxXspace logo silhouette
+   (round head + pointed tail) so every poster carries the mark.
+─────────────────────────────────────────────────────────────── */
+const PIN_W        = 320;                      // frame width = head diameter
+const PIN_TAIL     = 60;                       // pointed tail below the head
+const PIN_H        = PIN_W + PIN_TAIL;         // frame height
+const PIN_QR       = 210;                      // QR side (fits inside the head)
+const PIN_QR_INNER = (PIN_W - PIN_QR) / 2;     // QR inset from the frame edge
+
+const getPinFramePath = () => {
+  const r = PIN_W / 2;
+  const cx = r, cy = r, tipY = PIN_H;
+  return `M ${cx} ${tipY} `
+    + `C ${cx - r * 0.25} ${cy + r} ${cx - r} ${cy + r * 0.55} ${cx - r} ${cy} `
+    + `A ${r} ${r} 0 0 1 ${cx + r} ${cy} `
+    + `C ${cx + r} ${cy + r * 0.55} ${cx + r * 0.25} ${cy + r} ${cx} ${tipY} Z`;
+};
+const PIN_PATH = getPinFramePath();
+
 // Rosette Badge Component
 const ScallopBadge = () => {
   const path = getScallopPath(55, 55, 43, 18, 4);
@@ -285,12 +307,18 @@ function VacancyPoster({ property, qrCodeDataUrl, sourceLabel }) {
 
       {/* Scan instruction */}
       <div style={posterStyles.scanInstruction}>
-        SCAN TO VIEW HOUSE DETAILS AND CONTACTS
+        SCAN TO VIEW AVAILABILITY AND PROPERTY DETAILS/CONTACTS
       </div>
 
-      {/* QR Code Container */}
+      {/* QR Code Container — framed in the AxXspace pin silhouette */}
       <div style={posterStyles.qrContainer}>
-        <div style={posterStyles.qrBox}>
+        <div style={posterStyles.qrFrame}>
+          <svg
+            width={PIN_W} height={PIN_H} viewBox={`0 0 ${PIN_W} ${PIN_H}`}
+            style={posterStyles.qrFrameSvg} aria-hidden="true">
+            <path d={PIN_PATH} fill="#ffffff" stroke="#d9383a"
+              strokeWidth="4" strokeLinejoin="round" />
+          </svg>
           {qrCodeDataUrl ? (
             <img src={qrCodeDataUrl} alt="Property QR Code" style={posterStyles.qrCodeImg} />
           ) : (
@@ -428,7 +456,7 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
     qrCtx.fillText("Axxspace", 175, 365);
     qrCtx.font = "600 13px 'Inter', system-ui, sans-serif";
     qrCtx.fillStyle = "#64748b";
-    qrCtx.fillText("Scan to view property details", 175, 395);
+    qrCtx.fillText("Scan to view availability and property details", 175, 395);
 
     // ── High-Res Poster Canvas (800x1130) ──
     posterCtx.fillStyle = "#ffffff";
@@ -481,6 +509,20 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
           ctx.lineWidth = strokeWidth;
           ctx.stroke();
         }
+      };
+
+      // Same pin silhouette as the live preview's SVG frame
+      const drawPinFrame = (ctx, x, y, w, tail, fillCol, strokeCol, lw) => {
+        const r = w / 2;
+        const cx = x + r, cy = y + r, tipY = y + w + tail;
+        ctx.beginPath();
+        ctx.moveTo(cx, tipY);
+        ctx.bezierCurveTo(cx - r * 0.25, cy + r, cx - r, cy + r * 0.55, cx - r, cy);
+        ctx.arc(cx, cy, r, Math.PI, Math.PI * 2, false);
+        ctx.bezierCurveTo(cx + r, cy + r * 0.55, cx + r * 0.25, cy + r, cx, tipY);
+        ctx.closePath();
+        if (fillCol) { ctx.fillStyle = fillCol; ctx.fill(); }
+        if (strokeCol) { ctx.strokeStyle = strokeCol; ctx.lineWidth = lw; ctx.stroke(); }
       };
 
       // Draw background waves watermark (faint gray)
@@ -585,34 +627,26 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
       // Scan Call to Action text
       posterCtx.fillStyle = "#081A34";
       posterCtx.textAlign = "center";
-      posterCtx.font = "800 20px 'Inter', sans-serif";
-      posterCtx.fillText("SCAN TO VIEW HOUSE DETAILS AND CONTACTS", posterCanvas.width / 2, 378);
+      posterCtx.font = "800 18px 'Inter', sans-serif";
+      posterCtx.fillText("SCAN TO VIEW AVAILABILITY AND PROPERTY DETAILS/CONTACTS", posterCanvas.width / 2, 378);
 
-      // QR Code Box with red border
-      const qrBoxW = 296;
-      const qrBoxH = 296;
-      const qrBoxX = (posterCanvas.width - qrBoxW) / 2;
+      // QR frame cut in the AxXspace pin silhouette
+      const qrBoxX = (posterCanvas.width - PIN_W) / 2;
       const qrBoxY = 413;
-      const qrBoxR = 10;
-
-      // Fill white round rect
-      posterCtx.fillStyle = "#ffffff";
-      drawRoundRect(posterCtx, qrBoxX, qrBoxY, qrBoxW, qrBoxH, qrBoxR, true, true, "#d9383a", 4);
-
-      // Draw QR Code inside
-      posterCtx.drawImage(qrCanvas, qrBoxX + 16, qrBoxY + 16, 264, 264);
+      drawPinFrame(posterCtx, qrBoxX, qrBoxY, PIN_W, PIN_TAIL, "#ffffff", "#d9383a", 4);
+      posterCtx.drawImage(qrCanvas, qrBoxX + PIN_QR_INNER, qrBoxY + PIN_QR_INNER, PIN_QR, PIN_QR);
 
       // OR VISIT
       posterCtx.fillStyle = "#081A34";
       posterCtx.textAlign = "center";
       posterCtx.font = "800 16px 'Inter', sans-serif";
-      posterCtx.fillText("OR VISIT", posterCanvas.width / 2, 748);
+      posterCtx.fillText("OR VISIT", posterCanvas.width / 2, 830);
 
       // www.axxspace.com Pill
       const pillW = 280;
       const pillH = 44;
       const pillX = (posterCanvas.width - pillW) / 2;
-      const pillY = 768;
+      const pillY = 848;
       const pillR = 22;
 
       // Fill white round rect with navy border
@@ -658,7 +692,7 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
       posterCtx.fillText("www.axxspace.com", pillX + 44, pillY + 28);
 
       // Contact Footer row
-      const contactY = 858;
+      const contactY = 925;
       posterCtx.textAlign = "left";
       posterCtx.font = "800 15px 'Inter', sans-serif";
 
@@ -1139,25 +1173,31 @@ const posterStyles = {
     justifyContent: "center",
     marginTop: "25px",
   },
-  qrBox: {
-    border: "4px solid #d9383a",
-    borderRadius: "10px",
-    padding: "16px",
-    backgroundColor: "#ffffff",
-    boxShadow: "0 10px 25px rgba(0,0,0,0.05)",
-    display: "inline-block",
+  qrFrame: {
+    position: "relative",
+    width: `${PIN_W}px`,
+    height: `${PIN_H}px`,
+  },
+  qrFrameSvg: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    overflow: "visible",
   },
   qrCodeImg: {
-    width: "260px",
-    height: "260px",
+    position: "absolute",
+    left: `${PIN_QR_INNER}px`,
+    top: `${PIN_QR_INNER}px`,
+    width: `${PIN_QR}px`,
+    height: `${PIN_QR}px`,
     display: "block",
   },
   qrPlaceholder: {
-    width: "260px",
-    height: "260px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+    position: "absolute",
+    left: `${PIN_QR_INNER}px`,
+    top: `${PIN_QR_INNER + PIN_QR / 2 - 9}px`,
+    width: `${PIN_QR}px`,
+    textAlign: "center",
     fontSize: "14px",
     color: "#64748b",
   },

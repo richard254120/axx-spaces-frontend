@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import QRCode from "qrcode";
-import logo from "../assets/image.png";
+// Original AxXspace logo. Served from /public so the poster, the live preview
+// and the canvas export all use the same brand asset (and stay same-origin).
+const logo = "/logo.png";
 
 /* ══════════════════════════════════════════════════════════
    AgentQRPosterModal
@@ -19,6 +21,26 @@ const getScallopPath = (cx, cy, r, numScallops, depth) => {
   }
   return path + " Z";
 };
+
+/* ── Pin-shaped QR frame ──────────────────────────────────────
+   The QR sits inside a frame cut in the AxXspace logo silhouette
+   (round head + pointed tail) so every poster carries the mark.
+─────────────────────────────────────────────────────────────── */
+const PIN_W        = 320;                      // frame width = head diameter
+const PIN_TAIL     = 60;                       // pointed tail below the head
+const PIN_H        = PIN_W + PIN_TAIL;         // frame height
+const PIN_QR       = 210;                      // QR side (fits inside the head)
+const PIN_QR_INNER = (PIN_W - PIN_QR) / 2;     // QR inset from the frame edge
+
+const getPinFramePath = () => {
+  const r = PIN_W / 2;
+  const cx = r, cy = r, tipY = PIN_H;
+  return `M ${cx} ${tipY} `
+    + `C ${cx - r * 0.25} ${cy + r} ${cx - r} ${cy + r * 0.55} ${cx - r} ${cy} `
+    + `A ${r} ${r} 0 0 1 ${cx + r} ${cy} `
+    + `C ${cx + r} ${cy + r * 0.55} ${cx + r * 0.25} ${cy + r} ${cx} ${tipY} Z`;
+};
+const PIN_PATH = getPinFramePath();
 
 const AgentScallopBadge = () => {
   const path = getScallopPath(55, 55, 43, 18, 4);
@@ -67,11 +89,17 @@ function AgentPoster({ agent, qrCodeDataUrl }) {
       </div>
 
       {/* Scan instruction */}
-      <div style={ps.scanInstruction}>SCAN TO VIEW AGENT PROFILE AND LISTINGS</div>
+      <div style={ps.scanInstruction}>SCAN TO VIEW AVAILABILITY AND AGENTS PROFILE</div>
 
-      {/* QR */}
+      {/* QR — framed in the AxXspace pin silhouette */}
       <div style={ps.qrContainer}>
-        <div style={ps.qrBox}>
+        <div style={ps.qrFrame}>
+          <svg
+            width={PIN_W} height={PIN_H} viewBox={`0 0 ${PIN_W} ${PIN_H}`}
+            style={ps.qrFrameSvg} aria-hidden="true">
+            <path d={PIN_PATH} fill="#ffffff" stroke="#d9383a"
+              strokeWidth="4" strokeLinejoin="round" />
+          </svg>
           {qrCodeDataUrl
             ? <img src={qrCodeDataUrl} alt="Agent QR Code" style={ps.qrCodeImg} />
             : <div style={ps.qrPlaceholder}>Generating QR…</div>}
@@ -236,23 +264,31 @@ const ps = {
     justifyContent: "center",
     marginTop: "18px",
   },
-  qrBox: {
-    width: "264px",
-    height: "264px",
-    border: "4px solid #d9383a",
-    borderRadius: "10px",
-    padding: "12px",
-    backgroundColor: "#ffffff",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+  qrFrame: {
+    position: "relative",
+    width: `${PIN_W}px`,
+    height: `${PIN_H}px`,
+  },
+  qrFrameSvg: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    overflow: "visible",
   },
   qrCodeImg: {
-    width: "240px",
-    height: "240px",
+    position: "absolute",
+    left: `${PIN_QR_INNER}px`,
+    top: `${PIN_QR_INNER}px`,
+    width: `${PIN_QR}px`,
+    height: `${PIN_QR}px`,
     objectFit: "contain",
   },
   qrPlaceholder: {
+    position: "absolute",
+    left: `${PIN_QR_INNER}px`,
+    top: `${PIN_QR_INNER + PIN_QR / 2 - 10}px`,
+    width: `${PIN_QR}px`,
+    textAlign: "center",
     color: "#94a3b8",
     fontSize: "13px",
     fontWeight: 600,
@@ -422,6 +458,20 @@ export default function AgentQRPosterModal({ isOpen, onClose, agent }) {
     if (strokeCol) { ctx.strokeStyle = strokeCol; ctx.lineWidth = lw; ctx.stroke(); }
   };
 
+  // Same pin silhouette as the live preview's SVG frame
+  const drawPinFrame = (ctx, x, y, w, tail, fillCol, strokeCol, lw) => {
+    const r = w / 2;
+    const cx = x + r, cy = y + r, tipY = y + w + tail;
+    ctx.beginPath();
+    ctx.moveTo(cx, tipY);
+    ctx.bezierCurveTo(cx - r * 0.25, cy + r, cx - r, cy + r * 0.55, cx - r, cy);
+    ctx.arc(cx, cy, r, Math.PI, Math.PI * 2, false);
+    ctx.bezierCurveTo(cx + r, cy + r * 0.55, cx + r * 0.25, cy + r, cx, tipY);
+    ctx.closePath();
+    if (fillCol) { ctx.fillStyle = fillCol; ctx.fill(); }
+    if (strokeCol) { ctx.strokeStyle = strokeCol; ctx.lineWidth = lw; ctx.stroke(); }
+  };
+
   const drawCanvases = (qrCanvas) => {
     const dlQr  = downloadQrRef.current;
     const poster = posterCanvasRef.current;
@@ -440,7 +490,7 @@ export default function AgentQRPosterModal({ isOpen, onClose, agent }) {
     qCtx.fillText("Axxspace", 175, 365);
     qCtx.font = "600 13px 'Inter', system-ui, sans-serif";
     qCtx.fillStyle = "#64748b";
-    qCtx.fillText("Scan to view agent profile", 175, 395);
+    qCtx.fillText("Scan to view availability and profile", 175, 395);
 
     // ── High-res poster (800 × 1130) ──
     const logoImg = new Image();
@@ -543,17 +593,15 @@ export default function AgentQRPosterModal({ isOpen, onClose, agent }) {
     pCtx.fillStyle = "#081A34";
     pCtx.textAlign = "center";
     pCtx.font = "800 20px 'Inter', sans-serif";
-    pCtx.fillText("SCAN TO VIEW AGENT PROFILE AND LISTINGS", PW / 2, 378);
+    pCtx.fillText("SCAN TO VIEW AVAILABILITY AND AGENTS PROFILE", PW / 2, 378);
 
-    // QR box
-    const qbW = 296, qbH = 296;
-    const qbX = (PW - qbW) / 2, qbY = 413;
-    pCtx.fillStyle = "#ffffff";
-    drawRoundRect(pCtx, qbX, qbY, qbW, qbH, 10, true, true, "#d9383a", 4);
-    pCtx.drawImage(qrCanvas, qbX + 16, qbY + 16, 264, 264);
+    // QR frame in the AxXspace pin silhouette
+    const qbX = (PW - PIN_W) / 2, qbY = 413;
+    drawPinFrame(pCtx, qbX, qbY, PIN_W, PIN_TAIL, "#ffffff", "#d9383a", 4);
+    pCtx.drawImage(qrCanvas, qbX + PIN_QR_INNER, qbY + PIN_QR_INNER, PIN_QR, PIN_QR);
 
     // Agent name strip
-    const stripY = 738;
+    const stripY = 816;
     pCtx.fillStyle = "#f0f4ff";
     pCtx.fillRect(0, stripY, PW, 42);
     pCtx.strokeStyle = "#dde4f0";
@@ -572,11 +620,11 @@ export default function AgentQRPosterModal({ isOpen, onClose, agent }) {
     pCtx.fillStyle = "#081A34";
     pCtx.textAlign = "center";
     pCtx.font = "800 16px 'Inter', sans-serif";
-    pCtx.fillText("OR VISIT", PW / 2, 820);
+    pCtx.fillText("OR VISIT", PW / 2, 900);
 
     // URL pill
     const pW2 = 280, pH2 = 44;
-    const pX2 = (PW - pW2) / 2, pY2 = 836;
+    const pX2 = (PW - pW2) / 2, pY2 = 916;
     pCtx.fillStyle = "#ffffff";
     drawRoundRect(pCtx, pX2, pY2, pW2, pH2, 22, true, true, "#081A34", 2);
     // Globe
