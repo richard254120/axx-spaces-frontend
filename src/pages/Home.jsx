@@ -527,21 +527,8 @@ const css = `
 `;
 
 /* ════════ DATA ════════ */
-const COUNTIES = [
-  "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta", "Garissa", "Wajir", "Mandera", "Marsabit",
-  "Isiolo", "Meru", "Tharaka Nithi", "Embu", "Kitui", "Machakos", "Makueni", "Nyandarua", "Nyeri", "Kirinyaga",
-  "Murang'a", "Kiambu", "Turkana", "West Pokot", "Samburu", "Trans Nzoia", "Uasin Gishu", "Elgeyo Marakwet",
-  "Nandi", "Baringo", "Laikipia", "Nakuru", "Narok", "Kajiado", "Kericho", "Bomet", "Kakamega", "Vihiga",
-  "Bungoma", "Busia", "Siaya", "Kisumu", "Homa Bay", "Migori", "Kisii", "Nyamira", "Nairobi City",
-];
-
-const TYPES = [
-  "Bedsitter", "Studio Apartment", "1 Bedroom", "2 Bedroom", "3 Bedroom",
-  "4+ Bedroom", "Maisonette", "Bungalow", "Townhouse", "Apartment Block",
-];
-
 const TABS = [
-  { id: "properties", label: "Rentals", path: "/listings", hint: "Search by county and house type" },
+  { id: "properties", label: "Rentals", path: "/listings", hint: "Search rentals" },
   { id: "accommodation", label: "Accommodation", path: "/accommodation", hint: "Find hotels, lodges and stays" },
   { id: "businesses", label: "AxxBiashara", path: "/axxbiashara", hint: "Find business services" },
   { id: "materials", label: "QuickSales", path: "/quicksales", hint: "Find items for sale" },
@@ -560,24 +547,6 @@ const TRUST_ITEMS = [
   "Direct WhatsApp contact",
   "Owner-to-client, no middlemen",
 ];
-
-const HERO_CHIPS = {
-  rentals: [
-    { label: "Nairobi City", to: "/listings?county=Nairobi%20City" },
-    { label: "Bedsitters", to: "/listings?type=Bedsitter" },
-    { label: "2 Bedroom", to: "/listings?type=2%20Bedroom" },
-  ],
-  accommodation: [
-    { label: "Diani", to: "/accommodation/listings?search=Diani" },
-    { label: "Naivasha", to: "/accommodation/listings?search=Naivasha" },
-    { label: "Nanyuki", to: "/accommodation/listings?search=Nanyuki" },
-  ],
-  quicksales: [
-    { label: "Furniture", to: "/quicksales?search=furniture" },
-    { label: "Building materials", to: "/quicksales?search=materials" },
-    { label: "Electronics", to: "/quicksales?search=electronics" },
-  ],
-};
 
 const SERVICES = [
   {
@@ -935,8 +904,6 @@ export default function HomePro() {
   /* ── HERO SEARCH ── */
   const [heroTab, setHeroTab] = useState("rentals");
   const [query, setQuery] = useState("");
-  const [county, setCounty] = useState("");
-  const [houseType, setHouseType] = useState("");
   const [heroIdx, setHeroIdx] = useState(0);
 
   /* ── DATA FETCHING (same endpoints as before) ── */
@@ -1019,21 +986,18 @@ export default function HomePro() {
     const q = query.trim();
 
     if (heroTab === "rentals") {
-      if (county) params.set("county", county);
-      if (houseType) params.set("type", houseType);
+      if (q) params.set("search", q);
       navigate(`/listings${params.toString() ? `?${params}` : ""}`);
       return;
     }
 
     if (heroTab === "accommodation") {
       if (q) params.set("search", q);
-      if (county) params.set("area", county);
       navigate(`/accommodation/listings${params.toString() ? `?${params}` : ""}`);
       return;
     }
 
     if (q) params.set("search", q);
-    if (county) params.set("county", county);
     navigate(`/quicksales${params.toString() ? `?${params}` : ""}`);
   };
 
@@ -1131,26 +1095,6 @@ export default function HomePro() {
               Verified rentals, accommodation, business services and quick sales in one place.
               Talk to owners and hosts yourself and pay no broker fees.
             </p>
-
-            <div className="ax-hero-actions">
-              <button className="ax-btn ax-shine" onClick={() => navigate("/listings")}>
-                Browse rentals
-                <Icon size={17}><path d="M5 12h14M13 6l6 6-6 6" /></Icon>
-              </button>
-              <button className="ax-btn glass" onClick={handleListProperty}>
-                {token ? "List your property" : "List with us"}
-              </button>
-            </div>
-
-            <div className="ax-hero-stats">
-              <div><strong><Counter value={47} /></strong><span>Counties covered</span></div>
-              <div><strong>0%</strong><span>Broker fees</span></div>
-              {demographics?.totalListings ? (
-                <div><strong><Counter value={demographics.totalListings} /></strong><span>Verified listings</span></div>
-              ) : (
-                <div><strong>Direct</strong><span>Owner contact</span></div>
-              )}
-            </div>
           </div>
 
           <div className="ax-hero-side">
@@ -1190,54 +1134,23 @@ export default function HomePro() {
             </div>
 
             <div className="ax-search-body">
-              {heroTab === "rentals" ? (
-                <>
-                  <div className="ax-field">
-                    <label htmlFor="hero-county">County</label>
-                    <select id="hero-county" value={county} onChange={(e) => setCounty(e.target.value)}>
-                      <option value="">All counties</option>
-                      {COUNTIES.map((c) => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                  </div>
-                  <div className="ax-field">
-                    <label htmlFor="hero-type">House type</label>
-                    <select id="hero-type" value={houseType} onChange={(e) => setHouseType(e.target.value)}>
-                      <option value="">Any type</option>
-                      {TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
-                    </select>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="ax-field">
-                    <label htmlFor="hero-query">
-                      {heroTab === "accommodation" ? "Destination or property" : "What are you looking for?"}
-                    </label>
-                    <input id="hero-query" type="search" value={query}
-                      placeholder={heroTab === "accommodation" ? "Diani, Naivasha, lodge…" : "Sofa, cement, laptop…"}
-                      onChange={(e) => setQuery(e.target.value)} />
-                  </div>
-                  <div className="ax-field">
-                    <label htmlFor="hero-county-2">County</label>
-                    <select id="hero-county-2" value={county} onChange={(e) => setCounty(e.target.value)}>
-                      <option value="">All counties</option>
-                      {COUNTIES.map((c) => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                  </div>
-                </>
-              )}
+              <div className="ax-field">
+                <label htmlFor="hero-query">
+                  {heroTab === "rentals"
+                    ? "Search rentals"
+                    : heroTab === "accommodation"
+                      ? "Destination or property"
+                      : "What are you looking for?"}
+                </label>
+                <input id="hero-query" type="search" value={query}
+                  placeholder={heroTab === "rentals" ? "estate, area, house type…" : heroTab === "accommodation" ? "Diani, Naivasha, lodge…" : "Sofa, cement, laptop…"}
+                  onChange={(e) => setQuery(e.target.value)} />
+              </div>
 
               <button className="ax-btn ax-shine" type="submit">
                 Search
                 <Icon size={17}><path d="M11 19a8 8 0 100-16 8 8 0 000 16zM21 21l-4.3-4.3" /></Icon>
               </button>
-            </div>
-
-            <div className="ax-search-hint">
-              <span>Popular:</span>
-              {(HERO_CHIPS[heroTab] || []).map((c) => (
-                <button key={c.label} type="button" onClick={() => navigate(c.to)}>{c.label}</button>
-              ))}
             </div>
           </form>
         </div>
