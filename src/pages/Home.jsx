@@ -128,11 +128,6 @@ const css = `
 /* search panel */
 .ax-root .ax-search{margin-top:44px;background:var(--card);color:var(--ink);border-radius:18px;
   box-shadow:0 30px 70px rgba(0,0,0,.35);max-width:900px;overflow:hidden}
-.ax-root .ax-search-tabs{display:flex;border-bottom:1px solid var(--line);overflow-x:auto}
-.ax-root .ax-search-tabs button{flex:1;min-width:max-content;padding:15px 20px;background:none;border:0;
-  font-size:14px;font-weight:600;color:var(--mute);border-bottom:3px solid transparent;transition:color .2s,border-color .2s}
-.ax-root .ax-search-tabs button:hover{color:var(--ink)}
-.ax-root .ax-search-tabs button[aria-selected="true"]{color:var(--green);border-color:var(--green)}
 .ax-root .ax-search-body{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;padding:18px;align-items:end}
 .ax-root .ax-search-body.single{grid-template-columns:1fr auto}
 .ax-root .ax-field{display:flex;flex-direction:column;gap:6px}
@@ -368,9 +363,6 @@ const css = `
 .ax-root .ax-grad{background:linear-gradient(96deg,#FBBF24,#F59E0B 42%,#34D399);background-size:180% 100%;
   -webkit-background-clip:text;background-clip:text;color:transparent;animation:axGrad 9s ease infinite}
 .ax-root .ax-hero-sub{margin-top:20px;font-size:clamp(15px,1.5vw,18px);max-width:552px;color:#BFD1C7}
-.ax-root .ax-hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
-.ax-root .ax-hero-actions .ax-btn{height:52px;padding:0 24px;border-radius:12px;display:inline-flex;
-  align-items:center;gap:10px;font-size:14.5px}
 .ax-root .ax-btn.glass{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(10px)}
 .ax-root .ax-btn.glass:hover{background:rgba(255,255,255,.16);transform:translateY(-1px)}
 .ax-root .ax-shine{position:relative;overflow:hidden;isolation:isolate}
@@ -378,9 +370,6 @@ const css = `
   background:linear-gradient(110deg,transparent 22%,rgba(255,255,255,.5) 46%,transparent 66%);
   transform:translateX(-130%);transition:transform .8s ease}
 .ax-root .ax-shine:hover::after{transform:translateX(130%)}
-.ax-root .ax-hero-stats{display:flex;gap:38px;flex-wrap:wrap;margin-top:36px;padding-top:26px;border-top:1px solid rgba(255,255,255,.1)}
-.ax-root .ax-hero-stats strong{display:block;font:800 clamp(22px,2.4vw,30px)/1 'Bricolage Grotesque',sans-serif;color:#fff}
-.ax-root .ax-hero-stats span{display:block;margin-top:7px;font-size:12.5px;color:#94A3B8}
 
 /* hero visual */
 .ax-root .ax-hero-side{position:relative;min-height:420px;display:flex;align-items:center;justify-content:center}
@@ -412,21 +401,10 @@ const css = `
 /* hero search */
 .ax-root .ax-search{grid-column:1/-1;margin-top:8px;max-width:100%;border-radius:20px;
   background:rgba(255,255,255,.98);box-shadow:0 34px 80px rgba(0,0,0,.45)}
-.ax-root .ax-search-tabs{gap:6px;padding:12px 14px 0;border-bottom:0}
-.ax-root .ax-search-tabs button{flex:0 0 auto;min-width:0;padding:10px 18px;border-radius:10px;border-bottom:0;
-  background:var(--paper);color:var(--mute);font-size:13.5px;transition:all .25s}
-.ax-root .ax-search-tabs button:hover{color:var(--ink);background:#EEF2F0}
-.ax-root .ax-search-tabs button[aria-selected="true"]{background:var(--green);color:#fff;border-color:var(--green);
-  box-shadow:0 8px 20px rgba(11,93,59,.25)}
 .ax-root .ax-search-body{padding:14px}
 .ax-root .ax-search-body .ax-field label{font-size:11px;letter-spacing:.06em;text-transform:uppercase}
 .ax-root .ax-search-body .ax-btn{height:48px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 .ax-root .ax-search-body .ax-field input,.ax-root .ax-search-body .ax-field select{background:#fff}
-.ax-root .ax-search-hint{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:0 14px 15px;
-  font-size:12px;color:var(--mute)}
-.ax-root .ax-search-hint button{border:1px solid var(--line);background:var(--paper);border-radius:999px;
-  padding:5px 12px;font-size:12px;font-weight:600;color:var(--ink-2);transition:all .2s}
-.ax-root .ax-search-hint button:hover{border-color:var(--green);color:var(--green);background:var(--green-l)}
 
 /* marquee trust bar */
 .ax-root .ax-trust{overflow:hidden}
@@ -511,15 +489,9 @@ const css = `
 @media (max-width:1000px){
   .ax-root .ax-hero-inner{grid-template-columns:1fr;gap:34px;padding:66px 24px 48px}
   .ax-root .ax-hero-side{display:none}
-  .ax-root .ax-hero-stats{gap:26px}
   .ax-root .ax-app-visual{min-height:440px}
 }
 @media (max-width:720px){
-  .ax-root .ax-hero-actions .ax-btn{flex:1 1 auto;justify-content:center}
-  .ax-root .ax-hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-  .ax-root .ax-search-tabs{padding:10px 10px 0;gap:5px}
-  .ax-root .ax-search-tabs button{padding:9px 14px;font-size:12.5px}
-  .ax-root .ax-search-hint{padding:0 10px 13px}
   .ax-root .ax-app-visual{display:none}
   .ax-root .ax-phone-chip{display:none}
   .ax-root .ax-step::after{font-size:70px}
@@ -532,12 +504,6 @@ const TABS = [
   { id: "accommodation", label: "Accommodation", path: "/accommodation", hint: "Find hotels, lodges and stays" },
   { id: "businesses", label: "AxxBiashara", path: "/axxbiashara", hint: "Find business services" },
   { id: "materials", label: "QuickSales", path: "/quicksales", hint: "Find items for sale" },
-];
-
-const HERO_TABS = [
-  { id: "rentals", label: "Rentals" },
-  { id: "accommodation", label: "Stays" },
-  { id: "quicksales", label: "QuickSales" },
 ];
 
 const TRUST_ITEMS = [
@@ -902,7 +868,6 @@ export default function HomePro() {
   const [adIdx, setAdIdx] = useState(0);
 
   /* ── HERO SEARCH ── */
-  const [heroTab, setHeroTab] = useState("rentals");
   const [query, setQuery] = useState("");
   const [heroIdx, setHeroIdx] = useState(0);
 
@@ -984,21 +949,8 @@ export default function HomePro() {
     e.preventDefault();
     const params = new URLSearchParams();
     const q = query.trim();
-
-    if (heroTab === "rentals") {
-      if (q) params.set("search", q);
-      navigate(`/listings${params.toString() ? `?${params}` : ""}`);
-      return;
-    }
-
-    if (heroTab === "accommodation") {
-      if (q) params.set("search", q);
-      navigate(`/accommodation/listings${params.toString() ? `?${params}` : ""}`);
-      return;
-    }
-
     if (q) params.set("search", q);
-    navigate(`/quicksales${params.toString() ? `?${params}` : ""}`);
+    navigate(`/listings${params.toString() ? `?${params}` : ""}`);
   };
 
   /* Rotate the hero preview card through live listings */
@@ -1123,27 +1075,11 @@ export default function HomePro() {
           </div>
 
           <form className="ax-search" onSubmit={handleHeroSearch}>
-            <div className="ax-search-tabs" role="tablist" aria-label="What are you looking for?">
-              {HERO_TABS.map((t) => (
-                <button key={t.id} type="button" role="tab"
-                  aria-selected={heroTab === t.id}
-                  onClick={() => setHeroTab(t.id)}>
-                  {t.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="ax-search-body">
+            <div className="ax-search-body single">
               <div className="ax-field">
-                <label htmlFor="hero-query">
-                  {heroTab === "rentals"
-                    ? "Search rentals"
-                    : heroTab === "accommodation"
-                      ? "Destination or property"
-                      : "What are you looking for?"}
-                </label>
+                <label htmlFor="hero-query">What are you looking for?</label>
                 <input id="hero-query" type="search" value={query}
-                  placeholder={heroTab === "rentals" ? "estate, area, house type…" : heroTab === "accommodation" ? "Diani, Naivasha, lodge…" : "Sofa, cement, laptop…"}
+                  placeholder="Search rentals, stays, items for sale…"
                   onChange={(e) => setQuery(e.target.value)} />
               </div>
 

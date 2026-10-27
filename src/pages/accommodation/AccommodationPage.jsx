@@ -1746,20 +1746,6 @@ export default function AccommodationPage() {
         </div>
       </footer>
 
-      {/* ── FLOATING WHATSAPP BUTTON ── */}
-      <a
-        href="https://wa.me/254745689773?text=Hi%20AXXSpace%20Accommodation%20Concierge,%20I%20need%20assistance%20finding%20a%20verified%20stay"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="wa-floating-concierge"
-        aria-label="Direct WhatsApp Concierge"
-      >
-        <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
-          <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.23 8.23 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24m4.52 11.66c-.25.7-.72 1.33-1.37 1.57-.45.17-.98.24-3.16-.62-2.34-.92-3.83-3.32-3.95-3.48-.12-.16-.95-1.26-.95-2.4 0-1.14.6-1.7.81-1.93.21-.23.46-.29.62-.29.15 0 .31 0 .44.01.14.01.32-.05.5.38.18.44.62 1.51.68 1.62.06.12.1.25.02.4-.08.15-.12.25-.24.39-.12.14-.25.31-.36.42-.12.12-.24.25-.1.5.14.24.62 1.02 1.33 1.65.91.81 1.67 1.06 1.91 1.18.24.12.38.1.52-.06.14-.16.6-.7.76-.94.16-.24.32-.2.54-.12.22.08 1.4.66 1.64.78.24.12.4.18.46.28.06.1.06.6-.19 1.3z" />
-        </svg>
-        <span className="wa-tooltip-label">Direct Concierge</span>
-      </a>
-
       {/* ── SCROLL TO TOP ── */}
       <button
         type="button"
@@ -4059,50 +4045,7 @@ const css = `
     color: #64748B;
   }
 
-  /* ── 14. FLOATING WHATSAPP & SCROLL TOP ── */
-  .wa-floating-concierge {
-    position: fixed;
-    right: 20px;
-    bottom: 24px;
-    background: #25D366;
-    color: #FFFFFF;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 8px 25px rgba(37, 211, 102, 0.45);
-    z-index: 400;
-    text-decoration: none;
-    transition: all 0.25s ease;
-    animation: waPulse 2.4s infinite;
-  }
-  .wa-floating-concierge:hover {
-    transform: scale(1.08);
-  }
-  .wa-tooltip-label {
-    position: absolute;
-    right: 68px;
-    background: #0F172A;
-    color: #FFFFFF;
-    font-size: 0.75rem;
-    font-weight: 700;
-    padding: 6px 12px;
-    border-radius: 8px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s;
-  }
-  .wa-floating-concierge:hover .wa-tooltip-label {
-    opacity: 1;
-  }
-  @keyframes waPulse {
-    0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.55); }
-    70% { box-shadow: 0 0 0 16px rgba(37, 211, 102, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
-  }
+  /* ── 14. SCROLL TOP ── */
 
   .scroll-to-top-button {
     position: fixed;
