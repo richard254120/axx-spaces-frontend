@@ -377,6 +377,22 @@ export default function Navbar() {
                 <>
                   <div className="ax-menu-group-header">MY ACTIVITY &amp; ACCOUNT</div>
                   <div className="ax-menu-list">
+                    {isCommunityAccount ? (
+                      /* Community accounts: one hub entry point only */
+                      <Link to="/member" className="ax-menu-row" onClick={() => setDropdownOpen(false)}>
+                        <div className="ax-row-icon icon-purple">
+                          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                          </svg>
+                        </div>
+                        <div className="ax-row-info">
+                          <div className="ax-row-title">My Hub &amp; Activities</div>
+                          <div className="ax-row-sub">Saved spaces, bookings, enquiries &amp; settings</div>
+                        </div>
+                        <span className="ax-row-arrow">→</span>
+                      </Link>
+                    ) : (
+                      <>
                     <Link to="/notifications" className="ax-menu-row" onClick={() => setDropdownOpen(false)}>
                       <div className="ax-row-icon icon-purple">
                         <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -429,6 +445,8 @@ export default function Navbar() {
                       </div>
                       <span className="ax-row-arrow">→</span>
                     </Link>
+                      </>
+                    )}
                   </div>
                 </>
               )}
@@ -603,46 +621,52 @@ export default function Navbar() {
                         </div>
                       </div>
                       <div className="ax-divider" />
-                      <Link to="/profile" className="ax-item" onClick={() => setAccountOpen(false)}>
-                        My Profile
-                      </Link>
-                      {(user?.role === "member" || user?.role === "user") ? (
+                      {isCommunityAccount ? (
+                        /* Community accounts get a single entry point — everything
+                           else lives inside the hub's own tabs. */
                         <Link to="/member" className="ax-item" style={{ color: "#fbbf24", fontWeight: 700 }} onClick={() => setAccountOpen(false)}>
-                          My Hub & Activities
+                          My Hub &amp; Activities
                         </Link>
                       ) : (
-                        <Link to={getDashboardLink()} className="ax-item" style={{ color: "#fbbf24", fontWeight: 700 }} onClick={() => setAccountOpen(false)}>
-                          Dashboard
-                        </Link>
+                        <>
+                          <Link to="/profile" className="ax-item" onClick={() => setAccountOpen(false)}>
+                            My Profile
+                          </Link>
+                          <Link to={getDashboardLink()} className="ax-item" style={{ color: "#fbbf24", fontWeight: 700 }} onClick={() => setAccountOpen(false)}>
+                            Dashboard
+                          </Link>
+                          <Link to="/saved" className="ax-item" onClick={() => setAccountOpen(false)}>
+                            Saved Spaces
+                          </Link>
+                          <Link to="/my-bookings" className="ax-item" onClick={() => setAccountOpen(false)}>
+                            My Bookings
+                          </Link>
+                          <Link to="/notifications" className="ax-item" onClick={() => setAccountOpen(false)}>
+                            Notifications
+                          </Link>
+                          <Link to="/wallet" className="ax-item" onClick={() => setAccountOpen(false)}>
+                            AxxWallet
+                          </Link>
+                          <Link to="/payment-history" className="ax-item" onClick={() => setAccountOpen(false)}>
+                            Payment History
+                          </Link>
+                          {["landlord", "agent", "host"].includes((user?.role || "").toLowerCase()) && (
+                            <Link to="/upload" className="ax-item" onClick={() => setAccountOpen(false)}>
+                              Upload Property
+                            </Link>
+                          )}
+                          <Link to="/settings" className="ax-item" onClick={() => setAccountOpen(false)}>
+                            Settings &amp; Security
+                          </Link>
+                        </>
                       )}
-                      <Link to="/saved" className="ax-item" onClick={() => setAccountOpen(false)}>
-                        Saved Spaces
-                      </Link>
-                      <Link to="/my-bookings" className="ax-item" onClick={() => setAccountOpen(false)}>
-                        My Bookings
-                      </Link>
-                      <Link to="/notifications" className="ax-item" onClick={() => setAccountOpen(false)}>
-                        Notifications
-                      </Link>
-                      <Link to="/wallet" className="ax-item" onClick={() => setAccountOpen(false)}>
-                        AxxWallet
-                      </Link>
-                      <Link to="/payment-history" className="ax-item" onClick={() => setAccountOpen(false)}>
-                        Payment History
-                      </Link>
-                      {["landlord", "agent", "host"].includes((user?.role || "").toLowerCase()) && (
-                        <Link to="/upload" className="ax-item" onClick={() => setAccountOpen(false)}>
-                          Upload Property
-                        </Link>
-                      )}
-                      <Link to="/settings" className="ax-item" onClick={() => setAccountOpen(false)}>
-                        Settings & Security
-                      </Link>
-                      <div className="ax-divider" />
                       {!isCommunityAccount && (
-                        <button type="button" className="ax-item ax-item-danger" onClick={handleLogout}>
-                          Logout
-                        </button>
+                        <>
+                          <div className="ax-divider" />
+                          <button type="button" className="ax-item ax-item-danger" onClick={handleLogout}>
+                            Logout
+                          </button>
+                        </>
                       )}
                     </div>
                   </>

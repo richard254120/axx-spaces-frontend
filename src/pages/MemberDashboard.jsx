@@ -98,6 +98,35 @@ const IconArrowUpRight = ({ size = 13, color = "currentColor", style }) => (
   </svg>
 );
 
+const IconBell = ({ size = 18, color = "currentColor", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+  </svg>
+);
+
+const IconWallet = ({ size = 18, color = "currentColor", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <rect x="2" y="4" width="20" height="16" rx="2" />
+    <line x1="2" y1="10" x2="22" y2="10" />
+    <circle cx="16" cy="15" r="1.5" />
+  </svg>
+);
+
+const IconCreditCard = ({ size = 18, color = "currentColor", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <rect x="2" y="5" width="20" height="14" rx="2" />
+    <line x1="2" y1="10" x2="22" y2="10" />
+  </svg>
+);
+
+const IconSettings = ({ size = 18, color = "currentColor", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6h.09A1.65 1.65 0 0 0 10 3.09V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+  </svg>
+);
+
 const IconArrowRight = ({ size = 13, color = "currentColor", style }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={style}>
     <line x1="5" y1="12" x2="19" y2="12" />
@@ -505,6 +534,44 @@ const styles = {
     display: "inline-flex",
     alignItems: "center",
     gap: "6px",
+  },
+  accountLinks: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+    gap: "12px",
+    marginTop: "16px",
+  },
+  accountLink: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    padding: "14px 16px",
+    borderRadius: "12px",
+    background: "rgba(30, 41, 59, 0.55)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    textDecoration: "none",
+    minWidth: 0,
+  },
+  accountLinkIcon: {
+    width: "38px",
+    height: "38px",
+    borderRadius: "10px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  accountLinkTitle: {
+    display: "block",
+    fontSize: "13.5px",
+    fontWeight: 700,
+    color: "#f8fafc",
+  },
+  accountLinkSub: {
+    display: "block",
+    fontSize: "11.5px",
+    color: "#94a3b8",
+    marginTop: "2px",
   },
   input: {
     width: "100%",
@@ -1177,6 +1244,32 @@ export default function MemberDashboard() {
                 ))}
               </div>
             )}
+          </div>
+
+          {/* ACCOUNT SHORTCUTS — moved out of the navbar menu */}
+          <div style={styles.section}>
+            <div style={styles.sectionHeader}>
+              <div>
+                <h2 style={styles.sectionTitle}>My Activity &amp; Account</h2>
+                <div style={styles.sectionSub}>Notifications, wallet, payments and security — all one tap away</div>
+              </div>
+            </div>
+            <div style={styles.accountLinks}>
+              {[
+                { to: "/notifications", label: "Notifications", sub: "Alerts, enquiries & booking updates", icon: <IconBell size={18} />, tint: "rgba(192, 132, 252, 0.12)", color: "#c084fc" },
+                { to: "/wallet", label: "AxxWallet", sub: "Balances, transactions & payouts", icon: <IconWallet size={18} />, tint: "rgba(16, 185, 129, 0.12)", color: "#34d399" },
+                { to: "/payment-history", label: "Payment History", sub: "Receipts for every payment", icon: <IconCreditCard size={18} />, tint: "rgba(56, 189, 248, 0.12)", color: "#38bdf8" },
+                { to: "/settings", label: "Settings & Security", sub: "Password, 2FA & sign out", icon: <IconSettings size={18} />, tint: "rgba(251, 191, 36, 0.12)", color: "#fbbf24" },
+              ].map((item) => (
+                <Link key={item.to} to={item.to} style={styles.accountLink}>
+                  <span style={{ ...styles.accountLinkIcon, background: item.tint, color: item.color }}>{item.icon}</span>
+                  <span style={{ minWidth: 0 }}>
+                    <span style={styles.accountLinkTitle}>{item.label}</span>
+                    <span style={styles.accountLinkSub}>{item.sub}</span>
+                  </span>
+                </Link>
+              ))}
+            </div>
           </div>
           </>
         )}
