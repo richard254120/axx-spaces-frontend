@@ -450,6 +450,62 @@ const styles = {
     fontSize: "16px",
     flexShrink: 0,
   },
+  overviewColumns: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+    gap: "20px",
+    marginBottom: "20px",
+  },
+  detailRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "16px",
+    padding: "11px 0",
+    borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
+  },
+  detailLabel: {
+    fontSize: "12.5px",
+    color: "#94a3b8",
+    fontWeight: 600,
+  },
+  detailValue: {
+    fontSize: "13.5px",
+    color: "#f8fafc",
+    fontWeight: 700,
+    textAlign: "right",
+    wordBreak: "break-word",
+  },
+  perfRow: {
+    marginBottom: "16px",
+  },
+  perfLine: {
+    display: "flex",
+    justifyContent: "space-between",
+    fontSize: "12.5px",
+    color: "#cbd5e1",
+    fontWeight: 600,
+    marginBottom: "6px",
+  },
+  perfTrack: {
+    height: "7px",
+    borderRadius: "999px",
+    background: "rgba(255, 255, 255, 0.07)",
+    overflow: "hidden",
+  },
+  settingsLink: {
+    background: "rgba(255, 255, 255, 0.06)",
+    color: "#cbd5e1",
+    border: "1px solid rgba(255, 255, 255, 0.15)",
+    padding: "10px 16px",
+    borderRadius: "10px",
+    fontSize: "13px",
+    fontWeight: 700,
+    textDecoration: "none",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+  },
   input: {
     width: "100%",
     padding: "12px 14px",
@@ -520,7 +576,7 @@ function formatTimeAgo(dateInput) {
 }
 
 export default function MemberDashboard() {
-  const { user, token, updateUser, logout } = useContext(AuthContext);
+  const { user, token, updateUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const tabFromUrl = searchParams.get("tab");
@@ -573,39 +629,15 @@ export default function MemberDashboard() {
       if (res.ok) {
         const data = await res.json();
 
-        // Merge backend favorites with local accommodation wishlists
-        let combinedFavs = data.favorites || [];
-        try {
-          const localAccFavs = JSON.parse(localStorage.getItem("axx_accommodation_favs") || "[]");
-          if (Array.isArray(localAccFavs) && localAccFavs.length > 0) {
-            localAccFavs.forEach((item) => {
-              if (item && item.id && !combinedFavs.some((f) => f._id === item.id || f.property?._id === item.id)) {
-                combinedFavs.push({
-                  _id: `local-acc-${item.id}`,
-                  isLocal: true,
-                  property: {
-                    _id: item.id,
-                    title: item.name || item.title || "Holiday Stay",
-                    price: item.price,
-                    location: { address: item.county || item.location || "Kenya" },
-                    images: item.image ? [item.image] : [],
-                    category: "accommodation",
-                  },
-                  createdAt: new Date().toISOString(),
-                });
-              }
-            });
-          }
-        } catch (e) {
-          console.warn("Local favs parse error", e);
-        }
-
-        setFavorites(combinedFavs);
+        // Account activity is identity-scoped only.
+        // Device-local wishlists are deliberately excluded so a shared device
+        // can never surface another account's saved spaces here.
+        setFavorites(data.favorites || []);
         setEnquiries(data.enquiries || []);
         setBookings(data.bookings || { accommodations: [], services: [] });
         setItemRequests(data.itemRequests || []);
         setStats(data.stats || {
-          favoritesCount: combinedFavs.length,
+          favoritesCount: (data.favorites || []).length,
           enquiriesCount: (data.enquiries || []).length,
           bookingsCount: ((data.bookings?.accommodations || []).length + (data.bookings?.services || []).length),
           requestsCount: (data.itemRequests || []).length,
@@ -746,6 +778,22 @@ export default function MemberDashboard() {
   };
 
   const totalBookingsCount = (bookings.accommodations?.length || 0) + (bookings.services?.length || 0);
+  const totalActivities = favorites.length + enquiries.length + totalBookingsCount + itemRequests.length;
+  const accountType = user?.role === "member" ? "Axxspace Member" : "Community Explorer";
+  const memberSince = user?.createdAt
+    ? new Date(user.createdAt).toLocaleDateString("en-KE", { month: "long", year: "numeric" })
+    : "Not available";
+
+  // Share of this member's own activity, used for the performance snapshot
+  const performanceRows = [
+    { label: "Saved spaces", value: favorites.length, color: "#f43f5e" },
+    { label: "Bookings & stays", value: totalBookingsCount, color: "#fbbf24" },
+    { label: "Enquiries sent", value: enquiries.length, color: "#c084fc" },
+    { label: "Service requests", value: itemRequests.length, color: "#38bdf8" },
+  ].map((row) => ({
+    ...row,
+    percent: totalActivities ? Math.round((row.value / totalActivities) * 100) : 0,
+  }));
 
   return (
     <div style={styles.page}>
@@ -769,6 +817,10 @@ export default function MemberDashboard() {
           </div>
 
           <div style={styles.headerActions}>
+            <Link to="/settings" style={styles.settingsLink} title="Profile, security and sign out">
+              <IconUser size={14} />
+              <span>Account Settings</span>
+            </Link>
             <Link to="/listings" style={{ ...styles.exploreBtn, display: "inline-flex", alignItems: "center", gap: "6px" }}>
               <span>Browse Spaces</span>
               <IconArrowUpRight size={13} />
@@ -788,56 +840,66 @@ export default function MemberDashboard() {
           </div>
         </div>
 
-        {/* ACTIVITY STAT METRICS */}
+        {/* ACTIVITY STAT METRICS — personal performance at a glance */}
         <div style={styles.statsRow}>
           <div
             style={{ ...styles.statCard, ...(activeTab === "overview" ? styles.statCardActive : {}) }}
-            onClick={() => setActiveTab("overview")}
+            onClick={() => handleTabChange("overview")}
           >
             <div style={{ ...styles.statIconWrap, background: "rgba(56, 189, 248, 0.12)", color: "#38bdf8" }}>
               <IconActivity size={20} />
             </div>
-            <div style={styles.statNumber}>
-              {(favorites.length + enquiries.length + totalBookingsCount)}
-            </div>
+            <div style={styles.statNumber}>{totalActivities}</div>
             <div style={styles.statLabel}>Total Activities</div>
-            <div style={styles.statSub}>All platform interactions</div>
+            <div style={styles.statSub}>All your platform interactions</div>
           </div>
 
           <div
             style={{ ...styles.statCard, ...(activeTab === "favorites" ? styles.statCardActive : {}) }}
-            onClick={() => setActiveTab("favorites")}
+            onClick={() => handleTabChange("favorites")}
           >
             <div style={{ ...styles.statIconWrap, background: "rgba(244, 63, 94, 0.12)", color: "#f43f5e" }}>
               <IconHeart size={20} filled />
             </div>
             <div style={styles.statNumber}>{favorites.length}</div>
             <div style={styles.statLabel}>Saved Spaces</div>
-            <div style={styles.statSub}>Bookmarked listings & properties</div>
+            <div style={styles.statSub}>Your bookmarked listings</div>
           </div>
 
           <div
             style={{ ...styles.statCard, ...(activeTab === "bookings" ? styles.statCardActive : {}) }}
-            onClick={() => setActiveTab("bookings")}
+            onClick={() => handleTabChange("bookings")}
           >
             <div style={{ ...styles.statIconWrap, background: "rgba(251, 191, 36, 0.12)", color: "#fbbf24" }}>
               <IconCalendar size={20} />
             </div>
             <div style={styles.statNumber}>{totalBookingsCount}</div>
-            <div style={styles.statLabel}>Stays & Bookings</div>
-            <div style={styles.statSub}>Accommodations & services</div>
+            <div style={styles.statLabel}>Stays &amp; Bookings</div>
+            <div style={styles.statSub}>Your reservations with hosts</div>
           </div>
 
           <div
             style={{ ...styles.statCard, ...(activeTab === "enquiries" ? styles.statCardActive : {}) }}
-            onClick={() => setActiveTab("enquiries")}
+            onClick={() => handleTabChange("enquiries")}
           >
             <div style={{ ...styles.statIconWrap, background: "rgba(192, 132, 252, 0.12)", color: "#c084fc" }}>
               <IconMessageSquare size={20} />
             </div>
             <div style={styles.statNumber}>{enquiries.length}</div>
             <div style={styles.statLabel}>Enquiries Sent</div>
-            <div style={styles.statSub}>Waitlists & questions to hosts</div>
+            <div style={styles.statSub}>Questions to hosts &amp; owners</div>
+          </div>
+
+          <div
+            style={{ ...styles.statCard, ...(activeTab === "requests" ? styles.statCardActive : {}) }}
+            onClick={() => handleTabChange("requests")}
+          >
+            <div style={{ ...styles.statIconWrap, background: "rgba(56, 189, 248, 0.12)", color: "#38bdf8" }}>
+              <IconPackage size={20} />
+            </div>
+            <div style={styles.statNumber}>{itemRequests.length}</div>
+            <div style={styles.statLabel}>Service Requests</div>
+            <div style={styles.statSub}>Items &amp; services you requested</div>
           </div>
         </div>
 
@@ -846,7 +908,7 @@ export default function MemberDashboard() {
           <button
             type="button"
             style={{ ...styles.tabBtn, ...(activeTab === "overview" ? styles.tabBtnActive : {}) }}
-            onClick={() => setActiveTab("overview")}
+            onClick={() => handleTabChange("overview")}
           >
             <IconActivity size={16} />
             <span>Activity Feed</span>
@@ -854,7 +916,7 @@ export default function MemberDashboard() {
           <button
             type="button"
             style={{ ...styles.tabBtn, ...(activeTab === "favorites" ? styles.tabBtnActive : {}) }}
-            onClick={() => setActiveTab("favorites")}
+            onClick={() => handleTabChange("favorites")}
           >
             <IconHeart size={16} filled={activeTab === "favorites"} />
             <span>Saved Spaces ({favorites.length})</span>
@@ -862,7 +924,7 @@ export default function MemberDashboard() {
           <button
             type="button"
             style={{ ...styles.tabBtn, ...(activeTab === "bookings" ? styles.tabBtnActive : {}) }}
-            onClick={() => setActiveTab("bookings")}
+            onClick={() => handleTabChange("bookings")}
           >
             <IconCalendar size={16} />
             <span>My Bookings &amp; Stays ({totalBookingsCount})</span>
@@ -870,23 +932,109 @@ export default function MemberDashboard() {
           <button
             type="button"
             style={{ ...styles.tabBtn, ...(activeTab === "enquiries" ? styles.tabBtnActive : {}) }}
-            onClick={() => setActiveTab("enquiries")}
+            onClick={() => handleTabChange("enquiries")}
           >
             <IconMessageSquare size={16} />
             <span>Space Enquiries ({enquiries.length})</span>
           </button>
           <button
             type="button"
+            style={{ ...styles.tabBtn, ...(activeTab === "requests" ? styles.tabBtnActive : {}) }}
+            onClick={() => handleTabChange("requests")}
+          >
+            <IconPackage size={16} />
+            <span>Service Requests ({itemRequests.length})</span>
+          </button>
+          <button
+            type="button"
             style={{ ...styles.tabBtn, ...(activeTab === "profile" ? styles.tabBtnActive : {}) }}
-            onClick={() => setActiveTab("profile")}
+            onClick={() => handleTabChange("profile")}
           >
             <IconUser size={16} />
             <span>Account Profile</span>
           </button>
         </div>
 
-        {/* TAB 1: OVERVIEW & TIMELINE */}
+        {/* TAB 1: OVERVIEW — personal details, performance, and timeline */}
         {activeTab === "overview" && (
+          <>
+            <div style={styles.overviewColumns}>
+              {/* PERSONAL DETAILS */}
+              <div style={styles.section}>
+                <div style={styles.sectionHeader}>
+                  <div>
+                    <h2 style={styles.sectionTitle}>Your Account Details</h2>
+                    <div style={styles.sectionSub}>Only your own account information is shown here</div>
+                  </div>
+                  <Link to="/settings" style={styles.exploreBtn}>Edit</Link>
+                </div>
+
+                <div style={styles.detailRow}>
+                  <span style={styles.detailLabel}>Full name</span>
+                  <span style={styles.detailValue}>{user?.name || "Not set"}</span>
+                </div>
+                <div style={styles.detailRow}>
+                  <span style={styles.detailLabel}>Email address</span>
+                  <span style={styles.detailValue}>{user?.email || "Not set"}</span>
+                </div>
+                <div style={styles.detailRow}>
+                  <span style={styles.detailLabel}>Phone number</span>
+                  <span style={styles.detailValue}>{user?.phone || "Not set"}</span>
+                </div>
+                <div style={styles.detailRow}>
+                  <span style={styles.detailLabel}>County</span>
+                  <span style={styles.detailValue}>{user?.county || "Not set"}</span>
+                </div>
+                <div style={styles.detailRow}>
+                  <span style={styles.detailLabel}>Account type</span>
+                  <span style={styles.detailValue}>{accountType}</span>
+                </div>
+                <div style={{ ...styles.detailRow, borderBottom: "none" }}>
+                  <span style={styles.detailLabel}>Member since</span>
+                  <span style={styles.detailValue}>{memberSince}</span>
+                </div>
+              </div>
+
+              {/* PERFORMANCE SNAPSHOT */}
+              <div style={styles.section}>
+                <div style={styles.sectionHeader}>
+                  <div>
+                    <h2 style={styles.sectionTitle}>Your Activity Performance</h2>
+                    <div style={styles.sectionSub}>How you are using Axxspace, at a glance</div>
+                  </div>
+                </div>
+
+                <div style={{ ...styles.detailRow, borderBottom: "none", paddingTop: 0 }}>
+                  <span style={styles.detailLabel}>Total activities</span>
+                  <span style={{ ...styles.detailValue, color: "#fbbf24", fontSize: "20px" }}>{totalActivities}</span>
+                </div>
+
+                {performanceRows.map((row) => (
+                  <div key={row.label} style={styles.perfRow}>
+                    <div style={styles.perfLine}>
+                      <span>{row.label}</span>
+                      <span>{row.value} · {row.percent}%</span>
+                    </div>
+                    <div style={styles.perfTrack}>
+                      <div
+                        style={{
+                          width: `${row.percent}%`,
+                          height: "100%",
+                          background: row.color,
+                          borderRadius: "999px",
+                          transition: "width 0.3s ease",
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+
+                <p style={{ margin: "4px 0 0 0", fontSize: "12px", color: "#64748b" }}>
+                  Updated automatically from your own saved spaces, bookings, enquiries, and requests.
+                </p>
+              </div>
+            </div>
+
           <div style={styles.section}>
             <div style={styles.sectionHeader}>
               <div>
@@ -916,7 +1064,7 @@ export default function MemberDashboard() {
 
             {loading ? (
               <p style={{ color: "#94a3b8", padding: "20px 0" }}>Loading your activity feed...</p>
-            ) : favorites.length === 0 && enquiries.length === 0 && totalBookingsCount === 0 ? (
+            ) : favorites.length === 0 && enquiries.length === 0 && totalBookingsCount === 0 && itemRequests.length === 0 ? (
               <div style={styles.emptyBox}>
                 <div style={{ display: "flex", justifyContent: "center", marginBottom: "12px", color: "#64748b" }}>
                   <IconCompass size={40} />
@@ -984,7 +1132,7 @@ export default function MemberDashboard() {
                   </div>
                 ))}
 
-                {/* Favorites events */}
+                {/* Saved events */}
                 {favorites.map((fav) => {
                   const item = fav.property || fav.business;
                   if (!item) return null;
@@ -1007,9 +1155,30 @@ export default function MemberDashboard() {
                     </div>
                   );
                 })}
+
+                {/* Service request events */}
+                {itemRequests.map((req) => (
+                  <div key={req._id} style={styles.timelineItem}>
+                    <div style={{ ...styles.timelineDot, background: "rgba(56, 189, 248, 0.12)", color: "#38bdf8", borderColor: "rgba(56, 189, 248, 0.3)" }}>
+                      <IconPackage size={16} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "6px" }}>
+                        <span style={{ fontWeight: 700, color: "#ffffff", fontSize: "14.5px" }}>
+                          Requested: {req.searchQuery || "Service request"}
+                        </span>
+                        <span style={styles.statusBadge(req.status)}>{req.status || "pending"}</span>
+                      </div>
+                      {req.details && (
+                        <p style={{ margin: "4px 0 0 0", color: "#94a3b8", fontSize: "13px" }}>{req.details}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
+          </>
         )}
 
         {/* TAB 2: SAVED SPACES */}
@@ -1221,7 +1390,53 @@ export default function MemberDashboard() {
           </div>
         )}
 
-        {/* TAB 5: PROFILE & SETTINGS */}
+        {/* TAB 5: SERVICE REQUESTS */}
+        {activeTab === "requests" && (
+          <div style={styles.section}>
+            <div style={styles.sectionHeader}>
+              <div>
+                <h2 style={styles.sectionTitle}>Your Service Requests ({itemRequests.length})</h2>
+                <div style={styles.sectionSub}>Items, moves, and services you asked Axxspace to source</div>
+              </div>
+            </div>
+
+            {loading ? (
+              <p style={{ color: "#94a3b8" }}>Loading your requests...</p>
+            ) : itemRequests.length === 0 ? (
+              <div style={styles.emptyBox}>
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: "12px", color: "#64748b" }}>
+                  <IconPackage size={40} />
+                </div>
+                <h3 style={{ margin: "0 0 6px 0", color: "#ffffff", fontSize: "16px" }}>No service requests yet</h3>
+                <p style={{ margin: 0, color: "#94a3b8", fontSize: "13px" }}>
+                  When you ask us to source an item or service, it will be tracked here.
+                </p>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                {itemRequests.map((req) => (
+                  <div key={req._id} style={styles.enquiryCard}>
+                    <div>
+                      <h4 style={{ margin: "0 0 4px 0", color: "#f8fafc", fontSize: "15px" }}>
+                        {req.searchQuery || "Service request"}
+                      </h4>
+                      <p style={{ margin: "0 0 6px 0", color: "#94a3b8", fontSize: "12px" }}>
+                        {req.serviceType ? `${req.serviceType.toUpperCase()} · ` : ""}
+                        {req.createdAt ? new Date(req.createdAt).toLocaleDateString() : ""}
+                      </p>
+                      {req.details && (
+                        <p style={{ margin: 0, color: "#cbd5e1", fontSize: "13px" }}>{req.details}</p>
+                      )}
+                    </div>
+                    <span style={styles.statusBadge(req.status)}>{req.status || "pending"}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAB 6: PROFILE & SETTINGS */}
         {activeTab === "profile" && (
           <div style={styles.section}>
             <div style={styles.sectionHeader}>
@@ -1287,6 +1502,22 @@ export default function MemberDashboard() {
                 {profileSaving ? "Saving..." : "Save Profile Details"}
               </button>
             </form>
+
+            <div
+              style={{
+                marginTop: "24px",
+                paddingTop: "20px",
+                borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+                fontSize: "13px",
+                color: "#94a3b8",
+              }}
+            >
+              Password, notification preferences, and signing out are managed in{" "}
+              <Link to="/settings" style={{ color: "#fbbf24", fontWeight: 700 }}>
+                Account Settings
+              </Link>
+              .
+            </div>
           </div>
         )}
       </div>

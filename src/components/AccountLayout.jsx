@@ -8,6 +8,7 @@ import {
   getDashboardPath,
   getLoginPath,
   getWorkspaceBrand,
+  isWorkspaceUser,
   resolveAuth,
 } from "../utils/dashboardRoutes";
 import logo from "../assets/image.png";
@@ -30,6 +31,8 @@ export default function AccountLayout({ children, preferSeller = false }) {
   const dashboardPath = getDashboardPath(user?.role);
   const navItems = getAccountNav(user?.role);
   const brand = getWorkspaceBrand(user?.role);
+  // Community accounts (members/explorers) sign out from Account Settings only
+  const showLogout = isWorkspaceUser(user?.role);
 
   if (!user) {
     return <div style={styles.root}>{children}</div>;
@@ -87,9 +90,11 @@ export default function AccountLayout({ children, preferSeller = false }) {
             <span style={styles.userName}>{user?.name}</span>
           </div>
           <ProfileAvatar user={user} size={32} />
-          <button type="button" style={styles.logoutBtn} onClick={handleLogout}>
-            Logout
-          </button>
+          {showLogout && (
+            <button type="button" style={styles.logoutBtn} onClick={handleLogout}>
+              Logout
+            </button>
+          )}
         </div>
       </header>
 

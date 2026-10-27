@@ -74,6 +74,8 @@ export default function Navbar() {
   const userMenuRef = useRef(null);
 
   const isLoggedIn = token && user && user.role !== "guest";
+  // Members/explorers manage their account inside the member hub; sign-out lives in Account Settings
+  const isCommunityAccount = ["member", "user"].includes((user?.role || "").toLowerCase());
   const getDashboardLink = () => getDashboardPath(user?.role);
 
   const isActive = (path) => {
@@ -496,8 +498,8 @@ export default function Navbar() {
                 </Link>
               </div>
 
-              {/* Footer / Logout */}
-              {isLoggedIn && (
+              {/* Footer / Logout — workspace providers only; community accounts sign out from Settings */}
+              {isLoggedIn && !isCommunityAccount && (
                 <div className="ax-menu-footer-auth">
                   <button type="button" className="ax-menu-logout-btn" onClick={handleLogout}>
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -637,9 +639,11 @@ export default function Navbar() {
                         Settings & Security
                       </Link>
                       <div className="ax-divider" />
-                      <button type="button" className="ax-item ax-item-danger" onClick={handleLogout}>
-                        Logout
-                      </button>
+                      {!isCommunityAccount && (
+                        <button type="button" className="ax-item ax-item-danger" onClick={handleLogout}>
+                          Logout
+                        </button>
+                      )}
                     </div>
                   </>
                 )}

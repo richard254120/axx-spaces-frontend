@@ -127,18 +127,6 @@ export default function Settings() {
               </p>
             </div>
           </div>
-
-          <div style={styles.headerRight}>
-            <button
-              style={styles.logoutBtn}
-              onClick={() => {
-                if (logout) logout("/user-login");
-                else window.location.href = "/user-login";
-              }}
-            >
-              Sign Out
-            </button>
-          </div>
         </div>
 
         {/* Tab Navigation */}
@@ -348,6 +336,36 @@ export default function Settings() {
             </div>
           </div>
         )}
+
+        {/* SESSION & SIGN OUT */}
+        <div style={{ ...styles.cardSection, marginTop: "28px" }}>
+          <div style={styles.cardHeader}>
+            <h2 style={styles.cardTitle}>Session &amp; Sign Out</h2>
+            <p style={styles.cardSubtitle}>
+              Signing out ends this session on the current device. You will need your email and
+              password to sign back in.
+            </p>
+          </div>
+
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
+            <div>
+              <h4 style={styles.fieldLabel}>Signed in as</h4>
+              <p style={{ margin: "4px 0 0 0", fontSize: "14px", color: "#94a3b8" }}>
+                {user?.email || "—"}
+              </p>
+            </div>
+            <button
+              type="button"
+              style={styles.signOutBtn}
+              onClick={() => {
+                if (logout) logout("/user-login");
+                else window.location.href = "/user-login";
+              }}
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -408,8 +426,8 @@ const styles = {
     display: "flex",
     alignItems: "center",
   },
-  logoutBtn: {
-    padding: "9px 18px",
+  signOutBtn: {
+    padding: "10px 20px",
     background: "rgba(239, 68, 68, 0.12)",
     color: "#fca5a5",
     border: "1px solid rgba(239, 68, 68, 0.3)",

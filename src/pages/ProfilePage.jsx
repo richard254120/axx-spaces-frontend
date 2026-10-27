@@ -21,6 +21,8 @@ export default function ProfilePage() {
 
   const activeRole = normalizeRole(profile?.role || user?.role || "member");
   const isProvider = ["landlord", "agent", "host", "seller", "mover", "business", "admin", "team"].includes(activeRole);
+  // Members/explorers sign out from Account Settings, not from their overview
+  const isCommunityAccount = ["member", "user"].includes(activeRole);
 
   useEffect(() => {
     if (user) {
@@ -131,16 +133,18 @@ export default function ProfilePage() {
             </svg>
             <span>Edit Profile</span>
           </Link>
-          <button
-            type="button"
-            style={styles.logoutBtn}
-            onClick={() => {
-              if (logout) logout("/user-login");
-              else window.location.href = "/user-login";
-            }}
-          >
-            Logout
-          </button>
+          {!isCommunityAccount && (
+            <button
+              type="button"
+              style={styles.logoutBtn}
+              onClick={() => {
+                if (logout) logout("/user-login");
+                else window.location.href = "/user-login";
+              }}
+            >
+              Logout
+            </button>
+          )}
         </div>
       </div>
 
