@@ -5,5 +5,4 @@ scope:
     - axx-spaces-mobile/
 source_files: []
 depends_on: []
-related_to:
-    - path: admin_dashboard
+related_to: []

@@ -3,11 +3,11 @@ schema_version: 1
 locale: en-US
 branch: main
 nodes_managed: true
-exported_at: "2026-10-27T10:53:11Z"
+exported_at: "2026-10-27T11:42:48Z"
 modules:
     "":
-        dir_name: AXX Spaces Frontend Monorepo (Web + Mobile + Admin)
-        title: AXX Spaces Frontend Monorepo (Web + Mobile + Admin)
+        dir_name: AXXspace Frontend Monorepo Root
+        title: AXXspace Frontend Monorepo Root
         scope:
             - README.md
             - package.json
@@ -41,19 +41,16 @@ modules:
         source_files: []
         children: []
         depends_on: []
-        related_to:
-            - path: frontend_marketplace
-            - path: mobile_app
+        related_to: []
     frontend_marketplace:
-        dir_name: AXXspaces Marketplace Frontend (React SPA)
-        title: AXXspaces Marketplace Frontend (React SPA)
+        dir_name: Axxspace Marketplace Frontend (React SPA)
+        title: Axxspace Marketplace Frontend (React SPA)
         scope:
             - src/
         source_files: []
         children: []
         depends_on: []
-        related_to:
-            - path: admin_dashboard
+        related_to: []
     mobile_app:
         dir_name: AXX Spaces Mobile App (Expo_React Native)
         title: AXX Spaces Mobile App (Expo/React Native)
@@ -62,5 +59,4 @@ modules:
         source_files: []
         children: []
         depends_on: []
-        related_to:
-            - path: admin_dashboard
+        related_to: []

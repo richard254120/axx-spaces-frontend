@@ -5,6 +5,4 @@ scope:
     - axxspace-admin/
 source_files: []
 depends_on: []
-related_to:
-    - path: frontend_marketplace
-    - path: mobile_app
+related_to: []

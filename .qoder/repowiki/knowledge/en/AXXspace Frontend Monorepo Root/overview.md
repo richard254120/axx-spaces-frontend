@@ -1,0 +1,1 @@
+Root workspace bundling the React web SPA, Expo mobile app, and React admin dashboard around a shared Vite/Tailwind stack with cross-cutting security middleware and deployment configs.

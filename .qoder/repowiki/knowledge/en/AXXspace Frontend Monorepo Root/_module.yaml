@@ -1,6 +1,6 @@
 schema_version: 1
 module_path: ""
-title: AXX Spaces Frontend Monorepo (Web + Mobile + Admin)
+title: AXXspace Frontend Monorepo Root
 scope:
     - README.md
     - package.json
