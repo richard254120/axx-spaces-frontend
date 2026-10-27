@@ -1,0 +1,1 @@
+Requires a `VITE_API_URL` env var (falls back to `http://localhost:1000/api`); an invisible guest session is auto-created via `POST /auth/guest-signin` when no token exists in localStorage.

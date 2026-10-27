@@ -1,0 +1,1 @@
+React 18 + Vite (uses `import.meta.env.VITE_API_URL`), react-router-dom v6, axios for HTTP, leaflet for maps, react-ga4 for analytics, @vercel/speed-insights, and a custom splash screen gated by sessionStorage.

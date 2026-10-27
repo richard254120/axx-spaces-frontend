@@ -1,0 +1,1 @@
+Vite 8 + React 19 + Tailwind CSS 4 as the shared frontend stack across the web SPA and admin dashboard; Expo/React Native for the mobile app. Security stack shared between Node middleware and nginx: helmet, cors, express-rate-limit, mongo-sanitize, xss-clean, hpp, plus nginx rate-limit zones and bot blocking.

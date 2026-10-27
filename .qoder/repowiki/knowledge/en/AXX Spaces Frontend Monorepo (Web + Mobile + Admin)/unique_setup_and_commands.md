@@ -1,0 +1,1 @@
+`npm run dev` boots the Vite dev server on port 5173 (the same port the mobile app's API proxy and the backend CORS allowlist target); `npm run build` outputs to `dist/` for Vercel or nginx static serving; `setup-frontend.sh` provisions the frontend environment once for all three apps.

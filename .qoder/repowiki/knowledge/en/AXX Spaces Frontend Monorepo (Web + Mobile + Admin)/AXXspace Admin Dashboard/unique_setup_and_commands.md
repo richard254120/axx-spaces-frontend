@@ -1,0 +1,1 @@
+Development is launched via `npm start` (or the wrapper `start.sh`); production builds are created with `npm run build` and served by Vercel. The API endpoint is configured through the `REACT_APP_API_URL` environment variable (see `.env`), defaulting to the Render backend at `https://axx-spaces-backend-1.onrender.com/api`.

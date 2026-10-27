@@ -1,0 +1,24 @@
+schema_version: 1
+module_path: ""
+title: AXX Spaces Frontend Monorepo (Web + Mobile + Admin)
+scope:
+    - README.md
+    - package.json
+    - vite.config.js
+    - vercel.json
+    - eslint.config.js
+    - setup-frontend.sh
+    - nginx-security.conf
+    - middleware/
+    - public/
+    - .gitignore
+    - "0"
+    - axx-spaces-frontend.code-workspace
+    - index.html
+    - index.html.save
+    - package-lock.json
+    - react
+    - react-router-dom
+source_files: []
+depends_on: []
+related_to: []

@@ -308,20 +308,20 @@ export default function Listings() {
   const [sortBy, setSortBy] = useState("recommended");
   const [quickCategory, setQuickCategory] = useState("all");
 
-  // Filters
+  // Filters — seeded from the URL so homepage search lands on real results
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [filters, setFilters] = useState({
-    location: "",
+  const [filters, setFilters] = useState(() => ({
+    location: searchParams.get("county") || searchParams.get("location") || "",
     minPrice: 0,
     maxPrice: 1000000,
     bedrooms: "",
     bathrooms: "",
     furnished: "",
-    propertyType: "",
+    propertyType: searchParams.get("type") || "",
     amenities: "",
     petFriendly: "",
     availableFrom: "",
-  });
+  }));
 
   // Payment Modal
   const [showPaymentModal, setShowPaymentModal] = useState(false);

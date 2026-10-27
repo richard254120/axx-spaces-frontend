@@ -1,0 +1,6 @@
+Three sibling client applications share one root `package.json` and build toolchain: `frontend_marketplace` (Vite/React SPA), `mobile_app` (Expo/React Native), and `admin_dashboard` (React admin panel). Cross-app wiring lives at this level:
+- `vite.config.js` centralises dev server headers (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`) and production chunk hashing for all Vite-based apps.
+- `vercel.json` rewrites every non-static route to `index.html` (SPA fallback) while serving APKs under `/downloads/*` with `application/vnd.android.package-archive` — consumed by both the web SPA and the mobile app's download flow.
+- `middleware/security.js` is an Express-side security layer (helmet, cors, rate-limit, mongo-sanitize, xss-clean, hpp, cookie-parser) whose CORS whitelist points at `http://localhost:5173` and the Vercel frontend URL, binding the backend to the frontend's origin.
+- `nginx-security.conf` provides the reverse-proxy / TLS / rate-limiting layer that proxies `/api` and `/` to the Node server on port 1000 and serves the static frontend via `try_files $uri /index.html`, mirroring the Vercel rewrite strategy.
+- `public/` holds shared assets (logos, QR posters, PWA manifest/icons) referenced by both the web SPA and the mobile app's splash screens.

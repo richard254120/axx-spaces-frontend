@@ -1,0 +1,5 @@
+- Each domain surface area gets a paired screen file under `src/screens/` and a corresponding object of methods under `src/services/api.js` (e.g. `propertyAPI`, `tourismAPI`, `businessAPI`).
+- Network calls go through the shared `apiCall` wrapper which injects a Bearer token from `expo-secure-store` when `useAuth: true`; auth-only endpoints explicitly pass `useAuth: false`.
+- Platform-specific variants are implemented via the `.web.tsx` filename suffix alongside the default implementation (used for animated icons, tabs, and color scheme detection).
+- Screens consume global auth state through the `useAuth()` hook from `src/context/AuthContext.js` rather than importing storage primitives directly.
+- Styling is done with inline `StyleSheet.create` blocks at the bottom of each screen file, using the dark palette (`#0f1729` background, `#fbbf24` accent) consistently across screens.

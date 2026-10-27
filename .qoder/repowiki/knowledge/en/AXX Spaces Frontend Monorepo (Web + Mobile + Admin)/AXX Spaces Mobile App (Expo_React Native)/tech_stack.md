@@ -1,0 +1,1 @@
+Expo SDK ~51 / React Native 0.74.5 / React 18.2; navigation via `@react-navigation/native` + `stack` + `bottom-tabs`; HTTP via `fetch` wrapped in `src/services/api.js` (axios listed as dependency but not used); secure token storage via `expo-secure-store`; persistent user data via `@react-native-async-storage/async-storage`; cloud builds via EAS (`eas.json`, `build-apk.js`).

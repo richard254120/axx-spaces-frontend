@@ -1,0 +1,6 @@
+- Route definitions in `App.jsx` group routes by domain (public, accommodation, agent, agency, biashara, dashboard, user account) and wrap protected routes with `ProtectedRoute` specifying `loginPath` and `allowedRoles`.
+- Global UI shell composition uses three layout functions — `PublicLayout`, `DashboardLayout`, `BareLayout` — instead of per-page layout components.
+- Authentication state (user/token) is read/written exclusively through `AuthContext` and persisted to `localStorage` under keys `token` and `user`.
+- API clients are organized as small modules under `src/api/` that import the shared Axios instance from `api/api.js` rather than creating their own interceptors.
+- Feature domains (e.g. `features/accommodation`) encapsulate their hooks, components, constants, styles, and auth helpers behind a single barrel `index.js` that re-exports a curated public surface.
+- Themed styling is done by importing design tokens (COLORS, SPACING, BORDER_RADIUS, FONT_SIZES, buttonStyles, cardStyles, etc.) from `styles/theme.js` instead of hard-coded CSS values.

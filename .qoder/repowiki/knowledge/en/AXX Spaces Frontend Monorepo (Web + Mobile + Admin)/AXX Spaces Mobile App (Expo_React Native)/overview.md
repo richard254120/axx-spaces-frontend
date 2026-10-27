@@ -1,0 +1,1 @@
+Cross-platform mobile client for the AXX Spaces real-estate, tourism, business and marketplace platform built with Expo, React Navigation and a feature-scoped screen architecture.

@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useMemo } from "react";
+import { useState, useEffect, useContext, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
@@ -339,6 +339,191 @@ const css = `
 @media (prefers-reduced-motion:reduce){
   .ax-root *{animation:none!important;transition:none!important}
 }
+
+/* ════════════════════════════════════════════════
+   REFRESH LAYER — smarter hero, motion & polish
+════════════════════════════════════════════════ */
+.ax-root .ax-eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:11px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--green);margin-bottom:12px}
+.ax-root .ax-eyebrow::before{content:"";width:24px;height:2px;border-radius:2px;background:currentColor;opacity:.65}
+.ax-root .ax-sec-head .ax-eyebrow{color:var(--green)}
+
+/* scroll reveal */
+.ax-root [data-reveal]{opacity:0;transform:translateY(26px);
+  transition:opacity .7s cubic-bezier(.22,.61,.36,1),transform .7s cubic-bezier(.22,.61,.36,1);
+  transition-delay:var(--d,0ms)}
+.ax-root [data-reveal].is-visible{opacity:1;transform:none}
+
+/* hero rebuild */
+.ax-root .ax-hero-inner{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);
+  gap:48px;align-items:center;padding:80px 24px 58px;max-width:1200px}
+.ax-root .ax-hero-copy{min-width:0;animation:axRise .9s cubic-bezier(.22,.61,.36,1) both}
+.ax-root .ax-hero-side{animation:axRise 1.05s cubic-bezier(.22,.61,.36,1) both;animation-delay:.12s}
+.ax-root .ax-hero-badge{display:inline-flex;align-items:center;gap:10px;padding:8px 16px;border-radius:999px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);font-size:12.5px;font-weight:600;
+  color:#CBD5E1;backdrop-filter:blur(10px)}
+.ax-root .ax-hero-badge i{width:7px;height:7px;border-radius:50%;background:#34D399;
+  box-shadow:0 0 0 4px rgba(52,211,153,.18);animation:axPulse 2.4s ease-in-out infinite}
+.ax-root .ax-hero h1{margin-top:20px;font-size:clamp(34px,5vw,66px);line-height:1.05;letter-spacing:-.035em;max-width:640px}
+.ax-root .ax-grad{background:linear-gradient(96deg,#FBBF24,#F59E0B 42%,#34D399);background-size:180% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;animation:axGrad 9s ease infinite}
+.ax-root .ax-hero-sub{margin-top:20px;font-size:clamp(15px,1.5vw,18px);max-width:552px;color:#BFD1C7}
+.ax-root .ax-hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.ax-root .ax-hero-actions .ax-btn{height:52px;padding:0 24px;border-radius:12px;display:inline-flex;
+  align-items:center;gap:10px;font-size:14.5px}
+.ax-root .ax-btn.glass{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(10px)}
+.ax-root .ax-btn.glass:hover{background:rgba(255,255,255,.16);transform:translateY(-1px)}
+.ax-root .ax-shine{position:relative;overflow:hidden;isolation:isolate}
+.ax-root .ax-shine::after{content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(110deg,transparent 22%,rgba(255,255,255,.5) 46%,transparent 66%);
+  transform:translateX(-130%);transition:transform .8s ease}
+.ax-root .ax-shine:hover::after{transform:translateX(130%)}
+.ax-root .ax-hero-stats{display:flex;gap:38px;flex-wrap:wrap;margin-top:36px;padding-top:26px;border-top:1px solid rgba(255,255,255,.1)}
+.ax-root .ax-hero-stats strong{display:block;font:800 clamp(22px,2.4vw,30px)/1 'Bricolage Grotesque',sans-serif;color:#fff}
+.ax-root .ax-hero-stats span{display:block;margin-top:7px;font-size:12.5px;color:#94A3B8}
+
+/* hero visual */
+.ax-root .ax-hero-side{position:relative;min-height:420px;display:flex;align-items:center;justify-content:center}
+.ax-root .ax-hero-card{width:100%;max-width:360px;background:rgba(15,23,42,.72);border:1px solid rgba(255,255,255,.12);
+  border-radius:20px;padding:14px;backdrop-filter:blur(18px);box-shadow:0 30px 70px rgba(0,0,0,.45);
+  animation:axFloat 9s ease-in-out infinite}
+.ax-root .ax-hero-card-top{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:#94A3B8;padding:2px 4px 12px}
+.ax-root .ax-hero-card-top i{width:7px;height:7px;border-radius:50%;background:#34D399;animation:axPulse 2.4s infinite}
+.ax-root .ax-hero-thumb{position:relative;aspect-ratio:16/10;border-radius:14px;overflow:hidden;
+  background:linear-gradient(135deg,#12291F,#0B5D3B)}
+.ax-root .ax-hero-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease}
+.ax-root .ax-hero-card:hover .ax-hero-thumb img{transform:scale(1.05)}
+.ax-root .ax-hero-thumb::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(8,16,29,.6),transparent 58%)}
+.ax-root .ax-hero-thumb .ax-thumb-tag{position:absolute;top:10px;left:10px;z-index:2;background:var(--amber);color:#2A1A00;
+  font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;letter-spacing:.02em}
+.ax-root .ax-hero-card-body{padding:14px 6px 4px;display:flex;flex-direction:column;gap:3px}
+.ax-root .ax-hero-card-body strong{font-size:16px;color:#fff;line-height:1.3}
+.ax-root .ax-hero-card-body span{font-size:13px;color:#94A3B8}
+.ax-root .ax-hero-card-body .ax-price{font:800 20px 'Bricolage Grotesque',sans-serif;color:var(--amber);margin-top:8px}
+.ax-root .ax-hero-mini{position:absolute;right:0;bottom:6px;display:flex;align-items:center;gap:12px;padding:13px 18px;
+  border-radius:16px;background:rgba(255,255,255,.97);color:var(--ink);box-shadow:0 18px 44px rgba(0,0,0,.35);
+  animation:axFloat 7s ease-in-out infinite;animation-delay:-3.5s}
+.ax-root .ax-hero-mini b{display:block;font:800 19px 'Bricolage Grotesque',sans-serif;line-height:1.1}
+.ax-root .ax-hero-mini small{font-size:11.5px;color:var(--mute)}
+.ax-root .ax-hero-mini .ax-mini-ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;
+  background:var(--green-l);color:var(--green)}
+
+/* hero search */
+.ax-root .ax-search{grid-column:1/-1;margin-top:8px;max-width:100%;border-radius:20px;
+  background:rgba(255,255,255,.98);box-shadow:0 34px 80px rgba(0,0,0,.45)}
+.ax-root .ax-search-tabs{gap:6px;padding:12px 14px 0;border-bottom:0}
+.ax-root .ax-search-tabs button{flex:0 0 auto;min-width:0;padding:10px 18px;border-radius:10px;border-bottom:0;
+  background:var(--paper);color:var(--mute);font-size:13.5px;transition:all .25s}
+.ax-root .ax-search-tabs button:hover{color:var(--ink);background:#EEF2F0}
+.ax-root .ax-search-tabs button[aria-selected="true"]{background:var(--green);color:#fff;border-color:var(--green);
+  box-shadow:0 8px 20px rgba(11,93,59,.25)}
+.ax-root .ax-search-body{padding:14px}
+.ax-root .ax-search-body .ax-field label{font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.ax-root .ax-search-body .ax-btn{height:48px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.ax-root .ax-search-body .ax-field input,.ax-root .ax-search-body .ax-field select{background:#fff}
+.ax-root .ax-search-hint{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:0 14px 15px;
+  font-size:12px;color:var(--mute)}
+.ax-root .ax-search-hint button{border:1px solid var(--line);background:var(--paper);border-radius:999px;
+  padding:5px 12px;font-size:12px;font-weight:600;color:var(--ink-2);transition:all .2s}
+.ax-root .ax-search-hint button:hover{border-color:var(--green);color:var(--green);background:var(--green-l)}
+
+/* marquee trust bar */
+.ax-root .ax-trust{overflow:hidden}
+.ax-root .ax-marquee{display:flex;width:max-content;animation:axMarquee 34s linear infinite}
+.ax-root .ax-marquee:hover{animation-play-state:paused}
+.ax-root .ax-marquee-track{display:flex;gap:46px;padding:10px 23px}
+.ax-root .ax-marquee-track span{display:inline-flex;align-items:center;gap:9px;font-size:12.5px;white-space:nowrap}
+
+/* service cards */
+.ax-root .ax-svc{position:relative;overflow:hidden;isolation:isolate}
+.ax-root .ax-svc::before{content:"";position:absolute;inset:0;z-index:-1;
+  background:radial-gradient(320px 170px at var(--mx,50%) var(--my,0%),rgba(11,93,59,.12),transparent 70%);
+  opacity:0;transition:opacity .35s}
+.ax-root .ax-svc:hover::before{opacity:1}
+.ax-root .ax-svc-ico{transition:transform .4s cubic-bezier(.34,1.56,.64,1),background .3s,color .3s}
+.ax-root .ax-svc:hover .ax-svc-ico{transform:translateY(-4px) rotate(-6deg) scale(1.06);background:var(--green);color:#fff}
+.ax-root .ax-svc-arrow{margin-top:auto;display:inline-flex;align-items:center;gap:8px;color:var(--green);
+  font-size:13.5px;font-weight:700}
+.ax-root .ax-svc-arrow svg{transition:transform .3s}
+.ax-root .ax-svc:hover .ax-svc-arrow svg{transform:translateX(5px)}
+
+/* listing cards */
+.ax-root .ax-card{transition:box-shadow .3s,transform .3s,border-color .3s}
+.ax-root .ax-card:hover{border-color:rgba(11,93,59,.35);transform:translateY(-6px);box-shadow:0 22px 48px rgba(16,22,20,.14)}
+.ax-root .ax-card-img::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(to top,rgba(8,16,29,.32),transparent 46%);opacity:0;transition:opacity .3s}
+.ax-root .ax-card:hover .ax-card-img::after{opacity:1}
+.ax-root .ax-card-foot{transition:color .25s}
+.ax-root .ax-card:hover .ax-card-foot{color:var(--green)}
+
+/* steps */
+.ax-root .ax-steps{border-radius:20px;background:linear-gradient(180deg,#fff 0%,#F8FAFC 100%)}
+.ax-root .ax-step{position:relative;overflow:hidden;transition:background .3s}
+.ax-root .ax-step:hover{background:#fff}
+.ax-root .ax-step::after{content:attr(data-step);position:absolute;right:14px;bottom:-16px;
+  font:800 92px/1 'Bricolage Grotesque',sans-serif;color:rgba(11,93,59,.07);pointer-events:none}
+.ax-root .ax-step-n{background:linear-gradient(135deg,var(--green),#12865A);box-shadow:0 8px 20px rgba(11,93,59,.25)}
+
+/* analytics */
+.ax-root .ax-panel{transition:box-shadow .35s,transform .35s}
+.ax-root .ax-panel:hover{box-shadow:0 18px 40px rgba(15,23,42,.09)}
+.ax-root .ax-kpi{transition:transform .3s,background .3s}
+.ax-root .ax-kpi:hover{transform:translateY(-3px);background:#EFF5F1}
+.ax-root .ax-bar i{transform-origin:left;animation:axBarGrow 1.1s cubic-bezier(.22,.61,.36,1) both}
+.ax-root .ax-donut circle{transition:stroke-width .25s}
+.ax-root .ax-legend div{transition:background .2s,transform .2s}
+.ax-root .ax-legend div:hover{transform:translateX(3px)}
+
+/* app visual */
+.ax-root .ax-app-visual{position:relative;display:grid;place-items:center;min-height:520px}
+.ax-root .ax-app-visual::before{content:"";position:absolute;width:360px;height:360px;border-radius:50%;
+  background:radial-gradient(circle,rgba(11,93,59,.16),transparent 68%);animation:axGlow 8s ease-in-out infinite}
+.ax-root .ax-phone{position:relative;z-index:1;animation:axFloat 8s ease-in-out infinite}
+.ax-root .ax-phone-chip{position:absolute;z-index:2;display:flex;align-items:center;gap:10px;padding:11px 15px;
+  border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:0 16px 36px rgba(16,22,20,.16);
+  font-size:12.5px;font-weight:700;animation:axFloat 6.5s ease-in-out infinite}
+.ax-root .ax-phone-chip.top{top:44px;right:2%;animation-delay:-2s}
+.ax-root .ax-phone-chip.bottom{bottom:58px;left:0;animation-delay:-4s}
+.ax-root .ax-phone-chip i{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block}
+
+/* reviews */
+.ax-root .ax-rev{position:relative;overflow:hidden;transition:transform .3s,box-shadow .3s,border-color .3s}
+.ax-root .ax-rev:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(15,23,42,.09);border-color:rgba(11,93,59,.3)}
+.ax-root .ax-rev::before{content:"“";position:absolute;top:2px;right:16px;
+  font:800 68px/1 'Bricolage Grotesque',sans-serif;color:rgba(11,93,59,.09);pointer-events:none}
+
+/* cta glow */
+.ax-root .ax-cta::before{content:"";position:absolute;top:-280px;left:50%;width:560px;height:560px;
+  transform:translateX(-50%);border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(52,211,153,.22),transparent 66%);animation:axGlow 7s ease-in-out infinite}
+.ax-root .ax-cta h2,.ax-root .ax-cta p,.ax-root .ax-cta-btns,.ax-root .ax-cta small{position:relative;z-index:1}
+
+/* keyframes */
+@keyframes axRise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@keyframes axFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes axPulse{0%,100%{box-shadow:0 0 0 0 rgba(52,211,153,.35)}50%{box-shadow:0 0 0 6px rgba(52,211,153,0)}}
+@keyframes axGrad{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes axGlow{0%,100%{opacity:.55;transform:translateX(-50%) scale(1)}50%{opacity:.9;transform:translateX(-50%) scale(1.08)}}
+@keyframes axMarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes axBarGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+@media (max-width:1000px){
+  .ax-root .ax-hero-inner{grid-template-columns:1fr;gap:34px;padding:66px 24px 48px}
+  .ax-root .ax-hero-side{display:none}
+  .ax-root .ax-hero-stats{gap:26px}
+  .ax-root .ax-app-visual{min-height:440px}
+}
+@media (max-width:720px){
+  .ax-root .ax-hero-actions .ax-btn{flex:1 1 auto;justify-content:center}
+  .ax-root .ax-hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .ax-root .ax-search-tabs{padding:10px 10px 0;gap:5px}
+  .ax-root .ax-search-tabs button{padding:9px 14px;font-size:12.5px}
+  .ax-root .ax-search-hint{padding:0 10px 13px}
+  .ax-root .ax-app-visual{display:none}
+  .ax-root .ax-phone-chip{display:none}
+  .ax-root .ax-step::after{font-size:70px}
+}
 `;
 
 /* ════════ DATA ════════ */
@@ -361,6 +546,38 @@ const TABS = [
   { id: "businesses", label: "AxxBiashara", path: "/axxbiashara", hint: "Find business services" },
   { id: "materials", label: "QuickSales", path: "/quicksales", hint: "Find items for sale" },
 ];
+
+const HERO_TABS = [
+  { id: "rentals", label: "Rentals" },
+  { id: "accommodation", label: "Stays" },
+  { id: "quicksales", label: "QuickSales" },
+];
+
+const TRUST_ITEMS = [
+  "Verified listings",
+  "0% broker fees",
+  "All 47 counties",
+  "Direct WhatsApp contact",
+  "Owner-to-client, no middlemen",
+];
+
+const HERO_CHIPS = {
+  rentals: [
+    { label: "Nairobi City", to: "/listings?county=Nairobi%20City" },
+    { label: "Bedsitters", to: "/listings?type=Bedsitter" },
+    { label: "2 Bedroom", to: "/listings?type=2%20Bedroom" },
+  ],
+  accommodation: [
+    { label: "Diani", to: "/accommodation/listings?search=Diani" },
+    { label: "Naivasha", to: "/accommodation/listings?search=Naivasha" },
+    { label: "Nanyuki", to: "/accommodation/listings?search=Nanyuki" },
+  ],
+  quicksales: [
+    { label: "Furniture", to: "/quicksales?search=furniture" },
+    { label: "Building materials", to: "/quicksales?search=materials" },
+    { label: "Electronics", to: "/quicksales?search=electronics" },
+  ],
+};
 
 const SERVICES = [
   {
@@ -402,6 +619,8 @@ const FALLBACK_REVIEWS = [
 ];
 
 const DONUT_COLORS = ["#0B5D3B", "#F2A33A", "#2F7FB8", "#B3261E", "#7A5AA6"];
+const DONUT_R = 40;
+const DONUT_CIRC = 2 * Math.PI * DONUT_R;
 
 /* ════════ HELPERS ════════ */
 const money = (n) => (n != null ? `KES ${Number(n).toLocaleString()}` : null);
@@ -617,6 +836,84 @@ const Icon = ({ children, size = 22 }) => (
     strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{children}</svg>
 );
 
+/* Counts up once the number is on screen (respects reduced motion) */
+function Counter({ value = 0 }) {
+  const ref = useRef(null);
+  const [shown, setShown] = useState(0);
+
+  useEffect(() => {
+    const el = ref.current;
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+    if (!el || reduced || value < 2) {
+      const id = requestAnimationFrame(() => setShown(value || 0));
+      return () => cancelAnimationFrame(id);
+    }
+
+    let frame = 0;
+    let started = false;
+    const duration = 1100;
+    const start = performance.now();
+
+    const step = (now) => {
+      const t = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setShown(Math.round(value * eased));
+      if (t < 1) frame = requestAnimationFrame(step);
+    };
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !started) {
+          started = true;
+          frame = requestAnimationFrame(step);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.35 }
+    );
+    io.observe(el);
+
+    return () => {
+      io.disconnect();
+      cancelAnimationFrame(frame);
+    };
+  }, [value]);
+
+  return <span ref={ref}>{Number(shown).toLocaleString()}</span>;
+}
+
+/* Reveals [data-reveal] nodes as they scroll into view */
+function useScrollReveal(version) {
+  useEffect(() => {
+    const root = document.querySelector(".ax-root");
+    if (!root) return;
+
+    const nodes = Array.from(root.querySelectorAll("[data-reveal]"));
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+    if (reduced || !("IntersectionObserver" in window)) {
+      nodes.forEach((node) => node.classList.add("is-visible"));
+      return;
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+    );
+
+    nodes.forEach((node) => io.observe(node));
+    return () => io.disconnect();
+  }, [version]);
+}
+
 /* ═══════════════════════ COMPONENT ═══════════════════════ */
 export default function HomePro() {
   const navigate = useNavigate();
@@ -634,6 +931,13 @@ export default function HomePro() {
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [ads, setAds] = useState([]);
   const [adIdx, setAdIdx] = useState(0);
+
+  /* ── HERO SEARCH ── */
+  const [heroTab, setHeroTab] = useState("rentals");
+  const [query, setQuery] = useState("");
+  const [county, setCounty] = useState("");
+  const [houseType, setHouseType] = useState("");
+  const [heroIdx, setHeroIdx] = useState(0);
 
   /* ── DATA FETCHING (same endpoints as before) ── */
   useEffect(() => {
@@ -709,6 +1013,37 @@ export default function HomePro() {
     navigate("/upload");
   };
 
+  const handleHeroSearch = (e) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    const q = query.trim();
+
+    if (heroTab === "rentals") {
+      if (county) params.set("county", county);
+      if (houseType) params.set("type", houseType);
+      navigate(`/listings${params.toString() ? `?${params}` : ""}`);
+      return;
+    }
+
+    if (heroTab === "accommodation") {
+      if (q) params.set("search", q);
+      if (county) params.set("area", county);
+      navigate(`/accommodation/listings${params.toString() ? `?${params}` : ""}`);
+      return;
+    }
+
+    if (q) params.set("search", q);
+    if (county) params.set("county", county);
+    navigate(`/quicksales${params.toString() ? `?${params}` : ""}`);
+  };
+
+  /* Rotate the hero preview card through live listings */
+  useEffect(() => {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    const t = setInterval(() => setHeroIdx((i) => i + 1), 5200);
+    return () => clearInterval(t);
+  }, []);
+
   /* ── DERIVED ── */
   const items = useMemo(
     () => (featured[activeTab] || []).slice(0, 8).map((i) => normalise(i, activeTab)),
@@ -724,14 +1059,34 @@ export default function HomePro() {
     : items;
   const shownReviews = reviews.length ? reviews : FALLBACK_REVIEWS;
 
-  const services = demographics?.services || [];
+  const heroPreview = useMemo(() => {
+    const useRentals = featured.properties.length > 0;
+    const pool = useRentals ? featured.properties : featured.accommodation;
+    if (!pool.length) return null;
+    const item = normalise(pool[heroIdx % pool.length], useRentals ? "properties" : "accommodation");
+    return { ...item, tag: useRentals ? "Rental" : "Stay" };
+  }, [featured, heroIdx]);
+
+  useScrollReveal(`${loading}-${Boolean(demographics)}-${ads.length}-${shownReviews.length}`);
+
+  const services = useMemo(() => demographics?.services || [], [demographics]);
   const serviceTotal = services.reduce((s, x) => s + x.count, 0);
   const counties = demographics?.counties || [];
   const maxCounty = Math.max(...counties.map((c) => c.count), 1);
   const label = (s) => (s === "tourism" ? "Accommodation" : cap(s));
 
-  const R = 40, CIRC = 2 * Math.PI * R;
-  let acc = 0;
+  /* Donut slices: each arc starts where the previous ones ended */
+  const donutSlices = useMemo(() => {
+    const lengths = services.map((s) =>
+      serviceTotal > 0 ? (s.count / serviceTotal) * DONUT_CIRC : 0
+    );
+    return services.map((s, i) => ({
+      service: s.service,
+      len: lengths[i],
+      offset: -lengths.slice(0, i).reduce((a, b) => a + b, 0),
+      color: DONUT_COLORS[i % DONUT_COLORS.length],
+    }));
+  }, [services, serviceTotal]);
 
   /* ════════════════════════════════════ RENDER ════════════════════════════════════ */
   return (
@@ -740,11 +1095,14 @@ export default function HomePro() {
 
       {/* ── TRUST BAR ── */}
       <div className="ax-trust">
-        <div className="ax-wrap">
-          <span><i />Verified listings</span>
-          <span><i />0% broker fees</span>
-          <span><i />All 47 counties</span>
-          <span><i />Direct WhatsApp contact</span>
+        <div className="ax-marquee">
+          {[0, 1].map((copy) => (
+            <div key={copy} className="ax-marquee-track" aria-hidden={copy === 1 ? "true" : undefined}>
+              {TRUST_ITEMS.map((t) => (
+                <span key={t}><i />{t}</span>
+              ))}
+            </div>
+          ))}
         </div>
       </div>
 
@@ -764,22 +1122,139 @@ export default function HomePro() {
         </video>
 
         <div className="ax-hero-inner">
-          <h1>Rent, stay, shop and do business across Kenya, directly from the owner</h1>
-          <p className="ax-hero-sub">
-            Verified rentals, accommodation, business services and quick sales in one place. Talk to owners and hosts yourself and pay no broker fees.
-          </p>
+          <div className="ax-hero-copy">
+            <span className="ax-hero-badge"><i /> Verified owners across all 47 counties</span>
+            <h1>
+              Rent, stay, shop and <span className="ax-grad">do business</span> — straight from the owner
+            </h1>
+            <p className="ax-hero-sub">
+              Verified rentals, accommodation, business services and quick sales in one place.
+              Talk to owners and hosts yourself and pay no broker fees.
+            </p>
+
+            <div className="ax-hero-actions">
+              <button className="ax-btn ax-shine" onClick={() => navigate("/listings")}>
+                Browse rentals
+                <Icon size={17}><path d="M5 12h14M13 6l6 6-6 6" /></Icon>
+              </button>
+              <button className="ax-btn glass" onClick={handleListProperty}>
+                {token ? "List your property" : "List with us"}
+              </button>
+            </div>
+
+            <div className="ax-hero-stats">
+              <div><strong><Counter value={47} /></strong><span>Counties covered</span></div>
+              <div><strong>0%</strong><span>Broker fees</span></div>
+              {demographics?.totalListings ? (
+                <div><strong><Counter value={demographics.totalListings} /></strong><span>Verified listings</span></div>
+              ) : (
+                <div><strong>Direct</strong><span>Owner contact</span></div>
+              )}
+            </div>
+          </div>
+
+          <div className="ax-hero-side">
+            <div className="ax-hero-card">
+              <div className="ax-hero-card-top"><i /> Live listing</div>
+              <div className="ax-hero-thumb">
+                {heroPreview?.img && <img src={heroPreview.img} alt="" loading="lazy" />}
+                <span className="ax-thumb-tag">{heroPreview?.tag || "Verified"}</span>
+              </div>
+              <div className="ax-hero-card-body">
+                <strong>{heroPreview?.title || "Verified homes and stays"}</strong>
+                <span>{heroPreview?.loc || "Across all 47 counties"}</span>
+                <span className="ax-price">{heroPreview?.price || "Direct owner prices"}</span>
+              </div>
+            </div>
+
+            <div className="ax-hero-mini">
+              <span className="ax-mini-ico">
+                <Icon size={19}><path d="M20 6L9 17l-5-5" /></Icon>
+              </span>
+              <span>
+                <b>Direct contact</b>
+                <small>No brokers, no hidden fees</small>
+              </span>
+            </div>
+          </div>
+
+          <form className="ax-search" onSubmit={handleHeroSearch}>
+            <div className="ax-search-tabs" role="tablist" aria-label="What are you looking for?">
+              {HERO_TABS.map((t) => (
+                <button key={t.id} type="button" role="tab"
+                  aria-selected={heroTab === t.id}
+                  onClick={() => setHeroTab(t.id)}>
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="ax-search-body">
+              {heroTab === "rentals" ? (
+                <>
+                  <div className="ax-field">
+                    <label htmlFor="hero-county">County</label>
+                    <select id="hero-county" value={county} onChange={(e) => setCounty(e.target.value)}>
+                      <option value="">All counties</option>
+                      {COUNTIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                  <div className="ax-field">
+                    <label htmlFor="hero-type">House type</label>
+                    <select id="hero-type" value={houseType} onChange={(e) => setHouseType(e.target.value)}>
+                      <option value="">Any type</option>
+                      {TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="ax-field">
+                    <label htmlFor="hero-query">
+                      {heroTab === "accommodation" ? "Destination or property" : "What are you looking for?"}
+                    </label>
+                    <input id="hero-query" type="search" value={query}
+                      placeholder={heroTab === "accommodation" ? "Diani, Naivasha, lodge…" : "Sofa, cement, laptop…"}
+                      onChange={(e) => setQuery(e.target.value)} />
+                  </div>
+                  <div className="ax-field">
+                    <label htmlFor="hero-county-2">County</label>
+                    <select id="hero-county-2" value={county} onChange={(e) => setCounty(e.target.value)}>
+                      <option value="">All counties</option>
+                      {COUNTIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                </>
+              )}
+
+              <button className="ax-btn ax-shine" type="submit">
+                Search
+                <Icon size={17}><path d="M11 19a8 8 0 100-16 8 8 0 000 16zM21 21l-4.3-4.3" /></Icon>
+              </button>
+            </div>
+
+            <div className="ax-search-hint">
+              <span>Popular:</span>
+              {(HERO_CHIPS[heroTab] || []).map((c) => (
+                <button key={c.label} type="button" onClick={() => navigate(c.to)}>{c.label}</button>
+              ))}
+            </div>
+          </form>
         </div>
       </header>
 
       {/* ── FEATURED ── */}
       <section className="ax-section alt">
         <div className="ax-wrap">
-          <div className="ax-sec-head">
-            <h2>Featured listings</h2>
+          <div className="ax-sec-head" data-reveal>
+            <div>
+              <span className="ax-eyebrow">Fresh this week</span>
+              <h2>Featured listings</h2>
+            </div>
             <p>Hand-picked, verified listings from across the platform.</p>
           </div>
 
-          <div className="ax-tabs" role="tablist" aria-label="Featured category">
+          <div className="ax-tabs" role="tablist" aria-label="Featured category" data-reveal style={{ "--d": "80ms" }}>
             {TABS.map((t) => (
               <button key={t.id} role="tab" className="ax-tab" aria-selected={activeTab === t.id}
                 onClick={() => setActiveTab(t.id)}>
@@ -797,7 +1272,7 @@ export default function HomePro() {
               <button className="ax-btn" onClick={() => navigate(activeMeta.path)}>Browse all {activeMeta.label}</button>
             </div>
           ) : (
-            <div className="ax-grid">
+            <div className="ax-grid" data-reveal style={{ "--d": "150ms" }}>
               {cells.map((it, idx) => it.isAd ? (
                 <button key={it.id} className="ax-card" onClick={() => openAd(it.ad)}>
                   <div className="ax-card-img">
@@ -865,18 +1340,29 @@ export default function HomePro() {
       {/* ── SERVICES ── */}
       <section className="ax-section">
         <div className="ax-wrap">
-          <div className="ax-sec-head">
-            <h2>One platform for the way Kenyans live and trade</h2>
+          <div className="ax-sec-head" data-reveal>
+            <div>
+              <span className="ax-eyebrow">Four ways to use Axxspace</span>
+              <h2>One platform for the way Kenyans live and trade</h2>
+            </div>
             <p>Choose a service to start browsing. Each one connects you straight to the person behind the listing.</p>
           </div>
-          <div className="ax-services">
+          <div className="ax-services" data-reveal style={{ "--d": "120ms" }}>
             {SERVICES.map((s) => (
               <button key={s.id} className="ax-svc"
+                onMouseMove={(e) => {
+                  const r = e.currentTarget.getBoundingClientRect();
+                  e.currentTarget.style.setProperty("--mx", `${e.clientX - r.left}px`);
+                  e.currentTarget.style.setProperty("--my", `${e.clientY - r.top}px`);
+                }}
                 onClick={() => navigate(TABS.find((t) => t.id === s.id).path)}>
                 <span className="ax-svc-ico"><Icon>{s.icon}</Icon></span>
                 <h3>{s.title}</h3>
                 <p>{s.desc}</p>
-                <b>Browse {s.title}</b>
+                <span className="ax-svc-arrow">
+                  Browse {s.title}
+                  <Icon size={16}><path d="M5 12h14M13 6l6 6-6 6" /></Icon>
+                </span>
               </button>
             ))}
           </div>
@@ -886,13 +1372,16 @@ export default function HomePro() {
       {/* ── HOW IT WORKS ── */}
       <section className="ax-section">
         <div className="ax-wrap">
-          <div className="ax-sec-head">
-            <h2>How Axxspace works</h2>
+          <div className="ax-sec-head" data-reveal>
+            <div>
+              <span className="ax-eyebrow">Simple by design</span>
+              <h2>How Axxspace works</h2>
+            </div>
             <p>Three steps from search to done, with no middleman taking a cut.</p>
           </div>
-          <div className="ax-steps">
+          <div className="ax-steps" data-reveal style={{ "--d": "120ms" }}>
             {STEPS.map((s, i) => (
-              <div key={s.t} className="ax-step">
+              <div key={s.t} className="ax-step" data-step={String(i + 1).padStart(2, "0")}>
                 <div className="ax-step-n">{i + 1}</div>
                 <h3>{s.t}</h3>
                 <p>{s.d}</p>
@@ -906,12 +1395,15 @@ export default function HomePro() {
       {demographics && (
         <section className="ax-section alt">
           <div className="ax-wrap">
-            <div className="ax-sec-head">
-              <h2>Live platform activity</h2>
+            <div className="ax-sec-head" data-reveal>
+              <div>
+                <span className="ax-eyebrow">Live data</span>
+                <h2>Live platform activity</h2>
+              </div>
               <p>See which services and counties are most active. Figures refresh every 5 minutes.</p>
             </div>
 
-            <div className="ax-an">
+            <div className="ax-an" data-reveal style={{ "--d": "120ms" }}>
               <div className="ax-panel">
                 <div className="ax-seg" role="tablist">
                   <button role="tab" aria-selected={demoTab === "services"} onClick={() => setDemoTab("services")}>Services</button>
@@ -921,20 +1413,15 @@ export default function HomePro() {
                 {demoTab === "services" ? (
                   <div className="ax-donut">
                     <svg width="200" height="200" viewBox="0 0 100 100" role="img" aria-label="Service popularity chart">
-                      <circle cx="50" cy="50" r={R} fill="none" stroke="#ECEFEC" strokeWidth="12" />
-                      {services.map((s, i) => {
-                        const len = serviceTotal > 0 ? (s.count / serviceTotal) * CIRC : 0;
-                        const offset = -acc;
-                        acc += len;
-                        return (
-                          <circle key={s.service} cx="50" cy="50" r={R} fill="none"
-                            stroke={DONUT_COLORS[i % DONUT_COLORS.length]}
-                            strokeWidth={hovered === s.service ? 15 : 12}
-                            strokeDasharray={`${len} ${CIRC - len}`} strokeDashoffset={offset}
-                            transform="rotate(-90 50 50)" style={{ transition: "stroke-width .2s" }}
-                            onMouseEnter={() => setHovered(s.service)} onMouseLeave={() => setHovered(null)} />
-                        );
-                      })}
+                      <circle cx="50" cy="50" r={DONUT_R} fill="none" stroke="#ECEFEC" strokeWidth="12" />
+                      {donutSlices.map((s) => (
+                        <circle key={s.service} cx="50" cy="50" r={DONUT_R} fill="none"
+                          stroke={s.color}
+                          strokeWidth={hovered === s.service ? 15 : 12}
+                          strokeDasharray={`${s.len} ${DONUT_CIRC - s.len}`} strokeDashoffset={s.offset}
+                          transform="rotate(-90 50 50)" style={{ transition: "stroke-width .2s" }}
+                          onMouseEnter={() => setHovered(s.service)} onMouseLeave={() => setHovered(null)} />
+                      ))}
                       <text x="50" y="48" textAnchor="middle" fontSize="5" fill="#617069">
                         {hovered ? label(hovered) : "Total"}
                       </text>
@@ -960,8 +1447,8 @@ export default function HomePro() {
               <div className="ax-panel">
                 <h3>Platform overview</h3>
                 <div className="ax-kpis">
-                  <div className="ax-kpi"><strong>{demographics.totalListings || 0}</strong><span>Total listings</span></div>
-                  <div className="ax-kpi"><strong>{demographics.totalUsers || 0}</strong><span>Total users</span></div>
+                  <div className="ax-kpi"><strong><Counter value={demographics.totalListings || 0} /></strong><span>Total listings</span></div>
+                  <div className="ax-kpi"><strong><Counter value={demographics.totalUsers || 0} /></strong><span>Total users</span></div>
                 </div>
                 <div className="ax-bar-row">
                   <header><span>County coverage</span><span>{counties.length} of 47</span></header>
@@ -976,7 +1463,8 @@ export default function HomePro() {
       {/* ── MOBILE APP ── */}
       <section className="ax-section">
         <div className="ax-wrap ax-app">
-          <div>
+          <div data-reveal>
+            <span className="ax-eyebrow">Mobile app</span>
             <h2>Take Axxspace with you</h2>
             <p>Browse rentals, stays, services and quick sales on your phone, and contact owners without leaving the app.</p>
             <ul className="ax-list">
@@ -991,10 +1479,14 @@ export default function HomePro() {
               <span><strong>Version 1.0.0</strong><small>APK, 3.1 MB</small></span>
             </div>
           </div>
-          <div className="ax-phone" aria-hidden="true">
-            <b>Axxspace</b>
-            <div className="ax-ph-card"><div className="ax-ph-img" /><div className="ax-ph-l" style={{ width: "70%" }} /><div className="ax-ph-l" style={{ width: "40%" }} /></div>
-            <div className="ax-ph-card"><div className="ax-ph-l" style={{ width: "55%" }} /><div className="ax-ph-l" style={{ width: "30%" }} /></div>
+          <div className="ax-app-visual" data-reveal style={{ "--d": "140ms" }} aria-hidden="true">
+            <span className="ax-phone-chip top"><i />New match found</span>
+            <div className="ax-phone">
+              <b>Axxspace</b>
+              <div className="ax-ph-card"><div className="ax-ph-img" /><div className="ax-ph-l" style={{ width: "70%" }} /><div className="ax-ph-l" style={{ width: "40%" }} /></div>
+              <div className="ax-ph-card"><div className="ax-ph-l" style={{ width: "55%" }} /><div className="ax-ph-l" style={{ width: "30%" }} /></div>
+            </div>
+            <span className="ax-phone-chip bottom"><i />Chat on WhatsApp</span>
           </div>
         </div>
       </section>
@@ -1002,11 +1494,14 @@ export default function HomePro() {
       {/* ── REVIEWS ── */}
       <section className="ax-section alt">
         <div className="ax-wrap">
-          <div className="ax-sec-head">
-            <h2>What our users say</h2>
+          <div className="ax-sec-head" data-reveal>
+            <div>
+              <span className="ax-eyebrow">Real people, real deals</span>
+              <h2>What our users say</h2>
+            </div>
             <button className="ax-btn ghost" onClick={() => navigate("/leave-review")}>Leave a review</button>
           </div>
-          <div className="ax-reviews">
+          <div className="ax-reviews" data-reveal style={{ "--d": "120ms" }}>
             {shownReviews.map((r) => (
               <article key={r._id} className="ax-rev">
                 <div className="ax-stars" aria-label={`${r.rating} out of 5`}>{"★".repeat(r.rating || 5)}</div>
@@ -1028,7 +1523,7 @@ export default function HomePro() {
       {/* ── FINAL CTA ── */}
       <section className="ax-section" style={{ paddingBottom: 0 }}>
         <div className="ax-wrap">
-          <div className="ax-cta">
+          <div className="ax-cta" data-reveal>
             <h2>Find your place in Kenya</h2>
             <p>Join thousands of Kenyans finding homes, building projects and growing businesses through Axxspace.</p>
             <div className="ax-cta-btns">

@@ -1,0 +1,3 @@
+- Security headers (X-Frame-Options DENY, X-Content-Type-Options nosniff, Referrer-Policy strict-origin-when-cross-origin) are set identically in vite dev server config, vercel.json headers, and nginx-security.conf.
+- SPA routing is handled by rewriting all non-asset routes to `index.html` — mirrored in vercel.json rewrites and nginx `try_files $uri /index.html`.
+- Cross-origin access from the frontend to the backend is whitelisted against `http://localhost:5173` and the Vercel frontend URL in both the Express CORS middleware and the Vite dev server.

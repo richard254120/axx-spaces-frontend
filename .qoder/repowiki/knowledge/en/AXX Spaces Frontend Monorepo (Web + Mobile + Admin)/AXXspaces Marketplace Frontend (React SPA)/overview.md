@@ -1,0 +1,1 @@
+React single-page application powering the Axxspace marketplace — property listings, accommodation bookings, agent/agency dashboards, business directory, and user accounts.

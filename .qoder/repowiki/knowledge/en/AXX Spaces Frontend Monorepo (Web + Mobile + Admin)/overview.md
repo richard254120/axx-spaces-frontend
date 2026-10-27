@@ -1,0 +1,1 @@
+Top-level workspace bundling the React web SPA, Expo mobile app, and React admin dashboard around a shared Vite/Tailwind frontend stack with cross-cutting security middleware and deployment configs.

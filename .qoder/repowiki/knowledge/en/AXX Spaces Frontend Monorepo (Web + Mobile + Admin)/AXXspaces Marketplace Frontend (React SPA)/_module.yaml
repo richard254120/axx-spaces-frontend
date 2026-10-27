@@ -1,0 +1,9 @@
+schema_version: 1
+module_path: frontend_marketplace
+title: AXXspaces Marketplace Frontend (React SPA)
+scope:
+    - src/
+source_files: []
+depends_on: []
+related_to:
+    - path: admin_dashboard

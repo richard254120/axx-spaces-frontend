@@ -1,0 +1,5 @@
+- All network requests use the shared `API` instance from `src/api/api.js` rather than raw `axios` calls, so auth headers and logging are centralized.
+- Authentication state (token, user, login, logout, updateUser) is consumed via the `AuthContext` provider instead of props drilling or local storage reads inside pages.
+- Data loading follows a loadXxx / handleXxx pattern: async fetchers wrapped in try/catch that set dedicated loading booleans and call `refresh()` or re-fetch after mutations.
+- Component-scoped styling uses a sibling `.css` file imported next to each `.jsx` (e.g. `AdminDashboard.css`, `NotificationPanel.css`, `PaymentApprovals.css`).
+- Tab-driven navigation is driven by a `TABS` constant array and an `activeTab` state variable, with `useEffect` watchers that reload data when the active tab changes.

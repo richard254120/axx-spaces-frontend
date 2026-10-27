@@ -1,0 +1,66 @@
+# 知识卡导出索引文件
+schema_version: 1
+locale: en-US
+branch: main
+nodes_managed: true
+exported_at: "2026-10-27T10:53:11Z"
+modules:
+    "":
+        dir_name: AXX Spaces Frontend Monorepo (Web + Mobile + Admin)
+        title: AXX Spaces Frontend Monorepo (Web + Mobile + Admin)
+        scope:
+            - README.md
+            - package.json
+            - vite.config.js
+            - vercel.json
+            - eslint.config.js
+            - setup-frontend.sh
+            - nginx-security.conf
+            - middleware/
+            - public/
+            - .gitignore
+            - "0"
+            - axx-spaces-frontend.code-workspace
+            - index.html
+            - index.html.save
+            - package-lock.json
+            - react
+            - react-router-dom
+        source_files: []
+        children:
+            - admin_dashboard
+            - frontend_marketplace
+            - mobile_app
+        depends_on: []
+        related_to: []
+    admin_dashboard:
+        dir_name: AXXspace Admin Dashboard
+        title: AXXspace Admin Dashboard
+        scope:
+            - axxspace-admin/
+        source_files: []
+        children: []
+        depends_on: []
+        related_to:
+            - path: frontend_marketplace
+            - path: mobile_app
+    frontend_marketplace:
+        dir_name: AXXspaces Marketplace Frontend (React SPA)
+        title: AXXspaces Marketplace Frontend (React SPA)
+        scope:
+            - src/
+        source_files: []
+        children: []
+        depends_on: []
+        related_to:
+            - path: admin_dashboard
+    mobile_app:
+        dir_name: AXX Spaces Mobile App (Expo_React Native)
+        title: AXX Spaces Mobile App (Expo/React Native)
+        scope:
+            - axx-spaces-mobile/
+        source_files: []
+        children: []
+        depends_on: []
+        related_to:
+            - path: admin_dashboard

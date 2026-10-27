@@ -1,0 +1,1 @@
+React 19 + React Router v7 + axios for HTTP, qrcode for badge QR generation, Create React App (react-scripts 5) for build/dev server; deployed via Vercel (`.vercel/project.json`).
