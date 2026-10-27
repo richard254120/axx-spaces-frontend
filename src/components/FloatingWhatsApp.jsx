@@ -1,9 +1,20 @@
 // src/components/FloatingWhatsApp.jsx
 
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 export default function FloatingWhatsApp() {
+  const { pathname } = useLocation();
+
   useEffect(() => {
+    // Accommodation pages keep their own small per-card WhatsApp icons,
+    // so the large floating bubble is hidden on every /accommodation route
+    if (pathname.startsWith("/accommodation")) {
+      document.getElementById("wa-float-root")?.remove();
+      document.getElementById("wa-float-style")?.remove();
+      return;
+    }
+
     const phone = "254745689773";
     const message = "Hello Axxspace!  I need help finding a property.";
     const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
@@ -97,7 +108,7 @@ export default function FloatingWhatsApp() {
       if (el) el.remove();
       if (st) st.remove();
     };
-  }, []);
+  }, [pathname]);
 
   return null;
 }
