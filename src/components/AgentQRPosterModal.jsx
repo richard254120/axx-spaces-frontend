@@ -2,49 +2,52 @@ import { useState, useEffect, useRef } from "react";
 import QRCode from "qrcode";
 // Original AxXspace logo. Served from /public so the poster, the live preview
 // and the canvas export all use the same brand asset (and stay same-origin).
-const logo = "/logo.png";
+const logo = "/axxspace_poster_header_logo_clean.png";
 
 /* ══════════════════════════════════════════════════════════
    AgentQRPosterModal
-   The downloadable poster is one PNG cut in the AxXspace pin
-   silhouette: every word of the sheet sits inside the logo
-   shape, wrapped by a thick red brand border.
-   The canvas is the single source of truth — the live preview
-   renders the very same PNG that gets downloaded.
+   Matches the AxxSpace Househunting Agent pin poster:
+   - Location pin silhouette with thick red outer border
+   - Top white region with clean brand lockup & bold HOUSEHUNTING AGENT
+   - Central crisp QR code linking to agent profile
+   - Slanted bottom-right navy wedge with red divider & Contact Us
 ══════════════════════════════════════════════════════════ */
 
 const POSTER_W = 800;
 const POSTER_H = 1130;
 
-const NAVY = "#081A34";
-const RED  = "#d9383a";
+const NAVY = "#04244D";
+const RED  = "#E51A24";
 
 /* ── Poster shell = the AxXspace pin ─────────────────────────
    Round head + long tapered tail that comes to a point.
 ─────────────────────────────────────────────────────────────── */
 const HEAD_CX = POSTER_W / 2;   // 400
-const HEAD_CY = 430;
+const HEAD_CY = 405;
 const HEAD_R  = 370;
-const TIP_Y   = 1105;
+const TIP_Y   = 1095;
 
-const tracePosterShell = (ctx) => {
+// The entire pin silhouette
+const traceFullPin = (ctx) => {
   ctx.beginPath();
   ctx.moveTo(HEAD_CX, TIP_Y);
-  ctx.bezierCurveTo(340, 1030, HEAD_CX - HEAD_R, 900, HEAD_CX - HEAD_R, HEAD_CY);
+  ctx.bezierCurveTo(320, 1010, HEAD_CX - HEAD_R, 880, HEAD_CX - HEAD_R, HEAD_CY);
   ctx.arc(HEAD_CX, HEAD_CY, HEAD_R, Math.PI, 0, false);
-  ctx.bezierCurveTo(HEAD_CX + HEAD_R, 900, 460, 1030, HEAD_CX, TIP_Y);
+  ctx.bezierCurveTo(HEAD_CX + HEAD_R, 880, 480, 1010, HEAD_CX, TIP_Y);
   ctx.closePath();
 };
 
-/* ── Pin-shaped QR frame nested inside the sheet ─────────────
-   Same silhouette, one size down, so the code reads as a chip
-   of the AxXspace mark.
-─────────────────────────────────────────────────────────────── */
-const PIN_W        = 280;                      // frame width = head diameter
-const PIN_TAIL     = 50;                       // pointed tail below the head
-const PIN_QR       = 190;                      // QR side (fits inside the head)
-const PIN_QR_INNER = (PIN_W - PIN_QR) / 2;     // QR inset from the frame edge
-const QR_Y         = 466;
+// The white top portion of the pin framed by the red outline
+const traceWhiteSection = (ctx) => {
+  ctx.beginPath();
+  ctx.moveTo(204, 880);
+  ctx.bezierCurveTo(HEAD_CX - HEAD_R, 750, HEAD_CX - HEAD_R, HEAD_CY + 200, HEAD_CX - HEAD_R, HEAD_CY);
+  ctx.arc(HEAD_CX, HEAD_CY, HEAD_R, Math.PI, 0, false);
+  ctx.bezierCurveTo(HEAD_CX + HEAD_R, HEAD_CY + 120, HEAD_CX + HEAD_R, 490, 782, 520);
+  // Diagonal curve dividing top white from bottom navy:
+  ctx.bezierCurveTo(617, 667, 393, 808, 204, 880);
+  ctx.closePath();
+};
 
 // Preview is rendered straight from the export PNG, scaled to fit the modal.
 function AgentPoster({ posterDataUrl }) {
@@ -110,37 +113,7 @@ export default function AgentQRPosterModal({ isOpen, onClose, agent }) {
     });
   };
 
-  const drawRoundRect = (ctx, x, y, w, h, r, fill, stroke, strokeColor, lw) => {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + w - r, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
-    if (fill) ctx.fill();
-    if (stroke) { ctx.strokeStyle = strokeColor; ctx.lineWidth = lw; ctx.stroke(); }
-  };
-
-  const drawScallop = (ctx, cx, cy, r, n, d, fillCol, strokeCol, lw) => {
-    ctx.beginPath();
-    for (let i = 0; i <= 360; i++) {
-      const a = (i * Math.PI) / 180;
-      const cr = r + Math.sin(a * n) * d;
-      const x = cx + cr * Math.cos(a);
-      const y = cy + cr * Math.sin(a);
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    }
-    ctx.closePath();
-    if (fillCol) { ctx.fillStyle = fillCol; ctx.fill(); }
-    if (strokeCol) { ctx.strokeStyle = strokeCol; ctx.lineWidth = lw; ctx.stroke(); }
-  };
-
-  // Pin silhouette used for the QR frame (identical to the sheet outline)
+  // Pin silhouette used for the standalone QR frame download
   const drawPinFrame = (ctx, x, y, w, tail, fillCol, strokeCol, lw) => {
     const r = w / 2;
     const cx = x + r, cy = y + r, tipY = y + w + tail;
@@ -154,32 +127,133 @@ export default function AgentQRPosterModal({ isOpen, onClose, agent }) {
     if (strokeCol) { ctx.strokeStyle = strokeCol; ctx.lineWidth = lw; ctx.stroke(); }
   };
 
-  // Trims a string so it never spills out of its chip
-  const fitText = (ctx, text, maxW) => {
-    if (ctx.measureText(text).width <= maxW) return text;
-    let t = text;
-    while (t.length > 1 && ctx.measureText(t + "…").width > maxW) t = t.slice(0, -1);
-    return t + "…";
+  // Contact icon drawing functions (crisp white vectors)
+  const drawEnvelopeIcon = (ctx, x, y) => {
+    ctx.save();
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 2.2;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.strokeRect(x, y - 14, 22, 16);
+    ctx.beginPath();
+    ctx.moveTo(x + 1, y - 13);
+    ctx.lineTo(x + 11, y - 4);
+    ctx.lineTo(x + 21, y - 13);
+    ctx.stroke();
+    ctx.restore();
   };
 
-  // Draws icon + label pairs in one auto-centred row
-  const drawIconRow = (ctx, rowY, items, gap) => {
-    let total = 0;
-    items.forEach((it, i) => {
-      ctx.font = it.font;
-      it._w = ctx.measureText(it.text).width;
-      total += (it.iconW || 0) + it._w + (i < items.length - 1 ? gap : 0);
-    });
-    let x = HEAD_CX - total / 2;
-    items.forEach((it) => {
-      if (it.icon) it.icon(x, rowY);
-      x += it.iconW || 0;
-      ctx.font = it.font;
-      ctx.fillStyle = it.color;
-      ctx.textAlign = "left";
-      ctx.fillText(it.text, x, rowY);
-      x += it._w + gap;
-    });
+  const drawWhatsAppIcon = (ctx, x, y) => {
+    ctx.save();
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 2.2;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    const icx = x + 10, icy = y - 6;
+    ctx.beginPath();
+    ctx.arc(icx, icy, 9.5, 0.22 * Math.PI, 1.82 * Math.PI, false);
+    ctx.lineTo(icx - 9, icy + 9);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(icx, icy, 4.5, 0.7 * Math.PI, 1.35 * Math.PI, false);
+    ctx.stroke();
+    ctx.restore();
+  };
+
+  const drawGlobeIcon = (ctx, x, y) => {
+    ctx.save();
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 2.0;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    const icx = x + 10, icy = y - 6;
+    ctx.beginPath();
+    ctx.arc(icx, icy, 10, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(icx - 10, icy);
+    ctx.lineTo(icx + 10, icy);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(icx, icy - 10);
+    ctx.lineTo(icx, icy + 10);
+    ctx.stroke();
+    ctx.save();
+    ctx.translate(icx, icy);
+    ctx.scale(0.5, 1.0);
+    ctx.beginPath();
+    ctx.arc(0, 0, 10, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+    ctx.restore();
+  };
+
+  // Draws a 3-part word (navy, red, navy) centered horizontally
+  const drawTriPartText = (ctx, y, part1, part2, part3, font, navyCol, redCol, isAgent = false) => {
+    ctx.save();
+    ctx.font = font;
+    ctx.textBaseline = "alphabetic";
+    const w1 = ctx.measureText(part1).width;
+    const w2 = ctx.measureText(part2).width;
+    const w3 = ctx.measureText(part3).width;
+    const totalW = w1 + w2 + w3;
+    let curX = HEAD_CX - totalW / 2;
+
+    if (isAgent) {
+      ctx.shadowColor = "rgba(4, 36, 77, 0.2)";
+      ctx.shadowBlur = 6;
+      ctx.shadowOffsetY = 2;
+    }
+
+    ctx.fillStyle = navyCol;
+    ctx.fillText(part1, curX, y);
+    curX += w1;
+
+    ctx.fillStyle = redCol;
+    ctx.fillText(part2, curX, y);
+    curX += w2;
+
+    ctx.fillStyle = navyCol;
+    ctx.fillText(part3, curX, y);
+
+    ctx.restore();
+  };
+
+  // Draws the AxxSpace brand lockup at the top
+  const drawHeaderLogo = (ctx, logoImg) => {
+    if (logoImg && logoImg.complete && logoImg.naturalWidth > 0) {
+      const logoW = 320;
+      const logoH = 78;
+      const logoX = HEAD_CX - logoW / 2;
+      const logoY = 135;
+      ctx.drawImage(logoImg, logoX, logoY, logoW, logoH);
+    } else {
+      // Vector fallback if image not yet loaded
+      const logoX = HEAD_CX - 150;
+      const logoY = 175;
+      ctx.fillStyle = RED;
+      ctx.beginPath();
+      ctx.arc(logoX + 22, logoY - 14, 20, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.moveTo(logoX + 22, logoY - 26);
+      ctx.lineTo(logoX + 11, logoY - 15);
+      ctx.lineTo(logoX + 33, logoY - 15);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.font = "900 38px 'Inter', system-ui, sans-serif";
+      ctx.fillStyle = RED;
+      ctx.fillText("AXX", logoX + 52, logoY);
+      ctx.fillStyle = NAVY;
+      ctx.fillText("SPACE", logoX + 130, logoY);
+
+      ctx.font = "italic 500 13px 'Inter', system-ui, sans-serif";
+      ctx.fillStyle = "#4B5563";
+      ctx.fillText("Everything you need under one roof!", logoX + 54, logoY + 22);
+    }
   };
 
   const drawCanvases = (qrCanvas) => {
@@ -189,25 +263,32 @@ export default function AgentQRPosterModal({ isOpen, onClose, agent }) {
 
     const agentName = agent?.name || agent?.username || "Agent";
 
-    // ── Standalone QR download, also cut in the pin ──
+    // ── Standalone QR download, in branded pin ──
     const qCtx = dlQr.getContext("2d");
     qCtx.setTransform(1, 0, 0, 1, 0, 0);
     qCtx.clearRect(0, 0, dlQr.width, dlQr.height);
-    const qW = 260, qTail = 46, qX = (dlQr.width - qW) / 2, qY = 24;
+    const qW = 260, qTail = 46, qX = (dlQr.width - qW) / 2, qY = 20;
     drawPinFrame(qCtx, qX, qY, qW, qTail, "#ffffff", RED, 5);
     qCtx.drawImage(qrCanvas, qX + 35, qY + 35, qW - 70, qW - 70);
     qCtx.textAlign = "center";
     qCtx.fillStyle = NAVY;
-    qCtx.font = "900 24px 'Inter', system-ui, sans-serif";
-    qCtx.fillText("AXXSPACE", dlQr.width / 2, 360);
+    qCtx.font = "900 22px 'Inter', system-ui, sans-serif";
+    qCtx.fillText("AXXSPACE", dlQr.width / 2, 348);
+    qCtx.fillStyle = RED;
+    qCtx.font = "900 15px 'Inter', system-ui, sans-serif";
+    qCtx.fillText("AGENT DETAILS", dlQr.width / 2, 372);
     qCtx.fillStyle = "#64748b";
     qCtx.font = "600 12px 'Inter', system-ui, sans-serif";
-    qCtx.fillText("Scan to view availability and profile", dlQr.width / 2, 386);
+    qCtx.fillText("Scan to connect with agent", dlQr.width / 2, 396);
 
     // ── High-res poster (rendered at 2× for print) ──
     const logoImg = new Image();
     logoImg.onload = () => drawPosterCanvas(poster, qrCanvas, logoImg, agentName);
+    logoImg.onerror = () => drawPosterCanvas(poster, qrCanvas, null, agentName);
     logoImg.src = logo;
+    if (logoImg.complete) {
+      drawPosterCanvas(poster, qrCanvas, logoImg, agentName);
+    }
   };
 
   const drawPosterCanvas = (poster, qrCanvas, logoImg, agentName) => {
@@ -222,234 +303,97 @@ export default function AgentQRPosterModal({ isOpen, onClose, agent }) {
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
 
-    /* ── 1. The pin-shaped sheet ─────────────────────────── */
+    // 1. Fill entire pin with deep solid Navy (forms the bottom-right navy wedge)
     ctx.save();
-    ctx.shadowColor = "rgba(8,26,52,0.30)";
-    ctx.shadowBlur = 22;
-    ctx.shadowOffsetY = 6;
-    const shellFill = ctx.createLinearGradient(0, 40, 0, TIP_Y);
-    shellFill.addColorStop(0, "#ffffff");
-    shellFill.addColorStop(0.6, "#ffffff");
-    shellFill.addColorStop(1, "#f4f7fc");
-    ctx.fillStyle = shellFill;
-    tracePosterShell(ctx);
+    ctx.fillStyle = NAVY;
+    traceFullPin(ctx);
     ctx.fill();
     ctx.restore();
 
-    // Nothing may escape the silhouette from here on.
+    // 2. Fill the top white region
     ctx.save();
-    tracePosterShell(ctx);
-    ctx.clip();
-
-    // Soft red edge sitting just inside the thick border
-    ctx.strokeStyle = "rgba(217,56,58,0.10)";
-    ctx.lineWidth = 24;
-    tracePosterShell(ctx);
-    ctx.stroke();
-
-    /* ── 2. Faint brand watermark ────────────────────────── */
-    ctx.strokeStyle = "#f2f6fb";
-    ctx.lineWidth = 26;
-    for (let i = 0; i < 4; i++) {
-      const y0 = 130 + i * 290;
-      ctx.beginPath();
-      ctx.moveTo(-160, y0);
-      ctx.bezierCurveTo(200, y0 - 130, 600, y0 + 150, 960, y0 - 30);
-      ctx.stroke();
-    }
-
-    /* ── 3. Brand lock-up ────────────────────────────────── */
-    ctx.drawImage(logoImg, cx - 48, 72, 96, 96);
-
-    ctx.textAlign = "left";
-    ctx.font = "900 44px 'Inter', system-ui, sans-serif";
-    const t1 = "AXX", t2 = "SPACE";
-    const gap = 12;
-    const w1 = ctx.measureText(t1).width + gap;
-    const w2 = ctx.measureText(t2).width;
-    const brandX = cx - (w1 + w2) / 2;
-    ctx.fillStyle = RED;
-    ctx.fillText(t1, brandX, 216);
-    ctx.fillStyle = NAVY;
-    ctx.fillText(t2, brandX + w1, 216);
-
-    ctx.textAlign = "center";
-    ctx.font = "500 15px 'Inter', system-ui, sans-serif";
-    ctx.fillStyle = "#64748b";
-    ctx.fillText("Space hunting bila stress", cx, 242);
-
-    ctx.fillStyle = RED;
-    drawRoundRect(ctx, cx - 280, 258, 560, 5, 2.5, true, false);
-
-    /* ── 4. Headline + verified stamp ───────────────────── */
-    ctx.font = "900 42px 'Inter', system-ui, sans-serif";
-    ctx.fillStyle = NAVY;
-    ctx.fillText("VERIFIED", cx, 318);
-
-    ctx.font = "900 76px 'Inter', system-ui, sans-serif";
-    ctx.fillStyle = RED;
-    ctx.fillText("AGENT", cx, 392);
-
-    // Rosette stamp with a briefcase mark
-    const bx2 = 618, by2 = 344, br = 44;
-    drawScallop(ctx, bx2, by2, br, 18, 4, NAVY, RED, 3);
-    drawRoundRect(ctx, bx2 - 14, by2 - 8, 28, 18, 4, false, true, "#ffffff", 2.5);
-    ctx.beginPath();
-    ctx.moveTo(bx2 - 7, by2 - 8);
-    ctx.lineTo(bx2 - 7, by2 - 15);
-    ctx.quadraticCurveTo(bx2 - 7, by2 - 20, bx2, by2 - 20);
-    ctx.quadraticCurveTo(bx2 + 7, by2 - 20, bx2 + 7, by2 - 15);
-    ctx.lineTo(bx2 + 7, by2 - 8);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(bx2 - 14, by2 - 1);
-    ctx.lineTo(bx2 + 14, by2 - 1);
-    ctx.stroke();
     ctx.fillStyle = "#ffffff";
-    ctx.textAlign = "center";
-    ctx.font = "bold 8px 'Inter', sans-serif";
-    ctx.fillText("Listed On", bx2, by2 + 16);
-    ctx.font = "900 9.5px 'Inter', sans-serif";
-    ctx.fillText("AXXSPACE", bx2, by2 + 27);
+    traceWhiteSection(ctx);
+    ctx.fill();
 
-    /* ── 5. Call to action ───────────────────────────────── */
-    ctx.fillStyle = "#f0f4ff";
-    drawRoundRect(ctx, cx - 280, 414, 560, 40, 20, true, false);
-
-    ctx.textAlign = "center";
-    ctx.fillStyle = NAVY;
-    ctx.font = "900 15px 'Inter', system-ui, sans-serif";
-    ctx.fillText("SCAN TO VIEW AVAILABILITY AND AGENTS PROFILE", cx, 440);
-
-    /* ── 6. QR inside its own pin ────────────────────────── */
-    const qbX = cx - PIN_W / 2;
-
-    const halo = ctx.createRadialGradient(cx, 620, 40, cx, 620, 330);
-    halo.addColorStop(0, "rgba(217,56,58,0.13)");
-    halo.addColorStop(1, "rgba(217,56,58,0)");
-    ctx.fillStyle = halo;
-    ctx.fillRect(0, 300, POSTER_W, 660);
-
-    ctx.save();
-    ctx.shadowColor = "rgba(8,26,52,0.22)";
-    ctx.shadowBlur = 16;
-    ctx.shadowOffsetY = 5;
-    drawPinFrame(ctx, qbX, QR_Y, PIN_W, PIN_TAIL, "#ffffff", null, 0);
+    // 3. Thick Red brand border framing the white section & creating the diagonal divider
+    ctx.strokeStyle = RED;
+    ctx.lineWidth = 20;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    traceWhiteSection(ctx);
+    ctx.stroke();
     ctx.restore();
 
-    ctx.drawImage(qrCanvas, qbX + PIN_QR_INNER, QR_Y + PIN_QR_INNER, PIN_QR, PIN_QR);
-    drawPinFrame(ctx, qbX, QR_Y, PIN_W, PIN_TAIL, null, RED, 5);
+    // 4. Header Logo: AxxSpace pin + title + slogan
+    drawHeaderLogo(ctx, logoImg);
 
-    /* ── 7. Agent name chip ──────────────────────────────── */
+    // 5. HOUSEHUNTING with middle 'H' in Red
+    drawTriPartText(
+      ctx,
+      270,
+      "HOUSE",
+      "H",
+      "UNTING",
+      "900 44px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      NAVY,
+      RED,
+      false
+    );
+
+    // 6. AGENT with middle 'E' in Red
+    drawTriPartText(
+      ctx,
+      360,
+      "AG",
+      "E",
+      "NT",
+      "900 86px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      NAVY,
+      RED,
+      true
+    );
+
+    // 7. Call To Action: SCAN TO VIEW AGENT DETAILS
+    ctx.save();
+    ctx.font = "800 15px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
     ctx.fillStyle = NAVY;
-    drawRoundRect(ctx, cx - 210, 806, 420, 42, 21, true, false);
-
     ctx.textAlign = "center";
+    ctx.fillText("SCAN TO VIEW AGENT DETAILS", cx, 400);
+    ctx.restore();
+
+    // 8. Large Clean QR Code
+    const qrSize = 290;
+    const qrX = cx - qrSize / 2;
+    const qrY = 425;
+    ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
+
+    // 9. Contact Us in Bottom Navy Section
+    const contactCenterX = 430;
+    ctx.save();
+    ctx.font = "800 28px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
     ctx.fillStyle = "#ffffff";
-    ctx.font = "900 15px 'Inter', system-ui, sans-serif";
-    ctx.fillText(fitText(ctx, agentName.toUpperCase(), 370), cx, 833);
-
-    /* ── 8. Contact rows ─────────────────────────────────── */
-    const iconStroke = "#081A34";
-
-    const envelope = (x, rowY) => {
-      const top = rowY - 12;
-      drawRoundRect(ctx, x, top, 16, 12, 2, false, true, iconStroke, 1.6);
-      ctx.beginPath();
-      ctx.moveTo(x + 1, top + 2);
-      ctx.lineTo(x + 8, top + 7);
-      ctx.lineTo(x + 15, top + 2);
-      ctx.stroke();
-    };
-    const whatsapp = (x, rowY) => {
-      const gx = x + 8, gy = rowY - 6;
-      ctx.strokeStyle = iconStroke;
-      ctx.lineWidth = 1.6;
-      ctx.beginPath();
-      ctx.arc(gx, gy, 7, 0.15 * Math.PI, 1.85 * Math.PI);
-      ctx.lineTo(gx - 7, gy + 7);
-      ctx.closePath();
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(gx, gy, 3.2, 0.75 * Math.PI, 1.35 * Math.PI);
-      ctx.stroke();
-    };
-    const instagram = (x, rowY) => {
-      const top = rowY - 13;
-      drawRoundRect(ctx, x, top, 14, 14, 4, false, true, iconStroke, 1.6);
-      ctx.beginPath();
-      ctx.arc(x + 7, top + 7, 3.2, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.fillStyle = iconStroke;
-      ctx.beginPath();
-      ctx.arc(x + 10.6, top + 3.4, 0.9, 0, Math.PI * 2);
-      ctx.fill();
-    };
-    const xMark = (x, rowY) => {
-      const top = rowY - 12;
-      ctx.strokeStyle = iconStroke;
-      ctx.lineWidth = 1.8;
-      ctx.beginPath();
-      ctx.moveTo(x, top); ctx.lineTo(x + 11, top + 11);
-      ctx.moveTo(x + 11, top); ctx.lineTo(x, top + 11);
-      ctx.stroke();
-    };
-
-    drawIconRow(ctx, 884, [
-      { icon: envelope, iconW: 22, text: "info@axxspace.com", font: "800 13px 'Inter', system-ui, sans-serif", color: NAVY },
-      { icon: whatsapp, iconW: 22, text: "+254 745 689 773", font: "800 13px 'Inter', system-ui, sans-serif", color: NAVY },
-    ], 34);
-
-    drawIconRow(ctx, 910, [
-      {
-        icon: (x, rowY) => { instagram(x, rowY); xMark(x + 20, rowY); },
-        iconW: 38,
-        text: "axx.space",
-        font: "800 13px 'Inter', system-ui, sans-serif",
-        color: NAVY,
-      },
-    ], 0);
-
-    /* ── 9. Website pill ─────────────────────────────────── */
     ctx.textAlign = "center";
-    ctx.fillStyle = "#94a3b8";
-    ctx.font = "900 11px 'Inter', system-ui, sans-serif";
-    ctx.fillText("OR VISIT", cx, 938);
+    ctx.fillText("Contact Us", contactCenterX, 850);
 
-    const pillW = 250, pillH = 36;
-    const pillX = cx - pillW / 2, pillY = 946;
-    ctx.fillStyle = "#ffffff";
-    drawRoundRect(ctx, pillX, pillY, pillW, pillH, 18, true, true, NAVY, 2);
+    // 10. Contact rows with white icons
+    ctx.font = "600 18px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+    const contacts = [
+      { icon: drawEnvelopeIcon, text: "info@axxspace.com", y: 895 },
+      { icon: drawWhatsAppIcon, text: "+254 745 689 773", y: 935 },
+      { icon: drawGlobeIcon, text: "axxspace.com", y: 975 }
+    ];
 
-    ctx.font = "900 14px 'Inter', system-ui, sans-serif";
-    const urlText = "www.axxspace.com";
-    const urlW = ctx.measureText(urlText).width;
-    const gx = pillX + (pillW - (16 + 9 + urlW)) / 2 + 8;
-    const gy = pillY + pillH / 2;
-    ctx.fillStyle = NAVY;
-    ctx.beginPath(); ctx.arc(gx, gy, 7, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = 1.2;
-    ctx.beginPath(); ctx.arc(gx, gy, 7, 0, Math.PI * 2); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(gx - 7, gy); ctx.lineTo(gx + 7, gy); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(gx, gy - 7); ctx.lineTo(gx, gy + 7); ctx.stroke();
-    ctx.beginPath(); ctx.ellipse(gx, gy, 3.2, 7, 0, 0, Math.PI * 2); ctx.stroke();
-
-    ctx.fillStyle = NAVY;
-    ctx.textAlign = "left";
-    ctx.fillText(urlText, gx + 17, gy + 5);
-
-    /* ── 10. Tip accent ──────────────────────────────────── */
-    ctx.fillStyle = RED;
-    drawRoundRect(ctx, cx - 35, 1034, 70, 4, 2, true, false);
-
-    ctx.restore(); // end pin clip
-
-    /* ── 11. Thick red brand border ──────────────────────── */
-    ctx.strokeStyle = RED;
-    ctx.lineWidth = 14;
-    tracePosterShell(ctx);
-    ctx.stroke();
+    contacts.forEach(({ icon, text, y }) => {
+      const textW = ctx.measureText(text).width;
+      const totalW = 32 + textW;
+      const startX = contactCenterX - totalW / 2;
+      icon(ctx, startX, y);
+      ctx.textAlign = "left";
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(text, startX + 32, y);
+    });
+    ctx.restore();
 
     // Feed the preview / print view the exact file that gets downloaded
     setPosterDataUrl(poster.toDataURL("image/png"));
