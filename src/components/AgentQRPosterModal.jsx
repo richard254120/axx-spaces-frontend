@@ -276,10 +276,10 @@ export default function AgentQRPosterModal({ isOpen, onClose, agent }) {
     qCtx.fillText("AXXSPACE", dlQr.width / 2, 348);
     qCtx.fillStyle = RED;
     qCtx.font = "900 15px 'Inter', system-ui, sans-serif";
-    qCtx.fillText("AGENT DETAILS", dlQr.width / 2, 372);
+    qCtx.fillText("VERIFIED AGENT", dlQr.width / 2, 372);
     qCtx.fillStyle = "#64748b";
     qCtx.font = "600 12px 'Inter', system-ui, sans-serif";
-    qCtx.fillText("Scan to connect with agent", dlQr.width / 2, 396);
+    qCtx.fillText("Scan to view availability and details", dlQr.width / 2, 396);
 
     // ── High-res poster (rendered at 2× for print) ──
     const logoImg = new Image();
@@ -328,14 +328,14 @@ export default function AgentQRPosterModal({ isOpen, onClose, agent }) {
     // 4. Header Logo: AxxSpace pin + title + slogan
     drawHeaderLogo(ctx, logoImg);
 
-    // 5. HOUSEHUNTING with middle 'H' in Red
+    // 5. VERIFIED with middle 'I' in Red
     drawTriPartText(
       ctx,
       270,
-      "HOUSE",
-      "H",
-      "UNTING",
-      "900 44px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "VER",
+      "I",
+      "FIED",
+      "900 48px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
       NAVY,
       RED,
       false
@@ -354,12 +354,12 @@ export default function AgentQRPosterModal({ isOpen, onClose, agent }) {
       true
     );
 
-    // 7. Call To Action: SCAN TO VIEW AGENT DETAILS
+    // 7. Call To Action: SCAN TO VIEW AVAILABILITY AND DETAILS
     ctx.save();
-    ctx.font = "800 15px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+    ctx.font = "800 14px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
     ctx.fillStyle = NAVY;
     ctx.textAlign = "center";
-    ctx.fillText("SCAN TO VIEW AGENT DETAILS", cx, 400);
+    ctx.fillText("SCAN TO VIEW AVAILABILITY AND DETAILS", cx, 400);
     ctx.restore();
 
     // 8. Large Clean QR Code
