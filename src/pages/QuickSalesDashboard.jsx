@@ -55,19 +55,16 @@ const resolveStatus = (material) => {
   return raw;
 };
 
-// Read the seller session once (localStorage wins over the shared AuthContext)
+// Read the session (localStorage sellerToken or shared AuthContext)
 const readSellerSession = (ctxToken, ctxUser) => {
   const storedToken = localStorage.getItem("sellerToken") || ctxToken || null;
-  const storedUser = localStorage.getItem("sellerUser") || (ctxUser ? JSON.stringify(ctxUser) : null);
-  if (!storedToken || !storedUser) return { token: null, user: null, invalidRole: null };
+  const rawUser = localStorage.getItem("sellerUser") || ctxUser || null;
+  if (!storedToken || !rawUser) return { token: null, user: null, invalidRole: null };
   try {
-    const parsed = JSON.parse(storedUser);
-    if (parsed?.role && parsed.role !== "seller") {
-      return { token: storedToken, user: null, invalidRole: parsed.role };
-    }
+    const parsed = typeof rawUser === "string" ? JSON.parse(rawUser) : rawUser;
     return { token: storedToken, user: parsed, invalidRole: null };
   } catch {
-    return { token: null, user: null, invalidRole: null };
+    return { token: storedToken, user: rawUser, invalidRole: null };
   }
 };
 
@@ -76,7 +73,7 @@ export default function QuickSalesDashboard() {
   const { token: ctxToken, user: ctxUser, logout } = useContext(AuthContext);
 
   const handleLogout = () => {
-    logout?.("/quicksales-login");
+    logout?.("/user-login");
     localStorage.removeItem("sellerToken");
     localStorage.removeItem("sellerUser");
   };
@@ -107,7 +104,7 @@ export default function QuickSalesDashboard() {
     setBoostModalOpen(true);
   };
 
-  // Resolve the seller session synchronously (localStorage wins over AuthContext)
+  // Resolve the seller session synchronously (localStorage or AuthContext)
   const session = useMemo(
     () => readSellerSession(ctxToken, ctxUser),
     [ctxToken, ctxUser]
@@ -117,16 +114,12 @@ export default function QuickSalesDashboard() {
   const [profile, setProfile] = useState(null);
   const seller = profile || session.user;
 
-  // Session guard: redirect unauthenticated / wrong-role users to the right place
+  // Session guard: redirect unauthenticated users
   useEffect(() => {
-    if (!token || (!seller && !session.invalidRole)) {
-      navigate("/quicksales-login");
-      return;
+    if (!token) {
+      navigate("/user-login?redirect=/quicksales-dashboard");
     }
-    if (session.invalidRole) {
-      navigate(getDashboardPath(session.invalidRole));
-    }
-  }, [token, seller, session.invalidRole, navigate]);
+  }, [token, navigate]);
 
   const fetchMyMaterials = useCallback(async (tkn) => {
     try {

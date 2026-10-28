@@ -896,6 +896,10 @@ export default function MemberDashboard() {
               <span>Book Stays</span>
               <IconArrowUpRight size={13} />
             </Link>
+            <Link to="/quicksales?action=post" style={{ ...styles.exploreBtn, background: "rgba(229, 26, 36, 0.15)", color: "#f87171", border: "1px solid rgba(229, 26, 36, 0.3)", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+              <span>Sell Item (QuickSales)</span>
+              <IconArrowUpRight size={13} />
+            </Link>
             <button
               type="button"
               style={{ ...styles.providerBtn, display: "inline-flex", alignItems: "center", gap: "6px" }}

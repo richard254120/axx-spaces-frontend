@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useContext, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import QuickSalePostModal from "../components/QuickSalePostModal";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -271,6 +272,13 @@ export default function QuickSales() {
   const [currentImage, setCurrentImage] = useState(0);
   const [toastMessage, setToastMessage] = useState("");
   const [sortBy, setSortBy] = useState("newest");
+  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("action") === "post" || searchParams.get("post") === "true") {
+      setIsPostModalOpen(true);
+    }
+  }, [searchParams]);
 
   const [favorites, setFavorites] = useState(() => {
     const saved = localStorage.getItem("fav_quicksales");
@@ -414,7 +422,12 @@ export default function QuickSales() {
     }
   };
 
-  const handleSell = () => navigate("/quicksales-login");
+  const handleSell = () => setIsPostModalOpen(true);
+
+  const handleItemCreated = (newItem) => {
+    setItems((prev) => [newItem, ...prev]);
+    showToast("🎉 Your item is now LIVE on QuickSales!");
+  };
 
   const formatPhone = (phone) => {
     if (!phone) return "";
@@ -484,23 +497,23 @@ export default function QuickSales() {
             </span>
 
             <div className="hero-header-actions">
-              {isSeller ? (
+              {(token || isSeller) && (
                 <button
                   type="button"
                   className="hero-action-btn hero-dash-btn"
                   onClick={() => navigate("/quicksales-dashboard")}
                 >
                   <IconSparkles size={14} />
-                  <span>My Dashboard</span>
+                  <span>My Listings</span>
                 </button>
-              ) : null}
+              )}
               <button
                 type="button"
                 className="hero-action-btn hero-sell-btn"
                 onClick={handleSell}
               >
                 <IconTag size={14} />
-                <span>Sell Your Item</span>
+                <span>+ Sell Your Item Free</span>
               </button>
             </div>
           </div>
@@ -1060,6 +1073,13 @@ export default function QuickSales() {
           </div>
         </div>
       )}
+
+      {/* Direct Post Item Modal for All Users */}
+      <QuickSalePostModal
+        isOpen={isPostModalOpen}
+        onClose={() => setIsPostModalOpen(false)}
+        onItemCreated={handleItemCreated}
+      />
 
       {/* Toast Notification */}
       {toastMessage && (
