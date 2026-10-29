@@ -345,6 +345,8 @@ function QuickSalesComposer({ onClose, onItemCreated }) {
 
   const redirectTarget = typeof window !== "undefined" ? window.location.pathname : "/quicksales";
   const sellerSignupHref = "/quicksales-login?mode=register";
+  // Deep link into the community-member signup, not the landlord default.
+  const memberSignupHref = "/register?account=member";
   const loginHref = `/user-login?redirect=${encodeURIComponent(redirectTarget)}`;
 
   const gate = gateKind === "guest"
@@ -362,7 +364,7 @@ function QuickSalesComposer({ onClose, onItemCreated }) {
         fine: (
           <>
             New to AXXSpace?{" "}
-            <a href="/register">Create a member account</a> and sell from the same profile.
+            <a href={memberSignupHref}>Create a member account</a> and sell from the same profile.
           </>
         ),
       }
@@ -376,7 +378,7 @@ function QuickSalesComposer({ onClose, onItemCreated }) {
             "Keep your favourites, saved searches and alerts.",
             "Free seller accounts publish instantly, with no commission.",
           ],
-          primary: { label: "Become an AXXSpace member", href: "/register", variant: "primary" },
+          primary: { label: "Become an AXXSpace member", href: memberSignupHref, variant: "primary" },
           secondary: { label: "Register a seller account instead", href: sellerSignupHref, variant: "ghost" },
           fine: (
             <>

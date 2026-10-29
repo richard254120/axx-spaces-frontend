@@ -493,10 +493,10 @@ export default function QuickSalesDashboard() {
             listing your items.
           </p>
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-            <a href="/register" style={{ ...s.uploadBtn, textDecoration: "none" }}>
+            <a href="/register?account=member" style={{ ...s.uploadBtn, textDecoration: "none" }}>
               Become a Member
             </a>
-            <a href="/quicksales-login" style={{ ...s.cancelEditBtn, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>
+            <a href="/quicksales-login?mode=register" style={{ ...s.cancelEditBtn, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>
               Register as Seller
             </a>
           </div>

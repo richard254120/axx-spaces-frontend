@@ -1,5 +1,5 @@
 import { useState, useContext, useCallback } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import PhoneInput from "../components/PhoneInput";
 import { getDashboardPath } from "../utils/dashboardRoutes";
@@ -8,8 +8,32 @@ import AuthLayout from "../components/AuthLayout";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
+// Each signup path gets its own accent so the page never looks like the
+// wrong portal when it is opened from a deep link.
+const ACCENTS = {
+  landlord: {
+    color: "#fbbf24",
+    glow: "rgba(251, 191, 36, 0.22)",
+    gradient: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
+    onAccent: "#0B2140",
+    soft: "rgba(251, 191, 36, 0.15)",
+    border: "rgba(251, 191, 36, 0.4)",
+    shadow: "rgba(251, 191, 36, 0.35)",
+  },
+  member: {
+    color: "#38bdf8",
+    glow: "rgba(56, 189, 248, 0.22)",
+    gradient: "linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%)",
+    onAccent: "#04244D",
+    soft: "rgba(56, 189, 248, 0.15)",
+    border: "rgba(56, 189, 248, 0.45)",
+    shadow: "rgba(56, 189, 248, 0.35)",
+  },
+};
+
 export default function Register() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { login } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
@@ -24,7 +48,11 @@ export default function Register() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [landlordType, setLandlordType] = useState("general");
-  const [accountChoice, setAccountChoice] = useState("landlord"); // "landlord" | "member"
+  // ?account=member lets member/explorer CTAs land on the free member signup
+  // instead of the landlord flow.
+  const [accountChoice, setAccountChoice] = useState(() =>
+    searchParams.get("account") === "member" ? "member" : "landlord"
+  ); // "landlord" | "member"
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -205,16 +233,81 @@ export default function Register() {
     { value: "24/7", label: "Owner Assistance" },
   ];
 
+  const memberFeatures = [
+    {
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" />
+        </svg>
+      ),
+      title: "Verified Homes & Hostels",
+      desc: "Browse vetted rentals and student hostels across all 47 counties.",
+    },
+    {
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+        </svg>
+      ),
+      title: "Save, Compare & Get Alerts",
+      desc: "Shortlist favourites, save searches and be first to hear about new listings.",
+    },
+    {
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="9" cy="21" r="1" />
+          <circle cx="20" cy="21" r="1" />
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+        </svg>
+      ),
+      title: "Sell on QuickSales",
+      desc: "Post items for sale free and deal directly with buyers on WhatsApp.",
+    },
+  ];
+
+  const memberStats = [
+    { value: "100%", label: "Free Account" },
+    { value: "47", label: "Counties Covered" },
+    { value: "0%", label: "Listing Fees" },
+  ];
+
+  const isMember = accountChoice === "member";
+  const accent = ACCENTS[accountChoice];
+
+  const tabStyle = (choice) =>
+    accountChoice === choice
+      ? {
+          ...s.tabButton,
+          background: ACCENTS[choice].soft,
+          color: ACCENTS[choice].color,
+          border: `1px solid ${ACCENTS[choice].border}`,
+        }
+      : s.tabButton;
+
+  const typeCardStyle = (type) =>
+    landlordType === type
+      ? { ...s.typeCard, borderColor: accent.border, background: accent.soft }
+      : s.typeCard;
+
   return (
     <AuthLayout
-      portalBadge="Landlord Registration"
-      portalTitle="Start Listing & Monetizing Your Space Today"
-      portalSubtitle="Join thousands of Kenyan property owners who manage, rent out, and track income on AxxSpace with zero monthly fixed costs."
-      accentColor="#fbbf24"
-      accentGlow="rgba(251, 191, 36, 0.22)"
-      features={registerFeatures}
-      stats={registerStats}
-      backLink="/login"
+      portalBadge={isMember ? "Member Registration" : "Landlord Registration"}
+      portalTitle={
+        isMember
+          ? "Join the AxxSpace Community — Free Forever"
+          : "Start Listing & Monetizing Your Space Today"
+      }
+      portalSubtitle={
+        isMember
+          ? "Discover verified homes and hostels across all 47 counties. Save favourites, book instantly and sell on QuickSales with one free account."
+          : "Join thousands of Kenyan property owners who manage, rent out, and track income on AxxSpace with zero monthly fixed costs."
+      }
+      accentColor={accent.color}
+      accentGlow={accent.glow}
+      features={isMember ? memberFeatures : registerFeatures}
+      stats={isMember ? memberStats : registerStats}
+      backLink={isMember ? "/user-login" : "/login"}
       backText="Back to Login"
     >
       <div>
@@ -223,20 +316,14 @@ export default function Register() {
           <button
             type="button"
             onClick={() => setAccountChoice("landlord")}
-            style={{
-              ...s.tabButton,
-              ...(accountChoice === "landlord" ? s.tabButtonActive : {}),
-            }}
+            style={tabStyle("landlord")}
           >
             🏢 Landlord / Owner
           </button>
           <button
             type="button"
             onClick={() => setAccountChoice("member")}
-            style={{
-              ...s.tabButton,
-              ...(accountChoice === "member" ? s.tabButtonActive : {}),
-            }}
+            style={tabStyle("member")}
           >
             🌟 Member / Explorer
           </button>
@@ -265,10 +352,7 @@ export default function Register() {
               <button
                 type="button"
                 onClick={() => setLandlordType("general")}
-                style={{
-                  ...s.typeCard,
-                  ...(landlordType === "general" ? s.typeCardActive : {}),
-                }}
+                style={typeCardStyle("general")}
               >
                 <div style={s.typeCardTitle}>🏡 General Rentals</div>
                 <div style={s.typeCardDesc}>Apartments, villas, family homes, commercial spaces</div>
@@ -276,10 +360,7 @@ export default function Register() {
               <button
                 type="button"
                 onClick={() => setLandlordType("university")}
-                style={{
-                  ...s.typeCard,
-                  ...(landlordType === "university" ? s.typeCardActive : {}),
-                }}
+                style={typeCardStyle("university")}
               >
                 <div style={s.typeCardTitle}>🎓 Campus &amp; Hostels</div>
                 <div style={s.typeCardDesc}>Student rooms near colleges and university campuses</div>
@@ -359,6 +440,9 @@ export default function Register() {
             disabled={loading}
             style={{
               ...s.submitBtn,
+              background: accent.gradient,
+              color: accent.onAccent,
+              boxShadow: `0 4px 14px ${accent.shadow}`,
               opacity: loading ? 0.7 : 1,
               cursor: loading ? "not-allowed" : "pointer",
             }}
@@ -378,7 +462,10 @@ export default function Register() {
         <div style={{ marginTop: "24px", paddingTop: "18px", borderTop: "1px solid rgba(255,255,255,0.08)", textAlign: "center" }}>
           <p style={{ color: "#94a3b8", fontSize: "14px", margin: 0 }}>
             Already registered?{" "}
-            <Link to="/login" style={{ color: "#fbbf24", fontWeight: 700, textDecoration: "none" }}>
+            <Link
+              to={isMember ? "/user-login" : "/login"}
+              style={{ color: accent.color, fontWeight: 700, textDecoration: "none" }}
+            >
               Sign In Here &rarr;
             </Link>
           </p>
@@ -402,18 +489,13 @@ const s = {
     flex: 1,
     padding: "11px 12px",
     borderRadius: "10px",
-    border: "none",
+    border: "1px solid transparent",
     background: "transparent",
     color: "#94a3b8",
     fontSize: "13px",
     fontWeight: 700,
     cursor: "pointer",
     transition: "all 0.2s",
-  },
-  tabButtonActive: {
-    background: "rgba(251, 191, 36, 0.15)",
-    color: "#fbbf24",
-    border: "1px solid rgba(251, 191, 36, 0.4)",
   },
   typeGrid: {
     display: "grid",
@@ -428,10 +510,6 @@ const s = {
     textAlign: "left",
     cursor: "pointer",
     transition: "all 0.2s",
-  },
-  typeCardActive: {
-    borderColor: "#fbbf24",
-    background: "rgba(251, 191, 36, 0.08)",
   },
   typeCardTitle: {
     fontSize: "13px",
@@ -479,14 +557,11 @@ const s = {
   submitBtn: {
     width: "100%",
     padding: "14px",
-    background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
-    color: "#0B2140",
     border: "none",
     borderRadius: "12px",
     fontSize: "15px",
     fontWeight: 800,
     cursor: "pointer",
-    boxShadow: "0 4px 14px rgba(251, 191, 36, 0.35)",
     transition: "all 0.2s",
     marginTop: "6px",
   },
