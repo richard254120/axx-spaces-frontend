@@ -12,6 +12,10 @@ import { kenyanUniversities, searchUniversities } from "../data/kenyanUniversiti
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
+// "Any Budget" must not silently cap the results; only an explicit budget
+// choice from the dropdown or the price drawer may narrow the price range.
+const NO_PRICE_CAP = Number.POSITIVE_INFINITY;
+
 const formatKenyaPhone = (phone) => {
   if (!phone) return "";
   let cleaned = phone.toString().replace(/\D/g, "");
@@ -313,7 +317,7 @@ export default function Listings() {
   const [filters, setFilters] = useState(() => ({
     location: searchParams.get("county") || searchParams.get("location") || "",
     minPrice: 0,
-    maxPrice: 1000000,
+    maxPrice: NO_PRICE_CAP,
     bedrooms: "",
     bathrooms: "",
     furnished: "",
@@ -640,26 +644,30 @@ export default function Listings() {
     if (filters.amenities) count++;
     if (filters.availableFrom) count++;
     if (filters.minPrice > 0) count++;
-    if (filters.maxPrice < 1000000) count++;
+    if (Number.isFinite(filters.maxPrice)) count++;
     return count;
   }, [filters]);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    setFilters((prev) => ({
-      ...prev,
-      [name]:
-        name === "minPrice" || name === "maxPrice"
-          ? parseFloat(value) || 0
-          : value,
-    }));
+    setFilters((prev) => {
+      if (name === "minPrice") {
+        return { ...prev, minPrice: parseFloat(value) || 0 };
+      }
+      if (name === "maxPrice") {
+        // Clearing the field means "no maximum" rather than a 0 ceiling.
+        const parsed = parseFloat(value);
+        return { ...prev, maxPrice: Number.isFinite(parsed) ? parsed : NO_PRICE_CAP };
+      }
+      return { ...prev, [name]: value };
+    });
   };
 
   const resetAllFilters = () => {
     setFilters({
       location: "",
       minPrice: 0,
-      maxPrice: 1000000,
+      maxPrice: NO_PRICE_CAP,
       bedrooms: "",
       bathrooms: "",
       furnished: "",
@@ -794,7 +802,7 @@ Please contact me back with viewing details. Thank you!`;
 
   const saveCurrentSearch = () => {
     const hasActiveFilters = Object.values(filters).some(
-      (v) => v !== "" && v !== 0 && v !== 1000000
+      (v) => v !== "" && v !== 0 && v !== NO_PRICE_CAP
     );
     if (!hasActiveFilters) {
       alert("Please adjust some filters (e.g. location, budget, bedrooms) before saving.");
@@ -815,7 +823,15 @@ Please contact me back with viewing details. Thank you!`;
   };
 
   const applySavedSearch = (search) => {
-    setFilters(search.filters);
+    // Older snapshots stored the old 1,000,000 default (and JSON turns an
+    // unlimited cap into null), both of which must map back to "no cap".
+    const restored = search.filters || {};
+    const restoredMax = Number(restored.maxPrice);
+    setFilters({
+      ...restored,
+      maxPrice:
+        !restoredMax || restoredMax >= 1000000 ? NO_PRICE_CAP : restoredMax,
+    });
     setShowSavedSearches(false);
   };
 
@@ -979,11 +995,11 @@ Please contact me back with viewing details. Thank you!`;
                   <span className="currency-prefix">KES</span>
                   <select
                     name="maxPrice"
-                    value={filters.maxPrice >= 1000000 ? "" : filters.maxPrice}
+                    value={Number.isFinite(filters.maxPrice) ? filters.maxPrice : ""}
                     onChange={(e) =>
                       setFilters((prev) => ({
                         ...prev,
-                        maxPrice: e.target.value ? parseFloat(e.target.value) : 1000000,
+                        maxPrice: e.target.value ? parseFloat(e.target.value) : NO_PRICE_CAP,
                       }))
                     }
                     className="segment-select-input"
@@ -1176,8 +1192,8 @@ Please contact me back with viewing details. Thank you!`;
                     <input
                       type="number"
                       name="maxPrice"
-                      placeholder="1,000,000"
-                      value={filters.maxPrice >= 1000000 ? "" : filters.maxPrice}
+                      placeholder="No limit"
+                      value={Number.isFinite(filters.maxPrice) ? filters.maxPrice : ""}
                       onChange={handleFilterChange}
                       className="drawer-input"
                     />
