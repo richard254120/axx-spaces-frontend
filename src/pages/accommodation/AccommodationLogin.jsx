@@ -58,11 +58,19 @@ export default function AccommodationLogin({ defaultTab }) {
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotMsg, setForgotMsg] = useState("");
 
+  // Email verification resend state
+  const [showResend, setShowResend] = useState(false);
+  const [resendEmail, setResendEmail] = useState("");
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendMsg, setResendMsg] = useState("");
+
   const handleTabChange = (newTab) => {
     setTab(newTab);
     setError("");
     setSuccess("");
     setShowForgot(false);
+    setShowResend(false);
+    setResendMsg("");
     setSearchParams({ tab: newTab });
   };
 
@@ -116,6 +124,38 @@ export default function AccommodationLogin({ defaultTab }) {
     onError: handleGoogleError,
   });
 
+  // Resend the verification link when the original one expired or never arrived
+  const handleResendVerification = async () => {
+    const cleanEmail = resendEmail.trim().toLowerCase();
+    if (!cleanEmail) {
+      setResendMsg("Please enter your email address.");
+      return;
+    }
+
+    setResendLoading(true);
+    setResendMsg("");
+
+    try {
+      const res = await fetch(`${API_BASE}/auth/resend-verification`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: cleanEmail, role: "host" }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to resend verification email");
+      }
+
+      setResendMsg("✓ " + (data.message || "Verification email sent! Please check your inbox."));
+      setShowResend(false);
+    } catch (err) {
+      setResendMsg("✕ " + (err.message || "Failed to resend verification email. Please try again."));
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   // Login handler
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -129,6 +169,8 @@ export default function AccommodationLogin({ defaultTab }) {
     setLoading(true);
     setError("");
     setSuccess("");
+    setShowResend(false);
+    setResendMsg("");
 
     try {
       const response = await fetch(`${API_BASE}/auth/login`, {
@@ -149,6 +191,10 @@ export default function AccommodationLogin({ defaultTab }) {
       }
 
       if (!response.ok) {
+        if (data.requiresVerification) {
+          setShowResend(true);
+          setResendEmail(data.email || cleanEmail);
+        }
         throw new Error(data.error || "Login failed. Please check your credentials.");
       }
 
@@ -385,6 +431,39 @@ export default function AccommodationLogin({ defaultTab }) {
             <div className="acc-alert acc-alert-success" role="status">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
               <span>{success}</span>
+            </div>
+          )}
+
+          {/* Email verification resend */}
+          {showResend && (
+            <div className="acc-resend-box">
+              <p className="acc-resend-title">Email not verified yet?</p>
+              <p className="acc-resend-text">
+                The verification link may have expired. Enter your host email below and we will send a fresh link.
+              </p>
+              <div className="acc-resend-row">
+                <input
+                  type="email"
+                  className="acc-input acc-resend-input"
+                  placeholder="e.g. serengeti.lodge@example.com"
+                  value={resendEmail}
+                  onChange={(e) => setResendEmail(e.target.value)}
+                  autoComplete="email"
+                />
+                <button
+                  type="button"
+                  className="acc-resend-btn"
+                  onClick={handleResendVerification}
+                  disabled={resendLoading}
+                >
+                  {resendLoading ? "Sending..." : "Resend Link"}
+                </button>
+              </div>
+              {resendMsg && (
+                <p className={`acc-resend-msg ${resendMsg.startsWith("✓") ? "is-success" : "is-error"}`}>
+                  {resendMsg}
+                </p>
+              )}
             </div>
           )}
 
@@ -887,6 +966,63 @@ const css = `
     background: #f0fdf4;
     border: 1px solid #bbf7d0;
     color: #16a34a;
+  }
+
+  /* ── Verification Resend ── */
+  .acc-resend-box {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 18px;
+  }
+  .acc-resend-title {
+    margin: 0 0 4px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #92400e;
+  }
+  .acc-resend-text {
+    margin: 0 0 12px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: #78350f;
+  }
+  .acc-resend-row {
+    display: flex;
+    gap: 8px;
+  }
+  .acc-resend-input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 14px;
+  }
+  .acc-resend-btn {
+    background: #0B2140;
+    color: #fbbf24;
+    border: none;
+    border-radius: 10px;
+    padding: 0 16px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .acc-resend-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .acc-resend-msg {
+    margin: 10px 0 0;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .acc-resend-msg.is-success {
+    color: #16a34a;
+  }
+  .acc-resend-msg.is-error {
+    color: #dc2626;
   }
 
   /* ── Google Sign In ── */

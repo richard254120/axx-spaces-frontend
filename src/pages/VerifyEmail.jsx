@@ -11,12 +11,30 @@ export default function VerifyEmail() {
   const [countdown, setCountdown] = useState(3);
 
   // Resend state for error screen
+  const [expired, setExpired] = useState(false);
   const [resendEmail, setResendEmail] = useState("");
   const [resendLoading, setResendLoading] = useState(false);
   const [resendMsg, setResendMsg] = useState("");
   const [showResendInput, setShowResendInput] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   const countdownRef = useRef(null);
+  const resendCooldownRef = useRef(null);
+
+  const startResendCooldown = (seconds) => {
+    if (!seconds || seconds <= 0) return;
+    if (resendCooldownRef.current) clearInterval(resendCooldownRef.current);
+    setResendCooldown(seconds);
+    resendCooldownRef.current = setInterval(() => {
+      setResendCooldown((prev) => {
+        if (prev <= 1) {
+          clearInterval(resendCooldownRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
 
   const getLoginRoute = (role) => {
     const r = (role || "").toLowerCase().trim();
@@ -42,8 +60,16 @@ export default function VerifyEmail() {
         setUserRole(role);
       } catch (err) {
         if (!isMounted) return;
+        const payload = err.response?.data || {};
         setStatus("error");
-        setMessage(err.response?.data?.error || "Verification failed. The link may be invalid or expired.");
+        setExpired(Boolean(payload.expired));
+        setMessage(payload.error || "Verification failed. The link may be invalid or expired.");
+        // An expired link should surface the resend form straight away, with the
+        // address the link was sent to already filled in.
+        if (payload.expired) {
+          setShowResendInput(true);
+          if (payload.email) setResendEmail(payload.email);
+        }
       }
     };
 
@@ -57,6 +83,7 @@ export default function VerifyEmail() {
     return () => {
       isMounted = false;
       if (countdownRef.current) clearInterval(countdownRef.current);
+      if (resendCooldownRef.current) clearInterval(resendCooldownRef.current);
     };
   }, [token]);
 
@@ -87,14 +114,21 @@ export default function VerifyEmail() {
 
   const handleResend = async (e) => {
     e.preventDefault();
-    if (!resendEmail) return;
+    if (!resendEmail || resendCooldown > 0) return;
     setResendLoading(true);
     setResendMsg("");
     try {
-      const res = await API.post("/auth/resend-verification", { email: resendEmail });
+      const res = await API.post("/auth/resend-verification", { email: resendEmail.trim() });
       setResendMsg("✓ " + (res.data?.message || "Verification email sent! Check your inbox."));
+      startResendCooldown(res.data?.retryAfter || 60);
     } catch (err) {
-      setResendMsg("✕ " + (err.response?.data?.error || "Failed to resend verification link."));
+      const payload = err.response?.data;
+      if (err.response?.status === 429) {
+        setResendMsg("⏳ " + (payload?.error || "Please wait a moment before requesting another link."));
+        if (payload?.retryAfter) startResendCooldown(payload.retryAfter);
+      } else {
+        setResendMsg("✕ " + (payload?.error || "Failed to resend verification link."));
+      }
     } finally {
       setResendLoading(false);
     }
@@ -291,7 +325,7 @@ export default function VerifyEmail() {
             </div>
 
             <h2 style={{ color: "#0B2140", margin: "0 0 10px", fontSize: "24px", fontWeight: 800 }}>
-              Verification Failed
+              {expired ? "Verification Link Expired" : "Verification Failed"}
             </h2>
 
             <p style={{ color: "#64748b", margin: "0 0 24px", fontSize: "14px", lineHeight: "1.5" }}>
@@ -323,7 +357,7 @@ export default function VerifyEmail() {
                     <polyline points="1 20 1 14 7 14"></polyline>
                     <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
                   </svg>
-                  <span>Resend Verification Link</span>
+                  <span>{expired ? "Request a New Verification Link" : "Resend Verification Link"}</span>
                 </button>
               </div>
             ) : (
@@ -338,6 +372,7 @@ export default function VerifyEmail() {
                     onChange={(e) => setResendEmail(e.target.value)}
                     placeholder="name@gmail.com"
                     required
+                    autoFocus
                     style={{
                       flex: 1,
                       padding: "10px 12px",
@@ -349,7 +384,7 @@ export default function VerifyEmail() {
                   />
                   <button
                     type="submit"
-                    disabled={resendLoading}
+                    disabled={resendLoading || resendCooldown > 0}
                     style={{
                       background: "#0B2140",
                       color: "#fbbf24",
@@ -357,19 +392,28 @@ export default function VerifyEmail() {
                       borderRadius: "8px",
                       padding: "10px 16px",
                       fontWeight: 700,
-                      cursor: "pointer",
+                      cursor: resendLoading || resendCooldown > 0 ? "not-allowed" : "pointer",
                       fontSize: "13px",
                       whiteSpace: "nowrap",
+                      opacity: resendLoading || resendCooldown > 0 ? 0.6 : 1,
                     }}
                   >
-                    {resendLoading ? "Sending..." : "Send Link"}
+                    {resendLoading
+                      ? "Sending..."
+                      : resendCooldown > 0
+                      ? `Wait ${resendCooldown}s`
+                      : "Send Link"}
                   </button>
                 </div>
                 {resendMsg && (
                   <p style={{
                     fontSize: "13px",
                     margin: "8px 0 0",
-                    color: resendMsg.startsWith("✓") ? "#16a34a" : "#dc2626",
+                    color: resendMsg.startsWith("✓")
+                      ? "#16a34a"
+                      : resendMsg.startsWith("⏳")
+                      ? "#b45309"
+                      : "#dc2626",
                     fontWeight: 600,
                   }}>
                     {resendMsg}
