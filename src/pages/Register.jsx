@@ -48,8 +48,8 @@ export default function Register() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [landlordType, setLandlordType] = useState("general");
-  // ?account=member lets member/explorer CTAs land on the free member signup
-  // instead of the landlord flow.
+  // ?account=member opens the community account tab, which creates the same
+  // Explorer account as /user-register.
   const [accountChoice, setAccountChoice] = useState(() =>
     searchParams.get("account") === "member" ? "member" : "landlord"
   ); // "landlord" | "member"
@@ -69,7 +69,7 @@ export default function Register() {
           email: googleUser.email,
           name: googleUser.name,
           picture: googleUser.picture,
-          role: accountChoice === "member" ? "member" : "landlord",
+          role: accountChoice === "member" ? "user" : "landlord",
           landlordType: accountChoice === "member" ? undefined : landlordType,
         }),
       });
@@ -118,22 +118,25 @@ export default function Register() {
 
     try {
       if (accountChoice === "member") {
-        const memberPayload = {
+        const explorerPayload = {
           name: formData.name.trim(),
           email: formData.email.trim(),
           phone: formData.phone.trim(),
           password: formData.password,
+          // The community/member account and the Explorer account are the same
+          // account type, so it is always created with the "user" role.
+          role: "user",
         };
 
-        const response = await fetch(`${API_BASE}/auth/register-member`, {
+        const response = await fetch(`${API_BASE}/auth/register`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(memberPayload),
+          body: JSON.stringify(explorerPayload),
         });
 
         const data = await response.json();
         if (!response.ok) {
-          throw new Error(data.error || data.message || "Member registration failed");
+          throw new Error(data.error || data.message || "Explorer registration failed");
         }
 
         if (data.requiresVerification) {
@@ -147,7 +150,7 @@ export default function Register() {
 
         if (data.token && data.user) {
           login(data.token, data.user);
-          setSuccess("Welcome to AxxSpace! Member account created. Redirecting...");
+          setSuccess("Welcome to AxxSpace! Your Explorer (community member) account is ready. Redirecting...");
           setTimeout(() => {
             navigate("/member");
           }, 1200);
@@ -292,7 +295,7 @@ export default function Register() {
 
   return (
     <AuthLayout
-      portalBadge={isMember ? "Member Registration" : "Landlord Registration"}
+      portalBadge={isMember ? "Explorer Registration" : "Landlord Registration"}
       portalTitle={
         isMember
           ? "Join the AxxSpace Community — Free Forever"

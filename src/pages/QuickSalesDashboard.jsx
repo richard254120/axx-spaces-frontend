@@ -485,15 +485,15 @@ export default function QuickSalesDashboard() {
           <div style={s.sectionHeader}>
             <div>
               <h2 style={s.sectionTitle}>AXXSpace Membership Required</h2>
-              <p style={s.sectionSub}>Only AXXSpace members and registered sellers can publish items on QuickSales.</p>
+              <p style={s.sectionSub}>Only AXXSpace Explorers (community members) and registered sellers can publish items on QuickSales.</p>
             </div>
           </div>
           <p style={{ color: "#94a3b8", lineHeight: 1.6, marginBottom: "24px" }}>
-            Your current account ({seller?.role || "guest"}) cannot publish items. Become an AXXSpace member or register a seller account to start
-            listing your items.
+            Your current account ({seller?.role || "guest"}) cannot publish items. Create a free Explorer (community member) account or register a seller
+            account to start listing your items.
           </p>
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-            <a href="/register?account=member" style={{ ...s.uploadBtn, textDecoration: "none" }}>
+            <a href="/user-register" style={{ ...s.uploadBtn, textDecoration: "none" }}>
               Become a Member
             </a>
             <a href="/quicksales-login?mode=register" style={{ ...s.cancelEditBtn, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>

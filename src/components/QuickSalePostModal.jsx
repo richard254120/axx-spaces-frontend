@@ -345,15 +345,16 @@ function QuickSalesComposer({ onClose, onItemCreated }) {
 
   const redirectTarget = typeof window !== "undefined" ? window.location.pathname : "/quicksales";
   const sellerSignupHref = "/quicksales-login?mode=register";
-  // Deep link into the community-member signup, not the landlord default.
-  const memberSignupHref = "/register?account=member";
+  // Community membership is the Explorer account (role "user"), which is the
+  // same entry point the navbar account picker uses.
+  const memberSignupHref = "/user-register";
   const loginHref = `/user-login?redirect=${encodeURIComponent(redirectTarget)}`;
 
   const gate = gateKind === "guest"
     ? {
         eyebrow: "Seller access",
         title: "Start selling in under a minute",
-        sub: "QuickSales publishing is reserved for AXXSpace members and registered sellers. Registration is free.",
+        sub: "QuickSales publishing is open to AXXSpace Explorers (community members) and registered sellers. Both are free.",
         points: [
           "Free to join — no listing fees and no commission on sales.",
           "Go live instantly: your listing publishes the moment you post it.",
@@ -364,7 +365,7 @@ function QuickSalesComposer({ onClose, onItemCreated }) {
         fine: (
           <>
             New to AXXSpace?{" "}
-            <a href={memberSignupHref}>Create a member account</a> and sell from the same profile.
+            <a href={memberSignupHref}>Create a free Explorer account</a> and sell from the same profile.
           </>
         ),
       }
@@ -372,11 +373,11 @@ function QuickSalesComposer({ onClose, onItemCreated }) {
       ? {
           eyebrow: "Membership",
           title: "This account can't publish yet",
-          sub: "Selling on QuickSales needs a member or seller account. Switching takes about a minute and keeps your AXXSpace history.",
+          sub: "Selling on QuickSales needs an AXXSpace Explorer (community member) account or a seller account. Switching takes about a minute and keeps your AXXSpace history.",
           points: [
             "Upgrade your account to unlock QuickSales publishing.",
             "Keep your favourites, saved searches and alerts.",
-            "Free seller accounts publish instantly, with no commission.",
+            "Explorer and seller accounts publish instantly, with no commission.",
           ],
           primary: { label: "Become an AXXSpace member", href: memberSignupHref, variant: "primary" },
           secondary: { label: "Register a seller account instead", href: sellerSignupHref, variant: "ghost" },
