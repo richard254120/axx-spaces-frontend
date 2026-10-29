@@ -3,6 +3,7 @@ import { useNavigate, useParams, Link } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { optimizeImage, IMG_WIDTH } from "../../utils/imageUrl";
 
 import {
   useAccommodationProperty,
@@ -504,7 +505,13 @@ export default function AccommodationDetailPage() {
           {galleryImages.length >= 5 ? (
             <div className="bento-gallery-5">
               <div className="bento-main" onClick={() => setLightboxIndex(0)}>
-                <img src={galleryImages[0]} alt={`${property.name} preview 1`} loading="eager" />
+                <img
+                  src={optimizeImage(galleryImages[0], IMG_WIDTH.panel)}
+                  alt={`${property.name} preview 1`}
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
+                />
                 <div className="bento-hover-overlay">
                   <span>Zoom Photo</span>
                 </div>
@@ -513,7 +520,12 @@ export default function AccommodationDetailPage() {
               <div className="bento-mosaic">
                 {galleryImages.slice(1, 5).map((imgUrl, idx) => (
                   <div key={idx} className="bento-thumb" onClick={() => setLightboxIndex(idx + 1)}>
-                    <img src={imgUrl} alt={`${property.name} view ${idx + 2}`} loading="lazy" />
+                    <img
+                      src={optimizeImage(imgUrl, IMG_WIDTH.card)}
+                      alt={`${property.name} view ${idx + 2}`}
+                      loading="lazy"
+                      decoding="async"
+                    />
                     <div className="bento-hover-overlay">
                       <span>Zoom</span>
                     </div>
@@ -553,7 +565,11 @@ export default function AccommodationDetailPage() {
             <div className="bento-gallery-multi">
               {galleryImages.map((imgUrl, idx) => (
                 <div key={idx} className="bento-multi-tile" onClick={() => setLightboxIndex(idx)}>
-                  <img src={imgUrl} alt={`${property.name} photo ${idx + 1}`} />
+                  <img
+                    src={optimizeImage(imgUrl, IMG_WIDTH.card)}
+                    alt={`${property.name} photo ${idx + 1}`}
+                    decoding="async"
+                  />
                 </div>
               ))}
               <div style={{ display: "flex", gap: "10px", position: "absolute", bottom: "16px", right: "16px", zIndex: 3 }}>
@@ -581,7 +597,12 @@ export default function AccommodationDetailPage() {
             </div>
           ) : (
             <div className="bento-gallery-single" onClick={() => setLightboxIndex(0)}>
-              <img src={galleryImages[0]} alt={property.name} />
+              <img
+                src={optimizeImage(galleryImages[0], IMG_WIDTH.panel)}
+                alt={property.name}
+                fetchPriority="high"
+                decoding="async"
+              />
               <div style={{ display: "flex", gap: "10px", position: "absolute", bottom: "16px", right: "16px", zIndex: 3 }}>
                 {property.videos && property.videos.length > 0 && (
                   <button
@@ -1243,9 +1264,10 @@ export default function AccommodationDetailPage() {
           </button>
 
           <img
-            src={galleryImages[lightboxIndex]}
+            src={optimizeImage(galleryImages[lightboxIndex], IMG_WIDTH.hero)}
             alt={property.name}
             className="lb-showcase-img"
+            decoding="async"
             onClick={(e) => e.stopPropagation()}
           />
 

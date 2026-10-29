@@ -4,14 +4,15 @@ import { AuthContext } from "../context/AuthContext";
 import { COLORS, buttonStyles, pageStyles } from "../styles/theme";
 import SocialMediaLinks from "../components/SocialMediaLinks";
 
-// Import team images from src/assets
-import kenfredImg from "../assets/kenfred.jpg";
-import lucieImg from "../assets/lucie.jpg";
-import richardImg from "../assets/richard.jpg";
-import ianImg from "../assets/ian.jpg";
-import brianImg from "../assets/brian.jpg";
-import clareImg from "../assets/clare.jpg";
-import euniceImg from "../assets/eunice.jpg";
+// Team portraits are rendered at 110px — the 240px WebP versions are ~15x
+// smaller than the original camera JPEGs they replaced.
+import kenfredImg from "../assets/team/kenfred.webp";
+import lucieImg from "../assets/team/lucie.webp";
+import richardImg from "../assets/team/richard.webp";
+import ianImg from "../assets/team/ian.webp";
+import brianImg from "../assets/team/brian.webp";
+import clareImg from "../assets/team/clare.webp";
+import euniceImg from "../assets/team/eunice.webp";
 
 export default function AboutPage() {
   const navigate = useNavigate();
@@ -461,6 +462,10 @@ export default function AboutPage() {
                   src={member.image}
                   alt={member.name}
                   style={styles.teamImage}
+                  width="110"
+                  height="110"
+                  loading="lazy"
+                  decoding="async"
                   onContextMenu={(e) => e.preventDefault()}
                   draggable="false"
                 />

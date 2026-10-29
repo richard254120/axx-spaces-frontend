@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import FloatingWhatsApp from "../components/FloatingWhatsApp";
 import { resolveMediaUrl } from "../utils/fileLinks";
+import { optimizeImage, imageSrcSet, IMG_WIDTH, IMAGE_FALLBACK } from "../utils/imageUrl";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -302,9 +303,18 @@ export default function PropertyDetailPage() {
           {property.images?.length > 0 ? (
             <>
               <img
-                src={property.images[currentImageIndex]}
+                src={optimizeImage(property.images[currentImageIndex], IMG_WIDTH.hero)}
+                srcSet={imageSrcSet(property.images[currentImageIndex], [640, 960, 1280, 1600])}
+                sizes="100vw"
                 alt={property.title}
+                fetchPriority="high"
+                decoding="async"
+                width="1600"
+                height="900"
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                onError={(e) => {
+                  e.currentTarget.src = IMAGE_FALLBACK;
+                }}
               />
               {property.images.length > 1 && (
                 <>

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useContext, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import QuickSalePostModal from "../components/QuickSalePostModal";
+import { optimizeImage, imageSrcSet, IMG_WIDTH } from "../utils/imageUrl";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -138,18 +139,29 @@ function QuickSaleCardMedia({ item, isFavorite, onToggleFavorite }) {
     <div className="card-media-box">
       {images.length > 0 ? (
         <div className="card-carousel-track">
-          {images.map((imgUrl, idx) => (
-            <img
-              key={idx}
-              src={imgUrl}
-              alt={`${item.title} - photo ${idx + 1}`}
-              className={`card-carousel-slide ${idx === activeIdx ? "active" : ""}`}
-              loading={idx === 0 ? "eager" : "lazy"}
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-              }}
-            />
-          ))}
+          {images.map((imgUrl, idx) => {
+            // Mount only the visible slide plus the next one in the queue —
+            // rendering every slide downloaded the whole gallery per card.
+            const isQueued = idx === (activeIdx + 1) % images.length;
+            if (idx !== activeIdx && !isQueued) return null;
+            return (
+              <img
+                key={idx}
+                src={optimizeImage(imgUrl, IMG_WIDTH.card)}
+                srcSet={imageSrcSet(imgUrl)}
+                sizes="(max-width: 640px) 92vw, (max-width: 1100px) 45vw, 360px"
+                alt={`${item.title} - photo ${idx + 1}`}
+                className={`card-carousel-slide ${idx === activeIdx ? "active" : ""}`}
+                loading={activeIdx === 0 && idx === 0 ? "eager" : "lazy"}
+                decoding="async"
+                width="480"
+                height="360"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+            );
+          })}
         </div>
       ) : (
         <div className="card-no-photo">
@@ -898,13 +910,15 @@ export default function QuickSales() {
                 <>
                   <div className="modal-main-img-box">
                     <img
-                      src={
+                      src={optimizeImage(
                         typeof selected.images[currentImage] === "object"
                           ? selected.images[currentImage]?.imageUrl || selected.images[currentImage]?.url
-                          : selected.images[currentImage]
-                      }
+                          : selected.images[currentImage],
+                        IMG_WIDTH.panel
+                      )}
                       alt={selected.title}
                       className="modal-main-img"
+                      decoding="async"
                     />
 
                     {selected.images.length > 1 && (
@@ -947,10 +961,13 @@ export default function QuickSales() {
                         return (
                           <img
                             key={idx}
-                            src={src}
+                            src={optimizeImage(src, IMG_WIDTH.thumb)}
                             alt="thumbnail"
                             className={`modal-thumb ${idx === currentImage ? "active" : ""}`}
                             onClick={() => setCurrentImage(idx)}
+                            decoding="async"
+                            width="160"
+                            height="110"
                           />
                         );
                       })}

@@ -12,6 +12,27 @@
   <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/manifest.json" />
+
+  <!-- Speed up the two third-party origins that are on every listing page:
+       listing photos come from Cloudinary, API calls go to Render. -->
+  <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+  <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+  <link rel="preconnect" href="https://axx-spaces-backend-1.onrender.com" crossorigin />
+  <link rel="dns-prefetch" href="https://axx-spaces-backend-1.onrender.com" />
+
+  <!-- Web fonts: preconnect + non-blocking stylesheet.
+       The previous URL used an invalid axis syntax ("12..96,500;600;700;800")
+       and Google Fonts answered HTTP 400, so the brand fonts never loaded and
+       the request was wasted on every page view. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Sans:wght@400..700&display=swap"
+    media="print"
+    onload="this.media='all'"
+  />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Axxspace</title>
 
@@ -23,6 +44,7 @@
           https://www.google-analytics.com
           https://www.clarity.ms
           https://clarity.ms
+          https://scripts.clarity.ms
           https://accounts.google.com
           https://accounts.google.com/gsi/client
           https://apis.google.com;
@@ -41,8 +63,12 @@
           wss://axx-spaces-backend-1.onrender.com
           https://*.tile.openstreetmap.org
           https://www.google-analytics.com
-          https://www.clarity.ms
+          https://analytics.google.com
+          https://stats.g.doubleclick.net
+          https://www.google.com
+          https://*.clarity.ms
           https://clarity.ms
+          https://c.bing.com
           https://region1.google-analytics.com
           https://region1.analytics.google.com
           https://accounts.google.com
@@ -120,22 +146,27 @@
     gtag('config', 'G-9J06HNJ4T1');
   </script>
 
-  <!-- Microsoft Clarity -->
+  <!-- Microsoft Clarity is loaded after the page is interactive so it never
+       competes with React hydration for the main thread. -->
   <script type="text/javascript">
-    try {
-      (function (c, l, a, r, i, t, y) {
-        c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
-        t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
-        t.onerror = function () { console.log('Clarity script blocked by ad blocker'); };
-        y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
-      })(window, document, "clarity", "script", "wxnk54e8dy");
-    } catch (e) {
-      console.log('Clarity script failed to load:', e);
-    }
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        try {
+          (function (c, l, a, r, i, t, y) {
+            c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+            t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+            t.onerror = function () { console.log('Clarity script blocked by ad blocker'); };
+            y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+          })(window, document, "clarity", "script", "wxnk54e8dy");
+        } catch (e) {
+          console.log('Clarity script failed to load:', e);
+        }
+      }, 1200);
+    });
   </script>
 
-  <!-- Google Identity Services -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- Google Identity Services is injected on demand by useGoogleSignIn()
+       only on the pages that actually render a Google button. -->
 
 </head>
 

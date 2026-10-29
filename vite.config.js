@@ -19,6 +19,8 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,           // Important: Don't expose source maps in production
+    target: 'es2020',           // Smaller output, supported by every browser we care about
+    cssCodeSplit: true,         // Each route chunk carries only the CSS it needs
     rollupOptions: {
       output: {
         // Optional: Make chunk names less predictable

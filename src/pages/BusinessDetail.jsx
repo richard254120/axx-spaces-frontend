@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
 import { AuthContext } from "../context/AuthContext";
 import { getPricelistUrl } from "../utils/fileLinks";
+import { optimizeImage, IMG_WIDTH } from "../utils/imageUrl";
 
 /* ─────────────── GLOBAL STYLE INJECTION ─────────────── */
 const globalCSS = `
@@ -1130,12 +1131,12 @@ export default function BusinessDetail() {
         <header className="bd-hero">
           <div
             className="bd-cover"
-            style={images[0] ? { backgroundImage: `url(${images[0]})` } : undefined}
+            style={images[0] ? { backgroundImage: `url(${optimizeImage(images[0], IMG_WIDTH.hero)})` } : undefined}
           />
           <div className="bd-hero-body">
             <div className="bd-hero-top">
               {b.logo
-                ? <img src={b.logo} alt={b.name} className="bd-logo" />
+                ? <img src={optimizeImage(b.logo, IMG_WIDTH.thumb)} alt={b.name} className="bd-logo" decoding="async" />
                 : <div className="bd-logo-fallback"><IconStore size={36} /></div>
               }
               <div style={{ minWidth: 0, paddingBottom: 2 }}>
@@ -1275,7 +1276,7 @@ export default function BusinessDetail() {
                 <div className="bd-gallery">
                   {images.map((img, i) => (
                     <div key={i} className="bd-gallery-item" onClick={() => openLightbox(i)}>
-                      <img src={img} alt={`${b.name} photo ${i + 1}`} loading="lazy" />
+                      <img src={optimizeImage(img, IMG_WIDTH.card)} alt={`${b.name} photo ${i + 1}`} loading="lazy" decoding="async" />
                     </div>
                   ))}
                 </div>
@@ -1292,7 +1293,7 @@ export default function BusinessDetail() {
                 <div className="bd-promo-list">
                   {activePromos.map((promo, i) => (
                     <div key={i} className="bd-promo">
-                      {promo.imageUrl && <img src={promo.imageUrl} alt={promo.title} className="bd-promo-img" />}
+                      {promo.imageUrl && <img src={optimizeImage(promo.imageUrl, IMG_WIDTH.card)} alt={promo.title} className="bd-promo-img" loading="lazy" decoding="async" />}
                       <div className="bd-promo-body">
                         <div className="bd-promo-title">{promo.title}</div>
                         <div className="bd-promo-desc">{promo.description}</div>
@@ -1324,7 +1325,7 @@ export default function BusinessDetail() {
                   {products.map((product, i) => (
                     <div key={i} className="bd-product">
                       {product.imageUrl
-                        ? <img src={product.imageUrl} alt={product.name} className="bd-product-img" loading="lazy" />
+                        ? <img src={optimizeImage(product.imageUrl, IMG_WIDTH.card)} alt={product.name} className="bd-product-img" loading="lazy" decoding="async" />
                         : <div className="bd-product-placeholder"><IconImage size={28} /></div>
                       }
                       <div className="bd-product-body">
@@ -1351,10 +1352,11 @@ export default function BusinessDetail() {
                     <div key={i} className="bd-product">
                       {item.image ? (
                         <img
-                          src={item.image}
+                          src={optimizeImage(item.image, IMG_WIDTH.card)}
                           alt={item.name}
                           className="bd-product-img"
                           loading="lazy"
+                          decoding="async"
                           onClick={() => openLightbox(Math.max(0, categoryImages.indexOf(item.image)), categoryImages)}
                           style={{ cursor: "pointer" }}
                         />
@@ -1696,8 +1698,9 @@ export default function BusinessDetail() {
         <div className="bd-lightbox" onClick={closeLightbox}>
           <button className="bd-lightbox-close" onClick={closeLightbox} aria-label="Close"><IconClose size={18} /></button>
           <img
-            src={lightboxImages[lightboxIndex]}
+            src={optimizeImage(lightboxImages[lightboxIndex], IMG_WIDTH.hero)}
             alt={`${b.name} photo ${lightboxIndex + 1}`}
+            decoding="async"
             onClick={e => e.stopPropagation()}
           />
           <div className="bd-lightbox-nav" onClick={e => e.stopPropagation()}>

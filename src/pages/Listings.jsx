@@ -1,14 +1,18 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback, lazy, Suspense } from "react";
 import { createPortal } from "react-dom";
 import { useSearchParams } from "react-router-dom";
 
 import RequestItemModal from "../components/RequestItemModal";
 import ShareProperty from "../components/ShareProperty";
-import MapView from "../components/MapView";
 import MessagingSystem from "../components/MessagingSystem";
 import { useAuth } from "../context/AuthContext";
 import PhoneInput from "../components/PhoneInput";
 import { kenyanUniversities, searchUniversities } from "../data/kenyanUniversities";
+import { optimizeImage, imageSrcSet, IMG_WIDTH, IMAGE_FALLBACK } from "../utils/imageUrl";
+
+// Leaflet is ~200 KB and most visitors never open the map, so it is pulled in
+// on demand the first time the Map tab is shown.
+const MapView = lazy(() => import("../components/MapView"));
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -229,18 +233,31 @@ function PropertyCardMedia({ property, favorites, toggleFavorite }) {
     <div className="card-media-box">
       {images.length > 0 ? (
         <div className="card-carousel-track">
-          {images.map((imgUrl, idx) => (
-            <img
-              key={idx}
-              src={imgUrl}
-              alt={`${property.title} - photo ${idx + 1}`}
-              className={`card-carousel-slide ${idx === activeIdx ? "active" : ""}`}
-              loading={idx === 0 ? "eager" : "lazy"}
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-              }}
-            />
-          ))}
+          {images.map((imgUrl, idx) => {
+            // Only mount the visible slide and the one queued behind it. Rendering
+            // all 6–10 slides per card meant ~150 photos downloaded before a
+            // single card was even scrolled to.
+            const isQueued = idx === (activeIdx + 1) % images.length;
+            if (idx !== activeIdx && !isQueued) return null;
+            return (
+              <img
+                key={idx}
+                src={optimizeImage(imgUrl, IMG_WIDTH.card)}
+                srcSet={imageSrcSet(imgUrl)}
+                sizes="(max-width: 640px) 92vw, (max-width: 1100px) 45vw, 360px"
+                alt={`${property.title} - photo ${idx + 1}`}
+                className={`card-carousel-slide ${idx === activeIdx ? "active" : ""}`}
+                loading={activeIdx === 0 && idx === 0 ? "eager" : "lazy"}
+                fetchPriority={activeIdx === 0 && idx === 0 ? "high" : "low"}
+                decoding="async"
+                width="480"
+                height="360"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+            );
+          })}
         </div>
       ) : (
         <div className="card-no-photo">
@@ -464,31 +481,36 @@ export default function Listings() {
   };
 
   // Fetch properties on mount
+  const loadProperties = useCallback(async () => {
+    try {
+      setError("");
+      const response = await fetch(`${API_BASE}/properties`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      const processedProperties = data.map((prop) => ({
+        ...prop,
+        availableUnits: Math.max(0, (prop.totalUnits || 1) - (prop.bookedUnits || 0)),
+      }));
+      setProperties(processedProperties);
+      setFilteredProperties(processedProperties);
+    } catch (err) {
+      // A raw "Failed to fetch" tells the visitor nothing — say what happened
+      // and offer a retry instead.
+      console.error("Failed to load listings:", err);
+      setError("We couldn't load the listings just now. Check your connection and try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
-    const fetchProperties = async () => {
-      try {
-        const response = await fetch(`${API_BASE}/properties`);
-        if (!response.ok) throw new Error("Failed to fetch properties");
-        const data = await response.json();
-        const processedProperties = data.map((prop) => ({
-          ...prop,
-          availableUnits: Math.max(0, (prop.totalUnits || 1) - (prop.bookedUnits || 0)),
-        }));
-        setProperties(processedProperties);
-        setFilteredProperties(processedProperties);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProperties();
+    loadProperties();
 
     const savedFavorites = localStorage.getItem("axxspace_favorites");
     if (savedFavorites) setFavorites(JSON.parse(savedFavorites));
     const savedSearchesData = localStorage.getItem("axxspace_saved_searches");
     if (savedSearchesData) setSavedSearches(JSON.parse(savedSearchesData));
-  }, []);
+  }, [loadProperties]);
 
   // Handle URL property query parameter to highlight specific property
   useEffect(() => {
@@ -1373,6 +1395,9 @@ Please contact me back with viewing details. Thank you!`;
           <div className="error-alert-banner">
             <IconAlertTriangle size={18} />
             <span>{error}</span>
+            <button type="button" className="error-retry-btn" onClick={loadProperties}>
+              Retry
+            </button>
           </div>
         )}
 
@@ -1529,7 +1554,9 @@ Please contact me back with viewing details. Thank you!`;
               <span className="map-pin-icon"><IconMapPin size={16} /></span>
               <span>Interactive GPS Map View ({filteredProperties.length} Properties Located)</span>
             </div>
-            <MapView properties={filteredProperties} />
+            <Suspense fallback={<div className="map-loading-shell">Loading map…</div>}>
+              <MapView properties={filteredProperties} />
+            </Suspense>
           </div>
         )}
 
@@ -1654,7 +1681,7 @@ Please contact me back with viewing details. Thank you!`;
                       >
                         <div className="agent-avatar-wrap">
                           {agent.profileImage ? (
-                            <img src={agent.profileImage} alt={agent.name} className="agent-avatar-img" />
+                            <img src={optimizeImage(agent.profileImage, IMG_WIDTH.thumb)} alt={agent.name} className="agent-avatar-img" loading="lazy" decoding="async" />
                           ) : (
                             <div className="agent-avatar-initial">{agent.name?.charAt(0).toUpperCase()}</div>
                           )}
@@ -2019,9 +2046,13 @@ Please contact me back with viewing details. Thank you!`;
               {selectedProperty.images?.length > 0 ? (
                 <>
                   <img
-                    src={selectedProperty.images[currentImageIndex]}
+                    src={optimizeImage(selectedProperty.images[currentImageIndex], IMG_WIDTH.panel)}
                     alt={selectedProperty.title}
                     className="modal-featured-image"
+                    decoding="async"
+                    onError={(e) => {
+                      e.currentTarget.src = IMAGE_FALLBACK;
+                    }}
                   />
 
                   {selectedProperty.images.length > 1 && (
@@ -2049,10 +2080,13 @@ Please contact me back with viewing details. Thank you!`;
                 {selectedProperty.images.map((img, idx) => (
                   <img
                     key={idx}
-                    src={img}
+                    src={optimizeImage(img, IMG_WIDTH.thumb)}
                     alt=""
                     className={`modal-thumb-img ${idx === currentImageIndex ? "active" : ""}`}
                     onClick={() => setCurrentImageIndex(idx)}
+                    decoding="async"
+                    width="160"
+                    height="110"
                   />
                 ))}
               </div>
@@ -3045,6 +3079,34 @@ const css = `
     border-radius: var(--radius-md);
     margin-bottom: 24px;
     font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .error-retry-btn {
+    margin-left: auto;
+    background: #B91C1C;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 16px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .error-retry-btn:hover { background: #991B1B; }
+
+  /* Placeholder while the Leaflet chunk downloads */
+  .map-loading-shell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 420px;
+    background: #0F172A;
+    color: #94A3B8;
+    font-weight: 600;
+    border-radius: var(--radius-md);
   }
 
   /* Segmented Discovery Nav */

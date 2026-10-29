@@ -7,7 +7,6 @@ import { AuthProvider } from './context/AuthContext'
 import { NotificationProvider } from './components/NotificationSystem'
 import ReactGA from 'react-ga4'
 import { SpeedInsights } from '@vercel/speed-insights/react'
-import 'leaflet/dist/leaflet.css'
 import './index.css'
 
 // Initialize Google Analytics

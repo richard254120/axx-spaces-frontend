@@ -2,16 +2,19 @@ import { useState, useEffect, useContext, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
-import bgVideo from "../assets/AXX Homepage video.mp4";
+import bgVideo from "../assets/homepage-hero.mp4";
 import SocialMediaLinks from "../components/SocialMediaLinks";
 import RequestItemModal from "../components/RequestItemModal";
+import { optimizeImage, imageSrcSet, IMG_WIDTH } from "../utils/imageUrl";
 
 /* ════════════════════════════════════════════════
    HOMEPRO — all styles are scoped under .ax-root
    so this file can live beside the old Home.jsx
 ════════════════════════════════════════════════ */
 const css = `
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap');
+/* Web fonts are loaded from index.html with preconnect + display:swap.
+   An @import here would block first paint until the font CSS round-trip
+   finished, so it is deliberately kept out of this style block. */
 
 .ax-root{
   --ink:#0F172A; --ink-2:#1E293B; --mute:#64748B; --line:#E2E8F0;
@@ -629,25 +632,36 @@ function HomeCardMedia({ item, activeLabel }) {
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
-      {images.map((imgUrl, idx) => (
-        <img
-          key={idx}
-          src={imgUrl}
-          alt={item.title}
-          loading={idx === 0 ? "eager" : "lazy"}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            opacity: idx === activeIdx ? 1 : 0,
-            transition: "opacity 0.6s ease-in-out",
-          }}
-          onError={(e) => { e.currentTarget.style.display = "none"; }}
-        />
-      ))}
+      {images.map((imgUrl, idx) => {
+        // Only the visible slide and the queued one are mounted — see the note
+        // in Listings.jsx PropertyCardMedia.
+        const isQueued = idx === (activeIdx + 1) % images.length;
+        if (idx !== activeIdx && !isQueued) return null;
+        return (
+          <img
+            key={idx}
+            src={optimizeImage(imgUrl, IMG_WIDTH.card)}
+            srcSet={imageSrcSet(imgUrl)}
+            sizes="(max-width: 640px) 90vw, (max-width: 1100px) 45vw, 340px"
+            alt={item.title}
+            loading={activeIdx === 0 && idx === 0 ? "eager" : "lazy"}
+            decoding="async"
+            width="480"
+            height="360"
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              opacity: idx === activeIdx ? 1 : 0,
+              transition: "opacity 0.6s ease-in-out",
+            }}
+            onError={(e) => { e.currentTarget.style.display = "none"; }}
+          />
+        );
+      })}
 
       {images.length > 1 && (
         <>
@@ -862,6 +876,9 @@ export default function HomePro() {
   const [demoTab, setDemoTab] = useState("services");
   const [hovered, setHovered] = useState(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  // The hero clip is decorative ambience. Mounting it after first paint keeps it
+  // off the critical path, and phones / metered connections skip it entirely.
+  const [showHeroVideo, setShowHeroVideo] = useState(false);
   const [showBoostModal, setShowBoostModal] = useState(false);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [ads, setAds] = useState([]);
@@ -870,6 +887,38 @@ export default function HomePro() {
   /* ── HERO SEARCH ── */
   const [query, setQuery] = useState("");
   const [heroIdx, setHeroIdx] = useState(0);
+
+  /* ── HERO VIDEO: start it only after the page is interactive ── */
+  useEffect(() => {
+    const conn = navigator.connection;
+    const metered =
+      conn && (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || ""));
+    const smallScreen = window.matchMedia("(max-width: 768px)").matches;
+
+    if (metered || smallScreen) return undefined;
+
+    let cancelled = false;
+    let timerId;
+    let idleId;
+
+    const enable = () => {
+      if (!cancelled) setShowHeroVideo(true);
+    };
+
+    if (typeof window.requestIdleCallback === "function") {
+      idleId = window.requestIdleCallback(enable, { timeout: 2500 });
+    } else {
+      timerId = window.setTimeout(enable, 1500);
+    }
+
+    return () => {
+      cancelled = true;
+      if (idleId && typeof window.cancelIdleCallback === "function") {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timerId) window.clearTimeout(timerId);
+    };
+  }, []);
 
   /* ── DATA FETCHING (same endpoints as before) ── */
   useEffect(() => {
@@ -1030,12 +1079,14 @@ export default function HomePro() {
         <div className="ambient-orb orb-navy" />
         <div className="hero-grid-pattern" />
 
-        <video autoPlay muted loop playsInline
-          onLoadedData={() => setVideoLoaded(true)}
-          onError={() => setVideoLoaded(false)}
-          style={{ opacity: videoLoaded ? 0.35 : 0 }}>
-          <source src={bgVideo} type="video/mp4" />
-        </video>
+        {showHeroVideo && (
+          <video autoPlay muted loop playsInline preload="none"
+            onLoadedData={() => setVideoLoaded(true)}
+            onError={() => setVideoLoaded(false)}
+            style={{ opacity: videoLoaded ? 0.35 : 0 }}>
+            <source src={bgVideo} type="video/mp4" />
+          </video>
+        )}
 
         <div className="ax-hero-inner">
           <div className="ax-hero-copy">
@@ -1053,7 +1104,16 @@ export default function HomePro() {
             <div className="ax-hero-card">
               <div className="ax-hero-card-top"><i /> Live listing</div>
               <div className="ax-hero-thumb">
-                {heroPreview?.img && <img src={heroPreview.img} alt="" loading="lazy" />}
+                {heroPreview?.img && (
+                  <img
+                    src={optimizeImage(heroPreview.img, IMG_WIDTH.thumb)}
+                    alt=""
+                    loading="eager"
+                    decoding="async"
+                    width="160"
+                    height="120"
+                  />
+                )}
                 <span className="ax-thumb-tag">{heroPreview?.tag || "Verified"}</span>
               </div>
               <div className="ax-hero-card-body">
@@ -1125,7 +1185,7 @@ export default function HomePro() {
               {cells.map((it, idx) => it.isAd ? (
                 <button key={it.id} className="ax-card" onClick={() => openAd(it.ad)}>
                   <div className="ax-card-img">
-                    {it.ad.imageUrl ? <img src={it.ad.imageUrl} alt="" loading="lazy" /> : <div className="ph">Sponsored</div>}
+                    {it.ad.imageUrl ? <img src={optimizeImage(it.ad.imageUrl, IMG_WIDTH.card)} alt="" loading="lazy" decoding="async" /> : <div className="ph">Sponsored</div>}
                     <span className="ax-chip ad">Ad</span>
                   </div>
                   <div className="ax-card-body">
@@ -1166,7 +1226,7 @@ export default function HomePro() {
         <section className="ax-adband" aria-label="Sponsored">
           <div className="ax-wrap">
             <button className={`ax-ad ${banner.imageUrl ? "" : "noimg"}`} onClick={() => openAd(banner)}>
-              {banner.imageUrl && <img src={banner.imageUrl} alt="" loading="lazy" />}
+              {banner.imageUrl && <img src={optimizeImage(banner.imageUrl, IMG_WIDTH.panel)} alt="" loading="lazy" decoding="async" />}
               <div className="ax-ad-text">
                 <span className="ax-ad-tag">Sponsored{banner.sponsor ? ` by ${banner.sponsor}` : ""}</span>
                 <h3>{banner.title}</h3>

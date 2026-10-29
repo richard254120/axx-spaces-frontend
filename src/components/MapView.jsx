@@ -17,6 +17,8 @@
 import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
+// Loaded with this chunk only — the rest of the site never pays for Leaflet CSS
+import "leaflet/dist/leaflet.css";
 
 // ── Fix Leaflet marker icons broken by Vite bundler ───────────────────────────
 delete L.Icon.Default.prototype._getIconUrl;

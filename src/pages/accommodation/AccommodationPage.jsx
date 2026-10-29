@@ -6,6 +6,7 @@ import {
   ADVERTISING_PACKAGES,
 } from "../../features/accommodation";
 import SocialMediaLinks from "../../components/SocialMediaLinks";
+import { optimizeImage, IMG_WIDTH } from "../../utils/imageUrl";
 
 // Popular Kenyan destinations for quick filter & suggestions (No emojis)
 const POPULAR_DESTINATIONS = [
@@ -1137,10 +1138,13 @@ export default function AccommodationPage() {
                   {/* Card Media Shell */}
                   <div className="card-media-shell">
                     <img
-                      src={prop.image}
+                      src={optimizeImage(prop.image, IMG_WIDTH.card)}
                       alt={prop.name}
                       className="card-main-image"
                       loading="lazy"
+                      decoding="async"
+                      width="480"
+                      height="360"
                     />
 
                     {/* Badge Overlay */}
@@ -1611,7 +1615,7 @@ export default function AccommodationPage() {
                 <p className="testimonial-text">"{t.text}"</p>
                 <div className="testimonial-stay-badge">Stayed at {t.stay}</div>
                 <div className="testimonial-author-row">
-                  <img src={t.avatar} alt={t.name} className="testimonial-avatar" />
+                  <img src={optimizeImage(t.avatar, IMG_WIDTH.thumb)} alt={t.name} className="testimonial-avatar" loading="lazy" decoding="async" />
                   <div>
                     <div style={{ fontWeight: 800, color: "var(--navy-ink)", fontSize: "14px" }}>{t.name}</div>
                     <div style={{ fontSize: "12px", color: "#64748B" }}>{t.role}</div>
@@ -1800,7 +1804,7 @@ export default function AccommodationPage() {
                         navigate(`/accommodation/${p._id || p.id}`);
                       }}
                     >
-                      <img src={p.image} alt={p.name} className="wishlist-item-thumbnail" />
+                      <img src={optimizeImage(p.image, IMG_WIDTH.thumb)} alt={p.name} className="wishlist-item-thumbnail" loading="lazy" decoding="async" />
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontWeight: 800, fontSize: "13px", color: "var(--navy-ink)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                           {p.name}

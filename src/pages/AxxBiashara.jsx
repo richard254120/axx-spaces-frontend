@@ -2,6 +2,7 @@ import { useState, useEffect, useContext, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
 import { AuthContext } from "../context/AuthContext";
+import { optimizeImage, imageSrcSet, IMG_WIDTH } from "../utils/imageUrl";
 
 const BUSINESS_CATEGORIES = [
   "Restaurants", "Retail", "Services", "Technology", "Healthcare", "Education",
@@ -126,18 +127,28 @@ function BusinessCardMedia({ biz, isFav, onToggleFavorite, isCompared, onToggleC
     <div className="card-media-box">
       {images.length > 0 ? (
         <div className="card-carousel-track">
-          {images.map((imgUrl, idx) => (
-            <img
-              key={idx}
-              src={imgUrl}
-              alt={`${biz.name} - photo ${idx + 1}`}
-              className={`card-carousel-slide ${idx === activeIdx ? "active" : ""}`}
-              loading={idx === 0 ? "eager" : "lazy"}
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-              }}
-            />
-          ))}
+          {images.map((imgUrl, idx) => {
+            // Mount only the visible slide plus the next one in the queue.
+            const isQueued = idx === (activeIdx + 1) % images.length;
+            if (idx !== activeIdx && !isQueued) return null;
+            return (
+              <img
+                key={idx}
+                src={optimizeImage(imgUrl, IMG_WIDTH.card)}
+                srcSet={imageSrcSet(imgUrl)}
+                sizes="(max-width: 640px) 92vw, (max-width: 1100px) 45vw, 360px"
+                alt={`${biz.name} - photo ${idx + 1}`}
+                className={`card-carousel-slide ${idx === activeIdx ? "active" : ""}`}
+                loading={activeIdx === 0 && idx === 0 ? "eager" : "lazy"}
+                decoding="async"
+                width="480"
+                height="360"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+            );
+          })}
         </div>
       ) : (
         <div className="card-no-photo">

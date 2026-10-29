@@ -1,4 +1,5 @@
 // App.jsx
+import { lazy, Suspense } from "react";
 import { Routes, Route, useNavigate, Navigate, useParams, useSearchParams } from "react-router-dom";
 import { useDevToolsProtection } from "./hooks/useDevToolsProtection";
 
@@ -7,77 +8,77 @@ import FloatingWhatsApp from "./components/FloatingWhatsApp";
 import AppUpdateNotifier from "./components/AppUpdateNotifier";
 import DownloadNotification from "./components/DownloadNotification";
 
+// ── Eager: only the landing page and the shell ship in the entry bundle ──
 import Home from "./pages/Home";
-import Listings from "./pages/Listings";
-import PropertyDetailPage from "./pages/PropertyDetailPage";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import UserLogin from "./pages/UserLogin";
-import UserRegister from "./pages/UserRegister";
-import Upload from "./pages/Upload";
-import LandlordDashboard from "./pages/LandlordDashboard";
-import MemberDashboard from "./pages/MemberDashboard";
 
-import ResetPassword from "./pages/ResetPassword";
-import AboutUs from "./pages/AboutUs";
-import QuickSalesLogin from "./pages/QuickSalesLogin";
-import QuickSalesDashboard from "./pages/QuickSalesDashboard";
-import PremiumPlans from "./pages/PremiumPlans";
-import Checkout from "./pages/Checkout";
-import QuickSales from "./pages/QuickSales";
-import QuickSaleDetailPage from "./pages/QuickSaleDetailPage";
-import FAQ from "./pages/FAQ";
-import Contact from "./pages/Contact";
-import TermsAndPrivacy from "./pages/TermsAndPrivacy";
-import LeaveReview from "./pages/LeaveReview";
-import VerifyEmail from "./pages/VerifyEmail";
-import PaymentHistory from "./pages/PaymentHistory";
-import AdminDashboard from "./pages/AdminDashboard";
-import AdminVerification from "./pages/AdminVerification";
-import Settings from "./pages/Settings";
+// ── Everything else is split per route ──
+// A visitor landing on /listings should not download the admin dashboard,
+// the upload wizard or the accommodation portal before the page paints.
+const Listings = lazy(() => import("./pages/Listings"));
+const PropertyDetailPage = lazy(() => import("./pages/PropertyDetailPage"));
+const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
+const UserLogin = lazy(() => import("./pages/UserLogin"));
+const Upload = lazy(() => import("./pages/Upload"));
+const LandlordDashboard = lazy(() => import("./pages/LandlordDashboard"));
+const MemberDashboard = lazy(() => import("./pages/MemberDashboard"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const AboutUs = lazy(() => import("./pages/AboutUs"));
+const QuickSalesLogin = lazy(() => import("./pages/QuickSalesLogin"));
+const QuickSalesDashboard = lazy(() => import("./pages/QuickSalesDashboard"));
+const PremiumPlans = lazy(() => import("./pages/PremiumPlans"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const QuickSales = lazy(() => import("./pages/QuickSales"));
+const QuickSaleDetailPage = lazy(() => import("./pages/QuickSaleDetailPage"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const Contact = lazy(() => import("./pages/Contact"));
+const TermsAndPrivacy = lazy(() => import("./pages/TermsAndPrivacy"));
+const LeaveReview = lazy(() => import("./pages/LeaveReview"));
+const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
+const PaymentHistory = lazy(() => import("./pages/PaymentHistory"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminVerification = lazy(() => import("./pages/AdminVerification"));
+const Settings = lazy(() => import("./pages/Settings"));
 
 // ─── User Account Pages ──────────────────────────────────────────────────────
-import ProfilePage from "./pages/ProfilePage";
-import WalletPage from "./pages/WalletPage";
-import AxxWallet from "./pages/AxxWallet";
-import SavedListingsPage from "./pages/SavedListingsPage";
-import MessagesPage from "./pages/MessagesPage";
-import NotificationsPage from "./pages/NotificationsPage";
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const WalletPage = lazy(() => import("./pages/WalletPage"));
+const AxxWallet = lazy(() => import("./pages/AxxWallet"));
+const SavedListingsPage = lazy(() => import("./pages/SavedListingsPage"));
+const MessagesPage = lazy(() => import("./pages/MessagesPage"));
+const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
 
 // ─── New Accommodation Booking Pages ──────────────────────────────────────────
-import AccommodationSearch from "./pages/AccommodationSearch";
-import AccommodationBookingDetail from "./pages/AccommodationBookingDetail";
-import AccommodationGuestDashboard from "./pages/AccommodationGuestDashboard";
-import AccommodationLeaveReview from "./pages/AccommodationLeaveReview";
+const AccommodationSearch = lazy(() => import("./pages/AccommodationSearch"));
+const AccommodationBookingDetail = lazy(() => import("./pages/AccommodationBookingDetail"));
+const AccommodationGuestDashboard = lazy(() => import("./pages/AccommodationGuestDashboard"));
+const AccommodationLeaveReview = lazy(() => import("./pages/AccommodationLeaveReview"));
 
 // ─── Accommodation Pages ───────────────────────────────────────────────────────────
-import AccommodationPage from "./pages/accommodation/AccommodationPage";
-import AccommodationListingsPage from "./pages/accommodation/AccommodationListingsPage";
-import AccommodationDetailPage from "./pages/accommodation/AccommodationDetailPage";
-import AccommodationLogin from "./pages/accommodation/AccommodationLogin";
-import AccommodationRegister from "./pages/accommodation/AccommodationRegister";
-import RegisterPropertyPage from "./pages/accommodation/RegisterPropertyPage";
-import ProviderDashboard from "./pages/accommodation/ProviderDashboard";
-import EditPropertyPage from "./pages/accommodation/EditPropertyPage";
-import AccommodationDashboardLayout from "./components/AccommodationDashboardLayout";
-import BecomeAgentPage from "./pages/BecomeAgentPage";
-import AgentRegister from "./pages/AgentRegister";
-import AgentLogin from "./pages/AgentLogin";
-import AgentDashboard from "./pages/AgentDashboard";
-import AgentProfilePage from "./pages/AgentProfilePage";
-import RegisterAgencyPage from "./pages/RegisterAgencyPage";
-import AgencyDashboard from "./pages/AgencyDashboard";
+const AccommodationPage = lazy(() => import("./pages/accommodation/AccommodationPage"));
+const AccommodationListingsPage = lazy(() => import("./pages/accommodation/AccommodationListingsPage"));
+const AccommodationDetailPage = lazy(() => import("./pages/accommodation/AccommodationDetailPage"));
+const AccommodationLogin = lazy(() => import("./pages/accommodation/AccommodationLogin"));
+const RegisterPropertyPage = lazy(() => import("./pages/accommodation/RegisterPropertyPage"));
+const ProviderDashboard = lazy(() => import("./pages/accommodation/ProviderDashboard"));
+const EditPropertyPage = lazy(() => import("./pages/accommodation/EditPropertyPage"));
+const AccommodationDashboardLayout = lazy(() => import("./components/AccommodationDashboardLayout"));
+const BecomeAgentPage = lazy(() => import("./pages/BecomeAgentPage"));
+const AgentRegister = lazy(() => import("./pages/AgentRegister"));
+const AgentLogin = lazy(() => import("./pages/AgentLogin"));
+const AgentDashboard = lazy(() => import("./pages/AgentDashboard"));
+const AgentProfilePage = lazy(() => import("./pages/AgentProfilePage"));
+const RegisterAgencyPage = lazy(() => import("./pages/RegisterAgencyPage"));
+const AgencyDashboard = lazy(() => import("./pages/AgencyDashboard"));
 
 // ─── AxxBiashara Business Directory Pages ─────────────────────────────────────
-import AxxBiashara from "./pages/AxxBiashara";
-import BusinessForm from "./pages/BusinessForm";
-import BusinessDetail from "./pages/BusinessDetail";
-import UserDashboard from "./pages/UserDashboard";
-import BusinessLogin from "./pages/BusinessLogin";
-import BusinessRegister from "./pages/BusinessRegister";
-import MobileAppDownload from "./pages/MobileAppDownload";
-
-import "leaflet/dist/leaflet.css";
+const AxxBiashara = lazy(() => import("./pages/AxxBiashara"));
+const BusinessForm = lazy(() => import("./pages/BusinessForm"));
+const BusinessDetail = lazy(() => import("./pages/BusinessDetail"));
+const UserDashboard = lazy(() => import("./pages/UserDashboard"));
+const BusinessLogin = lazy(() => import("./pages/BusinessLogin"));
+const BusinessRegister = lazy(() => import("./pages/BusinessRegister"));
+const MobileAppDownload = lazy(() => import("./pages/MobileAppDownload"));
 
 // ─── Layouts ────────────────────────────────────────────────────────────────
 
@@ -120,11 +121,42 @@ function LegacyRedirect({ to }) {
   return <Navigate to={`${path}${qs ? `?${qs}` : ""}`} replace />;
 }
 
+// Shown for the split-second a route chunk is still downloading. Kept in the
+// site's own palette so navigating between pages never flashes white.
+function RouteFallback() {
+  return (
+    <div
+      style={{
+        minHeight: "60vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#0f1729",
+      }}
+      role="status"
+      aria-live="polite"
+    >
+      <span
+        style={{
+          width: "34px",
+          height: "34px",
+          borderRadius: "50%",
+          border: "3px solid rgba(251,191,36,0.25)",
+          borderTopColor: "#fbbf24",
+          animation: "axxRouteSpin 0.8s linear infinite",
+        }}
+      />
+      <style>{"@keyframes axxRouteSpin{to{transform:rotate(360deg)}}"}</style>
+    </div>
+  );
+}
+
 function App() {
   const navigate = useNavigate();
   useDevToolsProtection();
 
   return (
+    <Suspense fallback={<RouteFallback />}>
     <Routes>
 
       {/* ── PUBLIC ROUTES (have Navbar) ── */}
@@ -476,6 +508,7 @@ function App() {
         }
       />
     </Routes >
+    </Suspense>
   );
 }
 
