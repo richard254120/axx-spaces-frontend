@@ -1,5 +1,5 @@
 import { useState, useContext, useRef, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import AuthLayout from "../components/AuthLayout";
 
@@ -17,8 +17,10 @@ const COUNTIES = [
 
 export default function QuickSalesLogin() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { login } = useContext(AuthContext);
-  const [mode, setMode] = useState("login"); // "login" | "register"
+  // ?mode=register lets CTAs (e.g. the QuickSales composer) land on the signup tab.
+  const [mode, setMode] = useState(() => (searchParams.get("mode") === "register" ? "register" : "login")); // "login" | "register"
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");

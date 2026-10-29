@@ -1,0 +1,1221 @@
+/* ============================================================
+   QuickSales — Post an item
+   Split-panel composer: dark brand rail + guided 3-step form.
+   Scoped under .qsp- so it cannot leak into the rest of the app.
+   ============================================================ */
+
+.qsp-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(4, 12, 27, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: qsp-fade 0.18s ease-out;
+}
+
+.qsp-shell {
+  position: relative;
+  display: grid;
+  grid-template-columns: 336px minmax(0, 1fr);
+  width: 100%;
+  max-width: 1020px;
+  max-height: 92vh;
+  overflow: hidden;
+  background: #ffffff;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 40px 80px -20px rgba(2, 8, 24, 0.6),
+    0 0 0 1px rgba(4, 36, 77, 0.06);
+  animation: qsp-rise 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ───────────────────────── Brand rail ───────────────────────── */
+
+.qsp-rail {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 28px 26px;
+  overflow-y: auto;
+  color: #e8eefb;
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgba(229, 26, 36, 0.32) 0%, transparent 55%),
+    radial-gradient(120% 100% at 100% 100%, rgba(37, 99, 235, 0.28) 0%, transparent 60%),
+    linear-gradient(165deg, #04244d 0%, #062f63 55%, #031a39 100%);
+}
+
+.qsp-rail::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent 75%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent 75%);
+}
+
+.qsp-rail > * {
+  position: relative;
+  z-index: 1;
+}
+
+.qsp-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.qsp-brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: linear-gradient(145deg, #ff3b3b, #c0111a);
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  box-shadow: 0 6px 16px rgba(229, 26, 36, 0.45);
+}
+
+.qsp-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.qsp-brand-text strong {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.qsp-brand-text em {
+  font-style: normal;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(232, 238, 251, 0.62);
+}
+
+.qsp-rail-title {
+  margin: 6px 0 0;
+  font-size: 25px;
+  line-height: 1.22;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+.qsp-rail-copy {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: rgba(232, 238, 251, 0.78);
+}
+
+.qsp-rail-benefits {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  margin: 4px 0 0;
+  padding: 0;
+}
+
+.qsp-rail-benefits li {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 11px;
+  align-items: start;
+}
+
+.qsp-benefit-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #ffd0d2;
+}
+
+.qsp-benefit-text strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 2px;
+}
+
+.qsp-benefit-text span {
+  display: block;
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(232, 238, 251, 0.66);
+}
+
+.qsp-rail-foot {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.qsp-rail-pill {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(232, 238, 251, 0.86);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  padding: 5px 10px;
+}
+
+/* ───────────────────── Live preview (form mode) ───────────────────── */
+
+.qsp-rail-eyebrow {
+  margin: 0;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(232, 238, 251, 0.55);
+}
+
+.qsp-preview {
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 16px 32px -18px rgba(0, 0, 0, 0.8);
+}
+
+.qsp-preview-media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(232, 238, 251, 0.4);
+  overflow: hidden;
+}
+
+.qsp-preview-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.qsp-preview-tag {
+  position: absolute;
+  top: 9px;
+  left: 9px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(4, 12, 27, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.qsp-preview-body {
+  padding: 12px 14px 14px;
+}
+
+.qsp-preview-body h3 {
+  margin: 0 0 6px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.qsp-preview-price {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.qsp-preview-meta {
+  margin: 0;
+  font-size: 11.5px;
+  color: rgba(232, 238, 251, 0.62);
+}
+
+.qsp-preview-seller {
+  margin: 8px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(232, 238, 251, 0.55);
+}
+
+/* ───────────────────────── Step timeline ───────────────────────── */
+
+.qsp-steps {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.qsp-step {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 11px;
+  align-items: center;
+  padding: 7px 0;
+  position: relative;
+}
+
+.qsp-step::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 30px;
+  bottom: -6px;
+  width: 1.5px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.qsp-step:last-child::before {
+  display: none;
+}
+
+.qsp-step-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  color: rgba(232, 238, 251, 0.6);
+  transition: all 0.18s ease;
+}
+
+.qsp-step.is-active .qsp-step-dot {
+  background: #e51a24;
+  border-color: #ff6b73;
+  color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(229, 26, 36, 0.24);
+}
+
+.qsp-step.is-done .qsp-step-dot {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: rgba(34, 197, 94, 0.7);
+  color: #7ff0a8;
+}
+
+.qsp-step-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: rgba(232, 238, 251, 0.62);
+}
+
+.qsp-step.is-active .qsp-step-label {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.qsp-step.is-done .qsp-step-label {
+  color: rgba(232, 238, 251, 0.8);
+}
+
+.qsp-rail-note {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: rgba(232, 238, 251, 0.55);
+}
+
+/* ──────────────────────────── Panel ──────────────────────────── */
+
+.qsp-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  background: #ffffff;
+}
+
+.qsp-panel-head {
+  padding: 26px 30px 14px;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.qsp-eyebrow {
+  margin: 0 0 6px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #e51a24;
+}
+
+.qsp-panel-title {
+  margin: 0 0 5px;
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #04244d;
+  padding-right: 36px;
+}
+
+.qsp-panel-sub {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #64748b;
+}
+
+.qsp-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 3;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.qsp-close:hover {
+  background: #f8fafc;
+  color: #04244d;
+  border-color: #cbd5e1;
+}
+
+.qsp-progress {
+  height: 3px;
+  background: #f1f5f9;
+  overflow: hidden;
+}
+
+.qsp-progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #e51a24, #ff6b73);
+  transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.qsp-panel-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 22px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.qsp-panel-foot {
+  padding: 14px 30px 20px;
+  border-top: 1px solid #eef2f7;
+  background: #ffffff;
+}
+
+.qsp-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.qsp-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+/* ───────────────────────── Membership gate ───────────────────────── */
+
+.qsp-gate {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.qsp-account-chip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e8eef6;
+  font-size: 12.5px;
+  color: #475569;
+}
+
+.qsp-account-chip strong {
+  color: #04244d;
+  font-weight: 700;
+}
+
+.qsp-role-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.qsp-gate-points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.qsp-gate-points li {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #334155;
+}
+
+.qsp-gate-points li svg {
+  margin-top: 2px;
+  color: #16a34a;
+}
+
+.qsp-gate-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.qsp-gate-fine {
+  margin: 0;
+  font-size: 12px;
+  color: #64748b;
+  text-align: center;
+}
+
+.qsp-gate-fine a {
+  color: #04244d;
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 1px solid #cbd5e1;
+}
+
+.qsp-gate-fine a:hover {
+  color: #e51a24;
+  border-color: #e51a24;
+}
+
+/* ─────────────────────────── Buttons ─────────────────────────── */
+
+.qsp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 11px;
+  border: 1.5px solid transparent;
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.16s ease, background 0.16s ease,
+    border-color 0.16s ease, color 0.16s ease;
+}
+
+.qsp-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.qsp-btn-primary {
+  background: linear-gradient(180deg, #ef2b34 0%, #d91620 100%);
+  color: #ffffff;
+  box-shadow: 0 8px 20px -8px rgba(229, 26, 36, 0.75);
+}
+
+.qsp-btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px -10px rgba(229, 26, 36, 0.85);
+}
+
+.qsp-btn-dark {
+  background: #04244d;
+  color: #ffffff;
+  box-shadow: 0 8px 20px -10px rgba(4, 36, 77, 0.8);
+}
+
+.qsp-btn-dark:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: #062f63;
+}
+
+.qsp-btn-ghost {
+  background: #ffffff;
+  border-color: #d7e0ea;
+  color: #04244d;
+}
+
+.qsp-btn-ghost:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #b9c7d6;
+}
+
+.qsp-btn-quiet {
+  background: transparent;
+  color: #64748b;
+}
+
+.qsp-btn-quiet:hover:not(:disabled) {
+  color: #04244d;
+}
+
+.qsp-btn-block {
+  width: 100%;
+}
+
+/* ─────────────────────────── Field set ─────────────────────────── */
+
+.qsp-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.qsp-group-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.qsp-group-hint {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.qsp-req {
+  color: #e51a24;
+}
+
+.qsp-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.qsp-input,
+.qsp-select,
+.qsp-textarea {
+  width: 100%;
+  margin: 0;
+  padding: 11px 13px;
+  border: 1.5px solid #dbe3ec;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 13.5px;
+  font-family: inherit;
+  line-height: 1.45;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.qsp-input::placeholder,
+.qsp-textarea::placeholder {
+  color: #9aa8ba;
+}
+
+.qsp-input:focus,
+.qsp-select:focus,
+.qsp-textarea:focus {
+  border-color: #e51a24;
+  box-shadow: 0 0 0 3.5px rgba(229, 26, 36, 0.12);
+}
+
+.qsp-textarea {
+  resize: vertical;
+  min-height: 92px;
+}
+
+.qsp-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 34px;
+  cursor: pointer;
+}
+
+.qsp-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.qsp-input-prefix {
+  position: absolute;
+  left: 13px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  pointer-events: none;
+}
+
+.qsp-input-wrap .qsp-input {
+  padding-left: 48px;
+  font-weight: 700;
+}
+
+.qsp-counter {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-align: right;
+}
+
+/* ───────────────────────── Photo dropzone ───────────────────────── */
+
+.qsp-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 26px 18px;
+  border: 2px dashed #cfd9e5;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fbfdff 0%, #f5f9fd 100%);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.16s ease;
+}
+
+.qsp-dropzone:hover {
+  border-color: #e51a24;
+  background: #fff7f7;
+}
+
+.qsp-dropzone.is-drag {
+  border-color: #e51a24;
+  background: #fff1f1;
+  box-shadow: inset 0 0 0 3px rgba(229, 26, 36, 0.08);
+}
+
+.qsp-dropzone-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 6px;
+  border-radius: 13px;
+  background: #ffffff;
+  border: 1px solid #e6edf5;
+  color: #e51a24;
+  box-shadow: 0 6px 14px -8px rgba(4, 36, 77, 0.35);
+}
+
+.qsp-dropzone-title {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #04244d;
+}
+
+.qsp-dropzone-sub {
+  font-size: 11.5px;
+  color: #7c8ba1;
+}
+
+.qsp-thumbs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 10px;
+}
+
+.qsp-thumb {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 11px;
+  overflow: hidden;
+  border: 1.5px solid #e2e8f0;
+  background: #f1f5f9;
+}
+
+.qsp-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.qsp-thumb.is-cover {
+  border-color: #e51a24;
+  box-shadow: 0 0 0 3px rgba(229, 26, 36, 0.12);
+}
+
+.qsp-thumb-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 21px;
+  height: 21px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(4, 12, 27, 0.7);
+  color: #ffffff;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease;
+}
+
+.qsp-thumb:hover .qsp-thumb-remove,
+.qsp-thumb:focus-within .qsp-thumb-remove {
+  opacity: 1;
+}
+
+.qsp-thumb-remove:hover {
+  background: #e51a24;
+}
+
+.qsp-thumb-cover {
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  border: none;
+  border-radius: 6px;
+  padding: 3px 6px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: rgba(4, 12, 27, 0.72);
+  color: #ffffff;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.qsp-thumb:hover .qsp-thumb-cover,
+.qsp-thumb:focus-within .qsp-thumb-cover {
+  opacity: 1;
+}
+
+.qsp-thumb.is-cover .qsp-thumb-cover {
+  opacity: 1;
+  background: #e51a24;
+}
+
+.qsp-photo-tips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Touch devices have no hover, so keep the thumb actions visible. */
+@media (hover: none) {
+  .qsp-thumb-remove,
+  .qsp-thumb-cover {
+    opacity: 1;
+  }
+}
+
+.qsp-photo-tips span {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  background: #f1f5f9;
+  border-radius: 999px;
+  padding: 4px 9px;
+}
+
+/* ─────────────────────── Chips & stepper ─────────────────────── */
+
+.qsp-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.qsp-chip {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1.5px solid #dbe3ec;
+  background: #ffffff;
+  color: #475569;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.qsp-chip:hover {
+  border-color: #b9c7d6;
+  color: #04244d;
+}
+
+.qsp-chip.is-active {
+  border-color: #e51a24;
+  background: #fff1f1;
+  color: #c0111a;
+  box-shadow: 0 0 0 3px rgba(229, 26, 36, 0.09);
+}
+
+.qsp-qty {
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid #dbe3ec;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.qsp-qty button {
+  width: 38px;
+  height: 40px;
+  border: none;
+  background: #ffffff;
+  color: #04244d;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.qsp-qty button:hover:not(:disabled) {
+  background: #f1f5f9;
+}
+
+.qsp-qty button:disabled {
+  color: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.qsp-qty input {
+  width: 54px;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-left: 1px solid #eef2f7;
+  border-right: 1px solid #eef2f7;
+  text-align: center;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0f172a;
+  outline: none;
+}
+
+/* ───────────────────────── Review blocks ───────────────────────── */
+
+.qsp-review {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 13px;
+  background: #f8fafc;
+  border: 1px solid #e8eef6;
+}
+
+.qsp-review-media {
+  width: 58px;
+  height: 58px;
+  flex: 0 0 58px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #e2e8f0;
+}
+
+.qsp-review-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.qsp-review-body {
+  min-width: 0;
+}
+
+.qsp-review-body strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #04244d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.qsp-review-body span {
+  display: block;
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.qsp-note {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border-radius: 11px;
+  background: #f0f9ff;
+  border: 1px solid #dbeafe;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #075985;
+}
+
+.qsp-note svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.qsp-alert {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.qsp-alert svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+/* ──────────────────────────── Success ──────────────────────────── */
+
+.qsp-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 28px 10px 12px;
+}
+
+.qsp-success-ring {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 62px;
+  height: 62px;
+  margin-bottom: 4px;
+  border-radius: 50%;
+  background: #ecfdf3;
+  border: 1.5px solid #bbf7d0;
+  color: #16a34a;
+}
+
+.qsp-success h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #04244d;
+}
+
+.qsp-success p {
+  margin: 0 0 8px;
+  max-width: 380px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #64748b;
+}
+
+/* ───────────────────────────── Motion ───────────────────────────── */
+
+@keyframes qsp-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes qsp-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.qsp-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  animation: qsp-spin 0.7s linear infinite;
+}
+
+@keyframes qsp-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ──────────────────────────── Responsive ──────────────────────────── */
+
+@media (max-width: 880px) {
+  .qsp-shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
+    max-height: 94vh;
+    border-radius: 18px;
+  }
+
+  .qsp-rail {
+    padding: 18px 20px;
+    gap: 12px;
+  }
+
+  .qsp-rail-benefits,
+  .qsp-rail-foot,
+  .qsp-steps,
+  .qsp-rail-note,
+  .qsp-preview,
+  .qsp-rail-eyebrow {
+    display: none;
+  }
+
+  .qsp-rail-title {
+    font-size: 19px;
+    margin: 0;
+  }
+
+  .qsp-rail-copy {
+    font-size: 12.5px;
+  }
+
+  .qsp-panel-head {
+    padding: 18px 20px 12px;
+  }
+
+  .qsp-panel-body {
+    padding: 18px 20px;
+  }
+
+  .qsp-panel-foot {
+    padding: 12px 20px 16px;
+  }
+
+  .qsp-row {
+    grid-template-columns: 1fr;
+  }
+
+  .qsp-close {
+    top: 12px;
+    right: 12px;
+  }
+}
+
+@media (max-width: 520px) {
+  .qsp-overlay {
+    padding: 0;
+  }
+
+  .qsp-shell {
+    max-height: 100vh;
+    height: 100%;
+    border-radius: 0;
+  }
+
+  .qsp-panel-title {
+    font-size: 18px;
+  }
+
+  .qsp-actions {
+    flex-direction: column-reverse;
+  }
+
+  .qsp-actions .qsp-btn {
+    width: 100%;
+  }
+
+  .qsp-actions-right {
+    width: 100%;
+    margin-left: 0;
+  }
+}
