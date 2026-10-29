@@ -50,46 +50,64 @@ const STEPS = [
   { id: "amenities", label: "Amenities & Publish", icon: "✨", desc: "Features & Submit" },
 ];
 
+const SALE_STEPS = [
+  { id: "basic", label: "Basic Info", icon: "📋", desc: "Title & Location" },
+  { id: "details", label: "Sale Details", icon: "🏷️", desc: "Price & Ownership" },
+  { id: "images", label: "Photos & Media", icon: "📸", desc: "Images & Video" },
+  { id: "ownership", label: "Ownership & Publish", icon: "✨", desc: "Documents & Submit" },
+];
+
+const OWNERSHIP_TYPES = [
+  { value: "title_deed", label: "Title Deed" },
+  { value: "sectional_title", label: "Sectional Title" },
+  { value: "share_certificate", label: "Share Certificate" },
+  { value: "agreement", label: "Sale Agreement" },
+  { value: "no_title", label: "No Title (Plot / Informal)" },
+];
+
+const SALE_TERMS = [
+  { value: "cash", label: "Cash" },
+  { value: "mortgage", label: "Mortgage Accepted" },
+  { value: "negotiable", label: "Open to Negotiation" },
+];
+
 function needsUniversityLink(data, landlordType) {
-  return data.propertyType === HOSTEL_PROPERTY_TYPE || landlordType === "university";
+  return (
+    data.listingType !== "sale" &&
+    (data.propertyType === HOSTEL_PROPERTY_TYPE || landlordType === "university")
+  );
 }
 
 function validateBasic(data, { universityRequired = false } = {}) {
   const missing = [];
+  const isSale = data.listingType === "sale";
   if (!data.title?.trim()) missing.push("Title");
   if (!data.propertyType) missing.push("Property type");
   if (!data.county) missing.push("County");
   if (!data.location?.trim()) missing.push("Location");
-  if (!data.totalUnits || Number(data.totalUnits) < 1) missing.push("Number of units");
+  if (!isSale && (!data.totalUnits || Number(data.totalUnits) < 1)) missing.push("Number of units");
   if (universityRequired && !data.universityId) missing.push("University");
   return missing;
 }
 
 function validateDetails(data) {
   const missing = [];
+  const isSale = data.listingType === "sale";
   if (!data.description?.trim()) missing.push("Description");
-  if (!data.price || Number(data.price) <= 0) missing.push("Price");
-  if (data.bookedUnits > data.totalUnits) missing.push("Booked units cannot exceed total units");
+  if (!data.price || Number(data.price) <= 0) missing.push(isSale ? "Asking price" : "Price");
+  if (isSale && !data.ownershipType) missing.push("Ownership type");
+  if (!isSale && data.bookedUnits > data.totalUnits) missing.push("Booked units cannot exceed total units");
   return missing;
 }
 
-function validateImages(imageList) {
-  return imageList.length === 0 ? ["At least one image"] : [];
-}
-
-function validateAmenities(data, agreed) {
+function validateAmenities(data, agreed, ownershipDocReady) {
   const missing = [];
-  if (data.amenities.length === 0) missing.push("At least one amenity");
+  const isSale = data.listingType === "sale";
+  if (!isSale && data.amenities.length === 0) missing.push("At least one amenity");
+  if (isSale && !ownershipDocReady) missing.push("Ownership document");
   if (!agreed) missing.push("Terms agreement");
   return missing;
 }
-
-const STEP_VALIDATORS = [
-  null, // basic — validated in component (needs landlordType)
-  (data) => validateDetails(data),
-  (_data, images) => validateImages(images),
-  (data, _images, agreed) => validateAmenities(data, agreed),
-];
 
 const COUNTIES = [
   "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta",
@@ -114,6 +132,7 @@ export default function Upload() {
   const todayDateFormatted = new Date().toISOString().split("T")[0];
 
   const [formData, setFormData] = useState({
+    listingType: "rent",
     title: "",
     description: "",
     location: "",
@@ -135,11 +154,23 @@ export default function Upload() {
     initiallyBooked: false,
     university: "",
     universityId: "",
+    priceNegotiable: false,
+    saleTerms: "cash",
+    ownershipType: "",
+    titleNumber: "",
+    plotSize: "",
+    yearBuilt: "",
   });
+
+  const isSale = formData.listingType === "sale";
+  const steps = isSale ? SALE_STEPS : STEPS;
 
   const [images, setImages] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
+
+  const [ownershipDoc, setOwnershipDoc] = useState(null);
+  const [existingProofUrl, setExistingProofUrl] = useState("");
 
   const [videos, setVideos] = useState([]);
   const [videoPreviews, setVideoPreviews] = useState([]);
@@ -175,6 +206,7 @@ export default function Upload() {
           const data = await response.json();
 
           setFormData({
+            listingType: data.listingType === "sale" ? "sale" : "rent",
             title: data.title || "",
             description: data.description || "",
             location: data.location || "",
@@ -196,7 +228,15 @@ export default function Upload() {
             initiallyBooked: data.bookedUnits > 0,
             university: data.university || "",
             universityId: data.universityId || "",
+            priceNegotiable: Boolean(data.priceNegotiable),
+            saleTerms: data.saleTerms || "cash",
+            ownershipType: data.ownershipType || "",
+            titleNumber: data.titleNumber || "",
+            plotSize: data.plotSize || "",
+            yearBuilt: data.yearBuilt || "",
           });
+
+          setExistingProofUrl(data.listingAuthorization?.proofUrl || "");
 
           if (data.universityId && data.university) {
             setSelectedUniversity({
@@ -221,16 +261,40 @@ export default function Upload() {
   }, [id, token, isEditMode]);
 
   const universityRequired = needsUniversityLink(formData, landlordType);
+  const ownershipDocReady = Boolean(ownershipDoc || existingProofUrl);
 
   const runStepValidation = (stepIndex) => {
     if (stepIndex === 0) {
       return validateBasic(formData, { universityRequired });
     }
-    const validator = STEP_VALIDATORS[stepIndex];
-    if (!validator) return [];
-    if (stepIndex === 2) return (existingImages.length + images.length === 0) ? ["At least one image"] : [];
-    if (stepIndex === 3) return validator(formData, images, consent);
-    return validator(formData);
+    if (stepIndex === 1) {
+      return validateDetails(formData);
+    }
+    if (stepIndex === 2) {
+      return existingImages.length + images.length === 0 ? ["At least one image"] : [];
+    }
+    if (stepIndex === 3) {
+      return validateAmenities(formData, consent, ownershipDocReady);
+    }
+    return [];
+  };
+
+  const handleListingTypeChange = (nextType) => {
+    if (isEditMode) return; // transaction type is fixed once the listing exists
+    setStepErrors([]);
+    setError("");
+    setFormData((prev) => ({
+      ...prev,
+      listingType: nextType,
+      totalUnits: nextType === "sale" ? 1 : prev.totalUnits,
+      bookedUnits: nextType === "sale" ? 0 : prev.bookedUnits,
+      initiallyBooked: nextType === "sale" ? false : prev.initiallyBooked,
+      university: nextType === "sale" ? "" : prev.university,
+      universityId: nextType === "sale" ? "" : prev.universityId,
+    }));
+    if (nextType === "sale") {
+      setSelectedUniversity(null);
+    }
   };
 
   const isStepComplete = (stepIndex) => runStepValidation(stepIndex).length === 0;
@@ -252,7 +316,7 @@ export default function Upload() {
     setStepErrors([]);
     setError("");
     const next = currentStep + 1;
-    if (next < STEPS.length) {
+    if (next < steps.length) {
       setCurrentStep(next);
       setMaxUnlockedStep((prev) => Math.max(prev, next));
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -285,7 +349,7 @@ export default function Upload() {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
-    if (name === "furnished" || name === "initiallyBooked") {
+    if (name === "furnished" || name === "initiallyBooked" || name === "priceNegotiable") {
       setFormData((prev) => ({
         ...prev,
         [name]: type === "checkbox" ? checked : value === "true",
@@ -294,7 +358,7 @@ export default function Upload() {
     }
 
     const floatFields = ["price", "deposit", "lat", "lng"];
-    const intFields = ["bedrooms", "bathrooms", "totalUnits", "bookedUnits"];
+    const intFields = ["bedrooms", "bathrooms", "totalUnits", "bookedUnits", "yearBuilt"];
 
     setFormData((prev) => ({
       ...prev,
@@ -394,6 +458,18 @@ export default function Upload() {
     );
   };
 
+  const handleOwnershipDocChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const MAX_DOC_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_DOC_SIZE) {
+      setError("Ownership document must be 10MB or smaller");
+      return;
+    }
+    setError("");
+    setOwnershipDoc(file);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -411,7 +487,7 @@ export default function Upload() {
       ...validateBasic(formData, { universityRequired }),
       ...validateDetails(formData),
       ...imageCheck,
-      ...validateAmenities(formData, consent),
+      ...validateAmenities(formData, consent, ownershipDocReady),
     ];
     if (allMissing.length > 0) {
       setError(`Please complete all required steps: ${allMissing.join(", ")}`);
@@ -427,6 +503,24 @@ export default function Upload() {
     try {
       const formDataToSend = new FormData();
 
+      // Sale listings require a title deed / agreement before an admin can approve
+      let ownershipProofUrl = existingProofUrl;
+      if (isSale && ownershipDoc) {
+        const docPayload = new FormData();
+        docPayload.append("document", ownershipDoc);
+        const docResponse = await fetch(`${API_BASE}/uploads/ownership-document`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: docPayload,
+        });
+        if (!docResponse.ok) {
+          const docError = await docResponse.json().catch(() => ({}));
+          throw new Error(docError.error || "Failed to upload the ownership document");
+        }
+        const docData = await docResponse.json();
+        ownershipProofUrl = docData.url;
+      }
+
       Object.keys(formData).forEach((key) => {
         if (formData[key] !== undefined && formData[key] !== null) {
           if (key === "amenities") {
@@ -441,7 +535,7 @@ export default function Upload() {
               ? formData.bathrooms
               : 1;
             formDataToSend.append("bathrooms", String(numBathrooms));
-          } else if (key === "furnished" || key === "initiallyBooked") {
+          } else if (key === "furnished" || key === "initiallyBooked" || key === "priceNegotiable") {
             formDataToSend.append(key, String(formData[key]));
           } else {
             formDataToSend.append(key, formData[key]);
@@ -451,6 +545,10 @@ export default function Upload() {
 
       if (isEditMode) {
         formDataToSend.append("remainingImages", JSON.stringify(existingImages));
+      }
+
+      if (ownershipProofUrl) {
+        formDataToSend.append("ownershipProofUrl", ownershipProofUrl);
       }
 
       images.forEach((image) => formDataToSend.append("images", image));
@@ -470,20 +568,27 @@ export default function Upload() {
         throw new Error(errorData.message || errorData.error || "Submission failed");
       }
 
-      setSuccess(isEditMode ? "Property updated successfully!" : "Property submitted successfully! Pending approval.");
+      setSuccess(
+        isEditMode
+          ? "Property updated successfully!"
+          : `${isSale ? "Sale listing" : "Property"} submitted successfully! Pending approval.`
+      );
 
       if (!isEditMode) {
         setFormData({
-          title: "", description: "", location: "", price: "", deposit: "",
-          bedrooms: "", bathrooms: 1, amenities: [], totalUnits: 1,
+          listingType: formData.listingType, title: "", description: "", location: "", price: "",
+          deposit: "", bedrooms: "", bathrooms: 1, amenities: [], totalUnits: 1,
           furnished: true, leaseType: "monthly", availableFrom: "", rules: "",
           propertyType: "", county: "", lat: "", lng: "",
           bookedUnits: 0, initiallyBooked: false, university: "", universityId: "",
+          priceNegotiable: false, saleTerms: "cash", ownershipType: "",
+          titleNumber: "", plotSize: "", yearBuilt: "",
         });
         setImages([]);
         setImagePreviews([]);
         setVideos([]);
         setVideoPreviews([]);
+        setOwnershipDoc(null);
         setConsent(false);
         setSelectedUniversity(null);
         setCurrentStep(0);
@@ -520,8 +625,8 @@ export default function Upload() {
     );
   }
 
-  const currentStepData = STEPS[currentStep];
-  const progressPercent = ((currentStep) / (STEPS.length - 1)) * 100;
+  const currentStepData = steps[currentStep];
+  const progressPercent = ((currentStep) / (steps.length - 1)) * 100;
 
   return (
     <div style={styles.container}>
@@ -539,17 +644,23 @@ export default function Upload() {
           </button>
           <div style={styles.badgeLive}>
             <span style={styles.badgeDot} />
-            {isEditMode ? "Editing Property" : "Direct Listing"}
+            {isEditMode ? "Editing Property" : isSale ? "Sale Listing" : "Direct Listing"}
           </div>
         </div>
 
         {/* HERO TITLE */}
         <div style={styles.headerArea}>
           <h1 style={styles.heading}>
-            {isEditMode ? "Edit Property Listing" : "List Your Property"}
+            {isEditMode
+              ? "Edit Property Listing"
+              : isSale
+                ? "List a Property for Sale"
+                : "List Your Property"}
           </h1>
           <p style={styles.subheading}>
-            Reach thousands of verified tenants across Kenya with transparent pricing and zero broker hassle.
+            {isSale
+              ? "Present your house or land to serious buyers with verified ownership details and direct enquiries."
+              : "Reach thousands of verified tenants across Kenya with transparent pricing and zero broker hassle."}
           </p>
         </div>
 
@@ -560,7 +671,7 @@ export default function Upload() {
           </div>
 
           <div style={styles.stepGrid}>
-            {STEPS.map((step, index) => {
+            {steps.map((step, index) => {
               const unlocked = index <= maxUnlockedStep;
               const complete = index < currentStep && isStepComplete(index);
               const active = index === currentStep;
@@ -617,7 +728,7 @@ export default function Upload() {
               <div>
                 <h2 style={styles.cardStepTitle}>{currentStepData.label}</h2>
                 <span style={styles.cardStepIndicator}>
-                  Step {currentStep + 1} of {STEPS.length}
+                  Step {currentStep + 1} of {steps.length}
                 </span>
               </div>
             </div>
@@ -635,6 +746,45 @@ export default function Upload() {
             ═══════════════════════════════════════════════════════ */}
             {currentStep === 0 && (
               <div style={styles.stepSection}>
+                {/* Transaction type — rents and sales share one catalogue but never one filter */}
+                <div style={styles.modeSwitchWrap}>
+                  <span style={styles.modeSwitchLabel}>Listing intention</span>
+                  <div style={styles.modeSwitch}>
+                    <button
+                      type="button"
+                      disabled={isEditMode}
+                      onClick={() => handleListingTypeChange("rent")}
+                      style={{
+                        ...styles.modeOption,
+                        ...(!isSale ? styles.modeOptionActive : {}),
+                        ...(isEditMode ? styles.modeOptionDisabled : {}),
+                      }}
+                    >
+                      <span style={styles.modeIcon}>🔑</span>
+                      <span style={styles.modeCopy}>
+                        <span style={styles.modeTitle}>For Rent</span>
+                        <span style={styles.modeDesc}>Monthly rent, deposit and available units</span>
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isEditMode}
+                      onClick={() => handleListingTypeChange("sale")}
+                      style={{
+                        ...styles.modeOption,
+                        ...(isSale ? styles.modeOptionActive : {}),
+                        ...(isEditMode ? styles.modeOptionDisabled : {}),
+                      }}
+                    >
+                      <span style={styles.modeIcon}>🏡</span>
+                      <span style={styles.modeCopy}>
+                        <span style={styles.modeTitle}>For Sale</span>
+                        <span style={styles.modeDesc}>Asking price, title deed and viewings</span>
+                      </span>
+                    </button>
+                  </div>
+                </div>
+
                 <div style={styles.formGroup}>
                   <label style={styles.label}>
                     Property Title <span style={styles.reqStar}>*</span>
@@ -642,13 +792,19 @@ export default function Upload() {
                   <input
                     type="text"
                     name="title"
-                    placeholder="e.g., Spacious 2-Bedroom Master Ensuite Apartment"
+                    placeholder={isSale
+                      ? "e.g., 4-Bedroom Maisonette on 1/8 Acre, Ready Title Deed"
+                      : "e.g., Spacious 2-Bedroom Master Ensuite Apartment"}
                     value={formData.title}
                     onChange={handleChange}
                     style={styles.input}
                     required
                   />
-                  <span style={styles.helperText}>A descriptive title helps your listing stand out in search results.</span>
+                  <span style={styles.helperText}>
+                    {isSale
+                      ? "Lead with bedrooms, land size and ownership status — buyers scan for these first."
+                      : "A descriptive title helps your listing stand out in search results."}
+                  </span>
                 </div>
 
                 <div style={styles.gridTwo}>
@@ -706,35 +862,53 @@ export default function Upload() {
                   </div>
 
                   <div style={styles.formGroup}>
-                    <label style={styles.label}>
-                      Total Units Available <span style={styles.reqStar}>*</span>
-                    </label>
-                    <input
-                      type="number"
-                      name="totalUnits"
-                      min="1"
-                      value={formData.totalUnits}
-                      onChange={handleChange}
-                      style={styles.input}
-                      required
-                    />
+                    {isSale ? (
+                      <>
+                        <label style={styles.label}>Plot / Built-up Size</label>
+                        <input
+                          type="text"
+                          name="plotSize"
+                          placeholder="e.g., 50x100 ft or 0.25 acre"
+                          value={formData.plotSize}
+                          onChange={handleChange}
+                          style={styles.input}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <label style={styles.label}>
+                          Total Units Available <span style={styles.reqStar}>*</span>
+                        </label>
+                        <input
+                          type="number"
+                          name="totalUnits"
+                          min="1"
+                          value={formData.totalUnits}
+                          onChange={handleChange}
+                          style={styles.input}
+                          required
+                        />
+                      </>
+                    )}
                   </div>
                 </div>
 
-                {/* University Picker */}
-                <div style={styles.universityBox}>
-                  <UniversityPicker
-                    value={selectedUniversity}
-                    onChange={handleUniversityPick}
-                    required={universityRequired}
-                    label={universityRequired ? "Linked Campus / University *" : "Nearby University (Optional)"}
-                    hint={
-                      universityRequired
-                        ? "Required for hostel listings and campus landlords so students find your property."
-                        : "Link your property to a nearby campus to appear in student hostel searches."
-                    }
-                  />
-                </div>
+                {/* University Picker — rentals only */}
+                {!isSale && (
+                  <div style={styles.universityBox}>
+                    <UniversityPicker
+                      value={selectedUniversity}
+                      onChange={handleUniversityPick}
+                      required={universityRequired}
+                      label={universityRequired ? "Linked Campus / University *" : "Nearby University (Optional)"}
+                      hint={
+                        universityRequired
+                          ? "Required for hostel listings and campus landlords so students find your property."
+                          : "Link your property to a nearby campus to appear in student hostel searches."
+                      }
+                    />
+                  </div>
+                )}
 
                 {/* GPS Coordinates Section */}
                 <div style={styles.gpsContainer}>
@@ -842,7 +1016,9 @@ export default function Upload() {
                   </label>
                   <textarea
                     name="description"
-                    placeholder="Highlight main features, finishes, security, water availability, nearby transit, and what makes your property special..."
+                    placeholder={isSale
+                      ? "Describe the house, land, finishes, access roads, water and power, nearby schools and amenities, and the condition of the title..."
+                      : "Highlight main features, finishes, security, water availability, nearby transit, and what makes your property special..."}
                     value={formData.description}
                     onChange={handleChange}
                     style={styles.textarea}
@@ -855,35 +1031,68 @@ export default function Upload() {
                 <div style={styles.gridTwo}>
                   <div style={styles.formGroup}>
                     <label style={styles.label}>
-                      Monthly Rent (KES) <span style={styles.reqStar}>*</span>
+                      {isSale ? "Asking Price (KES)" : "Monthly Rent (KES)"} <span style={styles.reqStar}>*</span>
                     </label>
                     <div style={styles.prefixInputWrap}>
                       <span style={styles.inputPrefix}>KES</span>
                       <input
                         type="number"
                         name="price"
-                        placeholder="25000"
+                        placeholder={isSale ? "8500000" : "25000"}
                         value={formData.price}
                         onChange={handleChange}
                         style={styles.prefixInput}
                         required
                       />
                     </div>
+                    {isSale && (
+                      <label style={styles.inlineCheck}>
+                        <input
+                          type="checkbox"
+                          name="priceNegotiable"
+                          checked={formData.priceNegotiable}
+                          onChange={handleChange}
+                          style={styles.checkboxInput}
+                        />
+                        <span>Asking price is negotiable</span>
+                      </label>
+                    )}
                   </div>
 
                   <div style={styles.formGroup}>
-                    <label style={styles.label}>Security Deposit (KES)</label>
-                    <div style={styles.prefixInputWrap}>
-                      <span style={styles.inputPrefix}>KES</span>
-                      <input
-                        type="number"
-                        name="deposit"
-                        placeholder="25000"
-                        value={formData.deposit}
-                        onChange={handleChange}
-                        style={styles.prefixInput}
-                      />
-                    </div>
+                    {isSale ? (
+                      <>
+                        <label style={styles.label}>Payment Terms</label>
+                        <select
+                          name="saleTerms"
+                          value={formData.saleTerms}
+                          onChange={handleChange}
+                          style={styles.select}
+                        >
+                          {SALE_TERMS.map((term) => (
+                            <option key={term.value} value={term.value}>{term.label}</option>
+                          ))}
+                        </select>
+                        <span style={styles.helperText}>
+                          Kenyan home sales usually close on cash or a bank mortgage — buyers filter on this.
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <label style={styles.label}>Security Deposit (KES)</label>
+                        <div style={styles.prefixInputWrap}>
+                          <span style={styles.inputPrefix}>KES</span>
+                          <input
+                            type="number"
+                            name="deposit"
+                            placeholder="25000"
+                            value={formData.deposit}
+                            onChange={handleChange}
+                            style={styles.prefixInput}
+                          />
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -916,54 +1125,126 @@ export default function Upload() {
                   </div>
                 </div>
 
-                {/* Furnished & Lease Type */}
+                {/* Furnished & Lease Type — rentals only */}
+                {!isSale && (
+                  <div style={styles.gridTwo}>
+                    <div style={styles.formGroup}>
+                      <label style={styles.label}>Furnished</label>
+                      <select
+                        name="furnished"
+                        value={String(formData.furnished)}
+                        onChange={handleChange}
+                        style={styles.select}
+                      >
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+                      </select>
+                    </div>
+
+                    <div style={styles.formGroup}>
+                      <label style={styles.label}>Lease Type</label>
+                      <select
+                        name="leaseType"
+                        value={formData.leaseType}
+                        onChange={handleChange}
+                        style={styles.select}
+                      >
+                        <option value="monthly">Monthly</option>
+                        <option value="6months">6 Months</option>
+                        <option value="yearly">Yearly</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+
+                {/* Ownership details — asked up front so buyers trust the listing */}
+                {isSale && (
+                  <>
+                    <div style={styles.gridTwo}>
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>
+                          Ownership Type <span style={styles.reqStar}>*</span>
+                        </label>
+                        <select
+                          name="ownershipType"
+                          value={formData.ownershipType}
+                          onChange={handleChange}
+                          style={styles.select}
+                        >
+                          <option value="">Select Ownership Type</option>
+                          {OWNERSHIP_TYPES.map((type) => (
+                            <option key={type.value} value={type.value}>{type.label}</option>
+                          ))}
+                        </select>
+                        <span style={styles.helperText}>Buyers filter heavily on this before booking a viewing.</span>
+                      </div>
+
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>Title / Plot Number</label>
+                        <input
+                          type="text"
+                          name="titleNumber"
+                          placeholder="e.g., Nairobi/Block 92/1234"
+                          value={formData.titleNumber}
+                          onChange={handleChange}
+                          style={styles.input}
+                        />
+                        <span style={styles.helperText}>Shown to administrators only until the listing is approved.</span>
+                      </div>
+                    </div>
+
+                    <div style={styles.gridTwo}>
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>Year Built</label>
+                        <input
+                          type="number"
+                          name="yearBuilt"
+                          min="1900"
+                          max={new Date().getFullYear()}
+                          placeholder="e.g., 2019"
+                          value={formData.yearBuilt}
+                          onChange={handleChange}
+                          style={styles.input}
+                        />
+                      </div>
+
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>Plot / Built-up Size</label>
+                        <input
+                          type="text"
+                          name="plotSize"
+                          placeholder="e.g., 50x100 ft or 0.25 acre"
+                          value={formData.plotSize}
+                          onChange={handleChange}
+                          style={styles.input}
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+
                 <div style={styles.gridTwo}>
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>Furnished</label>
-                    <select
-                      name="furnished"
-                      value={String(formData.furnished)}
-                      onChange={handleChange}
-                      style={styles.select}
-                    >
-                      <option value="true">Yes</option>
-                      <option value="false">No</option>
-                    </select>
-                  </div>
+                  {!isSale && (
+                    <div style={styles.formGroup}>
+                      <label style={styles.label}>Available From</label>
+                      <input
+                        type="date"
+                        name="availableFrom"
+                        value={formData.availableFrom}
+                        onChange={handleChange}
+                        style={styles.input}
+                      />
+                    </div>
+                  )}
 
                   <div style={styles.formGroup}>
-                    <label style={styles.label}>Lease Type</label>
-                    <select
-                      name="leaseType"
-                      value={formData.leaseType}
-                      onChange={handleChange}
-                      style={styles.select}
-                    >
-                      <option value="monthly">Monthly</option>
-                      <option value="6months">6 Months</option>
-                      <option value="yearly">Yearly</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div style={styles.gridTwo}>
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>Available From</label>
-                    <input
-                      type="date"
-                      name="availableFrom"
-                      value={formData.availableFrom}
-                      onChange={handleChange}
-                      style={styles.input}
-                    />
-                  </div>
-
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>House Rules (Optional)</label>
+                    <label style={styles.label}>{isSale ? "Viewing Notes (Optional)" : "House Rules (Optional)"}</label>
                     <input
                       type="text"
                       name="rules"
-                      placeholder="e.g., No smoking inside, Quiet hours after 10 PM"
+                      placeholder={isSale
+                        ? "e.g., Viewings on weekends only, serious buyers please"
+                        : "e.g., No smoking inside, Quiet hours after 10 PM"}
                       value={formData.rules}
                       onChange={handleChange}
                       style={styles.input}
@@ -1166,7 +1447,8 @@ export default function Upload() {
                 <div style={styles.formGroup}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
                     <label style={{ ...styles.label, marginBottom: 0 }}>
-                      Select Property Amenities <span style={styles.reqStar}>*</span>
+                      Select Property Amenities{" "}
+                      {!isSale && <span style={styles.reqStar}>*</span>}
                     </label>
                     <span style={styles.countBadge}>
                       {formData.amenities.length} Selected
@@ -1200,6 +1482,57 @@ export default function Upload() {
                   </div>
                 </div>
 
+                {/* Ownership document — required before an admin can approve a sale */}
+                {isSale && (
+                  <div style={styles.docCard}>
+                    <div style={styles.docCardHeader}>
+                      <span style={styles.docIcon}>📄</span>
+                      <div>
+                        <h4 style={styles.docTitle}>
+                          Ownership Document <span style={styles.reqStar}>*</span>
+                        </h4>
+                        <p style={styles.docHint}>
+                          Upload the title deed, sectional title, share certificate or sale agreement.
+                          PDF, Word or a clear photo — maximum 10MB. Only administrators can review it
+                          before the listing goes live.
+                        </p>
+                      </div>
+                    </div>
+
+                    <label style={styles.docDropzone}>
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx,.txt,image/*"
+                        onChange={handleOwnershipDocChange}
+                        style={{ display: "none" }}
+                      />
+                      <span style={styles.docDropMain}>
+                        {ownershipDoc
+                          ? `📎 ${ownershipDoc.name}`
+                          : existingProofUrl
+                            ? "📎 Ownership document already on file — upload again to replace"
+                            : "Click to upload ownership document"}
+                      </span>
+                      <span style={styles.docDropSub}>
+                        {ownershipDocReady
+                          ? "Document attached. You can continue."
+                          : "A listing cannot be approved for sale without this."}
+                      </span>
+                    </label>
+
+                    {existingProofUrl && !ownershipDoc && (
+                      <a
+                        href={existingProofUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={styles.docLink}
+                      >
+                        Preview the document on file →
+                      </a>
+                    )}
+                  </div>
+                )}
+
                 {/* Agreement Checkbox */}
                 <div style={styles.termsCard}>
                   <label style={styles.termsLabel}>
@@ -1210,7 +1543,9 @@ export default function Upload() {
                       style={styles.checkboxInput}
                     />
                     <span style={styles.termsText}>
-                      I confirm that all property details, rent, and photos provided are accurate, genuine, and comply with AXX Spaces platform guidelines.
+                      {isSale
+                        ? "I confirm that I am the owner or an authorised representative of this property, that the ownership document provided is genuine, and that all details, asking price and photos are accurate and comply with AXX Spaces platform guidelines."
+                        : "I confirm that all property details, rent, and photos provided are accurate, genuine, and comply with AXX Spaces platform guidelines."}
                     </span>
                   </label>
                 </div>
@@ -1230,10 +1565,10 @@ export default function Upload() {
                   >
                     {loading ? (
                       <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
-                        <span className="upload-spinner" /> Publishing Property...
+                        <span className="upload-spinner" /> Publishing {isSale ? "Listing" : "Property"}...
                       </span>
                     ) : (
-                      <span>🚀 {isEditMode ? "Save Changes" : "Publish Property Listing"}</span>
+                      <span>🚀 {isEditMode ? "Save Changes" : isSale ? "Publish Sale Listing" : "Publish Property Listing"}</span>
                     )}
                   </button>
                 </div>
@@ -1871,6 +2206,143 @@ const styles = {
     fontSize: "13px",
     color: "#cbd5e1",
     lineHeight: 1.5,
+  },
+
+  // ── LISTING INTENTION SWITCH ──
+  modeSwitchWrap: {
+    background: "#0b1424",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderRadius: "12px",
+    padding: "14px",
+    marginBottom: "20px",
+  },
+  modeSwitchLabel: {
+    display: "block",
+    fontSize: "11px",
+    fontWeight: 700,
+    letterSpacing: "0.08em",
+    textTransform: "uppercase",
+    color: "#64748b",
+    marginBottom: "10px",
+  },
+  modeSwitch: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "10px",
+  },
+  modeOption: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    textAlign: "left",
+    padding: "12px 14px",
+    borderRadius: "10px",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    background: "rgba(255, 255, 255, 0.03)",
+    color: "#e2e8f0",
+    cursor: "pointer",
+    fontFamily: "inherit",
+    transition: "all 0.18s ease",
+  },
+  modeOptionActive: {
+    borderColor: "rgba(16, 185, 129, 0.6)",
+    background: "rgba(16, 185, 129, 0.12)",
+    boxShadow: "0 0 0 1px rgba(16, 185, 129, 0.35) inset",
+  },
+  modeOptionDisabled: {
+    opacity: 0.6,
+    cursor: "not-allowed",
+  },
+  modeIcon: {
+    fontSize: "20px",
+    lineHeight: 1,
+  },
+  modeCopy: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "2px",
+    overflow: "hidden",
+  },
+  modeTitle: {
+    fontSize: "13px",
+    fontWeight: 700,
+    color: "#f8fafc",
+  },
+  modeDesc: {
+    fontSize: "11px",
+    color: "#94a3b8",
+    lineHeight: 1.35,
+  },
+  inlineCheck: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    marginTop: "8px",
+    fontSize: "12px",
+    color: "#cbd5e1",
+    cursor: "pointer",
+  },
+
+  // ── OWNERSHIP DOCUMENT ──
+  docCard: {
+    background: "rgba(59, 130, 246, 0.07)",
+    border: "1px solid rgba(59, 130, 246, 0.28)",
+    borderRadius: "12px",
+    padding: "16px",
+    marginTop: "18px",
+  },
+  docCardHeader: {
+    display: "flex",
+    gap: "12px",
+    alignItems: "flex-start",
+    marginBottom: "12px",
+  },
+  docIcon: {
+    fontSize: "20px",
+    lineHeight: 1.2,
+  },
+  docTitle: {
+    fontSize: "14px",
+    fontWeight: 700,
+    color: "#f8fafc",
+    margin: "0 0 4px",
+  },
+  docHint: {
+    fontSize: "12px",
+    color: "#94a3b8",
+    lineHeight: 1.5,
+    margin: 0,
+  },
+  docDropzone: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "4px",
+    padding: "18px 14px",
+    borderRadius: "10px",
+    border: "1px dashed rgba(148, 163, 184, 0.45)",
+    background: "rgba(255, 255, 255, 0.03)",
+    cursor: "pointer",
+    textAlign: "center",
+  },
+  docDropMain: {
+    fontSize: "13px",
+    fontWeight: 600,
+    color: "#e2e8f0",
+    wordBreak: "break-word",
+  },
+  docDropSub: {
+    fontSize: "11px",
+    color: "#94a3b8",
+  },
+  docLink: {
+    display: "inline-block",
+    marginTop: "10px",
+    fontSize: "12px",
+    fontWeight: 600,
+    color: "#60a5fa",
+    textDecoration: "none",
   },
   actionsBar: {
     display: "flex",

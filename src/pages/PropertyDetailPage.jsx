@@ -6,6 +6,22 @@ import { resolveMediaUrl } from "../utils/fileLinks";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
+const isForSale = (property) => property?.listingType === "sale";
+
+const OWNERSHIP_LABELS = {
+  title_deed: "Title Deed",
+  sectional_title: "Sectional Title",
+  share_certificate: "Share Certificate",
+  agreement: "Sale Agreement",
+  no_title: "No Title",
+};
+
+const SALE_TERM_LABELS = {
+  cash: "Cash",
+  mortgage: "Mortgage accepted",
+  negotiable: "Negotiable",
+};
+
 const formatKenyaPhone = (phone) => {
   if (!phone) return "";
   let cleaned = phone.toString().replace(/\D/g, "");
@@ -147,7 +163,9 @@ export default function PropertyDetailPage() {
     if (!property) return;
     recordQRConversion("whatsapp");
     const phone = formatKenyaPhone(property.landlordPhone);
-    const msg = `Hi, I'm interested in your property "${property.title}" on Axxspace. Is it still available?`;
+    const msg = isForSale(property)
+      ? `Hi, I saw your property for sale "${property.title}" on Axxspace at KES ${property.price?.toLocaleString()}. I'd like to arrange a viewing.`
+      : `Hi, I'm interested in your property "${property.title}" on Axxspace. Is it still available?`;
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
@@ -362,6 +380,11 @@ export default function PropertyDetailPage() {
                 <span style={{ background: "#3b82f6", color: "white", padding: "4px 10px", borderRadius: "6px", fontSize: "11px", fontWeight: 600, textTransform: "uppercase" }}>
                   {property.propertyType || "Rental"}
                 </span>
+                {isForSale(property) && (
+                  <span style={{ background: "#fef2f2", color: "#b91c1c", padding: "4px 10px", borderRadius: "6px", fontSize: "11px", fontWeight: 800, textTransform: "uppercase", border: "1px solid #fecaca" }}>
+                    For Sale
+                  </span>
+                )}
                 {property.videos && property.videos.length > 0 && (
                   <span style={{ background: "#f0fdf4", color: "#166534", padding: "4px 10px", borderRadius: "6px", fontSize: "11px", fontWeight: 700, border: "1px solid #bbf7d0", display: "inline-flex", alignItems: "center", gap: "5px" }}>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
@@ -386,8 +409,18 @@ export default function PropertyDetailPage() {
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                   <span style={{ fontSize: "20px" }}></span>
-                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#1e293b" }}>{property.furnished ? "Furnished" : "Unfurnished"}</span>
+                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#1e293b" }}>
+                    {isForSale(property)
+                      ? OWNERSHIP_LABELS[property.ownershipType] || "Ownership on file"
+                      : property.furnished ? "Furnished" : "Unfurnished"}
+                  </span>
                 </div>
+                {isForSale(property) && property.plotSize && (
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span style={{ fontSize: "20px" }}>📐</span>
+                    <span style={{ fontSize: "14px", fontWeight: 600, color: "#1e293b" }}>{property.plotSize}</span>
+                  </div>
+                )}
                 <div style={{ display: "flex", alignItems: "center", gap: "6px", background: "#f8fafc", padding: "4px 10px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
                   <svg viewBox="0 0 24 24" width="16" height="16" stroke="#3b82f6" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                   <span style={{ fontSize: "14px", fontWeight: 700, color: "#3b82f6" }}>{property.views || 0} Views</span>
@@ -523,17 +556,93 @@ export default function PropertyDetailPage() {
               <div style={{ background: "white", borderRadius: "12px", padding: "20px", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", position: "sticky", top: "80px" }}>
                 <div style={{ marginBottom: "16px" }}>
                   <div style={{ fontSize: "28px", fontWeight: 700, color: "#1e293b" }}>KES {property.price?.toLocaleString()}</div>
-                  <div style={{ fontSize: "13px", color: "#64748b" }}>per month</div>
-                </div>
-
-                <div style={{ marginBottom: "16px" }}>
-                  <div style={{ fontSize: "13px", color: "#64748b", marginBottom: "6px" }}>Availability</div>
-                  <div style={{ fontSize: "14px", fontWeight: 600, color: property.availableUnits > 0 ? "#22c55e" : "#ef4444" }}>
-                    {property.availableUnits > 0 ? "Available" : "Fully Booked"}
+                  <div style={{ fontSize: "13px", color: "#64748b" }}>
+                    {isForSale(property)
+                      ? property.priceNegotiable ? "asking price · negotiable" : "asking price"
+                      : "per month"}
                   </div>
                 </div>
 
-                {property.availableUnits > 0 ? (
+                {isForSale(property) && (
+                  <div style={{ marginBottom: "16px", borderTop: "1px solid #e2e8f0", paddingTop: "14px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+                      <span style={{ fontSize: "13px", color: "#64748b" }}>Ownership</span>
+                      <span style={{ fontSize: "13px", fontWeight: 700, color: "#1e293b" }}>
+                        {OWNERSHIP_LABELS[property.ownershipType] || "On file"}
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+                      <span style={{ fontSize: "13px", color: "#64748b" }}>Payment terms</span>
+                      <span style={{ fontSize: "13px", fontWeight: 700, color: "#1e293b" }}>
+                        {SALE_TERM_LABELS[property.saleTerms] || "Cash"}
+                      </span>
+                    </div>
+                    {property.plotSize && (
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+                        <span style={{ fontSize: "13px", color: "#64748b" }}>Plot / Built-up</span>
+                        <span style={{ fontSize: "13px", fontWeight: 700, color: "#1e293b" }}>{property.plotSize}</span>
+                      </div>
+                    )}
+                    {property.yearBuilt && (
+                      <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <span style={{ fontSize: "13px", color: "#64748b" }}>Year built</span>
+                        <span style={{ fontSize: "13px", fontWeight: 700, color: "#1e293b" }}>{property.yearBuilt}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {!isForSale(property) && (
+                  <div style={{ marginBottom: "16px" }}>
+                    <div style={{ fontSize: "13px", color: "#64748b", marginBottom: "6px" }}>Availability</div>
+                    <div style={{ fontSize: "14px", fontWeight: 600, color: property.availableUnits > 0 ? "#22c55e" : "#ef4444" }}>
+                      {property.availableUnits > 0 ? "Available" : "Fully Booked"}
+                    </div>
+                  </div>
+                )}
+
+                {isForSale(property) ? (
+                  <>
+                    <button
+                      onClick={handleWhatsApp}
+                      style={{
+                        width: "100%",
+                        padding: "14px",
+                        background: "#25d366",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "8px",
+                        fontWeight: 700,
+                        fontSize: "14px",
+                        cursor: "pointer",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      Request a Viewing
+                    </button>
+                    <button
+                      onClick={handleCall}
+                      style={{
+                        width: "100%",
+                        padding: "14px",
+                        background: "#f1f5f9",
+                        color: "#1e293b",
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "8px",
+                        fontWeight: 700,
+                        fontSize: "14px",
+                        cursor: "pointer",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      Call Owner
+                    </button>
+                    <p style={{ fontSize: "11px", color: "#9ca3af", margin: 0, lineHeight: 1.5 }}>
+                      AxxSpace is not a party to this sale. Always view the property and verify the title
+                      before paying any deposit.
+                    </p>
+                  </>
+                ) : property.availableUnits > 0 ? (
                   <>
                     <button
                       onClick={() => setShowBookingModal(true)}

@@ -12,6 +12,52 @@ import { kenyanUniversities, searchUniversities } from "../data/kenyanUniversiti
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
+// ── Rent vs Sale presentation helpers ──
+// Listings created before sales existed have no listingType, so they are rents.
+const listingModeOf = (property) => (property?.listingType === "sale" ? "sale" : "rent");
+const isForSale = (property) => listingModeOf(property) === "sale";
+
+const OWNERSHIP_LABELS = {
+  title_deed: "Title Deed",
+  sectional_title: "Sectional Title",
+  share_certificate: "Share Certificate",
+  agreement: "Sale Agreement",
+  no_title: "No Title",
+};
+
+const SALE_TERM_LABELS = {
+  cash: "Cash",
+  mortgage: "Mortgage accepted",
+  negotiable: "Negotiable",
+};
+
+// Budget ceilings are mode-specific: a KES 9M asking price must never be
+// filtered out by a rent-shaped default.
+const RENT_PRICE_OPTIONS = [
+  { value: "10000", label: "Up to KES 10,000" },
+  { value: "20000", label: "Up to KES 20,000" },
+  { value: "35000", label: "Up to KES 35,000" },
+  { value: "50000", label: "Up to KES 50,000" },
+  { value: "80000", label: "Up to KES 80,000" },
+  { value: "150000", label: "Up to KES 150,000" },
+];
+
+const SALE_PRICE_OPTIONS = [
+  { value: "2000000", label: "Up to KES 2M" },
+  { value: "5000000", label: "Up to KES 5M" },
+  { value: "10000000", label: "Up to KES 10M" },
+  { value: "20000000", label: "Up to KES 20M" },
+  { value: "50000000", label: "Up to KES 50M" },
+];
+
+const ALL_PRICE_OPTIONS = [
+  { value: "50000", label: "Up to KES 50,000" },
+  { value: "500000", label: "Up to KES 500,000" },
+  { value: "2000000", label: "Up to KES 2M" },
+  { value: "10000000", label: "Up to KES 10M" },
+  { value: "50000000", label: "Up to KES 50M" },
+];
+
 // "Any Budget" must not silently cap the results; only an explicit budget
 // choice from the dropdown or the price drawer may narrow the price range.
 const NO_PRICE_CAP = Number.POSITIVE_INFINITY;
@@ -248,17 +294,19 @@ function PropertyCardMedia({ property, favorites, toggleFavorite }) {
       {/* Gradient shadow overlay */}
       <div className="card-img-gradient-overlay" />
 
-      {/* Availability Badge */}
+      {/* Availability / Sale Badge */}
       <div
         className={`card-avail-badge ${
-          property.availableUnits > 0 ? "avail-green" : "avail-red"
+          isForSale(property) || property.availableUnits > 0 ? "avail-green" : "avail-red"
         }`}
       >
         <span className="live-dot" />
         <span>
-          {property.availableUnits > 0
-            ? "Available"
-            : "Fully Occupied"}
+          {isForSale(property)
+            ? "For Sale"
+            : property.availableUnits > 0
+              ? "Available"
+              : "Fully Occupied"}
         </span>
       </div>
 
@@ -311,6 +359,12 @@ export default function Listings() {
   // Sorting & Quick Category
   const [sortBy, setSortBy] = useState("recommended");
   const [quickCategory, setQuickCategory] = useState("all");
+
+  // Transaction type — seeded from the URL so the homepage can deep-link to sales
+  const [listingType, setListingType] = useState(() => {
+    const fromUrl = searchParams.get("listingType");
+    return fromUrl === "sale" || fromUrl === "rent" ? fromUrl : "all";
+  });
 
   // Filters — seeded from the URL so homepage search lands on real results
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -464,6 +518,11 @@ export default function Listings() {
   useEffect(() => {
     let filtered = [...properties];
 
+    // Transaction type (rent / sale)
+    if (listingType !== "all") {
+      filtered = filtered.filter((p) => listingModeOf(p) === listingType);
+    }
+
     // Location / County
     if (filters.location) {
       const q = filters.location.toLowerCase();
@@ -487,7 +546,7 @@ export default function Listings() {
       filtered = filtered.filter((p) => p.furnished === true);
     } else if (quickCategory === "pet") {
       filtered = filtered.filter((p) => p.petFriendly === true);
-    } else if (quickCategory === "budget") {
+    } else if (quickCategory === "budget" && listingType !== "sale") {
       filtered = filtered.filter((p) => p.price <= 25000);
     } else if (quickCategory === "favorites") {
       filtered = filtered.filter((p) => favorites.includes(p._id));
@@ -559,7 +618,7 @@ export default function Listings() {
     }
 
     setFilteredProperties(filtered);
-  }, [filters, properties, favorites, showFavoritesOnly, quickCategory, sortBy]);
+  }, [filters, properties, favorites, showFavoritesOnly, quickCategory, sortBy, listingType]);
 
   // University Hostels logic
   useEffect(() => {
@@ -680,6 +739,28 @@ export default function Listings() {
     setShowFavoritesOnly(false);
   };
 
+  const handleListingTypeChange = (nextMode) => {
+    setListingType(nextMode);
+    setQuickCategory("all");
+    // Budget ceilings are mode-specific — never carry a rent cap into sales
+    setFilters((prev) => ({
+      ...prev,
+      minPrice: 0,
+      maxPrice: NO_PRICE_CAP,
+      furnished: nextMode === "sale" ? "" : prev.furnished,
+      petFriendly: nextMode === "sale" ? "" : prev.petFriendly,
+    }));
+  };
+
+  const priceOptions =
+    listingType === "sale"
+      ? SALE_PRICE_OPTIONS
+      : listingType === "rent"
+        ? RENT_PRICE_OPTIONS
+        : ALL_PRICE_OPTIONS;
+  const priceLabel =
+    listingType === "sale" ? "MAX ASKING PRICE" : listingType === "rent" ? "MAX MONTHLY RENT" : "MAX PRICE";
+
   const openModal = async (property) => {
     setSelectedProperty(property);
     setCurrentImageIndex(0);
@@ -713,7 +794,9 @@ export default function Listings() {
     if (e) e.stopPropagation();
     const phoneNumber = formatKenyaPhone(property.owner?.phone || property.phone || "");
     const landlordName = property.owner?.name || "Landlord";
-    const message = `Hi ${landlordName}, I'm interested in your property "${property.title}" located in ${property.county || ""} ${property.location || ""}. Is it currently available for viewing?`;
+    const message = isForSale(property)
+      ? `Hi ${landlordName}, I saw your property for sale "${property.title}" in ${property.county || ""} ${property.location || ""} listed at KES ${property.price?.toLocaleString()}. I would like to arrange a viewing.`
+      : `Hi ${landlordName}, I'm interested in your property "${property.title}" located in ${property.county || ""} ${property.location || ""}. Is it currently available for viewing?`;
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
@@ -761,7 +844,16 @@ export default function Listings() {
 
   const handleSendSMS = (property) => {
     const phoneNumber = formatKenyaPhone(property.owner?.phone || property.phone || "");
-    const message = `Hello, I am inquiring about booking this rental:
+    const sale = isForSale(property);
+    const message = sale
+      ? `Hello, I am interested in buying this property:
+${property.title}
+Location: ${property.county || ""} - ${property.location || ""}
+Asking price: KES ${property.price?.toLocaleString()}${property.priceNegotiable ? " (negotiable)" : ""}
+Bedrooms: ${property.bedrooms} | Bathrooms: ${property.bathrooms}
+
+Could we arrange a viewing? Thank you!`
+      : `Hello, I am inquiring about booking this rental:
 ${property.title}
 Location: ${property.county || ""} - ${property.location || ""}
 Rent: KES ${property.price?.toLocaleString()}/month
@@ -874,8 +966,16 @@ Please contact me back with viewing details. Thank you!`;
 
         <div className="hero-compact-header">
           <div className="hero-compact-left">
-            <h1 className="hero-compact-title">AxxSpace Rentals</h1>
-            <p className="hero-compact-sub">Verified residential rentals across all 47 counties</p>
+            <h1 className="hero-compact-title">
+              {listingType === "sale" ? "Houses & Land for Sale" : listingType === "rent" ? "AxxSpace Rentals" : "AxxSpace Homes"}
+            </h1>
+            <p className="hero-compact-sub">
+              {listingType === "sale"
+                ? "Verified houses, plots and apartments for sale — direct from owners and agents"
+                : listingType === "rent"
+                  ? "Verified residential rentals across all 47 counties"
+                  : "Verified homes to rent or buy across all 47 counties"}
+            </p>
           </div>
 
           <div className="hero-compact-actions">
@@ -910,6 +1010,30 @@ Please contact me back with viewing details. Thank you!`;
         ═════════════════════════════════════════════════════════════ */}
         <div className="search-console-wrapper">
           <div className="search-console-card">
+            {/* Rent / Sale Mode Switch */}
+            <div className="listing-mode-bar">
+              <span className="listing-mode-label">I'm looking to</span>
+              <div className="listing-mode-switch" role="tablist" aria-label="Rent or buy">
+                {[
+                  { id: "all", label: "All Homes" },
+                  { id: "rent", label: "Rent" },
+                  { id: "sale", label: "Buy" },
+                ].map((mode) => (
+                  <button
+                    key={mode.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={listingType === mode.id}
+                    className={`listing-mode-btn ${listingType === mode.id ? "active" : ""}`}
+                    onClick={() => handleListingTypeChange(mode.id)}
+                  >
+                    {mode.label}
+                    {mode.id === "sale" && <span className="listing-mode-tag">For Sale</span>}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Primary Search Inputs Row */}
             <div className="search-inputs-grid">
               {/* Location Input */}
@@ -990,7 +1114,7 @@ Please contact me back with viewing details. Thank you!`;
 
               {/* Max Budget Dropdown */}
               <div className="search-segment">
-                <label className="segment-label">MAX MONTHLY RENT</label>
+                <label className="segment-label">{priceLabel}</label>
                 <div className="segment-input-wrap">
                   <span className="currency-prefix">KES</span>
                   <select
@@ -1005,12 +1129,9 @@ Please contact me back with viewing details. Thank you!`;
                     className="segment-select-input"
                   >
                     <option value="">Any Budget</option>
-                    <option value="10000">Up to KES 10,000</option>
-                    <option value="20000">Up to KES 20,000</option>
-                    <option value="35000">Up to KES 35,000</option>
-                    <option value="50000">Up to KES 50,000</option>
-                    <option value="80000">Up to KES 80,000</option>
-                    <option value="150000">Up to KES 150,000</option>
+                    {priceOptions.map((option) => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -1055,7 +1176,7 @@ Please contact me back with viewing details. Thank you!`;
                   onClick={() => { setQuickCategory("all"); setFilters((p) => ({ ...p, propertyType: "" })); }}
                 >
                   <IconBuilding size={14} />
-                  <span>All Rentals</span>
+                  <span>{listingType === "sale" ? "All For Sale" : "All Rentals"}</span>
                 </button>
                 <button
                   type="button"
@@ -1081,30 +1202,36 @@ Please contact me back with viewing details. Thank you!`;
                   <IconHome size={14} />
                   <span>Maisonettes</span>
                 </button>
-                <button
-                  type="button"
-                  className={`quick-chip ${quickCategory === "furnished" ? "active" : ""}`}
-                  onClick={() => setQuickCategory(quickCategory === "furnished" ? "all" : "furnished")}
-                >
-                  <IconSparkles size={14} />
-                  <span>Furnished</span>
-                </button>
-                <button
-                  type="button"
-                  className={`quick-chip ${quickCategory === "pet" ? "active" : ""}`}
-                  onClick={() => setQuickCategory(quickCategory === "pet" ? "all" : "pet")}
-                >
-                  <IconPaw size={14} />
-                  <span>Pet Friendly</span>
-                </button>
-                <button
-                  type="button"
-                  className={`quick-chip ${quickCategory === "budget" ? "active" : ""}`}
-                  onClick={() => setQuickCategory(quickCategory === "budget" ? "all" : "budget")}
-                >
-                  <IconTag size={14} />
-                  <span>Under KES 25K</span>
-                </button>
+                {listingType !== "sale" && (
+                  <button
+                    type="button"
+                    className={`quick-chip ${quickCategory === "furnished" ? "active" : ""}`}
+                    onClick={() => setQuickCategory(quickCategory === "furnished" ? "all" : "furnished")}
+                  >
+                    <IconSparkles size={14} />
+                    <span>Furnished</span>
+                  </button>
+                )}
+                {listingType !== "sale" && (
+                  <button
+                    type="button"
+                    className={`quick-chip ${quickCategory === "pet" ? "active" : ""}`}
+                    onClick={() => setQuickCategory(quickCategory === "pet" ? "all" : "pet")}
+                  >
+                    <IconPaw size={14} />
+                    <span>Pet Friendly</span>
+                  </button>
+                )}
+                {listingType !== "sale" && (
+                  <button
+                    type="button"
+                    className={`quick-chip ${quickCategory === "budget" ? "active" : ""}`}
+                    onClick={() => setQuickCategory(quickCategory === "budget" ? "all" : "budget")}
+                  >
+                    <IconTag size={14} />
+                    <span>Under KES 25K</span>
+                  </button>
+                )}
                 {favorites.length > 0 && (
                   <button
                     type="button"
@@ -1299,7 +1426,11 @@ Please contact me back with viewing details. Thank you!`;
             <div className="toolbar-left">
               <h2 className="results-headline">
                 <span className="results-bold-num">{displayProperties.length}</span>
-                <span>{displayProperties.length === 1 ? " Verified Home Found" : " Verified Homes Found"}</span>
+                <span>
+                  {listingType === "sale"
+                    ? displayProperties.length === 1 ? " Property For Sale" : " Properties For Sale"
+                    : displayProperties.length === 1 ? " Verified Home Found" : " Verified Homes Found"}
+                </span>
                 {filters.location && <span className="results-location-tag">in "{filters.location}"</span>}
               </h2>
             </div>
@@ -1641,9 +1772,13 @@ Please contact me back with viewing details. Thank you!`;
         {!showUniversityHostels && displayProperties.length === 0 && (
           <div className="empty-results-box">
             <div className="empty-icon-wrap"><IconSearch size={44} /></div>
-            <h3 className="empty-title">No Rentals Match Your Specific Search Criteria</h3>
+            <h3 className="empty-title">
+              {listingType === "sale" ? "No Properties For Sale Match Your Search" : "No Rentals Match Your Specific Search Criteria"}
+            </h3>
             <p className="empty-desc">
-              Try broadening your budget range, resetting bedroom filters, or submitting a custom housing request to have landlords contact you directly.
+              {listingType === "sale"
+                ? "Try widening the asking price range, clearing the bedroom filter, or switching to \"All Homes\" to see rentals as well."
+                : "Try broadening your budget range, resetting bedroom filters, or submitting a custom housing request to have landlords contact you directly."}
             </p>
             <div className="empty-actions-row">
               <button type="button" className="empty-reset-btn" onClick={resetAllFilters}>
@@ -1719,12 +1854,25 @@ Please contact me back with viewing details. Thank you!`;
 
                     <span className="spec-separator">|</span>
 
-                    <div className="spec-item" title="Furnishing">
+                    <div className="spec-item" title={isForSale(property) ? "Ownership" : "Furnishing"}>
                       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
-                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                        {isForSale(property) ? (
+                          <>
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                          </>
+                        ) : (
+                          <>
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                          </>
+                        )}
                       </svg>
-                      <span>{property.furnished ? "Furnished" : "Unfurnished"}</span>
+                      <span>
+                        {isForSale(property)
+                          ? OWNERSHIP_LABELS[property.ownershipType] || "Ownership on file"
+                          : property.furnished ? "Furnished" : "Unfurnished"}
+                      </span>
                     </div>
                   </div>
 
@@ -1746,7 +1894,9 @@ Please contact me back with viewing details. Thank you!`;
                   <div className="card-landlord-verify-line">
                     <IconShieldCheck size={14} className="verify-shield" />
                     <span className="verify-text">
-                      {property.assignedAgent ? "Listed by an Agent" : "Direct Landlord Listing"}
+                      {isForSale(property)
+                        ? `${property.ownershipType === "title_deed" ? "Title Deed Verified" : "Ownership Document on File"} · ${property.assignedAgent ? "Listed by an Agent" : "Direct Owner Listing"}`
+                        : property.assignedAgent ? "Listed by an Agent" : "Direct Landlord Listing"}
                     </span>
                   </div>
 
@@ -1757,7 +1907,9 @@ Please contact me back with viewing details. Thank you!`;
                         KES {property.price?.toLocaleString()}
                       </div>
                       <div className="card-rent-period">
-                        per month {property.deposit ? `· KES ${property.deposit.toLocaleString()} dep` : ""}
+                        {isForSale(property)
+                          ? `${property.priceNegotiable ? "asking price · negotiable" : "asking price"}${property.plotSize ? ` · ${property.plotSize}` : ""}`
+                          : `per month ${property.deposit ? `· KES ${property.deposit.toLocaleString()} dep` : ""}`}
                       </div>
                     </div>
 
@@ -1911,7 +2063,10 @@ Please contact me back with viewing details. Thank you!`;
               {/* Top Meta Info */}
               <div className="modal-headline-block">
                 <div>
-                  <div className="modal-category-tag">{selectedProperty.propertyType || "Rental"}</div>
+                  <div className="modal-category-tag">
+                    {selectedProperty.propertyType || "Rental"}
+                    {isForSale(selectedProperty) ? " · For Sale" : ""}
+                  </div>
                   <h2 className="modal-main-title">{selectedProperty.title}</h2>
                   <div className="modal-location-tags">
                     <span className="location-pin-chip">
@@ -1935,7 +2090,11 @@ Please contact me back with viewing details. Thank you!`;
 
                 <div className="modal-pricing-box">
                   <div className="modal-price-big">KES {selectedProperty.price?.toLocaleString()}</div>
-                  <div className="modal-price-term">per month</div>
+                  <div className="modal-price-term">
+                    {isForSale(selectedProperty)
+                      ? selectedProperty.priceNegotiable ? "asking price · negotiable" : "asking price"
+                      : "per month"}
+                  </div>
                 </div>
               </div>
 
@@ -1952,36 +2111,71 @@ Please contact me back with viewing details. Thank you!`;
                 </div>
                 <div className="spec-divider" />
                 <div className="spec-unit">
-                  <span className="spec-val" style={{ color: selectedProperty.availableUnits > 0 ? "#10b981" : "#ef4444" }}>
-                    {selectedProperty.availableUnits > 0 ? "Available" : "Occupied"}
+                  <span className="spec-val" style={{ color: isForSale(selectedProperty) || selectedProperty.availableUnits > 0 ? "#10b981" : "#ef4444" }}>
+                    {isForSale(selectedProperty)
+                      ? "For Sale"
+                      : selectedProperty.availableUnits > 0 ? "Available" : "Occupied"}
                   </span>
                   <span className="spec-name">Status</span>
                 </div>
                 <div className="spec-divider" />
                 <div className="spec-unit">
-                  <span className="spec-val">{selectedProperty.furnished ? "Yes" : "No"}</span>
-                  <span className="spec-name">Furnished</span>
+                  <span className="spec-val">
+                    {isForSale(selectedProperty)
+                      ? OWNERSHIP_LABELS[selectedProperty.ownershipType] || "On file"
+                      : selectedProperty.furnished ? "Yes" : "No"}
+                  </span>
+                  <span className="spec-name">{isForSale(selectedProperty) ? "Ownership" : "Furnished"}</span>
                 </div>
               </div>
 
-              {/* Deposit and Lease info */}
-              {(selectedProperty.deposit > 0 || selectedProperty.leaseType) && (
+              {/* Sale terms, or deposit and lease info for rentals */}
+              {isForSale(selectedProperty) ? (
                 <div className="modal-deposit-row">
-                  {selectedProperty.deposit > 0 && (
+                  <div className="deposit-info-pill">
+                    <span className="deposit-lbl">Payment Terms:</span>
+                    <span className="deposit-val">
+                      {SALE_TERM_LABELS[selectedProperty.saleTerms] || "Cash"}
+                    </span>
+                  </div>
+                  {selectedProperty.plotSize && (
                     <div className="deposit-info-pill">
-                      <span className="deposit-lbl">Security Deposit:</span>
-                      <span className="deposit-val">KES {selectedProperty.deposit?.toLocaleString()}</span>
+                      <span className="deposit-lbl">Plot / Built-up:</span>
+                      <span className="deposit-val">{selectedProperty.plotSize}</span>
                     </div>
                   )}
-                  {selectedProperty.leaseType && (
+                  {selectedProperty.yearBuilt && (
                     <div className="deposit-info-pill">
-                      <span className="deposit-lbl">Lease Term:</span>
-                      <span className="deposit-val">
-                        {leaseLabel[selectedProperty.leaseType] || selectedProperty.leaseType}
-                      </span>
+                      <span className="deposit-lbl">Year Built:</span>
+                      <span className="deposit-val">{selectedProperty.yearBuilt}</span>
+                    </div>
+                  )}
+                  {selectedProperty.priceNegotiable && (
+                    <div className="deposit-info-pill">
+                      <span className="deposit-lbl">Asking Price:</span>
+                      <span className="deposit-val">Negotiable</span>
                     </div>
                   )}
                 </div>
+              ) : (
+                (selectedProperty.deposit > 0 || selectedProperty.leaseType) && (
+                  <div className="modal-deposit-row">
+                    {selectedProperty.deposit > 0 && (
+                      <div className="deposit-info-pill">
+                        <span className="deposit-lbl">Security Deposit:</span>
+                        <span className="deposit-val">KES {selectedProperty.deposit?.toLocaleString()}</span>
+                      </div>
+                    )}
+                    {selectedProperty.leaseType && (
+                      <div className="deposit-info-pill">
+                        <span className="deposit-lbl">Lease Term:</span>
+                        <span className="deposit-val">
+                          {leaseLabel[selectedProperty.leaseType] || selectedProperty.leaseType}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )
               )}
 
               {/* Description */}
@@ -2009,19 +2203,23 @@ Please contact me back with viewing details. Thank you!`;
               {/* House Rules */}
               {selectedProperty.rules && (
                 <div className="modal-rules-box">
-                  <h4 className="modal-rules-title">House Policies & Guidelines</h4>
+                  <h4 className="modal-rules-title">
+                    {isForSale(selectedProperty) ? "Viewing Notes" : "House Policies & Guidelines"}
+                  </h4>
                   <p className="modal-rules-text">{selectedProperty.rules}</p>
                 </div>
               )}
 
               {/* Landlord Contact & Direct Actions */}
-              {selectedProperty.availableUnits > 0 ? (
+              {isForSale(selectedProperty) || selectedProperty.availableUnits > 0 ? (
                 <div className="landlord-connect-card">
                   <div className="landlord-card-header">
                     <div>
-                      <span className="landlord-role-tag">LISTING CONTACT</span>
+                      <span className="landlord-role-tag">
+                        {isForSale(selectedProperty) ? "SELLER CONTACT" : "LISTING CONTACT"}
+                      </span>
                       <h4 className="landlord-person-name">
-                        {selectedProperty.owner?.name || "Verified Landlord"}
+                        {selectedProperty.owner?.name || (isForSale(selectedProperty) ? "Verified Owner" : "Verified Landlord")}
                       </h4>
                       <p className="landlord-phone-num">
                         {selectedProperty.owner?.phone || selectedProperty.phone || "Direct Phone Listed"}
@@ -2048,7 +2246,7 @@ Please contact me back with viewing details. Thank you!`;
                       className="cta-btn cta-whatsapp"
                       onClick={() => handleContactLandlord(selectedProperty)}
                     >
-                      <span>WhatsApp Landlord</span>
+                      <span>{isForSale(selectedProperty) ? "WhatsApp Owner" : "WhatsApp Landlord"}</span>
                     </button>
 
                     <button
@@ -2066,7 +2264,7 @@ Please contact me back with viewing details. Thank you!`;
                       className="cta-btn cta-sms"
                       onClick={() => handleSendSMS(selectedProperty)}
                     >
-                      <span>Send SMS</span>
+                      <span>{isForSale(selectedProperty) ? "Request Viewing by SMS" : "Send SMS"}</span>
                     </button>
                   </div>
                 </div>
@@ -4449,6 +4647,68 @@ const css = `
     border-radius: var(--radius-sm);
     font-size: 0.88rem;
     margin-bottom: 16px;
+  }
+
+  /* ── RENT / SALE MODE SWITCH ── */
+  .listing-mode-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 0 4px 14px;
+  }
+  .listing-mode-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted, #64748b);
+  }
+  .listing-mode-switch {
+    display: inline-flex;
+    padding: 4px;
+    gap: 4px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.06);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+  }
+  .listing-mode-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: #475569;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+  }
+  .listing-mode-btn:hover {
+    color: #0f172a;
+  }
+  .listing-mode-btn.active {
+    background: #0f172a;
+    color: #ffffff;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.25);
+  }
+  .listing-mode-tag {
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: rgba(227, 27, 27, 0.1);
+    color: #e31b1b;
+  }
+  .listing-mode-btn.active .listing-mode-tag {
+    background: rgba(255, 255, 255, 0.16);
+    color: #ffffff;
   }
 
   /* ── 10. ANIMATIONS ── */

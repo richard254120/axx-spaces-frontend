@@ -13,6 +13,8 @@ export default function AdminDashboard() {
   const [propertiesList, setPropertiesList] = useState([]);
   const [propertiesLoading, setPropertiesLoading] = useState(false);
   const [propertyFilter, setPropertyFilter] = useState("pending");
+    // "all" | "rent" | "sale" — sale listings arrive pending and need ownership review
+    const [propertyListingType, setPropertyListingType] = useState("all");
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [selectedPropertyForQR, setSelectedPropertyForQR] = useState(null);
   const [imageModalOpen, setImageModalOpen] = useState(false);
@@ -175,7 +177,7 @@ export default function AdminDashboard() {
     if (activeTab === "properties") {
       fetchProperties();
     }
-  }, [activeTab, propertyFilter]);
+  }, [activeTab, propertyFilter, propertyListingType]);
 
   const fetchProperties = async () => {
     setPropertiesLoading(true);
@@ -190,7 +192,13 @@ export default function AdminDashboard() {
       } else {
         res = await API.get("/admin/all", { params: { type: "properties" } });
       }
-      setPropertiesList(res.data || []);
+      setPropertiesList(
+        (res.data || []).filter((item) => {
+          if (propertyListingType === "all") return true;
+          const mode = item.listingType === "sale" ? "sale" : "rent";
+          return mode === propertyListingType;
+        })
+      );
     } catch (err) {
       console.error("Failed to load properties:", err);
     } finally {
@@ -887,8 +895,28 @@ export default function AdminDashboard() {
         <div style={{ display: "flex", flexDirection: "column", gap: "20px", width: "100%" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
             <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Properties Directory</h2>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <span style={{ fontSize: "14px", color: "#94a3b8", fontWeight: 600 }}>Filter by Status:</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+              <span style={{ fontSize: "14px", color: "#94a3b8", fontWeight: 600 }}>Type:</span>
+              <select
+                value={propertyListingType}
+                onChange={(e) => setPropertyListingType(e.target.value)}
+                style={{
+                  padding: "8px 12px",
+                  backgroundColor: "#0f172a",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: "8px",
+                  color: "#fff",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  outline: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <option value="all">Rent &amp; Sale</option>
+                <option value="rent">Rentals only</option>
+                <option value="sale">For Sale only</option>
+              </select>
+              <span style={{ fontSize: "14px", color: "#94a3b8", fontWeight: 600 }}>Status:</span>
               <select
                 value={propertyFilter}
                 onChange={(e) => setPropertyFilter(e.target.value)}
@@ -916,7 +944,7 @@ export default function AdminDashboard() {
             <div style={styles.loader}>Syncing with database...</div>
           ) : propertiesList.length === 0 ? (
             <div style={styles.emptyCard}>
-              <p style={styles.emptyText}>No properties found matching "{propertyFilter}" status.</p>
+              <p style={styles.emptyText}>No properties found matching "{propertyFilter}" status{propertyListingType === "all" ? "" : propertyListingType === "sale" ? " for sale" : " for rent"}.</p>
             </div>
           ) : (
             <div style={styles.tableContainer}>
@@ -978,7 +1006,20 @@ export default function AdminDashboard() {
                           }}>
                             {item.status.toUpperCase()}
                           </span>
-                          {(() => {
+                          {item.listingType === "sale" ? (
+                            <span style={{
+                              fontSize: "11px",
+                              padding: "2px 8px",
+                              borderRadius: "4px",
+                              fontWeight: 700,
+                              background: "rgba(239,68,68,0.12)",
+                              color: "#f87171",
+                              border: "1px solid rgba(239,68,68,0.3)",
+                              letterSpacing: "0.4px",
+                            }}>
+                              FOR SALE
+                            </span>
+                          ) : (() => {
                             const available = Math.max(0, (item.totalUnits || 1) - (item.bookedUnits || 0));
                             const isFullyBooked = available === 0;
                             return (
@@ -995,6 +1036,33 @@ export default function AdminDashboard() {
                               </span>
                             );
                           })()}
+                          {item.listingType === "sale" && item.listingAuthorization?.proofUrl && (
+                            <a
+                              href={item.listingAuthorization.proofUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{
+                                fontSize: "11px",
+                                padding: "2px 8px",
+                                borderRadius: "4px",
+                                fontWeight: 700,
+                                background: "rgba(59,130,246,0.12)",
+                                color: "#60a5fa",
+                                border: "1px solid rgba(59,130,246,0.3)",
+                                textDecoration: "none",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "4px",
+                              }}
+                              title="Open the ownership document submitted by the owner"
+                            >
+                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                              </svg>
+                              Verify Ownership Doc
+                            </a>
+                          )}
                         </div>
                       </td>
                       <td style={styles.td}>
@@ -1003,6 +1071,11 @@ export default function AdminDashboard() {
                       </td>
                       <td style={styles.td}>
                         <span style={styles.priceBadge}>{item.price?.toLocaleString()}</span>
+                        {item.listingType === "sale" && (
+                          <div style={{ fontSize: "11px", color: "#94a3b8", marginTop: "4px", fontWeight: 600 }}>
+                            Asking price{item.priceNegotiable ? " · negotiable" : ""}
+                          </div>
+                        )}
                       </td>
                       <td style={styles.td}>
                         <div style={styles.btnGroup}>
