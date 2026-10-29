@@ -5,6 +5,7 @@ import { UserProfileEditor, ProfileAvatar } from "../features/profile";
 import BoostNotification from "../components/BoostNotification";
 import AnalyticsDashboard from "../components/AnalyticsDashboard";
 import QuickBoostModal from "../components/QuickBoostModal";
+import { canPublishQuickSales } from "../utils/quicksalesPermissions";
 
 import { getDashboardPath } from "../utils/dashboardRoutes";
 
@@ -113,6 +114,7 @@ export default function QuickSalesDashboard() {
   // Local profile state so the Profile editor can reflect saved changes immediately
   const [profile, setProfile] = useState(null);
   const seller = profile || session.user;
+  const canPublish = canPublishQuickSales(seller);
 
   // Session guard: redirect unauthenticated users
   useEffect(() => {
@@ -292,7 +294,7 @@ export default function QuickSalesDashboard() {
       <nav style={s.tabs} aria-label="Seller dashboard">
         {[
           { id: "listings", label: "My Stock", icon: <path d="M3 7h18v14H3zM3 7l9-4 9 4M9 11h6" /> },
-          { id: "upload", label: "Upload Material", icon: <path d="M12 5v14M5 12h14" /> },
+          ...(canPublish ? [{ id: "upload", label: "Upload Material", icon: <path d="M12 5v14M5 12h14" /> }] : []),
           { id: "profile", label: "Profile & Analytics", icon: <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" /> },
         ].map((t) => (
           <button
@@ -342,12 +344,14 @@ export default function QuickSalesDashboard() {
       {/* CONTROLS (Only visible in listings view) */}
       {view === "listings" && (
         <div style={s.controlsRow}>
-          <button className="qs-upload-btn" style={s.uploadBtn} onClick={() => { resetForm(); setView("upload"); }}>
-            <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-            Upload New Material
-          </button>
+          {canPublish && (
+            <button className="qs-upload-btn" style={s.uploadBtn} onClick={() => { resetForm(); setView("upload"); }}>
+              <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Upload New Material
+            </button>
+          )}
           <div style={s.filterGroup}>
             <input
               type="text"
@@ -412,7 +416,7 @@ export default function QuickSalesDashboard() {
                 ? "Upload your first item and start selling on Axxspace."
                 : "Try a different keyword or status filter."}
             </p>
-            {materials.length === 0 && (
+            {materials.length === 0 && canPublish && (
               <button className="qs-upload-btn" style={s.uploadBtn} onClick={() => { resetForm(); setView("upload"); }}>
                 Upload your first material
               </button>
@@ -475,6 +479,28 @@ export default function QuickSalesDashboard() {
             })}
           </div>
         )
+      ) : !canPublish ? (
+        /* ============ MEMBERSHIP GATE ============ */
+        <section style={s.sectionBox}>
+          <div style={s.sectionHeader}>
+            <div>
+              <h2 style={s.sectionTitle}>AXXSpace Membership Required</h2>
+              <p style={s.sectionSub}>Only AXXSpace members and registered sellers can publish items on QuickSales.</p>
+            </div>
+          </div>
+          <p style={{ color: "#94a3b8", lineHeight: 1.6, marginBottom: "24px" }}>
+            Your current account ({seller?.role || "guest"}) cannot publish items. Become an AXXSpace member or register a seller account to start
+            listing your items.
+          </p>
+          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+            <a href="/register" style={{ ...s.uploadBtn, textDecoration: "none" }}>
+              Become a Member
+            </a>
+            <a href="/quicksales-login" style={{ ...s.cancelEditBtn, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>
+              Register as Seller
+            </a>
+          </div>
+        </section>
       ) : (
         /* ============ UPLOAD FORM ============ */
         <section style={s.sectionBox}>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { canPublishQuickSales } from "../utils/quicksalesPermissions";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -55,13 +56,12 @@ export default function QuickSalePostModal({ isOpen, onClose, onItemCreated }) {
     sellerName: "",
   });
 
-  // Prefill phone and name from logged in user if available
+  // Prefill only the location from the logged in user. Phone and seller name
+  // are always typed by the seller so no personal details auto-appear.
   useEffect(() => {
     if (user) {
       setForm((prev) => ({
         ...prev,
-        sellerPhone: prev.sellerPhone || user.phone || "",
-        sellerName: prev.sellerName || user.name || user.username || "",
         county: prev.county || user.county || "Nairobi City",
         location: prev.location || user.location || "",
       }));
@@ -104,6 +104,11 @@ export default function QuickSalePostModal({ isOpen, onClose, onItemCreated }) {
 
     if (!token) {
       setError("Please log in to post an item for sale.");
+      return;
+    }
+
+    if (!canPublishQuickSales(user)) {
+      setError("Only AXXSpace members and registered sellers can publish items.");
       return;
     }
 
@@ -200,9 +205,9 @@ export default function QuickSalePostModal({ isOpen, onClose, onItemCreated }) {
         {!token ? (
           <div style={styles.authNotice}>
             <div style={styles.authIcon}>🔒</div>
-            <h3 style={styles.authTitle}>Login Required to Post</h3>
+            <h3 style={styles.authTitle}>Membership Required to Post</h3>
             <p style={styles.authText}>
-              Any user, student, member, or landlord can post items for free. Please log in or create an account to start selling.
+              Only AXXSpace members and registered seller accounts can publish items. Log in with your membership, or register a seller account to start selling.
             </p>
             <div style={styles.authBtns}>
               <a
@@ -211,11 +216,25 @@ export default function QuickSalePostModal({ isOpen, onClose, onItemCreated }) {
               >
                 Log In
               </a>
-              <a
-                href={`/user-login?signup=true&redirect=${encodeURIComponent(window.location.pathname)}`}
-                style={styles.authRegisterBtn}
-              >
-                Create Free Account
+              <a href="/quicksales-login" style={styles.authRegisterBtn}>
+                Register as Seller
+              </a>
+            </div>
+          </div>
+        ) : !canPublishQuickSales(user) ? (
+          <div style={styles.authNotice}>
+            <div style={styles.authIcon}>🎫</div>
+            <h3 style={styles.authTitle}>AXXSpace Membership Required</h3>
+            <p style={styles.authText}>
+              Your current account ({user?.role || "guest"}) is not a seller account. To publish items on QuickSales, upgrade to an AXXSpace
+              membership or register a free seller account.
+            </p>
+            <div style={styles.authBtns}>
+              <a href="/register" style={styles.authLoginBtn}>
+                Become a Member
+              </a>
+              <a href="/quicksales-login" style={styles.authRegisterBtn}>
+                Register as Seller
               </a>
             </div>
           </div>
