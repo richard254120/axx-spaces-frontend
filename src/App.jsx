@@ -1,6 +1,5 @@
 // App.jsx
 import { Routes, Route, useNavigate, Navigate, useParams, useSearchParams } from "react-router-dom";
-import { useEffect } from "react";
 import { useDevToolsProtection } from "./hooks/useDevToolsProtection";
 
 import Navbar from "./components/Navbar";
@@ -124,18 +123,6 @@ function LegacyRedirect({ to }) {
 function App() {
   const navigate = useNavigate();
   useDevToolsProtection();
-
-  // Reset helper for testing (call from browser console: window.resetSplash())
-  useEffect(() => {
-    window.resetSplash = () => {
-      try {
-        sessionStorage.removeItem("axx_splash_seen");
-      } catch {
-        // ignore
-      }
-      window.location.reload();
-    };
-  }, []);
 
   return (
     <Routes>

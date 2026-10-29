@@ -1,6 +1,5 @@
 import { createContext, useState, useEffect, useContext, useCallback } from "react";
 import { clearSellerSession } from "../utils/dashboardRoutes";
-import SplashScreen from "../components/SplashScreen";
 
 const defaultAuth = {
   user: null,
@@ -14,87 +13,63 @@ const defaultAuth = {
 
 export const AuthContext = createContext(defaultAuth);
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
-  const [isAuthReady, setIsAuthReady] = useState(false);
-  const [showSplash, setShowSplash] = useState(() => {
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get("splash") === "true") return true;
-      // If already seen in this session (e.g. user refreshed the page), skip animation
-      return !sessionStorage.getItem("axx_splash_seen");
-    } catch {
-      return false;
+const readStoredSession = () => {
+  try {
+    const token = localStorage.getItem("token");
+    const rawUser = localStorage.getItem("user");
+    if (token && rawUser) {
+      return { token, user: JSON.parse(rawUser) };
     }
-  });
-
-  const handleSplashComplete = useCallback(() => {
+  } catch {
+    // Corrupted session data — drop it and start fresh.
     try {
-      sessionStorage.setItem("axx_splash_seen", "true");
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
     } catch {
       // ignore
     }
-    setShowSplash(false);
-  }, []);
+  }
+  return { token: null, user: null };
+};
 
-  useEffect(() => {
-    window.resetSplash = () => {
-      try {
-        sessionStorage.removeItem("axx_splash_seen");
-      } catch {
-        // ignore
-      }
-      window.location.reload();
-    };
-  }, []);
+export const AuthProvider = ({ children }) => {
+  // Restore the saved session on the very first render so the site paints
+  // immediately — no splash animation and no blocking network round-trip.
+  const [initialSession] = useState(readStoredSession);
+  const [user, setUser] = useState(initialSession.user);
+  const [token, setToken] = useState(initialSession.token);
 
+  // Guests get a session in the background; the UI never waits for it.
   useEffect(() => {
+    if (initialSession.token) return undefined;
     let isMounted = true;
-    const initAuth = async () => {
-      try {
-        const savedToken = localStorage.getItem("token");
-        const savedUser = localStorage.getItem("user");
 
-        if (savedToken && savedUser) {
-          if (isMounted) {
-            setToken(savedToken);
-            setUser(JSON.parse(savedUser));
-          }
-        } else {
-          // Invisible Guest Auto-Login
-          const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
-          const res = await fetch(`${API_BASE}/auth/guest-signin`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({}),
-          });
-          if (res.ok) {
-            const data = await res.json();
-            if (isMounted) {
-              setToken(data.token);
-              setUser(data.user);
-            }
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("user", JSON.stringify(data.user));
-          }
-        }
+    const createGuestSession = async () => {
+      try {
+        const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
+        const res = await fetch(`${API_BASE}/auth/guest-signin`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({}),
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!isMounted || !data?.token || !data?.user) return;
+        setToken(data.token);
+        setUser(data.user);
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
       } catch (err) {
-        console.error("Auth init/restore error:", err);
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-      } finally {
-        if (isMounted) {
-          setIsAuthReady(true);
-        }
+        console.error("Guest sign-in error:", err);
       }
     };
-    initAuth();
+
+    createGuestSession();
 
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [initialSession.token]);
 
   const login = useCallback((newToken, userData) => {
     if (!newToken || !userData) {
@@ -136,19 +111,13 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider value={{
       user,
       token,
-      loading: !isAuthReady,
+      loading: false,
       login,
       logout,
       updateUser,
       isAuthenticated: !!token,
     }}>
-      {isAuthReady && children}
-      {showSplash && (
-        <SplashScreen
-          isReady={isAuthReady}
-          onComplete={handleSplashComplete}
-        />
-      )}
+      {children}
     </AuthContext.Provider>
   );
 };
