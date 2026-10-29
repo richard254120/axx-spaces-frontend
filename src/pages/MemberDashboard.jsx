@@ -150,6 +150,33 @@ const IconPackage = ({ size = 18, color = "currentColor", style }) => (
   </svg>
 );
 
+const IconEye = ({ size = 14, color = "currentColor", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+const IconTag = ({ size = 18, color = "currentColor", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <path d="M20.59 13.41 13.42 20.6a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+    <line x1="7" y1="7" x2="7.01" y2="7" />
+  </svg>
+);
+
+const IconTrash = ({ size = 13, color = "currentColor", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <polyline points="3 6 5 6 21 6" />
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+  </svg>
+);
+
+const IconCheck = ({ size = 13, color = "currentColor", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+
 const styles = {
   page: {
     minHeight: "100vh",
@@ -409,6 +436,169 @@ const styles = {
     fontSize: "12.5px",
     fontWeight: 700,
     cursor: "pointer",
+  },
+  // ── QuickSales listings (Explorer account) ──
+  listingGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+    gap: "18px",
+  },
+  listingCard: {
+    background: "rgba(30, 41, 59, 0.7)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderRadius: "14px",
+    overflow: "hidden",
+    display: "flex",
+    flexDirection: "column",
+  },
+  listingMedia: {
+    position: "relative",
+    height: "150px",
+    background: "rgba(255, 255, 255, 0.04)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#475569",
+  },
+  listingImg: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+  },
+  listingStatus: {
+    position: "absolute",
+    top: "10px",
+    left: "10px",
+    padding: "4px 9px",
+    borderRadius: "999px",
+    fontSize: "10.5px",
+    fontWeight: 800,
+    letterSpacing: "0.4px",
+    textTransform: "uppercase",
+    backdropFilter: "blur(6px)",
+  },
+  listingLiveDot: {
+    position: "absolute",
+    top: "12px",
+    right: "12px",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    padding: "4px 9px",
+    borderRadius: "999px",
+    background: "rgba(2, 6, 23, 0.75)",
+    color: "#4ade80",
+    fontSize: "11px",
+    fontWeight: 800,
+    backdropFilter: "blur(6px)",
+  },
+  listingPulse: {
+    width: "7px",
+    height: "7px",
+    borderRadius: "50%",
+    background: "#4ade80",
+    animation: "axxLivePulse 1.6s ease-in-out infinite",
+  },
+  listingBody: {
+    padding: "14px 16px 16px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+    flex: 1,
+  },
+  listingMeta: {
+    fontSize: "12px",
+    color: "#94a3b8",
+  },
+  listingMetrics: {
+    display: "flex",
+    alignItems: "center",
+    gap: "14px",
+    padding: "8px 10px",
+    borderRadius: "10px",
+    background: "rgba(56, 189, 248, 0.08)",
+    border: "1px solid rgba(56, 189, 248, 0.16)",
+    fontSize: "12px",
+    fontWeight: 700,
+    color: "#7dd3fc",
+  },
+  listingActions: {
+    display: "flex",
+    gap: "8px",
+    marginTop: "auto",
+    flexWrap: "wrap",
+  },
+  listingBtn: {
+    flex: 1,
+    minWidth: "86px",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "6px",
+    padding: "9px 12px",
+    borderRadius: "9px",
+    fontSize: "12.5px",
+    fontWeight: 700,
+    border: "1px solid rgba(255, 255, 255, 0.14)",
+    background: "rgba(255, 255, 255, 0.06)",
+    color: "#e2e8f0",
+    cursor: "pointer",
+    textDecoration: "none",
+  },
+  listingSoldBtn: {
+    flex: 1,
+    minWidth: "86px",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "6px",
+    padding: "9px 12px",
+    borderRadius: "9px",
+    fontSize: "12.5px",
+    fontWeight: 800,
+    border: "1px solid rgba(34, 197, 94, 0.3)",
+    background: "rgba(34, 197, 94, 0.12)",
+    color: "#4ade80",
+    cursor: "pointer",
+  },
+  listingDeleteBtn: {
+    flex: 1,
+    minWidth: "86px",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "6px",
+    padding: "9px 12px",
+    borderRadius: "9px",
+    fontSize: "12.5px",
+    fontWeight: 800,
+    border: "1px solid rgba(239, 68, 68, 0.28)",
+    background: "rgba(239, 68, 68, 0.1)",
+    color: "#f87171",
+    cursor: "pointer",
+  },
+  listingChips: {
+    display: "flex",
+    gap: "10px",
+    flexWrap: "wrap",
+    marginBottom: "18px",
+  },
+  listingChip: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "9px 14px",
+    borderRadius: "12px",
+    background: "rgba(255, 255, 255, 0.04)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    fontSize: "12.5px",
+    color: "#94a3b8",
+    fontWeight: 600,
+  },
+  listingChipValue: {
+    fontSize: "16px",
+    fontWeight: 800,
+    color: "#ffffff",
   },
   statusBadge: (status) => {
     const s = (status || "pending").toLowerCase();
@@ -731,19 +921,48 @@ export default function MemberDashboard() {
     }
   }, [token]);
 
+  // ── QuickSales listings owned by this account ──
+  const [myListings, setMyListings] = useState([]);
+  const [listingsLoading, setListingsLoading] = useState(true);
+  const [listingBusyId, setListingBusyId] = useState("");
+  const [listingNotice, setListingNotice] = useState("");
+
+  const loadMyListings = useCallback(async () => {
+    if (!token) return;
+    try {
+      // Cache-buster keeps the view counters fresh on every poll.
+      const res = await fetch(`${API_BASE}/materials/seller/my-materials?_cb=${Date.now()}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setMyListings(Array.isArray(data) ? data : []);
+      }
+    } catch (err) {
+      console.error("Load QuickSales listings error:", err);
+    } finally {
+      setListingsLoading(false);
+    }
+  }, [token]);
+
   useEffect(() => {
     if (!token) {
       navigate("/user-login");
       return;
     }
     loadActivities();
+    loadMyListings();
 
-    // Auto-refresh activities every 20 seconds for real-time responsiveness
+    // Auto-refresh activities + listing view counters every 20 seconds
     const timer = setInterval(() => {
       loadActivities();
+      loadMyListings();
     }, 20000);
 
-    const onFocus = () => loadActivities();
+    const onFocus = () => {
+      loadActivities();
+      loadMyListings();
+    };
     window.addEventListener("focus", onFocus);
     window.addEventListener("storage", onFocus);
 
@@ -752,7 +971,7 @@ export default function MemberDashboard() {
       window.removeEventListener("focus", onFocus);
       window.removeEventListener("storage", onFocus);
     };
-  }, [token, loadActivities, navigate]);
+  }, [token, loadActivities, loadMyListings, navigate]);
 
   useEffect(() => {
     if (user) {
@@ -773,6 +992,69 @@ export default function MemberDashboard() {
       }
     } catch (err) {
       console.error("Remove favorite error:", err);
+    }
+  };
+
+  // ── QuickSales: status labels for items this account owns ──
+  const listingStatusOf = (material) => {
+    const raw = material?.status || "pending";
+    if (raw === "approved") return "active";
+    if (raw === "rejected") return "archived";
+    return raw;
+  };
+
+  const listingStatusStyle = {
+    active: { label: "Live", bg: "rgba(34, 197, 94, 0.92)", color: "#04120a" },
+    pending: { label: "Pending", bg: "rgba(251, 191, 36, 0.92)", color: "#1c1300" },
+    sold: { label: "Sold", bg: "rgba(148, 163, 184, 0.92)", color: "#0b1120" },
+    archived: { label: "Removed", bg: "rgba(239, 68, 68, 0.92)", color: "#1a0505" },
+  };
+
+  const handleMarkListingSold = async (id) => {
+    if (!window.confirm("Mark this item as sold? It will be hidden from buyers.")) return;
+    setListingBusyId(id);
+    setListingNotice("");
+    try {
+      const res = await fetch(`${API_BASE}/materials/${id}/sold`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        setMyListings((prev) => prev.map((m) => (m._id === id ? { ...m, status: "sold" } : m)));
+        setListingNotice("Item marked as sold. You can delete it now that it's done.");
+      } else {
+        setListingNotice("Could not mark that item as sold. Please try again.");
+      }
+    } catch (err) {
+      console.error("Mark listing sold error:", err);
+      setListingNotice("Network error — please try again.");
+    } finally {
+      setListingBusyId("");
+    }
+  };
+
+  const handleDeleteListing = async (id) => {
+    const item = myListings.find((m) => m._id === id);
+    const label = item?.title ? `"${item.title}"` : "this item";
+    if (!window.confirm(`Delete ${label} permanently? Buyers will no longer see it.`)) return;
+    setListingBusyId(id);
+    setListingNotice("");
+    try {
+      const res = await fetch(`${API_BASE}/materials/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        setMyListings((prev) => prev.filter((m) => m._id !== id));
+        setListingNotice("Listing deleted.");
+      } else {
+        setListingNotice("Could not delete that listing. Please try again.");
+      }
+    } catch (err) {
+      console.error("Delete listing error:", err);
+      setListingNotice("Network error — please try again.");
+    } finally {
+      setListingBusyId("");
     }
   };
 
@@ -845,18 +1127,23 @@ export default function MemberDashboard() {
   };
 
   const totalBookingsCount = (bookings.accommodations?.length || 0) + (bookings.services?.length || 0);
-  const totalActivities = favorites.length + enquiries.length + totalBookingsCount + itemRequests.length;
+  const totalActivities = favorites.length + enquiries.length + totalBookingsCount + itemRequests.length + myListings.length;
   const accountType = user?.role === "member" ? "Axxspace Member" : "Community Explorer";
   const memberSince = user?.createdAt
     ? new Date(user.createdAt).toLocaleDateString("en-KE", { month: "long", year: "numeric" })
     : "Not available";
 
   // Share of this member's own activity, used for the performance snapshot
+  const liveListingCount = myListings.filter((m) => listingStatusOf(m) === "active").length;
+  const soldListingCount = myListings.filter((m) => listingStatusOf(m) === "sold").length;
+  const totalListingViews = myListings.reduce((sum, m) => sum + (m.views || 0), 0);
+
   const performanceRows = [
     { label: "Saved spaces", value: favorites.length, color: "#f43f5e" },
     { label: "Bookings & stays", value: totalBookingsCount, color: "#fbbf24" },
     { label: "Enquiries sent", value: enquiries.length, color: "#c084fc" },
     { label: "Service requests", value: itemRequests.length, color: "#38bdf8" },
+    { label: `QuickSales listings · ${totalListingViews.toLocaleString()} views`, value: myListings.length, color: "#34d399" },
   ].map((row) => ({
     ...row,
     percent: totalActivities ? Math.round((row.value / totalActivities) * 100) : 0,
@@ -878,7 +1165,7 @@ export default function MemberDashboard() {
               </div>
               <p style={styles.email}>{user?.email}</p>
               <p style={styles.subtext}>
-                Member Hub · Explore, save, inquire, and track all your website activities
+                Member Hub · Explore, save, inquire, sell and track every activity in one place
               </p>
             </div>
           </div>
@@ -972,6 +1259,20 @@ export default function MemberDashboard() {
             <div style={styles.statLabel}>Service Requests</div>
             <div style={styles.statSub}>Items &amp; services you requested</div>
           </div>
+
+          <div
+            style={{ ...styles.statCard, ...(activeTab === "listings" ? styles.statCardActive : {}) }}
+            onClick={() => handleTabChange("listings")}
+          >
+            <div style={{ ...styles.statIconWrap, background: "rgba(52, 211, 153, 0.12)", color: "#34d399" }}>
+              <IconTag size={20} />
+            </div>
+            <div style={styles.statNumber}>{myListings.length}</div>
+            <div style={styles.statLabel}>QuickSales Items</div>
+            <div style={styles.statSub}>
+              {totalListingViews.toLocaleString()} views · {liveListingCount} live
+            </div>
+          </div>
         </div>
 
         {/* NAVIGATION TABS */}
@@ -1015,6 +1316,14 @@ export default function MemberDashboard() {
           >
             <IconPackage size={16} />
             <span>Service Requests ({itemRequests.length})</span>
+          </button>
+          <button
+            type="button"
+            style={{ ...styles.tabBtn, ...(activeTab === "listings" ? styles.tabBtnActive : {}) }}
+            onClick={() => handleTabChange("listings")}
+          >
+            <IconTag size={16} />
+            <span>My QuickSales ({myListings.length})</span>
           </button>
           <button
             type="button"
@@ -1135,7 +1444,7 @@ export default function MemberDashboard() {
 
             {loading ? (
               <p style={{ color: "#94a3b8", padding: "20px 0" }}>Loading your activity feed...</p>
-            ) : favorites.length === 0 && enquiries.length === 0 && totalBookingsCount === 0 && itemRequests.length === 0 ? (
+            ) : favorites.length === 0 && enquiries.length === 0 && totalBookingsCount === 0 && itemRequests.length === 0 && myListings.length === 0 ? (
               <div style={styles.emptyBox}>
                 <div style={{ display: "flex", justifyContent: "center", marginBottom: "12px", color: "#64748b" }}>
                   <IconCompass size={40} />
@@ -1158,6 +1467,70 @@ export default function MemberDashboard() {
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                {/* QuickSales listing events — live views + sold/delete controls */}
+                {myListings.map((item) => {
+                  const status = listingStatusOf(item);
+                  const badge = listingStatusStyle[status] || listingStatusStyle.pending;
+                  const busy = listingBusyId === item._id;
+                  return (
+                    <div key={`listing-${item._id}`} style={styles.timelineItem}>
+                      <div style={{ ...styles.timelineDot, background: "rgba(52, 211, 153, 0.12)", color: "#34d399", borderColor: "rgba(52, 211, 153, 0.3)" }}>
+                        <IconTag size={16} />
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "6px" }}>
+                          <span style={{ fontWeight: 700, color: "#ffffff", fontSize: "14.5px" }}>
+                            Listed {item.title || "an item"} on QuickSales
+                          </span>
+                          <span
+                            style={{
+                              padding: "4px 10px",
+                              borderRadius: "999px",
+                              fontSize: "10.5px",
+                              fontWeight: 800,
+                              letterSpacing: "0.4px",
+                              textTransform: "uppercase",
+                              background: badge.bg,
+                              color: badge.color,
+                            }}
+                          >
+                            {badge.label}
+                          </span>
+                        </div>
+                        <p style={{ margin: "4px 0 0 0", color: "#94a3b8", fontSize: "13px" }}>
+                          KES {Number(item.price || 0).toLocaleString()} · {item.views || 0} views · Posted {formatTimeAgo(item.createdAt)}
+                        </p>
+                        <div style={{ display: "flex", gap: "8px", marginTop: "8px", flexWrap: "wrap" }}>
+                          <Link
+                            to={`/quicksales/${item._id}`}
+                            style={{ ...styles.listingBtn, flex: "0 0 auto", minWidth: "auto", padding: "6px 12px" }}
+                          >
+                            View listing
+                          </Link>
+                          {status === "active" && (
+                            <button
+                              type="button"
+                              disabled={busy}
+                              onClick={() => handleMarkListingSold(item._id)}
+                              style={{ ...styles.listingSoldBtn, flex: "0 0 auto", minWidth: "auto", padding: "6px 12px" }}
+                            >
+                              <IconCheck size={12} /> Mark sold
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            disabled={busy}
+                            onClick={() => handleDeleteListing(item._id)}
+                            style={{ ...styles.listingDeleteBtn, flex: "0 0 auto", minWidth: "auto", padding: "6px 12px" }}
+                          >
+                            <IconTrash size={12} /> {busy ? "Working…" : "Delete"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+
                 {/* Bookings events */}
                 {bookings.accommodations?.map((b) => (
                   <div key={b._id} style={styles.timelineItem}>
@@ -1528,6 +1901,164 @@ export default function MemberDashboard() {
                     <span style={styles.statusBadge(req.status)}>{req.status || "pending"}</span>
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAB: MY QUICKSALES LISTINGS — live views + sold/delete controls */}
+        {activeTab === "listings" && (
+          <div style={styles.section}>
+            <style>{`@keyframes axxLivePulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.78); } }`}</style>
+            <div style={styles.sectionHeader}>
+              <div>
+                <h2 style={styles.sectionTitle}>My QuickSales Listings ({myListings.length})</h2>
+                <div style={styles.sectionSub}>
+                  View counts refresh live every 20 seconds — mark an item sold or delete it the moment it's gone.
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
+                <button
+                  type="button"
+                  onClick={loadMyListings}
+                  style={{
+                    background: "none",
+                    border: "1px solid rgba(255, 255, 255, 0.15)",
+                    color: "#cbd5e1",
+                    borderRadius: "8px",
+                    padding: "8px 14px",
+                    fontSize: "12px",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
+                >
+                  <IconRefresh size={12} />
+                  <span>Refresh</span>
+                </button>
+                <Link to="/quicksales?action=post" style={{ ...styles.submitBtn, textDecoration: "none" }}>
+                  + Post New Item
+                </Link>
+              </div>
+            </div>
+
+            {listingNotice && (
+              <div
+                style={{
+                  marginBottom: "16px",
+                  padding: "11px 14px",
+                  borderRadius: "10px",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  background: "rgba(56, 189, 248, 0.1)",
+                  border: "1px solid rgba(56, 189, 248, 0.25)",
+                  color: "#7dd3fc",
+                }}
+              >
+                {listingNotice}
+              </div>
+            )}
+
+            <div style={styles.listingChips}>
+              <div style={styles.listingChip}>
+                Live listings <span style={styles.listingChipValue}>{liveListingCount}</span>
+              </div>
+              <div style={styles.listingChip}>
+                <IconEye size={13} /> Total views
+                <span style={styles.listingChipValue}>{totalListingViews.toLocaleString()}</span>
+              </div>
+              <div style={styles.listingChip}>
+                Sold <span style={styles.listingChipValue}>{soldListingCount}</span>
+              </div>
+            </div>
+
+            {listingsLoading ? (
+              <p style={{ color: "#94a3b8" }}>Loading your QuickSales listings...</p>
+            ) : myListings.length === 0 ? (
+              <div style={styles.emptyBox}>
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: "12px", color: "#64748b" }}>
+                  <IconTag size={40} />
+                </div>
+                <h3 style={{ margin: "0 0 6px 0", color: "#ffffff", fontSize: "17px" }}>
+                  You haven't posted anything on QuickSales yet
+                </h3>
+                <p style={{ margin: "0 0 20px 0", color: "#94a3b8", fontSize: "13.5px", maxWidth: "460px", marginInline: "auto" }}>
+                  Anything you post appears here with its live view count, so you can track interest and remove it once it sells.
+                </p>
+                <Link to="/quicksales?action=post" style={{ ...styles.submitBtn, textDecoration: "none" }}>
+                  Post your first item
+                </Link>
+              </div>
+            ) : (
+              <div style={styles.listingGrid}>
+                {myListings.map((m) => {
+                  const status = listingStatusOf(m);
+                  const badge = listingStatusStyle[status] || listingStatusStyle.pending;
+                  const busy = listingBusyId === m._id;
+                  return (
+                    <article key={m._id} style={styles.listingCard}>
+                      <div style={styles.listingMedia}>
+                        {m.images?.[0] ? (
+                          <img src={m.images[0]} alt={m.title} style={styles.listingImg} loading="lazy" />
+                        ) : (
+                          <IconTag size={34} />
+                        )}
+                        <span style={{ ...styles.listingStatus, background: badge.bg, color: badge.color }}>
+                          {badge.label}
+                        </span>
+                        {status === "active" && (
+                          <span style={styles.listingLiveDot}>
+                            <span style={styles.listingPulse} />
+                            LIVE
+                          </span>
+                        )}
+                      </div>
+
+                      <div style={styles.listingBody}>
+                        <h3 style={{ ...styles.cardTitle, margin: 0 }}>{m.title}</h3>
+                        <p style={{ ...styles.cardPrice, margin: 0 }}>KES {Number(m.price || 0).toLocaleString()}</p>
+                        <p style={{ ...styles.listingMeta, margin: 0 }}>
+                          {m.category || "Item"}
+                          {m.county ? ` · ${m.county}` : ""} · Posted {formatTimeAgo(m.createdAt)}
+                        </p>
+
+                        <div style={styles.listingMetrics}>
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                            <IconEye size={13} /> {m.views || 0} views
+                          </span>
+                          <span style={{ opacity: 0.5 }}>·</span>
+                          <span style={{ color: "#94a3b8" }}>{m.quantity || 1} in stock</span>
+                        </div>
+
+                        <div style={styles.listingActions}>
+                          <Link to={`/quicksales/${m._id}`} style={styles.listingBtn}>
+                            View
+                          </Link>
+                          {status === "active" && (
+                            <button
+                              type="button"
+                              disabled={busy}
+                              onClick={() => handleMarkListingSold(m._id)}
+                              style={{ ...styles.listingSoldBtn, opacity: busy ? 0.6 : 1 }}
+                            >
+                              <IconCheck size={13} /> Mark sold
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            disabled={busy}
+                            onClick={() => handleDeleteListing(m._id)}
+                            style={{ ...styles.listingDeleteBtn, opacity: busy ? 0.6 : 1 }}
+                          >
+                            <IconTrash size={13} /> {busy ? "Working…" : "Delete"}
+                          </button>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
             )}
           </div>
