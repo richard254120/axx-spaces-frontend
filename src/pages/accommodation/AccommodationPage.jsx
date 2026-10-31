@@ -83,7 +83,7 @@ const FAQS = [
 export default function AccommodationPage() {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
-  const isHostUser = Boolean(user && (user.role === "host" || user.role === "admin"));
+  const isHostUser = Boolean(user && (user.role === "host" || user.role === "agent" || user.role === "admin"));
   const { featured: backendFeatured } = useAccommodationHome();
 
   // Search Bar State

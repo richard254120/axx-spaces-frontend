@@ -377,7 +377,7 @@ export default function ProfilePage() {
                   </Link>
                 )}
 
-                {activeRole === "host" && (
+                {["host", "agent"].includes(activeRole) && (
                   <Link to="/accommodation/register-property" style={styles.actionCard}>
                     <div style={{ ...styles.actionIcon, color: "#fbbf24", background: "rgba(251, 191, 36, 0.1)" }}>
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

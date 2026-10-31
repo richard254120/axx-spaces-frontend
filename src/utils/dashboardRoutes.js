@@ -130,6 +130,7 @@ export const ACCOUNT_NAV_BY_ROLE = {
   agent: [
     { label: "Dashboard", path: "/agent/dashboard" },
     { label: "Upload House", path: "/upload" },
+    { label: "Add Accommodation", path: "/accommodation/register-property" },
     { label: "Settings", path: "/settings" },
   ],
   host: [

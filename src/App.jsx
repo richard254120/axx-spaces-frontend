@@ -216,7 +216,7 @@ function App() {
         path="/accommodation/register-property"
         element={
           <BareLayout>
-            <ProtectedRoute allowedRoles={["host", "admin"]} loginPath="/accommodation/login">
+            <ProtectedRoute allowedRoles={["host", "agent", "admin"]} loginPath="/accommodation/login">
               <RegisterPropertyPage />
             </ProtectedRoute>
           </BareLayout>
@@ -226,7 +226,7 @@ function App() {
         path="/accommodation/dashboard"
         element={
           <AccommodationDashboardLayout>
-            <ProtectedRoute allowedRoles={["host"]}>
+            <ProtectedRoute allowedRoles={["host", "agent"]}>
               <ProviderDashboard />
             </ProtectedRoute>
           </AccommodationDashboardLayout>
@@ -236,7 +236,7 @@ function App() {
         path="/accommodation/dashboard/property/:id"
         element={
           <AccommodationDashboardLayout>
-            <ProtectedRoute allowedRoles={["host"]}>
+            <ProtectedRoute allowedRoles={["host", "agent"]}>
               <EditPropertyPage />
             </ProtectedRoute>
           </AccommodationDashboardLayout>
