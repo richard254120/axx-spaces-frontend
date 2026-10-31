@@ -20,7 +20,7 @@
       ]
     },
     {
-      "source": "/(favicon|logo|og-image|axxbiashara|movers|rentals|tourism|apple-touch-icon|site.webmanifest|manifest).*",
+      "source": "/((?=favicon|logo|og-image|axxbiashara|movers|rentals|tourism|apple-touch-icon|site\\.webmanifest|manifest).*)",
       "headers": [
         {
           "key": "Cache-Control",
