@@ -10,6 +10,8 @@ import {
   PROPERTY_CATEGORIES,
   getDisplayName,
 } from "../../features/accommodation";
+import BoostListingModal from "../../components/monetization/BoostListingModal";
+import SubscriptionPlansModal from "../../components/monetization/SubscriptionPlansModal";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -38,6 +40,10 @@ export default function ProviderDashboard() {
   const [viewMode, setViewMode] = useState("grid"); // 'grid' | 'list'
   const [toastMessage, setToastMessage] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Monetization modals
+  const [boostTarget, setBoostTarget] = useState(null); // accommodation listing being boosted
+  const [showPlans, setShowPlans] = useState(false);
 
   useEffect(() => {
     if (token) {
@@ -279,6 +285,15 @@ export default function ProviderDashboard() {
               <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
             <span>+ List New Property</span>
+          </button>
+
+          <button
+            type="button"
+            style={styles.plansHeaderBtn}
+            onClick={() => setShowPlans(true)}
+            title="View listing plans and limits"
+          >
+            💎 Plans
           </button>
         </div>
       </section>
@@ -835,6 +850,20 @@ export default function ProviderDashboard() {
                       {isApproved && (
                         <button
                           type="button"
+                          style={styles.boostBtn}
+                          onClick={() => setBoostTarget(l)}
+                          title="Boost this listing into featured placement"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                          </svg>
+                          <span>{l.isFeatured ? "Re-boost" : "Boost"}</span>
+                        </button>
+                      )}
+
+                      {isApproved && (
+                        <button
+                          type="button"
                           style={styles.viewLiveBtn}
                           onClick={() => navigate(`/accommodation/${propId}`)}
                           title="View live stay on marketplace"
@@ -917,6 +946,16 @@ export default function ProviderDashboard() {
                     {isApproved && (
                       <button
                         type="button"
+                        style={styles.boostBtnSmall}
+                        onClick={() => setBoostTarget(l)}
+                        title="Boost this listing"
+                      >
+                        ⚡ Boost
+                      </button>
+                    )}
+                    {isApproved && (
+                      <button
+                        type="button"
                         style={styles.viewLiveBtnSmall}
                         onClick={() => navigate(`/accommodation/${propId}`)}
                       >
@@ -980,6 +1019,21 @@ export default function ProviderDashboard() {
           </div>
         </div>
       </section>
+
+      {/* MONETIZATION MODALS */}
+      {boostTarget && (
+        <BoostListingModal
+          listing={boostTarget}
+          listingType="Accommodation"
+          onClose={() => setBoostTarget(null)}
+          onSuccess={() => {
+            setBoostTarget(null);
+            showToast("M-Pesa prompt sent — promotion activates right after payment.");
+            reload?.();
+          }}
+        />
+      )}
+      {showPlans && <SubscriptionPlansModal role="host" onClose={() => setShowPlans(false)} />}
     </div>
   );
 }
@@ -1828,6 +1882,44 @@ const styles = {
     padding: "10px",
     cursor: "pointer",
     transition: "all 0.2s ease",
+  },
+  boostBtn: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "6px",
+    background: "rgba(34, 197, 94, 0.12)",
+    border: "1px solid rgba(34, 197, 94, 0.45)",
+    color: "#4ade80",
+    borderRadius: "10px",
+    padding: "10px 12px",
+    fontSize: "13px",
+    fontWeight: 800,
+    cursor: "pointer",
+    transition: "all 0.2s ease",
+  },
+  boostBtnSmall: {
+    background: "rgba(34, 197, 94, 0.12)",
+    border: "1px solid rgba(34, 197, 94, 0.45)",
+    color: "#4ade80",
+    borderRadius: "8px",
+    padding: "8px 10px",
+    fontSize: "12.5px",
+    fontWeight: 800,
+    cursor: "pointer",
+  },
+  plansHeaderBtn: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    background: "rgba(139, 92, 246, 0.14)",
+    border: "1px solid rgba(139, 92, 246, 0.45)",
+    color: "#c4b5fd",
+    borderRadius: "10px",
+    padding: "10px 14px",
+    fontSize: "13px",
+    fontWeight: 800,
+    cursor: "pointer",
   },
   listViewContainer: {
     display: "flex",

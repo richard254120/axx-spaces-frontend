@@ -5,7 +5,8 @@ import QRCode from "qrcode";
 import { UserProfileEditor } from "../features/profile";
 import AnalyticsDashboard from "../components/AnalyticsDashboard";
 import BoostNotification from "../components/BoostNotification";
-import QuickBoostModal from "../components/QuickBoostModal";
+import BoostListingModal from "../components/monetization/BoostListingModal";
+import SubscriptionPlansModal from "../components/monetization/SubscriptionPlansModal";
 import QRGeneratorModal from "../components/QRGeneratorModal";
 import QRStatsModal from "../components/QRStatsModal";
 
@@ -114,6 +115,7 @@ export default function LandlordDashboard() {
   const [properties, setProperties] = useState([]);
   const [boostModalOpen, setBoostModalOpen] = useState(false);
   const [selectedPropertyForBoost, setSelectedPropertyForBoost] = useState(null);
+  const [plansModalOpen, setPlansModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [authLoading, setAuthLoading] = useState(true);
   const [error, setError] = useState("");
@@ -384,6 +386,8 @@ export default function LandlordDashboard() {
     setMobileMenuOpen(false);
     if (item.id === "add-property") {
       navigate("/upload");
+    } else if (item.id === "my-plans") {
+      setPlansModalOpen(true);
     } else if (item.id === "logout") {
       logout();
     } else {
@@ -399,6 +403,7 @@ export default function LandlordDashboard() {
     { id: "enquiries", label: "Enquiries", icon: EnquiriesIcon },
     { id: "bookings", label: "Bookings", icon: BookingsIcon },
     { id: "promote-property", label: "Promote Property", icon: PromoteIcon },
+    { id: "my-plans", label: "My Plans 🎫", icon: PromoteIcon },
     { id: "messages", label: "Messages", icon: MessagesIcon },
     { id: "profile", label: "Profile", icon: ProfileIcon },
     { id: "settings", label: "Settings", icon: SettingsIcon },
@@ -1560,17 +1565,23 @@ export default function LandlordDashboard() {
 
       {/* MODALS */}
       {selectedPropertyForBoost && (
-        <QuickBoostModal
-          isOpen={boostModalOpen}
+        <BoostListingModal
+          listing={selectedPropertyForBoost}
+          listingType="Property"
           onClose={() => {
             setBoostModalOpen(false);
             setSelectedPropertyForBoost(null);
           }}
-          itemType="property"
-          itemId={selectedPropertyForBoost._id}
-          itemName={selectedPropertyForBoost.title}
-          onSuccess={fetchMyProperties}
+          onSuccess={() => {
+            setBoostModalOpen(false);
+            setSelectedPropertyForBoost(null);
+            fetchMyProperties();
+          }}
         />
+      )}
+
+      {plansModalOpen && (
+        <SubscriptionPlansModal role="landlord" onClose={() => setPlansModalOpen(false)} />
       )}
 
       {selectedPropertyForQR && (

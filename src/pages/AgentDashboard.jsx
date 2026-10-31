@@ -4,6 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import { resolveMediaUrl } from "../utils/fileLinks";
 import QRGeneratorModal from "../components/QRGeneratorModal";
 import AgentQRPosterModal from "../components/AgentQRPosterModal";
+import BoostListingModal from "../components/monetization/BoostListingModal";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -450,6 +451,18 @@ const s = {
     textAlign: "center",
     transition: "all 0.2s ease",
   },
+  boostBtn: {
+    padding: "8px 12px",
+    borderRadius: "6px",
+    border: "1px solid #86efac",
+    background: "#f0fdf4",
+    color: "#16a34a",
+    fontWeight: 700,
+    fontSize: "12px",
+    cursor: "pointer",
+    textAlign: "center",
+    transition: "all 0.2s ease",
+  },
   avatarOverlay: {
     position: "absolute",
     top: 0,
@@ -495,6 +508,7 @@ export default function AgentDashboard() {
   const [deleteLoading, setDeleteLoading] = useState(null);
   const [loading, setLoading] = useState(true);
   const [qrModalProperty, setQrModalProperty] = useState(null);
+  const [boostTarget, setBoostTarget] = useState(null); // house (Property) being boosted
   const [showAgentQRPoster, setShowAgentQRPoster] = useState(false);
 
   // New professional enhancements state
@@ -1744,6 +1758,16 @@ export default function AgentDashboard() {
                           >
                             QR Poster
                           </button>
+                          {isApproved && (
+                            <button
+                              style={{ ...s.boostBtn, minHeight: '44px', transition: 'all 0.2s ease' }}
+                              onClick={() => setBoostTarget(house)}
+                              title="Boost this listing into featured placement"
+                              aria-label="Boost listing"
+                            >
+                              ⚡ {house.isFeatured && house.promotionTier && house.promotionTier !== "none" ? "Re-boost" : "Boost"}
+                            </button>
+                          )}
                           <button
                             style={{ ...s.editBtn, minHeight: '44px', transition: 'all 0.2s ease' }}
                             onClick={() => navigate(`/property/edit/${house._id}`)}
@@ -2157,6 +2181,18 @@ export default function AgentDashboard() {
           isOpen={!!qrModalProperty}
           onClose={() => setQrModalProperty(null)}
           property={qrModalProperty}
+        />
+      )}
+
+      {boostTarget && (
+        <BoostListingModal
+          listing={boostTarget}
+          listingType="Property"
+          onClose={() => setBoostTarget(null)}
+          onSuccess={() => {
+            setBoostTarget(null);
+            addToast("M-Pesa prompt sent — promotion activates right after payment.", "success");
+          }}
         />
       )}
 
