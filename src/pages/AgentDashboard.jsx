@@ -490,6 +490,8 @@ export default function AgentDashboard() {
   const { user, token, logout, updateUser } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState("houses");
   const [myHouses, setMyHouses] = useState([]);
+  const [myAccommodations, setMyAccommodations] = useState([]);
+  const [accDeleteLoading, setAccDeleteLoading] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(null);
   const [loading, setLoading] = useState(true);
   const [qrModalProperty, setQrModalProperty] = useState(null);
@@ -736,6 +738,19 @@ export default function AgentDashboard() {
       } catch (err) {
         console.error("Error loading agent houses:", err);
       }
+
+      // Load my posted accommodations (agents can list hotels, guesthouses, Airbnb-style stays)
+      try {
+        const accRes = await fetch(`${API_BASE}/accommodations/my-accommodations/all`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (accRes.ok) {
+          const accData = await accRes.json();
+          setMyAccommodations(Array.isArray(accData) ? accData : []);
+        }
+      } catch (err) {
+        console.error("Error loading agent accommodations:", err);
+      }
     } catch (error) {
       console.error("Error loading data:", error);
     } finally {
@@ -970,6 +985,28 @@ export default function AgentDashboard() {
     }
   };
 
+  const handleDeleteAccommodation = async (accId) => {
+    setAccDeleteLoading(accId);
+    try {
+      const res = await fetch(`${API_BASE}/accommodations/${accId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        setMyAccommodations((prev) => prev.filter((a) => a._id !== accId));
+        addToast("Accommodation deleted successfully", "success");
+      } else {
+        const data = await res.json().catch(() => ({}));
+        addToast(data.error || data.message || "Failed to delete accommodation", "error");
+      }
+    } catch (err) {
+      console.error("Error deleting accommodation:", err);
+      addToast("Network error while deleting accommodation", "error");
+    } finally {
+      setAccDeleteLoading(null);
+    }
+  };
+
   const handleLogout = () => {
     clearApprovalProcessedFlag();
     logout("/agent/login");
@@ -1118,6 +1155,20 @@ export default function AgentDashboard() {
         <div style={{ ...s.headerActions, flexWrap: 'wrap', gap: '8px' }}>
           <button style={{ ...s.uploadBtn, padding: isMobile ? '10px 12px' : '8px 16px', fontSize: isMobile ? '12px' : '13px', minHeight: '44px' }} onClick={() => navigate('/upload')}>
             + Upload House
+          </button>
+          <button
+            style={{
+              ...s.uploadBtn,
+              background: 'linear-gradient(135deg,#0ea5e9,#0284c7)',
+              border: 'none',
+              padding: isMobile ? '10px 12px' : '8px 16px',
+              fontSize: isMobile ? '12px' : '13px',
+              minHeight: '44px',
+            }}
+            onClick={() => navigate('/accommodation/register-property')}
+            title="Post an accommodation (hotel, guesthouse, Airbnb...)"
+          >
+            {isMobile ? '+ Accommodation' : '+ Post Accommodation'}
           </button>
           <button
             style={{
@@ -1326,6 +1377,10 @@ export default function AgentDashboard() {
               <div style={s.statLabel}>Listings</div>
             </div>
             <div style={s.statBox}>
+              <div style={s.statValue}>{myAccommodations.length}</div>
+              <div style={s.statLabel}>Accommodations</div>
+            </div>
+            <div style={s.statBox}>
               <div style={s.statValue}>{myHouses.reduce((sum, h) => sum + (h.views || 0), 0)}</div>
               <div style={s.statLabel}>Total Views</div>
             </div>
@@ -1458,6 +1513,12 @@ export default function AgentDashboard() {
             onClick={() => setActiveTab("houses")}
           >
             My Houses ({myHouses.length})
+          </button>
+          <button
+            style={{ ...s.tab, ...(activeTab === 'accommodations' ? s.tabActive : {}), whiteSpace: 'nowrap', padding: isMobile ? '10px 12px' : '12px 20px', minHeight: '44px', fontSize: isMobile ? '12px' : '14px' }}
+            onClick={() => setActiveTab("accommodations")}
+          >
+            My Accommodations ({myAccommodations.length})
           </button>
           <button
             style={{ ...s.tab, ...(activeTab === 'hunting-fee' ? s.tabActive : {}), whiteSpace: 'nowrap', padding: isMobile ? '10px 12px' : '12px 20px', minHeight: '44px', fontSize: isMobile ? '12px' : '14px' }}
@@ -1699,6 +1760,129 @@ export default function AgentDashboard() {
                             aria-label="Delete house listing"
                           >
                             {deleteLoading === house._id ? "..." : "Delete"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "accommodations" && (
+          <div>
+            <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', marginBottom: '16px', gap: '10px' }}>
+              <div>
+                <h2 style={{ ...s.sectionTitle, marginBottom: "4px" }}>My Accommodations</h2>
+                <p style={{ margin: 0, fontSize: "13px", color: "#6b7280" }}>
+                  Post and manage hotels, guesthouses, apartments and other stays directly from your agent account
+                </p>
+              </div>
+              <button style={s.uploadBtn} onClick={() => navigate("/accommodation/register-property")}>
+                + Post New Accommodation
+              </button>
+            </div>
+
+            {myAccommodations.length === 0 ? (
+              <div style={s.emptyCard}>
+                <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#1f2937", marginBottom: "8px" }}>
+                  No Accommodations Posted Yet
+                </h3>
+                <p style={{ fontSize: "14px", color: "#6b7280", lineHeight: 1.5, marginBottom: "20px" }}>
+                  As an agent, you can also post accommodations — hotels, guesthouses, bed &amp; breakfasts and short-stay apartments — to reach travelers booking on AXXSpace.
+                </p>
+                <button
+                  style={{ ...s.uploadBtn, padding: "10px 22px", fontSize: "14px" }}
+                  onClick={() => navigate("/accommodation/register-property")}
+                >
+                  + Post Your First Accommodation
+                </button>
+              </div>
+            ) : (
+              <div style={{ ...s.houseGrid, gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(290px, 1fr))' }}>
+                {myAccommodations.map((acc) => {
+                  const isLive = acc.status === "approved" || acc.status === "active";
+                  const isRejected = acc.status === "rejected";
+                  const thumb = acc.images?.[0] ? resolveMediaUrl(acc.images[0].imageUrl || acc.images[0]) : "";
+                  const isHovered = hoveredCard === acc._id;
+
+                  return (
+                    <div
+                      key={acc._id}
+                      style={{
+                        ...s.houseCard,
+                        boxShadow: isHovered ? '0 8px 24px rgba(0,0,0,0.12)' : '0 2px 8px rgba(0,0,0,0.05)',
+                        transform: isHovered ? 'translateY(-4px)' : 'translateY(0)',
+                        transition: 'all 0.2s ease',
+                      }}
+                      onMouseEnter={() => setHoveredCard(acc._id)}
+                      onMouseLeave={() => setHoveredCard(null)}
+                    >
+                      <div style={s.houseImgWrap}>
+                        {thumb ? (
+                          <img src={thumb} alt={acc.name} style={s.houseImg} />
+                        ) : (
+                          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8", fontSize: "36px", background: "#f1f5f9" }}>
+                          </div>
+                        )}
+                        <span style={s.houseTypePill}>{acc.type ? acc.type.replace(/_/g, " ") : "Stay"}</span>
+                        <span
+                          style={{
+                            ...s.houseStatusPill,
+                            ...(isLive
+                              ? s.statusApproved
+                              : isRejected
+                                ? s.statusRejected
+                                : s.statusPending),
+                          }}
+                        >
+                          {isLive ? "✓ LIVE" : isRejected ? "REJECTED" : "PENDING REVIEW"}
+                        </span>
+                        {acc.isFeatured && (
+                          <span style={{ ...s.houseStatusPill, top: "auto", bottom: "10px", left: "10px", background: "#fef3c7", color: "#92400e" }}>⭐ Featured</span>
+                        )}
+                      </div>
+                      <div style={s.houseBody}>
+                        <h4 style={s.houseTitle}>{acc.name || "Untitled Accommodation"}</h4>
+                        <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#6b7280' }}>
+                          {[acc.address, acc.county].filter(Boolean).join(', ') || 'No location set'}
+                        </p>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
+                          <span style={{ fontWeight: 800, color: '#1f2937', fontSize: '15px' }}>
+                            KES {Number(acc.basePrice || 0).toLocaleString()}
+                            <span style={{ fontWeight: 500, fontSize: '12px', color: '#6b7280' }}> / night</span>
+                          </span>
+                          <span style={{ fontSize: '12px', color: '#6b7280' }}>{acc.views || 0} views</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px', marginTop: '14px' }}>
+                          {isLive && (
+                            <button
+                              style={{ ...s.viewBtn, minHeight: '44px', transition: 'all 0.2s ease' }}
+                              onClick={() => window.open(`/accommodation/${acc._id}`, "_blank")}
+                              title="View live listing"
+                              aria-label="View live accommodation listing"
+                            >
+                              Live ↗
+                            </button>
+                          )}
+                          <button
+                            style={{ ...s.editBtn, minHeight: '44px', transition: 'all 0.2s ease' }}
+                            onClick={() => navigate(`/accommodation/dashboard/property/${acc._id}`)}
+                            title="Edit accommodation"
+                            aria-label="Edit accommodation"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            style={{ ...s.delBtn, minHeight: '44px', transition: 'all 0.2s ease' }}
+                            onClick={() => handleDeleteAccommodation(acc._id)}
+                            disabled={accDeleteLoading === acc._id}
+                            title="Delete accommodation"
+                            aria-label="Delete accommodation"
+                          >
+                            {accDeleteLoading === acc._id ? "..." : "Delete"}
                           </button>
                         </div>
                       </div>
