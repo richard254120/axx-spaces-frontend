@@ -8,6 +8,18 @@ const HOSTEL_PROPERTY_TYPE = "Hostel Room";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
+function formatVideoUrl(url) {
+  if (!url || typeof url !== "string") return "";
+  let cleanUrl = url.trim().replace(/^http:\/\//i, "https://");
+  if (cleanUrl.includes("cloudinary.com") && cleanUrl.includes("/video/upload/")) {
+    cleanUrl = cleanUrl.replace(/\.(mov|quicktime|mkv|avi|webm|ogv|m4v)$/i, ".mp4");
+    if (!/\.(mp4|webm)$/i.test(cleanUrl)) {
+      cleanUrl = `${cleanUrl}.mp4`;
+    }
+  }
+  return cleanUrl;
+}
+
 const AMENITIES_DATA = [
   { name: "WiFi", icon: "📶" },
   { name: "Parking", icon: "🅿️" },
@@ -174,6 +186,7 @@ export default function Upload() {
 
   const [videos, setVideos] = useState([]);
   const [videoPreviews, setVideoPreviews] = useState([]);
+  const [existingVideos, setExistingVideos] = useState([]);
   const [isDraggingVideo, setIsDraggingVideo] = useState(false);
 
   const [consent, setConsent] = useState(false);
@@ -251,6 +264,7 @@ export default function Upload() {
 
           setExistingImages(data.images || []);
           setImagePreviews(data.images || []);
+          setExistingVideos(Array.isArray(data.videos) ? data.videos : []);
           setMaxUnlockedStep(3);
         } catch (err) {
           setError(err.message || "Failed to load property data");
@@ -397,7 +411,7 @@ export default function Upload() {
     const validVideos = [];
     const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB
 
-    if (videos.length + files.length > 5) {
+    if (existingVideos.length + videos.length + files.length > 5) {
       setError("Maximum 5 videos allowed per listing");
       return;
     }
@@ -423,6 +437,10 @@ export default function Upload() {
   const removeVideo = (index) => {
     setVideos((prev) => prev.filter((_, i) => i !== index));
     setVideoPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const removeExistingVideo = (index) => {
+    setExistingVideos((prev) => prev.filter((_, i) => i !== index));
   };
 
   const removeImage = (index) => {
@@ -545,6 +563,7 @@ export default function Upload() {
 
       if (isEditMode) {
         formDataToSend.append("remainingImages", JSON.stringify(existingImages));
+        formDataToSend.append("remainingVideos", JSON.stringify(existingVideos));
       }
 
       if (ownershipProofUrl) {
@@ -1353,6 +1372,41 @@ export default function Upload() {
                       </span>
                     )}
                   </div>
+
+                  {/* Saved videos already attached to this listing (edit mode) */}
+                  {existingVideos.length > 0 && (
+                    <div style={{ marginBottom: "14px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                        <span style={{ fontSize: "12px", fontWeight: 800, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                          Uploaded Videos ({existingVideos.length})
+                        </span>
+                        <span style={{ fontSize: "11px", color: "#64748b" }}>already attached to this listing</span>
+                      </div>
+                      <div style={styles.videoList}>
+                        {existingVideos.map((url, idx) => (
+                          <div key={url || idx} style={styles.videoItem}>
+                            <video
+                              src={formatVideoUrl(url)}
+                              controls
+                              playsInline
+                              preload="metadata"
+                              style={styles.videoPlayer}
+                            />
+                            <div style={styles.videoMeta}>
+                              <span style={styles.videoFileName}>Saved video #{idx + 1}</span>
+                              <button
+                                type="button"
+                                onClick={() => removeExistingVideo(idx)}
+                                style={styles.videoDeleteBtn}
+                              >
+                                Remove video
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   <div
                     style={{

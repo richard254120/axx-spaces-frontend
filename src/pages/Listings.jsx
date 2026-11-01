@@ -21,6 +21,20 @@ const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.o
 const listingModeOf = (property) => (property?.listingType === "sale" ? "sale" : "rent");
 const isForSale = (property) => listingModeOf(property) === "sale";
 
+// Cloudinary video links need the https + explicit player-friendly extension,
+// otherwise browsers refuse to play .mov/.mkv uploads.
+const formatVideoUrl = (url) => {
+  if (!url || typeof url !== "string") return "";
+  let cleanUrl = url.trim().replace(/^http:\/\//i, "https://");
+  if (cleanUrl.includes("cloudinary.com") && cleanUrl.includes("/video/upload/")) {
+    cleanUrl = cleanUrl.replace(/\.(mov|quicktime|mkv|avi|webm|ogv|m4v)$/i, ".mp4");
+    if (!/\.(mp4|webm)$/i.test(cleanUrl)) {
+      cleanUrl = `${cleanUrl}.mp4`;
+    }
+  }
+  return cleanUrl;
+};
+
 const OWNERSHIP_LABELS = {
   title_deed: "Title Deed",
   sectional_title: "Sectional Title",
@@ -200,6 +214,7 @@ function PropertyCardMedia({ property, favorites, toggleFavorite }) {
   const images = rawImages
     .map((img) => (typeof img === "object" ? img?.imageUrl || img?.url : img))
     .filter(Boolean);
+  const videos = Array.isArray(property.videos) ? property.videos.filter(Boolean) : [];
 
   const [activeIdx, setActiveIdx] = useState(0);
 
@@ -337,6 +352,35 @@ function PropertyCardMedia({ property, favorites, toggleFavorite }) {
         <div className="card-photo-count">
           <IconCamera size={12} />
           <span>{activeIdx + 1} / {images.length}</span>
+        </div>
+      )}
+
+      {/* Video Tour Indicator — lets renters know the listing has uploaded walkthroughs */}
+      {videos.length > 0 && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: "12px",
+            right: "12px",
+            zIndex: 2,
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            background: "rgba(15, 23, 42, 0.85)",
+            color: "#fff",
+            fontSize: "11px",
+            fontWeight: 700,
+            padding: "5px 9px",
+            borderRadius: "6px",
+            border: "1px solid rgba(148, 163, 184, 0.35)",
+            pointerEvents: "none",
+          }}
+        >
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="23 7 16 12 23 17 23 7"></polygon>
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+          </svg>
+          <span>Video Tour ({videos.length})</span>
         </div>
       )}
 
@@ -2089,6 +2133,34 @@ Please contact me back with viewing details. Thank you!`;
                     height="110"
                   />
                 ))}
+              </div>
+            )}
+
+            {/* Gallery Videos Section — walkthroughs uploaded by the host */}
+            {Array.isArray(selectedProperty.videos) && selectedProperty.videos.filter(Boolean).length > 0 && (
+              <div style={{ margin: "16px 0 4px" }}>
+                <h3 style={{ fontSize: "15px", fontWeight: 800, color: "#0f172a", display: "flex", alignItems: "center", gap: "8px", margin: "0 0 10px" }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                  </svg>
+                  <span>Video Walkthrough ({selectedProperty.videos.filter(Boolean).length})</span>
+                </h3>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "12px" }}>
+                  {selectedProperty.videos.filter(Boolean).map((vid, idx) => (
+                    <div key={idx} style={{ borderRadius: "10px", overflow: "hidden", background: "#000", border: "1px solid #e2e8f0" }}>
+                      <video
+                        src={formatVideoUrl(vid)}
+                        controls
+                        playsInline
+                        preload="metadata"
+                        style={{ width: "100%", height: "200px", objectFit: "contain", background: "#000", display: "block" }}
+                      >
+                        Your browser does not support playing this video format directly.
+                      </video>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
