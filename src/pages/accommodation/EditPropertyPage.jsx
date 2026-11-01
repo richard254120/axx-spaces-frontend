@@ -4,7 +4,7 @@ import {
   StatusBadge,
   LoadingBlock,
   ErrorAlert,
-  AMENITIES_LIST,
+  getProfileForType,
 } from "../../features/accommodation";
 import { fetchOwnerListing, updateOwnerListing, formatVideoUrl } from "../../api/accommodation";
 import { getAccommodationToken } from "../../features/accommodation";
@@ -46,6 +46,7 @@ export default function EditPropertyPage() {
           basePrice: data.basePrice ?? "",
           currency: data.currency || "KES",
           amenities: data.amenities || [],
+          extraDetails: data.extraDetails && typeof data.extraDetails === "object" && !Array.isArray(data.extraDetails) ? data.extraDetails : {},
           checkInTime: data.checkInTime || "14:00",
           checkOutTime: data.checkOutTime || "11:00",
           houseRules: data.houseRules || "",
@@ -61,6 +62,26 @@ export default function EditPropertyPage() {
   }, [id, token]);
 
   const update = (field, value) => setForm((f) => ({ ...f, [field]: value }));
+
+  // Category-aware profile so the edit form mirrors the tailored registration form
+  const profile = getProfileForType(form.type);
+  const isTailored = profile.family !== "general";
+  const amenityOptions = Array.from(new Set([...profile.amenities, ...(form.amenities || [])]));
+
+  const handleTypeChange = (val) => {
+    const p = getProfileForType(val);
+    setForm((f) => ({
+      ...f,
+      type: val,
+      checkInTime: p.family !== "general" ? p.checkIn : f.checkInTime,
+      checkOutTime: p.family !== "general" ? p.checkOut : f.checkOutTime,
+    }));
+  };
+
+  const updateExtra = (label, value) => setForm((f) => ({
+    ...f,
+    extraDetails: { ...(f.extraDetails || {}), [label]: value },
+  }));
 
   const toggleAmenity = (a) =>
     setForm((f) => ({
@@ -79,7 +100,15 @@ export default function EditPropertyPage() {
       const fd = new FormData();
       Object.entries(form).forEach(([k, v]) => {
         if (k === "amenities") fd.append("amenities", JSON.stringify(v));
+        else if (k === "extraDetails") {
+          const clean = {};
+          Object.entries(v || {}).forEach(([label, val]) => {
+            if (val !== "" && val !== null && val !== undefined) clean[label] = val;
+          });
+          fd.append("extraDetails", JSON.stringify(clean));
+        }
         else if (Array.isArray(v)) return;
+        else if (typeof v === "object") return;
         else if (v !== undefined && v !== null) fd.append(k, v);
       });
       if (removeImages.length) fd.append("removeImages", JSON.stringify(removeImages));
@@ -327,7 +356,7 @@ export default function EditPropertyPage() {
             <select
               style={styles.select}
               value={form.type}
-              onChange={(e) => update("type", e.target.value)}
+              onChange={(e) => handleTypeChange(e.target.value)}
               required
             >
               <option value="">Select category…</option>
@@ -404,14 +433,14 @@ export default function EditPropertyPage() {
           </div>
 
           <div style={styles.twoCol}>
-            <Field label="Base Price Per Night *">
+            <Field label={profile.priceLabel}>
               <input
                 style={styles.input}
                 type="number"
                 value={form.basePrice}
                 onChange={(e) => update("basePrice", e.target.value)}
                 required
-                placeholder="15000"
+                placeholder={profile.pricePlaceholder}
               />
             </Field>
             <Field label="Currency">
@@ -428,7 +457,7 @@ export default function EditPropertyPage() {
           </div>
 
           <div style={styles.twoCol}>
-            <Field label="Max Guests Allowed *">
+            <Field label={profile.guestCountLabel}>
               <input
                 style={styles.input}
                 type="number"
@@ -436,10 +465,10 @@ export default function EditPropertyPage() {
                 value={form.maxGuests}
                 onChange={(e) => update("maxGuests", e.target.value)}
                 required
-                placeholder="4"
+                placeholder={profile.guestCountPlaceholder}
               />
             </Field>
-            <Field label="Total Bedrooms / Rooms *">
+            <Field label={profile.roomCountLabel}>
               <input
                 style={styles.input}
                 type="number"
@@ -489,8 +518,13 @@ export default function EditPropertyPage() {
 
           <div style={{ marginTop: "24px" }}>
             <label style={styles.fieldLabel}>Amenities & Features</label>
+            {isTailored && (
+              <p style={{ fontSize: "12px", color: "#0369a1", background: "#f0f9ff", border: "1px solid #bae6fd", padding: "8px 12px", borderRadius: "8px", margin: "6px 0 10px" }}>
+                Curated for a {profile.label.toLowerCase()} — these are the features {form.type ? form.type.replace(/-/g, " ") : "this stay"} guests compare most. Your existing selections are kept.
+              </p>
+            )}
             <div style={styles.amenityGrid}>
-              {AMENITIES_LIST.map((a) => {
+              {amenityOptions.map((a) => {
                 const isSelected = form.amenities?.includes(a);
                 return (
                   <button
@@ -511,6 +545,39 @@ export default function EditPropertyPage() {
               })}
             </div>
           </div>
+
+          {isTailored && profile.extraFields.length > 0 && (
+            <div style={{ marginTop: "24px" }}>
+              <label style={styles.fieldLabel}>{profile.detailsTitle}</label>
+              <p style={{ fontSize: "12px", color: "#6b7280", margin: "6px 0 12px" }}>
+                The category-specific details guests booking a {form.type ? form.type.replace(/-/g, " ") : "this stay"} look for first. Leave anything that doesn't apply blank.
+              </p>
+              {profile.extraFields.map((fld) => (
+                <Field key={fld.key} label={fld.label}>
+                  {fld.type === "select" ? (
+                    <select
+                      style={styles.select}
+                      value={form.extraDetails?.[fld.label] || ""}
+                      onChange={(e) => updateExtra(fld.label, e.target.value)}
+                    >
+                      <option value="">Select...</option>
+                      {fld.options.map((o) => <option key={o} value={o}>{o}</option>)}
+                    </select>
+                  ) : (
+                    <input
+                      style={styles.input}
+                      type={fld.type === "number" ? "number" : "text"}
+                      min={fld.type === "number" ? "0" : undefined}
+                      step={fld.type === "number" ? "any" : undefined}
+                      placeholder={fld.placeholder}
+                      value={form.extraDetails?.[fld.label] || ""}
+                      onChange={(e) => updateExtra(fld.label, e.target.value)}
+                    />
+                  )}
+                </Field>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* SUBMIT BUTTONS */}

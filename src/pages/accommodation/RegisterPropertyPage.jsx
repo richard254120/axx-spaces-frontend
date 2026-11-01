@@ -6,9 +6,9 @@ import {
   ADVERTISING_PACKAGES,
   PROPERTY_CATEGORIES,
   KENYA_COUNTIES,
-  AMENITIES_LIST,
   INITIAL_REGISTER_FORM,
   REGISTER_STEPS,
+  getCategoryProfile,
   setAccommodationSession,
   ErrorAlert,
 } from "../../features/accommodation";
@@ -16,7 +16,6 @@ import PhoneInput from "../../components/PhoneInput";
 
 const categories = PROPERTY_CATEGORIES;
 const counties = KENYA_COUNTIES;
-const amenitiesList = AMENITIES_LIST;
 const steps = REGISTER_STEPS;
 const packages = ADVERTISING_PACKAGES;
 
@@ -180,7 +179,27 @@ export default function RegisterPropertyPage() {
   const [isDraggingVideo, setIsDraggingVideo] = useState(false);
   const [isDraggingImage, setIsDraggingImage] = useState(false);
 
+  // Category-aware profile: tailors labels, pricing wording, amenities and
+  // detail fields to the selected category (hostel ≠ city hotel ≠ resort).
+  const profile = getCategoryProfile(form.category);
+  const isTailored = profile.family !== "general";
+  const amenityOptions = Array.from(new Set([...profile.amenities, ...form.amenities]));
+
   const update = (field, value) => setForm((f) => ({ ...f, [field]: value }));
+  const handleCategoryChange = (val) => {
+    const p = getCategoryProfile(val);
+    setForm((f) => ({
+      ...f,
+      category: val,
+      extraDetails: {},
+      checkIn: p.family !== "general" ? p.checkIn : f.checkIn,
+      checkOut: p.family !== "general" ? p.checkOut : f.checkOut,
+    }));
+  };
+  const updateExtra = (label, value) => setForm((f) => ({
+    ...f,
+    extraDetails: { ...f.extraDetails, [label]: value },
+  }));
   const toggleAmenity = (a) => setForm((f) => ({
     ...f,
     amenities: f.amenities.includes(a) ? f.amenities.filter((x) => x !== a) : [...f.amenities, a],
@@ -244,7 +263,7 @@ export default function RegisterPropertyPage() {
     if (step === 1) return form.county && form.town && form.address && form.lat && form.lng;
     if (step === 2) return true; // Media upload is optional
     if (step === 3) return form.amenities.length > 0;
-    if (step === 4) return form.basePrice && form.basePrice !== "";
+    if (step === 4) return form.basePrice && form.basePrice !== "" && form.totalRooms && form.maxGuests;
     return true;
   };
 
@@ -302,7 +321,14 @@ export default function RegisterPropertyPage() {
 
       Object.entries(form).forEach(([k, v]) => {
         if (k === "amenities") fd.append("amenities", JSON.stringify(v));
-        else if (k === "category") fd.append("type", categoryToTypeMap[v] || "hotel");
+        else if (k === "category") fd.append("type", profile.type || categoryToTypeMap[v] || "hotel");
+        else if (k === "extraDetails") {
+          const clean = {};
+          Object.entries(v || {}).forEach(([label, val]) => {
+            if (val !== "" && val !== null && val !== undefined) clean[label] = val;
+          });
+          if (Object.keys(clean).length > 0) fd.append("extraDetails", JSON.stringify(clean));
+        }
         else if (k === "checkIn") fd.append("checkInTime", v);
         else if (k === "checkOut") fd.append("checkOutTime", v);
         else if (k === "basePrice") {
@@ -312,6 +338,7 @@ export default function RegisterPropertyPage() {
           if (v && v !== "") fd.append(k, parseInt(v) || 0);
         }
         else if (Array.isArray(v)) return;
+        else if (typeof v === "object") return;
         else if (v !== undefined && v !== null && v !== "") fd.append(k, v);
       });
       newImages.forEach((file) => fd.append("images", file));
@@ -407,18 +434,32 @@ export default function RegisterPropertyPage() {
                 <p style={s.formSub}>Tell guests what makes your property special</p>
                 <div style={s.field}>
                   <label style={s.label}>Property Name *</label>
-                  <input style={s.input} placeholder="e.g. Sunrise Beach Resort" value={form.name} onChange={(e) => update("name", e.target.value)} />
+                  <input style={s.input} placeholder={profile.namePlaceholder} value={form.name} onChange={(e) => update("name", e.target.value)} />
                 </div>
                 <div style={s.field}>
                   <label style={s.label}>Category *</label>
-                  <select style={s.input} value={form.category} onChange={(e) => update("category", e.target.value)}>
+                  <select style={s.input} value={form.category} onChange={(e) => handleCategoryChange(e.target.value)}>
                     <option value="">Select category...</option>
                     {categories.map((c) => <option key={c}>{c}</option>)}
                   </select>
+                  {!form.category && (
+                    <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "4px" }}>
+                      Pick your exact category — the rest of the form adapts: pricing style, amenities and details change for a hostel vs. a city hotel vs. a beach resort.
+                    </div>
+                  )}
                 </div>
+                {isTailored && profile.tagline && (
+                  <div style={{ background: "#f0f9ff", border: "1px solid #bae6fd", borderRadius: "12px", padding: "14px 16px", marginBottom: "16px", display: "flex", gap: "10px", alignItems: "flex-start" }}>
+                    <span style={{ flexShrink: 0, background: "#0284c7", color: "white", fontSize: "10px", fontWeight: 800, padding: "3px 8px", borderRadius: "6px", letterSpacing: "0.5px", marginTop: "2px" }}>TAILORED</span>
+                    <div>
+                      <div style={{ fontSize: "13px", fontWeight: 800, color: "#0c4a6e", marginBottom: "3px" }}>{profile.label}</div>
+                      <div style={{ fontSize: "12px", color: "#0369a1", lineHeight: 1.6 }}>{profile.tagline}</div>
+                    </div>
+                  </div>
+                )}
                 <div style={s.field}>
                   <label style={s.label}>Description *</label>
-                  <textarea style={{ ...s.input, height: "140px", resize: "vertical" }} placeholder="Describe your property, unique features, nearby attractions, experiences offered..." value={form.description} onChange={(e) => update("description", e.target.value)} />
+                  <textarea style={{ ...s.input, height: "140px", resize: "vertical" }} placeholder={profile.descPlaceholder} value={form.description} onChange={(e) => update("description", e.target.value)} />
                   <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "4px" }}>{form.description.length}/500 characters recommended</div>
                 </div>
               </div>
@@ -695,9 +736,18 @@ export default function RegisterPropertyPage() {
             {step === 3 && (
               <div>
                 <h2 style={s.formTitle}> Amenities & Features</h2>
-                <p style={s.formSub}>Select everything your property offers — this helps guests discover you</p>
+                <p style={s.formSub}>
+                  {isTailored
+                    ? `Curated for a ${profile.label.toLowerCase()} — select everything you offer so the right guests discover you`
+                    : "Select everything your property offers — this helps guests discover you"}
+                </p>
+                {isTailored && (
+                  <div style={{ background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "10px", padding: "10px 14px", marginBottom: "16px", fontSize: "12px", color: "#92400e" }}>
+                    These are the amenities {profile.family === "hostel" ? "backpackers and budget travellers" : profile.family === "hotel" ? "hotel guests" : profile.family === "resort" ? "resort guests" : profile.family === "lodge" ? "lodge & safari guests" : profile.family === "camping" ? "campers" : profile.family === "guesthouse" ? "guest house travellers" : "holiday-home renters"} filter and compare on most.
+                  </div>
+                )}
                 <div className="amenities-grid">
-                  {amenitiesList.map((a) => (
+                  {amenityOptions.map((a) => (
                     <button
                       key={a}
                       style={{ ...s.amenityBtn, ...(form.amenities.includes(a) ? s.amenityActive : {}) }}
@@ -718,8 +768,12 @@ export default function RegisterPropertyPage() {
             {/* STEP 4 — PRICING & BOOKING URL */}
             {step === 4 && (
               <div>
-                <h2 style={s.formTitle}> Pricing, Rooms & Booking</h2>
-                <p style={s.formSub}>Set your rates and add your existing booking site link</p>
+                <h2 style={s.formTitle}> Pricing, {profile.unitWordPlural} & Booking</h2>
+                <p style={s.formSub}>
+                  {isTailored
+                    ? `Set your ${profile.family === "hostel" ? "per-bed" : profile.family === "camping" ? "per-pitch" : profile.family === "lodge" ? "per-person" : "per-room"} rates and add your existing booking site link`
+                    : "Set your rates and add your existing booking site link"}
+                </p>
 
                 {/* BOOKING URL — KEY FEATURE */}
                 <div style={s.bookingUrlBox}>
@@ -746,26 +800,74 @@ export default function RegisterPropertyPage() {
                 <div style={s.sectionBreak}>Base Pricing</div>
                 <div className="two-col-form">
                   <div style={s.field}>
-                    <label style={s.label}>Base Price / Night (KSh) *</label>
-                    <input style={s.input} type="number" placeholder="e.g. 8500" value={form.basePrice} onChange={(e) => update("basePrice", e.target.value)} />
+                    <label style={s.label}>{profile.priceLabel}</label>
+                    <input style={s.input} type="number" placeholder={profile.pricePlaceholder} value={form.basePrice} onChange={(e) => update("basePrice", e.target.value)} />
                   </div>
                   <div style={s.field}>
                     <label style={s.label}>Weekend Price (KSh)</label>
                     <input style={s.input} type="number" placeholder="e.g. 12000" value={form.weekendPrice} onChange={(e) => update("weekendPrice", e.target.value)} />
                   </div>
                 </div>
+                {profile.priceHint && (
+                  <div style={{ fontSize: "12px", color: "#0369a1", background: "#f0f9ff", border: "1px solid #bae6fd", padding: "8px 12px", borderRadius: "8px", marginBottom: "14px" }}>
+                    {profile.priceHint}
+                  </div>
+                )}
                 <div style={s.field}>
                   <label style={s.label}>Peak Season Price (KSh)</label>
                   <input style={s.input} type="number" placeholder="e.g. 18000 (Dec, Jul-Aug)" value={form.peakPrice} onChange={(e) => update("peakPrice", e.target.value)} />
                 </div>
 
-                <div style={s.sectionBreak}>Room Types (optional)</div>
+                <div className="two-col-form">
+                  <div style={s.field}>
+                    <label style={s.label}>{profile.roomCountLabel}</label>
+                    <input style={s.input} type="number" min="1" placeholder={profile.roomCountPlaceholder} value={form.totalRooms} onChange={(e) => update("totalRooms", e.target.value)} />
+                  </div>
+                  <div style={s.field}>
+                    <label style={s.label}>{profile.guestCountLabel}</label>
+                    <input style={s.input} type="number" min="1" placeholder={profile.guestCountPlaceholder} value={form.maxGuests} onChange={(e) => update("maxGuests", e.target.value)} />
+                  </div>
+                </div>
+
+                {profile.extraFields.length > 0 && (
+                  <>
+                    <div style={s.sectionBreak}>{profile.detailsTitle} (recommended)</div>
+                    <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}>
+                      Guests booking a {form.category.toLowerCase()} look for these first. Filling them in makes your listing stand out as professional.
+                    </div>
+                    {profile.extraFields.map((fld) => (
+                      <div key={fld.key} style={s.field}>
+                        <label style={s.label}>{fld.label}</label>
+                        {fld.type === "select" ? (
+                          <select style={s.input} value={form.extraDetails[fld.label] || ""} onChange={(e) => updateExtra(fld.label, e.target.value)}>
+                            <option value="">Select...</option>
+                            {fld.options.map((o) => <option key={o} value={o}>{o}</option>)}
+                          </select>
+                        ) : (
+                          <>
+                            <input
+                              style={s.input}
+                              type={fld.type === "number" ? "number" : "text"}
+                              min={fld.type === "number" ? "0" : undefined}
+                              step={fld.type === "number" ? "any" : undefined}
+                              placeholder={fld.placeholder}
+                              value={form.extraDetails[fld.label] || ""}
+                              onChange={(e) => updateExtra(fld.label, e.target.value)}
+                            />
+                          </>
+                        )}
+                      </div>
+                    ))}
+                  </>
+                )}
+
+                <div style={s.sectionBreak}>{profile.roomTypesTitle}</div>
                 {form.roomTypes.map((r, i) => (
                   <div key={i} style={{ background: "#f9fafb", borderRadius: "12px", padding: "16px", marginBottom: "16px", border: "1px solid #e5e7eb" }}>
                     <div className="room-row" style={{ marginBottom: "12px" }}>
-                      <input style={{ ...s.input, flex: 2 }} placeholder="Room type name (e.g. Deluxe Suite)" value={r.name} onChange={(e) => updateRoom(i, "name", e.target.value)} />
+                      <input style={{ ...s.input, flex: 2 }} placeholder={profile.roomTypePlaceholder} value={r.name} onChange={(e) => updateRoom(i, "name", e.target.value)} />
                       <input style={{ ...s.input, flex: 1 }} type="number" placeholder="Price KSh" value={r.price} onChange={(e) => updateRoom(i, "price", e.target.value)} />
-                      <input style={{ ...s.input, flex: 1 }} type="number" placeholder="Max guests" value={r.guests} onChange={(e) => updateRoom(i, "guests", e.target.value)} />
+                      <input style={{ ...s.input, flex: 1 }} type="number" placeholder={profile.family === "hostel" || profile.family === "camping" ? "Beds / campers" : "Max guests"} value={r.guests} onChange={(e) => updateRoom(i, "guests", e.target.value)} />
                       {form.roomTypes.length > 1 && <button style={s.removeRoomBtn} onClick={() => removeRoom(i)}>✕</button>}
                     </div>
 
@@ -856,9 +958,12 @@ export default function RegisterPropertyPage() {
                 <div className="review-grid">
                   {[
                     ["Property Name", form.name || "—"],
-                    ["Category", form.category || "—"],
+                    ["Category", form.category ? `${form.category}${isTailored ? ` · ${profile.label}` : ""}` : "—"],
                     ["Location", form.town ? `${form.town}, ${form.county}` : "—"],
-                    ["Base Price", form.basePrice ? `KSh ${Number(form.basePrice).toLocaleString()}/night` : "—"],
+                    [profile.priceLabel.replace(" *", ""), form.basePrice ? `KSh ${Number(form.basePrice).toLocaleString()}` : "—"],
+                    [profile.roomCountLabel.replace(" *", ""), form.totalRooms || "—"],
+                    [profile.guestCountLabel.replace(" *", ""), form.maxGuests || "—"],
+                    ["Category Details", Object.values(form.extraDetails).filter((v) => v !== "" && v != null).length > 0 ? `${Object.values(form.extraDetails).filter((v) => v !== "" && v != null).length} filled in` : "—"],
                     ["Photos", `${newImages.length} photo(s) selected`],
                     ["Video Walkthroughs", `${newVideos.length} video(s) ready`],
                     ["Amenities", form.amenities.length > 0 ? `${form.amenities.length} selected` : "—"],

@@ -720,6 +720,24 @@ export default function AccommodationDetailPage() {
                 </p>
               </div>
 
+              {/* Category-Specific Host Details (tailored listing info: star rating, meal plan, dorm style, ablutions...) */}
+              {property.extraDetails && Object.keys(property.extraDetails).length > 0 && (
+                <div className="lux-glance-wrap">
+                  <h3 className="lux-sec-title">The essentials for this {String(property.type || "stay").replace(/-/g, " ")}</h3>
+                  <p className="lux-sec-sub" style={{ margin: "4px 0 12px" }}>Provided by the host — exactly what guests in this category compare before booking</p>
+                  <div className="lux-glance-grid">
+                    {Object.entries(property.extraDetails)
+                      .filter(([, v]) => v !== null && v !== undefined && v !== "")
+                      .map(([k, v], i) => (
+                        <div key={i} className="lux-glance-item">
+                          <span className="lux-glance-key">{k}</span>
+                          <span className="lux-glance-val">{String(v)}</span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+
               {/* Highlights List */}
               <div className="lux-highlights-list">
                 <div className="lux-hl-item">
@@ -1860,6 +1878,37 @@ const luxStyles = `
     font-size: 12px;
     color: #64748b;
     margin: 0;
+  }
+
+  /* Category-specific host details */
+  .lux-glance-wrap {
+    margin-top: 18px;
+  }
+  .lux-glance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+  }
+  .lux-glance-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .lux-glance-key {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #64748b;
+  }
+  .lux-glance-val {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f172a;
   }
 
   /* Amenities */
