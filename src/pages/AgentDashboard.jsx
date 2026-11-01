@@ -10,13 +10,24 @@ const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.o
 
 const s = {
   root: {
-    fontFamily: "'DM Sans', sans-serif",
-    background: "#f8f4f0",
+    fontFamily: "'DM Sans', 'Inter', sans-serif",
     minHeight: "100vh",
+    color: "#0f172a",
+    backgroundColor: "#eef2f7",
+    backgroundImage: `
+      radial-gradient(rgba(100, 116, 139, 0.10) 1px, transparent 1px),
+      radial-gradient(1100px 620px at 88% -8%, rgba(251, 191, 36, 0.20), transparent 62%),
+      radial-gradient(900px 560px at -8% 18%, rgba(14, 165, 233, 0.14), transparent 58%),
+      radial-gradient(820px 520px at 55% 108%, rgba(139, 92, 246, 0.12), transparent 60%),
+      linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%)
+    `,
+    backgroundSize: "22px 22px, auto, auto, auto, auto",
+    backgroundAttachment: "fixed",
   },
   header: {
-    background: "white",
-    borderBottom: "1px solid #e5e7eb",
+    background: "linear-gradient(120deg, #0b1424 0%, #101d33 55%, #16263f 100%)",
+    borderBottom: "3px solid #fbbf24",
+    boxShadow: "0 6px 24px rgba(11, 20, 36, 0.35)",
     padding: "16px 24px",
     display: "flex",
     alignItems: "center",
@@ -35,22 +46,25 @@ const s = {
   logoWord: {
     fontSize: "20px",
     fontWeight: 900,
-    color: "#1f2937",
+    color: "#f8fafc",
+    letterSpacing: "0.02em",
   },
   headerTitle: {
     fontSize: "18px",
     fontWeight: 700,
-    color: "#1f2937",
+    color: "#e2e8f0",
+    letterSpacing: "0.01em",
   },
   logoutBtn: {
-    background: "#fee2e2",
-    color: "#dc2626",
-    border: "none",
+    background: "rgba(239, 68, 68, 0.16)",
+    color: "#fca5a5",
+    border: "1px solid rgba(239, 68, 68, 0.45)",
     borderRadius: "8px",
     padding: "8px 16px",
     fontWeight: 600,
     fontSize: "13px",
     cursor: "pointer",
+    backdropFilter: "blur(6px)",
     transition: "all 0.2s ease",
   },
   container: {
@@ -60,30 +74,40 @@ const s = {
   },
   tabs: {
     display: "flex",
-    gap: "12px",
+    gap: "8px",
     marginBottom: "24px",
-    borderBottom: "2px solid #e5e7eb",
+    background: "rgba(255, 255, 255, 0.78)",
+    backdropFilter: "blur(10px)",
+    padding: "6px",
+    borderRadius: "999px",
+    border: "1px solid rgba(226, 232, 240, 0.9)",
+    boxShadow: "0 2px 12px rgba(15, 23, 42, 0.06)",
+    width: "fit-content",
+    maxWidth: "100%",
   },
   tab: {
-    padding: "12px 20px",
+    padding: "10px 18px",
     background: "transparent",
-    border: "none",
-    borderBottom: "3px solid transparent",
+    border: "1px solid transparent",
+    borderRadius: "999px",
     fontSize: "14px",
     fontWeight: 600,
-    color: "#6b7280",
+    color: "#475569",
     cursor: "pointer",
     transition: "all 0.2s ease",
   },
   tabActive: {
-    color: "#fbbf24",
-    borderBottomColor: "#fbbf24",
+    color: "#1f2937",
+    fontWeight: 800,
+    background: "linear-gradient(135deg, #fbbf24, #f59e0b)",
+    boxShadow: "0 4px 14px rgba(245, 158, 11, 0.35)",
   },
   sectionTitle: {
     fontSize: "22px",
     fontWeight: 800,
-    color: "#1f2937",
+    color: "#0f172a",
     marginBottom: "16px",
+    letterSpacing: "-0.01em",
   },
   grid: {
     display: "grid",
@@ -92,10 +116,10 @@ const s = {
   },
   card: {
     background: "white",
-    borderRadius: "12px",
+    borderRadius: "16px",
     padding: "20px",
-    border: "1px solid #e5e7eb",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+    border: "1px solid #e2e8f0",
+    boxShadow: "0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.06)",
     transition: "all 0.2s ease",
   },
   cardHeader: {
@@ -108,7 +132,7 @@ const s = {
     width: "48px",
     height: "48px",
     borderRadius: "50%",
-    background: "#fbbf24",
+    background: "linear-gradient(135deg, #fbbf24, #f59e0b)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -150,10 +174,11 @@ const s = {
   },
   modalContent: {
     background: "white",
-    borderRadius: "12px",
+    borderRadius: "18px",
     padding: "24px",
     maxWidth: "500px",
     width: "100%",
+    boxShadow: "0 24px 60px rgba(15, 23, 42, 0.25)",
   },
   modalTitle: {
     fontSize: "18px",
@@ -186,7 +211,7 @@ const s = {
     transition: "all 0.2s ease",
   },
   modalBtnPrimary: {
-    background: "#fbbf24",
+    background: "linear-gradient(135deg, #fbbf24, #f59e0b)",
     color: "#1f2937",
   },
   modalBtnSecondary: {
@@ -204,7 +229,7 @@ const s = {
     gap: "10px",
   },
   uploadBtn: {
-    background: "#10b981",
+    background: "linear-gradient(135deg, #10b981, #059669)",
     color: "white",
     border: "none",
     borderRadius: "8px",
@@ -215,7 +240,7 @@ const s = {
     display: "inline-flex",
     alignItems: "center",
     gap: "6px",
-    boxShadow: "0 2px 6px rgba(16, 185, 129, 0.25)",
+    boxShadow: "0 2px 8px rgba(5, 150, 105, 0.35)",
     transition: "all 0.2s",
   },
   statusApproved: {
@@ -237,10 +262,10 @@ const s = {
   },
   houseCard: {
     background: "white",
-    borderRadius: "12px",
+    borderRadius: "16px",
     overflow: "hidden",
-    border: "1px solid #e5e7eb",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+    border: "1px solid #e2e8f0",
+    boxShadow: "0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.06)",
     display: "flex",
     flexDirection: "column",
     transition: "all 0.2s ease",
@@ -360,21 +385,23 @@ const s = {
     transition: "all 0.2s ease",
   },
   emptyCard: {
-    background: "white",
-    borderRadius: "14px",
+    background: "rgba(255, 255, 255, 0.82)",
+    backdropFilter: "blur(8px)",
+    borderRadius: "18px",
     border: "1.5px dashed #cbd5e1",
     padding: "48px 24px",
     textAlign: "center",
     maxWidth: "520px",
     margin: "24px auto",
+    boxShadow: "0 8px 28px rgba(15, 23, 42, 0.05)",
   },
   profileSection: {
     background: "white",
-    borderRadius: "16px",
+    borderRadius: "20px",
     padding: "24px",
     marginBottom: "24px",
-    border: "1px solid #e5e7eb",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+    border: "1px solid #e8edf5",
+    boxShadow: "0 1px 3px rgba(15, 23, 42, 0.05), 0 14px 36px rgba(15, 23, 42, 0.08)",
     display: "flex",
     gap: "24px",
     alignItems: "flex-start",
@@ -419,19 +446,22 @@ const s = {
     flexWrap: "wrap",
   },
   statBox: {
-    background: "#f8fafc",
+    background: "rgba(255, 255, 255, 0.88)",
     border: "1px solid #e2e8f0",
-    borderRadius: "12px",
+    borderRadius: "14px",
     padding: "16px 24px",
     textAlign: "center",
     flex: "1",
     minWidth: "120px",
+    boxShadow: "0 2px 8px rgba(15, 23, 42, 0.04)",
+    backdropFilter: "blur(6px)",
   },
   statValue: {
     fontSize: "24px",
     fontWeight: 800,
-    color: "#3b82f6",
+    color: "#2563eb",
     marginBottom: "4px",
+    letterSpacing: "-0.02em",
   },
   statLabel: {
     fontSize: "12px",
@@ -1165,12 +1195,16 @@ export default function AgentDashboard() {
           <span style={s.logoAccent}>AXX</span>
           <span style={s.logoWord}>SPACE</span>
         </div>
-        <div style={{ ...s.headerTitle, fontSize: isMobile ? '15px' : '18px' }}>Agent Dashboard</div>
+        <div style={{ ...s.headerTitle, fontSize: isMobile ? '15px' : '18px' }}>
+          <span style={{ display: 'block', fontSize: '10px', fontWeight: 800, letterSpacing: '0.14em', color: '#fbbf24', textTransform: 'uppercase', lineHeight: 1.4 }}>AXXSpace Partner Portal</span>
+          Agent Dashboard
+        </div>
         <div style={{ ...s.headerActions, flexWrap: 'wrap', gap: '8px' }}>
-          <button style={{ ...s.uploadBtn, padding: isMobile ? '10px 12px' : '8px 16px', fontSize: isMobile ? '12px' : '13px', minHeight: '44px' }} onClick={() => navigate('/upload')}>
+          <button className="ag-hdr-btn" style={{ ...s.uploadBtn, padding: isMobile ? '10px 12px' : '8px 16px', fontSize: isMobile ? '12px' : '13px', minHeight: '44px' }} onClick={() => navigate('/upload')}>
             + Upload House
           </button>
           <button
+            className="ag-hdr-btn"
             style={{
               ...s.uploadBtn,
               background: 'linear-gradient(135deg,#0ea5e9,#0284c7)',
@@ -1185,6 +1219,7 @@ export default function AgentDashboard() {
             {isMobile ? '+ Accommodation' : '+ Post Accommodation'}
           </button>
           <button
+            className="ag-hdr-btn"
             style={{
               ...s.uploadBtn,
               background: 'linear-gradient(135deg,#8b5cf6,#7c3aed)',
@@ -1201,6 +1236,7 @@ export default function AgentDashboard() {
             {isMobile ? 'Package' : myPackage?.package?.name || 'Upgrade Package'}
           </button>
           <button
+            className="ag-hdr-btn"
             style={{
               ...s.uploadBtn,
               background: 'linear-gradient(135deg,#d9383a,#b91c1c)',
@@ -1216,7 +1252,7 @@ export default function AgentDashboard() {
           >
             {isMobile ? 'QR' : 'My QR Poster'}
           </button>
-          <button style={{ ...s.logoutBtn, minHeight: '44px', padding: isMobile ? '10px 14px' : '8px 16px' }} onClick={handleLogout}>
+          <button className="ag-logout" style={{ ...s.logoutBtn, minHeight: '44px', padding: isMobile ? '10px 14px' : '8px 16px' }} onClick={handleLogout}>
             Logout
           </button>
         </div>
@@ -1243,6 +1279,7 @@ export default function AgentDashboard() {
         </div>
         <style>
           {`
+            @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
             @keyframes slideIn {
               from { transform: translateX(100%); opacity: 0; }
               to { transform: translateX(0); opacity: 1; }
@@ -1251,6 +1288,15 @@ export default function AgentDashboard() {
               from { transform: rotate(0deg); }
               to { transform: rotate(360deg); }
             }
+            ::selection { background: rgba(251, 191, 36, 0.35); }
+            .ag-tabs::-webkit-scrollbar { display: none; }
+            .ag-tabs { scrollbar-width: none; }
+            .ag-tab { transition: all 0.2s ease; }
+            .ag-tab:hover { color: #0f172a; background: rgba(148, 163, 184, 0.14); }
+            .ag-logout { transition: all 0.2s ease; }
+            .ag-logout:hover { background: rgba(239, 68, 68, 0.3) !important; color: #fecaca !important; border-color: rgba(248, 113, 113, 0.7) !important; }
+            .ag-hdr-btn { transition: all 0.2s ease; }
+            .ag-hdr-btn:hover { transform: translateY(-1px); filter: brightness(1.07); }
           `}
         </style>
 
@@ -1261,7 +1307,8 @@ export default function AgentDashboard() {
           gap: isMobile ? '16px' : '24px',
           padding: isMobile ? '16px' : '24px',
           alignItems: isMobile ? 'center' : 'flex-start',
-          background: 'linear-gradient(135deg, rgba(254, 243, 199, 0.3) 0%, rgba(253, 230, 138, 0.3) 100%), white',
+          background: 'radial-gradient(640px 220px at 100% 0%, rgba(251, 191, 36, 0.16), transparent 62%), rgba(255, 255, 255, 0.88)',
+          backdropFilter: 'blur(10px)',
         }}>
           {/* Avatar with upload functionality */}
           <div
@@ -1413,13 +1460,14 @@ export default function AgentDashboard() {
           marginBottom: '24px',
         }} role="status" aria-label="Dashboard statistics">
           <div style={{
-            background: 'white',
-            borderRadius: '12px',
+            background: 'rgba(255, 255, 255, 0.92)',
+            backdropFilter: 'blur(8px)',
+            borderRadius: '16px',
             padding: '20px',
-            border: '1px solid #e5e7eb',
+            border: '1px solid #e2e8f0',
             borderTop: '3px solid',
             borderImage: 'linear-gradient(90deg, #fbbf24, #f59e0b) 1',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 28px rgba(15, 23, 42, 0.07)',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
               <div>
@@ -1430,13 +1478,14 @@ export default function AgentDashboard() {
           </div>
 
           <div style={{
-            background: 'white',
-            borderRadius: '12px',
+            background: 'rgba(255, 255, 255, 0.92)',
+            backdropFilter: 'blur(8px)',
+            borderRadius: '16px',
             padding: '20px',
-            border: '1px solid #e5e7eb',
+            border: '1px solid #e2e8f0',
             borderTop: '3px solid',
             borderImage: 'linear-gradient(90deg, #fbbf24, #f59e0b) 1',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 28px rgba(15, 23, 42, 0.07)',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
               <div>
@@ -1447,13 +1496,14 @@ export default function AgentDashboard() {
           </div>
 
           <div style={{
-            background: 'white',
-            borderRadius: '12px',
+            background: 'rgba(255, 255, 255, 0.92)',
+            backdropFilter: 'blur(8px)',
+            borderRadius: '16px',
             padding: '20px',
-            border: '1px solid #e5e7eb',
+            border: '1px solid #e2e8f0',
             borderTop: '3px solid',
             borderImage: 'linear-gradient(90deg, #fbbf24, #f59e0b) 1',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 28px rgba(15, 23, 42, 0.07)',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
               <div>
@@ -1464,13 +1514,14 @@ export default function AgentDashboard() {
           </div>
 
           <div style={{
-            background: 'white',
-            borderRadius: '12px',
+            background: 'rgba(255, 255, 255, 0.92)',
+            backdropFilter: 'blur(8px)',
+            borderRadius: '16px',
             padding: '20px',
-            border: '1px solid #e5e7eb',
+            border: '1px solid #e2e8f0',
             borderTop: '3px solid',
             borderImage: 'linear-gradient(90deg, #10b981, #059669) 1',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 28px rgba(15, 23, 42, 0.07)',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
@@ -1521,21 +1572,24 @@ export default function AgentDashboard() {
           </div>
         </div>
 
-        <div style={{ ...s.tabs, overflowX: isMobile ? 'auto' : 'visible', WebkitOverflowScrolling: 'touch', flexWrap: 'nowrap', paddingBottom: isMobile ? '2px' : '0', gap: isMobile ? '4px' : '12px' }}>
+        <div className="ag-tabs" style={{ ...s.tabs, overflowX: isMobile ? 'auto' : 'visible', WebkitOverflowScrolling: 'touch', flexWrap: 'nowrap', paddingBottom: isMobile ? '2px' : '0', gap: isMobile ? '4px' : '8px' }}>
           <button
-            style={{ ...s.tab, ...(activeTab === 'houses' ? s.tabActive : {}), whiteSpace: 'nowrap', padding: isMobile ? '10px 12px' : '12px 20px', minHeight: '44px', fontSize: isMobile ? '12px' : '14px' }}
+            className="ag-tab"
+            style={{ ...s.tab, ...(activeTab === 'houses' ? s.tabActive : {}), whiteSpace: 'nowrap', padding: isMobile ? '10px 12px' : '10px 18px', minHeight: '44px', fontSize: isMobile ? '12px' : '14px' }}
             onClick={() => setActiveTab("houses")}
           >
             My Houses ({myHouses.length})
           </button>
           <button
-            style={{ ...s.tab, ...(activeTab === 'accommodations' ? s.tabActive : {}), whiteSpace: 'nowrap', padding: isMobile ? '10px 12px' : '12px 20px', minHeight: '44px', fontSize: isMobile ? '12px' : '14px' }}
+            className="ag-tab"
+            style={{ ...s.tab, ...(activeTab === 'accommodations' ? s.tabActive : {}), whiteSpace: 'nowrap', padding: isMobile ? '10px 12px' : '10px 18px', minHeight: '44px', fontSize: isMobile ? '12px' : '14px' }}
             onClick={() => setActiveTab("accommodations")}
           >
             My Accommodations ({myAccommodations.length})
           </button>
           <button
-            style={{ ...s.tab, ...(activeTab === 'hunting-fee' ? s.tabActive : {}), whiteSpace: 'nowrap', padding: isMobile ? '10px 12px' : '12px 20px', minHeight: '44px', fontSize: isMobile ? '12px' : '14px' }}
+            className="ag-tab"
+            style={{ ...s.tab, ...(activeTab === 'hunting-fee' ? s.tabActive : {}), whiteSpace: 'nowrap', padding: isMobile ? '10px 12px' : '10px 18px', minHeight: '44px', fontSize: isMobile ? '12px' : '14px' }}
             onClick={() => setActiveTab("hunting-fee")}
           >
             House Hunting Fee {Number(houseHuntingFee) > 0 && `(KES ${Number(houseHuntingFee).toLocaleString()})`}
