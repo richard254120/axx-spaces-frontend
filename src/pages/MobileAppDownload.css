@@ -325,6 +325,15 @@
   background: #FBBF24;
 }
 
+.copy-btn.download-primary {
+  background: linear-gradient(135deg, #2563EB, #022754);
+  color: #ffffff;
+}
+
+.copy-btn.download-primary:hover {
+  filter: brightness(1.08);
+}
+
 .direct-link-hint {
   font-size: 0.8rem;
   color: #94A3B8;

@@ -2,9 +2,14 @@ import React, { useState, useEffect } from "react";
 import QRCode from "qrcode";
 import "./MobileAppDownload.css";
 
-// Permanent download URL for the Axxspace app APK (EAS build artifact).
-// Vercel can't carry the ~86 MB binary, so the site links straight to Expo's
-// CDN. Replace this after each new build (or move to GitHub Releases later).
+// Clean, branded download endpoint on our own API. It redirects the browser
+// straight to the APK on the EAS CDN, so one click downloads the file instead
+// of showing the raw Expo artifact URL. Vercel can't carry the ~86 MB binary.
+const API_BASE =
+  import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
+const DOWNLOAD_URL = `${API_BASE}/app/download`;
+
+// Direct CDN artifact (fallback / reference). Update after each new EAS build.
 const CLIENT_APK_URL =
   "https://expo.dev/artifacts/eas/tfbHKWKT1XUGv5tHV7rAnRi59n5fPcRWqFWZGS-QsU4.apk";
 
@@ -12,6 +17,7 @@ const APP_NAME = "Axxspace";
 const APK_VERSION = "v1.1.0";
 const APK_SIZE = "86 MB";
 const APK_UPDATED = "Nov 2, 2026";
+const APK_FILENAME = "Axxspace.apk";
 
 const MobileAppDownload = () => {
   const [downloadCount, setDownloadCount] = useState(1480);
@@ -41,8 +47,11 @@ const MobileAppDownload = () => {
 
   const handleDownloadClient = () => {
     setIsDownloadingClient(true);
+    // Real anchor click → the browser downloads the APK directly (the endpoint
+    // redirects to the CDN which serves it as an attachment). No page/URL shown.
     const link = document.createElement("a");
-    link.href = CLIENT_APK_URL;
+    link.href = DOWNLOAD_URL;
+    link.download = APK_FILENAME;
     link.rel = "noopener noreferrer";
     document.body.appendChild(link);
     link.click();
@@ -59,7 +68,7 @@ const MobileAppDownload = () => {
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(CLIENT_APK_URL);
+      await navigator.clipboard.writeText(DOWNLOAD_URL);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -170,9 +179,17 @@ const MobileAppDownload = () => {
 
         {/* Direct download link */}
         <div className="direct-link">
-          <span className="direct-link-label">Direct APK link</span>
+          <span className="direct-link-label">Direct download</span>
           <div className="direct-link-row">
-            <code className="direct-link-url" title={CLIENT_APK_URL}>{CLIENT_APK_URL}</code>
+            <code className="direct-link-url" title={DOWNLOAD_URL}>{DOWNLOAD_URL}</code>
+            <button
+              onClick={handleDownloadClient}
+              className="copy-btn download-primary"
+              id="direct-download-btn"
+              aria-label="Download APK now"
+            >
+              Download
+            </button>
             <button
               onClick={handleCopyLink}
               className="copy-btn"
@@ -183,8 +200,8 @@ const MobileAppDownload = () => {
             </button>
           </div>
           <p className="direct-link-hint">
-            Updated {APK_UPDATED} · {APK_SIZE} · After downloading, open the file and allow
-            “install from unknown sources” to install {APP_NAME}.
+            Updated {APK_UPDATED} · {APK_SIZE} · Clicking Download saves <strong>{APK_FILENAME}</strong>{" "}
+            to your device. Open the file and allow “install from unknown sources” to install {APP_NAME}.
           </p>
         </div>
 
