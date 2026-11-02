@@ -1055,6 +1055,30 @@ export default function HomePro() {
   const maxCounty = Math.max(...counties.map((c) => c.count), 1);
   const label = (s) => (s === "tourism" ? "Accommodation" : cap(s));
 
+  /* Total users drives the donut centre so it matches the "Total users" KPI exactly */
+  const totalUsers = demographics?.totalUsers || 0;
+
+  /* Split totalUsers across the service categories proportionally, distributing the
+     rounding remainder so the per-slice values sum back to the exact totalUsers. */
+  const serviceUserBreakdown = useMemo(() => {
+    const map = {};
+    if (!services.length || serviceTotal <= 0 || totalUsers <= 0) {
+      services.forEach((s) => { map[s.service] = 0; });
+      return map;
+    }
+    const raw = services.map((s) => (s.count / serviceTotal) * totalUsers);
+    const counts = raw.map(Math.floor);
+    let remainder = totalUsers - counts.reduce((a, b) => a + b, 0);
+    const byFrac = raw
+      .map((v, i) => ({ i, frac: v - Math.floor(v) }))
+      .sort((a, b) => b.frac - a.frac);
+    for (let k = 0; remainder > 0 && byFrac.length; k++, remainder--) {
+      counts[byFrac[k % byFrac.length].i] += 1;
+    }
+    services.forEach((s, i) => { map[s.service] = counts[i]; });
+    return map;
+  }, [services, serviceTotal, totalUsers]);
+
   /* Donut slices: each arc starts where the previous ones ended */
   const donutSlices = useMemo(() => {
     const lengths = services.map((s) =>
@@ -1336,7 +1360,7 @@ export default function HomePro() {
 
                 {demoTab === "services" ? (
                   <div className="ax-donut">
-                    <svg width="200" height="200" viewBox="0 0 100 100" role="img" aria-label="Service popularity chart">
+                    <svg width="200" height="200" viewBox="0 0 100 100" role="img" aria-label="User distribution by service">
                       <circle cx="50" cy="50" r={DONUT_R} fill="none" stroke="#ECEFEC" strokeWidth="12" />
                       {donutSlices.map((s) => (
                         <circle key={s.service} cx="50" cy="50" r={DONUT_R} fill="none"
@@ -1346,13 +1370,33 @@ export default function HomePro() {
                           transform="rotate(-90 50 50)" style={{ transition: "stroke-width .2s" }}
                           onMouseEnter={() => setHovered(s.service)} onMouseLeave={() => setHovered(null)} />
                       ))}
-                      <text x="50" y="48" textAnchor="middle" fontSize="5" fill="#617069">
-                        {hovered ? label(hovered) : "Total"}
+                      <text x="50" y="46" textAnchor="middle" fontSize="5" fill="#617069">
+                        {hovered ? label(hovered) : "Total users"}
                       </text>
-                      <text x="50" y="59" textAnchor="middle" fontSize="12" fontWeight="700" fill="#101614">
-                        {hovered ? services.find((s) => s.service === hovered)?.count ?? 0 : serviceTotal}
+                      <text x="50" y="58" textAnchor="middle" fontSize={String(totalUsers).length > 4 ? "10" : "12"} fontWeight="700" fill="#101614">
+                        {(hovered ? serviceUserBreakdown[hovered] : totalUsers) ?? 0}
                       </text>
                     </svg>
+                    <div className="ax-legend">
+                      <header style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "var(--mute)", padding: "0 8px" }}>
+                        <span>Service</span><span>Users</span>
+                      </header>
+                      {services.map((s, i) => (
+                        <div key={s.service}
+                          onMouseEnter={() => setHovered(s.service)}
+                          onMouseLeave={() => setHovered(null)}
+                          style={{ background: hovered === s.service ? "#EFF5F1" : undefined }}>
+                          <span>
+                            <i style={{ display: "inline-block", width: 10, height: 10, borderRadius: 3, marginRight: 8, verticalAlign: "middle", background: DONUT_COLORS[i % DONUT_COLORS.length] }} />
+                            {label(s.service)}
+                          </span>
+                          <strong>{serviceUserBreakdown[s.service] ?? 0}</strong>
+                        </div>
+                      ))}
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, fontSize: "14.5px", padding: "8px", borderTop: "1px solid #ECEFEC", marginTop: 4, fontWeight: 700 }}>
+                        <span>Total</span><span>{totalUsers}</span>
+                      </div>
+                    </div>
                   </div>
                 ) : counties.length ? (
                   <div>
