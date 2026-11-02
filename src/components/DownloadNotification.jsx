@@ -1,142 +1,144 @@
 // src/components/DownloadNotification.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useLocation } from "react-router-dom";
+import "./DownloadNotification.css";
 
 /**
  * DownloadNotification
- * A dismissable top banner that prompts users to download the Axxspace app.
- * Dismissal is remembered in localStorage so it only shows once per browser.
+ * A professional, dismissable modal popup prompting visitors to download the
+ * Axxspace app. The primary button triggers the exact APK URL directly (the EAS
+ * CDN serves it with Content-Disposition: attachment, so it downloads on click),
+ * with a secondary link to the full download page. Dismissal is remembered per
+ * browser and it does not appear on the download page itself.
  */
+const APP_NAME = "Axxspace";
+const APK_VERSION = "v1.1.0";
+// The exact URL that downloads the app APK. Update after each new EAS build.
+const APK_DOWNLOAD_URL =
+  "https://expo.dev/artifacts/eas/tfbHKWKT1XUGv5tHV7rAnRi59n5fPcRWqFWZGS-QsU4.apk";
+const APK_FILENAME = "Axxspace.apk";
+const DOWNLOAD_PAGE_PATH = "/mobile-app";
+const DISMISS_KEY = "axx_download_popup_dismissed_v3";
+
 const DownloadNotification = () => {
+  const location = useLocation();
   const [visible, setVisible] = useState(false);
-  const [isClosing, setIsClosing] = useState(false);
+  const [closing, setClosing] = useState(false);
 
-  useEffect(() => {
-    // Inject slide-down and slide-up animations only once
-    const styleId = "download-notif-style";
-    if (!document.getElementById(styleId)) {
-      const style = document.createElement("style");
-      style.id = styleId;
-      style.textContent = `
-        @keyframes slideDown {
-          from { transform: translateY(-100%); opacity: 0; }
-          to   { transform: translateY(0);    opacity: 1; }
-        }
-        @keyframes slideUp {
-          from { transform: translateY(0);    opacity: 1; }
-          to   { transform: translateY(-100%); opacity: 0; }
-        }
-      `;
-      document.head.appendChild(style);
-    }
+  const isDownloadPage =
+    location.pathname.toLowerCase() === DOWNLOAD_PAGE_PATH;
 
-    let hideTimer;
-    let removeTimer;
-
-    const dismissed = localStorage.getItem("axx_download_notification_dismissed_v2");
-    if (dismissed !== "true") {
-      setVisible(true);
-
-      // Auto-dismiss after 10 seconds
-      hideTimer = setTimeout(() => {
-        setIsClosing(true);
-        removeTimer = setTimeout(() => {
-          setVisible(false);
-          setIsClosing(false);
-        }, 400);
-      }, 10000);
-    }
-
-    return () => {
-      if (hideTimer) clearTimeout(hideTimer);
-      if (removeTimer) clearTimeout(removeTimer);
-    };
-  }, []);
-
-  const handleClose = () => {
-    setIsClosing(true);
+  const close = useCallback(() => {
+    setClosing(true);
     setTimeout(() => {
       setVisible(false);
-      setIsClosing(false);
-    }, 400);
-    localStorage.setItem("axx_download_notification_dismissed_v2", "true");
-  };
+      setClosing(false);
+    }, 240);
+    localStorage.setItem(DISMISS_KEY, "true");
+  }, []);
+
+  useEffect(() => {
+    if (isDownloadPage) return undefined;
+    if (localStorage.getItem(DISMISS_KEY) === "true") return undefined;
+    // Small delay so it isn't intrusive on first paint.
+    const t = setTimeout(() => setVisible(true), 2500);
+    return () => clearTimeout(t);
+  }, [isDownloadPage]);
+
+  // Escape key dismisses the popup.
+  useEffect(() => {
+    if (!visible) return undefined;
+    const onKey = (e) => {
+      if (e.key === "Escape") close();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [visible, close]);
 
   if (!visible) return null;
 
+  const handleDownload = () => {
+    // Real anchor click → the browser downloads the APK directly from the CDN.
+    const link = document.createElement("a");
+    link.href = APK_DOWNLOAD_URL;
+    link.download = APK_FILENAME;
+    link.rel = "noopener noreferrer";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    localStorage.setItem(DISMISS_KEY, "true");
+    setVisible(false);
+    setClosing(false);
+  };
+
+  const handleOverlayMouseDown = (e) => {
+    if (e.target === e.currentTarget) close();
+  };
+
   return (
     <div
-      id="download-notification-banner"
-      role="alert"
-      aria-live="polite"
-      style={{
-        background: "linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%)",
-        color: "white",
-        padding: "10px 20px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: "12px",
-        fontFamily: "'Inter', 'DM Sans', sans-serif",
-        fontSize: "0.92rem",
-        boxShadow: "0 2px 12px rgba(79,70,229,0.35)",
-        position: "relative",
-        zIndex: 1100,
-        animation: isClosing ? "slideUp 0.4s ease-in forwards" : "slideDown 0.4s ease-out",
-      }}
+      className={`dl-popup-overlay${closing ? " is-closing" : ""}`}
+      onMouseDown={handleOverlayMouseDown}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="dl-popup-title"
     >
-      {/* 📱 Icon + Text */}
-      <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <span style={{ fontSize: "1.3rem" }}>📱</span>
-        <span>
-          <strong>Get more from Axxspace!</strong> Download our mobile app for a
-          faster, smoother experience.
-        </span>
-      </span>
-
-      {/* Action buttons */}
-      <span style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
-        <a
-          id="download-notification-cta"
-          href="/mobile-app"
-          style={{
-            background: "white",
-            color: "#4f46e5",
-            border: "none",
-            borderRadius: "6px",
-            padding: "7px 16px",
-            fontWeight: 700,
-            cursor: "pointer",
-            textDecoration: "none",
-            fontSize: "0.85rem",
-            letterSpacing: "0.02em",
-            transition: "opacity 0.2s",
-            whiteSpace: "nowrap",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
-          onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
-        >
-          Download App
-        </a>
+      <div className="dl-popup-card">
         <button
-          id="download-notification-close"
-          onClick={handleClose}
-          aria-label="Dismiss notification"
-          style={{
-            background: "transparent",
-            border: "none",
-            color: "rgba(255,255,255,0.8)",
-            fontSize: "1.4rem",
-            lineHeight: 1,
-            cursor: "pointer",
-            padding: "0 4px",
-            transition: "color 0.2s",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "white")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.8)")}
+          className="dl-popup-close"
+          onClick={close}
+          aria-label="Close"
+          id="download-popup-close"
         >
           ×
         </button>
-      </span>
+
+        <div className="dl-popup-icon" aria-hidden="true">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="5" y="2" width="14" height="20" rx="2.5" ry="2.5"></rect>
+            <path d="M9 13l2 2 4-4"></path>
+            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+          </svg>
+        </div>
+
+        <h2 id="dl-popup-title" className="dl-popup-title">
+          Get the {APP_NAME} App
+        </h2>
+        <p className="dl-popup-sub">
+          Rentals, stays, movers, services and quick sales — right in your
+          pocket, always in sync with the website.
+        </p>
+
+        <div className="dl-popup-meta">
+          <span>Android 7.0+</span>
+          <span className="dot">•</span>
+          <span>Free</span>
+          <span className="dot">•</span>
+          <span>{APK_VERSION}</span>
+        </div>
+
+        <button
+          className="dl-popup-cta"
+          onClick={handleDownload}
+          id="download-popup-cta"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Download {APP_NAME} App
+        </button>
+
+        <a
+          href={DOWNLOAD_PAGE_PATH}
+          className="dl-popup-alt"
+          onClick={close}
+          id="download-popup-alt"
+        >
+          Or view all download options &amp; QR code →
+        </a>
+      </div>
     </div>
   );
 };
