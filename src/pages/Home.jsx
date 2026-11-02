@@ -863,6 +863,18 @@ function useScrollReveal(version) {
   }, [version]);
 }
 
+/* ── MOCK USER COUNT ──
+   Baseline of 1,035 users on 1 Aug 2026, growing automatically by 4 users per day.
+   The value is derived from the current date, so it keeps incrementing on its own. */
+const USER_COUNT_BASELINE = 1035;
+const USER_COUNT_BASE_DATE = new Date(2026, 7, 1); // 1 Aug 2026 (month is 0-based)
+const USER_COUNT_PER_DAY = 4;
+
+const growthUsersCount = () => {
+  const days = Math.max(0, Math.floor((Date.now() - USER_COUNT_BASE_DATE.getTime()) / 86400000));
+  return USER_COUNT_BASELINE + days * USER_COUNT_PER_DAY;
+};
+
 /* ═══════════════════════ COMPONENT ═══════════════════════ */
 export default function HomePro() {
   const navigate = useNavigate();
@@ -925,7 +937,10 @@ export default function HomePro() {
     const load = async () => {
       try {
         const res = await API.get("/analytics/demographics");
-        setDemographics(res.data?.data || null);
+        const data = res.data?.data || null;
+        // Use the growing mock user count instead of the live total.
+        if (data) data.totalUsers = growthUsersCount();
+        setDemographics(data);
       } catch (err) {
         console.error("Failed to load demographics:", err?.message || err);
       }
