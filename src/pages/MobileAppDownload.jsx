@@ -2,23 +2,28 @@ import React, { useState, useEffect } from "react";
 import QRCode from "qrcode";
 import "./MobileAppDownload.css";
 
-// Direct download: the APK artifact on the EAS CDN. The CDN serves it with
+// Direct download: the Axxspace app APK on the EAS CDN. The CDN serves it with
 // Content-Disposition: attachment, so a click downloads the file directly
 // (no page shown). Update this URL after each new EAS build.
 const DOWNLOAD_URL =
   "https://expo.dev/artifacts/eas/tfbHKWKT1XUGv5tHV7rAnRi59n5fPcRWqFWZGS-QsU4.apk";
 
+// Manager app download. NOTE: the manager build isn't hosted on its own CDN link
+// yet, so this currently falls back to the same APK. Replace MANAGER_DOWNLOAD_URL
+// with the hosted manager artifact URL once it's built/uploaded.
+const MANAGER_DOWNLOAD_URL = DOWNLOAD_URL;
+const MANAGER_FILENAME = "Axxspace-manager.apk";
+
 const APP_NAME = "Axxspace";
 const APK_VERSION = "v1.1.0";
 const APK_SIZE = "86 MB";
-const APK_UPDATED = "Nov 2, 2026";
 const APK_FILENAME = "Axxspace.apk";
 
 const MobileAppDownload = () => {
   const [downloadCount, setDownloadCount] = useState(1480);
   const [isDownloadingClient, setIsDownloadingClient] = useState(false);
+  const [isDownloadingManager, setIsDownloadingManager] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState("");
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const generateQRCode = async () => {
@@ -40,35 +45,31 @@ const MobileAppDownload = () => {
     generateQRCode();
   }, []);
 
-  const handleDownloadClient = () => {
-    setIsDownloadingClient(true);
-    // Real anchor click → the browser downloads the APK directly (the endpoint
-    // redirects to the CDN which serves it as an attachment). No page/URL shown.
+  // Trigger a real file download via a temporary anchor. The CDN serves the APK
+  // with Content-Disposition: attachment, so it saves directly (no page shown).
+  const triggerDownload = (url, filename, setActive) => {
+    setActive(true);
     const link = document.createElement("a");
-    link.href = DOWNLOAD_URL;
-    link.download = APK_FILENAME;
+    link.href = url;
+    link.download = filename;
     link.rel = "noopener noreferrer";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     setTimeout(() => {
-      setIsDownloadingClient(false);
+      setActive(false);
       setDownloadCount((prev) => prev + 1);
     }, 1200);
   };
 
+  const handleDownloadClient = () =>
+    triggerDownload(DOWNLOAD_URL, APK_FILENAME, setIsDownloadingClient);
+
+  const handleDownloadManager = () =>
+    triggerDownload(MANAGER_DOWNLOAD_URL, MANAGER_FILENAME, setIsDownloadingManager);
+
   const handleOpenWebApp = () => {
     window.open(window.location.origin, "_blank", "noopener,noreferrer");
-  };
-
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(DOWNLOAD_URL);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy link", err);
-    }
   };
 
   return (
@@ -90,7 +91,7 @@ const MobileAppDownload = () => {
         </div>
 
         <div className="download-options-grid">
-          {/* Client App Android APK Card (Axxspace) */}
+          {/* Manager App Card */}
           <div className="option-card primary-card">
             <div className="option-badge">Android · Recommended</div>
             <div className="option-icon-wrap">
@@ -100,8 +101,47 @@ const MobileAppDownload = () => {
                 <line x1="12" y1="15" x2="12" y2="3"></line>
               </svg>
             </div>
+            <h3>{APP_NAME} manager app</h3>
+            <p>Built for landlords, agents &amp; hosts — manage listings, tenants and bookings on the go.</p>
+            <button
+              onClick={handleDownloadManager}
+              disabled={isDownloadingManager}
+              className="action-btn download-btn"
+              id="download-manager-apk-btn"
+            >
+              {isDownloadingManager ? (
+                <>
+                  <span className="spinner"></span>
+                  Downloading APK...
+                </>
+              ) : (
+                <>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  Download Manager App
+                </>
+              )}
+            </button>
+            <div className="card-meta">
+              <span>Android 7.0+</span>
+            </div>
+          </div>
+
+          {/* Axxspace App Card (updated build) */}
+          <div className="option-card primary-card">
+            <div className="option-badge">Android</div>
+            <div className="option-icon-wrap">
+              <svg className="option-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+            </div>
             <h3>{APP_NAME} App</h3>
-            <p>Browse listings, book, chat and pay — always in sync with the website.</p>
+            <p>Browse rentals, stays, movers, services and quick sales — always in sync with the website.</p>
             <button
               onClick={handleDownloadClient}
               disabled={isDownloadingClient}
@@ -132,31 +172,6 @@ const MobileAppDownload = () => {
               <span>Android 7.0+</span>
             </div>
           </div>
-
-          {/* Web App Card */}
-          <div className="option-card secondary-card">
-            <div className="option-badge">Instant Access</div>
-            <div className="option-icon-wrap">
-              <svg className="option-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                <polyline points="15 3 21 3 21 9"></polyline>
-                <line x1="10" y1="14" x2="21" y2="3"></line>
-              </svg>
-            </div>
-            <h3>{APP_NAME} Web App</h3>
-            <p>Open {APP_NAME} instantly in any browser — no installation required.</p>
-            <button onClick={handleOpenWebApp} className="action-btn web-btn" id="open-web-app-btn">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                <polyline points="15 3 21 3 21 9"></polyline>
-                <line x1="10" y1="14" x2="21" y2="3"></line>
-              </svg>
-              Launch Web App
-            </button>
-            <div className="card-meta">
-              <span>Works on any device</span>
-            </div>
-          </div>
         </div>
 
         {/* QR Code Section */}
@@ -172,39 +187,14 @@ const MobileAppDownload = () => {
           </div>
         )}
 
-        {/* Direct download link */}
-        <div className="direct-link">
-          <span className="direct-link-label">Direct download</span>
-          <div className="direct-link-row">
-            <code className="direct-link-url" title={DOWNLOAD_URL}>{DOWNLOAD_URL}</code>
-            <button
-              onClick={handleDownloadClient}
-              className="copy-btn download-primary"
-              id="direct-download-btn"
-              aria-label="Download APK now"
-            >
-              Download
-            </button>
-            <button
-              onClick={handleCopyLink}
-              className="copy-btn"
-              id="copy-apk-link-btn"
-              aria-label="Copy APK download link"
-            >
-              {copied ? "Copied" : "Copy"}
-            </button>
-          </div>
-          <p className="direct-link-hint">
-            Updated {APK_UPDATED} · {APK_SIZE} · Clicking Download saves <strong>{APK_FILENAME}</strong>{" "}
-            to your device. Open the file and allow “install from unknown sources” to install {APP_NAME}.
-          </p>
-        </div>
-
-        {/* Client App Download & Badges */}
+        {/* Web app + notes */}
         <div className="extra-links-row">
           <span className="text-link-btn" style={{ cursor: "default" }}>
             New to {APP_NAME}? The app updates itself whenever we change the website — no reinstall needed.
           </span>
+          <button onClick={handleOpenWebApp} className="text-link-btn" id="open-web-app-btn">
+            Prefer not to install? Open the {APP_NAME} web app →
+          </button>
         </div>
 
         {/* Trust Badges */}
