@@ -1385,7 +1385,7 @@ export default function HomePro() {
             </ul>
             <div className="ax-app-cta">
               <button className="ax-btn" onClick={() => navigate("/mobile-app")}>Download the Android app</button>
-              <span><strong>Version 1.0.0</strong><small>APK, 3.1 MB</small></span>
+              <span><strong>Version 1.1.0</strong><small>APK, ~86 MB</small></span>
             </div>
           </div>
           <div className="ax-app-visual" data-reveal style={{ "--d": "140ms" }} aria-hidden="true">

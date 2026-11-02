@@ -25,6 +25,5 @@ dist-ssr
 .vercel
 .env*
 *.apk
-!public/downloads/*.apk
 
 

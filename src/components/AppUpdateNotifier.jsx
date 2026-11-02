@@ -41,7 +41,8 @@ export default function AppUpdateNotifier() {
     if (updateInfo?.downloadUrl) {
       window.location.href = updateInfo.downloadUrl;
     } else {
-      window.location.href = '/downloads/axx-spaces-mobile-v1.0.1.apk';
+      window.location.href =
+        'https://expo.dev/artifacts/eas/tfbHKWKT1XUGv5tHV7rAnRi59n5fPcRWqFWZGS-QsU4.apk';
     }
   };
 

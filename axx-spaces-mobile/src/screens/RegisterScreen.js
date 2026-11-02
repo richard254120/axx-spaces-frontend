@@ -94,7 +94,7 @@ const RegisterScreen = ({ navigation }) => {
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.header}>
             <Text style={styles.title}>Create Account</Text>
-            <Text style={styles.subtitle}>Join AXX Spaces today</Text>
+            <Text style={styles.subtitle}>Join Axxspace today</Text>
           </View>
 
           <View style={styles.form}>

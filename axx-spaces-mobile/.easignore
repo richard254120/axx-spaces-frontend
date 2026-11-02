@@ -1,0 +1,24 @@
+# Files/dirs excluded from the EAS build archive (keeps uploads small & fast).
+# We keep android/ SOURCE (build.gradle, app/src, gradle wrapper) because this
+# project uses a committed bare-workflow android folder, but never its build outputs.
+
+# Local Gradle / build outputs (can be hundreds of MB, regenerated in the cloud)
+android/.gradle
+android/build
+android/app/build
+android/app/.cxx
+
+# iOS not needed for Android builds (and vice-versa is handled by --platform)
+ios
+
+# Metro / Expo caches and logs
+.expo
+.tmpmetro
+*.log
+
+# Misc local-only
+.vercel
+coverage
+
+# Dependencies (EAS runs `npm ci` from package-lock.json in the cloud)
+node_modules/

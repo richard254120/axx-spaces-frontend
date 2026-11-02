@@ -268,6 +268,70 @@
   line-height: 1.4;
 }
 
+/* Direct download link */
+.direct-link {
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.direct-link-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #F59E0B;
+}
+
+.direct-link-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.direct-link-url {
+  flex: 1;
+  min-width: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+  color: #CBD5E1;
+  background: rgba(2, 6, 23, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 10px 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.copy-btn {
+  flex-shrink: 0;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: #0F172A;
+  background: #F59E0B;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.copy-btn:hover {
+  background: #FBBF24;
+}
+
+.direct-link-hint {
+  font-size: 0.8rem;
+  color: #94A3B8;
+  margin: 0;
+  line-height: 1.45;
+}
+
 /* Extra links */
 .extra-links-row {
   display: flex;
@@ -337,5 +401,19 @@
   .trust-row {
     flex-direction: column;
     gap: 12px;
+  }
+
+  .direct-link-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .direct-link-url {
+    white-space: normal;
+    word-break: break-all;
+  }
+
+  .copy-btn {
+    width: 100%;
   }
 }

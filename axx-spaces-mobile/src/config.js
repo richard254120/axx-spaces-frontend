@@ -9,8 +9,16 @@ export const CONFIG = {
   WEBSITE_URL: 'https://axxspace.com',
 
   // App Configuration
-  APP_NAME: 'AXX Spaces',
-  APP_VERSION: '1.0.1',
+  APP_NAME: 'Axxspace',
+  APP_VERSION: '1.1.0',
+  APP_VERSION_CODE: 3,
+
+  // Self-update manifest for the app SHELL (site content updates are automatic
+  // because the WebView always loads the live site).
+  VERSION_MANIFEST_URL: 'https://axxspace.com/downloads/version.json',
+  // Same EAS artifact the web download page and version.json point to (the
+  // local /downloads APK files were removed — Vercel can't carry the binary).
+  DEFAULT_APK_URL: 'https://expo.dev/artifacts/eas/tfbHKWKT1XUGv5tHV7rAnRi59n5fPcRWqFWZGS-QsU4.apk',
 
   // Feature Flags
   FEATURES: {

@@ -1,177 +1,228 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
-  StyleSheet,
   View,
   Text,
-  ActivityIndicator,
-  TouchableOpacity,
-  BackHandler,
+  StyleSheet,
   SafeAreaView,
   StatusBar,
   Platform,
-  RefreshControl,
-  ScrollView,
+  BackHandler,
+  Share,
   Linking,
+  Animated,
+  Easing,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import NetInfo from '@react-native-community/netinfo';
 import CONFIG from '../config';
+import { COLORS } from '../constants/appTheme';
+import { INJECTED_JS } from '../utils/injected';
+import TopBar from '../components/TopBar';
+import SplashOverlay from '../components/SplashOverlay';
+import { OfflineScreen, ErrorScreen, UpdateBanner } from '../components/StateScreens';
 
 const TARGET_URL = CONFIG.WEBSITE_URL || 'https://axxspace.com';
+const SITE_HOST = (() => {
+  try { return new URL(TARGET_URL).host; } catch { return 'axxspace.com'; }
+})();
+
+function isNewerVersion(latest, current) {
+  const l = latest.split('.').map(Number);
+  const c = current.split('.').map(Number);
+  for (let i = 0; i < Math.max(l.length, c.length); i++) {
+    const a = l[i] || 0;
+    const b = c[i] || 0;
+    if (a > b) return true;
+    if (a < b) return false;
+  }
+  return false;
+}
 
 export default function WebViewScreen() {
   const webViewRef = useRef(null);
+
+  const [loading, setLoading] = useState(true);
+  const [splashVisible, setSplashVisible] = useState(true);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+
+  const [currentPath, setCurrentPath] = useState('/');
+  const [pageTitle, setPageTitle] = useState('Axxspace');
   const [canGoBack, setCanGoBack] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+
   const [isOffline, setIsOffline] = useState(false);
   const [webError, setWebError] = useState(null);
-  const [refreshing, setRefreshing] = useState(false);
-  const [updateAvailable, setUpdateAvailable] = useState(null);
-  const [showUpdateBanner, setShowUpdateBanner] = useState(false);
+  const [retrying, setRetrying] = useState(false);
 
-  // Check for app version updates from version manifest
+  const [updateInfo, setUpdateInfo] = useState(null);
+  const [showUpdate, setShowUpdate] = useState(false);
+
+  const progress = useRef(new Animated.Value(0)).current;
+
+  // --- Top progress bar animation driven by the loading flag ---
   useEffect(() => {
-    fetch('https://axxspace.com/downloads/version.json?t=' + Date.now())
-      .then((res) => res.json())
+    if (loading && !splashVisible) {
+      progress.setValue(0);
+      Animated.timing(progress, {
+        toValue: 1,
+        duration: 900,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: false,
+      }).start();
+    }
+  }, [loading, splashVisible, progress]);
+
+  // --- Shell (APK) self-update check. Site content updates are automatic. ---
+  useEffect(() => {
+    const url = `${CONFIG.VERSION_MANIFEST_URL}?t=${Date.now()}`;
+    fetch(url)
+      .then((r) => r.json())
       .then((data) => {
-        if (data && data.latestVersion) {
-          const installedVersion = CONFIG.APP_VERSION || '1.0.1';
-          if (isNewerVersion(data.latestVersion, installedVersion)) {
-            setUpdateAvailable(data);
-            setShowUpdateBanner(true);
-          }
+        if (data && data.latestVersion && isNewerVersion(data.latestVersion, CONFIG.APP_VERSION)) {
+          setUpdateInfo(data);
+          if (!data.forceUpdate) setShowUpdate(true);
+          else setShowUpdate(true);
         }
       })
-      .catch((err) => console.log('Version check skipped:', err));
+      .catch(() => {});
   }, []);
 
-  const isNewerVersion = (latest, current) => {
-    const lParts = latest.split('.').map(Number);
-    const cParts = current.split('.').map(Number);
-    for (let i = 0; i < Math.max(lParts.length, cParts.length); i++) {
-      const l = lParts[i] || 0;
-      const c = cParts[i] || 0;
-      if (l > c) return true;
-      if (l < c) return false;
-    }
-    return false;
-  };
-
-  // Monitor network connectivity status
+  // --- Connectivity ---
   useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener((state) => {
-      if (state.isConnected === false) {
-        setIsOffline(true);
-      } else if (state.isConnected === true && isOffline) {
-        setIsOffline(false);
+    const unsub = NetInfo.addEventListener((state) => {
+      const offline = state.isConnected === false || state.isInternetReachable === false;
+      setIsOffline(offline);
+      if (!offline && hasLoadedOnce && webViewRef.current) {
+        // came back online: clear the offline screen and let the WebView show again
+        setWebError(null);
       }
     });
+    NetInfo.fetch().then((s) => setIsOffline(s.isConnected === false));
+    return () => unsub();
+  }, [hasLoadedOnce]);
 
-    return () => unsubscribe();
-  }, [isOffline]);
-
-  // Handle Android hardware back button
+  // --- Android hardware back: navigate the page history, else minimize ---
   useEffect(() => {
     if (Platform.OS !== 'android') return;
-
-    const onBackPress = () => {
+    const onBack = () => {
       if (canGoBack && webViewRef.current) {
         webViewRef.current.goBack();
-        return true; // prevent default back behavior
+        return true;
       }
-      return false; // allow default app exit/back behavior
+      BackHandler.exitApp();
+      return true;
     };
-
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
-    return () => backHandler.remove();
+    const sub = BackHandler.addEventListener('hardwareBackPress', onBack);
+    return () => sub.remove();
   }, [canGoBack]);
 
-  const handleRefresh = useCallback(() => {
-    setRefreshing(true);
+  const handleRetry = useCallback(() => {
+    setRetrying(true);
     setWebError(null);
-    if (webViewRef.current) {
-      webViewRef.current.reload();
-    }
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1500);
+    setIsOffline(false);
+    setLoading(true);
+    webViewRef.current && webViewRef.current.reload();
+    setTimeout(() => setRetrying(false), 1200);
   }, []);
 
-  const handleRetry = () => {
-    setIsOffline(false);
+  const handleRefresh = useCallback(() => {
     setWebError(null);
-    setIsLoading(true);
-    if (webViewRef.current) {
-      webViewRef.current.reload();
-    }
+    setLoading(true);
+    webViewRef.current && webViewRef.current.reload();
+  }, []);
+
+  const handleShare = useCallback(() => {
+    const link = `${TARGET_URL.replace(/\/$/, '')}${currentPath}`;
+    Share.share({
+      message: `Check this out on Axxspace: ${link}`,
+      url: link,
+      title: pageTitle || 'Axxspace',
+    }).catch(() => {});
+  }, [currentPath, pageTitle]);
+
+  // External protocols and off-site links
+  const openExternal = (url) => {
+    Linking.openURL(url).catch(() => {});
   };
 
-  const handleOpenBrowser = () => {
-    Linking.openURL(TARGET_URL).catch((err) => console.log('Error launching browser:', err));
-  };
-
-  const handleShouldStartLoad = (event) => {
+  const handleShouldStartLoad = useCallback((event) => {
     const { url } = event;
     if (!url) return true;
 
-    // Allow blob/data URLs for canvas exports, posters, and dynamic media
-    if (url.startsWith('blob:') || url.startsWith('data:')) {
+    if (url.startsWith('about:') || url.startsWith('blob:') || url.startsWith('data:')) {
       return true;
     }
 
-    // Allow standard HTTP/HTTPS web links in WebView
-    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('about:')) {
+    // Non-web schemes -> native apps
+    if (!/^https?:\/\//i.test(url)) {
+      openExternal(url);
+      return false;
+    }
+
+    let host = '';
+    try { host = new URL(url).host; } catch { return true; }
+
+    // Stay inside the app for our own site (and dev server)
+    if (host === SITE_HOST || host === 'localhost' || host.endsWith(`.${SITE_HOST}`)) {
       return true;
     }
 
-    // External protocols like tel:, mailto:, whatsapp:, etc. open in external system apps
-    try {
-      Linking.canOpenURL(url)
-        .then((supported) => {
-          if (supported) {
-            Linking.openURL(url);
-          } else {
-            Linking.openURL(url).catch(() => {});
-          }
-        })
-        .catch((err) => console.log('Error opening external link:', err));
-    } catch (e) {
-      console.log('Error checking external URL:', e);
-    }
+    // Everything else opens in the system browser
+    openExternal(url);
     return false;
-  };
+  }, []);
+
+  const handleMessage = useCallback((event) => {
+    try {
+      const data = JSON.parse(event.nativeEvent.data);
+      if (data && data.type === 'nav') {
+        setCurrentPath(data.path || '/');
+        if (data.title && data.title.toLowerCase() !== 'axxspace') setPageTitle(data.title);
+        if (typeof data.canGoBack === 'boolean') setCanGoBack(data.canGoBack);
+      }
+    } catch (e) {
+      /* ignore malformed messages */
+    }
+  }, []);
+
+  const headerTitle =
+    pageTitle && pageTitle.trim() && pageTitle.toLowerCase() !== 'axxspace'
+      ? pageTitle
+      : 'Axxspace';
+
+  const widthInterp = progress.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] });
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0f1729" translucent={false} />
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.background} translucent={false} />
 
-      {isOffline ? (
-        <ScrollView
-          contentContainerStyle={styles.offlineContainer}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              tintColor="#fbbf24"
-              colors={['#fbbf24']}
+      <TopBar
+        title={headerTitle}
+        canGoBack={canGoBack && !splashVisible}
+        loading={loading}
+        onBack={() => webViewRef.current && webViewRef.current.goBack()}
+        onRefresh={handleRefresh}
+        onShare={handleShare}
+      />
+
+      {/* thin top progress bar during page loads */}
+      {loading && !splashVisible ? (
+        <View style={styles.progressTrack}>
+          <Animated.View style={[styles.progressFill, { width: widthInterp }]} />
+        </View>
+      ) : null}
+
+      <View style={styles.content}>
+        {isOffline ? (
+          <OfflineScreen onRetry={handleRetry} refreshing={retrying} />
+        ) : webError ? (
+          <View style={{ flex: 1 }}>
+            <ErrorScreen
+              message={webError}
+              onRetry={handleRetry}
+              onOpenBrowser={() => openExternal(TARGET_URL)}
             />
-          }
-        >
-          <View style={styles.offlineCard}>
-            <View style={styles.iconCircle}>
-              <Text style={styles.wifiIcon}>📶</Text>
-            </View>
-            <Text style={styles.offlineTitle}>No Internet Connection</Text>
-            <Text style={styles.offlineSubtitle}>
-              Please check your mobile data or Wi-Fi connection and tap retry to open Axxspace.
-            </Text>
-            <TouchableOpacity style={styles.retryButton} activeOpacity={0.8} onPress={handleRetry}>
-              <Text style={styles.retryText}>Retry Connection</Text>
-            </TouchableOpacity>
           </View>
-        </ScrollView>
-      ) : (
-        <View style={styles.webViewWrapper}>
+        ) : (
           <WebView
             ref={webViewRef}
             source={{ uri: TARGET_URL }}
@@ -179,107 +230,75 @@ export default function WebViewScreen() {
             originWhitelist={['*']}
             javaScriptEnabled={true}
             domStorageEnabled={true}
+            geolocationEnabled={true}
+            sharedCookiesEnabled={true}
+            thirdPartyCookiesEnabled={true}
+            cacheEnabled={true}
             allowFileAccess={false}
             allowUniversalAccessFromFileURLs={false}
-            javaScriptCanOpenWindowsAutomatically={true}
-            startInLoadingState={true}
-            allowsInlineMediaPlayback={true}
-            mediaPlaybackRequiresUserAction={false}
-            mixedContentMode="always"
-            thirdPartyCookiesEnabled={true}
-            sharedCookiesEnabled={true}
-            allowsBackForwardNavigationGestures={true}
+            mixedContentMode="compatibility"
+            startInLoadingState={false}
             setSupportMultipleWindows={false}
-            androidLayerType="software"
+            javaScriptCanOpenWindowsAutomatically={true}
+            mediaPlaybackRequiresUserAction={false}
+            allowsInlineMediaPlayback={true}
+            overScrollMode="never"
+            pullToRefreshEnabled={false}
+            injectedJavaScriptBeforeContentLoaded={INJECTED_JS}
             onShouldStartLoadWithRequest={handleShouldStartLoad}
-            onNavigationStateChange={(navState) => {
-              setCanGoBack(navState.canGoBack);
+            onMessage={handleMessage}
+            onNavigationStateChange={(nav) => {
+              setCanGoBack(nav.canGoBack);
+              if (nav.title) setPageTitle(nav.title);
+              if (nav.url) {
+                try {
+                  const u = new URL(nav.url);
+                  if (u.host === SITE_HOST) {
+                    setCurrentPath(u.pathname + u.search);
+                  }
+                } catch (e) {}
+              }
             }}
-            onLoadStart={() => setIsLoading(true)}
+            onLoadStart={() => setLoading(true)}
             onLoadEnd={() => {
-              setIsLoading(false);
+              setLoading(false);
               setWebError(null);
+              setHasLoadedOnce(true);
+              // let the splash rest briefly so the first paint is ready underneath
+              setTimeout(() => setSplashVisible(false), 250);
             }}
-            onError={(syntheticEvent) => {
-              const { nativeEvent } = syntheticEvent;
-              console.warn('WebView load error: ', nativeEvent);
-              setWebError(nativeEvent.description || 'Failed to connect to Axxspace website.');
+            onError={(syn) => {
+              const { nativeEvent } = syn;
+              setLoading(false);
+              setSplashVisible(false);
+              setWebError((nativeEvent && nativeEvent.description) || 'Failed to connect to Axxspace.');
             }}
-            onReceivedHttpError={(syntheticEvent) => {
-              const { nativeEvent } = syntheticEvent;
-              console.warn('WebView HTTP error: ', nativeEvent);
+            onRenderProcessGone={() => {
+              setLoading(false);
+              setWebError('The app was reset. Tap reload to continue.');
             }}
-            onRenderProcessGone={(syntheticEvent) => {
-              const { nativeEvent } = syntheticEvent;
-              console.warn('WebView render process killed: ', nativeEvent);
-              setIsLoading(false);
-              setWebError('WebView process reset. Tap Reload to restore.');
-            }}
-            onReceivedSslError={(syntheticEvent) => {
-              const { nativeEvent } = syntheticEvent;
-              console.warn('WebView SSL notice: ', nativeEvent);
-            }}
-            renderLoading={() => (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#fbbf24" />
-                <Text style={styles.loadingText}>Loading Axxspace...</Text>
-              </View>
-            )}
           />
+        )}
 
-          {showUpdateBanner && updateAvailable && (
-            <View style={styles.updateBannerContainer}>
-              <View style={styles.updateBannerContent}>
-                <Text style={styles.updateBannerTitle}>App Upgrade Available!</Text>
-                <Text style={styles.updateBannerDesc}>
-                  Version {updateAvailable.latestVersion} is ready with new features and improvements.
-                </Text>
-              </View>
-              <View style={styles.updateBannerActions}>
-                <TouchableOpacity
-                  style={styles.updateNowButton}
-                  onPress={() => {
-                    Linking.openURL(
-                      updateAvailable.downloadUrl ||
-                        'https://axxspace.com/downloads/axx-spaces-mobile-v1.0.1.apk'
-                    ).catch((err) => console.log('Error launching download:', err));
-                  }}
-                >
-                  <Text style={styles.updateNowText}>Update</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.dismissButton}
-                  onPress={() => setShowUpdateBanner(false)}
-                >
-                  <Text style={styles.dismissText}>✕</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
+        {showUpdate && updateInfo ? (
+          <UpdateBanner
+            info={updateInfo}
+            onUpdate={() =>
+              openExternal(updateInfo.downloadUrl || CONFIG.DEFAULT_APK_URL)
+            }
+            onDismiss={() => setShowUpdate(false)}
+          />
+        ) : null}
 
-          {webError && (
-            <View style={styles.errorOverlay}>
-              <Text style={styles.errorTitle}>Unable to load Axxspace</Text>
-              <Text style={styles.errorSubtitle}>{webError}</Text>
-              <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
-                <Text style={styles.retryText}>Reload Page</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.retryButton, { marginTop: 12, backgroundColor: 'transparent', borderWidth: 1, borderColor: '#fbbf24' }]}
-                onPress={handleOpenBrowser}
-              >
-                <Text style={[styles.retryText, { color: '#fbbf24' }]}>Open in Browser</Text>
-              </TouchableOpacity>
-            </View>
-          )}
+        <SplashOverlay
+          visible={splashVisible}
+          onDone={() => setHasLoadedOnce(true)}
+        />
+      </View>
 
-          {isLoading && !webError && (
-            <View style={styles.topProgressBar}>
-              <ActivityIndicator size="small" color="#fbbf24" />
-            </View>
-          )}
-        </View>
-      )}
+      <Text style={styles.footerBrand} numberOfLines={1}>
+        Powered by axxspace.com · updates automatically
+      </Text>
     </SafeAreaView>
   );
 }
@@ -287,178 +306,31 @@ export default function WebViewScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f1729',
+    backgroundColor: COLORS.background,
   },
-  webViewWrapper: {
+  content: {
     flex: 1,
-    backgroundColor: '#0f1729',
+    backgroundColor: COLORS.background,
     position: 'relative',
   },
   webView: {
     flex: 1,
-    backgroundColor: '#0f1729',
+    backgroundColor: COLORS.background,
   },
-  updateBannerContainer: {
-    position: 'absolute',
-    top: 10,
-    left: 12,
-    right: 12,
-    zIndex: 99,
-    backgroundColor: '#1e293b',
-    borderColor: '#fbbf24',
-    borderWidth: 1,
-    borderRadius: 14,
-    padding: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
-    shadowRadius: 10,
-    elevation: 10,
+  progressTrack: {
+    height: 2,
+    backgroundColor: 'rgba(251,191,36,0.12)',
   },
-  updateBannerContent: {
-    flex: 1,
-    marginRight: 8,
+  progressFill: {
+    height: '100%',
+    backgroundColor: COLORS.primary,
   },
-  updateBannerTitle: {
-    color: '#fbbf24',
-    fontWeight: '700',
-    fontSize: 14,
-    marginBottom: 2,
-  },
-  updateBannerDesc: {
-    color: '#94a3b8',
-    fontSize: 12,
-    lineHeight: 16,
-  },
-  updateBannerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  updateNowButton: {
-    backgroundColor: '#fbbf24',
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    borderRadius: 8,
-  },
-  updateNowText: {
-    color: '#0f1729',
-    fontWeight: '800',
-    fontSize: 13,
-  },
-  dismissButton: {
-    padding: 6,
-  },
-  dismissText: {
-    color: '#94a3b8',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  loadingContainer: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#0f1729',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 10,
-  },
-  loadingText: {
-    marginTop: 14,
-    color: '#94a3b8',
-    fontSize: 15,
-    fontWeight: '500',
-    letterSpacing: 0.3,
-  },
-  topProgressBar: {
-    position: 'absolute',
-    top: 10,
-    right: 15,
-    zIndex: 20,
-    backgroundColor: 'rgba(15, 23, 41, 0.8)',
-    borderRadius: 20,
-    padding: 6,
-  },
-  errorOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#0f1729',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-    zIndex: 30,
-  },
-  errorTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    marginBottom: 8,
-  },
-  errorSubtitle: {
-    fontSize: 14,
-    color: '#94a3b8',
+  footerBrand: {
     textAlign: 'center',
-    marginBottom: 20,
-  },
-  offlineContainer: {
-    flexGrow: 1,
-    backgroundColor: '#0f1729',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-  },
-  offlineCard: {
-    backgroundColor: '#1e293b',
-    borderRadius: 20,
-    padding: 32,
-    alignItems: 'center',
-    width: '100%',
-    maxWidth: 380,
-    borderWidth: 1,
-    borderColor: 'rgba(251, 191, 36, 0.2)',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 15,
-    elevation: 8,
-  },
-  iconCircle: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: 'rgba(251, 191, 36, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  wifiIcon: {
-    fontSize: 32,
-  },
-  offlineTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  offlineSubtitle: {
-    fontSize: 14,
-    color: '#94a3b8',
-    textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: 24,
-  },
-  retryButton: {
-    backgroundColor: '#fbbf24',
-    paddingVertical: 14,
-    paddingHorizontal: 28,
-    borderRadius: 12,
-    width: '100%',
-    alignItems: 'center',
-  },
-  retryText: {
-    color: '#0f1729',
-    fontWeight: '700',
-    fontSize: 15,
+    color: COLORS.textDim,
+    fontSize: 10,
+    paddingBottom: 4,
+    paddingTop: 2,
+    backgroundColor: COLORS.surfaceAlt,
   },
 });

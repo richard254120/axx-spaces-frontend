@@ -11,18 +11,4 @@
 -keep class com.swmansion.reanimated.** { *; }
 -keep class com.facebook.react.turbomodule.** { *; }
 
-# react-native-webview
--keep class com.reactnativecommunity.webview.** { *; }
--keep class com.reactnativecommunity.webview.RNCWebViewManager** { *; }
--keep class com.reactnativecommunity.webview.RNCWebViewModule** { *; }
--keep interface com.reactnativecommunity.webview.** { *; }
-
-# react-native-gesture-handler
--keep class com.swmansion.gesturehandler.** { *; }
-
-# Expo & React Native Core
--keep class com.facebook.react.** { *; }
--keep class expo.modules.** { *; }
--keep class android.webkit.** { *; }
-
-
+# Add any project specific keep options here:

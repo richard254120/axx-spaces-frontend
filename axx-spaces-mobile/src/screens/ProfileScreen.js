@@ -81,7 +81,7 @@ const ProfileScreen = ({ navigation }) => {
       </TouchableOpacity>
 
       <View style={styles.versionInfo}>
-        <Text style={styles.versionText}>AXX Spaces Mobile v1.0.0</Text>
+        <Text style={styles.versionText}>Axxspace Mobile v1.1.0</Text>
       </View>
     </ScrollView>
   );

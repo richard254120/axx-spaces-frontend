@@ -32,7 +32,7 @@ class ErrorBoundary extends Component {
             <Text style={styles.errorIcon}>⚠️</Text>
             <Text style={styles.errorTitle}>Something Went Wrong</Text>
             <Text style={styles.errorSubtitle}>
-              An unexpected error occurred in AXX Spaces. Tap below to reload the app.
+              An unexpected error occurred in Axxspace. Tap below to reload the app.
             </Text>
             <TouchableOpacity style={styles.reloadButton} onPress={this.handleRestart}>
               <Text style={styles.reloadButtonText}>Reload App</Text>
@@ -105,5 +105,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 });
+
+// App.js is loaded through node_modules/expo/AppEntry.js, which does:
+//   import App from '../../App'; registerRootComponent(App);
+// The default export below is what AppEntry registers as the root component.
+// (Without a default export, AppEntry receives an empty `{}` object and React
+// crashes on launch with "Element type is invalid ... got: object".)
+export default MainApp;
 
 registerRootComponent(MainApp);
