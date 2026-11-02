@@ -2,15 +2,10 @@ import React, { useState, useEffect } from "react";
 import QRCode from "qrcode";
 import "./MobileAppDownload.css";
 
-// Clean, branded download endpoint on our own API. It redirects the browser
-// straight to the APK on the EAS CDN, so one click downloads the file instead
-// of showing the raw Expo artifact URL. Vercel can't carry the ~86 MB binary.
-const API_BASE =
-  import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
-const DOWNLOAD_URL = `${API_BASE}/app/download`;
-
-// Direct CDN artifact (fallback / reference). Update after each new EAS build.
-const CLIENT_APK_URL =
+// Direct download: the APK artifact on the EAS CDN. The CDN serves it with
+// Content-Disposition: attachment, so a click downloads the file directly
+// (no page shown). Update this URL after each new EAS build.
+const DOWNLOAD_URL =
   "https://expo.dev/artifacts/eas/tfbHKWKT1XUGv5tHV7rAnRi59n5fPcRWqFWZGS-QsU4.apk";
 
 const APP_NAME = "Axxspace";

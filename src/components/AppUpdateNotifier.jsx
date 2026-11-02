@@ -3,11 +3,10 @@ import './AppUpdateNotifier.css';
 
 const CURRENT_APP_VERSION = '1.0.0';
 
-// Clean download endpoint on our API — redirects to the APK on the EAS CDN so
-// the browser downloads the file directly instead of showing the raw URL.
-const API_BASE =
-  import.meta.env.VITE_API_URL || 'https://axx-spaces-backend-1.onrender.com/api';
-const DOWNLOAD_URL = `${API_BASE}/app/download`;
+// Direct download: APK artifact on the EAS CDN (served with Content-Disposition:
+// attachment, so the browser downloads it). Update after each new EAS build.
+const DOWNLOAD_URL =
+  'https://expo.dev/artifacts/eas/tfbHKWKT1XUGv5tHV7rAnRi59n5fPcRWqFWZGS-QsU4.apk';
 
 export default function AppUpdateNotifier() {
   const [updateInfo, setUpdateInfo] = useState(null);
