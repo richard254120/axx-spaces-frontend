@@ -110,14 +110,12 @@ export const ACCOUNT_NAV_BY_ROLE = {
   member: [
     { label: "My Hub", path: "/member" },
     { label: "Saved Spaces", path: "/saved" },
-    { label: "My Bookings", path: "/my-bookings" },
     { label: "Profile", path: "/profile" },
     { label: "Settings", path: "/settings" },
   ],
   user: [
     { label: "My Hub", path: "/member" },
     { label: "Saved Spaces", path: "/saved" },
-    { label: "My Bookings", path: "/my-bookings" },
     { label: "Profile", path: "/profile" },
     { label: "Settings", path: "/settings" },
   ],

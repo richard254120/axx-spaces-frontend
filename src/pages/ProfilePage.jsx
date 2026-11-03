@@ -249,7 +249,7 @@ export default function ProfilePage() {
               <div style={styles.statSub}>Bookmarked rentals & stays</div>
             </Link>
 
-            <Link to="/my-bookings" style={styles.statCard}>
+            <Link to="/member" style={styles.statCard}>
               <div style={{ ...styles.statIconWrap, background: "rgba(56, 189, 248, 0.12)", color: "#38bdf8" }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -327,7 +327,7 @@ export default function ProfilePage() {
                   </div>
                 </Link>
 
-                <Link to="/my-bookings" style={styles.actionCard}>
+                <Link to="/member" style={styles.actionCard}>
                   <div style={{ ...styles.actionIcon, color: "#34d399", background: "rgba(16, 185, 129, 0.1)" }}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -337,8 +337,8 @@ export default function ProfilePage() {
                     </svg>
                   </div>
                   <div>
-                    <div style={styles.actionTitle}>Stays & Bookings</div>
-                    <div style={styles.actionDesc}>Track your accommodation bookings & check-ins</div>
+                    <div style={styles.actionTitle}>My Activity</div>
+                    <div style={styles.actionDesc}>View your saved spaces, enquiries and activity</div>
                   </div>
                 </Link>
               </>

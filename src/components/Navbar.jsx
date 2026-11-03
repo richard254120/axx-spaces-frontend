@@ -638,7 +638,7 @@ export default function Navbar() {
                           <Link to="/saved" className="ax-item" onClick={() => setAccountOpen(false)}>
                             Saved Spaces
                           </Link>
-                          <Link to="/my-bookings" className="ax-item" onClick={() => setAccountOpen(false)}>
+                          <Link to="/member" className="ax-item" onClick={() => setAccountOpen(false)}>
                             My Bookings
                           </Link>
                           <Link to="/notifications" className="ax-item" onClick={() => setAccountOpen(false)}>

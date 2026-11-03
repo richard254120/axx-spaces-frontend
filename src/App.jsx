@@ -47,12 +47,6 @@ const SavedListingsPage = lazy(() => import("./pages/SavedListingsPage"));
 const MessagesPage = lazy(() => import("./pages/MessagesPage"));
 const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
 
-// ─── New Accommodation Booking Pages ──────────────────────────────────────────
-const AccommodationSearch = lazy(() => import("./pages/AccommodationSearch"));
-const AccommodationBookingDetail = lazy(() => import("./pages/AccommodationBookingDetail"));
-const AccommodationGuestDashboard = lazy(() => import("./pages/AccommodationGuestDashboard"));
-const AccommodationLeaveReview = lazy(() => import("./pages/AccommodationLeaveReview"));
-
 // ─── Accommodation Pages ───────────────────────────────────────────────────────────
 const AccommodationPage = lazy(() => import("./pages/accommodation/AccommodationPage"));
 const AccommodationListingsPage = lazy(() => import("./pages/accommodation/AccommodationListingsPage"));
@@ -180,34 +174,11 @@ function App() {
       <Route path="/terms" element={<PublicLayout><TermsAndPrivacy /></PublicLayout>} />
       {/* Users page removed */}
 
-      {/* ── NEW ACCOMMODATION BOOKING ROUTES ── */}
-      <Route path="/accommodation-booking-search" element={<PublicLayout><AccommodationSearch /></PublicLayout>} />
-      <Route path="/accommodation-booking-detail/:id" element={<PublicLayout><AccommodationBookingDetail /></PublicLayout>} />
-      <Route
-        path="/my-bookings"
-        element={
-          <DashboardLayout>
-            <ProtectedRoute><AccommodationGuestDashboard /></ProtectedRoute>
-          </DashboardLayout>
-        }
-      />
-      <Route
-        path="/accommodation-leave-review"
-        element={
-          <DashboardLayout>
-            <ProtectedRoute><AccommodationLeaveReview /></ProtectedRoute>
-          </DashboardLayout>
-        }
-      />
-
       {/* ── ACCOMMODATION ROUTES (have Navbar) ── */}
       {/* IMPORTANT: specific /accommodation/* paths must come before /accommodation/:id */}
       <Route path="/accommodation" element={<PublicLayout><AccommodationPage /></PublicLayout>} />
       <Route path="/accommodation/login" element={<BareLayout><AccommodationLogin defaultTab="login" /></BareLayout>} />
       <Route path="/accommodation/register" element={<BareLayout><AccommodationLogin defaultTab="register" /></BareLayout>} />
-      <Route path="/host-login" element={<BareLayout><AccommodationLogin defaultTab="login" /></BareLayout>} />
-      <Route path="/host-register" element={<BareLayout><AccommodationLogin defaultTab="register" /></BareLayout>} />
-      <Route path="/host-portal" element={<BareLayout><AccommodationLogin defaultTab="login" /></BareLayout>} />
       <Route path="/accommodation/listings" element={<PublicLayout><AccommodationListingsPage /></PublicLayout>} />
       <Route
         path="/accommodation/register-property"
