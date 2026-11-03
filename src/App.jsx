@@ -5,7 +5,6 @@ import { useDevToolsProtection } from "./hooks/useDevToolsProtection";
 
 import Navbar from "./components/Navbar";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
-import AppUpdateNotifier from "./components/AppUpdateNotifier";
 import DownloadNotification from "./components/DownloadNotification";
 
 // ── Eager: only the landing page and the shell ship in the entry bundle ──
@@ -85,7 +84,7 @@ const MobileAppDownload = lazy(() => import("./pages/MobileAppDownload"));
 import ProtectedRoute from "./components/ProtectedRoute";
 import AccountLayout from "./components/AccountLayout";
 
-// Public pages get the Navbar + WhatsApp button + App Update Notifier
+// Public pages get the Navbar + WhatsApp button
 function PublicLayout({ children }) {
   return (
     <>
@@ -93,7 +92,6 @@ function PublicLayout({ children }) {
       <DownloadNotification />
       {children}
       <FloatingWhatsApp />
-      <AppUpdateNotifier />
     </>
   );
 }
@@ -103,7 +101,6 @@ function DashboardLayout({ children, preferSeller = false }) {
   return (
     <AccountLayout preferSeller={preferSeller}>
       {children}
-      <AppUpdateNotifier />
     </AccountLayout>
   );
 }
