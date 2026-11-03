@@ -637,16 +637,7 @@ export default function AccommodationPage() {
           </div>
 
           <div className="hero-compact-actions">
-            {!user ? (
-              <button
-                type="button"
-                className="hero-compact-btn-primary"
-                onClick={() => navigate("/accommodation/register?tab=register")}
-              >
-                <span>List Stay (Host)</span>
-                <span className="btn-arrow">→</span>
-              </button>
-            ) : isHostUser ? (
+            {isHostUser && (
               <button
                 type="button"
                 className="hero-compact-btn-primary"
@@ -655,15 +646,7 @@ export default function AccommodationPage() {
                 <span>Host Dashboard</span>
                 <span className="btn-arrow">→</span>
               </button>
-            ) : null}
-
-            <button
-              type="button"
-              className="hero-compact-btn-secondary"
-              onClick={() => navigate("/accommodation/login?tab=login")}
-            >
-              <span>Host Portal</span>
-            </button>
+            )}
           </div>
         </div>
 
