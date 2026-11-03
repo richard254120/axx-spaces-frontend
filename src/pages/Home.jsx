@@ -208,7 +208,7 @@ const css = `
 .ax-root .ax-seg{display:inline-flex;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:3px;margin-bottom:20px}
 .ax-root .ax-seg button{border:0;background:none;padding:7px 16px;border-radius:8px;font-size:14px;font-weight:600;color:var(--mute)}
 .ax-root .ax-seg button[aria-selected="true"]{background:var(--green);color:#fff}
-.ax-root .ax-donut{display:flex;gap:28px;align-items:center;flex-wrap:wrap}
+.ax-root .ax-donut{display:flex;gap:28px;align-items:center;justify-content:center;flex-wrap:wrap}
 .ax-root .ax-legend{flex:1;min-width:200px;display:flex;flex-direction:column;gap:8px}
 .ax-root .ax-legend div{display:flex;justify-content:space-between;gap:12px;font-size:14.5px;padding:6px 8px;border-radius:8px;cursor:default}
 .ax-root .ax-legend div:hover,.ax-root .ax-legend div.on{background:var(--paper)}
@@ -1377,26 +1377,6 @@ export default function HomePro() {
                         {(hovered ? serviceUserBreakdown[hovered] : totalUsers) ?? 0}
                       </text>
                     </svg>
-                    <div className="ax-legend">
-                      <header style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "var(--mute)", padding: "0 8px" }}>
-                        <span>Service</span><span>Users</span>
-                      </header>
-                      {services.map((s, i) => (
-                        <div key={s.service}
-                          onMouseEnter={() => setHovered(s.service)}
-                          onMouseLeave={() => setHovered(null)}
-                          style={{ background: hovered === s.service ? "#EFF5F1" : undefined }}>
-                          <span>
-                            <i style={{ display: "inline-block", width: 10, height: 10, borderRadius: 3, marginRight: 8, verticalAlign: "middle", background: DONUT_COLORS[i % DONUT_COLORS.length] }} />
-                            {label(s.service)}
-                          </span>
-                          <strong>{serviceUserBreakdown[s.service] ?? 0}</strong>
-                        </div>
-                      ))}
-                      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, fontSize: "14.5px", padding: "8px", borderTop: "1px solid #ECEFEC", marginTop: 4, fontWeight: 700 }}>
-                        <span>Total</span><span>{totalUsers}</span>
-                      </div>
-                    </div>
                   </div>
                 ) : counties.length ? (
                   <div>
