@@ -9,6 +9,14 @@ import {
 import { fetchOwnerListing, updateOwnerListing, formatVideoUrl } from "../../api/accommodation";
 import { getAccommodationToken } from "../../features/accommodation";
 
+// Backend returns images as AccommodationImage documents ({ imageUrl, ... }),
+// so resolve a renderable URL from either shape (object or plain string).
+function getImageUrl(img) {
+  if (!img) return "";
+  if (typeof img === "string") return img;
+  return img.imageUrl || img.url || "";
+}
+
 export default function EditPropertyPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -23,8 +31,35 @@ export default function EditPropertyPage() {
   const [form, setForm] = useState({});
   const [newImages, setNewImages] = useState([]);
   const [newVideos, setNewVideos] = useState([]);
-  const [removeImages, setRemoveImages] = useState([]);
+  const [remainingImages, setRemainingImages] = useState(null); // null = untouched; array = kept image URLs
   const [removeVideos, setRemoveVideos] = useState([]);
+
+  const applyLoadedProperty = (data) => {
+    setProperty(data);
+    setForm({
+      name: data.name || "",
+      type: data.type || "",
+      description: data.description || "",
+      address: data.address || "",
+      lat: data.location?.lat || "",
+      lng: data.location?.lng || "",
+      basePrice: data.basePrice ?? "",
+      currency: data.currency || "KES",
+      amenities: data.amenities || [],
+      extraDetails: data.extraDetails && typeof data.extraDetails === "object" && !Array.isArray(data.extraDetails) ? data.extraDetails : {},
+      checkInTime: data.checkInTime || "14:00",
+      checkOutTime: data.checkOutTime || "11:00",
+      houseRules: data.houseRules || "",
+      maxGuests: data.maxGuests ?? "",
+      totalRooms: data.totalRooms ?? "",
+    });
+    setRemainingImages(null);
+  };
+
+  const loadProperty = async () => {
+    const data = await fetchOwnerListing(token, id);
+    applyLoadedProperty(data);
+  };
 
   useEffect(() => {
     if (!token) {
@@ -34,25 +69,7 @@ export default function EditPropertyPage() {
     }
     (async () => {
       try {
-        const data = await fetchOwnerListing(token, id);
-        setProperty(data);
-        setForm({
-          name: data.name || "",
-          type: data.type || "",
-          description: data.description || "",
-          address: data.address || "",
-          lat: data.location?.lat || "",
-          lng: data.location?.lng || "",
-          basePrice: data.basePrice ?? "",
-          currency: data.currency || "KES",
-          amenities: data.amenities || [],
-          extraDetails: data.extraDetails && typeof data.extraDetails === "object" && !Array.isArray(data.extraDetails) ? data.extraDetails : {},
-          checkInTime: data.checkInTime || "14:00",
-          checkOutTime: data.checkOutTime || "11:00",
-          houseRules: data.houseRules || "",
-          maxGuests: data.maxGuests ?? "",
-          totalRooms: data.totalRooms ?? "",
-        });
+        await loadProperty();
       } catch (err) {
         setError(err.message || "Failed to load property details");
       } finally {
@@ -111,17 +128,20 @@ export default function EditPropertyPage() {
         else if (typeof v === "object") return;
         else if (v !== undefined && v !== null) fd.append(k, v);
       });
-      if (removeImages.length) fd.append("removeImages", JSON.stringify(removeImages));
+      // Backend deletes any existing image NOT present in remainingImages,
+      // so only send the field once the host has removed at least one photo.
+      if (remainingImages) fd.append("remainingImages", JSON.stringify(remainingImages));
       if (removeVideos.length) fd.append("removeVideos", JSON.stringify(removeVideos));
       newImages.forEach((file) => fd.append("images", file));
       newVideos.forEach((file) => fd.append("videos", file));
 
-      const res = await updateOwnerListing(token, id, fd);
-      setSuccess(res.message || "Property updated successfully!");
-      if (res.data) setProperty(res.data);
+      await updateOwnerListing(token, id, fd);
+      // Re-fetch so the form, previews, and pending changes reflect saved state
+      // (including freshly uploaded image URLs returned by the backend).
+      await loadProperty();
+      setSuccess("Property updated successfully!");
       setNewImages([]);
       setNewVideos([]);
-      setRemoveImages([]);
       setRemoveVideos([]);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
@@ -158,8 +178,19 @@ export default function EditPropertyPage() {
     );
   }
 
-  const currentImages = (property.images || []).filter((u) => !removeImages.includes(u));
+  // Images come back as { imageUrl } objects — normalize to URLs for display/removal
+  const allImageUrls = (property.images || []).map(getImageUrl).filter(Boolean);
+  const keptSet = new Set(remainingImages || allImageUrls);
+  const currentImages = allImageUrls.filter((u) => keptSet.has(u));
   const currentVideos = (property.videos || []).filter((u) => !removeVideos.includes(u));
+
+  const handleRemoveImage = (url) => {
+    setRemainingImages(allImageUrls.filter((u) => u !== url));
+  };
+
+  const handleUndoRemoveImage = (url) => {
+    setRemainingImages((r) => (r ? [...r, url].sort((a, b) => allImageUrls.indexOf(a) - allImageUrls.indexOf(b)) : r));
+  };
   const isApproved = property.status === "active" || property.status === "approved";
 
   return (
@@ -250,22 +281,76 @@ export default function EditPropertyPage() {
             </p>
           </div>
 
-          {currentImages.length > 0 && (
-            <div style={styles.mediaGrid}>
-              {currentImages.map((url) => (
-                <div key={url} style={styles.mediaItem}>
-                  <img src={url} alt="" style={styles.mediaImg} />
-                  <button
-                    type="button"
-                    style={styles.removeBtn}
-                    onClick={() => setRemoveImages((r) => [...r, url])}
-                    title="Remove photo"
-                  >
-                    ✕ Remove
-                  </button>
-                </div>
-              ))}
-            </div>
+          {allImageUrls.length > 0 && (
+            <>
+              <div style={styles.mediaSubhead}>Existing photos ({currentImages.length}) — click ✕ Remove to delete a photo when you save</div>
+              <div style={styles.mediaGrid}>
+                {allImageUrls.map((url, index) => {
+                  const marked = !keptSet.has(url);
+                  return (
+                    <div
+                      key={url}
+                      style={{
+                        ...styles.mediaItem,
+                        ...(marked ? styles.mediaItemMarked : {}),
+                      }}
+                    >
+                      <img
+                        src={url}
+                        alt={`Photo ${index + 1}`}
+                        loading="lazy"
+                        style={styles.mediaImg}
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                          const fallback = e.currentTarget.parentElement?.querySelector(".img-fallback");
+                          if (fallback) fallback.style.display = "flex";
+                        }}
+                      />
+                      <div
+                        className="img-fallback"
+                        style={styles.imgFallback}
+                      >
+                        <span>⚠️</span>
+                        <span>Preview unavailable</span>
+                      </div>
+                      <span style={styles.mediaIndex}>#{index + 1}</span>
+                      {marked && <div style={styles.markedOverlay}>Will be removed on save</div>}
+                      <div style={styles.mediaActions}>
+                        <button
+                          type="button"
+                          style={marked ? { ...styles.removeBtn, ...styles.undoBtn } : styles.removeBtn}
+                          onClick={() => (marked ? handleUndoRemoveImage(url) : handleRemoveImage(url))}
+                          title={marked ? "Undo removal" : "Remove photo"}
+                        >
+                          {marked ? "↩ Undo" : "✕ Remove"}
+                        </button>
+                        <label style={styles.replaceBtn} title="Replace this photo with a new upload">
+                          ⟳ Replace
+                          <input
+                            type="file"
+                            accept="image/*"
+                            hidden
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                setNewImages((prev) => [...prev, file]);
+                                handleRemoveImage(url);
+                              }
+                              e.target.value = "";
+                            }}
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              {newImages.length > 0 && (
+                <p style={styles.replaceNote}>
+                  ⟳ Replaced photos upload the new image and delete the old one when you click Save All Changes.
+                </p>
+              )}
+            </>
           )}
 
           {currentVideos.length > 0 && (
@@ -823,11 +908,61 @@ const styles = {
     background: "#0b1222",
     height: "130px",
   },
+  mediaItemMarked: {
+    border: "1px solid rgba(239, 68, 68, 0.55)",
+    opacity: 0.55,
+  },
   mediaImg: {
     width: "100%",
     height: "100%",
     objectFit: "cover",
     display: "block",
+  },
+  imgFallback: {
+    position: "absolute",
+    inset: 0,
+    display: "none",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "6px",
+    color: "#94a3b8",
+    fontSize: "11px",
+    fontWeight: 700,
+    background: "#0b1222",
+  },
+  mediaIndex: {
+    position: "absolute",
+    top: "6px",
+    left: "6px",
+    background: "rgba(15, 23, 42, 0.75)",
+    color: "#e2e8f0",
+    fontSize: "10.5px",
+    fontWeight: 800,
+    padding: "2px 7px",
+    borderRadius: "6px",
+    pointerEvents: "none",
+  },
+  markedOverlay: {
+    position: "absolute",
+    top: "6px",
+    right: "6px",
+    background: "rgba(239, 68, 68, 0.9)",
+    color: "white",
+    fontSize: "10px",
+    fontWeight: 800,
+    padding: "3px 7px",
+    borderRadius: "6px",
+    pointerEvents: "none",
+  },
+  mediaActions: {
+    position: "absolute",
+    bottom: "6px",
+    right: "6px",
+    left: "6px",
+    display: "flex",
+    justifyContent: "flex-end",
+    gap: "6px",
   },
   mediaSubhead: {
     fontSize: "13px",
@@ -836,9 +971,6 @@ const styles = {
     marginBottom: "10px",
   },
   removeBtn: {
-    position: "absolute",
-    bottom: "6px",
-    right: "6px",
     background: "rgba(239, 68, 68, 0.85)",
     color: "white",
     border: "none",
@@ -848,6 +980,28 @@ const styles = {
     fontWeight: 700,
     cursor: "pointer",
     backdropFilter: "blur(6px)",
+  },
+  undoBtn: {
+    background: "rgba(16, 185, 129, 0.88)",
+  },
+  replaceBtn: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "4px",
+    background: "rgba(56, 189, 248, 0.85)",
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    padding: "4px 8px",
+    fontSize: "11px",
+    fontWeight: 700,
+    cursor: "pointer",
+    backdropFilter: "blur(6px)",
+  },
+  replaceNote: {
+    marginTop: "10px",
+    fontSize: "12px",
+    color: "#7dd3fc",
   },
   uploadRow: {
     display: "grid",
