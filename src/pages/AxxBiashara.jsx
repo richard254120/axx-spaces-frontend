@@ -423,7 +423,7 @@ export default function AxxBiashara() {
   const toggleFavorite = async (businessId, e) => {
     e.stopPropagation();
     if (!token) {
-      navigate("/business-login");
+      navigate("/login");
       return;
     }
     try {
@@ -435,7 +435,10 @@ export default function AxxBiashara() {
         await API.post("/favorites", { businessId });
         loadFavorites();
       }
-    } catch (err) { }
+    } catch (err) {
+      console.error("Failed to toggle favorite:", err);
+      alert("Could not update your favorites. Please try again.");
+    }
   };
 
   const isFavorite = (id) => favorites.some((f) => f.business?._id === id || f.business === id);
