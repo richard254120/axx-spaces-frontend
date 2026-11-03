@@ -10,22 +10,6 @@ const BUSINESS_CATEGORIES = [
   "Construction", "Transportation", "Other",
 ];
 
-const CATEGORY_EMOJIS = {
-  "Restaurants": "🍽️",
-  "Retail": "🛍️",
-  "Services": "🛠️",
-  "Technology": "💻",
-  "Healthcare": "🏥",
-  "Education": "🎓",
-  "Entertainment": "🎬",
-  "Professional Services": "💼",
-  "Manufacturing": "🏭",
-  "Agriculture": "🌾",
-  "Construction": "🏗️",
-  "Transportation": "🚚",
-  "Other": "🏢",
-};
-
 const KENYA_COUNTIES = [
   "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta", "Garissa", "Wajir",
   "Mandera", "Marsabit", "Isiolo", "Meru", "Tharaka Nithi", "Embu", "Kitui", "Machakos",
@@ -37,12 +21,12 @@ const KENYA_COUNTIES = [
 ];
 
 const BADGE_CONFIG = {
-  student_verified: { label: "Student Verified", color: "#10b981", icon: "✦" },
-  identity_verified: { label: "Identity Verified", color: "#10b981", icon: "✦" },
-  business_verified: { label: "Business Verified", color: "#3b82f6", icon: "◈" },
-  online_verified: { label: "Online Verified", color: "#3b82f6", icon: "◈" },
-  location_verified: { label: "Location Verified", color: "#8b5cf6", icon: "◉" },
-  premium_verified: { label: "Premium", color: "#f59e0b", icon: "★" },
+  student_verified: { label: "Student Verified", color: "#10b981" },
+  identity_verified: { label: "Identity Verified", color: "#10b981" },
+  business_verified: { label: "Business Verified", color: "#3b82f6" },
+  online_verified: { label: "Online Verified", color: "#3b82f6" },
+  location_verified: { label: "Location Verified", color: "#8b5cf6" },
+  premium_verified: { label: "Premium", color: "#f59e0b" },
 };
 
 // ── Professional Icons ──
@@ -76,6 +60,84 @@ const IconWhatsApp = ({ size = 14, className = "" }) => (
 const IconSparkles = ({ size = 14, className = "" }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
     <path d="M12 2l2.4 5 5.6.8-4 4 1 5.6-5-2.6-5 2.6 1-5.6-4-4 5.6-.8z" />
+  </svg>
+);
+
+const IconStar = ({ size = 12, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={className} style={{ flexShrink: 0 }}>
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+  </svg>
+);
+
+const IconBolt = ({ size = 14, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+  </svg>
+);
+
+const IconMegaphone = ({ size = 14, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z" />
+    <path d="M15 8a4 4 0 0 1 0 8" />
+    <path d="M18 5a8 8 0 0 1 0 14" />
+  </svg>
+);
+
+const IconBuilding = ({ size = 14, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <rect x="4" y="2" width="16" height="20" rx="1.5" />
+    <path d="M9 7h1M14 7h1M9 11h1M14 11h1M9 15h1M14 15h1" />
+    <path d="M10 22v-3h4v3" />
+  </svg>
+);
+
+const IconVerified = ({ size = 11, color = "currentColor", className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke={color} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <path d="M12 2l7 3v6c0 4.5-3 8.5-7 11-4-2.5-7-6.5-7-11V5l7-3z" />
+    <polyline points="9 12 11 14 15 10" />
+  </svg>
+);
+
+// ── Category Icons (professional SVG, no emoji) ──
+const CATEGORY_ICON_PATHS = {
+  "Restaurants": <><path d="M5 3v7a2 2 0 0 0 4 0V3" /><path d="M7 10v11" /><path d="M17 3c-1.5 0-2.5 2-2.5 5s1 4 2.5 4" /><path d="M17 3v18" /></>,
+  "Retail": <><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" /></>,
+  "Services": <><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" /></>,
+  "Technology": <><rect x="2" y="3" width="20" height="14" rx="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" /></>,
+  "Healthcare": <><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></>,
+  "Education": <><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></>,
+  "Entertainment": <><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></>,
+  "Professional Services": <><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></>,
+  "Manufacturing": <><path d="M3 21V10l6 4V10l6 4V6l6 3v12z" /><path d="M3 21h18" /></>,
+  "Agriculture": <><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z" /><path d="M2 21c0-3 1.85-5.36 5.08-6" /></>,
+  "Construction": <><path d="M2 20h20" /><path d="M4 20a8 8 0 0 1 16 0" /><path d="M10 4h4v5h-4z" /><path d="M8 9h8" /></>,
+  "Transportation": <><rect x="1" y="5" width="14" height="12" rx="1" /><polygon points="15 9 20 9 23 12 23 17 15 17 15 9" /><circle cx="5.5" cy="18.5" r="2" /><circle cx="18.5" cy="18.5" r="2" /></>,
+  "Other": <><rect x="4" y="2" width="16" height="20" rx="1.5" /><path d="M9 7h1M14 7h1M9 11h1M14 11h1M9 15h1M14 15h1" /><path d="M10 22v-3h4v3" /></>,
+};
+
+const CategoryIcon = ({ category, size = 20, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    {CATEGORY_ICON_PATHS[category] || CATEGORY_ICON_PATHS["Other"]}
+  </svg>
+);
+
+const IconX = ({ size = 16, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
+
+const IconCheck = ({ size = 16, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+
+const IconArrowRight = ({ size = 14, className = "" }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
+    <line x1="5" y1="12" x2="19" y2="12" />
+    <polyline points="12 5 19 12 12 19" />
   </svg>
 );
 
@@ -152,8 +214,8 @@ function BusinessCardMedia({ biz, isFav, onToggleFavorite, isCompared, onToggleC
         </div>
       ) : (
         <div className="card-no-photo">
-          <span style={{ fontSize: "38px" }}>{CATEGORY_EMOJIS[category] || "🏢"}</span>
-          <span style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 700, marginTop: "4px" }}>No Photos Uploaded</span>
+          <CategoryIcon category={category} size={44} className="card-no-photo-icon" />
+          <span style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 700, marginTop: "6px" }}>No Photos Uploaded</span>
         </div>
       )}
 
@@ -206,14 +268,14 @@ function BusinessCardMedia({ biz, isFav, onToggleFavorite, isCompared, onToggleC
       {/* Featured Tag */}
       {biz.featured && (
         <div className="card-featured-badge">
-          <span>⚡ Featured</span>
+          <span className="featured-badge-inner"><IconBolt size={12} /> Featured</span>
         </div>
       )}
 
       {/* Rating Badge */}
       {biz.rating > 0 && (
         <div className="card-rating-badge">
-          <span style={{ color: "#F59E0B" }}>★</span>
+          <span style={{ color: "#F59E0B", display: "inline-flex" }}><IconStar size={12} /></span>
           <span>{biz.rating?.toFixed(1)}</span>
         </div>
       )}
@@ -396,10 +458,20 @@ export default function AxxBiashara() {
       return;
     }
     try {
-      const res = await API.get(`/business/compare?ids=${comparisonList.join(",")}`);
-      setComparisonData(res.data.businesses || []);
+      const res = await API.get("/business/compare", {
+        params: { ids: comparisonList.join(",") },
+      });
+      const list = res.data?.businesses || [];
+      if (list.length === 0) {
+        alert("No businesses are available to compare right now.");
+        return;
+      }
+      setComparisonData(list);
       setShowComparisonModal(true);
-    } catch (err) { }
+    } catch (err) {
+      console.error("Comparison failed:", err);
+      alert("Could not load the comparison right now. Please try again.");
+    }
   };
 
   /* ── announcement submit ── */
@@ -529,7 +601,7 @@ export default function AxxBiashara() {
                     className="clear-input-btn"
                     title="Clear search"
                   >
-                    ✕
+                    <IconX size={14} />
                   </button>
                 )}
               </div>
@@ -553,7 +625,7 @@ export default function AxxBiashara() {
 
               {/* Category Dropdown */}
               <div className="search-field search-select-field">
-                <span className="field-icon">🏢</span>
+                <span className="field-icon"><IconBuilding size={16} /></span>
                 <select
                   value={selectedCategory || ""}
                   onChange={(e) => setSelectedCategory(e.target.value || null)}
@@ -562,7 +634,7 @@ export default function AxxBiashara() {
                   <option value="">All Categories</option>
                   {BUSINESS_CATEGORIES.map((cat) => (
                     <option key={cat} value={cat}>
-                      {CATEGORY_EMOJIS[cat] || "🏢"} {cat}
+                      {cat}
                     </option>
                   ))}
                 </select>
@@ -570,7 +642,7 @@ export default function AxxBiashara() {
 
               {/* Sort By Dropdown */}
               <div className="search-field search-select-field">
-                <span className="field-icon">⚡</span>
+                <span className="field-icon"><IconBolt size={15} /></span>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
@@ -605,7 +677,7 @@ export default function AxxBiashara() {
                   className={`quick-category-chip ${selectedCategory === null ? "active" : ""}`}
                   onClick={() => setSelectedCategory(null)}
                 >
-                  ✨ All Categories
+                  <IconSparkles size={13} /> <span>All Categories</span>
                 </button>
                 {BUSINESS_CATEGORIES.map((cat) => (
                   <button
@@ -614,7 +686,7 @@ export default function AxxBiashara() {
                     className={`quick-category-chip ${selectedCategory === cat ? "active" : ""}`}
                     onClick={() => setSelectedCategory(cat)}
                   >
-                    <span>{CATEGORY_EMOJIS[cat] || "🏢"}</span>
+                    <CategoryIcon category={cat} size={15} />
                     <span>{cat}</span>
                   </button>
                 ))}
@@ -628,7 +700,7 @@ export default function AxxBiashara() {
       {refreshBanner && (
         <div className="refresh-banner-wrap">
           <div className="refresh-banner">
-            <span style={{ fontSize: "16px" }}>✓</span>
+            <IconCheck size={16} />
             Directory records updated successfully!
           </div>
         </div>
@@ -667,7 +739,7 @@ export default function AxxBiashara() {
         {/* Announcements Strip if Available */}
         {announcements.length > 0 && (
           <div className="announcements-bar">
-            <span className="ann-label">📢 Updates:</span>
+            <span className="ann-label"><IconMegaphone size={14} /> Updates:</span>
             <div className="ann-scroll-track">
               {announcements.map((ann) => (
                 <div
@@ -694,7 +766,7 @@ export default function AxxBiashara() {
           </div>
         ) : businesses.length === 0 ? (
           <div className="biashara-empty-state">
-            <div className="empty-icon-box">🏢</div>
+            <div className="empty-icon-box"><IconBuilding size={34} /></div>
             <h3 className="empty-title">No matching businesses found</h3>
             <p className="empty-subtitle">
               Try adjusting your search keywords, clearing specific county filters, or selecting a broader business category.
@@ -773,7 +845,7 @@ export default function AxxBiashara() {
                     <div className="card-rating-row">
                       {biz.rating > 0 ? (
                         <>
-                          <span style={{ color: "#F59E0B" }}>★</span>
+                          <span style={{ color: "#F59E0B", display: "inline-flex" }}><IconStar size={13} /></span>
                           <span style={{ fontWeight: 800, color: "#0F172A" }}>{biz.rating?.toFixed(1)}</span>
                           <span style={{ color: "#64748B" }}>({biz.reviewCount || 0} reviews)</span>
                         </>
@@ -791,7 +863,7 @@ export default function AxxBiashara() {
                     {biz.verificationBadges?.length > 0 && (
                       <div className="card-badges-row">
                         {biz.verificationBadges.map((badge, bIdx) => {
-                          const config = BADGE_CONFIG[badge.type] || { label: badge.type, color: "#64748b", icon: "◈" };
+                          const config = BADGE_CONFIG[badge.type] || { label: badge.type, color: "#64748b" };
                           return (
                             <span
                               key={bIdx}
@@ -810,7 +882,7 @@ export default function AxxBiashara() {
                                 letterSpacing: "0.02em",
                               }}
                             >
-                              <span>{config.icon}</span>
+                              <IconVerified color={config.color} size={11} />
                               <span>{config.label}</span>
                             </span>
                           );
@@ -827,7 +899,7 @@ export default function AxxBiashara() {
                     {/* Card Footer Actions */}
                     <div className="card-footer-row">
                       <span className="card-profile-link">
-                        View Profile <span className="profile-arrow">→</span>
+                        View Profile <span className="profile-arrow"><IconArrowRight size={13} /></span>
                       </span>
 
                       <div className="card-footer-buttons">
@@ -886,10 +958,10 @@ export default function AxxBiashara() {
               className="modal-close-round"
               onClick={() => setShowAnnouncementModal(false)}
             >
-              ✕
+              <IconX size={16} />
             </button>
             <div className="ann-modal-header-tag">
-              📢 {selectedAnnouncement.businessName || "Announcement"}
+              <IconMegaphone size={14} /> {selectedAnnouncement.businessName || "Announcement"}
             </div>
             <h3 className="ann-modal-title">{selectedAnnouncement.title}</h3>
             <div className="ann-modal-meta">
@@ -918,40 +990,52 @@ export default function AxxBiashara() {
               className="modal-close-round"
               onClick={() => setShowComparisonModal(false)}
             >
-              ✕
+              <IconX size={16} />
             </button>
             <div className="compare-modal-header">
               <span className="compare-modal-tag">Side-by-Side Review</span>
               <h3 className="compare-modal-title">Business Comparison</h3>
+              <p className="compare-modal-sub">{comparisonData.length} businesses compared · ranked by the fields that matter most</p>
             </div>
-            <div className="compare-grid-layout" style={{ gridTemplateColumns: `repeat(${comparisonData.length}, 1fr)` }}>
-              {comparisonData.map((biz) => (
-                <div key={biz._id} className="compare-card">
-                  <div className="compare-card-title">{biz.name}</div>
-                  {[
-                    ["Category", biz.categories?.join(", ") || biz.category],
-                    ["Location", `${biz.location?.town || ""}, ${biz.location?.county || "Kenya"}`],
-                    ["Rating", biz.rating ? `★ ${biz.rating.toFixed(1)}` : "No rating"],
-                    ["Reviews", biz.reviewCount || 0],
-                    ["Price Guide", biz.priceRange || "N/A"],
-                    ["Founded", biz.yearEstablished || "N/A"],
-                    ["Contact Phone", biz.contact?.phone || "N/A"],
-                    ["Contact Email", biz.contact?.email || "N/A"],
-                  ].map(([label, val]) => (
-                    <div key={label} className="compare-row">
-                      <div className="compare-row-label">{label}</div>
-                      <div className="compare-row-val">{val}</div>
+            <div className="compare-grid-scroll">
+              <div className="compare-grid-layout" style={{ gridTemplateColumns: `repeat(${comparisonData.length}, minmax(230px, 1fr))` }}>
+                {comparisonData.map((biz) => {
+                  const ratingNum = Number(biz.rating) || 0;
+                  const verifiedCount = (biz.verificationBadges || []).length;
+                  return (
+                    <div key={biz._id} className="compare-card">
+                      <div className="compare-card-head">
+                        <span className="compare-card-icon"><CategoryIcon category={biz.categories?.[0] || biz.category} size={18} /></span>
+                        <div className="compare-card-title">{biz.name}</div>
+                      </div>
+                      {[
+                        ["Category", biz.categories?.join(", ") || biz.category || "—"],
+                        ["Location", `${biz.location?.town ? biz.location.town + ", " : ""}${biz.location?.county || "Kenya"}`],
+                        ["Rating", ratingNum > 0 ? (
+                          <span className="compare-rating"><IconStar size={13} /> {ratingNum.toFixed(1)} <span className="compare-rating-muted">/ 5 ({biz.reviewCount || 0})</span></span>
+                        ) : "No rating yet"],
+                        ["Price Guide", biz.priceRange || "N/A"],
+                        ["Founded", biz.yearEstablished || "N/A"],
+                        ["Verification", verifiedCount > 0 ? `${verifiedCount} verified ${verifiedCount === 1 ? "badge" : "badges"}` : "Unverified"],
+                        ["Contact Phone", biz.contact?.phone || "N/A"],
+                        ["Contact Email", biz.contact?.email || "N/A"],
+                      ].map(([label, val]) => (
+                        <div key={label} className="compare-row">
+                          <div className="compare-row-label">{label}</div>
+                          <div className="compare-row-val">{val}</div>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/business/${biz._id}`)}
+                        className="compare-view-btn"
+                      >
+                        View Full Profile <IconArrowRight size={13} />
+                      </button>
                     </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => navigate(`/business/${biz._id}`)}
-                    className="compare-view-btn"
-                  >
-                    View Full Profile →
-                  </button>
-                </div>
-              ))}
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
@@ -978,7 +1062,7 @@ export default function AxxBiashara() {
           </div>
           <div className="footer-bottom">
             <p>© 2026 Axxspace. All rights reserved.</p>
-            <p style={{ color: "#F59E0B", fontWeight: 700 }}>Built for Kenya 🇰🇪</p>
+            <p style={{ color: "#F59E0B", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "6px" }}>Built for Kenya <IconMapPin size={14} /></p>
           </div>
         </div>
       </footer>
@@ -1013,6 +1097,7 @@ const css = `
 
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     color: var(--navy-ink);
+    background: linear-gradient(180deg, #F8FAFC 0%, #EEF2F8 55%, #E7EDF5 100%);
     background-color: var(--canvas-light);
     min-height: 100vh;
     overflow-x: hidden;
@@ -1027,7 +1112,11 @@ const css = `
   /* ── 1. HERO ATMOSPHERE ── */
   .biashara-hero {
     position: relative;
-    background: radial-gradient(circle at 50% 20%, #112035 0%, var(--bg-dark) 80%);
+    background:
+      radial-gradient(1100px 460px at 12% -12%, rgba(245, 158, 11, 0.16) 0%, transparent 58%),
+      radial-gradient(950px 440px at 88% -6%, rgba(227, 27, 27, 0.14) 0%, transparent 55%),
+      radial-gradient(circle at 50% 18%, #14263d 0%, var(--bg-dark) 78%),
+      linear-gradient(180deg, #0d1b2a 0%, #08101d 100%);
     color: #FFFFFF;
     padding: 30px 20px 46px;
     overflow: hidden;
@@ -1483,6 +1572,9 @@ const css = `
     overflow-x: auto;
   }
   .ann-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     font-size: 0.8rem;
     font-weight: 800;
     color: #B45309;
@@ -1649,6 +1741,9 @@ const css = `
     color: #94A3B8;
     background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
   }
+  .card-no-photo-icon {
+    color: rgba(148, 163, 184, 0.5);
+  }
 
   .card-img-gradient-overlay {
     position: absolute;
@@ -1670,6 +1765,11 @@ const css = `
     letter-spacing: 0.04em;
     z-index: 2;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  }
+  .featured-badge-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .card-rating-badge {
@@ -2026,6 +2126,9 @@ const css = `
   }
 
   .ann-modal-header-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     font-size: 0.75rem;
     font-weight: 800;
     color: #B45309;
@@ -2055,7 +2158,7 @@ const css = `
     background: #FFFFFF;
     border-radius: var(--radius-xl);
     padding: 32px;
-    max-width: 900px;
+    max-width: 1080px;
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
@@ -2079,6 +2182,26 @@ const css = `
     font-weight: 800;
     color: var(--navy-ink);
   }
+  .compare-modal-sub {
+    font-size: 0.86rem;
+    color: #64748B;
+    margin-top: 6px;
+    font-weight: 500;
+  }
+
+  .compare-grid-scroll {
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+  .compare-grid-scroll::-webkit-scrollbar {
+    height: 8px;
+  }
+  .compare-grid-scroll::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 999px;
+  }
 
   .compare-grid-layout {
     display: grid;
@@ -2092,14 +2215,48 @@ const css = `
     padding: 20px;
   }
 
+  .compare-card-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #E2E8F0;
+  }
+  .compare-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(245, 158, 11, 0.12);
+    color: #B45309;
+    flex-shrink: 0;
+  }
+
   .compare-card-title {
     font-family: 'Outfit', sans-serif;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     font-weight: 800;
     color: #0F172A;
-    margin-bottom: 14px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #E2E8F0;
+    line-height: 1.25;
+  }
+
+  .compare-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #B45309;
+    font-weight: 800;
+  }
+  .compare-rating svg {
+    color: #F59E0B;
+  }
+  .compare-rating-muted {
+    color: #94A3B8;
+    font-weight: 600;
+    font-size: 0.78rem;
   }
 
   .compare-row {
@@ -2122,6 +2279,10 @@ const css = `
     width: 100%;
     margin-top: 14px;
     padding: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     background: #0F172A;
     color: #FFFFFF;
     border: none;
@@ -2163,8 +2324,16 @@ const css = `
     border-radius: var(--radius-lg);
   }
   .empty-icon-box {
-    font-size: 42px;
-    margin-bottom: 12px;
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+    color: #F59E0B;
+    box-shadow: 0 10px 24px -8px rgba(15, 23, 42, 0.4);
   }
   .empty-title {
     font-family: 'Outfit', sans-serif;
