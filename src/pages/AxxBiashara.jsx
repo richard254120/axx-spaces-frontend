@@ -423,7 +423,7 @@ export default function AxxBiashara() {
   const toggleFavorite = async (businessId, e) => {
     e.stopPropagation();
     if (!token) {
-      navigate("/login");
+      navigate("/user-login");
       return;
     }
     try {
