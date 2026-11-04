@@ -4146,3 +4146,52 @@
     font-size: 14px;
   }
 }
+
+/* ── Embedded mode (dashboard rendered inside AdminLayout shell) ── */
+.admin-dashboard-container.embedded {
+  display: block;
+  min-height: 0;
+  grid-template-columns: none;
+}
+
+.admin-main-content.embedded-main {
+  padding: 0;
+  height: auto;
+  overflow: visible;
+}
+
+.embedded-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+  position: relative;
+}
+
+.embedded-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+.embedded-bell {
+  position: relative;
+}
+
+.embedded-notif-wrap {
+  position: absolute;
+  right: 32px;
+  z-index: 1200;
+  margin-top: -6px;
+}
+
+@media (max-width: 768px) {
+  .embedded-notif-wrap {
+    right: 14px;
+  }
+  .embedded-title {
+    font-size: 16px;
+  }
+}

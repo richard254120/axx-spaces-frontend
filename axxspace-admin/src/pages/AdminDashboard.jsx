@@ -1,22 +1,19 @@
 import { useEffect, useState, useContext, useRef } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import API from "../api/api";
-import AdminHeader from "../components/AdminHeader";
 import StatsCard from "../components/StatsCard";
-import TabNavigation from "../components/TabNavigation";
 import NotificationPanel from "../components/NotificationPanel";
 import BadgeManagement from "../components/BadgeManagement";
 import UserBadgeManagement from "../components/UserBadgeManagement";
 import PaymentApprovals from "../components/PaymentApprovals";
-import GlitterBackground from "../components/GlitterBackground";
 import { getPricelistUrl } from "../utils/fileLinks";
 import QRGeneratorModal from "../components/QRGeneratorModal";
 import WebsitePoster from "../components/WebsitePoster";
 import "./AdminDashboard.css";
 
 // ── tiny helpers ──────────────────────────────────────────────
-const TABS = ["overview", "website-poster", "properties", "materials", "sold", "payment", "boosts", "businesses", "announcements", "requests", "listings-badges", "user-badges", "accommodations"];
+const TABS = ["overview", "website-poster", "properties", "materials", "tourism", "sold", "payment", "boosts", "businesses", "announcements", "requests", "listings-badges", "user-badges", "accommodations"];
 const STATUS_VIEWS = ["pending", "approved", "rejected"];
 
 function formatVideoUrl(url) {
@@ -34,6 +31,11 @@ function formatVideoUrl(url) {
 export default function AdminDashboard() {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // The active tab is driven by the URL (?tab=) so the shell sidebar can deep-link here
+  const urlTab = searchParams.get("tab");
+  const initialTab = TABS.includes(urlTab) ? urlTab : "properties";
 
   const [allPending, setAllPending] = useState(null);
   const [allItems, setAllItems] = useState([]);
@@ -41,7 +43,7 @@ export default function AdminDashboard() {
   const [viewStats, setViewStats] = useState(null);
   const [topViewed, setTopViewed] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTabState] = useState(initialTab);
   const [statusView, setStatusView] = useState("pending");
   const [selected, setSelected] = useState(null);
   const [editMode, setEditMode] = useState(false);
@@ -50,7 +52,6 @@ export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // ── NOTIFICATION STATE ─────────────────────────────────────
   const [pendingBoosts, setPendingBoosts] = useState([]);
@@ -101,6 +102,23 @@ export default function AdminDashboard() {
   // ── POSTER / QR STATE ──────────────────────────────────────
   const [selectedPropertyForQR, setSelectedPropertyForQR] = useState(null);
   const [qrModalOpen, setQrModalOpen] = useState(false);
+
+  // ── tab <-> URL sync ───────────────────────────────────────
+  // Wrapper keeps internal calls working while reflecting the tab in ?tab=
+  const setActiveTab = (tab) => {
+    setActiveTabState(tab);
+    setSearchParams({ tab }, { replace: true });
+    if (tab !== "sold" && tab !== "payment" && tab !== "boosts") setStatusView("pending");
+  };
+
+  // React to shell navigation (URL changes without a component remount)
+  useEffect(() => {
+    if (TABS.includes(urlTab) && urlTab !== activeTab) {
+      setActiveTabState(urlTab);
+      if (urlTab !== "sold" && urlTab !== "payment" && urlTab !== "boosts") setStatusView("pending");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlTab]);
 
   // ── auth guard ─────────────────────────────────────────────
   useEffect(() => {
@@ -697,74 +715,80 @@ export default function AdminDashboard() {
   const hasAllNotifications = allNotifications.length > 0;
 
   // ── render ─────────────────────────────────────────────────
+  // This view is now embedded inside AdminLayout, which owns the sidebar,
+  // top bar, notifications and logout. Only the working area renders here.
   return (
-    <div className="admin-dashboard-container">
-      <GlitterBackground />
-      {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />}
-      <aside className={`admin-sidebar ${isSidebarOpen ? 'open' : ''}`}>
-        <div className="admin-sidebar-brand">
-          <span className="brand-emoji"></span> AXXSPACE ADMIN
-          <button className="btn-close-sidebar-mobile" onClick={() => setIsSidebarOpen(false)}>✕</button>
+    <div className="admin-dashboard-container embedded">
+      <main className="admin-main-content embedded-main">
+        {/* CONTEXT HEADER FOR THIS QUEUE */}
+        <div className="embedded-heading">
+          <h2 className="embedded-title">
+            {{
+              properties: "Properties Moderation",
+              materials: "QuickSales Moderation",
+              tourism: "Tourism Moderation",
+              accommodations: "Accommodations Moderation",
+              businesses: "Businesses Moderation",
+              announcements: "Announcements Moderation",
+              requests: "User Requests",
+              sold: "Sold Items",
+              payment: "Package Purchase Approvals",
+              boosts: "Payment Activity & Boosts",
+              "listings-badges": "Listing Badges",
+              "user-badges": "User Badges",
+              "website-poster": "Website Poster & QR",
+              overview: "Overview",
+            }[activeTab] || "Moderation Queue"}
+          </h2>
+          <button
+            type="button"
+            className={`btn-notification embedded-bell ${allNotifications.length > 0 ? "active" : ""}`}
+            onClick={() => setShowNotifPanel((v) => !v)}
+            title={`${allNotifications.length} notification(s)`}
+          >
+            <span className="bell-icon">🔔</span>
+            {allNotifications.length > 0 && (
+              <span className="notification-badge blink">{allNotifications.length}</span>
+            )}
+          </button>
         </div>
-        <div className="admin-sidebar-subtitle">Control Center</div>
-        <TabNavigation
-          tabs={TABS}
-          activeTab={activeTab}
-          setActiveTab={(tab) => {
-            setActiveTab(tab);
-            setIsSidebarOpen(false);
-            if (tab !== "sold" && tab !== "payment" && tab !== "boosts") setStatusView("pending");
-          }}
-          pendingCounts={{
-            allPending,
-            businesses: stats?.businesses,
-            announcements: pendingAnnouncements.length,
-            requests: requests.length,
-            accommodations: pendingAccommodations.length || (allPending?.accommodations?.length || 0),
-            payment: pendingPackagePurchasesCount
-          }}
-          hasPendingBoosts={hasPendingBoosts}
-          pendingBoosts={pendingBoosts}
-        />
-      </aside>
-      <main className="admin-main-content">
-        {/* HEADER */}
-        <AdminHeader onToggleSidebar={() => setIsSidebarOpen(true)}>
-          <NotificationPanel
-            showNotifPanel={showNotifPanel}
-            setShowNotifPanel={setShowNotifPanel}
-            notifications={allNotifications}
-            onApprove={handleApproveBoost}
-            onReject={handleRejectBoost}
-            onReview={async (notif) => {
-              if (notif) {
-                const tabMap = {
-                  property: "properties",
-                  material: "materials",
-                  business: "businesses",
-                  announcement: "announcements",
-                  item_request: "requests",
-                  accommodation: "accommodations"
-                };
-                setActiveTab(tabMap[notif.type] || "properties");
-                setStatusView("pending");
 
-                // Mark the notification as read if it is a database-backed item_request notification
-                if (notif.type === "item_request" && notif._id) {
-                  try {
-                    await API.put(`/payment/notifications/${notif._id}/read`, { approve: true });
-                    loadAllNotifications();
-                  } catch (err) {
-                    console.error("Failed to mark notification as read:", err);
+        {showNotifPanel && (
+          <div className="embedded-notif-wrap">
+            <NotificationPanel
+              showNotifPanel={showNotifPanel}
+              setShowNotifPanel={setShowNotifPanel}
+              notifications={allNotifications}
+              onApprove={handleApproveBoost}
+              onReject={handleRejectBoost}
+              onReview={async (notif) => {
+                if (notif) {
+                  const tabMap = {
+                    property: "properties",
+                    material: "materials",
+                    business: "businesses",
+                    announcement: "announcements",
+                    item_request: "requests",
+                    accommodation: "accommodations"
+                  };
+                  setActiveTab(tabMap[notif.type] || "properties");
+                  setStatusView("pending");
+                  if (notif.type === "item_request" && notif._id) {
+                    try {
+                      await API.put(`/payment/notifications/${notif._id}/read`, { approve: true });
+                      loadAllNotifications();
+                    } catch (err) {
+                      console.error("Failed to mark notification as read:", err);
+                    }
                   }
+                } else {
+                  setActiveTab("properties");
+                  setStatusView("pending");
                 }
-              } else {
-                setActiveTab("properties");
-                setStatusView("pending");
-              }
-            }}
-          />
-        </AdminHeader>
+              }}
+            />
+          </div>
+        )}
 
         {/* MOBILE HORIZONTAL QUICK PILLS */}
         <div className="mobile-quick-pills-bar" aria-label="Mobile quick tabs">
