@@ -1,5 +1,6 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
 import "./Login.css";
@@ -93,7 +94,7 @@ export default function Login() {
               onClick={() => { setShowForgot(false); setForgotMsg(""); }} 
               className="login-back-link"
             >
-              ← Back to Login
+              <ArrowLeft size={14} style={{ verticalAlign: "-2px", marginRight: "4px" }} /> Back to Login
             </button>
           </>
         ) : (

@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { Search, X, Download, RefreshCw, Inbox, CircleCheckBig } from "lucide-react";
 import API from "../api/api";
 import "./AdminPages.css";
 
 const ROLES = [
-  "member", "provider", "pending_provider", "user", "mover", "admin",
+  "member", "provider", "pending_provider", "user", "admin",
   "landlord", "seller", "team", "caretaker", "host", "agent",
   "agency_admin", "guest", "business",
 ];
@@ -81,7 +82,7 @@ export default function UsersPage() {
     const now = Date.now();
     return [
       { label: "Total users", value: users.length, tone: "" },
-      { label: "Pending movers", value: users.filter((u) => u.role === "mover" && u.status === "pending").length, tone: "warn" },
+      { label: "Pending providers", value: users.filter((u) => u.role === "pending_provider" || (u.role === "provider" && u.status === "pending")).length, tone: "warn" },
       { label: "Agents", value: users.filter((u) => u.role === "agent").length, tone: "" },
       { label: "Admins", value: users.filter((u) => u.role === "admin").length, tone: "" },
       { label: "Joined this week", value: users.filter((u) => now - new Date(u.createdAt).getTime() <= WEEK_MS).length, tone: "ok" },
@@ -136,14 +137,14 @@ export default function UsersPage() {
       <div className="ap-panel">
         <div className="ap-toolbar">
           <div className="ap-search-wrap">
-            <span className="ap-search-icon">🔎</span>
+            <Search size={14} className="ap-search-icon" />
             <input
               className="ap-search"
               placeholder="Search name, email, phone, county…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            {search && <button type="button" className="ap-clear" onClick={() => setSearch("")}>✕</button>}
+            {search && <button type="button" className="ap-clear" onClick={() => setSearch("")} aria-label="Clear search"><X size={13} /></button>}
           </div>
 
           <select className="ap-select" value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)}>
@@ -158,8 +159,8 @@ export default function UsersPage() {
             <option value="rejected">rejected</option>
           </select>
 
-          <button type="button" className="ap-btn ap-btn-ghost" onClick={exportCsv}>⬇ Export CSV</button>
-          <button type="button" className="ap-btn ap-btn-ghost" onClick={loadUsers}>⟳ Refresh</button>
+          <button type="button" className="ap-btn ap-btn-ghost" onClick={exportCsv}><Download size={13} /> Export CSV</button>
+          <button type="button" className="ap-btn ap-btn-ghost" onClick={loadUsers}><RefreshCw size={13} /> Refresh</button>
         </div>
 
         <div className="ap-count">
@@ -171,7 +172,7 @@ export default function UsersPage() {
         {loading ? (
           <div className="ap-loading"><div className="spinner" /><p>Loading users…</p></div>
         ) : filtered.length === 0 ? (
-          <div className="ap-empty">🗒 No users match the current filters.</div>
+          <div className="ap-empty"><Inbox size={22} className="ap-empty-ic" /><div>No users match the current filters.</div></div>
         ) : (
           <div className="ap-table-wrap">
             <table className="ap-table">
@@ -206,7 +207,7 @@ export default function UsersPage() {
                         {u.status || "—"}
                       </span>
                     </td>
-                    <td>{u.isApproved ? "✅" : "—"}</td>
+                    <td>{u.isApproved ? <CircleCheckBig size={16} className="ap-ic-ok" /> : <span className="ap-dash">—</span>}</td>
                     <td>{u.county || "—"}</td>
                     <td>{u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "—"}</td>
                     <td className="ap-th-actions">
@@ -234,7 +235,7 @@ export default function UsersPage() {
             <h3>Delete user account?</h3>
             <p>
               <strong>{deleteTarget.name || deleteTarget.email}</strong> ({deleteTarget.role})
-              will be permanently removed along with their properties, QuickSales and tourism
+              will be permanently removed along with their properties, QuickSales and
               listings. This cannot be undone.
             </p>
             <div className="ap-modal-actions">

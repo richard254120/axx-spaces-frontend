@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { X } from "lucide-react";
 import API from "../api/api";
 
 const styles = {
@@ -44,7 +45,7 @@ const styles = {
   filterLabel: {
     fontSize: "14px",
     fontWeight: 600,
-    color: "#cbd5e1",
+    color: "#e6edf6",
   },
   filterSelect: {
     padding: "12px 16px",
@@ -89,12 +90,12 @@ const styles = {
   },
   cardCategory: {
     fontSize: "14px",
-    color: "#94a3b8",
+    color: "#cdd8e8",
     marginBottom: "12px",
   },
   cardLocation: {
     fontSize: "14px",
-    color: "#64748b",
+    color: "#b4c1d4",
     marginBottom: "12px",
     display: "flex",
     alignItems: "center",
@@ -102,7 +103,7 @@ const styles = {
   },
   cardDescription: {
     fontSize: "14px",
-    color: "#cbd5e1",
+    color: "#e6edf6",
     marginBottom: "15px",
     lineHeight: "1.5",
     display: "-webkit-box",
@@ -204,13 +205,13 @@ const styles = {
     textAlign: "center",
     padding: "60px 20px",
     fontSize: "24px",
-    color: "#94a3b8",
+    color: "#cdd8e8",
   },
   empty: {
     textAlign: "center",
     padding: "60px 20px",
     fontSize: "18px",
-    color: "#64748b",
+    color: "#b4c1d4",
   },
   addButton: {
     padding: "12px 24px",
@@ -248,7 +249,7 @@ const styles = {
   },
   pricingSubtext: {
     fontSize: "14px",
-    color: "#94a3b8",
+    color: "#cdd8e8",
   },
   announcementsSection: {
     background: "rgba(30, 41, 59, 0.5)",
@@ -285,13 +286,13 @@ const styles = {
   announcementBusiness: {
     fontSize: "13px",
     fontWeight: 600,
-    color: "#94a3b8",
+    color: "#cdd8e8",
     marginBottom: "10px",
     display: "block",
   },
   announcementSubmitter: {
     fontSize: "13px",
-    color: "#64748b",
+    color: "#b4c1d4",
     marginBottom: "5px",
     display: "block",
   },
@@ -304,7 +305,7 @@ const styles = {
   },
   announcementBoxDate: {
     fontSize: "12px",
-    color: "#64748b",
+    color: "#b4c1d4",
   },
   modalOverlay: {
     position: "fixed",
@@ -340,6 +341,9 @@ const styles = {
     color: "#f1f5f9",
     cursor: "pointer",
     transition: "all 0.3s",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
   modalTitle: {
     fontSize: "28px",
@@ -349,17 +353,17 @@ const styles = {
   },
   modalBusiness: {
     fontSize: "16px",
-    color: "#94a3b8",
+    color: "#cdd8e8",
     marginBottom: "10px",
   },
   modalDate: {
     fontSize: "14px",
-    color: "#64748b",
+    color: "#b4c1d4",
     marginBottom: "20px",
   },
   modalContentText: {
     fontSize: "16px",
-    color: "#cbd5e1",
+    color: "#e6edf6",
     lineHeight: "1.8",
   },
   announcementSuccess: {
@@ -454,7 +458,7 @@ const styles = {
     transform: "translateY(-50%)",
     background: "none",
     border: "none",
-    color: "#94a3b8",
+    color: "#cdd8e8",
     cursor: "pointer",
     fontSize: "18px",
     padding: "5px",
@@ -671,7 +675,7 @@ export default function AxxBiashara() {
               ))}
             </div>
           ) : (
-            <p style={{ color: "#94a3b8", fontSize: "14px" }}>
+            <p style={{ color: "#cdd8e8", fontSize: "14px" }}>
               No announcements yet. Create one on a business page!
             </p>
           )}
@@ -700,7 +704,7 @@ export default function AxxBiashara() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           {searchQuery && (
-            <button style={styles.clearSearchBtn} onClick={() => setSearchQuery("")}>✕</button>
+            <button style={styles.clearSearchBtn} onClick={() => setSearchQuery("")}><X size={14} /></button>
           )}
         </div>
       </div>
@@ -902,7 +906,7 @@ export default function AxxBiashara() {
         <div style={styles.modalOverlay} onClick={() => setShowAnnouncementModal(false)}>
           <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <button style={styles.modalClose} onClick={() => setShowAnnouncementModal(false)}>
-              ✕
+              <X size={16} />
             </button>
             <h3 style={styles.modalTitle}>{selectedAnnouncement.title}</h3>
             <p style={styles.modalBusiness}> {selectedAnnouncement.businessName}</p>

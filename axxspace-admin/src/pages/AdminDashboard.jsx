@@ -10,10 +10,11 @@ import PaymentApprovals from "../components/PaymentApprovals";
 import { getPricelistUrl } from "../utils/fileLinks";
 import QRGeneratorModal from "../components/QRGeneratorModal";
 import WebsitePoster from "../components/WebsitePoster";
+import { Bell, LayoutDashboard, House, Package, Bed, CreditCard, Zap, Briefcase, ClipboardList, Palette, Megaphone, X, Video, Building2, User, Phone, Play, Check, Star, Trash2, TriangleAlert } from "lucide-react";
 import "./AdminDashboard.css";
 
 // ── tiny helpers ──────────────────────────────────────────────
-const TABS = ["overview", "website-poster", "properties", "materials", "tourism", "sold", "payment", "boosts", "businesses", "announcements", "requests", "listings-badges", "user-badges", "accommodations"];
+const TABS = ["overview", "website-poster", "properties", "materials", "sold", "payment", "boosts", "businesses", "announcements", "requests", "listings-badges", "user-badges", "accommodations"];
 const STATUS_VIEWS = ["pending", "approved", "rejected"];
 
 function formatVideoUrl(url) {
@@ -678,10 +679,9 @@ export default function AdminDashboard() {
   };
 
   const getNotifTitle = (n) => {
-    if (n.isPayment || ["property_booking", "material_purchase", "tourism_booking", "boost", "subscription"].includes(n.type)) {
+    if (n.isPayment || ["property_booking", "material_purchase", "boost", "subscription"].includes(n.type)) {
       if (n.type === "property_booking") return n.propertyId?.title || "Property Booking";
       if (n.type === "material_purchase") return n.materialId?.title || "Material Purchase";
-      if (n.type === "tourism_booking") return n.tourismId?.title || "Tourism Booking";
       if (n.type === "boost") return n.plan ? `Listing Boost (${n.plan})` : "Listing Boost";
       if (n.type === "subscription") {
         if (n.plan && n.plan.startsWith("verification-")) {
@@ -703,8 +703,8 @@ export default function AdminDashboard() {
   };
 
   const getNotifIcon = (type, isPayment) => {
-    if (isPayment || ["property_booking", "material_purchase", "tourism_booking", "boost", "subscription"].includes(type)) {
-      const icons = { property_booking: "", material_purchase: "", tourism_booking: "", boost: "", subscription: "" };
+    if (isPayment || ["property_booking", "material_purchase", "boost", "subscription"].includes(type)) {
+      const icons = { property_booking: "", material_purchase: "", boost: "", subscription: "" };
       return icons[type] || "";
     }
     const icons = { property: "", material: "", business: "", announcement: "" };
@@ -726,7 +726,6 @@ export default function AdminDashboard() {
             {{
               properties: "Properties Moderation",
               materials: "QuickSales Moderation",
-              tourism: "Tourism Moderation",
               accommodations: "Accommodations Moderation",
               businesses: "Businesses Moderation",
               announcements: "Announcements Moderation",
@@ -746,7 +745,7 @@ export default function AdminDashboard() {
             onClick={() => setShowNotifPanel((v) => !v)}
             title={`${allNotifications.length} notification(s)`}
           >
-            <span className="bell-icon">🔔</span>
+            <span className="bell-icon"><Bell size={17} /></span>
             {allNotifications.length > 0 && (
               <span className="notification-badge blink">{allNotifications.length}</span>
             )}
@@ -793,16 +792,16 @@ export default function AdminDashboard() {
         {/* MOBILE HORIZONTAL QUICK PILLS */}
         <div className="mobile-quick-pills-bar" aria-label="Mobile quick tabs">
           {[
-            { id: "overview", label: "Overview", icon: "📊" },
-            { id: "properties", label: "Properties", icon: "🏠", count: allPending?.properties?.length || 0 },
-            { id: "materials", label: "QuickSales", icon: "📦", count: allPending?.materials?.length || 0 },
-            { id: "accommodations", label: "Stays", icon: "🏨", count: pendingAccommodations.length || (allPending?.accommodations?.length || 0) },
-            { id: "payment", label: "Payments", icon: "💳", count: pendingPackagePurchasesCount || 0 },
-            { id: "boosts", label: "Boosts", icon: "⚡", count: pendingBoosts.length || 0 },
-            { id: "businesses", label: "Businesses", icon: "💼", count: stats?.businesses?.pending || 0 },
-            { id: "requests", label: "Requests", icon: "📝", count: requests.length || 0 },
-            { id: "website-poster", label: "Poster", icon: "🎨" },
-            { id: "announcements", label: "Notices", icon: "📢", count: pendingAnnouncements.length || 0 },
+            { id: "overview", label: "Overview", icon: LayoutDashboard },
+            { id: "properties", label: "Properties", icon: House, count: allPending?.properties?.length || 0 },
+            { id: "materials", label: "QuickSales", icon: Package, count: allPending?.materials?.length || 0 },
+            { id: "accommodations", label: "Stays", icon: Bed, count: pendingAccommodations.length || (allPending?.accommodations?.length || 0) },
+            { id: "payment", label: "Payments", icon: CreditCard, count: pendingPackagePurchasesCount || 0 },
+            { id: "boosts", label: "Boosts", icon: Zap, count: pendingBoosts.length || 0 },
+            { id: "businesses", label: "Businesses", icon: Briefcase, count: stats?.businesses?.pending || 0 },
+            { id: "requests", label: "Requests", icon: ClipboardList, count: requests.length || 0 },
+            { id: "website-poster", label: "Poster", icon: Palette },
+            { id: "announcements", label: "Notices", icon: Megaphone, count: pendingAnnouncements.length || 0 },
           ].map((item) => (
             <button
               key={`quick-${item.id}`}
@@ -813,7 +812,7 @@ export default function AdminDashboard() {
                 if (item.id !== "sold" && item.id !== "payment" && item.id !== "boosts") setStatusView("pending");
               }}
             >
-              <span className="pill-icon">{item.icon}</span>
+              <span className="pill-icon"><item.icon size={13} /></span>
               <span className="pill-text">{item.label}</span>
               {item.count > 0 && <span className="pill-count-badge">{item.count}</span>}
             </button>
@@ -1004,7 +1003,7 @@ export default function AdminDashboard() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              {searchQuery && <button className="btn-clear-search" onClick={() => setSearchQuery("")}>✕</button>}
+              {searchQuery && <button className="btn-clear-search" onClick={() => setSearchQuery("")}><X size={13} /></button>}
             </div>
             {(activeTab === "materials" || activeTab === "properties") && (
               <select className="filter-select" value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
@@ -1218,7 +1217,7 @@ export default function AdminDashboard() {
                       immediate: { bg: "rgba(239, 68, 68, 0.2)", text: "#f87171", border: "#ef4444" },
                       this_week: { bg: "rgba(245, 158, 11, 0.2)", text: "#fbbf24", border: "#f59e0b" },
                       this_month: { bg: "rgba(59, 130, 246, 0.2)", text: "#60a5fa", border: "#3b82f6" },
-                      flexible: { bg: "rgba(148, 163, 184, 0.2)", text: "#94a3b8", border: "#64748b" }
+                      flexible: { bg: "rgba(148, 163, 184, 0.2)", text: "#cdd8e8", border: "#b4c1d4" }
                     };
                     const uStyle = urgencyColors[req.urgency] || urgencyColors.flexible;
 
@@ -1228,7 +1227,7 @@ export default function AdminDashboard() {
                           <div style={{ fontWeight: 700, fontSize: "15px", marginBottom: "4px", color: "#ffffff" }}>
                             {req.name || "Client"}
                           </div>
-                          <div style={{ fontSize: "13px", color: "#94a3b8" }}>{req.email}</div>
+                          <div style={{ fontSize: "13px", color: "#cdd8e8" }}>{req.email}</div>
                           {req.phone && (
                             <div style={{ fontSize: "12px", color: "#38bdf8", marginTop: "2px" }}>
                               Tel: {req.phone}
@@ -1244,7 +1243,7 @@ export default function AdminDashboard() {
                               fontWeight: 700,
                               textTransform: "uppercase",
                               background: req.preferredContact === "whatsapp" ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.06)",
-                              color: req.preferredContact === "whatsapp" ? "#4ade80" : "#cbd5e1",
+                              color: req.preferredContact === "whatsapp" ? "#4ade80" : "#e6edf6",
                               border: req.preferredContact === "whatsapp" ? "1px solid rgba(34,197,94,0.3)" : "1px solid rgba(255,255,255,0.1)"
                             }}>
                               Channel: {req.preferredContact}
@@ -1260,7 +1259,7 @@ export default function AdminDashboard() {
                               fontWeight: 700,
                               textTransform: "uppercase",
                               background: req.serviceType === "rental" ? "rgba(251, 191, 36, 0.15)" : "rgba(30,41,59,0.8)",
-                              color: req.serviceType === "rental" ? "#fbbf24" : "#94a3b8",
+                              color: req.serviceType === "rental" ? "#fbbf24" : "#cdd8e8",
                               border: req.serviceType === "rental" ? "1px solid #fbbf24" : "1px solid #334155"
                             }}>
                               {req.serviceType}
@@ -1285,7 +1284,7 @@ export default function AdminDashboard() {
                           <strong style={{ color: "#f1f5f9", display: "block", marginBottom: "4px", fontSize: "14px" }}>
                             "{req.searchQuery}"
                           </strong>
-                          <div style={{ maxWidth: "260px", whiteSpace: "normal", wordBreak: "break-word", fontSize: "12px", color: "#94a3b8", lineHeight: 1.4 }}>
+                          <div style={{ maxWidth: "260px", whiteSpace: "normal", wordBreak: "break-word", fontSize: "12px", color: "#cdd8e8", lineHeight: 1.4 }}>
                             {req.details}
                           </div>
                         </td>
@@ -1300,7 +1299,7 @@ export default function AdminDashboard() {
                               {req.budgetCurrency || "KES"} {req.budgetMin ? Number(req.budgetMin).toLocaleString() : "0"} - {req.budgetMax ? Number(req.budgetMax).toLocaleString() : "Flex"}{req.budgetPeriod === "monthly" ? " / mo" : ""}
                             </div>
                           ) : (
-                            <span style={{ fontSize: "11px", color: "#64748b" }}>Budget open</span>
+                            <span style={{ fontSize: "11px", color: "#b4c1d4" }}>Budget open</span>
                           )}
                         </td>
                         <td style={{ padding: "18px" }}>
@@ -1483,7 +1482,7 @@ export default function AdminDashboard() {
                               gap: "4px",
                               boxShadow: "0 2px 6px rgba(0,0,0,0.3)"
                             }}>
-                              🎬 Video Tour
+                              <Video size={12} /> Video Tour
                             </span>
                           )}
                         </div>
@@ -1495,12 +1494,12 @@ export default function AdminDashboard() {
                           flexDirection: "column",
                           alignItems: "center",
                           justifyContent: "center",
-                          color: "#94a3b8",
+                          color: "#cdd8e8",
                           gap: "8px",
                           position: "relative"
                         }}>
-                          <span style={{ fontSize: "32px" }}>{hasVideos ? "🎬" : "🏨"}</span>
-                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#cbd5e1" }}>
+                          {hasVideos ? <Video size={30} style={{ color: "#38bdf8" }} /> : <Building2 size={30} style={{ color: "#b4c1d4" }} />}
+                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#e6edf6" }}>
                             {hasVideos ? "Video Walkthrough Included" : "No Photo Uploaded"}
                           </span>
                           {hasVideos && (
@@ -1535,21 +1534,25 @@ export default function AdminDashboard() {
                           </span>
                         </div>
                         <p className="card-subtitle">{item.type} · {item.address}{item.county ? `, ${item.county}` : ""}</p>
-                        <p className="card-owner">👤 {item.owner?.name || "Host"} · 📞 {item.owner?.phone || "—"}</p>
+                        <p className="card-owner" style={{ display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
+                          <User size={12} style={{ flexShrink: 0 }} /> {item.owner?.name || "Host"}
+                          <span style={{ margin: "0 2px" }}>·</span>
+                          <Phone size={12} style={{ flexShrink: 0 }} /> {item.owner?.phone || "—"}
+                        </p>
                         <div className="card-footer">
                           <span className="price-badge">KSh {item.basePrice?.toLocaleString()}/night</span>
                           {hasVideos && (
-                            <span style={{ fontSize: "12px", color: "#0284c7", fontWeight: "600" }}>
-                              ▶ Has Video
+                            <span style={{ fontSize: "12px", color: "#0284c7", fontWeight: "600", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                              <Play size={11} /> Has Video
                             </span>
                           )}
                         </div>
                         <div className="card-buttons" onClick={e => e.stopPropagation()}>
                           {item.status !== "active" && (
-                            <button className="btn-approve" onClick={() => handleAccommodationStatus(item._id, "active")}>✓ Approve</button>
+                            <button className="btn-approve" onClick={() => handleAccommodationStatus(item._id, "active")}><Check size={13} /> Approve</button>
                           )}
                           {item.status !== "inactive" && (
-                            <button className="btn-reject" onClick={() => handleAccommodationStatus(item._id, "inactive")}>✕ Reject</button>
+                            <button className="btn-reject" onClick={() => handleAccommodationStatus(item._id, "inactive")}><X size={13} /> Reject</button>
                           )}
                           {item.status === "active" && (
                             <button
@@ -1572,10 +1575,10 @@ export default function AdminDashboard() {
                                 handleToggleFeaturedAccommodation(item._id, item.isFeatured);
                               }}
                             >
-                              {item.isFeatured ? " Unfeature" : " Feature"}
+                              {item.isFeatured ? <><Star size={12} /> Unfeature</> : <><Star size={12} /> Feature</>}
                             </button>
                           )}
-                          <button className="btn-delete" style={{ padding: "6px 10px", background: "#ef4444", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "12px" }} onClick={() => confirmDelete("accommodations", item._id, item.name)}>🗑 Delete</button>
+                          <button className="btn-delete" style={{ padding: "6px 10px", background: "#ef4444", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "12px", display: "inline-flex", alignItems: "center", gap: "5px" }} onClick={() => confirmDelete("accommodations", item._id, item.name)}><Trash2 size={12} /> Delete</button>
                         </div>
                       </div>
                     </div>
@@ -1719,7 +1722,7 @@ export default function AdminDashboard() {
               <div className="modal" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
                   <h2 className="modal-title"> Feature Business</h2>
-                  <button className="btn-close-modal" onClick={() => setShowFeatureModal(false)}>✕</button>
+                  <button className="btn-close-modal" onClick={() => setShowFeatureModal(false)}><X size={15} /></button>
                 </div>
                 <div className="modal-body">
                   <p style={{ marginBottom: "20px" }}>
@@ -1747,7 +1750,7 @@ export default function AdminDashboard() {
                       <option value={90}>90 days</option>
                     </select>
                   </div>
-                  <p style={{ fontSize: "12px", color: "#64748b", marginBottom: "20px" }}>
+                  <p style={{ fontSize: "12px", color: "#b4c1d4", marginBottom: "20px" }}>
                     This business will appear in the featured section on the homepage until {new Date(Date.now() + featureDuration * 24 * 60 * 60 * 1000).toLocaleDateString()}
                   </p>
                   <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
@@ -1815,7 +1818,7 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
   ];
 
   const typeLabel = (type) => {
-    const labels = { property_booking: "Property Booking", material_purchase: "Material Purchase", tourism_booking: "Tourism Booking", boost: "Listing Boost", subscription: "Subscription" };
+    const labels = { property_booking: "Property Booking", material_purchase: "Material Purchase", boost: "Listing Boost", subscription: "Subscription" };
     return labels[type] || type;
   };
 
@@ -1896,18 +1899,6 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
                       {notif.transactionId || notif.mpesaRef || "—"}
                     </span>
                   </div>
-                  {notif.type === "tourism_booking" && notif.checkIn && (
-                    <>
-                      <div className="boost-detail-row">
-                        <span className="boost-detail-key"> Check-in</span>
-                        <span className="boost-detail-val">{new Date(notif.checkIn).toLocaleDateString()}</span>
-                      </div>
-                      <div className="boost-detail-row">
-                        <span className="boost-detail-key"> Check-out</span>
-                        <span className="boost-detail-val">{new Date(notif.checkOut).toLocaleDateString()}</span>
-                      </div>
-                    </>
-                  )}
                   <div className="boost-detail-row">
                     <span className="boost-detail-key"> Received</span>
                     <span className="boost-detail-val">{new Date(notif.createdAt).toLocaleString()}</span>
@@ -1944,7 +1935,7 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
                           }}
                         >
                           <div style={{ fontSize: 20, marginBottom: 4 }}></div>
-                          <div style={{ fontSize: 10, color: "#94a3b8" }}>No Badge</div>
+                          <div style={{ fontSize: 10, color: "#cdd8e8" }}>No Badge</div>
                         </div>
                         {VERIFICATION_BADGES.map(badge => (
                           <div
@@ -1965,7 +1956,7 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
                               alt={badge.name}
                               style={{ width: 32, height: 32, objectFit: "contain", marginBottom: 4 }}
                             />
-                            <div style={{ fontSize: 9, color: "#94a3b8", lineHeight: 1.2 }}>{badge.name}</div>
+                            <div style={{ fontSize: 9, color: "#cdd8e8", lineHeight: 1.2 }}>{badge.name}</div>
                           </div>
                         ))}
                       </div>
@@ -1987,7 +1978,7 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
                               <div style={{ fontSize: 12, fontWeight: 700, color: "#fbbf24" }}>
                                 {VERIFICATION_BADGES.find(b => b.id === selectedBadges[notif._id])?.name}
                               </div>
-                              <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>
+                              <div style={{ fontSize: 10, color: "#cdd8e8", marginTop: 2 }}>
                                 Badge will be awarded to user upon payment confirmation
                               </div>
                             </div>
@@ -2000,7 +1991,7 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
                         Mark as Confirmed
                       </button>
                       <button className="btn-boost-reject" onClick={() => onReject(notif._id)}>
-                        ✕ Dismiss
+                        <X size={12} /> Dismiss
                       </button>
                     </div>
                   </>
@@ -2105,10 +2096,10 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
       <div className="modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h2 className="modal-title">
-            {item.isFeatured && <span style={{ marginRight: 8 }}></span>}
+            {item.isFeatured && <Star size={16} style={{ marginRight: 8, color: "#fbbf24", verticalAlign: "-3px" }} />}
             {getTitle(item)}
           </h2>
-          <button className="btn-close-modal" onClick={onClose}>✕</button>
+          <button className="btn-close-modal" onClick={onClose}><X size={15} /></button>
         </div>
         <div className="modal-body">
           {images.length > 0 && (
@@ -2150,7 +2141,7 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
           {item.videos && item.videos.length > 0 && (
             <div style={{ marginTop: "16px", marginBottom: "16px", padding: "14px", background: "#f8fafc", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
               <h4 style={{ margin: "0 0 10px 0", fontSize: "14px", fontWeight: "700", color: "#0f1729", display: "flex", alignItems: "center", gap: "6px" }}>
-                <span>🎬</span> Video Walkthrough ({item.videos.length})
+                <Video size={15} /> Video Walkthrough ({item.videos.length})
               </h4>
               <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                 {item.videos.map((vidUrl, vIdx) => (
@@ -2175,11 +2166,11 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
                   <img src={qrCodeUrl} alt="QR Code" style={{ width: "100px", height: "100px", border: "1px solid #e2e8f0", borderRadius: "8px" }} />
                 ) : (
                   <div style={{ width: "100px", height: "100px", display: "flex", alignItems: "center", justifyContent: "center", background: "#e2e8f0", borderRadius: "8px" }}>
-                    <span style={{ fontSize: "12px", color: "#64748b" }}>Loading...</span>
+                    <span style={{ fontSize: "12px", color: "#475569" }}>Loading...</span>
                   </div>
                 )}
                 <div style={{ flex: 1 }}>
-                  <p style={{ margin: "0 0 12px 0", fontSize: "12px", color: "#64748b" }}>
+                  <p style={{ margin: "0 0 12px 0", fontSize: "12px", color: "#475569" }}>
                     Scan this QR code to view the listing on the Axxspace platform.
                   </p>
                   <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
@@ -2229,7 +2220,7 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
                     <h4 style={{ margin: 0, fontSize: "14px", fontWeight: 700, color: "#0f172a" }}>
                       Property Images ({(editData.images || []).length})
                     </h4>
-                    <span style={{ fontSize: "12px", color: "#64748b" }}>
+                    <span style={{ fontSize: "12px", color: "#475569" }}>
                       First photo is the main cover
                     </span>
                   </div>
@@ -2266,7 +2257,7 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
                             style={{ position: "absolute", top: 3, right: 3, background: "rgba(220, 38, 38, 0.9)", color: "#fff", border: "none", borderRadius: "50%", width: "20px", height: "20px", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center" }}
                             title="Delete photo"
                           >
-                            ✕
+                            <X size={10} />
                           </button>
                         </div>
                       );
@@ -2274,8 +2265,8 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
                   </div>
 
                   {imageUploadError && (
-                    <div style={{ color: "#dc2626", fontSize: "12px", marginBottom: "8px", fontWeight: 600 }}>
-                      ⚠️ {imageUploadError}
+                    <div style={{ color: "#dc2626", fontSize: "12px", marginBottom: "8px", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                      <TriangleAlert size={13} /> {imageUploadError}
                     </div>
                   )}
 
@@ -2312,7 +2303,7 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
                       </svg>
                       {uploadingImage ? "Uploading from Device..." : "Pick Pictures from Device"}
                     </label>
-                    <span style={{ fontSize: "12px", color: "#64748b" }}>
+                    <span style={{ fontSize: "12px", color: "#475569" }}>
                       Select photos directly from your phone, laptop, or computer gallery
                     </span>
                   </div>
@@ -2387,7 +2378,7 @@ function PaymentSettings({ mpesaConfig, setMpesaConfig, configSaving, configMess
           <label className="edit-label">{label}</label>
           <input type={type} value={mpesaConfig[k]} placeholder={placeholder}
             onChange={e => setMpesaConfig({ ...mpesaConfig, [k]: e.target.value })} className="edit-input" />
-          <p style={{ fontSize: 11, color: "#64748b", margin: "4px 0 0" }}>{hint}</p>
+          <p style={{ fontSize: 11, color: "#b4c1d4", margin: "4px 0 0" }}>{hint}</p>
         </div>
       ))}
       <button className="btn-save" onClick={handleSave} disabled={configSaving}>{configSaving ? "Saving…" : " Save Configuration"}</button>

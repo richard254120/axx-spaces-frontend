@@ -65,7 +65,7 @@
   top: 52px;
   right: 0;
   width: 360px;
-  background: #0f1729;
+  background: #1d2942;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
@@ -92,7 +92,7 @@
 .btn-close-notification {
   background: none;
   border: none;
-  color: #64748b;
+  color: #b4c1d4;
   font-size: 16px;
   cursor: pointer;
   padding: 4;
@@ -152,7 +152,7 @@
   gap: 8px;
   margin-bottom: 4px;
   font-size: 12px;
-  color: #94a3b8;
+  color: #cdd8e8;
 }
 
 .notification-item-buttons {
@@ -199,14 +199,14 @@
 .notification-empty {
   padding: 32px 20px;
   text-align: center;
-  color: #64748b;
+  color: #b4c1d4;
   font-size: 13px;
 }
 
 .notification-footer {
   padding: 12px 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.07);
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(24, 34, 55, 0.5);
 }
 
 .btn-view-all-notifications {
@@ -340,4 +340,21 @@
   .notification-item-meta {
     font-size: 10px;
   }
+}
+
+/* ── Icon alignment (lucide) ── */
+.btn-approve-notification,
+.btn-reject-notification,
+.btn-view-all-notifications,
+.btn-close-notification {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.notification-item-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }

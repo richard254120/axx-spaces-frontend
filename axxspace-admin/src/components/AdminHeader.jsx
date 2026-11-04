@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import { Menu, LogOut } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
 import "./AdminHeader.css";
 
@@ -26,7 +27,7 @@ export default function AdminHeader({
             onClick={onToggleSidebar}
             aria-label="Open sidebar menu"
           >
-            <span className="hamburger-icon">☰</span>
+            <span className="hamburger-icon"><Menu size={16} /></span>
             <span className="hamburger-text">Menu</span>
           </button>
         )}
@@ -50,7 +51,7 @@ export default function AdminHeader({
           title="Sign out of Admin Portal"
         >
           <span className="logout-text">Logout</span>
-          <span className="logout-icon" aria-hidden="true">🚪</span>
+          <span className="logout-icon" aria-hidden="true"><LogOut size={14} /></span>
         </button>
       </div>
     </header>

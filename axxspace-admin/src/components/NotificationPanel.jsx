@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import { Bell, X, ArrowRight, Check, Eye, House, ShoppingBag, Briefcase, Megaphone, ClipboardList, Zap, CreditCard, Package, ShieldCheck } from "lucide-react";
 import "./NotificationPanel.css";
 
 export default function NotificationPanel({
@@ -24,29 +25,28 @@ export default function NotificationPanel({
   const getNotifIcon = (type, isPayment) => {
     if (isPayment) {
       const icons = {
-        property_booking: "",
-        material_purchase: "",
-        tourism_booking: "",
-        boost: "",
-        subscription: ""
+        property_booking: House,
+        material_purchase: ShoppingBag,
+        boost: Zap,
+        subscription: ShieldCheck,
+        package_pending: Package
       };
-      return icons[type] || "";
+      return icons[type] || CreditCard;
     }
     const icons = {
-      property: "",
-      material: "",
-      business: "",
-      announcement: "",
-      item_request: ""
+      property: House,
+      material: ShoppingBag,
+      business: Briefcase,
+      announcement: Megaphone,
+      item_request: ClipboardList
     };
-    return icons[type] || "";
+    return icons[type] || Bell;
   };
 
   const getNotifTitle = (n) => {
     if (n.isPayment) {
       if (n.type === "property_booking") return n.propertyId?.title || "Property Booking";
       if (n.type === "material_purchase") return n.materialId?.title || "Material Purchase";
-      if (n.type === "tourism_booking") return n.tourismId?.title || "Tourism Booking";
       if (n.type === "boost") return "Listing Boost";
       if (n.type === "subscription") return "Subscription Payment";
       if (n.type === "package_pending") return `${n.agentPackageTier || "Package"} Upgrade Payment`;
@@ -69,7 +69,7 @@ export default function NotificationPanel({
         onClick={() => setShowNotifPanel(!showNotifPanel)}
         title={notifications.length > 0 ? `${notifications.length} notification(s) awaiting approval` : "No pending notifications"}
       >
-        <span className="bell-icon">🔔</span>
+        <span className="bell-icon"><Bell size={17} /></span>
         {notifications.length > 0 && (
           <span className={`notification-badge ${notifications.length > 0 ? 'blink' : ''}`}>
             {notifications.length}
@@ -83,19 +83,21 @@ export default function NotificationPanel({
             <span className="notification-panel-title">
                All Notifications
             </span>
-            <button className="btn-close-notification" onClick={() => setShowNotifPanel(false)}>✕</button>
+            <button className="btn-close-notification" onClick={() => setShowNotifPanel(false)}><X size={14} /></button>
           </div>
 
           {notifications.length > 0 ? (
             <div className="notification-list">
-              {notifications.map(notif => (
+              {notifications.map(notif => {
+                const NIcon = getNotifIcon(notif.type, notif.isPayment);
+                return (
                 <div key={notif._id} className={`notification-item ${notif.isPayment ? 'notification-item-pulse' : ''}`}>
                   <div className="notification-item-header">
                     {!notif.isPayment && <span className="notification-red-dot blink" />}
                     <span className="notification-item-title">
-                      {getNotifIcon(notif.type, notif.isPayment)} {getNotifTitle(notif)}
+                      <NIcon size={13} style={{ flexShrink: 0 }} /> {getNotifTitle(notif)}
                     </span>
-                    <span style={{ fontSize: 10, color: "#94a3b8", marginLeft: "auto" }}>
+                    <span style={{ fontSize: 10, color: "#cdd8e8", marginLeft: "auto" }}>
                       {notif.isPayment ? " Payment" : " Approval"}
                     </span>
                   </div>
@@ -108,26 +110,20 @@ export default function NotificationPanel({
                       <span style={{ color: "#fbbf24", fontWeight: 700 }}>
                         KES {notif.amount?.toLocaleString() || "—"}
                       </span>
-                      <span style={{ color: "#94a3b8", fontSize: 11 }}>
+                      <span style={{ color: "#cdd8e8", fontSize: 11 }}>
                         {notif.mpesaRef || notif.transactionId || "Pending verification"}
                       </span>
                     </div>
                   )}
                   {!notif.isPayment && (
                     <div className="notification-item-meta">
-                      <span style={{ color: "#64748b", fontSize: 11 }}>
+                      <span style={{ color: "#b4c1d4", fontSize: 11 }}>
                         {notif.category || "—"}
                       </span>
                     </div>
                   )}
-                  {notif.type === "tourism_booking" && notif.checkIn && (
-                    <div style={{ ...styles.notifItemMeta, fontSize: 11 }}>
-                      <span> Check-in: {new Date(notif.checkIn).toLocaleDateString()}</span>
-                      <span>Check-out: {new Date(notif.checkOut).toLocaleDateString()}</span>
-                    </div>
-                  )}
                   <div className="notification-item-meta">
-                    <span style={{ color: "#64748b", fontSize: 10 }}>
+                    <span style={{ color: "#b4c1d4", fontSize: 10 }}>
                       {new Date(notif.createdAt).toLocaleString()}
                     </span>
                   </div>
@@ -138,13 +134,13 @@ export default function NotificationPanel({
                           className="btn-approve-notification"
                           onClick={() => { onApprove(notif._id); setShowNotifPanel(false); }}
                         >
-                           Confirm
+                           <Check size={12} /> Confirm
                         </button>
                         <button
                           className="btn-reject-notification"
                           onClick={() => onReject(notif._id)}
                         >
-                          ✕ Dismiss
+                          <X size={12} /> Dismiss
                         </button>
                       </>
                     ) : (
@@ -155,12 +151,13 @@ export default function NotificationPanel({
                           setShowNotifPanel(false);
                         }}
                       >
-                         Review
+                         <Eye size={12} /> Review
                       </button>
                     )}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="notification-empty">
@@ -173,7 +170,7 @@ export default function NotificationPanel({
               className="btn-view-all-notifications"
               onClick={() => { onReview(null); setShowNotifPanel(false); }}
             >
-              Review All Pending →
+              Review All Pending <ArrowRight size={13} />
             </button>
           </div>
         </div>
@@ -181,14 +178,3 @@ export default function NotificationPanel({
     </div>
   );
 }
-
-const styles = {
-  notifItemMeta: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: 8,
-    marginBottom: 4,
-    fontSize: 12,
-    color: "#94a3b8"
-  }
-};

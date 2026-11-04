@@ -99,7 +99,7 @@ const styles = {
   container: { minHeight: "100vh", background: "linear-gradient(135deg, #06101f 0%, #0a1428 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'DM Sans', sans-serif", padding: "20px" },
   card: { background: "rgba(15, 23, 42, 0.9)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "20px", padding: "48px 40px", width: "100%", maxWidth: "450px", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" },
   title: { color: "#fbbf24", fontSize: "26px", fontWeight: 800, margin: "0 0 8px", textAlign: "center" },
-  subtitle: { color: "#94a3b8", fontSize: "14px", textAlign: "center", marginBottom: "30px" },
+  subtitle: { color: "#cdd8e8", fontSize: "14px", textAlign: "center", marginBottom: "30px" },
   error: { background: "rgba(239,68,68,0.1)", color: "#ef4444", border: "1px solid #ef4444", borderRadius: "8px", padding: "12px", fontSize: "14px", marginBottom: "20px", textAlign: "center" },
   success: { background: "rgba(34,197,94,0.1)", color: "#22c55e", border: "1px solid #22c55e", borderRadius: "8px", padding: "12px", fontSize: "14px", marginBottom: "20px", textAlign: "center" },
   form: { display: "flex", flexDirection: "column", gap: "20px" },

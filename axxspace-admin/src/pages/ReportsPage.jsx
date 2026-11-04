@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Search, RefreshCw, ShieldCheck, CircleCheckBig, UserRound, Phone, House, CalendarDays } from "lucide-react";
 import API from "../api/api";
 import "./AdminPages.css";
 
@@ -120,7 +121,7 @@ export default function ReportsPage() {
             ))}
           </div>
           <div className="ap-search-wrap">
-            <span className="ap-search-icon">🔎</span>
+            <Search size={14} className="ap-search-icon" />
             <input
               className="ap-search"
               placeholder="Search agent, reason, rental…"
@@ -128,11 +129,11 @@ export default function ReportsPage() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <button type="button" className="ap-btn ap-btn-ghost" onClick={loadReports}>⟳ Refresh</button>
+          <button type="button" className="ap-btn ap-btn-ghost" onClick={loadReports}><RefreshCw size={13} /> Refresh</button>
         </div>
 
-        <p className="ap-hint" style={{ marginBottom: 16 }}>
-          🛡 Agents accumulate 3+ open reports are automatically flagged and their verification
+        <p className="ap-hint" style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+          <ShieldCheck size={15} style={{ color: "var(--gold)", flexShrink: 0 }} /> Agents with 3+ open reports are automatically flagged and their verification
           is revoked by the system.
         </p>
 
@@ -141,7 +142,7 @@ export default function ReportsPage() {
         {loading ? (
           <div className="ap-loading"><div className="spinner" /><p>Loading reports…</p></div>
         ) : filtered.length === 0 ? (
-          <div className="ap-empty">✅ No reports in this view.</div>
+          <div className="ap-empty"><CircleCheckBig size={22} className="ap-empty-ic" /><div>No reports in this view.</div></div>
         ) : (
           <div className="ap-card-list">
             {filtered.map((r) => (
@@ -151,16 +152,16 @@ export default function ReportsPage() {
                     {r.reason || "Report"} · {r.agent?.name || "Unknown agent"}
                   </div>
                   <div className="ap-report-meta">
-                    <span>👤 {r.agent?.email || "—"}</span>
-                    <span>📞 {r.reporterContact || "—"}</span>
-                    {r.rental?.title && <span>🏠 {r.rental.title}</span>}
-                    <span>🗓 {new Date(r.createdAt).toLocaleString()}</span>
+                    <span><UserRound size={12} className="ap-meta-ic" /> {r.agent?.email || "—"}</span>
+                    <span><Phone size={12} className="ap-meta-ic" /> {r.reporterContact || "—"}</span>
+                    {r.rental?.title && <span><House size={12} className="ap-meta-ic" /> {r.rental.title}</span>}
+                    <span><CalendarDays size={12} className="ap-meta-ic" /> {new Date(r.createdAt).toLocaleString()}</span>
                     <span className={`ap-pill ap-pill-${STATUS_PILL[r.status] || "muted"}`}>{r.status}</span>
                   </div>
                   {r.details && <div className="ap-report-details">{r.details}</div>}
                   {r.actionTaken && (
                     <div className="ap-report-details" style={{ borderTop: "2px solid rgba(16,185,129,0.35)" }}>
-                      ✔ Action taken: {r.actionTaken}
+                      <CircleCheckBig size={13} style={{ color: "var(--emerald)", verticalAlign: "-2px" }} /> Action taken: {r.actionTaken}
                     </div>
                   )}
                 </div>

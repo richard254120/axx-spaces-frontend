@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { CreditCard, Zap, Ticket, Medal, Globe, Settings, Compass, RefreshCw } from "lucide-react";
 import API from "../api/api";
 import "./AdminPages.css";
 
@@ -68,17 +69,17 @@ export default function SettingsPage() {
   ];
 
   const shortcuts = [
-    { label: "Package Purchase Approvals", icon: "💳", to: "/dashboard?tab=payment" },
-    { label: "Payment Activity & Boosts", icon: "⚡", to: "/dashboard?tab=boosts" },
-    { label: "Listing Badges", icon: "🏅", to: "/dashboard?tab=listings-badges" },
-    { label: "User Badges", icon: "🎖️", to: "/dashboard?tab=user-badges" },
-    { label: "Website Poster & QR", icon: "🎨", to: "/dashboard?tab=website-poster" },
+    { label: "Package Purchase Approvals", icon: CreditCard, to: "/dashboard?tab=payment" },
+    { label: "Payment Activity & Boosts", icon: Zap, to: "/dashboard?tab=boosts" },
+    { label: "Listing Badges", icon: Ticket, to: "/dashboard?tab=listings-badges" },
+    { label: "User Badges", icon: Medal, to: "/dashboard?tab=user-badges" },
+    { label: "Website Poster & QR", icon: Globe, to: "/dashboard?tab=website-poster" },
   ];
 
   return (
     <div className="ap-page">
       <section className="ap-panel">
-        <h2 className="ap-panel-title">⚙️ M-Pesa Payment Configuration</h2>
+        <h2 className="ap-panel-title"><Settings size={17} /> M-Pesa Payment Configuration</h2>
         {loading ? (
           <div className="ap-loading"><div className="spinner" /><p>Loading configuration…</p></div>
         ) : (
@@ -103,7 +104,7 @@ export default function SettingsPage() {
                 {saving ? "Saving…" : "Save Configuration"}
               </button>
               <button type="button" className="ap-btn ap-btn-ghost" onClick={loadConfig} disabled={saving}>
-                ⟳ Reload
+                <RefreshCw size={13} /> Reload
               </button>
             </div>
             <p className="ap-hint" style={{ marginTop: 14 }}>
@@ -115,11 +116,11 @@ export default function SettingsPage() {
       </section>
 
       <section className="ap-panel">
-        <h2 className="ap-panel-title">🧭 Admin Shortcuts</h2>
+        <h2 className="ap-panel-title"><Compass size={17} /> Admin Shortcuts</h2>
         <div className="ap-filter-tabs">
           {shortcuts.map((s) => (
             <button key={s.to} type="button" className="ap-btn ap-btn-ghost" onClick={() => navigate(s.to)}>
-              {s.icon} {s.label}
+              <s.icon size={13} /> {s.label}
             </button>
           ))}
         </div>

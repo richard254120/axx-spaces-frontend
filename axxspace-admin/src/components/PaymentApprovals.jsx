@@ -31,15 +31,15 @@ export default function PaymentApprovals({ onRefresh }) {
   const handleApprove = async (agentId) => {
     try {
       setActionLoading(agentId);
-      console.log("📤 [Admin] Approving payment for agent:", agentId);
+      console.log("[Admin] Approving payment for agent:", agentId);
       const response = await API.put(`/agents/approve-purchase/${agentId}`);
-      console.log("✅ [Admin] Approval response:", response);
+      console.log("[Admin] Approval response:", response);
       setMessage("Package approved successfully!");
       setPendingPurchases(prev => prev.filter(p => p._id !== agentId));
       if (onRefresh) onRefresh();
     } catch (err) {
       const errMsg = err.response?.data?.error || err.message || "Failed to approve package";
-      console.error("❌ [Admin] Approval error:", err.response?.data || err);
+      console.error("[Admin] Approval error:", err.response?.data || err);
       setMessage("Error: " + errMsg);
     } finally {
       setActionLoading(null);

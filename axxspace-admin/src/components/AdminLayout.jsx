@@ -1,5 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import {
+  LayoutDashboard, House, ShoppingBag, Bed, Briefcase, Megaphone,
+  ClipboardList, Car, Users, Shield, CreditCard, Zap, Ticket, Medal, Globe,
+  Settings, Bell, LogOut, X, Menu
+} from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
 import "./AdminLayout.css";
@@ -8,46 +13,45 @@ import "./AdminLayout.css";
 const NAV_GROUPS = [
   {
     section: "Command",
-    items: [{ to: "/", label: "Command Center", icon: "🛰️", exact: true }],
+    items: [{ to: "/", label: "Command Center", icon: LayoutDashboard, exact: true }],
   },
   {
     section: "Moderation Queues",
     items: [
-      { to: "/dashboard?tab=properties", label: "Properties", icon: "🏠" },
-      { to: "/dashboard?tab=materials", label: "QuickSales", icon: "📦" },
-      { to: "/dashboard?tab=accommodations", label: "Accommodations", icon: "🏨" },
-      { to: "/dashboard?tab=tourism", label: "Tourism", icon: "✈️" },
-      { to: "/dashboard?tab=businesses", label: "Businesses", icon: "💼" },
-      { to: "/dashboard?tab=announcements", label: "Announcements", icon: "📢" },
-      { to: "/dashboard?tab=requests", label: "User Requests", icon: "📝" },
-      { to: "/dashboard?tab=sold", label: "Sold Items", icon: "🤝" },
+      { to: "/dashboard?tab=properties", label: "Properties", icon: House },
+      { to: "/dashboard?tab=materials", label: "QuickSales", icon: ShoppingBag },
+      { to: "/dashboard?tab=accommodations", label: "Accommodations", icon: Bed },
+      { to: "/dashboard?tab=businesses", label: "Businesses", icon: Briefcase },
+      { to: "/dashboard?tab=announcements", label: "Announcements", icon: Megaphone },
+      { to: "/dashboard?tab=requests", label: "User Requests", icon: ClipboardList },
+      { to: "/dashboard?tab=sold", label: "Sold Items", icon: Car },
     ],
   },
   {
     section: "Users & Trust",
     items: [
-      { to: "/users", label: "User Management", icon: "👥" },
-      { to: "/reports", label: "Reports & Moderation", icon: "🛡️" },
+      { to: "/users", label: "User Management", icon: Users },
+      { to: "/reports", label: "Reports & Moderation", icon: Shield },
     ],
   },
   {
     section: "Finance",
     items: [
-      { to: "/dashboard?tab=payment", label: "Package Purchases", icon: "💳" },
-      { to: "/dashboard?tab=boosts", label: "Payment Activity", icon: "⚡" },
+      { to: "/dashboard?tab=payment", label: "Package Purchases", icon: CreditCard },
+      { to: "/dashboard?tab=boosts", label: "Payment Activity", icon: Zap },
     ],
   },
   {
     section: "Growth Tools",
     items: [
-      { to: "/dashboard?tab=listings-badges", label: "Listing Badges", icon: "🏅" },
-      { to: "/dashboard?tab=user-badges", label: "User Badges", icon: "🎖️" },
-      { to: "/dashboard?tab=website-poster", label: "Website Poster", icon: "🎨" },
+      { to: "/dashboard?tab=listings-badges", label: "Listing Badges", icon: Ticket },
+      { to: "/dashboard?tab=user-badges", label: "User Badges", icon: Medal },
+      { to: "/dashboard?tab=website-poster", label: "Website Poster", icon: Globe },
     ],
   },
   {
     section: "Platform",
-    items: [{ to: "/settings", label: "Settings & Payments Config", icon: "⚙️" }],
+    items: [{ to: "/settings", label: "Settings & Payments Config", icon: Settings }],
   },
 ];
 
@@ -121,7 +125,7 @@ export default function AdminLayout() {
             onClick={() => setSidebarOpen(false)}
             aria-label="Close sidebar"
           >
-            ✕
+            <X size={18} />
           </button>
         </div>
 
@@ -129,16 +133,19 @@ export default function AdminLayout() {
           {NAV_GROUPS.map((group) => (
             <div key={group.section} className="shell-nav-group">
               <div className="shell-nav-section">{group.section}</div>
-              {group.items.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  className={`shell-nav-link ${isActive(item) ? "active" : ""}`}
-                >
-                  <span className="shell-nav-icon">{item.icon}</span>
-                  <span className="shell-nav-label">{item.label}</span>
-                </NavLink>
-              ))}
+              {group.items.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    className={`shell-nav-link ${isActive(item) ? "active" : ""}`}
+                  >
+                    <Icon size={16} className="shell-nav-icon" />
+                    <span className="shell-nav-label">{item.label}</span>
+                  </NavLink>
+                );
+              })}
             </div>
           ))}
         </nav>
@@ -163,7 +170,7 @@ export default function AdminLayout() {
               onClick={() => setSidebarOpen(true)}
               aria-label="Open sidebar menu"
             >
-              ☰
+              <Menu size={18} />
             </button>
             <div className="shell-page-heading">
               <h1 className="shell-page-title">{pageLabel}</h1>
@@ -178,11 +185,12 @@ export default function AdminLayout() {
               title={unreadCount > 0 ? `${unreadCount} item(s) awaiting action` : "No pending items"}
               onClick={() => navigate("/")}
             >
-              <span aria-hidden="true">🔔</span>
+              <Bell size={17} />
               {unreadCount > 0 && <span className="shell-badge">{unreadCount}</span>}
             </button>
             <button type="button" className="shell-logout-btn" onClick={handleLogout}>
-              Logout
+              <LogOut size={14} />
+              <span>Logout</span>
             </button>
           </div>
         </header>

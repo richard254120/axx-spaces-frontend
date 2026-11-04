@@ -24,7 +24,7 @@
 /* Login Container */
 .login-container {
   min-height: 100vh;
-  background-color: #070c18;
+  background-color: #111a2c;
   background-image: 
     radial-gradient(ellipse 80% 50% at 50% -20%, rgba(251, 191, 36, 0.1), transparent 70%),
     radial-gradient(ellipse 60% 50% at 85% 95%, rgba(59, 130, 246, 0.08), transparent 70%),
@@ -72,7 +72,7 @@
 }
 
 .login-subtitle {
-  color: #94a3b8;
+  color: #cdd8e8;
   font-size: 14px;
   text-align: center;
   margin-bottom: 32px;

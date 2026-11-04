@@ -10,7 +10,9 @@
 
 /* ── Sidebar ─────────────────────────────────────────────── */
 .admin-shell-sidebar {
-  background: rgba(10, 17, 32, 0.95);
+  background:
+    linear-gradient(180deg, rgba(251, 191, 36, 0.05), transparent 22%),
+    rgba(17, 26, 45, 0.96);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-right: 1px solid var(--border-subtle);
@@ -59,7 +61,7 @@
 .shell-brand-sub {
   font-size: 10px;
   font-weight: 700;
-  color: #64748b;
+  color: #b4c1d4;
   text-transform: uppercase;
   letter-spacing: 1.3px;
   margin-top: 2px;
@@ -119,10 +121,9 @@
 }
 
 .shell-nav-icon {
-  font-size: 16px;
-  width: 20px;
-  text-align: center;
   flex-shrink: 0;
+  color: currentColor;
+  opacity: 0.9;
 }
 
 .shell-sidebar-footer {
@@ -165,7 +166,7 @@
 
 .shell-user-role {
   font-size: 11px;
-  color: #64748b;
+  color: #b4c1d4;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -176,6 +177,28 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+  position: relative;
+  /* Ambient stage lighting: warm gold crown, cool corner glows, deep base */
+  background:
+    radial-gradient(ellipse 70% 32% at 50% -6%, rgba(251, 191, 36, 0.10), transparent 62%),
+    radial-gradient(ellipse 45% 45% at 102% 100%, rgba(59, 130, 246, 0.08), transparent 70%),
+    radial-gradient(ellipse 40% 40% at -5% 85%, rgba(16, 185, 129, 0.05), transparent 65%),
+    linear-gradient(180deg, rgba(22, 31, 52, 0.5), rgba(12, 19, 35, 0.9));
+}
+
+/* Precision blueprint grid fading in from the top of the content column */
+.admin-shell-main::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 44px 44px;
+  -webkit-mask-image: radial-gradient(ellipse 90% 55% at 50% 0%, black, transparent 78%);
+  mask-image: radial-gradient(ellipse 90% 55% at 50% 0%, black, transparent 78%);
 }
 
 .shell-topbar {
@@ -187,10 +210,11 @@
   justify-content: space-between;
   gap: 16px;
   padding: 14px 32px;
-  background: rgba(7, 12, 24, 0.82);
+  background: rgba(11, 18, 33, 0.86);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border-subtle);
+  box-shadow: 0 1px 0 rgba(251, 191, 36, 0.06), 0 8px 28px -18px rgba(0, 0, 0, 0.8);
 }
 
 .shell-topbar-left {
@@ -202,6 +226,8 @@
 
 .shell-menu-btn {
   display: none;
+  align-items: center;
+  justify-content: center;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--border-subtle);
   border-radius: 9px;
@@ -252,6 +278,9 @@
 
 .shell-icon-btn {
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--border-subtle);
   border-radius: 10px;
@@ -285,6 +314,9 @@
 }
 
 .shell-logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: transparent;
   border: 1px solid rgba(239, 68, 68, 0.4);
   color: #fca5a5;
@@ -307,6 +339,9 @@
   min-width: 0;
   position: relative;
   z-index: 1;
+  width: 100%;
+  max-width: 1480px;
+  margin: 0 auto;
 }
 
 .admin-shell-overlay {
@@ -342,7 +377,7 @@
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(2, 6, 15, 0.65);
+    background: rgba(9, 15, 28, 0.7);
     backdrop-filter: blur(3px);
     z-index: 999;
   }

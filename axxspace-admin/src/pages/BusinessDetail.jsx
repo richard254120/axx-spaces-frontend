@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { ArrowLeft, Star } from "lucide-react";
 import API from "../api/api";
 import { getPricelistUrl, resolveMediaUrl } from "../utils/fileLinks";
 
@@ -63,7 +64,7 @@ const styles = {
   },
   infoLabel: {
     fontSize: "14px",
-    color: "#94a3b8",
+    color: "#cdd8e8",
     fontWeight: 600,
   },
   infoValue: {
@@ -99,18 +100,18 @@ const styles = {
   reviewTitle: {
     fontSize: "16px",
     fontWeight: 600,
-    color: "#cbd5e1",
+    color: "#e6edf6",
     marginBottom: "10px",
   },
   reviewComment: {
     fontSize: "14px",
-    color: "#94a3b8",
+    color: "#cdd8e8",
     lineHeight: "1.6",
     marginBottom: "15px",
   },
   reviewMeta: {
     fontSize: "12px",
-    color: "#64748b",
+    color: "#b4c1d4",
   },
   deleteButton: {
     padding: "8px 16px",
@@ -127,13 +128,13 @@ const styles = {
     textAlign: "center",
     padding: "60px 20px",
     fontSize: "24px",
-    color: "#94a3b8",
+    color: "#cdd8e8",
   },
   empty: {
     textAlign: "center",
     padding: "40px 20px",
     fontSize: "16px",
-    color: "#64748b",
+    color: "#b4c1d4",
   },
   badges: {
     display: "flex",
@@ -211,8 +212,8 @@ export default function BusinessDetail() {
     <div style={styles.container}>
       <div style={styles.header}>
         <h1 style={styles.title}>Business Details</h1>
-        <button style={styles.backButton} onClick={() => navigate("/")}>
-          ← Back to Dashboard
+        <button style={{ ...styles.backButton, display: "inline-flex", alignItems: "center", gap: "6px" }} onClick={() => navigate("/")}>
+          <ArrowLeft size={14} /> Back to Dashboard
         </button>
       </div>
 
@@ -337,7 +338,11 @@ export default function BusinessDetail() {
                 <div style={styles.reviewHeader}>
                   <div>
                     <div style={styles.reviewAuthor}>{review.userName}</div>
-                    <div style={styles.reviewRating}>{"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}</div>
+                    <div style={{ ...styles.reviewRating, display: "inline-flex", alignItems: "center", gap: "2px" }}>
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <Star key={s} size={14} style={{ color: s <= review.rating ? "#fbbf24" : "#475569", fill: s <= review.rating ? "#fbbf24" : "transparent" }} />
+                      ))}
+                    </div>
                   </div>
                   <button
                     style={styles.deleteButton}

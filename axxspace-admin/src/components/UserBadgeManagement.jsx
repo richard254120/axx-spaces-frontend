@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { X } from "lucide-react";
 
 const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:1001";
 
@@ -357,7 +358,7 @@ export default function UserBadgeManagement() {
                               onClick={() => handleRemoveBadge(user, badge.type)}
                               title="Remove badge"
                             >
-                              ✕
+                              <X size={11} />
                             </button>
                           </div>
                         );

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { Check, X, CircleCheckBig } from "lucide-react";
 
 const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:1000";
 
@@ -213,14 +214,14 @@ export default function BoostManagement() {
                       onClick={() => handleApprove(boost._id)}
                       disabled={loading}
                     >
-                      ✓ Approve
+                      <Check size={14} /> Approve
                     </button>
                     <button
                       style={styles.rejectButton}
                       onClick={() => handleReject(boost._id)}
                       disabled={loading}
                     >
-                      ✕ Reject
+                      <X size={14} /> Reject
                     </button>
                   </div>
                 )}
@@ -233,7 +234,7 @@ export default function BoostManagement() {
 
                 {boost.status === "approved" && (
                   <div style={styles.approvedInfo}>
-                    <span>✓ Approved on {new Date(boost.approvedAt).toLocaleString()}</span>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><CircleCheckBig size={14} /> Approved on {new Date(boost.approvedAt).toLocaleString()}</span>
                     <span>Expires on {new Date(boost.expiresAt).toLocaleString()}</span>
                   </div>
                 )}
@@ -412,6 +413,10 @@ const styles = {
     fontWeight: "600",
     cursor: "pointer",
     transition: "background 0.2s",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "6px",
   },
   rejectButton: {
     flex: 1,
@@ -424,6 +429,10 @@ const styles = {
     fontWeight: "600",
     cursor: "pointer",
     transition: "background 0.2s",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "6px",
   },
   rejectionReason: {
     marginTop: "12px",
