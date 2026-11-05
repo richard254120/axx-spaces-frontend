@@ -37,7 +37,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.9px;
-  color: #b4c1d4;
+  color: var(--text-secondary);
 }
 
 /* ── Panel ────────────────────────────────────────────────── */
@@ -55,7 +55,7 @@
   margin: 0 0 14px;
   font-size: 16.5px;
   font-weight: 800;
-  color: #fb7185;
+  color: var(--accent-title);
 }
 
 /* ── Toolbar ──────────────────────────────────────────────── */
@@ -82,12 +82,12 @@
   font-size: 14.5px;
   opacity: 0.7;
   pointer-events: none;
-  color: #cdd8e8;
+  color: var(--text-muted);
 }
 
 .ap-search {
   width: 100%;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--hl-0_05);
   border: 1px solid var(--border-subtle);
   border-radius: 10px;
   color: var(--text-main);
@@ -145,11 +145,11 @@
 .ap-meta-ic {
   vertical-align: -2px;
   margin-right: 2px;
-  color: #b4c1d4;
+  color: var(--text-secondary);
 }
 
 .ap-select {
-  background: rgba(46, 24, 60, 0.9);
+  background: var(--surface-glass);
   border: 1px solid var(--border-subtle);
   border-radius: 10px;
   color: var(--text-main);
@@ -196,7 +196,7 @@
 }
 
 .ap-btn-ghost {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--hl-0_05);
   border-color: var(--border-subtle);
   color: var(--text-main);
 }
@@ -253,8 +253,8 @@
 .ap-table thead th {
   text-align: left;
   padding: 11px 14px;
-  background: rgba(255, 255, 255, 0.035);
-  color: #cdd8e8;
+  background: var(--hl-0_035);
+  color: var(--text-muted);
   font-size: 12.5px;
   font-weight: 800;
   text-transform: uppercase;
@@ -265,13 +265,13 @@
 
 .ap-table tbody td {
   padding: 11px 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+  border-bottom: 1px solid var(--hl-0_045);
   color: var(--text-main);
   vertical-align: middle;
 }
 
 .ap-table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--hl-0_025);
 }
 
 .ap-table tbody tr:last-child td {
@@ -324,7 +324,7 @@
 
 .ap-user-email {
   font-size: 12.5px;
-  color: #b4c1d4;
+  color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -368,7 +368,7 @@
 
 .ap-pill-muted {
   background: rgba(148, 163, 184, 0.12);
-  color: #cdd8e8;
+  color: var(--text-muted);
   border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
@@ -448,12 +448,12 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: #b4c1d4;
+  color: var(--text-secondary);
 }
 
 .ap-modal-field input,
 .ap-modal-field textarea {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--hl-0_05);
   border: 1px solid var(--border-subtle);
   border-radius: 10px;
   color: var(--text-main);
@@ -523,7 +523,7 @@
 }
 
 .ap-field-input {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--hl-0_05);
   border: 1px solid var(--border-subtle);
   border-radius: 10px;
   color: var(--text-main);
@@ -553,7 +553,7 @@
 }
 
 .ap-filter-btn {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--hl-0_05);
   border: 1px solid var(--border-subtle);
   color: var(--text-muted);
   border-radius: 999px;
@@ -587,7 +587,7 @@
   gap: 14px;
   padding: 16px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--hl-0_03);
   border: 1px solid var(--border-subtle);
   align-items: flex-start;
   flex-wrap: wrap;
@@ -630,7 +630,7 @@
   font-size: 14px;
   color: #b6c2d4;
   line-height: 1.55;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--hl-0_05);
   border-radius: 9px;
   padding: 9px 12px;
   margin-top: 8px;

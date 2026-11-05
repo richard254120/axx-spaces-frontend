@@ -8,7 +8,7 @@
   background: rgba(15, 23, 42, 0.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--hl-0_08);
   border-radius: 16px;
   box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
   position: relative;
@@ -27,7 +27,7 @@
   gap: 6px;
   background: rgba(244, 63, 94, 0.1);
   border: 1px solid rgba(244, 63, 94, 0.3);
-  color: #fb7185;
+  color: var(--accent-title);
   padding: 8px 14px;
   border-radius: 10px;
   font-size: 14.5px;
@@ -62,14 +62,14 @@
   font-size: 21.5px;
   font-weight: 900;
   letter-spacing: 0.5px;
-  background: linear-gradient(135deg, #fb7185 0%, #e11d48 100%);
+  background: linear-gradient(135deg, var(--accent-title) 0%, #e11d48 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin: 0;
 }
 
 .admin-logo-sub {
-  color: #cdd8e8;
+  color: var(--text-muted);
   font-size: 13.5px;
   margin: 2px 0 0;
   font-weight: 500;

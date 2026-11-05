@@ -3,11 +3,19 @@
   box-sizing: border-box;
 }
 
-/* CSS Custom Properties - Executive Design System */
+/* ===================================================================
+   Design Tokens — Themeable design system.
+   :root            = LIGHT (default, white)
+   [data-theme=dark] = PLUM-NOIR AURORA (dark)
+   Components must reference these vars (not literals) so the whole
+   console flips when <html data-theme> changes.
+   =================================================================== */
 :root {
   /* Type system: Manrope (UI) + Outfit/Sora (display) — loaded via public/index.html */
   --font-ui: 'Manrope', 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-display: 'Outfit', 'Sora', 'Manrope', sans-serif;
+
+  /* Brand accents — consistent across both themes */
   --gold: #f43f5e;
   --gold-hover: #e11d48;
   --gold-dim: rgba(244, 63, 94, 0.12);
@@ -17,20 +25,139 @@
   --rose-dim: rgba(239, 68, 68, 0.12);
   --blue: #3b82f6;
   --blue-dim: rgba(59, 130, 246, 0.12);
+
+  /* ── LIGHT theme surfaces ── */
+  --page-base: #eef1f7;
+  --page-grad:
+    radial-gradient(ellipse 70% 42% at 18% -8%, rgba(244, 63, 94, 0.07), transparent 60%),
+    radial-gradient(ellipse 55% 45% at 92% 12%, rgba(168, 85, 247, 0.06), transparent 62%),
+    linear-gradient(162deg, #ffffff 0%, #f6f7fb 46%, #eef0f7 100%);
+  --main-bg:
+    radial-gradient(ellipse 70% 42% at 18% -8%, rgba(244, 63, 94, 0.06), transparent 60%),
+    radial-gradient(ellipse 55% 45% at 92% 12%, rgba(168, 85, 247, 0.05), transparent 62%),
+    linear-gradient(162deg, #ffffff 0%, #f7f8fc 50%, #f1f2f8 100%);
+  --sidebar-bg:
+    linear-gradient(180deg, rgba(244, 63, 94, 0.04), transparent 22%),
+    #ffffff;
+  --topbar-bg: rgba(255, 255, 255, 0.82);
+  --aurora-grad:
+    radial-gradient(circle 320px at 22% 28%, rgba(244, 63, 94, 0.10), transparent 62%),
+    radial-gradient(circle 300px at 78% 58%, rgba(168, 85, 247, 0.08), transparent 62%),
+    radial-gradient(circle 240px at 48% 88%, rgba(236, 72, 153, 0.06), transparent 62%);
+
+  --bg-deep: #f4f6fb;
+  --bg-sidebar: #ffffff;
+  --bg-card: rgba(255, 255, 255, 0.92);
+  --bg-card-solid: #ffffff;
+  --surface-glass: rgba(255, 255, 255, 0.9);
+  --surface-solid: #ffffff;
+  --well: rgba(15, 23, 42, 0.04);
+  --input-bg: #ffffff;
+  --input-border: rgba(15, 23, 42, 0.14);
+
+  /* ── LIGHT text ── */
+  --text-main: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --accent-title: #e11d48;
+  --accent-label: #be123c;
+
+  /* ── LIGHT borders & shadows ── */
+  --border-subtle: rgba(15, 23, 42, 0.1);
+  --border-highlight: rgba(244, 63, 94, 0.32);
+  --shadow-subtle: 0 6px 22px -6px rgba(15, 23, 42, 0.18);
+  --shadow-gold: 0 0 24px -6px rgba(244, 63, 94, 0.18);
+
+  /* ── chart ── */
+  --chart-axis: #64748b;
+  --chart-grid: rgba(15, 23, 42, 0.1);
+
+  /* ── white-overlay tokens (light = subtle slate overlay) ── */
+  --hl-0_02: rgba(15, 23, 42, 0.04);
+  --hl-0_025: rgba(15, 23, 42, 0.05);
+  --hl-0_03: rgba(15, 23, 42, 0.05);
+  --hl-0_035: rgba(15, 23, 42, 0.06);
+  --hl-0_04: rgba(15, 23, 42, 0.06);
+  --hl-0_045: rgba(15, 23, 42, 0.07);
+  --hl-0_05: rgba(15, 23, 42, 0.07);
+  --hl-0_06: rgba(15, 23, 42, 0.08);
+  --hl-0_07: rgba(15, 23, 42, 0.09);
+  --hl-0_08: rgba(15, 23, 42, 0.1);
+  --hl-0_09: rgba(15, 23, 42, 0.11);
+  --hl-0_1: rgba(15, 23, 42, 0.12);
+  --hl-0_12: rgba(15, 23, 42, 0.14);
+  --hl-0_14: rgba(15, 23, 42, 0.16);
+  --hl-0_15: rgba(15, 23, 42, 0.18);
+  --hl-0_2: rgba(15, 23, 42, 0.22);
+
+  --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── DARK (plum-noir aurora) overrides ── */
+[data-theme="dark"] {
+  --page-base: #150a20;
+  --page-grad:
+    radial-gradient(ellipse 70% 42% at 18% -8%, rgba(244, 63, 94, 0.14), transparent 60%),
+    radial-gradient(ellipse 55% 45% at 92% 12%, rgba(168, 85, 247, 0.12), transparent 62%),
+    radial-gradient(ellipse 75% 50% at 50% 112%, rgba(225, 29, 72, 0.11), transparent 60%),
+    linear-gradient(162deg, #170f24 0%, #1d1128 42%, #221228 68%, #180b1e 100%);
+  --main-bg:
+    radial-gradient(ellipse 70% 42% at 18% -8%, rgba(244, 63, 94, 0.13), transparent 60%),
+    radial-gradient(ellipse 55% 45% at 92% 12%, rgba(168, 85, 247, 0.11), transparent 62%),
+    radial-gradient(ellipse 75% 50% at 50% 112%, rgba(225, 29, 72, 0.10), transparent 60%),
+    linear-gradient(162deg, #170f24 0%, #1d1128 42%, #221228 68%, #180b1e 100%);
+  --sidebar-bg:
+    linear-gradient(180deg, rgba(244, 63, 94, 0.05), transparent 22%),
+    rgba(26, 13, 36, 0.96);
+  --topbar-bg: rgba(20, 9, 30, 0.88);
+  --aurora-grad:
+    radial-gradient(circle 320px at 22% 28%, rgba(244, 63, 94, 0.15), transparent 62%),
+    radial-gradient(circle 300px at 78% 58%, rgba(168, 85, 247, 0.13), transparent 62%),
+    radial-gradient(circle 240px at 48% 88%, rgba(236, 72, 153, 0.10), transparent 62%);
+
   --bg-deep: #150a20;
   --bg-sidebar: #1f1230;
   --bg-card: rgba(52, 26, 68, 0.72);
   --bg-card-solid: #2a1440;
+  --surface-glass: rgba(46, 24, 60, 0.85);
+  --surface-solid: #2a1440;
+  --well: rgba(255, 255, 255, 0.05);
+  --input-bg: rgba(58, 32, 74, 0.6);
+  --input-border: rgba(255, 255, 255, 0.1);
+
+  --text-main: #ffffff;
+  --text-secondary: #b4c1d4;
+  --text-muted: #cdd8e8;
+  --accent-title: #fb7185;
+  --accent-label: #fda4af;
+
   --border-subtle: rgba(255, 255, 255, 0.14);
   --border-highlight: rgba(244, 63, 94, 0.32);
-  --text-main: #ffffff;
-  --text-muted: #cdd8e8;
   --shadow-subtle: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
   --shadow-gold: 0 0 24px -4px rgba(244, 63, 94, 0.15);
-  --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  --chart-axis: #cdd8e8;
+  --chart-grid: rgba(255, 255, 255, 0.08);
+
+  --hl-0_02: rgba(255, 255, 255, 0.02);
+  --hl-0_025: rgba(255, 255, 255, 0.025);
+  --hl-0_03: rgba(255, 255, 255, 0.03);
+  --hl-0_035: rgba(255, 255, 255, 0.035);
+  --hl-0_04: rgba(255, 255, 255, 0.04);
+  --hl-0_045: rgba(255, 255, 255, 0.045);
+  --hl-0_05: rgba(255, 255, 255, 0.05);
+  --hl-0_06: rgba(255, 255, 255, 0.06);
+  --hl-0_07: rgba(255, 255, 255, 0.07);
+  --hl-0_08: rgba(255, 255, 255, 0.08);
+  --hl-0_09: rgba(255, 255, 255, 0.09);
+  --hl-0_1: rgba(255, 255, 255, 0.1);
+  --hl-0_12: rgba(255, 255, 255, 0.12);
+  --hl-0_14: rgba(255, 255, 255, 0.14);
+  --hl-0_15: rgba(255, 255, 255, 0.15);
+  --hl-0_2: rgba(255, 255, 255, 0.2);
 }
 
-/* Base Body Styling with Precision Dark Mesh */
+/* Base Body Styling */
 body {
   margin: 0;
   font-family: var(--font-ui);
@@ -39,21 +166,17 @@ body {
   letter-spacing: 0.006em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Plum-noir aurora — matches the console shell background */
-  background-color: var(--bg-deep);
-  background-image: 
-    radial-gradient(ellipse 70% 42% at 18% -8%, rgba(244, 63, 94, 0.14), transparent 60%),
-    radial-gradient(ellipse 55% 45% at 92% 12%, rgba(168, 85, 247, 0.12), transparent 62%),
-    radial-gradient(ellipse 75% 50% at 50% 112%, rgba(225, 29, 72, 0.11), transparent 60%),
-    linear-gradient(162deg, #170f24 0%, #1d1128 42%, #221228 68%, #180b1e 100%);
+  background-color: var(--page-base);
+  background-image: var(--page-grad);
   background-attachment: fixed;
   color: var(--text-main);
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* High-contrast smooth scrollbar */
+/* Smooth scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -64,7 +187,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--hl-0_15);
   border-radius: 9999px;
 }
 
@@ -120,4 +243,3 @@ td,
 th {
   font-variant-numeric: tabular-nums;
 }
-

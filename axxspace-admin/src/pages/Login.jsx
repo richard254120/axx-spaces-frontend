@@ -1,8 +1,9 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Sun, Moon } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
+import { getTheme, toggleTheme } from "../theme";
 import "./Login.css";
 
 export default function Login() {
@@ -12,6 +13,8 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [theme, setThemeState] = useState(() => getTheme());
+  const handleToggleTheme = () => setThemeState(toggleTheme());
 
   // Forgot password state
   const [showForgot, setShowForgot] = useState(false);
@@ -61,6 +64,15 @@ export default function Login() {
 
   return (
     <div className="login-container">
+      <button
+        type="button"
+        className="login-theme-toggle"
+        onClick={handleToggleTheme}
+        title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+        aria-label="Toggle color theme"
+      >
+        {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+      </button>
       <div className="login-card">
         {showForgot ? (
           <>

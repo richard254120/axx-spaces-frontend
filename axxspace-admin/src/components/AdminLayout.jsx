@@ -3,10 +3,11 @@ import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, House, ShoppingBag, Bed, Briefcase, Megaphone,
   ClipboardList, Car, Users, Shield, CreditCard, Zap, Ticket, Medal, Globe,
-  Settings, Bell, LogOut, X, Menu
+  Settings, Bell, LogOut, X, Menu, Sun, Moon
 } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
+import { getTheme, toggleTheme } from "../theme";
 import "./AdminLayout.css";
 
 // Navigation groups rendered in the sidebar, in display order
@@ -68,6 +69,9 @@ export default function AdminLayout() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [theme, setThemeState] = useState(() => getTheme());
+
+  const handleToggleTheme = () => setThemeState(toggleTheme());
 
   const isActive = (item) => {
     const [path, query] = item.to.split("?");
@@ -179,6 +183,15 @@ export default function AdminLayout() {
           </div>
 
           <div className="shell-topbar-actions">
+            <button
+              type="button"
+              className="shell-icon-btn"
+              onClick={handleToggleTheme}
+              title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              aria-label="Toggle color theme"
+            >
+              {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
+            </button>
             <button
               type="button"
               className="shell-icon-btn"
