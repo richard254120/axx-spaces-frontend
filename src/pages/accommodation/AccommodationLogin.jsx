@@ -1,6 +1,8 @@
 import { useState, useContext, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import { readMismatch, clientGuardMismatch } from "../../utils/portalAuth";
+import PortalMismatchNotice from "../../components/PortalMismatchNotice";
 import { useGoogleSignIn, GOOGLE_CLIENT_ID } from "../../hooks/useGoogleSignIn";
 import {
   setAccommodationSession,
@@ -50,6 +52,7 @@ export default function AccommodationLogin({ defaultTab }) {
   // Status & feedback state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [mismatch, setMismatch] = useState(null);
   const [success, setSuccess] = useState("");
 
   // Forgot password modal state
@@ -171,6 +174,7 @@ export default function AccommodationLogin({ defaultTab }) {
     setSuccess("");
     setShowResend(false);
     setResendMsg("");
+    setMismatch(null);
 
     try {
       const response = await fetch(`${API_BASE}/auth/login`, {
@@ -191,6 +195,11 @@ export default function AccommodationLogin({ defaultTab }) {
       }
 
       if (!response.ok) {
+        const m = readMismatch(data);
+        if (m) {
+          setMismatch(m);
+          return;
+        }
         if (data.requiresVerification) {
           setShowResend(true);
           setResendEmail(data.email || cleanEmail);
@@ -198,13 +207,11 @@ export default function AccommodationLogin({ defaultTab }) {
         throw new Error(data.error || "Login failed. Please check your credentials.");
       }
 
-      // Defense in depth: the backend already restricts this portal to host
-      // accounts, so only a host session may proceed past this point.
-      const userRole = data.user?.role;
-      if (userRole !== "host") {
-        throw new Error(
-          `Your account is registered as a ${userRole}. Please sign in through your respective portal.`
-        );
+      // Defense in depth: only a host session may proceed past this point.
+      const gm = clientGuardMismatch("host", data.user);
+      if (gm) {
+        setMismatch(gm);
+        return;
       }
 
       setAccommodationSession(data.token, data.user);
@@ -428,6 +435,8 @@ export default function AccommodationLogin({ defaultTab }) {
               <span>{error}</span>
             </div>
           )}
+
+          <PortalMismatchNotice mismatch={mismatch} />
 
           {success && (
             <div className="acc-alert acc-alert-success" role="status">

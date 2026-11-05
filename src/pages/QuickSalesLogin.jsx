@@ -2,6 +2,8 @@ import { useState, useContext, useRef, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import AuthLayout from "../components/AuthLayout";
+import { readMismatch, clientGuardMismatch } from "../utils/portalAuth";
+import PortalMismatchNotice from "../components/PortalMismatchNotice";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -25,6 +27,7 @@ export default function QuickSalesLogin() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [mismatch, setMismatch] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
 
   const [showResend, setShowResend] = useState(false);
@@ -200,6 +203,7 @@ export default function QuickSalesLogin() {
     setError("");
     setSuccess("");
     setShowResend(false);
+    setMismatch(null);
 
     try {
       const url =
@@ -221,6 +225,11 @@ export default function QuickSalesLogin() {
       const data = await res.json();
 
       if (!res.ok) {
+        const m = readMismatch(data);
+        if (m) {
+          setMismatch(m);
+          return;
+        }
         if (data.requiresVerification) {
           setShowResend(true);
           setResendEmail(data.email || form.email);
@@ -237,6 +246,11 @@ export default function QuickSalesLogin() {
         setMode("login");
         setForm({ name: "", email: "", password: "", phone: "", county: "" });
       } else {
+        const gm = clientGuardMismatch("seller", data.user);
+        if (gm) {
+          setMismatch(gm);
+          return;
+        }
         localStorage.setItem("sellerToken", data.token);
         localStorage.setItem("sellerUser", JSON.stringify(data.user));
         login(data.token, data.user);
@@ -428,6 +442,7 @@ export default function QuickSalesLogin() {
             </div>
 
             {error && <div style={localStyles.errorAlert}>{error}</div>}
+            <PortalMismatchNotice mismatch={mismatch} />
             {success && <div style={localStyles.successAlert}>{success}</div>}
 
             {showResend && (

@@ -5,6 +5,8 @@ import API from "../api/api";
 import { getDashboardPath } from "../utils/dashboardRoutes";
 import { useGoogleSignIn } from "../hooks/useGoogleSignIn";
 import AuthLayout from "../components/AuthLayout";
+import { readMismatch, clientGuardMismatch } from "../utils/portalAuth";
+import PortalMismatchNotice from "../components/PortalMismatchNotice";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -17,6 +19,7 @@ export default function BusinessLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [mismatch, setMismatch] = useState(null);
 
   const [showResend, setShowResend] = useState(false);
   const [resendEmail, setResendEmail] = useState("");
@@ -96,10 +99,17 @@ export default function BusinessLogin() {
     setError("");
     setSuccess("");
     setShowResend(false);
+    setMismatch(null);
 
     try {
       const res = await API.post("/auth/login", { ...formData, role: "business" });
       const { token, user } = res.data;
+
+      const gm = clientGuardMismatch("business", user);
+      if (gm) {
+        setMismatch(gm);
+        return;
+      }
 
       login(token, user);
       setSuccess("✓ Sign in successful! Redirecting to your dashboard...");
@@ -108,11 +118,16 @@ export default function BusinessLogin() {
         navigate(getDashboardPath(user?.role));
       }, 1000);
     } catch (err) {
-      if (err.response?.data?.requiresVerification) {
-        setShowResend(true);
-        setResendEmail(err.response.data.email || formData.email);
+      const m = readMismatch(err.response?.data);
+      if (m) {
+        setMismatch(m);
+      } else {
+        if (err.response?.data?.requiresVerification) {
+          setShowResend(true);
+          setResendEmail(err.response.data.email || formData.email);
+        }
+        setError(err.response?.data?.error || "Login failed. Please verify your credentials.");
       }
-      setError(err.response?.data?.error || "Login failed. Please verify your credentials.");
     } finally {
       setLoading(false);
     }
@@ -261,6 +276,7 @@ export default function BusinessLogin() {
             </div>
 
             {error && <div style={localStyles.errorAlert}>{error}</div>}
+            <PortalMismatchNotice mismatch={mismatch} />
             {success && <div style={localStyles.successAlert}>{success}</div>}
 
             {showResend && (

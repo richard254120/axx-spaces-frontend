@@ -2,6 +2,8 @@ import { useState, useContext, useCallback } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { getDashboardPath } from "../utils/dashboardRoutes";
+import { readMismatch, clientGuardMismatch } from "../utils/portalAuth";
+import PortalMismatchNotice from "../components/PortalMismatchNotice";
 import { useGoogleSignIn, GOOGLE_CLIENT_ID } from "../hooks/useGoogleSignIn";
 import AuthLayout from "../components/AuthLayout";
 
@@ -20,6 +22,7 @@ export default function Login() {
   const [googleError, setGoogleError] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(isVerifiedParam ? "✓ Email verified successfully! Please log in to your account." : "");
+  const [mismatch, setMismatch] = useState(null);
 
   const [showResend, setShowResend] = useState(false);
   const [resendEmail, setResendEmail] = useState("");
@@ -105,6 +108,7 @@ export default function Login() {
     setSuccess("");
     setGoogleError("");
     setShowResend(false);
+    setMismatch(null);
 
     if (!formData.email || !formData.password) {
       setError("Email and password are required");
@@ -126,6 +130,11 @@ export default function Login() {
       const data = await response.json();
 
       if (!response.ok) {
+        const m = readMismatch(data);
+        if (m) {
+          setMismatch(m);
+          return;
+        }
         if (data.requiresVerification) {
           setShowResend(true);
           setResendEmail(data.email || formData.email);
@@ -135,6 +144,12 @@ export default function Login() {
 
       if (!data.token || !data.user) {
         throw new Error("Invalid login response from server");
+      }
+
+      const gm = clientGuardMismatch(isMover ? "mover" : "landlord", data.user);
+      if (gm) {
+        setMismatch(gm);
+        return;
       }
 
       login(data.token, data.user);
@@ -334,6 +349,7 @@ export default function Login() {
           </div>
 
           {error && <div style={s.alertError}>{error}</div>}
+          <PortalMismatchNotice mismatch={mismatch} />
           {success && <div style={s.alertSuccess}>{success}</div>}
           {googleError && <div style={s.alertError}>{googleError}</div>}
 
