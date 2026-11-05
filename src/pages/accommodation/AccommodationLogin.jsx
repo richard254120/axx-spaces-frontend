@@ -198,10 +198,12 @@ export default function AccommodationLogin({ defaultTab }) {
         throw new Error(data.error || "Login failed. Please check your credentials.");
       }
 
+      // Defense in depth: the backend already restricts this portal to host
+      // accounts, so only a host session may proceed past this point.
       const userRole = data.user?.role;
-      if (userRole !== "host" && userRole !== "admin" && userRole !== "landlord") {
+      if (userRole !== "host") {
         throw new Error(
-          `Your account is registered as a ${userRole}. Please register as an Accommodation Host or sign in through your respective portal.`
+          `Your account is registered as a ${userRole}. Please sign in through your respective portal.`
         );
       }
 
