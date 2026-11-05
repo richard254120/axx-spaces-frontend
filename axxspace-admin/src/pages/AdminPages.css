@@ -24,7 +24,7 @@
 }
 
 .ap-chip-value {
-  font-size: 24px;
+  font-size: 25.5px;
   font-weight: 800;
   color: var(--text-main);
 }
@@ -33,7 +33,7 @@
 .ap-chip-card.ok .ap-chip-value { color: var(--emerald); }
 
 .ap-chip-label {
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.9px;
@@ -53,9 +53,9 @@
   align-items: center;
   gap: 8px;
   margin: 0 0 14px;
-  font-size: 15px;
+  font-size: 16.5px;
   font-weight: 800;
-  color: var(--text-main);
+  color: #fb7185;
 }
 
 /* ── Toolbar ──────────────────────────────────────────────── */
@@ -79,7 +79,7 @@
 .ap-search-icon {
   position: absolute;
   left: 11px;
-  font-size: 13px;
+  font-size: 14.5px;
   opacity: 0.7;
   pointer-events: none;
   color: #cdd8e8;
@@ -92,7 +92,7 @@
   border-radius: 10px;
   color: var(--text-main);
   padding: 9px 32px 9px 34px;
-  font-size: 13px;
+  font-size: 14.5px;
   font-family: inherit;
   outline: none;
   transition: var(--transition-smooth);
@@ -100,7 +100,7 @@
 
 .ap-search:focus {
   border-color: var(--border-highlight);
-  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.08);
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.08);
 }
 
 .ap-search::placeholder {
@@ -116,7 +116,7 @@
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13.5px;
 }
 
 /* Icon helpers */
@@ -149,12 +149,12 @@
 }
 
 .ap-select {
-  background: rgba(24, 34, 55, 0.9);
+  background: rgba(43, 39, 68, 0.9);
   border: 1px solid var(--border-subtle);
   border-radius: 10px;
   color: var(--text-main);
   padding: 9px 12px;
-  font-size: 12.5px;
+  font-size: 14px;
   font-family: inherit;
   font-weight: 600;
   cursor: pointer;
@@ -166,7 +166,7 @@
 }
 
 .ap-count {
-  font-size: 12px;
+  font-size: 13.5px;
   color: var(--text-muted);
   margin-bottom: 12px;
 }
@@ -182,7 +182,7 @@
   gap: 6px;
   border-radius: 10px;
   padding: 8px 15px;
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
   transition: var(--transition-smooth);
@@ -209,7 +209,7 @@
 
 .ap-btn-primary {
   background: linear-gradient(135deg, var(--gold), var(--gold-hover));
-  color: #0f172a;
+  color: #ffffff;
 }
 
 .ap-btn-primary:hover:not(:disabled) {
@@ -246,7 +246,7 @@
 .ap-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12.5px;
+  font-size: 14px;
   min-width: 760px;
 }
 
@@ -255,7 +255,7 @@
   padding: 11px 14px;
   background: rgba(255, 255, 255, 0.035);
   color: #cdd8e8;
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.9px;
@@ -304,7 +304,7 @@
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 12px;
+  font-size: 13.5px;
   flex-shrink: 0;
 }
 
@@ -323,7 +323,7 @@
 }
 
 .ap-user-email {
-  font-size: 11px;
+  font-size: 12.5px;
   color: #b4c1d4;
   white-space: nowrap;
   overflow: hidden;
@@ -336,7 +336,7 @@
   display: inline-block;
   padding: 3px 10px;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 800;
   text-transform: capitalize;
   white-space: nowrap;
@@ -386,7 +386,7 @@
   padding: 38px 0;
   text-align: center;
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: 14.5px;
 }
 
 .ap-error {
@@ -395,7 +395,7 @@
   color: #fca5a5;
   border-radius: 10px;
   padding: 10px 14px;
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 600;
   margin-bottom: 12px;
 }
@@ -404,7 +404,7 @@
 .ap-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(2, 6, 15, 0.7);
+  background: rgba(11, 9, 22, 0.72);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -425,13 +425,13 @@
 
 .ap-modal h3 {
   margin: 0 0 10px;
-  font-size: 16px;
+  font-size: 17.5px;
   color: var(--text-main);
 }
 
 .ap-modal p {
   margin: 0 0 18px;
-  font-size: 13px;
+  font-size: 14.5px;
   color: var(--text-muted);
   line-height: 1.6;
 }
@@ -444,7 +444,7 @@
 }
 
 .ap-modal-field label {
-  font-size: 11.5px;
+  font-size: 13px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.8px;
@@ -458,7 +458,7 @@
   border-radius: 10px;
   color: var(--text-main);
   padding: 10px 12px;
-  font-size: 13px;
+  font-size: 14.5px;
   font-family: inherit;
   outline: none;
   resize: vertical;
@@ -484,7 +484,7 @@
   z-index: 2100;
   padding: 12px 22px;
   border-radius: 12px;
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 700;
   box-shadow: var(--shadow-subtle);
   max-width: 90vw;
@@ -517,7 +517,7 @@
 }
 
 .ap-field-label {
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 700;
   color: var(--text-muted);
 }
@@ -528,7 +528,7 @@
   border-radius: 10px;
   color: var(--text-main);
   padding: 10px 13px;
-  font-size: 13px;
+  font-size: 14.5px;
   font-family: inherit;
   outline: none;
   transition: var(--transition-smooth);
@@ -536,11 +536,11 @@
 
 .ap-field-input:focus {
   border-color: var(--border-highlight);
-  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.08);
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.08);
 }
 
 .ap-hint {
-  font-size: 11.5px;
+  font-size: 13px;
   color: #5b6b8b;
   line-height: 1.5;
 }
@@ -558,7 +558,7 @@
   color: var(--text-muted);
   border-radius: 999px;
   padding: 6px 14px;
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
   transition: var(--transition-smooth);
@@ -611,7 +611,7 @@
 }
 
 .ap-report-title {
-  font-size: 14px;
+  font-size: 15.5px;
   font-weight: 800;
   color: var(--text-main);
   margin-bottom: 4px;
@@ -621,13 +621,13 @@
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  font-size: 11.5px;
+  font-size: 13px;
   color: var(--text-muted);
   margin-bottom: 8px;
 }
 
 .ap-report-details {
-  font-size: 12.5px;
+  font-size: 14px;
   color: #b6c2d4;
   line-height: 1.55;
   background: rgba(255, 255, 255, 0.05);

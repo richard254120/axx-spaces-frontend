@@ -10,7 +10,7 @@ const styles = {
     background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
     padding: "20px",
     color: "#f1f5f9",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "var(--font-ui)",
   },
   header: {
     display: "flex",
@@ -34,7 +34,7 @@ const styles = {
     color: "#f1f5f9",
     border: "none",
     borderRadius: "8px",
-    fontSize: "14px",
+    fontSize: "15.5px",
     fontWeight: 600,
     cursor: "pointer",
     transition: "all 0.3s",
@@ -47,7 +47,7 @@ const styles = {
     border: "1px solid rgba(255, 255, 255, 0.1)",
   },
   sectionTitle: {
-    fontSize: "24px",
+    fontSize: "25.5px",
     fontWeight: 700,
     color: "#fbbf24",
     marginBottom: "20px",
@@ -63,12 +63,12 @@ const styles = {
     gap: "5px",
   },
   infoLabel: {
-    fontSize: "14px",
+    fontSize: "15.5px",
     color: "#cdd8e8",
     fontWeight: 600,
   },
   infoValue: {
-    fontSize: "16px",
+    fontSize: "17.5px",
     color: "#f1f5f9",
   },
   reviewsList: {
@@ -89,28 +89,28 @@ const styles = {
     marginBottom: "15px",
   },
   reviewAuthor: {
-    fontSize: "18px",
+    fontSize: "19.5px",
     fontWeight: 600,
     color: "#f1f5f9",
   },
   reviewRating: {
-    fontSize: "16px",
+    fontSize: "17.5px",
     color: "#fbbf24",
   },
   reviewTitle: {
-    fontSize: "16px",
+    fontSize: "17.5px",
     fontWeight: 600,
     color: "#e6edf6",
     marginBottom: "10px",
   },
   reviewComment: {
-    fontSize: "14px",
+    fontSize: "15.5px",
     color: "#cdd8e8",
     lineHeight: "1.6",
     marginBottom: "15px",
   },
   reviewMeta: {
-    fontSize: "12px",
+    fontSize: "13.5px",
     color: "#b4c1d4",
   },
   deleteButton: {
@@ -119,7 +119,7 @@ const styles = {
     color: "#f1f5f9",
     border: "none",
     borderRadius: "6px",
-    fontSize: "12px",
+    fontSize: "13.5px",
     fontWeight: 600,
     cursor: "pointer",
     transition: "all 0.3s",
@@ -127,13 +127,13 @@ const styles = {
   loading: {
     textAlign: "center",
     padding: "60px 20px",
-    fontSize: "24px",
+    fontSize: "25.5px",
     color: "#cdd8e8",
   },
   empty: {
     textAlign: "center",
     padding: "40px 20px",
-    fontSize: "16px",
+    fontSize: "17.5px",
     color: "#b4c1d4",
   },
   badges: {
@@ -145,7 +145,7 @@ const styles = {
   badge: {
     padding: "4px 12px",
     borderRadius: "20px",
-    fontSize: "12px",
+    fontSize: "13.5px",
     fontWeight: 600,
     background: "rgba(251, 191, 36, 0.2)",
     color: "#fbbf24",
@@ -317,8 +317,8 @@ export default function BusinessDetail() {
                   {item.image && (
                     <img src={resolveMediaUrl(item.image)} alt={item.name} style={{ width: "100%", height: "120px", objectFit: "cover", borderRadius: "6px", marginBottom: "8px" }} />
                   )}
-                  <div style={{ fontSize: "14px", fontWeight: 600, color: "#f1f5f9", marginBottom: "4px" }}>{item.name || "Unnamed Item"}</div>
-                  {item.price && <div style={{ fontSize: "14px", color: "#22c55e", fontWeight: 700 }}>KES {item.price}</div>}
+                  <div style={{ fontSize: "15.5px", fontWeight: 600, color: "#f1f5f9", marginBottom: "4px" }}>{item.name || "Unnamed Item"}</div>
+                  {item.price && <div style={{ fontSize: "15.5px", color: "#22c55e", fontWeight: 700 }}>KES {item.price}</div>}
                 </div>
               ))}
             </div>

@@ -143,7 +143,7 @@ export default function CommandCenter() {
       { key: "properties", label: "Properties", total: stats.properties?.total || 0, pending: stats.properties?.pending || 0, color: "#3b82f6", icon: House, queue: "/dashboard?tab=properties" },
       { key: "materials", label: "QuickSales", total: stats.materials?.total || 0, pending: stats.materials?.pending || 0, color: "#22c55e", icon: ShoppingBag, queue: "/dashboard?tab=materials" },
       { key: "accommodations", label: "Accommodations", total: stats.accommodations?.total || 0, pending: stats.accommodations?.pending || 0, color: "#14b8a6", icon: Bed, queue: "/dashboard?tab=accommodations" },
-      { key: "businesses", label: "Businesses", total: stats.businesses?.total || 0, pending: stats.businesses?.pending || 0, color: "#fbbf24", icon: Briefcase, queue: "/dashboard?tab=businesses" },
+      { key: "businesses", label: "Businesses", total: stats.businesses?.total || 0, pending: stats.businesses?.pending || 0, color: "#fb7185", icon: Briefcase, queue: "/dashboard?tab=businesses" },
       { key: "sellers", label: "Seller Verifications", total: stats.sellers?.total || 0, pending: stats.sellers?.pending || 0, color: "#fb923c", icon: BadgeCheck, queue: "/dashboard?tab=materials" },
     ];
   }, [stats]);

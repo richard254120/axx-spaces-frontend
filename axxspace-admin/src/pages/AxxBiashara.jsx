@@ -9,15 +9,15 @@ const styles = {
     background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
     padding: "20px",
     color: "#f1f5f9",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "var(--font-ui)",
   },
   header: {
     textAlign: "center",
     marginBottom: "40px",
     padding: "40px 20px",
-    background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
+    background: "linear-gradient(135deg, #fb7185 0%, #e11d48 100%)",
     borderRadius: "20px",
-    boxShadow: "0 10px 40px rgba(251, 191, 36, 0.3)",
+    boxShadow: "0 10px 40px rgba(244, 63, 94, 0.3)",
   },
   title: {
     fontSize: "48px",
@@ -26,7 +26,7 @@ const styles = {
     marginBottom: "10px",
   },
   subtitle: {
-    fontSize: "18px",
+    fontSize: "19.5px",
     color: "#1e293b",
     fontWeight: 500,
   },
@@ -43,7 +43,7 @@ const styles = {
     gap: "8px",
   },
   filterLabel: {
-    fontSize: "14px",
+    fontSize: "15.5px",
     fontWeight: 600,
     color: "#e6edf6",
   },
@@ -53,7 +53,7 @@ const styles = {
     border: "1px solid rgba(255, 255, 255, 0.2)",
     borderRadius: "10px",
     color: "#f1f5f9",
-    fontSize: "14px",
+    fontSize: "15.5px",
     cursor: "pointer",
     outline: "none",
     minWidth: "200px",
@@ -83,18 +83,18 @@ const styles = {
     padding: "20px",
   },
   cardTitle: {
-    fontSize: "20px",
+    fontSize: "21.5px",
     fontWeight: 700,
-    color: "#fbbf24",
+    color: "#fb7185",
     marginBottom: "8px",
   },
   cardCategory: {
-    fontSize: "14px",
+    fontSize: "15.5px",
     color: "#cdd8e8",
     marginBottom: "12px",
   },
   cardLocation: {
-    fontSize: "14px",
+    fontSize: "15.5px",
     color: "#b4c1d4",
     marginBottom: "12px",
     display: "flex",
@@ -102,7 +102,7 @@ const styles = {
     gap: "5px",
   },
   cardDescription: {
-    fontSize: "14px",
+    fontSize: "15.5px",
     color: "#e6edf6",
     marginBottom: "15px",
     lineHeight: "1.5",
@@ -120,7 +120,7 @@ const styles = {
   badge: {
     padding: "4px 10px",
     borderRadius: "20px",
-    fontSize: "12px",
+    fontSize: "13.5px",
     fontWeight: 600,
   },
   cardActions: {
@@ -130,11 +130,11 @@ const styles = {
   },
   contactButton: {
     padding: "10px 20px",
-    background: "#fbbf24",
-    color: "#0f172a",
+    background: "#fb7185",
+    color: "#ffffff",
     border: "none",
     borderRadius: "8px",
-    fontSize: "14px",
+    fontSize: "15.5px",
     fontWeight: 600,
     cursor: "pointer",
     textDecoration: "none",
@@ -169,9 +169,9 @@ const styles = {
     border: "1px solid #a855f7",
   },
   badgePremium: {
-    background: "rgba(251, 191, 36, 0.2)",
-    color: "#fbbf24",
-    border: "1px solid #fbbf24",
+    background: "rgba(244, 63, 94, 0.2)",
+    color: "#fb7185",
+    border: "1px solid #fb7185",
   },
   socialLinks: {
     display: "flex",
@@ -194,35 +194,35 @@ const styles = {
     position: "absolute",
     top: "10px",
     right: "10px",
-    background: "#fbbf24",
-    color: "#0f172a",
+    background: "#fb7185",
+    color: "#ffffff",
     padding: "5px 15px",
     borderRadius: "20px",
-    fontSize: "12px",
+    fontSize: "13.5px",
     fontWeight: 700,
   },
   loading: {
     textAlign: "center",
     padding: "60px 20px",
-    fontSize: "24px",
+    fontSize: "25.5px",
     color: "#cdd8e8",
   },
   empty: {
     textAlign: "center",
     padding: "60px 20px",
-    fontSize: "18px",
+    fontSize: "19.5px",
     color: "#b4c1d4",
   },
   addButton: {
     padding: "12px 24px",
-    background: "#fbbf24",
-    color: "#0f172a",
+    background: "#fb7185",
+    color: "#ffffff",
     border: "none",
     borderRadius: "10px",
-    fontSize: "16px",
+    fontSize: "17.5px",
     fontWeight: 700,
     cursor: "pointer",
-    boxShadow: "0 4px 15px rgba(251, 191, 36, 0.3)",
+    boxShadow: "0 4px 15px rgba(244, 63, 94, 0.3)",
     transition: "opacity 0.3s",
     display: "flex",
     alignItems: "center",
@@ -234,21 +234,21 @@ const styles = {
     justifyContent: "center",
   },
   pricingCard: {
-    background: "rgba(251, 191, 36, 0.1)",
-    border: "2px solid #fbbf24",
+    background: "rgba(244, 63, 94, 0.1)",
+    border: "2px solid #fb7185",
     borderRadius: "20px",
     padding: "30px 50px",
     textAlign: "center",
     maxWidth: "500px",
   },
   pricingPlaceholder: {
-    fontSize: "20px",
+    fontSize: "21.5px",
     fontWeight: 700,
-    color: "#fbbf24",
+    color: "#fb7185",
     marginBottom: "10px",
   },
   pricingSubtext: {
-    fontSize: "14px",
+    fontSize: "15.5px",
     color: "#cdd8e8",
   },
   announcementsSection: {
@@ -259,9 +259,9 @@ const styles = {
     border: "1px solid rgba(255, 255, 255, 0.1)",
   },
   announcementsTitle: {
-    fontSize: "24px",
+    fontSize: "25.5px",
     fontWeight: 700,
-    color: "#fbbf24",
+    color: "#fb7185",
     marginBottom: "20px",
   },
   announcementsScroll: {
@@ -270,7 +270,7 @@ const styles = {
     overflowX: "auto",
     paddingBottom: "10px",
     scrollbarWidth: "thin",
-    scrollbarColor: "#fbbf24 rgba(30, 41, 59, 0.5)",
+    scrollbarColor: "#fb7185 rgba(30, 41, 59, 0.5)",
   },
   announcementBox: {
     background: "rgba(15, 23, 42, 0.8)",
@@ -284,27 +284,27 @@ const styles = {
     flexShrink: 0,
   },
   announcementBusiness: {
-    fontSize: "13px",
+    fontSize: "14.5px",
     fontWeight: 600,
     color: "#cdd8e8",
     marginBottom: "10px",
     display: "block",
   },
   announcementSubmitter: {
-    fontSize: "13px",
+    fontSize: "14.5px",
     color: "#b4c1d4",
     marginBottom: "5px",
     display: "block",
   },
   announcementBoxTitle: {
-    fontSize: "16px",
+    fontSize: "17.5px",
     fontWeight: 600,
     color: "#f1f5f9",
     marginBottom: "10px",
     margin: 0,
   },
   announcementBoxDate: {
-    fontSize: "12px",
+    fontSize: "13.5px",
     color: "#b4c1d4",
   },
   modalOverlay: {
@@ -337,7 +337,7 @@ const styles = {
     borderRadius: "50%",
     width: "40px",
     height: "40px",
-    fontSize: "20px",
+    fontSize: "21.5px",
     color: "#f1f5f9",
     cursor: "pointer",
     transition: "all 0.3s",
@@ -346,23 +346,23 @@ const styles = {
     justifyContent: "center",
   },
   modalTitle: {
-    fontSize: "28px",
+    fontSize: "29.5px",
     fontWeight: 700,
-    color: "#fbbf24",
+    color: "#fb7185",
     marginBottom: "15px",
   },
   modalBusiness: {
-    fontSize: "16px",
+    fontSize: "17.5px",
     color: "#cdd8e8",
     marginBottom: "10px",
   },
   modalDate: {
-    fontSize: "14px",
+    fontSize: "15.5px",
     color: "#b4c1d4",
     marginBottom: "20px",
   },
   modalContentText: {
-    fontSize: "16px",
+    fontSize: "17.5px",
     color: "#e6edf6",
     lineHeight: "1.8",
   },
@@ -383,9 +383,9 @@ const styles = {
     border: "1px solid rgba(255, 255, 255, 0.1)",
   },
   formTitle: {
-    fontSize: "24px",
+    fontSize: "25.5px",
     fontWeight: 700,
-    color: "#fbbf24",
+    color: "#fb7185",
     marginBottom: "20px",
   },
   formInput: {
@@ -395,7 +395,7 @@ const styles = {
     border: "1px solid rgba(255, 255, 255, 0.2)",
     borderRadius: "10px",
     color: "#f1f5f9",
-    fontSize: "16px",
+    fontSize: "17.5px",
     marginBottom: "15px",
     outline: "none",
     boxSizing: "border-box",
@@ -407,7 +407,7 @@ const styles = {
     border: "1px solid rgba(255, 255, 255, 0.2)",
     borderRadius: "10px",
     color: "#f1f5f9",
-    fontSize: "16px",
+    fontSize: "17.5px",
     marginBottom: "15px",
     outline: "none",
     resize: "vertical",
@@ -415,11 +415,11 @@ const styles = {
   },
   formSubmit: {
     padding: "12px 24px",
-    background: "#fbbf24",
-    color: "#0f172a",
+    background: "#fb7185",
+    color: "#ffffff",
     border: "none",
     borderRadius: "10px",
-    fontSize: "16px",
+    fontSize: "17.5px",
     fontWeight: 600,
     cursor: "pointer",
     transition: "all 0.3s",
@@ -437,7 +437,7 @@ const styles = {
     left: "15px",
     top: "50%",
     transform: "translateY(-50%)",
-    fontSize: "20px",
+    fontSize: "21.5px",
   },
   searchInput: {
     width: "100%",
@@ -446,7 +446,7 @@ const styles = {
     border: "1px solid rgba(255, 255, 255, 0.2)",
     borderRadius: "12px",
     color: "#f1f5f9",
-    fontSize: "16px",
+    fontSize: "17.5px",
     outline: "none",
     transition: "border-color 0.3s",
     boxSizing: "border-box",
@@ -460,7 +460,7 @@ const styles = {
     border: "none",
     color: "#cdd8e8",
     cursor: "pointer",
-    fontSize: "18px",
+    fontSize: "19.5px",
     padding: "5px",
   },
 };
@@ -575,7 +575,7 @@ export default function AxxBiashara() {
       {/* ── HEADER ─────────────────────────────────────────────────────────── */}
       <div style={styles.header}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-          <h1 style={styles.title}><img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "56px", height: "56px", marginRight: "14px", verticalAlign: "middle", filter: "drop-shadow(0 4px 12px rgba(251,191,36,0.4))", borderRadius: "50%", objectFit: "cover", border: "3px solid rgba(251,191,36,0.3)" }} /> AxxBiashara</h1>
+          <h1 style={styles.title}><img src="/axxbiashara.png" alt="AxxBiashara" style={{ width: "56px", height: "56px", marginRight: "14px", verticalAlign: "middle", filter: "drop-shadow(0 4px 12px rgba(244,63,94,0.4))", borderRadius: "50%", objectFit: "cover", border: "3px solid rgba(244,63,94,0.3)" }} /> AxxBiashara</h1>
           <div style={{ display: "flex", gap: "10px" }}>
             <button
               style={styles.addButton}
@@ -655,7 +655,7 @@ export default function AxxBiashara() {
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = "translateY(-5px)";
-                    e.currentTarget.style.boxShadow = "0 10px 30px rgba(251, 191, 36, 0.3)";
+                    e.currentTarget.style.boxShadow = "0 10px 30px rgba(244, 63, 94, 0.3)";
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = "translateY(0)";
@@ -675,7 +675,7 @@ export default function AxxBiashara() {
               ))}
             </div>
           ) : (
-            <p style={{ color: "#cdd8e8", fontSize: "14px" }}>
+            <p style={{ color: "#cdd8e8", fontSize: "15.5px" }}>
               No announcements yet. Create one on a business page!
             </p>
           )}
@@ -833,7 +833,7 @@ export default function AxxBiashara() {
                         style={styles.socialIcon}
                         onClick={(e) => e.stopPropagation()}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.background = "#fbbf24";
+                          e.currentTarget.style.background = "#fb7185";
                           e.currentTarget.style.color = "#0f172a";
                         }}
                         onMouseLeave={(e) => {
@@ -850,7 +850,7 @@ export default function AxxBiashara() {
                         style={styles.socialIcon}
                         onClick={(e) => e.stopPropagation()}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.background = "#fbbf24";
+                          e.currentTarget.style.background = "#fb7185";
                           e.currentTarget.style.color = "#0f172a";
                         }}
                         onMouseLeave={(e) => {
@@ -867,7 +867,7 @@ export default function AxxBiashara() {
                         style={styles.socialIcon}
                         onClick={(e) => e.stopPropagation()}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.background = "#fbbf24";
+                          e.currentTarget.style.background = "#fb7185";
                           e.currentTarget.style.color = "#0f172a";
                         }}
                         onMouseLeave={(e) => {
@@ -884,7 +884,7 @@ export default function AxxBiashara() {
                         style={styles.socialIcon}
                         onClick={(e) => e.stopPropagation()}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.background = "#fbbf24";
+                          e.currentTarget.style.background = "#fb7185";
                           e.currentTarget.style.color = "#0f172a";
                         }}
                         onMouseLeave={(e) => {

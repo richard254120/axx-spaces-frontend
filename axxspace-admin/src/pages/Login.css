@@ -24,16 +24,16 @@
 /* Login Container */
 .login-container {
   min-height: 100vh;
-  background-color: #111a2c;
+  background-color: #1e1b31;
   background-image: 
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(251, 191, 36, 0.1), transparent 70%),
-    radial-gradient(ellipse 60% 50% at 85% 95%, rgba(59, 130, 246, 0.08), transparent 70%),
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(244, 63, 94, 0.1), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 85% 95%, rgba(139, 92, 246, 0.10), transparent 70%),
     radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
   background-size: 100% 100%, 100% 100%, 28px 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-ui);
   position: relative;
   overflow: hidden;
   padding: 20px;
@@ -41,7 +41,7 @@
 
 /* Login Card - Glassmorphism */
 .login-card {
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(43, 39, 68, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -49,7 +49,7 @@
   padding: 42px 36px;
   width: 100%;
   max-width: 420px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 24px -4px rgba(251, 191, 36, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 24px -4px rgba(244, 63, 94, 0.1);
   animation: cardEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
   position: relative;
   z-index: 1;
@@ -64,8 +64,8 @@
 
 /* Title and Subtitle */
 .login-title {
-  color: #fbbf24;
-  font-size: 28px;
+  color: #fb7185;
+  font-size: 29.5px;
   font-weight: 800;
   text-align: center;
   margin: 0 0 8px 0;
@@ -73,7 +73,7 @@
 
 .login-subtitle {
   color: #cdd8e8;
-  font-size: 14px;
+  font-size: 15.5px;
   text-align: center;
   margin-bottom: 32px;
 }
@@ -85,7 +85,7 @@
   border: 1px solid #ef4444;
   border-radius: 8px;
   padding: 12px;
-  font-size: 13px;
+  font-size: 14.5px;
   margin-bottom: 20px;
   text-align: center;
 }
@@ -96,7 +96,7 @@
   border: 1px solid #22c55e;
   border-radius: 8px;
   padding: 12px;
-  font-size: 13px;
+  font-size: 14.5px;
   margin-bottom: 20px;
   text-align: center;
 }
@@ -117,7 +117,7 @@
 
 .login-label {
   color: #f1f5f9;
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -128,41 +128,41 @@
   padding: 12px 16px;
   border-radius: 10px;
   border: 1px solid rgba(255,255,255,0.1);
-  background: rgba(30,41,59,0.6);
+  background: rgba(53,48,82,0.6);
   color: #f1f5f9;
-  font-size: 14px;
+  font-size: 15.5px;
   outline: none;
   transition: all 0.2s ease;
   width: 100%;
   box-sizing: border-box;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-ui);
 }
 
 .login-input:focus {
-  border-color: rgba(251,191,36,0.5);
-  box-shadow: 0 0 0 3px rgba(251,191,36,0.1);
-  background: rgba(30,41,59,0.8);
+  border-color: rgba(244,63,94,0.5);
+  box-shadow: 0 0 0 3px rgba(244,63,94,0.1);
+  background: rgba(53,48,82,0.8);
 }
 
 /* Button */
 .login-btn {
   padding: 14px;
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  color: #1f2937;
+  background: linear-gradient(135deg, #f43f5e 0%, #be123c 100%);
+  color: #ffffff;
   border: none;
   border-radius: 10px;
   font-weight: 800;
-  font-size: 15px;
+  font-size: 16.5px;
   cursor: pointer;
   margin-top: 8px;
   transition: all 0.2s ease;
   letter-spacing: 0.3px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-ui);
 }
 
 .login-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(251,191,36,0.35);
+  box-shadow: 0 8px 25px rgba(244,63,94,0.35);
 }
 
 .login-btn:active:not(:disabled) {
@@ -177,9 +177,9 @@
 
 /* Forgot Password Link */
 .login-forgot {
-  color: #fbbf24;
+  color: #fb7185;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 600;
   text-align: right;
   margin-top: 4px;
@@ -187,7 +187,7 @@
   background: none;
   border: none;
   padding: 0;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-ui);
 }
 
 .login-forgot:hover {
@@ -196,9 +196,9 @@
 
 /* Back Link */
 .login-back-link {
-  color: #fbbf24;
+  color: #fb7185;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 600;
   text-align: center;
   display: block;
@@ -206,7 +206,7 @@
   background: none;
   border: none;
   padding: 0;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-ui);
 }
 
 .login-back-link:hover {

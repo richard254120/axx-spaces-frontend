@@ -94,7 +94,7 @@ export default function BoostManagement() {
   const getStatusColor = (status) => {
     switch (status) {
       case "pending":
-        return "#f59e0b";
+        return "#e11d48";
       case "approved":
         return "#22c55e";
       case "rejected":
@@ -284,7 +284,7 @@ const styles = {
     margin: "0 auto",
   },
   header: {
-    fontSize: "28px",
+    fontSize: "29.5px",
     fontWeight: "700",
     color: "#1e293b",
     marginBottom: "24px",
@@ -299,7 +299,7 @@ const styles = {
     border: "1px solid #e2e8f0",
     borderRadius: "8px",
     background: "white",
-    fontSize: "14px",
+    fontSize: "15.5px",
     fontWeight: "500",
     cursor: "pointer",
     transition: "all 0.2s",
@@ -329,7 +329,7 @@ const styles = {
     marginBottom: "4px",
   },
   statLabel: {
-    fontSize: "14px",
+    fontSize: "15.5px",
     color: "#64748b",
   },
   loading: {
@@ -359,7 +359,7 @@ const styles = {
     marginBottom: "12px",
   },
   boostType: {
-    fontSize: "12px",
+    fontSize: "13.5px",
     fontWeight: "600",
     color: "#3b82f6",
     textTransform: "uppercase",
@@ -367,11 +367,11 @@ const styles = {
   statusBadge: {
     padding: "4px 12px",
     borderRadius: "20px",
-    fontSize: "12px",
+    fontSize: "13.5px",
     fontWeight: "600",
   },
   boostTitle: {
-    fontSize: "18px",
+    fontSize: "19.5px",
     fontWeight: "600",
     color: "#1e293b",
     marginBottom: "16px",
@@ -387,12 +387,12 @@ const styles = {
     flexDirection: "column",
   },
   detailLabel: {
-    fontSize: "12px",
+    fontSize: "13.5px",
     color: "#64748b",
     marginBottom: "2px",
   },
   detailValue: {
-    fontSize: "14px",
+    fontSize: "15.5px",
     fontWeight: "500",
     color: "#1e293b",
   },
@@ -409,7 +409,7 @@ const styles = {
     color: "white",
     border: "none",
     borderRadius: "8px",
-    fontSize: "14px",
+    fontSize: "15.5px",
     fontWeight: "600",
     cursor: "pointer",
     transition: "background 0.2s",
@@ -425,7 +425,7 @@ const styles = {
     color: "white",
     border: "none",
     borderRadius: "8px",
-    fontSize: "14px",
+    fontSize: "15.5px",
     fontWeight: "600",
     cursor: "pointer",
     transition: "background 0.2s",
@@ -440,7 +440,7 @@ const styles = {
     background: "#fef2f2",
     border: "1px solid #fecaca",
     borderRadius: "8px",
-    fontSize: "14px",
+    fontSize: "15.5px",
     color: "#991b1b",
   },
   approvedInfo: {
@@ -449,7 +449,7 @@ const styles = {
     background: "#f0fdf4",
     border: "1px solid #bbf7d0",
     borderRadius: "8px",
-    fontSize: "14px",
+    fontSize: "15.5px",
     color: "#166534",
     display: "flex",
     justifyContent: "space-between",
@@ -474,7 +474,7 @@ const styles = {
     maxWidth: "500px",
   },
   modalTitle: {
-    fontSize: "18px",
+    fontSize: "19.5px",
     fontWeight: "600",
     color: "#1e293b",
     marginBottom: "16px",
@@ -484,7 +484,7 @@ const styles = {
     padding: "12px",
     border: "1px solid #e2e8f0",
     borderRadius: "8px",
-    fontSize: "14px",
+    fontSize: "15.5px",
     resize: "vertical",
     marginBottom: "16px",
   },
@@ -499,7 +499,7 @@ const styles = {
     color: "#64748b",
     border: "1px solid #e2e8f0",
     borderRadius: "8px",
-    fontSize: "14px",
+    fontSize: "15.5px",
     fontWeight: "500",
     cursor: "pointer",
   },
@@ -509,7 +509,7 @@ const styles = {
     color: "white",
     border: "none",
     borderRadius: "8px",
-    fontSize: "14px",
+    fontSize: "15.5px",
     fontWeight: "600",
     cursor: "pointer",
   },

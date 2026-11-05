@@ -827,8 +827,8 @@ export default function AdminDashboard() {
                 { label: " Properties", total: stats.properties?.total || 0, pending: stats.properties?.pending || 0, color: "#3b82f6" },
                 { label: " QuickSales", total: stats.materials?.total || 0, pending: stats.materials?.pending || 0, color: "#22c55e" },
                 { label: " Accommodations", total: stats.accommodations?.total || 0, pending: stats.accommodations?.pending || 0, color: "#14b8a6" },
-                { label: " Businesses", total: stats.businesses?.total || 0, pending: stats.businesses?.pending || 0, color: "#fbbf24" },
-                { label: " Payments", total: allBoosts.length, pending: pendingBoosts.length, color: "#f59e0b", isPulse: pendingBoosts.length > 0 },
+                { label: " Businesses", total: stats.businesses?.total || 0, pending: stats.businesses?.pending || 0, color: "#fb7185" },
+                { label: " Payments", total: allBoosts.length, pending: pendingBoosts.length, color: "#e11d48", isPulse: pendingBoosts.length > 0 },
               ].map(s => (
                 <StatsCard
                   key={s.label}
@@ -915,7 +915,7 @@ export default function AdminDashboard() {
                   { label: "Properties", total: stats.properties.total, pending: stats.properties.pending, color: "#3b82f6" },
                   { label: "QuickSales", total: stats.materials.total, pending: stats.materials.pending, color: "#22c55e" },
                   { label: "Accommodations", total: stats.accommodations?.total || 0, pending: stats.accommodations?.pending || 0, color: "#14b8a6" },
-                  { label: "Businesses", total: stats.businesses?.total || 0, pending: stats.businesses?.pending || 0, color: "#fbbf24" },
+                  { label: "Businesses", total: stats.businesses?.total || 0, pending: stats.businesses?.pending || 0, color: "#fb7185" },
                 ].map(s => {
                   const maxTotal = Math.max(...[stats.properties.total, stats.materials.total, stats.accommodations?.total || 0, stats.businesses?.total || 0]);
                   const barWidth = maxTotal > 0 ? (s.total / maxTotal) * 100 : 0;
@@ -1090,7 +1090,7 @@ export default function AdminDashboard() {
                       </p>
                     )}
                     <div className="card-footer">
-                      <span className="status-dot" style={{ background: business.status === "approved" ? "#22c55e" : business.status === "rejected" ? "#ef4444" : "#fbbf24" }}>
+                      <span className="status-dot" style={{ background: business.status === "approved" ? "#22c55e" : business.status === "rejected" ? "#ef4444" : "#fb7185" }}>
                         {business.status}
                       </span>
                     </div>
@@ -1104,7 +1104,7 @@ export default function AdminDashboard() {
                         style={{
                           marginTop: "10px",
                           width: "100%",
-                          background: business.featured ? "#ef4444" : "#fbbf24",
+                          background: business.featured ? "#ef4444" : "#fb7185",
                           color: "#0f1729",
                           cursor: "pointer",
                           pointerEvents: "auto",
@@ -1122,7 +1122,7 @@ export default function AdminDashboard() {
                     )}
                     <select
                       className="filter-select"
-                      style={{ marginTop: "10px", padding: "8px", fontSize: "12px" }}
+                      style={{ marginTop: "10px", padding: "8px", fontSize: "13.5px" }}
                       onChange={(e) => handleAddBadge(business._id, e.target.value)}
                       defaultValue=""
                     >
@@ -1168,7 +1168,7 @@ export default function AdminDashboard() {
                       <p className="card-owner"> Organization: {announcement.organizationName}</p>
                     )}
                     <p className="card-owner"> {new Date(announcement.createdAt).toLocaleDateString()}</p>
-                    <p className="card-owner" style={{ color: announcement.status === "approved" ? "#22c55e" : announcement.status === "rejected" ? "#ef4444" : "#fbbf24" }}>
+                    <p className="card-owner" style={{ color: announcement.status === "approved" ? "#22c55e" : announcement.status === "rejected" ? "#ef4444" : "#fb7185" }}>
                       Status: {announcement.status.toUpperCase()}
                     </p>
                     <p className="card-owner">{announcement.content}</p>
@@ -1200,13 +1200,13 @@ export default function AdminDashboard() {
             <div style={{ width: "100%", overflowX: "auto", background: "rgba(15, 23, 42, 0.8)", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.05)" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", color: "#f1f5f9" }}>
                 <thead>
-                  <tr style={{ background: "rgba(251, 191, 36, 0.1)" }}>
-                    <th style={{ padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" }}>Requester & Channel</th>
-                    <th style={{ padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" }}>Category & Timeline</th>
-                    <th style={{ padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" }}>Item / Requirements</th>
-                    <th style={{ padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" }}>Location & Budget</th>
-                    <th style={{ padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" }}>Status</th>
-                    <th style={{ padding: "18px", textAlign: "left", color: "#fbbf24", fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px" }}>Actions</th>
+                  <tr style={{ background: "rgba(244, 63, 94, 0.1)" }}>
+                    <th style={{ padding: "18px", textAlign: "left", color: "#fb7185", fontSize: "14.5px", textTransform: "uppercase", letterSpacing: "1px" }}>Requester & Channel</th>
+                    <th style={{ padding: "18px", textAlign: "left", color: "#fb7185", fontSize: "14.5px", textTransform: "uppercase", letterSpacing: "1px" }}>Category & Timeline</th>
+                    <th style={{ padding: "18px", textAlign: "left", color: "#fb7185", fontSize: "14.5px", textTransform: "uppercase", letterSpacing: "1px" }}>Item / Requirements</th>
+                    <th style={{ padding: "18px", textAlign: "left", color: "#fb7185", fontSize: "14.5px", textTransform: "uppercase", letterSpacing: "1px" }}>Location & Budget</th>
+                    <th style={{ padding: "18px", textAlign: "left", color: "#fb7185", fontSize: "14.5px", textTransform: "uppercase", letterSpacing: "1px" }}>Status</th>
+                    <th style={{ padding: "18px", textAlign: "left", color: "#fb7185", fontSize: "14.5px", textTransform: "uppercase", letterSpacing: "1px" }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1215,7 +1215,7 @@ export default function AdminDashboard() {
                     const waPhone = cleanPhone.startsWith("0") ? `254${cleanPhone.slice(1)}` : cleanPhone;
                     const urgencyColors = {
                       immediate: { bg: "rgba(239, 68, 68, 0.2)", text: "#f87171", border: "#ef4444" },
-                      this_week: { bg: "rgba(245, 158, 11, 0.2)", text: "#fbbf24", border: "#f59e0b" },
+                      this_week: { bg: "rgba(225, 29, 72, 0.2)", text: "#fb7185", border: "#e11d48" },
                       this_month: { bg: "rgba(59, 130, 246, 0.2)", text: "#60a5fa", border: "#3b82f6" },
                       flexible: { bg: "rgba(148, 163, 184, 0.2)", text: "#cdd8e8", border: "#b4c1d4" }
                     };
@@ -1224,12 +1224,12 @@ export default function AdminDashboard() {
                     return (
                       <tr key={req._id} style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                         <td style={{ padding: "18px" }}>
-                          <div style={{ fontWeight: 700, fontSize: "15px", marginBottom: "4px", color: "#ffffff" }}>
+                          <div style={{ fontWeight: 700, fontSize: "16.5px", marginBottom: "4px", color: "#ffffff" }}>
                             {req.name || "Client"}
                           </div>
-                          <div style={{ fontSize: "13px", color: "#cdd8e8" }}>{req.email}</div>
+                          <div style={{ fontSize: "14.5px", color: "#cdd8e8" }}>{req.email}</div>
                           {req.phone && (
-                            <div style={{ fontSize: "12px", color: "#38bdf8", marginTop: "2px" }}>
+                            <div style={{ fontSize: "13.5px", color: "#38bdf8", marginTop: "2px" }}>
                               Tel: {req.phone}
                             </div>
                           )}
@@ -1239,7 +1239,7 @@ export default function AdminDashboard() {
                               marginTop: "4px",
                               padding: "2px 6px",
                               borderRadius: "4px",
-                              fontSize: "10px",
+                              fontSize: "11.5px",
                               fontWeight: 700,
                               textTransform: "uppercase",
                               background: req.preferredContact === "whatsapp" ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.06)",
@@ -1255,12 +1255,12 @@ export default function AdminDashboard() {
                             <span style={{
                               padding: "4px 8px",
                               borderRadius: "4px",
-                              fontSize: "11px",
+                              fontSize: "12.5px",
                               fontWeight: 700,
                               textTransform: "uppercase",
-                              background: req.serviceType === "rental" ? "rgba(251, 191, 36, 0.15)" : "rgba(30,41,59,0.8)",
-                              color: req.serviceType === "rental" ? "#fbbf24" : "#cdd8e8",
-                              border: req.serviceType === "rental" ? "1px solid #fbbf24" : "1px solid #334155"
+                              background: req.serviceType === "rental" ? "rgba(244, 63, 94, 0.15)" : "rgba(30,41,59,0.8)",
+                              color: req.serviceType === "rental" ? "#fb7185" : "#cdd8e8",
+                              border: req.serviceType === "rental" ? "1px solid #fb7185" : "1px solid #334155"
                             }}>
                               {req.serviceType}
                             </span>
@@ -1268,7 +1268,7 @@ export default function AdminDashboard() {
                               <span style={{
                                 padding: "2px 6px",
                                 borderRadius: "4px",
-                                fontSize: "10px",
+                                fontSize: "11.5px",
                                 fontWeight: 700,
                                 textTransform: "uppercase",
                                 background: uStyle.bg,
@@ -1281,36 +1281,36 @@ export default function AdminDashboard() {
                           </div>
                         </td>
                         <td style={{ padding: "18px" }}>
-                          <strong style={{ color: "#f1f5f9", display: "block", marginBottom: "4px", fontSize: "14px" }}>
+                          <strong style={{ color: "#f1f5f9", display: "block", marginBottom: "4px", fontSize: "15.5px" }}>
                             "{req.searchQuery}"
                           </strong>
-                          <div style={{ maxWidth: "260px", whiteSpace: "normal", wordBreak: "break-word", fontSize: "12px", color: "#cdd8e8", lineHeight: 1.4 }}>
+                          <div style={{ maxWidth: "260px", whiteSpace: "normal", wordBreak: "break-word", fontSize: "13.5px", color: "#cdd8e8", lineHeight: 1.4 }}>
                             {req.details}
                           </div>
                         </td>
                         <td style={{ padding: "18px" }}>
                           {req.targetLocation && (
-                            <div style={{ fontSize: "12px", color: "#e2e8f0", marginBottom: "4px" }}>
+                            <div style={{ fontSize: "13.5px", color: "#e2e8f0", marginBottom: "4px" }}>
                               Location: {req.targetLocation}
                             </div>
                           )}
                           {(req.budgetMin || req.budgetMax) ? (
-                            <div style={{ fontSize: "12px", color: "#34d399", fontWeight: 700 }}>
+                            <div style={{ fontSize: "13.5px", color: "#34d399", fontWeight: 700 }}>
                               {req.budgetCurrency || "KES"} {req.budgetMin ? Number(req.budgetMin).toLocaleString() : "0"} - {req.budgetMax ? Number(req.budgetMax).toLocaleString() : "Flex"}{req.budgetPeriod === "monthly" ? " / mo" : ""}
                             </div>
                           ) : (
-                            <span style={{ fontSize: "11px", color: "#b4c1d4" }}>Budget open</span>
+                            <span style={{ fontSize: "12.5px", color: "#b4c1d4" }}>Budget open</span>
                           )}
                         </td>
                         <td style={{ padding: "18px" }}>
                           <span style={{
                             padding: "4px 8px",
                             borderRadius: "4px",
-                            fontSize: "11px",
+                            fontSize: "12.5px",
                             fontWeight: 700,
                             textTransform: "uppercase",
-                            background: req.status === "resolved" ? "rgba(34,197,94,0.15)" : req.status === "contacted" ? "rgba(251,191,36,0.15)" : "rgba(239,68,68,0.15)",
-                            color: req.status === "resolved" ? "#22c55e" : req.status === "contacted" ? "#fbbf24" : "#ef4444",
+                            background: req.status === "resolved" ? "rgba(34,197,94,0.15)" : req.status === "contacted" ? "rgba(244,63,94,0.15)" : "rgba(239,68,68,0.15)",
+                            color: req.status === "resolved" ? "#22c55e" : req.status === "contacted" ? "#fb7185" : "#ef4444",
                           }}>
                             {req.status}
                           </span>
@@ -1322,13 +1322,13 @@ export default function AdminDashboard() {
                                 <button
                                   onClick={() => handleRequestStatus(req._id, "contacted")}
                                   style={{
-                                    background: "#fbbf24",
-                                    color: "#000",
+                                    background: "#fb7185",
+                                    color: "#ffffff",
                                     border: "none",
                                     padding: "6px 12px",
                                     borderRadius: "6px",
                                     fontWeight: 700,
-                                    fontSize: "11px",
+                                    fontSize: "12.5px",
                                     cursor: "pointer"
                                   }}
                                 >
@@ -1345,7 +1345,7 @@ export default function AdminDashboard() {
                                     padding: "6px 12px",
                                     borderRadius: "6px",
                                     fontWeight: 700,
-                                    fontSize: "11px",
+                                    fontSize: "12.5px",
                                     cursor: "pointer"
                                   }}
                                 >
@@ -1365,7 +1365,7 @@ export default function AdminDashboard() {
                                     color: "#4ade80",
                                     border: "1px solid rgba(34,197,94,0.3)",
                                     borderRadius: "6px",
-                                    fontSize: "11px",
+                                    fontSize: "12.5px",
                                     fontWeight: 700,
                                     textDecoration: "none"
                                   }}
@@ -1382,7 +1382,7 @@ export default function AdminDashboard() {
                                     color: "#38bdf8",
                                     border: "1px solid rgba(56,189,248,0.3)",
                                     borderRadius: "6px",
-                                    fontSize: "11px",
+                                    fontSize: "12.5px",
                                     fontWeight: 700,
                                     textDecoration: "none"
                                   }}
@@ -1395,10 +1395,10 @@ export default function AdminDashboard() {
                                 style={{
                                   padding: "5px 10px",
                                   background: "transparent",
-                                  color: "#fbbf24",
-                                  border: "1px solid rgba(251, 191, 36, 0.4)",
+                                  color: "#fb7185",
+                                  border: "1px solid rgba(244, 63, 94, 0.4)",
                                   borderRadius: "6px",
-                                  fontSize: "11px",
+                                  fontSize: "12.5px",
                                   fontWeight: 700,
                                   textDecoration: "none"
                                 }}
@@ -1475,7 +1475,7 @@ export default function AdminDashboard() {
                               color: "#38bdf8",
                               padding: "3px 8px",
                               borderRadius: "6px",
-                              fontSize: "11px",
+                              fontSize: "12.5px",
                               fontWeight: "700",
                               display: "flex",
                               alignItems: "center",
@@ -1499,7 +1499,7 @@ export default function AdminDashboard() {
                           position: "relative"
                         }}>
                           {hasVideos ? <Video size={30} style={{ color: "#38bdf8" }} /> : <Building2 size={30} style={{ color: "#b4c1d4" }} />}
-                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#e6edf6" }}>
+                          <span style={{ fontSize: "13.5px", fontWeight: "600", color: "#e6edf6" }}>
                             {hasVideos ? "Video Walkthrough Included" : "No Photo Uploaded"}
                           </span>
                           {hasVideos && (
@@ -1511,7 +1511,7 @@ export default function AdminDashboard() {
                               color: "#fff",
                               padding: "3px 8px",
                               borderRadius: "6px",
-                              fontSize: "10px",
+                              fontSize: "11.5px",
                               fontWeight: "700"
                             }}>
                               {item.videos.length} Video{item.videos.length > 1 ? "s" : ""}
@@ -1525,7 +1525,7 @@ export default function AdminDashboard() {
                           <span className="status-dot" style={{
                             padding: "2px 8px",
                             borderRadius: "12px",
-                            fontSize: "11px",
+                            fontSize: "12.5px",
                             fontWeight: "600",
                             background: item.status === "active" ? "#dcfce7" : item.status === "inactive" ? "#fee2e2" : "#fef3c7",
                             color: item.status === "active" ? "#166534" : item.status === "inactive" ? "#991b1b" : "#92400e"
@@ -1542,7 +1542,7 @@ export default function AdminDashboard() {
                         <div className="card-footer">
                           <span className="price-badge">KSh {item.basePrice?.toLocaleString()}/night</span>
                           {hasVideos && (
-                            <span style={{ fontSize: "12px", color: "#0284c7", fontWeight: "600", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                            <span style={{ fontSize: "13.5px", color: "#0284c7", fontWeight: "600", display: "inline-flex", alignItems: "center", gap: "4px" }}>
                               <Play size={11} /> Has Video
                             </span>
                           )}
@@ -1560,12 +1560,12 @@ export default function AdminDashboard() {
                               style={{
                                 marginTop: "10px",
                                 width: "100%",
-                                background: item.isFeatured ? "#ef4444" : "#fbbf24",
+                                background: item.isFeatured ? "#ef4444" : "#fb7185",
                                 color: item.isFeatured ? "#fff" : "#0f172a",
                                 border: "none",
                                 borderRadius: "6px",
                                 cursor: "pointer",
-                                fontSize: "12px",
+                                fontSize: "13.5px",
                                 fontWeight: "700",
                                 padding: "8px 10px",
                               }}
@@ -1578,7 +1578,7 @@ export default function AdminDashboard() {
                               {item.isFeatured ? <><Star size={12} /> Unfeature</> : <><Star size={12} /> Feature</>}
                             </button>
                           )}
-                          <button className="btn-delete" style={{ padding: "6px 10px", background: "#ef4444", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "12px", display: "inline-flex", alignItems: "center", gap: "5px" }} onClick={() => confirmDelete("accommodations", item._id, item.name)}><Trash2 size={12} /> Delete</button>
+                          <button className="btn-delete" style={{ padding: "6px 10px", background: "#ef4444", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "13.5px", display: "inline-flex", alignItems: "center", gap: "5px" }} onClick={() => confirmDelete("accommodations", item._id, item.name)}><Trash2 size={12} /> Delete</button>
                         </div>
                       </div>
                     </div>
@@ -1615,7 +1615,7 @@ export default function AdminDashboard() {
                   <p className="card-owner"> {getOwner(item)} · {getContact(item)}</p>
                   <div className="card-footer">
                     <span className="price-badge">{getPrice(item)}</span>
-                    <span className="status-dot" style={{ background: item.status === "approved" || item.isApproved ? "#22c55e" : item.status === "rejected" ? "#ef4444" : "#fbbf24" }}>
+                    <span className="status-dot" style={{ background: item.status === "approved" || item.isApproved ? "#22c55e" : item.status === "rejected" ? "#ef4444" : "#fb7185" }}>
                       {item.status || (item.isApproved ? "approved" : "pending")}
                     </span>
                   </div>
@@ -1639,7 +1639,7 @@ export default function AdminDashboard() {
                       style={{
                         marginTop: "10px",
                         width: "100%",
-                        background: item.isFeatured ? "#ef4444" : "#fbbf24",
+                        background: item.isFeatured ? "#ef4444" : "#fb7185",
                         color: "#0f1729",
                         cursor: "pointer"
                       }}
@@ -1704,7 +1704,7 @@ export default function AdminDashboard() {
                 <p className="confirm-text">
                   Are you sure you want to delete <strong>{deleteConfirm.title}</strong>?
                   <br />
-                  <span style={{ fontSize: 12, color: "#ef4444" }}>This action cannot be undone.</span>
+                  <span style={{ fontSize: 13.5, color: "#ef4444" }}>This action cannot be undone.</span>
                 </p>
                 <div className="confirm-buttons">
                   <button className="btn-cancel" onClick={() => setDeleteConfirm(null)}>Cancel</button>
@@ -1740,7 +1740,7 @@ export default function AdminDashboard() {
                         padding: "10px",
                         borderRadius: "8px",
                         border: "1px solid #e2e8f0",
-                        fontSize: "14px"
+                        fontSize: "15.5px"
                       }}
                     >
                       <option value={7}>7 days</option>
@@ -1750,7 +1750,7 @@ export default function AdminDashboard() {
                       <option value={90}>90 days</option>
                     </select>
                   </div>
-                  <p style={{ fontSize: "12px", color: "#b4c1d4", marginBottom: "20px" }}>
+                  <p style={{ fontSize: "13.5px", color: "#b4c1d4", marginBottom: "20px" }}>
                     This business will appear in the featured section on the homepage until {new Date(Date.now() + featureDuration * 24 * 60 * 60 * 1000).toLocaleDateString()}
                   </p>
                   <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
@@ -1772,7 +1772,7 @@ export default function AdminDashboard() {
                         padding: "10px 20px",
                         borderRadius: "8px",
                         border: "none",
-                        background: "#fbbf24",
+                        background: "#fb7185",
                         color: "#0f1729",
                         fontWeight: "600",
                         cursor: "pointer"
@@ -1824,7 +1824,7 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
 
   const statusColor = (n) => {
     if (n.read) return "#22c55e";
-    return "#fbbf24";
+    return "#fb7185";
   };
 
   return (
@@ -1889,13 +1889,13 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
                   </div>
                   <div className="boost-detail-row">
                     <span className="boost-detail-key"> Amount</span>
-                    <span className="boost-detail-val" style={{ color: "#fbbf24", fontWeight: 700 }}>
+                    <span className="boost-detail-val" style={{ color: "#fb7185", fontWeight: 700 }}>
                       KES {notif.amount?.toLocaleString() || "—"}
                     </span>
                   </div>
                   <div className="boost-detail-row">
                     <span className="boost-detail-key"> Transaction ID</span>
-                    <span className="boost-detail-val" style={{ fontFamily: "monospace", color: "#a78bfa", fontSize: 11 }}>
+                    <span className="boost-detail-val" style={{ fontFamily: "monospace", color: "#a78bfa", fontSize: 12.5 }}>
                       {notif.transactionId || notif.mpesaRef || "—"}
                     </span>
                   </div>
@@ -1913,10 +1913,10 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
 
                 {!notif.read && (
                   <>
-                    <div style={{ marginTop: 16, padding: "16px", background: "linear-gradient(135deg, rgba(251, 191, 36, 0.08) 0%, rgba(251, 191, 36, 0.02) 100%)", borderRadius: "12px", border: "1px solid rgba(251, 191, 36, 0.25)" }}>
+                    <div style={{ marginTop: 16, padding: "16px", background: "linear-gradient(135deg, rgba(244, 63, 94, 0.08) 0%, rgba(244, 63, 94, 0.02) 100%)", borderRadius: "12px", border: "1px solid rgba(244, 63, 94, 0.25)" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-                        <span style={{ fontSize: 16 }}></span>
-                        <label style={{ fontSize: 13, fontWeight: 700, color: "#fbbf24", letterSpacing: "0.5px" }}>
+                        <span style={{ fontSize: 17.5 }}></span>
+                        <label style={{ fontSize: 14.5, fontWeight: 700, color: "#fb7185", letterSpacing: "0.5px" }}>
                           ISSUE VERIFICATION BADGE
                         </label>
                       </div>
@@ -1926,16 +1926,16 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
                           onClick={() => setSelectedBadges(prev => ({ ...prev, [notif._id]: "" }))}
                           style={{
                             padding: "10px 8px",
-                            background: selectedBadges[notif._id] === "" ? "rgba(251, 191, 36, 0.2)" : "rgba(255, 255, 255, 0.05)",
-                            border: selectedBadges[notif._id] === "" ? "2px solid #fbbf24" : "1px solid rgba(255, 255, 255, 0.1)",
+                            background: selectedBadges[notif._id] === "" ? "rgba(244, 63, 94, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                            border: selectedBadges[notif._id] === "" ? "2px solid #fb7185" : "1px solid rgba(255, 255, 255, 0.1)",
                             borderRadius: "8px",
                             cursor: "pointer",
                             textAlign: "center",
                             transition: "all 0.2s"
                           }}
                         >
-                          <div style={{ fontSize: 20, marginBottom: 4 }}></div>
-                          <div style={{ fontSize: 10, color: "#cdd8e8" }}>No Badge</div>
+                          <div style={{ fontSize: 21.5, marginBottom: 4 }}></div>
+                          <div style={{ fontSize: 11.5, color: "#cdd8e8" }}>No Badge</div>
                         </div>
                         {VERIFICATION_BADGES.map(badge => (
                           <div
@@ -1943,8 +1943,8 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
                             onClick={() => setSelectedBadges(prev => ({ ...prev, [notif._id]: badge.id }))}
                             style={{
                               padding: "10px 8px",
-                              background: selectedBadges[notif._id] === badge.id ? "rgba(251, 191, 36, 0.2)" : "rgba(255, 255, 255, 0.05)",
-                              border: selectedBadges[notif._id] === badge.id ? "2px solid #fbbf24" : "1px solid rgba(255, 255, 255, 0.1)",
+                              background: selectedBadges[notif._id] === badge.id ? "rgba(244, 63, 94, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                              border: selectedBadges[notif._id] === badge.id ? "2px solid #fb7185" : "1px solid rgba(255, 255, 255, 0.1)",
                               borderRadius: "8px",
                               cursor: "pointer",
                               textAlign: "center",
@@ -1956,7 +1956,7 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
                               alt={badge.name}
                               style={{ width: 32, height: 32, objectFit: "contain", marginBottom: 4 }}
                             />
-                            <div style={{ fontSize: 9, color: "#cdd8e8", lineHeight: 1.2 }}>{badge.name}</div>
+                            <div style={{ fontSize: 10.5, color: "#cdd8e8", lineHeight: 1.2 }}>{badge.name}</div>
                           </div>
                         ))}
                       </div>
@@ -1964,9 +1964,9 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
                       {selectedBadges[notif._id] && (
                         <div style={{
                           padding: "10px",
-                          background: "rgba(251, 191, 36, 0.15)",
+                          background: "rgba(244, 63, 94, 0.15)",
                           borderRadius: "8px",
-                          border: "1px solid rgba(251, 191, 36, 0.3)"
+                          border: "1px solid rgba(244, 63, 94, 0.3)"
                         }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                             <img
@@ -1975,10 +1975,10 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
                               style={{ width: 48, height: 48, objectFit: "contain" }}
                             />
                             <div>
-                              <div style={{ fontSize: 12, fontWeight: 700, color: "#fbbf24" }}>
+                              <div style={{ fontSize: 13.5, fontWeight: 700, color: "#fb7185" }}>
                                 {VERIFICATION_BADGES.find(b => b.id === selectedBadges[notif._id])?.name}
                               </div>
-                              <div style={{ fontSize: 10, color: "#cdd8e8", marginTop: 2 }}>
+                              <div style={{ fontSize: 11.5, color: "#cdd8e8", marginTop: 2 }}>
                                 Badge will be awarded to user upon payment confirmation
                               </div>
                             </div>
@@ -1997,7 +1997,7 @@ function PaymentNotifications({ pendingBoosts, allBoosts, boostLoading, onApprov
                   </>
                 )}
                 {notif.read && (
-                  <div style={{ padding: "10px 0", color: "#22c55e", fontWeight: 600, fontSize: 13 }}>
+                  <div style={{ padding: "10px 0", color: "#22c55e", fontWeight: 600, fontSize: 14.5 }}>
                     Payment reviewed
                   </div>
                 )}
@@ -2096,7 +2096,7 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
       <div className="modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h2 className="modal-title">
-            {item.isFeatured && <Star size={16} style={{ marginRight: 8, color: "#fbbf24", verticalAlign: "-3px" }} />}
+            {item.isFeatured && <Star size={16} style={{ marginRight: 8, color: "#fb7185", verticalAlign: "-3px" }} />}
             {getTitle(item)}
           </h2>
           <button className="btn-close-modal" onClick={onClose}><X size={15} /></button>
@@ -2124,7 +2124,7 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
                       color: "#15803d",
                       border: "1px solid #bbf7d0",
                       borderRadius: "6px",
-                      fontSize: "12px",
+                      fontSize: "13.5px",
                       fontWeight: 700,
                       cursor: "pointer",
                       display: "inline-flex",
@@ -2140,7 +2140,7 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
           )}
           {item.videos && item.videos.length > 0 && (
             <div style={{ marginTop: "16px", marginBottom: "16px", padding: "14px", background: "#f8fafc", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
-              <h4 style={{ margin: "0 0 10px 0", fontSize: "14px", fontWeight: "700", color: "#0f1729", display: "flex", alignItems: "center", gap: "6px" }}>
+              <h4 style={{ margin: "0 0 10px 0", fontSize: "15.5px", fontWeight: "700", color: "#0f1729", display: "flex", alignItems: "center", gap: "6px" }}>
                 <Video size={15} /> Video Walkthrough ({item.videos.length})
               </h4>
               <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
@@ -2160,17 +2160,17 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
           {/* QR Code Section for Properties, Materials */}
           {["properties", "materials"].includes(tab) && (
             <div style={{ marginTop: "20px", padding: "16px", background: "#f8fafc", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-              <h4 style={{ margin: "0 0 12px 0", fontSize: "14px", fontWeight: "600", color: "#0f1729" }}>Listing QR Code</h4>
+              <h4 style={{ margin: "0 0 12px 0", fontSize: "15.5px", fontWeight: "600", color: "#0f1729" }}>Listing QR Code</h4>
               <div style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
                 {qrCodeUrl ? (
                   <img src={qrCodeUrl} alt="QR Code" style={{ width: "100px", height: "100px", border: "1px solid #e2e8f0", borderRadius: "8px" }} />
                 ) : (
                   <div style={{ width: "100px", height: "100px", display: "flex", alignItems: "center", justifyContent: "center", background: "#e2e8f0", borderRadius: "8px" }}>
-                    <span style={{ fontSize: "12px", color: "#475569" }}>Loading...</span>
+                    <span style={{ fontSize: "13.5px", color: "#475569" }}>Loading...</span>
                   </div>
                 )}
                 <div style={{ flex: 1 }}>
-                  <p style={{ margin: "0 0 12px 0", fontSize: "12px", color: "#475569" }}>
+                  <p style={{ margin: "0 0 12px 0", fontSize: "13.5px", color: "#475569" }}>
                     Scan this QR code to view the listing on the Axxspace platform.
                   </p>
                   <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
@@ -2178,11 +2178,11 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
                       onClick={downloadQRCode}
                       style={{
                         padding: "8px 16px",
-                        background: "#fbbf24",
-                        color: "#0f1729",
+                        background: "#fb7185",
+                        color: "#ffffff",
                         border: "none",
                         borderRadius: "6px",
-                        fontSize: "13px",
+                        fontSize: "14.5px",
                         fontWeight: "600",
                         cursor: "pointer"
                       }}
@@ -2198,7 +2198,7 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
                           color: "#ffffff",
                           border: "none",
                           borderRadius: "6px",
-                          fontSize: "13px",
+                          fontSize: "14.5px",
                           fontWeight: "600",
                           cursor: "pointer"
                         }}
@@ -2217,10 +2217,10 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
               {tab === "properties" && (
                 <div style={{ marginBottom: "20px", padding: "16px", background: "#f8fafc", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-                    <h4 style={{ margin: 0, fontSize: "14px", fontWeight: 700, color: "#0f172a" }}>
+                    <h4 style={{ margin: 0, fontSize: "15.5px", fontWeight: 700, color: "#0f172a" }}>
                       Property Images ({(editData.images || []).length})
                     </h4>
-                    <span style={{ fontSize: "12px", color: "#475569" }}>
+                    <span style={{ fontSize: "13.5px", color: "#475569" }}>
                       First photo is the main cover
                     </span>
                   </div>
@@ -2232,7 +2232,7 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
                         <div key={i} style={{ position: "relative", borderRadius: "8px", overflow: "hidden", border: i === 0 ? "2px solid #0ea5e9" : "1px solid #cbd5e1", aspectRatio: "4/3", background: "#0f172a" }}>
                           <img src={src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                           {i === 0 ? (
-                            <span style={{ position: "absolute", top: 3, left: 3, background: "#0ea5e9", color: "#fff", fontSize: "9px", fontWeight: 800, padding: "1px 5px", borderRadius: "3px" }}>Cover</span>
+                            <span style={{ position: "absolute", top: 3, left: 3, background: "#0ea5e9", color: "#fff", fontSize: "10.5px", fontWeight: 800, padding: "1px 5px", borderRadius: "3px" }}>Cover</span>
                           ) : (
                             <button
                               type="button"
@@ -2241,7 +2241,7 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
                                 const rem = (editData.images || []).filter((_, idx) => idx !== i);
                                 setEditData({ ...editData, images: [selected, ...rem] });
                               }}
-                              style={{ position: "absolute", top: 3, left: 3, background: "rgba(0,0,0,0.75)", color: "#fff", border: "none", fontSize: "9px", fontWeight: 700, padding: "2px 5px", borderRadius: "3px", cursor: "pointer" }}
+                              style={{ position: "absolute", top: 3, left: 3, background: "rgba(0,0,0,0.75)", color: "#fff", border: "none", fontSize: "10.5px", fontWeight: 700, padding: "2px 5px", borderRadius: "3px", cursor: "pointer" }}
                             >
                               Cover
                             </button>
@@ -2254,7 +2254,7 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
                                 images: (editData.images || []).filter((_, idx) => idx !== i)
                               });
                             }}
-                            style={{ position: "absolute", top: 3, right: 3, background: "rgba(220, 38, 38, 0.9)", color: "#fff", border: "none", borderRadius: "50%", width: "20px", height: "20px", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center" }}
+                            style={{ position: "absolute", top: 3, right: 3, background: "rgba(220, 38, 38, 0.9)", color: "#fff", border: "none", borderRadius: "50%", width: "20px", height: "20px", cursor: "pointer", fontSize: "12.5px", display: "flex", alignItems: "center", justifyContent: "center" }}
                             title="Delete photo"
                           >
                             <X size={10} />
@@ -2265,7 +2265,7 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
                   </div>
 
                   {imageUploadError && (
-                    <div style={{ color: "#dc2626", fontSize: "12px", marginBottom: "8px", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <div style={{ color: "#dc2626", fontSize: "13.5px", marginBottom: "8px", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "6px" }}>
                       <TriangleAlert size={13} /> {imageUploadError}
                     </div>
                   )}
@@ -2290,7 +2290,7 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
                         background: uploadingImage ? "#94a3b8" : "#0ea5e9",
                         color: "#fff",
                         borderRadius: "7px",
-                        fontSize: "13px",
+                        fontSize: "14.5px",
                         fontWeight: 700,
                         cursor: uploadingImage ? "not-allowed" : "pointer",
                         boxShadow: "0 2px 5px rgba(14, 165, 233, 0.3)",
@@ -2303,7 +2303,7 @@ function DetailModal({ item, tab, statusView, onClose, onApprove, onReject,
                       </svg>
                       {uploadingImage ? "Uploading from Device..." : "Pick Pictures from Device"}
                     </label>
-                    <span style={{ fontSize: "12px", color: "#475569" }}>
+                    <span style={{ fontSize: "13.5px", color: "#475569" }}>
                       Select photos directly from your phone, laptop, or computer gallery
                     </span>
                   </div>
@@ -2378,7 +2378,7 @@ function PaymentSettings({ mpesaConfig, setMpesaConfig, configSaving, configMess
           <label className="edit-label">{label}</label>
           <input type={type} value={mpesaConfig[k]} placeholder={placeholder}
             onChange={e => setMpesaConfig({ ...mpesaConfig, [k]: e.target.value })} className="edit-input" />
-          <p style={{ fontSize: 11, color: "#b4c1d4", margin: "4px 0 0" }}>{hint}</p>
+          <p style={{ fontSize: 12.5, color: "#b4c1d4", margin: "4px 0 0" }}>{hint}</p>
         </div>
       ))}
       <button className="btn-save" onClick={handleSave} disabled={configSaving}>{configSaving ? "Saving…" : " Save Configuration"}</button>

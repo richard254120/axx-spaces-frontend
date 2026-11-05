@@ -11,8 +11,8 @@
 /* ── Sidebar ─────────────────────────────────────────────── */
 .admin-shell-sidebar {
   background:
-    linear-gradient(180deg, rgba(251, 191, 36, 0.05), transparent 22%),
-    rgba(17, 26, 45, 0.96);
+    linear-gradient(180deg, rgba(244, 63, 94, 0.05), transparent 22%),
+    rgba(33, 29, 54, 0.96);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-right: 1px solid var(--border-subtle);
@@ -43,15 +43,15 @@
   height: 40px;
   border-radius: 11px;
   background: linear-gradient(135deg, var(--gold), var(--gold-hover));
-  color: #0f172a;
+  color: #ffffff;
   font-weight: 800;
-  font-size: 14px;
+  font-size: 15.5px;
   letter-spacing: 0.5px;
   flex-shrink: 0;
 }
 
 .shell-brand-title {
-  font-size: 15px;
+  font-size: 16.5px;
   font-weight: 800;
   color: var(--gold);
   letter-spacing: 0.6px;
@@ -59,7 +59,7 @@
 }
 
 .shell-brand-sub {
-  font-size: 10px;
+  font-size: 11.5px;
   font-weight: 700;
   color: #b4c1d4;
   text-transform: uppercase;
@@ -73,7 +73,7 @@
   background: none;
   border: none;
   color: var(--text-muted);
-  font-size: 18px;
+  font-size: 19.5px;
   cursor: pointer;
 }
 
@@ -86,11 +86,11 @@
 }
 
 .shell-nav-section {
-  font-size: 10px;
+  font-size: 11.5px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 1.4px;
-  color: #5b6b84;
+  color: #fb7185;
   padding: 4px 10px 6px;
 }
 
@@ -101,7 +101,7 @@
   padding: 9px 12px;
   border-radius: 10px;
   color: var(--text-muted);
-  font-size: 13.5px;
+  font-size: 15px;
   font-weight: 600;
   text-decoration: none;
   transition: var(--transition-smooth);
@@ -149,14 +149,14 @@
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 13px;
+  font-size: 14.5px;
   flex-shrink: 0;
 }
 
 .shell-user-info { min-width: 0; }
 
 .shell-user-name {
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text-main);
   white-space: nowrap;
@@ -165,7 +165,7 @@
 }
 
 .shell-user-role {
-  font-size: 11px;
+  font-size: 12.5px;
   color: #b4c1d4;
   white-space: nowrap;
   overflow: hidden;
@@ -178,27 +178,13 @@
   flex-direction: column;
   min-width: 0;
   position: relative;
-  /* Ambient stage lighting: warm gold crown, cool corner glows, deep base */
-  background:
-    radial-gradient(ellipse 70% 32% at 50% -6%, rgba(251, 191, 36, 0.10), transparent 62%),
-    radial-gradient(ellipse 45% 45% at 102% 100%, rgba(59, 130, 246, 0.08), transparent 70%),
-    radial-gradient(ellipse 40% 40% at -5% 85%, rgba(16, 185, 129, 0.05), transparent 65%),
-    linear-gradient(180deg, rgba(22, 31, 52, 0.5), rgba(12, 19, 35, 0.9));
-}
-
-/* Precision blueprint grid fading in from the top of the content column */
-.admin-shell-main::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
+  /* Same backdrop as the admin login page: indigo base, gold crown, violet corner, dot grid */
+  background-color: #1e1b31;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 44px 44px;
-  -webkit-mask-image: radial-gradient(ellipse 90% 55% at 50% 0%, black, transparent 78%);
-  mask-image: radial-gradient(ellipse 90% 55% at 50% 0%, black, transparent 78%);
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(244, 63, 94, 0.1), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 85% 95%, rgba(139, 92, 246, 0.1), transparent 70%),
+    radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 28px 28px;
 }
 
 .shell-topbar {
@@ -210,11 +196,11 @@
   justify-content: space-between;
   gap: 16px;
   padding: 14px 32px;
-  background: rgba(11, 18, 33, 0.86);
+  background: rgba(25, 22, 42, 0.88);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border-subtle);
-  box-shadow: 0 1px 0 rgba(251, 191, 36, 0.06), 0 8px 28px -18px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 1px 0 rgba(244, 63, 94, 0.06), 0 8px 28px -18px rgba(0, 0, 0, 0.8);
 }
 
 .shell-topbar-left {
@@ -232,7 +218,7 @@
   border: 1px solid var(--border-subtle);
   border-radius: 9px;
   color: var(--text-main);
-  font-size: 17px;
+  font-size: 18.5px;
   padding: 6px 11px;
   cursor: pointer;
 }
@@ -246,7 +232,7 @@
 
 .shell-page-title {
   margin: 0;
-  font-size: 19px;
+  font-size: 20.5px;
   font-weight: 800;
   letter-spacing: 0.2px;
   color: var(--text-main);
@@ -285,7 +271,7 @@
   border: 1px solid var(--border-subtle);
   border-radius: 10px;
   padding: 7px 11px;
-  font-size: 16px;
+  font-size: 17.5px;
   cursor: pointer;
   transition: var(--transition-smooth);
   color: var(--text-main);
@@ -306,7 +292,7 @@
   border-radius: 9px;
   background: var(--rose);
   color: #fff;
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 800;
   display: flex;
   align-items: center;
@@ -322,7 +308,7 @@
   color: #fca5a5;
   border-radius: 10px;
   padding: 7px 16px;
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 700;
   cursor: pointer;
   transition: var(--transition-smooth);
@@ -377,7 +363,7 @@
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(9, 15, 28, 0.7);
+    background: rgba(14, 12, 26, 0.72);
     backdrop-filter: blur(3px);
     z-index: 999;
   }
@@ -391,13 +377,13 @@
   }
 
   .shell-page-title {
-    font-size: 16px;
+    font-size: 17.5px;
   }
 }
 
 @media (max-width: 480px) {
   .shell-logout-btn {
     padding: 6px 10px;
-    font-size: 12px;
+    font-size: 13.5px;
   }
 }

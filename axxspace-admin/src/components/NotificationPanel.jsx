@@ -97,7 +97,7 @@ export default function NotificationPanel({
                     <span className="notification-item-title">
                       <NIcon size={13} style={{ flexShrink: 0 }} /> {getNotifTitle(notif)}
                     </span>
-                    <span style={{ fontSize: 10, color: "#cdd8e8", marginLeft: "auto" }}>
+                    <span style={{ fontSize: 11.5, color: "#cdd8e8", marginLeft: "auto" }}>
                       {notif.isPayment ? " Payment" : " Approval"}
                     </span>
                   </div>
@@ -107,23 +107,23 @@ export default function NotificationPanel({
                   </div>
                   {notif.isPayment && (
                     <div className="notification-item-meta">
-                      <span style={{ color: "#fbbf24", fontWeight: 700 }}>
+                      <span style={{ color: "#fb7185", fontWeight: 700 }}>
                         KES {notif.amount?.toLocaleString() || "—"}
                       </span>
-                      <span style={{ color: "#cdd8e8", fontSize: 11 }}>
+                      <span style={{ color: "#cdd8e8", fontSize: 12.5 }}>
                         {notif.mpesaRef || notif.transactionId || "Pending verification"}
                       </span>
                     </div>
                   )}
                   {!notif.isPayment && (
                     <div className="notification-item-meta">
-                      <span style={{ color: "#b4c1d4", fontSize: 11 }}>
+                      <span style={{ color: "#b4c1d4", fontSize: 12.5 }}>
                         {notif.category || "—"}
                       </span>
                     </div>
                   )}
                   <div className="notification-item-meta">
-                    <span style={{ color: "#b4c1d4", fontSize: 10 }}>
+                    <span style={{ color: "#b4c1d4", fontSize: 11.5 }}>
                       {new Date(notif.createdAt).toLocaleString()}
                     </span>
                   </div>

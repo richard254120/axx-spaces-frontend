@@ -13,7 +13,7 @@ export default function BadgeManagement() {
   const [stats, setStats] = useState(null);
 
   const badgeTypes = [
-    { value: "premium_verified", label: "Premium Verified", icon: "", color: "#fbbf24" },
+    { value: "premium_verified", label: "Premium Verified", icon: "", color: "#fb7185" },
     { value: "student_verified", label: "Student Verified", icon: "", color: "#3b82f6" },
     { value: "business_verified", label: "Business Verified", icon: "", color: "#8b5cf6" },
     { value: "identity_verified", label: "Identity Verified", icon: "", color: "#22c55e" },
@@ -290,7 +290,7 @@ const styles = {
     margin: "0 auto",
   },
   header: {
-    fontSize: "28px",
+    fontSize: "29.5px",
     fontWeight: "700",
     color: "#1e293b",
     marginBottom: "24px",
@@ -318,18 +318,18 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: "24px",
+    fontSize: "25.5px",
   },
   statInfo: {
     flex: 1,
   },
   statLabel: {
-    fontSize: "14px",
+    fontSize: "15.5px",
     color: "#64748b",
     marginBottom: "4px",
   },
   statValue: {
-    fontSize: "24px",
+    fontSize: "25.5px",
     fontWeight: "700",
     color: "#1e293b",
   },
@@ -342,7 +342,7 @@ const styles = {
     padding: "10px 16px",
     border: "1px solid #e2e8f0",
     borderRadius: "8px",
-    fontSize: "14px",
+    fontSize: "15.5px",
     background: "white",
     minWidth: "200px",
   },
@@ -354,7 +354,7 @@ const styles = {
     marginBottom: "32px",
   },
   formTitle: {
-    fontSize: "18px",
+    fontSize: "19.5px",
     fontWeight: "600",
     color: "#1e293b",
     marginBottom: "16px",
@@ -370,7 +370,7 @@ const styles = {
     color: "white",
     border: "none",
     borderRadius: "8px",
-    fontSize: "14px",
+    fontSize: "15.5px",
     fontWeight: "600",
     cursor: "pointer",
     transition: "background 0.2s",
@@ -382,7 +382,7 @@ const styles = {
     border: "1px solid #e2e8f0",
   },
   sectionTitle: {
-    fontSize: "18px",
+    fontSize: "19.5px",
     fontWeight: "600",
     color: "#1e293b",
     marginBottom: "20px",
@@ -412,20 +412,20 @@ const styles = {
     marginBottom: "12px",
   },
   listingType: {
-    fontSize: "12px",
+    fontSize: "13.5px",
     fontWeight: "600",
     color: "#3b82f6",
     textTransform: "uppercase",
   },
   listingTitle: {
-    fontSize: "16px",
+    fontSize: "17.5px",
     fontWeight: "600",
     color: "#1e293b",
     display: "block",
     marginTop: "4px",
   },
   listingOwner: {
-    fontSize: "14px",
+    fontSize: "15.5px",
     color: "#64748b",
     marginBottom: "16px",
   },
@@ -444,11 +444,11 @@ const styles = {
     border: "1px solid #e2e8f0",
   },
   badgeIcon: {
-    fontSize: "18px",
+    fontSize: "19.5px",
   },
   badgeLabel: {
     flex: 1,
-    fontSize: "14px",
+    fontSize: "15.5px",
     fontWeight: "500",
     color: "#1e293b",
   },
@@ -458,12 +458,12 @@ const styles = {
     color: "white",
     border: "none",
     borderRadius: "6px",
-    fontSize: "12px",
+    fontSize: "13.5px",
     fontWeight: "500",
     cursor: "pointer",
   },
   noBadges: {
-    fontSize: "14px",
+    fontSize: "15.5px",
     color: "#94a3b8",
     fontStyle: "italic",
   },

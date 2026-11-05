@@ -19,7 +19,7 @@ export default function UserBadgeManagement() {
   const [amount, setAmount] = useState("");
 
   const badgeTypes = [
-    { value: "premium_verified", label: "Premium Verified", icon: "", color: "#fbbf24", image: "Premium Verified.png" },
+    { value: "premium_verified", label: "Premium Verified", icon: "", color: "#fb7185", image: "Premium Verified.png" },
     { value: "student_verified", label: "Student Verified", icon: "", color: "#3b82f6", image: "Student Verified.png" },
     { value: "business_verified", label: "Business Verified", icon: "", color: "#8b5cf6", image: "Business Verified.png" },
     { value: "identity_verified", label: "Identity Verified", icon: "", color: "#22c55e", image: "Identity Verified.png" },
@@ -405,12 +405,12 @@ export default function UserBadgeManagement() {
 const styles = {
   container: {
     padding: "20px",
-    fontFamily: "Arial, sans-serif",
+    fontFamily: "var(--font-ui)",
     backgroundColor: "#f5f5f5",
     minHeight: "100vh",
   },
   header: {
-    fontSize: "24px",
+    fontSize: "25.5px",
     fontWeight: "bold",
     marginBottom: "20px",
     color: "#333",
@@ -443,12 +443,12 @@ const styles = {
     flex: 1,
   },
   statLabel: {
-    fontSize: "12px",
+    fontSize: "13.5px",
     color: "#666",
     marginBottom: "5px",
   },
   statValue: {
-    fontSize: "24px",
+    fontSize: "25.5px",
     fontWeight: "bold",
     color: "#333",
   },
@@ -461,14 +461,14 @@ const styles = {
     padding: "10px",
     borderRadius: "5px",
     border: "1px solid #ddd",
-    fontSize: "14px",
+    fontSize: "15.5px",
     flex: 1,
   },
   input: {
     padding: "10px",
     borderRadius: "5px",
     border: "1px solid #ddd",
-    fontSize: "14px",
+    fontSize: "15.5px",
     flex: 1,
   },
   issueForm: {
@@ -479,7 +479,7 @@ const styles = {
     marginBottom: "20px",
   },
   formTitle: {
-    fontSize: "18px",
+    fontSize: "19.5px",
     fontWeight: "bold",
     marginBottom: "15px",
     color: "#333",
@@ -494,7 +494,7 @@ const styles = {
     padding: "10px",
     borderRadius: "5px",
     border: "1px solid #ddd",
-    fontSize: "14px",
+    fontSize: "15.5px",
   },
   searchButton: {
     padding: "10px 20px",
@@ -503,7 +503,7 @@ const styles = {
     border: "none",
     borderRadius: "5px",
     cursor: "pointer",
-    fontSize: "14px",
+    fontSize: "15.5px",
   },
   searchResults: {
     maxHeight: "200px",
@@ -522,14 +522,14 @@ const styles = {
   },
   userName: {
     fontWeight: "bold",
-    fontSize: "14px",
+    fontSize: "15.5px",
   },
   userEmail: {
-    fontSize: "12px",
+    fontSize: "13.5px",
     color: "#666",
   },
   userRole: {
-    fontSize: "11px",
+    fontSize: "12.5px",
     color: "#999",
     marginTop: "5px",
   },
@@ -538,7 +538,7 @@ const styles = {
     gap: "5px",
   },
   existingBadge: {
-    fontSize: "16px",
+    fontSize: "17.5px",
   },
   selectedUser: {
     display: "flex",
@@ -550,7 +550,7 @@ const styles = {
     marginBottom: "15px",
   },
   selectedUserInfo: {
-    fontSize: "14px",
+    fontSize: "15.5px",
   },
   clearButton: {
     padding: "5px 10px",
@@ -559,7 +559,7 @@ const styles = {
     border: "none",
     borderRadius: "5px",
     cursor: "pointer",
-    fontSize: "12px",
+    fontSize: "13.5px",
   },
   formRow: {
     display: "flex",
@@ -573,7 +573,7 @@ const styles = {
     border: "none",
     borderRadius: "5px",
     cursor: "pointer",
-    fontSize: "14px",
+    fontSize: "15.5px",
     fontWeight: "bold",
   },
   button: {
@@ -583,7 +583,7 @@ const styles = {
     border: "none",
     borderRadius: "5px",
     cursor: "pointer",
-    fontSize: "14px",
+    fontSize: "15.5px",
     fontWeight: "bold",
   },
   buttonDisabled: {
@@ -597,7 +597,7 @@ const styles = {
     boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
   },
   sectionTitle: {
-    fontSize: "18px",
+    fontSize: "19.5px",
     fontWeight: "bold",
     marginBottom: "15px",
     color: "#333",
@@ -656,14 +656,14 @@ const styles = {
     color: "white",
     border: "none",
     cursor: "pointer",
-    fontSize: "12px",
+    fontSize: "13.5px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
   },
   noBadges: {
     color: "#999",
-    fontSize: "12px",
+    fontSize: "13.5px",
   },
   badgeDetails: {
     borderTop: "1px solid #eee",
@@ -676,7 +676,7 @@ const styles = {
     display: "flex",
     flexWrap: "wrap",
     gap: "15px",
-    fontSize: "12px",
+    fontSize: "13.5px",
     color: "#666",
   },
   badgeDetailLabel: {

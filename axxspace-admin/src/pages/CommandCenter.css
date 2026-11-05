@@ -24,7 +24,7 @@
   padding: 26px 30px;
   border-radius: 18px;
   background:
-    linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(24, 34, 55, 0.6) 45%),
+    linear-gradient(135deg, rgba(244, 63, 94, 0.1), rgba(43, 39, 68, 0.6) 45%),
     var(--bg-card);
   border: 1px solid var(--border-highlight);
   box-shadow: var(--shadow-gold);
@@ -32,14 +32,14 @@
 
 .cc-hero-title {
   margin: 0 0 6px;
-  font-size: 24px;
+  font-size: 25.5px;
   font-weight: 800;
   color: var(--text-main);
 }
 
 .cc-hero-sub {
   margin: 0 0 14px;
-  font-size: 13.5px;
+  font-size: 15px;
   color: var(--text-muted);
 }
 
@@ -55,7 +55,7 @@
   gap: 6px;
   padding: 6px 13px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 700;
   border: 1px solid var(--border-subtle);
 }
@@ -96,7 +96,7 @@
 }
 
 .cc-big-label {
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.1px;
@@ -145,26 +145,26 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 17px;
+  font-size: 18.5px;
 }
 
 .cc-kpi-pending {
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 800;
   padding: 3px 9px;
   border-radius: 999px;
 }
 
 .cc-kpi-total {
-  font-size: 27px;
+  font-size: 28.5px;
   font-weight: 800;
   margin-top: 8px;
 }
 
 .cc-kpi-label {
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 600;
-  color: var(--text-muted);
+  color: #fda4af;
 }
 
 .cc-kpi-bar {
@@ -183,7 +183,7 @@
 }
 
 .cc-kpi-foot {
-  font-size: 11px;
+  font-size: 12.5px;
   color: #b4c1d4;
   font-weight: 600;
 }
@@ -198,9 +198,9 @@
 
 .cc-panel-title {
   margin: 0 0 16px;
-  font-size: 15px;
+  font-size: 16.5px;
   font-weight: 800;
-  color: var(--text-main);
+  color: #fb7185;
 }
 
 .cc-two-col {
@@ -225,7 +225,7 @@
 }
 
 .cc-dist-label {
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-muted);
   white-space: nowrap;
@@ -248,7 +248,7 @@
 }
 
 .cc-dist-value {
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 800;
   color: var(--text-main);
   text-align: right;
@@ -277,7 +277,7 @@
 
 .cc-top-rank {
   width: 30px;
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 800;
   color: var(--gold);
   flex-shrink: 0;
@@ -291,7 +291,7 @@
 }
 
 .cc-top-title {
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 700;
   color: var(--text-main);
   white-space: nowrap;
@@ -300,12 +300,12 @@
 }
 
 .cc-top-meta {
-  font-size: 11px;
+  font-size: 12.5px;
   color: #b4c1d4;
 }
 
 .cc-top-views {
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 700;
   color: #93c5fd;
   white-space: nowrap;
@@ -326,7 +326,7 @@
 }
 
 .cc-traffic-name {
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 700;
   color: var(--text-muted);
   margin-bottom: 6px;
@@ -336,13 +336,13 @@
 }
 
 .cc-traffic-views {
-  font-size: 20px;
+  font-size: 21.5px;
   font-weight: 800;
   color: var(--text-main);
 }
 
 .cc-traffic-sub {
-  font-size: 11px;
+  font-size: 12.5px;
   color: #b4c1d4;
   margin-top: 3px;
 }
@@ -372,7 +372,7 @@
   color: var(--text-muted);
   border-radius: 999px;
   padding: 6px 14px;
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
   transition: var(--transition-smooth);
@@ -412,7 +412,7 @@
 }
 
 .cc-feed-type {
-  font-size: 19px;
+  font-size: 20.5px;
   width: 34px;
   height: 34px;
   display: inline-flex;
@@ -436,7 +436,7 @@
 }
 
 .cc-feed-title {
-  font-size: 13.5px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--text-main);
   white-space: nowrap;
@@ -446,7 +446,7 @@
 }
 
 .cc-feed-amount {
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 800;
   color: var(--gold);
   background: var(--gold-dim);
@@ -455,7 +455,7 @@
 }
 
 .cc-feed-time {
-  font-size: 11px;
+  font-size: 12.5px;
   color: #b4c1d4;
   margin-left: auto;
   white-space: nowrap;
@@ -464,7 +464,7 @@
 .cc-feed-meta {
   display: flex;
   gap: 6px;
-  font-size: 11.5px;
+  font-size: 13px;
   color: var(--text-muted);
   margin-top: 3px;
   flex-wrap: wrap;
@@ -479,7 +479,7 @@
 .cc-btn {
   border-radius: 9px;
   padding: 7px 13px;
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 800;
   cursor: pointer;
   transition: var(--transition-smooth);
@@ -538,7 +538,7 @@
 
 .cc-empty-inline {
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: 14.5px;
 }
 
 .cc-toast {
@@ -549,7 +549,7 @@
   z-index: 2000;
   padding: 12px 22px;
   border-radius: 12px;
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 700;
   box-shadow: var(--shadow-subtle);
   animation: cc-toast-in 0.25s ease;
