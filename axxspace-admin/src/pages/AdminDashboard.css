@@ -108,7 +108,7 @@
 
 /* Notification Button */
 .btn-notification {
-  background: rgba(53, 48, 82, 0.8);
+  background: rgba(58, 32, 74, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #f1f5f9;
   width: 44px;
@@ -124,7 +124,7 @@
 }
 
 .btn-notification:hover {
-  background: rgba(53, 48, 82, 1);
+  background: rgba(58, 32, 74, 1);
   transform: translateY(-1px);
 }
 
@@ -161,7 +161,7 @@
   top: 52px;
   right: 0;
   width: 360px;
-  background: #2c2846;
+  background: #2b1b3a;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
@@ -294,7 +294,7 @@
 .notification-footer {
   padding: 12px 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.07);
-  background: rgba(43, 39, 68, 0.5);
+  background: rgba(46, 24, 60, 0.5);
 }
 
 .btn-view-all-notifications {
@@ -316,7 +316,7 @@
 }
 
 .stat-card {
-  background: rgba(53, 48, 82, 0.6);
+  background: rgba(58, 32, 74, 0.6);
   padding: 16px 20px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -348,7 +348,7 @@
 
 /* Chart Container */
 .chart-container {
-  background: rgba(53, 48, 82, 0.6);
+  background: rgba(58, 32, 74, 0.6);
   padding: 24px;
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -370,7 +370,7 @@
 }
 
 .view-stat-section {
-  background: rgba(43, 39, 68, 0.6);
+  background: rgba(46, 24, 60, 0.6);
   padding: 16px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -420,7 +420,7 @@
   flex-direction: column;
   gap: 6px;
   padding: 12px;
-  background: rgba(43, 39, 68, 0.4);
+  background: rgba(46, 24, 60, 0.4);
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
@@ -465,7 +465,7 @@
 .chart-bar-track {
   flex: 1;
   height: 24px;
-  background: rgba(43, 39, 68, 0.8);
+  background: rgba(46, 24, 60, 0.8);
   border-radius: 12px;
   overflow: hidden;
   position: relative;
@@ -508,7 +508,7 @@
 
 /* Quick Actions */
 .quick-actions {
-  background: rgba(53, 48, 82, 0.6);
+  background: rgba(58, 32, 74, 0.6);
   padding: 24px;
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -532,7 +532,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(43, 39, 68, 0.8);
+  background: rgba(46, 24, 60, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.08);
   padding: 14px 18px;
   border-radius: 12px;
@@ -643,7 +643,7 @@
 }
 
 .btn-status {
-  background: rgba(53, 48, 82, 0.4);
+  background: rgba(58, 32, 74, 0.4);
   color: #cdd8e8;
   border: 1px solid rgba(255, 255, 255, 0.08);
   padding: 7px 16px;
@@ -655,7 +655,7 @@
 }
 
 .btn-status:hover {
-  background: rgba(53, 48, 82, 0.6);
+  background: rgba(58, 32, 74, 0.6);
 }
 
 .btn-status.active {
@@ -675,7 +675,7 @@
 .search-input-wrapper {
   display: flex;
   align-items: center;
-  background: rgba(53, 48, 82, 0.6);
+  background: rgba(58, 32, 74, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   padding: 8px 16px;
@@ -714,7 +714,7 @@
 }
 
 .filter-select {
-  background: rgba(53, 48, 82, 0.6);
+  background: rgba(58, 32, 74, 0.6);
   color: #f1f5f9;
   border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 8px 16px;
@@ -775,7 +775,7 @@
 
 /* Empty State */
 .empty {
-  background: rgba(53, 48, 82, 0.4);
+  background: rgba(58, 32, 74, 0.4);
   padding: 60px;
   border-radius: 16px;
   text-align: center;
@@ -814,7 +814,7 @@
 
 /* Card */
 .card {
-  background: rgba(43, 39, 68, 0.85);
+  background: rgba(46, 24, 60, 0.85);
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.06);
   overflow: hidden;
@@ -988,7 +988,7 @@
 }
 
 .btn-cancel {
-  background: rgba(53, 48, 82, 0.6);
+  background: rgba(58, 32, 74, 0.6);
   color: #cdd8e8;
   border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 10px 20px;
@@ -1000,7 +1000,7 @@
 }
 
 .btn-cancel:hover {
-  background: rgba(53, 48, 82, 0.8);
+  background: rgba(58, 32, 74, 0.8);
   transform: translateY(-1px);
 }
 
@@ -1035,7 +1035,7 @@
 }
 
 .modal {
-  background: #2c2846;
+  background: #2b1b3a;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   width: 100%;
@@ -1054,7 +1054,7 @@
   align-items: center;
   padding: 20px 24px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-  background: rgba(43, 39, 68, 0.95);
+  background: rgba(46, 24, 60, 0.95);
 }
 
 .modal-title {
@@ -1139,7 +1139,7 @@
 
 /* Owner Box */
 .owner-box {
-  background: rgba(53, 48, 82, 0.5);
+  background: rgba(58, 32, 74, 0.5);
   padding: 12px 16px;
   border-radius: 10px;
   margin-bottom: 16px;
@@ -1161,7 +1161,7 @@
 .field-row {
   display: flex;
   flex-direction: column;
-  background: rgba(53, 48, 82, 0.3);
+  background: rgba(58, 32, 74, 0.3);
   padding: 8px 12px;
   border-radius: 8px;
 }
@@ -1205,7 +1205,7 @@
   padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(53, 48, 82, 0.7);
+  background: rgba(58, 32, 74, 0.7);
   color: #f1f5f9;
   font-size: 14.5px;
   outline: none;
@@ -1218,7 +1218,7 @@
 
 /* Config Box */
 .config-box {
-  background: rgba(43, 39, 68, 0.8);
+  background: rgba(46, 24, 60, 0.8);
   border-radius: 16px;
   padding: 32px;
   max-width: 600px;
@@ -1256,7 +1256,7 @@
 
 /* Confirm Modal */
 .confirm-modal {
-  background: #2c2846;
+  background: #2b1b3a;
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   padding: 32px;
@@ -1309,7 +1309,7 @@
 }
 
 .btn-back {
-  background: rgba(53, 48, 82, 0.6);
+  background: rgba(58, 32, 74, 0.6);
   color: #f1f5f9;
   border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 8px 16px;
@@ -1322,12 +1322,12 @@
 }
 
 .btn-back:hover {
-  background: rgba(53, 48, 82, 0.8);
+  background: rgba(58, 32, 74, 0.8);
   transform: translateY(-1px);
 }
 
 .detail-card {
-  background: rgba(43, 39, 68, 0.8);
+  background: rgba(46, 24, 60, 0.8);
   border-radius: 16px;
   padding: 24px;
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -1366,7 +1366,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  background: rgba(53, 48, 82, 0.5);
+  background: rgba(58, 32, 74, 0.5);
   border-radius: 8px;
   margin-bottom: 8px;
 }
@@ -1413,7 +1413,7 @@
   padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(53, 48, 82, 0.7);
+  background: rgba(58, 32, 74, 0.7);
   color: #f1f5f9;
   font-size: 14.5px;
   outline: none;
@@ -1434,7 +1434,7 @@
 }
 
 .boost-card {
-  background: rgba(43, 39, 68, 0.85);
+  background: rgba(46, 24, 60, 0.85);
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.06);
   overflow: hidden;
@@ -1508,7 +1508,7 @@
 }
 
 .boost-details {
-  background: rgba(53, 48, 82, 0.4);
+  background: rgba(58, 32, 74, 0.4);
   border-radius: 10px;
   padding: 12px 16px;
   margin-bottom: 16px;
@@ -1753,7 +1753,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(43, 39, 68, 0.8);
+  background: rgba(46, 24, 60, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: #cdd8e8;
   padding: 8px 14px;
@@ -1768,7 +1768,7 @@
 }
 
 .mobile-quick-pill:hover {
-  background: rgba(53, 48, 82, 0.9);
+  background: rgba(58, 32, 74, 0.9);
   color: #e2e8f0;
 }
 
@@ -1999,7 +1999,7 @@
 
 /* Website QR Poster */
 .website-poster-page {
-  background: rgba(53, 48, 82, 0.6);
+  background: rgba(58, 32, 74, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 16px;
   padding: 24px;
@@ -2176,7 +2176,7 @@
 
 /* Stats cards — enhanced glassmorphism */
 .stat-card {
-  background: rgba(43,39,68,0.7) !important;
+  background: rgba(46,24,60,0.7) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
   border: 1px solid rgba(255,255,255,0.07) !important;
@@ -2271,7 +2271,7 @@
 
 /* Notification panel glass */
 .notification-panel {
-  background: rgba(43,39,68,0.95) !important;
+  background: rgba(46,24,60,0.95) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
   border: 1px solid rgba(255,255,255,0.1) !important;
@@ -2341,8 +2341,8 @@
   right: 0;
   bottom: 0;
   background-image: 
-    radial-gradient(circle at 20% 30%, rgba(139, 92, 246, 0.10) 0%, transparent 50%),
-    radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+    radial-gradient(circle at 20% 30%, rgba(168, 85, 247, 0.10) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(168, 85, 247, 0.05) 0%, transparent 50%);
   pointer-events: none;
   z-index: 0;
   animation: fadeInOut 30s ease-in-out infinite;
@@ -2367,7 +2367,7 @@
 
 /* Enhanced stat cards with entrance animation */
 .stat-card {
-  background: rgba(53, 48, 82, 0.6);
+  background: rgba(58, 32, 74, 0.6);
   backdrop-filter: blur(10px);
   padding: 16px 20px;
   border-radius: 12px;
@@ -2393,7 +2393,7 @@
 .stat-card:hover {
   transform: translateY(-4px);
   border-color: rgba(244, 63, 94, 0.3);
-  background: rgba(53, 48, 82, 0.8);
+  background: rgba(58, 32, 74, 0.8);
   box-shadow: 0 12px 30px rgba(244, 63, 94, 0.1);
 }
 
@@ -2409,7 +2409,7 @@
 
 /* Enhanced chart container */
 .chart-container {
-  background: rgba(53, 48, 82, 0.6);
+  background: rgba(58, 32, 74, 0.6);
   backdrop-filter: blur(10px);
   padding: 24px;
   border-radius: 16px;
@@ -2420,14 +2420,14 @@
 }
 
 .chart-container:hover {
-  background: rgba(53, 48, 82, 0.8);
+  background: rgba(58, 32, 74, 0.8);
   border-color: rgba(244, 63, 94, 0.2);
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
 }
 
 /* Enhanced card styling with glass effect */
 .card {
-  background: rgba(43, 39, 68, 0.85);
+  background: rgba(46, 24, 60, 0.85);
   backdrop-filter: blur(10px);
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -2448,7 +2448,7 @@
   transform: translateY(-6px);
   box-shadow: 0 20px 50px rgba(244, 63, 94, 0.15);
   border-color: rgba(244, 63, 94, 0.3);
-  background: rgba(43, 39, 68, 1);
+  background: rgba(46, 24, 60, 1);
 }
 
 .card.featured {
@@ -2506,7 +2506,7 @@
 
 /* Modal enhancements with glassmorphism */
 .modal {
-  background: rgba(43, 39, 68, 0.95);
+  background: rgba(46, 24, 60, 0.95);
   backdrop-filter: blur(16px);
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -2556,7 +2556,7 @@
 
 /* Notifications with enhanced styling */
 .notification-panel {
-  background: rgba(43, 39, 68, 0.95);
+  background: rgba(46, 24, 60, 0.95);
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   animation: notifPanelSlideEnhanced 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -2641,7 +2641,7 @@
 
 /* Enhanced quick actions with gradient */
 .btn-quick-action {
-  background: linear-gradient(135deg, rgba(43, 39, 68, 0.8), rgba(53, 48, 82, 0.4));
+  background: linear-gradient(135deg, rgba(46, 24, 60, 0.8), rgba(58, 32, 74, 0.4));
   border: 1px solid rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(10px);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -2656,7 +2656,7 @@
 
 /* Enhanced search bar with glass effect */
 .search-input-wrapper {
-  background: rgba(53, 48, 82, 0.6);
+  background: rgba(58, 32, 74, 0.6);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -2664,7 +2664,7 @@
 
 .search-input-wrapper:focus-within {
   border-color: rgba(244, 63, 94, 0.3);
-  background: rgba(53, 48, 82, 0.8);
+  background: rgba(58, 32, 74, 0.8);
   box-shadow: 0 0 20px rgba(244, 63, 94, 0.1);
 }
 
@@ -2677,7 +2677,7 @@
 
 /* Professional filter select */
 .filter-select {
-  background: rgba(53, 48, 82, 0.6);
+  background: rgba(58, 32, 74, 0.6);
   backdrop-filter: blur(10px);
   color: #f1f5f9;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -2686,7 +2686,7 @@
 
 .filter-select:focus {
   border-color: rgba(244, 63, 94, 0.3);
-  background: rgba(53, 48, 82, 0.8);
+  background: rgba(58, 32, 74, 0.8);
   box-shadow: 0 0 15px rgba(244, 63, 94, 0.1);
 }
 
@@ -2796,7 +2796,7 @@
 
 /* Stats cards — enhanced glassmorphism */
 .stat-card {
-  background: rgba(43,39,68,0.7) !important;
+  background: rgba(46,24,60,0.7) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
   border: 1px solid rgba(255,255,255,0.07) !important;
@@ -2891,7 +2891,7 @@
 
 /* Notification panel glass */
 .notification-panel {
-  background: rgba(43,39,68,0.95) !important;
+  background: rgba(46,24,60,0.95) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
   border: 1px solid rgba(255,255,255,0.1) !important;

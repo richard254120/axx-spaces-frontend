@@ -62,6 +62,85 @@ export function DonutChart({ data = [], size = 190, thickness = 24, centerValue,
 }
 
 /**
+ * MultiLineChart — responsive SVG line chart with several daily series,
+ * gridlines, y-axis ticks, x labels and hover dots with value tooltips.
+ * series: [{ name, color, values: number[] }], labels: string[]
+ */
+export function MultiLineChart({ series = [], labels = [], height = 230 }) {
+  const data = series.filter((s) => Array.isArray(s.values) && s.values.length);
+  if (!data.length || !labels.length) return null;
+
+  const W = 640;
+  const H = height;
+  const padL = 36; const padR = 14; const padT = 14; const padB = 26;
+  const max = Math.max(...data.flatMap((s) => s.values), 1);
+  const n = Math.max(...data.map((s) => s.values.length));
+  const x = (i) => padL + (i * (W - padL - padR)) / Math.max(n - 1, 1);
+  const y = (v) => padT + (1 - v / max) * (H - padT - padB);
+  const ticks = [0, 0.25, 0.5, 0.75, 1].map((t) => Math.round(max * t));
+  const everyX = Math.ceil(n / 7);
+
+  return (
+    <div className="ac-ml">
+      <svg viewBox={`0 0 ${W} ${H}`} className="ac-ml-svg" preserveAspectRatio="none" role="img" aria-label="Trend chart">
+        {ticks.map((t, i) => (
+          <g key={t}>
+            <line x1={padL} x2={W - padR} y1={y(t)} y2={y(t)} stroke="rgba(255,255,255,0.08)" strokeWidth="1" strokeDasharray={i === 4 ? "0" : "3 5"} />
+            <text x={padL - 7} y={y(t) + 3.5} textAnchor="end" fontSize="10" fill="#cdd8e8" opacity="0.75">{t}</text>
+          </g>
+        ))}
+        {data.map((s) => {
+          const pts = s.values.map((v, i) => `${x(i)},${y(v || 0)}`).join(" ");
+          return (
+            <g key={s.name}>
+              <polyline points={pts} fill="none" stroke={s.color} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" style={{ filter: `drop-shadow(0 0 6px ${s.color}55)` }} />
+              {s.values.map((v, i) => (
+                <circle key={i} cx={x(i)} cy={y(v || 0)} r="7" fill="transparent">
+                  <title>{`${labels[i] ?? ""} · ${s.name}: ${(v || 0).toLocaleString()}`}</title>
+                </circle>
+              ))}
+              {s.values.map((v, i) => (
+                <circle key={`d-${i}`} cx={x(i)} cy={y(v || 0)} r="2.2" fill={s.color} pointerEvents="none" />
+              ))}
+            </g>
+          );
+        })}
+        {labels.map((l, i) =>
+          i % everyX === 0 || i === labels.length - 1 ? (
+            <text key={`${l}-${i}`} x={x(i)} y={H - 7} textAnchor="middle" fontSize="10" fill="#cdd8e8" opacity="0.7">{l}</text>
+          ) : null
+        )}
+      </svg>
+      <div className="ac-ml-legend">
+        {data.map((s) => (
+          <span key={s.name} className="ac-ml-legend-item">
+            <i style={{ background: s.color }} /> {s.name}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Sparkline — compact area+line for a single series (used in growth cards).
+ */
+export function Sparkline({ values = [], color = "#f43f5e", width = 130, height = 38 }) {
+  if (!values.length) return null;
+  const max = Math.max(...values, 1);
+  const x = (i) => (i * width) / Math.max(values.length - 1, 1);
+  const y = (v) => height - 3 - (v / max) * (height - 6);
+  const line = values.map((v, i) => `${x(i).toFixed(1)},${y(v || 0).toFixed(1)}`).join(" ");
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} className="ac-spark" width={width} height={height} aria-hidden="true">
+      <polygon points={`0,${height} ${line} ${width},${height}`} fill={color} opacity="0.16" />
+      <polyline points={line} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx={x(values.length - 1)} cy={y(values[values.length - 1] || 0)} r="2.6" fill={color} />
+    </svg>
+  );
+}
+
+/**
  * ColumnChart — rounded vertical bars with value labels and category axis.
  * data: [{ label, value, color }]
  */

@@ -116,3 +116,46 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* ── MultiLineChart ── */
+.ac-ml {
+  width: 100%;
+}
+
+.ac-ml-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ac-ml-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  padding-top: 10px;
+}
+
+.ac-ml-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #cdd8e8;
+}
+
+.ac-ml-legend-item i {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+/* ── Sparkline ── */
+.ac-spark {
+  display: block;
+  width: 100%;
+  max-width: 160px;
+  height: auto;
+}

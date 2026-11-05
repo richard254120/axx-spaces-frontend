@@ -96,8 +96,8 @@ export default function ResetPassword() {
 }
 
 const styles = {
-  container: { minHeight: "100vh", background: "linear-gradient(135deg, #141126 0%, #1e1b31 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-ui)", padding: "20px" },
-  card: { background: "rgba(43, 39, 68, 0.9)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "20px", padding: "48px 40px", width: "100%", maxWidth: "450px", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" },
+  container: { minHeight: "100vh", background: "linear-gradient(135deg, #141126 0%, #150a20 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-ui)", padding: "20px" },
+  card: { background: "rgba(46, 24, 60, 0.9)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "20px", padding: "48px 40px", width: "100%", maxWidth: "450px", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" },
   title: { color: "#fb7185", fontSize: "27.5px", fontWeight: 800, margin: "0 0 8px", textAlign: "center" },
   subtitle: { color: "#cdd8e8", fontSize: "15.5px", textAlign: "center", marginBottom: "30px" },
   error: { background: "rgba(239,68,68,0.1)", color: "#ef4444", border: "1px solid #ef4444", borderRadius: "8px", padding: "12px", fontSize: "15.5px", marginBottom: "20px", textAlign: "center" },
@@ -105,6 +105,6 @@ const styles = {
   form: { display: "flex", flexDirection: "column", gap: "20px" },
   field: { display: "flex", flexDirection: "column", gap: "6px" },
   label: { color: "#f1f5f9", fontSize: "13.5px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" },
-  input: { padding: "12px 16px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(53, 48, 82, 0.6)", color: "#f1f5f9", fontSize: "15.5px", outline: "none" },
+  input: { padding: "12px 16px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(58, 32, 74, 0.6)", color: "#f1f5f9", fontSize: "15.5px", outline: "none" },
   btn: { padding: "14px", background: "linear-gradient(135deg, #f43f5e 0%, #be123c 100%)", color: "#ffffff", border: "none", borderRadius: "8px", fontWeight: 800, fontSize: "16.5px", cursor: "pointer" },
 };

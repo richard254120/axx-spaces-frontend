@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import {
   House, ShoppingBag, Bed, Briefcase, Megaphone, BadgeCheck,
   ClipboardList, Zap, CreditCard, Package, TrendingUp, Flame, ChartColumn,
-  ListChecks, RefreshCw, Clock, Check, X, ArrowRight, CircleCheckBig, Inbox
+  ListChecks, RefreshCw, Clock, Check, X, ArrowRight, CircleCheckBig, Inbox,
+  UserPlus, LogIn, PenLine, Send
 } from "lucide-react";
 import API from "../api/api";
-import { DonutChart, ColumnChart } from "../components/AdminCharts";
+import { DonutChart, ColumnChart, MultiLineChart, Sparkline } from "../components/AdminCharts";
 import "../pages/AdminDashboard.css";
 import "./CommandCenter.css";
 
@@ -64,6 +65,7 @@ export default function CommandCenter() {
   const [feed, setFeed] = useState([]);
   const [viewStats, setViewStats] = useState(null);
   const [topViewed, setTopViewed] = useState(null);
+  const [activity, setActivity] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
@@ -79,11 +81,12 @@ export default function CommandCenter() {
   const loadAll = useCallback(async (isRefresh = false) => {
     isRefresh ? setRefreshing(true) : setLoading(true);
     try {
-      const [statsR, notifR, viewR, topR] = await Promise.all([
+      const [statsR, notifR, viewR, topR, actR] = await Promise.all([
         API.get("/admin/stats"),
         API.get("/admin/notifications"),
         API.get("/admin/view-stats"),
         API.get("/admin/top-viewed", { params: { limit: 10 } }),
+        API.get("/admin/activity", { params: { days: 14 } }).catch(() => null),
       ]);
       setStats(statsR.data);
       setFeed(notifR.data?.notifications || []);
@@ -91,6 +94,7 @@ export default function CommandCenter() {
       // view-stats & top-viewed respond with { success, data }— unwrap defensively
       setViewStats(viewR.data?.data ?? viewR.data);
       setTopViewed(topR.data?.data ?? topR.data);
+      setActivity(actR?.data?.data ?? null);
       setLastUpdated(new Date());
     } catch (e) {
       console.error("Command center load:", e);
@@ -182,6 +186,29 @@ export default function CommandCenter() {
     return rows.sort((a, b) => b.value - a.value).slice(0, 9);
   }, [viewStats]);
 
+  // Engagement headline stats + per-category growth from /admin/activity
+  const engagement = useMemo(() => {
+    const t = activity?.totals;
+    if (!t) return [];
+    return [
+      { key: "registrations", value: t.registeredPeriod, label: "New registrations", sub: `${t.registered.toLocaleString()} total accounts`, color: "#38bdf8", icon: UserPlus },
+      { key: "logins", value: t.loggedPeriod, label: "People logged in", sub: `${t.loggedEver.toLocaleString()} have signed in at least once`, color: "#a78bfa", icon: LogIn },
+      { key: "edits", value: t.editsPeriod, label: "Edits made", sub: `${t.auditActionsPeriod} admin actions logged`, color: "#fb7185", icon: PenLine },
+      { key: "submissions", value: t.submissionsPeriod, label: "Submissions received", sub: "properties · QuickSales · businesses · stays", color: "#22c55e", icon: Send },
+    ];
+  }, [activity]);
+
+  const growthCards = useMemo(() => {
+    if (!activity?.growth) return [];
+    const sum = (arr) => (arr || []).reduce((a, b) => a + b, 0);
+    return [
+      { key: "properties", name: "Properties", color: "#38bdf8", icon: House, values: activity.growth.properties, added: sum(activity.growth.properties) },
+      { key: "materials", name: "QuickSales", color: "#22c55e", icon: ShoppingBag, values: activity.growth.materials, added: sum(activity.growth.materials) },
+      { key: "businesses", name: "Businesses", color: "#fb7185", icon: Briefcase, values: activity.growth.businesses, added: sum(activity.growth.businesses) },
+      { key: "accommodations", name: "Accommodations", color: "#14b8a6", icon: Bed, values: activity.growth.accommodations, added: sum(activity.growth.accommodations) },
+    ];
+  }, [activity]);
+
   if (loading) {
     return (
       <div className="cc-loading">
@@ -217,7 +244,21 @@ export default function CommandCenter() {
         </div>
       </section>
 
-      {/* ── KPI cards ──────────────────────────────────────── */}
+      {/* ── Engagement strip ─────────────────────────────── */}
+      {engagement.length > 0 && (
+        <section className="cc-eng-grid">
+          {engagement.map((e) => (
+            <div key={e.key} className="cc-eng-card" style={{ "--eng-color": e.color }}>
+              <span className="cc-eng-icon" style={{ background: `${e.color}1f`, color: e.color }}><e.icon size={17} /></span>
+              <div className="cc-eng-value">{e.value.toLocaleString()}</div>
+              <div className="cc-eng-label">{e.label} <span className="cc-eng-period">· last {activity.days}d</span></div>
+              <div className="cc-eng-sub">{e.sub}</div>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {/* ── KPI cards ─── */}
       <section className="cc-kpi-grid">
         {kpis.map((k) => (
           <button key={k.key} type="button" className="cc-kpi-card" onClick={() => navigate(k.queue)}>
@@ -315,7 +356,35 @@ export default function CommandCenter() {
         </section>
       )}
 
-      {/* ── Action feed ────────────────────────────────────── */}
+      {/* ── Engagement trend + category growth ───────────── */}
+      {activity && (
+        <section className="cc-panel cc-growth-panel">
+          <h3 className="cc-panel-title"><TrendingUp size={16} className="cc-title-ic" /> Platform Pulse · last {activity.days} days</h3>
+          <MultiLineChart
+            labels={activity.labels}
+            series={[
+              { name: "Registrations", color: "#38bdf8", values: activity.series?.registrations },
+              { name: "Logins", color: "#a78bfa", values: activity.series?.logins },
+              { name: "Edits", color: "#fb7185", values: activity.series?.edits },
+              { name: "Submissions", color: "#22c55e", values: activity.series?.submissions },
+            ]}
+          />
+          <div className="cc-growth-grid">
+            {growthCards.map((g) => (
+              <div key={g.key} className="cc-growth-card">
+                <div className="cc-growth-head">
+                  <span className="cc-growth-name" style={{ color: g.color }}><g.icon size={13} className="cc-inline-ic" /> {g.name}</span>
+                  <span className="cc-growth-added">+{g.added}</span>
+                </div>
+                <Sparkline values={g.values} color={g.color} />
+                <div className="cc-growth-sub">new {g.name.toLowerCase()} submissions</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── Action feed ─── */}
       <section className="cc-panel cc-feed-panel">
         <div className="cc-feed-head">
           <h3 className="cc-panel-title"><ListChecks size={16} className="cc-title-ic" /> Unified Action Queue</h3>
