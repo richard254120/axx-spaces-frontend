@@ -4,7 +4,11 @@ import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
 import QuickBoostModal from "../components/QuickBoostModal";
 import { UserProfileEditor, ProfileAvatar } from "../features/profile";
-import AnalyticsDashboard from "../components/AnalyticsDashboard";
+import DashboardShell from "../components/dashboard/DashboardShell";
+import PageHeader from "../components/dashboard/PageHeader";
+import StatGrid from "../components/dashboard/StatGrid";
+import SectionCard from "../components/dashboard/SectionCard";
+import DashIcon from "../components/dashboard/DashIcon";
 
 import { getDashboardPath } from "../utils/dashboardRoutes";
 
@@ -145,30 +149,17 @@ export default function UserDashboard() {
   }
 
   return (
-    <div style={s.dashboardContainer}>
+    <DashboardShell
+      role="business"
+      activeId={activeTab}
+      onSelect={setActiveTab}
+      nav={[
+        { id: "overview", label: "Overview", icon: <DashIcon d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" /> },
+        { id: "businesses", label: "Directory Listings", icon: <DashIcon d="M3 7h18v14H3zM3 7l9-4 9 4M9 11h6" /> },
+        { id: "profile", label: "Profile & KYC", icon: <DashIcon d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" /> },
+      ]}
+    >
       <style>{customStyles}</style>
-
-      {/* HORIZONTAL TAB SELECTOR */}
-      <div style={s.tabsScroll}>
-        <button
-          style={{ ...s.tabBtn, ...(activeTab === "overview" && s.tabBtnActive) }}
-          onClick={() => setActiveTab("overview")}
-        >
-           Overview
-        </button>
-        <button
-          style={{ ...s.tabBtn, ...(activeTab === "businesses" && s.tabBtnActive) }}
-          onClick={() => setActiveTab("businesses")}
-        >
-           Directory Listings
-        </button>
-        <button
-          style={{ ...s.tabBtn, ...(activeTab === "profile" && s.tabBtnActive) }}
-          onClick={() => setActiveTab("profile")}
-        >
-           Profile & KYC
-        </button>
-      </div>
 
       {/* MAIN CONTENT AREA */}
       <main style={s.mainContent}>
@@ -181,40 +172,29 @@ export default function UserDashboard() {
         {/* OVERVIEW PANEL */}
         {activeTab === "overview" && (
           <div>
-            <div style={s.welcomeBanner}>
-              <div style={s.bannerLeft}>
-                <h1 style={s.bannerTitle}>
-                  {getGreeting()}, {user?.name?.split(" ")[0] || "User"}! 
-                </h1>
-                <p style={s.bannerSubtitle}>Monitor your listings, inquiries, and directory items from one unified space.</p>
-              </div>
-            </div>
+            <PageHeader
+              eyebrow="Overview"
+              title={`${getGreeting()}, ${user?.name?.split(" ")[0] || "User"}`}
+              subtitle="Monitor your listings, inquiries, and directory items from one unified space."
+            />
 
             {/* Quick Stats Grid */}
-            <div style={s.statsGrid}>
-              <div style={s.statCard}>
-                <div style={s.statValue}>{totalListedCount}</div>
-                <div style={s.statLabel}>Total Listings</div>
-              </div>
-              <div style={s.statCard}>
-                <div style={s.statValue}>{businesses.length}</div>
-                <div style={s.statLabel}>Businesses (Directory)</div>
-              </div>
-            </div>
+            <StatGrid
+              stats={[
+                { label: "Total Listings", value: totalListedCount, color: "#fbbf24", icon: <DashIcon size={22} d="M3 7h18v14H3zM3 7l9-4 9 4M9 11h6" /> },
+                { label: "Businesses (Directory)", value: businesses.length, color: "#3b82f6", icon: <DashIcon size={22} d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /> },
+              ]}
+            />
 
             {/* Quick Actions Panel */}
-            <div style={s.panelCard}>
-              <h3 style={s.panelHeading}> Quick Actions</h3>
+            <SectionCard title="Quick Actions">
               <div style={s.actionsGrid}>
                 <button style={s.actionGridBtn} onClick={() => navigate("/business/create")}>
                    Register New Business
                 </button>
               </div>
-            </div>
+            </SectionCard>
 
-            <div style={{ marginTop: "24px" }}>
-              <AnalyticsDashboard userId={user?._id || user?.id} userType={user?.role} />
-            </div>
           </div>
         )}
 
@@ -315,7 +295,7 @@ export default function UserDashboard() {
           onSuccess={loadAllData}
         />
       )}
-    </div>
+    </DashboardShell>
   );
 }
 

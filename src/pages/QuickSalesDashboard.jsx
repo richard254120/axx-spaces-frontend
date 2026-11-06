@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { UserProfileEditor, ProfileAvatar } from "../features/profile";
 import BoostNotification from "../components/BoostNotification";
-import AnalyticsDashboard from "../components/AnalyticsDashboard";
 import QuickBoostModal from "../components/QuickBoostModal";
 import { canPublishQuickSales } from "../utils/quicksalesPermissions";
+import DashboardShell from "../components/dashboard/DashboardShell";
+import StatGrid from "../components/dashboard/StatGrid";
+import DashIcon from "../components/dashboard/DashIcon";
 
 import { getDashboardPath } from "../utils/dashboardRoutes";
 
@@ -270,76 +272,34 @@ export default function QuickSalesDashboard() {
   }
 
   return (
-    <div style={s.page}>
+    <DashboardShell
+      role="seller"
+      preferSeller
+      logoutTo="/user-login"
+      title="Seller Dashboard"
+      subtitle={seller ? `${seller.name || "Seller"}${seller.email ? ` • ${seller.email}` : ""}` : undefined}
+      activeId={view}
+      onSelect={(id) => { setView(id); if (id !== "upload" && editingId) resetForm(); }}
+      nav={[
+        { id: "listings", label: "My Stock", icon: <DashIcon d="M3 7h18v14H3zM3 7l9-4 9 4M9 11h6" /> },
+        ...(canPublish ? [{ id: "upload", label: "Upload Material", icon: <DashIcon d="M12 5v14M5 12h14" /> }] : []),
+        { id: "profile", label: "Profile", icon: <DashIcon d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" /> },
+      ]}
+    >
       <style>{css}</style>
-
-      {/* HEADER */}
-      <header style={s.header}>
-        <div style={s.headerLeft}>
-          <ProfileAvatar user={seller} size={48} />
-          <div>
-            <h1 style={s.headerTitle}>Seller Dashboard</h1>
-            <p style={s.headerMeta}>{seller?.name || "Seller"}{seller?.email ? ` • ${seller.email}` : ""}</p>
-          </div>
-        </div>
-        <button type="button" className="qs-signout" style={s.signOutBtn} onClick={handleLogout}>
-          Sign Out
-        </button>
-      </header>
 
       {/* BOOST NOTIFICATION */}
       <BoostNotification user={seller} userType="seller" />
 
-      {/* TABS */}
-      <nav style={s.tabs} aria-label="Seller dashboard">
-        {[
-          { id: "listings", label: "My Stock", icon: <path d="M3 7h18v14H3zM3 7l9-4 9 4M9 11h6" /> },
-          ...(canPublish ? [{ id: "upload", label: "Upload Material", icon: <path d="M12 5v14M5 12h14" /> }] : []),
-          { id: "profile", label: "Profile & Analytics", icon: <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" /> },
-        ].map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            className="qs-tab"
-            style={{ ...s.tabBtn, ...(view === t.id && s.tabBtnActive) }}
-            onClick={() => {
-              setView(t.id);
-              // Leaving the upload tab clears any pending edit mode
-              if (t.id !== "upload" && editingId) resetForm();
-            }}
-            aria-selected={view === t.id}
-          >
-            <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{t.icon}</svg>
-            <span>{t.label}</span>
-          </button>
-        ))}
-      </nav>
-
       {/* STATS */}
-      <div style={s.statsGrid}>
-        {[
-          { label: "Revenue", value: `KES ${stats.totalEarnings.toLocaleString()}`, color: "#22c55e", icon: <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /> },
-          { label: "Live Listings", value: stats.liveItems, color: "#3b82f6", icon: <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM13 2v7h7" /> },
-          { label: "Pending Review", value: stats.pendingReview, color: "#fbbf24", icon: <path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" /> },
-          { label: "Total Views", value: stats.totalViews.toLocaleString(), color: "#a855f7", icon: <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" /> },
-        ].map((stat) => (
-          <div key={stat.label} className="qs-stat-card" style={s.statCard}>
-            <div style={{ ...s.statIconWrap, color: stat.color, background: `${stat.color}1A` }}>
-              <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{stat.icon}</svg>
-            </div>
-            <div>
-              <div style={s.statLabel}>{stat.label}</div>
-              <div style={s.statVal}>{stat.value}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {view === "listings" && (
-        <div style={{ marginBottom: "24px" }}>
-          <AnalyticsDashboard userType="seller" userId={seller?._id || seller?.id} />
-        </div>
-      )}
+      <StatGrid
+        stats={[
+          { label: "Revenue", value: `KES ${stats.totalEarnings.toLocaleString()}`, color: "#22c55e", icon: <DashIcon size={22} d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /> },
+          { label: "Live Listings", value: stats.liveItems, color: "#3b82f6", icon: <DashIcon size={22} d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM13 2v7h7" /> },
+          { label: "Pending Review", value: stats.pendingReview, color: "#fbbf24", icon: <DashIcon size={22} d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" /> },
+          { label: "Total Views", value: stats.totalViews.toLocaleString(), color: "#a855f7", icon: <DashIcon size={22} d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" /> },
+        ]}
+      />
 
       {/* CONTROLS (Only visible in listings view) */}
       {view === "listings" && (
@@ -381,11 +341,10 @@ export default function QuickSalesDashboard() {
         <section style={s.sectionBox}>
           <div style={s.sectionHeader}>
             <div>
-              <h2 style={s.sectionTitle}>Profile &amp; Analytics</h2>
-              <p style={s.sectionSub}>Update your seller details and track performance</p>
+              <h2 style={s.sectionTitle}>Profile</h2>
+              <p style={s.sectionSub}>Update your seller details</p>
             </div>
           </div>
-          <AnalyticsDashboard userType="seller" userId={seller?._id || seller?.id} />
           <UserProfileEditor
             token={token}
             user={seller}
@@ -615,7 +574,7 @@ export default function QuickSalesDashboard() {
           onSuccess={fetchMyMaterials}
         />
       )}
-    </div>
+    </DashboardShell>
   );
 }
 

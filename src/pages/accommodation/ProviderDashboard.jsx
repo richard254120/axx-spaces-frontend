@@ -12,6 +12,8 @@ import {
 } from "../../features/accommodation";
 import BoostListingModal from "../../components/monetization/BoostListingModal";
 import SubscriptionPlansModal from "../../components/monetization/SubscriptionPlansModal";
+import DashboardShell from "../../components/dashboard/DashboardShell";
+import DashIcon from "../../components/dashboard/DashIcon";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -209,7 +211,17 @@ export default function ProviderDashboard() {
   const viewsCount = stats?.totalViews ?? listings.reduce((sum, l) => sum + (l.views || 0), 0);
 
   return (
-    <div style={styles.pageContainer}>
+    <DashboardShell
+      role={user?.role || "host"}
+      logoutTo="/accommodation"
+      nav={[
+        { path: "/accommodation/dashboard", label: "Overview", icon: <DashIcon d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" />, match: (p) => p === "/accommodation/dashboard" || p.startsWith("/accommodation/dashboard/property") },
+        { path: "/accommodation/register-property", label: "Add Property", badge: "New", icon: <DashIcon d={["M12 5v14", "M5 12h14"]} /> },
+        { path: "/accommodation", label: "Browse Stays", icon: <DashIcon d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88z" /> },
+        { path: "/member", label: "Member Hub", icon: <DashIcon d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" /> },
+        { path: "/settings", label: "Settings", icon: <DashIcon d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" /> },
+      ]}
+    >
       <style>{dashboardStyles}</style>
 
       {/* TOAST NOTIFICATION */}
@@ -1034,7 +1046,7 @@ export default function ProviderDashboard() {
         />
       )}
       {showPlans && <SubscriptionPlansModal role="host" onClose={() => setShowPlans(false)} />}
-    </div>
+    </DashboardShell>
   );
 }
 

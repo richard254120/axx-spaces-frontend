@@ -3,12 +3,14 @@ import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import QRCode from "qrcode";
 import { UserProfileEditor } from "../features/profile";
-import AnalyticsDashboard from "../components/AnalyticsDashboard";
 import BoostNotification from "../components/BoostNotification";
 import BoostListingModal from "../components/monetization/BoostListingModal";
 import SubscriptionPlansModal from "../components/monetization/SubscriptionPlansModal";
 import QRGeneratorModal from "../components/QRGeneratorModal";
 import QRStatsModal from "../components/QRStatsModal";
+import DashboardShell from "../components/dashboard/DashboardShell";
+import PageHeader from "../components/dashboard/PageHeader";
+import StatGrid from "../components/dashboard/StatGrid";
 
 import { getDashboardPath, normalizeRole } from "../utils/dashboardRoutes";
 import logo from "../assets/image.png";
@@ -658,78 +660,50 @@ export default function LandlordDashboard() {
   }
 
   return (
-    <div style={styles.dashboardWrapper}>
+    <DashboardShell
+      role="landlord"
+      title="Landlord Portal"
+      logoutTo="/axxbiashara"
+      activeId={activeSidebarTab}
+      onSelect={(id) => setActiveSidebarTab(id)}
+      sidebarHeader={
+        agentRequests.filter(r => r.status === "pending").length > 0 ? (
+          <button
+            onClick={() => setShowAgentRequests(!showAgentRequests)}
+            style={{
+              background: "#fbbf24",
+              color: "#1f2937",
+              border: "none",
+              borderRadius: "8px",
+              padding: "8px 12px",
+              fontWeight: 700,
+              fontSize: "12px",
+              cursor: "pointer",
+              width: "100%",
+            }}
+          >
+            Agent Requests ({agentRequests.filter(r => r.status === "pending").length})
+          </button>
+        ) : null
+      }
+      nav={[
+        { id: "dashboard", label: "Dashboard", icon: <DashboardIcon /> },
+        { id: "my-properties", label: "My Properties", icon: <MyPropertiesIcon /> },
+        { id: "add-property", label: "Add Property", icon: <AddPropertyIcon />, onClick: () => navigate("/upload") },
+        { id: "waitlist", label: "Waitlist", icon: <WaitlistIcon /> },
+        { id: "enquiries", label: "Enquiries", icon: <EnquiriesIcon /> },
+        { id: "bookings", label: "Bookings", icon: <BookingsIcon /> },
+        { id: "promote-property", label: "Promote Property", icon: <PromoteIcon /> },
+        { id: "my-plans", label: "My Plans", icon: <PromoteIcon />, onClick: () => setPlansModalOpen(true) },
+        { id: "messages", label: "Messages", icon: <MessagesIcon /> },
+        { id: "profile", label: "Profile", icon: <ProfileIcon /> },
+        { id: "settings", label: "Settings", icon: <SettingsIcon /> },
+      ]}
+    >
       <style>{cssStyles}</style>
 
-      {/* MOBILE HEADER BAR */}
-      <header style={styles.mobileHeader}>
-        <button style={styles.hamburgerBtn} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-          ☰
-        </button>
-        <div style={styles.mobileLogoRow}>
-          <img src={logo} alt="Axxspace Logo" style={styles.mobileLogoImg} />
-          <span style={styles.mobileLogoText}>AXXSPACE</span>
-        </div>
-        <div style={{ width: "28px" }} /> {/* Spacer */}
-      </header>
-
-      {/* SIDEBAR NAVIGATION */}
-      <aside style={styles.sidebar} className={`axx-sidebar${mobileMenuOpen ? " open" : ""}`}>
-        <div style={styles.sidebarHeader}>
-          <div style={styles.logoRow}>
-            <img src={logo} alt="Axxspace Logo" style={styles.logoImg} />
-            <span style={styles.logoText}>AXXSPACE</span>
-          </div>
-          <span style={styles.portalSubtitle}>LANDLORD PORTAL</span>
-          {agentRequests.filter(r => r.status === "pending").length > 0 && (
-            <button
-              style={{
-                background: "#fbbf24",
-                color: "#1f2937",
-                border: "none",
-                borderRadius: "8px",
-                padding: "8px 12px",
-                fontWeight: 700,
-                fontSize: "12px",
-                cursor: "pointer",
-                marginTop: "12px",
-                width: "100%",
-              }}
-              onClick={() => setShowAgentRequests(!showAgentRequests)}
-            >
-              Agent Requests ({agentRequests.filter(r => r.status === "pending").length})
-            </button>
-          )}
-        </div>
-
-        <nav style={styles.sidebarMenu}>
-          {SIDEBAR_ITEMS.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeSidebarTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleSidebarClick(item)}
-                style={{
-                  ...styles.menuItem,
-                  ...(isActive && styles.menuItemActiveRed),
-                }}
-              >
-                <Icon />
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
-        </nav>
-      </aside>
-
-      {/* MOBILE SIDEBAR BACKDROP */}
-      {mobileMenuOpen && (
-        <div style={styles.sidebarBackdrop} onClick={() => setMobileMenuOpen(false)} />
-      )}
-
       {/* MAIN CONTENT AREA */}
-      <main style={styles.mainContent}>
+      <div>
         {/* BOOST NOTIFICATION */}
         <BoostNotification user={user} userType="landlord" />
 
@@ -822,29 +796,20 @@ export default function LandlordDashboard() {
         {/* ── SCREEN 1: DASHBOARD OVERVIEW ── */}
         {activeSidebarTab === "dashboard" && (
           <div style={styles.tabContentSection}>
-            <div style={styles.header}>
-              <h2 style={styles.contentTitle}>Performance Dashboard</h2>
-              <p style={styles.contentSubtitle}>Real-time overview of listing views, engagement, and conversion tracking.</p>
-            </div>
+            <PageHeader
+              eyebrow="Overview"
+              title="Performance Dashboard"
+              subtitle="Real-time overview of listing views, engagement, and conversion tracking."
+            />
 
             {/* Summary stat cards */}
-            <div style={styles.statsContainer}>
-              <div style={styles.statCard}>
-                <div style={styles.statValue}>{counts.all}</div>
-                <div style={styles.statName}>Total Listings</div>
-              </div>
-              <div style={styles.statCard}>
-                <div style={styles.statValue}>{counts.approved}</div>
-                <div style={styles.statName}>Live Listings</div>
-              </div>
-              <div style={styles.statCard}>
-                <div style={styles.statValue}>{counts.booked}</div>
-                <div style={styles.statName}>Units Occupied</div>
-              </div>
-            </div>
-
-            {/* Custom Interactive charts / graphs via analytics component */}
-            <AnalyticsDashboard userType="landlord" userId={user?._id || user?.id} />
+            <StatGrid
+              stats={[
+                { key: "total", label: "Total Listings", value: counts.all },
+                { key: "live", label: "Live Listings", value: counts.approved },
+                { key: "occupied", label: "Units Occupied", value: counts.booked },
+              ]}
+            />
           </div>
         )}
 
@@ -1561,7 +1526,7 @@ export default function LandlordDashboard() {
             </div>
           </div>
         )}
-      </main>
+      </div>
 
       {/* MODALS */}
       {selectedPropertyForBoost && (
@@ -1605,7 +1570,7 @@ export default function LandlordDashboard() {
           property={selectedPropertyForStats}
         />
       )}
-    </div>
+    </DashboardShell>
   );
 }
 

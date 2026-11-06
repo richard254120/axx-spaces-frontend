@@ -3,7 +3,6 @@ import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { UserProfileEditor } from "../features/profile";
 import BoostNotification from "../components/BoostNotification";
-import AnalyticsDashboard from "../components/AnalyticsDashboard";
 import QuickBoostModal from "../components/QuickBoostModal";
 
 import { getDashboardPath } from "../utils/dashboardRoutes";
@@ -398,10 +397,6 @@ export default function MoverDashboard() {
                   </div>
                 </div>
               ))}
-            <div style={{ marginBottom: '24px' }}>
-              <AnalyticsDashboard userType="mover" userId={user?._id || user?.id} />
-            </div>
-
             {jobs.filter(j => j.status === "pending").length > 0 && (
               <div style={{ marginBottom: "24px" }}>
                 <h3 style={{ ...styles.sectionTitle, color: "#ef4444" }}> Pending Bookings</h3>
@@ -484,8 +479,6 @@ export default function MoverDashboard() {
         {/* ── PROFILE TAB ── */}
         {activeTab === "profile" && (
           <section>
-            <AnalyticsDashboard userType="mover" userId={user?._id || user?.id} />
-
             {/* Portfolio Management */}
             <div style={styles.profileSection}>
               <h3 style={styles.sectionTitle}> Portfolio Gallery</h3>

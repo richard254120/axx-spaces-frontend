@@ -193,11 +193,11 @@ function App() {
       <Route
         path="/accommodation/dashboard"
         element={
-          <AccommodationDashboardLayout>
+          <BareLayout>
             <ProtectedRoute allowedRoles={["host", "agent"]}>
               <ProviderDashboard />
             </ProtectedRoute>
-          </AccommodationDashboardLayout>
+          </BareLayout>
         }
       />
       <Route
@@ -271,11 +271,11 @@ function App() {
       <Route
         path="/business-dashboard"
         element={
-          <DashboardLayout>
+          <BareLayout>
             <ProtectedRoute loginPath="/business-login" allowedRoles={["business", "admin"]}>
               <UserDashboard />
             </ProtectedRoute>
-          </DashboardLayout>
+          </BareLayout>
         }
       />
 
@@ -287,11 +287,11 @@ function App() {
       <Route
         path="/quicksales-dashboard"
         element={
-          <DashboardLayout preferSeller>
+          <BareLayout>
             <ProtectedRoute allowedRoles={["seller"]} loginPath="/quicksales-login" preferSeller>
               <QuickSalesDashboard />
             </ProtectedRoute>
-          </DashboardLayout>
+          </BareLayout>
         }
       />
       <Route
@@ -307,11 +307,11 @@ function App() {
       <Route
         path="/dashboard"
         element={
-          <DashboardLayout>
+          <BareLayout>
             <ProtectedRoute allowedRoles={["landlord", "provider"]}>
               <LandlordDashboard />
             </ProtectedRoute>
-          </DashboardLayout>
+          </BareLayout>
         }
       />
 
