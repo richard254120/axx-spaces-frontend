@@ -8,10 +8,10 @@ import "./MobileAppDownload.css";
 const DOWNLOAD_URL =
   "https://expo.dev/artifacts/eas/tfbHKWKT1XUGv5tHV7rAnRi59n5fPcRWqFWZGS-QsU4.apk";
 
-// Manager app download. NOTE: the manager build isn't hosted on its own CDN link
-// yet, so this currently falls back to the same APK. Replace MANAGER_DOWNLOAD_URL
-// with the hosted manager artifact URL once it's built/uploaded.
-const MANAGER_DOWNLOAD_URL = DOWNLOAD_URL;
+// Manager app download (landlord, agent & host portal). Direct EAS build
+// artifact — update this URL after each new manager app build.
+const MANAGER_DOWNLOAD_URL =
+  "https://expo.dev/artifacts/eas/Inly7D4CB5qkVOytznt-hrXqN5ndhKgpGSo0DSpAANc.apk";
 const MANAGER_FILENAME = "Axxspace-manager.apk";
 
 const APP_NAME = "Axxspace";
