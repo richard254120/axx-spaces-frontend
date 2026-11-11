@@ -109,12 +109,14 @@ export function isWorkspaceUser(role) {
 export const ACCOUNT_NAV_BY_ROLE = {
   member: [
     { label: "My Hub", path: "/member" },
+    { label: "Messages", path: "/messages" },
     { label: "Saved Spaces", path: "/saved" },
     { label: "Profile", path: "/profile" },
     { label: "Settings", path: "/settings" },
   ],
   user: [
     { label: "My Hub", path: "/member" },
+    { label: "Messages", path: "/messages" },
     { label: "Saved Spaces", path: "/saved" },
     { label: "Profile", path: "/profile" },
     { label: "Settings", path: "/settings" },
@@ -122,6 +124,7 @@ export const ACCOUNT_NAV_BY_ROLE = {
   landlord: [
     { label: "Dashboard", path: "/dashboard" },
     { label: "Upload", path: "/upload" },
+    { label: "Messages", path: "/messages" },
     { label: "Payments", path: "/payment-history" },
     { label: "Settings", path: "/settings" },
   ],
@@ -129,24 +132,29 @@ export const ACCOUNT_NAV_BY_ROLE = {
     { label: "Dashboard", path: "/agent/dashboard" },
     { label: "Upload House", path: "/upload" },
     { label: "Add Accommodation", path: "/accommodation/register-property" },
+    { label: "Messages", path: "/messages" },
     { label: "Settings", path: "/settings" },
   ],
   host: [
     { label: "Dashboard", path: "/accommodation/dashboard" },
     { label: "Add Listing", path: "/accommodation/register-property" },
+    { label: "Messages", path: "/messages" },
     { label: "Settings", path: "/settings" },
   ],
   seller: [
     { label: "Dashboard", path: "/quicksales-dashboard" },
+    { label: "Messages", path: "/messages" },
     { label: "Settings", path: "/settings" },
   ],
   mover: [
     { label: "Dashboard", path: "/mover-dashboard" },
+    { label: "Messages", path: "/messages" },
     { label: "Settings", path: "/settings" },
   ],
   business: [
     { label: "Dashboard", path: "/business-dashboard" },
     { label: "Add Business", path: "/business/create" },
+    { label: "Messages", path: "/messages" },
     { label: "Settings", path: "/settings" },
   ],
   admin: [

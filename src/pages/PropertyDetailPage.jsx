@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { startConversation } from "../api/conversations";
 import FloatingWhatsApp from "../components/FloatingWhatsApp";
 import { resolveMediaUrl } from "../utils/fileLinks";
 import { optimizeImage, imageSrcSet, IMG_WIDTH, IMAGE_FALLBACK } from "../utils/imageUrl";
@@ -63,6 +64,7 @@ export default function PropertyDetailPage() {
   });
   const [bookingLoading, setBookingLoading] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState("");
+  const [openingChat, setOpeningChat] = useState(false);
 
   // Waitlist state
   const [showWaitlistModal, setShowWaitlistModal] = useState(false);
@@ -92,6 +94,31 @@ export default function PropertyDetailPage() {
     setWaitlistError("");
     setWaitlistSuccess("");
     setShowWaitlistModal(true);
+  };
+
+  const handleMessageOwner = async () => {
+    if (!token) {
+      navigate("/user-login", { state: { from: `/listings/${id}` } });
+      return;
+    }
+    const ownerId = property?.owner?._id || property?.owner;
+    const meId = user?._id || user?.id;
+    if (ownerId && meId && String(ownerId) === String(meId)) {
+      navigate("/messages");
+      return;
+    }
+    setOpeningChat(true);
+    try {
+      const data = await startConversation({
+        contextType: "property",
+        contextId: id,
+      });
+      navigate(`/messages?c=${data.conversation._id}`);
+    } catch (err) {
+      alert(err.message || "Could not open the conversation");
+    } finally {
+      setOpeningChat(false);
+    }
   };
 
   useEffect(() => {
@@ -610,6 +637,36 @@ export default function PropertyDetailPage() {
                     </div>
                   </div>
                 )}
+
+                <button
+                  onClick={handleMessageOwner}
+                  disabled={openingChat}
+                  style={{
+                    width: "100%",
+                    padding: "14px",
+                    background: "#1e3a5f",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "8px",
+                    fontWeight: 700,
+                    fontSize: "14px",
+                    cursor: openingChat ? "wait" : "pointer",
+                    marginBottom: "10px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                  }}
+                >
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                  </svg>
+                  {openingChat
+                    ? "Opening chat..."
+                    : String(property.owner?._id || property.owner) === String(user?._id || user?.id)
+                      ? "View Messages"
+                      : "Message Landlord"}
+                </button>
 
                 {isForSale(property) ? (
                   <>

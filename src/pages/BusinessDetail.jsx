@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
 import { AuthContext } from "../context/AuthContext";
+import { startConversation } from "../api/conversations";
 import { getPricelistUrl } from "../utils/fileLinks";
 import { optimizeImage, IMG_WIDTH } from "../utils/imageUrl";
 
@@ -880,7 +881,7 @@ export default function BusinessDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useContext(AuthContext);
+  const { user, token } = useContext(AuthContext);
 
   const [business, setBusiness] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -889,6 +890,7 @@ export default function BusinessDetail() {
   const [annTitle, setAnnTitle] = useState("");
   const [annContent, setAnnContent] = useState("");
   const [annMsg, setAnnMsg] = useState("");
+  const [openingChat, setOpeningChat] = useState(false);
 
   // Reviews state
   const [reviews, setReviews] = useState([]);
@@ -934,8 +936,32 @@ export default function BusinessDetail() {
     }
   };
 
-  const loadReviews = async () => {
-    setReviewsLoading(true);
+  const handleMessageOwner = async () => {
+    const ownerId = business?.owner?._id || business?.owner;
+    if (!ownerId) return;
+    if (!token) {
+      navigate("/user-login", { state: { from: `/business/${id}` } });
+      return;
+    }
+    if (String(ownerId) === String(user?._id || user?.id)) {
+      navigate("/messages");
+      return;
+    }
+    setOpeningChat(true);
+    try {
+      const data = await startConversation({
+        contextType: "business",
+        contextId: id,
+      });
+      navigate(`/messages?c=${data.conversation._id}`);
+    } catch (err) {
+      alert(err.message || "Could not open the conversation");
+    } finally {
+      setOpeningChat(false);
+    }
+  };
+
+  const loadReviews = async () => {    setReviewsLoading(true);
     try {
       const res = await API.get(`/business-reviews/business/${id}`);
       setReviews(res.data.reviews || []);
@@ -1613,6 +1639,17 @@ export default function BusinessDetail() {
                     <div className="bd-owner-detail">{b.owner.phone}</div>
                   </div>
                 </div>
+                <button
+                  className="bd-btn bd-btn-primary"
+                  style={{ width: "100%", marginTop: 12, justifyContent: "center" }}
+                  onClick={handleMessageOwner}
+                  disabled={openingChat}
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                  </svg>
+                  {openingChat ? "Opening chat..." : "Message owner"}
+                </button>
               </section>
             )}
 

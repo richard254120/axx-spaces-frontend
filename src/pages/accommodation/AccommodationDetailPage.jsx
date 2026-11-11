@@ -15,7 +15,7 @@ import {
 } from "../../features/accommodation";
 import PhoneInput from "../../components/PhoneInput";
 import { useAuth } from "../../context/AuthContext";
-import MessagingSystem from "../../components/MessagingSystem";
+import { startConversation } from "../../api/conversations";
 import AgentCard from "../../components/AgentCard";
 
 // Fix Leaflet default marker icons broken in Vite bundles
@@ -135,6 +135,7 @@ export default function AccommodationDetailPage() {
   });
   const [guestsCount, setGuestsCount] = useState(2);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [openingChat, setOpeningChat] = useState(false);
 
   // M-Pesa payment modal state
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -170,6 +171,33 @@ export default function AccommodationDetailPage() {
       localStorage.setItem("axx_accommodation_favs", JSON.stringify(updated));
     } catch { }
     showToast(nextSaved ? "Saved to your Wishlist" : "Removed from your Wishlist");
+  };
+
+  const handleMessageHost = async () => {
+    const listingId = property?._id || property?.id || id;
+    if (!listingId) return;
+    if (!token) {
+      navigate("/user-login", { state: { from: `/accommodation/${listingId}` } });
+      return;
+    }
+    const ownerId = property?.owner?._id || property?.owner;
+    const meId = user?._id || user?.id;
+    if (ownerId && meId && String(ownerId) === String(meId)) {
+      navigate("/messages");
+      return;
+    }
+    setOpeningChat(true);
+    try {
+      const data = await startConversation({
+        contextType: "accommodation",
+        contextId: listingId,
+      });
+      navigate(`/messages?c=${data.conversation._id}`);
+    } catch (err) {
+      alert(err.message || "Could not open the conversation");
+    } finally {
+      setOpeningChat(false);
+    }
   };
 
   // Share handler
@@ -1058,20 +1086,18 @@ export default function AccommodationDetailPage() {
                   <span>Call Host</span>
                 </a>
 
+                <button
+                  type="button"
+                  onClick={handleMessageHost}
+                  disabled={openingChat}
+                  className="lux-btn-message"
+                >
+                  <span>{openingChat ? "Opening chat..." : "Message Host"}</span>
+                </button>
+
                 <a href={`mailto:${host.email}`} className="lux-btn-email">
                   <span>Email</span>
                 </a>
-              </div>
-
-              {/* In-App Direct Chat Container */}
-              <div className="lux-messaging-box">
-                <MessagingSystem
-                  recipientId={host.email}
-                  recipientName={host.name}
-                  recipientType="Host Representative"
-                  propertyId={property._id || property.id}
-                  propertyTitle={property.name}
-                />
               </div>
 
               {/* Assigned Agent Card if present */}
@@ -2368,6 +2394,28 @@ const luxStyles = `
   .lux-btn-call:hover {
     transform: translateY(-2px);
     background: #1e293b;
+  }
+  .lux-btn-message {
+    background: #1e3a5f;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 800;
+    font-family: inherit;
+    text-align: center;
+    transition: transform 0.15s;
+  }
+  .lux-btn-message:hover {
+    transform: translateY(-2px);
+    background: #16293f;
+  }
+  .lux-btn-message:disabled {
+    opacity: 0.7;
+    cursor: wait;
+    transform: none;
   }
   .lux-btn-email {
     background: #0284c7;

@@ -379,6 +379,7 @@ export default function Navbar() {
                   <div className="ax-menu-list">
                     {isCommunityAccount ? (
                       /* Community accounts: one hub entry point only */
+                      <>
                       <Link to="/member" className="ax-menu-row" onClick={() => setDropdownOpen(false)}>
                         <div className="ax-row-icon icon-purple">
                           <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -391,6 +392,19 @@ export default function Navbar() {
                         </div>
                         <span className="ax-row-arrow">→</span>
                       </Link>
+                      <Link to="/messages" className="ax-menu-row" onClick={() => setDropdownOpen(false)}>
+                        <div className="ax-row-icon icon-rose">
+                          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                          </svg>
+                        </div>
+                        <div className="ax-row-info">
+                          <div className="ax-row-title">Messages</div>
+                          <div className="ax-row-sub">Chat with landlords, hosts &amp; businesses</div>
+                        </div>
+                        <span className="ax-row-arrow">→</span>
+                      </Link>
+                      </>
                     ) : (
                       <>
                     <Link to="/notifications" className="ax-menu-row" onClick={() => setDropdownOpen(false)}>
@@ -404,6 +418,19 @@ export default function Navbar() {
                         <div className="ax-row-sub">Alerts, enquiries &amp; booking updates</div>
                       </div>
                       <span className="ax-dot" />
+                    </Link>
+
+                    <Link to="/messages" className="ax-menu-row" onClick={() => setDropdownOpen(false)}>
+                      <div className="ax-row-icon icon-rose">
+                        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                        </svg>
+                      </div>
+                      <div className="ax-row-info">
+                        <div className="ax-row-title">Messages</div>
+                        <div className="ax-row-sub">Chat with tenants, buyers &amp; guests</div>
+                      </div>
+                      <span className="ax-row-arrow">→</span>
                     </Link>
 
                     <Link to="/saved" className="ax-menu-row" onClick={() => setDropdownOpen(false)}>
@@ -643,6 +670,9 @@ export default function Navbar() {
                           </Link>
                           <Link to="/notifications" className="ax-item" onClick={() => setAccountOpen(false)}>
                             Notifications
+                          </Link>
+                          <Link to="/messages" className="ax-item" onClick={() => setAccountOpen(false)}>
+                            Messages
                           </Link>
                           <Link to="/wallet" className="ax-item" onClick={() => setAccountOpen(false)}>
                             AxxWallet
