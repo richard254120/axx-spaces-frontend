@@ -1,6 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../../context/AuthContext";
+import { startConversation } from "../../../api/conversations";
 
 export default function PropertyCard({ property: p, onOpen }) {
+  const navigate = useNavigate();
+  const { user, token } = useContext(AuthContext);
+
   const BADGE_IMAGES = {
     student_verified: "/Student Verified.png",
     business_verified: "/Business Verified.png",
@@ -33,6 +39,23 @@ export default function PropertyCard({ property: p, onOpen }) {
   const priceVal = Number(p.price ?? p.basePrice ?? 0);
   const categoryText = p.category || (p.type ? p.type.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ") : "Accommodation");
   const cardColor = p.color || "#0ea5e9";
+
+  const handleMessageHost = async (e) => {
+    e.stopPropagation();
+    if (!user || !token || user.role === "guest") {
+      navigate("/user-login", { state: { from: "/accommodation/listings" } });
+      return;
+    }
+    try {
+      const data = await startConversation({
+        contextType: "accommodation",
+        contextId: propId,
+      });
+      navigate(`/messages?c=${data.conversation._id}`);
+    } catch (err) {
+      alert(err.message || "Could not open chat. Please try again.");
+    }
+  };
 
   return (
     <div className="prop-card" onClick={() => onOpen(propId)} style={{ cursor: "pointer" }}>
@@ -263,6 +286,16 @@ export default function PropertyCard({ property: p, onOpen }) {
           onClick={(e) => { e.stopPropagation(); onOpen(propId); }}
         >
           {p.bookingUrl ? "View & Book →" : "View Details →"}
+        </button>
+        <button
+          type="button"
+          style={{ width: "100%", marginTop: "8px", background: "#1e3a5f", border: "none", color: "white", padding: "10px", borderRadius: "8px", fontWeight: 700, fontSize: "13px", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
+          onClick={handleMessageHost}
+        >
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+          </svg>
+          <span>Message Host</span>
         </button>
       </div>
     </div>

@@ -126,12 +126,12 @@ export default function MessagesPage() {
   }, [loadInbox, setSearchParams]);
 
   useEffect(() => {
-    if (!token) {
+    if (!token || user?.role === "guest") {
       navigate("/user-login", { state: { from: "/messages" } });
       return;
     }
     loadInbox();
-  }, [token, navigate, loadInbox]);
+  }, [token, user, navigate, loadInbox]);
 
   // Open a thread linked from a listing page (?c=<conversationId>).
   useEffect(() => {

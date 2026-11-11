@@ -176,7 +176,7 @@ export default function AccommodationDetailPage() {
   const handleMessageHost = async () => {
     const listingId = property?._id || property?.id || id;
     if (!listingId) return;
-    if (!token) {
+    if (!token || user?.role === "guest") {
       navigate("/user-login", { state: { from: `/accommodation/${listingId}` } });
       return;
     }

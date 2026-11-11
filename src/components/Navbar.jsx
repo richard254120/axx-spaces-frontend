@@ -5,6 +5,7 @@ import { ProfileAvatar } from "../features/profile";
 import AccountTypeSelector from "./AccountTypeSelector";
 import NotificationBell from "./NotificationSystem";
 import { getDashboardPath, getAccountNav, getWorkspaceBrand, isWorkspaceUser } from "../utils/dashboardRoutes";
+import { getConversationSummary } from "../api/conversations";
 import logo from "../assets/image.png";
 import RequestItemModal from "./RequestItemModal";
 
@@ -68,6 +69,7 @@ export default function Navbar() {
   const [accountSelectorOpen, setAccountSelectorOpen] = useState(false);
   const [accountSelectorMode, setAccountSelectorMode] = useState("login");
   const [jobDropdownOpen, setJobDropdownOpen] = useState(null);
+  const [chatUnread, setChatUnread] = useState(0);
 
   const dropdownRef = useRef(null);
   const accountRef = useRef(null);
@@ -77,6 +79,28 @@ export default function Navbar() {
   // Members/explorers manage their account inside the member hub; sign-out lives in Account Settings
   const isCommunityAccount = ["member", "user"].includes((user?.role || "").toLowerCase());
   const getDashboardLink = () => getDashboardPath(user?.role);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setChatUnread(0);
+      return undefined;
+    }
+    let active = true;
+    const loadSummary = async () => {
+      try {
+        const data = await getConversationSummary();
+        if (active) setChatUnread(data?.totalUnread || 0);
+      } catch {
+        // Badge is nice-to-have; a failed poll must not break the navbar.
+      }
+    };
+    loadSummary();
+    const timer = setInterval(loadSummary, 60000);
+    return () => {
+      active = false;
+      clearInterval(timer);
+    };
+  }, [isLoggedIn, token]);
 
   const isActive = (path) => {
     if (path === "/") return location.pathname === "/";
@@ -621,6 +645,21 @@ export default function Navbar() {
           {renderBrand("/", "AxxSpace", "AxxSpace")}
 
           <div className="ax-top-right">
+            {isLoggedIn && (
+              <Link
+                to="/messages"
+                className="ax-icon-btn ax-msg-link"
+                aria-label={chatUnread > 0 ? `Messages, ${chatUnread} unread` : "Messages"}
+                title="Messages"
+              >
+                <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                </svg>
+                {chatUnread > 0 && (
+                  <span className="ax-msg-badge">{chatUnread > 99 ? "99+" : chatUnread}</span>
+                )}
+              </Link>
+            )}
             {isLoggedIn ? (
               <div className="ax-account" ref={accountRef}>
                 <button
@@ -649,11 +688,16 @@ export default function Navbar() {
                       </div>
                       <div className="ax-divider" />
                       {isCommunityAccount ? (
-                        /* Community accounts get a single entry point — everything
-                           else lives inside the hub's own tabs. */
-                        <Link to="/member" className="ax-item" style={{ color: "#fbbf24", fontWeight: 700 }} onClick={() => setAccountOpen(false)}>
-                          My Hub &amp; Activities
-                        </Link>
+                        /* Community accounts get a single entry point plus messages;
+                           everything else lives inside the hub's own tabs. */
+                        <>
+                          <Link to="/member" className="ax-item" style={{ color: "#fbbf24", fontWeight: 700 }} onClick={() => setAccountOpen(false)}>
+                            My Hub &amp; Activities
+                          </Link>
+                          <Link to="/messages" className="ax-item" onClick={() => setAccountOpen(false)}>
+                            Messages{chatUnread > 0 ? ` (${chatUnread})` : ""}
+                          </Link>
+                        </>
                       ) : (
                         <>
                           <Link to="/profile" className="ax-item" onClick={() => setAccountOpen(false)}>
@@ -836,6 +880,25 @@ const css = `
     transition: background .2s, border-color .2s;
   }
   .ax-nav .ax-icon-btn:hover { background: var(--mist); border-color: var(--gold); }
+  .ax-nav .ax-msg-link { position: relative; text-decoration: none; }
+  .ax-nav .ax-msg-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: #e11d48;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
 
   .ax-nav .ax-hamburger-btn {
     display: inline-flex;

@@ -97,7 +97,7 @@ export default function PropertyDetailPage() {
   };
 
   const handleMessageOwner = async () => {
-    if (!token) {
+    if (!token || user?.role === "guest") {
       navigate("/user-login", { state: { from: `/listings/${id}` } });
       return;
     }

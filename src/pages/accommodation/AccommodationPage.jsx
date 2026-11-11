@@ -1,6 +1,7 @@
 import { useContext, useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import { startConversation } from "../../api/conversations";
 import {
   useAccommodationHome,
   ADVERTISING_PACKAGES,
@@ -82,7 +83,7 @@ const FAQS = [
 
 export default function AccommodationPage() {
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  const { user, token } = useContext(AuthContext);
   const isHostUser = Boolean(user && (user.role === "host" || user.role === "agent" || user.role === "admin"));
   const { featured: backendFeatured } = useAccommodationHome();
 
@@ -312,6 +313,23 @@ export default function AccommodationPage() {
       `Hi! I saw ${prop.name} on AXXSpace Accommodation. I would like to inquire about booking availability and rates.`
     );
     window.open(`https://wa.me/${cleanPhone}?text=${text}`, "_blank");
+  };
+
+  const handleMessageHost = async (e, prop) => {
+    e.stopPropagation();
+    if (!user || !token || user.role === "guest") {
+      navigate("/user-login", { state: { from: "/accommodation" } });
+      return;
+    }
+    try {
+      const data = await startConversation({
+        contextType: "accommodation",
+        contextId: prop._id || prop.id,
+      });
+      navigate(`/messages?c=${data.conversation._id}`);
+    } catch (err) {
+      alert(err.message || "Could not open chat. Please try again.");
+    }
   };
 
   // Format guests label
@@ -1230,6 +1248,17 @@ export default function AccommodationPage() {
                         <span>WhatsApp</span>
                       </button>
                     </div>
+
+                    <button
+                      type="button"
+                      className="btn-card-message"
+                      onClick={(e) => handleMessageHost(e, prop)}
+                    >
+                      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                      </svg>
+                      <span>Message Host</span>
+                    </button>
                   </div>
                 </article>
               );
@@ -3152,6 +3181,28 @@ const css = `
     grid-template-columns: 1fr auto;
     gap: 8px;
     margin-top: auto;
+  }
+  .btn-card-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    margin-top: 8px;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    background: #1E3A5F;
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-card-message:hover {
+    background: #16293F;
+    transform: translateY(-1px);
   }
   .btn-card-details {
     display: inline-flex;

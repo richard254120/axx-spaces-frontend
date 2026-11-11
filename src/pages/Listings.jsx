@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo, useCallback, lazy, Suspense } from "react";
 import { createPortal } from "react-dom";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 import RequestItemModal from "../components/RequestItemModal";
 import ShareProperty from "../components/ShareProperty";
 import { useAuth } from "../context/AuthContext";
+import { startConversation } from "../api/conversations";
 import PhoneInput from "../components/PhoneInput";
 import { kenyanUniversities, searchUniversities } from "../data/kenyanUniversities";
 import { optimizeImage, imageSrcSet, IMG_WIDTH, IMAGE_FALLBACK } from "../utils/imageUrl";
@@ -400,6 +401,7 @@ function PropertyCardMedia({ property, favorites, toggleFavorite }) {
 
 export default function Listings() {
   const { user, token } = useAuth();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   // Modals & Popups
@@ -863,6 +865,26 @@ export default function Listings() {
       ? `Hi ${landlordName}, I saw your property for sale "${property.title}" in ${property.county || ""} ${property.location || ""} listed at KES ${property.price?.toLocaleString()}. I would like to arrange a viewing.`
       : `Hi ${landlordName}, I'm interested in your property "${property.title}" located in ${property.county || ""} ${property.location || ""}. Is it currently available for viewing?`;
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
+  };
+
+  const handleMessageOwner = async (property, e) => {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    if (!user || !token || user.role === "guest") {
+      navigate("/user-login", { state: { from: "/listings" } });
+      return;
+    }
+    try {
+      const data = await startConversation({
+        contextType: "property",
+        contextId: property._id || property.id,
+      });
+      navigate(`/messages?c=${data.conversation._id}`);
+    } catch (err) {
+      alert(err.message || "Could not open chat. Please try again.");
+    }
   };
 
   const handleBookNow = (property) => {
@@ -1984,6 +2006,19 @@ Please contact me back with viewing details. Thank you!`;
                     </div>
 
                     <div className="card-cta-group" onClick={(e) => e.stopPropagation()}>
+                      {/* In-platform chat with the landlord/agent */}
+                      <button
+                        type="button"
+                        className="quick-message-cta"
+                        onClick={(e) => handleMessageOwner(property, e)}
+                        title="Message the landlord"
+                      >
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                        </svg>
+                        <span>Message Landlord</span>
+                      </button>
+
                       {/* WhatsApp Direct Connect */}
                       <button
                         type="button"
@@ -2345,6 +2380,20 @@ Please contact me back with viewing details. Thank you!`;
                   </div>
 
                   {/* Direct Contact Buttons */}
+                  <button
+                    type="button"
+                    className="modal-message-cta"
+                    onClick={(e) => handleMessageOwner(selectedProperty, e)}
+                  >
+                    <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                    </svg>
+                    <span>
+                      {String(selectedProperty.owner?._id || selectedProperty.owner) === String(user?._id || user?.id)
+                        ? "View Messages"
+                        : "Message Landlord"}
+                    </span>
+                  </button>
                   <div className="modal-cta-buttons-grid">
                     <button
                       type="button"
@@ -3773,7 +3822,35 @@ const css = `
   .card-cta-group {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
     gap: 8px;
+  }
+  .quick-message-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 36px;
+    padding: 0 12px;
+    border-radius: 10px;
+    background: #1e3a5f;
+    color: #FFFFFF;
+    border: none;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(30, 58, 95, 0.25);
+    transition: all 0.2s ease;
+  }
+  .quick-message-cta:hover {
+    background: #16293f;
+    transform: translateY(-1px);
+  }
+  .quick-message-cta:disabled {
+    opacity: 0.6;
+    cursor: wait;
   }
   .quick-whatsapp-cta {
     width: 36px;
@@ -4598,6 +4675,28 @@ const css = `
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
+  }
+  .modal-message-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 13px 14px;
+    border-radius: var(--radius-md);
+    border: none;
+    background: #1E3A5F;
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .modal-message-cta:hover {
+    background: #16293F;
+    transform: translateY(-1px);
   }
   @media (max-width: 640px) {
     .modal-cta-buttons-grid {

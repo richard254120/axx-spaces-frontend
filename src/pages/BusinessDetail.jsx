@@ -939,7 +939,7 @@ export default function BusinessDetail() {
   const handleMessageOwner = async () => {
     const ownerId = business?.owner?._id || business?.owner;
     if (!ownerId) return;
-    if (!token) {
+    if (!token || user?.role === "guest") {
       navigate("/user-login", { state: { from: `/business/${id}` } });
       return;
     }

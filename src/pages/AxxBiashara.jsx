@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
+import { startConversation } from "../api/conversations";
 import { AuthContext } from "../context/AuthContext";
 import { optimizeImage, imageSrcSet, IMG_WIDTH } from "../utils/imageUrl";
 
@@ -442,6 +443,23 @@ export default function AxxBiashara() {
   };
 
   const isFavorite = (id) => favorites.some((f) => f.business?._id === id || f.business === id);
+
+  const handleMessageBusiness = async (e, biz) => {
+    e.stopPropagation();
+    if (!token || !user || user.role === "guest") {
+      navigate("/user-login", { state: { from: "/axxbiashara" } });
+      return;
+    }
+    try {
+      const data = await startConversation({
+        contextType: "business",
+        contextId: biz._id,
+      });
+      navigate(`/messages?c=${data.conversation._id}`);
+    } catch (err) {
+      alert(err.message || "Could not open chat. Please try again.");
+    }
+  };
 
   /* ── comparison ── */
   const toggleComparison = (businessId, e) => {
@@ -906,6 +924,17 @@ export default function AxxBiashara() {
                       </span>
 
                       <div className="card-footer-buttons">
+                        <button
+                          type="button"
+                          className="card-quick-msg-btn"
+                          title={`Message ${biz.name}`}
+                          onClick={(e) => handleMessageBusiness(e, biz)}
+                        >
+                          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                          </svg>
+                          <span>Message Owner</span>
+                        </button>
                         {(biz.socialMedia?.whatsapp || biz.contact?.phone) && (
                           <a
                             href={`https://wa.me/${(biz.socialMedia?.whatsapp || biz.contact?.phone).replace(/[^0-9]/g, "")}`}
@@ -1990,6 +2019,27 @@ const css = `
     display: flex;
     align-items: center;
     gap: 8px;
+  }
+
+  .card-quick-msg-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 8px;
+    background: #1e3a5f;
+    color: #ffffff;
+    border: 1px solid #1e3a5f;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .card-quick-msg-btn:hover {
+    background: #16293f;
+    transform: scale(1.04);
   }
 
   .card-quick-wa-btn {
