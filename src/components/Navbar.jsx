@@ -11,6 +11,7 @@ import RequestItemModal from "./RequestItemModal";
 
 const TAB_LINKS = [
   { to: "/", label: "Home" },
+  { to: "/axxgo", label: "AxxGo" },
   { to: "/axxbiashara", label: "AxxBiashara" },
   { to: "/quicksales", label: "QuickSales" },
   { to: "/listings", label: "Rentals" },
@@ -20,6 +21,7 @@ const TAB_LINKS = [
 
 const MENU_PRIMARY = [
   { to: "/", label: "Home" },
+  { to: "/axxgo", label: "AxxGo" },
   { to: "/axxbiashara", label: "AxxBiashara" },
   { to: "/quicksales", label: "QuickSales" },
   { to: "/listings", label: "Rentals" },

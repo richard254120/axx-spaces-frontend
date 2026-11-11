@@ -73,6 +73,13 @@ const BusinessLogin = lazy(() => import("./pages/BusinessLogin"));
 const BusinessRegister = lazy(() => import("./pages/BusinessRegister"));
 const MobileAppDownload = lazy(() => import("./pages/MobileAppDownload"));
 
+// ─── AxxGo Classifieds Pages ────────────────────────────────────────────────
+const AxxGoHome = lazy(() => import("./pages/axxgo/AxxGoHome"));
+const AxxGoPost = lazy(() => import("./pages/axxgo/AxxGoPost"));
+const AxxGoDetail = lazy(() => import("./pages/axxgo/AxxGoDetail"));
+const AxxGoManage = lazy(() => import("./pages/axxgo/AxxGoManage"));
+const AxxGoAdmin = lazy(() => import("./pages/axxgo/AxxGoAdmin"));
+
 // ─── Layouts ────────────────────────────────────────────────────────────────
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -168,6 +175,20 @@ function App() {
       <Route path="/materials/:id" element={<LegacyRedirect to="/quicksales" />} />
       <Route path="/quicksales" element={<PublicLayout><QuickSales /></PublicLayout>} />
       <Route path="/quicksales/:id" element={<PublicLayout><QuickSaleDetailPage /></PublicLayout>} />
+
+      {/* ── AXXGO CLASSIFIEDS ROUTES ── */}
+      <Route path="/axxgo" element={<PublicLayout><AxxGoHome /></PublicLayout>} />
+      <Route path="/axxgo/post" element={<PublicLayout><AxxGoPost /></PublicLayout>} />
+      <Route path="/axxgo/listing/:id" element={<PublicLayout><AxxGoDetail /></PublicLayout>} />
+      <Route path="/axxgo/manage/:token" element={<PublicLayout><AxxGoManage /></PublicLayout>} />
+      <Route
+        path="/axxgo/admin"
+        element={
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <PublicLayout><AxxGoAdmin /></PublicLayout>
+          </ProtectedRoute>
+        }
+      />
       <Route path="/faq" element={<PublicLayout><FAQ /></PublicLayout>} />
       <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
       <Route path="/mobile-app" element={<PublicLayout><MobileAppDownload /></PublicLayout>} />
