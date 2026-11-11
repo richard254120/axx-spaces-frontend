@@ -9,9 +9,10 @@ const DOWNLOAD_URL =
   "https://expo.dev/artifacts/eas/tfbHKWKT1XUGv5tHV7rAnRi59n5fPcRWqFWZGS-QsU4.apk";
 
 // Manager app download (landlord, agent & host portal). Direct EAS build
-// artifact — update this URL after each new manager app build.
+// artifact — update this URL and public/downloads/manager-version.json after
+// each new manager app build.
 const MANAGER_DOWNLOAD_URL =
-  "https://expo.dev/artifacts/eas/Inly7D4CB5qkVOytznt-hrXqN5ndhKgpGSo0DSpAANc.apk";
+  "https://expo.dev/artifacts/eas/a_THpQv2IFawGgKmawaCtfiNVawX-vTssZhIGd6HTxU.apk";
 const MANAGER_FILENAME = "Axxspace-manager.apk";
 
 const APP_NAME = "Axxspace";
