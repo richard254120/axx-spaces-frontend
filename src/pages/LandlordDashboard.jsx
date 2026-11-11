@@ -10,6 +10,7 @@ import QRGeneratorModal from "../components/QRGeneratorModal";
 import QRStatsModal from "../components/QRStatsModal";
 import DashboardShell from "../components/dashboard/DashboardShell";
 import PageHeader from "../components/dashboard/PageHeader";
+import useChatUnread from "../hooks/useChatUnread";
 import StatGrid from "../components/dashboard/StatGrid";
 
 import { getDashboardPath, normalizeRole } from "../utils/dashboardRoutes";
@@ -113,6 +114,7 @@ const WaitlistIcon = () => (
 export default function LandlordDashboard() {
   const { token, user, logout, login } = useContext(AuthContext);
   const navigate = useNavigate();
+  const chatUnread = useChatUnread();
 
   const [properties, setProperties] = useState([]);
   const [boostModalOpen, setBoostModalOpen] = useState(false);
@@ -382,35 +384,6 @@ export default function LandlordDashboard() {
       </div>
     );
   }
-
-  // Sidebar item helper click
-  const handleSidebarClick = (item) => {
-    setMobileMenuOpen(false);
-    if (item.id === "add-property") {
-      navigate("/upload");
-    } else if (item.id === "my-plans") {
-      setPlansModalOpen(true);
-    } else if (item.id === "logout") {
-      logout();
-    } else {
-      setActiveSidebarTab(item.id);
-    }
-  };
-
-  const SIDEBAR_ITEMS = [
-    { id: "dashboard", label: "Dashboard", icon: DashboardIcon },
-    { id: "my-properties", label: "My Properties", icon: MyPropertiesIcon },
-    { id: "add-property", label: "Add Property", icon: AddPropertyIcon },
-    { id: "waitlist", label: "Waitlist", icon: WaitlistIcon },
-    { id: "enquiries", label: "Enquiries", icon: EnquiriesIcon },
-    { id: "bookings", label: "Bookings", icon: BookingsIcon },
-    { id: "promote-property", label: "Promote Property", icon: PromoteIcon },
-    { id: "my-plans", label: "My Plans 🎫", icon: PromoteIcon },
-    { id: "messages", label: "Messages", icon: MessagesIcon },
-    { id: "profile", label: "Profile", icon: ProfileIcon },
-    { id: "settings", label: "Settings", icon: SettingsIcon },
-    { id: "logout", label: "Logout", icon: LogoutIcon }
-  ];
 
   // ── Fetch all waitlist entries for this landlord
   const fetchWaitlist = async () => {
@@ -695,7 +668,7 @@ export default function LandlordDashboard() {
         { id: "bookings", label: "Bookings", icon: <BookingsIcon /> },
         { id: "promote-property", label: "Promote Property", icon: <PromoteIcon /> },
         { id: "my-plans", label: "My Plans", icon: <PromoteIcon />, onClick: () => setPlansModalOpen(true) },
-        { id: "messages", label: "Messages", icon: <MessagesIcon /> },
+        { path: "/messages", label: "Messages", icon: <MessagesIcon />, badge: chatUnread > 0 ? (chatUnread > 99 ? "99+" : chatUnread) : undefined },
         { id: "profile", label: "Profile", icon: <ProfileIcon /> },
         { id: "settings", label: "Settings", icon: <SettingsIcon /> },
       ]}
@@ -1397,82 +1370,6 @@ export default function LandlordDashboard() {
         {/* ── SCREEN 5: PROMOTE SUITE (MATCHING MOCKUP IMAGE) ── */}
         {activeSidebarTab === "promote-property" && (
           <PromotePropertyTab propertiesList={properties} />
-        )}
-
-        {/* ── SCREEN 6: MESSAGES BOX ── */}
-        {activeSidebarTab === "messages" && (
-          <div style={styles.tabContentSection}>
-            <div>
-              <h2 style={styles.contentTitle}>Messages</h2>
-              <p style={styles.contentSubtitle}>Communicate with prospective tenants and assigned agents.</p>
-            </div>
-
-            {/* Premium Chat Layout Mockup */}
-            <div style={styles.chatWrapper}>
-              <div style={styles.chatSidebar}>
-                <div style={styles.chatSearch}>
-                  <input type="text" placeholder="Search chats..." style={styles.chatSearchInput} />
-                </div>
-                <div style={styles.chatContactList}>
-                  <div style={{ ...styles.chatContact, ...styles.chatContactActive }}>
-                    <div style={styles.contactAvatar}>DK</div>
-                    <div style={styles.contactInfo}>
-                      <div style={styles.contactHeader}>
-                        <span style={styles.contactName}>David Kiprop</span>
-                        <span style={styles.contactTime}>12:30 PM</span>
-                      </div>
-                      <p style={styles.contactPreview}>Is the 2-bedroom Kileleshwa still vacant?</p>
-                    </div>
-                  </div>
-                  <div style={styles.chatContact}>
-                    <div style={styles.contactAvatar}>AM</div>
-                    <div style={styles.contactInfo}>
-                      <div style={styles.contactHeader}>
-                        <span style={styles.contactName}>Alice Mutua</span>
-                        <span style={styles.contactTime}>Yesterday</span>
-                      </div>
-                      <p style={styles.contactPreview}>I will send the deposit in 1 hour.</p>
-                    </div>
-                  </div>
-                  <div style={styles.chatContact}>
-                    <div style={styles.contactAvatar}>KA</div>
-                    <div style={styles.contactInfo}>
-                      <div style={styles.contactHeader}>
-                        <span style={styles.contactName}>Kevin Agent</span>
-                        <span style={styles.contactTime}>Aug 17</span>
-                      </div>
-                      <p style={styles.contactPreview}>Assigned property keys received.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div style={styles.chatArea}>
-                <div style={styles.chatHeader}>
-                  <div style={styles.chatHeaderName}>David Kiprop</div>
-                  <div style={styles.chatHeaderStatus}>Active QR lead (Gate Poster)</div>
-                </div>
-                <div style={styles.chatMessages}>
-                  <div style={styles.messageReceived}>
-                    <div style={styles.messageText}>
-                      Hello, I scanned the poster outside. Is the Kileleshwa 2 bedroom apartment available for viewings?
-                    </div>
-                    <span style={styles.messageTime}>12:28 PM</span>
-                  </div>
-                  <div style={styles.messageSent}>
-                    <div style={styles.messageText}>
-                      Yes, David! It is available. You can view today at 4:00 PM. Our assigned agent Kevin will be there.
-                    </div>
-                    <span style={styles.messageTime}>12:30 PM</span>
-                  </div>
-                </div>
-                <div style={styles.chatInputRow}>
-                  <input type="text" placeholder="Type a message..." style={styles.chatInput} />
-                  <button style={styles.chatSendBtn}>Send</button>
-                </div>
-              </div>
-            </div>
-          </div>
         )}
 
         {/* ── SCREEN 7: PROFILE SCREEN ── */}
@@ -2210,171 +2107,6 @@ const styles = {
     color: "#94a3b8",
     margin: "4px 0 0 0",
   },
-  // Chat Room layouts
-  chatWrapper: {
-    display: "grid",
-    gridTemplateColumns: "300px 1fr",
-    backgroundColor: "#111A2E",
-    border: "1px solid rgba(255, 255, 255, 0.05)",
-    borderRadius: "16px",
-    height: "550px",
-    overflow: "hidden",
-  },
-  chatSidebar: {
-    borderRight: "1px solid rgba(255,255,255,0.05)",
-    display: "flex",
-    flexDirection: "column",
-  },
-  chatSearch: {
-    padding: "16px",
-    borderBottom: "1px solid rgba(255,255,255,0.05)",
-  },
-  chatSearchInput: {
-    width: "100%",
-    padding: "10px 12px",
-    backgroundColor: "#070F1E",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: "8px",
-    color: "#ffffff",
-    fontSize: "13px",
-    outline: "none",
-  },
-  chatContactList: {
-    flex: 1,
-    overflowY: "auto",
-  },
-  chatContact: {
-    display: "flex",
-    gap: "10px",
-    padding: "14px 16px",
-    borderBottom: "1px solid rgba(255,255,255,0.03)",
-    cursor: "pointer",
-    transition: "background 0.2s",
-  },
-  chatContactActive: {
-    backgroundColor: "rgba(217, 56, 58, 0.08)",
-  },
-  contactAvatar: {
-    width: "36px",
-    height: "36px",
-    borderRadius: "50%",
-    backgroundColor: "#334155",
-    color: "#ffffff",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontWeight: "750",
-    fontSize: "12px",
-  },
-  contactInfo: {
-    flex: 1,
-    minWidth: 0,
-  },
-  contactHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "4px",
-  },
-  contactName: {
-    fontSize: "13px",
-    fontWeight: "750",
-    color: "#ffffff",
-  },
-  contactTime: {
-    fontSize: "10px",
-    color: "#64748b",
-  },
-  contactPreview: {
-    fontSize: "11px",
-    color: "#94a3b8",
-    margin: 0,
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-  },
-  chatArea: {
-    display: "flex",
-    flexDirection: "column",
-    backgroundColor: "#08101E",
-  },
-  chatHeader: {
-    padding: "16px 20px",
-    backgroundColor: "#111A2E",
-    borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
-  },
-  chatHeaderName: {
-    fontSize: "15px",
-    fontWeight: "800",
-  },
-  chatHeaderStatus: {
-    fontSize: "11px",
-    color: "#fbbf24",
-    marginTop: "2px",
-    fontWeight: "600",
-  },
-  chatMessages: {
-    flex: 1,
-    padding: "20px",
-    overflowY: "auto",
-    display: "flex",
-    flexDirection: "column",
-    gap: "16px",
-  },
-  messageReceived: {
-    alignSelf: "flex-start",
-    maxWidth: "70%",
-    display: "flex",
-    flexDirection: "column",
-    gap: "4px",
-  },
-  messageSent: {
-    alignSelf: "flex-end",
-    maxWidth: "70%",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-end",
-    gap: "4px",
-  },
-  messageText: {
-    padding: "12px 16px",
-    borderRadius: "14px",
-    backgroundColor: "#111A2E",
-    color: "#f1f5f9",
-    fontSize: "13px",
-    lineHeight: "1.4",
-  },
-  messageTime: {
-    fontSize: "10px",
-    color: "#64748b",
-  },
-  chatInputRow: {
-    padding: "16px 20px",
-    backgroundColor: "#111A2E",
-    borderTop: "1px solid rgba(255, 255, 255, 0.05)",
-    display: "flex",
-    gap: "12px",
-  },
-  chatInput: {
-    flex: 1,
-    padding: "12px 16px",
-    backgroundColor: "#070F1E",
-    border: "1px solid rgba(255, 255, 255, 0.08)",
-    borderRadius: "10px",
-    color: "#ffffff",
-    fontSize: "13px",
-    outline: "none",
-  },
-  chatSendBtn: {
-    padding: "0 20px",
-    backgroundColor: "#d9383a",
-    color: "#ffffff",
-    border: "none",
-    borderRadius: "10px",
-    fontWeight: "750",
-    fontSize: "13px",
-    cursor: "pointer",
-  },
   // Settings Screen
   settingsGrid: {
     display: "grid",
@@ -2443,15 +2175,6 @@ const cssStyles = `
     }
     div[style*="promoteSplit"] {
       grid-template-columns: 1fr !important;
-    }
-    div[style*="chatWrapper"] {
-      grid-template-columns: 1fr !important;
-      height: auto !important;
-    }
-    div[style*="chatSidebar"] {
-      border-right: none !important;
-      border-bottom: 1px solid rgba(255,255,255,0.05) !important;
-      max-height: 200px;
     }
   }
 

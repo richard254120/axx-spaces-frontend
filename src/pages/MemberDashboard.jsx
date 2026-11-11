@@ -2,6 +2,7 @@ import { useState, useEffect, useContext, useCallback, useMemo } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { ProfileAvatar } from "../features/profile";
+import useChatUnread from "../hooks/useChatUnread";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -835,6 +836,7 @@ function formatTimeAgo(dateInput) {
 export default function MemberDashboard() {
   const { user, token, updateUser } = useContext(AuthContext);
   const navigate = useNavigate();
+  const chatUnread = useChatUnread();
   const [searchParams, setSearchParams] = useSearchParams();
   const tabFromUrl = searchParams.get("tab");
 
@@ -1171,6 +1173,10 @@ export default function MemberDashboard() {
           </div>
 
           <div style={styles.headerActions}>
+            <Link to="/messages" style={{ ...styles.exploreBtn, display: "inline-flex", alignItems: "center", gap: "6px" }}>
+              <IconMessageSquare size={14} />
+              <span>Messages{chatUnread > 0 ? ` (${chatUnread})` : ""}</span>
+            </Link>
             <Link to="/settings" style={styles.settingsLink} title="Profile, security and sign out">
               <IconUser size={14} />
               <span>Account Settings</span>

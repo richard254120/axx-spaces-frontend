@@ -5,6 +5,7 @@ import { resolveMediaUrl } from "../utils/fileLinks";
 import QRGeneratorModal from "../components/QRGeneratorModal";
 import AgentQRPosterModal from "../components/AgentQRPosterModal";
 import BoostListingModal from "../components/monetization/BoostListingModal";
+import useChatUnread from "../hooks/useChatUnread";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://axx-spaces-backend-1.onrender.com/api";
 
@@ -531,6 +532,7 @@ const s = {
 export default function AgentDashboard() {
   const navigate = useNavigate();
   const { user, token, logout, updateUser } = useContext(AuthContext);
+  const chatUnread = useChatUnread();
   const [activeTab, setActiveTab] = useState("houses");
   const [myHouses, setMyHouses] = useState([]);
   const [myAccommodations, setMyAccommodations] = useState([]);
@@ -1251,6 +1253,22 @@ export default function AgentDashboard() {
             title="Generate My Agent QR Poster"
           >
             {isMobile ? 'QR' : 'My QR Poster'}
+          </button>
+          <button
+            className="ag-hdr-btn"
+            style={{
+              ...s.uploadBtn,
+              background: 'linear-gradient(135deg,#fbbf24,#f59e0b)',
+              color: '#0f172a',
+              border: 'none',
+              padding: isMobile ? '10px 12px' : '8px 16px',
+              fontSize: isMobile ? '12px' : '13px',
+              minHeight: '44px',
+            }}
+            onClick={() => navigate('/messages')}
+            title="Chat with tenants, buyers and owners"
+          >
+            Messages{chatUnread > 0 ? ` (${chatUnread})` : ''}
           </button>
           <button className="ag-logout" style={{ ...s.logoutBtn, minHeight: '44px', padding: isMobile ? '10px 14px' : '8px 16px' }} onClick={handleLogout}>
             Logout

@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/api";
+import useChatUnread from "../hooks/useChatUnread";
 
 const s = {
   root: {
@@ -174,6 +175,7 @@ const s = {
 export default function AgencyDashboard() {
   const navigate = useNavigate();
   const { token, user } = useContext(AuthContext);
+  const chatUnread = useChatUnread();
 
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -287,12 +289,20 @@ export default function AgencyDashboard() {
             <h1 style={s.title}>Agency Dashboard</h1>
             <p style={s.subtitle}>Manage your agency's agents and track their performance</p>
           </div>
-          <button
-            onClick={() => setShowInviteModal(true)}
-            style={{ ...s.button, ...s.primaryButton }}
-          >
-            + Add Agent
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <button
+              onClick={() => navigate("/messages")}
+              style={{ ...s.button, background: "#1e3a5f", color: "white" }}
+            >
+              Messages{chatUnread > 0 ? ` (${chatUnread})` : ""}
+            </button>
+            <button
+              onClick={() => setShowInviteModal(true)}
+              style={{ ...s.button, ...s.primaryButton }}
+            >
+              + Add Agent
+            </button>
+          </div>
         </div>
 
         {error && <div style={s.error}>{error}</div>}

@@ -9,6 +9,7 @@ import PageHeader from "../components/dashboard/PageHeader";
 import StatGrid from "../components/dashboard/StatGrid";
 import SectionCard from "../components/dashboard/SectionCard";
 import DashIcon from "../components/dashboard/DashIcon";
+import useChatUnread from "../hooks/useChatUnread";
 
 import { getDashboardPath } from "../utils/dashboardRoutes";
 
@@ -56,6 +57,7 @@ const resolveStatus = (item) => {
 export default function UserDashboard() {
   const { user, token, logout, login } = useContext(AuthContext);
   const navigate = useNavigate();
+  const chatUnread = useChatUnread();
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -156,6 +158,7 @@ export default function UserDashboard() {
       nav={[
         { id: "overview", label: "Overview", icon: <DashIcon d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" /> },
         { id: "businesses", label: "Directory Listings", icon: <DashIcon d="M3 7h18v14H3zM3 7l9-4 9 4M9 11h6" /> },
+        { path: "/messages", label: "Messages", badge: chatUnread > 0 ? (chatUnread > 99 ? "99+" : chatUnread) : undefined, icon: <DashIcon d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /> },
         { id: "profile", label: "Profile & KYC", icon: <DashIcon d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" /> },
       ]}
     >
