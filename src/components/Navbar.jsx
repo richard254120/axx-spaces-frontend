@@ -734,14 +734,10 @@ export default function Navbar() {
                           </Link>
                         </>
                       )}
-                      {!isCommunityAccount && (
-                        <>
-                          <div className="ax-divider" />
-                          <button type="button" className="ax-item ax-item-danger" onClick={handleLogout}>
-                            Logout
-                          </button>
-                        </>
-                      )}
+                      <div className="ax-divider" />
+                      <button type="button" className="ax-item ax-item-danger" onClick={handleLogout}>
+                        Log out
+                      </button>
                     </div>
                   </>
                 )}
