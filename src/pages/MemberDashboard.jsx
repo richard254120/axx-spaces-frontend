@@ -923,6 +923,27 @@ export default function MemberDashboard() {
     }
   }, [token]);
 
+  // ── AxxJunks listings posted by this account ──
+  const [myJunksListings, setMyJunksListings] = useState([]);
+  const [junksLoading, setJunksLoading] = useState(true);
+
+  const loadMyJunksListings = useCallback(async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_BASE}/axxjunks/my-listings`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setMyJunksListings(Array.isArray(data.listings) ? data.listings : []);
+      }
+    } catch (err) {
+      console.error("Load AxxJunks listings error:", err);
+    } finally {
+      setJunksLoading(false);
+    }
+  }, [token]);
+
   // ── QuickSales listings owned by this account ──
   const [myListings, setMyListings] = useState([]);
   const [listingsLoading, setListingsLoading] = useState(true);
@@ -954,16 +975,19 @@ export default function MemberDashboard() {
     }
     loadActivities();
     loadMyListings();
+    loadMyJunksListings();
 
     // Auto-refresh activities + listing view counters every 20 seconds
     const timer = setInterval(() => {
       loadActivities();
       loadMyListings();
+      loadMyJunksListings();
     }, 20000);
 
     const onFocus = () => {
       loadActivities();
       loadMyListings();
+      loadMyJunksListings();
     };
     window.addEventListener("focus", onFocus);
     window.addEventListener("storage", onFocus);
@@ -973,7 +997,7 @@ export default function MemberDashboard() {
       window.removeEventListener("focus", onFocus);
       window.removeEventListener("storage", onFocus);
     };
-  }, [token, loadActivities, loadMyListings, navigate]);
+  }, [token, loadActivities, loadMyListings, loadMyJunksListings, navigate]);
 
   useEffect(() => {
     if (user) {
@@ -1279,6 +1303,22 @@ export default function MemberDashboard() {
               {totalListingViews.toLocaleString()} views · {liveListingCount} live
             </div>
           </div>
+
+          {/* AxxJunks stat card */}
+          <div
+            style={{ ...styles.statCard, ...(activeTab === "axxjunks" ? styles.statCardActive : {}) }}
+            onClick={() => handleTabChange("axxjunks")}
+          >
+            <div style={{ ...styles.statIconWrap, background: "rgba(249, 115, 22, 0.12)", color: "#fb923c" }}>
+              <IconTag size={20} />
+            </div>
+            <div style={styles.statNumber}>{myJunksListings.length}</div>
+            <div style={styles.statLabel}>AxxJunks Posts</div>
+            <div style={styles.statSub}>
+              {myJunksListings.filter(l => l.status === "active").length} live ·{" "}
+              {myJunksListings.reduce((s, l) => s + (l.views || 0), 0).toLocaleString()} views
+            </div>
+          </div>
         </div>
 
         {/* NAVIGATION TABS */}
@@ -1330,6 +1370,14 @@ export default function MemberDashboard() {
           >
             <IconTag size={16} />
             <span>My QuickSales ({myListings.length})</span>
+          </button>
+          <button
+            type="button"
+            style={{ ...styles.tabBtn, ...(activeTab === "axxjunks" ? styles.tabBtnActive : {}) }}
+            onClick={() => handleTabChange("axxjunks")}
+          >
+            <IconTag size={16} />
+            <span>AxxJunks ({myJunksListings.length})</span>
           </button>
           <button
             type="button"
@@ -1531,6 +1579,41 @@ export default function MemberDashboard() {
                           >
                             <IconTrash size={12} /> {busy ? "Working…" : "Delete"}
                           </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {/* AxxJunks listing events */}
+                {myJunksListings.map((item) => {
+                  const jStatus = item.status || "active";
+                  const jBg = jStatus === "active" ? "rgba(249,115,22,0.15)" : jStatus === "hidden" ? "rgba(239,68,68,0.15)" : "rgba(100,116,139,0.15)";
+                  const jColor = jStatus === "active" ? "#fb923c" : jStatus === "hidden" ? "#fca5a5" : "#94a3b8";
+                  return (
+                    <div key={`junks-${item._id}`} style={styles.timelineItem}>
+                      <div style={{ ...styles.timelineDot, background: "rgba(249, 115, 22, 0.12)", color: "#fb923c", borderColor: "rgba(249, 115, 22, 0.3)" }}>
+                        <IconTag size={16} />
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "6px" }}>
+                          <span style={{ fontWeight: 700, color: "#ffffff", fontSize: "14.5px" }}>
+                            Posted on AxxJunks: {item.title || "Classified listing"}
+                          </span>
+                          <span style={{ padding: "4px 10px", borderRadius: "999px", fontSize: "10.5px", fontWeight: 800, letterSpacing: "0.4px", textTransform: "uppercase", background: jBg, color: jColor }}>
+                            {jStatus}
+                          </span>
+                        </div>
+                        <p style={{ margin: "4px 0 0 0", color: "#94a3b8", fontSize: "13px" }}>
+                          {item.category} · {item.location?.county}{item.location?.area ? `, ${item.location.area}` : ""} · KES {Number(item.price || 0).toLocaleString()} · {item.views || 0} views
+                        </p>
+                        <div style={{ display: "flex", gap: "8px", marginTop: "8px", flexWrap: "wrap" }}>
+                          <Link to={`/axxjunks/listing/${item._id}`} style={{ ...styles.listingBtn, flex: "0 0 auto", minWidth: "auto", padding: "6px 12px" }}>
+                            View listing
+                          </Link>
+                          <Link to={`/axxjunks/manage/${item.manageToken || ""}`} style={{ ...styles.exploreBtn, fontSize: "12px", padding: "6px 12px", flex: "0 0 auto" }}>
+                            Manage
+                          </Link>
                         </div>
                       </div>
                     </div>
@@ -2060,6 +2143,123 @@ export default function MemberDashboard() {
                           >
                             <IconTrash size={13} /> {busy ? "Working…" : "Delete"}
                           </button>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAB: AXXJUNKS — Classified listings posted by this account */}
+        {activeTab === "axxjunks" && (
+          <div style={styles.section}>
+            <div style={styles.sectionHeader}>
+              <div>
+                <h2 style={styles.sectionTitle}>My AxxJunks Listings ({myJunksListings.length})</h2>
+                <div style={styles.sectionSub}>
+                  Classifieds you&apos;ve posted on AxxJunks — track views, manage or delete them here.
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
+                <button
+                  type="button"
+                  onClick={loadMyJunksListings}
+                  style={{ background: "none", border: "1px solid rgba(255,255,255,0.15)", color: "#cbd5e1", borderRadius: "8px", padding: "8px 14px", fontSize: "12px", fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}
+                >
+                  <IconRefresh size={12} />
+                  <span>Refresh</span>
+                </button>
+                <Link to="/axxjunks/post" style={{ ...styles.submitBtn, textDecoration: "none" }}>
+                  + Post New Listing
+                </Link>
+              </div>
+            </div>
+
+            {/* Summary chips */}
+            <div style={styles.listingChips}>
+              <div style={styles.listingChip}>
+                Live <span style={styles.listingChipValue}>{myJunksListings.filter(l => l.status === "active").length}</span>
+              </div>
+              <div style={styles.listingChip}>
+                <IconEye size={13} /> Total views
+                <span style={styles.listingChipValue}>{myJunksListings.reduce((s, l) => s + (l.views || 0), 0).toLocaleString()}</span>
+              </div>
+              <div style={styles.listingChip}>
+                Expired / Hidden <span style={styles.listingChipValue}>{myJunksListings.filter(l => l.status !== "active").length}</span>
+              </div>
+            </div>
+
+            {junksLoading ? (
+              <p style={{ color: "#94a3b8" }}>Loading your AxxJunks listings...</p>
+            ) : myJunksListings.length === 0 ? (
+              <div style={styles.emptyBox}>
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: "12px", color: "#64748b" }}>
+                  <IconTag size={40} />
+                </div>
+                <h3 style={{ margin: "0 0 6px 0", color: "#ffffff", fontSize: "17px" }}>
+                  You haven&apos;t posted anything on AxxJunks yet
+                </h3>
+                <p style={{ margin: "0 0 20px 0", color: "#94a3b8", fontSize: "13.5px", maxWidth: "460px", marginInline: "auto" }}>
+                  Post your rentals, items for sale, accommodation or business services. Listings go live immediately.
+                </p>
+                <Link to="/axxjunks/post" style={{ ...styles.submitBtn, textDecoration: "none" }}>
+                  Post your first listing
+                </Link>
+              </div>
+            ) : (
+              <div style={styles.listingGrid}>
+                {myJunksListings.map((item) => {
+                  const jStatus = item.status || "active";
+                  const jBg = jStatus === "active" ? "rgba(249,115,22,0.18)" : jStatus === "hidden" ? "rgba(239,68,68,0.18)" : "rgba(100,116,139,0.18)";
+                  const jColor = jStatus === "active" ? "#fb923c" : jStatus === "hidden" ? "#fca5a5" : "#94a3b8";
+                  const jLabel = jStatus === "active" ? "Live" : jStatus === "hidden" ? "Hidden" : jStatus === "expired" ? "Expired" : jStatus;
+                  return (
+                    <article key={item._id} style={styles.listingCard}>
+                      <div style={styles.listingMedia}>
+                        {item.photos?.[0] ? (
+                          <img src={item.photos[0]} alt={item.title} style={styles.listingImg} loading="lazy" />
+                        ) : (
+                          <IconTag size={34} />
+                        )}
+                        <span style={{ ...styles.listingStatus, background: jBg, color: jColor }}>
+                          {jLabel}
+                        </span>
+                        {jStatus === "active" && (
+                          <span style={styles.listingLiveDot}>
+                            <span style={styles.listingPulse} />
+                            LIVE
+                          </span>
+                        )}
+                      </div>
+
+                      <div style={styles.listingBody}>
+                        <h3 style={{ ...styles.cardTitle, margin: 0 }}>{item.title}</h3>
+                        <p style={{ ...styles.cardPrice, margin: 0 }}>KES {Number(item.price || 0).toLocaleString()}</p>
+                        <p style={{ ...styles.listingMeta, margin: 0 }}>
+                          {item.category} · {item.location?.county}{item.location?.area ? `, ${item.location.area}` : ""}
+                        </p>
+
+                        <div style={styles.listingMetrics}>
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                            <IconEye size={13} /> {item.views || 0} views
+                          </span>
+                          <span style={{ opacity: 0.5 }}>·</span>
+                          <span style={{ color: "#94a3b8" }}>Expires {item.expiresAt ? new Date(item.expiresAt).toLocaleDateString("en-KE") : "in 30 days"}</span>
+                        </div>
+
+                        <div style={styles.listingActions}>
+                          <Link to={`/axxjunks/listing/${item._id}`} style={styles.listingBtn}>
+                            View
+                          </Link>
+                          <Link
+                            to={`/axxjunks/manage/${item.manageToken || ""}`}
+                            style={{ ...styles.listingSoldBtn, background: "rgba(249,115,22,0.15)", color: "#fb923c", border: "1px solid rgba(249,115,22,0.3)" }}
+                          >
+                            Manage / Edit
+                          </Link>
                         </div>
                       </div>
                     </article>
