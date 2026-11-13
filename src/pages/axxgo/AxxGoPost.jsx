@@ -10,6 +10,33 @@ import {
   BUSINESS_TYPES,
   ITEM_CONDITIONS,
 } from "../../data/axxgoData";
+import {
+  IconCheckCircle,
+  IconKey,
+  IconCamera,
+  IconShield,
+  IconPlus,
+  IconHome,
+  IconBed,
+  IconBriefcase,
+  IconTag,
+  IconCheck,
+} from "../../components/axxgo/AxxGoIcons";
+
+function renderCategoryIcon(catId, size = 22, color = "currentColor") {
+  switch (catId) {
+    case "Rentals":
+      return <IconHome size={size} color={color} />;
+    case "Accommodation":
+      return <IconBed size={size} color={color} />;
+    case "AxxBiashara":
+      return <IconBriefcase size={size} color={color} />;
+    case "Quick Sales":
+      return <IconTag size={size} color={color} />;
+    default:
+      return <IconTag size={size} color={color} />;
+  }
+}
 
 export default function AxxGoPost() {
   const navigate = useNavigate();
@@ -275,7 +302,9 @@ export default function AxxGoPost() {
             boxShadow: "0 20px 40px rgba(0,0,0,0.5)",
           }}
         >
-          <div style={{ fontSize: "56px", marginBottom: "12px" }}>🎉</div>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: "14px" }}>
+            <IconCheckCircle size={52} color="#10b981" />
+          </div>
           <h2 style={{ margin: "0 0 8px", fontSize: "24px", color: "#10b981", fontWeight: "800" }}>
             Your Listing is Live!
           </h2>
@@ -296,7 +325,7 @@ export default function AxxGoPost() {
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-              <span style={{ fontSize: "18px" }}>🔑</span>
+              <IconKey size={18} color="#f59e0b" />
               <h4 style={{ margin: 0, fontSize: "14px", fontWeight: "700", color: "#f59e0b" }}>
                 Secret Management Link (Save This!)
               </h4>
@@ -353,8 +382,9 @@ export default function AxxGoPost() {
             </div>
 
             {posterEmail && (
-              <p style={{ margin: "10px 0 0", fontSize: "12px", color: "#10b981" }}>
-                ✉️ We also sent a copy of this management link to <strong>{posterEmail}</strong>.
+              <p style={{ margin: "10px 0 0", fontSize: "12px", color: "#10b981", display: "flex", alignItems: "center", gap: "6px" }}>
+                <IconCheck size={14} color="#10b981" />
+                <span>We also sent a copy of this management link to <strong>{posterEmail}</strong>.</span>
               </p>
             )}
           </div>
@@ -497,7 +527,9 @@ export default function AxxGoPost() {
                       transition: "all 0.15s ease",
                     }}
                   >
-                    <span style={{ fontSize: "24px" }}>{cat.icon}</span>
+                    <div style={{ marginBottom: "2px" }}>
+                      {renderCategoryIcon(cat.id, 26, isSelected ? "#ef4444" : "#94a3b8")}
+                    </div>
                     <span style={{ fontSize: "14px", fontWeight: "700" }}>{cat.label}</span>
                     <span style={{ fontSize: "11px", color: "#94a3b8", lineHeight: 1.2 }}>{cat.tagline}</span>
                   </button>
@@ -1236,10 +1268,10 @@ export default function AxxGoPost() {
                       alignItems: "center",
                       justifyContent: "center",
                       color: "#94a3b8",
-                      gap: "4px",
+                      gap: "6px",
                     }}
                   >
-                    <span style={{ fontSize: "22px" }}>📸</span>
+                    <IconCamera size={22} color="#94a3b8" />
                     <span style={{ fontSize: "11px", fontWeight: "600" }}>+ Add Photo</span>
                   </div>
                 </button>
@@ -1383,8 +1415,9 @@ export default function AxxGoPost() {
             }}
           >
             <div>
-              <p style={{ margin: "0 0 2px", fontSize: "13px", fontWeight: "700", color: "#f8fafc" }}>
-                🤖 Anti-Spam Security Question:
+              <p style={{ margin: "0 0 2px", fontSize: "13px", fontWeight: "700", color: "#f8fafc", display: "flex", alignItems: "center", gap: "6px" }}>
+                <IconShield size={16} color="#38bdf8" />
+                <span>Anti-Spam Security Question:</span>
               </p>
               <p style={{ margin: 0, fontSize: "12px", color: "#94a3b8" }}>
                 What is <strong style={{ color: "#38bdf8" }}>{mathA} + {mathB}</strong>?
@@ -1447,7 +1480,7 @@ export default function AxxGoPost() {
                   <span>Publishing Instantly...</span>
                 </>
               ) : (
-                <span>🚀 Publish Listing Now</span>
+                <span>Publish Listing Now</span>
               )}
             </button>
             <p style={{ margin: "10px 0 0", fontSize: "12px", color: "#64748b" }}>

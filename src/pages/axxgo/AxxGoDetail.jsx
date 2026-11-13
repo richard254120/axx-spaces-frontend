@@ -4,6 +4,35 @@ import API from "../../api/api";
 import AxxGoSafetyBanner from "../../components/axxgo/AxxGoSafetyBanner";
 import AxxGoReportModal from "../../components/axxgo/AxxGoReportModal";
 import { CATEGORIES, formatPrice, formatTimeAgo } from "../../data/axxgoData";
+import {
+  IconSearch,
+  IconMapPin,
+  IconUser,
+  IconPhone,
+  IconWhatsApp,
+  IconShare,
+  IconFlag,
+  IconAlertTriangle,
+  IconHome,
+  IconBed,
+  IconBriefcase,
+  IconTag,
+} from "../../components/axxgo/AxxGoIcons";
+
+function renderCategoryIcon(category, size = 13, color = "currentColor") {
+  switch (category) {
+    case "Rentals":
+      return <IconHome size={size} color={color} />;
+    case "Accommodation":
+      return <IconBed size={size} color={color} />;
+    case "AxxBiashara":
+      return <IconBriefcase size={size} color={color} />;
+    case "Quick Sales":
+      return <IconTag size={size} color={color} />;
+    default:
+      return <IconTag size={size} color={color} />;
+  }
+}
 
 export default function AxxGoDetail() {
   const { id } = useParams();
@@ -92,7 +121,9 @@ export default function AxxGoDetail() {
             textAlign: "center",
           }}
         >
-          <div style={{ fontSize: "48px", marginBottom: "12px" }}>⚠️</div>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: "12px" }}>
+            <IconAlertTriangle size={48} color="#ef4444" />
+          </div>
           <h2 style={{ margin: "0 0 10px", fontSize: "20px", color: "#fca5a5" }}>Listing Unavailable</h2>
           <p style={{ margin: "0 0 24px", color: "#cbd5e1", fontSize: "14px", lineHeight: 1.5 }}>
             {error || "The listing you are looking for is no longer available."}
@@ -210,9 +241,13 @@ export default function AxxGoDetail() {
               margin: "16px 0",
               color: "#fca5a5",
               fontSize: "14px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
             }}
           >
-            ⚠️ This listing was auto-hidden from public browse after receiving multiple reports.
+            <IconAlertTriangle size={16} color="#ef4444" />
+            <span>This listing was auto-hidden from public browse after receiving multiple reports.</span>
           </div>
         )}
 
@@ -269,7 +304,8 @@ export default function AxxGoDetail() {
                   gap: "6px",
                 }}
               >
-                <span>🔍 Click to expand</span>
+                <IconSearch size={12} color="#e2e8f0" />
+                <span>Click to expand</span>
                 <span>•</span>
                 <span>
                   {activePhotoIndex + 1}/{photos.length}
@@ -367,7 +403,7 @@ export default function AxxGoDetail() {
                     gap: "6px",
                   }}
                 >
-                  <span>{categoryMeta.icon}</span>
+                  {renderCategoryIcon(listing.category, 13, categoryMeta.color)}
                   <span>{categoryMeta.label}</span>
                 </span>
 
@@ -416,7 +452,7 @@ export default function AxxGoDetail() {
 
               {/* Location Card */}
               <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", color: "#cbd5e1", marginBottom: "20px" }}>
-                <span style={{ color: "#ef4444", fontSize: "18px" }}>📍</span>
+                <IconMapPin size={18} color="#ef4444" />
                 <span>
                   <strong>{listing.location?.area}</strong>, {listing.location?.county}
                 </span>
@@ -592,11 +628,10 @@ export default function AxxGoDetail() {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      fontSize: "18px",
                       color: "#f8fafc",
                     }}
                   >
-                    👤
+                    <IconUser size={20} color="#f8fafc" />
                   </div>
                   <div>
                     <h4 style={{ margin: 0, fontSize: "15px", fontWeight: "700" }}>{listing.poster?.name || "Seller"}</h4>
@@ -624,7 +659,7 @@ export default function AxxGoDetail() {
                         boxShadow: "0 4px 12px rgba(220, 38, 38, 0.4)",
                       }}
                     >
-                      <span>📞</span>
+                      <IconPhone size={16} color="white" />
                       <span>Call {posterPhone}</span>
                     </a>
                   )}
@@ -648,7 +683,7 @@ export default function AxxGoDetail() {
                         gap: "8px",
                       }}
                     >
-                      <span>💬</span>
+                      <IconWhatsApp size={17} color="white" />
                       <span>Chat on WhatsApp</span>
                     </a>
                   )}
@@ -671,7 +706,7 @@ export default function AxxGoDetail() {
                       cursor: "pointer",
                     }}
                   >
-                    <span>🔗</span>
+                    <IconShare size={15} color="#cbd5e1" />
                     <span>{copiedLink ? "Link Copied!" : "Share Listing"}</span>
                   </button>
                 </div>
@@ -690,12 +725,12 @@ export default function AxxGoDetail() {
                     cursor: "pointer",
                     display: "inline-flex",
                     alignItems: "center",
-                    gap: "4px",
+                    gap: "6px",
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = "#f87171")}
                   onMouseLeave={(e) => (e.currentTarget.style.color = "#94a3b8")}
                 >
-                  <span>🚩</span>
+                  <IconFlag size={13} color="#94a3b8" />
                   <span>Report this listing (Scam / Sold / Offensive)</span>
                 </button>
               </div>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import API from "../../api/api";
+import { IconFlag, IconCheckCircle, IconAlertTriangle } from "./AxxGoIcons";
 
 const REASONS = [
   { value: "scam", label: "Scam / Fraudulent (asking for money upfront, fake listing)" },
@@ -81,9 +82,12 @@ export default function AxxGoReportModal({ listingId, listingTitle, isOpen, onCl
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "16px" }}>
           <div>
-            <h3 style={{ margin: "0 0 4px", fontSize: "18px", fontWeight: "700", color: "#f8fafc" }}>
-              🚩 Report this Listing
-            </h3>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+              <IconFlag size={18} color="#ef4444" />
+              <h3 style={{ margin: 0, fontSize: "18px", fontWeight: "700", color: "#f8fafc" }}>
+                Report this Listing
+              </h3>
+            </div>
             <p style={{ margin: 0, fontSize: "13px", color: "#94a3b8" }}>
               Listing: <strong style={{ color: "#cbd5e1" }}>{listingTitle}</strong>
             </p>
@@ -96,7 +100,7 @@ export default function AxxGoReportModal({ listingId, listingTitle, isOpen, onCl
               background: "transparent",
               border: "none",
               color: "#94a3b8",
-              fontSize: "20px",
+              fontSize: "18px",
               cursor: "pointer",
               padding: "4px 8px",
             }}
@@ -115,7 +119,9 @@ export default function AxxGoReportModal({ listingId, listingTitle, isOpen, onCl
               borderRadius: "8px",
             }}
           >
-            <div style={{ fontSize: "36px", marginBottom: "10px" }}>✅</div>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "10px" }}>
+              <IconCheckCircle size={36} color="#10b981" />
+            </div>
             <h4 style={{ margin: "0 0 6px", color: "#10b981", fontSize: "16px" }}>Report Submitted</h4>
             <p style={{ margin: 0, fontSize: "13px", color: "#cbd5e1" }}>
               Thank you for keeping AxxGo safe! Our automated moderation and review team will evaluate this listing.
@@ -133,9 +139,13 @@ export default function AxxGoReportModal({ listingId, listingTitle, isOpen, onCl
                   borderRadius: "6px",
                   fontSize: "13px",
                   marginBottom: "14px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
                 }}
               >
-                {error}
+                <IconAlertTriangle size={15} color="#ef4444" />
+                <span>{error}</span>
               </div>
             )}
 
@@ -262,4 +272,3 @@ export default function AxxGoReportModal({ listingId, listingTitle, isOpen, onCl
     </div>
   );
 }
-

@@ -1,4 +1,5 @@
 import React from "react";
+import { IconShield } from "./AxxGoIcons";
 
 export default function AxxGoSafetyBanner({ compact = false }) {
   return (
@@ -27,10 +28,9 @@ export default function AxxGoSafetyBanner({ compact = false }) {
           justifyContent: "center",
           flexShrink: 0,
           color: "#fca5a5",
-          fontSize: compact ? "14px" : "18px",
         }}
       >
-        🛡️
+        <IconShield size={compact ? 16 : 20} color="#fca5a5" />
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <p
@@ -42,7 +42,7 @@ export default function AxxGoSafetyBanner({ compact = false }) {
             letterSpacing: "0.2px",
           }}
         >
-          Safety First: Never send money before seeing the item or property.
+          Safety Notice: Never send money before seeing the item or property.
         </p>
         {!compact && (
           <p
@@ -60,4 +60,3 @@ export default function AxxGoSafetyBanner({ compact = false }) {
     </div>
   );
 }
-

@@ -13,7 +13,7 @@ export const CATEGORIES = [
   {
     id: "Rentals",
     label: "Rentals",
-    icon: "🏠",
+    iconKey: "home",
     tagline: "Apartments, bedsitters, houses & commercial spaces",
     color: "#3b82f6", // Blue
     badgeBg: "rgba(59, 130, 246, 0.15)",
@@ -22,7 +22,7 @@ export const CATEGORIES = [
   {
     id: "Accommodation",
     label: "Accommodation",
-    icon: "🛏️",
+    iconKey: "bed",
     tagline: "Hostels, Airbnbs, guest rooms & hotels",
     color: "#a855f7", // Purple
     badgeBg: "rgba(168, 85, 247, 0.15)",
@@ -31,7 +31,7 @@ export const CATEGORIES = [
   {
     id: "AxxBiashara",
     label: "AxxBiashara",
-    icon: "💼",
+    iconKey: "briefcase",
     tagline: "Businesses, services, local shops & promotions",
     color: "#f59e0b", // Amber
     badgeBg: "rgba(245, 158, 11, 0.15)",
@@ -40,7 +40,7 @@ export const CATEGORIES = [
   {
     id: "Quick Sales",
     label: "Quick Sales",
-    icon: "🏷️",
+    iconKey: "tag",
     tagline: "Electronics, furniture, vehicles & deals",
     color: "#10b981", // Emerald
     badgeBg: "rgba(16, 185, 129, 0.15)",
@@ -143,4 +143,3 @@ export function formatTimeAgo(dateString) {
   if (diffWeeks < 4) return `${diffWeeks}w ago`;
   return date.toLocaleDateString("en-KE", { month: "short", day: "numeric" });
 }
-

@@ -2,6 +2,16 @@ import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import API from "../../api/api";
 import { COUNTIES, CATEGORIES, formatPrice } from "../../data/axxgoData";
+import {
+  IconLock,
+  IconKey,
+  IconCheck,
+  IconRefresh,
+  IconTrash,
+  IconTag,
+  IconHome,
+  IconExternalLink,
+} from "../../components/axxgo/AxxGoIcons";
 
 export default function AxxGoManage() {
   const { token } = useParams();
@@ -172,7 +182,9 @@ export default function AxxGoManage() {
             textAlign: "center",
           }}
         >
-          <div style={{ fontSize: "44px", marginBottom: "12px" }}>🔒</div>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: "12px" }}>
+            <IconLock size={44} color="#ef4444" />
+          </div>
           <h2 style={{ margin: "0 0 10px", fontSize: "20px", color: "#fca5a5" }}>Management Link Invalid</h2>
           <p style={{ margin: "0 0 20px", color: "#cbd5e1", fontSize: "14px" }}>{error}</p>
           <Link
@@ -211,9 +223,13 @@ export default function AxxGoManage() {
                 fontWeight: "700",
                 padding: "3px 10px",
                 borderRadius: "20px",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
               }}
             >
-              🔑 Secret Poster Console
+              <IconKey size={13} color="#f59e0b" />
+              <span>Secret Poster Console</span>
             </span>
             <span style={{ fontSize: "12px", color: "#94a3b8" }}>No Password Required</span>
           </div>
@@ -255,9 +271,13 @@ export default function AxxGoManage() {
               textDecoration: "none",
               fontSize: "13px",
               fontWeight: "600",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
             }}
           >
-            View Live Listing ↗
+            <span>View Live Listing</span>
+            <IconExternalLink size={13} />
           </Link>
         </div>
 
@@ -272,9 +292,13 @@ export default function AxxGoManage() {
               color: "#a7f3d0",
               fontSize: "14px",
               marginBottom: "16px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
             }}
           >
-            ✓ {successMsg}
+            <IconCheck size={16} color="#10b981" />
+            <span>{successMsg}</span>
           </div>
         )}
 
@@ -332,9 +356,13 @@ export default function AxxGoManage() {
                 fontSize: "13px",
                 fontWeight: "700",
                 cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
               }}
             >
-              ✓ Active / Available
+              <IconCheck size={14} />
+              <span>Active / Available</span>
             </button>
 
             <button
@@ -350,9 +378,13 @@ export default function AxxGoManage() {
                 fontSize: "13px",
                 fontWeight: "700",
                 cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
               }}
             >
-              🏷️ Mark as Sold
+              <IconTag size={14} />
+              <span>Mark as Sold</span>
             </button>
 
             <button
@@ -368,9 +400,13 @@ export default function AxxGoManage() {
                 fontSize: "13px",
                 fontWeight: "700",
                 cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
               }}
             >
-              🏠 Mark as Rented
+              <IconHome size={14} />
+              <span>Mark as Rented</span>
             </button>
 
             <button
@@ -386,9 +422,12 @@ export default function AxxGoManage() {
                 fontSize: "13px",
                 fontWeight: "700",
                 cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
               }}
             >
-              ⏸️ Mark as Unavailable
+              <span>Mark as Unavailable</span>
             </button>
           </div>
         </div>
@@ -430,9 +469,19 @@ export default function AxxGoManage() {
               fontWeight: "800",
               fontSize: "13px",
               cursor: renewing ? "not-allowed" : "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
             }}
           >
-            {renewing ? "Renewing..." : "🔄 Renew for +30 Days"}
+            {renewing ? (
+              "Renewing..."
+            ) : (
+              <>
+                <IconRefresh size={14} />
+                <span>Renew for +30 Days</span>
+              </>
+            )}
           </button>
         </div>
 

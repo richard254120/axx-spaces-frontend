@@ -1,6 +1,29 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { CATEGORIES, formatPrice, formatTimeAgo } from "../../data/axxgoData";
+import {
+  IconHome,
+  IconBed,
+  IconBriefcase,
+  IconTag,
+  IconCamera,
+  IconMapPin,
+} from "./AxxGoIcons";
+
+function renderCategoryIcon(category, size = 13, color = "currentColor") {
+  switch (category) {
+    case "Rentals":
+      return <IconHome size={size} color={color} />;
+    case "Accommodation":
+      return <IconBed size={size} color={color} />;
+    case "AxxBiashara":
+      return <IconBriefcase size={size} color={color} />;
+    case "Quick Sales":
+      return <IconTag size={size} color={color} />;
+    default:
+      return <IconTag size={size} color={color} />;
+  }
+}
 
 export default function AxxGoCard({ listing }) {
   const [imgError, setImgError] = useState(false);
@@ -9,7 +32,6 @@ export default function AxxGoCard({ listing }) {
 
   const categoryMeta = CATEGORIES.find((c) => c.id === listing.category) || {
     label: listing.category,
-    icon: "📦",
     color: "#94a3b8",
     badgeBg: "rgba(148, 163, 184, 0.15)",
     badgeBorder: "rgba(148, 163, 184, 0.4)",
@@ -89,16 +111,16 @@ export default function AxxGoCard({ listing }) {
             color: categoryMeta.color,
             fontSize: "11px",
             fontWeight: "700",
-            padding: "3px 8px",
+            padding: "4px 8px",
             borderRadius: "6px",
             display: "flex",
             alignItems: "center",
-            gap: "4px",
+            gap: "5px",
             zIndex: 2,
             boxShadow: "0 2px 4px rgba(0,0,0,0.3)",
           }}
         >
-          <span>{categoryMeta.icon}</span>
+          {renderCategoryIcon(listing.category, 12, categoryMeta.color)}
           <span>{categoryMeta.label}</span>
         </div>
 
@@ -109,7 +131,7 @@ export default function AxxGoCard({ listing }) {
               position: "absolute",
               bottom: "8px",
               right: "8px",
-              background: "rgba(15, 23, 41, 0.75)",
+              background: "rgba(15, 23, 41, 0.8)",
               color: "#f1f5f9",
               fontSize: "11px",
               fontWeight: "600",
@@ -121,7 +143,7 @@ export default function AxxGoCard({ listing }) {
               zIndex: 2,
             }}
           >
-            <span>📷</span>
+            <IconCamera size={11} color="#cbd5e1" />
             <span>{listing.photos.length}</span>
           </div>
         )}
@@ -135,7 +157,7 @@ export default function AxxGoCard({ listing }) {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              background: "rgba(15, 23, 41, 0.5)",
+              background: "rgba(15, 23, 41, 0.55)",
               zIndex: 3,
             }}
           >
@@ -144,9 +166,9 @@ export default function AxxGoCard({ listing }) {
                 background: "#dc2626",
                 color: "white",
                 fontWeight: "800",
-                fontSize: "13px",
+                fontSize: "12px",
                 textTransform: "uppercase",
-                padding: "6px 14px",
+                padding: "5px 12px",
                 borderRadius: "6px",
                 letterSpacing: "1px",
                 boxShadow: "0 4px 10px rgba(0,0,0,0.5)",
@@ -174,7 +196,7 @@ export default function AxxGoCard({ listing }) {
             style={{
               fontSize: "17px",
               fontWeight: "800",
-              color: "#38bdf8", // Sky blue for high contrast
+              color: "#38bdf8",
               marginBottom: "6px",
               display: "flex",
               alignItems: "center",
@@ -216,26 +238,26 @@ export default function AxxGoCard({ listing }) {
             {listing.title}
           </h3>
 
-          {/* Specific category snippet tag (bedrooms, condition, business type) */}
+          {/* Specific category snippet tag */}
           {listing.category === "Rentals" && listing.categoryFields?.bedrooms && (
             <p style={{ margin: "0 0 6px", fontSize: "12px", color: "#94a3b8" }}>
-              🛏️ {listing.categoryFields.bedrooms} Bedroom{listing.categoryFields.bedrooms > 1 ? "s" : ""}
+              {listing.categoryFields.bedrooms} Bedroom{listing.categoryFields.bedrooms > 1 ? "s" : ""}
               {listing.categoryFields.propertyType ? ` • ${listing.categoryFields.propertyType}` : ""}
             </p>
           )}
           {listing.category === "Accommodation" && listing.categoryFields?.accommodationType && (
             <p style={{ margin: "0 0 6px", fontSize: "12px", color: "#94a3b8" }}>
-              🏨 {listing.categoryFields.accommodationType}
+              {listing.categoryFields.accommodationType}
             </p>
           )}
           {listing.category === "Quick Sales" && listing.categoryFields?.itemCondition && (
             <p style={{ margin: "0 0 6px", fontSize: "12px", color: "#94a3b8" }}>
-              ✨ Condition: {listing.categoryFields.itemCondition}
+              Condition: {listing.categoryFields.itemCondition}
             </p>
           )}
           {listing.category === "AxxBiashara" && listing.categoryFields?.businessName && (
             <p style={{ margin: "0 0 6px", fontSize: "12px", color: "#f59e0b", fontWeight: "500" }}>
-              🏢 {listing.categoryFields.businessName}
+              {listing.categoryFields.businessName}
             </p>
           )}
         </div>
@@ -265,7 +287,7 @@ export default function AxxGoCard({ listing }) {
               maxWidth: "65%",
             }}
           >
-            <span style={{ color: "#ef4444" }}>📍</span>
+            <IconMapPin size={12} color="#ef4444" />
             <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
               {listing.location?.area ? `${listing.location.area}, ` : ""}
               {listing.location?.county || "Kenya"}
@@ -281,4 +303,3 @@ export default function AxxGoCard({ listing }) {
     </Link>
   );
 }
-

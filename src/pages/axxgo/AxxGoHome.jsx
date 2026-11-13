@@ -4,6 +4,32 @@ import API from "../../api/api";
 import AxxGoCard from "../../components/axxgo/AxxGoCard";
 import AxxGoSafetyBanner from "../../components/axxgo/AxxGoSafetyBanner";
 import { COUNTIES, CATEGORIES } from "../../data/axxgoData";
+import {
+  IconGrid,
+  IconHome,
+  IconBed,
+  IconBriefcase,
+  IconTag,
+  IconSearch,
+  IconSliders,
+  IconMapPin,
+  IconPlus,
+} from "../../components/axxgo/AxxGoIcons";
+
+function renderCategoryIcon(category, size = 14, color = "currentColor") {
+  switch (category) {
+    case "Rentals":
+      return <IconHome size={size} color={color} />;
+    case "Accommodation":
+      return <IconBed size={size} color={color} />;
+    case "AxxBiashara":
+      return <IconBriefcase size={size} color={color} />;
+    case "Quick Sales":
+      return <IconTag size={size} color={color} />;
+    default:
+      return <IconTag size={size} color={color} />;
+  }
+}
 
 export default function AxxGoHome() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -74,7 +100,6 @@ export default function AxxGoHome() {
         next.set(k, v);
       }
     });
-    // Reset page to 1 on filter changes unless page itself was updated
     if (!newParams.page) {
       next.delete("page");
     }
@@ -163,12 +188,12 @@ export default function AxxGoHome() {
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: "10px",
+                  gap: "8px",
                   background: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)",
                   color: "#ffffff",
-                  fontSize: "16px",
+                  fontSize: "15px",
                   fontWeight: "800",
-                  padding: "14px 28px",
+                  padding: "14px 26px",
                   borderRadius: "10px",
                   textDecoration: "none",
                   boxShadow: "0 6px 20px -2px rgba(220, 38, 38, 0.5)",
@@ -183,7 +208,7 @@ export default function AxxGoHome() {
                   e.currentTarget.style.boxShadow = "0 6px 20px -2px rgba(220, 38, 38, 0.5)";
                 }}
               >
-                <span style={{ fontSize: "20px", lineHeight: 1 }}>＋</span>
+                <IconPlus size={18} color="#ffffff" strokeWidth={2.5} />
                 <span>Post on AxxGo Free</span>
               </Link>
             </div>
@@ -204,7 +229,7 @@ export default function AxxGoHome() {
             }}
           >
             <div style={{ display: "flex", alignItems: "center", paddingLeft: "12px", color: "#94a3b8" }}>
-              🔍
+              <IconSearch size={18} color="#94a3b8" />
             </div>
             <input
               type="text"
@@ -289,7 +314,7 @@ export default function AxxGoHome() {
                 flexShrink: 0,
               }}
             >
-              <span>🔥</span>
+              <IconGrid size={14} color="#ffffff" />
               <span>All Classifieds</span>
             </button>
 
@@ -317,7 +342,7 @@ export default function AxxGoHome() {
                     transition: "all 0.15s ease",
                   }}
                 >
-                  <span>{cat.icon}</span>
+                  {renderCategoryIcon(cat.id, 14, "#ffffff")}
                   <span>{cat.label}</span>
                 </button>
               );
@@ -349,7 +374,8 @@ export default function AxxGoHome() {
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "10px" }}>
             {/* County Selector */}
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <span style={{ fontSize: "13px", color: "#94a3b8" }}>📍 County:</span>
+              <IconMapPin size={14} color="#ef4444" />
+              <span style={{ fontSize: "13px", color: "#94a3b8" }}>County:</span>
               <select
                 value={activeCounty}
                 onChange={(e) => updateParams({ county: e.target.value })}
@@ -414,9 +440,10 @@ export default function AxxGoHome() {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "6px",
+                cursor: "pointer",
               }}
             >
-              <span>⚙️</span>
+              <IconSliders size={13} color={filtersOpen ? "#fca5a5" : "#cbd5e1"} />
               <span>Price Filter {activeMinPrice || activeMaxPrice ? "• Active" : ""}</span>
             </button>
 
@@ -585,7 +612,9 @@ export default function AxxGoHome() {
               margin: "30px 0",
             }}
           >
-            <div style={{ fontSize: "48px", marginBottom: "14px" }}>📦</div>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "14px" }}>
+              <IconTag size={42} color="#64748b" />
+            </div>
             <h3 style={{ margin: "0 0 8px", fontSize: "20px", fontWeight: "700" }}>No Listings Found</h3>
             <p style={{ margin: "0 0 20px", color: "#94a3b8", fontSize: "14px", maxWidth: "450px", marginLeft: "auto", marginRight: "auto" }}>
               {hasActiveFilters
@@ -605,6 +634,7 @@ export default function AxxGoHome() {
                     borderRadius: "8px",
                     fontSize: "14px",
                     fontWeight: "600",
+                    cursor: "pointer",
                   }}
                 >
                   Clear Filters
@@ -699,4 +729,3 @@ export default function AxxGoHome() {
     </div>
   );
 }
-

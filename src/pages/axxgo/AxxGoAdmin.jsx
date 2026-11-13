@@ -2,6 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import API from "../../api/api";
 import { formatTimeAgo, formatPrice } from "../../data/axxgoData";
+import {
+  IconFlag,
+  IconBan,
+  IconCheck,
+  IconTrash,
+  IconExternalLink,
+} from "../../components/axxgo/AxxGoIcons";
 
 export default function AxxGoAdmin() {
   const [activeTab, setActiveTab] = useState("reports"); // reports, banned
@@ -163,9 +170,13 @@ export default function AxxGoAdmin() {
               fontSize: "14px",
               fontWeight: "700",
               cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
             }}
           >
-            🚩 Reports ({reports.length})
+            <IconFlag size={15} />
+            <span>Reports ({reports.length})</span>
           </button>
           <button
             type="button"
@@ -179,9 +190,13 @@ export default function AxxGoAdmin() {
               fontSize: "14px",
               fontWeight: "700",
               cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
             }}
           >
-            🚫 Banned Entities ({bannedList.length})
+            <IconBan size={15} />
+            <span>Banned Entities ({bannedList.length})</span>
           </button>
         </div>
 
@@ -195,9 +210,13 @@ export default function AxxGoAdmin() {
               color: "#a7f3d0",
               fontSize: "13px",
               marginBottom: "16px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
             }}
           >
-            ✓ {actionSuccess}
+            <IconCheck size={16} color="#10b981" />
+            <span>{actionSuccess}</span>
           </div>
         )}
 
@@ -447,7 +466,10 @@ export default function AxxGoAdmin() {
                 width: "100%",
               }}
             >
-              <h3 style={{ margin: "0 0 16px", fontSize: "18px", fontWeight: "700" }}>🚫 Ban Phone Number or IP</h3>
+              <h3 style={{ margin: "0 0 16px", fontSize: "18px", fontWeight: "700", display: "flex", alignItems: "center", gap: "8px" }}>
+                <IconBan size={18} color="#ef4444" />
+                <span>Ban Phone Number or IP</span>
+              </h3>
               <form onSubmit={handleBanSubmit}>
                 <div style={{ marginBottom: "12px" }}>
                   <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "6px" }}>
