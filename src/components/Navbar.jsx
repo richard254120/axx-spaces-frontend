@@ -10,22 +10,20 @@ import logo from "../assets/image.png";
 import RequestItemModal from "./RequestItemModal";
 
 const TAB_LINKS = [
-  { to: "/", label: "Home" },
-  { to: "/axxjunks", label: "AxxJunks" },
-  { to: "/axxbiashara", label: "AxxBiashara" },
-  { to: "/quicksales", label: "QuickSales" },
   { to: "/listings", label: "Rentals" },
   { to: "/accommodation", label: "Accommodation" },
+  { to: "/quicksales", label: "QuickSales" },
+  { to: "/axxbiashara", label: "AxxBiashara" },
+  { to: "/axxjunks", label: "AxxJunks" },
   { to: "/mobile-app", label: "Download App" },
 ];
 
 const MENU_PRIMARY = [
-  { to: "/", label: "Home" },
-  { to: "/axxjunks", label: "AxxJunks" },
-  { to: "/axxbiashara", label: "AxxBiashara" },
-  { to: "/quicksales", label: "QuickSales" },
   { to: "/listings", label: "Rentals" },
   { to: "/accommodation", label: "Accommodation" },
+  { to: "/quicksales", label: "QuickSales" },
+  { to: "/axxbiashara", label: "AxxBiashara" },
+  { to: "/axxjunks", label: "AxxJunks" },
   { to: "/accommodation/login?tab=login", label: "Host Sign In" },
   { to: "/accommodation/register?tab=register", label: "Host Register" },
   { to: "/agent/login", label: "Agent login" },
