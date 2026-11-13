@@ -495,55 +495,68 @@ export default function AxxGoPost() {
         {!isRegisteredUser && (
           <div
             style={{
-              background: "rgba(220, 38, 38, 0.12)",
+              background: "rgba(220, 38, 38, 0.08)",
               border: "1px solid #dc2626",
-              borderRadius: "14px",
-              padding: "28px 20px",
+              borderRadius: "16px",
+              padding: "32px 24px",
               marginBottom: "28px",
               textAlign: "center",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: "12px" }}>
-              <IconLock size={44} color="#ef4444" />
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "14px" }}>
+              <IconLock size={48} color="#ef4444" />
             </div>
-            <h3 style={{ margin: "0 0 8px", fontSize: "19px", fontWeight: "800", color: "#fca5a5" }}>
+            <h3 style={{ margin: "0 0 8px", fontSize: "20px", fontWeight: "800", color: "#fca5a5" }}>
               AxxSpace Account Required to Post
             </h3>
-            <p style={{ margin: "0 auto 20px", fontSize: "14px", color: "#e2e8f0", maxWidth: "520px", lineHeight: 1.5 }}>
-              Posting on <strong>AxxJunks</strong> is restricted exclusively to registered AxxSpace users.
-              Please sign in with your AxxSpace account or register to publish your listings and connect with buyers!
+            <p style={{ margin: "0 auto 6px", fontSize: "14px", color: "#e2e8f0", maxWidth: "540px", lineHeight: 1.6 }}>
+              Posting on <strong>AxxJunks</strong> is restricted to{" "}
+              <strong style={{ color: "#38bdf8" }}>Explorer &amp; Community Members</strong> only.
+            </p>
+            <p style={{ margin: "0 auto 24px", fontSize: "13px", color: "#94a3b8", maxWidth: "480px", lineHeight: 1.5 }}>
+              Sign in to your AxxSpace account, or create a free <strong>Explorer &amp; Community Member</strong> account
+              — explore verified spaces, save favorites &amp; chat with hosts. Free · No listings needed.
             </p>
             <div style={{ display: "flex", justifyContent: "center", gap: "12px", flexWrap: "wrap" }}>
               <Link
-                to="/login?from=/axxjunks/post"
+                to="/user-login?redirect=/axxjunks/post"
                 style={{
                   background: "#dc2626",
                   color: "white",
-                  padding: "10px 24px",
+                  padding: "11px 28px",
                   borderRadius: "8px",
                   fontWeight: "700",
                   textDecoration: "none",
                   fontSize: "14px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
                 }}
               >
                 Sign In to AxxSpace
               </Link>
               <Link
-                to="/register?from=/axxjunks/post"
+                to="/register?account=member&redirect=/axxjunks/post"
                 style={{
-                  background: "#1e293b",
-                  border: "1px solid #475569",
-                  color: "white",
-                  padding: "10px 24px",
+                  background: "#0f172a",
+                  border: "1px solid #38bdf8",
+                  color: "#38bdf8",
+                  padding: "11px 28px",
                   borderRadius: "8px",
                   fontWeight: "700",
                   textDecoration: "none",
                   fontSize: "14px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
                 }}
               >
                 Create Free Account
               </Link>
             </div>
+            <p style={{ margin: "16px 0 0", fontSize: "12px", color: "#64748b" }}>
+              Explorer &amp; Community Member · Free · No listings needed
+            </p>
           </div>
         )}
 
@@ -1541,7 +1554,7 @@ export default function AxxGoPost() {
             {!isRegisteredUser ? (
               <div style={{ display: "inline-block" }}>
                 <Link
-                  to="/login?from=/axxjunks/post"
+                  to="/user-login?redirect=/axxjunks/post"
                   style={{
                     background: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)",
                     color: "white",
@@ -1557,10 +1570,13 @@ export default function AxxGoPost() {
                   }}
                 >
                   <IconLock size={16} />
-                  <span>Sign In as AxxSpace User to Post</span>
+                  <span>Sign In as AxxSpace Member to Post</span>
                 </Link>
                 <p style={{ margin: "10px 0 0", fontSize: "12px", color: "#f87171" }}>
-                  Only registered AxxSpace users can post on AxxJunks.
+                  Only Explorer &amp; Community Members can post on AxxJunks.{" "}
+                  <Link to="/register?account=member&redirect=/axxjunks/post" style={{ color: "#38bdf8", textDecoration: "underline" }}>
+                    Create free account →
+                  </Link>
                 </p>
               </div>
             ) : (

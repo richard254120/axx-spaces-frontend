@@ -35,6 +35,7 @@ export default function Register() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { login } = useContext(AuthContext);
+  const redirectPath = searchParams.get("redirect") || null;
 
   const [formData, setFormData] = useState({
     name: "",
@@ -79,7 +80,7 @@ export default function Register() {
 
       login(data.token, data.user);
       setSuccess("✓ Google registration successful! Redirecting...");
-      setTimeout(() => navigate(getDashboardPath(data.user?.role)), 1000);
+      setTimeout(() => navigate(redirectPath || getDashboardPath(data.user?.role)), 1000);
     } catch (err) {
       setError(err.message || "Google registration failed. Please try again.");
     }
@@ -143,7 +144,7 @@ export default function Register() {
           setSuccess("Registration successful! A verification email has been sent to " + formData.email + ". Please check your inbox and verify your email before logging in.");
           setFormData({ name: "", email: "", password: "", phone: "" });
           setTimeout(() => {
-            navigate("/user-login");
+            navigate(redirectPath ? `/user-login?redirect=${encodeURIComponent(redirectPath)}` : "/user-login");
           }, 3000);
           return;
         }
@@ -152,7 +153,7 @@ export default function Register() {
           login(data.token, data.user);
           setSuccess("Welcome to AxxSpace! Your Explorer (community member) account is ready. Redirecting...");
           setTimeout(() => {
-            navigate("/member");
+            navigate(redirectPath || "/member");
           }, 1200);
           return;
         }
