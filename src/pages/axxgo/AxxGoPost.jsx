@@ -44,7 +44,8 @@ export default function AxxGoPost() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const { user, token } = useAuth();
-  const isRegisteredUser = Boolean(token && user && user.role !== "guest");
+  const ALLOWED_ROLES = ["member", "user"];
+  const isRegisteredUser = Boolean(token && user && ALLOWED_ROLES.includes(user.role));
 
   // Form State
   const [category, setCategory] = useState("Rentals");

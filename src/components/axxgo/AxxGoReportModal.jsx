@@ -124,7 +124,7 @@ export default function AxxGoReportModal({ listingId, listingTitle, isOpen, onCl
             </div>
             <h4 style={{ margin: "0 0 6px", color: "#10b981", fontSize: "16px" }}>Report Submitted</h4>
             <p style={{ margin: 0, fontSize: "13px", color: "#cbd5e1" }}>
-              Thank you for keeping AxxGo safe! Our automated moderation and review team will evaluate this listing.
+              Thank you for keeping AxxJunks safe! Our automated moderation and review team will evaluate this listing.
             </p>
           </div>
         ) : (

@@ -634,7 +634,7 @@ export default function AxxGoDetail() {
                   </div>
                   <div>
                     <h4 style={{ margin: 0, fontSize: "15px", fontWeight: "700" }}>{listing.poster?.name || "Seller"}</h4>
-                    <p style={{ margin: "2px 0 0", fontSize: "12px", color: "#94a3b8" }}>Direct Poster on AxxGo</p>
+                    <p style={{ margin: "2px 0 0", fontSize: "12px", color: "#94a3b8" }}>Direct Poster on AxxJunks</p>
                   </div>
                 </div>
 

@@ -42,7 +42,7 @@ export default function AxxGoManage() {
       setLoading(true);
       setError("");
       try {
-        const res = await API.get(`/axxgo/manage/${token}`);
+        const res = await API.get(`/axxjunks/manage/${token}`);
         if (res.data.success) {
           const l = res.data.listing;
           setListing(l);
@@ -72,7 +72,7 @@ export default function AxxGoManage() {
     setError("");
     setSuccessMsg("");
     try {
-      const res = await API.put(`/axxgo/manage/${token}`, { status: newStatus });
+      const res = await API.put(`/axxjunks/manage/${token}`, { status: newStatus });
       if (res.data.success) {
         setListing(res.data.listing);
         setSuccessMsg(`Status updated to "${newStatus.toUpperCase()}"!`);
@@ -91,7 +91,7 @@ export default function AxxGoManage() {
     setError("");
     setSuccessMsg("");
     try {
-      const res = await API.post(`/axxgo/manage/${token}/renew`);
+      const res = await API.post(`/axxjunks/manage/${token}/renew`);
       if (res.data.success) {
         setListing((prev) => ({ ...prev, expiresAt: res.data.expiresAt, status: "active" }));
         setStatus("active");
@@ -112,7 +112,7 @@ export default function AxxGoManage() {
     setError("");
     setSuccessMsg("");
     try {
-      const res = await API.put(`/axxgo/manage/${token}`, {
+      const res = await API.put(`/axxjunks/manage/${token}`, {
         title: title.trim(),
         description: description.trim(),
         price: Number(price) >= 0 ? Number(price) : 0,
@@ -140,10 +140,10 @@ export default function AxxGoManage() {
     setDeleting(true);
     setError("");
     try {
-      const res = await API.delete(`/axxgo/manage/${token}`);
+      const res = await API.delete(`/axxjunks/manage/${token}`);
       if (res.data.success) {
-        alert("Your listing has been permanently deleted from AxxGo.");
-        navigate("/axxgo");
+        alert("Your listing has been permanently deleted from AxxJunks.");
+        navigate("/axxjunks");
       }
     } catch (err) {
       setError(err.response?.data?.error || "Failed to delete listing.");
@@ -188,7 +188,7 @@ export default function AxxGoManage() {
           <h2 style={{ margin: "0 0 10px", fontSize: "20px", color: "#fca5a5" }}>Management Link Invalid</h2>
           <p style={{ margin: "0 0 20px", color: "#cbd5e1", fontSize: "14px" }}>{error}</p>
           <Link
-            to="/axxgo"
+            to="/axxjunks"
             style={{
               background: "#dc2626",
               color: "white",
@@ -199,7 +199,7 @@ export default function AxxGoManage() {
               fontSize: "14px",
             }}
           >
-            Go to AxxGo Classifieds
+            Go to AxxJunks Classifieds
           </Link>
         </div>
       </div>
@@ -261,7 +261,7 @@ export default function AxxGoManage() {
             </div>
           </div>
           <Link
-            to={`/axxgo/listing/${listing._id}`}
+            to={`/axxjunks/listing/${listing._id}`}
             style={{
               background: "#334155",
               color: "#38bdf8",

@@ -28,7 +28,7 @@ export default function AxxGoAdmin() {
     setLoading(true);
     setError("");
     try {
-      const res = await API.get("/axxgo/admin/reports");
+      const res = await API.get("/axxjunks/admin/reports");
       if (res.data.success) {
         setReports(res.data.reports || []);
       }
@@ -43,7 +43,7 @@ export default function AxxGoAdmin() {
     setLoading(true);
     setError("");
     try {
-      const res = await API.get("/axxgo/admin/banned");
+      const res = await API.get("/axxjunks/admin/banned");
       if (res.data.success) {
         setBannedList(res.data.banned || []);
       }
@@ -61,7 +61,7 @@ export default function AxxGoAdmin() {
 
   const handleToggleHide = async (listingId, currentlyHidden) => {
     try {
-      const res = await API.post(`/axxgo/admin/listings/${listingId}/hide`, {
+      const res = await API.post(`/axxjunks/admin/listings/${listingId}/hide`, {
         hide: !currentlyHidden,
       });
       if (res.data.success) {
@@ -77,7 +77,7 @@ export default function AxxGoAdmin() {
   const handleDeleteListing = async (listingId) => {
     if (!window.confirm("Permanently delete this listing and all its reports?")) return;
     try {
-      const res = await API.delete(`/axxgo/admin/listings/${listingId}`);
+      const res = await API.delete(`/axxjunks/admin/listings/${listingId}`);
       if (res.data.success) {
         setActionSuccess("Listing deleted permanently.");
         fetchReports();
@@ -93,7 +93,7 @@ export default function AxxGoAdmin() {
     if (!banValue.trim()) return;
 
     try {
-      const res = await API.post("/axxgo/admin/ban", {
+      const res = await API.post("/axxjunks/admin/ban", {
         type: banType,
         value: banValue.trim(),
         reason: banReason.trim(),
@@ -114,7 +114,7 @@ export default function AxxGoAdmin() {
   const handleUnban = async (id) => {
     if (!window.confirm("Remove this ban?")) return;
     try {
-      const res = await API.delete(`/axxgo/admin/banned/${id}`);
+      const res = await API.delete(`/axxjunks/admin/banned/${id}`);
       if (res.data.success) {
         setActionSuccess("Ban removed successfully.");
         fetchBanned();
@@ -137,10 +137,10 @@ export default function AxxGoAdmin() {
               </span>
               <span style={{ fontSize: "13px", color: "#94a3b8" }}>Cleanup & Moderation</span>
             </div>
-            <h1 style={{ margin: 0, fontSize: "24px", fontWeight: "800" }}>AxxGo Moderation Console</h1>
+            <h1 style={{ margin: 0, fontSize: "24px", fontWeight: "800" }}>AxxJunks Moderation Console</h1>
           </div>
           <Link
-            to="/axxgo"
+            to="/axxjunks"
             style={{
               background: "#1e293b",
               border: "1px solid #475569",
@@ -152,7 +152,7 @@ export default function AxxGoAdmin() {
               fontWeight: "600",
             }}
           >
-            ← View Public AxxGo
+            ← View Public AxxJunks
           </Link>
         </div>
 
@@ -265,7 +265,7 @@ export default function AxxGoAdmin() {
                             {l ? (
                               <div>
                                 <Link
-                                  to={`/axxgo/listing/${l._id}`}
+                                  to={`/axxjunks/listing/${l._id}`}
                                   target="_blank"
                                   style={{ color: "#38bdf8", fontWeight: "600", textDecoration: "none" }}
                                 >

@@ -641,7 +641,7 @@ export default function AxxGoHome() {
                 </button>
               )}
               <Link
-                to="/axxgo/post"
+                to="/axxjunks/post"
                 style={{
                   background: "#dc2626",
                   color: "white",
@@ -653,7 +653,7 @@ export default function AxxGoHome() {
                   display: "inline-block",
                 }}
               >
-                Post on AxxGo Now
+                Post on AxxJunks Now
               </Link>
             </div>
           </div>
