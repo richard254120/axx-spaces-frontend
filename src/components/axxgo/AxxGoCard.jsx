@@ -47,7 +47,7 @@ export default function AxxGoCard({ listing }) {
 
   return (
     <Link
-      to={`/axxgo/listing/${listing._id}`}
+      to={`/axxjunks/listing/${listing._id}`}
       style={{
         display: "flex",
         flexDirection: "column",

@@ -73,13 +73,13 @@ export default function AxxGoHome() {
       if (activeMinPrice) params.minPrice = activeMinPrice;
       if (activeMaxPrice) params.maxPrice = activeMaxPrice;
 
-      const res = await API.get("/axxgo/listings", { params });
+      const res = await API.get("/axxjunks/listings", { params });
       if (res.data.success) {
         setListings(res.data.listings || []);
         setPagination(res.data.pagination || { total: 0, page: 1, limit: 20, totalPages: 1 });
       }
     } catch (err) {
-      console.error("Error fetching AxxGo listings:", err);
+      console.error("Error fetching AxxJunks listings:", err);
       setError("Unable to load listings. Please check your internet connection and try again.");
     } finally {
       setLoading(false);
@@ -159,7 +159,7 @@ export default function AxxGoHome() {
                     letterSpacing: "0.8px",
                   }}
                 >
-                  Instant Classifieds • No Sign-In Needed
+                  Instant Classifieds • AxxSpace Network
                 </span>
               </div>
               <h1
@@ -173,18 +173,18 @@ export default function AxxGoHome() {
                   WebkitTextFillColor: "transparent",
                 }}
               >
-                AxxGo Marketplace
+                AxxJunks Marketplace
               </h1>
               <p style={{ margin: 0, fontSize: "15px", color: "#94a3b8", maxWidth: "600px", lineHeight: 1.5 }}>
                 Post rentals, student hostels, businesses, or items for quick sale in Kenya. Listings publish
-                <strong> instantly</strong> without waiting for approval.
+                <strong> instantly</strong> for registered AxxSpace users.
               </p>
             </div>
 
-            {/* Prominent "Post on AxxGo" Button */}
+            {/* Prominent "Post on AxxJunks" Button */}
             <div style={{ flexShrink: 0 }}>
               <Link
-                to="/axxgo/post"
+                to="/axxjunks/post"
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
@@ -209,7 +209,7 @@ export default function AxxGoHome() {
                 }}
               >
                 <IconPlus size={18} color="#ffffff" strokeWidth={2.5} />
-                <span>Post on AxxGo Free</span>
+                <span>Post on AxxJunks</span>
               </Link>
             </div>
           </div>

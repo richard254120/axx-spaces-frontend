@@ -26,7 +26,7 @@ export default function AxxGoReportModal({ listingId, listingTitle, isOpen, onCl
     setSubmitting(true);
 
     try {
-      const res = await API.post(`/axxgo/listings/${listingId}/report`, {
+      const res = await API.post(`/axxjunks/listings/${listingId}/report`, {
         reason,
         details,
         reporterContact: contact,

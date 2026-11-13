@@ -1,6 +1,7 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../../api/api";
+import { useAuth } from "../../context/AuthContext";
 import {
   COUNTIES,
   CATEGORIES,
@@ -21,6 +22,7 @@ import {
   IconBriefcase,
   IconTag,
   IconCheck,
+  IconLock,
 } from "../../components/axxgo/AxxGoIcons";
 
 function renderCategoryIcon(catId, size = 22, color = "currentColor") {
@@ -41,6 +43,8 @@ function renderCategoryIcon(catId, size = 22, color = "currentColor") {
 export default function AxxGoPost() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const { user, token } = useAuth();
+  const isRegisteredUser = Boolean(token && user && user.role !== "guest");
 
   // Form State
   const [category, setCategory] = useState("Rentals");
@@ -83,6 +87,15 @@ export default function AxxGoPost() {
   const [posterWhatsapp, setPosterWhatsapp] = useState("");
   const [sameAsPhone, setSameAsPhone] = useState(false);
   const [posterEmail, setPosterEmail] = useState("");
+
+  // Auto-fill poster details if logged in as registered AxxSpace user
+  useEffect(() => {
+    if (isRegisteredUser && user) {
+      if (user.name) setPosterName((prev) => prev || user.name);
+      if (user.phone) setPosterPhone((prev) => prev || user.phone);
+      if (user.email) setPosterEmail((prev) => prev || user.email);
+    }
+  }, [isRegisteredUser, user]);
 
   // Honeypot field (invisible to real users)
   const [website_hp, setWebsite_hp] = useState("");
@@ -259,8 +272,8 @@ export default function AxxGoPost() {
         formData.append("photos", file);
       });
 
-      // Submit
-      const res = await API.post("/axxgo/listings", formData, {
+      // Submit to AxxJunks
+      const res = await API.post("/axxjunks/listings", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -309,7 +322,7 @@ export default function AxxGoPost() {
             Your Listing is Live!
           </h2>
           <p style={{ margin: "0 0 24px", fontSize: "15px", color: "#cbd5e1", lineHeight: 1.5 }}>
-            <strong>"{postResult.listing.title}"</strong> has been published instantly on AxxGo and is now searchable by
+            <strong>"{postResult.listing.title}"</strong> has been published instantly on AxxJunks and is now searchable by
             buyers, tenants, and clients across Kenya.
           </p>
 
@@ -331,7 +344,7 @@ export default function AxxGoPost() {
               </h4>
             </div>
             <p style={{ margin: "0 0 12px", fontSize: "13px", color: "#94a3b8", lineHeight: 1.4 }}>
-              Because AxxGo requires no accounts, this secret link is your key to <strong>edit details</strong>, mark as
+              This secret link is your direct key to <strong>edit details</strong>, mark as
               <strong> "Sold"</strong> or <strong>"Rented"</strong>, or <strong>delete</strong> this listing anytime.
             </p>
 
@@ -392,7 +405,7 @@ export default function AxxGoPost() {
           {/* Action Buttons */}
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             <Link
-              to={`/axxgo/listing/${postResult.listing._id}`}
+              to={`/axxjunks/listing/${postResult.listing._id}`}
               style={{
                 background: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)",
                 color: "white",
@@ -408,7 +421,7 @@ export default function AxxGoPost() {
             </Link>
 
             <Link
-              to="/axxgo"
+              to="/axxjunks"
               style={{
                 background: "transparent",
                 border: "1px solid #475569",
@@ -421,7 +434,7 @@ export default function AxxGoPost() {
                 display: "block",
               }}
             >
-              Back to AxxGo Classifieds
+              Back to AxxJunks Classifieds
             </Link>
           </div>
         </div>
@@ -435,7 +448,7 @@ export default function AxxGoPost() {
         {/* Breadcrumb & Header */}
         <div style={{ marginBottom: "20px" }}>
           <Link
-            to="/axxgo"
+            to="/axxjunks"
             style={{
               color: "#94a3b8",
               textDecoration: "none",
@@ -446,15 +459,92 @@ export default function AxxGoPost() {
               marginBottom: "8px",
             }}
           >
-            ← Back to AxxGo
+            ← Back to AxxJunks
           </Link>
-          <h1 style={{ margin: "0 0 6px", fontSize: "clamp(22px, 3.5vw, 28px)", fontWeight: "800" }}>
-            Post a Listing on AxxGo
-          </h1>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px" }}>
+            <h1 style={{ margin: "0 0 6px", fontSize: "clamp(22px, 3.5vw, 28px)", fontWeight: "800" }}>
+              Post on AxxJunks
+            </h1>
+            {isRegisteredUser && (
+              <span
+                style={{
+                  background: "rgba(16, 185, 129, 0.15)",
+                  color: "#a7f3d0",
+                  border: "1px solid #10b981",
+                  fontSize: "12px",
+                  fontWeight: "700",
+                  padding: "4px 12px",
+                  borderRadius: "20px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+              >
+                <IconCheck size={13} color="#10b981" />
+                <span>Verified User: {user?.name || "AxxSpace Member"}</span>
+              </span>
+            )}
+          </div>
           <p style={{ margin: 0, fontSize: "14px", color: "#94a3b8" }}>
-            No registration or account required. Fill in your details below and your post goes live immediately!
+            Publish your items, rentals, business services, or accommodation. Listings go live immediately for registered AxxSpace users!
           </p>
         </div>
+
+        {/* ── Registered User Check Guard ── */}
+        {!isRegisteredUser && (
+          <div
+            style={{
+              background: "rgba(220, 38, 38, 0.12)",
+              border: "1px solid #dc2626",
+              borderRadius: "14px",
+              padding: "28px 20px",
+              marginBottom: "28px",
+              textAlign: "center",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "12px" }}>
+              <IconLock size={44} color="#ef4444" />
+            </div>
+            <h3 style={{ margin: "0 0 8px", fontSize: "19px", fontWeight: "800", color: "#fca5a5" }}>
+              AxxSpace Account Required to Post
+            </h3>
+            <p style={{ margin: "0 auto 20px", fontSize: "14px", color: "#e2e8f0", maxWidth: "520px", lineHeight: 1.5 }}>
+              Posting on <strong>AxxJunks</strong> is restricted exclusively to registered AxxSpace users.
+              Please sign in with your AxxSpace account or register to publish your listings and connect with buyers!
+            </p>
+            <div style={{ display: "flex", justifyContent: "center", gap: "12px", flexWrap: "wrap" }}>
+              <Link
+                to="/login?from=/axxjunks/post"
+                style={{
+                  background: "#dc2626",
+                  color: "white",
+                  padding: "10px 24px",
+                  borderRadius: "8px",
+                  fontWeight: "700",
+                  textDecoration: "none",
+                  fontSize: "14px",
+                }}
+              >
+                Sign In to AxxSpace
+              </Link>
+              <Link
+                to="/register?from=/axxjunks/post"
+                style={{
+                  background: "#1e293b",
+                  border: "1px solid #475569",
+                  color: "white",
+                  padding: "10px 24px",
+                  borderRadius: "8px",
+                  fontWeight: "700",
+                  textDecoration: "none",
+                  fontSize: "14px",
+                }}
+              >
+                Create Free Account
+              </Link>
+            </div>
+          </div>
+        )}
 
         {error && (
           <div
@@ -1447,45 +1537,74 @@ export default function AxxGoPost() {
 
           {/* Submit Button */}
           <div style={{ textAlign: "center" }}>
-            <button
-              type="submit"
-              disabled={submitting}
-              style={{
-                background: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)",
-                color: "white",
-                border: "none",
-                fontWeight: "800",
-                fontSize: "16px",
-                padding: "14px 40px",
-                borderRadius: "10px",
-                cursor: submitting ? "not-allowed" : "pointer",
-                boxShadow: "0 6px 20px -2px rgba(220, 38, 38, 0.5)",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "10px",
-              }}
-            >
-              {submitting ? (
-                <>
-                  <span
-                    style={{
-                      width: "18px",
-                      height: "18px",
-                      borderRadius: "50%",
-                      border: "2px solid white",
-                      borderTopColor: "transparent",
-                      animation: "spin 0.8s linear infinite",
-                    }}
-                  />
-                  <span>Publishing Instantly...</span>
-                </>
-              ) : (
-                <span>Publish Listing Now</span>
-              )}
-            </button>
-            <p style={{ margin: "10px 0 0", fontSize: "12px", color: "#64748b" }}>
-              By posting, you agree to AxxSpace Terms of Service. Posts go live immediately.
-            </p>
+            {!isRegisteredUser ? (
+              <div style={{ display: "inline-block" }}>
+                <Link
+                  to="/login?from=/axxjunks/post"
+                  style={{
+                    background: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)",
+                    color: "white",
+                    fontWeight: "800",
+                    fontSize: "15px",
+                    padding: "14px 36px",
+                    borderRadius: "10px",
+                    textDecoration: "none",
+                    boxShadow: "0 6px 20px -2px rgba(220, 38, 38, 0.5)",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                  }}
+                >
+                  <IconLock size={16} />
+                  <span>Sign In as AxxSpace User to Post</span>
+                </Link>
+                <p style={{ margin: "10px 0 0", fontSize: "12px", color: "#f87171" }}>
+                  Only registered AxxSpace users can post on AxxJunks.
+                </p>
+              </div>
+            ) : (
+              <>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  style={{
+                    background: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)",
+                    color: "white",
+                    border: "none",
+                    fontWeight: "800",
+                    fontSize: "16px",
+                    padding: "14px 40px",
+                    borderRadius: "10px",
+                    cursor: submitting ? "not-allowed" : "pointer",
+                    boxShadow: "0 6px 20px -2px rgba(220, 38, 38, 0.5)",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "10px",
+                  }}
+                >
+                  {submitting ? (
+                    <>
+                      <span
+                        style={{
+                          width: "18px",
+                          height: "18px",
+                          borderRadius: "50%",
+                          border: "2px solid white",
+                          borderTopColor: "transparent",
+                          animation: "spin 0.8s linear infinite",
+                        }}
+                      />
+                      <span>Publishing Instantly...</span>
+                    </>
+                  ) : (
+                    <span>Publish Listing Now</span>
+                  )}
+                </button>
+                <p style={{ margin: "10px 0 0", fontSize: "12px", color: "#64748b" }}>
+                  By posting, you agree to AxxSpace Terms of Service. Posts go live immediately for registered users.
+                </p>
+              </>
+            )}
           </div>
         </form>
       </div>

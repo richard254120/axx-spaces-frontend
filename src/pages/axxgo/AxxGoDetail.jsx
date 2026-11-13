@@ -52,7 +52,7 @@ export default function AxxGoDetail() {
       setLoading(true);
       setError(null);
       try {
-        const res = await API.get(`/axxgo/listings/${id}`);
+        const res = await API.get(`/axxjunks/listings/${id}`);
         if (res.data.success && isMounted) {
           setListing(res.data.listing);
         }
@@ -129,7 +129,7 @@ export default function AxxGoDetail() {
             {error || "The listing you are looking for is no longer available."}
           </p>
           <Link
-            to="/axxgo"
+            to="/axxjunks"
             style={{
               background: "#dc2626",
               color: "white",
@@ -150,7 +150,6 @@ export default function AxxGoDetail() {
 
   const categoryMeta = CATEGORIES.find((c) => c.id === listing.category) || {
     label: listing.category,
-    icon: "📦",
     color: "#38bdf8",
   };
 
@@ -161,15 +160,15 @@ export default function AxxGoDetail() {
   const posterPhone = listing.poster?.phone || "";
   const whatsappNum = (listing.poster?.whatsapp || posterPhone).replace(/[^0-9]/g, "");
   const prefilledWhatsappMsg = encodeURIComponent(
-    `Hello ${listing.poster?.name || ""}, I saw your listing on AxxGo: "${listing.title}" (KES ${listing.price}). Is it still available?`
+    `Hello ${listing.poster?.name || ""}, I saw your listing on AxxJunks: "${listing.title}" (KES ${listing.price}). Is it still available?`
   );
   const whatsappUrl = `https://wa.me/${whatsappNum}?text=${prefilledWhatsappMsg}`;
 
   // Share action
   const handleShare = async () => {
     const shareData = {
-      title: `${listing.title} on AxxGo`,
-      text: `${listing.title} - KES ${listing.price} on AxxGo Kenya:`,
+      title: `${listing.title} on AxxJunks`,
+      text: `${listing.title} - KES ${listing.price} on AxxJunks Kenya:`,
       url: window.location.href,
     };
 
@@ -210,12 +209,12 @@ export default function AxxGoDetail() {
             Home
           </Link>
           <span>/</span>
-          <Link to="/axxgo" style={{ color: "#94a3b8", textDecoration: "none" }}>
-            AxxGo
+          <Link to="/axxjunks" style={{ color: "#94a3b8", textDecoration: "none" }}>
+            AxxJunks
           </Link>
           <span>/</span>
           <Link
-            to={`/axxgo?category=${encodeURIComponent(listing.category)}`}
+            to={`/axxjunks?category=${encodeURIComponent(listing.category)}`}
             style={{ color: categoryMeta.color, textDecoration: "none", fontWeight: "600" }}
           >
             {categoryMeta.label}

@@ -176,19 +176,25 @@ function App() {
       <Route path="/quicksales" element={<PublicLayout><QuickSales /></PublicLayout>} />
       <Route path="/quicksales/:id" element={<PublicLayout><QuickSaleDetailPage /></PublicLayout>} />
 
-      {/* ── AXXGO CLASSIFIEDS ROUTES ── */}
-      <Route path="/axxgo" element={<PublicLayout><AxxGoHome /></PublicLayout>} />
-      <Route path="/axxgo/post" element={<PublicLayout><AxxGoPost /></PublicLayout>} />
-      <Route path="/axxgo/listing/:id" element={<PublicLayout><AxxGoDetail /></PublicLayout>} />
-      <Route path="/axxgo/manage/:token" element={<PublicLayout><AxxGoManage /></PublicLayout>} />
+      {/* ── AXXJUNKS CLASSIFIEDS ROUTES ── */}
+      <Route path="/axxjunks" element={<PublicLayout><AxxGoHome /></PublicLayout>} />
+      <Route path="/axxjunks/post" element={<PublicLayout><AxxGoPost /></PublicLayout>} />
+      <Route path="/axxjunks/listing/:id" element={<PublicLayout><AxxGoDetail /></PublicLayout>} />
+      <Route path="/axxjunks/manage/:token" element={<PublicLayout><AxxGoManage /></PublicLayout>} />
       <Route
-        path="/axxgo/admin"
+        path="/axxjunks/admin"
         element={
           <ProtectedRoute allowedRoles={["admin"]}>
             <PublicLayout><AxxGoAdmin /></PublicLayout>
           </ProtectedRoute>
         }
       />
+      {/* Backward-compatibility aliases for /axxgo */}
+      <Route path="/axxgo" element={<LegacyRedirect to="/axxjunks" />} />
+      <Route path="/axxgo/post" element={<Navigate to="/axxjunks/post" replace />} />
+      <Route path="/axxgo/listing/:id" element={<LegacyRedirect to="/axxjunks/listing" />} />
+      <Route path="/axxgo/manage/:token" element={<LegacyRedirect to="/axxjunks/manage" />} />
+      <Route path="/axxgo/admin" element={<Navigate to="/axxjunks/admin" replace />} />
       <Route path="/faq" element={<PublicLayout><FAQ /></PublicLayout>} />
       <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
       <Route path="/mobile-app" element={<PublicLayout><MobileAppDownload /></PublicLayout>} />
