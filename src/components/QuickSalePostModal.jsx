@@ -354,7 +354,7 @@ function QuickSalesComposer({ onClose, onItemCreated }) {
     ? {
         eyebrow: "Seller access",
         title: "Start selling in under a minute",
-        sub: "QuickSales publishing is open to AXXSpace Explorers (community members) and registered sellers. Both are free.",
+        sub: "QuickSales publishing is open to AXXSpace user accounts and registered sellers. Both are free.",
         points: [
           "Free to join — no listing fees and no commission on sales.",
           "Go live instantly: your listing publishes the moment you post it.",
@@ -365,7 +365,7 @@ function QuickSalesComposer({ onClose, onItemCreated }) {
         fine: (
           <>
             New to AXXSpace?{" "}
-            <a href={memberSignupHref}>Create a free Explorer account</a> and sell from the same profile.
+            <a href={memberSignupHref}>Create a free user account</a> and sell from the same profile.
           </>
         ),
       }
@@ -373,13 +373,13 @@ function QuickSalesComposer({ onClose, onItemCreated }) {
       ? {
           eyebrow: "Membership",
           title: "This account can't publish yet",
-          sub: "Selling on QuickSales needs an AXXSpace Explorer (community member) account or a seller account. Switching takes about a minute and keeps your AXXSpace history.",
+          sub: "Selling on QuickSales needs a user account or a seller account. Switching takes about a minute and keeps your AXXSpace history.",
           points: [
             "Upgrade your account to unlock QuickSales publishing.",
             "Keep your favourites, saved searches and alerts.",
-            "Explorer and seller accounts publish instantly, with no commission.",
+            "User and seller accounts publish instantly, with no commission.",
           ],
-          primary: { label: "Become an AXXSpace member", href: memberSignupHref, variant: "primary" },
+          primary: { label: "Become an AXXSpace user", href: memberSignupHref, variant: "primary" },
           secondary: { label: "Register a seller account instead", href: sellerSignupHref, variant: "ghost" },
           fine: (
             <>
