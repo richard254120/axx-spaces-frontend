@@ -511,10 +511,10 @@ export default function AxxGoPost() {
             </h3>
             <p style={{ margin: "0 auto 6px", fontSize: "14px", color: "#e2e8f0", maxWidth: "540px", lineHeight: 1.6 }}>
               Posting on <strong>AxxJunks</strong> is restricted to{" "}
-              <strong style={{ color: "#38bdf8" }}>Explorer &amp; Community Members</strong> only.
+              <strong style={{ color: "#38bdf8" }}>User Accounts</strong> only.
             </p>
             <p style={{ margin: "0 auto 24px", fontSize: "13px", color: "#94a3b8", maxWidth: "480px", lineHeight: 1.5 }}>
-              Sign in to your AxxSpace account, or create a free <strong>Explorer &amp; Community Member</strong> account
+              Sign in to your AxxSpace account, or create a free <strong>User Account</strong>
               — explore verified spaces, save favorites &amp; chat with hosts. Free · No listings needed.
             </p>
             <div style={{ display: "flex", justifyContent: "center", gap: "12px", flexWrap: "wrap" }}>
@@ -555,7 +555,7 @@ export default function AxxGoPost() {
               </Link>
             </div>
             <p style={{ margin: "16px 0 0", fontSize: "12px", color: "#64748b" }}>
-              Explorer &amp; Community Member · Free · No listings needed
+              User Account · Free · No listings needed
             </p>
           </div>
         )}
@@ -1573,7 +1573,7 @@ export default function AxxGoPost() {
                   <span>Sign In as AxxSpace Member to Post</span>
                 </Link>
                 <p style={{ margin: "10px 0 0", fontSize: "12px", color: "#f87171" }}>
-                  Only Explorer &amp; Community Members can post on AxxJunks.{" "}
+                  Only User Accounts can post on AxxJunks.{" "}
                   <Link to="/register?account=member&redirect=/axxjunks/post" style={{ color: "#38bdf8", textDecoration: "underline" }}>
                     Create free account →
                   </Link>
