@@ -101,9 +101,9 @@ const styles = {
 const accountTypes = [
   {
     id: "user",
-    name: "Explorer & Community Member",
+    name: "user",
     icon: "/assets/user-icon.png",
-    description: "Explore verified spaces, save favorites & chat with hosts (Free · No listings needed)",
+    description: "user",
     loginPath: "/user-login",
     registerPath: "/user-register",
   },
