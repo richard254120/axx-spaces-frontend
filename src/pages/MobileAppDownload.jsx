@@ -2,17 +2,15 @@ import React, { useState, useEffect } from "react";
 import QRCode from "qrcode";
 import "./MobileAppDownload.css";
 
-// Direct download: the Axxspace app APK on the EAS CDN. The CDN serves it with
-// Content-Disposition: attachment, so a click downloads the file directly
-// (no page shown). Update this URL after each new EAS build.
+// Permanent GitHub Releases download URL for the Axxspace client app APK.
+// Update this URL (and public/downloads/version.json) after each new release.
 const DOWNLOAD_URL =
-  "https://expo.dev/artifacts/eas/tfbHKWKT1XUGv5tHV7rAnRi59n5fPcRWqFWZGS-QsU4.apk";
+  "https://github.com/richard254120/axx-spaces-frontend/releases/download/v1.1.0/Axxspace.apk";
 
-// Manager app download (landlord, agent & host portal). Direct EAS build
-// artifact — update this URL and public/downloads/manager-version.json after
-// each new manager app build.
+// Permanent GitHub Releases download URL for the manager (landlord/agent/host) app.
+// Update this URL (and public/downloads/manager-version.json) after each new release.
 const MANAGER_DOWNLOAD_URL =
-  "https://expo.dev/artifacts/eas/a_THpQv2IFawGgKmawaCtfiNVawX-vTssZhIGd6HTxU.apk";
+  "https://github.com/richard254120/axx-spaces-frontend/releases/download/v1.1.0/Axxspace-manager.apk";
 const MANAGER_FILENAME = "Axxspace-manager.apk";
 
 const APP_NAME = "Axxspace";

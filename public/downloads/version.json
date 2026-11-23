@@ -1,7 +1,7 @@
 {
   "latestVersion": "1.1.0",
   "versionCode": 3,
-  "downloadUrl": "https://expo.dev/artifacts/eas/tfbHKWKT1XUGv5tHV7rAnRi59n5fPcRWqFWZGS-QsU4.apk",
+  "downloadUrl": "https://github.com/richard254120/axx-spaces-frontend/releases/download/v1.1.0/Axxspace.apk",
   "releaseNotes": "Renamed to Axxspace. Fixed the launcher icon so the logo fits the icon area, and added the Axxspace splash screen (blue background with logo on launch). Content stays in sync with axxspace.com automatically.",
   "forceUpdate": false
 }

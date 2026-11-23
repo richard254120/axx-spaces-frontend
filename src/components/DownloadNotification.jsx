@@ -13,9 +13,10 @@ import "./DownloadNotification.css";
  */
 const APP_NAME = "Axxspace";
 const APK_VERSION = "v1.1.0";
-// The exact URL that downloads the app APK. Update after each new EAS build.
+// Permanent GitHub Releases URL for the Axxspace client APK.
+// Update after each new release (bump the tag and re-upload the APK asset).
 const APK_DOWNLOAD_URL =
-  "https://expo.dev/artifacts/eas/tfbHKWKT1XUGv5tHV7rAnRi59n5fPcRWqFWZGS-QsU4.apk";
+  "https://github.com/richard254120/axx-spaces-frontend/releases/download/v1.1.0/Axxspace.apk";
 const APK_FILENAME = "Axxspace.apk";
 const DOWNLOAD_PAGE_PATH = "/mobile-app";
 const DISMISS_KEY = "axx_download_popup_dismissed_v3";
