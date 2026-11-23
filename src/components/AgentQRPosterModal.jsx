@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import QRCode from "qrcode";
+import { drawQrCenterLogo } from "../utils/qrLogo";
 // Original AxXspace logo. Served from /public so the poster, the live preview
 // and the canvas export all use the same brand asset (and stay same-origin).
 const logo = "/axxspace_poster_header_logo_clean.png";
@@ -105,9 +106,10 @@ export default function AgentQRPosterModal({ isOpen, onClose, agent }) {
       margin: 1.5,
       errorCorrectionLevel: "H",
       color: { dark: NAVY, light: "#ffffff" },
-    }, (err) => {
+    }, async (err) => {
       if (err) { console.error("QR error:", err); return; }
 
+      await drawQrCenterLogo(canvas, { logoSrc: "/logo.png" });
       setQrLoaded(true);
       drawCanvases(canvas);
     });

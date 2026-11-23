@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import QRCode from "qrcode";
+import { generateBrandedQrDataUrl } from "../utils/qrLogo";
 import "./MobileAppDownload.css";
 
 // Permanent GitHub Releases download URL for the Axxspace client app APK.
@@ -28,9 +29,9 @@ const MobileAppDownload = () => {
     const generateQRCode = async () => {
       try {
         const url = window.location.origin;
-        const qrDataUrl = await QRCode.toDataURL(url, {
-          width: 180,
-          margin: 1,
+        const qrDataUrl = await generateBrandedQrDataUrl(url, {
+          width: 320,
+          margin: 1.5,
           color: {
             dark: "#0F172A",
             light: "#FFFFFF",

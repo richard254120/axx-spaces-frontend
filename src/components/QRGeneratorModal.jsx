@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import QRCode from "qrcode";
+import { drawQrCenterLogo } from "../utils/qrLogo";
 // Original AxXspace logo. Served from /public so the poster, the live preview
 // and the canvas export all use the same brand asset (and stay same-origin).
 const logo = "/logo.png";
@@ -112,12 +113,13 @@ export default function QRGeneratorModal({ isOpen, onClose, property }) {
         dark: NAVY,
         light: "#ffffff"
       }
-    }, (error) => {
+    }, async (error) => {
       if (error) {
         console.error("QR Code generation error:", error);
         return;
       }
 
+      await drawQrCenterLogo(qrCanvas, { logoSrc: logo });
       setQrLoaded(true);
       drawDownloadableCanvases();
     });

@@ -2,6 +2,7 @@ import { useState, useEffect, useContext, useRef } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import QRCode from "qrcode";
+import { drawQrCenterLogo } from "../utils/qrLogo";
 import { UserProfileEditor } from "../features/profile";
 import BoostNotification from "../components/BoostNotification";
 import BoostListingModal from "../components/monetization/BoostListingModal";
@@ -454,59 +455,22 @@ export default function LandlordDashboard() {
       const url = `${window.location.origin}/listings/${selectedProperty._id}?ref=qr&source=${promoSource}`;
 
       QRCode.toCanvas(canvasRef.current, url, {
-        width: 300,
+        width: 320,
         margin: 1.5,
         errorCorrectionLevel: "H",
         color: {
           dark: "#081A34",
           light: "#ffffff"
         }
-      }, (error) => {
+      }, async (error) => {
         if (error) {
           console.error("QR Code generation error:", error);
           return;
         }
 
-        const ctx = canvasRef.current.getContext("2d");
-        const logoImg = new Image();
-        logoImg.src = logo;
-        logoImg.onload = () => {
-          const cardSize = 90;
-          const x = (canvasRef.current.width - cardSize) / 2;
-          const y = (canvasRef.current.height - cardSize) / 2;
-
-          ctx.fillStyle = "#ffffff";
-          ctx.beginPath();
-          const radius = 8;
-          ctx.moveTo(x + radius, y);
-          ctx.lineTo(x + cardSize - radius, y);
-          ctx.quadraticCurveTo(x + cardSize, y, x + cardSize, y + radius);
-          ctx.lineTo(x + cardSize, y + cardSize - radius);
-          ctx.quadraticCurveTo(x + cardSize, y + cardSize, x + cardSize - radius, y + cardSize);
-          ctx.lineTo(x + radius, y + cardSize);
-          ctx.quadraticCurveTo(x, y + cardSize, x, y + cardSize - radius);
-          ctx.lineTo(x, y + radius);
-          ctx.quadraticCurveTo(x, y, x + radius, y);
-          ctx.closePath();
-          ctx.fill();
-
-          const logoSize = 34;
-          const logoX = x + (cardSize - logoSize) / 2;
-          const logoY = y + 10;
-          ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
-
-          ctx.font = "bold 9px 'Inter', sans-serif";
-          ctx.fillStyle = "#d9383a";
-          ctx.textAlign = "center";
-          ctx.fillText("AXXSPACE", x + cardSize / 2, y + 56);
-
-          ctx.font = "500 5px 'Inter', sans-serif";
-          ctx.fillStyle = "#475569";
-          ctx.fillText("Space hunting bila stress.", x + cardSize / 2, y + 68);
-
-          setQrCodeDataUrl(canvasRef.current.toDataURL("image/png"));
-          setQrLoaded(true);
-        };
+        await drawQrCenterLogo(canvasRef.current, { logoSrc: logo || "/logo.png" });
+        setQrCodeDataUrl(canvasRef.current.toDataURL("image/png"));
+        setQrLoaded(true);
       });
     }, [selectedId, promoSource]);
 
