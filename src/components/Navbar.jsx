@@ -58,7 +58,7 @@ const JOBS = [
 ];
 
 export default function Navbar() {
-  const { token, user, logout } = useContext(AuthContext);
+  const { token, user, logout, openPhonePrompt } = useContext(AuthContext);
   const location = useLocation();
 
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
@@ -597,47 +597,88 @@ export default function Navbar() {
   );
 
   // ─── WORKSPACE NAVBAR (landlord, seller, mover, business, admin) ─────────
+  const renderPhoneBanner = () => {
+    if (!user || (user.phone && !user.phone.startsWith("google-"))) return null;
+    return (
+      <div style={{
+        background: "linear-gradient(90deg, #1e3a8a, #0369a1)",
+        color: "#ffffff",
+        padding: "7px 16px",
+        fontSize: "12.5px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "10px",
+        textAlign: "center",
+        fontWeight: 500,
+        boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+      }}>
+        <span>⚠️ Complete your profile with a phone number so clients &amp; landlords can reach you.</span>
+        <button
+          type="button"
+          onClick={openPhonePrompt}
+          style={{
+            background: "#fbbf24",
+            color: "#0f172a",
+            border: "none",
+            padding: "3px 10px",
+            borderRadius: "5px",
+            fontSize: "11.5px",
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          Add Phone
+        </button>
+      </div>
+    );
+  };
+
   if (token && user && isWorkspaceUser(user.role)) {
     const navItems = getAccountNav(user.role);
     const dashboardPath = getDashboardPath(user.role);
     const brand = getWorkspaceBrand(user.role);
 
     return (
-      <header className="ax-nav">
-        <style>{css}</style>
+      <>
+        {renderPhoneBanner()}
+        <header className="ax-nav">
+          <style>{css}</style>
 
-        <div className="ax-top">
-          {renderBrand(dashboardPath, brand, "Axxspace")}
-          <div className="ax-top-right">
-            <ProfileAvatar user={user} size={32} />
-            <span className="ax-username">{user?.name}</span>
-            <button type="button" className="ax-logout" onClick={handleLogout} aria-label="Log out">
-              Logout
-            </button>
+          <div className="ax-top">
+            {renderBrand(dashboardPath, brand, "Axxspace")}
+            <div className="ax-top-right">
+              <ProfileAvatar user={user} size={32} />
+              <span className="ax-username">{user?.name}</span>
+              <button type="button" className="ax-logout" onClick={handleLogout} aria-label="Log out">
+                Logout
+              </button>
+            </div>
           </div>
-        </div>
 
-        <nav className="ax-tabs" aria-label="Workspace">
-          <div className="ax-tabs-inner">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`ax-tab${isActive(item.path) ? " is-active" : ""}`}
-                onClick={() => setMenuOpen(false)}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        </nav>
-      </header>
+          <nav className="ax-tabs" aria-label="Workspace">
+            <div className="ax-tabs-inner">
+              {navItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`ax-tab${isActive(item.path) ? " is-active" : ""}`}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </nav>
+        </header>
+      </>
     );
   }
 
   // ─── REGULAR NAVBAR (guests & renters browsing the site) ─────────────────
   return (
     <>
+      {renderPhoneBanner()}
       <header className="ax-nav">
         <style>{css}</style>
 

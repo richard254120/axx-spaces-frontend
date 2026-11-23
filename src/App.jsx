@@ -6,6 +6,7 @@ import { useDevToolsProtection } from "./hooks/useDevToolsProtection";
 import Navbar from "./components/Navbar";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
 import DownloadNotification from "./components/DownloadNotification";
+import PhonePromptModal from "./components/PhonePromptModal";
 
 // ── Eager: only the landing page and the shell ship in the entry bundle ──
 import Home from "./pages/Home";
@@ -154,8 +155,10 @@ function App() {
   useDevToolsProtection();
 
   return (
-    <Suspense fallback={<RouteFallback />}>
-    <Routes>
+    <>
+      <PhonePromptModal />
+      <Suspense fallback={<RouteFallback />}>
+      <Routes>
 
       {/* ── PUBLIC ROUTES (have Navbar) ── */}
       <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
@@ -504,6 +507,7 @@ function App() {
       />
     </Routes >
     </Suspense>
+    </>
   );
 }
 

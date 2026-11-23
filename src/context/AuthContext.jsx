@@ -9,6 +9,9 @@ const defaultAuth = {
   logout: () => {},
   updateUser: () => {},
   isAuthenticated: false,
+  showPhonePrompt: false,
+  openPhonePrompt: () => {},
+  closePhonePrompt: () => {},
 };
 
 export const AuthContext = createContext(defaultAuth);
@@ -38,6 +41,10 @@ export const AuthProvider = ({ children }) => {
   const [initialSession] = useState(readStoredSession);
   const [user, setUser] = useState(initialSession.user);
   const [token, setToken] = useState(initialSession.token);
+  const [showPhonePrompt, setShowPhonePrompt] = useState(false);
+
+  const openPhonePrompt = useCallback(() => setShowPhonePrompt(true), []);
+  const closePhonePrompt = useCallback(() => setShowPhonePrompt(false), []);
 
   // Guests get a session in the background; the UI never waits for it.
   useEffect(() => {
@@ -81,10 +88,19 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
     localStorage.setItem("token", newToken);
     localStorage.setItem("user", JSON.stringify(userData));
+
+    // Check if phone number is a placeholder from Google OAuth
+    if (!userData.phone || userData.phone.startsWith("google-")) {
+      sessionStorage.removeItem("axx_phone_prompt_skipped");
+      setShowPhonePrompt(true);
+    }
   }, []);
 
   const updateUser = useCallback((partial) => {
     if (!partial || typeof partial !== "object") return;
+    if (partial.phone && !partial.phone.startsWith("google-")) {
+      setShowPhonePrompt(false);
+    }
     setUser((prev) => {
       // Check if shallow equal to avoid unnecessary state updates
       let changed = false;
@@ -104,6 +120,7 @@ export const AuthProvider = ({ children }) => {
   const logout = useCallback((redirectTo = "/axxbiashara") => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    sessionStorage.removeItem("axx_phone_prompt_skipped");
     window.location.replace(redirectTo);
   }, []);
 
@@ -116,6 +133,9 @@ export const AuthProvider = ({ children }) => {
       logout,
       updateUser,
       isAuthenticated: !!token,
+      showPhonePrompt,
+      openPhonePrompt,
+      closePhonePrompt,
     }}>
       {children}
     </AuthContext.Provider>
